@@ -48,7 +48,7 @@ def employeesList(request,key=None):
     employees = Employee.objects.select_related().order_by('user__last_name', 'user__first_name')
 	
     if key==None:
-        return render_to_response('mobile/keyboard_employee.html', None, context_instance=RequestContext(request))
+        return render_to_response('mobile/keyboard_employees.html', None, context_instance=RequestContext(request))
 	
     employees = {
     '1' : employees.filter(Q(user__last_name__startswith='Æ') | Q(user__last_name__startswith='£') | Q(user__last_name__startswith='Œ')),
