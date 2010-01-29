@@ -4,3 +4,4 @@ from main_page import *
 from subject_list import *
 from subject_terms import *
 from student_schedule import *
+from employees_list import *

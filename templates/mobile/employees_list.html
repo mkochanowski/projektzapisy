@@ -1,0 +1,42 @@
+{% extends "mobile/base_m.html" %}
+
+{% block content %}
+
+
+<div id="center-container">
+	<a href="{% url students-list %}">
+		<div class="subject-outer">
+			<div class="subject-inner" >
+				Zmień na: plany studentów
+			</div>
+		</div>
+	</a>
+</div>
+<br/>
+<div class="nav">
+		<a href="/employees/">
+			<div class="subject-inner-clear">
+				<img src="/site_media/images/larrow.gif" width="5%" alt="left arrow"  />
+				Inne litery
+			</div>
+		</a>
+</div>
+<br/>
+<div id="center-container">
+	<div class="subject-outer">
+		<div class="subject-inner">
+			Lista pracowników:
+			<hr>
+			{% for e in employees %}
+				<div style="margin: 1% 4%;" >
+					<a href="{% url employee-profile e.user.id %}" style="float:left">{{e.get_full_name}}</a><br/>
+					<hr>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+
+</div>
+{% endblock %}
+
+

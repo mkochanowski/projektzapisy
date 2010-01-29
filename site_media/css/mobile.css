@@ -218,17 +218,19 @@ border-bottom: none;
   float: right;
 
   width: 75%;
-  border-left: 1px solid black;
+
+
 }
 
 .sschedule .left{
   float: left; 
   width: 24%;
+  border-right: 1px solid black;
 }
 
 .sschedule .break{
   border-bottom:1px solid black; 
-  height: 1em;
+ 
 }
 
 .sschedule .row{
@@ -244,4 +246,12 @@ border-bottom: none;
 }
 .align{
   clear: both;
+}
+
+
+.square{
+margin: 7%;
+float: left;
+padding: 6%;
+border: 1px solid black;
 }

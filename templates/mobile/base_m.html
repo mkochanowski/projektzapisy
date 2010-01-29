@@ -22,11 +22,13 @@
         <div id="main-header" >
             <a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
              <a href = {% url user-mobile-logout %}>
-				 <div class="subject-inner-clear">
-					{% if user.is_authenticated %}
-					   Wyloguj {{ user.username }}
-					{% endif %}
-				</div>
+			 	{% if user.is_authenticated %}
+					 <div class="subject-inner-clear">
+
+						   Wyloguj {{ user.username }}
+
+					</div>
+				{% endif %}
 			</a>
         </div>
         
