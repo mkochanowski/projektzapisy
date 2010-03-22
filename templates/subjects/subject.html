@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block content %}
 	<h1>{{subject.name}}</h1>
@@ -15,7 +15,7 @@
 		{% if forloop.last %}</ul>{% endif %}
 	{% endfor %}
 	
-	{% for exc in excercises %}
+	{% for exc in exercises %}
 		{% if forloop.first %}<h3>Ćwiczenia</h3><ul>{% endif %}
 			<li>Prowadzący: {{exc.teacher}}</li>
 		{% if forloop.last %}</ul>{% endif %}
