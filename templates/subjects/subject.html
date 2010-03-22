@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>{{subject.name}}</h1>
+	<ul>
+		<li>Wykłady: {{subject.lectures}} godz.</li>
+		<li>Ćwiczenia: {{subject.exercises}} godz.</li>
+		<li>Pracownia: {{subject.laboratories}} godz.</li>	
+	</ul>
+	
+	<h2>Grupy:</h2>
+	{% for lec in lectures %}
+		{% if forloop.first %}<h3>Wykłady</h3><ul>{% endif %}
+			<li>Prowadzący: {{lec.teacher}}</li>
+		{% if forloop.last %}</ul>{% endif %}
+	{% endfor %}
+	
+	{% for exc in excercises %}
+		{% if forloop.first %}<h3>Ćwiczenia</h3><ul>{% endif %}
+			<li>Prowadzący: {{exc.teacher}}</li>
+		{% if forloop.last %}</ul>{% endif %}
+	{% endfor %}
+	
+	{% for lab in laboratories %}
+		{% if forloop.first %}<h3>Pracownie</h3><ul>{% endif %}
+			<li>Prowadzący: {{lab.teacher}}</li>
+		{% if forloop.last %}</ul>{% endif %}
+	{% endfor %}
+	
+{% endblock %}
