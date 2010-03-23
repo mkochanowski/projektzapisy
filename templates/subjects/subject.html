@@ -12,18 +12,21 @@
 	{% for lec in lectures %}
 		{% if forloop.first %}<h3>Wykłady</h3><ul>{% endif %}
 			<li>Prowadzący: {{lec.teacher}}</li>
+			<a href='/records/change/{{ lec.id }}'>zapisz/wypisz mnie</a>
 		{% if forloop.last %}</ul>{% endif %}
 	{% endfor %}
 	
 	{% for exc in exercises %}
 		{% if forloop.first %}<h3>Ćwiczenia</h3><ul>{% endif %}
 			<li>Prowadzący: {{exc.teacher}}</li>
+			<a href='/records/change/{{ exc.id }}'>zapisz/wypisz mnie</a>
 		{% if forloop.last %}</ul>{% endif %}
 	{% endfor %}
 	
 	{% for lab in laboratories %}
 		{% if forloop.first %}<h3>Pracownie</h3><ul>{% endif %}
 			<li>Prowadzący: {{lab.teacher}}</li>
+			<a href='/records/change/{{ lab.id }}'>zapisz/wypisz mnie</a>
 		{% if forloop.last %}</ul>{% endif %}
 	{% endfor %}
 	

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <p>Zajecia na ktore jestes zapisany:</p>
+    <ul>
+    {% for group in groups %}
+       <li>{{ group }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+

@@ -82,6 +82,7 @@ INSTALLED_APPS = (
     'south',
     'fereol.users',
     'fereol.subjects',
+	'fereol.records',
 )
 
 LOGIN_URL = '/users/login/'
