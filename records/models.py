@@ -2,7 +2,7 @@
 
 from django.db import models
 from fereol.users.models import User
-from fereol.subjects.models import Group
+from fereol.subjects.models import Group, group_type
 
 class Record( models.Model ):
     group = models.ForeignKey(Group, verbose_name = 'grupa')
@@ -13,8 +13,6 @@ class Record( models.Model ):
         verbose_name_plural = 'zapisy'
         unique_together = ( ( 'student', 'group' ) , )
     
-    def __str__(self):
-        return str(self.group.subject) + '(typ:' + str(self.group.type) + ')' # pawel musi naprawic funkcje group_type() zeby dzialala nie tylko dla unicodu
     def __unicode__(self): 
-        return unicode(self.group)
+        return unicode( self.group.subject ) + ' ( ' + group_type( self.group.type ) + ' -  ' + self.group.teacher.user.get_full_name()  + ' ) '
 

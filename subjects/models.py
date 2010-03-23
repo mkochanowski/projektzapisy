@@ -17,8 +17,6 @@ class Subject( models.Model ):
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
     
-    def __str__(self):
-        return self.name
     def __unicode__(self):
         return self.name
 
@@ -40,8 +38,6 @@ class Group( models.Model ):
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
         
-    def __str__(self):
-        return self.subject.name + ': ' + group_type( self.type )
     def __unicode__(self):
         return self.subject.name + ': ' + group_type( self.type )
     
