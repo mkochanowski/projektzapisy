@@ -7,6 +7,7 @@ from fereol.subjects.models import *
 from fereol.users.models import *
 from fereol.records.models import *
 
+@login_required
 def change( request, group_id):
 
     user = request.user
@@ -29,6 +30,7 @@ def change( request, group_id):
  
     return render_to_response( 'records/status.html', data)
 
+@login_required
 def own(request):
 
     user = request.user
