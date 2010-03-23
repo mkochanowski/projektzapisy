@@ -17,11 +17,14 @@ class Subject( models.Model ):
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
 
-    def description():
+    def description(self):
         """
             Get last description.
         """
-        return self.descriptions.order_by('-date')[0]
+        if self.descriptions.count() > 0:
+            return self.descriptions.order_by('-date')[0]
+        else:
+            return None
      
     def __str__(self):
         return self.name
