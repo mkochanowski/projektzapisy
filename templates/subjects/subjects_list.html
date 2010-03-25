@@ -4,7 +4,7 @@
 	<h1>Przedmioty</h1>
 	{% for sub in subjects %}
 		{% if forloop.first %}<ul>{% endif %}
-		<a href="/subjects/{{sub.slug}}">{{sub.name}}</a>
+			<li><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>
 		{% if forloop.end %}</ul>{% endif %}
 		{% empty %}Brak przedmiotów
 	{% endfor %}

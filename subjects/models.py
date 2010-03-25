@@ -16,7 +16,7 @@ class Subject( models.Model ):
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
-
+		
     def description(self):
         """
             Get last description.

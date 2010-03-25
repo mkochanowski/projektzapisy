@@ -79,9 +79,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
--   'south',   
+    'south',   
     'fereol.users',
     'fereol.subjects',
+	'fereol.records',
 )
 
 LOGIN_URL = '/users/login/'
