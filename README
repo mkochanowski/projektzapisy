@@ -1,0 +1,16 @@
+Zależności:
+
+* python = 2.6.x
+http://www.python.org/
+- fedora, debian/ubuntu: python
+
+* django >= 1.1
+http://www.djangoproject.com/
+- fedora: Django
+- debian/ubuntu: python-django
+
+* south >= 0.6
+http://south.aeracode.org/
+- fedora: Django-south
+- debian/ubuntu: python-django-south
+
