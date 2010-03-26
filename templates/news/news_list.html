@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if object_list %}
+  <div class="news_list">
+  {% for news in object_list %}
+    <div class="news_item">
+      <h3 class="news_title">{{ news.title }}</h3>
+      <div class="news_date">{{ news.date|date:"l, d F Y"|lower }}</div>
+      <div class="news_body">
+        {{ news.body|linebreaks }}
+      </div>
+    </div>
+  {% endfor %}
+    <div class="news_navigator">
+      {% ifnotequal older_no 0 %}
+        <a href="{% url news.views.paginated_news older_beginwith %}" title="Starsze">Starsze ({{ older_no }})</a>
+      {% endifnotequal %}
+      {% ifnotequal newer_no 0 %}
+        <a href="{% url news.views.paginated_news newer_beginwith %}" title="Nowsze">Nowsze ({{ newer_no }})</a>
+        <a href="{% url news.views.paginated_news newer_beginwith %}" title="Najnowsze">Najnowsze</a>
+      {% endifnotequal %}
+    </div>
+  </div>
+{% else %}
+  <p>Nie ma nowych ogłoszeń</p>
+{% endif %}
+
+{% endblock %}

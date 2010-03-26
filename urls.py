@@ -7,7 +7,7 @@ urlpatterns = patterns('',
     (r'^users/', include('fereol.users.urls')),
     (r'^subjects/', include('fereol.subjects.urls')),
     (r'^records/', include('fereol.records.urls')),
-    
+    (r'^news/', include('fereol.news.urls')),
 	
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
