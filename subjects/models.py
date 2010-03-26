@@ -53,8 +53,8 @@ def group_type(type):
     d = {}
     for x, y in GROUP_TYPE_CHOICES:
         d[x] = y
-    return d[type] 
-
+    return d[type]     
+    
 class Group( models.Model ):
     
     subject = models.ForeignKey( Subject, verbose_name = 'przedmiot' )
@@ -71,3 +71,16 @@ class Group( models.Model ):
     def __unicode__(self):
         return self.subject.name + ': ' + group_type( self.type )
     
+class Books( models.Model ):
+    subject = models.ForeignKey(Subject, verbose_name = 'przedmiot')
+    name = models.TextField( verbose_name = 'nazwa' )
+    
+    class Meta:
+        verbose_name = 'ksiazka'
+        verbose_name_plural = 'ksiazki'
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
