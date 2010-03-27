@@ -9,7 +9,7 @@ http://www.djangoproject.com/
 - fedora: Django
 - debian/ubuntu: python-django
 
-* south >= 0.6
+* south >= 0.7
 http://south.aeracode.org/
 - fedora: Django-south
 - debian/ubuntu: python-django-south

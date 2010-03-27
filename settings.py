@@ -79,7 +79,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'south',
+    'fereol.south',
     'fereol.news',
     'fereol.users',
     'fereol.subjects',
@@ -88,3 +88,5 @@ INSTALLED_APPS = (
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/profile/'
+
+# SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
