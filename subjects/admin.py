@@ -12,3 +12,4 @@ class SubjectAdmin( admin.ModelAdmin ):
 admin.site.register( Subject, SubjectAdmin )
 admin.site.register( SubjectDescription)
 admin.site.register( Group )
+admin.site.register( Classroom )

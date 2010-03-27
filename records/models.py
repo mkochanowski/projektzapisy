@@ -14,5 +14,5 @@ class Record( models.Model ):
         unique_together = ( ( 'student', 'group' ) , )
     
     def __unicode__(self): 
-        return unicode( self.group.subject ) + ' ( ' + group_type( self.group.type ) + ' -  ' + self.group.teacher.user.get_full_name()  + ' ) '
+        return unicode( self.group.subject ) + ' ( ' + group_type( self.group.type ) + ' -  ' + self.group.get_teacher_full_name()  + ' ) '
 

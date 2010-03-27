@@ -16,7 +16,7 @@ class Subject( models.Model ):
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
-		
+    
     def description(self):
         """
             Get last description.
@@ -25,9 +25,6 @@ class Subject( models.Model ):
             return self.descriptions.order_by('-date')[0]
         else:
             return None
-     
-    def __str__(self):
-        return self.name
 
     def __unicode__(self):
         return self.name
@@ -47,30 +44,42 @@ class SubjectDescription(models.Model):
     def __unicode__(self):
         return self.description
 
-GROUP_TYPE_CHOICES = [ ( '1', 'wykład' ), ( '2', 'ćwiczenia' ), ( '3', 'pracownia' ) ]
+GROUP_TYPE_CHOICES = [ ( '1', u'wykład' ), ( '2', u'ćwiczenia' ), ( '3', u'pracownia' ) ]
 
 def group_type(type):
     d = {}
     for x, y in GROUP_TYPE_CHOICES:
         d[x] = y
-    return d[type]     
+    return d[type]
+
+class Classroom( models.Model ):
+    
+    number = models.CharField( max_length = 4, verbose_name = 'numer sali' )
+    
+    class Meta:
+        verbose_name = 'sala'
+        verbose_name_plural = 'sale'
+    
+    def __unicode__(self):
+        return self.number
     
 class Group( models.Model ):
     
     subject = models.ForeignKey( Subject, verbose_name = 'przedmiot' )
     teacher = models.ForeignKey( Employee, verbose_name = 'prowadzący' )
     type = models.CharField( max_length = 1, choices = GROUP_TYPE_CHOICES, verbose_name = 'typ zajęć' )
+    classroom = models.ManyToManyField( Classroom, verbose_name = 'sala', related_name = 'grupy' )
+    
+    def get_teacher_full_name(self):
+        return self.teacher.user.get_full_name()
     
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
-        
-    def __str__(self):
-        return self.subject.name + ': ' + group_type( self.type )
 
     def __unicode__(self):
         return self.subject.name + ': ' + group_type( self.type )
-    
+
 class Books( models.Model ):
     subject = models.ForeignKey(Subject, verbose_name = 'przedmiot')
     name = models.TextField( verbose_name = 'nazwa' )

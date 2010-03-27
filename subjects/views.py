@@ -1,27 +1,41 @@
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from fereol.subjects.models import *
+from fereol.records.models import *
 
 import datetime
 
-def subjects(self):
+def subjects(request):
     subjects = Subject.objects.all()
     return render_to_response( 'subjects/subjects_list.html', { 'subjects' : subjects } )
 
-def subject( self, slug ):
+def subject( request, slug ):
     subject = Subject.objects.get(slug=slug)
     lectures = Group.objects.filter(subject=subject).filter( type = 1)
     exercises = Group.objects.filter(subject=subject).filter( type = 2 )
     laboratories = Group.objects.filter(subject=subject).filter( type = 3 )
+    
+    user_groups = [ g.group.id for g in Record.objects.filter( student = request.user ) ]
+    
+    for lec in lectures:
+        if lec.id in user_groups:
+            lec.signed = True
+    for exe in exercises:
+        if exe.id in user_groups:
+            exe.signed = True
+    for lab in laboratories:
+        if lab.id in user_groups:
+            lab.signed = True
+    
     data = {
             'subject' : subject,
             'lectures' : lectures,
             'exercises' : exercises,
-            'laboratories' : laboratories 
-    }
-                
-    return render_to_response( 'subjects/subject.html', data )
+            'laboratories' : laboratories,
+    }         
+    return render_to_response( 'subjects/subject.html', data, context_instance = RequestContext( request ) )
 
 def subjectForm(request, sid = None):
 	"""
@@ -61,11 +75,11 @@ def subjectForm(request, sid = None):
 			description.save()
 			
 			if editMode:
-				message = 'Zmiany zosta³y wprowadzone'
+				message = 'Zmiany zostaï¿½y wprowadzone'
 			else:
-				message = 'Przedmiot zosta³ dodany'
+				message = 'Przedmiot zostaï¿½ dodany'
  		else:
-			message = 'Wype³nij wszystkie pola'
+			message = 'Wypeï¿½nij wszystkie pola'
 		
 	data = {
 		'editMode' : editMode,

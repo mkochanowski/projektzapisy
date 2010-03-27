@@ -2,33 +2,39 @@
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from fereol.subjects.models import *
 from fereol.users.models import *
 from fereol.records.models import *
 
 @login_required
-def change( request, group_id):
+    
+def change( request, group_id ):
 
     user = request.user
     gid = int(group_id)
  
+    
     my_profile = User.objects.get(id = user.id)
     sel_group = Group.objects.get(id = gid)
 
+    msg = ''
     data = {}
  
     try:
-      ex = Record.objects.get(group = sel_group, student = my_profile)
-     
+      ex = Record.objects.get(group = sel_group, student = my_profile)    
       ex.delete()
-      data = {'message' : 'Wypisano Ciebie z grupy'}
+      msg = 'Zostałeś wypisany'
     except: 
       r = Record(group = sel_group, student = my_profile)
       r.save()
-      data = {'message' : 'Zapisano Ciebie do grupy'}
- 
-    return render_to_response( 'records/status.html', data)
+      msg = 'Zostałeś zapisany'
+      
+    request.user.message_set.create( message = msg )
+    
+    return HttpResponseRedirect( '/subjects/%s' % sel_group.subject.slug )
 
 @login_required
 def own(request):

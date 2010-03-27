@@ -2,10 +2,11 @@
 
 {% block content %}
 
-    <p>Zajecia na ktore jestes zapisany:</p>
+    <p>Zajecia na które jesteś zapisany:</p>
     <ul>
     {% for group in groups %}
        <li>{{ group }}</li>
+       {% empty %}brak zajęć
     {% endfor %}
     </ul>
 {% endblock %}

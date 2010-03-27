@@ -1,6 +1,13 @@
 ﻿{% extends "base.html" %}
 
 {% block content %}
+	{% if messages %}
+	<ul>
+	    {% for message in messages %}
+	    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	    {% endfor %}
+	</ul>
+	{% endif %}
 	<h1>{{subject.name}}</h1>
 	<ul>
 		<li>Wykłady: {{subject.lectures}} godz.</li>
@@ -9,25 +16,44 @@
 	</ul>
 	
 	<h2>Grupy:</h2>
+	
+	<h3>Wykłady:</h3>
+	<ul>
 	{% for lec in lectures %}
-		{% if forloop.first %}<h3>Wykłady</h3><ul>{% endif %}
-			<li>Prowadzący: {{lec.teacher.user.get_full_name }}</li>
-			<a href='/records/change/{{ lec.id }}'>zapisz/wypisz mnie</a>
-		{% if forloop.last %}</ul>{% endif %}
+		<li>Prowadzący: {{lec.teacher.user.get_full_name }}<br/> sala: 
+			{% for c in lec.classroom.all %}
+				{{c}}{% if not forloop.last %}, {% endif %}
+			{% endfor %}
+		</li>
+		<a href='/records/change/{{ lec.id }}'>{% if not lec.signed %}zapisz{% else %}wypisz{% endif %}</a>
+		{% empty %}brak
 	{% endfor %}
+	</ul>
 	
-	{% for exc in exercises %}
-		{% if forloop.first %}<h3>Ćwiczenia</h3><ul>{% endif %}
-			<li>Prowadzący: {{exc.teacher.user.get_full_name }}</li>
-			<a href='/records/change/{{ exc.id }}'>zapisz/wypisz mnie</a>
-		{% if forloop.last %}</ul>{% endif %}
+	<h3>Ćwiczenia</h3>
+	<ul>
+	{% for exe in exercises %}
+		<li>Prowadzący: {{exe.teacher.user.get_full_name }}<br/> sala: 
+			{% for c in exe.classroom.all %}
+				{{c}}{% if not forloop.last %}, {% endif %}
+			{% endfor %}
+		</li>
+		<a href='/records/change/{{ exe.id }}'>{% if not exe.signed %}zapisz{% else %}wypisz{% endif %}</a>
+		{% empty %}brak
 	{% endfor %}
+	</ul>
 	
+	<h3>Pracownie</h3>
+	<ul>
 	{% for lab in laboratories %}
-		{% if forloop.first %}<h3>Pracownie</h3><ul>{% endif %}
-			<li>Prowadzący: {{lab.teacher.user.get_full_name }}</li>
-			<a href='/records/change/{{ lab.id }}'>zapisz/wypisz mnie</a>
-		{% if forloop.last %}</ul>{% endif %}
+		<li>Prowadzący: {{lab.teacher.user.get_full_name }}<br/> sala: 
+			{% for c in lab.classroom.all %}
+				{{c}}{% if not forloop.last %}, {% endif %}
+			{% endfor %}
+		</li>
+		<a href='/records/change/{{ lab.id }}'>{% if not lab.signed %}zapisz{% else %}wypisz{% endif %}</a>
+		{% empty %}brak
 	{% endfor %}
+	</ul>
 	
 {% endblock %}
