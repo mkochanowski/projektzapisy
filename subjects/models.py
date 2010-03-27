@@ -46,14 +46,15 @@ class SubjectDescription(models.Model):
 
 GROUP_TYPE_CHOICES = [ ( '1', u'wykład' ), ( '2', u'ćwiczenia' ), ( '3', u'pracownia' ) ]
 
-def group_type(type):
-    d = {}
-    for x, y in GROUP_TYPE_CHOICES:
-        d[x] = y
-    return d[type]
+def group_type( code_type ):
+    """returns name of group type"""
+    dic = {}
+    for key, value in GROUP_TYPE_CHOICES:
+        dic[ key ] = value
+    return dic[ code_type ]
 
 class Classroom( models.Model ):
-    
+    """classroom in institute"""
     number = models.CharField( max_length = 4, verbose_name = 'numer sali' )
     
     class Meta:
@@ -64,13 +65,14 @@ class Classroom( models.Model ):
         return self.number
     
 class Group( models.Model ):
-    
+    """group for subject"""
     subject = models.ForeignKey( Subject, verbose_name = 'przedmiot' )
     teacher = models.ForeignKey( Employee, verbose_name = 'prowadzący' )
     type = models.CharField( max_length = 1, choices = GROUP_TYPE_CHOICES, verbose_name = 'typ zajęć' )
     classroom = models.ManyToManyField( Classroom, verbose_name = 'sala', related_name = 'grupy' )
     
     def get_teacher_full_name(self):
+        """returns teacher's full name for group"""
         return self.teacher.user.get_full_name()
     
     class Meta:
