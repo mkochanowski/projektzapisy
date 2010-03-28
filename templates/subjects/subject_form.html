@@ -1,17 +1,39 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<h1>{% if editMode %}Modyfikuj{% else %}Dodaj{% endif %} przedmiot</h1>
-	<form action="" method="POST">
-		{% if message %}<div class="message">{{ message }}</div>{% endif %} 
-		<table class="form">
-		<tr><td class="label">Nazwa:</td><td class="field"><input type="text" name="name" value="{{ subject.name }}" /></td></tr>
-		<tr><td class="label">Opis:</td><td class="field"><textarea name="description">{{ subject.description.description }}</textarea></td></tr>
-		<tr><td class="label">Ilość godzin wykładów:</td><td class="field"><input type="text" name="lectures" value="{{ subject.lectures }}" /></td></tr>
-		<tr><td class="label">Ilość godzin ćwiczeń:</td><td class="field"><input type="text" name="exercises" value="{{ subject.exercises }}" /></td></tr>
-		<tr><td class="label">Ilość godzin pracowni:</td><td class="field"><input type="text" name="laboratories" value="{{ subject.laboratories }}" /></td></tr>
-		<tr><td colspan="2" class="button"><input type="submit" value="Zatwierdź" /></td></tr>
-		
-	</form>
-	
+
+<div id="main-content" class="narrow">
+	<ul id="od-subjectoffer-subjectlist">
+		<li><a href="#">Algorytmy rozproszone 2</a></li>
+		<li class="active"><span>CCNA 2</span></li>
+		<li><a href="#">Języki formalne 2</a></li>
+		<li><a href="#">Bazy danych</a></li>
+	</ul>
+	<div id="od-subjectoffer-contents">
+		<form action="" method="post" id="od-subjectoffer-form">
+
+			<p id="od-subjectoffer-form-title"><input type="text" name="name" value="{{ subject.name }}" /></p>
+
+			<p><textarea name="description" rows="15" cols="80">{{ subject.description.description }}</textarea></p>
+
+			<table>
+				<tr>
+					<th>Ilość godzin wykładów</th>
+					<td><input type="text" name="lectures" value="{{ subject.lectures }}" /></td>
+				</tr>
+				<tr>
+					<th>Ilość godzin ćwiczeń</th>
+					<td><input type="text" name="exercises" value="{{ subject.exercises }}" /></td>
+				</tr>
+				<tr>
+					<th>Ilość godzin pracowni</th>
+					<td><input type="text" name="laboratories" value="{{ subject.laboratories }}" /></td>
+				</tr>
+			</table>
+
+			<p id="od-subjectoffer-form-submit"><input type="submit" value="{% if editMode %}zapisz{% else %}dodaj{% endif %}" /></p>
+		</form>
+	</div>
+</div>
+
 {% endblock %}
