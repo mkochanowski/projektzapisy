@@ -89,4 +89,4 @@ INSTALLED_APPS = (
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/profile/'
 
-# SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
+SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
