@@ -21,9 +21,7 @@
 	<ul>
 	{% for lec in lectures %}
 		<li>Prowadzący: {{lec.teacher.user.get_full_name }}<br/> sala: 
-			{% for c in lec.classroom.all %}
-				{{c}}{% if not forloop.last %}, {% endif %}
-			{% endfor %}
+			{{ lec.classroom.all|join:", " }} 
 		</li>
 		<a href='/records/change/{{ lec.id }}'>{% if not lec.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
@@ -34,9 +32,7 @@
 	<ul>
 	{% for exe in exercises %}
 		<li>Prowadzący: {{exe.teacher.user.get_full_name }}<br/> sala: 
-			{% for c in exe.classroom.all %}
-				{{c}}{% if not forloop.last %}, {% endif %}
-			{% endfor %}
+			{{ exe.classroom.all|join:", " }}
 		</li>
 		<a href='/records/change/{{ exe.id }}'>{% if not exe.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
@@ -47,9 +43,7 @@
 	<ul>
 	{% for lab in laboratories %}
 		<li>Prowadzący: {{lab.teacher.user.get_full_name }}<br/> sala: 
-			{% for c in lab.classroom.all %}
-				{{c}}{% if not forloop.last %}, {% endif %}
-			{% endfor %}
+			{{ lab.classroom.all|join:", " }}
 		</li>
 		<a href='/records/change/{{ lab.id }}'>{% if not lab.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
