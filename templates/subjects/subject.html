@@ -18,39 +18,55 @@
 	<h2>Grupy:</h2>
 	
 	<h3>Wykłady:</h3>
-	<ul>
+    <ul>
 	{% for lec in lectures %}
 		<li>Prowadzący: {{lec.teacher.user.get_full_name }}<br/> sala: 
-			{% for c in lec.classroom.all %}
-				{{c}}{% if not forloop.last %}, {% endif %}
+			{{ lec.classroom.all|join:", " }} 
+			<br />
+			Ilość miejsc: {{ lec.get_group_limit }}, zajętych: {{ lec.enrolled}}<br />
+			<ul>
+			{% for d in lec.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
+			   <li>{{d}}</li>
 			{% endfor %}
-		</li>
+			</ul>
+        </li>
 		<a href='/records/change/{{ lec.id }}'>{% if not lec.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
 	</ul>
+
 	
 	<h3>Ćwiczenia</h3>
-	<ul>
+    <ul>
 	{% for exe in exercises %}
 		<li>Prowadzący: {{exe.teacher.user.get_full_name }}<br/> sala: 
-			{% for c in exe.classroom.all %}
-				{{c}}{% if not forloop.last %}, {% endif %}
+			{{ exe.classroom.all|join:", " }} 
+			<br />
+			Ilość miejsc: {{ exe.get_group_limit }}, zajętych: {{ exe.enrolled}}<br />
+			<ul>
+			{% for d in exe.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
+			   <li>{{d}}</li>
 			{% endfor %}
-		</li>
+			</ul>
+        </li>
 		<a href='/records/change/{{ exe.id }}'>{% if not exe.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
 	</ul>
 	
 	<h3>Pracownie</h3>
-	<ul>
+	    <ul>
 	{% for lab in laboratories %}
 		<li>Prowadzący: {{lab.teacher.user.get_full_name }}<br/> sala: 
-			{% for c in lab.classroom.all %}
-				{{c}}{% if not forloop.last %}, {% endif %}
+			{{ lab.classroom.all|join:", " }} 
+			<br />
+			Ilość miejsc: {{ lab.get_group_limit }}, zajętych: {{ lab.enrolled}}<br />
+			<ul>
+			{% for d in lab.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
+			   <li>{{d}}</li>
 			{% endfor %}
-		</li>
+			</ul>
+        </li>
 		<a href='/records/change/{{ lab.id }}'>{% if not lab.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}

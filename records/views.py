@@ -25,12 +25,22 @@ def change( request, group_id ):
  
     try:
       ex = Record.objects.get(group = sel_group, student = my_profile)    
-      ex.delete()
-      msg = 'Zostałeś wypisany'
+
     except: 
       r = Record(group = sel_group, student = my_profile)
-      r.save()
-      msg = 'Zostałeś zapisany'
+  
+      group_limit = sel_group.get_group_limit()
+      students_in_group = Record.number_of_students(group = sel_group) #Record.objects.filter(group = sel_group).count()
+  
+      if(students_in_group < group_limit  ):
+        r.save()
+        msg = 'Zostałeś zapisany'
+      else:
+        msg = 'Limit miejsc został wyczerpany, nie zostałeś zapisany'
+
+    else:
+      ex.delete()
+      msg = 'Zostałeś wypisany'
       
     request.user.message_set.create( message = msg )
     

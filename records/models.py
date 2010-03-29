@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from fereol.users.models import User
-from fereol.subjects.models import Group, group_type
+from django.contrib.auth.models import User
+from fereol.subjects.models import *
+
 
 class Record( models.Model ):
-    group = models.ForeignKey(Group, verbose_name = 'grupa')
-    student = models.ForeignKey(User, verbose_name = 'student')
+    group = models.ForeignKey(Group, verbose_name = 'grupa' )
+    student = models.ForeignKey(User, verbose_name = 'student' )
+    
+    @staticmethod
+    def number_of_students(group):
+      """Returns number of students enrolled to particular group"""
+      group_ = group
+      return Record.objects.filter(group = group_).count()
 
     class Meta:
         verbose_name = 'zapis'
@@ -14,5 +21,4 @@ class Record( models.Model ):
         unique_together = ( ( 'student', 'group' ) , )
     
     def __unicode__(self): 
-        return unicode( self.group.subject ) + ' ( ' + group_type( self.group.type ) + ' -  ' + self.group.get_teacher_full_name()  + ' ) '
-
+        return unicode( self.group.subject ) + ' ( ' + PrettyLabel.encode_list( self.group.type, GROUP_TYPE_CHOICES) + ' -  ' + self.group.get_teacher_full_name()  + ' ) '
