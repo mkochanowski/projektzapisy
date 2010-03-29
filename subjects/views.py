@@ -2,15 +2,18 @@
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
 from fereol.subjects.models import *
 from fereol.records.models import *
 
 import datetime
 
+@login_required
 def subjects(request):
     subjects = Subject.objects.all()
     return render_to_response( 'subjects/subjects_list.html', { 'subjects' : subjects } )
 
+@login_required
 def subject( request, slug ):
     subject = Subject.objects.get(slug=slug)
     lectures = Group.objects.filter(subject=subject).filter( type = 1)

@@ -10,7 +10,6 @@ from fereol.users.models import *
 from fereol.records.models import *
 
 @login_required
-    
 def change( request, group_id ):
 
     user = request.user
