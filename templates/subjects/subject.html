@@ -22,7 +22,6 @@
 	{% for lec in lectures %}
 		<li>Prowadzący: {{lec.teacher.user.get_full_name }}<br/> sala: 
 			{{ lec.classroom.all|join:", " }} 
-<<<<<<< HEAD
 			<br />
 			Ilość miejsc: {{ lec.get_group_limit }}, zajętych: {{ lec.enrolled}}<br />
 			<ul>
@@ -31,9 +30,6 @@
 			{% endfor %}
 			</ul>
         </li>
-=======
-		</li>
->>>>>>> da235fe58cd4bcbe31fe7537a3500a9c7f2f6ed4
 		<a href='/records/change/{{ lec.id }}'>{% if not lec.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
@@ -44,7 +40,6 @@
     <ul>
 	{% for exe in exercises %}
 		<li>Prowadzący: {{exe.teacher.user.get_full_name }}<br/> sala: 
-<<<<<<< HEAD
 			{{ exe.classroom.all|join:", " }} 
 			<br />
 			Ilość miejsc: {{ exe.get_group_limit }}, zajętych: {{ exe.enrolled}}<br />
@@ -54,10 +49,6 @@
 			{% endfor %}
 			</ul>
         </li>
-=======
-			{{ exe.classroom.all|join:", " }}
-		</li>
->>>>>>> da235fe58cd4bcbe31fe7537a3500a9c7f2f6ed4
 		<a href='/records/change/{{ exe.id }}'>{% if not exe.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
@@ -67,7 +58,6 @@
 	    <ul>
 	{% for lab in laboratories %}
 		<li>Prowadzący: {{lab.teacher.user.get_full_name }}<br/> sala: 
-<<<<<<< HEAD
 			{{ lab.classroom.all|join:", " }} 
 			<br />
 			Ilość miejsc: {{ lab.get_group_limit }}, zajętych: {{ lab.enrolled}}<br />
@@ -77,10 +67,6 @@
 			{% endfor %}
 			</ul>
         </li>
-=======
-			{{ lab.classroom.all|join:", " }}
-		</li>
->>>>>>> da235fe58cd4bcbe31fe7537a3500a9c7f2f6ed4
 		<a href='/records/change/{{ lab.id }}'>{% if not lab.signed %}zapisz{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
