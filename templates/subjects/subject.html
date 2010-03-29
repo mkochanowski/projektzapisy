@@ -30,7 +30,8 @@
 			{% endfor %}
 			</ul>
         </li>
-		<a href='/records/change/{{ lec.id }}'>{% if not lec.signed %}zapisz{% else %}wypisz{% endif %}</a>
+
+		<a href='/records/change/{{ lec.id }}'>{% if not lec.signed %}{% ifnotequal lec.get_group_limit lec.enrolled %}zapisz{% endifnotequal %}{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
 	</ul>
@@ -49,7 +50,7 @@
 			{% endfor %}
 			</ul>
         </li>
-		<a href='/records/change/{{ exe.id }}'>{% if not exe.signed %}zapisz{% else %}wypisz{% endif %}</a>
+		<a href='/records/change/{{ exe.id }}'>{% if not exe.signed %}{% ifnotequal exe.get_group_limit exe.enrolled %}zapisz{% endifnotequal %}{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
 	</ul>
@@ -67,7 +68,7 @@
 			{% endfor %}
 			</ul>
         </li>
-		<a href='/records/change/{{ lab.id }}'>{% if not lab.signed %}zapisz{% else %}wypisz{% endif %}</a>
+		<a href='/records/change/{{ lab.id }}'>{% if not lab.signed %}{% ifnotequal lab.get_group_limit lab.enrolled %}zapisz{% endifnotequal %}{% else %}wypisz{% endif %}</a>
 		{% empty %}brak
 	{% endfor %}
 	</ul>
