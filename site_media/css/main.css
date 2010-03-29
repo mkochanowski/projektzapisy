@@ -1,0 +1,115 @@
+/**
+ * Style odpowiadające za wygląd głównego szablonu (logo, menu, stopka itp)
+ */
+
+#main-container
+{
+	width: 1000px;
+	background: white;
+	border: 1px solid #99bb99;
+	margin: auto;
+	margin-top: 5px;
+	margin-bottom: 5px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+/*** NAGŁÓWEK ***/
+
+#main-header
+{
+	position: relative;
+	height: 32px;
+	padding: 5px;
+	border-bottom: 2px solid #262626;
+}
+
+#main-header h1
+{
+	font-weight: normal;
+	text-transform: uppercase;
+	font-size: 28px;
+}
+
+#main-header h1 a
+{
+	color: black;
+	text-decoration: none;
+}
+
+#main-header ul, #main-header li
+{
+	margin: 0;
+	padding: 0;
+}
+
+#main-header li
+{
+	display: inline;
+}
+
+#main-header li:before
+{
+	content: '| ';
+	padding: 10px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#main-header li:first-child:before
+{
+	content: '';
+	padding: 0;
+}
+
+#main-header ul
+{
+	position: absolute;
+	top: 11px;
+	left: 250px;
+	width: 740px;
+	text-align: right;
+}
+
+/*** NAGŁÓWEK - koniec ***/
+
+/*** BREADCRUMBS (pasek nawigacyjny) ***/
+
+#main-navigation
+{
+	border-bottom: 2px solid #262626;
+	padding: 5px;
+}
+
+#main-navigation ul, #main-navigation li
+{
+	margin: 0;
+	padding: 0;
+	display: inline;
+}
+
+#main-navigation li:before
+{
+	content: '> ';
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#main-navigation li:first-child:before
+{
+	content: '';
+	padding: 0;
+}
+
+/*** BREADCRUMBS - koniec ***/
+
+/*** ZAWARTOŚĆ - koniec ***/
+
+#main-content.narrow
+{
+	padding: 70px;
+}
+
+/*** ZAWARTOŚĆ ***/
