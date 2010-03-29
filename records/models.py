@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from fereol.users.models import User
+from fereol.users.models import Student
 from fereol.subjects.models import Group, group_type
 
 class Record( models.Model ):
     group = models.ForeignKey(Group, verbose_name = 'grupa')
-    student = models.ForeignKey(User, verbose_name = 'student')
+    student = models.ForeignKey(Student, verbose_name = 'student')
 
     class Meta:
         verbose_name = 'zapis'

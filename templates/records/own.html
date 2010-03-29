@@ -2,10 +2,44 @@
 
 {% block content %}
 
+	<style>
+		table .schedule {  border: 1px solid gray;  }
+		.gr {position:absolute; border: 1px solid black;}
+		div.schedule {position:relative;}
+	</style>
+	
+	<table class="schedule" >
+		<tr>
+			<div>&nbsp;</div>
+			{% for day in days %}
+				<td>{{ day.1 }}</td>
+			{% endfor %}
+		</tr>
+		<tr>
+			<td>
+				<div class="schedule" style="width:{{ cons.tableWidth }}px; height:{{ cons.tableHeight }}px;">
+					{% for group in groups %}
+						<div class="gr" style="top:{{ group.divTop }}px;left:{{ group.divLeft }}px;width:{{ group.divWidth }}px;height:{{ group.divHeight}}px;">
+							{{ group }}
+						</div>
+					{% endfor %}
+				</div>
+			</td>
+		</tr>
+		{% for hour in hours %}
+			<tr>
+				<td>{{ hour }}</td>
+				{% for day in days %}
+					<td>&nbsp;</td>
+				{% endfor %}
+			</tr>
+		{% endfor %}
+	</table>
+
     <p>Zajecia na które jesteś zapisany:</p>
     <ul>
-    {% for group in groups %}
-       <li>{{ group }}</li>
+    {% for record in records %}
+       <li>{{ record }}</li>
        {% empty %}brak zajęć
     {% endfor %}
     </ul>

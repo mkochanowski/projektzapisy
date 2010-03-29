@@ -52,7 +52,7 @@ def group_type( code_type ):
     for key, value in GROUP_TYPE_CHOICES:
         dic[ key ] = value
     return dic[ code_type ]
-
+    
 class Classroom( models.Model ):
     """classroom in institute"""
     number = models.CharField( max_length = 4, verbose_name = 'numer sali' )
@@ -66,10 +66,25 @@ class Classroom( models.Model ):
     
 class Group( models.Model ):
     """group for subject"""
+    
+     # inty, bo sie dobrze sortuja
+    DAY_OF_WEEK_CHOICES = [ 
+        ( 1, u'Poniedziałek' ), 
+        ( 2, u'Wtorek' ), 
+        ( 3, u'Środa' ), 
+        ( 4, u'Czwartek' ), 
+        ( 5, u'Piątek' ), 
+        ( 6, u'Sobota' ), 
+        ( 7, u'Niedziela' ) 
+    ]
+    
     subject = models.ForeignKey( Subject, verbose_name = 'przedmiot' )
     teacher = models.ForeignKey( Employee, verbose_name = 'prowadzący' )
     type = models.CharField( max_length = 1, choices = GROUP_TYPE_CHOICES, verbose_name = 'typ zajęć' )
     classroom = models.ManyToManyField( Classroom, verbose_name = 'sala', related_name = 'grupy' )
+    day = models.IntegerField(choices = DAY_OF_WEEK_CHOICES)
+    start = models.TimeField()
+    end = models.TimeField()
     
     def get_teacher_full_name(self):
         """returns teacher's full name for group"""

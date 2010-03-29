@@ -61,6 +61,7 @@ def subjectForm(request, sid = None):
 		subjectExercises = request.POST.get('exercises', '')
 		subjectLaboratories = request.POST.get('laboratories', '')
 		
+        #@todo: zmienic na ModelForm
 		if subjectName and subjectDescription and subjectLectures and subjectExercises and subjectLaboratories:
 			subject.name = subjectName
 			subject.lectures = subjectLectures
