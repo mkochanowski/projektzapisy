@@ -2,7 +2,7 @@
 
 from django.db import models
 from fereol.users.models import Student
-from fereol.subjects.models import Group, group_type
+from fereol.subjects.models import *
 
 class Record( models.Model ):
     group = models.ForeignKey(Group, verbose_name = 'grupa')

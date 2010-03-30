@@ -1,47 +1,78 @@
 {% extends "base.html" %}
 
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/z-schedule.css" type="text/css" />
+{% endblock %}
+
 {% block content %}
 
-	<style>
-		table .schedule {  border: 1px solid gray;  }
-		.gr {position:absolute; border: 1px solid black;}
-		div.schedule {position:relative;}
-	</style>
 	
-	<table class="schedule" >
-		<tr>
-			<div>&nbsp;</div>
-			{% for day in days %}
-				<td>{{ day.1 }}</td>
-			{% endfor %}
-		</tr>
-		<tr>
-			<td>
-				<div class="schedule" style="width:{{ cons.tableWidth }}px; height:{{ cons.tableHeight }}px;">
-					{% for group in groups %}
-						<div class="gr" style="top:{{ group.divTop }}px;left:{{ group.divLeft }}px;width:{{ group.divWidth }}px;height:{{ group.divHeight}}px;">
-							{{ group }}
-						</div>
-					{% endfor %}
-				</div>
-			</td>
-		</tr>
-		{% for hour in hours %}
+	<div class="schedule-wrapper">
+		<table class="schedule-table">
 			<tr>
-				<td>{{ hour }}</td>
+				<td></td>
 				{% for day in days %}
-					<td>&nbsp;</td>
+					<td>
+						<div class="schedule-days-cell-content">
+							{{ day.1 }}
+						</div>
+					</td>
 				{% endfor %}
 			</tr>
-		{% endfor %}
-	</table>
+			<tr>
+				<td>
+					{% for hour in hours %}
+						<div class="schedule-hours-cell-content">
+							{{ hour.1 }}
+						</div>
+					{% endfor %}
+				</td>
+				{% for day in days %}
+					<td class="schedule-grid-cell">
+						{% for hour in hours %}
+							<div class="schedule-grid-cell-content">
+								{% for group in groups %}
+									{% for term in group.terms_ %}
+										{% ifequal term.dayOfWeek day.0  %}
+											{% ifequal term.hourFrom hour.0  %}
+												<div class="group-term" style="height: {{ term.length }}px">
+													{{ group }}
+												</div>
+											{% endifequal  %}
+										{% endifequal  %}
+									{% endfor %}
+								{% endfor %}
+								&nbsp;
+							</div>
+						{% endfor %}
+					</td>
+				{% endfor %}
+			</tr>
+		</table>
+		<p>Zajecia na które jesteś zapisany:</p>
+	    <table class="schedule-table-simple">
+	    	<tr>
+				<td>Przedmiot</td>
+				<td>Termin</td>
+				<td>Sale</td>
+			</tr>
+	    {% for group in groups %}
+			{% for term in group.terms_ %}
+	       	<tr>
+				<td>{{group}}</td>
+				<td>{{term}}</td>
+				<td>
+					{% for class in group.get_all_classrooms %}
+						{{class}}
+					{% endfor %}
+				</td>
+			</tr>
+	       		{% empty %}brak zajęć
+		   {% endfor %}
+	    {% endfor %}
+	    </table>
+	</div>
 
-    <p>Zajecia na które jesteś zapisany:</p>
-    <ul>
-    {% for record in records %}
-       <li>{{ record }}</li>
-       {% empty %}brak zajęć
-    {% endfor %}
-    </ul>
+    
 {% endblock %}
 

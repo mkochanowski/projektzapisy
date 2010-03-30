@@ -55,47 +55,26 @@ def change( request, group_id ):
 @login_required
 def own(request):
     
-    start_hour = 6
-    end_hour = 20
-    
-    cons = { 
-        'headerHeight' : 20,
-        'rowHeight' : 50,
-        'columnWidth' : 100,
-        'tableWidth' : 100 * len(Group.DAY_OF_WEEK_CHOICES),
-        'tableHeight' : 50 * (end_hour - start_hour),
-    }
-
     try:
         student = request.user.student
     except:
         #@todo: message 'tylko studenci moga wyswietlac plan zajec'
         return HttpResponseRedirect(settings.LOGIN_URL)
     else:
-        records = Record.objects.filter(student = student).order_by('group__day', 'group__start')
+        records = Record.objects.filter(student = student)
         groups = [record.group for record in records]
-        hours = [time(x) for x in range(start_hour, end_hour+1)]
-        days = Group.DAY_OF_WEEK_CHOICES
+        #hours = [time(x) for x in range(start_hour, end_hour+1)]
+        hours = HOURS
+        #days = Group.DAY_OF_WEEK_CHOICES
+        days = DAYS_OF_WEEK
         
-        for day_number, day_name in days:
-            
-            for hour in hours:
-                
-                starting_groups = [g for g in groups if g.start.hour == hour.hour and  g.day == day_number]
-                num_of_intersecting = len([g for g in groups if g.start.hour <= hour.hour and  g.end.hour > hour.hour])
-                num_of_starting = len(starting_groups)
-                
-                print starting_groups
-                
-                for (i, g) in zip(range(1, num_of_starting+1), starting_groups):
-                   
-                    g.divWidth =  cons['columnWidth']/num_of_intersecting
-                    g.divLeft = (day_number) * cons['columnWidth'] + ( num_of_intersecting - num_of_starting + ( i ) ) *  g.divWidth 
-                    g.divHeight = cons['rowHeight'] * (g.end.hour - g.start.hour)
-                    g.divTop = cons['rowHeight'] * (hour.hour - start_hour)
+        for group in groups:
+            group.terms_ = group.get_all_terms()
+            for term in group.terms_:
+                #print int(term.hourTo) - int(term.hourFrom)
+                term.length = (int(term.hourTo) - int(term.hourFrom))*32-4
         
         data = {
-            'cons' : cons,
             'days': days,
             'groups': groups,
             'hours': hours,
@@ -103,3 +82,7 @@ def own(request):
         }
         
         return render_to_response( 'records/own.html', data, context_instance = RequestContext( request ))
+    
+    
+    
+    
