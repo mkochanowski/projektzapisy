@@ -7,11 +7,11 @@ from fereol.users.models import Employee
 class Subject( models.Model ):
     
     name = models.CharField( max_length = 255, verbose_name = 'nazwa przedmiotu' )
-    slug = models.SlugField( max_length=255, unique = True, verbose_name='odnośnik' )
+    slug = models.SlugField( max_length=255, unique = True, verbose_name='odnośnik' )
     #description = models.TextField( verbose_name = 'opis' ) # description should be in other model (for history)
-    lectures = models.IntegerField( verbose_name = 'iloś godzin wykładów' )
+    lectures = models.IntegerField( verbose_name = 'ilość godzin wykładów' )
     exercises = models.IntegerField( verbose_name = 'ilość godzin ćwiczeń' )
-    laboratories = models.IntegerField( verbose_name = 'ilość godzin pracownii' )
+    laboratories = models.IntegerField( verbose_name = 'ilość godzin pracowni' )
     
     class Meta:
         verbose_name = 'przedmiot'
@@ -142,8 +142,8 @@ class Books( models.Model ):
     name = models.TextField( verbose_name = 'nazwa' )
     
     class Meta:
-        verbose_name = 'ksiazka'
-        verbose_name_plural = 'ksiazki'
+        verbose_name = 'książka'
+        verbose_name_plural = 'książki'
 
     def __str__(self):
         return self.name
