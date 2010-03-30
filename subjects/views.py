@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
-from fereol.subjects.models import *
-from fereol.records.models import *
-
 import datetime
+
+from django.contrib.auth.decorators import login_required
+from django.http                    import HttpResponseRedirect
+from django.shortcuts               import render_to_response
+from django.template                import RequestContext
+
+from fereol.records.models          import *
+from fereol.subjects.models         import *
 
 @login_required
 def subjects(request):
@@ -84,11 +86,11 @@ def subjectForm(request, sid = None):
 			description.save()
 			
 			if editMode:
-				message = 'Zmiany zosta�y wprowadzone'
+				message = 'Zmiany zostały wprowadzone'
 			else:
-				message = 'Przedmiot zosta� dodany'
+				message = 'Przedmiot został dodany'
  		else:
-			message = 'Wype�nij wszystkie pola'
+			message = 'Wypełnij wszystkie pola'
 		
 	data = {
 		'editMode' : editMode,
@@ -96,3 +98,23 @@ def subjectForm(request, sid = None):
 		'subject' : subject,
 	}
 	return render_to_response( 'subjects/subject_form.html', data);
+
+@login_required
+def subjectHistory( request, slug):
+    subject      = Subject.objects.get(slug = slug)
+    descriptions = subject.descriptions.order_by('-date')
+    data         = {'descriptions' : descriptions}
+
+    return render_to_response ('subjects/subject_history.html', data) 
+    
+@login_required
+def subjectRestore ( request, descid ):
+    olddesc = SubjectDescription.objects.get(id = descid)
+    
+    newdesc             = SubjectDescription()
+    newdesc.description = olddesc.description
+    newdesc.date        = datetime.datetime.now()
+    newdesc.subject     = olddesc.subject
+    newdesc.save()
+    
+    return HttpResponseRedirect(newdesc.subject.slug)
