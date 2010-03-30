@@ -2,10 +2,10 @@
 
 {% block content %}
 	<h1>Przedmioty</h1>
+	<ul>
 	{% for sub in subjects %}
-		{% if forloop.first %}<ul>{% endif %}
-			<li><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>
-		{% if forloop.end %}</ul>{% endif %}
+		<li><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>
 		{% empty %}Brak przedmiotów
 	{% endfor %}
+	</ul>
 {% endblock %}
