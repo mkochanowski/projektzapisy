@@ -5,8 +5,6 @@ from news.models import News
 
 import datetime
 
-import mox
-
 def today():
     return datetime.date(2010, 3, 26)
 
