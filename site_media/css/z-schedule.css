@@ -1,0 +1,31 @@
+/**
+ * Style dotyczące planu zajęc
+ */
+
+.schedule-wrapper {  margin:auto; }
+		
+table.schedule-table-simple 
+	{ border-collapse:collapse; margin:auto; width:700px;}
+	
+table.schedule-table 
+	{ border-collapse:collapse; margin:auto;  }
+
+.schedule-grid-cell 
+	{ border-style:solid; border-width:1px; border-color: #dddddd; }
+
+.schedule-grid-cell-content,
+.schedule-days-cell-content,
+.schedule-hours-cell-content
+	{ border-style:solid; border-width:1px}
+
+.schedule-grid-cell-content 
+	{ position:relative; width: 110px; height: 30px; border-color: #dddddd; }
+
+.schedule-days-cell-content 
+	{ overflow:hidden; text-transform:capitalize; text-align:center; width: 110px; border-color: transparent; }
+
+.schedule-hours-cell-content 
+	{ overflow:hidden; width: 40px; height: 30px; border-color: transparent; }
+
+.group-term 
+	{ position:absolute; top:0; left:0; border:2px solid gray; background:white; color:gray; width:108px; z-index:500;}
