@@ -5,17 +5,17 @@ from django.db import models
 from datetime import date, timedelta
 
 class NewsManager(models.Manager):
-    def new(self):
+    def new(self, now=date.today):
         '''Zwraca ogłoszenia oznaczone jako nowe.
 
         Zwraca ogłoszenia z ostatnich 7 dni.'''
-        begin = date.today() - timedelta(days=7)
+        begin = now() - timedelta(days=7)
         return self.filter(date__gte=begin)
-    def count_new(self):
+    def count_new(self, now=date.today):
         '''Zwraca liczbę ogłoszeń oznaczonych jako nowe.
 
         Zwraca liczbę ogłoszeń z ostatnich 7 dni.'''
-        begin = date.today() - timedelta(days=7)
+        begin = now() - timedelta(days=7)
         return self.filter(date__gte=begin).count()
 
 
