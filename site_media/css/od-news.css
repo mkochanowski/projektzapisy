@@ -1,0 +1,49 @@
+/**
+ * Aktualności
+ */
+
+.od-news-item
+{
+    margin-bottom: 50px;
+}
+
+.od-news-header
+{
+    width: 100%;
+    text-align: right;
+}
+
+.od-news-header h2
+{
+    float: left;
+}
+
+.od-news-date
+{
+    height: 1.5em;
+    padding-right: 15px;
+    vertical-align: sub;
+}
+
+.od-news-body
+{
+    clear: both;
+    padding-top: 10px;
+}
+
+.od-news-navigator
+{
+    text-align: right;
+}
+
+.od-news-navigator a
+{
+    border-left: solid 2px #333;
+    padding-left:  6px;
+    padding-right: 6px;
+}
+
+.od-news-navigator :first-child
+{
+    border-left: none;
+}
