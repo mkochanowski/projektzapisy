@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.core.urlresolvers import reverse
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -7,50 +8,44 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
 
-from fereol.subjects.models import *
-from fereol.users.models import *
-from fereol.records.models import *
+from subjects.models import *
+from users.models import *
+from records.models import *
+from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException
+from django.shortcuts import redirect
 
 from datetime import time
 
 @login_required
-def change( request, group_id ):
-    gid = int(group_id)
- 
+def assign(request, group_id):
     try:
-        student = request.user.student
-    except:
-        #@todo: tylko studenci mogę się zapisywac
-        pass
-    else:   
-        try:
-            sel_group = Group.objects.get(id = gid)
-        except Group.DoesNotExist:
-            #@todo: co jak nie istnieje grupa?
-            pass
-        else:
-            msg = ''
-            data = {}
-         
-            try:
-                ex = Record.objects.get(group = sel_group, student = student)    
-            except: 
-                r = Record(group = sel_group, student = student)
-                group_limit = sel_group.get_group_limit()
-                students_in_group = Record.number_of_students(group = sel_group) #Record.objects.filter(group = sel_group).count()
-                
-                if(students_in_group < group_limit  ):
-                    r.save()
-                    msg = 'Zostałeś zapisany'
-                else:
-                    msg = 'Limit miejsc został wyczerpany, nie zostałeś zapisany'
-            else:
-                ex.delete()
-                msg = 'Zostałeś wypisany'
-                
-            request.user.message_set.create( message = msg )
-            
-            return HttpResponseRedirect( '/subjects/%s' % sel_group.subject.slug )
+        record = Record.add_student_to_group(request.user.id, group_id)
+        request.user.message_set.create(message="Zostałeś zapisany do grupy.")
+        return redirect("subject-page", slug=record.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
+        # trzeba dodac redirecta
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
+        # trzeba dodac redirecta
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
+        # trzeba dodac redirecta
+
+def resign(request, group_id):
+    try:
+        record = Record.remove_student_from_group(request.user.id, group_id)
+        request.user.message_set.create(message="Zostałeś wypisany z grupy.")
+        return redirect("subject-page", slug=record.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
+        # trzeba dodac redirecta
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
+        # trzeba dodac redirecta
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
+        # trzeba dodac redirecta
 
 @login_required
 def own(request):

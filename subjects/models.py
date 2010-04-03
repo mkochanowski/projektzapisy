@@ -129,6 +129,9 @@ class Group( models.Model ):
         """return maximal amount of participants"""
         return self.limit
 
+    def subject_slug(self):
+        return self.subject.slug
+
 
     class Meta:
         verbose_name = 'grupa'

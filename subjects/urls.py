@@ -5,6 +5,6 @@ urlpatterns = patterns( 'fereol.subjects.views',
     ( '^edit/(?P<sid>[0-9]+)/$', 'subjectForm' ),
     ( '^history/(?P<descid>[0-9]+)/$', 'subjectHistory' ),
     ( '^restore/(?P<descid>[0-9]+)/$', 'subjectRestore' ),
-    ('(?P<slug>[\w\-_]+)', 'subject' ),
+    url('(?P<slug>[\w\-_]+)', 'subject', name='subject-page'),
     ( '', 'subjects' ),
 )
