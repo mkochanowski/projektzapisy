@@ -57,5 +57,5 @@ class Record( models.Model ):
         verbose_name_plural = 'zapisy'
         unique_together = (( 'student', 'group' ),)
 
-    def __unicode__(self): 
-        return unicode( self.group.subject ) + ' ( ' + PrettyLabel.encode_list( self.group.type, GROUP_TYPE_CHOICES) + ' -  ' + self.group.get_teacher_full_name()  + ' ) '
+    def __unicode__(self):
+        return "%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())

@@ -44,17 +44,6 @@ class SubjectDescription(models.Model):
     def __unicode__(self):
         return self.description
 
-#moved to PrettyLabel class in order to avoid code redundancy
-
-#GROUP_TYPE_CHOICES = [ ( '1', u'wykład' ), ( '2', u'ćwiczenia' ), ( '3', u'pracownia' ) ]
-
-#def group_type( code_type ):
-   # """returns name of group type"""
-   # dic = {}
-  #  for key, value in GROUP_TYPE_CHOICES:
-  #      dic[ key ] = value
-  #  return dic[ code_type ]
-
 
 class Classroom( models.Model ):
     """classroom in institute"""
@@ -75,17 +64,6 @@ DAYS_OF_WEEK = [( '1', u'poniedziałek' ), ( '2', u'wtorek' ), ( '3', u'środa' 
 
 HOURS = [( '8', '8.00' ), ( '9', '9.00' ), ( '10', '10.00' ), ( '11', '11.00' ), ( '12', '12.00' ), ( '13', '13.00' ), ( '14', '14.00' ), ( '15', '15.00' ), 
          ( '16', '16.00' ), ( '17', '17.00' ), ( '17', '17.00' ), ( '18', '18.00' ), ( '19', '19.00' ), ( '20', '20.00' ), ( '21', '21.00' ), ( '22', '22.00' )]
- 
- 
-class PrettyLabel:
-   
-   @staticmethod
-   def encode_list(code_id, list):
-      """encodes list od tuples"""
-      dic = {}
-      for key, value in list:
-         dic[ key ] = value
-      return dic[ code_id ]
 
   
 class Term( models.Model ):
@@ -100,7 +78,7 @@ class Term( models.Model ):
         verbose_name_plural = 'terminy'
 
     def __unicode__(self):
-        return PrettyLabel.encode_list(self.dayOfWeek, DAYS_OF_WEEK) + ', (od: ' + PrettyLabel.encode_list(self.hourFrom, HOURS) + ', do: ' + PrettyLabel.encode_list(self.hourTo, HOURS) + ')'
+        return "%s (od %s do %s)" % (self.get_dayOfWeek_display(), self.get_hourFrom_display(), self.get_hourTo_display())
 
     
 class Group( models.Model ):
@@ -120,7 +98,6 @@ class Group( models.Model ):
         """return all terms of current groupt""" 
         return self.term.all()
 
-    # poprawka kodu Pawła (Zasada o ktorej czym wspominal Jan ;-) )
     def get_all_classrooms(self):
         """return all classrooms of current groupt""" 
         return self.classroom.all()
@@ -138,7 +115,7 @@ class Group( models.Model ):
         verbose_name_plural = 'grupy'
 
     def __unicode__(self):
-        return self.subject.name + ': ' + PrettyLabel.encode_list( self.type, GROUP_TYPE_CHOICES )
+        return "%s: %s" % (self.subject.name, self.get_type_display())
 
 class Books( models.Model ):
     subject = models.ForeignKey(Subject, verbose_name = 'przedmiot')
