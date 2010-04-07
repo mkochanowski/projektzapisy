@@ -1,11 +1,12 @@
+# -*- coding: utf8 -*-
+
 from django.db import models
 from django.contrib.auth.models import User
 
 class BaseUser(models.Model):
     '''
-    Abstrakcyjna klasa uzytkownika. Dla kazdego uzytkownika aplikacji mamy wpis w django.auth.
-    
-    Nie dziedziczymy po User bezposrednio, bo jest ogolnie zamieszanie z calym backendem logowania itp.
+    User abstract class. For every app user there is entry in django.auth.
+    We do not inherit after User directly, because of problems with logging beckend etc.
     '''
     user = models.OneToOneField(User)
     
@@ -14,9 +15,11 @@ class BaseUser(models.Model):
 
 class Employee(BaseUser):
     '''
-    Pracownik.
+    Employee.
     '''
-    
+    class Meta:
+        app_label = 'users'
+        
     def __unicode__(self):
         return str(self.user)
 
@@ -24,7 +27,6 @@ class Student(BaseUser):
     ''' 
     Student.
     '''
-    
     def __unicode__(self):
         return str(self.user)
     
