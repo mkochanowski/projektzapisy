@@ -39,6 +39,16 @@
 	text-decoration: none;
 }
 
+#main-menu
+{
+	position: absolute;
+	top: 11px;
+	left: 250px;
+	width: 740px;
+	text-align: right;
+}
+
+/* menu list styled in droppy.css
 #main-header ul, #main-header li
 {
 	margin: 0;
@@ -71,7 +81,7 @@
 	left: 250px;
 	width: 740px;
 	text-align: right;
-}
+}*/
 
 /*** NAGŁÓWEK - koniec ***/
 

@@ -32,6 +32,7 @@ def assign(request, group_id):
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         # trzeba dodac redirecta
 
+@login_required
 def resign(request, group_id):
     try:
         record = Record.remove_student_from_group(request.user.id, group_id)
@@ -49,7 +50,6 @@ def resign(request, group_id):
 
 @login_required
 def own(request):
-    
     try:
         student = request.user.student
     except:

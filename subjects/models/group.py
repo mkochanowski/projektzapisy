@@ -32,7 +32,6 @@ class Group( models.Model ):
     def subject_slug(self):
         return self.subject.slug
 
-
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
