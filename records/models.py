@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.contrib.auth.models import User
 from django.db import models
 from users.models import Student
 from subjects.models import *
@@ -14,6 +15,19 @@ class Record( models.Model ):
       """Returns number of students enrolled to particular group"""
       group_ = group
       return Record.objects.filter(group = group_).count()
+
+    @staticmethod
+    def get_student_groups(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            records = Record.objects.filter(student = student)
+            groups = [record.group for record in records]
+            for group in groups:
+                group.terms_ = group.get_all_terms()
+            return groups
+        except Student.DoesNotExist:
+            raise NonStudentException()
 
     @staticmethod
     def add_student_to_group(user_id, group_id):

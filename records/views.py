@@ -51,33 +51,17 @@ def resign(request, group_id):
 @login_required
 def own(request):
     try:
-        student = request.user.student
-    except:
-        #@todo: message 'tylko studenci moga wyswietlac plan zajec'
-        return HttpResponseRedirect(settings.LOGIN_URL)
-    else:
-        records = Record.objects.filter(student = student)
-        groups = [record.group for record in records]
-        #hours = [time(x) for x in range(start_hour, end_hour+1)]
-        hours = HOURS
-        #days = Group.DAY_OF_WEEK_CHOICES
+        groups = Record.get_student_groups(request.user.id)
+        hours = [(hour, "%s:00" % hour) for hour in range(8, 23)]
         days = DAYS_OF_WEEK
-        
-        for group in groups:
-            group.terms_ = group.get_all_terms()
-            for term in group.terms_:
-                #print int(term.hourTo) - int(term.hourFrom)
-                term.length = (int(term.hourTo) - int(term.hourFrom))*32-4
-        
         data = {
             'days': days,
             'groups': groups,
             'hours': hours,
-            'records' : records,
         }
-        
-        return render_to_response( 'records/own.html', data, context_instance = RequestContext( request ))
-    
-    
+        return render_to_response( 'records/own.html', data)
+    except NonStudentException:
+        request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
+        # trzeba dodac redirecta
     
     

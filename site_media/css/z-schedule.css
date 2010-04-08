@@ -1,24 +1,39 @@
 /**
- * Style dotyczące planu zajęc
+ * Schedule styles
  */
 
 .schedule-wrapper {  margin:auto; }
 		
-table.schedule-table-simple 
-	{ border-collapse:collapse; margin:auto; width:700px;}
+.schedule-table-simple 
+	{ border-collapse:collapse; margin:auto; width:700px; border-collapse:collapse; }
 	
-table.schedule-table 
+.schedule-table-simple, .schedule-table-simple td, .schedule-table-simple th
+	{ border:2px solid black; } 
+	
+.schedule-table-simple th
+	{ background: #C0C0C0; }
+	
+.schedule-table-simple tr.even 
+	{ background: #CDCDCD; }
+	
+.schedule-table 
 	{ border-collapse:collapse; margin:auto;  }
+	
+.schedule-table td
+	{ vertical-align: top;  }
 
-.schedule-grid-cell 
+.schedule-day-cell 
 	{ border-style:solid; border-width:1px; border-color: #dddddd; }
 
-.schedule-grid-cell-content,
+.schedule-column-place-indicator 
+	{ height:0; position:relative; width: 105px; }
+
+.schedule-grid-cell,
 .schedule-days-cell-content,
 .schedule-hours-cell-content
 	{ border-style:solid; border-width:1px}
 
-.schedule-grid-cell-content 
+.schedule-grid-cell 
 	{ position:relative; width: 110px; height: 30px; border-color: #dddddd; }
 
 .schedule-days-cell-content 
@@ -27,5 +42,5 @@ table.schedule-table
 .schedule-hours-cell-content 
 	{ overflow:hidden; width: 40px; height: 30px; border-color: transparent; }
 
-.group-term 
+.schedule-group-term 
 	{ position:absolute; top:0; left:0; border:2px solid gray; background:white; color:gray; width:108px; z-index:500;}

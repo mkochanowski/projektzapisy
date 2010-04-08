@@ -3,10 +3,11 @@
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/z-schedule.css" type="text/css" />
 {% endblock %}
+{% block scripts %}
+	<script src="/site_media/js/z-schedule.js" type="text/javascript"></script>
+{% endblock %}
 
 {% block content %}
-
-	
 	<div class="schedule-wrapper">
 		<table class="schedule-table">
 			<tr>
@@ -22,26 +23,16 @@
 			<tr>
 				<td>
 					{% for hour in hours %}
-						<div class="schedule-hours-cell-content">
+						<div class="schedule-hours-cell-content" id="shedule-hour-{{ hour.0 }}">
 							{{ hour.1 }}
 						</div>
 					{% endfor %}
 				</td>
 				{% for day in days %}
-					<td class="schedule-grid-cell">
+					<td class="schedule-day-cell">
+						<div class="schedule-column-place-indicator" id="schedule-column-day-{{ day.0 }}"></div>
 						{% for hour in hours %}
-							<div class="schedule-grid-cell-content">
-								{% for group in groups %}
-									{% for term in group.terms_ %}
-										{% ifequal term.dayOfWeek day.0  %}
-											{% ifequal term.hourFrom hour.0  %}
-												<div class="group-term" style="height: {{ term.length }}px">
-													{{ group }}
-												</div>
-											{% endifequal  %}
-										{% endifequal  %}
-									{% endfor %}
-								{% endfor %}
+							<div class="schedule-grid-cell">
 								&nbsp;
 							</div>
 						{% endfor %}
@@ -49,29 +40,40 @@
 				{% endfor %}
 			</tr>
 		</table>
+		
+		{% for group in groups %}
+			{% for term in group.terms_ %}
+				<div class="schedule-group-term" from="{{ term.time_from_offset_in_minutes }}" minutes="{{ term.length_in_minutes }}" day="{{ term.dayOfWeek }}">
+					{{ group }}
+				</div>
+			{% endfor %}
+		{% endfor %}
+	</div>
+
+		
 		<p>Zajecia na które jesteś zapisany:</p>
 	    <table class="schedule-table-simple">
 	    	<tr>
-				<td>Przedmiot</td>
-				<td>Termin</td>
-				<td>Sale</td>
+				<th>Przedmiot</th>
+				<th>Termin</th>
+				<th>Sala</th>
 			</tr>
-	    {% for group in groups %}
-			{% for term in group.terms_ %}
-	       	<tr>
-				<td>{{group}}</td>
-				<td>{{term}}</td>
-				<td>
-					{% for class in group.get_all_classrooms %}
-						{{class}}
-					{% endfor %}
-				</td>
-			</tr>
-	       		{% empty %}brak zajęć
-		   {% endfor %}
-	    {% endfor %}
+		    {% for group in groups %}
+				{% for term in group.terms_ %}
+		       	<tr>
+					<td>{{group}}</td>
+					<td>{{term}}</td>
+					<td>
+						{% for class in group.get_all_classrooms %}
+							{{class}}
+						{% endfor %}
+					</td>
+				</tr>
+		       		{% empty %}brak zajęć
+			   {% endfor %}
+		    {% endfor %}
 	    </table>
-	</div>
+	
 
     
 {% endblock %}
