@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import re
 
 from django.contrib.auth.decorators import login_required
 from django.http                    import HttpResponseRedirect
@@ -73,7 +74,9 @@ def subjectForm(request, sid = None):
 		
         #@todo: zmienic na ModelForm
 		if subjectName and subjectDescription and subjectLectures and subjectExercises and subjectLaboratories:
+			slug = re.sub(" +", "_", subjectName)
 			subject.name = subjectName
+			subject.slug = slug
 			subject.lectures = subjectLectures
 			subject.exercises = subjectExercises
 			subject.laboratories = subjectLaboratories
