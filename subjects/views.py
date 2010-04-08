@@ -48,6 +48,7 @@ def subject( request, slug ):
     }         
     return render_to_response( 'subjects/subject.html', data, context_instance = RequestContext( request ) )
 
+
 def subjectForm(request, sid = None):
 	"""
 		Formularz do dodawania i edycji przedmiotu.
@@ -74,8 +75,23 @@ def subjectForm(request, sid = None):
 		
         #@todo: zmienic na ModelForm
 		if subjectName and subjectDescription and subjectLectures and subjectExercises and subjectLaboratories:
-			slug = re.sub(" +", "_", subjectName)
 			subject.name = subjectName
+			slug = subjectName.lower()
+			#@todo stworzyc funkcje generujaca slug
+			slug = re.sub(u'ą', "a", slug)
+			slug = re.sub(u'ę', "e", slug)
+			slug = re.sub(u'ś', "s", slug)
+			slug = re.sub(u'ć', "c", slug)
+			slug = re.sub(u'ż', "z", slug)
+			slug = re.sub(u'ź', "z", slug)
+			slug = re.sub(u'ł', "l", slug)
+			slug = re.sub(u'ó', "o", slug)
+			slug = re.sub(u'ć', "c", slug)
+			slug = re.sub(u'ń', "n", slug)
+			slug = re.sub("\W", "-", slug)
+			slug = re.sub("-+", "-", slug)
+			slug = re.sub("^-", "", slug)
+			slug = re.sub("-$", "", slug)
 			subject.slug = slug
 			subject.lectures = subjectLectures
 			subject.exercises = subjectExercises
@@ -103,8 +119,8 @@ def subjectForm(request, sid = None):
 	return render_to_response( 'subjects/subject_form.html', data);
 
 @login_required
-def subjectHistory( request, slug):
-    subject      = Subject.objects.get(slug = slug)
+def subjectHistory( request, slug ):
+    subject = Subject.objects.get(slug=slug)
     descriptions = subject.descriptions.order_by('-date')
     data         = {'descriptions' : descriptions}
 
