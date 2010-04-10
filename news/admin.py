@@ -4,6 +4,7 @@ from news.models import News
 from django.contrib import admin
 
 class NewsAdmin(admin.ModelAdmin):
+    fields = ('title', 'body')
     list_display = ('title', 'date')
     list_filter  = ['date']
 
