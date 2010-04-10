@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -27,8 +27,10 @@ class Student(BaseUser):
     ''' 
     Student.
     '''
+    matricula = models.CharField(max_length=20, default="", unique=True)
+    
     def __unicode__(self):
         return str(self.user)
-    
+
 # tutsj oczywiscie bedziemy dodawac pola wg uznania
 # widok w adminie rowniez do zaprojektownia (na podstawie w/w pol)
