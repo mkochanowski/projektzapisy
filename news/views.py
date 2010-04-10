@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from news.models import News
 
 news_per_page = 5
@@ -38,4 +39,5 @@ def paginated_news(self,
          'older_no': max(News.objects.count() - (beginwith + quantity), 0),
          'older_beginwith': beginwith + quantity,
          'archive_view': archive,
-        } )
+        },
+        context_instance = RequestContext(self))

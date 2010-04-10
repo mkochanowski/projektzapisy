@@ -14,7 +14,7 @@ from fereol.subjects.models         import *
 @login_required
 def subjects(request):
     subjects = Subject.objects.all()
-    return render_to_response( 'subjects/subjects_list.html', { 'subjects' : subjects, 'mode' : 'list' } )
+    return render_to_response( 'subjects/subjects_list.html', { 'subjects' : subjects, 'mode' : 'list' }, context_instance = RequestContext(request) )
 
 @login_required
 def subject( request, slug ):
@@ -165,15 +165,15 @@ def subjectForm(request, sid = None):
         'mode'      : 'form',
         'subjects'  : Subject.objects.all()
     }
-    return render_to_response( 'subjects/subjects_list.html', data);               
+    return render_to_response( 'subjects/subjects_list.html', data, context_instance = RequestContext(request));
 
 @login_required
 def subjectHistory( request, sid ):
     subject      = Subject.objects.get( pk = sid)
     descriptions = subject.descriptions.order_by( '-date' )
     data         = { 'descriptions' : descriptions }
-
-    return render_to_response ( 'subjects/subject_history.html', data ) 
+    
+    return render_to_response ('subjects/subject_history.html', data, context_instance = RequestContext(request)) 
     
 @login_required
 def subjectViewArcival( request, descid ):

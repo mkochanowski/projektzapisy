@@ -37,7 +37,11 @@
 					</li>
 					<li><a href="#">Pracownicy</a></li>
 					<li><a href="#">Inne</a></li>
-					<li>Imie Nazwisko <a href="{% url user-logout %}">(wyloguj)</a></li>
+					{% if user.is_authenticated %}
+					<li>{{ user.first_name }} {{user.last_name }} {{user.student.matricula}} <a href="{% url user-logout %}">(wyloguj)</a></li>
+					{% else %}
+					<li><a href="{% url user-login %}">Zaloguj</a></li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>

@@ -6,10 +6,7 @@ from django.template import RequestContext
 
 @login_required
 def profile(request):
-    data = {
-        'user': request.user,
-    }
-    return render_to_response('users/profile.html', data, context_instance = RequestContext( request ))
+    return render_to_response('users/profile.html', context_instance = RequestContext( request ))
 
 def logout(request):
     auth.logout(request)
