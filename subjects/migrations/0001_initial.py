@@ -70,13 +70,13 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('subjects_group_term', ['group_id', 'term_id'])
 
-        # Adding model 'Books'
-        db.create_table('subjects_books', (
+        # Adding model 'Book'
+        db.create_table('subjects_book', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.TextField')()),
             ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'])),
         ))
-        db.send_create_signal('subjects', ['Books'])
+        db.send_create_signal('subjects', ['Book'])
     
     
     def backwards(self, orm):
@@ -102,8 +102,8 @@ class Migration(SchemaMigration):
         # Removing M2M table for field term on 'Group'
         db.delete_table('subjects_group_term')
 
-        # Deleting model 'Books'
-        db.delete_table('subjects_books')
+        # Deleting model 'Book'
+        db.delete_table('subjects_book')
     
     
     models = {
@@ -143,8 +143,8 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'subjects.books': {
-            'Meta': {'object_name': 'Books'},
+        'subjects.book': {
+            'Meta': {'object_name': 'Book'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {}),
             'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"})

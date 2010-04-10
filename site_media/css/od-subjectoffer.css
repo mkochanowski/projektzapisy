@@ -63,6 +63,17 @@
 	margin-left: 20px;
 }
 
+
+#od-subjectoffer-form table .book input
+{
+	width: 300px;	
+}
+
+#od-subjectoffer-form table  a
+{
+	padding-left: 20px;	
+}
+
 #od-subjectoffer-form-title input
 {
 	width: 100%;

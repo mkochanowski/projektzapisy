@@ -2,8 +2,8 @@
 
 from django.db import models
 
-class Books( models.Model ):
-    subject = models.ForeignKey('Subject', verbose_name = 'przedmiot')
+class Book( models.Model ):
+    subject = models.ForeignKey('Subject', verbose_name = 'przedmiot', related_name = 'books')
     name = models.TextField( verbose_name = 'nazwa' )
     
     class Meta:

@@ -50,73 +50,117 @@ def subject( request, slug ):
 
 
 def subjectForm(request, sid = None):
-	"""
-		Formularz do dodawania i edycji przedmiotu.
-	"""
-	editMode = True if sid else False
-	message = None
-	
-	subject = None
-	if editMode:
-		try:
-			subject = Subject.objects.get(pk = sid)
-		except:			
-			editMode = False
-	
-	if request.method == 'POST':
-		if not editMode:
-			subject = Subject()
-	
-		subjectName = request.POST.get('name', '')
-		subjectDescription = request.POST.get('description', '')
-		subjectLectures = request.POST.get('lectures', '')
-		subjectExercises = request.POST.get('exercises', '')
-		subjectLaboratories = request.POST.get('laboratories', '')
-		
-        #@todo: zmienic na ModelForm
-		if subjectName and subjectDescription and subjectLectures and subjectExercises and subjectLaboratories:
-			subject.name = subjectName
-			slug = subjectName.lower()
-			#@todo stworzyc funkcje generujaca slug
-			slug = re.sub(u'ą', "a", slug)
-			slug = re.sub(u'ę', "e", slug)
-			slug = re.sub(u'ś', "s", slug)
-			slug = re.sub(u'ć', "c", slug)
-			slug = re.sub(u'ż', "z", slug)
-			slug = re.sub(u'ź', "z", slug)
-			slug = re.sub(u'ł', "l", slug)
-			slug = re.sub(u'ó', "o", slug)
-			slug = re.sub(u'ć', "c", slug)
-			slug = re.sub(u'ń', "n", slug)
-			slug = re.sub("\W", "-", slug)
-			slug = re.sub("-+", "-", slug)
-			slug = re.sub("^-", "", slug)
-			slug = re.sub("-$", "", slug)
-			subject.slug = slug
-			subject.lectures = subjectLectures
-			subject.exercises = subjectExercises
-			subject.laboratories = subjectLaboratories
-			subject.save()
-			
-			description = SubjectDescription()
-			description.description = subjectDescription
-			description.date = datetime.datetime.now()
-			description.subject = subject
-			description.save()
-			
-			if editMode:
-				message = 'Zmiany zostały wprowadzone'
-			else:
-				message = 'Przedmiot został dodany'
- 		else:
-			message = 'Wypełnij wszystkie pola'
-		
-	data = {
-		'editMode' : editMode,
-		'message' : message,
-		'subject' : subject,
-	}
-	return render_to_response( 'subjects/subject_form.html', data);
+    """
+        Formularz do dodawania i edycji przedmiotu.
+    """
+    editMode = True if sid else False    
+    message = None
+    booksToForm = []
+    success = False
+    subjectDescription = ""
+    
+    subject = None
+    if editMode:
+        try:
+            subject = Subject.objects.get(pk = sid)
+            subjectDescription = subject.description().description 
+        except:            
+            editMode = False
+    
+    if request.method == 'POST':        
+        if not editMode:
+            subject = Subject()
+            
+        correctForm = True
+        
+        """ Read data from html form """
+        
+        subjectName = request.POST.get('name', '')
+        subjectDescription = request.POST.get('description', '')
+        
+        books = request.POST.getlist('books[]')
+        
+        try:
+            subjectLectures = int(request.POST.get('lectures', 0))                        
+        except:        
+            subjectLectures = 0             
+            
+        try:            
+            subjectExercises = int(request.POST.get('exercises', 0))            
+        except:                    
+            subjectExercises = 0            
+            
+        try:            
+            subjectLaboratories = int(request.POST.get('laboratories', 0))
+        except:                    
+            subjectLaboratories = 0
+            
+        subject.name = subjectName
+        subject.lectures = subjectLectures
+        subject.exercises = subjectExercises
+        subject.laboratories = subjectLaboratories            
+        subject.slug = subject.createSlug(subject.name)        
+        
+        if Subject.objects.filter(slug = subject.slug).exclude(id = subject.id).count() > 0:                
+            message = 'Istnieje już przedmiot o takiej nazwie'
+            correctForm = False                                    
+            
+        if subjectName == "" or subjectDescription == "":
+            message = 'Wypełnij wszystkie pola'
+            correctForm = False
+                            
+        if subjectLectures < 0 and subjectExercises < 0 and subjectLaboratories < 0:
+            message = "Ilości godzin muszą być liczbami naturalnymi"
+            correctForm = False
+            
+        if correctForm:
+                        
+            subject.save()
+            
+            description = SubjectDescription()
+            description.description = subjectDescription
+            description.date = datetime.datetime.now()
+            description.subject = subject
+            description.save()
+            
+            for book in subject.books.all():
+                fieldValue =  request.POST.get('book' + str(book.id), None)                                                
+                if fieldValue != None:
+                    if fieldValue == "":                    
+                        book.delete()
+                    elif book.name != fieldValue:
+                        book.name = fieldValue
+                        book.save()                                                
+          
+            for bookName in books:
+                if bookName != "":
+                    book = Book(name = bookName, subject = subject).save()
+                    
+            success = True                                     
+                                               
+            if editMode:
+                message = 'Zmiany zostały wprowadzone'
+            else:
+                message = 'Przedmiot został dodany'
+                subject = None
+                subjectDescription = ""
+        
+        if subject and subject.id:
+            booksToForm = list(subject.books.all())
+        
+        
+    if request.method == "POST" and not success:
+        for bookName in request.POST.getlist('books[]'):
+            booksToForm.append({ "id" : None, "name" : bookName})
+    
+    data = {
+        'editMode'  : editMode,
+        'message'   : message,
+        'subject'   : subject,
+        'books'     : booksToForm,
+        'subjectDescription' : subjectDescription
+    }
+    return render_to_response( 'subjects/subject_form.html', data);               
 
 @login_required
 def subjectHistory( request, slug ):

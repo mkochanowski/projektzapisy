@@ -123,3 +123,13 @@
 }
 
 /*** ZAWARTOŚĆ ***/
+
+
+/*** KOMUNIKATY ***/
+
+.message {
+    text-align: center;
+    font-weight: bold;
+    color: red;
+    margin: 10px 0px;    
+}
