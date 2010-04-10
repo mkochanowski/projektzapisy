@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.contrib.auth.models import User
 
 from datetime import datetime, timedelta
 
@@ -25,6 +26,7 @@ class News(models.Model):
     body = models.TextField(verbose_name=u'Treść',
                             blank=True)
     date = models.DateTimeField(default=datetime.now)
+    author = models.ForeignKey(User)
     
     objects = NewsManager()
     

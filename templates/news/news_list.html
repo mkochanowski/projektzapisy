@@ -26,6 +26,9 @@
       <div class="od-news-body">
         {{ news.body|linebreaks }}
       </div>
+      <div class="od-news-footer">
+	{{ news.author.first_name }} {{ news.author.last_name }}
+      </div>
     </div>
   {% endfor %}
     <div class="od-news-navigator">
