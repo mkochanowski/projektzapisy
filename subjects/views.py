@@ -145,13 +145,14 @@ def subjectForm(request, sid = None):
                 subject = None
                 subjectDescription = ""
         
-        if subject and subject.id:
-            booksToForm = list(subject.books.all())
+    if subject and subject.id:
+        booksToForm = list(subject.books.all())
         
         
     if request.method == "POST" and not success:
         for bookName in request.POST.getlist('books[]'):
             booksToForm.append({ "id" : None, "name" : bookName})
+    
     
     data = {
         'editMode'  : editMode,
