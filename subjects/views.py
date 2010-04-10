@@ -157,6 +157,7 @@ def subjectForm(request, sid = None):
     
     
     data = {
+        'editForm'  : True,
         'editMode'  : editMode,
         'message'   : message,
         'subject'   : subject,

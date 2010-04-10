@@ -8,6 +8,21 @@
 <script type="text/javascript" src="/site_media/js/subjects/form.js"></script>
 {% endblock %}
 
+{% block main-navigation %}
+<li>Oferta</li>
+<li><a href="{% url subject-list %}">Propozycje</a></li>
+{% if subject %}
+  <li><a href="{% url subject-page slug=subject.slug %}">{{subject.slug}}</a></li>
+  {% if editMode %}
+    <li>Edycja</li>
+  {% endif %}
+{% else %}
+  {% if editForm %}
+    <li>Dodaj nową</li>
+  {% endif %}
+{% endif %}
+{% endblock %}
+
 
 {% block content %}
 
