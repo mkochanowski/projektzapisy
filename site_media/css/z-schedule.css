@@ -2,7 +2,7 @@
  * Schedule styles
  */
 
-.schedule-wrapper {  margin:auto; }
+#schedule-wrapper {  margin:auto; }
 		
 .schedule-table-simple 
 	{ border-collapse:collapse; margin:auto; width:700px; border-collapse:collapse; }
@@ -26,7 +26,7 @@
 	{ border-style:solid; border-width:1px; border-color: #dddddd; }
 
 .schedule-column-place-indicator 
-	{ height:0; position:relative; width: 105px; }
+	{ height:0; z-index:1000; position:relative; width: 110px;  border-left:1px solid white; border-right:1px solid white;}
 
 .schedule-grid-cell,
 .schedule-days-cell-content,
@@ -34,13 +34,19 @@
 	{ border-style:solid; border-width:1px}
 
 .schedule-grid-cell 
-	{ position:relative; width: 110px; height: 30px; border-color: #dddddd; }
+	{ position:relative; width: 110px; height: 30px; border-color: #dddddd; z-index:1;}
 
 .schedule-days-cell-content 
-	{ overflow:hidden; text-transform:capitalize; text-align:center; width: 110px; border-color: transparent; }
+	{ overflow:hidden; text-transform:capitalize; text-align:center; width: 100%; border-color: transparent; }
 
 .schedule-hours-cell-content 
 	{ overflow:hidden; width: 40px; height: 30px; border-color: transparent; }
 
 .schedule-group-term 
-	{ position:absolute; top:0; left:0; border:2px solid gray; background:white; color:gray; width:108px; z-index:500;}
+	{ position:absolute; top:0; left:0; z-index:500; overflow:hidden; padding:0 4px 4px 0; color:black; background:white;  border-color:gray;}
+	
+.schedule-group-term:hover
+	{ z-index:2000!important;width:100%!important; left:0!important; font-size:16px!important }
+	
+.schedule-group-term-m
+	{ border-style:solid; border-width:2px; border-color:inherit; background-color:inherit; width:100%; height:100%; font-size:10px }

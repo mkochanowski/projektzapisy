@@ -7,14 +7,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
+from django.shortcuts import redirect
 
 from subjects.models import *
 from users.models import *
 from records.models import *
 from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException
-from django.shortcuts import redirect
 
 from datetime import time
+
+
 
 @login_required
 def assign(request, group_id):
