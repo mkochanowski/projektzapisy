@@ -168,21 +168,27 @@ def subjectForm(request, sid = None):
     return render_to_response( 'subjects/subjects_list.html', data);               
 
 @login_required
-def subjectHistory( request, slug ):
-    subject = Subject.objects.get(slug=slug)
-    descriptions = subject.descriptions.order_by('-date')
-    data         = {'descriptions' : descriptions}
+def subjectHistory( request, sid ):
+    subject      = Subject.objects.get( pk = sid)
+    descriptions = subject.descriptions.order_by( '-date' )
+    data         = { 'descriptions' : descriptions }
 
-    return render_to_response ('subjects/subject_history.html', data) 
+    return render_to_response ( 'subjects/subject_history.html', data ) 
+    
+@login_required
+def subjectViewArcival( request, descid ):
+    desc = SubjectDescription.objects.get( pk = descid )
+    data = {'desc' : desc}
+    
+    return render_to_response ('subjects/subject_archival.html', data)
     
 @login_required
 def subjectRestore ( request, descid ):
-    olddesc = SubjectDescription.objects.get(id = descid)
-    
+    olddesc = SubjectDescription.objects.get( pk = descid )
     newdesc             = SubjectDescription()
     newdesc.description = olddesc.description
     newdesc.date        = datetime.datetime.now()
     newdesc.subject     = olddesc.subject
     newdesc.save()
     
-    return HttpResponseRedirect(newdesc.subject.slug)
+    return subject( request, olddesc.subject.slug )
