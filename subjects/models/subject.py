@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 from django.db import models
+import re
 
 class Subject( models.Model ):
     
@@ -27,3 +28,21 @@ class Subject( models.Model ):
 
     def __unicode__(self):
         return self.name
+        
+    def createSlug(self, name):
+        slug = name.lower()
+        slug = re.sub(u'ą', "a", slug)
+        slug = re.sub(u'ę', "e", slug)
+        slug = re.sub(u'ś', "s", slug)
+        slug = re.sub(u'ć', "c", slug)
+        slug = re.sub(u'ż', "z", slug)
+        slug = re.sub(u'ź', "z", slug)
+        slug = re.sub(u'ł', "l", slug)
+        slug = re.sub(u'ó', "o", slug)
+        slug = re.sub(u'ć', "c", slug)
+        slug = re.sub(u'ń', "n", slug)
+        slug = re.sub("\W", "-", slug)
+        slug = re.sub("-+", "-", slug)
+        slug = re.sub("^-", "", slug)
+        slug = re.sub("-$", "", slug)
+        return slug     

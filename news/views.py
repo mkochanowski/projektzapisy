@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from news.models import News
 
 news_per_page = 5
@@ -14,14 +15,17 @@ def latest_news(self):
     no_new = News.objects.count_new()
     if no_new > 2:
         return paginated_news(self,beginwith=0,
-                              quantity=no_new)
+                              quantity=no_new,
+                              archive=False)
     else:
         return paginated_news(self,beginwith=0,
-                              quantity=2)
+                              quantity=2,
+                              archive=False)
 
 def paginated_news(self,
                    beginwith,
-                   quantity=news_per_page):
+                   quantity=news_per_page,
+                   archive=True):
     '''Wyświetla ogłoszenia.
 
     beginwith - pierwsze wyświetlane, licząc od zera
@@ -33,5 +37,7 @@ def paginated_news(self,
          'newer_no': beginwith,
          'newer_beginwith': max(beginwith - quantity, 0),
          'older_no': max(News.objects.count() - (beginwith + quantity), 0),
-         'older_beginwith': beginwith + quantity
-        } )
+         'older_beginwith': beginwith + quantity,
+         'archive_view': archive,
+        },
+        context_instance = RequestContext(self))

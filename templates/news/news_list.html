@@ -4,6 +4,13 @@
 <link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
 {% endblock %}
 
+{% block main-navigation %}
+<li><a href="{% url news.views.latest_news %}">Aktualności</a></li>
+{% if archive_view %}
+<li>Archiwum</li>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 
 <div id="main-content" class="narrow">
@@ -18,6 +25,9 @@
       </div>
       <div class="od-news-body">
         {{ news.body|linebreaks }}
+      </div>
+      <div class="od-news-footer">
+	{{ news.author.first_name }} {{ news.author.last_name }}
       </div>
     </div>
   {% endfor %}

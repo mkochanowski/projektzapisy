@@ -61,7 +61,7 @@ def own(request):
             'groups': groups,
             'hours': hours,
         }
-        return render_to_response( 'records/own.html', data)
+        return render_to_response( 'records/own.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
         # trzeba dodac redirecta

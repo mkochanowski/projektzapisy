@@ -42,7 +42,7 @@
 	background: #dddddd;
 }
 
-#od-subjectoffer-subjectlist li.active span
+#od-subjectoffer-subjectlist li.active a
 {
 	background: #f7f7f7;
 }
@@ -61,6 +61,17 @@
 {
 	width: 40px; /* ilości godzin */
 	margin-left: 20px;
+}
+
+
+#od-subjectoffer-form table .book input
+{
+	width: 300px;	
+}
+
+#od-subjectoffer-form table  a
+{
+	padding-left: 20px;	
 }
 
 #od-subjectoffer-form-title input

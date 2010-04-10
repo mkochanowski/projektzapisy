@@ -3,10 +3,7 @@
 from django.test import TestCase
 from news.models import News
 
-import datetime
-
-def today():
-    return datetime.date(2010, 3, 26)
+from utils import generate_random_news
 
 class NewsModelTest(TestCase):
     def test_creating_news(self):
@@ -15,8 +12,9 @@ class NewsModelTest(TestCase):
         self.assertEquals(str(n1), "news test")
     
 class NewsManagerTest(TestCase):
-    fixtures = ['news_manager_test_data.json']
-    
     def test_count_new(self):
-        # 4 - prawidłowa wartość z fikstury
-        self.assertEquals(4, News.objects.count_new(now=today))
+        (new, old, ns) = generate_random_news()
+        self.assertEquals(new, News.objects.count_new())
+        for n in ns:
+            n.delete()
+    

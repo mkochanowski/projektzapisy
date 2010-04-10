@@ -1,3 +1,5 @@
+{% load news_extras %}
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
 <head>
@@ -24,7 +26,7 @@
 			<h1><a href="/">Fereol &copy;</a></h1>
 			<div id="main-menu">
 				<ul id="main-menu-list">
-					<li><a href="#">Aktualności</a> (2)</li>
+				        <li><a href="{% url news.views.latest_news %}">Aktualności</a> ({% newscount %})</li>
 					<li>Przedmioty
 						<ul>
 							<li><a href="{% url record-schedule %}">Plan Zajęć</a></li>
@@ -35,14 +37,18 @@
 					</li>
 					<li><a href="#">Pracownicy</a></li>
 					<li><a href="#">Inne</a></li>
-					<li>Imie Nazwisko <a href="{% url user-logout %}">(wyloguj)</a></li>
+					{% if user.is_authenticated %}
+					<li>{{ user.first_name }} {{user.last_name }} {{user.student.matricula}} <a href="{% url user-logout %}">(wyloguj)</a></li>
+					{% else %}
+					<li><a href="{% url user-login %}">Zaloguj</a></li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>
 		<div id="main-navigation">
 			<ul>
-				<li><a href="#">Level 1</a></li>
-				<li><a href="#">Level 2</a></li>
+			  {% block main-navigation %}
+			  {% endblock %}
 			</ul>
 		</div>
 		{% block content %}
