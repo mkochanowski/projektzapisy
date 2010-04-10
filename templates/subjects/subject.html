@@ -1,6 +1,4 @@
-﻿{% extends "base.html" %}
 
-{% block content %}
     {% if messages %}
     <ul>
         {% for message in messages %}
@@ -9,6 +7,9 @@
     </ul>
     {% endif %}
     <h1>{{subject.name}}</h1>
+    <div class="actions">
+    <a href="">Historia zmian</a> :: <a href="/subjects/edit/{{subject.id}}/">Edytuj</a>
+    </div>
     <ul>
         <li>Wykłady: {{subject.lectures}} godz.</li>
         <li>Ćwiczenia: {{subject.exercises}} godz.</li>
@@ -79,4 +80,4 @@
     {% endfor %}
     </ul>
     
-{% endblock %}
+    

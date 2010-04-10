@@ -42,7 +42,7 @@
 	background: #dddddd;
 }
 
-#od-subjectoffer-subjectlist li.active span
+#od-subjectoffer-subjectlist li.active a
 {
 	background: #f7f7f7;
 }

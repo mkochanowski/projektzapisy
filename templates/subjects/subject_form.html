@@ -1,23 +1,4 @@
-{% extends "base.html" %}
 
-{% block styles %}
-<link rel="stylesheet" href="/site_media/css/od-subjectoffer.css" type="text/css" />
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript" src="/site_media/js/subjects/form.js"></script>
-{% endblock %}
-
-{% block content %}
-
-<div id="main-content" class="narrow">
-    <ul id="od-subjectoffer-subjectlist">
-        <li><a href="#">Algorytmy rozproszone 2</a></li>
-        <li class="active"><span>CCNA 2</span></li>
-        <li><a href="#">Języki formalne 2</a></li>
-        <li><a href="#">Bazy danych</a></li>
-    </ul>
-    <div id="od-subjectoffer-contents">
        {% if message %}<div class="message">{{ message }}</div>{% endif %}
         <form action="" method="post" id="od-subjectoffer-form">
 
@@ -71,7 +52,3 @@
 
             <p id="od-subjectoffer-form-submit"><input type="submit" value="{% if editMode %}zapisz{% else %}dodaj{% endif %}" /></p>
         </form>
-    </div>
-</div>
-
-{% endblock %}

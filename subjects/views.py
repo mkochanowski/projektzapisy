@@ -14,7 +14,7 @@ from fereol.subjects.models         import *
 @login_required
 def subjects(request):
     subjects = Subject.objects.all()
-    return render_to_response( 'subjects/subjects_list.html', { 'subjects' : subjects } )
+    return render_to_response( 'subjects/subjects_list.html', { 'subjects' : subjects, 'mode' : 'list' } )
 
 @login_required
 def subject( request, slug ):
@@ -41,12 +41,14 @@ def subject( request, slug ):
         lab.enrolled = Record.number_of_students(group = lab)
     
     data = {
-            'subject' : subject,
-            'lectures' : lectures,
-            'exercises' : exercises,
-            'laboratories' : laboratories,
+            'subject'       : subject,
+            'lectures'      : lectures,
+            'exercises'     : exercises,
+            'laboratories'  : laboratories,
+            'mode'          : 'details',
+            'subjects'      : Subject.objects.all()             
     }         
-    return render_to_response( 'subjects/subject.html', data, context_instance = RequestContext( request ) )
+    return render_to_response( 'subjects/subjects_list.html', data, context_instance = RequestContext( request ) )
 
 
 def subjectForm(request, sid = None):
@@ -159,9 +161,11 @@ def subjectForm(request, sid = None):
         'message'   : message,
         'subject'   : subject,
         'books'     : booksToForm,
-        'subjectDescription' : subjectDescription
+        'subjectDescription' : subjectDescription,
+        'mode'      : 'form',
+        'subjects'  : Subject.objects.all()
     }
-    return render_to_response( 'subjects/subject_form.html', data);               
+    return render_to_response( 'subjects/subjects_list.html', data);               
 
 @login_required
 def subjectHistory( request, slug ):

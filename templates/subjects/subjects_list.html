@@ -1,11 +1,36 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<link rel="stylesheet" href="/site_media/css/od-subjectoffer.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="/site_media/js/subjects/form.js"></script>
+{% endblock %}
+
+
 {% block content %}
-	<h1>Przedmioty</h1>
-	<ul>
-	{% for sub in subjects %}
-		<li><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>
-		{% empty %}Brak przedmiotów
-	{% endfor %}
-	</ul>
+
+<div id="main-content" class="narrow">
+    <ul id="od-subjectoffer-subjectlist">
+        {% for sub in subjects %}
+            <li {% ifequal subject.id sub.id %}class="active"{% endifequal %}><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>    		
+    	   {% empty %}<li>Brak przedmiotów</li>
+    	{% endfor %}
+        <li {% ifequal mode 'form' %}{% if not editMode %}class="active"{% endif %}{% endifequal %} ><a  href="/subjects/add/">Dodaj przedmiot</a></li>
+    </ul>
+    <div id="od-subjectoffer-contents">
+        {% ifequal mode 'form' %}
+            {% include 'subjects/subject_form.html' %}
+        {% else %}
+            {% ifequal mode 'details' %}
+                {% include 'subjects/subject.html' %}
+            {% else %}
+                <br /><br /><br /><br /><br /><br />
+            {% endifequal %}
+        {% endifequal %}
+        
+    </div>
+</div>
+
 {% endblock %}
