@@ -115,14 +115,38 @@
 
 /*** BREADCRUMBS - koniec ***/
 
-/*** ZAWARTOŚĆ - koniec ***/
+/*** ZAWARTOŚĆ ***/
+
+#main-content
+{
+	position:relative;
+}
+
+
+#main-content-left 
+{
+	position:absolute;
+	width:30%;
+	height: 100%;
+	top:0; 
+	left:0;
+}
+
+#main-content-right 
+{
+	margin-left: 30%;
+	margin-top: 10px;
+	margin-botton:10px;
+	width:70%;
+	border-left: 2px solid black;
+}
 
 #main-content.narrow
 {
 	padding: 70px;
 }
 
-/*** ZAWARTOŚĆ ***/
+/*** ZAWARTOŚĆ - koniec ***/
 
 
 /*** KOMUNIKATY ***/

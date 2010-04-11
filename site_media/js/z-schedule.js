@@ -1,23 +1,7 @@
 
 $(function(){
 	$('.schedule-table-simple tr:even').addClass('even');
-	$('#schedule-wrapper').schedule();
+	$('#schedule-wrapper').schedule({
+		hourColumnWidth: 40,
+		dayColumnWidth: Math.floor(($('#schedule-wrapper').width() - 140)/5)});
 });
-
-
-/*
- * 
- * .hover(
-					function(){
-						$(this).css({
-							'z-index': '2000',
-							'width': '300px',
-							'height': '300px' 
-						});},
-					function(){
-						$(this).css({
-							'z-index': '2000',
-							'width': '300px',
-							'height': '300px' 
-						});})
- */

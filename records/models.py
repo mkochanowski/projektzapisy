@@ -9,6 +9,17 @@ from exceptions import NonStudentException, NonGroupException, AlreadyAssignedEx
 
 from itertools import cycle
 
+COLOR = [
+     ('#086808', '#719a71'), #green 
+     ('#093a9d', '#5f7ab1'), #blue  
+     ('#724848', '#837878'), #brown
+     ('#7b267a', '#9b789b'), #violet 
+     ('#1B887A', '#7fa6a2'), #ocean 
+     ('#AB8B00', '#bdaf70'), #yellow  
+     ('#b32727', '#b57272'), #red  
+     ('#b10ea7', '#c395c0'), #pink   
+]
+
 class Record( models.Model ):
     group = models.ForeignKey(Group, verbose_name = 'grupa')
     student = models.ForeignKey(Student, verbose_name = 'student')
@@ -23,26 +34,16 @@ class Record( models.Model ):
     def get_student_groups(user_id):
         user = User.objects.get(id=user_id)
         try:
-            
-            color = [
-                     ('#086808', '#719a71'), #green 
-                     ('#093a9d', '#5f7ab1'), #blue  
-                     ('#724848', '#837878'), #brown
-                     ('#7b267a', '#9b789b'), #violet 
-                     ('#1B887A', '#7fa6a2'), #ocean 
-                     ('#AB8B00', '#bdaf70'), #yellow  
-                     ('#b32727', '#b57272'), #red  
-                     ('#b10ea7', '#c395c0'), #pink   
-                    ]
             student = user.student
             records = Record.objects.filter(student = student).order_by('group__subject')
             groups = [record.group for record in records]
             subjects = set([group.subject for group in groups])
-            subject_color = dict(zip(subjects, cycle(color)))
+            subject_color = dict(zip(subjects, cycle(COLOR)))
             for group in groups:
                 group.terms_ = group.get_all_terms()
                 group.background_color = subject_color[group.subject][1]
                 group.border_color = subject_color[group.subject][0]
+                group.subject_ = group.subject
             return groups
         except Student.DoesNotExist:
             raise NonStudentException()

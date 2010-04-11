@@ -1,0 +1,6 @@
+
+#schedule-wrapper {  margin:auto; }
+
+.schedule-prototype-subject { cursor:pointer; }
+.schedule-prototype-subject:hover { text-decoration:underline; }
+.schedule-prototype-subject-hide:after { content: ' schowaj '; }

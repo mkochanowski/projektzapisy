@@ -16,8 +16,6 @@ from exceptions import NonStudentException, NonGroupException, AlreadyAssignedEx
 
 from datetime import time
 
-
-
 @login_required
 def assign(request, group_id):
     try:
@@ -50,20 +48,41 @@ def resign(request, group_id):
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         # trzeba dodac redirecta
 
+def didacticOffer( request ):
+    subjects = Subject.objects.all()
+    return render_to_response( 'records/didactic_offer.html', { 'subjects' : subjects }, context_instance = RequestContext(request) )
+
 @login_required
 def own(request):
     try:
         groups = Record.get_student_groups(request.user.id)
-        hours = [(hour, "%s:00" % hour) for hour in range(8, 23)]
-        days = DAYS_OF_WEEK
         data = {
-            'days': days,
             'groups': groups,
-            'hours': hours,
         }
         return render_to_response( 'records/own.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
         # trzeba dodac redirecta
+ 
+@login_required       
+def schedulePrototype(request):
+    try:
+        student_groups = Record.get_student_groups(request.user.id)
+        subjects = Subject.objects.all()
+        for subject in subjects:
+            subject.groups_ = Group.objects.filter(subject=subject)
+            for group in subject.groups_:
+                group.terms_ = group.get_all_terms()
+        data = {
+            'student_groups': student_groups,
+            'subjects': subjects,
+        }
+        return render_to_response( 'records/schedule_prototype.html', data, context_instance = RequestContext(request))
+    except NonStudentException:
+        request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
+        # trzeba dodac redirecta
+        
+    
+    
     
     

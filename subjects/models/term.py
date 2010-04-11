@@ -14,6 +14,9 @@ class Term( models.Model ):
     hourFrom = models.CharField(max_length = 2, choices = HOURS, verbose_name = 'od')
     hourTo = models.CharField(max_length = 2, choices = HOURS, verbose_name = 'do')
 
+    def day_in_zero_base(self):
+        return int(self.dayOfWeek)-1
+    
     def length_in_minutes(self):
         timeFrom = self.time_from()
         timeTo = self.time_to()

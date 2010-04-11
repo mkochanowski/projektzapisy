@@ -7,47 +7,33 @@ $.widget("ui.schedule", {
 		minPerCell: 60,
 		startMinute: 480,
 		endMinute: 1380,
-		dayList: ['Poniedzialek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'],
+		dayList: ['Poniedzialek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek'],
 		minutesPerCell : 60, 
-		cellHeight: 32
+		cellHeight: 32,
+		hourColumnWidth: 40,
+		dayColumnWidth: 110
 	},
 	
 	_create: function() {
 		
 		var self = this,
-			dayList = this.options.dayList || [],
-			startMinute = this.options.startMinute || 480,
-			endMinute = this.options.endMinute || 1380,
-			minPerCell = this.options.minPerCell || 60,
-			minutesPerCell = this.options.minutesPerCell || 60, 
-			cellHeight = this.options.cellHeight || 32, 
-			cellWidth = this.options.cellWidth || 105;
+			o = this.options;
 		
 		self.initialTerms = self.element.find('div');
 		
 		self.scheduleTable = (self.scheduleTable = $('<table></table>'))
 			.appendTo(self.element)
 			.addClass('schedule-table')
-			.append(self._daysRow(dayList));
+			.append(self._daysRow());
 		
 		var $row = $('<tr></tr>')
-			.append(self._hoursColumn(startMinute, endMinute, minPerCell))
+			.append(self._hoursColumn())
 			.appendTo(self.scheduleTable);
 		
-		/* there is no map in ie:( 
-		 self.dayColumnList = dayList.map(
-			function() { 
-				return self._dayColumn(startMinute, endMinute, minPerCell)
-					.appendTo($row)
-					.children()
-					.first(); 
-			}
-		);*/
-		
 		self.dayColumnList = [];
-		$.each(dayList, function(idx, itm) {
+		$.each(o.dayList, function(idx, itm) {
 			self.dayColumnList.push( 
-				self._dayColumn(startMinute, endMinute, minPerCell)
+				self._dayColumn()
 					.appendTo($row)
 					.children()
 					.first()
@@ -55,69 +41,120 @@ $.widget("ui.schedule", {
 		});
 	
 		self.initialTerms.each(function(){
-			self._addDivTerm($(this), minutesPerCell, cellHeight, cellWidth);
+			self._addDivTerm($(this));
+			self._makeTermFixed($(this));
 		});		
 	},
 	
-	_daysRow: function(dayList) {
+	_daysRow: function() {
 		
-		var $row = $('<tr></tr>').append($('<td></td>'));
-		for (var d = 0; d < dayList.length; d++) {
+		var o = this.options,
+			$row = $('<tr></tr>').append($('<td></td>'));
+		for (var d = 0; d < o.dayList.length; d++) {
 		    $row.append(
 				$('<td></td>').append(
 					$('<div></div>')
-						.addClass('schedule-days-cell-content')
-						.append($('<span>'+dayList[d]+'</span>'))
+						.addClass('schedule-days-cell')
+						.append($('<span>'+o.dayList[d]+'</span>'))
 				)
 			);
 		}
 		return $row;
 	},
 	
-	_hoursColumn: function(startMinute, endMinute, minPerCell) {
+	_hoursColumn: function() {
 		
-		var $column = $('<td></td>');
-		for (var h = startMinute; h < endMinute; h=h+minPerCell) {
-		    $column.append(
-				$('<div></div>')
-					.addClass('schedule-hours-cell-content')
+		var self = this,
+			o = this.options,
+			$column = $('<td></td>'),
+			$placeIndicator = $('<div>&nbsp;</div>')
+					.addClass('schedule-column-place-indicator')
+					.css({
+						height: (o.endMinute-o.startMinute)*o.cellHeight/o.minutesPerCell,
+						width: o.hourColumnWidth})
+					.appendTo($column);
+			
+		for (var h = o.startMinute; h < o.endMinute; h=h+o.minutesPerCell) {
+		    $placeIndicator
+				.append($('<div></div>')
+					.addClass('schedule-hour-separator')
+					.css({
+						left: o.hourColumnWidth + 5,
+						width: (o.dayColumnWidth + 5) * o.dayList.length,
+						top: self._minuteAbsoluteTop(h-o.startMinute)}))
+				.append($('<div></div>')
+					.addClass('schedule-hours-cell')
 					.append($('<span>'+(h/60 >= 10 ? h/60 : '0'+h/60)+':'+(h%60 >= 10 ? h%60 : '0'+h%60)+'</span>'))
+					.css({
+						height: self._termHeight(o.minutesPerCell),
+						top: self._minuteAbsoluteTop(h-o.startMinute)})
 			);
 		}
 		return $column;
 	},
 	
-	_dayColumn: function(startMinute, endMinute, minPerCell) {
+	_dayColumn: function() {
 		
-		var $column = $('<td></td>')
-			.addClass('schedule-day-cell')
-			.append($('<div>&nbsp;</div>')
-				.addClass('schedule-column-place-indicator'));
-				
-	    for (var h = startMinute; h < endMinute; h=h+minPerCell) {
-		    $column.append(
-				$('<div>&nbsp;</div>')
-					.addClass('schedule-grid-cell')
-			);
-		}
-		
+		var o = this.options,
+			$column = $('<td></td>')
+				.addClass('schedule-day-cell')
+				.append($('<div>&nbsp;</div>')
+					.addClass('schedule-column-place-indicator')
+					.css({width: o.dayColumnWidth}));
 		return $column;
 	},
 	
-	addTerm: function(content, day, from, minutes) {
-		
-		this._addDivTerm(
-			$('<div></div>')
-				.attr({
-					minutes: minutes,
-					day: day,
-					from: from}),
-			this.options.minutesPerCell,
-			this.options.cellHeight
-		);
+	_subjectTermClass: function(subjectID) {
+		if(subjectID == undefined) {
+			return 'schedule-unknown-subject-term';
+		}
+		else {
+			return 'schedule-subject-' + subjectID + '-term';
+		}
 	},
 	
-	_addDivTerm: function(divTerm, minutesPerCell, cellHeight) {
+	_subjectTermId: function(termID) {
+		if(termID == undefined) {
+			throw 'GroupID undefined.';
+		}
+		else {
+			return 'schedule-' + termID + '-term';
+		}
+	},
+	
+	addTerm: function(content, day, from, minutes, subjectID, termID) {
+		var self = this,
+			add = true;
+		
+		$('#'+self._subjectTermId(termID)).each(function(){
+			add = false;	
+		});
+		
+		if(add) {
+			this._addDivTerm($('<div></div>').attr({
+				minutes: minutes,
+				day: day,
+				from: from,
+				subjectID: subjectID,
+				termID: termID
+			}).html(content));
+		}
+	},
+	
+	_makeTermFixed: function(termDiv) {
+		termDiv.addClass('schedule-fixed');
+	},
+	
+	deleteTerms: function(subjectID){
+		var self = this;
+		$('.'+self._subjectTermClass(subjectID)+':not(.schedule-fixed)').remove();
+		for(var i=0; i<self.dayColumnList.length; i++){
+			self._orderColumnContent(self.dayColumnList[i]);
+		}
+	},
+	
+	_addDivTerm: function(divTerm) {
+		var self = this;
 		
 		$('<div></div>')
 			.addClass('schedule-group-term-m')
@@ -125,11 +162,24 @@ $.widget("ui.schedule", {
 			.appendTo(divTerm
 				.empty()
 				.addClass('schedule-group-term')
+				.addClass(self._subjectTermClass(divTerm.attr('subjectid')))
+				.attr('id', self._subjectTermId(divTerm.attr('termid')))
 				.css({
-					height: parseInt(divTerm.attr('minutes'))*cellHeight/minutesPerCell - 5,
-					top: parseInt(divTerm.attr('from'))*cellHeight/minutesPerCell})
-				.appendTo(this.dayColumnList[parseInt(divTerm.attr('day'))-1]));
-		this._orderColumnContent(this.dayColumnList[parseInt(divTerm.attr('day'))-1]);
+					height: self._termHeight(parseInt(divTerm.attr('minutes'))),
+					top: self._minuteAbsoluteTop(parseInt(divTerm.attr('from')))})
+				.appendTo(this.dayColumnList[parseInt(divTerm.attr('day'))]));
+				
+		this._orderColumnContent(this.dayColumnList[parseInt(divTerm.attr('day'))]);
+	},
+	
+	_termHeight: function(minutes) {
+		var o = this.options;
+		return minutes*o.cellHeight/o.minutesPerCell - 5;
+	},
+	
+	_minuteAbsoluteTop: function(minute_offset) {
+		var o = this.options;
+		return minute_offset*o.cellHeight/o.minutesPerCell;
 	},
 	
 	_orderColumnContent: function(column) {
