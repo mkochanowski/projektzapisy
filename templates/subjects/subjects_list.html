@@ -19,15 +19,18 @@
 <li>Oferta</li>
 <li><a href="{% url subject-list %}">Propozycje</a></li>
 {% if subject %}
-  <li><a href="{% url subject-page slug=subject.slug %}">{{subject.slug}}</a></li>
-  {% if editMode %}
-    <li>Edycja</li>
-  {% endif %}
-{% else %}
-  {% if editForm %}
-    <li>Dodaj nową</li>
-  {% endif %}
+    {% if subject.pk %}
+        <li><a href="{% url subject-page slug=subject.slug %}">{{subject.slug}}</a></li>  
+        {% if editMode %}
+            <li>Edycja</li>
+        {% endif %}
+    {% else %}
+        {% if editForm %}
+            <li>Dodaj nową</li>
+        {% endif %}
+    {% endif %}
 {% endif %}
+
 {% endblock %}
 
 
