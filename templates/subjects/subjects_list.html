@@ -36,7 +36,7 @@
 <div id="main-content" class="narrow">
     <ul id="od-subjectoffer-subjectlist">
         {% for sub in subjects %}
-            <li {% ifequal subject.id sub.id %}class="active"{% endifequal %}><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>    		
+            <li {% ifequal subject.id sub.id %}class="active"{% endifequal %}><a href="{% url subject-page slug=sub.slug %}">{{sub.name}}</a></li>    		
     	   {% empty %}<li>Brak przedmiotów</li>
     	{% endfor %}
         <li {% ifequal mode 'form' %}{% if not editMode %}class="active"{% endif %}{% endifequal %} ><a  href="/subjects/add/">Dodaj przedmiot</a></li>
