@@ -1,9 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
-from subjects.models import Group, Subject
-from users.models import Employee, Student
-from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException
+
+from enrollment.subjects.models import Group, Subject
 from models import Record
+from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException
+
+from users.models import Employee, Student
+
 import mox
 
 class AddUserToGroupTest(TestCase):

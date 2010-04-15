@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block contents %}
+<h1> {{descriptions.0.subject.name}} </h1>
+<h3> Opisy: </h3>
+{% for desc in descriptions %}
+<h5> {{desc.date.__unicode__}} </h5>
+<p>
+<a href='/subjects/restore/{{desc.subject.slug}}/{{desc.id}}'><b>Przywróć</b></a>
+{{desc.description}}
+</p>
+{% empty %} Brak opisów
+{% endfor %}
+
+{% endblock %}

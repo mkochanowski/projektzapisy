@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Przedmioty</h1>
+	<ul>
+	{% for sub in subjects %}
+		<li><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>
+		{% empty %}Brak przedmiotów
+	{% endfor %}
+	</ul>
+{% endblock %}

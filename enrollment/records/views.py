@@ -9,9 +9,9 @@ from django.template import RequestContext
 from django.conf import settings
 from django.shortcuts import redirect
 
-from subjects.models import *
+from enrollment.subjects.models import *
 from users.models import *
-from records.models import *
+from enrollment.records.models import *
 from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException
 
 from datetime import time
@@ -48,10 +48,6 @@ def resign(request, group_id):
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         # trzeba dodac redirecta
 
-def didacticOffer( request ):
-    subjects = Subject.objects.all()
-    return render_to_response( 'records/didactic_offer.html', { 'subjects' : subjects }, context_instance = RequestContext(request) )
-
 @login_required
 def own(request):
     try:
@@ -59,7 +55,7 @@ def own(request):
         data = {
             'groups': groups,
         }
-        return render_to_response( 'records/own.html', data, context_instance = RequestContext(request))
+        return render_to_response( 'enrollment/records/schedule.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
         # trzeba dodac redirecta
@@ -77,7 +73,7 @@ def schedulePrototype(request):
             'student_groups': student_groups,
             'subjects': subjects,
         }
-        return render_to_response( 'records/schedule_prototype.html', data, context_instance = RequestContext(request))
+        return render_to_response( 'enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
         # trzeba dodac redirecta

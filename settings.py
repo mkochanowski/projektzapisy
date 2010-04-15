@@ -82,8 +82,8 @@ INSTALLED_APPS = (
     'fereol.south',
     'fereol.news',
     'fereol.users',
-    'fereol.subjects',
-	'fereol.records',
+    'fereol.enrollment.subjects',
+	'fereol.enrollment.records',
 )
 
 LOGIN_URL = '/users/login/'

@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from users.models import Student
-from subjects.models import *
+
+from enrollment.subjects.models import *
 from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException
 
 from itertools import cycle

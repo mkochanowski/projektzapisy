@@ -11,7 +11,8 @@ $.widget("ui.schedule", {
 		minutesPerCell : 60, 
 		cellHeight: 32,
 		hourColumnWidth: 40,
-		dayColumnWidth: 110
+		dayColumnWidth: 110,
+		colors: ['#C0C0C0'/*Silver*/]
 	},
 	
 	_create: function() {
@@ -39,12 +40,20 @@ $.widget("ui.schedule", {
 					.first()
 			);
 		});
-	
+		
 		self.initialTerms.each(function(){
 			self._addDivTerm($(this));
 			self._makeTermFixed($(this));
 		});		
 	},
+	
+	_nextColor: function(){
+		if(this.colorIndex == undefined )
+			this.colorIndex = 0;
+		else 
+			this.colorIndex = (this.colorIndex+1) % this.options.colors.length;
+		return this.options.colors[this.colorIndex];
+	}, 
 	
 	_daysRow: function() {
 		
@@ -131,13 +140,15 @@ $.widget("ui.schedule", {
 		});
 		
 		if(add) {
-			this._addDivTerm($('<div></div>').attr({
-				minutes: minutes,
-				day: day,
-				from: from,
-				subjectID: subjectID,
-				termID: termID
-			}).html(content));
+			this._addDivTerm($('<div></div>')
+				.attr({
+					minutes: minutes,
+					day: day,
+					from: from,
+					subjectID: subjectID,
+					termID: termID})
+				.html(content)
+				.css('background-color',self._nextColor()));
 		}
 	},
 	

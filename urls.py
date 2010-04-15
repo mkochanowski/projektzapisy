@@ -7,8 +7,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^users/', include('fereol.users.urls')),
-    (r'^subjects/', include('fereol.subjects.urls')),
-    (r'^records/', include('fereol.records.urls')),
+    (r'^subjects/', include('fereol.enrollment.subjects.urls')),
+    (r'^records/', include('fereol.enrollment.records.urls')),
     (r'^news/', include('fereol.news.urls')),
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
 
