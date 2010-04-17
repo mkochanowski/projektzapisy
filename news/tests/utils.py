@@ -10,12 +10,14 @@ def generate_random_news(new=randint(1,6),
     ns = []
     for i in xrange(new):
         n = News(title="news", body="news body",
-                 date=datetime.now() - timedelta(days=randint(0,6)))
+                 date=datetime.now() - timedelta(days=randint(0,6)),
+                 author_id=1)
         n.save()
         ns.append(n)
     for i in xrange(old):
         n= News(title="old news", body="news body",
-                date=datetime.now() - timedelta(days=randint(8,20)))
+                date=datetime.now() - timedelta(days=randint(8,20)),
+                author_id=1)
         n.save()
         ns.append(n)
     return (new, old, ns)
