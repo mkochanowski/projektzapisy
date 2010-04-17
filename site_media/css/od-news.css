@@ -31,9 +31,14 @@
     padding-top: 10px;
 }
 
+#od-news-search-form {
+    float:left;
+}
+
 .od-news-navigator
 {
     text-align: right;
+    margin-right: 30px;
 }
 
 .od-news-navigator a
@@ -48,8 +53,18 @@
     border-left: none;
 }
 
+#od-news-rss-icon
+{
+    border-left: none;
+}
+
 .od-news-footer
 {
     margin-top: 1em;
     text-align: left;
+}
+
+#od-news-top-bar {
+    border-bottom: 2px solid #262626;
+    padding: 15px;
 }

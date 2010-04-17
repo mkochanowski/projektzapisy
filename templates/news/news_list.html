@@ -13,6 +13,23 @@
 
 {% block content %}
 
+<div id="od-news-top-bar">
+  <form id="od-news-search-form" action="#">
+    <input type="text" name="od-news-search" id="od-news-search" value="Szukaj"/>
+  </form>
+  <div class="od-news-navigator">
+    {% ifnotequal newer_no 0 %}
+      <a href="{% url news.views.paginated_news newer_beginwith %}" title="Najnowsze">Najnowsze</a>
+      <a href="{% url news.views.paginated_news newer_beginwith %}" title="Nowsze">Nowsze ({{ newer_no }})</a>
+    {% endifnotequal %}
+    {% ifnotequal older_no 0 %}
+      <a href="{% url news.views.paginated_news older_beginwith %}" title="Starsze">Starsze ({{ older_no }})</a>
+    {% endifnotequal %}
+    <a href="#" title="Aktualności RSS" id="od-news-rss-icon">[RSS]</a>
+  </div>
+  <div style="clear: both;"></div>
+</div>
+
 <div id="main-content" class="narrow">
 
 {% if object_list %}
@@ -31,15 +48,6 @@
       </div>
     </div>
   {% endfor %}
-    <div class="od-news-navigator">
-      {% ifnotequal older_no 0 %}
-        <a href="{% url news.views.paginated_news older_beginwith %}" title="Starsze">Starsze ({{ older_no }})</a>
-      {% endifnotequal %}
-      {% ifnotequal newer_no 0 %}
-        <a href="{% url news.views.paginated_news newer_beginwith %}" title="Nowsze">Nowsze ({{ newer_no }})</a>
-        <a href="{% url news.views.paginated_news newer_beginwith %}" title="Najnowsze">Najnowsze</a>
-      {% endifnotequal %}
-    </div>
   </div>
 {% else %}
   <p>Nie ma nowych ogłoszeń</p>
