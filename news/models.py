@@ -7,18 +7,20 @@ from datetime import datetime, timedelta
 
 class NewsManager(models.Manager):
     def new(self):
-        '''Zwraca ogłoszenia oznaczone jako nowe.
-
-        Zwraca ogłoszenia z ostatnich 7 dni.'''
-        begin = datetime.now() - timedelta(days=7)
-        return self.filter(date__gte=begin)
+        '''Zwraca ogłoszenia oznaczone jako nowe.'''
+        if self.count_new() >= 3:
+            begin = datetime.now() - timedelta(days=7)
+            return self.filter(date__gte=begin)
+        else:
+           return self.get_successive_news(0, 3)
     def count_new(self):
         '''Zwraca liczbę ogłoszeń oznaczonych jako nowe.
 
         Zwraca liczbę ogłoszeń z ostatnich 7 dni.'''
         begin = datetime.now() - timedelta(days=7)
         return self.filter(date__gte=begin).count()
-
+    def get_successive_news(self, beginwith, quantity=1):
+        return News.objects.all()[beginwith:(beginwith+quantity)]
 
 class News(models.Model):
     title = models.CharField(max_length=255,
@@ -38,3 +40,5 @@ class News(models.Model):
     
     def __unicode__(self):
         return self.title
+
+    
