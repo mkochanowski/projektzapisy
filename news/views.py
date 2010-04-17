@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
+from django.contrib.auth.decorators import permission_required
+from django.core.urlresolvers import reverse
 from news.models import News
+from news.forms import NewsForm
 
 news_per_page = 5
 
@@ -38,4 +41,38 @@ def display_news_list(request, items, newdata={}):
     return render_to_response(
         'news/news_list.html',
         data,
+        context_instance = RequestContext(request))
+
+@permission_required('news.add_news')
+def add(request):
+    if request.method == 'POST':
+        form = NewsForm(request.POST)
+        if form.is_valid():
+            news = form.save(commit=False)
+            news.author = request.user
+            news.save()
+            return redirect(latest_news)
+    else:
+        form = NewsForm()
+    return render_to_response('news/news_form.html', {
+        'form': form,
+        'adding': True,
+        },
+        context_instance = RequestContext(request))
+
+@permission_required('news.change_news')
+def edit(request, id):
+    if request.method == 'POST':
+        form = NewsForm(request.POST)
+        if form.is_valid():
+            news = form.save(commit=False)
+            news.author = request.user
+            news.id = id
+            news.save()
+            return redirect(latest_news)
+    else:
+        form = NewsForm(instance = News.objects.get(pk=id))
+    return render_to_response('news/news_form.html', {
+        'form': form,
+        },
         context_instance = RequestContext(request))

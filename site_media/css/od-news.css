@@ -37,7 +37,7 @@
 
 .od-news-navigator
 {
-    text-align: right;
+    display: inline-block;
     margin-right: 30px;
 }
 
@@ -67,4 +67,5 @@
 #od-news-top-bar {
     border-bottom: 2px solid #262626;
     padding: 15px;
+    text-align: right;
 }

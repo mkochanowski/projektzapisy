@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+{% include "tinymcebbcode.html" %}
+{% endblock %}
+
+{% block main-navigation %}
+<li><a href="{% url news.views.latest_news %}">Aktualności</a></li>
+{% if adding %}
+<li>Dodaj ogłoszenie</li>
+{% else %}
+<li>Edytuj ogłoszenie</li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div id="main-content" class="narrow">
+  <form action="" method="post" id="od-news-form">
+    {{ form.as_p }}
+    <a href="{% url news.views.latest_news %}">Anuluj</a>
+    <input type="submit" value="Zapisz" />
+  </form>
+</div>
+{% endblock %}

@@ -17,6 +17,9 @@
   <form id="od-news-search-form" action="#">
     <input type="text" name="od-news-search" id="od-news-search" value="Szukaj"/>
   </form>
+  {% if perms.news.add_news %}
+  <a href="{% url news-add %}">Dodaj ogłoszenie</a>
+  {% endif %}
   <div class="od-news-navigator">
     {% ifnotequal newer_no 0 %}
       <a href="{% url news.views.paginated_news newer_beginwith %}" title="Najnowsze">Najnowsze</a>
@@ -45,6 +48,9 @@
       </div>
       <div class="od-news-footer">
 	{{ news.author.first_name }} {{ news.author.last_name }}
+	{% if perms.news.change_news %}
+	<a href="{% url news-edit news.id %}">Edytuj</a>
+	{% endif %}
       </div>
     </div>
   {% endfor %}
