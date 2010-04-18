@@ -4,7 +4,7 @@ from django import template
 
 register = template.Library()
 
-from fereol.news.models import News
+from fereol.offer.news.models import News
 
 @register.simple_tag
 def newscount():

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from news.models import News
+from offer.news.models import News
 from django.contrib import admin
 
 class NewsAdmin(admin.ModelAdmin):

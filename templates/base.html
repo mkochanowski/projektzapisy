@@ -26,11 +26,11 @@
 			<h1><a href="/">Fereol &copy;</a></h1>
 			<div id="main-menu">
 				<ul id="main-menu-list">
-				        <li><a href="{% url news.views.latest_news %}">Aktualności</a> ({% newscount %})</li>
+				        <li><a href="{% url offer.news.views.latest_news %}">Aktualności</a> ({% newscount %})</li>
 					<li>Przedmioty
 						<ul>
 							<li><a href="{% url record-schedule %}">Plan Zajęć</a></li>
-							<li><a href="{% url subject-list %}">Oferta Dydaktyczna</a></li>
+							<li><a href="{% url proposal-list %}">Oferta Dydaktyczna</a></li>
 							<li><a href="#">Zaliczone Przedmioty</a></li>
 							<li><a href="{% url schedule-prototype %}">Prototyp Planu</a></li>
 						</ul>

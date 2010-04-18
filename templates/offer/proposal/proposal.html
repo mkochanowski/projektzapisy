@@ -1,0 +1,26 @@
+
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <h1>{{proposal.name}}</h1>
+    <div class="actions">
+    <a href="/Proposals/history/{{Proposal.id}}/">Historia zmian</a> :: <a href="/proposals/edit/{{proposal.id}}/">Edytuj</a>
+    </div>
+    
+    <h2>Opis:</h2>
+    <div>
+    {{ proposal.description.description }}
+    </div>
+    <h3>Literatura</h3>
+    <ul>
+    {% for book in proposal.books.all %}
+        <li>{{ book.name }}
+        </li>
+        {% empty %}Brak
+      
+    {% endfor %}
+    </ul>

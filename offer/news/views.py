@@ -39,7 +39,7 @@ def display_news_list(request, items, newdata={}):
     data.update(newdata)
     data.update({ 'object_list': items, })
     return render_to_response(
-        'news/news_list.html',
+        'offer/news/news_list.html',
         data,
         context_instance = RequestContext(request))
 
@@ -54,7 +54,7 @@ def add(request):
             return redirect(latest_news)
     else:
         form = NewsForm()
-    return render_to_response('news/news_form.html', {
+    return render_to_response('offer/news/news_form.html', {
         'form': form,
         'adding': True,
         },
@@ -72,7 +72,7 @@ def edit(request, id):
             return redirect(latest_news)
     else:
         form = NewsForm(instance = News.objects.get(pk=id))
-    return render_to_response('news/news_form.html', {
+    return render_to_response('offer/news/news_form.html', {
         'form': form,
         },
         context_instance = RequestContext(request))

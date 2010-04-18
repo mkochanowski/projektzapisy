@@ -3,19 +3,14 @@
 from django.db import models
 import re
 
-class Subject( models.Model ):
-    
+class Proposal( models.Model ):
     name = models.CharField( max_length = 255, verbose_name = 'nazwa przedmiotu' )
-    slug = models.SlugField( max_length=255, unique = True, verbose_name='odnośnik' )
-    #description = models.TextField( verbose_name = 'opis' ) # description should be in other model (for history)
-    lectures = models.IntegerField( verbose_name = 'ilość godzin wykładów' )
-    exercises = models.IntegerField( verbose_name = 'ilość godzin ćwiczeń' )
-    laboratories = models.IntegerField( verbose_name = 'ilość godzin pracowni' )
+    slug = models.SlugField( max_length = 255, unique = True, verbose_name='odnośnik' )
     
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
-        app_label = 'subjects'
+        app_label = 'proposal'
     
     def description(self):
         """
@@ -45,4 +40,4 @@ class Subject( models.Model ):
         slug = re.sub("-+", "-", slug)
         slug = re.sub("^-", "", slug)
         slug = re.sub("-$", "", slug)
-        return slug     
+        return slug

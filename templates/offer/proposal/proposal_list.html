@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="/site_media/css/od-proposaloffer.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="/site_media/js/proposal/form.js"></script>
+<script type="text/javascript" src="/site_media/js/proposal/form.js"></script>
+
+{% include "tinymcebbcode.html" %}
+    
+</script>
+
+
+{% endblock %}
+
+{% block main-navigation %}
+<li>Oferta</li>
+<li><a href="{% url proposal-list %}">Propozycje</a></li>
+{% if proposal %}
+    {% if proposal.pk %}
+        <li><a href="{% url proposal-page slug=proposal.slug %}">{{proposal.slug}}</a></li>  
+        {% if editMode %}
+            <li>Edycja</li>
+        {% endif %}
+    {% else %}
+        {% if editForm %}
+            <li>Dodaj nową</li>
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div id="main-content" class="narrow">
+    <ul id="od-proposaloffer-proposallist">
+        {% for sub in proposals %}
+            <li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}><a href="{% url proposal-page slug=sub.slug %}">{{sub.name}}</a></li>    		
+    	   {% empty %}<li>Brak przedmiotów</li>
+    	{% endfor %}
+        <li {% ifequal mode 'form' %}{% if not editMode %}class="active"{% endif %}{% endifequal %} ><a  href="/proposal/add/">Dodaj przedmiot</a></li>
+    </ul>
+    <div id="od-proposaloffer-contents">
+        {% ifequal mode 'form' %}
+            {% include 'offer/proposal/proposal_form.html' %}
+        {% else %}
+            {% ifequal mode 'details' %}
+                {% include 'offer/proposal/proposal.html' %}
+            {% else %}
+                <br /><br /><br /><br /><br /><br />
+            {% endifequal %}
+        {% endifequal %}
+        
+    </div>
+</div>
+
+{% endblock %}

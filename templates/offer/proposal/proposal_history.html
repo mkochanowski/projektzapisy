@@ -1,0 +1,11 @@
+<h1> {{descriptions.0.proposal.name}} </h1>
+<h3> Opisy: </h3>
+<ul>
+{% for desc in descriptions %}
+<li>
+{{desc.date}} :: 
+<a href="/proposals/archival/{{desc.id}}/">Pokaż</a> ::
+<a href="/proposals/restore/{{desc.id}}/">Przywróć</a>
+</li>
+{% endfor %}
+</ul>

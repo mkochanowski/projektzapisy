@@ -80,8 +80,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'fereol.south',
-    'fereol.news',
     'fereol.users',
+    'fereol.offer.proposal',
+    'fereol.offer.news',
     'fereol.enrollment.subjects',
 	'fereol.enrollment.records',
 )

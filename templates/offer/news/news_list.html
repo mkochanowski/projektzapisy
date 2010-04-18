@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main-navigation %}
-<li><a href="{% url news.views.latest_news %}">Aktualności</a></li>
+<li><a href="{% url offer.news.views.latest_news %}">Aktualności</a></li>
 {% if archive_view %}
 <li>Archiwum</li>
 {% endif %}
@@ -22,11 +22,11 @@
   {% endif %}
   <div class="od-news-navigator">
     {% ifnotequal newer_no 0 %}
-      <a href="{% url news.views.paginated_news newer_beginwith %}" title="Najnowsze">Najnowsze</a>
-      <a href="{% url news.views.paginated_news newer_beginwith %}" title="Nowsze">Nowsze ({{ newer_no }})</a>
+      <a href="{% url offer.news.views.paginated_news newer_beginwith %}" title="Najnowsze">Najnowsze</a>
+      <a href="{% url offer.news.views.paginated_news newer_beginwith %}" title="Nowsze">Nowsze ({{ newer_no }})</a>
     {% endifnotequal %}
     {% ifnotequal older_no 0 %}
-      <a href="{% url news.views.paginated_news older_beginwith %}" title="Starsze">Starsze ({{ older_no }})</a>
+      <a href="{% url offer.news.views.paginated_news older_beginwith %}" title="Starsze">Starsze ({{ older_no }})</a>
     {% endifnotequal %}
     <a href="#" title="Aktualności RSS" id="od-news-rss-icon">[RSS]</a>
   </div>
