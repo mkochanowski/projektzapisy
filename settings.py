@@ -84,7 +84,7 @@ INSTALLED_APPS = (
     'fereol.offer.proposal',
     'fereol.offer.news',
     'fereol.enrollment.subjects',
-	'fereol.enrollment.records',
+    'fereol.enrollment.records',
 )
 
 LOGIN_URL = '/users/login/'

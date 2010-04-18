@@ -4,8 +4,8 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
-from news.models import News
-from news.forms import NewsForm
+from offer.news.models import News
+from offer.news.forms import NewsForm
 
 news_per_page = 5
 

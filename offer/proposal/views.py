@@ -12,19 +12,34 @@ from django.shortcuts               import redirect
 from fereol.enrollment.records.models          import *
 from fereol.offer.proposal.models              import *
 
+
 @login_required
 def proposals(request):
     proposals = Proposal.objects.all()
     return render_to_response( 'offer/proposal/proposal_list.html', { 'proposals' : proposals, 'mode' : 'list' }, context_instance = RequestContext(request) )
 
 @login_required
-def proposal( request, slug ):
+def proposal( request, slug, descid = None ):
     proposal = Proposal.objects.get(slug=slug)
+    newest = proposal.description()
+    if descid:
+        proposal.description = ProposalDescription.objects.get( pk = descid )
+    else:
+        proposal.description = newest
+        descid = proposal.id
+    next = proposal.description.getNewer( proposal )
+    prev = proposal.description.getOlder( proposal )
+
     data = {
-            'proposal'       : proposal,
+            'proposal'      : proposal,
             'mode'          : 'details',
-            'proposals'      : Proposal.objects.all()             
-    }         
+            'proposals'     : Proposal.objects.all(),
+            'descid'        : int(descid),
+            'newest'        : newest,
+            'id'            : proposal.id,
+            'next'          : next,
+            'prev'          : prev
+    }
     return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext( request ) )
 
 
