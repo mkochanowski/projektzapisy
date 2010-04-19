@@ -37,6 +37,7 @@
 {% block content %}
 
 <div id="main-content" class="narrow">
+    {% if message %}<div class="message">{{ message }}</div>{% endif %}
     <ul id="od-proposaloffer-proposallist">
         {% for sub in proposals %}
             <li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}><a href="{% url proposal-page slug=sub.slug %}">{{sub.name}}</a></li>    		
