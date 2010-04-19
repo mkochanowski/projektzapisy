@@ -18,9 +18,9 @@ def subjects(request):
 @login_required
 def subject( request, slug ):
     subject = Subject.objects.get(slug=slug)
-    lectures = Group.objects.filter(subject=subject).filter( type = 1)
-    exercises = Group.objects.filter(subject=subject).filter( type = 2 )
-    laboratories = Group.objects.filter(subject=subject).filter( type = 3 )
+    lectures = Group.objects.filter(subject=subject).filter( type = "1" )
+    exercises = Group.objects.filter(subject=subject).filter( type = "2" )
+    laboratories = Group.objects.filter(subject=subject).filter( type = "3" )
 
     user_groups = [ g.group.id for g in Record.objects.filter( student = request.user ) ]
     
