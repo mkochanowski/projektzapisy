@@ -48,6 +48,17 @@ def resign(request, group_id):
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         # trzeba dodac redirecta
 
+def records(request, group_id):
+    try:
+        students = Record.get_students_in_group(group_id)
+        data = {
+            'students' : students,
+        }
+        return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Podana grupa nie istnieje.")
+        # trzeba dodac redirecta
+        
 @login_required
 def own(request):
     try:
@@ -55,7 +66,7 @@ def own(request):
         data = {
             'groups': groups,
         }
-        return render_to_response( 'enrollment/records/schedule.html', data, context_instance = RequestContext(request))
+        return render_to_response( 'enrollment/records/schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
         # trzeba dodac redirecta

@@ -7,8 +7,6 @@ from exceptions import NonStudentException, NonGroupException, AlreadyAssignedEx
 
 from users.models import Employee, Student
 
-import mox
-
 class AddUserToGroupTest(TestCase):
     fixtures = ['user_and_group']
 
@@ -66,3 +64,37 @@ class RemoveUserToGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
         self.assertRaises(AlreadyNotAssignedException, Record.remove_student_from_group, self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 0)
+        
+# te testy nalezy sprawdzic
+class GetGroupsForStudentTest(TestCase):
+    fixtures = ['user_and_group']
+    
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.group = Group.objects.get(id=1)
+        self.record = Record.objects.create(student=self.user.student, group=self.group)
+    
+    def testStudentAssignedToGroup(self):
+        groups = Record.get_groups_for_student(self.user.id)
+        self.assertEqual(groups, [self.group])
+        
+    def testWithNonStudentUser(self):
+        self.user.student.delete()
+        self.assertRaises(NonStudentException, Record.get_groups_for_student, self.user.id)
+        
+class GetStudentsInGroupTest(TestCase):
+    fixtures = ['user_and_group']
+    
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.group = Group.objects.get(id=1)
+        self.record = Record.objects.create(student=self.user.student, group=self.group)
+    
+    def testStudentAssignedToGroup(self):
+        students = Record.get_students_in_group(self.group.id)
+        self.assertEqual(students, [self.user.student])
+        
+    def testWithNonExistsGroup(self):
+        self.group.delete()
+        self.assertRaises(NonGroupException, Record.get_students_in_group, self.group.id)
+

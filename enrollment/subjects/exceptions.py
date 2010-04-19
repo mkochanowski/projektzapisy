@@ -1,0 +1,2 @@
+class NonSubjectException(Exception):
+    pass

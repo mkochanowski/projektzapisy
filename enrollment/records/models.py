@@ -68,6 +68,23 @@ class Record( models.Model ):
             raise NonGroupException()
 
     @staticmethod
+    def get_students_in_group(group_id):
+        try:
+            group = Group.objects.get(id=group_id)
+            return map(lambda x: x.student, Record.objects.filter(group=group))
+        except Group.DoesNotExist:
+            raise NonGroupException()
+    
+    @staticmethod
+    def get_groups_for_student(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            return map(lambda x: x.group, Record.objects.filter(student=student))
+        except Student.DoesNotExist:
+            raise NonStudentException()
+            
+    @staticmethod
     def remove_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)
         try:
@@ -89,7 +106,7 @@ class Record( models.Model ):
     class Meta:
         verbose_name = 'zapis'
         verbose_name_plural = 'zapisy'
-        unique_together = (( 'student', 'group' ),)
+        unique_together = (('student', 'group'),)
 
     def __unicode__(self):
         return "%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())
