@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
     {% if messages %}
@@ -9,74 +9,122 @@
     </ul>
     {% endif %}
     <h1>{{subject.name}}</h1>
+    <h3>Prowadzący:</h3>
+    {% for teacher in subject.teachers.all %}
+    	<a href="#">{{teacher.user.get_full_name}}</a> 
+    {% endfor %}
+    
+    <h3>Opis przedmiotu:</h3>
+    <p>{{subject.description}}</p>
+    <a href="#">pokaż więcej...</a>
+    
+    <!--
     <ul>
         <li>Wykłady: {{subject.lectures}} godz.</li>
         <li>Ćwiczenia: {{subject.exercises}} godz.</li>
         <li>Pracownia: {{subject.laboratories}} godz.</li>  
     </ul>
+    -->
     
-    <h2>Grupy:</h2>
-    
-    <h3>Wykłady:</h3>
-    <ul>
-    {% for lec in lectures %}
-        <li>Prowadzący: {{lec.teacher.user.get_full_name }}<br/> sala: 
-            {{ lec.classroom.all|join:", " }} 
-            <br />
-            Ilość miejsc: {{ lec.get_group_limit }}, zajętych: {{ lec.enrolled}}<br />
-            <ul>
-            {% for d in lec.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
-               <li>{{d}}</li>
-            {% endfor %}
-            </ul>
-        </li>
+    <h3>Wykład:</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for lec in lectures %}
+	        <tr>
+		        <td>{{ lec.teacher.user.get_full_name }}</td>
+		        <td>
+		            {% for d in lec.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
+		               {{d}}
+		            {% endfor %}
+		        </td>
+		        <td>{{ lec.classroom.all|join:", " }}</td> 
+		        <td>{{ lec.get_group_limit }}</td>
+		        <td>{{ lec.enrolled }}</td>
+	        	<td>
+	        	{% if not lec.signed %}
+		            {% ifnotequal lec.get_group_limit lec.enrolled %}
+		                <a href="{% url record-assign lec.id %}">zapisz</a>
+		            {% endifnotequal %}
+	        	{% else %}
+	            	<a href="{% url record-resign lec.id %}">wypisz</a>
+	        	{% endif %}
+	        	</td>
+	        	<td><a href="{% url group-records lec.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table>
 
-        {% if not lec.signed %}
-            {% ifnotequal lec.get_group_limit lec.enrolled %}
-                <a href="{% url record-assign lec.id %}">zapisz</a>
-            {% endifnotequal %}
-        {% else %}
-            <a href="{% url record-resign lec.id %}">wypisz</a>
-        {% endif %}
-        {% empty %}brak
-    {% endfor %}
-    </ul>
-
+	<h3>Ćwiczenia:</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for exe in exercises %}
+	        <tr>
+		        <td>{{ exe.teacher.user.get_full_name }}</td>
+		        <td>
+		            {% for d in exe.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
+		               {{d}}
+		            {% endfor %}
+		        </td>
+		        <td>{{ exe.classroom.all|join:", " }}</td> 
+		        <td>{{ exe.get_group_limit }}</td>
+		        <td>{{ exe.enrolled }}</td>
+	        	<td>
+	        	{% if not exe.signed %}
+		            {% ifnotequal exe.get_group_limit exe.enrolled %}
+		                <a href="{% url record-assign exe.id %}">zapisz</a>
+		            {% endifnotequal %}
+	        	{% else %}
+	            	<a href="{% url record-resign exe.id %}">wypisz</a>
+	        	{% endif %}
+	        	</td>
+	        	<td><a href="{% url group-records exe.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table>
     
-    <h3>Ćwiczenia</h3>
-    <ul>
-    {% for exe in exercises %}
-        <li>Prowadzący: {{exe.teacher.user.get_full_name }}<br/> sala: 
-            {{ exe.classroom.all|join:", " }} 
-            <br />
-            Ilość miejsc: {{ exe.get_group_limit }}, zajętych: {{ exe.enrolled}}<br />
-            <ul>
-            {% for d in exe.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
-               <li>{{d}}</li>
-            {% endfor %}
-            </ul>
-        </li>
-        <a href='/records/change/{{ exe.id }}'>{% if not exe.signed %}{% ifnotequal exe.get_group_limit exe.enrolled %}zapisz{% endifnotequal %}{% else %}wypisz{% endif %}</a>
-        {% empty %}brak
-    {% endfor %}
-    </ul>
-    
-    <h3>Pracownie</h3>
-        <ul>
-    {% for lab in laboratories %}
-        <li>Prowadzący: {{lab.teacher.user.get_full_name }}<br/> sala: 
-            {{ lab.classroom.all|join:", " }} 
-            <br />
-            Ilość miejsc: {{ lab.get_group_limit }}, zajętych: {{ lab.enrolled}}<br />
-            <ul>
-            {% for d in lab.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
-               <li>{{d}}</li>
-            {% endfor %}
-            </ul>
-        </li>
-        <a href='/records/change/{{ lab.id }}'>{% if not lab.signed %}{% ifnotequal lab.get_group_limit lab.enrolled %}zapisz{% endifnotequal %}{% else %}wypisz{% endif %}</a>
-        {% empty %}brak
-    {% endfor %}
-    </ul>
-    
+	<h3>Pracownia:</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for lab in laboratories %}
+	        <tr>
+		        <td>{{ lab.teacher.user.get_full_name }}</td>
+		        <td>
+		            {% for d in lab.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
+		               {{d}}
+		            {% endfor %}
+		        </td>
+		        <td>{{ lab.classroom.all|join:", " }}</td> 
+		        <td>{{ lab.get_group_limit }}</td>
+		        <td>{{ lab.enrolled }}</td>
+	        	<td>
+	        	{% if not lab.signed %}
+		            {% ifnotequal lab.get_group_limit lab.enrolled %}
+		                <a href="{% url record-assign lab.id %}">zapisz</a>
+		            {% endifnotequal %}
+	        	{% else %}
+	            	<a href="{% url record-resign lab.id %}">wypisz</a>
+	        	{% endif %}
+	        	</td>
+	        	<td><a href="{% url group-records lab.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table>    
 {% endblock %}

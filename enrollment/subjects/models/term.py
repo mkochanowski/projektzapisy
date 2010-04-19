@@ -46,4 +46,4 @@ class Term( models.Model ):
         app_label = 'subjects'
 
     def __unicode__(self):
-        return "%s (od %s do %s)" % (self.get_dayOfWeek_display(), self.get_hourFrom_display(), self.get_hourTo_display())
+        return "%s (%s-%s)" % (self.get_dayOfWeek_display(), self.get_hourFrom_display(), self.get_hourTo_display())
