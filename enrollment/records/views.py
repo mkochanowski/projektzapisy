@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from enrollment.subjects.models import *
 from users.models import *
 from enrollment.records.models import *
-from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException
+from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, AlreadyNotAssignedException
 
 from datetime import time
 
@@ -44,7 +44,7 @@ def resign(request, group_id):
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
-    except AlreadyAssignedException:
+    except AlreadyNotAssignedException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
