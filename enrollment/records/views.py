@@ -24,13 +24,13 @@ def assign(request, group_id):
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
 @login_required
 def resign(request, group_id):
@@ -40,13 +40,13 @@ def resign(request, group_id):
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
 def records(request, group_id):
     try:
@@ -57,7 +57,7 @@ def records(request, group_id):
         return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Podana grupa nie istnieje.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
         
 @login_required
 def own(request):
@@ -66,10 +66,10 @@ def own(request):
         data = {
             'groups': groups,
         }
-        return render_to_response( 'enrollment/records/schedule.html', data, context_instance=RequestContext(request))
+        return render_to_response('enrollment/records/schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
  
 @login_required       
 def schedulePrototype(request):
@@ -84,10 +84,10 @@ def schedulePrototype(request):
             'student_groups': student_groups,
             'subjects': subjects,
         }
-        return render_to_response( 'enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))
+        return render_to_response('enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
         
     
     
