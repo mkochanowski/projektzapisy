@@ -20,26 +20,13 @@ def subjects(request):
 def subject( request, slug ):
     try:
         subject = Subject.objects.get(slug=slug)
-        lectures = Group.get_groups_for_subject(slug, 1) 
-        exercises = Group.get_groups_for_subject(slug, 2)
-        laboratories = Group.get_groups_for_subject(slug, 3)
-
-        user_groups = Record.get_groups_for_student(request.user.id)
         
-        for lec in lectures:
-            if lec in user_groups:
-                lec.signed = True
-            lec.enrolled = Record.number_of_students(group = lec)
-    
-        for exe in exercises:
-            if exe in user_groups:
-                exe.signed = True
-            exe.enrolled = Record.number_of_students(group = exe)
-    
-        for lab in laboratories:
-            if lab in user_groups:
-                lab.signed = True
-            lab.enrolled = Record.number_of_students(group = lab)
+        subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
+        subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
+        
+        lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
+        exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
+        laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
         
         data = {
                 'subject' : subject,
@@ -50,5 +37,5 @@ def subject( request, slug ):
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
     except NonSubjectException:
         request.user.message_set.create(message="Przedmiot nie istnieje.")
-        # trzeba dodac redirecta
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
 

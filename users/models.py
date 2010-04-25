@@ -10,6 +10,14 @@ class BaseUser(models.Model):
     '''
     user = models.OneToOneField(User)
     
+    @staticmethod
+    def get(self, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            raise NonUserException
+        return user
+    
     class Meta:
         abstract = True
 

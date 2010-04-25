@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block main-navigation %}
+<li><a href="{% url my-profile %}">Profil</a></li>
+<li><a href="{% url email-change %}">Zmień e-mail</a></li>
+{% endblock %}
+
+{% block content %}
+<form action='' method="post">
+	<fieldset>
+		<legend>Zmień adres e-mail</legend>
+		{{form.as_p}}
+		<input type="submit" value="zmień"/>
+	</fieldset>
+</form>
+{% endblock %}

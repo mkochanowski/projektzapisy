@@ -5,5 +5,9 @@
 {% endblock %}
 
 {% block content %}
-	<p>Czesc {{ user.username }}!</p>
+	Dane:
+	<ul>
+		<li>{{profile.get_full_name}}</li>
+		<li><b>email:</b> {{profile.email}}</li>
+	</ul>
 {% endblock %}

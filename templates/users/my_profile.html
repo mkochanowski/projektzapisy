@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block main-navigation %}
+<li><a href="{% url my-profile %}">Profil</a></li>
+{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<ul>
+	{% for message in messages %}
+	<li>{{ message }}</li>
+	{% endfor %}
+</ul>
+{% endif %}
+	
+Moje dane:
+<ul>
+	<li>login: {{user.username}}</li>
+	<li>email: {{user.email}}</li>
+</ul>
+<a href="{% url password-change %}">zmień hasło</a>
+<a href="{% url email-change %}">zmień adres email</a>
+
+{% endblock %}

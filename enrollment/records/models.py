@@ -7,6 +7,7 @@ from users.models import Student
 
 from enrollment.subjects.models import *
 from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException
+from enrollment.subjects.exceptions import NonSubjectException
 
 from itertools import cycle
 
@@ -48,6 +49,53 @@ class Record( models.Model ):
             return groups
         except Student.DoesNotExist:
             raise NonStudentException()
+    
+    @staticmethod
+    def get_groups_with_records_for_subject(slug, user_id, group_type):
+        try:
+            subject = Subject.objects.get(slug=slug)
+            groups = Group.objects.filter(subject=subject).filter(type=group_type)
+            student_groups = Record.get_groups_for_student(user_id)
+            for g in groups:
+                g.limit = g.get_group_limit()
+                g.classrooms = g.get_all_terms()
+                g.enrolled = Record.number_of_students(g)
+                if g in student_groups:
+                    g.signed = True
+        except Subject.DoesNotExist:
+            raise NonSubjectException()
+        return groups
+    
+    @staticmethod
+    def get_students_in_group(group_id):
+        try:
+            group = Group.objects.get(id=group_id)
+            return map(lambda x: x.student, Record.objects.filter(group=group))
+        except Group.DoesNotExist:
+            raise NonGroupException()
+    
+    @staticmethod
+    def get_groups_for_student(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            return map(lambda x: x.group, Record.objects.filter(student=student))
+        except Student.DoesNotExist:
+            raise NonStudentException()
+    
+    @staticmethod
+    def is_student_in_subject_group_type(user_id, slug, group_type):
+        try:
+            student = User.objects.get(id=user_id).student
+            subject = Subject.objects.get(slug=slug)
+            user_subject_group_type = [g.id for g in Record.get_groups_for_student(user_id) if g.subject == subject and g.type == group_type]
+            if user_subject_group_type:
+                return user_subject_group_type[0]
+            return False
+        except Student.DoesNotExist:
+            raise NonStudentException()
+        except Subject.DoesNotExist:
+            raise NonSubjectException()
 
     @staticmethod
     def add_student_to_group(user_id, group_id):
@@ -68,22 +116,23 @@ class Record( models.Model ):
             raise NonGroupException()
 
     @staticmethod
-    def get_students_in_group(group_id):
-        try:
-            group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Record.objects.filter(group=group))
-        except Group.DoesNotExist:
-            raise NonGroupException()
-    
-    @staticmethod
-    def get_groups_for_student(user_id):
+    def change_student_group(user_id, old_id, new_id):
         user = User.objects.get(id=user_id)
         try:
-            student = user.student
-            return map(lambda x: x.group, Record.objects.filter(student=student))
+            student = user.student  
+            old_group = Group.objects.get(id=old_id)
+            new_group = Group.objects.get(id=new_id)
+            record = Record.objects.get(group=old_group, student=student)
+            record.delete()
+            Record.objects.create(group=new_group, student=student)
+            return record
         except Student.DoesNotExist:
             raise NonStudentException()
-            
+        except Group.DoesNotExist:
+            raise NonGroupException()
+        except Record.DoesNotExist:
+            raise AlreadyNotAssignedException()
+        
     @staticmethod
     def remove_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)

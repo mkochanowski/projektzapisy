@@ -4,14 +4,14 @@
     {% if messages %}
     <ul>
         {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
     <h1>{{subject.name}}</h1>
     <h3>Prowadzący:</h3>
     {% for teacher in subject.teachers.all %}
-    	<a href="#">{{teacher.user.get_full_name}}</a> 
+    	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
     
     <h3>Opis przedmiotu:</h3>
@@ -82,7 +82,11 @@
 	        	<td>
 	        	{% if not exe.signed %}
 		            {% ifnotequal exe.get_group_limit exe.enrolled %}
-		                <a href="{% url record-assign exe.id %}">zapisz</a>
+		            	{% if subject.user_enrolled_to_exercise %}
+	        				<a href="{% url record-change subject.user_enrolled_to_exercise exe.id %}">przenieś</a>
+	        			{% else %}
+		                	<a href="{% url record-assign exe.id %}">zapisz</a>
+		                {% endif %}
 		            {% endifnotequal %}
 	        	{% else %}
 	            	<a href="{% url record-resign exe.id %}">wypisz</a>
@@ -116,7 +120,11 @@
 	        	<td>
 	        	{% if not lab.signed %}
 		            {% ifnotequal lab.get_group_limit lab.enrolled %}
-		                <a href="{% url record-assign lab.id %}">zapisz</a>
+		            	{% if subject.user_enrolled_to_laboratory %}
+	        				<a href="{% url record-change subject.user_enrolled_to_laboratory lab.id %}">przenieś</a>
+	        			{% else %}
+		                	<a href="{% url record-assign lab.id %}">zapisz</a>
+		                {% endif %}
 		            {% endifnotequal %}
 	        	{% else %}
 	            	<a href="{% url record-resign lab.id %}">wypisz</a>

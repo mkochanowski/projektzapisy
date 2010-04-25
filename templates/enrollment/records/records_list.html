@@ -3,7 +3,7 @@
 {% block content %}
 	<ul>
 	{% for student in students %}
-		<li><a href="#">{{student.user.get_full_name}}</a></li>
+		<li><a href="{% url profile student.user.id %}">{{student.user.get_full_name}}</a></li>
 		{% empty %}brak zapisanych osób
 	{% endfor %}
 	</ul>

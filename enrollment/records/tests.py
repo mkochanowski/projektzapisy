@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from enrollment.subjects.models import Group, Subject
 from models import Record
 from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException
+from enrollment.subjects.exceptions import NonSubjectException
 
 from users.models import Employee, Student
 
@@ -38,9 +39,44 @@ class AddUserToGroupTest(TestCase):
         self.group.save()
         self.assertRaises(OutOfLimitException, Record.add_student_to_group, self.user.id, self.group.id)
 
+class ChangeUserGroupTest(TestCase):
+    fixtures = ['user_and_group']
+    
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.old_group = Group.objects.get(id=1)
+        self.new_group = Group.objects.get(id=2)
+        self.old_record = Record.objects.create(student=self.user.student, group=self.old_group)
+    
+    def testWithNonStudentUser(self):
+        self.user.student.delete()
+        self.assertRaises(NonStudentException, Record.change_student_group, self.user.id, self.old_group.id, self.new_group.id)
+    
+    def testWithoutGivenOldGroup(self):
+        group_id = self.old_group.id
+        self.old_group.delete()
+        self.assertRaises(NonGroupException, Record.change_student_group, self.user.id, group_id, self.new_group.id)
+    
+    def testWithoutGivenNewGroup(self):
+        group_id = self.new_group.id
+        self.new_group.delete()
+        self.assertRaises(NonGroupException, Record.change_student_group, self.user.id, self.old_group.id, group_id)
+    
+    def testStudentChangeGroup(self):
+        Record.change_student_group(self.user.id, self.old_group.id, self.new_group.id)
+        new_record = Record.objects.get(id=1)
+        self.assertEqual(new_record.group.id, 2)
+        self.assertEqual(new_record.student, self.user.student)
+        
+    def testStudentNotAssignedChangeGroup(self):
+        self.old_record.delete()
+        self.assertEqual(Record.objects.count(), 0)
+        self.assertRaises(AlreadyNotAssignedException, Record.change_student_group, self.user.id, self.old_group.id, self.new_group.id)
+        self.assertEqual(Record.objects.count(), 0)
+           
 class RemoveUserToGroupTest(TestCase):
     fixtures = ['user_and_group']
-
+        
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.group = Group.objects.get(id=1)
@@ -64,8 +100,30 @@ class RemoveUserToGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
         self.assertRaises(AlreadyNotAssignedException, Record.remove_student_from_group, self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 0)
+ 
+class IsStudentInSubjectGroupTypeTest(TestCase):
+    fixtures = ['user_and_group']
+    
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.group = Group.objects.get(id=1)
+        self.group2 = Group.objects.get(id=2)
+        self.subject = Subject.objects.get(id=1)
+        self.record = Record.objects.create(student=self.user.student, group=self.group)
+    
+    def testWithNonStudent(self):
+        self.user.student.delete()
+        self.assertRaises(NonStudentException, Record.is_student_in_subject_group_type, self.user.id, self.subject.slug, self.group.type)
         
-# te testy nalezy sprawdzic
+    def testWithNonSubject(self):    
+        subject_slug = self.subject.slug
+        self.subject.delete()
+        self.assertRaises(NonSubjectException, Record.is_student_in_subject_group_type, self.user.id, subject_slug, self.group.type)
+    
+    def testStudentInSubjectGroupType(self):
+        self.assert_(Record.is_student_in_subject_group_type(self.user.id, self.subject.slug, self.group.type))
+        self.assertFalse(Record.is_student_in_subject_group_type(self.user.id, self.subject.slug, self.group2.type))
+                    
 class GetGroupsForStudentTest(TestCase):
     fixtures = ['user_and_group']
     
