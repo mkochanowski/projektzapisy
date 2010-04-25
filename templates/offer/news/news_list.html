@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
+{% load news_extras %}
+
 {% block styles %}
 <link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
 {% endblock %}
 
 {% block main-navigation %}
-<li><a href="{% url offer.news.views.latest_news %}">Aktualności</a></li>
+<li><a href="{% url latest_news %}">Aktualności</a></li>
 {% if archive_view %}
 <li>Archiwum</li>
 {% endif %}
@@ -44,7 +46,7 @@
 	<span class="od-news-date">{{ news.date|date:"l, d F Y"|lower }}</span>
       </div>
       <div class="od-news-body">
-        {{ news.body|linebreaks }}
+        {{ news.body|bbcode|nl2br|safe }}
       </div>
       <div class="od-news-footer">
 	{{ news.author.first_name }} {{ news.author.last_name }}
