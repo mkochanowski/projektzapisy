@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-
 from django.contrib.auth.decorators import login_required
-from django.http                    import HttpResponseRedirect
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 
@@ -13,7 +10,9 @@ from exceptions import NonSubjectException
 
 @login_required
 def subjects(request):
-    subjects = Subject.objects.all()
+    semesters = Semester.objects.all()
+    subjects = [(sem.get_name(), sem.get_subjects()) for sem in semesters]
+    
     return render_to_response( 'enrollment/subjects/subjects_list.html', { 'subjects' : subjects } )
 
 @login_required
