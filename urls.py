@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     (r'^news/', include('fereol.offer.news.urls')),
     
     #
+    (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
     (r'^users/', include('fereol.users.urls')),
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
 

@@ -5,6 +5,8 @@ urlpatterns = patterns( 'fereol.enrollment.records.views',
      url('(?P<old_id>[\d]+)/change/(?P<new_id>[\d]+)/', 'change', name='record-change'),
     url('(?P<group_id>[\d]+)/resign', 'resign', name='record-resign'),
     url('(?P<group_id>[\d]+)/records', 'records', name='group-records'),
+    url('^schedule/prototype/pin$', 'ajaxPin', name='schedule-prototype-pin' ),
+    url('^schedule/prototype/unpin$', 'ajaxUnpin', name='schedule-prototype-unpin' ),
     url('^schedule/prototype/$', 'schedulePrototype', name='schedule-prototype' ),
     url('^schedule/$', 'own', name='record-schedule' ),
 )

@@ -27,8 +27,9 @@
 					{% for term in group.terms_ %}
 						<div class="subject{{sub.pk}}"
 							subjectID="{{sub.pk}}"
-							termID="{{group.pk}}-{{term.pk}}"
-							from="{{ term.time_from_offset_in_minutes }}" 
+							groupID="{{group.pk}}"
+							termID="{{term.pk}}"
+							from="{{ term.time_from_in_minutes }}" 
 							minutes="{{ term.length_in_minutes }}" 
 							day="{{ term.day_in_zero_base }}">
 							{{group}}<br/>
@@ -50,18 +51,19 @@
 
 {% block content-right %}
 
-	<div id="schedule-wrapper">
-		{% for group in student_groups %}
-			{% for term in group.terms_ %}
-				<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}" 
-					subjectID="{{group.subject_.pk}}"
-					termID="{{group.pk}}-{{term.pk}}"
-					from="{{ term.time_from_offset_in_minutes }}" 
+	<div id="schedule-wrapper" pinUrl="{% url schedule-prototype-pin %}" unpinUrl="{% url schedule-prototype-unpin %}">
+		{% for record in student_records %}
+			{% for term in record.group_.terms_ %}
+				<div subjectID="{{record.group_.subject_.pk}}"
+					groupID="{{record.group_.pk}}"
+					termID="{{term.pk}}"
+					from="{{ term.time_from_in_minutes }}" 
 					minutes="{{ term.length_in_minutes }}" 
-					day="{{ term.day_in_zero_base }}">
-					{{group}}<br/>
+					day="{{ term.day_in_zero_base }}"
+					status="{{ record.schedule_widget_status_ }}">
+					{{record.group_}}<br/>
 					(
-					{% for class in group.get_all_classrooms %}
+					{% for class in record.group_.get_all_classrooms %}
 						{{class}} {%if not forloop.last %}, {%endif%}
 					{% endfor %}
 					)

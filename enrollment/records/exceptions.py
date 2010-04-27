@@ -10,5 +10,11 @@ class AlreadyAssignedException(Exception):
 class AlreadyNotAssignedException(Exception):
     pass
 
+class AlreadyPinnedException(Exception):
+    pass
+
+class AlreadyNotPinnedException(Exception):
+    pass
+
 class OutOfLimitException(Exception):
     pass

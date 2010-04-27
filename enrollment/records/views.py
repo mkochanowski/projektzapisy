@@ -3,7 +3,7 @@
 from django.core.urlresolvers import reverse
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
@@ -12,9 +12,38 @@ from django.shortcuts import redirect
 from enrollment.subjects.models import *
 from users.models import *
 from enrollment.records.models import *
-from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, AlreadyNotAssignedException
+from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, \
+    AlreadyNotAssignedException, AlreadyPinnedException, AlreadyNotPinnedException
 
 from datetime import time
+
+@login_required
+def ajaxPin(request):
+    try:
+        group_id = request.POST["GroupId"]
+        record = Record.pin_student_to_group(request.user.id, group_id)
+        message = "Zostałeś przypięty do grupy."
+    except NonStudentException:
+        message="Nie możesz się przypiąć, bo nie jesteś studentem."
+    except NonGroupException:
+        message="Nie możesz się przypiąć, bo podana grupa nie istnieje."
+    except AlreadyPinnedException:
+        message="Nie możesz się przypiąć, bo już jesteś przypięty."
+    return HttpResponse(message)
+
+@login_required
+def ajaxUnpin(request):
+    try:
+        group_id = request.POST["GroupId"]
+        record = Record.unpin_student_from_group(request.user.id, group_id)
+        message="Zostałeś wypięty z grupy."
+    except NonStudentException:
+        message="Nie możesz się wypiąć, bo nie jesteś studentem."
+    except NonGroupException:
+        message="Nie możesz się wypiąć, bo podana grupa nie istnieje."
+    except AlreadyNotAssignedException:
+        message="Nie możesz się wypiąć, bo nie jesteś zapisany."
+    return HttpResponse(message)
 
 @login_required
 def assign(request, group_id):
@@ -77,7 +106,7 @@ def records(request, group_id):
 @login_required
 def own(request):
     try:
-        groups = Record.get_student_groups(request.user.id)
+        groups = Record.get_student_all_detiled_enrollings(request.user.id)
         data = {
             'groups': groups,
         }
@@ -89,14 +118,14 @@ def own(request):
 @login_required       
 def schedulePrototype(request):
     try:
-        student_groups = Record.get_student_groups(request.user.id)
+        student_records = Record.get_student_all_detiled_records(request.user.id)
         subjects = Subject.objects.all()
         for subject in subjects:
             subject.groups_ = Group.objects.filter(subject=subject)
             for group in subject.groups_:
                 group.terms_ = group.get_all_terms()
         data = {
-            'student_groups': student_groups,
+            'student_records': student_records,
             'subjects': subjects,
         }
         return render_to_response('enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))

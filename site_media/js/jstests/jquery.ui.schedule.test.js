@@ -1,0 +1,6 @@
+(function($) {
+
+module("schedule");
+
+
+})(jQuery);

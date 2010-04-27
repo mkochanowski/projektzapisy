@@ -12,7 +12,9 @@ $.widget("ui.schedule", {
 		cellHeight: 32,
 		hourColumnWidth: 40,
 		dayColumnWidth: 110,
-		colors: ['#C0C0C0'/*Silver*/]
+		boxClass: ['box-1', 'box-2', 'box-3', 'box-4', 'box-5', 'box-6', 'box-7', 'box-8'],
+		pinUrl: undefined,
+		unpinUrl: undefined
 	},
 	
 	_create: function() {
@@ -20,7 +22,19 @@ $.widget("ui.schedule", {
 		var self = this,
 			o = this.options;
 		
+		self.subjectList = [];	
+		
 		self.initialTerms = self.element.find('div');
+		
+		var pinUrl = self.element.attr('pinUrl'),
+			unpinUrl = self.element.attr('unpinUrl');
+		
+		if(pinUrl != undefined) {
+			o.pinUrl = pinUrl;
+		}
+		if(unpinUrl != undefined) {
+			o.unpinUrl = unpinUrl;
+		}
 		
 		self.scheduleTable = (self.scheduleTable = $('<table></table>'))
 			.appendTo(self.element)
@@ -43,18 +57,11 @@ $.widget("ui.schedule", {
 		
 		self.initialTerms.each(function(){
 			self._addDivTerm($(this));
-			self._makeTermFixed($(this));
-		});		
+		});	
+		
+		
 	},
-	
-	_nextColor: function(){
-		if(this.colorIndex == undefined )
-			this.colorIndex = 0;
-		else 
-			this.colorIndex = (this.colorIndex+1) % this.options.colors.length;
-		return this.options.colors[this.colorIndex];
-	}, 
-	
+
 	_daysRow: function() {
 		
 		var o = this.options,
@@ -90,13 +97,13 @@ $.widget("ui.schedule", {
 					.css({
 						left: o.hourColumnWidth + 5,
 						width: (o.dayColumnWidth + 5) * o.dayList.length,
-						top: self._minuteAbsoluteTop(h-o.startMinute)}))
+						top: self._minuteAbsoluteTop(h)}))
 				.append($('<div></div>')
 					.addClass('schedule-hours-cell')
 					.append($('<span>'+(h/60 >= 10 ? h/60 : '0'+h/60)+':'+(h%60 >= 10 ? h%60 : '0'+h%60)+'</span>'))
 					.css({
 						height: self._termHeight(o.minutesPerCell),
-						top: self._minuteAbsoluteTop(h-o.startMinute)})
+						top: self._minuteAbsoluteTop(h)})
 			);
 		}
 		return $column;
@@ -113,72 +120,190 @@ $.widget("ui.schedule", {
 		return $column;
 	},
 	
-	_subjectTermClass: function(subjectID) {
+	_groupClass: function(groupID) { 
+		if(groupID == undefined) {
+			return 'schedule-group-unknown';
+		}
+		else {
+			return 'schedule-group-' + groupID;
+		}
+	},
+	
+	_subjectClass: function(subjectID) {
 		if(subjectID == undefined) {
-			return 'schedule-unknown-subject-term';
+			return 'schedule-subject-unknown';
 		}
 		else {
-			return 'schedule-subject-' + subjectID + '-term';
+			return 'schedule-subject-' + subjectID;
 		}
 	},
 	
-	_subjectTermId: function(termID) {
+	_termEntityId: function(groupID, termID) {
 		if(termID == undefined) {
-			throw 'GroupID undefined.';
+			throw 'TermID undefined.';
 		}
 		else {
-			return 'schedule-' + termID + '-term';
+			return 'schedule-term-' + groupID + '-' + termID;
 		}
 	},
 	
-	addTerm: function(content, day, from, minutes, subjectID, termID) {
+	_nextBoxClass: function(){
+		if(this.colorIndex == undefined )
+			this.colorIndex = 0;
+		else 
+			this.colorIndex = (this.colorIndex+1) % this.options.boxClass.length;
+		return this.options.boxClass[this.colorIndex];
+	}, 
+	
+	_termWithSameIdAlreadyAdded: function(groupID, termID){
 		var self = this,
-			add = true;
-		
-		$('#'+self._subjectTermId(termID)).each(function(){
-			add = false;	
+			added = false;
+		$('#'+self._termEntityId(groupID, termID)).each(function(){
+			added = true;	
 		});
+		return added;
+	},
+	
+	addTerm: function(content, day, from, minutes, subjectID, groupID, termID, status) {
+		var self = this;
 		
-		if(add) {
+		if(!self._termWithSameIdAlreadyAdded(groupID, termID)) {
 			this._addDivTerm($('<div></div>')
 				.attr({
 					minutes: minutes,
 					day: day,
 					from: from,
 					subjectID: subjectID,
-					termID: termID})
-				.html(content)
-				.css('background-color',self._nextColor()));
+					groupID: groupID,
+					termID: termID,
+					status: status})
+				.html(content));
 		}
 	},
 	
 	_makeTermFixed: function(termDiv) {
-		termDiv.addClass('schedule-fixed');
+		termDiv.removeClass('schedule-pinned').addClass('schedule-fixed');
 	},
 	
-	deleteTerms: function(subjectID){
+	_makeTermPinned: function(termDiv) {
+		termDiv.removeClass('schedule-unpinned').addClass('schedule-pinned');
+	},
+	
+	_makeTermUnPinned: function(termDiv) {
+		termDiv.removeClass('schedule-pinned').addClass('schedule-unpinned');
+	},
+	
+	_ajaxGroupPin: function(groupID, successCallback) {
 		var self = this;
-		$('.'+self._subjectTermClass(subjectID)+':not(.schedule-fixed)').remove();
+		if (self.options.pinUrl == undefined) {
+			alert("Pin url undefined");
+		}
+		else {
+			$.ajax({
+				type: "POST",
+				url: self.options.pinUrl,
+				data: {
+					GroupId: groupID
+				},
+				success: function(msg){
+					alert(msg);
+					successCallback();
+				}
+			});
+		}
+	},
+	
+	_ajaxGroupUnpin: function(groupID, successCallback) {
+		var self = this;
+		if (self.options.unpinUrl == undefined) {
+			alert("Unpin url undefined");
+		}
+		else {
+			$.ajax({
+				type: "POST",
+				url: self.options.unpinUrl,
+				data: {
+					GroupId: groupID
+				},
+				success: function(msg, callback){
+					alert(msg);
+					successCallback();
+				}
+			});
+		}
+	},
+	
+	deleteSubjectTerms: function(subjectID){
+		var self = this;
+		$('.'+self._subjectClass(subjectID)+':not(.schedule-fixed,.schedule-pinned)').remove();
 		for(var i=0; i<self.dayColumnList.length; i++){
 			self._orderColumnContent(self.dayColumnList[i]);
 		}
 	},
 	
+	_toolBox: function(divTerm) {
+		var self = this,
+			$toolBox = $('<div></div>')
+				.append($('<a>Pin</a>')
+					.addClass('toolPin')
+					.click(function(){
+						self._ajaxGroupPin(
+							divTerm.attr('groupid'),
+							function() {
+								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+									self._makeTermPinned($(this));
+								});
+							}
+						);
+					}))
+				.append($('<a>UnPin</a>')
+					.addClass('toolUnPin')
+					.click(function(){
+						self._ajaxGroupUnpin(
+							divTerm.attr('groupid'),
+							function() {
+								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+									self._makeTermUnPinned($(this));
+								});
+							}
+						);
+					}));
+		return $toolBox;
+	},
+	
 	_addDivTerm: function(divTerm) {
 		var self = this;
 		
+		if(self.subjectList[divTerm.attr('subjectid')] == undefined) {
+			self.subjectList[divTerm.attr('subjectid')] = { boxClass : self._nextBoxClass() };
+		}
+		
 		$('<div></div>')
-			.addClass('schedule-group-term-m')
-			.append(divTerm.html())
+			.addClass('box ' + self.subjectList[divTerm.attr('subjectid')].boxClass) 
+			.append($('<div></div>')
+				.addClass('middle')
+				.append(divTerm.html())
+				.append(self._toolBox(divTerm)))
 			.appendTo(divTerm
 				.empty()
 				.addClass('schedule-group-term')
-				.addClass(self._subjectTermClass(divTerm.attr('subjectid')))
-				.attr('id', self._subjectTermId(divTerm.attr('termid')))
+				.addClass(self._subjectClass(divTerm.attr('subjectid')))
+				.addClass(self._groupClass(divTerm.attr('groupid')))
+				.attr('id', self._termEntityId(divTerm.attr('groupid'), divTerm.attr('termid')))
 				.css({
 					height: self._termHeight(parseInt(divTerm.attr('minutes'))),
 					top: self._minuteAbsoluteTop(parseInt(divTerm.attr('from')))})
 				.appendTo(this.dayColumnList[parseInt(divTerm.attr('day'))]));
+		
+		if(divTerm.attr('status') === 'fixed'){
+			self._makeTermFixed(divTerm);
+		}
+		else if(divTerm.attr('status') === 'pinned'){
+			self._makeTermPinned(divTerm);
+		}
+		else {
+			self._makeTermUnPinned(divTerm);
+		}
 				
 		this._orderColumnContent(this.dayColumnList[parseInt(divTerm.attr('day'))]);
 	},
@@ -188,9 +313,9 @@ $.widget("ui.schedule", {
 		return minutes*o.cellHeight/o.minutesPerCell - 5;
 	},
 	
-	_minuteAbsoluteTop: function(minute_offset) {
+	_minuteAbsoluteTop: function(minute_of_day) {
 		var o = this.options;
-		return minute_offset*o.cellHeight/o.minutesPerCell;
+		return (minute_of_day-o.startMinute)*o.cellHeight/o.minutesPerCell;
 	},
 	
 	_orderColumnContent: function(column) {
@@ -200,8 +325,8 @@ $.widget("ui.schedule", {
 			termsList = column.children('.schedule-group-term').get();
 		
 		termsList.sort(function(a, b){
-			var startA = $(a).attr('from'),
-		   	 	startB = $(b).attr('from');
+			var startA = parseInt($(a).attr('from')),
+		   	 	startB = parseInt($(b).attr('from'));
 		   	return (startA < startB) ? -1 : (startA > startB) ? 1 : 0;
 		}); 
 		
@@ -209,6 +334,7 @@ $.widget("ui.schedule", {
 			var $itm = $(itm),
 				from = parseInt($itm.attr('from')),
 				minutes = parseInt($itm.attr('minutes'));
+			
 			for(var i=0; i<lastOccHourInCol.length; i++) {
 				if(lastOccHourInCol[i] <= from) {
 					lastOccHourInCol[i] = from + minutes;

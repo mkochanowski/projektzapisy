@@ -11,21 +11,23 @@ from enrollment.subjects.exceptions import NonSubjectException
 
 from itertools import cycle
 
-COLOR = [
-     ('#086808', '#719a71'), #green 
-     ('#093a9d', '#5f7ab1'), #blue  
-     ('#724848', '#837878'), #brown
-     ('#7b267a', '#9b789b'), #violet 
-     ('#1B887A', '#7fa6a2'), #ocean 
-     ('#AB8B00', '#bdaf70'), #yellow  
-     ('#b32727', '#b57272'), #red  
-     ('#b10ea7', '#c395c0'), #pink   
-]
+STATUS_ENROLLED = '1'
+STATUS_PINNED = '2'
+RECORD_STATUS = [( STATUS_ENROLLED, u'zapisany' ), ( STATUS_PINNED, u'oczekujący' )]
+
+class EnrolledManager(models.Manager):
+    def get_query_set(self):
+        """ Returns only enrolled students. """
+        return super(EnrolledManager, self).get_query_set().filter(status = STATUS_ENROLLED)
 
 class Record( models.Model ):
     group = models.ForeignKey(Group, verbose_name = 'grupa')
     student = models.ForeignKey(Student, verbose_name = 'student')
-
+    status = models.CharField(max_length = 1, choices = RECORD_STATUS, verbose_name = 'status')
+    
+    objects = models.Manager()
+    enrolled = EnrolledManager()
+    
     @staticmethod
     def number_of_students(group):
       """Returns number of students enrolled to particular group"""
@@ -33,18 +35,37 @@ class Record( models.Model ):
       return Record.objects.filter(group = group_).count()
 
     @staticmethod
-    def get_student_groups(user_id):
+    def get_student_all_detiled_records(user_id):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            records = Record.objects.filter(student = student).order_by('group__subject')
+            records = Record.objects.filter(student = student).\
+                select_related('group', 'group__subject').order_by('group__subject')
+            for record in records:
+                record.group_ = record.group
+                record.group_.terms_ = record.group.get_all_terms()
+                record.group_.subject_ = record.group.subject
+                if record.status == STATUS_ENROLLED:
+                    record.schedule_widget_status_ = 'fixed'
+                elif record.status == STATUS_PINNED:
+                    record.schedule_widget_status_ = 'pinned'
+                else:
+                    record.schedule_widget_status_ = ''
+            return records
+        except Student.DoesNotExist:
+            raise NonStudentException()
+    
+    @staticmethod    
+    def get_student_all_detiled_enrollings(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            records = Record.enrolled.filter(student = student).\
+                select_related('group', 'group__subject').order_by('group__subject')
             groups = [record.group for record in records]
             subjects = set([group.subject for group in groups])
-            subject_color = dict(zip(subjects, cycle(COLOR)))
             for group in groups:
                 group.terms_ = group.get_all_terms()
-                group.background_color = subject_color[group.subject][1]
-                group.border_color = subject_color[group.subject][0]
                 group.subject_ = group.subject
             return groups
         except Student.DoesNotExist:
@@ -70,7 +91,7 @@ class Record( models.Model ):
     def get_students_in_group(group_id):
         try:
             group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Record.objects.filter(group=group))
+            return map(lambda x: x.student, Record.objects.filter(group=group, status=STATUS_ENROLLED))
         except Group.DoesNotExist:
             raise NonGroupException()
     
@@ -79,7 +100,7 @@ class Record( models.Model ):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            return map(lambda x: x.group, Record.objects.filter(student=student))
+            return map(lambda x: x.group, Record.objects.filter(student=student, status=STATUS_ENROLLED))
         except Student.DoesNotExist:
             raise NonStudentException()
     
@@ -98,13 +119,44 @@ class Record( models.Model ):
             raise NonSubjectException()
 
     @staticmethod
+    def pin_student_to_group(user_id, group_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            group = Group.objects.get(id=group_id)
+            record, is_created = Record.objects.get_or_create(group=group, student=student, status=STATUS_PINNED)
+            if is_created == False:
+                raise AlreadyPinnedException()
+            return record
+        except Student.DoesNotExist:
+            raise NonStudentException()
+        except Group.DoesNotExist:
+            raise NonGroupException()
+
+    @staticmethod
+    def unpin_student_from_group(user_id, group_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            group = Group.objects.get(id=group_id)
+            record = Record.objects.get(group=group, student=student, status=STATUS_PINNED)
+            record.delete()
+            return record
+        except Record.DoesNotExist:
+            raise AlreadyNotPinnedException()
+        except Student.DoesNotExist:
+            raise NonStudentException()
+        except Group.DoesNotExist:
+            raise NonGroupException()
+
+    @staticmethod
     def add_student_to_group(user_id, group_id):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
             if Record.number_of_students(group=group) < group.limit:
-                record, is_created = Record.objects.get_or_create(group=group, student=student)
+                record, is_created = Record.objects.get_or_create(group=group, student=student, status=STATUS_ENROLLED)
                 if is_created == False:
                     raise AlreadyAssignedException()
             else:
@@ -122,9 +174,9 @@ class Record( models.Model ):
             student = user.student  
             old_group = Group.objects.get(id=old_id)
             new_group = Group.objects.get(id=new_id)
-            record = Record.objects.get(group=old_group, student=student)
+            record = Record.objects.get(group=old_group, student=student, status=STATUS_ENROLLED)
             record.delete()
-            Record.objects.create(group=new_group, student=student)
+            Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
             return record
         except Student.DoesNotExist:
             raise NonStudentException()
@@ -139,7 +191,7 @@ class Record( models.Model ):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            record = Record.objects.get(group=group, student=student)
+            record = Record.objects.get(group=group, student=student, status=STATUS_ENROLLED)
             record.delete()
             return record
         except Record.DoesNotExist:

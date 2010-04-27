@@ -12,14 +12,15 @@ $(function(){
 				from = $(this).attr('from'), 
 				minutes = $(this).attr('minutes'), 
 				subjectID = $(this).attr('subjectID'), 
+				groupID = $(this).attr('groupID');
 				termID = $(this).attr('termID');
 
-			$('#schedule-wrapper').schedule('addTerm', content, day, from, minutes, subjectID, termID );
+			$('#schedule-wrapper').schedule('addTerm', content, day, from, minutes, subjectID, groupID, termID );
 		});
 	}
 	
 	function removeSubject(subjectid) {
-		$('#schedule-wrapper').schedule('deleteTerms', subjectid );
+		$('#schedule-wrapper').schedule('deleteSubjectTerms', subjectid );
 	}
 	
 	$('.schedule-prototype-subject').click(function(){

@@ -22,11 +22,10 @@ class Term( models.Model ):
         timeTo = self.time_to()
         return (timeTo.hour - timeFrom.hour)*60 + (timeTo.minute - timeFrom.minute) 
     
-    def time_from_offset_in_minutes(self):
-        "Returns number of minutes from first hour of day to term beggining"""
+    def time_from_in_minutes(self):
+        "Returns number of minutes from start of day (midnight) to term beggining"""
         timeFrom = self.time_from()
-        startTime = self._convert_string_to_time(HOURS[0][1])
-        return (timeFrom.hour - startTime.hour)*60 + (timeFrom.minute - startTime.minute) 
+        return (timeFrom.hour)*60 + (timeFrom.minute) 
 
     def time_from(self):
         "Returns hourFrom in time format"""
