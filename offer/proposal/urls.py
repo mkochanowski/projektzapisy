@@ -1,6 +1,9 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns( 'fereol.offer.proposal.views',
+
+    url( '^offer/create/$',                          'offerCreate',        name='offer-create' ),
+    
     ( '^add/$', 'proposalForm' ),
     url( '^edit/(?P<sid>[0-9]+)/$',                  'proposalForm',        name='proposal-edit' ),
     url( '^history/(?P<sid>[0-9]+)/$',               'proposalHistory',     name='proposal-history' ),
@@ -9,5 +12,5 @@ urlpatterns = patterns( 'fereol.offer.proposal.views',
     url('^(?P<slug>[\w\-_]+)/(?P<descid>[0-9]+)/?$', 'proposal',            name='proposal-page-archival'),
     url('^(?P<slug>[\w\-_]+)',                       'proposal',            name='proposal-page'),
     #url('^details/(?P<slug>[\w\-_]+)',               'proposal',            name='proposal-page'),
-    url('^$',                                        'proposals',           name='proposal-list' ),
+    url('^$',                                        'proposals',           name='proposal-list' ),    
 )

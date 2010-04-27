@@ -163,3 +163,25 @@ def proposalRestore ( request, descid ):
     newdesc.save()
     
     return proposal( request, olddesc.proposal.slug )
+
+@login_required
+def offerCreate( request ):
+    """
+        Widok listy przedmiotów, które można wybrać w ramach oferty dydaktycznej
+    """
+    data = {
+        'subjects' : Proposal.objects.order_by('name'),
+    }    
+    
+    return render_to_response('offer/proposal/offerCreate.html', data)
+    
+@login_required
+def offerCreateTeachers( request, subjectId ):
+    """
+        Widok pobiera listę nauczycieli gotowych poprowadzić dany przedmiot.
+        TODO: zrobić pobieranie listy
+    """
+    data = {
+        'teachers' : []
+    }
+    return render_to_response('offer/proposal/offerCreateTeachers.html')
