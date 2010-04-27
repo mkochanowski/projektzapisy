@@ -32,10 +32,16 @@ td.schedule-day-cell
 
 .schedule-fixed .toolPin { display:none; }
 .schedule-fixed .toolUnPin { display:none; }
+.schedule-fixed .toolAssign { display:none; }
+.schedule-fixed .toolResign { display:block; }
 .schedule-pinned .toolPin { display:none; }
 .schedule-pinned .toolUnPin { display:block; }
+.schedule-pinned .toolAssign { display:block; }
+.schedule-pinned .toolResign { display:none; }
 .schedule-unpinned .toolPin { display:block; }
 .schedule-unpinned .toolUnPin { display:none; }
+.schedule-unpinned .toolAssign { display:none; }
+.schedule-unpinned .toolResign { display:none; }
 
 .box .middle
 	{ border-style:solid; border-width:2px; width:100%; height:100%; }

@@ -51,7 +51,11 @@
 
 {% block content-right %}
 
-	<div id="schedule-wrapper" pinUrl="{% url schedule-prototype-pin %}" unpinUrl="{% url schedule-prototype-unpin %}">
+	<div id="schedule-wrapper" 
+		pinUrl="{% url schedule-prototype-pin %}" 
+		unpinUrl="{% url schedule-prototype-unpin %}"
+		assignUrl="{% url schedule-prototype-assign %}" 
+		resignUrl="{% url schedule-prototype-resign %}">
 		{% for record in student_records %}
 			{% for term in record.group_.terms_ %}
 				<div subjectID="{{record.group_.subject_.pk}}"

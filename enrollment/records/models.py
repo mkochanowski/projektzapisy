@@ -6,7 +6,7 @@ from django.db import models
 from users.models import Student
 
 from enrollment.subjects.models import *
-from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException
+from enrollment.records.exceptions import *
 from enrollment.subjects.exceptions import NonSubjectException
 
 from itertools import cycle

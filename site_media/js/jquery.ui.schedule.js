@@ -14,7 +14,9 @@ $.widget("ui.schedule", {
 		dayColumnWidth: 110,
 		boxClass: ['box-1', 'box-2', 'box-3', 'box-4', 'box-5', 'box-6', 'box-7', 'box-8'],
 		pinUrl: undefined,
-		unpinUrl: undefined
+		unpinUrl: undefined,
+		assignUrl: undefined,
+		resignUrl: undefined
 	},
 	
 	_create: function() {
@@ -27,13 +29,21 @@ $.widget("ui.schedule", {
 		self.initialTerms = self.element.find('div');
 		
 		var pinUrl = self.element.attr('pinUrl'),
-			unpinUrl = self.element.attr('unpinUrl');
+			unpinUrl = self.element.attr('unpinUrl'),
+			assignUrl = self.element.attr('assignUrl')
+			resignUrl = self.element.attr('resignUrl');
 		
 		if(pinUrl != undefined) {
 			o.pinUrl = pinUrl;
 		}
 		if(unpinUrl != undefined) {
 			o.unpinUrl = unpinUrl;
+		}
+		if(assignUrl != undefined) {
+			o.assignUrl = assignUrl;
+		}
+		if(resignUrl != undefined) {
+			o.resignUrl = resignUrl;
 		}
 		
 		self.scheduleTable = (self.scheduleTable = $('<table></table>'))
@@ -193,41 +203,40 @@ $.widget("ui.schedule", {
 		termDiv.removeClass('schedule-pinned').addClass('schedule-unpinned');
 	},
 	
-	_ajaxGroupPin: function(groupID, successCallback) {
-		var self = this;
-		if (self.options.pinUrl == undefined) {
-			alert("Pin url undefined");
+	_ajaxGroupOperation: function(opCode, groupID, successCallback) {
+		var self = this,
+			opUrl;
+		if(opCode === 'Pin') {
+			opUrl = self.options.pinUrl;
+		} 
+		else if (opCode === 'Unpin'){
+			opUrl = self.options.unpinUrl;
+		}
+		else if(opCode === 'Assign') {
+			opUrl = self.options.assignUrl;
+		}
+		else if(opCode === 'Resign') {
+			opUrl = self.options.resignUrl;
+		}
+		if (opUrl == undefined) {
+			alert("Operation url undefined");
 		}
 		else {
 			$.ajax({
 				type: "POST",
-				url: self.options.pinUrl,
+				dataType : "json", 
+				url: opUrl,
 				data: {
 					GroupId: groupID
 				},
-				success: function(msg){
-					alert(msg);
-					successCallback();
-				}
-			});
-		}
-	},
-	
-	_ajaxGroupUnpin: function(groupID, successCallback) {
-		var self = this;
-		if (self.options.unpinUrl == undefined) {
-			alert("Unpin url undefined");
-		}
-		else {
-			$.ajax({
-				type: "POST",
-				url: self.options.unpinUrl,
-				data: {
-					GroupId: groupID
-				},
-				success: function(msg, callback){
-					alert(msg);
-					successCallback();
+				success: function(resp){
+					if(resp.Success) {
+						alert(resp.Success.Message);
+						successCallback();
+					} 
+					else {
+						alert(resp.Exception.Message);
+					}
 				}
 			});
 		}
@@ -244,10 +253,37 @@ $.widget("ui.schedule", {
 	_toolBox: function(divTerm) {
 		var self = this,
 			$toolBox = $('<div></div>')
-				.append($('<a>Pin</a>')
+				.append($('<a>Zapisz</a>')
+					.addClass('toolAssign')
+					.click(function(){
+						self._ajaxGroupOperation(
+							'Assign',
+							divTerm.attr('groupid'),
+							function() {
+								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+									self._makeTermFixed($(this));
+								});
+							}
+						);
+					}))
+				.append($('<a>Wypisz</a>')
+					.addClass('toolResign')
+					.click(function(){
+						self._ajaxGroupOperation(
+							'Resign',
+							divTerm.attr('groupid'),
+							function() {
+								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+									self._makeTermUnPinned($(this));
+								});
+							}
+						);
+					}))
+				.append($('<a>Przypnij</a>')
 					.addClass('toolPin')
 					.click(function(){
-						self._ajaxGroupPin(
+						self._ajaxGroupOperation(
+							'Pin',
 							divTerm.attr('groupid'),
 							function() {
 								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
@@ -256,10 +292,11 @@ $.widget("ui.schedule", {
 							}
 						);
 					}))
-				.append($('<a>UnPin</a>')
+				.append($('<a>Wypnij</a>')
 					.addClass('toolUnPin')
 					.click(function(){
-						self._ajaxGroupUnpin(
+						self._ajaxGroupOperation(
+							'Unpin',
 							divTerm.attr('groupid'),
 							function() {
 								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){

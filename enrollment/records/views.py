@@ -8,42 +8,107 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
 from django.shortcuts import redirect
+from django.utils import simplejson
 
 from enrollment.subjects.models import *
 from users.models import *
 from enrollment.records.models import *
-from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, \
-    AlreadyNotAssignedException, AlreadyPinnedException, AlreadyNotPinnedException
+from enrollment.records.exceptions import *
 
 from datetime import time
 
 @login_required
 def ajaxPin(request):
+    data = {}
     try:
         group_id = request.POST["GroupId"]
         record = Record.pin_student_to_group(request.user.id, group_id)
-        message = "Zostałeś przypięty do grupy."
+        data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś przypięty do grupy."
     except NonStudentException:
-        message="Nie możesz się przypiąć, bo nie jesteś studentem."
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonStudent"
+        data['Exception']['Message'] = "Nie możesz się przypiąć, bo nie jesteś studentem."
     except NonGroupException:
-        message="Nie możesz się przypiąć, bo podana grupa nie istnieje."
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonGroup"
+        data['Exception']['Message'] = "Nie możesz się przypiąć, bo podana grupa nie istnieje."
     except AlreadyPinnedException:
-        message="Nie możesz się przypiąć, bo już jesteś przypięty."
-    return HttpResponse(message)
+        data['Exception'] = {}
+        data['Exception']['Code'] = "AlreadyNotPinned"
+        data['Exception']['Message'] = "Nie możesz się przypiąć, bo już jesteś przypięty."
+    return HttpResponse(simplejson.dumps(data))
 
 @login_required
 def ajaxUnpin(request):
+    data = {}
     try:
         group_id = request.POST["GroupId"]
         record = Record.unpin_student_from_group(request.user.id, group_id)
-        message="Zostałeś wypięty z grupy."
+        data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś wypięty do grupy."
     except NonStudentException:
-        message="Nie możesz się wypiąć, bo nie jesteś studentem."
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonStudent"
+        data['Exception']['Message'] = "Nie możesz się wypięty, bo nie jesteś studentem."
     except NonGroupException:
-        message="Nie możesz się wypiąć, bo podana grupa nie istnieje."
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonGroup"
+        data['Exception']['Message'] = "Nie możesz się wypięty, bo podana grupa nie istnieje."
+    except AlreadyUnPinnedException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "AlreadyNotUnPinned"
+        data['Exception']['Message'] = "Nie możesz zostać wypięty, bo nie jesteś przypięty."
+    return HttpResponse(simplejson.dumps(data))
+
+@login_required
+def ajaxAssign(request):
+    data = {}
+    try:
+        group_id = request.POST["GroupId"]
+        record = Record.add_student_to_group(request.user.id, group_id)
+        data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś zapisany do grupy."
+    except NonStudentException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonStudent"
+        data['Exception']['Message'] = "Nie możesz się zapisać, bo nie jesteś studentem."
+    except NonGroupException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonGroup"
+        data['Exception']['Message'] = "Nie możesz się zapisać, bo podana grupa nie istnieje."
+    except AlreadyAssignedException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "AlreadyAssigned"
+        data['Exception']['Message'] = "Nie możesz się zapisać, bo już jesteś zapisany."
+    except OutOfLimitException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "OutOfLimit"
+        data['Exception']['Message'] = "Nie możesz się zapisać, bo grupa jest już zapełniona."
+    return HttpResponse(simplejson.dumps(data))
+
+
+@login_required
+def ajaxResign(request):
+    data = {}
+    try:
+        group_id = request.POST["GroupId"]
+        record = Record.remove_student_from_group(request.user.id, group_id)
+        data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś wypisany z grupy."
+    except NonStudentException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonStudent"
+        data['Exception']['Message'] = "Nie możesz się wypisać, bo nie jesteś studentem."
+    except NonGroupException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "NonGroup"
+        data['Exception']['Message'] = "Nie możesz się wypisać, bo podana grupa nie istnieje."
     except AlreadyNotAssignedException:
-        message="Nie możesz się wypiąć, bo nie jesteś zapisany."
-    return HttpResponse(message)
+        data['Exception'] = {}
+        data['Exception']['Code'] = "AlreadyNotAssigned"
+        data['Exception']['Message'] = "Nie możesz się wypisać, bo nie jesteś zapisany."
+    return HttpResponse(simplejson.dumps(data))
 
 @login_required
 def assign(request, group_id):
