@@ -1,11 +1,16 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 from django.db import models
 import re
 
+from proposal_tag import ProposalTag
+
 class Proposal( models.Model ):
-    name = models.CharField( max_length = 255, verbose_name = 'nazwa przedmiotu' )
-    slug = models.SlugField( max_length = 255, unique = True, verbose_name='odnośnik' )
+    name = models.CharField(max_length = 255,
+                            verbose_name = 'nazwa przedmiotu' )
+    slug = models.SlugField(max_length = 255,
+                            unique = True, verbose_name='odnośnik' )
+    tags = models.ManyToManyField(ProposalTag)
     
     class Meta:
         verbose_name = 'przedmiot'
@@ -41,3 +46,8 @@ class Proposal( models.Model ):
         slug = re.sub("^-", "", slug)
         slug = re.sub("-$", "", slug)
         return slug
+    
+    @staticmethod
+    def get_by_tag(tag):
+        "Return proposals by tag."
+        return Proposal.objects.filter(tags__name=tag)

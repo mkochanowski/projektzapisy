@@ -1,11 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-	<h1>Przedmioty</h1>
-	<ul>
-	{% for sub in subjects %}
-		<li><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>
-		{% empty %}Brak przedmiotów
+    <h1>Przedmioty</h1>
+    
+    {% for sem, subs in subjects %}
+	    <h2>{{sem}}</h2>
+	    
+	    <ul>
+	    {% for sub in subs %}
+		    <li><a href="/subjects/{{sub.slug}}">{{sub.name}}</a></li>
+		    {% empty %}Brak przedmiotów
+	    {% endfor %}
+	    </ul>
+	    
+	    {% empty %} Brak semestrów
 	{% endfor %}
-	</ul>
 {% endblock %}

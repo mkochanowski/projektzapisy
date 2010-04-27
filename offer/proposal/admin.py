@@ -11,3 +11,5 @@ class ProposalAdmin( admin.ModelAdmin ):
         
 admin.site.register( Proposal, ProposalAdmin )
 admin.site.register( ProposalDescription )
+admin.site.register(ProposalTag)
+admin.site.register(ProposalDescriptionTag)

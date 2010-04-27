@@ -91,7 +91,7 @@ def proposalForm(request, sid = None):
             
             description = ProposalDescription()
             description.description = proposalDescription
-            description.date = datetime.datetime.now()
+            description.date = datetime.now()
             description.proposal = proposal
             description.save()
             
@@ -155,11 +155,11 @@ def proposalViewArcival( request, descid ):
     
 @login_required
 def proposalRestore ( request, descid ):
-    olddesc = ProposalDescription.objects.get( pk = descid )
+    olddesc             = ProposalDescription.objects.get( pk = descid )
     newdesc             = ProposalDescription()
     newdesc.description = olddesc.description
-    newdesc.date        = datetime.datetime.now()
-    newdesc.Proposal     = olddesc.Proposal
+    newdesc.date        = datetime.now()
+    newdesc.proposal    = olddesc.proposal
     newdesc.save()
     
-    return Proposal( request, olddesc.Proposal.slug )
+    return proposal( request, olddesc.proposal.slug )

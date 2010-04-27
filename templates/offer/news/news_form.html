@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block main-navigation %}
-<li><a href="{% url news.views.latest_news %}">Aktualności</a></li>
+<li><a href="{% url latest_news %}">Aktualności</a></li>
 {% if adding %}
 <li>Dodaj ogłoszenie</li>
 {% else %}
@@ -21,7 +21,7 @@
 <div id="main-content" class="narrow">
   <form action="" method="post" id="od-news-form">
     {{ form.as_p }}
-    <a href="{% url news.views.latest_news %}">Anuluj</a>
+    <a href="{% url latest_news %}">Anuluj</a>
     <input type="submit" value="Zapisz" />
   </form>
 </div>
