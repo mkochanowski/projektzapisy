@@ -1,0 +1,37 @@
+
+#offerCreate table {
+    width: 95%;        
+    margin: 15px 0px;
+    margin: auto;
+}
+
+#offerCreate table th {
+    padding: 5px 2px;
+    text-align: center;
+    font-weight: bold;    
+}
+
+#offerCreate .cen {
+    text-align: center; 
+}
+
+#offerCreate table td {
+    padding: 5px 2px;
+    border-top: 1px solid #eeeeee;        
+}
+
+#offerCreate tr.selected td {
+    background: #E9F7EF;
+}
+
+.teachers div {
+    display: none;
+}
+
+.teacher {
+    width: 500px;
+}
+
+.teacher div {
+padding: 3px 5px;
+}

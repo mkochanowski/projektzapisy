@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="/site_media/css/offer/proposal/offerCreate.css" type="text/css" />
+<link rel="stylesheet" href="/site_media/css/colorbox.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="/site_media/js/jquery.colorbox.js"></script>
+<script type="text/javascript" src="/site_media/js/offer/proposal/offerCreate.js"></script>
+{% endblock %}
+
+{% block main-navigation %}
+<li>Oferta</li>
+<li>Propozycje</li>
+<li>Wybór przedmiotów do oferty dydaktycznej</li>
+{% endblock %}
+
+
+{% block content %}
+
+<div id="offerCreate">
+    <table cellspacing="0">
+    <tr>
+        <th></th>
+        <th style="text-align: left;">Przedmiot</th>
+        <th>Poparcie</th>
+        <th>Chętni do poprowadzenia</th>
+    </tr>
+    {% for subject in subjects %}
+    <tr>
+        <td>
+            <input type="checkbox" name="selectSubject" value="{{ subject.id }}" />
+        </td>
+        <td>{{ subject.name }}</td>
+        <td class="cen">X</td>
+        <td class="cen">X <a  href="#" subject="{{ subject.id }}" class="teachersDetails">więcej</a></td>
+    </tr>
+    {% endfor %}        
+    </table>
+    
+    <div class="teachers">
+        {% for subject in subjects %}
+            <div class="teacher" id="teachers{{ subject.id }}">
+                <div>XX YY</div>
+                <div>XX YY</div>
+                <div>XX YY</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
