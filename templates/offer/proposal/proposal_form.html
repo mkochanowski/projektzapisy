@@ -1,41 +1,45 @@
+<form action="" method="post" id="od-proposaloffer-form">
+	<p id="od-proposaloffer-form-title">
+		<input type="text" name="name" value="{{ proposal.name }}" />
+	</p>
 
-       
-        <form action="" method="post" id="od-proposaloffer-form">
+	<p>
+		<textarea name="description" rows="15" cols="80">{{ proposalDescription }}</textarea>
+	</p>
 
-            <p id="od-proposaloffer-form-title"><input type="text" name="name" value="{{ proposal.name }}" /></p>
+	<table>
+		{% if books %}
+			{% for book in books %}
+				{% if forloop.first %}
+					<tr class="book" >
+						<th>Literatura:</th>
+						<td class="field">
+							<input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" />
+						</td>
+					</tr>
+				{% else %}
+					<tr class="book">
+						<th class="label" >&nbsp;</th>
+						<td class="field">
+							<input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" />
+						</td>
+					</tr>
+				{% endif %}
+			{% endfor %}
+		{% else %}
+			<tr class="book">
+				<th class="label" >Literatura:</th>
+				<td class="field"><input type="text" name="books[]" /></td>
+			</tr>
+		{% endif %}
 
-            <p><textarea name="description" rows="15" cols="80">{{ proposalDescription }}</textarea></p>
+		<tr >
+			<th class="label" >&nbsp;</th>
+			<td class="field"><a href="#" id="addBook">Dodaj książkę</a></td>
+		</tr>
+	</table>
 
-            <table>
-                        
-                {% if books %}
-                    {% for book in books %}
-                        {% if forloop.first %}
-                        <tr class="book" >
-                            <th>Literatura:</th>
-                            <td class="field"><input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" /></td>
-                        </tr>
-                        {% else %}
-                        <tr class="book">
-                            <th class="label" >&nbsp;</th>
-                            <td class="field"><input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" /></td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}  
-                {% else %}
-                <tr class="book">
-                    <th class="label" >Literatura:</th>
-                    <td class="field"><input type="text" name="books[]" /></td>            
-                </tr>
-                {% endif %}
-            
-                <tr >
-                    <th class="label" >&nbsp;</th>
-                    <td class="field"><a href="#" id="addBook">Dodaj książkę</a></td>
-                </tr>
-            </table>
-            
-            
-
-            <p id="od-proposaloffer-form-submit"><input type="submit" value="{% if editMode %}zapisz{% else %}dodaj{% endif %}" /></p>
-        </form>
+	<p id="od-proposaloffer-form-submit">
+		<input type="submit" value="{% if editMode %}zapisz{% else %}dodaj{% endif %}" />
+	</p>
+</form>

@@ -1,26 +1,28 @@
 {% extends "offer/base-offer.html" %}
 
 {% block styles %}
-<link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
 {% endblock %}
 
 {% block scripts %}
-{% include "tinymcebbcode.html" %}
+	{% include "tinymcebbcode.html" %}
 {% endblock %}
 
 {% block main-navigation %}
-<li><a href="{% url latest_news %}">Aktualności</a></li>
-{% if adding %}
-<li>Dodaj ogłoszenie</li>
-{% else %}
-<li>Edytuj ogłoszenie</li>
-{% endif %}
+	<li><a href="{% url latest_news %}">Aktualności</a></li>
+	{% if adding %}
+		<li>Dodaj ogłoszenie</li>
+	{% else %}
+		<li>Edytuj ogłoszenie</li>
+	{% endif %}
 {% endblock %}
 
 {% block content %}
-  <form action="" method="post" id="od-news-form">
-    {{ form.as_p }}
-    <a href="{% url latest_news %}">Anuluj</a>
-    <input type="submit" value="Zapisz" />
-  </form>
+	<form action="" method="post" id="od-news-form">
+		{{ form.as_p }}
+		<p>
+			<a href="{% url latest_news %}">Anuluj</a>
+			<input type="submit" value="Zapisz" />
+		</p>
+	</form>
 {% endblock %}
