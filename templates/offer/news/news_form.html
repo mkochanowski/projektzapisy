@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "offer/base-offer.html" %}
 
 {% block styles %}
 <link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
@@ -18,11 +18,9 @@
 {% endblock %}
 
 {% block content %}
-<div id="main-content" class="narrow">
   <form action="" method="post" id="od-news-form">
     {{ form.as_p }}
     <a href="{% url latest_news %}">Anuluj</a>
     <input type="submit" value="Zapisz" />
   </form>
-</div>
 {% endblock %}

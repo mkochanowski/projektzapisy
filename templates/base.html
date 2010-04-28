@@ -1,61 +1,49 @@
-{% load news_extras %}
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
 <head>
-    <title>Fereol &copy;</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Fereol &copy;</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-    <link rel="stylesheet" href="/site_media/css/general.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/main.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/menu-droppy.css" type="text/css" />
-{% block styles %}
-{% endblock %}
-{% comment %}
-    <link rel="shortcut icon" href="/favicon.ico" />
-{% endcomment %}
-    <script src="/site_media/js/jquery-v1.4.2.js" type="text/javascript"></script>
-    <script src="/site_media/js/jquery.droppy.js" type="text/javascript"></script>
-    <script src="/site_media/js/main.js" type="text/javascript"></script>
-{% block scripts %}
-{% endblock %}
+	<link rel="stylesheet" href="/site_media/css/general.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/main.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/menu-droppy.css" type="text/css" />
+	{% block styles %}
+	{% endblock %}
+
+	{% comment %}
+	<link rel="shortcut icon" href="/favicon.ico" />
+	{% endcomment %}
+	
+	<script src="/site_media/js/jquery-v1.4.2.js" type="text/javascript"></script>
+	<script src="/site_media/js/jquery.droppy.js" type="text/javascript"></script>
+	<script src="/site_media/js/main.js" type="text/javascript"></script>
+	{% block scripts %}
+	{% endblock %}
 </head>
 <body>
-    <div id="main-container">
-        <div id="main-header">
-            <h1><a href="/">Fereol &copy;</a></h1>
-            <div id="main-menu">
-                <ul id="main-menu-list">
-                        <li><a href="{% url offer.news.views.latest_news %}">Aktualności</a> ({% newscount %})</li>
-                    <li>Przedmioty
-                        <ul>
-                            <li><a href="{% url record-schedule %}">Plan Zajęć</a></li>
-                            <li><a href="{% url proposal-list %}">Oferta Dydaktyczna</a></li>
-                            <li><a href="#">Zaliczone Przedmioty</a></li>
-                            <li><a href="{% url schedule-prototype %}">Prototyp Planu</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Pracownicy</a></li>
-                    <li><a href="#">Inne</a></li>
-                    {% if user.is_authenticated %}
-                    <li>{{ user.first_name }} {{user.last_name }} {{user.student.matricula}} <a href="{% url user-logout %}">(wyloguj)</a></li>
-                    {% else %}
-                    <li><a href="{% url user-login %}">Zaloguj</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-        <div id="main-navigation">
-            <ul>
-              {% block main-navigation %}
-              {% endblock %}
-            </ul>
-        </div>
-        <div id="main-content">
-        
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
+	<div id="main-container">
+		<div id="main-header">
+			<h1><a href="/">Fereol &copy;</a></h1>
+			<div id="main-menu">
+				<ul id="main-menu-list">
+					{% block main-menu %}
+					{% endblock %}
+				</ul>
+			</div>
+		</div>
+		<div id="main-navigation">
+			<ul>
+				{% block main-navigation %}
+					<li><a href="/">Strona główna</a></li>
+				{% endblock %}
+			</ul>
+		</div>
+		{% block top-bar %}
+		{% endblock %}
+		<div id="main-content" class="{% block content-class %}narrow{% endblock %}">
+			{% block content %}
+			{% endblock %}
+		</div>
+	</div>
 </body>
 </html>

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "offer/base-offer.html" %}
 
 {% load news_extras %}
 
@@ -13,8 +13,7 @@
 {% endif %}
 {% endblock %}
 
-{% block content %}
-
+{% block top-bar %}
 <div id="od-news-top-bar">
   <form id="od-news-search-form" action="#">
     <input type="text" name="od-news-search" id="od-news-search" value="Szukaj"/>
@@ -34,8 +33,9 @@
   </div>
   <div style="clear: both;"></div>
 </div>
+{% endblock %}
 
-<div id="main-content" class="narrow">
+{% block content %}
 
 {% if object_list %}
   <div class="od-news-list">
@@ -60,7 +60,4 @@
 {% else %}
   <p>Nie ma nowych ogłoszeń</p>
 {% endif %}
-
-</div>
-
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "offer/base-offer.html" %}
 
 {% block styles %}
 <link rel="stylesheet" href="/site_media/css/offer/proposal/proposal.css" type="text/css" />
@@ -9,8 +9,7 @@
 <script type="text/javascript" src="/site_media/js/offer/proposal/history.js"></script>
 
 {% include "tinymcebbcode.html" %}
-    
-</script>
+
 
 
 {% endblock %}
@@ -36,7 +35,6 @@
 
 {% block content %}
 
-<div id="main-content" class="narrow">
     {% if message %}<div class="message">{{ message }}</div>{% endif %}
     <ul id="od-proposaloffer-proposallist">
         {% for sub in proposals %}
@@ -57,6 +55,5 @@
         {% endifequal %}
         
     </div>
-</div>
 
 {% endblock %}
