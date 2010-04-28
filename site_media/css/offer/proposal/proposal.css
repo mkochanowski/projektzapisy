@@ -4,21 +4,46 @@
 
 #od-proposaloffer-contents
 {
-	border: 2px solid #262626;
+	border: 1px solid #cccccc;
 
-	margin-left: 171px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+
+	margin-left: 170px;
 	padding: 20px 40px;
 }
 
 /*** LISTA PROPOZYCJI ***/
 
-#od-proposaloffer-proposallist, #od-proposaloffer-proposallist li
+#od-proposaloffer-proposallist
 {
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
-	border: 1px solid #262626;
+}
+
+#od-proposaloffer-proposallist li
+{
+	border: 1px solid #cccccc;
 	border-right: 0;
+	border-bottom: 0;
+	overflow: hidden;
+}
+
+#od-proposaloffer-proposallist li:first-child
+{
+	-moz-border-radius-topleft: 4px;
+	-webkit-border-radius-topleft: 4px;
+	border-radius-topleft: 4px;
+}
+
+#od-proposaloffer-proposallist li:last-child
+{
+	-moz-border-radius-bottomleft: 4px;
+	-webkit-border-radius-bottomleft: 4px;
+	border-radius-bottomleft: 4px;
+	border-bottom: 1px solid #cccccc;
 }
 
 #od-proposaloffer-proposallist
@@ -31,7 +56,7 @@
 #od-proposaloffer-proposallist li a, #od-proposaloffer-proposallist li span
 {
 	padding: 2px;
-	background: #cfcfcf;
+	background: #dddddd;
 	display: block;
 	color: black;
 	text-decoration: none;
@@ -39,7 +64,7 @@
 
 #od-proposaloffer-proposallist li a:hover
 {
-	background: #dddddd;
+	background: #eeeeee;
 }
 
 #od-proposaloffer-proposallist li.active a

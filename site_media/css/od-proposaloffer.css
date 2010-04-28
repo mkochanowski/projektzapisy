@@ -4,7 +4,7 @@
 
 #od-proposaloffer-contents
 {
-	border: 2px solid #262626;
+	border: 1px solid #cccccc;
 
 	margin-left: 171px;
 	padding: 20px 40px;
@@ -17,7 +17,7 @@
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
-	border: 1px solid #262626;
+	border: 1px solid #cccccc;
 	border-right: 0;
 }
 

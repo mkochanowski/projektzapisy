@@ -6,7 +6,7 @@
 {
 	width: 1000px;
 	background: white;
-	border: 1px solid #99bb99;
+	border: 1px solid #cccccc;
 	margin: auto;
 	margin-top: 5px;
 	margin-bottom: 5px;
@@ -23,7 +23,7 @@
 	position: relative;
 	height: 32px;
 	padding: 5px;
-	border-bottom: 2px solid #262626;
+	border-bottom: 1px solid #cccccc;
 }
 
 #main-header h1
@@ -89,7 +89,7 @@
 
 #main-navigation
 {
-	border-bottom: 2px solid #262626;
+	border-bottom: 1px solid #cccccc;
 	padding: 5px;
 }
 
