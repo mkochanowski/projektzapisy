@@ -10,7 +10,7 @@ from exceptions import NonSubjectException
 
 @login_required
 def subjects(request):
-    semesters = Semester.objects.all()
+    semesters = Semester.objects.filter(visible=True)
     subjects = [(sem.get_name(), sem.get_subjects()) for sem in semesters]
     
     return render_to_response( 'enrollment/subjects/subjects_list.html', { 'subjects' : subjects } )
@@ -18,7 +18,7 @@ def subjects(request):
 @login_required
 def subject( request, slug ):
     try:
-        subject = Subject.objects.get(slug=slug)
+        subject = Subject.visible.get(slug=slug)
         
         subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
         subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')

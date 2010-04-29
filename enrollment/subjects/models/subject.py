@@ -2,19 +2,27 @@
 
 from django.db import models
 
+class VisibleManager(models.Manager):
+    def get_query_set(self):
+	    """ Returns all subjects which have marked semester as visible """
+	    return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
+
 class Subject( models.Model ):
     
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik')
+    semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     description = models.TextField(verbose_name='opis') 
     lectures = models.IntegerField(verbose_name='ilość godzin wykładów')
     exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń')
     laboratories = models.IntegerField(verbose_name='ilość godzin pracowni')
-    semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method
+    
+    objects = models.Manager()
+    visible = VisibleManager()
     
     def get_semester_name(self):
         if self.semester is None:

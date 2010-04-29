@@ -9,6 +9,7 @@ class Semester( models.Model ):
     TYPE_SUMMER = 'l'
     TYPE_CHOICES = [(TYPE_WINTER, u'zimowy'), (TYPE_SUMMER, u'letni')]
 
+    visible = models.BooleanField(verbose_name='widoczny')
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.PositiveIntegerField(default=lambda: datetime.now().year, verbose_name='rok akademicki')
     # implies academic year: year/(year+1)
