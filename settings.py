@@ -79,6 +79,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'haystack',
     'fereol.south',
     'fereol.users',
     'fereol.offer.proposal',
@@ -91,3 +92,8 @@ LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/profile/'
 
 SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
+
+HAYSTACK_SITECONF = 'search_sites'
+HAYSTACK_SEARCH_ENGINE = 'whoosh'
+HAYSTACK_WHOOSH_PATH = 'search_index'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5

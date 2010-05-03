@@ -1,0 +1,3 @@
+{% load news_extras %}
+<div>{{ obj.body|bbcode|nl2br|safe }}</div>
+<div>{{ obj.author.get_full_name }}, {{ obj.date|date:"l, d F Y"|lower }}</div>
