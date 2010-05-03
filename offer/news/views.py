@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
@@ -51,6 +51,7 @@ def add(request):
             news = form.save(commit=False)
             news.author = request.user
             news.save()
+            request.user.message_set.create(message="Opublikowano ogłoszenie.")
             return redirect(latest_news)
     else:
         form = NewsForm()
@@ -66,12 +67,16 @@ def edit(request, id):
         form = NewsForm(request.POST)
         if form.is_valid():
             news = form.save(commit=False)
-            news.author = request.user
+            old_news = News.objects.get(pk=id)
             news.id = id
+            news.author = old_news.author
+            news.date = old_news.date
             news.save()
+            request.user.message_set.create(message="Zapisano zmiany w ogłoszeniu.")
             return redirect(latest_news)
     else:
-        form = NewsForm(instance = News.objects.get(pk=id))
+        news_instance = get_object_or_404(News, pk=id)
+        form = NewsForm(instance = news_instance)
     return render_to_response('offer/news/news_form.html', {
         'form': form,
         },

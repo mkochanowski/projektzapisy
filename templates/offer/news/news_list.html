@@ -41,6 +41,9 @@
 {% endblock %}
 
 {% block content %}
+	{% for message in messages %}
+	  <div class="message">{{ message }}</div>
+	{% endfor %}
 	{% if object_list %}
 		<div class="od-news-list">
 			{% for news in object_list %}
