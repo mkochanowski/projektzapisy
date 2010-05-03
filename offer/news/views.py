@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import get_object_or_404, render_to_response, redirect
-from django.template import RequestContext
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
+from django.shortcuts import get_object_or_404, render_to_response, \
+     redirect
+from django.template import RequestContext
 from django.utils import simplejson
-from offer.news.models import News
+
 from offer.news.forms import NewsForm
-from offer.news.utils import news_per_page, prepare_data, render_items
+from offer.news.models import News
+from offer.news.utils import news_per_page, prepare_data, \
+     render_items, get_search_results_data
 
 def ajax_latest_news(request):
     items = News.objects.new()
@@ -22,6 +25,17 @@ def ajax_news_page(request, beginwith):
                         beginwith=beginwith, quantity=news_per_page,
                         archive_view=True)
     return HttpResponse(simplejson.dumps(data))
+
+def ajax_search_page(request):
+    data = get_search_results_data(request)
+    return HttpResponse(simplejson.dumps(data))
+
+def search_page(request):
+    data = get_search_results_data(request)
+    if 'message' in data: # error: bad query
+        request.user.message_set.create(message=data['message'])
+        return latest_news(request)
+    return display_news_list(request, data)
 
 def latest_news(request):
     items = News.objects.new()

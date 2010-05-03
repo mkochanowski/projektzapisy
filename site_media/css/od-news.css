@@ -41,15 +41,16 @@
     margin-right: 30px;
 }
 
-.od-news-navigator a
+.od-news-navigator #news-nav-groups a
 {
+    border-left: solid 2px #333;
     padding-left:  6px;
     padding-right: 6px;
 }
 
-.od-news-navigator #news-newer-group a
+.od-news-navigator #news-nav-groups :first-child
 {
-    border-right: solid 2px #333;
+    border-left: none;
 }
 
 .od-news-footer

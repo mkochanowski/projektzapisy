@@ -3,9 +3,11 @@
 {% comment %}
   Todo: move out, after upgrade to django 1.2 and message framework
 {% endcomment %}
+<div class="messages">
 {% for message in messages %}
   <div class="message">{{ message }}</div>
 {% endfor %}
+</div>
 
 {% if object_list %}
 <div class="od-news-list">
@@ -28,5 +30,5 @@
   {% endfor %}
 </div>
 {% else %}
-<p>Nie ma nowych ogłoszeń.</p>
+<p>Nie ma ogłoszeń pasujących do zapytania.</p>
 {% endif %}

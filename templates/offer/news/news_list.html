@@ -13,14 +13,16 @@
 {% block main-navigation %}
 	<li><a href="{% url latest_news %}">Aktualności</a></li>
         <li id="news-archive-nav" style="{% if not archive_view %}display:none{% endif %}">Archiwum</li>
+        <li id="news-search-nav" style="{% if not search_view %}display:none{% endif %}">Wyniki wyszukiwania</li>
 
 {% endblock %}
 
 {% block top-bar %}
 	<div id="od-news-top-bar">
-		<form id="od-news-search-form" action="#">
+	  <form id="od-news-search-form" action="{% url news-search %}" method="GET">
 			<div>
-				<input type="text" name="od-news-search" id="od-news-search" value="Szukaj"/>
+			  <input type="text" name="q" id="od-news-search-q" value="Szukaj"/>
+			  <input type="reset" id="od-news-search-reset" value="X" style="display:none;" />
 			</div>
 		</form>
 
@@ -29,10 +31,8 @@
 		{% endif %}
 
 		<div class="od-news-navigator">
-		  <span id="news-newer-group">
+		  <span id="news-nav-groups">
 		    {{ newer_group }}
-		  </span>
-		  <span id="news-older-group">
 		    {{ older_group }}
 		  </span>
 			<a href="/feeds/news/" title="Aktualności RSS" id="od-news-rss-icon">[RSS]</a>
