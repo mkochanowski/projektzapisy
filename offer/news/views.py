@@ -4,17 +4,28 @@ from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import permission_required
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
+from django.utils import simplejson
 from offer.news.models import News
 from offer.news.forms import NewsForm
+from offer.news.utils import prepare_data, news_per_page
 
-news_per_page = 5
+def ajax_latest_news(request):
+    items = News.objects.new()
+    data = prepare_data(request, items, quantity=len(items))
+    return HttpResponse(simplejson.dumps(data))
+
+def ajax_news_page(request, beginwith):
+    beginwith = int(beginwith)
+    items = News.objects.get_successive_news(beginwith, news_per_page)
+    data = prepare_data(request, items, 
+                        beginwith=beginwith, quantity=news_per_page,
+                        archive_view=True)
+    return HttpResponse(simplejson.dumps(data))
 
 def latest_news(request):
     items = News.objects.new()
-    data = {
-        'older_no': max(News.objects.count() - len(items), 0),
-        'older_beginwith': len(items),
-    }
+    data = prepare_data(request, items, quantity=len(items))
     return display_news_list(request, items, data)
 
 def paginated_news(request,
@@ -22,21 +33,12 @@ def paginated_news(request,
                    quantity=news_per_page):
     beginwith = int(beginwith)
     items = News.objects.get_successive_news(beginwith, quantity)
-    data = {
-        'newer_no': beginwith,
-        'newer_beginwith': max(beginwith - quantity, 0),
-        'older_no': max(News.objects.count() - (beginwith + quantity), 0),
-        'older_beginwith': beginwith + quantity,
-        'archive_view': True,
-    }
+    data = prepare_data(request, items,
+                        beginwith=beginwith, quantity=quantity,
+                        archive_view=True)
     return display_news_list(request, items, data)
 
-def display_news_list(request, items, newdata={}):
-    data = {
-        'older_no': 0,
-        'newer_no': 0,
-    }
-    data.update(newdata)
+def display_news_list(request, items, data={}):
     data.update({ 'object_list': items, })
     return render_to_response(
         'offer/news/news_list.html',

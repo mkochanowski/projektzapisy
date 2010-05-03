@@ -43,19 +43,13 @@
 
 .od-news-navigator a
 {
-    border-left: solid 2px #333;
     padding-left:  6px;
     padding-right: 6px;
 }
 
-.od-news-navigator :first-child
+.od-news-navigator #news-newer-group a
 {
-    border-left: none;
-}
-
-#od-news-rss-icon
-{
-    border-left: none;
+    border-right: solid 2px #333;
 }
 
 .od-news-footer

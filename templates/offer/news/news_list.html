@@ -5,12 +5,15 @@
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
 {% endblock %}
+{% block scripts %}
+	<script src="/site_media/js/jquery-v1.4.2.js" type="text/javascript"></script>
+	<script src="/site_media/js/offer/news/news.js" type="text/javascript"></script>
+{% endblock %}
 
 {% block main-navigation %}
 	<li><a href="{% url latest_news %}">Aktualności</a></li>
-	{% if archive_view %}
-		<li>Archiwum</li>
-	{% endif %}
+        <li id="news-archive-nav" style="{% if not archive_view %}display:none{% endif %}">Archiwum</li>
+
 {% endblock %}
 
 {% block top-bar %}
@@ -26,13 +29,12 @@
 		{% endif %}
 
 		<div class="od-news-navigator">
-			{% ifnotequal newer_no 0 %}
-				<a href="{% url offer.news.views.paginated_news newer_beginwith %}" title="Najnowsze">Najnowsze</a>
-				<a href="{% url offer.news.views.paginated_news newer_beginwith %}" title="Nowsze">Nowsze ({{ newer_no }})</a>
-			{% endifnotequal %}
-			{% ifnotequal older_no 0 %}
-				<a href="{% url offer.news.views.paginated_news older_beginwith %}" title="Starsze">Starsze ({{ older_no }})</a>
-			{% endifnotequal %}
+		  <span id="news-newer-group">
+		    {{ newer_group }}
+		  </span>
+		  <span id="news-older-group">
+		    {{ older_group }}
+		  </span>
 			<a href="#" title="Aktualności RSS" id="od-news-rss-icon">[RSS]</a>
 		</div>
 		
@@ -41,30 +43,7 @@
 {% endblock %}
 
 {% block content %}
-	{% for message in messages %}
-	  <div class="message">{{ message }}</div>
-	{% endfor %}
-	{% if object_list %}
-		<div class="od-news-list">
-			{% for news in object_list %}
-			<div class="od-news-item">
-				<div class="od-news-header">
-					<h2>{{ news.title }}</h2>
-					<span class="od-news-date">{{ news.date|date:"l, d F Y"|lower }}</span>
-				</div>
-				<div class="od-news-body">
-					{{ news.body|bbcode|nl2br|safe }}
-				</div>
-				<div class="od-news-footer">
-					{{ news.author.first_name }} {{ news.author.last_name }}
-					{% if perms.news.change_news %}
-						<a href="{% url news-edit news.id %}">Edytuj</a>
-					{% endif %}
-				</div>
-			</div>
-			{% endfor %}
-		</div>
-	{% else %}
-		<p>Nie ma nowych ogłoszeń.</p>
-	{% endif %}
+<div id="news-content">
+  {{ content }}
+</div>
 {% endblock %}
