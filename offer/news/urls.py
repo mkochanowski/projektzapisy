@@ -7,6 +7,7 @@ urlpatterns = patterns('offer.news.views',
     url(r'^add/$', 'add', name='news-add'),
     url(r'^edit/(?P<id>\d+)/$', 'edit', name='news-edit'),
     (r'^archive/from/(?P<beginwith>\d+)/$', 'paginated_news'),
+    url(r'^archive/(?P<id>\d+)/$', 'news_item', name='news-item'),
     url(r'^ajax/latest/$', 'ajax_latest_news', name='news-ajax-latest'),
     url(r'^ajax/(?P<beginwith>\d+)/$', 'ajax_news_page', name='news-ajax-find'),
 )

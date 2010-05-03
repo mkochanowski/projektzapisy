@@ -5,6 +5,11 @@ import os
 
 admin.autodiscover()
 
+from fereol.feeds import LatestNews
+feeds = {
+    'news': LatestNews, 
+}
+
 urlpatterns = patterns('',
     #Z
     (r'^subjects/', include('fereol.enrollment.subjects.urls')),
@@ -17,6 +22,8 @@ urlpatterns = patterns('',
     (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
     (r'^users/', include('fereol.users.urls')),
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
+
+    (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

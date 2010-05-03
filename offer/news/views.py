@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from offer.news.models import News
 from offer.news.forms import NewsForm
-from offer.news.utils import prepare_data, news_per_page
+from offer.news.utils import news_per_page, prepare_data, render_items
 
 def ajax_latest_news(request):
     items = News.objects.new()
@@ -26,7 +26,7 @@ def ajax_news_page(request, beginwith):
 def latest_news(request):
     items = News.objects.new()
     data = prepare_data(request, items, quantity=len(items))
-    return display_news_list(request, items, data)
+    return display_news_list(request, data)
 
 def paginated_news(request,
                    beginwith,
@@ -36,10 +36,19 @@ def paginated_news(request,
     data = prepare_data(request, items,
                         beginwith=beginwith, quantity=quantity,
                         archive_view=True)
-    return display_news_list(request, items, data)
+    return display_news_list(request, data)
 
-def display_news_list(request, items, data={}):
-    data.update({ 'object_list': items, })
+def news_item(request, id):
+    items = [get_object_or_404(News,pk=id)]
+    data = {}
+    data['content']      = render_items(request, items)
+    data['older_group']  = ""
+    data['newer_group']  = ""
+    data['archive_view'] = True
+    return display_news_list(request, data)
+    
+
+def display_news_list(request, data={}):
     return render_to_response(
         'offer/news/news_list.html',
         data,
