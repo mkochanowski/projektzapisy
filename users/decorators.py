@@ -6,7 +6,7 @@ from functools import update_wrapper
 
 from users.models import Employee, Student
 
-def student_required(function,
+def student_required(function=None,
                      redirect_to=None):
     """
     Decorator that checks that the user has a student profile,
@@ -16,11 +16,15 @@ def student_required(function,
         try:
             user.student
             return True
+        except AttributeError:
+            return False
         except Student.DoesNotExist:
             return False
-    return _CheckProfileOr403(function, test_f, redirect_to)
+    if function:
+        return _CheckProfileOr403(function, test_f, redirect_to)
+    return (lambda f: _CheckProfileOr403(f, test_f, redirect_to))
 
-def employee_required(function,
+def employee_required(function=None,
                       redirect_to=None):
     """
     Decorator that checks that the user has a student profile,
@@ -30,9 +34,13 @@ def employee_required(function,
         try:
             user.employee
             return True
+        except AttributeError:
+            return False
         except Student.DoesNotExist:
             return False
-    return _CheckProfileOr403(function, test_f, redirect_to)
+    if function:
+        return _CheckProfileOr403(function, test_f, redirect_to)
+    return lambda f: _CheckProfileOr403(f, test_f, redirect_to)
 
 class _CheckProfileOr403(object):
     """
@@ -59,5 +67,5 @@ class _CheckProfileOr403(object):
         if self.test_func(request.user):
             return self.view_func(request, *args, **kwargs)
         if self.redirect_to:
-            redirect(self.redirect_to)
-        return HttpResponseForbidden("") # TODO - error page
+            return redirect(self.redirect_to)
+        return HttpResponseForbidden("You do not have a required profile") # TODO - error page
