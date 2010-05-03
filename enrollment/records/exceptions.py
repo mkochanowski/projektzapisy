@@ -6,10 +6,13 @@ class NonGroupException(Exception):
 
 class AlreadyAssignedException(Exception):
     pass
+	
+class AssignedInThisTypeGroupException(Exception):
+    pass
 
 class AlreadyNotAssignedException(Exception):
     pass
-
+	
 class AlreadyPinnedException(Exception):
     pass
 

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 from enrollment.subjects.models import Group, Subject
 from models import Record
-from exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException
+from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException
 from enrollment.subjects.exceptions import NonSubjectException
 
 from users.models import Employee, Student
@@ -156,3 +156,28 @@ class GetStudentsInGroupTest(TestCase):
         self.group.delete()
         self.assertRaises(NonGroupException, Record.get_students_in_group, self.group.id)
 
+class AssignmentToGroupsWithSameTypes(TestCase):
+    fixtures = ['user_and_group']
+    
+    def setUp(self):
+        self.user = User.objects.get(id=1)
+        self.lecture1 = Group.objects.get(id=1)
+        self.lecture2 = Group.objects.get(id=3)
+        self.group1 = Group.objects.get(id=2)
+        self.group2 = Group.objects.get(id=4)
+		
+        self.record = Record.objects.create(student=self.user.student, group=self.lecture1)
+
+    def testAssignToAnotherLecture(self):
+        Record.add_student_to_group(self.user.id, self.lecture2.id) 
+        self.assertEqual(Record.objects.count(), 2)
+
+    def testAssignToGroupForFirstTime(self):
+        Record.add_student_to_group(self.user.id, self.group1.id)
+        self.assertEqual(Record.objects.count(), 2)
+		
+    def testAssignToCurrentlyBookedGroupWithSameType(self):
+        Record.add_student_to_group(self.user.id, self.group1.id)
+        self.assertRaises(AssignedInThisTypeGroupException, Record.add_student_to_group, self.user.id, self.group2.id)
+
+    

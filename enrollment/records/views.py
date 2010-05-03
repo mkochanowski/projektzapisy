@@ -125,6 +125,9 @@ def assign(request, group_id):
     except AlreadyAssignedException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
+    except AssignedInThisTypeGroupException:
+        request.user.message_set.create(message="Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu.")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
 @login_required
 def change(request, old_id, new_id):
@@ -141,6 +144,7 @@ def change(request, old_id, new_id):
     except AlreadyNotAssignedException:
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś zapisany.")
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
+
 @login_required
 def resign(request, group_id):
     try:
