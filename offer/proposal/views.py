@@ -26,7 +26,7 @@ def proposal( request, slug, descid = None ):
         proposal.description = ProposalDescription.objects.get( pk = descid )
     else:
         proposal.description = newest
-        descid = proposal.id
+        descid = proposal.description.id
     next = proposal.description.getNewer( proposal )
     prev = proposal.description.getOlder( proposal )
 
