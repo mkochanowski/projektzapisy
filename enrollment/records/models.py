@@ -32,7 +32,7 @@ class Record( models.Model ):
     def number_of_students(group):
       """Returns number of students enrolled to particular group"""
       group_ = group
-      return Record.objects.filter(group = group_).count()
+      return Record.enrolled.filter(group = group_).count()
 
     @staticmethod
     def get_student_all_detiled_records(user_id):
@@ -91,7 +91,7 @@ class Record( models.Model ):
     def get_students_in_group(group_id):
         try:
             group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Record.objects.filter(group=group, status=STATUS_ENROLLED))
+            return map(lambda x: x.student, Record.enrolled.filter(group=group))
         except Group.DoesNotExist:
             raise NonGroupException()
     
@@ -100,7 +100,7 @@ class Record( models.Model ):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            return map(lambda x: x.group, Record.objects.filter(student=student, status=STATUS_ENROLLED))
+            return map(lambda x: x.group, Record.enrolled.filter(student=student))
         except Student.DoesNotExist:
             raise NonStudentException()
     
@@ -176,7 +176,7 @@ class Record( models.Model ):
             student = user.student  
             old_group = Group.objects.get(id=old_id)
             new_group = Group.objects.get(id=new_id)
-            record = Record.objects.get(group=old_group, student=student, status=STATUS_ENROLLED)
+            record = Record.enrolled.get(group=old_group, student=student)
             record.delete()
             Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
             return record
@@ -193,7 +193,7 @@ class Record( models.Model ):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            record = Record.objects.get(group=group, student=student, status=STATUS_ENROLLED)
+            record = Record.enrolled.get(group=group, student=student)
             record.delete()
             return record
         except Record.DoesNotExist:

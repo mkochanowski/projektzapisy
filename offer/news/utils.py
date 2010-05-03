@@ -7,7 +7,7 @@ from django.template.loader import get_template
 from haystack.forms import SearchForm
 from haystack.query import SearchQuerySet
 
-from news.models import News
+from fereol.offer.news.models import News
 
 news_per_page = 5
 

@@ -25,7 +25,7 @@ class AddUserToGroupTest(TestCase):
         self.assertRaises(NonGroupException, Record.add_student_to_group, self.user.id, group_id)
 
     def testStudentAssignedToGroup(self):
-        Record.objects.create(student=self.user.student, group=self.group)
+        Record.add_student_to_group(self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 1)
         self.assertRaises(AlreadyAssignedException, Record.add_student_to_group, self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 1)
@@ -46,7 +46,7 @@ class ChangeUserGroupTest(TestCase):
         self.user = User.objects.get(id=1)
         self.old_group = Group.objects.get(id=1)
         self.new_group = Group.objects.get(id=2)
-        self.old_record = Record.objects.create(student=self.user.student, group=self.old_group)
+        self.old_record = Record.add_student_to_group(self.user.id, self.old_group.id)
     
     def testWithNonStudentUser(self):
         self.user.student.delete()
@@ -80,7 +80,7 @@ class RemoveUserToGroupTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.group = Group.objects.get(id=1)
-        self.record = Record.objects.create(student=self.user.student, group=self.group)
+        self.record = Record.add_student_to_group(self.user.id, self.group.id)
 
     def testWithNonStudentUser(self):
         self.user.student.delete()
@@ -109,7 +109,7 @@ class IsStudentInSubjectGroupTypeTest(TestCase):
         self.group = Group.objects.get(id=1)
         self.group2 = Group.objects.get(id=2)
         self.subject = Subject.objects.get(id=1)
-        self.record = Record.objects.create(student=self.user.student, group=self.group)
+        self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
     def testWithNonStudent(self):
         self.user.student.delete()
@@ -130,7 +130,7 @@ class GetGroupsForStudentTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.group = Group.objects.get(id=1)
-        self.record = Record.objects.create(student=self.user.student, group=self.group)
+        self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
     def testStudentAssignedToGroup(self):
         groups = Record.get_groups_for_student(self.user.id)
@@ -146,7 +146,7 @@ class GetStudentsInGroupTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.group = Group.objects.get(id=1)
-        self.record = Record.objects.create(student=self.user.student, group=self.group)
+        self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
     def testStudentAssignedToGroup(self):
         students = Record.get_students_in_group(self.group.id)
