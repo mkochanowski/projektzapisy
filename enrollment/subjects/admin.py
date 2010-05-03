@@ -14,3 +14,5 @@ admin.site.register(Group)
 admin.site.register(Classroom)
 admin.site.register(Term)
 admin.site.register(Semester)
+admin.site.register(Type)
+

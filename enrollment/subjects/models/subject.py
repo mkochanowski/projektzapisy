@@ -12,6 +12,7 @@ class Subject( models.Model ):
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik')
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
+    type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     description = models.TextField(verbose_name='opis') 
     lectures = models.IntegerField(verbose_name='ilość godzin wykładów')
@@ -37,4 +38,22 @@ class Subject( models.Model ):
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.get_semester_name())
-        
+		
+		
+# TODO: move class to one another file 		
+class Type(models.Model):
+    """types of subjects"""
+    name = models.CharField(max_length=30, verbose_name='rodzaj zajęć', default="", unique=True)
+	
+	
+    @staticmethod
+    def get_all_types_of_subjects():
+	    Type.objects.all()
+		
+    class Meta:
+        verbose_name = 'rodzaj'
+        verbose_name_plural = 'rodzaje'
+        app_label = 'subjects'
+
+    def __unicode__(self):
+        return "%s" % (self.name)
