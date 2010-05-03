@@ -63,9 +63,8 @@ class ChangeUserGroupTest(TestCase):
         self.assertRaises(NonGroupException, Record.change_student_group, self.user.id, self.old_group.id, group_id)
     
     def testStudentChangeGroup(self):
-        Record.change_student_group(self.user.id, self.old_group.id, self.new_group.id)
-        new_record = Record.objects.get(id=1)
-        self.assertEqual(new_record.group.id, 2)
+        new_record = Record.change_student_group(self.user.id, self.old_group.id, self.new_group.id)
+        self.assertEqual(new_record.group, self.new_group)
         self.assertEqual(new_record.student, self.user.student)
         
     def testStudentNotAssignedChangeGroup(self):

@@ -171,6 +171,7 @@ class Record( models.Model ):
 
     @staticmethod
     def change_student_group(user_id, old_id, new_id):
+        """ Deletes old student record and returns new record with changed group. """
         user = User.objects.get(id=user_id)
         try:
             student = user.student  
@@ -178,8 +179,8 @@ class Record( models.Model ):
             new_group = Group.objects.get(id=new_id)
             record = Record.enrolled.get(group=old_group, student=student)
             record.delete()
-            Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
-            return record
+            new_record = Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
+            return new_record
         except Student.DoesNotExist:
             raise NonStudentException()
         except Group.DoesNotExist:
