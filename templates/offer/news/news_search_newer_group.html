@@ -1,0 +1,6 @@
+{% if page.has_previous %}
+<a href="{% url news-search %}?q={{query}}&page={{page.previous_page_number}}" title="Nowsze"
+ onClick="load_data('{% url news-ajax-search %}?q={{query}}&page={{page.previous_page_number}}'); return false;">
+  Nowsze
+</a>
+{% endif %}
