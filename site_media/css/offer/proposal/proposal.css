@@ -46,6 +46,20 @@
 	border-bottom: 1px solid #cccccc;
 }
 
+#od-proposaloffer-proposallist li:first-child a
+{
+	-moz-border-radius-topleft: 3px;
+	-webkit-border-radius-topleft: 3px;
+	border-radius-topleft: 3px;
+}
+
+#od-proposaloffer-proposallist li:last-child a
+{
+	-moz-border-radius-bottomleft: 3px;
+	-webkit-border-radius-bottomleft: 3px;
+	border-radius-bottomleft: 3px;
+}
+
 #od-proposaloffer-proposallist
 {
 	margin-top: 30px;

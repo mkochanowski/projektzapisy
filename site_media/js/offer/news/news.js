@@ -25,8 +25,15 @@ $(document).ready(function() {
 		  '?q=' + $('#od-news-search-q').attr('value'));
 	return false;
     });
-    $('#od-news-search-q').focus(function() {
-	$('#od-news-search-q').attr('value', '');
+    $('#od-news-search-q').focus(function()
+	{
+		if ($('#od-news-search-q').attr('value') == 'Szukaj')
+			$('#od-news-search-q').attr('value', '');
+    });
+	$('#od-news-search-q').blur(function()
+	{
+		if ($('#od-news-search-q').attr('value') == '')
+			$('#od-news-search-q').attr('value', 'Szukaj');
     });
     $('#od-news-search-reset').css('display','inline-block');
     $('#od-news-search-reset').click(function() {

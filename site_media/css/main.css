@@ -102,7 +102,7 @@
 
 #main-navigation li:before
 {
-	content: '> ';
+	content: '» ';
 	padding-left: 5px;
 	padding-right: 5px;
 }
@@ -136,12 +136,17 @@
 {
 	margin-left: 30%;
 	margin-top: 10px;
-	margin-botton:10px;
+	margin-bottom:10px;
 	width:70%;
 	border-left: 2px solid black;
 }
 
 #main-content.narrow
+{
+	padding: 70px 150px;
+}
+
+#main-content.normal
 {
 	padding: 70px;
 }
