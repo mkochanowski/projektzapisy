@@ -13,6 +13,9 @@ from fereol.offer.news.models import News
 from fereol.offer.news.utils import news_per_page, prepare_data, \
      render_items, get_search_results_data
 
+def mainPage( request ):
+    return render_to_response( 'mainPage.html', context_instance = RequestContext( request ) )
+
 def ajax_latest_news(request):
     items = News.objects.new()
     data = prepare_data(request, items, quantity=len(items))

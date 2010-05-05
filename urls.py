@@ -11,6 +11,8 @@ feeds = {
 }
 
 urlpatterns = patterns('',
+    #MAIN PAGE
+    url('', 'fereol.offer.news.views.mainPage', name='main-page'),
     #Z
     (r'^subjects/', include('fereol.enrollment.subjects.urls')),
     (r'^records/', include('fereol.enrollment.records.urls')),
