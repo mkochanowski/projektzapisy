@@ -10,7 +10,7 @@ class Proposal( models.Model ):
                             verbose_name = 'nazwa przedmiotu' )
     slug = models.SlugField(max_length = 255,
                             unique = True, verbose_name='odnośnik' )
-    tags = models.ManyToManyField(ProposalTag)
+    tags = models.ManyToManyField(ProposalTag, blank=True)
     
     class Meta:
         verbose_name = 'przedmiot'
@@ -46,6 +46,22 @@ class Proposal( models.Model ):
         slug = re.sub("^-", "", slug)
         slug = re.sub("-$", "", slug)
         return slug
+
+    def in_summer( self ):
+        # sprawdza czy przedmiot będzie w semestrze letnim
+        # odpowiada za to tag summer
+        for t in self.tags.all():
+            if t.__unicode__() == 'summer':
+                return True
+        return False
+    
+    def in_winter( self ):
+        # sprawdza czy przedmiot będzie w semestrze zimowym
+        # odpowiada za to tag winter
+        for t in self.tags.all():
+            if t.__unicode__() == 'winter':
+                return True
+        return False
     
     @staticmethod
     def get_by_tag(tag):

@@ -1,0 +1,95 @@
+{% extends "offer/base-offer.html" %}
+
+{% block content %}
+<center>{{ user.student.matricula }}</center>
+<table>
+    <tr>
+        <th>Semestr Zimowy</th>
+        <th></th>
+        <th></th>
+        <th>Semestr Letni</th>
+        <th></th>
+        <th></th>
+        <th>Semestr Nieokreślony</th>
+        <th></th>
+        <th></th>
+    </tr>
+    <tr>
+        <th>Przedmiot</th>
+        <th>Punkty</th>
+        <th>Poprzednio</th>
+        <th>Przedmiot</th>
+        <th>Punkty</th>
+        <th>Poprzednio</th>
+        <th>Przedmiot</th>
+        <th>Punkty</th>
+        <th>Poprzednio</th>
+    </tr>
+    
+    {% for sub in subjects %}
+        <tr>
+            {% if sub.0 %}
+                <td>{{ sub.0.0.name }}</td>
+                <td> 
+                    <select>
+                        {% for i in maxPoints %}
+                            <option value={{i}}>{{i}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    {% if sub.0.1 %}
+                        <b>{{ sub.0.1}}</b>
+                    {% endif %}
+                </td>
+            {% else %}
+                <td></td>
+                <td></td>
+                <td></td>
+            {% endif %}
+            
+            {% if sub.1 %}
+                <td>{{ sub.1.0.name }}</td>
+                <td>
+                    <select>
+                        {% for i in maxPoints %}
+                            <option value={{i}}>{{i}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    {% if sub.1.1 %}
+                        <b>{{ sub.1.1}}</b>
+                    {% endif %}
+                </td>
+            {% else %}
+                <td></td>
+                <td></td>
+                <td></td>
+            {% endif %}
+            
+            {% if sub.2 %}
+                <td>{{ sub.2.0.name }}</td>
+                <td>
+                    <select>
+                        {% for i in maxPoints %}
+                            <option value={{i}}>{{i}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    {% if sub.2.1 %}
+                        <b>{{ sub.2.1}}</b>
+                    {% endif %}
+                </td>
+            {% else %}
+                <td></td>
+                <td></td>
+                <td></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    
+</table>
+
+{% endblock %}

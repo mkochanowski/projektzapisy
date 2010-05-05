@@ -173,7 +173,7 @@ def offerCreate( request ):
         'subjects' : Proposal.objects.order_by('name'),
     }    
     
-    return render_to_response('offer/proposal/offerCreate.html', data)
+    return render_to_response('offer/proposal/offerCreate.html', data, context_instance = RequestContext( request ))
     
 @login_required
 def offerCreateTeachers( request, subjectId ):
@@ -184,4 +184,4 @@ def offerCreateTeachers( request, subjectId ):
     data = {
         'teachers' : []
     }
-    return render_to_response('offer/proposal/offerCreateTeachers.html')
+    return render_to_response('offer/proposal/offerCreateTeachers.html', context_instance = RequestContext( request ))
