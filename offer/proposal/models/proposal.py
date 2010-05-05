@@ -10,7 +10,7 @@ class Proposal( models.Model ):
                             verbose_name = 'nazwa przedmiotu' )
     slug = models.SlugField(max_length = 255,
                             unique = True, verbose_name='odnośnik' )
-    tags = models.ManyToManyField(ProposalTag)
+    tags = models.ManyToManyField(ProposalTag, blank = True)
     
     class Meta:
         verbose_name = 'przedmiot'
