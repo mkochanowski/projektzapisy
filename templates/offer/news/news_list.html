@@ -2,9 +2,16 @@
 
 {% load news_extras %}
 
+{% block content-class %}narrow{% endblock %}
+
+{% block rss %}
+	<link href="/feeds/news/" rel="alternate" type="application/rss+xml" title="Aktualności RSS" />
+{% endblock %}
+
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
 {% endblock %}
+
 {% block scripts %}
 	<script src="/site_media/js/jquery-v1.4.2.js" type="text/javascript"></script>
 	<script src="/site_media/js/offer/news/news.js" type="text/javascript"></script>
@@ -31,11 +38,13 @@
 		{% endif %}
 
 		<div class="od-news-navigator">
-		  <span id="news-nav-groups">
-		    {{ newer_group }}
-		    {{ older_group }}
-		  </span>
-			<a href="/feeds/news/" title="Aktualności RSS" id="od-news-rss-icon">[RSS]</a>
+			<span id="news-nav-groups">
+				{{ newer_group }}
+				{{ older_group }}
+			</span>
+			<a href="/feeds/news/" title="Aktualności RSS" id="od-news-rss-icon">
+				<img src="/site_media/images/rss.png" alt="RSS" />
+			</a>
 		</div>
 		
 		<div style="clear: both;"></div>

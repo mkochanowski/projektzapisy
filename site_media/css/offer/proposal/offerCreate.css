@@ -17,7 +17,7 @@
 
 #offerCreate table td {
     padding: 5px 2px;
-    border-top: 1px solid #eeeeee;        
+    border-top: 1px solid #cccccc;
 }
 
 #offerCreate tr.selected td {
