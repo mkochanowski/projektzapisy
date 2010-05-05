@@ -102,7 +102,7 @@
 
 #main-navigation li:before
 {
-	content: '> ';
+	content: '» ';
 	padding-left: 5px;
 	padding-right: 5px;
 }
