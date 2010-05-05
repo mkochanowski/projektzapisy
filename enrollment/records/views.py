@@ -188,7 +188,7 @@ def own(request):
 def schedulePrototype(request):
     try:
         student_records = Record.get_student_all_detiled_records(request.user.id)
-        subjects = Subject.objects.all()
+        subjects = Subject.visible.all()
         for subject in subjects:
             subject.groups_ = Group.objects.filter(subject=subject)
             for group in subject.groups_:

@@ -2,13 +2,24 @@
 
 from django.db import models
 
+class SubjectEntity(models.Model):
+    name = models.CharField(max_length=100)
+    class Meta:
+        verbose_name = 'encja przedmiotu'
+        verbose_name_plural = 'encje przedmiotów'
+        app_label = 'subjects'
+        
+    def __unicode__(self):
+        return '%s' % (self.name, )
+    
+
 class VisibleManager(models.Manager):
     def get_query_set(self):
 	    """ Returns all subjects which have marked semester as visible """
 	    return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
 
 class Subject( models.Model ):
-    
+    entity = models.ForeignKey(SubjectEntity)
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik')
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')

@@ -1,2 +1,7 @@
 *.pyc
 *.swp
+.project
+.pydevproject
+.settings/
+search_index/*
+*.tmp*
