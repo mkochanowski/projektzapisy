@@ -156,7 +156,7 @@ class Record( models.Model ):
             student = user.student
             group = Group.objects.get(id=group_id)
             if Record.number_of_students(group=group) < group.limit:
-                if (Record.is_student_in_subject_group_type(user_id=student.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
+                if (Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
                     raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException 
                 record, is_created = Record.objects.get_or_create(group=group, student=student, status=STATUS_ENROLLED)
                 if is_created == False:
