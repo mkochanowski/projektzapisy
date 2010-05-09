@@ -11,6 +11,7 @@
         <li><a href="#">Preferencje</a></li>
 	{% endif %}
     <li><a href="{% url proposal-list %}">Propozycje</a></li>
+    <li><a href="{% url proposal-offer-create %}">Oferta dydaktyczna</a></li>
 	<li><a href="#">Inne</a></li>
 	{% if user.is_authenticated %}
 		<li>{{ user.first_name }} {{user.last_name }} {{user.student.matricula}} <a href="{% url user-logout %}">(wyloguj)</a></li>

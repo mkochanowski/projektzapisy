@@ -4,7 +4,7 @@ import datetime
 import re
 
 from django.contrib.auth.decorators import login_required
-from django.http                    import HttpResponseRedirect
+from django.http                    import HttpResponseRedirect, HttpResponse
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
@@ -185,3 +185,21 @@ def offerCreateTeachers( request, subjectId ):
         'teachers' : []
     }
     return render_to_response('offer/proposal/offerCreateTeachers.html', context_instance = RequestContext( request ))
+
+@login_required
+def offerSelect(request):
+    """
+        Wybiera lub odznacza przedmiot w ofercie dydaktycznej
+    """    
+    action = request.POST['action']
+    id = request.POST['id']
+    
+    proposal = Proposal.objects.get(pk = id)
+    tag = ProposalTag.objects.get(name = "offer")
+    
+    if action == 'select':
+        proposal.tags.add(tag)
+    else: # unselect
+        proposal.tags.remove(tag)
+        
+    return HttpResponse('ok')

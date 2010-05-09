@@ -67,3 +67,9 @@ class Proposal( models.Model ):
     def get_by_tag(tag):
         "Return proposals by tag."
         return Proposal.objects.filter(tags__name=tag)
+
+    def inOffer(self):
+        for t in self.tags.all():
+            if t.__unicode__() == 'offer':
+                return True
+        return False
