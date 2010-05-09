@@ -12,6 +12,10 @@ from django.shortcuts               import redirect
 from fereol.enrollment.records.models          import *
 from fereol.offer.proposal.models              import *
 
+import fereol.offer.proposal.models       
+
+
+
 
 @login_required
 def proposals(request):
@@ -52,12 +56,16 @@ def proposalForm(request, sid = None):
     booksToForm = []
     success = False
     proposalDescription = ""
+    proposalRequirements = ""
+    proposalComments = ""
     
     proposal = None
     if editMode:
         try:
             proposal = Proposal.objects.get(pk = sid)
             proposalDescription = proposal.description().description 
+            proposalRequirements = proposal.description().requirements
+            proposalComments = proposal.description().comments
         except:            
             editMode = False
     
@@ -71,18 +79,36 @@ def proposalForm(request, sid = None):
         
         proposalName = request.POST.get('name', '')
         proposalDescription = request.POST.get('description', '')
+        proposalRequirements = request.POST.get('requirements', '')
+        proposalComments = request.POST.get('comments', '')
+        
+        proposalType = request.POST.get('type', '')
+        
+        proposalEcts = int(request.POST.get('ects', 0))
+    
+        proposalLectures = int(request.POST.get('lectures', -1))
+        proposalRepetitories = int(request.POST.get('repetitories', -1))
+        proposalExercises = int(request.POST.get('exercises', -1))
+        proposalLaboratories = int(request.POST.get('laboratories', -1))
         
         books = request.POST.getlist('books[]')
         
         proposal.name = proposalName
-        proposal.slug = proposal.createSlug(proposal.name)        
+        proposal.slug = proposal.createSlug(proposal.name)
+                
+        proposal.type = proposalType
+        proposal.ects = proposalEcts
+        proposal.lectures = proposalLectures
+        proposal.repetitories = proposalRepetitories
+        proposal.exercises = proposalExercises
+        proposal.laboratories = proposalLaboratories                
         
         if Proposal.objects.filter(slug = proposal.slug).exclude(id = proposal.id).count() > 0:                
             message = 'Istnieje już przedmiot o takiej nazwie'
-            correctForm = False                                    
+            correctForm = False                                                 
             
-        if proposalName == "" or proposalDescription == "":
-            message = 'Wypełnij wszystkie pola'
+        if  proposalName == "" or proposalDescription == "" or proposalRequirements == "" or proposalType == "" or proposalLectures == -1 or proposalRepetitories == -1 or proposalExercises == -1 or proposalLaboratories == -1:
+            message = 'Podaj nazwę, opis, wymagania, typ przedmiotu oraz liczbę godzin zajęć'
             correctForm = False
                                 
         if correctForm:
@@ -91,6 +117,8 @@ def proposalForm(request, sid = None):
             
             description = ProposalDescription()
             description.description = proposalDescription
+            description.requirements = proposalRequirements
+            description.comments = proposalComments
             description.date = datetime.now()
             description.proposal = proposal
             description.save()
@@ -132,9 +160,13 @@ def proposalForm(request, sid = None):
         'message'   : message,
         'proposal'  : proposal,
         'books'     : booksToForm,
-        'proposalDescription' : proposalDescription,
-        'mode'      : 'form',
-        'proposals'  : Proposal.objects.all()
+        'proposalDescription'   : proposalDescription,
+        'proposalRequirements'  : proposalRequirements,
+        'proposalComments'      : proposalComments,
+        'mode'          : 'form',
+        'proposals'     : Proposal.objects.all(),
+        'proposalTypes' : fereol.offer.proposal.models.proposal.PROPOSAL_TYPES,
+        'proposalHours' : fereol.offer.proposal.models.proposal.PROPOSAL_HOURS,
     }
     return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext(request));
 

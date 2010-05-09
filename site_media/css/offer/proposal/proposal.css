@@ -124,4 +124,30 @@
 	text-align: right;
 }
 
+.proposalField span {
+    width: 300px;
+    float: left;
+    display: block;
+}
+
+.proposalField {
+    clear: both;
+    padding-top: 5px;
+}
+
+.proposalField select {
+    width: 100px;
+}
+
+.proposalField input {
+    width: 100px;
+}
+
+.proposalField .mceEditor {
+    clear: both;
+    float: none;
+}
+
+
+
 /*** FORMULARZ DODAWANIA / EDYCJI - koniec ***/

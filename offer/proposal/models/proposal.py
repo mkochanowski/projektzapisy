@@ -4,6 +4,19 @@ from django.db import models
 import re
 
 from proposal_tag import ProposalTag
+          
+PROPOSAL_TYPES = (
+    ('seminar', 'Seminarium'),
+    ('course', 'Kurs'),
+)
+
+PROPOSAL_HOURS = (
+    (0, 0),
+    (15, 15),
+    (30, 30),
+    (45, 45),
+    (60, 60),
+)
 
 class Proposal( models.Model ):
     name = models.CharField(max_length = 255,
@@ -11,7 +24,19 @@ class Proposal( models.Model ):
     slug = models.SlugField(max_length = 255,
                             unique = True, verbose_name='odnośnik' )
     tags = models.ManyToManyField(ProposalTag, blank = True)
+    type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
+        verbose_name = 'typ')
+    ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
     
+    lectures = models.IntegerField(verbose_name='ilość godzin wykładów', 
+        choices = PROPOSAL_HOURS)
+    repetitories = models.IntegerField(verbose_name='ilość godzin repetytoriów', 
+        choices = PROPOSAL_HOURS)
+    exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń', 
+        choices = PROPOSAL_HOURS)
+    laboratories = models.IntegerField(verbose_name='ilość godzin pracowni', 
+        choices = PROPOSAL_HOURS)
+                
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
@@ -24,7 +49,7 @@ class Proposal( models.Model ):
         if self.descriptions.count() > 0:
             return self.descriptions.order_by('-date')[0]
         else:
-            return None
+            return None            
 
     def __unicode__(self):
         return self.name
