@@ -35,8 +35,8 @@ class News(models.Model):
     class Meta:
         get_latest_by = 'date'
         ordering = ['-date','-id']
-        verbose_name = 'ogłoszenie'
-        verbose_name_plural = 'ogłoszenia'
+        verbose_name = u'Ogłoszenie'
+        verbose_name_plural = u'Ogłoszenia'
     
     def __unicode__(self):
         return self.title
