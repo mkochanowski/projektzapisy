@@ -20,6 +20,15 @@ DATABASE_PASSWORD = ''                   # Not used with sqlite3.
 DATABASE_HOST = ''                       # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''                       # Set to empty string for default. Not used with sqlite3.
 
+# mass-mail account
+# You can test sending with:
+# $ python -m smtpd -n -c DebuggingServer localhost:1025
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -80,6 +89,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'haystack',
+    'fereol.mailer',
     'fereol.south',
     'fereol.users',
     'fereol.offer.proposal',

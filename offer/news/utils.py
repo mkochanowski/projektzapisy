@@ -1,14 +1,23 @@
 # -*- coding: utf-8 -*-
+"""
+Various utils.
+"""
 
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, InvalidPage
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.template import Context, RequestContext
 from django.template.loader import get_template
 from haystack.forms import SearchForm
 from haystack.query import SearchQuerySet
+from mailer import send_html_mail
 
 from fereol.offer.news.models import News
+from fereol.users.models import Employee
 
+mass_mail_from = 'noreply@example.com'
 news_per_page = 5
 
 def render_items(request, items):
@@ -90,3 +99,41 @@ def get_search_results_data(request):
             return data
     except InvalidPage:
         raise Http404
+
+def render_email_from_news(news):
+    """
+    Creates multipart email message given a news instance.
+
+    Returns (subject, text_body, html_body) triple.
+    """
+    c = Context( {
+        'news':  news,
+        'news_url': "http://" +
+                  str(Site.objects.get_current().domain) +
+                  reverse('news-item', args=[news.id])
+    } )
+    t = get_template('offer/news/news_email_plaintext.html')
+    plaintext_body = t.render(c)
+    t = get_template('offer/news/news_email_html.html')
+    html_body = t.render(c)
+    from_email = mass_mail_from
+    subject = settings.EMAIL_SUBJECT_PREFIX + news.title
+    return (subject, plaintext_body, html_body)
+
+def send_mass_mail_to_employees(msg_parts):
+    """
+    Queue mass mail to employees who haven't opted out.
+    """
+    (subject, text_body, html_body) = msg_parts
+    emails = [emp.user.email for emp in
+              Employee.objects.filter(receive_mass_mail_offer=True)]
+    for email in emails:
+        send_html_mail(subject, text_body, html_body, 
+                       mass_mail_from, [email])
+
+def mail_news_to_employees(news):
+    """
+    Queue news in form of a mail message to all employees
+    that haven't opted out.
+    """
+    send_mass_mail_to_employees(render_email_from_news(news))
