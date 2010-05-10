@@ -13,7 +13,7 @@ def subjects(request):
     semesters = Semester.objects.filter(visible=True)
     subjects = [(sem.get_name(), sem.get_subjects()) for sem in semesters]
     
-    return render_to_response( 'enrollment/subjects/subjects_list.html', { 'subjects' : subjects } )
+    return render_to_response( 'enrollment/subjects/subjects_list.html', {'subjects' : subjects}, context_instance=RequestContext(request))
 
 @login_required
 def subject( request, slug ):
