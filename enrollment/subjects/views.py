@@ -78,7 +78,7 @@ def list_of_subjects( request ):
              response = response.filter(type__id__in=list_of_types)
     
     except Semester.DoesNotExist:
-       return HttpResponse(simplejson.dumps({}), mimetype="application/javascript")
+       return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
     else:
        response = response.order_by('entity__name').values('id', 'entity__name', 'slug')
     

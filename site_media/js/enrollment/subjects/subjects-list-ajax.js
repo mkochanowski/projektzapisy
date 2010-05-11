@@ -16,12 +16,13 @@ function getSearchedSubjects(url_) {
 var SubjTypes = "";
 
 $('input:checkbox[class:type-list]:checked').each(function() { SubjTypes += "&type=" + this.value; }); 
+var sem_id = $('#semester').val() || 0;
 
 $.ajax({
       url: url_,
       type: "POST",
 	  dataType: "json",
-      data: "semester=" + $('#semester').val() + "&keyword=" + $('input:text[name:keyword]').val() + SubjTypes,
+      data: "semester=" + sem_id + "&keyword=" + $('input:text[name:keyword]').val() + SubjTypes,
       success: function(data) {
 	    
 	       $("#main-content-left").text("");
