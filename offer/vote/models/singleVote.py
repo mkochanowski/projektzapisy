@@ -4,16 +4,14 @@ from django.db import models
 
 from fereol.offer.vote.models import SystemState
 
-MAX_VOTE = SystemState.get_maxPoints()
-
 class SingleVote ( models.Model ):
-    VALUE_CHOICES = [ (x, str(x)) for x in range(1, MAX_VOTE+1) ]
-                
     subject = models.ForeignKey  ( 'proposal.Proposal', 
                                    related_name = 'votes',
                                    verbose_name = 'przedmiot')
-    value   = models.IntegerField( verbose_name = 'punkty',
-                                   choices      = VALUE_CHOICES)
+
+    value   = models.IntegerField( verbose_name = 'punkty')
+    
+    # ZMODYFIKOWAĆ SAVE'A I SETTERA ZAMIAST TEGO CO BYŁO...
     
     class Meta:
         verbose_name        = 'pojedynczy głos'
