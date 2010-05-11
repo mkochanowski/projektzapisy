@@ -20,6 +20,7 @@ def make_it_json_friendly(element):
 @login_required
 def subjects(request):
     semesters = Semester.objects.filter(visible=True)
+
     semesters_list = [(sem.pk, sem.get_name()) for sem in semesters]
 
     types = Type.get_all_types_of_subjects()

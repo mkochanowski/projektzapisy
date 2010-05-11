@@ -1,6 +1,13 @@
-{% extends "base.html" %}
- 
+{% extends "enrollment/base-enrollment.html" %}
+
+{% block main-navigation %}
+	<li><a href="{% url subject-list %}">Przedmioty</a></li>
+	<li><a href="{% url subject-page group.subject_slug %}">{{group.subject}}</a></li>
+	<li>{{group.type_and_teacher}}</li>
+{% endblock %}
+
 {% block content %}
+	<h2>Lista zapisanych osób</h2>
 	<ul>
 	{% for student in students %}
 		<li><a href="{% url profile student.user.id %}">{{student.user.get_full_name}}</a></li>
