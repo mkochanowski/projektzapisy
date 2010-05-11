@@ -190,6 +190,8 @@ def proposalRestore ( request, descid ):
     olddesc             = ProposalDescription.objects.get( pk = descid )
     newdesc             = ProposalDescription()
     newdesc.description = olddesc.description
+    newdesc.requirements = olddesc.requirements
+    newdesc.comments    = olddesc.comments
     newdesc.date        = datetime.now()
     newdesc.proposal    = olddesc.proposal
     newdesc.save()
