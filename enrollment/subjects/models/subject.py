@@ -59,8 +59,11 @@ class Type(models.Model):
 	
     @staticmethod
     def get_all_types_of_subjects():
-	    Type.objects.all()
-		
+        Type.objects.all()
+    
+    def get_name(self):
+        self.name
+
     class Meta:
         verbose_name = 'rodzaj'
         verbose_name_plural = 'rodzaje'
