@@ -163,9 +163,11 @@ def resign(request, group_id):
 
 def records(request, group_id):
     try:
+        group = Group.objects.get(id=group_id)
         students = Record.get_students_in_group(group_id)
         data = {
             'students' : students,
+            'group' : group,
         }
         return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
     except NonGroupException:
@@ -188,7 +190,7 @@ def own(request):
 def schedulePrototype(request):
     try:
         student_records = Record.get_student_all_detiled_records(request.user.id)
-        subjects = Subject.visible.all()
+        subjects = Subject.objects.all()
         for subject in subjects:
             subject.groups_ = Group.objects.filter(subject=subject)
             for group in subject.groups_:
