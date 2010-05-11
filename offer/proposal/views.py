@@ -36,7 +36,7 @@ def proposal( request, slug, descid = None ):
 
     data = {
             'proposal'      : proposal,
-            'mode'          : 'details',
+            'mode'          : 'details',            
             'proposals'     : Proposal.objects.all(),
             'descid'        : int(descid),
             'newest'        : newest,
@@ -84,12 +84,15 @@ def proposalForm(request, sid = None):
         
         proposalType = request.POST.get('type', '')
         
-        proposalEcts = int(request.POST.get('ects', 0))
-    
+        try:
+            proposalEcts = int(request.POST.get('ects', 0))
+        except:
+            proposalEcts = ""
+
         proposalLectures = int(request.POST.get('lectures', -1))
         proposalRepetitories = int(request.POST.get('repetitories', -1))
         proposalExercises = int(request.POST.get('exercises', -1))
-        proposalLaboratories = int(request.POST.get('laboratories', -1))
+        proposalLaboratories = int(request.POST.get('laboratories', -1))        
         
         books = request.POST.getlist('books[]')
         
@@ -107,8 +110,8 @@ def proposalForm(request, sid = None):
             message = 'Istnieje już przedmiot o takiej nazwie'
             correctForm = False                                                 
             
-        if  proposalName == "" or proposalDescription == "" or proposalRequirements == "" or proposalType == "" or proposalLectures == -1 or proposalRepetitories == -1 or proposalExercises == -1 or proposalLaboratories == -1:
-            message = 'Podaj nazwę, opis, wymagania, typ przedmiotu oraz liczbę godzin zajęć'
+        if  proposalName == "" or proposalEcts == "" or proposalDescription == "" or proposalRequirements == "" or proposalType == "" or proposalLectures == -1 or proposalRepetitories == -1 or proposalExercises == -1 or proposalLaboratories == -1:
+            message = 'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę punktów ECTS oraz liczbę godzin zajęć'
             correctForm = False
                                 
         if correctForm:
@@ -123,18 +126,42 @@ def proposalForm(request, sid = None):
             description.proposal = proposal
             description.save()
             
+            bookOrder = request.POST['bookOrder'].split(';')
+            newBooksOrder = []
+            oldBooksOrder = {}            
+            newBookCounter = 0
+            orderNumber = 1            
+                        
+            for order in bookOrder:
+                if order == '_':
+                    if books[newBookCounter] != "":                                                   
+                        newBooksOrder.append(orderNumber)
+                        orderNumber += 1
+                        
+                    newBookCounter += 1
+                else:
+                    book = request.POST.get('book' + str(order), None)
+                    if book:
+                        oldBooksOrder[int(order)] = orderNumber
+                        orderNumber += 1                        
+            
             for book in proposal.books.all():
                 fieldValue =  request.POST.get('book' + str(book.id), None)                                                
                 if fieldValue != None:
                     if fieldValue == "":                    
                         book.delete()
-                    elif book.name != fieldValue:
+                    else:
                         book.name = fieldValue
-                        book.save()                                                
+                        book.order = oldBooksOrder[book.id]                        
+                        book.save()
+                                                                       
           
+            newBookCounter = 0
             for bookName in books:
                 if bookName != "":
-                    book = Book(name = bookName, proposal = proposal).save()
+                    book = Book(name = bookName, proposal = proposal, order = newBooksOrder[newBookCounter]).save()                
+                    newBookCounter += 1
+                                        
                     
             success = True                                     
                                                

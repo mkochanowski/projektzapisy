@@ -68,6 +68,16 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
         ))
         db.send_create_signal('proposal', ['ProposalDescriptionTag'])
+        
+        db.delete_table('proposal_book')
+        # Adding model 'Book'
+        db.create_table('proposal_book', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.TextField')()),
+            ('order', self.gf('django.db.models.fields.IntegerField')()),
+            ('proposal', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal'])),
+        ))
+        db.send_create_signal('proposal', ['Book'])
     
     
     def backwards(self, orm):
@@ -106,6 +116,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'ProposalDescriptionTag'
         db.delete_table('proposal_proposaldescriptiontag')
+        
+        # Deleting model 'Book'
+        db.delete_table('proposal_book')        
     
     
     models = {
@@ -113,6 +126,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Book'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {}),
+            'order' : ('django.db.models.fields.IntegerField', [], {}),
             'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'books'", 'to': "orm['proposal.Proposal']"})
         },
         'proposal.proposal': {
