@@ -74,37 +74,37 @@
         <textarea name="comments" rows="15" cols="80">{{ proposalComments }}</textarea>
     </p>
 
-    <table>
+    <div class="books">
         {% if books %}
             {% for book in books %}
                 {% if forloop.first %}
-                    <tr class="book" >
-                        <th>Literatura:</th>
-                        <td class="field">
+                    <div class="book">
+                        <div class="label">Literatura:</div
+                        <div class="field">
                             <input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" />
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                 {% else %}
-                    <tr class="book">
-                        <th class="label" >&nbsp;</th>
-                        <td class="field">
+                    <div class="book">
+                        <div class="label">&nbsp;</div>
+                        <div class="field">
                             <input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" />
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                 {% endif %}
             {% endfor %}
         {% else %}
-            <tr class="book">
-                <th class="label" >Literatura:</th>
-                <td class="field"><input type="text" name="books[]" /></td>
-            </tr>
+            <div class="book">
+                <div class="label" >Literatura:</div>
+                <div class="field"><input type="text" name="books[]" /></div>
+            </div>
         {% endif %}
 
-        <tr >
-            <th class="label" >&nbsp;</th>
-            <td class="field"><a href="#" id="addBook">Dodaj książkę</a></td>
-        </tr>
-    </table>
+        <div class="book">
+            <div class="label" >&nbsp;</div>
+            <div class="field"><a href="#" id="addBook">Dodaj książkę</a></div>
+        </div>
+    </div>
 
     <p id="od-proposaloffer-form-submit">
         <input type="submit" value="{% if editMode %}zapisz{% else %}dodaj{% endif %}" />

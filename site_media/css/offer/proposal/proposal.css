@@ -103,15 +103,34 @@
 }
 
 
-#od-proposaloffer-form table .book input
+#od-proposaloffer-form .books .book input
 {
 	width: 300px;	
 }
 
-#od-proposaloffer-form table  a
+#od-proposaloffer-form .books  a
 {
 	padding-left: 20px;	
 }
+
+#od-proposaloffer-form .books .label
+{	
+    
+    float: left;
+    width: 100px;
+}
+
+#od-proposaloffer-form .books .field
+{	
+    float: left;
+    
+}
+
+#od-proposaloffer-form .books .book
+{	
+    clear: both;
+}
+
 
 #od-proposaloffer-form-title input
 {
