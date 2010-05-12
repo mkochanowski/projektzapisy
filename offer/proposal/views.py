@@ -2,6 +2,7 @@
 
 import datetime
 import re
+import fereol.offer.proposal.models 
 
 from django.contrib.auth.decorators import login_required
 from django.http                    import HttpResponseRedirect, HttpResponse
@@ -93,7 +94,10 @@ def proposal( request, slug, descid = None ):
             'id'            : proposal.id,
             'next'          : next,
             'prev'          : prev,
-            'isFan'         : proposal.isFan(request.user)
+            'isFan'         : proposal.isFan(request.user),
+            'isTeacher'     : proposal.isTeacher(request.user),
+            'fans'          : proposal.fansCount(),
+            'teachers'      : proposal.teachersCount(),
     }
     return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext( request ) )
 

@@ -79,7 +79,7 @@ class TeachersTest(TestCase):
 # sprawdzanie uprawnien:
     def testUserIsntTeacher1(self):
         self.firstUser.employee.delete()
-        self.assertRaises(NonEmployeeException, self.proposal.addUserToTeachers self.firstUser)
+        self.assertRaises(NonEmployeeException, self.proposal.addUserToTeachers, self.firstUser)
     def testUserIsntTeacher2(self):
         self.firstUser.employee.delete()
         self.assertRaises(NonEmployeeException, self.proposal.deleteUserToTeachers, self.firstUser)
