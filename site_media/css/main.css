@@ -48,7 +48,6 @@
 	padding: 6px 10px;
 }
 
-/* menu list styled in droppy.css
 #main-header ul, #main-header li
 {
 	margin: 0;
@@ -62,10 +61,10 @@
 
 #main-header li:before
 {
-	content: '| ';
-	padding: 10px;
-	font-size: 16px;
-	font-weight: bold;
+    content: '| ';
+    padding: 10px;
+    font-size: 16px;
+	color: #cccccc;
 }
 
 #main-header li:first-child:before
@@ -76,12 +75,8 @@
 
 #main-header ul
 {
-	position: absolute;
-	top: 11px;
-	left: 250px;
-	width: 740px;
-	text-align: right;
-}*/
+	width: 800px;
+}
 
 /*** NAGŁÓWEK - koniec ***/
 
