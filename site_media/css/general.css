@@ -52,3 +52,10 @@ hr
 	height: 0;
 	border-bottom: 1px solid #cccccc;
 }
+
+.clear
+{
+	clear: both;
+	_font-size: 1px;
+	_height: 1px;
+}

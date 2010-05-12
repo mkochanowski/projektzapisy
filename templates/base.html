@@ -6,7 +6,8 @@
 
 	<link rel="stylesheet" href="/site_media/css/general.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/main.css" type="text/css" />
-	<link rel="stylesheet" href="/site_media/css/menu-droppy.css" type="text/css" />
+	{% block mainstyles %}
+	{% endblock %}
 	{% block styles %}
 	{% endblock %}
 
@@ -33,6 +34,7 @@
 					{% endblock %}
 				</ul>
 			</div>
+			<div class="clear"></div>
 		</div>
 		<div id="main-navigation">
 			<ul>

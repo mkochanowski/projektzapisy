@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/od-news.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/offer/news.css" type="text/css" />
 {% endblock %}
 
 {% block scripts %}
@@ -26,7 +26,7 @@
 
 {% block top-bar %}
 	<div id="od-news-top-bar">
-	  <form id="od-news-search-form" action="{% url news-search %}" method="GET">
+	  <form id="od-news-search-form" action="{% url news-search %}" method="get">
 			<div>
 			  <input type="text" name="q" id="od-news-search-q" value="Szukaj"/>
 			  <input type="reset" id="od-news-search-reset" value="X" style="display:none;" />
