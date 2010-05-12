@@ -1,5 +1,7 @@
 {% extends "offer/base-offer.html" %}
 
+{% load proposal_extras %}
+
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/offer/proposal/proposal.css" type="text/css" />
 {% endblock %}
@@ -7,6 +9,8 @@
 {% block scripts %}
 	<script type="text/javascript" src="/site_media/js/offer/proposal/form.js"></script>
 	<script type="text/javascript" src="/site_media/js/offer/proposal/history.js"></script>
+	<script type="text/javascript" src="/site_media/js/jquery-ui-1.8.1.custom.min.js"></script>
+	
 	{% include "tinymcebbcode.html" %}
 {% endblock %}
 
@@ -52,4 +56,12 @@
 		{% endifequal %}
 		<div style="clear:both"></div>
 	</div>
+
+	<div class="right_sidebar">
+	  <p>Przedmioty w ofercie dydaktycznej</p>
+	  <ul>
+	    {% subjects_in_offer %}
+	  </ul>
+	</div>
+
 {% endblock %}

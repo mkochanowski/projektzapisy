@@ -13,12 +13,21 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = './database/db.sqlite3'             # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_ENGINE = 'sqlite3'              # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = './database/db.sqlite3'  # Or path to database file if using sqlite3.
+DATABASE_USER = ''                       # Not used with sqlite3.
+DATABASE_PASSWORD = ''                   # Not used with sqlite3.
+DATABASE_HOST = ''                       # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''                       # Set to empty string for default. Not used with sqlite3.
+
+# mass-mail account
+# You can test sending with:
+# $ python -m smtpd -n -c DebuggingServer localhost:1025
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -80,10 +89,12 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'haystack',
+    'fereol.mailer',
     'fereol.south',
     'fereol.users',
     'fereol.offer.proposal',
     'fereol.offer.news',
+    'fereol.offer.vote',
     'fereol.enrollment.subjects',
     'fereol.enrollment.records',
 )

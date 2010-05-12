@@ -26,6 +26,10 @@ class Employee(BaseUser):
     '''
     Employee.
     '''
+    receive_mass_mail_offer = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia OD")
+    
     class Meta:
         app_label = 'users'
         

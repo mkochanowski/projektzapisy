@@ -19,6 +19,9 @@
 	<script src="/site_media/js/main.js" type="text/javascript"></script>
 	{% block scripts %}
 	{% endblock %}
+
+	{% block rss %}
+	{% endblock %}
 </head>
 <body>
 	<div id="main-container">
@@ -40,7 +43,7 @@
 		</div>
 		{% block top-bar %}
 		{% endblock %}
-		<div id="main-content" class="{% block content-class %}narrow{% endblock %}">
+		<div id="main-content" class="{% block content-class %}normal{% endblock %}">
 			{% block content %}
 			{% endblock %}
 		</div>

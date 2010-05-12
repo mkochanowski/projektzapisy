@@ -39,3 +39,16 @@ th, td
 {
 	text-align: left;
 }
+
+img
+{
+	border: 0;
+}
+
+hr
+{
+	display: block;
+	border: 0;
+	height: 0;
+	border-bottom: 1px solid #cccccc;
+}

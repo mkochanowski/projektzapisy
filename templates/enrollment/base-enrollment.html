@@ -6,10 +6,10 @@
 
 {% block main-menu %}
 	<li><a href="{% url offer.news.views.latest_news %}">Aktualności</a> ({% newscount %})</li>
-	<li>Przedmioty
+	<li><a href="{% url subject-list %}">Przedmioty</a>
 	<ul>
 	<li><a href="{% url schedule-own %}">Plan Zajęć</a></li>
-	<li><a href="{% url subject-list %}">Oferta Dydaktyczna</a></li>
+	<li><a href="{% url proposal-list %}">Oferta Dydaktyczna</a></li>
 	<li><a href="#">Zaliczone Przedmioty</a></li>
 	<li><a href="{% url schedule-prototype %}">Prototyp Planu</a></li>
 	</ul>
@@ -17,7 +17,8 @@
 	<li><a href="#">Pracownicy</a></li>
 	<li><a href="#">Inne</a></li>
 	{% if user.is_authenticated %}
-	<li>{{ user.first_name }} {{user.last_name }} {{user.student.matricula}} <a href="{% url user-logout %}">(wyloguj)</a></li>
+	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a> ({{user.student.matricula}}) </li>
+	<li><a href="{% url user-logout %}">(wyloguj)</a></li>
 	{% else %}
 	<li><a href="{% url user-login %}">Zaloguj</a></li>
 	{% endif %}

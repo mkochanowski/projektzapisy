@@ -19,6 +19,12 @@ class Migration(SchemaMigration):
             ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255, db_index=True)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length = 30)),
+            ('ects', self.gf('django.db.models.fields.IntegerField')()),                       
+            ('lectures', self.gf('django.db.models.fields.IntegerField')()),
+            ('repetitories', self.gf('django.db.models.fields.IntegerField')()),
+            ('exercises', self.gf('django.db.models.fields.IntegerField')()),
+            ('laboratories', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('proposal', ['Proposal'])
 
@@ -36,6 +42,8 @@ class Migration(SchemaMigration):
             ('proposal', self.gf('django.db.models.fields.related.ForeignKey')(related_name='descriptions', to=orm['proposal.Proposal'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('description', self.gf('django.db.models.fields.TextField')()),
+            ('requirements', self.gf('django.db.models.fields.TextField')()),
+            ('comments', self.gf('django.db.models.fields.TextField')()),
         ))
         db.send_create_signal('proposal', ['ProposalDescription'])
 
@@ -60,6 +68,16 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
         ))
         db.send_create_signal('proposal', ['ProposalDescriptionTag'])
+        
+        db.delete_table('proposal_book')
+        # Adding model 'Book'
+        db.create_table('proposal_book', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.TextField')()),
+            ('order', self.gf('django.db.models.fields.IntegerField')()),
+            ('proposal', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal'])),
+        ))
+        db.send_create_signal('proposal', ['Book'])
     
     
     def backwards(self, orm):
@@ -98,6 +116,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'ProposalDescriptionTag'
         db.delete_table('proposal_proposaldescriptiontag')
+        
+        # Deleting model 'Book'
+        db.delete_table('proposal_book')        
     
     
     models = {
@@ -105,6 +126,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Book'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {}),
+            'order' : ('django.db.models.fields.IntegerField', [], {}),
             'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'books'", 'to': "orm['proposal.Proposal']"})
         },
         'proposal.proposal': {
@@ -112,12 +134,21 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
-            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalTag']"})
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalTag']"}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'ects': ('django.db.models.fields.IntegerField', [], {}),
+            
+            'lectures': ('django.db.models.fields.IntegerField', [], {}),
+            'repetitories': ('django.db.models.fields.IntegerField', [], {}),
+            'exercises': ('django.db.models.fields.IntegerField', [], {}),
+            'laboratories': ('django.db.models.fields.IntegerField', [], {}),
         },
         'proposal.proposaldescription': {
             'Meta': {'object_name': 'ProposalDescription'},
             'date': ('django.db.models.fields.DateTimeField', [], {}),
             'description': ('django.db.models.fields.TextField', [], {}),
+            'requirements': ('django.db.models.fields.TextField', [], {}),
+            'comments': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptions'", 'to': "orm['proposal.Proposal']"}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalDescriptionTag']"})

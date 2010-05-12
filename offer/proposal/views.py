@@ -4,7 +4,7 @@ import datetime
 import re
 
 from django.contrib.auth.decorators import login_required
-from django.http                    import HttpResponseRedirect
+from django.http                    import HttpResponseRedirect, HttpResponse
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
@@ -12,6 +12,7 @@ from django.shortcuts               import redirect
 from offer.proposal.exceptions                 import *
 from fereol.enrollment.records.models          import *
 from fereol.offer.proposal.models              import *
+
 
 @login_required
 def becomeFan(request, slug):
@@ -65,7 +66,6 @@ def stopBeTeacher(request, slug):
         request.user.message_set.create(message="Nie jesteś pracownkiem")
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
-
 @login_required
 def proposals(request):
     proposals = Proposal.objects.all()
@@ -86,7 +86,7 @@ def proposal( request, slug, descid = None ):
 
     data = {
             'proposal'      : proposal,
-            'mode'          : 'details',
+            'mode'          : 'details',            
             'proposals'     : Proposal.objects.all(),
             'descid'        : int(descid),
             'newest'        : newest,
@@ -107,12 +107,16 @@ def proposalForm(request, sid = None):
     booksToForm = []
     success = False
     proposalDescription = ""
+    proposalRequirements = ""
+    proposalComments = ""
     
     proposal = None
     if editMode:
         try:
             proposal = Proposal.objects.get(pk = sid)
             proposalDescription = proposal.description().description 
+            proposalRequirements = proposal.description().requirements
+            proposalComments = proposal.description().comments
         except:            
             editMode = False
     
@@ -126,18 +130,39 @@ def proposalForm(request, sid = None):
         
         proposalName = request.POST.get('name', '')
         proposalDescription = request.POST.get('description', '')
+        proposalRequirements = request.POST.get('requirements', '')
+        proposalComments = request.POST.get('comments', '')
+        
+        proposalType = request.POST.get('type', '')
+        
+        try:
+            proposalEcts = int(request.POST.get('ects', 0))
+        except:
+            proposalEcts = ""
+
+        proposalLectures = int(request.POST.get('lectures', -1))
+        proposalRepetitories = int(request.POST.get('repetitories', -1))
+        proposalExercises = int(request.POST.get('exercises', -1))
+        proposalLaboratories = int(request.POST.get('laboratories', -1))        
         
         books = request.POST.getlist('books[]')
         
         proposal.name = proposalName
-        proposal.slug = proposal.createSlug(proposal.name)        
+        proposal.slug = proposal.createSlug(proposal.name)
+                
+        proposal.type = proposalType
+        proposal.ects = proposalEcts
+        proposal.lectures = proposalLectures
+        proposal.repetitories = proposalRepetitories
+        proposal.exercises = proposalExercises
+        proposal.laboratories = proposalLaboratories                
         
         if Proposal.objects.filter(slug = proposal.slug).exclude(id = proposal.id).count() > 0:                
             message = 'Istnieje już przedmiot o takiej nazwie'
-            correctForm = False                                    
+            correctForm = False                                                 
             
-        if proposalName == "" or proposalDescription == "":
-            message = 'Wypełnij wszystkie pola'
+        if  proposalName == "" or proposalEcts == "" or proposalDescription == "" or proposalRequirements == "" or proposalType == "" or proposalLectures == -1 or proposalRepetitories == -1 or proposalExercises == -1 or proposalLaboratories == -1:
+            message = 'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę punktów ECTS oraz liczbę godzin zajęć'
             correctForm = False
                                 
         if correctForm:
@@ -146,22 +171,48 @@ def proposalForm(request, sid = None):
             
             description = ProposalDescription()
             description.description = proposalDescription
+            description.requirements = proposalRequirements
+            description.comments = proposalComments
             description.date = datetime.now()
             description.proposal = proposal
             description.save()
+            
+            bookOrder = request.POST['bookOrder'].split(';')
+            newBooksOrder = []
+            oldBooksOrder = {}            
+            newBookCounter = 0
+            orderNumber = 1            
+                        
+            for order in bookOrder:
+                if order == '_':
+                    if books[newBookCounter] != "":                                                   
+                        newBooksOrder.append(orderNumber)
+                        orderNumber += 1
+                        
+                    newBookCounter += 1
+                else:
+                    book = request.POST.get('book' + str(order), None)
+                    if book:
+                        oldBooksOrder[int(order)] = orderNumber
+                        orderNumber += 1                        
             
             for book in proposal.books.all():
                 fieldValue =  request.POST.get('book' + str(book.id), None)                                                
                 if fieldValue != None:
                     if fieldValue == "":                    
                         book.delete()
-                    elif book.name != fieldValue:
+                    else:
                         book.name = fieldValue
-                        book.save()                                                
+                        book.order = oldBooksOrder[book.id]                        
+                        book.save()
+                                                                       
           
+            newBookCounter = 0
             for bookName in books:
                 if bookName != "":
-                    book = Book(name = bookName, proposal = proposal).save()
+                    book = Book(name = bookName, proposal = proposal, order = newBooksOrder[newBookCounter]).save()                
+                    newBookCounter += 1
+                                        
                     
             success = True                                     
                                                
@@ -187,9 +238,13 @@ def proposalForm(request, sid = None):
         'message'   : message,
         'proposal'  : proposal,
         'books'     : booksToForm,
-        'proposalDescription' : proposalDescription,
-        'mode'      : 'form',
-        'proposals'  : Proposal.objects.all()
+        'proposalDescription'   : proposalDescription,
+        'proposalRequirements'  : proposalRequirements,
+        'proposalComments'      : proposalComments,
+        'mode'          : 'form',
+        'proposals'     : Proposal.objects.all(),
+        'proposalTypes' : fereol.offer.proposal.models.proposal.PROPOSAL_TYPES,
+        'proposalHours' : fereol.offer.proposal.models.proposal.PROPOSAL_HOURS,
     }
     return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext(request));
 
@@ -213,6 +268,8 @@ def proposalRestore ( request, descid ):
     olddesc             = ProposalDescription.objects.get( pk = descid )
     newdesc             = ProposalDescription()
     newdesc.description = olddesc.description
+    newdesc.requirements = olddesc.requirements
+    newdesc.comments    = olddesc.comments
     newdesc.date        = datetime.now()
     newdesc.proposal    = olddesc.proposal
     newdesc.save()
@@ -228,7 +285,7 @@ def offerCreate( request ):
         'subjects' : Proposal.objects.order_by('name'),
     }    
     
-    return render_to_response('offer/proposal/offerCreate.html', data)
+    return render_to_response('offer/proposal/offerCreate.html', data, context_instance = RequestContext( request ))
     
 @login_required
 def offerCreateTeachers( request, subjectId ):
@@ -239,4 +296,22 @@ def offerCreateTeachers( request, subjectId ):
     data = {
         'teachers' : []
     }
-    return render_to_response('offer/proposal/offerCreateTeachers.html')
+    return render_to_response('offer/proposal/offerCreateTeachers.html', context_instance = RequestContext( request ))
+
+@login_required
+def offerSelect(request):
+    """
+        Wybiera lub odznacza przedmiot w ofercie dydaktycznej
+    """    
+    action = request.POST['action']
+    id = request.POST['id']
+    
+    proposal = Proposal.objects.get(pk = id)
+    tag = ProposalTag.objects.get(name = "offer")
+    
+    if action == 'select':
+        proposal.tags.add(tag)
+    else: # unselect
+        proposal.tags.remove(tag)
+        
+    return HttpResponse('ok')

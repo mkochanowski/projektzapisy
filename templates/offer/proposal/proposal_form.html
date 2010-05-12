@@ -1,45 +1,105 @@
 <form action="" method="post" id="od-proposaloffer-form">
-	<p id="od-proposaloffer-form-title">
-		<input type="text" name="name" value="{{ proposal.name }}" />
-	</p>
+    <p id="od-proposaloffer-form-title">
+        <input type="text" name="name" value="{{ proposal.name }}" />
+    </p>
+    
+    <p class="proposalField">
+        <span>Sugerowany rodzaj:</span> 
+        <select name="type">
+            <option value="">- wybierz -</option>
+            {% for type in proposalTypes %}
+                <option value="{{ type.0 }}" {% ifequal proposal.type type.0 %}selected="selected"{% endifequal %}>{{ type.1 }}</option>
+            {% endfor %}
+        </select>
+        
+    </p>
+    
+    <p class="proposalField">
+        <span>Sugerowana liczba punktów ECTS:</span> 
+        <input type="text" name="ects" value="{{ proposal.ects }}" />
+    </p>
+        
+    <p class="proposalField">
+        <span>Sugerowana liczba godzin wykładów:</span> 
+        <select name="lectures">
+            <option value="-1">- wybierz -</option>
+            {% for hour in proposalHours %}
+                <option value="{{ hour.0 }}" {% ifequal proposal.lectures hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    
+    <p class="proposalField">
+        <span>Sugerowana liczba godzin repetytoriów:</span> 
+        <select name="repetitories">
+            <option value="-1">- wybierz -</option>
+            {% for hour in proposalHours %}
+                <option value="{{ hour.0 }}" {% ifequal proposal.repetitories hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    
+    <p class="proposalField">
+        <span>Sugerowana liczba godzin ćwiczeń:</span> 
+        <select name="exercises">
+            <option value="-1">- wybierz -</option>
+            {% for hour in proposalHours %}
+                <option value="{{ hour.0 }}" {% ifequal proposal.exercises hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    
+    <p class="proposalField">
+        <span>Sugerowana liczba godzin pracowni: </span>
+        <select name="laboratories">
+            <option value="-1">- wybierz -</option>
+            {% for hour in proposalHours %}
+                <option value="{{ hour.0 }}" {% ifequal proposal.laboratories hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+            {% endfor %}
+        </select>
+    </p>
 
-	<p>
-		<textarea name="description" rows="15" cols="80">{{ proposalDescription }}</textarea>
-	</p>
+    <p class="proposalField">
+        <span>Opis: </span>
+        <textarea name="description" rows="15" cols="80">{{ proposalDescription }}</textarea>
+    </p>
+    
+    <p class="proposalField">
+        <span>Wymagania: </span>
+        <textarea name="requirements" rows="15" cols="80">{{ proposalRequirements }}</textarea>
+    </p>
+    
+    <p class="proposalField">
+        <span>Uwagi: </span>
+        <textarea name="comments" rows="15" cols="80">{{ proposalComments }}</textarea>
+    </p>
 
-	<table>
-		{% if books %}
-			{% for book in books %}
-				{% if forloop.first %}
-					<tr class="book" >
-						<th>Literatura:</th>
-						<td class="field">
-							<input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" />
-						</td>
-					</tr>
-				{% else %}
-					<tr class="book">
-						<th class="label" >&nbsp;</th>
-						<td class="field">
-							<input type="text" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" />
-						</td>
-					</tr>
-				{% endif %}
-			{% endfor %}
-		{% else %}
-			<tr class="book">
-				<th class="label" >Literatura:</th>
-				<td class="field"><input type="text" name="books[]" /></td>
-			</tr>
-		{% endif %}
+    <div class="">Literatura:</div>
+    <ul id="books">    
+        {% if books %}
+            {% for book in books %}            
+                <li class="book">                                    
+                    <input type="text" bookId="{% if book.id %}{{ book.id }}{% endif %}" name="book{% if book.id %}{{ book.id }}{% else %}s[]{% endif %}" value="{{ book.name }}" />
+                    <span><img src="/site_media/images/arrow.jpg" alt="" /></span>                   
+                </li>               
+            {% endfor %}
+        {% else %}
+            <li class="book">
+                <input type="text" name="books[]" />
+                <span><img src="/site_media/images/arrow.jpg" alt="" /></span>
+            </li>
+        {% endif %}                
+            
 
-		<tr >
-			<th class="label" >&nbsp;</th>
-			<td class="field"><a href="#" id="addBook">Dodaj książkę</a></td>
-		</tr>
-	</table>
+    </ul>
+    
+    <div class="book">
+        <div class="label" >&nbsp;</div>
+        <div class="field"><a href="#" id="addBook">Dodaj książkę</a></div>
+    </div>
 
-	<p id="od-proposaloffer-form-submit">
-		<input type="submit" value="{% if editMode %}zapisz{% else %}dodaj{% endif %}" />
-	</p>
+    <p id="od-proposaloffer-form-submit">
+        <input type="submit" value="{% if editMode %}zapisz{% else %}dodaj{% endif %}" />
+    </p>
+    <input type="hidden" name="bookOrder" value="" />
 </form>

@@ -12,7 +12,13 @@ class Migration(SchemaMigration):
         db.create_table('proposal_proposal', (
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)), # primary key jest tworzone automatycznie!
-            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255, db_index=True)),
+            ('slug', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255, db_index=True)),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length = 30)),
+            ('ects', self.gf('django.db.models.fields.IntegerField')()),                       
+            ('lectures', self.gf('django.db.models.fields.IntegerField')()),
+            ('repetitories', self.gf('django.db.models.fields.IntegerField')()),
+            ('exercises', self.gf('django.db.models.fields.IntegerField')()),
+            ('laboratories', self.gf('django.db.models.fields.IntegerField')()),                  
         ))
         db.send_create_signal('proposal', ['Proposal'])
 
@@ -20,6 +26,8 @@ class Migration(SchemaMigration):
         db.create_table('proposal_proposaldescription', (
             ('date', self.gf('django.db.models.fields.DateTimeField')()),
             ('description', self.gf('django.db.models.fields.TextField')()),
+            ('requirements', self.gf('django.db.models.fields.TextField')()),
+            ('comments', self.gf('django.db.models.fields.TextField')()),               
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('proposal', self.gf('django.db.models.fields.related.ForeignKey')(related_name='descriptions', to=orm['proposal.Proposal'])),
         ))
@@ -92,12 +100,22 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Proposal'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'})
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
+            'ects': ('django.db.models.fields.IntegerField', [], {}),
+            
+            'lectures': ('django.db.models.fields.IntegerField', [], {}),
+            'repetitories': ('django.db.models.fields.IntegerField', [], {}),
+            'exercises': ('django.db.models.fields.IntegerField', [], {}),
+            'laboratories': ('django.db.models.fields.IntegerField', [], {}),                        
         },
         'proposal.Proposaldescription': {
             'Meta': {'object_name': 'ProposalDescription'},
             'date': ('django.db.models.fields.DateTimeField', [], {}),
             'description': ('django.db.models.fields.TextField', [], {}),
+            'requirements': ('django.db.models.fields.TextField', [], {}),
+            'comments': ('django.db.models.fields.TextField', [], {}),            
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptions'", 'to': "orm['proposal.Proposal']"})
         },

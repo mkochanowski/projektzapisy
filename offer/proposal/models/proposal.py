@@ -9,6 +9,19 @@ import re
 
 from proposal_tag import ProposalTag
 from users.models import Employee, Student
+          
+PROPOSAL_TYPES = (
+    ('seminar', 'Seminarium'),
+    ('course', 'Kurs'),
+)
+
+PROPOSAL_HOURS = (
+    (0, 0),
+    (15, 15),
+    (30, 30),
+    (45, 45),
+    (60, 60),
+)
 
 class Proposal( models.Model ):
     name = models.CharField(max_length = 255,
@@ -18,7 +31,19 @@ class Proposal( models.Model ):
     tags     = models.ManyToManyField(ProposalTag)
     fans     = models.ManyToManyField(Student, verbose_name='poszli by na to')
     teachers = models.ManyToManyField(Employee, verbose_name='poprowadziliby to')
-    
+    tags = models.ManyToManyField(ProposalTag, blank = True)
+    type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
+        verbose_name = 'typ')
+    ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
+    lectures = models.IntegerField(verbose_name='ilość godzin wykładów', 
+        choices = PROPOSAL_HOURS)
+    repetitories = models.IntegerField(verbose_name='ilość godzin repetytoriów', 
+        choices = PROPOSAL_HOURS)
+    exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń', 
+        choices = PROPOSAL_HOURS)
+    laboratories = models.IntegerField(verbose_name='ilość godzin pracowni', 
+        choices = PROPOSAL_HOURS)
+                
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
@@ -31,7 +56,7 @@ class Proposal( models.Model ):
         if self.descriptions.count() > 0:
             return self.descriptions.order_by('-date')[0]
         else:
-            return None
+            return None            
 
     def isFan(self, user):
         try:
@@ -106,8 +131,30 @@ class Proposal( models.Model ):
         slug = re.sub("^-", "", slug)
         slug = re.sub("-$", "", slug)
         return slug
+
+    def in_summer( self ):
+        # sprawdza czy przedmiot będzie w semestrze letnim
+        # odpowiada za to tag summer
+        for t in self.tags.all():
+            if t.__unicode__() == 'summer':
+                return True
+        return False
+    
+    def in_winter( self ):
+        # sprawdza czy przedmiot będzie w semestrze zimowym
+        # odpowiada za to tag winter
+        for t in self.tags.all():
+            if t.__unicode__() == 'winter':
+                return True
+        return False
     
     @staticmethod
     def get_by_tag(tag):
         "Return proposals by tag."
         return Proposal.objects.filter(tags__name=tag)
+
+    def inOffer(self):
+        for t in self.tags.all():
+            if t.__unicode__() == 'offer':
+                return True
+        return False

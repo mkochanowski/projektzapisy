@@ -11,13 +11,16 @@ feeds = {
 }
 
 urlpatterns = patterns('',
+    #MAIN PAGE
+    url('^$', 'fereol.offer.news.views.mainPage', name='main-page'),
     #Z
     (r'^subjects/', include('fereol.enrollment.subjects.urls')),
     (r'^records/', include('fereol.enrollment.records.urls')),
     # OD
     (r'^proposal/', include('fereol.offer.proposal.urls')),
     (r'^news/', include('fereol.offer.news.urls')),
-    
+    (r'^vote/', include('fereol.offer.vote.urls')),
+    url( '^offer/create/$', 'fereol.offer.proposal.views.offerCreate', name='offer-create' ),
     #
     (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
     (r'^users/', include('fereol.users.urls')),

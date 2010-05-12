@@ -46,6 +46,20 @@
 	border-bottom: 1px solid #cccccc;
 }
 
+#od-proposaloffer-proposallist li:first-child a
+{
+	-moz-border-radius-topleft: 3px;
+	-webkit-border-radius-topleft: 3px;
+	border-radius-topleft: 3px;
+}
+
+#od-proposaloffer-proposallist li:last-child a
+{
+	-moz-border-radius-bottomleft: 3px;
+	-webkit-border-radius-bottomleft: 3px;
+	border-radius-bottomleft: 3px;
+}
+
 #od-proposaloffer-proposallist
 {
 	margin-top: 30px;
@@ -89,15 +103,34 @@
 }
 
 
-#od-proposaloffer-form table .book input
+#od-proposaloffer-form .books .book input
 {
 	width: 300px;	
 }
 
-#od-proposaloffer-form table  a
+#od-proposaloffer-form .books  a
 {
 	padding-left: 20px;	
 }
+
+#od-proposaloffer-form .books .label
+{	
+    
+    float: left;
+    width: 100px;
+}
+
+#od-proposaloffer-form .books .field
+{	
+    float: left;
+    
+}
+
+#od-proposaloffer-form .books .book
+{	
+    clear: both;
+}
+
 
 #od-proposaloffer-form-title input
 {
@@ -109,5 +142,33 @@
 {
 	text-align: right;
 }
+
+.proposalField span {
+    width: 300px;
+    float: left;
+    display: block;
+}
+
+.proposalField {
+    clear: both;
+    padding-top: 5px;
+}
+
+.proposalField select {
+    width: 100px;
+}
+
+.proposalField input {
+    width: 100px;
+}
+
+.proposalField .mceEditor {
+    clear: both;
+    float: none;
+}
+
+#books { list-style-type: none; margin: 0; padding: 0; padding-left: 20px;}	
+
+
 
 /*** FORMULARZ DODAWANIA / EDYCJI - koniec ***/

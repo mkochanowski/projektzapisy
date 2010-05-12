@@ -25,6 +25,9 @@
       {% if perms.news.change_news %}
       <a href="{% url news-edit news.id %}">Edytuj</a>
       {% endif %}
+      {% if perms.news.delete_news %}
+      <a href="{% url news-delete news.id %}">Usuń</a>
+      {% endif %}
     </div>
   </div>
   {% endfor %}

@@ -16,15 +16,39 @@ function selectSubject()
     if ($(this).is(':checked'))
     {
         tr.addClass('selected');
+        $(this).attr('checked', true);
         action = 'select';    
     }
     else
     {
         tr.removeClass('selected');
+        $(this).removeAttr('checked');
         action = 'unselect';
     }
     
-    // TODO: Wysłać zapytanie zaznaczające / odznaczające
+    $.ajax({
+        type    : 'POST',
+        url     : '/proposal/offer/select/',
+        data    : {
+            'action'    : action,
+            'id'        : $(this).val()
+        },
+        success : function ()
+        {
+        },
+        error : function()
+        {
+            if (action == "unselect")
+            {
+                tr.addClass('selected');
+            }
+            else 
+            {
+                tr.removeClass('selected');
+            }
+            alert('Operacja wyboru nie powidła się');
+        }          
+    });
 }
 
 function showTeachersDetails()

@@ -7,8 +7,10 @@ from proposal_description_tag import ProposalDescriptionTag
 class ProposalDescription(models.Model):
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
     description = models.TextField( verbose_name = 'opis' )
+    requirements = models.TextField( verbose_name = 'wymagania' )
+    comments = models.TextField( verbose_name = 'uwagi' )
     date = models.DateTimeField(verbose_name = 'data dodania')
-    tags = models.ManyToManyField(ProposalDescriptionTag)
+    tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
     
     class Meta:
         verbose_name = 'opis przedmiotu'

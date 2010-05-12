@@ -3,6 +3,7 @@
 {% block scripts %}
     <script src="/site_media/js/jquery-v1.4.2.js" type="text/javascript"></script>
     <script src="/site_media/js/offer/proposal/history.js" type="text/javascript"></script>
+    
 {% endblock %}
 
 {% if messages %}
@@ -37,6 +38,14 @@
 
 <hr />
 
+<div>Typ: {{ proposal.get_type_display }}</div>
+<div>ECTS: {{ proposal.ects }}</div>
+
+<div>Ilość godzin wykładów: {{ proposal.lectures }}</div>
+<div>Ilość godzin repetytoriów: {{ proposal.repetitories }}</div>
+<div>Ilość godzin ćwiczeń: {{ proposal.exercises }}</div>
+<div>Ilość godzin pracowni: {{ proposal.laboratories }}</div>
+
 <h2>Opis:</h2>
 <div>
     {{ proposal.description.description|bbcode|nl2br|safe }}
@@ -49,6 +58,17 @@
     <a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
 {% endif %}
 </div>
+
+<h2>Wymagania:</h2>
+<div>
+    {{ proposal.description.requirements|bbcode|nl2br|safe }}
+</div>
+
+<h2>Uwagi:</h2>
+<div>
+    {{ proposal.description.comments|bbcode|nl2br|safe }}
+</div>
+
 <br /><br />
 
 <h3>Literatura:</h3>
