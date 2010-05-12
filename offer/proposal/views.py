@@ -9,8 +9,61 @@ from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 
+from offer.proposal.exceptions                 import *
 from fereol.enrollment.records.models          import *
 from fereol.offer.proposal.models              import *
+
+@login_required
+def becomeFan(request, slug):
+    try:
+        proposal = Proposal.objects.get(slug=slug)
+        proposal.addUserToFans(request.user)
+        return redirect("proposal-page" , slug=slug)
+    except NonStudentException:
+        request.user.message_set.create(message="Nie jesteś studentem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+    except NonEmployeeException:
+        request.user.message_set.create(message="Nie jesteś pracownkiem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        
+@login_required
+def becomeTeacher(request, slug):
+    try:
+        proposal = Proposal.objects.get(slug=slug)
+        proposal.addUserToTeachers(request.user)
+        return redirect("proposal-page" , slug=slug)
+    except NonStudentException:
+        request.user.message_set.create(message="Nie jesteś studentem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+    except NonEmployeeException:
+        request.user.message_set.create(message="Nie jesteś pracownkiem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+
+@login_required
+def stopBeFan(request, slug):
+    try:
+        proposal = Proposal.objects.get(slug=slug)
+        proposal.deleteUserFromFans(request.user)
+        return redirect("proposal-page" , slug=slug)
+    except NonStudentException:
+        request.user.message_set.create(message="Nie jesteś studentem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+    except NonEmployeeException:
+        request.user.message_set.create(message="Nie jesteś pracownkiem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+
+@login_required
+def stopBeTeacher(request, slug):
+    try:
+        proposal = Proposal.objects.get(slug=slug)
+        proposal.deleteUserFromTeachers(request.user)
+        return redirect("proposal-page" , slug=slug)
+    except NonStudentException:
+        request.user.message_set.create(message="Nie jesteś studentem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+    except NonEmployeeException:
+        request.user.message_set.create(message="Nie jesteś pracownkiem")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
 
 @login_required
@@ -27,6 +80,7 @@ def proposal( request, slug, descid = None ):
     else:
         proposal.description = newest
         descid = proposal.description.id
+        
     next = proposal.description.getNewer( proposal )
     prev = proposal.description.getOlder( proposal )
 
@@ -38,7 +92,8 @@ def proposal( request, slug, descid = None ):
             'newest'        : newest,
             'id'            : proposal.id,
             'next'          : next,
-            'prev'          : prev
+            'prev'          : prev,
+            'isFan'         : proposal.isFan(request.user)
     }
     return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext( request ) )
 
