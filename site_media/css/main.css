@@ -21,7 +21,7 @@
 #main-header
 {
 	position: relative;
-	height: 32px;
+	min-height: 32px;
 	padding: 5px;
 	border-bottom: 1px solid #cccccc;
 }
@@ -37,15 +37,15 @@
 {
 	color: black;
 	text-decoration: none;
+	float: left;
 }
 
 #main-menu
 {
-	position: absolute;
-	top: 11px;
-	left: 250px;
-	width: 740px;
+	float: right;
+	width: 800px;
 	text-align: right;
+	padding: 6px 10px;
 }
 
 /* menu list styled in droppy.css

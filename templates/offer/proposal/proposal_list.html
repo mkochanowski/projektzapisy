@@ -33,17 +33,17 @@
 
 {% block content %}
 	{% if message %}<div class="message">{{ message }}</div>{% endif %}
-	<ul id="od-proposaloffer-proposallist">
-		{% for sub in proposals %}
-			<li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}>
-				<a href="{% url proposal-page slug=sub.slug %}">{{sub.name}}</a>
-			</li>
-		   {% empty %}<li>Brak przedmiotów</li>
-		{% endfor %}
-		<li {% ifequal mode 'form' %}{% if not editMode %}class="active"{% endif %}{% endifequal %} >
-			<a  href="/proposal/add/">Dodaj przedmiot</a>
-		</li>
-	</ul>
+	<div id="od-proposaloffer-proposalmenu">
+		<ul id="od-proposaloffer-proposallist">
+			{% for sub in proposals %}
+				<li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}>
+					<a href="{% url proposal-page slug=sub.slug %}">{{sub.name}}</a>
+				</li>
+			   {% empty %}<li>Brak przedmiotów</li>
+			{% endfor %}
+		</ul>
+		<a href="/proposal/add/" id="od-proposaloffer-addlink">Dodaj przedmiot</a>
+	</div>
 	<div id="od-proposaloffer-contents">
 		{% ifequal mode 'form' %}
 			{% include 'offer/proposal/proposal_form.html' %}

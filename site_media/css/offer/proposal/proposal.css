@@ -16,6 +16,19 @@
 
 /*** LISTA PROPOZYCJI ***/
 
+#od-proposaloffer-proposalmenu
+{
+	margin-top: 30px;
+	width: 170px;
+	float: left;
+}
+
+#od-proposaloffer-proposalmenu #od-proposaloffer-addlink
+{
+	display:block;
+	margin: 10px 5px;
+}
+
 #od-proposaloffer-proposallist
 {
 	margin: 0;
@@ -58,13 +71,6 @@
 	-moz-border-radius-bottomleft: 3px;
 	-webkit-border-radius-bottomleft: 3px;
 	border-radius-bottomleft: 3px;
-}
-
-#od-proposaloffer-proposallist
-{
-	margin-top: 30px;
-	width: 170px;
-	float: left;
 }
 
 #od-proposaloffer-proposallist li a, #od-proposaloffer-proposallist li span
