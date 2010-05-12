@@ -1,0 +1,24 @@
+/**
+ * Strona główna (dla obu podprojektów).
+ */
+
+#mainPage-container
+{
+	width: 800px;
+	margin: auto;
+}
+
+#mainPage-container div
+{
+	padding: 25px;
+}
+
+#mainPage-container a
+{
+	display: block;
+	font-size: 40px;
+	font-variant: small-caps;
+	font-weight: bold;
+	color: #333333;
+	padding-bottom: 10px;
+}
