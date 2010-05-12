@@ -51,6 +51,16 @@
     {{ proposal.description.description|bbcode|nl2br|safe }}
 </div>
 
+<div>
+{% if isFan %}
+    <a href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
+{% else %}
+    <a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
+{% endif %}
+
+Liczba osób, które poszłyby na przedmiot: {{fans}}
+</div>
+
 <h2>Wymagania:</h2>
 <div>
     {{ proposal.description.requirements|bbcode|nl2br|safe }}

@@ -9,7 +9,8 @@ class BaseUser(models.Model):
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
     user = models.OneToOneField(User)
-    
+    first_name = models.CharField( max_length=50, default="" )
+    last_name  = models.CharField( max_length=50, default="" )
     @staticmethod
     def get(self, user_id):
         try:
