@@ -76,7 +76,7 @@
 #od-proposaloffer-proposallist li a, #od-proposaloffer-proposallist li span
 {
 	padding: 2px;
-	background: #dddddd;
+	background: #F8F8F8;
 	display: block;
 	color: black;
 	text-decoration: none;
@@ -89,7 +89,7 @@
 
 #od-proposaloffer-proposallist li.active a
 {
-	background: #f7f7f7;
+	background: white;
 }
 
 /*** LISTA PROPOZYCJI - koniec ***/

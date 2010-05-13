@@ -24,6 +24,11 @@
 	min-height: 32px;
 	padding: 5px;
 	border-bottom: 1px solid #cccccc;
+	background: #fff5b3 url('/site_media/images/top-bg.png') repeat-x;
+
+	-moz-border-radius: 3px 3px 0 0;
+	-webkit-border-radius: 3px 3px 0 0;
+	border-radius: 3px 3px 0 0;
 }
 
 #main-header h1
@@ -38,6 +43,7 @@
 	color: black;
 	text-decoration: none;
 	float: left;
+	text-shadow: 1px 1px #CCCCCC;
 }
 
 #main-menu
@@ -86,6 +92,7 @@
 {
 	border-bottom: 1px solid #cccccc;
 	padding: 5px;
+	background: #f8f8f8;
 }
 
 #main-navigation ul, #main-navigation li
@@ -162,3 +169,14 @@
     color: red;
     margin: 10px 0px;    
 }
+
+/*** KOMUNIKATY - koniec ***/
+
+/*** PANEL FILTROWANIA ***/
+
+.main-top-bar
+{
+	background: #f8f8f8;
+}
+
+/*** PANEL FILTROWANIA - koniec ***/

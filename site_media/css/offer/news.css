@@ -109,7 +109,7 @@
 	height: 20px;
 	float: left;
 	padding-left: 20px;
-	background: url('/site_media/images/search-ico.png') no-repeat 3px 4px;
+	background: white url('/site_media/images/search-ico.png') no-repeat 3px 4px;
 
 	-moz-border-radius: 4px 0 0 4px;
 	-webkit-border-radius: 4px 0 0 4px;

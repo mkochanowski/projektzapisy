@@ -14,12 +14,12 @@ body, html
 
 body
 {
-	background: #f0f0f0;
+	background: #f0f0f0 url('/site_media/images/main-bg.png') repeat-x top;
 }
 
 a
 {
-	color: blue;
+	color: #0066cc;
 	text-decoration: underline;
 	cursor: pointer;
 }
