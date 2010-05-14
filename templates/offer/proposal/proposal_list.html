@@ -58,9 +58,12 @@
 	</div>
 
 	<div class="right_sidebar">
+	  {% get_subjects_in_offer as subjects_in_offer %}
 	  <p>Przedmioty w ofercie dydaktycznej</p>
 	  <ul>
-	    {% subjects_in_offer %}
+	    {% for sub in subjects_in_offer %}
+	      <li>{{ sub.name }}</li>
+	    {% endfor %}
 	  </ul>
 	</div>
 

@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
 
-from django import template
+from django.template import Library, Node, TemplateSyntaxError
 
-register = template.Library()
+register = Library()
 
 from fereol.offer.proposal.models import Proposal
 
-@register.simple_tag
-def subjects_in_offer():
-    """
-    Renders a list of proposals tagged as offer,
-    in a form of <li> tagged list.
-    """
-    proposals = Proposal.get_by_tag("offer")
-    text = ''.join( ["<li>" + str(proposal.name) + "</li>"
-                     for proposal in proposals] )
-    return text
+class SubjectsInOfferNode(Node):
+    """Adds a list of subjects to template context"""
+    def __init__(self, varname):
+        self.varname = varname
+    
+    def render(self, context):
+        context[self.varname] = Proposal.get_by_tag("offer")
+        return ''
+
+@register.tag
+def get_subjects_in_offer(parser, token):
+    bits = token.contents.split()
+    if len(bits) != 3:
+        raise TemplateSyntaxError, "get_subjects_in_offer tag takes exactly two arguments"
+    if bits[1] != 'as':
+        raise TemplateSyntaxError, "first argument to the get_subjects_in_offer tag must be 'as'"
+    return SubjectsInOfferNode(bits[2])
