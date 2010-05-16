@@ -47,7 +47,7 @@ class SystemState( models.Model ):
     # pobiera aktualny stan systemu    
     @staticmethod
     def get_state(yearC = date.today().year):
-        return SystemState.objects.filter(year=yearC)
+        return SystemState.objects.filter(year=yearC)[0]
     
     # tworzy stan systemu o wartościach domyślnych
     @staticmethod
@@ -68,7 +68,7 @@ class SystemState( models.Model ):
         state = SystemState.get_state(year)
         
         try:
-            return state[0].maxPoints
+            return state.maxPoints
         except IndexError:
             SystemState.create_default_state(year)
             return DEFAULT_MAX_POINTS
@@ -78,7 +78,7 @@ class SystemState( models.Model ):
         state = SystemState.get_state(year)
         
         try:
-            return state[0].maxVote
+            return state.maxVote
         except IndexError:
             SystemState.create_default_state(year)
             return DEFAULT_MAX_VOTE
@@ -88,7 +88,7 @@ class SystemState( models.Model ):
         state = SystemState.get_state(year)
         
         try:
-            return state[0].voteBeg
+            return state.voteBeg
         except IndexError:
             SystemState.create_default_state(year)
             return date(year, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
@@ -98,7 +98,7 @@ class SystemState( models.Model ):
         state = SystemState.get_state(year)
         
         try:
-            return state[0].voteEnd
+            return state.voteEnd
         except IndexError:
             SystemState.create_default_state(year)
             return date(year, DEFAULT_MONTH_END, DEFAULT_DAY_END)

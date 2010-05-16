@@ -17,13 +17,7 @@ class SingleVote ( models.Model ):
                                    default      = SystemState.get_state() )
     
     value   = models.IntegerField( verbose_name = 'punkty')
-    
-    def save(self, *args, **kwargs):
-		if self.value > 0 and self.value < self.state.maxPoints:
-			super(SingleVote, self).save(*args, **kwargs)
-		else:
-			return "Vote value is invalid"
-		
+    	
     class Meta:
         verbose_name        = 'pojedynczy głos'
         verbose_name_plural = 'pojedyncze głosy'
