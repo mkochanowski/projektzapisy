@@ -109,7 +109,7 @@ class IsStudentInSubjectGroupTypeTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=1)
-        self.group2 = Group.objects.get(id=2)
+        self.group2 = Group.objects.get(id=3)
         self.subject = Subject.objects.get(id=1)
         self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
@@ -146,7 +146,7 @@ class GetStudentsInGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']
     
     def setUp(self):
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=1)
         self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
