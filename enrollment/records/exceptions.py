@@ -1,5 +1,5 @@
 class NonStudentException(Exception):
-   """is thrown when student does not exists"""
+    """is thrown when student does not exists"""
     pass
 
 class NonGroupException(Exception):
