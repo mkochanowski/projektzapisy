@@ -1,61 +1,75 @@
 {% extends "enrollment/base-enrollment.html" %}
-
+ {% block styles %}
+	<link rel="stylesheet" href="/site_media/css/enrollment/subjects/subjects-list.css" type="text/css" />
+{% endblock %}
 {% block scripts %}
-    <script type="text/javascript">var ajaxUrl = "{% url subject-ajax %}";</script>
-	<script src="/site_media/js/enrollment/subjects/subjects-list-ajax.js" type="text/javascript"></script>
-	<script src="/site_media/js/enrollment/subjects/subjects-list.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var ajaxUrl = "{% url subject-ajax %}";
+</script>
+<script src="/site_media/js/enrollment/subjects/subjects-list-ajax.js" type="text/javascript">
+</script>
+<script src="/site_media/js/enrollment/subjects/subjects-list.js" type="text/javascript">
+</script>
 {% endblock %}
-
 {% block main-navigation %}
-	<li>Zapisy</li>
-	<li><a href="{% url subject-list %}">Przedmioty</a></li>
-	<br />
-	<table style="border-top: 1px solid #000000; border-bottom: 1px solid #000000">
-	  <tr>
-	    <td style="border-right: 1px solid #000000">
-		   <label><input type="text" id="keyword" name="keyword" /><br /><sub>Tutaj wpisz fragment nazwy lub prowadzącego</sub></label>
-		</td>
-		<td style="border-right: 1px solid #000000">
-		   <select id="semester" name="semester">
-		   {% for key, name in semesters_list %}
-		     <option value='{{ key }}'> {{ name }} </option> 
-		   {% endfor %}
-		   </select>
-		</td>
-		<td style="border-right: 1px solid #000000; width: 200px">
-		   {% for key, name in types_list %}
-		     <label><input type='checkbox' class='type-list' name='type[{{ forloop.counter0 }}]' value='{{ key }}' checked>{{ name }}</label>
-		   {% endfor %}
-		</td>
-		<td>
-		   <label><input type="checkbox" name="">Schowaj przedmioty na które już byłem zapisany</label>
-		</td>
-	  </tr>
-	</table>
-
-	
-{% endblock %}
-
+<li>
+    Zapisy
+</li>
+<li>
+    <a href="{% url subject-list %}">Przedmioty</a>
+</li>
+<br/>
+<table style="border-top: 1px solid #000000; border-bottom: 1px solid #000000">
+    <tr>
+        <td style="border-right: 1px solid #000000">
+            <label>
+                <input type="text" id="keyword" name="keyword" />
+                <br/>
+                <sub>
+                    Tutaj wpisz fragment nazwy lub prowadzącego
+                </sub>
+            </label>
+        </td>
+        <td style="border-right: 1px solid #000000">
+            <select id="semester" name="semester">
+                {% for key, name in semesters_list %}<option value='{{ key }}'>{{ name }} </option>
+                {% endfor %}
+            </select>
+        </td>
+        <td style="border-right: 1px solid #000000; width: 200px">
+            {% for key, name in types_list %}
+            <label>
+                <input type='checkbox' class='type-list' name='type[{{ forloop.counter0 }}]' value='{{ key }}' checked />
+                {{ name }}
+            </label>{% endfor %}
+        </td>
+        <td>
+            <label>
+                <input type="checkbox" name="">Schowaj przedmioty na które już byłem zapisany
+            </label>
+        </td>
+    </tr>
+</table>{% endblock %}
 {% block content %}
-	<div id='main-content-left'><!--
-		<h1>Przedmioty</h1>
-	    {% for sem, subs in subjects %}
-		    <h2>{{sem}}</h2>
-		    
-		    <ul>
-		    {% for sub in subs %}
-			    <li><a class="subject-link" id="subject-{{ sub.pk }}" href="#" link="/subjects/{{ sub.slug }}">{{sub.name}}</a></li>
-			    {% empty %}Brak przedmiotów
-		    {% endfor %}
-		    </ul>
-		    
-		    {% empty %} Brak semestrów
-		{% endfor %} -->
-	</div>
-	
-	<div id='main-content-right' style='height: 300px'>
-		<div id="subject-details">.</div>
-	</div>
-	
-	<div style="clear-both" ></div>
+<div id='main-content-left'>
+    <!--
+    <h1>Przedmioty</h1>
+    {% for sem, subs in subjects %}
+    <h2>{{sem}}</h2>
+    <ul>
+    {% for sub in subs %}
+    <li><a class="subject-link" id="subject-{{ sub.pk }}" href="#" link="/subjects/{{ sub.slug }}">{{sub.name}}</a></li>
+    {% empty %}Brak przedmiotów
+    {% endfor %}
+    </ul>
+    {% empty %} Brak semestrów
+    {% endfor %} -->
+</div>
+<div id='main-content-right' style='min-height: 300px'>
+    <div id="subject-details">
+        .
+    </div>
+</div>
+<div style="clear-both">
+</div>
 {% endblock %}

@@ -1,10 +1,4 @@
-{% extends "enrollment/base-enrollment.html" %}
-
-{% block main-navigation %}
-	<li><a href="{% url subject-list %}">Przedmioty</a></li>
-	<li>{{subject.name}}</li>
-{% endblock %}
-{% block content %}
+<div>
     {% if messages %}
     <ul>
         {% for message in messages %}
@@ -15,12 +9,12 @@
     <h1>{{subject.name}}</h1>
     <h3>Prowadzący:</h3>
     {% for teacher in subject.teachers.all %}
-    	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
+    	<a class="subject-details-link" link="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
     
     <h3>Opis przedmiotu:</h3>
     <p>{{subject.description}}</p>
-    <a href="#">pokaż więcej...</a>
+    <a>pokaż więcej...</a>
     
     <!--
     <ul>
@@ -52,13 +46,13 @@
 	        	<td>
 	        	{% if not lec.signed %}
 		            {% ifnotequal lec.get_group_limit lec.enrolled %}
-		                <a href="{% url record-assign lec.id %}">zapisz</a>
+		                <a class="subject-details-link" link="{% url record-assign lec.id %}">zapisz</a>
 		            {% endifnotequal %}
 	        	{% else %}
-	            	<a href="{% url record-resign lec.id %}">wypisz</a>
+	            	<a class="subject-details-link" link="{% url record-resign lec.id %}">wypisz</a>
 	        	{% endif %}
 	        	</td>
-	        	<td><a href="{% url group-records lec.id %}">Lista zapisanych osób</a></td>
+	        	<td><a class="subject-details-link" link="{% url group-records lec.id %}">Lista zapisanych osób</a></td>
 	        </tr>
     	{% endfor %}
     	</tbody>
@@ -87,16 +81,16 @@
 	        	{% if not exe.signed %}
 		            {% ifnotequal exe.get_group_limit exe.enrolled %}
 		            	{% if subject.user_enrolled_to_exercise %}
-	        				<a href="{% url record-change subject.user_enrolled_to_exercise exe.id %}">przenieś</a>
+	        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_exercise exe.id %}">przenieś</a>
 	        			{% else %}
-		                	<a href="{% url record-assign exe.id %}">zapisz</a>
+		                	<a class="subject-details-link" link="{% url record-assign exe.id %}">zapisz</a>
 		                {% endif %}
 		            {% endifnotequal %}
 	        	{% else %}
-	            	<a href="{% url record-resign exe.id %}">wypisz</a>
+	            	<a class="subject-details-link" link="{% url record-resign exe.id %}">wypisz</a>
 	        	{% endif %}
 	        	</td>
-	        	<td><a href="{% url group-records exe.id %}">Lista zapisanych osób</a></td>
+	        	<td><a class="subject-details-link" link="{% url group-records exe.id %}">Lista zapisanych osób</a></td>
 	        </tr>
     	{% endfor %}
     	</tbody>
@@ -125,18 +119,18 @@
 	        	{% if not lab.signed %}
 		            {% ifnotequal lab.get_group_limit lab.enrolled %}
 		            	{% if subject.user_enrolled_to_laboratory %}
-	        				<a href="{% url record-change subject.user_enrolled_to_laboratory lab.id %}">przenieś</a>
+	        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_laboratory lab.id %}">przenieś</a>
 	        			{% else %}
-		                	<a href="{% url record-assign lab.id %}">zapisz</a>
+		                	<a class="subject-details-link" link="{% url record-assign lab.id %}">zapisz</a>
 		                {% endif %}
 		            {% endifnotequal %}
 	        	{% else %}
-	            	<a href="{% url record-resign lab.id %}">wypisz</a>
+	            	<a class="subject-details-link" link="{% url record-resign lab.id %}">wypisz</a>
 	        	{% endif %}
 	        	</td>
-	        	<td><a href="{% url group-records lab.id %}">Lista zapisanych osób</a></td>
+	        	<td><a class="subject-details-link" link="{% url group-records lab.id %}">Lista zapisanych osób</a></td>
 	        </tr>
     	{% endfor %}
     	</tbody>
     </table>    
-{% endblock %}
+</div>

@@ -1,19 +1,10 @@
-{% extends "enrollment/base-enrollment.html" %}
-
-{% block main-navigation %}
-	<li><a href="{% url subject-list %}">Przedmioty</a></li>
-	<li><a href="{% url subject-page group.subject_slug %}">{{group.subject}}</a></li>
-	<li>{{group.type_and_teacher}}</li>
-{% endblock %}
-
-{% block content %}
-	<h2>Lista zapisanych osób</h2>
-	<ul>
-	{% for student in students %}
-		<li><a href="{% url profile student.user.id %}">{{student.user.get_full_name}}</a></li>
-		{% empty %}brak zapisanych osób
-	{% endfor %}
-	</ul>
-{% endblock %}
-	
- 
+<div>
+<h2><a class="subject-details-link" link="{% url subject-page group.subject_slug %}">{{group.subject}}</a> {{group.type_and_teacher}} - Lista zapisanych osób </h2>
+{% for student in students %}
+<li>
+    <a class="subject-details-link" link="{% url profile student.user.id %}">{{student.user.get_full_name}}</a>
+</li>
+{% empty %}brak zapisanych osób
+{% endfor %}
+</ul>
+</div>

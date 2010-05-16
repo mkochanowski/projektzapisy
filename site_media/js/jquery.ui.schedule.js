@@ -203,6 +203,20 @@ $.widget("ui.schedule", {
 		termDiv.removeClass('schedule-pinned').addClass('schedule-unpinned');
 	},
 	
+	_groupStartLoading: function(groupId){
+		var self = this;
+		$('.'+self._groupClass(groupId)).each(function(){
+			$(this).addClass('loading');
+		});
+	},
+	
+	_groupFinishLoading: function(groupId){
+		var self = this;
+		$('.'+self._groupClass(groupId)).each(function(){
+			$(this).removeClass('loading');
+		});
+	},
+	
 	_ajaxGroupOperation: function(opCode, groupID, successCallback) {
 		var self = this,
 			opUrl;
@@ -222,6 +236,7 @@ $.widget("ui.schedule", {
 			alert("Operation url undefined");
 		}
 		else {
+			self._groupStartLoading(groupID);
 			$.ajax({
 				type: "POST",
 				dataType : "json", 
@@ -237,10 +252,14 @@ $.widget("ui.schedule", {
 					else {
 						alert(resp.Exception.Message);
 					}
+				},
+				complete: function() {
+					self._groupFinishLoading(groupID);
 				}
 			});
 		}
 	},
+	
 	
 	deleteSubjectTerms: function(subjectID){
 		var self = this;
