@@ -29,7 +29,7 @@ class PreferenceManager(models.Manager):
         if types:
             prefs = prefs.filter(proposal__type__in=types)
         if query: # TODO: zaawansowane filtrowanie
-            prefs = prefs.filter(proposal__name__contains=query)
+            prefs = prefs.filter(proposal__name__icontains=query)
         return prefs
 
     def init_preference(self, employee, course):
