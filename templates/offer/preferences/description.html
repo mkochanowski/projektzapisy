@@ -1,0 +1,9 @@
+{% load news_extras %}
+
+<h3>{{ description.proposal.name }}</h3>
+<p>{{ description.description|bbcode|nl2br|safe }}</p>
+<ul>
+{% for book in description.proposal.books.all %}
+<li>{{ book.name }}</li>
+{% endfor %}
+</ul>

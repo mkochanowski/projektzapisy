@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     (r'^subjects/', include('fereol.enrollment.subjects.urls')),
     (r'^records/', include('fereol.enrollment.records.urls')),
     # OD
+    (r'^prefs/', include('fereol.offer.preferences.urls')),
     (r'^proposal/', include('fereol.offer.proposal.urls')),
     (r'^news/', include('fereol.offer.news.urls')),
     (r'^vote/', include('fereol.offer.vote.urls')),
