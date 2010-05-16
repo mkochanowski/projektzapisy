@@ -9,7 +9,7 @@ from enrollment.subjects.exceptions import NonSubjectException
 from users.models import Employee, Student
 
 class AddUserToGroupTest(TestCase):
-    fixtures = ['fixtures__records']
+    fixtures =  ['fixtures__users', 'fixtures__subjects']
 
     def setUp(self):
         self.user = User.objects.get(id=5)
@@ -40,7 +40,7 @@ class AddUserToGroupTest(TestCase):
         self.assertRaises(OutOfLimitException, Record.add_student_to_group, self.user.id, self.group.id)
 
 class ChangeUserGroupTest(TestCase):
-    fixtures = ['fixtures__records']
+    fixtures =  ['fixtures__users', 'fixtures__subjects']
 
     
     def setUp(self):
@@ -75,7 +75,7 @@ class ChangeUserGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
            
 class RemoveUserToGroupTest(TestCase):
-    fixtures = ['fixtures__records']
+    fixtures =  ['fixtures__users', 'fixtures__subjects']
 
         
     def setUp(self):
@@ -103,7 +103,7 @@ class RemoveUserToGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
  
 class IsStudentInSubjectGroupTypeTest(TestCase):
-    fixtures = ['fixtures__records']
+    fixtures =  ['fixtures__users', 'fixtures__subjects']
 
     
     def setUp(self):
@@ -127,7 +127,7 @@ class IsStudentInSubjectGroupTypeTest(TestCase):
         self.assertFalse(Record.is_student_in_subject_group_type(self.user.id, self.subject.slug, self.group2.type))
                     
 class GetGroupsForStudentTest(TestCase):
-    fixtures = ['fixtures__records']
+    fixtures =  ['fixtures__users', 'fixtures__subjects']
 
     def setUp(self):
         self.user = User.objects.get(id=5)
@@ -143,7 +143,7 @@ class GetGroupsForStudentTest(TestCase):
         self.assertRaises(NonStudentException, Record.get_groups_for_student, self.user.id)
         
 class GetStudentsInGroupTest(TestCase):
-    fixtures = ['fixtures__records']
+    fixtures =  ['fixtures__users', 'fixtures__subjects']
     
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -159,7 +159,7 @@ class GetStudentsInGroupTest(TestCase):
         self.assertRaises(NonGroupException, Record.get_students_in_group, self.group.id)
 
 class AssignmentToGroupsWithSameTypes(TestCase):
-    fixtures = ['fixtures__records']
+    fixtures =  ['fixtures__users', 'fixtures__subjects']
     
     def setUp(self):
         self.user = User.objects.get(id=5)
