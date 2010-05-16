@@ -12,7 +12,9 @@ from users.models import Employee, Student
           
 PROPOSAL_TYPES = (
     ('seminar', 'Seminarium'),
-    ('course', 'Kurs'),
+    ('req',  'Obowiązkowy'),
+    ('cs_1', 'Informatyczny'),
+    ('cs_2', 'Informatyczny 2'),
 )
 
 PROPOSAL_HOURS = (
@@ -28,9 +30,10 @@ class Proposal( models.Model ):
                             verbose_name = 'nazwa przedmiotu' )
     slug = models.SlugField(max_length = 255,
                             unique = True, verbose_name='odnośnik' )
-    tags     = models.ManyToManyField(ProposalTag)
-    fans     = models.ManyToManyField(Student, verbose_name='poszli by na to')
-    teachers = models.ManyToManyField(Employee, verbose_name='poprowadziliby to')
+    fans     = models.ManyToManyField(Student, blank=True, 
+                                      verbose_name='poszli by na to')
+    teachers = models.ManyToManyField(Employee, blank=True, 
+                                      verbose_name='poprowadziliby to')
     tags = models.ManyToManyField(ProposalTag, blank = True)
     type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
         verbose_name = 'typ')

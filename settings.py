@@ -91,12 +91,13 @@ INSTALLED_APPS = (
     'haystack',
     'fereol.mailer',
     'fereol.south',
-    'fereol.users',
-    'fereol.offer.proposal',
-    'fereol.offer.news',
-    'fereol.offer.vote',
     'fereol.enrollment.subjects',
     'fereol.enrollment.records',
+    'fereol.offer.news',
+    'fereol.offer.preferences',
+    'fereol.offer.proposal',
+    'fereol.offer.vote',
+    'fereol.users',
 )
 
 LOGIN_URL = '/users/login/'

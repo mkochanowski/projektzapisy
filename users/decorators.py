@@ -36,7 +36,7 @@ def employee_required(function=None,
             return True
         except AttributeError:
             return False
-        except Student.DoesNotExist:
+        except Employee.DoesNotExist:
             return False
     if function:
         return _CheckProfileOr403(function, test_f, redirect_to)

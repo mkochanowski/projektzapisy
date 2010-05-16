@@ -30,9 +30,9 @@ class Record( models.Model ):
     
     @staticmethod
     def number_of_students(group):
-      """Returns number of students enrolled to particular group"""
-      group_ = group
-      return Record.enrolled.filter(group = group_).count()
+        """Returns number of students enrolled to particular group"""
+        group_ = group
+        return Record.enrolled.filter(group = group_).count()
 
     @staticmethod
     def get_student_all_detiled_records(user_id):
@@ -107,7 +107,7 @@ class Record( models.Model ):
     @staticmethod
     def is_student_in_subject_group_type(user_id, slug, group_type):
         try:
-            student = User.objects.get(id=user_id).student
+            User.objects.get(id=user_id).student
             subject = Subject.objects.get(slug=slug)
             user_subject_group_type = [g.id for g in Record.get_groups_for_student(user_id) if g.subject == subject and g.type == group_type]
             if user_subject_group_type:
