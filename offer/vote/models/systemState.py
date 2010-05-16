@@ -47,7 +47,11 @@ class SystemState( models.Model ):
     # pobiera aktualny stan systemu    
     @staticmethod
     def get_state(yearC = date.today().year):
-        return SystemState.objects.filter(year=yearC)[0]
+        try:
+            return SystemState.objects.filter(year=yearC)[0]
+        except IndexError:
+            return SystemState.create_default_state(yearC)
+    
     
     # tworzy stan systemu o wartościach domyślnych
     @staticmethod
@@ -59,6 +63,7 @@ class SystemState( models.Model ):
         newState.voteBeg   = date(year, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
         newState.voteEnd   = date(year, DEFAULT_MONTH_END, DEFAULT_DAY_END)
         newState.save()
+        return newState
         
     # poniższe funkcje służa do uzyskania odpowiednich danych ze stanu
     # systemu na podany rok. Jeśli stan nie istenieje to zostanie 
@@ -66,43 +71,24 @@ class SystemState( models.Model ):
     @staticmethod
     def get_maxPoints(year = date.today().year):
         state = SystemState.get_state(year)
-        
-        try:
-            return state.maxPoints
-        except IndexError:
-            SystemState.create_default_state(year)
-            return DEFAULT_MAX_POINTS
+        return state.maxPoints
         
     @staticmethod
     def get_maxVote(year = date.today().year):
         state = SystemState.get_state(year)
+        return state.maxVote
         
-        try:
-            return state.maxVote
-        except IndexError:
-            SystemState.create_default_state(year)
-            return DEFAULT_MAX_VOTE
     
     @staticmethod
     def get_voteBeg(year = date.today().year):
         state = SystemState.get_state(year)
-        
-        try:
-            return state.voteBeg
-        except IndexError:
-            SystemState.create_default_state(year)
-            return date(year, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
+        return state.voteBeg
         
     @staticmethod
     def get_voteEnd(year = date.today().year):
         state = SystemState.get_state(year)
+        return state.voteEnd
         
-        try:
-            return state.voteEnd
-        except IndexError:
-            SystemState.create_default_state(year)
-            return date(year, DEFAULT_MONTH_END, DEFAULT_DAY_END)
-    
     # sprawdza czy głosowanie jest aktywne
     @staticmethod
     def is_vote_active():
