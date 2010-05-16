@@ -109,7 +109,7 @@ class PreferenceManagerGettersTest(TestCase):
             Preference.objects.get_employees_prefs(self.emp2, hidden=True, query='kurs'),
             [self.course1, self.course2])
         self.assertProps(
-            Preference.objects.get_employees_prefs(self.emp2, query='semi'),
+            Preference.objects.get_employees_prefs(self.emp2, hidden=True, query='semi'),
             [self.seminar])
     
     def test_init_preference_already_set(self):
