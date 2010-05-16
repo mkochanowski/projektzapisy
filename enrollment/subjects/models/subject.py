@@ -3,6 +3,7 @@
 from django.db import models
 
 class SubjectEntity(models.Model):
+    """entity of particular subject title"""
     name = models.CharField(max_length=100)
     class Meta:
         verbose_name = 'encja przedmiotu'
@@ -19,6 +20,7 @@ class VisibleManager(models.Manager):
 	    return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
 
 class Subject( models.Model ):
+    """subject in offer"""
     entity = models.ForeignKey(SubjectEntity)
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik')

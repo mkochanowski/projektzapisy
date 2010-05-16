@@ -5,6 +5,7 @@ from django.db import models
 from subject import Subject
 
 class Semester( models.Model ):
+    """semester in academic year"""
     TYPE_WINTER = 'z'
     TYPE_SUMMER = 'l'
     TYPE_CHOICES = [(TYPE_WINTER, u'zimowy'), (TYPE_SUMMER, u'letni')]

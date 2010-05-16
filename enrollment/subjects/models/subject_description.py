@@ -3,6 +3,7 @@
 from django.db import models
 
 class SubjectDescription(models.Model):
+    """description of particular subject"""
     subject = models.ForeignKey('Subject', related_name = 'descriptions')
     description = models.TextField( verbose_name = 'opis' )
     date = models.DateTimeField(verbose_name = 'data dodania')

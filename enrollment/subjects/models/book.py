@@ -3,6 +3,7 @@
 from django.db import models
 
 class Book( models.Model ):
+    """book useful to learn concrete subject"""
     subject = models.ForeignKey('Subject', verbose_name = 'przedmiot', related_name = 'books')
     name = models.TextField( verbose_name = 'nazwa' )
     

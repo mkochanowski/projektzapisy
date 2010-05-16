@@ -8,7 +8,6 @@ DAYS_OF_WEEK = [( '1', u'poniedziałek' ), ( '2', u'wtorek' ), ( '3', u'środa' 
 HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)] 
   
 class Term( models.Model ):
-   
     """terms of groups"""
     dayOfWeek = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia') 
     hourFrom = models.CharField(max_length = 2, choices = HOURS, verbose_name = 'od')
