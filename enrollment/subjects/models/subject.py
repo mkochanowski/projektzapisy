@@ -5,8 +5,8 @@ from django.db import models
 class SubjectEntity(models.Model):
     name = models.CharField(max_length=100)
     class Meta:
-        verbose_name = 'encja przedmiotu'
-        verbose_name_plural = 'encje przedmiotów'
+        verbose_name = 'Podstawa przedmiotu'
+        verbose_name_plural = 'Podstawy przedmiotów'
         app_label = 'subjects'
         
     def __unicode__(self):

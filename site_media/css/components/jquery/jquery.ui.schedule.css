@@ -105,5 +105,8 @@ td.schedule-day-cell
 .schedule-unpinned .box-8 .middle
 	{ border-color:gray; background-color:#C0C0C0; }
 	
+	
+.loading .box .middle
+	{ background: white url(../../../images/loading-black.gif) bottom right no-repeat; }
 
 
