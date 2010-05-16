@@ -89,7 +89,7 @@ class SystemStateAdminForm( ModelForm ):
 class StateAdmin( admin.ModelAdmin ):
     form = SystemStateAdminForm
 
-admin.site.register( SingleVote )
-admin.site.register( Votes )
 admin.site.register( SystemState, StateAdmin )
+admin.site.register( SingleVote )
+
 

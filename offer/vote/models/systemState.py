@@ -37,8 +37,8 @@ class SystemState( models.Model ):
                     default      = DEFAULT_VOTE_END)
                     
     class Meta:
-        verbose_name        = 'stan systemu'
-        verbose_name_plural = 'stany systemu'
+        verbose_name        = 'ustawienia głosowania'
+        verbose_name_plural = 'ustawienia głosowań'
         app_label           = 'vote'
         
     def __unicode__( self ):

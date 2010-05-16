@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+{% if isVoteActive %}
 <h3> Zasady głosowania</h3>
 <div style="text-align:justify">
     <!--
@@ -14,11 +15,15 @@
 </div>
 <br><br>
 <div style="text-align:center">
-    <a href="#">Pokaż mój głos</a><br>
-    <!-- 
-        CHCEMY, ŻEBY PRZEJŚĆ DO GŁOSOWANIA MOŻNA BYŁO 
-        PRZEJŚC TYLKO WTEDY I TYLKO WTEDY JEŚLI JEST OTWARTE
-    -->
-    <a href="#">Głosuj</a>
+    <a href="#"> Głosuj </a>
+</div>
+{% else %}
+<div style="text-align:justify">
+    Głosowanie nie jest aktywne.
+</div>
+<br><br>
+{% endif %}
+<div style="text-align:center">
+    <a href="{% url vote-view %}"> Pokaż mój głos </a>
 </div>
 {% endblock %}

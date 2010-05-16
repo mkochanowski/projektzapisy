@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.contrib.auth.decorators import login_required
 from django.http                    import HttpResponseRedirect
 from django.shortcuts               import render_to_response
@@ -12,36 +11,27 @@ from fereol.users.decorators      import student_required
 
 @student_required
 def voteMain( request ):
-    return render_to_response ('offer/vote/voteMain.html', context_instance = RequestContext( request ))
+    data = { 'isVoteActive' : SystemState.is_vote_active() }
+    return render_to_response ('offer/vote/voteMain.html', data, context_instance = RequestContext( request ))
 
 @student_required
-def voteForm ( requst ):
-    subjects = Proposal.objects.all()
-    # zamienic na: 
-    # subjects = Proposal.get_by_tag('vote')
-    # jak już będzie można dodawać tagi
-    
-    summer = []
-    winter = []
-    undef  = []
-    voted  = []
-    
-    # DODAĆ WYCIĄGANIE ZAPISANYCH DANYCH!!!
-    
-    for sub in subjects:
-        if sub.in_summer():
-            summer.append((sub, None))
-        elif sub.in_winter():
-            winter.append((sub, None))
+def voteView( request ):
+    votes = SingleVote.get_votes( request.user )
+    summer_votes  = []
+    winter_votes  = []
+    unknown_votes = []
+    sum           = 0
+    for vote in votes:
+        sum = sum + vote.value
+        if   vote.subject.in_summer():
+            summer_votes.append(vote)
+        elif vote.subject.in_winter():
+            winter_votes.append(vote)
         else:
-            undef.append((sub, None))
-    
-    maxLen = max(len(summer), len(winter), len(undef))
-    for i in range(len(summer), maxLen): summer.append(None)
-    for i in range(len(winter), maxLen): winter.append(None)
-    for i in range(len(undef),  maxLen): undef. append(None)
-    
-    data = { 'subjects'  : zip(winter, summer, undef),
-             'maxPoints' : range(0, MAX_VOTE+1) }
-          
-    return render_to_response ('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
+            unknown_votes.append(vote)
+            
+    data = {  'summer_votes'  : summer_votes,
+              'winter_votes'  : winter_votes,
+              'unknown_votes' : unknown_votes,
+              'vote_sum'      : sum }
+    return render_to_response ('offer/vote/voteView.html', data, context_instance = RequestContext( request ))

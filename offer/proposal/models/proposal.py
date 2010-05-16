@@ -70,9 +70,9 @@ class Proposal( models.Model ):
     def isTeacher(self, user):
         try:
             if self.teachers.get(user = user):
-                return true
+                return True
             else:
-                return false
+                return False
         except Employee.DoesNotExist:
             return False            
     def addUserToFans(self, user):
