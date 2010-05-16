@@ -19,7 +19,12 @@ class Semester( models.Model ):
 		
     def get_name(self):
         return '%s %i/%i' % (self.get_type_display() , self.year, self.year + 1)
-	
+
+    @staticmethod
+    def is_visible(id):
+        param = id
+        return Semester.objects.get(id = param).visible 
+
     class Meta:
         verbose_name = 'semestr'
         verbose_name_plural = 'semestry'

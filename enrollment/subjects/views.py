@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from fereol.enrollment.records.models          import *
 from fereol.enrollment.subjects.models         import *
-from exceptions import NonSubjectException
+from enrollment.subjects.exceptions import NonSubjectException
 
 def make_it_json_friendly(element):
     element['entity__name'] = unicode(element['entity__name'])
@@ -57,34 +57,34 @@ def subject( request, slug ):
 @login_required
 def list_of_subjects( request ):
     semester_name, list_of_types = "", []
-    keyword, semester, type = "", None, None
+    keyword, semester = "", None
     response = Subject.objects.all()      
 
     try:
-       if request.POST.has_key('keyword'):
-          keyword = request.POST['keyword']
+        if request.POST.has_key('keyword'):
+            keyword = request.POST['keyword']
   
-          if keyword != "":
-             response = response.filter(Q(entity__name__icontains=keyword) | Q(teachers__user__last_name__icontains=keyword))
+            if keyword != "":
+               response = response.filter(Q(entity__name__icontains=keyword) | Q(teachers__user__last_name__icontains=keyword))
 
-       if request.POST.has_key('semester'):
-          semester = request.POST['semester']
-          semester_name = Semester.objects.get(id=semester).get_name()
-          response = response.filter(semester__id__exact=semester)
+        if request.POST.has_key('semester'):
+            semester = request.POST['semester']
+            semester_name = Semester.objects.get(id=semester).get_name()
+            response = response.filter(semester__id__exact=semester)
 
-       if request.POST.has_key('type'):
-          list_of_types = request.POST.getlist('type')
-          if list_of_types:
-             response = response.filter(type__id__in=list_of_types)
-    
+        if request.POST.has_key('type'):
+            list_of_types = request.POST.getlist('type')
+            if list_of_types:
+               response = response.filter(type__id__in=list_of_types)
+   
     except Semester.DoesNotExist:
-       return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
+        return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
     else:
-       response = response.order_by('entity__name').values('id', 'entity__name', 'slug')
+        response = response.order_by('entity__name').values('id', 'entity__name', 'slug')
     
-       response = map(make_it_json_friendly, response)
-       result = {'semester_name' : semester_name, 'subjects' : response }
+        response = map(make_it_json_friendly, response)
+        result = {'semester_name' : semester_name, 'subjects' : response }
 
-       return HttpResponse(simplejson.dumps(result), mimetype="application/javascript")
+        return HttpResponse(simplejson.dumps(result), mimetype="application/javascript")
  
  

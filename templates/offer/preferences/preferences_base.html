@@ -1,0 +1,50 @@
+{% extends "offer/base-offer.html" %}
+
+{% block main-navigation %}
+  <li>Preferencje</li>
+{% endblock %}
+
+{% block top-bar %}
+<div id="od-prefs-top-bar">
+  <form id"od-prefs-filtering" action="{% url prefs-default-view %}" method="get">
+    <fieldset>
+      <legend>Filtrowanie</legend>
+      <input type="text" name="query" id="od-prefs-search-q" value="Filtruj"/>
+      <input type="reset" id="od-prefs-search-reset" value="X" />
+    </fieldset>
+    <fieldset>
+      <legend>Rodzaj przedmiotu:</legend>
+      <input type="checkbox" id="od-prefs-required"/>Obowiązkowe
+      <input type="checkbox" id="od-prefs-course"/>Kursy
+      <input type="checkbox" id="od-prefs-cs_1"/>Informatyczne
+      <input type="checkbox" id="od-prefs-cs_2"/>Informatyczne 2
+    </fieldset>
+    <fieldset>
+      <legend>Inne:</legend>
+      <input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/>Pokaż ukryte przedmioty
+      <input type="checkbox" id="od-prefs-only-new"/>Pokaż tylko nowe przedmioty
+    </fieldset>
+  </form>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<p>Widok: <a href="{% url prefs-list-view %}">listy</a> | <a href="{% url prefs-tree-view %}">drzewa</a></p>
+
+<h3>Przedmioty z ustalonymi preferencjami</h3>
+
+{% block pref_list %}
+{% endblock %}
+
+<div class="sidebar">
+  <h3>Przedmioty bez ustalonych preferencji</h3>
+  <ul>
+  {% for prop in unset_offer %}
+  <li><form method="post" action="{% url prefs-init-pref prop.id %}">
+      <input type="submit" value="<="\></form>{{ prop.name }}</li>
+  {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}

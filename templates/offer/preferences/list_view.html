@@ -1,0 +1,30 @@
+{% extends "offer/preferences/preferences_base.html" %}
+
+{% load preferences_extras %}
+
+{% block pref_list %}
+
+<ul class="pref_list_view">
+{% for pref in prefs %}
+{% if pref.hidden %}
+<form method="POST" action="{% url prefs-unhide pref.id %}"><input type="submit" value="Nie ukrywaj"/></form>
+{% else %}
+<form method="POST" action="{% url prefs-hide pref.id %}"><input type="submit" value="Ukryj"/></form>
+{% endif %}
+  <li>{{pref.proposal.name}} wykład:
+    <select class="lecture_select" id="{{ pref.id }}_lecture_select">
+      {% prefs_form_options selected pref.lecture %}
+  </select></li>
+  <li>{{pref.proposal.name}} repetytorium: <select class="review_lecture_select" id="{{ pref.id }}_review_lecture_select">
+      {% prefs_form_options selected pref.review_lecture %}
+  </select></li>
+  <li>{{pref.proposal.name}} ćwiczenia: <select class="tutorial_select" id="{{ pref.id }}_tutorial_select">
+      {% prefs_form_options selected pref.tutorial %}
+  </select></li>
+  <li>{{pref.proposal.name}} pracownia: <select class="lab_select" id="{{ pref.id }}_lab_select">
+      {% prefs_form_options selected pref.lab %}
+  </select></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

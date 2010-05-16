@@ -5,6 +5,13 @@
 {% endblock %}
 
 {% block content %}
+{% if message %}
+<div style="text-align:center">
+    <b><font color=red>{{ message }}</font></b>
+    <br><br>
+</div>
+{% endif %}
+
 {% if isVoteActive %}
 <h3> Zasady głosowania</h3>
 <div style="text-align:justify">
@@ -15,7 +22,7 @@
 </div>
 <br><br>
 <div style="text-align:center">
-    <a href="#"> Głosuj </a>
+    <a href="{% url vote %}"> Głosuj </a>
 </div>
 {% else %}
 <div style="text-align:justify">
