@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from enrollment.subjects.models import *
-from enrollment.records.models import *
+from enrollment.subjects.models import Subject, Group
+from enrollment.records.models import Record
 from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException
 from enrollment.subjects.exceptions import NonSubjectException
 
