@@ -1,18 +1,18 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from enrollment.subjects.models import Group, Subject
-from models import Record
+from enrollment.subjects.models import *
+from enrollment.records.models import *
 from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException
 from enrollment.subjects.exceptions import NonSubjectException
 
 from users.models import Employee, Student
 
 class AddUserToGroupTest(TestCase):
-    fixtures = ['user_and_group']
+    fixtures = ['fixtures__records']
 
     def setUp(self):
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=1)
 
     def testWithNonStudentUser(self):
@@ -40,10 +40,11 @@ class AddUserToGroupTest(TestCase):
         self.assertRaises(OutOfLimitException, Record.add_student_to_group, self.user.id, self.group.id)
 
 class ChangeUserGroupTest(TestCase):
-    fixtures = ['user_and_group']
+    fixtures = ['fixtures__records']
+
     
     def setUp(self):
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.get(id=5)
         self.old_group = Group.objects.get(id=1)
         self.new_group = Group.objects.get(id=2)
         self.old_record = Record.add_student_to_group(self.user.id, self.old_group.id)
@@ -74,10 +75,11 @@ class ChangeUserGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
            
 class RemoveUserToGroupTest(TestCase):
-    fixtures = ['user_and_group']
+    fixtures = ['fixtures__records']
+
         
     def setUp(self):
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=1)
         self.record = Record.add_student_to_group(self.user.id, self.group.id)
 
@@ -101,10 +103,11 @@ class RemoveUserToGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
  
 class IsStudentInSubjectGroupTypeTest(TestCase):
-    fixtures = ['user_and_group']
+    fixtures = ['fixtures__records']
+
     
     def setUp(self):
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=1)
         self.group2 = Group.objects.get(id=2)
         self.subject = Subject.objects.get(id=1)
@@ -124,10 +127,10 @@ class IsStudentInSubjectGroupTypeTest(TestCase):
         self.assertFalse(Record.is_student_in_subject_group_type(self.user.id, self.subject.slug, self.group2.type))
                     
 class GetGroupsForStudentTest(TestCase):
-    fixtures = ['user_and_group']
-    
+    fixtures = ['fixtures__records']
+
     def setUp(self):
-        self.user = User.objects.get(id=1)
+        self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=1)
         self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
@@ -140,7 +143,7 @@ class GetGroupsForStudentTest(TestCase):
         self.assertRaises(NonStudentException, Record.get_groups_for_student, self.user.id)
         
 class GetStudentsInGroupTest(TestCase):
-    fixtures = ['user_and_group']
+    fixtures = ['fixtures__records']
     
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -156,15 +159,16 @@ class GetStudentsInGroupTest(TestCase):
         self.assertRaises(NonGroupException, Record.get_students_in_group, self.group.id)
 
 class AssignmentToGroupsWithSameTypes(TestCase):
-    fixtures = ['user_and_group']
+    fixtures = ['fixtures__records']
     
     def setUp(self):
-        self.user = User.objects.get(id=1)
-        self.lecture1 = Group.objects.get(id=1)
-        self.lecture2 = Group.objects.get(id=3)
-        self.group1 = Group.objects.get(id=2)
-        self.group2 = Group.objects.get(id=4)
-		
+        self.user = User.objects.get(id=5)
+
+        self.group1 = Group.objects.get(id=1)
+        self.group2 = Group.objects.get(id=2)
+        self.lecture1 = Group.objects.get(id=3)
+        self.lecture2 = Group.objects.get(id=4)
+
         self.record = Record.objects.create(student=self.user.student, group=self.lecture1)
 
     def testAssignToAnotherLecture(self):

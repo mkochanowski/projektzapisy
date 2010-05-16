@@ -7,7 +7,7 @@ class NonGroupException(Exception):
 class AlreadyAssignedException(Exception):
     pass
 	
-class AssignedInThisTypeGroupException(Exception):
+class AssignedInThisTypeGroupException(AlreadyAssignedException):
     pass
 
 class AlreadyNotAssignedException(Exception):
