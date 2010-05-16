@@ -14,8 +14,7 @@ class SingleVote ( models.Model ):
                                    verbose_name = 'przedmiot')
 
     state   = models.ForeignKey  ( 'vote.SystemState',
-                                   verbose_name = 'ustawienia głosowania',
-                                   default      = SystemState.get_state() )
+                                   verbose_name = 'ustawienia głosowania')
     
     value   = models.IntegerField( verbose_name = 'punkty')
     	
