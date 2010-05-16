@@ -5,10 +5,7 @@ from offer.proposal.models import Proposal
 
 #dopisac
 
-from models import Record
 from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException
-
-
 from users.models import Employee, Student
 
 class FansTest(TestCase):
