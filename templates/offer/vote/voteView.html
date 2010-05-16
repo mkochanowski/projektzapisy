@@ -1,0 +1,72 @@
+{% extends "offer/base-offer.html" %}
+
+{% block main-nawigation %}
+<li><a href="{% url vote-main %}">Głosowanie</a></li>
+<li><a href="{% url vote-view %}">Pokaż głos</a></li>
+{% endblock %}
+
+{% block content %}
+<table>
+    <tr>
+        <th>Semestr Zimowy</th>
+        <th></th>
+    </tr>
+    {% if winter_votes %}
+        {% for vote in winter_votes %}
+        <tr>
+            <td>{{ vote.subject.name }}</td>
+            <td>{{ vote.value }}</td>
+        </tr>
+        {% endfor %}
+    {% else %}
+    <tr>
+        <td>Brak głosów</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th><br><br></th>
+    </tr>
+    <tr>
+        <th>Semestr Letni</th>
+        <th></th>
+    </tr>
+    {% if summer_votes %}
+        {% for vote in summer_votes %}
+        <tr>
+            <td>{{ vote.subject.name }}</td>
+            <td>{{ vote.value }}</td>
+        </tr>
+        {% endfor %}
+    {% else %}
+    <tr>
+        <td>Brak głosów</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th><br><br></th>
+    </tr>
+    <tr>
+        <th>Semestr Nieokreślony</th>
+        <th></th>
+    </tr>
+    {% if unknown_votes %}
+        {% for vote in unknown_votes %}
+        <tr>
+            <td>{{ vote.subject.name }}</td>
+            <td>{{ vote.value }}</td>
+        </tr>
+        {% endfor %}
+    {% else %}
+    <tr>
+        <td>Brak głosów</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th><br><br></th>
+    </tr>
+    <tr>
+        <th>Suma: </th>
+        <td>{{ vote_sum }}</td>
+    </tr>
+</table>
+{% endblock %}
