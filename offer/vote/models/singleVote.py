@@ -3,13 +3,14 @@ from datetime  import date
 
 from django.db import models
 
+from fereol.offer.proposal.models import Proposal
 from fereol.offer.vote.models import SystemState
 
 class SingleVote ( models.Model ):
     student = models.ForeignKey  ( 'users.Student',
                                     verbose_name = 'głosujący' )
                                     
-    subject = models.ForeignKey  ( 'proposal.Proposal', 
+    subject = models.ForeignKey  ( Proposal, 
                                    verbose_name = 'przedmiot')
 
     state   = models.ForeignKey  ( 'vote.SystemState',
