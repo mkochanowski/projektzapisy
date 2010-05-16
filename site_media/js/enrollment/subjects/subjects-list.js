@@ -8,7 +8,8 @@ function loadSubjectDetails(detailsUrl){
 		dataType: "html",
 		url: detailsUrl,
 		success: function(resp){
-			$detailsDiv.html(resp);
+			$detailsDiv.empty();
+			$detailsDiv.append($(resp));
 			$('.subject-details-link').click(function(){
 				loadSubjectDetails($(this).attr('link'));
 			});
