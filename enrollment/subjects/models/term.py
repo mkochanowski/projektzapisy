@@ -20,7 +20,8 @@ class Term( models.Model ):
                            ('end_time', 'classroom'))
         verbose_name = 'termin'
         verbose_name_plural = 'terminy'
- 
+        app_label = 'subjects'
+        
     def day_in_zero_base(self):
         return int(self.dayOfWeek)-1
     
@@ -50,11 +51,6 @@ class Term( models.Model ):
     def _convert_string_to_time(self, str):
         hour, minute = map(lambda x: int(x), str.split('.'))
         return time(hour=hour, minute=minute)
-
-    class Meta:
-        verbose_name = 'termin'
-        verbose_name_plural = 'terminy'
-        app_label = 'subjects'
 
     def __unicode__(self):
         return "%s (%s-%s) s.%s" % (self.get_dayOfWeek_display(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom)
