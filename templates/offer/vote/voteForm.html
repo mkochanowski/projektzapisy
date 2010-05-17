@@ -1,5 +1,11 @@
 {% extends "offer/base-offer.html" %}
 
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url vote-main %}">Głosowanie</a></li>
+	<li><a href="{% url vote %}"> Głosuj</a></li>
+{% endblock %}
+
 {% block content %}
 {% if message %}
 <div style="text-align:center">

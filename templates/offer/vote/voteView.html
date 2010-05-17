@@ -1,8 +1,9 @@
 {% extends "offer/base-offer.html" %}
 
-{% block main-nawigation %}
-<li><a href="{% url vote-main %}">Głosowanie</a></li>
-<li><a href="{% url vote-view %}">Pokaż głos</a></li>
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url vote-main %}">Głosowanie</a></li>
+	<li><a href="{% url vote-view %}"> Pokaż Głos </a></li>
 {% endblock %}
 
 {% block content %}

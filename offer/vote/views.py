@@ -61,7 +61,8 @@ def vote( request ):
         
         if form.is_valid():
             sum = 0
-            for name, points in form.vote_points(): sum = sum + int(points)
+            for name, points in form.vote_points(): 
+                sum = sum + int(points)
             
             if sum <= SystemState.get_maxVote():
                 votes = SingleVote.get_votes(request.user.student)
@@ -74,7 +75,7 @@ def vote( request ):
                         singleVote.student = request.user.student
                         singleVote.subject = subject
                         singleVote.state   = SystemState.get_state()
-                        singleVote.value   = points
+                        singleVote.value   = int(points)
                         singleVote.save()
             
                 data = { 'isVoteActive' : SystemState.is_vote_active(),
