@@ -58,7 +58,7 @@ def subject( request, slug ):
 def list_of_subjects( request ):
     semester_name, list_of_types = "", []
     keyword, semester = "", None
-    response = Subject.objects.all()      
+    response = Subject.visible.all()      
 
     try:
         if request.POST.has_key('keyword'):

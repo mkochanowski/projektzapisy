@@ -158,9 +158,15 @@ class Record( models.Model ):
             if Record.number_of_students(group=group) < group.limit:
                 if (Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
                     raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException 
-                record, is_created = Record.objects.get_or_create(group=group, student=student, status=STATUS_ENROLLED)
-                if is_created == False:
+                
+                record = Record.objects.get(group=group, student=student)
+                
+                if record.status == STATUS_ENROLLED:
                     raise AlreadyAssignedException()
+                             
+                record.status = STATUS_ENROLLED
+                record.save()
+                
             else:
                 raise OutOfLimitException()
             return record
@@ -168,6 +174,8 @@ class Record( models.Model ):
             raise NonStudentException()
         except Group.DoesNotExist:
             raise NonGroupException()
+        except Record.DoesNotExist:
+            return Record.objects.create(group=group, student=student, status=STATUS_ENROLLED)
 
     @staticmethod
     def change_student_group(user_id, old_id, new_id):
