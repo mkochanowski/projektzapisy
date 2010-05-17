@@ -33,11 +33,7 @@
 							minutes="{{ term.length_in_minutes }}" 
 							day="{{ term.day_in_zero_base }}">
 							{{group}}<br/>
-							(
-							{% for class in group.get_all_classrooms %}
-								{{class}} {%if not forloop.last %}, {%endif%}
-							{% endfor %}
-							)	
+							({{term.classroom}})
 						</div>
 					{% endfor %}
 				{% endfor %}
@@ -66,11 +62,7 @@
 					day="{{ term.day_in_zero_base }}"
 					status="{{ record.schedule_widget_status_ }}">
 					{{record.group_}}<br/>
-					(
-					{% for class in record.group_.get_all_classrooms %}
-						{{class}} {%if not forloop.last %}, {%endif%}
-					{% endfor %}
-					)
+					(s.{{term.classroom}})
 				</div>
 			{% endfor %}
 		{% endfor %}

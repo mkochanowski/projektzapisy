@@ -26,7 +26,7 @@ def subjects(request):
     types = Type.get_all_types_of_subjects()
     types_list = [(type.pk, type.name) for type in Type.objects.all()] 
 
-    return render_to_response( 'enrollment/subjects/subjects_list.html', { 'semesters_list' : semesters_list, 'types_list' : types_list } )
+    return render_to_response('enrollment/subjects/subjects_list.html', {'semesters_list' : semesters_list, 'types_list' : types_list}, context_instance=RequestContext(request))
 
    
 @login_required

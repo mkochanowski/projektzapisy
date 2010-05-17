@@ -67,11 +67,8 @@
         "pk": 1, 
         "model": "subjects.group", 
         "fields": {
-            "classroom": [
-                1
-            ], 
             "term": [
-                3
+                1
             ], 
             "limit": 120, 
             "type": "2", 
@@ -83,11 +80,8 @@
         "pk": 2, 
         "model": "subjects.group", 
         "fields": {
-            "classroom": [
-                3
-            ], 
             "term": [
-                3
+                2
             ], 
             "limit": 25, 
             "type": "2", 
@@ -99,11 +93,8 @@
         "pk": 3, 
         "model": "subjects.group", 
         "fields": {
-            "classroom": [
-                1
-            ], 
             "term": [
-                2
+                3
             ], 
             "limit": 120, 
             "type": "1", 
@@ -114,12 +105,9 @@
     {
         "pk": 4, 
         "model": "subjects.group", 
-        "fields": {
-            "classroom": [
-                2
-            ], 
+        "fields": { 
             "term": [
-                3
+                4
             ], 
             "limit": 300, 
             "type": "1", 
@@ -153,8 +141,9 @@
         "model": "subjects.term", 
         "fields": {
             "dayOfWeek": "1", 
-            "hourFrom": "8", 
-            "hourTo": "10"
+            "start_time": "10:00:00", 
+            "end_time": "12:00:00",
+            "classroom": 2
         }
     }, 
     {
@@ -162,17 +151,29 @@
         "model": "subjects.term", 
         "fields": {
             "dayOfWeek": "4", 
-            "hourFrom": "10", 
-            "hourTo": "12"
+            "start_time": "14:00:00", 
+            "end_time": "16:00:00",
+            "classroom": 2
         }
-    }, 
+    },
+    {
+        "pk": 2, 
+        "model": "subjects.term", 
+        "fields": {
+            "dayOfWeek": "4", 
+            "start_time": "10:00:00", 
+            "end_time": "12:00:00",
+            "classroom": 3
+        }
+    },  
     {
         "pk": 3, 
         "model": "subjects.term", 
         "fields": {
             "dayOfWeek": "3", 
-            "hourFrom": "12", 
-            "hourTo": "14"
+            "start_time": "08:00:00", 
+            "end_time": "10:00:00",
+            "classroom": 1
         }
     }, 
     {

@@ -28,11 +28,7 @@
 					day="{{ term.day_in_zero_base }}"
 					status="fixed">
 					{{group}}<br/>
-					(
-					{% for class in group.get_all_classrooms %}
-						{{class}} {%if not forloop.last %}, {%endif%}
-					{% endfor %}
-					)
+					(s.{{term.classroom}})
 				</div>
 			{% endfor %}
 		{% endfor %}
@@ -43,18 +39,12 @@
     	<tr>
 			<th>Przedmiot</th>
 			<th>Termin</th>
-			<th>Sala</th>
 		</tr>
 	    {% for group in groups %}
 			{% for term in group.terms_ %}
 	       	<tr>
 				<td>{{group}}</td>
 				<td>{{term}}</td>
-				<td>
-					{% for class in group.get_all_classrooms %}
-						{{class}}
-					{% endfor %}
-				</td>
 			</tr>
 	       		{% empty %}brak zajęć
 		   {% endfor %}

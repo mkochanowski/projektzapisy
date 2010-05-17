@@ -1,4 +1,13 @@
 <div>
+{% comment %}
+{% extends "enrollment/base-enrollment.html" %}
+
+{% block main-navigation %}
+	<li><a href="{% url subject-list %}">Przedmioty</a></li>
+	<li>{{subject.name}}</li>
+{% endblock %}
+{% block content %}
+{% endcomment %}
     {% if messages %}
     <ul>
         {% for message in messages %}
@@ -12,23 +21,21 @@
     	<a class="subject-details-link" link="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
     
-    <h3>Opis przedmiotu:</h3>
-    <p>{{subject.description}}</p>
-    <a>pokaż więcej...</a>
-    
-    <!--
     <ul>
         <li>Wykłady: {{subject.lectures}} godz.</li>
         <li>Ćwiczenia: {{subject.exercises}} godz.</li>
         <li>Pracownia: {{subject.laboratories}} godz.</li>  
     </ul>
-    -->
+        
+    <h3>Opis przedmiotu:</h3>
+    <p>{{subject.description}}</p>
+    <a>pokaż więcej...</a>
     
     <h3>Wykład:</h3>
     <table>
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
@@ -36,11 +43,10 @@
 	        <tr>
 		        <td>{{ lec.teacher.user.get_full_name }}</td>
 		        <td>
-		            {% for d in lec.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
-		               {{d}}
+		            {% for d in lec.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ lec.classroom.all|join:", " }}</td> 
 		        <td>{{ lec.get_group_limit }}</td>
 		        <td>{{ lec.enrolled }}</td>
 	        	<td>
@@ -70,8 +76,8 @@
 	        <tr>
 		        <td>{{ exe.teacher.user.get_full_name }}</td>
 		        <td>
-		            {% for d in exe.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
-		               {{d}}
+		            {% for d in exe.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
 		        <td>{{ exe.classroom.all|join:", " }}</td> 
@@ -108,8 +114,8 @@
 	        <tr>
 		        <td>{{ lab.teacher.user.get_full_name }}</td>
 		        <td>
-		            {% for d in lab.get_all_terms|dictsort:"dayOfWeek" %} {% comment %} Set order ;){% endcomment %}
-		               {{d}}
+		            {% for d in lab.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
 		        <td>{{ lab.classroom.all|join:", " }}</td> 
@@ -134,3 +140,7 @@
     	</tbody>
     </table>    
 </div>
+    </table> 
+{% comment %}   
+{% endblock %}
+{% endcomment %}

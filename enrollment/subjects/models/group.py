@@ -6,14 +6,14 @@ from subject import *
 
 from fereol.enrollment.records.models import *
 
-GROUP_TYPE_CHOICES = [('1', u'wykład'), ('2', u'ćwiczenia'), ('3', u'pracownia')]
+GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia')]
 
 class Group(models.Model):
     """group for subject"""
     subject = models.ForeignKey('Subject', verbose_name='przedmiot')
     teacher = models.ForeignKey('users.Employee', verbose_name='prowadzący')
     type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
-    classroom = models.ManyToManyField('Classroom', verbose_name='sala', related_name='grupy')
+    #classroom = models.ManyToManyField('Classroom', verbose_name='sala', related_name='grupy')
     term = models.ManyToManyField('Term', verbose_name='termin zajęć', related_name='grupy')
     limit = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     
@@ -24,10 +24,6 @@ class Group(models.Model):
     def get_all_terms(self):
         """return all terms of current group""" 
         return self.term.all()
-
-    def get_all_classrooms(self):
-        """return all classrooms of current group""" 
-        return self.classroom.all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
