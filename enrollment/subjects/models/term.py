@@ -2,37 +2,50 @@
 
 from django.db import models
 from datetime import time
-  
-DAYS_OF_WEEK = [( '1', u'poniedziałek' ), ( '2', u'wtorek' ), ( '3', u'środa' ), ( '4', u'czwartek'), ( '5', u'piątek'), ( '6', u'sobota'), ( '7', u'niedziela')]
+
+DAYS_OF_WEEK = [( '1', 'poniedziałek' ), ( '2', 'wtorek' ), ( '3', 'środa' ), ( '4', 'czwartek'), ( '5', 'piątek'), ( '6', 'sobota'), ( '7', 'niedziela')]
 
 HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)] 
   
 class Term( models.Model ):
     """terms of groups"""
     dayOfWeek = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia') 
-    hourFrom = models.CharField(max_length = 2, choices = HOURS, verbose_name = 'od')
-    hourTo = models.CharField(max_length = 2, choices = HOURS, verbose_name = 'do')
+    start_time = models.TimeField(verbose_name = 'rozpoczęcie')
+    end_time = models.TimeField(verbose_name = 'zakończenie')
+    classroom = models.ForeignKey('Classroom', verbose_name='sala')
 
+    class Meta:
+        #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
+        unique_together = (('start_time', 'classroom'),
+                           ('end_time', 'classroom'))
+        verbose_name = 'termin'
+        verbose_name_plural = 'terminy'
+ 
     def day_in_zero_base(self):
         return int(self.dayOfWeek)-1
     
     def length_in_minutes(self):
-        timeFrom = self.time_from()
-        timeTo = self.time_to()
-        return (timeTo.hour - timeFrom.hour)*60 + (timeTo.minute - timeFrom.minute) 
+        #timeFrom = self.time_from()
+        #timeTo = self.time_to()
+        #return (timeTo.hour - timeFrom.hour)*60 + (timeTo.minute - timeFrom.minute)
+        #return self.start_time - self.end_time 
+        return (self.end_time.hour - self.start_time.hour)*60 + (self.end_time.minute - self.start_time.minute)
     
     def time_from_in_minutes(self):
         "Returns number of minutes from start of day (midnight) to term beggining"""
-        timeFrom = self.time_from()
-        return (timeFrom.hour)*60 + (timeFrom.minute) 
+        #timeFrom = self.time_from()
+        #return (timeFrom.hour)*60 + (timeFrom.minute)
+        return (self.start_time.hour)* 60 + (self.start_time.minute) 
 
     def time_from(self):
         "Returns hourFrom in time format"""
-        return self._convert_string_to_time(self.get_hourFrom_display())
+        return self.start_time
+        #return self._convert_string_to_time(self.get_hourFrom_display())
   
     def time_to(self):
         "Returns hourTo in time format"""
-        return self._convert_string_to_time(self.get_hourTo_display())
+        return self.end_time
+        #return self._convert_string_to_time(self.get_hourTo_display())
 
     def _convert_string_to_time(self, str):
         hour, minute = map(lambda x: int(x), str.split('.'))
@@ -44,4 +57,4 @@ class Term( models.Model ):
         app_label = 'subjects'
 
     def __unicode__(self):
-        return "%s (%s-%s)" % (self.get_dayOfWeek_display(), self.get_hourFrom_display(), self.get_hourTo_display())
+        return "%s (%s-%s) s.%s" % (self.get_dayOfWeek_display(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom)

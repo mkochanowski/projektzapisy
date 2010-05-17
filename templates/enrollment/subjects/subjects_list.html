@@ -52,7 +52,7 @@
 </table>{% endblock %}
 {% block content %}
 <div id='main-content-left'>
-    <!--
+    {% comment %}
     <h1>Przedmioty</h1>
     {% for sem, subs in subjects %}
     <h2>{{sem}}</h2>
@@ -63,7 +63,8 @@
     {% endfor %}
     </ul>
     {% empty %} Brak semestrów
-    {% endfor %} -->
+    {% endfor %}
+    {% endcomment %}
 </div>
 <div id='main-content-right' style='min-height: 300px'>
     <div id="subject-details">
