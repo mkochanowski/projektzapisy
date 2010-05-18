@@ -1,18 +1,17 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from offer.proposal.models import Proposal
+from offer.proposal.proposal import *
 
-#dopisac
-
-from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException
+from offer.proposal.exceptions import NonStudentException, NonEmployeeException
 from users.models import Employee, Student
 
 class FansTest(TestCase):
+    fixtures =  ['fixtures__users', 'fixtures__proposal']
     def setUp(self):
-        self.firstUser = User.objects.get(id=1)
-        self.secondUser = User.objects.get(id=2)
-        self.proposal = Proposal.objects.get(id=1)
+        self.firstUser = User.objects.get(pk=1)
+        self.secondUser = User.objects.get(pk=2)
+        self.proposal = Proposal.objects.get(pk=1)
 
     def testUserJoinToFans(self):
         self.proposal.addUserToFans(self.firstUser)
@@ -46,10 +45,11 @@ class FansTest(TestCase):
         self.assertRaises(NonStudentException, self.proposal.deleteUserToFans, self.firstUser)
         
 class TeachersTest(TestCase):
+    fixtures =  ['fixtures__users', 'fixtures__proposal']
     def setUp(self):
-        self.firstUser = User.objects.get(id=1)
-        self.secondUser = User.objects.get(id=2)
-        self.proposal = Proposal.objects.get(id=1)
+        self.firstUser = User.objects.get(pk=1)
+        self.secondUser = User.objects.get(pk=2)
+        self.proposal = Proposal.objects.get(pk=1)
     def testUserJoinToTeachers(self):
         self.proposal.addUserToTeachers(self.firstUser)
         self.assertEqual(self.proposal.Teachers.count(), 1)

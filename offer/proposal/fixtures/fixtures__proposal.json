@@ -1,0 +1,20 @@
+[
+    {
+        "pk": 1, 
+        "model": "proposal.proposal", 
+    
+        "fields": {
+            "name": "Algorytmy i struktury danych",
+            "slug": "algorytmy-i-struktury-danych",
+            "fans": [],
+            "teachers": [],
+            "tags": [], 
+            "type": "req",
+            "ects" : 10,
+            "lectures": 30, 
+            "repetitories": 30, 
+            "exercises": 30, 
+            "laboratories": 30
+        }
+    }
+]

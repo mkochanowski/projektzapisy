@@ -30,9 +30,9 @@ class Proposal( models.Model ):
                             verbose_name = 'nazwa przedmiotu' )
     slug = models.SlugField(max_length = 255,
                             unique = True, verbose_name='odnośnik' )
-    fans     = models.ManyToManyField(Student, blank=True, 
+    fans     = models.ManyToManyField('users.Student', blank=True, 
                                       verbose_name='poszli by na to')
-    teachers = models.ManyToManyField(Employee, blank=True, 
+    teachers = models.ManyToManyField('users.Employee', blank=True, 
                                       verbose_name='poprowadziliby to')
     tags = models.ManyToManyField(ProposalTag, blank = True)
     type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
