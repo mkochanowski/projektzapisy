@@ -117,11 +117,25 @@
 
 /*** BREADCRUMBS - koniec ***/
 
+#main-content-container
+{
+	position: relative;
+	
+	-moz-border-radius: 0 0 3px 3px;
+	-webkit-border-radius: 0 0 3px 3px;
+	border-radius: 0 0 3px 3px;
+}
+
 /*** ZAWARTOŚĆ ***/
 
 #main-content
 {
 	position:relative;
+	background: white;
+
+	-moz-border-radius: 0 0 0 3px;
+	-webkit-border-radius: 0 0 0 3px;
+	border-radius: 0 0 0 3px;
 }
 
 
@@ -159,6 +173,135 @@
 }
 
 /*** ZAWARTOŚĆ - koniec ***/
+
+
+/*** SIDEBAR ***/
+
+#main-sidebar
+{
+	position: relative;
+	width: 250px;
+
+	-moz-border-radius: 0 0 3px 0;
+	-webkit-border-radius: 0 0 3px 0;
+	border-radius: 0 0 3px 0;
+}
+
+#main-content-container.sidebar-visible.sidebar-right,
+#main-content-container.sidebar-visible.sidebar-left
+{
+	background: #f8f8f8;
+}
+
+#main-content-container.sidebar-visible.sidebar-right #main-sidebar
+{
+	float: right;
+}
+
+#main-content-container.sidebar-visible.sidebar-left #main-sidebar
+{
+	float: left;
+}
+
+#main-content-container.sidebar-visible.sidebar-right #main-content
+{
+	margin-right: 250px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-right: 1px solid #cccccc;
+}
+
+#main-content-container.sidebar-visible.sidebar-left #main-content
+{
+	margin-left: 250px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border-left: 1px solid #cccccc;
+}
+
+a.main-sidebar-toggle-button
+{
+	border: 1px solid #cccccc;
+
+	display: block;
+	width: 16px;
+	height: 16px;
+	padding: 2px;
+
+	background: white;
+	text-decoration: none;
+	color: black;
+	overflow: hidden;
+	text-align: center;
+	font-weight: bold;
+}
+
+#main-content-container.sidebar-visible.sidebar-right a.main-sidebar-toggle-button.hide,
+#main-content-container.sidebar-left a.main-sidebar-toggle-button.show
+{
+	-moz-border-radius: 0 4px 4px 0;
+	-webkit-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;
+	border-left: 0;
+}
+
+#main-content-container.sidebar-visible.sidebar-right a.main-sidebar-toggle-button.hide
+{
+	position: absolute;
+	top: 20px;
+	left: 0;
+}
+
+#main-content-container.sidebar-visible.sidebar-left a.main-sidebar-toggle-button.hide
+{
+	position: absolute;
+	top: 20px;
+	left: 229px;
+}
+
+#main-content-container.sidebar-right a.main-sidebar-toggle-button.show,
+#main-content-container.sidebar-visible.sidebar-left a.main-sidebar-toggle-button.hide
+{
+	-moz-border-radius: 4px 0 0 4px;
+	-webkit-border-radius: 4px 0 0 4px;
+	border-radius: 4px 0 0 4px;
+	border-right: 0;
+}
+
+#main-content-container.sidebar-right a.main-sidebar-toggle-button.show
+{
+	position: absolute;
+	top: 20px;
+	left: 979px;
+}
+
+#main-content-container.sidebar-left a.main-sidebar-toggle-button.show
+{
+	position: absolute;
+	top: 20px;
+	left: 0;
+}
+
+a.main-sidebar-toggle-button:hover
+{
+	background: #dddddd;
+}
+
+#main-sidebar h2
+{
+	padding: 15px 5px;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+}
+
+#main-sidebar ul
+{
+	margin-left: 0;
+	padding-left: 25px;
+}
+
+/*** SIDEBAR - koniec ***/
 
 
 /*** KOMUNIKATY ***/

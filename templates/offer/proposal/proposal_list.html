@@ -54,17 +54,20 @@
 				<p>Wybierz przedmiot z menu po lewej.</p>
 			{% endifequal %}
 		{% endifequal %}
-		<div style="clear:both"></div>
+		<div style="clear: left"></div>
 	</div>
+{% endblock %}
 
-	<div class="right_sidebar">
-	  {% get_subjects_in_offer as subjects_in_offer %}
-	  <p>Przedmioty w ofercie dydaktycznej</p>
-	  <ul>
-	    {% for sub in subjects_in_offer %}
-	      <li>{{ sub.name }}</li>
-	    {% endfor %}
-	  </ul>
+{% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
+
+{% block sidebar %}
+	<div id="main-sidebar">
+		{% get_subjects_in_offer as subjects_in_offer %}
+		<h2>Przedmioty w ofercie dydaktycznej</h2>
+		<ul>
+			{% for sub in subjects_in_offer %}
+				<li>{{ sub.name }}</li>
+			{% endfor %}
+		</ul>
 	</div>
-
 {% endblock %}
