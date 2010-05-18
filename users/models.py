@@ -12,7 +12,7 @@ class BaseUser(models.Model):
     first_name = models.CharField( max_length=50, default="" )
     last_name  = models.CharField( max_length=50, default="" )
     @staticmethod
-    def get(self, user_id):
+    def get(user_id):
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
