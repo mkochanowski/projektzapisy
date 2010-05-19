@@ -1,31 +1,41 @@
 {% extends "offer/base-offer.html" %}
 
 {% block main-navigation %}
-  <li>Preferencje</li>
+	<li>Preferencje</li>
+{% endblock %}
+
+{% block scripts %}
+	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/offer/prefs.css" type="text/css" />
 {% endblock %}
 
 {% block top-bar %}
-<div id="od-prefs-top-bar">
-  <form id"od-prefs-filtering" action="{% url prefs-default-view %}" method="get">
-    <fieldset>
-      <legend>Filtrowanie</legend>
-      <input type="text" name="query" id="od-prefs-search-q" value="Filtruj"/>
-      <input type="reset" id="od-prefs-search-reset" value="X" />
-    </fieldset>
-    <fieldset>
-      <legend>Rodzaj przedmiotu:</legend>
-      <input type="checkbox" id="od-prefs-required"/>Obowiązkowe
-      <input type="checkbox" id="od-prefs-course"/>Kursy
-      <input type="checkbox" id="od-prefs-cs_1"/>Informatyczne
-      <input type="checkbox" id="od-prefs-cs_2"/>Informatyczne 2
-    </fieldset>
-    <fieldset>
-      <legend>Inne:</legend>
-      <input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/>Pokaż ukryte przedmioty
-      <input type="checkbox" id="od-prefs-only-new"/>Pokaż tylko nowe przedmioty
-    </fieldset>
-  </form>
-</div>
+	<div id="od-prefs-top-bar" class="main-top-bar">
+		<form id="od-prefs-filtering" action="{% url prefs-default-view %}" method="get">
+		<fieldset id="od-prefs-filter">
+			<legend><span>Filtrowanie</span></legend>
+			<div class="main-filter-input">
+				<input class="text" id="od-prefs-q" type="text" name="q" />
+				<input class="reset" id="od-prefs-reset" type="reset" value="X" style="display:none;" />
+			</div>
+		</fieldset>
+		<fieldset id="od-prefs-subjtype">
+			<legend><span>Rodzaj przedmiotu</span></legend>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-required"/><label for="od-prefs-required">Obowiązkowe</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-course"/><label for="od-prefs-course">Kursy</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-cs_1"/><label for="od-prefs-cs_1">Informatyczne</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-cs_2"/><label for="od-prefs-cs_2">Informatyczne 2</label></span>
+		</fieldset>
+		<fieldset id="od-prefs-other">
+			<legend><span>Inne</span></legend>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/><label for="od-prefs-hidden">Pokaż ukryte przedmioty</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-only-new"/><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
+		</fieldset>
+		</form>
+	</div>
 {% endblock %}
 
 {% block content %}

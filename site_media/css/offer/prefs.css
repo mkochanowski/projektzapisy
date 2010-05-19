@@ -1,0 +1,24 @@
+#od-prefs-top-bar fieldset
+{
+	height: 40px;
+}
+
+#od-prefs-top-bar fieldset > span
+{
+	min-width: 150px;
+}
+
+#od-prefs-filter .main-filter-input
+{
+	margin-top: 7px;
+}
+
+#od-prefs-subjtype
+{
+	width: 350px;
+}
+
+#od-prefs-other
+{
+	width: 300px;
+}
