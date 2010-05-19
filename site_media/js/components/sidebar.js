@@ -11,6 +11,7 @@ Sidebar.init = function()
 
 	Sidebar.sidebarNode = sidebarNode;
 	Sidebar.mainContentContainer = $('#main-content-container')[0];
+	Sidebar.mainContent = $('#main-content')[0];
 
 	Sidebar.isRightSidebar = $(Sidebar.mainContentContainer).hasClass('sidebar-right');
 	if (!Sidebar.isRightSidebar &&
@@ -25,7 +26,7 @@ Sidebar.init = function()
 
 	Sidebar.showButton = document.createElement('a');
 	Sidebar.showButton.style.display = 'none';
-	Sidebar.mainContentContainer.appendChild(Sidebar.showButton);
+	Sidebar.mainContent.appendChild(Sidebar.showButton);
 	Sidebar.showButton.className = 'main-sidebar-toggle-button show';
 	Sidebar.showButton.appendChild(document.createTextNode(Sidebar.isRightSidebar?'<':'>'));
 	$(Sidebar.showButton).click(Sidebar.toggleVisibility);

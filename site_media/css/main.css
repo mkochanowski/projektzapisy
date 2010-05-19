@@ -289,7 +289,9 @@ a.main-sidebar-toggle-button:hover
 
 #main-sidebar h2
 {
-	padding: 15px 5px;
+	padding: 15px;
+	padding-left: 25px;
+	padding-right: 5px;
 	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
@@ -297,7 +299,6 @@ a.main-sidebar-toggle-button:hover
 
 #main-sidebar ul
 {
-	margin-left: 0;
 	padding-left: 25px;
 }
 

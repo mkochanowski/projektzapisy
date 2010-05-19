@@ -59,3 +59,16 @@ hr
 	_font-size: 1px;
 	_height: 1px;
 }
+
+ul
+{
+	margin: 0;
+	padding: 0;
+	padding-left: 40px;
+}
+
+li
+{
+	margin: 0;
+	padding: 0;
+}

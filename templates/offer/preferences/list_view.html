@@ -3,28 +3,38 @@
 {% load preferences_extras %}
 
 {% block pref_list %}
+	<ul id="od-prefs-list-list" class="od-prefs-list">
+		{% for pref in prefs %}
+				<li><span>{{pref.proposal.name}} wykład:</span>
 
-<ul class="pref_list_view">
-{% for pref in prefs %}
-{% if pref.hidden %}
-<form method="POST" action="{% url prefs-unhide pref.id %}"><input type="submit" value="Nie ukrywaj"/></form>
-{% else %}
-<form method="POST" action="{% url prefs-hide pref.id %}"><input type="submit" value="Ukryj"/></form>
-{% endif %}
-  <li>{{pref.proposal.name}} wykład:
-    <select class="lecture_select" id="{{ pref.id }}_lecture_select">
-      {% prefs_form_options selected pref.lecture %}
-  </select></li>
-  <li>{{pref.proposal.name}} repetytorium: <select class="review_lecture_select" id="{{ pref.id }}_review_lecture_select">
-      {% prefs_form_options selected pref.review_lecture %}
-  </select></li>
-  <li>{{pref.proposal.name}} ćwiczenia: <select class="tutorial_select" id="{{ pref.id }}_tutorial_select">
-      {% prefs_form_options selected pref.tutorial %}
-  </select></li>
-  <li>{{pref.proposal.name}} pracownia: <select class="lab_select" id="{{ pref.id }}_lab_select">
-      {% prefs_form_options selected pref.lab %}
-  </select></li>
-{% endfor %}
-</ul>
+					{% if pref.hidden %}
+						<input type="button" class="od-prefs-toggleHidden" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
+					{% else %}
+						<input type="button" class="od-prefs-toggleHidden" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
+					{% endif %}
 
+					<select class="lecture_select" id="id_{{ pref.id }}_lecture_select">
+						{% prefs_form_options selected pref.lecture %}
+					</select>
+				</li>
+
+				<li><span>{{pref.proposal.name}} repetytorium:</span>
+					<select class="review_lecture_select" id="id_{{ pref.id }}_review_lecture_select">
+						{% prefs_form_options selected pref.review_lecture %}
+					</select>
+				</li>
+
+				<li><span>{{pref.proposal.name}} ćwiczenia:</span>
+					<select class="tutorial_select" id="id_{{ pref.id }}_tutorial_select">
+						{% prefs_form_options selected pref.tutorial %}
+					</select>
+				</li>
+
+				<li><span>{{pref.proposal.name}} pracownia:</span>
+					<select class="lab_select" id="id_{{ pref.id }}_lab_select">
+						{% prefs_form_options selected pref.lab %}
+					</select>
+				</li>
+		{% endfor %}
+	</ul>
 {% endblock %}

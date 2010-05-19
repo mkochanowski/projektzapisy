@@ -22,3 +22,178 @@
 {
 	width: 300px;
 }
+
+ul#od-prefs-undecided
+{
+	list-style: none;
+	padding: 0 10px;
+}
+
+ul#od-prefs-undecided li
+{
+	padding: 1px 0;
+}
+
+ul#od-prefs-undecided input
+{
+	border: 0;
+	background: white url('/site_media/images/larrow.png') no-repeat center;
+	text-indent: 50px;
+	overflow: hidden;
+	width: 30px;
+
+	cursor: pointer;
+
+	border: 1px solid #999999;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+ul#od-prefs-undecided input:hover
+{
+	background-color: #cccccc;
+}
+
+#od-prefs-viewmode-selection
+{
+	position: absolute;
+	top: 3px;
+	left: 3px;
+}
+
+/******************************************************************************/
+
+.od-prefs-list
+{
+	list-style: none;
+	padding: 0;
+	width: 400px;
+	border: 1px solid #cccccc;
+	background: #f8f8f8;
+
+	margin: auto;
+	margin-top: 20px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.od-prefs-list > li
+{
+	border-bottom: 1px solid #cccccc;
+	min-height: 25px;
+}
+
+.od-prefs-list > li:last-child
+{
+	border-bottom: 0;
+}
+
+.od-prefs-list .od-prefs-toggleHidden,
+.od-prefs-list .od-prefs-toggleCollapse
+{
+	height: 25px;
+	border: 0;
+	background: #f8f8f8;
+
+	cursor: pointer;
+}
+
+.od-prefs-list .od-prefs-toggleHidden
+{
+	float: right;
+	border-left: 1px solid #cccccc;
+	width: 90px;
+}
+
+.od-prefs-list .od-prefs-toggleCollapse
+{
+	border-right: 1px solid #cccccc;
+	width: 25px;
+}
+
+.od-prefs-list li:first-child .od-prefs-toggleHidden
+{
+	-moz-border-radius: 0 3px 0 0;
+	-webkit-border-radius: 0 3px 0 0;
+	border-radius: 0 3px 0 0;
+}
+
+.od-prefs-list li:last-child .od-prefs-toggleHidden
+{
+	-moz-border-radius: 0 0 3px 0;
+	-webkit-border-radius: 0 0 3px 0;
+	border-radius: 0 0 3px 0;
+}
+
+.od-prefs-list li:first-child .od-prefs-toggleCollapse
+{
+	-moz-border-radius: 3px 0 0 0;
+	-webkit-border-radius: 3px 0 0 0;
+	border-radius: 3px 0 0 0;
+}
+
+.od-prefs-list li:last-child .od-prefs-toggleCollapse
+{
+	-moz-border-radius: 0 0 0 3px;
+	-webkit-border-radius: 0 0 0 3px;
+	border-radius: 0 0 0 3px;
+}
+
+.od-prefs-list .od-prefs-toggleHidden:hover,
+.od-prefs-list .od-prefs-toggleCollapse:hover
+{
+	background-color: #cccccc;
+}
+
+#od-prefs-list-tree ul
+{
+	border-top: 1px solid #cccccc;
+	display: none;
+	list-style: none;
+	padding: 10px;
+	background: white;
+}
+
+#od-prefs-list-tree ul.visible
+{
+	display: block;
+}
+
+#od-prefs-list-tree ul li
+{
+	padding-left: 130px;
+	padding-right: 50px;
+	height: 30px;
+}
+
+#od-prefs-list-tree ul li select
+{
+	float: right;
+	height: 25px;
+}
+
+#od-prefs-list-list li
+{
+	position: relative;
+}
+
+#od-prefs-list-list li span
+{
+	position: relative;
+	top: 4px;
+	left: 4px;
+}
+
+#od-prefs-list-list li select
+{
+	position: absolute;
+	top: 2px;
+	left: 200px;
+	height: 21px;
+}
+
+/******************************************************************************/

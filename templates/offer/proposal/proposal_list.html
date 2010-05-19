@@ -3,14 +3,14 @@
 {% load proposal_extras %}
 
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/offer/proposal/proposal.css" type="text/css" />
+	<link type="text/css" rel="stylesheet" href="/site_media/css/offer/proposal/proposal.css" />
 {% endblock %}
 
 {% block scripts %}
 	<script type="text/javascript" src="/site_media/js/jquery-ui-1.8.1.custom.min.js"></script>
-	<script type="text/javascript" src="/site_media/js/jquery.cookies.2.2.0.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="/site_media/js/jquery.cookies.2.2.0.min.js"></script>
 	
-	<script type="text/javascript" src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
+	<script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
 
 	<script type="text/javascript" src="/site_media/js/offer/proposal/form.js"></script>
 	<script type="text/javascript" src="/site_media/js/offer/proposal/history.js"></script>
@@ -63,7 +63,6 @@
 {% endblock %}
 
 {% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
-
 {% block sidebar %}
 	<div id="main-sidebar">
 		{% get_subjects_in_offer as subjects_in_offer %}

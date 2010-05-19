@@ -5,7 +5,12 @@
 {% endblock %}
 
 {% block scripts %}
-	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
+	<script type="text/javascript" src="/site_media/js/jquery.cookies.2.2.0.min.js"></script>
+
+	<script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
+	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
+
+	<script type="text/javascript" src="/site_media/js/offer/prefs/prefs.js"></script>
 {% endblock %}
 
 {% block styles %}
@@ -38,23 +43,29 @@
 	</div>
 {% endblock %}
 
-{% block content %}
-
-<p>Widok: <a href="{% url prefs-list-view %}">listy</a> | <a href="{% url prefs-tree-view %}">drzewa</a></p>
-
-<h3>Przedmioty z ustalonymi preferencjami</h3>
-
-{% block pref_list %}
+{% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
+{% block sidebar %}
+	<div id="main-sidebar">
+		<h2>Przedmioty bez ustalonych preferencji</h2>
+		<ul id="od-prefs-undecided">
+			{% for prop in unset_offer %}
+				<li>
+					<input type="button" value="<" onclick="Prefs.initPref(this, '{% url prefs-init-pref prop.id %}')" />
+					{{ prop.name }}
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
 {% endblock %}
 
-<div class="sidebar">
-  <h3>Przedmioty bez ustalonych preferencji</h3>
-  <ul>
-  {% for prop in unset_offer %}
-  <li><form method="post" action="{% url prefs-init-pref prop.id %}">
-      <input type="submit" value="<="\></form>{{ prop.name }}</li>
-  {% endfor %}
-  </ul>
-</div>
+{% block content %}
+	<p id="od-prefs-viewmode-selection">Widok:
+		<a href="{% url prefs-list-view %}">listy</a>
+		<a href="{% url prefs-tree-view %}">drzewa</a>
+	</p>
 
+	<h2>Przedmioty z ustalonymi preferencjami</h2>
+
+	{% block pref_list %}
+	{% endblock %}
 {% endblock %}
