@@ -8,7 +8,7 @@ from offer.proposal.exceptions import *
 
 
 class ProposalFansTest(TestCase):
-    fixtures = ['fixtures__users.json', 'fixtures__proposal.json']
+    fixtures = ['fixtures__proposal_users.json', 'fixtures__proposal.json']
     
     def setUp(self):
         self.firstUser  = User.objects.get(pk=5)
