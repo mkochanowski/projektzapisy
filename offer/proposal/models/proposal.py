@@ -102,7 +102,7 @@ class Proposal( models.Model ):
         except Employee.DoesNotExist:
             raise NonEmployeeException()
 
-    def deleteUserToTeachers(self, user):
+    def deleteUserFromTeachers(self, user):
         try:
             teacher = user.employee
             self.teachers.remove(teacher)

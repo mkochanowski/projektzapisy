@@ -1,20 +1,190 @@
 [
-    {
-        "pk": 1, 
-        "model": "proposal.proposal", 
-    
-        "fields": {
-            "name": "Algorytmy i struktury danych",
-            "slug": "algorytmy-i-struktury-danych",
-            "fans": [],
-            "teachers": [],
-            "tags": [], 
-            "type": "req",
-            "ects" : 10,
-            "lectures": 30, 
-            "repetitories": 30, 
-            "exercises": 30, 
-            "laboratories": 30
-        }
+  {
+    "pk": 1, 
+    "model": "proposal.proposaltag", 
+    "fields": {
+      "name": "offer"
     }
+  }, 
+  {
+    "pk": 1, 
+    "model": "proposal.proposal", 
+    "fields": {
+      "lectures": 15, 
+      "name": "Kurs 1", 
+      "ects": 6, 
+      "tags": [
+        1
+      ], 
+      "repetitories": 15, 
+      "fans": [], 
+      "teachers": [], 
+      "exercises": 15, 
+      "laboratories": 15, 
+      "type": "cs_1", 
+      "slug": "kurs1"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "proposal.proposal", 
+    "fields": {
+      "lectures": 15, 
+      "name": "Kurs 2", 
+      "ects": 6, 
+      "tags": [
+        1
+      ], 
+      "repetitories": 15, 
+      "fans": [], 
+      "teachers": [], 
+      "exercises": 15, 
+      "laboratories": 15, 
+      "type": "cs_2", 
+      "slug": "kurs2"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "proposal.proposal", 
+    "fields": {
+      "lectures": 15, 
+      "name": "Seminarium 1", 
+      "ects": 3, 
+      "tags": [
+        1
+      ], 
+      "repetitories": 0, 
+      "fans": [], 
+      "teachers": [], 
+      "exercises": 0, 
+      "laboratories": 0, 
+      "type": "seminar", 
+      "slug": "seminarium1"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "proposal.proposaldescription", 
+    "fields": {
+      "requirements": "Wymagania", 
+      "description": "Opis", 
+      "tags": [], 
+      "comments": "Uwagi", 
+      "date": "2010-05-15 18:37:00", 
+      "proposal": 1
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "proposal.proposaldescription", 
+    "fields": {
+      "requirements": "Wymagania", 
+      "description": "opis", 
+      "tags": [], 
+      "comments": "Uwagi", 
+      "date": "2010-05-15 18:37:37", 
+      "proposal": 2
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "proposal.proposaldescription", 
+    "fields": {
+      "requirements": "Wymagania", 
+      "description": "seminarium", 
+      "tags": [], 
+      "comments": "Uwagi", 
+      "date": "2010-05-15 18:38:10", 
+      "proposal": 3
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "proposal.book", 
+    "fields": {
+      "proposal": 1, 
+      "name": "Ksi\u0105\u017cka 1", 
+      "order": 1
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "proposal.book", 
+    "fields": {
+      "proposal": 2, 
+      "name": "Book 1", 
+      "order": 1
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "proposal.book", 
+    "fields": {
+      "proposal": 3, 
+      "name": "Seminaria w praktyce", 
+      "order": 1
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "proposal.book", 
+    "fields": {
+      "proposal": 1, 
+      "name": "Ksi\u0105\u017cka 2", 
+      "order": 2
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "preferences.preference", 
+    "fields": {
+      "review_lecture": 2, 
+      "lab": 0, 
+      "employee": 3, 
+      "lecture": 3, 
+      "proposal": 1, 
+      "hidden": false, 
+      "tutorial": 1
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "preferences.preference", 
+    "fields": {
+      "review_lecture": 0, 
+      "lab": 0, 
+      "employee": 3, 
+      "lecture": 0, 
+      "proposal": 2, 
+      "hidden": true, 
+      "tutorial": 0
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "preferences.preference", 
+    "fields": {
+      "review_lecture": 2, 
+      "lab": 2, 
+      "employee": 3, 
+      "lecture": 3, 
+      "proposal": 3, 
+      "hidden": false, 
+      "tutorial": 3
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "preferences.preference", 
+    "fields": {
+      "review_lecture": 0, 
+      "lab": 3, 
+      "employee": 4, 
+      "lecture": 3, 
+      "proposal": 1, 
+      "hidden": false, 
+      "tutorial": 0
+    }
+  }
 ]
