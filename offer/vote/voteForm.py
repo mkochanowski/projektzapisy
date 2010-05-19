@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from django                  import forms
-from django.utils.safestring import SafeUnicode
+from django                   import forms
+from django.utils.safestring  import SafeUnicode
 from fereol.offer.vote.models import SystemState
 
 class VoteForm( forms.Form ):
@@ -13,20 +13,20 @@ class VoteForm( forms.Form ):
         unknown = kwargs.pop('unknown')
         super(VoteForm, self).__init__(*args, **kwargs)
 
-        for (i, sub) in enumerate(winter):
-            self.fields['winter_%s' % i] = forms.ChoiceField(
+        for sub in winter:
+            self.fields['winter_%s' % sub.pk] = forms.ChoiceField(
                                             label     = sub.name,
                                             choices   = self.choices,
                                             help_text = u'Semestr Zimowy')
                                             
-        for (i, sub) in enumerate(summer):
-            self.fields['summer_%s' % i] = forms.ChoiceField(
+        for sub in summer:
+            self.fields['summer_%s' % sub.pk] = forms.ChoiceField(
                                             label     = sub.name,
                                             choices   = self.choices,
                                             help_text = u'Semestr Letni')
         
-        for (i, sub) in enumerate(unknown):
-            self.fields['unknown_%s' % i] = forms.ChoiceField(
+        for sub in unknown:
+            self.fields['unknown_%s' % sub.pk] = forms.ChoiceField(
                                             label     = sub.name,
                                             choices   = self.choices,
                                             help_text = u'Semestr Nieokreślony')
@@ -39,9 +39,14 @@ class VoteForm( forms.Form ):
                 yield (self.fields[name].label, value)
     
     def as_table( self ):
-        winter  = u'<tr><th>Semestr Zimowy</th><th></th></tr>'
-        summer  = u'<tr><th>Semestr Letni</th><th></th></tr>'
-        unknown = u'<tr><th>Semestr Nieokreślony</th><th></th></tr>'
+        winter   = u'<tr><th>Semestr Zimowy</th><th></th></tr>'
+        summer   = u'<tr><th>Semestr Letni</th><th></th></tr>'
+        unknown  = u'<tr><th>Semestr Nieokreślony</th><th></th></tr>'
+        
+        maksimum  = u'<tr><th>Maksymalna liczba punktów:</th><td>'
+        maksimum += str(SystemState.get_maxVote())
+        maksimum += u'</td></th>'
+        
         
         for key in self.fields.iterkeys():
             field = self.fields[key]
@@ -66,5 +71,6 @@ class VoteForm( forms.Form ):
                 
         return  SafeUnicode(winter) + \
                 SafeUnicode(summer) + \
-                SafeUnicode(unknown)
+                SafeUnicode(unknown) + \
+                SafeUnicode(maksimum)
 
