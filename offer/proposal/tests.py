@@ -1,82 +1,78 @@
+﻿# -*- coding:utf-8 -*-
+
 from django.test import TestCase
 from django.contrib.auth.models import User
-
-from offer.proposal.proposal import *
-
-from offer.proposal.exceptions import NonStudentException, NonEmployeeException
 from users.models import Employee, Student
+from offer.proposal.models import Proposal
+from offer.proposal.exceptions import *
 
-class FansTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__proposal']
+
+class ProposalFansTest(TestCase):
+    fixtures = ['fixtures__proposal_users.json', 'fixtures__proposal.json']
+    
     def setUp(self):
-        self.firstUser = User.objects.get(pk=1)
-        self.secondUser = User.objects.get(pk=2)
-        self.proposal = Proposal.objects.get(pk=1)
+        self.firstUser  = User.objects.get(pk=5)
+        self.secondUser = User.objects.get(pk=6)
+        self.thirdUser  = User.objects.get(pk=3) 
+        self.proposall = Proposal.objects.get( name='Kurs 1' )
 
     def testUserJoinToFans(self):
-        self.proposal.addUserToFans(self.firstUser)
-        self.assertEqual(self.proposal.fans.count(), 1)
-
-    def testUserJoinToFans2(self):
-        self.assertRaises(IsFanException, self.proposal.addUserToFans, self.firstUser)
+        self.proposall.addUserToFans(self.firstUser)
+        self.assertEqual(self.proposall.fans.count(), 1)
 
     def testUsersJoinToFans(self):
-        self.proposal.addUserToFans(self.firstUser)
-        self.proposal.addUserToFans(self.secondUser)
-        self.assertEqual(self.proposal.fans.count(), 2)
+        self.proposall.addUserToFans(self.firstUser)
+        self.proposall.addUserToFans(self.secondUser)
+        self.assertEqual(self.proposall.fans.count(), 2)
 
     def testUserStopBeFan1(self):
-        self.proposal.addUserToFans(self.firstUser)
-        self.proposal.deleteUserFromFans(self.firstUser)
-        self.assertEqual(self.proposal.fans.all().count(), 0)
+        self.proposall.addUserToFans(self.firstUser)
+        self.proposall.deleteUserFromFans(self.firstUser)
+        self.assertEqual(self.proposall.fans.all().count(), 0)
 
     def testUserStopBeFan2(self):
-        self.proposal.addUserToFans(self.firstUser)
-        self.proposal.addUserToFans(self.secondUser)
-        self.proposal.deleteUserFromFans(self.firstUser)
-        self.assertEqual(self.proposal.fans.all().count(), 1)
+        self.proposall.addUserToFans(self.firstUser)
+        self.proposall.addUserToFans(self.secondUser)
+        self.proposall.deleteUserFromFans(self.firstUser)
+        self.assertEqual(self.proposall.fans.all().count(), 1)
 
 # sprawdzanie uprawnien:
     def testUserIsntFan(self):
-        self.firstUser.student.delete()
-        self.assertRaises(NonStudentException, self.proposal.addUserToFans, self.firstUser)
-    def testUserIsntFan(self):
-        self.firstUser.student.delete()
-        self.assertRaises(NonStudentException, self.proposal.deleteUserToFans, self.firstUser)
+        self.assertRaises(NonStudentException, self.proposall.addUserToFans, self.thirdUser)
+    def testUserIsntFan2(self):
+        self.assertRaises(NonStudentException, self.proposall.deleteUserFromFans, self.thirdUser)
         
-class TeachersTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__proposal']
+class ProposalTeachersTest(TestCase):
+    fixtures = ['fixtures__users.json', 'fixtures__proposal.json']
+    
     def setUp(self):
-        self.firstUser = User.objects.get(pk=1)
-        self.secondUser = User.objects.get(pk=2)
-        self.proposal = Proposal.objects.get(pk=1)
+        self.firstUser  = User.objects.get(pk=4)
+        self.secondUser = User.objects.get(pk=3)
+        self.thirdUser  = User.objects.get(pk=5) 
+        self.proposal   = Proposal.objects.get(pk=1)
+        
     def testUserJoinToTeachers(self):
         self.proposal.addUserToTeachers(self.firstUser)
-        self.assertEqual(self.proposal.Teachers.count(), 1)
-
-    def testUserJoinToTeachers2(self):
-        self.assertRaises(IsTeacherException, self.proposal.addUserToTeachers, self.firstUser)
+        self.assertEqual(self.proposal.teachers.count(), 1)
 
     def testUsersJoinToTeachers(self):
         self.proposal.addUserToTeachers(self.firstUser)
         self.proposal.addUserToTeachers(self.secondUser)
-        self.assertEqual(self.proposal.Teachers.count(), 2)
+        self.assertEqual(self.proposal.teachers.count(), 2)
 
     def testUserStopBeTeacher1(self):
         self.proposal.addUserToTeachers(self.firstUser)
         self.proposal.deleteUserFromTeachers(self.firstUser)
-        self.assertEqual(self.proposal.Teachers.count(), 0)
+        self.assertEqual(self.proposal.teachers.count(), 0)
 
     def testUserStopBeTeacher2(self):
         self.proposal.addUserToTeachers(self.firstUser)
         self.proposal.addUserToTeachers(self.secondUser)
         self.proposal.deleteUserFromTeachers(self.firstUser)
-        self.assertEqual(self.proposal.Teachers.count(), 1)
+        self.assertEqual(self.proposal.teachers.count(), 1)
 
-# sprawdzanie uprawnien:
-    def testUserIsntTeacher1(self):
-        self.firstUser.employee.delete()
-        self.assertRaises(NonEmployeeException, self.proposal.addUserToTeachers, self.firstUser)
+    def testUserIsntTeacher(self):
+        self.assertRaises(NonEmployeeException, self.proposal.addUserToTeachers, self.thirdUser)
+
     def testUserIsntTeacher2(self):
-        self.firstUser.employee.delete()
-        self.assertRaises(NonEmployeeException, self.proposal.deleteUserToTeachers, self.firstUser)
+        self.assertRaises(NonEmployeeException, self.proposal.deleteUserFromTeachers, self.thirdUser)

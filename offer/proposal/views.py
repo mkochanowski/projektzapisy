@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import re
-import fereol.offer.proposal.models 
 
 from django.contrib.auth.decorators import login_required
-from django.http                    import HttpResponseRedirect, HttpResponse
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
