@@ -224,8 +224,6 @@ def proposalForm(request, sid = None):
                 message = 'Zmiany zostały wprowadzone'
             else:
                 message = 'Przedmiot został dodany'
-                proposal = None
-                proposalDescription = ""
         
     if proposal and proposal.id:
         booksToForm = list(proposal.books.all())
@@ -250,7 +248,11 @@ def proposalForm(request, sid = None):
         'proposalTypes' : fereol.offer.proposal.models.proposal.PROPOSAL_TYPES,
         'proposalHours' : fereol.offer.proposal.models.proposal.PROPOSAL_HOURS,
     }
-    return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext(request));
+    
+    if success:
+        return redirect("proposal-page" , slug=proposal.slug)
+    else:
+        return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext(request));
 
 @login_required
 def proposalHistory( request, sid ):
