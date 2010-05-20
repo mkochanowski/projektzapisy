@@ -117,30 +117,30 @@ ul#od-prefs-undecided input:hover
 
 .od-prefs-list li:first-child .od-prefs-toggleHidden
 {
-	-moz-border-radius: 0 3px 0 0;
-	-webkit-border-radius: 0 3px 0 0;
-	border-radius: 0 3px 0 0;
+	-moz-border-radius-topright: 3px;
+	-webkit-border-radius-topright: 3px;
+	border-radius-topright: 3px;
 }
 
 .od-prefs-list li:last-child .od-prefs-toggleHidden
 {
-	-moz-border-radius: 0 0 3px 0;
-	-webkit-border-radius: 0 0 3px 0;
-	border-radius: 0 0 3px 0;
+	-moz-border-radius-bottomright: 3px;
+	-webkit-border-radius-bottomright: 3px;
+	border-radius-bottomright: 3px;
 }
 
 .od-prefs-list li:first-child .od-prefs-toggleCollapse
 {
-	-moz-border-radius: 3px 0 0 0;
-	-webkit-border-radius: 3px 0 0 0;
-	border-radius: 3px 0 0 0;
+	-moz-border-radius-topleft: 3px;
+	-webkit-border-radius-topleft: 3px;
+	border-radius-topleft: 3px;
 }
 
 .od-prefs-list li:last-child .od-prefs-toggleCollapse
 {
-	-moz-border-radius: 0 0 0 3px;
-	-webkit-border-radius: 0 0 0 3px;
-	border-radius: 0 0 0 3px;
+	-moz-border-radius-bottomleft: 3px;
+	-webkit-border-radius-bottomleft: 3px;
+	border-radius-bottomleft: 3px;
 }
 
 .od-prefs-list .od-prefs-toggleHidden:hover,

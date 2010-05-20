@@ -395,10 +395,12 @@ a.main-sidebar-toggle-button:hover
 .main-filter-input .reset
 {
 	border: 1px solid #999999;
-	border-left: 0;
 	height: 24px;
 	background-color: white;
 	font-weight: bold;
+
+	position: relative;
+	left: -5px;
 
 	-moz-border-radius: 0 4px 4px 0;
 	-webkit-border-radius: 0 4px 4px 0;

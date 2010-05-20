@@ -43,19 +43,21 @@
 	</div>
 {% endblock %}
 
-{% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
+{% block sidebar-class %}{% if unset_offer %}sidebar-right sidebar-visible{% endif %}{% endblock %}
 {% block sidebar %}
-	<div id="main-sidebar">
-		<h2>Przedmioty bez ustalonych preferencji</h2>
-		<ul id="od-prefs-undecided">
-			{% for prop in unset_offer %}
-				<li>
-					<input type="button" value="<" onclick="Prefs.initPref(this, '{% url prefs-init-pref prop.id %}')" />
-					{{ prop.name }}
-				</li>
-			{% endfor %}
-		</ul>
-	</div>
+	{% if unset_offer %}
+		<div id="main-sidebar">
+			<h2>Przedmioty bez ustalonych preferencji</h2>
+			<ul id="od-prefs-undecided">
+				{% for prop in unset_offer %}
+					<li>
+						<input type="button" value="<" onclick="Prefs.initPref(this, '{% url prefs-init-pref prop.id %}')" />
+						{{ prop.name }}
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -64,8 +66,13 @@
 		<a href="{% url prefs-tree-view %}">drzewa</a>
 	</p>
 
-	<h2>Przedmioty z ustalonymi preferencjami</h2>
+	{% if prefs %}
+		<h2>Przedmioty z ustalonymi preferencjami</h2>
 
-	{% block pref_list %}
-	{% endblock %}
+		{% block pref_list %}
+		{% endblock %}
+	{% else %}
+		<p>Jeszcze nie ustaliłeś preferencji dla żadnego przedmiotu. Możesz to
+			zrobić, dodając je z menu po prawej.</p>
+	{% endif %}
 {% endblock %}
