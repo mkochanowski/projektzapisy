@@ -1,0 +1,175 @@
+/**
+ * Style odpowiadające za panel głosowania
+ */
+
+/*** PANEL FILTROWANIA ***/
+
+#od-vote-top-bar fieldset
+{
+	height: 40px;
+}
+
+#od-vote-top-bar fieldset > span
+{
+	min-width: 150px;
+}
+
+#od-vote-filter .main-filter-input
+{
+	margin-top: 7px;
+}
+
+#od-vote-subjtype
+{
+	width: 350px;
+}
+
+#od-vote-other
+{
+	width: 300px;
+}
+
+/*** PANEL FILTROWANIA - koniec ***/
+
+
+/*** GŁOWNA STRONA GŁOSOWANIA ***/
+
+#od-vote-main-rules
+{
+    text-align: justify;
+    margin-bottom: 30px;
+}
+
+#od-vote-main .link, #od-vote-main .disabled-link
+{
+    text-align: center;
+}
+
+#od-vote-main .link
+{
+    font-size: 20px;
+    padding-top: 10px;
+}
+
+/*** GŁOWNA STRONA GŁOSOWANIA - koniec ***/
+
+
+/*** PODGLĄD GŁOSOWANIA ***/
+
+#od-vote-view .emptyList
+{
+    padding: 20px;
+    text-align: center;
+}
+
+#od-vote-view > ul
+{
+    margin: 20px;
+    list-style: none;
+    padding: 0;
+}
+
+#od-vote-view > ul > li > span
+{
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 15px;
+}
+
+#od-vote-view li ul
+{
+    list-style: none;
+    padding-left: 20px;
+}
+
+#od-vote-view li li
+{
+    height: 100%;
+    overflow: hidden;
+}
+
+#od-vote-view li li > span
+{
+    width: 250px;
+    float: left;
+}
+
+/*** PODGLĄD GŁOSOWANIA - koniec ***/
+
+
+#od-vote-submitBar
+{
+    clear: both;
+    text-align: center;
+}
+
+#od-vote-maxPoints
+{
+    position: absolute;
+    top: 3px;
+    left: 3px;
+}
+
+/*** LISTY PRZEDMIOTÓW W SEMESTRZE - FORMULARZ ***/
+
+.od-vote-semester
+{
+    width: 420px;
+    float: left;
+    margin: 5px;
+    margin-bottom: 35px;
+}
+
+#od-vote-form .od-vote-semester:nth-child(3)
+{
+    float: none;
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.od-vote-semester > h2
+{
+    font-size: 16px;
+    padding-bottom: 5px;
+}
+
+.od-vote-semester > ul
+{
+    list-style: none;
+    padding: 0;
+    border: 1px solid #cccccc;
+    background: #f8f8f8;
+
+    -moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.od-vote-semester > ul > li
+{
+    border-bottom: 1px solid #cccccc;
+    padding: 2px 5px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.od-vote-semester > ul > li:last-child
+{
+    border: 0;
+}
+
+.od-vote-semester > ul > li > select
+{
+    height: 21px;
+    float: right;
+}
+
+.od-vote-semester > ul > li > label
+{
+    position: relative;
+    top: 2px;
+}
+
+/*** LISTY PRZEDMIOTÓW W SEMESTRZE - FORMULARZ - koniec ***/

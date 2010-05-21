@@ -73,25 +73,25 @@ class VoteForm( forms.Form ):
                name.startswith('unknown_'):
                 yield (self.fields[name].label, value)
     
-    def as_table( self ):
-        #str = super(forms.Form, self).as_table()
-        #print str
-        #return str
-        winter   = u'<tr><th>Semestr Zimowy</th><th></th></tr>'
-        summer   = u'<tr><th>Semestr Letni</th><th></th></tr>'
-        unknown  = u'<tr><th>Semestr Nieokreślony</th><th></th></tr>'
+    def as_lists( self ):
+        winter   = u'<div class="od-vote-semester" id="od-vote-semester-winter"><h2>Semestr Zimowy</h2><ul>'
+        summer   = u'<div class="od-vote-semester" id="od-vote-semester-summer"><h2>Semestr Letni</h2><ul>'
+        unknown  = u'<div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr Nieokreślony</h2><ul>'
+
+        winterEmpty = True
+        summerEmpty = True
+        unknownEmpty = True
         
-        maksimum  = u'<tr><th>Maksymalna liczba punktów:</th><td>'
+        maksimum  = u'<p id="od-vote-maxPoints">Maksymalna liczba punktów:'
         maksimum += str(SystemState.get_maxVote())
-        maksimum += u'</td></th>'
-        
+        maksimum += u'</p>'
         
         for key in self.fields.iterkeys():
             field = self.fields[key]
             field_str = \
-                u'<tr>\
-                    <td><label for="id_' + key + '">' + field.label + '</td>\
-                    <td><select name="' + key + '" id="id_' + key + '">'
+                u'<li>\
+                    <label for="id_' + key + '">' + field.label + '</label>\
+                    <select name="' + key + '" id="id_' + key + '">'
             for (i, s) in field.choices:
                 field_str += '<option value="'
                 field_str += str(i)
@@ -101,18 +101,24 @@ class VoteForm( forms.Form ):
                 field_str += '>'
                 field_str += str(s)
                 field_str += '</option>'
-            field_str += '</select></td></tr>'
+            field_str += ' </select></li>'
                     
             if   key.startswith('winter_'):
+                winterEmpty = False
                 winter += field_str
             elif key.startswith('summer_'):
+                summerEmpty = False
                 summer += field_str
             elif key.startswith('unknown_'):
+                unknownEmpty = False
                 unknown += field_str
-                
-        wyn  =  SafeUnicode(winter) + \
-                SafeUnicode(summer) + \
-                SafeUnicode(unknown) + \
-                SafeUnicode(maksimum)
-        print wyn
-        return wyn
+
+        list = SafeUnicode(u'')
+        if (not winterEmpty):
+            list += SafeUnicode(winter) + SafeUnicode(u'</ul></div>')
+        if (not summerEmpty):
+            list += SafeUnicode(summer) + SafeUnicode(u'</ul></div>')
+        if (not unknownEmpty):
+            list += SafeUnicode(unknown) + SafeUnicode(u'</ul></div>')
+
+        return  list + SafeUnicode(maksimum)

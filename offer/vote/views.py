@@ -52,13 +52,18 @@ def vote( request ):
             winter_subs.append(sub)
         else:
             unknown_subs.append(sub)
-    
+
+    data = {
+		'proposalTypes': proposal.PROPOSAL_TYPES
+	}
+
     if request.method == "POST":
         form = VoteForm( request.POST, 
                          winter  = winter_subs, 
                          summer  = summer_subs,
                          unknown = unknown_subs,
                          voter   = request.user.student )
+        data['form'] = form
         
         if form.is_valid():
             sum = 0
@@ -79,19 +84,18 @@ def vote( request ):
                         singleVote.value   = int(points)
                         singleVote.save()
             
-                data = { 'isVoteActive' : SystemState.is_vote_active(),
-                         'message'      : u'Głos został pomyślnie zapisany' }
-                return render_to_response('offer/vote/voteMain.html', data, context_instance = RequestContext( request ))
+                data['isVoteActive'] = SystemState.is_vote_active()
+                data['message'] = u'Głos został pomyślnie zapisany.'
+                return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
             else:
-                data = { 'message'      : u'Przekroczono limit głosowania.\
-                                          Limit wynosi ' + str(SystemState.get_maxVote()) +\
-                                          u'. Oddano głos o watości: ' + str(sum) + '.',
-                         'form'         : form }
+                data['message'] = u'Przekroczono limit głosowania.\
+                                  Limit wynosi ' + str(SystemState.get_maxVote()) +\
+                                  u'. Oddano głos o watości: ' + str(sum) + '.'
                 return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
     else:
-        form = VoteForm( winter  = winter_subs, 
+        data['form'] = VoteForm( winter  = winter_subs,
                          summer  = summer_subs,
                          unknown = unknown_subs,
                          voter   = request.user.student )
             
-    return render_to_response('offer/vote/voteForm.html', {'form' : form}, context_instance = RequestContext( request ))
+    return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
