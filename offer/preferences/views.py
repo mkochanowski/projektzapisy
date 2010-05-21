@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 
+import fereol.offer.proposal.models 
+
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import Context, RequestContext, Template
 from django.utils import simplejson
@@ -29,7 +31,10 @@ def view(request, template):
     if types:
         types = types.split(',')
     prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query)
-    data = {'prefs': prefs }
+    data = {
+		'prefs': prefs,
+		'proposalTypes': fereol.offer.proposal.models.proposal.PROPOSAL_TYPES
+	}
     if format == 'json':
         def process_pref(pref):
             obj = {}

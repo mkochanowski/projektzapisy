@@ -29,10 +29,9 @@
 		</fieldset>
 		<fieldset id="od-prefs-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-required"/><label for="od-prefs-required">Obowiązkowe</label></span>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-course"/><label for="od-prefs-course">Kursy</label></span>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-cs_1"/><label for="od-prefs-cs_1">Informatyczne</label></span>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-cs_2"/><label for="od-prefs-cs_2">Informatyczne 2</label></span>
+			{% for type in proposalTypes %}
+				<span class="checkbox"><input type="checkbox" id="od-prefs-type-{{ type.0 }}"/><label for="od-prefs-type-{{ type.0 }}">{{ type.1 }}</label></span>
+			{% endfor %}
 		</fieldset>
 		<fieldset id="od-prefs-other">
 			<legend><span>Inne</span></legend>
