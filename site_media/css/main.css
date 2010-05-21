@@ -426,3 +426,23 @@ a.main-sidebar-toggle-button:hover
 }
 
 /*** STOPKA - koniec ***/
+
+
+/*** KOMUNIKAT ***/
+
+.main-message
+{
+    border: 1px solid #cccccc;
+    background: #FFF5B3;
+    font-size: 16px;
+
+    margin: 10px;
+    margin-bottom: 35px;
+    padding: 20px 40px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+/*** KOMUNIKAT - koniec ***/

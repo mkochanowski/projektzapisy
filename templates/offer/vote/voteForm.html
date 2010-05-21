@@ -1,23 +1,50 @@
 {% extends "offer/base-offer.html" %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
+	<li><a href="/">Strona główna</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
-	<li><a href="{% url vote %}"> Głosuj</a></li>
+	<li><a href="{% url vote %}">Głosuj</a></li>
+{% endblock %}
+
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript" src="/site_media/js/jquery.cookies.2.2.0.min.js"></script>
+
+	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
+{% endblock %}
+
+{% block top-bar %}
+	<div id="od-vote-top-bar" class="main-top-bar">
+		<fieldset id="od-vote-filter">
+			<legend><span>Filtrowanie</span></legend>
+			<div class="main-filter-input">
+				<input class="text" id="od-prefs-q" type="text" name="q" />
+				<input class="reset" id="od-prefs-reset" type="reset" value="X" style="display:none;" />
+			</div>
+		</fieldset>
+		<fieldset id="od-vote-subjtype">
+			<legend><span>Rodzaj przedmiotu</span></legend>
+			{% for type in proposalTypes %}
+				<span class="checkbox"><input type="checkbox" id="od-prefs-type-{{ type.0 }}"/><label for="od-prefs-type-{{ type.0 }}">{{ type.1 }}</label></span>
+			{% endfor %}
+		</fieldset>
+		<fieldset id="od-vote-other">
+			<legend><span>Inne</span></legend>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/><label for="od-prefs-hidden">Pokaż tylko przedmioty, na które chcę iść</label></span>
+		</fieldset>
+	</div>
 {% endblock %}
 
 {% block content %}
-{% if message %}
-<div style="text-align:center">
-    <b><font color=red>{{ message }}</font></b>
-    <br><br>
-</div>
-{% endif %}
+	{% if message %}
+		<div class="main-message">{{ message }}</div>
+	{% endif %}
 
-<form action="" method="POST">
-<table>
-{{ form.as_table }}
-</table>
-<input type="submit" value="Głosuj" />
-</form>
+	<form action="" method="post" id="od-vote-form">
+		{{ form.as_lists }}
+        <p id="od-vote-submitBar"><input type="submit" value="Głosuj" /></p>
+	</form>
 {% endblock %}

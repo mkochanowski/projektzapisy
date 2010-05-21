@@ -1,73 +1,54 @@
 {% extends "offer/base-offer.html" %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
+	<li><a href="/">Strona główna</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
-	<li><a href="{% url vote-view %}"> Pokaż Głos </a></li>
+	<li><a href="{% url vote-view %}">Pokaż głos</a></li>
 {% endblock %}
 
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
+{% endblock %}
+
+{% block content-class %}narrow{% endblock %}
 {% block content %}
-<table>
-    <tr>
-        <th>Semestr Zimowy</th>
-        <th></th>
-    </tr>
-    {% if winter_votes %}
-        {% for vote in winter_votes %}
-        <tr>
-            <td>{{ vote.subject.name }}</td>
-            <td>{{ vote.value }}</td>
-        </tr>
-        {% endfor %}
-    {% else %}
-    <tr>
-        <td>Brak głosów</td>
-    </tr>
-    {% endif %}
-    <tr>
-        <th><br><br></th>
-    </tr>
-    <tr>
-        <th>Semestr Letni</th>
-        <th></th>
-    </tr>
-    {% if summer_votes %}
-        {% for vote in summer_votes %}
-        <tr>
-            <td>{{ vote.subject.name }}</td>
-            <td>{{ vote.value }}</td>
-        </tr>
-        {% endfor %}
-    {% else %}
-    <tr>
-        <td>Brak głosów</td>
-    </tr>
-    {% endif %}
-    <tr>
-        <th><br><br></th>
-    </tr>
-    <tr>
-        <th>Semestr Nieokreślony</th>
-        <th></th>
-    </tr>
-    {% if unknown_votes %}
-        {% for vote in unknown_votes %}
-        <tr>
-            <td>{{ vote.subject.name }}</td>
-            <td>{{ vote.value }}</td>
-        </tr>
-        {% endfor %}
-    {% else %}
-    <tr>
-        <td>Brak głosów</td>
-    </tr>
-    {% endif %}
-    <tr>
-        <th><br><br></th>
-    </tr>
-    <tr>
-        <th>Suma: </th>
-        <td>{{ vote_sum }}</td>
-    </tr>
-</table>
+    <div id="od-vote-view">
+        <h2>Podsumowanie głosowania</h2>
+        {% if winter_votes or summer_votes or unknown_votes %}
+            <ul>
+                {% if winter_votes %}
+                    <li><span>Semestr zimowy</span>
+                        <ul>
+                            {% for vote in winter_votes %}
+                                <li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+
+                {% if summer_votes %}
+                    <li><span>Semestr letni</span>
+                        <ul>
+                            {% for vote in summer_votes %}
+                                <li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+
+                {% if unknown_votes %}
+                    <li><span>Semestr nieokreślony</span>
+                        <ul>
+                            {% for vote in unknown_votes %}
+                                <li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        {% else %}
+            <p class="emptyList">Nie zagłosowałeś jeszcze na żaden przedmiot.</p>
+        {% endif %}
+        <p class="sum">Suma: {{ vote_sum }}</p>
+    </div>
 {% endblock %}
