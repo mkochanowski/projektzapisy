@@ -57,7 +57,8 @@ def vote( request ):
         form = VoteForm( request.POST, 
                          winter  = winter_subs, 
                          summer  = summer_subs,
-                         unknown = unknown_subs )
+                         unknown = unknown_subs,
+                         voter   = request.user.student )
         
         if form.is_valid():
             sum = 0
@@ -90,6 +91,7 @@ def vote( request ):
     else:
         form = VoteForm( winter  = winter_subs, 
                          summer  = summer_subs,
-                         unknown = unknown_subs )
+                         unknown = unknown_subs,
+                         voter   = request.user.student )
             
     return render_to_response('offer/vote/voteForm.html', {'form' : form}, context_instance = RequestContext( request ))
