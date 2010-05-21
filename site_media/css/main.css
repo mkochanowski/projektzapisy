@@ -120,10 +120,6 @@
 #main-content-container
 {
 	position: relative;
-	
-	-moz-border-radius: 0 0 3px 3px;
-	-webkit-border-radius: 0 0 3px 3px;
-	border-radius: 0 0 3px 3px;
 }
 
 /*** ZAWARTOŚĆ ***/
@@ -132,10 +128,6 @@
 {
 	position:relative;
 	background: white;
-
-	-moz-border-radius: 0 0 0 3px;
-	-webkit-border-radius: 0 0 0 3px;
-	border-radius: 0 0 0 3px;
 }
 
 
@@ -181,10 +173,6 @@
 {
 	position: relative;
 	width: 250px;
-
-	-moz-border-radius: 0 0 3px 0;
-	-webkit-border-radius: 0 0 3px 0;
-	border-radius: 0 0 3px 0;
 }
 
 #main-content-container.sidebar-visible.sidebar-right,
@@ -414,3 +402,26 @@ a.main-sidebar-toggle-button:hover
 }
 
 /*** PANEL FILTROWANIA - KOMPONENTY - koniec ***/
+
+/*** STOPKA ***/
+
+#main-footer
+{
+	clear: both;
+	color: #999999;
+	background: #f8f8f8;
+	border-top: 1px solid #cccccc;
+	padding: 5px 10px;
+	font-size: 12px;
+
+	-moz-border-radius: 0 0 3px 3px;
+	-webkit-border-radius: 0 0 3px 3px;
+	border-radius: 0 0 3px 3px;
+}
+
+#main-footer a
+{
+	color: #999999;
+}
+
+/*** STOPKA - koniec ***/
