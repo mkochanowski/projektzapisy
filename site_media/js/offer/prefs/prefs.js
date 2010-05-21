@@ -40,15 +40,15 @@ Prefs.toggleHidden = function(elem, hide, url)
 
 Prefs.toggleCollapse = function(elem)
 {
-	var coll = $(elem.parentNode).children('ul')[0];
-	if ($(coll).hasClass('visible'))
+	var coll = $(elem.parentNode);
+	if (coll.hasClass('subtree-visible'))
 	{
 		elem.value = '+';
-		$(coll).removeClass('visible');
+		coll.removeClass('subtree-visible');
 	}
 	else
 	{
 		elem.value = '-';
-		$(coll).addClass('visible');
+		coll.addClass('subtree-visible');
 	}
 };

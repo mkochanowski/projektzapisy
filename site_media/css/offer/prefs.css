@@ -98,6 +98,7 @@ ul#od-prefs-undecided input:hover
 	height: 25px;
 	border: 0;
 	background: #f8f8f8;
+	padding: 1px;
 
 	cursor: pointer;
 }
@@ -118,29 +119,43 @@ ul#od-prefs-undecided input:hover
 .od-prefs-list li:first-child .od-prefs-toggleHidden
 {
 	-moz-border-radius-topright: 3px;
-	-webkit-border-radius-topright: 3px;
-	border-radius-topright: 3px;
+	-webkit-border-top-right-radius: 3px;
+	border-top-right-radius: 3px;
 }
 
 .od-prefs-list li:last-child .od-prefs-toggleHidden
 {
 	-moz-border-radius-bottomright: 3px;
-	-webkit-border-radius-bottomright: 3px;
-	border-radius-bottomright: 3px;
+	-webkit-border-bottom-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.od-prefs-list li.subtree-visible .od-prefs-toggleHidden
+{
+	-moz-border-radius-bottomright: 0;
+	-webkit-border-bottom-right-radius: 0;
+	border-bottom-right-radius: 0;
 }
 
 .od-prefs-list li:first-child .od-prefs-toggleCollapse
 {
 	-moz-border-radius-topleft: 3px;
-	-webkit-border-radius-topleft: 3px;
-	border-radius-topleft: 3px;
+	-webkit-border-top-left-radius: 3px;
+	border-top-left-radius: 3px;
 }
 
 .od-prefs-list li:last-child .od-prefs-toggleCollapse
 {
 	-moz-border-radius-bottomleft: 3px;
-	-webkit-border-radius-bottomleft: 3px;
-	border-radius-bottomleft: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+}
+
+.od-prefs-list li.subtree-visible .od-prefs-toggleCollapse
+{
+	-moz-border-radius-bottomleft: 0;
+	-webkit-border-bottom-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 .od-prefs-list .od-prefs-toggleHidden:hover,
@@ -158,7 +173,7 @@ ul#od-prefs-undecided input:hover
 	background: white;
 }
 
-#od-prefs-list-tree ul.visible
+#od-prefs-list-tree li.subtree-visible ul
 {
 	display: block;
 }

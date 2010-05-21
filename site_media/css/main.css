@@ -343,7 +343,8 @@ a.main-sidebar-toggle-button:hover
 
 .main-top-bar fieldset legend span
 {
-	position: relative;
+	position: absolute;
+	white-space: nowrap;
 	font-size: 10px;
 	top: -15px;
 	left: -5px;
