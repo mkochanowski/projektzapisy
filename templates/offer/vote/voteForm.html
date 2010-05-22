@@ -14,26 +14,29 @@
 	<script type="text/javascript" src="/site_media/js/jquery.cookies.2.2.0.min.js"></script>
 
 	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
+    <script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
+    <script type="text/javascript" src="/site_media/js/offer/vote/vote.js"></script>
 {% endblock %}
 
 {% block top-bar %}
-	<div id="od-vote-top-bar" class="main-top-bar">
+    <div id="od-vote-top-bar" class="main-top-bar" style="display: none">
 		<fieldset id="od-vote-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text" id="od-prefs-q" type="text" name="q" />
-				<input class="reset" id="od-prefs-reset" type="reset" value="X" style="display:none;" />
+				<input class="text" id="od-vote-q" type="text" />
+				<input class="reset" id="od-vote-reset" type="button" value="X" style="display:none;" />
 			</div>
 		</fieldset>
 		<fieldset id="od-vote-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in proposalTypes %}
-				<span class="checkbox"><input type="checkbox" id="od-prefs-type-{{ type.0 }}"/><label for="od-prefs-type-{{ type.0 }}">{{ type.1 }}</label></span>
+                <span class="checkbox"><input type="checkbox" id="od-vote-type-{{ type.0 }}" checked="checked" /><label for="od-vote-type-{{ type.0 }}">{{ type.1 }}</label></span>
 			{% endfor %}
 		</fieldset>
 		<fieldset id="od-vote-other">
 			<legend><span>Inne</span></legend>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/><label for="od-prefs-hidden">Pokaż tylko przedmioty, na które chcę iść</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-vote-onlywanted" /><label for="od-vote-onlywanted">Pokaż tylko przedmioty, na które chcę iść</label></span>
+            <span class="checkbox"><input type="checkbox" id="od-vote-withoutcompleted" disabled="disabled" /><label for="od-vote-withoutcompleted">Nie pokazuj przedmiotów, na które już chodziłem</label></span>
 		</fieldset>
 	</div>
 {% endblock %}

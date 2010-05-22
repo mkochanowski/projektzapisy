@@ -84,13 +84,13 @@ def vote( request ):
                         singleVote.value   = int(points)
                         singleVote.save()
             
-                data['isVoteActive'] = SystemState.is_vote_active()
-                data['message'] = u'Głos został pomyślnie zapisany.'
-                return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
+#                data['message'] = u'Głos został pomyślnie zapisany.'
+#                return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
+                return voteView( request )
             else:
                 data['message'] = u'Przekroczono limit głosowania.\
                                   Limit wynosi ' + str(SystemState.get_maxVote()) +\
-                                  u'. Oddano głos o watości: ' + str(sum) + '.'
+                                  u', a oddano głos o watości: ' + str(sum) + '.'
                 return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
     else:
         data['form'] = VoteForm( winter  = winter_subs,

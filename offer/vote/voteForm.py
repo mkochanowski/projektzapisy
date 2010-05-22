@@ -10,6 +10,7 @@ from fereol.offer.vote.models import SingleVote
 
 class VoteForm( forms.Form ):
     choices = [(str(i), i) for i in range(SystemState.get_maxPoints()+1)]
+    subject_types = {}
     
     def __init__ (self, *args, **kwargs):
         winter  = kwargs.pop('winter')
@@ -35,6 +36,7 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Zimowy',
                                             initial   = choosed)
+            self.subject_types['winter_%s' % sub.pk] = sub.type
                                             
         for sub in summer:
             try:
@@ -50,6 +52,7 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Letni',
                                             initial   = choosed)
+            self.subject_types['summer_%s' % sub.pk] = sub.type
         
         for sub in unknown:
             try:
@@ -65,6 +68,7 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Nieokreślony',
                                             initial   = choosed)
+            self.subject_types['unknown_%s' % sub.pk] = sub.type
     
     def vote_points( self ):
         for name, value in self.cleaned_data.items():
@@ -74,22 +78,23 @@ class VoteForm( forms.Form ):
                 yield (self.fields[name].label, value)
     
     def as_lists( self ):
-        winter   = u'<div class="od-vote-semester" id="od-vote-semester-winter"><h2>Semestr Zimowy</h2><ul>'
-        summer   = u'<div class="od-vote-semester" id="od-vote-semester-summer"><h2>Semestr Letni</h2><ul>'
-        unknown  = u'<div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr Nieokreślony</h2><ul>'
+        winter   = u'<div class="od-vote-semester" id="od-vote-semester-winter"><h2>Semestr zimowy</h2><ul>'
+        summer   = u'<div class="od-vote-semester" id="od-vote-semester-summer"><h2>Semestr letni</h2><ul>'
+        unknown  = u'<div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr nieokreślony</h2><ul>'
 
         winterEmpty = True
         summerEmpty = True
         unknownEmpty = True
         
-        maksimum  = u'<p id="od-vote-maxPoints">Maksymalna liczba punktów:'
+        maksimum  = u'<p id="od-vote-maxPoints">Maksymalna liczba punktów do wykorzystania: <span>'
         maksimum += str(SystemState.get_maxVote())
-        maksimum += u'</p>'
+        maksimum += u' </span></p>'
         
         for key in self.fields.iterkeys():
             field = self.fields[key]
+            subject_type = self.subject_types[key];
             field_str = \
-                u'<li>\
+                u'<li class="od-vote-subject ' + subject_type + '">\
                     <label for="id_' + key + '">' + field.label + '</label>\
                     <select name="' + key + '" id="id_' + key + '">'
             for (i, s) in field.choices:

@@ -295,7 +295,7 @@ a.main-sidebar-toggle-button:hover
 
 /*** KOMUNIKATY ***/
 
-.message {
+.message { /* TODO: zastąpić main-message */
     text-align: center;
     font-weight: bold;
     color: red;
