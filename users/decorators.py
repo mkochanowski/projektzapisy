@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
+from django.utils.http import urlquote
 from functools import update_wrapper
 
 from users.models import Employee, Student
@@ -10,7 +12,7 @@ def student_required(function=None,
                      redirect_to=None):
     """
     Decorator that checks that the user has a student profile,
-    redirecting or returning http 403 forbidden as needed.
+    redirecting to the given or the default login page as needed.
     """
     def test_f(user):
         try:
@@ -28,7 +30,7 @@ def employee_required(function=None,
                       redirect_to=None):
     """
     Decorator that checks that the user has a student profile,
-    redirecting or returning http 403 forbidden as needed.
+    redirecting to the given or the default login page as needed.
     """
     def test_f(user):
         try:
@@ -45,7 +47,7 @@ def employee_required(function=None,
 class _CheckProfileOr403(object):
     """
     Class that checks that the user passes the given test,
-    redirecting to the given view or returning 403 if necessary.
+    redirecting to the given view, login page by default.
 
     Check django.contrib.auth.decorators._CheckLogin for more info.
     """
@@ -66,6 +68,11 @@ class _CheckProfileOr403(object):
     def __call__(self, request, *args, **kwargs):
         if self.test_func(request.user):
             return self.view_func(request, *args, **kwargs)
-        if self.redirect_to:
-            return redirect(self.redirect_to)
-        return HttpResponseForbidden("You do not have a required profile") # TODO - error page
+        if not self.redirect_to:
+            from django.conf import settings
+            login_url = settings.LOGIN_URL
+            path = urlquote(request.get_full_path())
+            tup = login_url, REDIRECT_FIELD_NAME, path
+            self.redirect_to = '%s?%s=%s' % tup
+        return redirect(self.redirect_to)
+
