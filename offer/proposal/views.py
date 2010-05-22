@@ -313,11 +313,10 @@ def offerSelect(request):
     id = request.POST['id']
     
     proposal = Proposal.objects.get(pk = id)
-    tag = ProposalTag.objects.get(name = "offer")
     
     if action == 'select':
-        proposal.tags.add(tag)
+        proposal.add_tag("offer")
     else: # unselect
-        proposal.tags.remove(tag)
+        proposal.remove_tag("offer")
         
     return HttpResponse('ok')
