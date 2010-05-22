@@ -3,7 +3,6 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from django.core.management import call_command
 
 class Migration(SchemaMigration):
     
@@ -62,7 +61,6 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
         ))
         db.send_create_signal('proposal', ['ProposalTag'])
-        call_command('loaddata', 'offer/proposal/fixtures/tags.json')
 
         # Adding model 'ProposalDescriptionTag'
         db.create_table('proposal_proposaldescriptiontag', (
