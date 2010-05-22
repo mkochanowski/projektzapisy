@@ -4,7 +4,7 @@ import datetime
 import re
 import fereol.offer.proposal.models 
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http                    import HttpResponseRedirect, HttpResponse
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
@@ -13,7 +13,6 @@ from django.shortcuts               import redirect
 from offer.proposal.exceptions                 import *
 from fereol.enrollment.records.models          import *
 from fereol.offer.proposal.models              import *
-
 
 @login_required
 def becomeFan(request, slug):
@@ -282,7 +281,7 @@ def proposalRestore ( request, descid ):
     
     return proposal( request, olddesc.proposal.slug )
 
-@login_required
+@permission_required('proposal.can_create_offer')
 def offerCreate( request ):
     """
         Widok listy przedmiotów, które można wybrać w ramach oferty dydaktycznej
@@ -293,7 +292,7 @@ def offerCreate( request ):
     
     return render_to_response('offer/proposal/offerCreate.html', data, context_instance = RequestContext( request ))
     
-@login_required
+@permission_required('proposal.can_create_offer')
 def offerCreateTeachers( request, subjectId ):
     """
         Widok pobiera listę nauczycieli gotowych poprowadzić dany przedmiot.
@@ -304,7 +303,7 @@ def offerCreateTeachers( request, subjectId ):
     }
     return render_to_response('offer/proposal/offerCreateTeachers.html', context_instance = RequestContext( request ))
 
-@login_required
+@permission_required('proposal.can_create_offer')
 def offerSelect(request):
     """
         Wybiera lub odznacza przedmiot w ofercie dydaktycznej

@@ -51,6 +51,9 @@ class Proposal( models.Model ):
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
         app_label = 'proposal'
+        permissions = (
+            ("can_create_offer", u"Może tworzyć ofertę dydaktyczną"),
+        )
     
     def description(self):
         """
