@@ -1,14 +1,13 @@
-﻿# -*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 from django.test import TestCase
 from django.contrib.auth.models import User
 from users.models import Employee, Student
-from offer.proposal.models import Proposal
+from offer.proposal.models import Proposal, ProposalDescription
 from offer.proposal.exceptions import *
 
-
 class ProposalFansTest(TestCase):
-    fixtures = ['fixtures__proposal_users.json', 'fixtures__proposal.json']
+    fixtures = ['proposal_testing_users.json', 'proposal_testing.json']
     
     def setUp(self):
         self.firstUser  = User.objects.get(pk=5)
@@ -43,7 +42,7 @@ class ProposalFansTest(TestCase):
         self.assertRaises(NonStudentException, self.proposall.deleteUserFromFans, self.thirdUser)
         
 class ProposalTeachersTest(TestCase):
-    fixtures = ['fixtures__users.json', 'fixtures__proposal.json']
+    fixtures = ['proposal_testing_users.json', 'proposal_testing.json']
     
     def setUp(self):
         self.firstUser  = User.objects.get(pk=4)
@@ -76,3 +75,40 @@ class ProposalTeachersTest(TestCase):
 
     def testUserIsntTeacher2(self):
         self.assertRaises(NonEmployeeException, self.proposal.deleteUserFromTeachers, self.thirdUser)
+
+class ProposalTaggingTest(TestCase):
+    fixtures = ['proposal_testing_users.json', 'proposal_testing.json']
+
+    def setUp(self):
+        self.proposal    = Proposal.objects.get(pk=1)
+        self.description = ProposalDescription.objects.get(pk=1)
+
+    def testTagProposalWithExistingTag(self):
+        self.proposal.add_tag("sampletag")
+        self.assertTrue(self.proposal
+                        in Proposal.get_by_tag("sampletag"))
+    
+    def testTagProposalWithNonexistentTag(self):
+        self.proposal.add_tag("othertag")
+        self.assertTrue(self.proposal
+                        in Proposal.get_by_tag("othertag"))       
+    
+    def testTagProposalDescriptionWithExistingTag(self):
+        self.description.add_tag("sampletag")
+        self.assertTrue(self.description
+                        in ProposalDescription.get_by_tag("sampletag"))
+    
+    def testTagProposalDescriptionWithNonexistentTag(self):
+        self.description.add_tag("othertag")
+        self.assertTrue(self.description
+                        in ProposalDescription.get_by_tag("othertag"))
+    
+    def testUntagProposal(self):
+        self.proposal.remove_tag("default")
+        self.assertFalse(self.proposal
+                         in Proposal.get_by_tag("default"))
+    
+    def testUntagProposalDescription(self):
+        self.description.remove_tag("default")
+        self.assertFalse(self.description
+                         in ProposalDescription.get_by_tag("default"))

@@ -154,9 +154,26 @@ class Proposal( models.Model ):
         return False
     
     @staticmethod
-    def get_by_tag(tag):
+    def get_by_tag(tag_name):
         "Return proposals by tag."
-        return Proposal.objects.filter(tags__name=tag)
+        return Proposal.objects.filter(tags__name=tag_name)
+    
+    def add_tag(self, tag_name):
+        """Apply tag to the proposal"""
+        try:
+            tag = ProposalTag.objects.get(name=tag_name) 
+        except ProposalTag.DoesNotExist:
+            tag = ProposalTag.objects.create(name=tag_name)
+        finally:
+            self.tags.add(tag)
+    
+    def remove_tag(self, tag_name):
+        """Remove tag from the proposal."""
+        try:
+            tag = ProposalTag.objects.get(name=tag_name)
+            self.tags.remove(tag)
+        except ProposalTag.DoesNotExist:
+            pass
 
     def inOffer(self):
         for t in self.tags.all():

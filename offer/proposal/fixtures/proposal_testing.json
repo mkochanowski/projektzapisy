@@ -5,6 +5,34 @@
     "fields": {
       "name": "offer"
     }
+  },
+  { 
+    "pk": 2, 
+    "model": "proposal.proposaltag", 
+    "fields": {
+      "name": "sampletag"
+    }
+  }, 
+  { 
+    "pk": 3, 
+    "model": "proposal.proposaltag", 
+    "fields": {
+      "name": "default"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "proposal.proposaldescriptiontag", 
+    "fields": {
+      "name": "sampletag"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "proposal.proposaldescriptiontag", 
+    "fields": {
+      "name": "default"
+    }
   }, 
   {
     "pk": 1, 
@@ -14,7 +42,8 @@
       "name": "Kurs 1", 
       "ects": 6, 
       "tags": [
-        1
+        1, 2,
+        3
       ], 
       "repetitories": 15, 
       "fans": [], 
@@ -69,7 +98,7 @@
     "fields": {
       "requirements": "Wymagania", 
       "description": "Opis", 
-      "tags": [], 
+      "tags": [2], 
       "comments": "Uwagi", 
       "date": "2010-05-15 18:37:00", 
       "proposal": 1

@@ -44,3 +44,21 @@ class ProposalDescription(models.Model):
     def get_by_tag(tag):
         "Return proposal descriptions by tag."
         return ProposalDescription.objects.filter(tags__name=tag)
+    
+    def add_tag(self, tag_name):
+        """Apply tag to the proposal description."""
+        try:
+            tag = ProposalDescriptionTag.objects.get(name=tag_name) 
+        except ProposalDescriptionTag.DoesNotExist:
+            tag = ProposalDescriptionTag.objects.create(name=tag_name)
+        finally:
+            self.tags.add(tag)
+    
+    def remove_tag(self, tag_name):
+        """Remove tag from the proposal description."""
+        try:
+            tag = ProposalDescriptionTag.objects.get(name=tag_name)
+            self.tags.remove(tag)
+        except ProposalDescriptionTag.DoesNotExist:
+            pass
+                        

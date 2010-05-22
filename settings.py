@@ -99,6 +99,9 @@ INSTALLED_APPS = (
     'fereol.offer.vote',
     'fereol.users',
 )
+FIXTURE_DIRS = (
+    './offer/proposal/fixtures',
+)
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/profile/'
