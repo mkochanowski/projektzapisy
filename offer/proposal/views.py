@@ -166,7 +166,7 @@ def proposalForm(request, sid = None):
             correctForm = False                                                 
             
         if  proposalName == "" or proposalEcts == "" or proposalDescription == "" or proposalRequirements == "" or proposalType == "" or proposalLectures == -1 or proposalRepetitories == -1 or proposalExercises == -1 or proposalLaboratories == -1:
-            message = 'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę punktów ECTS oraz liczbę godzin zajęć'
+            message = 'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę punktów ECTS oraz liczbę godzin zajęć.'
             correctForm = False
                                 
         if correctForm:
@@ -221,9 +221,9 @@ def proposalForm(request, sid = None):
             success = True                                     
                                                
             if editMode:
-                message = 'Zmiany zostały wprowadzone'
+                message = 'Zmiany zostały wprowadzone.'
             else:
-                message = 'Przedmiot został dodany'
+                message = 'Przedmiot został dodany.'
         
     if proposal and proposal.id:
         booksToForm = list(proposal.books.all())

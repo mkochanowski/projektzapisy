@@ -1,7 +1,8 @@
 function load_data(url) {
+    MessageBox.clear();
     $.getJSON(url, function(data) {
 	if (typeof(data.message) != "undefined") {
-	    $('.messages').html('<div class="message">' + data.message + '</div>')
+        MessageBox.display(data.message);
 	} else {
 	    $('#news-nav-groups').html(data.newer_group + data.older_group);
 	    $('#news-content').html(data.content);

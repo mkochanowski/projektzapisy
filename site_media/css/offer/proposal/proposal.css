@@ -156,7 +156,8 @@
 }
 
 .proposalField {
-    clear: both;
+    height: 100%;
+    overflow: hidden;
     padding-top: 5px;
 }
 
