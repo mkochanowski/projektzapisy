@@ -33,7 +33,12 @@
 				</td>
 				<td>{{ subject.name }}</td>
 				<td class="cen">{{ subject.fansCount }}</td>
-				<td class="cen"><a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachersCount }}</a></td>
+				<td class="cen">
+				    {% ifequal subject.teachersCount 0 %}0
+                    {% else %}
+                        <a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachersCount }}</a>
+                    {% endifequal %}
+                </td>
 			</tr>
 			{% endfor %}
 		</table>
