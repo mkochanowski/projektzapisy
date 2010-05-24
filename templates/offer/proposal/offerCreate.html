@@ -32,8 +32,13 @@
 					<input type="checkbox" name="selectSubject" value="{{ subject.id }}" autocomplete="off" {% if subject.inOffer %}checked{% endif %} />
 				</td>
 				<td>{{ subject.name }}</td>
-				<td class="cen">X</td>
-				<td class="cen"><a href="#" subject="{{ subject.id }}" class="teachersDetails">X</a></td>
+				<td class="cen">{{ subject.fansCount }}</td>
+				<td class="cen">
+				    {% ifequal subject.teachersCount 0 %}0
+                    {% else %}
+                        <a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachersCount }}</a>
+                    {% endifequal %}
+                </td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -41,10 +46,12 @@
 		<div class="teachers">
 			{% for subject in subjects %}
 				<div class="teacher" id="teachers{{ subject.id }}">
-					<div>XX YY</div>
-					<div>XX YY</div>
-					<div>XX YY</div>
+				    {% for teacher in subject.teachers.all %}
+					<div>{{ teacher.first_name }} {{ teacher.last_name }}</div>
+					{% endfor %}
 				</div>
+			{% empty %}
+			     <div>- brak -</div>
 			{% endfor %}
 		</div>
 	</div>
