@@ -13,7 +13,7 @@ class Term( models.Model ):
     start_time = models.TimeField(verbose_name = 'rozpoczęcie')
     end_time = models.TimeField(verbose_name = 'zakończenie')
     classroom = models.ForeignKey('Classroom', verbose_name='sala')
-    group = models.ForeignKey('Group', verbose_name='grupa', related_name='term', blank=True, null=True)
+    group = models.ForeignKey('Group', verbose_name='grupa', related_name='term')
 
     class Meta:
         #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
