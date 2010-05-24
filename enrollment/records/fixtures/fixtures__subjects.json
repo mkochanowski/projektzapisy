@@ -67,9 +67,6 @@
         "pk": 1, 
         "model": "subjects.group", 
         "fields": {
-            "term": [
-                1
-            ], 
             "limit": 120, 
             "type": "2", 
             "teacher": 3, 
@@ -80,9 +77,6 @@
         "pk": 2, 
         "model": "subjects.group", 
         "fields": {
-            "term": [
-                2
-            ], 
             "limit": 25, 
             "type": "2", 
             "teacher": 2, 
@@ -93,9 +87,6 @@
         "pk": 3, 
         "model": "subjects.group", 
         "fields": {
-            "term": [
-                3
-            ], 
             "limit": 120, 
             "type": "1", 
             "teacher": 3, 
@@ -106,9 +97,6 @@
         "pk": 4, 
         "model": "subjects.group", 
         "fields": { 
-            "term": [
-                4
-            ], 
             "limit": 300, 
             "type": "1", 
             "teacher": 1, 
@@ -143,7 +131,8 @@
             "dayOfWeek": "1", 
             "start_time": "10:00:00", 
             "end_time": "12:00:00",
-            "classroom": 2
+            "classroom": 2,
+            "group" : 1
         }
     }, 
     {
@@ -153,27 +142,30 @@
             "dayOfWeek": "4", 
             "start_time": "14:00:00", 
             "end_time": "16:00:00",
-            "classroom": 2
+            "classroom": 2,
+            "group" : 2
         }
     },
     {
-        "pk": 2, 
+        "pk": 3, 
         "model": "subjects.term", 
         "fields": {
             "dayOfWeek": "4", 
             "start_time": "10:00:00", 
             "end_time": "12:00:00",
-            "classroom": 3
+            "classroom": 3,
+            "group" : 3
         }
     },  
     {
-        "pk": 3, 
+        "pk": 4, 
         "model": "subjects.term", 
         "fields": {
             "dayOfWeek": "3", 
             "start_time": "08:00:00", 
             "end_time": "10:00:00",
-            "classroom": 1
+            "classroom": 1,
+            "group" : 4
         }
     }, 
     {

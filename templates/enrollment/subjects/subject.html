@@ -31,6 +31,7 @@
     <p>{{subject.description}}</p>
     <a>pokaż więcej...</a>
     
+    {% if lectures %}
     <h3>Wykład:</h3>
     <table>
     	<thead>
@@ -63,7 +64,9 @@
     	{% endfor %}
     	</tbody>
     </table>
-
+	{% endif %}
+	
+	{% if exercises %}
 	<h3>Ćwiczenia:</h3>
     <table>
     	<thead>
@@ -101,7 +104,9 @@
     	{% endfor %}
     	</tbody>
     </table>
+    {% endif %}
     
+    {% if laboratories %}
 	<h3>Pracownia:</h3>
     <table>
     	<thead>
@@ -138,9 +143,9 @@
 	        </tr>
     	{% endfor %}
     	</tbody>
-    </table>    
-</div>
     </table> 
+    {% endif %}   
+</div>
 {% comment %}   
 {% endblock %}
 {% endcomment %}

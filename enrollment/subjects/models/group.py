@@ -13,8 +13,7 @@ class Group(models.Model):
     subject = models.ForeignKey('Subject', verbose_name='przedmiot')
     teacher = models.ForeignKey('users.Employee', verbose_name='prowadzący')
     type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
-    #classroom = models.ManyToManyField('Classroom', verbose_name='sala', related_name='grupy')
-    term = models.ManyToManyField('Term', verbose_name='termin zajęć', related_name='grupy')
+    term = models.ManyToManyField('Term', verbose_name='termin zajęć', blank=True, null=True, related_name = 'groupy')
     limit = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     
     def get_teacher_full_name(self):

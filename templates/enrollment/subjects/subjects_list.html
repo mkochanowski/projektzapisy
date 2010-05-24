@@ -19,9 +19,9 @@
     <a href="{% url subject-list %}">Przedmioty</a>
 </li>
 <br/>
-<table style="border-top: 1px solid #000000; border-bottom: 1px solid #000000">
+<table id="subject-filter-bar" cellspacing="0">
     <tr>
-        <td style="border-right: 1px solid #000000">
+        <td>
             <label>
                 <input type="text" id="keyword" name="keyword" />
                 <br/>
@@ -30,13 +30,14 @@
                 </sub>
             </label>
         </td>
-        <td style="border-right: 1px solid #000000">
+        <td>
+        	<label for="semester">Semestr</label>
             <select id="semester" name="semester">
                 {% for key, name in semesters_list %}<option value='{{ key }}'>{{ name }} </option>
                 {% endfor %}
             </select>
         </td>
-        <td style="border-right: 1px solid #000000; width: 200px">
+        <td>
             {% for key, name in types_list %}
             <label>
                 <input type='checkbox' class='type-list' name='type[{{ forloop.counter0 }}]' value='{{ key }}' checked />
@@ -66,7 +67,7 @@
     {% endfor %}
     {% endcomment %}
 </div>
-<div id='main-content-right' style='min-height: 300px'>
+<div id="main-content-right">
     <div id="subject-details">
         .
     </div>
