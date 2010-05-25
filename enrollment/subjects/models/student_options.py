@@ -14,7 +14,7 @@ class StudentOptions( models.Model ):
 
     def get_opening_delay_timedelta(self):
         """ returns records opening delay as timedelta """
-        return timedelta(seconds=60*60*self.get_opening_delay_hours())
+        return timedelta(hours=self.get_opening_delay_hours())
     
     def get_opening_delay_hours(self):
         """ returns records opening delay as imteger standing for hours """

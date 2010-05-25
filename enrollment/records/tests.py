@@ -44,7 +44,7 @@ class AddUserToGroupTest(TestCase):
         
     def testSubjectWithWithRecordsNotOpenForStudent(self):
         self.user.student.records_opening_hour = datetime.now()
-        self.user.save()
+        self.user.student.save()
         student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
         student_options.records_opening_delay_hours = 10
         student_options.save()

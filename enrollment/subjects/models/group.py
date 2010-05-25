@@ -11,13 +11,16 @@ GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia')]
 class Group(models.Model):
     """group for subject"""
     subject = models.ForeignKey('Subject', verbose_name='przedmiot')
-    teacher = models.ForeignKey('users.Employee', verbose_name='prowadzący')
+    teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
     type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
-        return self.teacher.user.get_full_name()
+        if self.teacher is None:
+            return u'(nieznany prowadzący)'
+        else:
+            return self.teacher.user.get_full_name()
 
     def get_all_terms(self):
         """return all terms of current group""" 
