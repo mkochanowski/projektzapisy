@@ -41,6 +41,7 @@ class Student(BaseUser):
     Student.
     '''
     matricula = models.CharField(max_length=20, default="", unique=True)
+    records_opening_hour = models.DateTimeField(blank = True, null = True)
     
     def __unicode__(self):
         return str(self.user)

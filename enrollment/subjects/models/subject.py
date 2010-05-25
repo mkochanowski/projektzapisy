@@ -31,6 +31,7 @@ class Subject( models.Model ):
     lectures = models.IntegerField(verbose_name='ilość godzin wykładów')
     exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń')
     laboratories = models.IntegerField(verbose_name='ilość godzin pracowni')
+    students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method
@@ -52,24 +53,3 @@ class Subject( models.Model ):
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.get_semester_name())
 		
-		
-# TODO: move class to one another file 		
-class Type(models.Model):
-    """types of subjects"""
-    name = models.CharField(max_length=30, verbose_name='rodzaj zajęć', default="", unique=True)
-	
-	
-    @staticmethod
-    def get_all_types_of_subjects():
-        Type.objects.all()
-    
-    def get_name(self):
-        self.name
-
-    class Meta:
-        verbose_name = 'rodzaj'
-        verbose_name_plural = 'rodzaje'
-        app_label = 'subjects'
-
-    def __unicode__(self):
-        return "%s" % (self.name)
