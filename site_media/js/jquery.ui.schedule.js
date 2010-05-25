@@ -109,6 +109,12 @@ $.widget("ui.schedule", {
 						width: (o.dayColumnWidth + 5) * o.dayList.length,
 						top: self._minuteAbsoluteTop(h)}))
 				.append($('<div></div>')
+					.addClass('schedule-hour-semi-separator')
+					.css({
+						left: o.hourColumnWidth + 5,
+						width: (o.dayColumnWidth + 5) * o.dayList.length,
+						top: self._minuteAbsoluteTop(h+o.minutesPerCell/2)}))
+				.append($('<div></div>')
 					.addClass('schedule-hours-cell')
 					.append($('<span>'+(h/60 >= 10 ? h/60 : '0'+h/60)+':'+(h%60 >= 10 ? h%60 : '0'+h%60)+'</span>'))
 					.css({
@@ -130,22 +136,16 @@ $.widget("ui.schedule", {
 		return $column;
 	},
 	
-	_groupClass: function(groupID) { 
-		if(groupID == undefined) {
-			return 'schedule-group-unknown';
-		}
-		else {
-			return 'schedule-group-' + groupID;
-		}
+	_groupSelector: function(groupID) {
+		return '.schedule-group-term[groupid="' + groupID + '"]';
 	},
 	
-	_subjectClass: function(subjectID) {
-		if(subjectID == undefined) {
-			return 'schedule-subject-unknown';
-		}
-		else {
-			return 'schedule-subject-' + subjectID;
-		}
+	_subjectSelector: function(subjectID) {
+		return '.schedule-group-term[subjectid="' + subjectID + '"]';
+	},
+	
+	_subjectTermsToDeleteSelector: function(subjectID) {
+		return '.schedule-group-term[subjectid="' + subjectID + '"]:not(.schedule-fixed,.schedule-pinned)';
 	},
 	
 	_termEntityId: function(groupID, termID) {
@@ -205,14 +205,14 @@ $.widget("ui.schedule", {
 	
 	_groupStartLoading: function(groupId){
 		var self = this;
-		$('.'+self._groupClass(groupId)).each(function(){
+		self.element.find(self._groupSelector(groupId)).each(function(){
 			$(this).addClass('loading');
 		});
 	},
 	
 	_groupFinishLoading: function(groupId){
 		var self = this;
-		$('.'+self._groupClass(groupId)).each(function(){
+		self.element.find(self._groupSelector(groupId)).each(function(){
 			$(this).removeClass('loading');
 		});
 	},
@@ -263,7 +263,7 @@ $.widget("ui.schedule", {
 	
 	deleteSubjectTerms: function(subjectID){
 		var self = this;
-		$('.'+self._subjectClass(subjectID)+':not(.schedule-fixed,.schedule-pinned)').remove();
+		self.element.find(self._subjectTermsToDeleteSelector(subjectID)).remove();
 		for(var i=0; i<self.dayColumnList.length; i++){
 			self._orderColumnContent(self.dayColumnList[i]);
 		}
@@ -279,7 +279,7 @@ $.widget("ui.schedule", {
 							'Assign',
 							divTerm.attr('groupid'),
 							function() {
-								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
 									self._makeTermFixed($(this));
 								});
 							}
@@ -292,7 +292,7 @@ $.widget("ui.schedule", {
 							'Resign',
 							divTerm.attr('groupid'),
 							function() {
-								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
 									self._makeTermUnPinned($(this));
 								});
 							}
@@ -305,7 +305,7 @@ $.widget("ui.schedule", {
 							'Pin',
 							divTerm.attr('groupid'),
 							function() {
-								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
 									self._makeTermPinned($(this));
 								});
 							}
@@ -318,7 +318,7 @@ $.widget("ui.schedule", {
 							'Unpin',
 							divTerm.attr('groupid'),
 							function() {
-								$('.'+self._groupClass(divTerm.attr('groupid'))).each(function(){
+								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
 									self._makeTermUnPinned($(this));
 								});
 							}
@@ -343,8 +343,6 @@ $.widget("ui.schedule", {
 			.appendTo(divTerm
 				.empty()
 				.addClass('schedule-group-term')
-				.addClass(self._subjectClass(divTerm.attr('subjectid')))
-				.addClass(self._groupClass(divTerm.attr('groupid')))
 				.attr('id', self._termEntityId(divTerm.attr('groupid'), divTerm.attr('termid')))
 				.css({
 					height: self._termHeight(parseInt(divTerm.attr('minutes'))),
