@@ -10,7 +10,7 @@ class StudentOptions( models.Model ):
     """ Used for defining relation between Student and Subject """
     subject = models.ForeignKey('Subject', verbose_name = 'przedmiot')
     student = models.ForeignKey('users.Student', verbose_name = 'student')
-    records_opening_delay_hours = models.IntegerField(verbose_name='opuźnienie w otwarciu zapisów (godziny)')
+    records_opening_delay_hours = models.IntegerField(verbose_name='opóźnienie w otwarciu zapisu (godziny)')
 
     def get_opening_delay_timedelta(self):
         """ returns records opening delay as timedelta """

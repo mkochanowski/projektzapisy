@@ -22,9 +22,9 @@
     {% endfor %}
     
     <ul>
-        <li>Wykłady: {{subject.lectures}} godz.</li>
-        <li>Ćwiczenia: {{subject.exercises}} godz.</li>
-        <li>Pracownia: {{subject.laboratories}} godz.</li>  
+        {% if subject.lectures %}<li>Wykłady: {{subject.lectures}} godz.</li>{% endif %}
+        {% if subject.exercises %}<li>Ćwiczenia: {{subject.exercises}} godz.</li>{% endif %}
+        {% if subject.laboratories %}<li>Pracownia: {{subject.laboratories}} godz.</li>{% endif %}  
     </ul>
         
     <h3>Opis przedmiotu:</h3>
