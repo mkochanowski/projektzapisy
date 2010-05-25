@@ -29,3 +29,7 @@ class AlreadyNotPinnedException(Exception):
 class OutOfLimitException(Exception):
     """is thrown when someone tries to join already full group"""
     pass
+
+class RecordsNotOpenException(Exception):
+    """is thrown when someone tries to enroll to subject and he do not have open enrollings for that subject at that time"""
+    pass

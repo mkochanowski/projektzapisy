@@ -7,7 +7,7 @@ from users.models import Student
 
 from enrollment.subjects.models import *
 from enrollment.records.exceptions import *
-from enrollment.subjects.exceptions import NonSubjectException
+from enrollment.subjects.exceptions import NonSubjectException, NonStudentOptionsException
 
 from itertools import cycle
 
@@ -151,10 +151,14 @@ class Record( models.Model ):
 
     @staticmethod
     def add_student_to_group(user_id, group_id):
+        """ assignes student to group if his records for subject are open. If student is pinned to group, pinned becomes enrolled """
         user = User.objects.get(id=user_id)
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
+            student_options = StudentOptions.get_student_options_for_subject(student.id, group.subject.id)
+            if not student_options.is_recording_open():
+                raise RecordsNotOpenException()
             if Record.number_of_students(group=group) < group.limit:
                 if (Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
                     raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException 
@@ -170,6 +174,8 @@ class Record( models.Model ):
             else:
                 raise OutOfLimitException()
             return record
+        except NonStudentOptionsException:
+            raise RecordsNotOpenException()
         except Student.DoesNotExist:
             raise NonStudentException()
         except Group.DoesNotExist:

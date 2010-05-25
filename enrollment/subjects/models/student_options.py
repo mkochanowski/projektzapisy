@@ -2,7 +2,9 @@
 
 from django.db import models
 
-from datetime import timedelta
+from enrollment.subjects.exceptions import NonStudentOptionsException
+
+from datetime import timedelta, datetime
            
 class StudentOptions( models.Model ):
     subject = models.ForeignKey('Subject', verbose_name = 'przedmiot')
@@ -10,13 +12,40 @@ class StudentOptions( models.Model ):
     records_opening_delay_hours = models.IntegerField(verbose_name='opuźnienie w otwarciu zapisów (godziny)')
 
     def get_opening_delay_timedelta(self):
-        return timedelta(seconds=60*60*opening_delay_hours)
+        """ returns records opening delay as timedelta """
+        return timedelta(seconds=60*60*self.get_opening_delay_hours())
     
     def get_opening_delay_hours(self):
-        return opening_delay_hours
+        """ returns records opening delay as imteger standing for hours """
+        return self.records_opening_delay_hours
+
+    def is_recording_open(self):
+        """ gives the answer to question: is student enrolling open for this subject at the very moment? """
+        records_opening = self.get_records_opening_datetime()
+        if records_opening == None:
+            return false
+        else:
+            return records_opening < datetime.now()
+        
+    def get_records_opening_datetime(self):
+        """ returns datetime meaning when records for particular subject starts to be open for student """
+        student_records_opening_hour = self.student.records_opening_hour
+        if student_records_opening_hour == None:
+            return None
+        else:
+            return student_records_opening_hour + self.get_opening_delay_timedelta()
+
+    
+    @staticmethod
+    def get_student_options_for_subject(student_id, subject_id):
+        try:    
+            return StudentOptions.objects.get(subject__id=subject_id, student__id=student_id)
+        except StudentOptions.DoesNotExist:
+            raise NonStudentOptionsException()
+
 
     def get_name(self):
-        return 'Przedmiot: %s, Student: %s ' % (subject, student)
+        return 'Przedmiot: %s, Student: %s ' % (self.subject, self.student)
     
     class Meta:
         verbose_name = 'zależność przedmiot-student'
