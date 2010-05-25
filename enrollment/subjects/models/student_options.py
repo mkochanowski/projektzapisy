@@ -7,6 +7,7 @@ from enrollment.subjects.exceptions import NonStudentOptionsException
 from datetime import timedelta, datetime
            
 class StudentOptions( models.Model ):
+    """ Used for defining relation between Student and Subject """
     subject = models.ForeignKey('Subject', verbose_name = 'przedmiot')
     student = models.ForeignKey('users.Student', verbose_name = 'student')
     records_opening_delay_hours = models.IntegerField(verbose_name='opuźnienie w otwarciu zapisów (godziny)')
@@ -23,7 +24,7 @@ class StudentOptions( models.Model ):
         """ gives the answer to question: is student enrolling open for this subject at the very moment? """
         records_opening = self.get_records_opening_datetime()
         if records_opening == None:
-            return false
+            return False
         else:
             return records_opening < datetime.now()
         
@@ -38,6 +39,7 @@ class StudentOptions( models.Model ):
     
     @staticmethod
     def get_student_options_for_subject(student_id, subject_id):
+        """ returns StudentOption instance for student and subject id, throws NonStudentOptionsException if such record do not exist""" 
         try:    
             return StudentOptions.objects.get(subject__id=subject_id, student__id=student_id)
         except StudentOptions.DoesNotExist:
@@ -45,6 +47,7 @@ class StudentOptions( models.Model ):
 
 
     def get_name(self):
+        """ gets printable name of StudentOptions """
         return 'Przedmiot: %s, Student: %s ' % (self.subject, self.student)
     
     class Meta:

@@ -31,5 +31,5 @@ class OutOfLimitException(Exception):
     pass
 
 class RecordsNotOpenException(Exception):
-    """is thrown when someone tries to enroll to subject and he do not have open enrollings for that subject at that time"""
+    """is thrown when someone tries to enroll to subject and he do not have open records at that time"""
     pass

@@ -126,11 +126,11 @@ def assign(request, group_id):
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
-    except AlreadyAssignedException:
-        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
     except AssignedInThisTypeGroupException:
         request.user.message_set.create(message="Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu.")
+        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
