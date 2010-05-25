@@ -47,7 +47,7 @@ def import_semester_schedule(xmlfile):
     def create_subject(el_subject, semester):
         """ This function parses <subject> element """
         
-        teachers = get_teachers(element.find('teachers'))
+        teachers = get_teachers(el_subject.find('teachers'))
 
         name = el_subject.find('name').text
         entity = SubjectEntity.objects.get_or_create(name=name)[0]
@@ -72,7 +72,7 @@ def import_semester_schedule(xmlfile):
         subject.teachers = teachers
         subject.save()
 
-        create_groups(element.find('groups'), subject)
+        create_groups(el_subject.find('groups'), subject)
         
     def create_groups(el_groups, subject):
         """ This function parses <groups> element """
