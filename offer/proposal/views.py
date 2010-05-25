@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import re
 import fereol.offer.proposal.models 
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http                    import HttpResponseRedirect, HttpResponse
+from django.http                    import HttpResponse
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 
-from offer.proposal.exceptions                 import *
 from fereol.enrollment.records.models          import *
 from fereol.offer.proposal.models              import *
 
 @login_required
-def becomeFan(request, slug):
+def become_fan(request, slug):
     try:
         proposal = Proposal.objects.get(slug=slug)
         proposal.addUserToFans(request.user)
@@ -28,7 +26,7 @@ def becomeFan(request, slug):
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
         
 @login_required
-def becomeTeacher(request, slug):
+def become_teacher(request, slug):
     try:
         proposal = Proposal.objects.get(slug=slug)
         proposal.addUserToTeachers(request.user)
@@ -41,7 +39,7 @@ def becomeTeacher(request, slug):
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
 @login_required
-def stopBeFan(request, slug):
+def stop_be_fan(request, slug):
     try:
         proposal = Proposal.objects.get(slug=slug)
         proposal.deleteUserFromFans(request.user)
@@ -54,7 +52,7 @@ def stopBeFan(request, slug):
         return render_to_response('errorpage.html', context_instance=RequestContext(request))
 
 @login_required
-def stopBeTeacher(request, slug):
+def stop_be_teacher(request, slug):
     try:
         proposal = Proposal.objects.get(slug=slug)
         proposal.deleteUserFromTeachers(request.user)
@@ -69,7 +67,11 @@ def stopBeTeacher(request, slug):
 @login_required
 def proposals(request):
     proposals = Proposal.objects.all()
-    return render_to_response( 'offer/proposal/proposal_list.html', { 'proposals' : proposals, 'mode' : 'list' }, context_instance = RequestContext(request) )
+    return render_to_response( 'offer/proposal/proposal_list.html',
+        {
+            'proposals' : proposals,
+            'mode' : 'list'
+        }, context_instance = RequestContext(request) )
 
 @login_required
 def proposal( request, slug, descid = None ):
@@ -101,7 +103,7 @@ def proposal( request, slug, descid = None ):
     return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext( request ) )
 
 
-def proposalForm(request, sid = None):
+def proposal_form(request, sid = None):
     """
         Formularz do dodawania i edycji przedmiotu.
     """
@@ -164,8 +166,12 @@ def proposalForm(request, sid = None):
             message = 'Istnieje już przedmiot o takiej nazwie'
             correctForm = False                                                 
             
-        if  proposalName == "" or proposalEcts == "" or proposalDescription == "" or proposalRequirements == "" or proposalType == "" or proposalLectures == -1 or proposalRepetitories == -1 or proposalExercises == -1 or proposalLaboratories == -1:
-            message = 'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę punktów ECTS oraz liczbę godzin zajęć.'
+        if  (proposalName == "" or proposalEcts == "" or proposalDescription == ""
+            or proposalRequirements == "" or proposalType == ""
+            or proposalLectures == -1 or proposalRepetitories == -1
+            or proposalExercises == -1 or proposalLaboratories == -1):
+            message = ('Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' +
+                'punktów ECTS oraz liczbę godzin zajęć.')
             correctForm = False
                                 
         if correctForm:
@@ -254,7 +260,7 @@ def proposalForm(request, sid = None):
         return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext(request));
 
 @login_required
-def proposalHistory( request, sid ):
+def proposal_history( request, sid ):
     proposal      = Proposal.objects.get( pk = sid)
     descriptions = proposal.descriptions.order_by( '-date' )
     data         = { 'descriptions' : descriptions }
@@ -262,14 +268,14 @@ def proposalHistory( request, sid ):
     return render_to_response ('offer/proposal/proposal_history.html', data, context_instance = RequestContext(request)) 
     
 @login_required
-def proposalViewArcival( request, descid ):
+def proposal_view_archival( request, descid ):
     desc = ProposalDescription.objects.get( pk = descid )
     data = {'desc' : desc}
     
     return render_to_response ('offer/proposal/proposal_archival.html', data)
     
 @login_required
-def proposalRestore ( request, descid ):
+def proposal_restore ( request, descid ):
     olddesc             = ProposalDescription.objects.get( pk = descid )
     newdesc             = ProposalDescription()
     newdesc.description = olddesc.description
