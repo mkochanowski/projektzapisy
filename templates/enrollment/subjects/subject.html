@@ -18,7 +18,7 @@
     <h1>{{subject.name}}</h1>
     <h3>Prowadzący:</h3>
     {% for teacher in subject.teachers.all %}
-    	<a class="subject-details-link" link="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
+    	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
     
     <ul>
