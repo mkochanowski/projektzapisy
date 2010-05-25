@@ -25,9 +25,8 @@ $.ajax({
       data: "semester=" + sem_id + "&keyword=" + $('input:text[name:keyword]').val() + SubjTypes,
       success: function(data) {
 	    
-	       $("#main-content-left").text("");
-           $("#main-content-left").append("<h1>Przedmioty</h1>");  
-           $("#main-content-left").append("<h2>Semestr: " + data.semester_name + "</h2>");    
+	       $("#subject-list").text("");  
+           $("#subject-list").append("<h2>Semestr: " + data.semester_name + "</h2>");    
 		   
 		   var str = "";
 		   var size = 0;
@@ -38,13 +37,13 @@ $.ajax({
             });
            
 		   
-	       $("#main-content-left").append("<ul>" + str + "</ul>");
+	       $("#subject-list").append("<ul>" + str + "</ul>");
 		   
 		   	$('.subject-link').click(function(){
 		      loadSubjectDetails($(this).attr('link'));
 	       })
 		   
-		    $("#main-content-left").append("<i>Przedmiotow: " + size);
+		    $("#subject-list").append("<i>Przedmiotow: " + size);
   
 	  },
 	  error: function (XMLHttpRequest, textStatus, errorThrown) {
