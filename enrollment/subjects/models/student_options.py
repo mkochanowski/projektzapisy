@@ -48,7 +48,7 @@ class StudentOptions( models.Model ):
 
     def get_name(self):
         """ gets printable name of StudentOptions """
-        return 'Przedmiot: %s, Student: %s ' % (self.subject, self.student)
+        return u'Przedmiot: %s, Student: %s ' % (self.subject, self.student)
     
     class Meta:
         verbose_name = 'zależność przedmiot-student'

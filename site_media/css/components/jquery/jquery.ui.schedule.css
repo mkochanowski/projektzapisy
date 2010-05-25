@@ -12,8 +12,11 @@ td.schedule-day-cell
 .schedule-column-place-indicator 
 	{ height:0; z-index:1000; position:relative; margin-right: 4px; }
 
-.schedule-hour-separator 
+.schedule-hour-separator, .schedule-hour-semi-separator  
 	{ position:absolute; overflow:hidden; border-width:0; border-top: 1px solid #dddddd; height:0; }
+	
+.schedule-hour-semi-separator  
+	{ border-top-style:dotted; }
 
 .schedule-days-cell
 	{ overflow:hidden; text-transform:capitalize; text-align:center; width: 100%; border-width:0; }
