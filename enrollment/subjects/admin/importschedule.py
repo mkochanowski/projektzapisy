@@ -1,17 +1,27 @@
 # -*- coding: utf-8 -*-
 
+import os
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from lxml import etree
-from fereol.enrollment.subjects.models import Semester, Group, Subject, Term,\
+from fereol.settings import PROJECT_PATH
+from fereol.enrollment.subjects.models import Semester, Group, Subject, Term, \
      SubjectEntity, Type, Classroom
 from fereol.users.models import Employee
 
-XSCHEMA = 'enrollment/subjects/admin/xml/semesterschedule.xsd'
+XSCHEMA = os.path.join(PROJECT_PATH, 'enrollment/subjects/admin/xml/semesterschedule.xsd')
 
 @transaction.commit_on_success
 def import_semester_schedule(xmlfile):
+    """ This function parses XML file containing complete schedule of semester (subjects, grups, terms,
+        teachers, etc.). The file is validated with XSCHEMA.
+        
+        xmlfile - path to XML file or file object
+    """ 
+
     def get_teacher(el_teacher):
+        """ This function parses <teacher> element and returns existing in database Employee object """
+        
         name = el_teacher.find('name').text
         surname = el_teacher.find('surname').text
 
@@ -25,6 +35,8 @@ def import_semester_schedule(xmlfile):
         return employee
     
     def get_teachers(el_teachers):
+        """ This function parses <teachers> element and returns list of Employees objects """
+        
         teachers = []
         
         for el_teacher in el_teachers:
@@ -33,12 +45,14 @@ def import_semester_schedule(xmlfile):
         return teachers
     
     def create_subject(el_subject, semester):
+        """ This function parses <subject> element """
+        
         teachers = get_teachers(element.find('teachers'))
 
         name = el_subject.find('name').text
         entity = SubjectEntity.objects.get_or_create(name=name)[0]
         slug = slugify(semester.year + '_' + name)
-        type = Type.objects.get_or_create(name=el_subject.find('type').text)[0]
+        sub_type = Type.objects.get_or_create(name=el_subject.find('type').text)[0]
         desc = el_subject.find('desc').text
         lectures = el_subject.find('lectures').text
         exercises = el_subject.find('exercises').text
@@ -48,7 +62,7 @@ def import_semester_schedule(xmlfile):
                                          name=name,
                                          slug=slug,
                                          semester=semester,
-                                         type=type,
+                                         type=sub_type,
                                          description=desc,
                                          lectures=lectures,
                                          exercises=exercises,
@@ -61,6 +75,8 @@ def import_semester_schedule(xmlfile):
         create_groups(element.find('groups'), subject)
         
     def create_groups(el_groups, subject):
+        """ This function parses <groups> element """
+        
         for el_group in el_groups:
             el_teacher = el_group.find('teacher')
 
@@ -72,17 +88,17 @@ def import_semester_schedule(xmlfile):
             el_type_text = el_group.find('type').text
 
             if el_type_text == 'lecture':
-                type = '1'
+                gr_type = '1'
             elif el_type_text == 'exercise':
-                type = '2'
+                gr_type = '2'
             elif el_type_text == 'laboratory':
-                type = '3'
+                gr_type = '3'
 
             limit = el_group.find('limit').text
 
             group = Group.objects.create(subject=subject,
                          teacher=teacher,
-                         type=type,
+                         type=gr_type,
                          limit=limit
                          )
                          
@@ -90,6 +106,7 @@ def import_semester_schedule(xmlfile):
 
 
     def create_terms(el_terms, group):
+        """ This function parses <terms> element and returns list of Terms objects """
         terms = []
         
         for el_term in el_terms:
