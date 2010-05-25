@@ -1,4 +1,3 @@
-# encoding: utf-8
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
@@ -6,9 +5,9 @@ from django.db import models
 from django.core.management import call_command
 
 class Migration(SchemaMigration):
-    
+   
     def forwards(self, orm):
-        
+       
         # Adding M2M table for field fans on 'Proposal'
         db.create_table('proposal_proposal_fans', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
@@ -24,19 +23,19 @@ class Migration(SchemaMigration):
             ('employee', models.ForeignKey(orm['users.employee'], null=False))
         ))
         db.create_unique('proposal_proposal_teachers', ['proposal_id', 'employee_id'])
-        
+       
         call_command('loaddata', 'offer/proposal/fixtures/fixtures__proposal.json')
-    
-    
+   
+   
     def backwards(self, orm):
-        
+       
         # Removing M2M table for field fans on 'Proposal'
         db.delete_table('proposal_proposal_fans')
 
         # Removing M2M table for field teachers on 'Proposal'
         db.delete_table('proposal_proposal_teachers')
-    
-    
+   
+   
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -123,5 +122,5 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
-    
+   
     complete_apps = ['proposal']

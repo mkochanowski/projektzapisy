@@ -51,13 +51,22 @@
 </div>
 
 <div>
-{% if isFan %}
-    <a href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
-{% else %}
-    <a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
+{% if user.student %}
+    {% if isFan %}
+        <a href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
+    {% else %}
+        <a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
+    {% endif %}
 {% endif %}
-
-Liczba osób, które poszłyby na przedmiot: {{fans}}
+Liczba osób, które poszłyby na przedmiot: {{fans}} <br />
+{% if user.employee %}
+    {% if isTeacher %}
+        <a href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie poprowadzę tego</a>
+    {% else %}
+        <a href="{% url proposal-beTeacher slug=proposal.slug %}">Poprowadzę to</a>
+    {% endif %}
+{% endif %}
+Liczba pracowników, gotowych prowadzić przedmiot: {{teachers}}
 </div>
 
 <h2>Wymagania:</h2>
