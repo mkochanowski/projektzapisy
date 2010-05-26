@@ -18,13 +18,13 @@
     <h1>{{subject.name}}</h1>
     <h3>Prowadzący:</h3>
     {% for teacher in subject.teachers.all %}
-    	<a class="subject-details-link" link="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
+    	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
     
     <ul>
-        <li>Wykłady: {{subject.lectures}} godz.</li>
-        <li>Ćwiczenia: {{subject.exercises}} godz.</li>
-        <li>Pracownia: {{subject.laboratories}} godz.</li>  
+        {% if subject.lectures %}<li>Wykłady: {{subject.lectures}} godz.</li>{% endif %}
+        {% if subject.exercises %}<li>Ćwiczenia: {{subject.exercises}} godz.</li>{% endif %}
+        {% if subject.laboratories %}<li>Pracownia: {{subject.laboratories}} godz.</li>{% endif %}  
     </ul>
         
     <h3>Opis przedmiotu:</h3>
@@ -42,7 +42,7 @@
     	<tbody>
 	    {% for lec in lectures %}
 	        <tr>
-		        <td>{{ lec.teacher.user.get_full_name }}</td>
+		        <td>{{ lec.get_teacher_full_name }}</td>
 		        <td>
 		            {% for d in lec.get_all_terms|dictsort:"dayOfWeek" %}
 		               {{d}}<br/>
@@ -77,7 +77,7 @@
     	<tbody>
 	    {% for exe in exercises %}
 	        <tr>
-		        <td>{{ exe.teacher.user.get_full_name }}</td>
+		        <td>{{ exe.get_teacher_full_name }}</td>
 		        <td>
 		            {% for d in exe.get_all_terms|dictsort:"dayOfWeek" %}
 		               {{d}}<br/>
@@ -117,7 +117,7 @@
     	<tbody>
 	    {% for lab in laboratories %}
 	        <tr>
-		        <td>{{ lab.teacher.user.get_full_name }}</td>
+		        <td>{{ lab.get_teacher_full_name }}</td>
 		        <td>
 		            {% for d in lab.get_all_terms|dictsort:"dayOfWeek" %}
 		               {{d}}<br/>

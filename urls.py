@@ -33,5 +33,6 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
+    (r'admin/subjects/import_semester', 'fereol.enrollment.subjects.admin.views.import_semester'),
     (r'^admin/', include(admin.site.urls)),
 )

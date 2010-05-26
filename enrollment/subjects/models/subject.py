@@ -15,9 +15,10 @@ class SubjectEntity(models.Model):
     
 
 class VisibleManager(models.Manager):
+    """ Manager for subject objects with visible semester """
     def get_query_set(self):
-	    """ Returns all subjects which have marked semester as visible """
-	    return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
+        """ Returns all subjects which have marked semester as visible """
+        return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
 
 class Subject( models.Model ):
     """subject in offer"""

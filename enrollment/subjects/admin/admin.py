@@ -11,6 +11,7 @@ class SubjectAdmin(admin.ModelAdmin):
         
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(SubjectEntity)
+admin.site.register(StudentOptions)
 admin.site.register(Group)
 admin.site.register(Classroom)
 admin.site.register(Term)

@@ -17,8 +17,6 @@ class Term( models.Model ):
 
     class Meta:
         #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
-        unique_together = (('start_time', 'classroom'),
-                           ('end_time', 'classroom'))
         verbose_name = 'termin'
         verbose_name_plural = 'terminy'
         app_label = 'subjects'

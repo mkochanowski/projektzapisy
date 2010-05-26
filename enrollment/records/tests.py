@@ -1,12 +1,14 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from enrollment.subjects.models import Subject, Group
+from enrollment.subjects.models import Subject, Group, StudentOptions
 from enrollment.records.models import Record
-from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException
+from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException
 from enrollment.subjects.exceptions import NonSubjectException
 
 from users.models import Employee, Student
+
+from datetime import datetime
 
 class AddUserToGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']
@@ -14,6 +16,7 @@ class AddUserToGroupTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=1)
+        
 
     def testWithNonStudentUser(self):
         self.user.student.delete()
@@ -38,6 +41,14 @@ class AddUserToGroupTest(TestCase):
         self.group.limit = 0
         self.group.save()
         self.assertRaises(OutOfLimitException, Record.add_student_to_group, self.user.id, self.group.id)
+        
+    def testSubjectWithWithRecordsNotOpenForStudent(self):
+        self.user.student.records_opening_hour = datetime.now()
+        self.user.student.save()
+        student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
+        student_options.records_opening_delay_hours = 10
+        student_options.save()
+        self.assertRaises(RecordsNotOpenException, Record.add_student_to_group, self.user.id, self.group.id)
 
 class ChangeUserGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']

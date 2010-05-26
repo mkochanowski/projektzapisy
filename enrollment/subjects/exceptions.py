@@ -5,4 +5,8 @@ class NonSubjectException(Exception):
 class NonSemesterException(Exception):
     """is thrown when semester does not exists"""
     pass
+
+class NonStudentOptionsException(Exception):
+    """is thrown when StudentOptions does not exists"""
+    pass
     

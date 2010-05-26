@@ -14,3 +14,6 @@ http://south.aeracode.org/
 - fedora: Django-south
 - debian/ubuntu: python-django-south
 
+* lxml >= 2.2.4
+http://codespeak.net/lxml/
+- fedora, debian/ubuntu: python-lxml
