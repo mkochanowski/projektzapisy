@@ -1,21 +1,28 @@
 {% extends "offer/preferences/preferences_base.html" %}
-
 {% load preferences_extras %}
 
+
 {% block pref_list %}
+<div style="display:none">
+    <ul>
+        <li id="od-prefs-undecided-list">{% url prefs-undecided-list %}</li>
+        <li id="od-prefs-save-url">{% url prefs-set-pref 0 %}</li>
+        <li ><select id="od-prefs-list-option">{% prefs_form_options %}</select></li>
+    </ul>
+</div>
+		
 	<ul id="od-prefs-list-tree" class="od-prefs-list">
 		{% for pref in prefs %}
-			<li>
+			<li{% if pref.hidden %} class="od-prefs-tree-hidden" {% else %} class="od-prefs-tree-show"{% endif %}>
 				<input type="button" class="od-prefs-toggleCollapse" value="+" onclick="Prefs.toggleCollapse(this)" />
+		{{pref.proposal.name}}
 
-				{{pref.proposal.name}}
+					<input type="button" class="od-prefs-toggleHidden {% if pref.hidden %}{% else %} hidden {%endif %}" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
+					<input type="button" class="od-prefs-toggleHidden {% if pref.hidden %} hidden {%endif %}" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
 
-				{% if pref.hidden %}
-					<input type="button" class="od-prefs-toggleHidden" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
-				{% else %}
-					<input type="button" class="od-prefs-toggleHidden" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
-				{% endif %}
-
+                <input type="hidden" class="pref_id" value="{{pref.id }}">
+                <input type="hidden" class="pref_name" value="{{pref.proposal.name }}">
+                <input type="hidden" class="pref_type" value="{{pref.proposal.type }}">
 				<ul>
 					<li>
 						Wykład:

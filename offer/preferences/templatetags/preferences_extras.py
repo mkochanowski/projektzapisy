@@ -29,8 +29,11 @@ class PrefsFormOptions(Node):
 @register.tag
 def prefs_form_options(parser, token):
     bits = token.contents.split()
-    if len(bits) != 3:
-        raise TemplateSyntaxError, "prefs_form_options tag takes exactly two arguments"
-    if bits[1] != 'selected':
-        raise TemplateSyntaxError, "first argument to the prefs_form_options tag must be 'selected'"
-    return PrefsFormOptions(bits[2])
+    if len(bits) == 3:
+        if bits[1] != 'selected':
+            raise TemplateSyntaxError, "first argument to the prefs_form_options tag must be 'selected'"
+        return PrefsFormOptions(bits[2])
+    if len(bits) == 1:
+        return PrefsFormOptions("0")
+    raise TemplateSyntaxError, "prefs_form_options tag takes zero or two arguments"
+

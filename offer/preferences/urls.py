@@ -12,6 +12,7 @@ urlpatterns = patterns('fereol.offer.preferences.views',
     url(r'^description/(?P<proposal_id>\d+)/$', 'description', name='prefs-description'),
     url(r'^hide/(?P<pref_id>\d+)/$',  'hide',   name='prefs-hide'),
     url(r'^unhide/(?P<pref_id>\d+)/$','unhide', name='prefs-unhide'),
+    url(r'^undecided/$', 'undecided_list', name='prefs-undecided-list'),
     url(r'^set/(?P<pref_id>\d+)/$', 'set_pref', name='prefs-set-pref'),
     url(r'^init/(?P<prop_id>\d+)/$', 'init_pref', name='prefs-init-pref'),
 )

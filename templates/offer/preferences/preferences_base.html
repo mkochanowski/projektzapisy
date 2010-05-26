@@ -1,5 +1,6 @@
 {% extends "offer/base-offer.html" %}
 
+
 {% block main-navigation %}
 	<li>Preferencje</li>
 {% endblock %}
@@ -23,14 +24,14 @@
 		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text" id="od-prefs-q" type="text" name="q" />
+				<input class="text od-filter" id="od-prefs-q" type="text" name="q" />
 				<input class="reset" id="od-prefs-reset" type="reset" value="X" style="display:none;" />
 			</div>
 		</fieldset>
 		<fieldset id="od-prefs-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in proposalTypes %}
-				<span class="checkbox"><input type="checkbox" id="od-prefs-type-{{ type.0 }}"/><label for="od-prefs-type-{{ type.0 }}">{{ type.1 }}</label></span>
+				<span class="checkbox od-filter-checkbox"><input type="checkbox" id="od-prefs-type-{{ type.0 }}" value="{{ type.0 }}"/><label for="od-prefs-type-{{ type.0 }}">{{ type.1 }}</label></span>
 			{% endfor %}
 		</fieldset>
 		<fieldset id="od-prefs-other">
@@ -44,27 +45,23 @@
 
 {% block sidebar-class %}{% if unset_offer %}sidebar-right sidebar-visible{% endif %}{% endblock %}
 {% block sidebar %}
+
 	{% if unset_offer %}
 		<div id="main-sidebar">
 			<h2>Przedmioty bez ustalonych preferencji</h2>
 			<ul id="od-prefs-undecided">
-				{% for prop in unset_offer %}
-					<li>
-						<input type="button" value="<" onclick="Prefs.initPref(this, '{% url prefs-init-pref prop.id %}')" />
-						{{ prop.name }}
-					</li>
-				{% endfor %}
+
 			</ul>
 		</div>
 	{% endif %}
 {% endblock %}
 
-{% block content %}
+{% block content %} {% comment %}
 	<p id="od-prefs-viewmode-selection">Widok:
 		<a href="{% url prefs-list-view %}">listy</a>
 		<a href="{% url prefs-tree-view %}">drzewa</a>
 	</p>
-
+{% endcomment %}
 	{% if prefs %}
 		<h2>Przedmioty z ustalonymi preferencjami</h2>
 

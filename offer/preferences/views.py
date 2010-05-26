@@ -12,6 +12,8 @@ from fereol.offer.preferences.utils import *
 from fereol.offer.proposal.models import Proposal
 from fereol.users.decorators import employee_required
 
+from django.core.urlresolvers import reverse
+
 def view(request, template):
     """
     Employee preferences' view renderend using the given template.
@@ -24,7 +26,7 @@ def view(request, template):
     * query=<filter>
     """
     format = request.GET.get('format', None)
-    hidden = request.GET.get('hidden', False)
+    hidden = request.GET.get('hidden', True)
     types  = request.GET.get('types',  None)
     query  = request.GET.get('query',  None)
     employee = request.user.employee
@@ -38,13 +40,13 @@ def view(request, template):
     if format == 'json':
         def process_pref(pref):
             obj = {}
-            obj['name'] = pref.proposal.name
-            obj['lecture'] = pref.lecture
+            obj['name']           = pref.proposal.name
+            obj['lecture']        = pref.lecture
             obj['review_lecture'] = pref.review_lecture
             obj['tutorial'] = pref.tutorial
-            obj['lab'] = pref.lab
-            obj['hidden'] = pref.hidden
-            obj['type'] = pref.proposal.type
+            obj['lab']      = pref.lab
+            obj['hidden']   = pref.hidden
+            obj['type']     = pref.proposal.type
             return obj
         data['prefs'] = map(process_pref, data['prefs'])
         return HttpResponse(simplejson.dumps(data))
@@ -59,6 +61,30 @@ def view(request, template):
         template,
         data,
         context_instance = RequestContext(request))
+
+@employee_required
+def undecided_list(request):
+    """
+        Return json with list of unset preferences
+    """
+
+    employee = request.user.employee
+    unset = get_employees_unset(employee)
+    def process_proposal(prop):
+        obj = {}
+        obj['id']   = prop.id
+        obj['name'] = prop.name
+        obj['hideUrl']  = reverse('prefs-hide', args = [ prop.id ] )
+        obj['showUrl']  = reverse('prefs-unhide', args = [ prop.id ] )
+        obj['url']      = reverse('prefs-init-pref', args = [ prop.id ] )
+        obj['type']     = prop.type
+        # obj['tags'] ?
+        return obj
+    unset = map(process_proposal, unset)
+    data = {
+        'unset': unset
+    }
+    return HttpResponse(simplejson.dumps(data))
 
 @employee_required
 def tree_view(request):
@@ -136,16 +162,16 @@ def set_pref(request, pref_id):
       lecture=2&tutorial=0.
     """
     try:
-        if reqeust.method == 'POST':
+        if request.method == 'POST':
             pref = Preference.objects.get(pk=pref_id)
-            pref.set_preference(request.POST)
-            data = {'Success': 'OK'}
+            pref.set_preference(lecture=int(request.POST['lecture']), tutorial=int(request.POST['tutorial']), review_lecture=int(request.POST['review_lecture']), lab = int(request.POST['lab']))
+            data = {'Success': "OK"}
         else:
             data = {'Failure': 'Use POST'}
     except (Preference.DoesNotExist, UnknownPreferenceValue):
         data = {'Failure': 'Preference does not exist'}
     return HttpResponse(simplejson.dumps(data))
-
+'lecture', 'review_lecture', 'tutorial', 'lab'
 @employee_required
 def init_pref(request, prop_id):
     try:

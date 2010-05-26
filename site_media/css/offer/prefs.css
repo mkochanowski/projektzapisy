@@ -23,6 +23,13 @@
 	width: 300px;
 }
 
+.hidden {
+    display:none;
+}
+
+.od-filter-hide {
+    display:none;
+}
 /******************************************************************************/
 
 ul#od-prefs-undecided
