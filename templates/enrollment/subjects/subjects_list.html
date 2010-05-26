@@ -1,16 +1,21 @@
 {% extends "enrollment/base-enrollment.html" %}
- {% block styles %}
+
+{% block styles %}
 	<link rel="stylesheet" href="/site_media/css/enrollment/subjects/subjects-list.css" type="text/css" />
 {% endblock %}
+
 {% block scripts %}
 <script type="text/javascript">
     var ajaxUrl = "{% url subject-ajax %}";
 </script>
-<script src="/site_media/js/enrollment/subjects/subjects-list-ajax.js" type="text/javascript">
-</script>
+<script type="text/javascript" src="/site_media/js/jquery-ui-1.8.1.custom.min.js"></script> 
+<script type="text/javascript" src="/site_media/js/jquery.cookies.2.2.0.min.js"></script> 
+<script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
+<script src="/site_media/js/enrollment/subjects/subjects-list-ajax.js" type="text/javascript"></script>
 <script src="/site_media/js/enrollment/subjects/subjects-list.js" type="text/javascript">
 </script>
 {% endblock %}
+
 {% block main-navigation %}
 <li>
     Zapisy
@@ -50,28 +55,19 @@
             </label>
         </td>
     </tr>
-</table>{% endblock %}
+</table>
+{% endblock %}
+
 {% block content %}
-<div id='main-content-left'>
-    {% comment %}
-    <h1>Przedmioty</h1>
-    {% for sem, subs in subjects %}
-    <h2>{{sem}}</h2>
-    <ul>
-    {% for sub in subs %}
-    <li><a class="subject-link" id="subject-{{ sub.pk }}" href="#" link="/subjects/{{ sub.slug }}">{{sub.name}}</a></li>
-    {% empty %}Brak przedmiotów
-    {% endfor %}
-    </ul>
-    {% empty %} Brak semestrów
-    {% endfor %}
-    {% endcomment %}
+<div id="subject-details">
+Wybierz przedmiot z menu po lewej.
 </div>
-<div id="main-content-right">
-    <div id="subject-details">
-        .
-    </div>
-</div>
-<div style="clear-both">
-</div>
+{% endblock %}
+
+{% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
+{% block sidebar %}
+	<div id="main-sidebar">
+		<div id="subject-list">
+		</div>
+	</div>
 {% endblock %}
