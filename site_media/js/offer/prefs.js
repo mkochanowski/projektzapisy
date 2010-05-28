@@ -80,18 +80,19 @@ $(document).ready(function(){
             }
     });
     url = $("#od-prefs-undecided-list").text();
-    Prefs.getList( url );
+    if (url)
+        Prefs.getList( url );
 });
 
 Prefs = new Object();
 Prefs.unset = new Array();
 Prefs.getList = function( url )
 {
- $.ajax({  
+ $.ajax({
    url: url,
    dataType: 'json',
    async: false,  
-   success: function(data){  
+   success: function(data){ 
                 list = Prefs.generateList(data);
                 $.each(list, function(key, value){
                     $("#od-prefs-undecided").append(value);
