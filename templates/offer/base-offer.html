@@ -16,8 +16,9 @@
     {% endif %}
 	<li style="display: none"><a>więcej</a></li>
 	{% if user.is_authenticated %}
-		<li>{{ user.first_name }} {{user.last_name }} {{user.student.matricula}} <a href="{% url user-logout %}">(wyloguj)</a></li>
+	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a> ({{user.student.matricula}}) </li>
+	<li><a href="{% url user-logout %}">(wyloguj)</a></li>
 	{% else %}
-		<li><a href="{% url user-login %}">Zaloguj</a></li>
+	<li><a href="{% url user-login %}">Zaloguj</a></li>
 	{% endif %}
 {% endblock %}
