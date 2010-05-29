@@ -11,6 +11,7 @@ from fereol.offer.vote.models import SingleVote
 class VoteForm( forms.Form ):
     choices = [(str(i), i) for i in range(SystemState.get_maxPoints()+1)]
     subject_types = {}
+    subject_fan_flag = {}
     
     def __init__ (self, *args, **kwargs):
         winter  = kwargs.pop('winter')
@@ -37,6 +38,7 @@ class VoteForm( forms.Form ):
                                             help_text = u'Semestr Zimowy',
                                             initial   = choosed)
             self.subject_types['winter_%s' % sub.pk] = sub.type
+            self.subject_fan_flag['winter_%s' % sub.pk] = sub.isFan(voter)
                                             
         for sub in summer:
             try:
@@ -53,6 +55,7 @@ class VoteForm( forms.Form ):
                                             help_text = u'Semestr Letni',
                                             initial   = choosed)
             self.subject_types['summer_%s' % sub.pk] = sub.type
+            self.subject_fan_flag['summer_%s' % sub.pk] = sub.isFan(voter)
         
         for sub in unknown:
             try:
@@ -69,6 +72,7 @@ class VoteForm( forms.Form ):
                                             help_text = u'Semestr Nieokreślony',
                                             initial   = choosed)
             self.subject_types['unknown_%s' % sub.pk] = sub.type
+            self.subject_fan_flag['unknown_%s' % sub.pk] = sub.isFan(voter)
     
     def vote_points( self ):
         for name, value in self.cleaned_data.items():
@@ -92,9 +96,11 @@ class VoteForm( forms.Form ):
         
         for key in self.fields.iterkeys():
             field = self.fields[key]
-            subject_type = self.subject_types[key];
+            subject_class = self.subject_types[key];
+            if self.subject_fan_flag[key]:
+                subject_class += " isFan"
             field_str = \
-                u'<li class="od-vote-subject ' + subject_type + '">\
+                u'<li class="od-vote-subject ' + subject_class + '">\
                     <label for="id_' + key + '">' + field.label + '</label>\
                     <select name="' + key + '" id="id_' + key + '">'
             for (i, s) in field.choices:

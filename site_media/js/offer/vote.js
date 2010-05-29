@@ -90,11 +90,12 @@ Vote.init = function()
     maxPointsNode.appendChild(Vote.maxPointsNode);
     maxPointsNode.appendChild(document.createTextNode('.'));
 
+    Vote.totalSubjectsCount = $('#od-vote-form').find('select').length;
+    Vote.wantedSubjectsCount = $('#od-vote-form').find('.isFan').length;
+
     var onlyWantedLabel = $('#od-vote-onlywanted').parent().children('label')[0];
-    onlyWantedLabel.appendChild(document.createTextNode(' ('));
-    Vote.onlyWantedCounter = document.createElement('span');
-    onlyWantedLabel.appendChild(Vote.onlyWantedCounter);
-    onlyWantedLabel.appendChild(document.createTextNode(')'));
+    onlyWantedLabel.appendChild(document.createTextNode(' (' +
+        Vote.wantedSubjectsCount + ' z ' + Vote.totalSubjectsCount + ')'));
 
     $('#od-vote-form').find('select').change(Vote.refreshCounters);
 
@@ -123,8 +124,6 @@ $(Vote.init);
 Vote.refreshCounters = function()
 {
     var votes = $('#od-vote-form').find('select');
-    var totalSubjects = votes.length;
-    var wantedSubjects = 0;
     var totalPoints = 0;
 
     for (var i = 0; i < votes.length; i++)
@@ -133,16 +132,11 @@ Vote.refreshCounters = function()
         if (isNaN(voteValue) || voteValue < 0)
             throw new Exception('Vote.refreshCounters: nieprawidłowa wartość głosu');
         totalPoints += voteValue;
-        if (voteValue > 0)
-            wantedSubjects++;
     }
 
     $(Vote.maxPointsNode).text(totalPoints + ' z ' + Vote.maxPoints);
     Vote.maxPointsNode.className = (totalPoints > Vote.maxPoints)?'warning':'';
-    $(Vote.onlyWantedCounter).text(wantedSubjects + ' z ' + totalSubjects);
 
-    Vote.totalSubjects = totalSubjects;
-    Vote.wantedSubjects = wantedSubjects;
     Vote.totalPoints = totalPoints;
 };
 
@@ -236,7 +230,7 @@ Vote.doFilter = function(filter)
 
         if (filter.onlyWanted)
         {
-            if ($(subject).children('select')[0].value > 0)
+            if ($(subject).hasClass('isFan'))
                 isVisible = true;
         }
         else
