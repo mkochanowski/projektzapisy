@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django import template
-from fereol.libs import postmarkup
+from libs import postmarkup
 
 register = template.Library()
 
-from fereol.offer.news.models import News
+from offer.news.models import News
 
 @register.simple_tag
 def newscount():

@@ -5,11 +5,11 @@ from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 
-from fereol.offer.vote.models     import *
-from fereol.offer.proposal.models import *
+from offer.vote.models     import *
+from offer.proposal.models import *
 
-from fereol.users.decorators      import student_required
-from fereol.offer.vote.voteForm   import VoteForm
+from users.decorators      import student_required
+from offer.vote.voteForm   import VoteForm
 
 @student_required
 def voteMain( request ):

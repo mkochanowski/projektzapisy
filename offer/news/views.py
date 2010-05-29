@@ -8,9 +8,9 @@ from django.shortcuts import get_object_or_404, render_to_response, \
 from django.template import RequestContext
 from django.utils import simplejson
 
-from fereol.offer.news.forms import NewsForm
-from fereol.offer.news.models import News
-from fereol.offer.news.utils import news_per_page, prepare_data, \
+from offer.news.forms import NewsForm
+from offer.news.models import News
+from offer.news.utils import news_per_page, prepare_data, \
      render_items, get_search_results_data, mail_news_to_employees
 
 def mainPage( request ):

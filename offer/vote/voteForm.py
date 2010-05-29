@@ -4,8 +4,8 @@ from django                   import forms
 from django.core.exceptions   import ObjectDoesNotExist
 from django.utils.safestring  import SafeUnicode
 
-from fereol.offer.vote.models import SystemState
-from fereol.offer.vote.models import SingleVote
+from offer.vote.models import SystemState
+from offer.vote.models import SingleVote
 
 
 class VoteForm( forms.Form ):

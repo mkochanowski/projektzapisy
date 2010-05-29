@@ -1,16 +1,14 @@
 # -*- coding:utf-8 -*-
 
-import fereol.offer.proposal.models 
-
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import Context, RequestContext, Template
 from django.utils import simplejson
 
-from fereol.offer.preferences.exceptions import *
-from fereol.offer.preferences.models import Preference
-from fereol.offer.preferences.utils import *
-from fereol.offer.proposal.models import Proposal
-from fereol.users.decorators import employee_required
+from offer.preferences.exceptions import *
+from offer.preferences.models import Preference
+from offer.preferences.utils import *
+from offer.proposal.models import Proposal, PROPOSAL_TYPE
+from users.decorators import employee_required
 
 from django.core.urlresolvers import reverse
 
@@ -35,7 +33,7 @@ def view(request, template):
     prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query)
     data = {
 		'prefs': prefs,
-		'proposalTypes': fereol.offer.proposal.models.proposal.PROPOSAL_TYPES
+		'proposalTypes': PROPOSAL_TYPES
 	}
     if format == 'json':
         def process_pref(pref):

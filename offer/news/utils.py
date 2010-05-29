@@ -14,8 +14,8 @@ from haystack.forms import SearchForm
 from haystack.query import SearchQuerySet
 from mailer import send_html_mail
 
-from fereol.offer.news.models import News
-from fereol.users.models import Employee
+from offer.news.models import News
+from users.models import Employee
 
 mass_mail_from = 'noreply@example.com'
 news_per_page = 5

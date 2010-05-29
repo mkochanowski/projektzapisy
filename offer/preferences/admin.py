@@ -2,6 +2,6 @@
 
 from django.contrib import admin
 
-from fereol.offer.preferences.models import *
+from offer.preferences.models import *
 
 admin.site.register(Preference)

@@ -3,8 +3,8 @@ from datetime  import date
 
 from django.db import models
 
-from fereol.offer.proposal.models import Proposal
-from fereol.offer.vote.models import SystemState
+from offer.proposal.models import Proposal
+from offer.vote.models import SystemState
 
 class SingleVote ( models.Model ):
     student = models.ForeignKey  ( 'users.Student',

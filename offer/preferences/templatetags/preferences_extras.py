@@ -5,7 +5,7 @@ from django.template import Library, Node, TemplateSyntaxError, \
 
 register = Library()
 
-from fereol.offer.preferences.models import PREFERENCE_CHOICES
+from offer.preferences.models import PREFERENCE_CHOICES
 
 class PrefsFormOptions(Node):
     """Return a list of <options> given selected"""

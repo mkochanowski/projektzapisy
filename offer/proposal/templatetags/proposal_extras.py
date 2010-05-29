@@ -4,7 +4,7 @@ from django.template import Library, Node, TemplateSyntaxError
 
 register = Library()
 
-from fereol.offer.proposal.models import Proposal
+from offer.proposal.models import Proposal
 
 class SubjectsInOfferNode(Node):
     """Adds a list of subjects to template context"""

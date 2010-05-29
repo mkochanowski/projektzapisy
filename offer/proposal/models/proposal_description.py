@@ -2,7 +2,7 @@
 
 from django.db import models
 
-from proposal_description_tag import ProposalDescriptionTag
+from offer.proposal.models.proposal_description_tag import ProposalDescriptionTag
 
 class ProposalDescription(models.Model):
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
@@ -61,4 +61,3 @@ class ProposalDescription(models.Model):
             self.tags.remove(tag)
         except ProposalDescriptionTag.DoesNotExist:
             pass
-                        

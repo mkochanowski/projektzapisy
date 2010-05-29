@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import fereol.offer.proposal.models 
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http                    import HttpResponse
@@ -9,8 +8,7 @@ from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 
-from fereol.enrollment.records.models          import *
-from fereol.offer.proposal.models              import *
+from offer.proposal.models              import *
 
 @login_required
 def become_fan(request, slug):
@@ -250,8 +248,8 @@ def proposal_form(request, sid = None):
         'proposalComments'      : proposalComments,
         'mode'          : 'form',
         'proposals'     : Proposal.objects.all(),
-        'proposalTypes' : fereol.offer.proposal.models.proposal.PROPOSAL_TYPES,
-        'proposalHours' : fereol.offer.proposal.models.proposal.PROPOSAL_HOURS,
+        'proposalTypes' : PROPOSAL_TYPES,
+        'proposalHours' : PROPOSAL_HOURS,
     }
     
     if success:

@@ -2,7 +2,7 @@
 
 import datetime
 from haystack import indexes
-from fereol.offer.news.models import News
+from offer.news.models import News
 
 class NewsIndex(indexes.RealTimeSearchIndex):
     text = indexes.CharField(document=True, use_template=True)

@@ -3,7 +3,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from django.template.loader_tags import ExtendsNode
-from fereol.offer.proposal.models import Proposal
+from offer.proposal.models import Proposal
 
 def render_to_response_wo_extends(template_name, data, context):
     """

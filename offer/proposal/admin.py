@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from fereol.offer.proposal.models import *
+from offer.proposal.models import *
 
 class ProposalAdmin( admin.ModelAdmin ):
     
@@ -11,5 +11,5 @@ class ProposalAdmin( admin.ModelAdmin ):
         
 admin.site.register( Proposal, ProposalAdmin )
 admin.site.register( ProposalDescription )
-admin.site.register(ProposalTag)
-admin.site.register(ProposalDescriptionTag)
+admin.site.register( ProposalTag )
+admin.site.register( ProposalDescriptionTag )

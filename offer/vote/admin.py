@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from datetime import *
+from datetime import date
 
 from django.contrib import admin
 from django.forms   import ModelForm
 from django.forms   import ValidationError
 
-from fereol.offer.vote.models import *
+from offer.vote.models import *
 
 class SystemStateAdminForm( ModelForm ):
     class Meta:

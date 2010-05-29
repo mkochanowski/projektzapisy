@@ -2,8 +2,8 @@
 
 from django.db import models
 
-from fereol.users.models import Employee
-from fereol.offer.proposal.models import Proposal
+from users.models import Employee
+from offer.proposal.models import Proposal
 from offer.preferences.exceptions import *
 
 PREFERENCE_CHOICES = (
