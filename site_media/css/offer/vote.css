@@ -6,7 +6,7 @@
 
 #od-vote-top-bar fieldset
 {
-	height: 40px;
+	min-height: 40px;
 }
 
 #od-vote-top-bar fieldset > span

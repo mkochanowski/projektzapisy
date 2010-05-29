@@ -1,6 +1,6 @@
 #od-prefs-top-bar fieldset
 {
-	height: 40px;
+	min-height: 40px;
 }
 
 #od-prefs-top-bar fieldset > span
