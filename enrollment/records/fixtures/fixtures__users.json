@@ -95,8 +95,6 @@
         "pk": 1, 
         "model": "users.employee", 
         "fields": {
-            "first_name": "Przemka", 
-            "last_name": "Kanarek", 
             "receive_mass_mail_offer": true, 
             "user": 2
         }
@@ -105,8 +103,6 @@
         "pk": 2, 
         "model": "users.employee", 
         "fields": {
-            "first_name": "Tomasz", 
-            "last_name": "W", 
             "receive_mass_mail_offer": true, 
             "user": 3
         }
@@ -115,8 +111,6 @@
         "pk": 3, 
         "model": "users.employee", 
         "fields": {
-            "first_name": "Krzysztof", 
-            "last_name": "Lory\u015b", 
             "receive_mass_mail_offer": true, 
             "user": 4
         }
@@ -127,8 +121,6 @@
         "fields": {
 			"records_opening_hour": "2010-05-25 10:35:31",
             "matricula": "221135", 
-            "first_name": "Piotr", 
-            "last_name": "Walkowski", 
             "user": 5
         }
     }

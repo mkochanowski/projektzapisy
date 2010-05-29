@@ -57,8 +57,6 @@
     "pk": 2, 
     "model": "users.employee", 
     "fields": {
-      "first_name": "Emp1_U", 
-      "last_name": "Emp1Sur_U", 
       "receive_mass_mail_offer": true, 
       "user": 2
     }
@@ -67,8 +65,6 @@
     "pk": 3, 
     "model": "users.employee", 
     "fields": {
-      "first_name": "Emp2_U", 
-      "last_name": "Emp2Sur_U", 
       "receive_mass_mail_offer": true, 
       "user": 3
     }
@@ -77,8 +73,6 @@
     "pk": 4, 
     "model": "users.employee", 
     "fields": {
-      "first_name": "Emp3_U", 
-      "last_name": "Emp3Sur_U", 
       "receive_mass_mail_offer": true, 
       "user": 4
     }
