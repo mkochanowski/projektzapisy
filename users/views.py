@@ -7,10 +7,20 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.forms import AuthenticationForm
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.cache import never_cache
 
 from users.exceptions import NonUserException
 from users.forms import EmailChangeForm
 
+@csrf_protect
+@never_cache
+def login(request, template_name='registration/login.html',
+          redirect_field_name=REDIRECT_FIELD_NAME,
+          authentication_form=AuthenticationForm):
+    auth.login(request, template_name, redirect_field_name, authentication_form);
 
 def profile(request, user_id):
     '''profile'''
