@@ -41,6 +41,15 @@
         </table>
         </div>
     {% endfor %}
+    <div class="module">
+        <table>
+            <caption>Import</caption>
+            <tr>
+                <th scope="row">Plan semestru</th>
+                <td><a href="{{ model.admin_url }}subjects/import_semester" class="addlink">Importuj</a></td>
+            </tr>
+        </table>
+    </div>
 {% else %}
     <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
@@ -76,13 +85,5 @@
             </ul>
             {% endif %}
     </div>
-</div>
-<div class="module">
-  <h2>Import</h2>
-    <ul class="actionlist">
-      <li class="changelink">
-        <a href="/admin/subjects/import_semester"> Plan semestru</a>
-      </li>
-    </ul>
 </div>
 {% endblock %}
