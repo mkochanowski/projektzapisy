@@ -9,7 +9,8 @@ from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 
-from offer.proposal.models              import *
+from offer.proposal.models          import *
+from offer.proposal.exceptions      import *
 
 @login_required
 def become_fan(request, slug):
@@ -18,11 +19,11 @@ def become_fan(request, slug):
         proposal.addUserToFans(request.user)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
-        request.user.message_set.create(message="Nie jesteś studentem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonEmployeeException:
-        request.user.message_set.create(message="Nie jesteś pracownkiem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś pracownkiem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
         
 @login_required
 def become_teacher(request, slug):
@@ -31,11 +32,11 @@ def become_teacher(request, slug):
         proposal.addUserToTeachers(request.user)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
-        request.user.message_set.create(message="Nie jesteś studentem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonEmployeeException:
-        request.user.message_set.create(message="Nie jesteś pracownkiem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś pracownkiem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @login_required
 def stop_be_fan(request, slug):
@@ -44,11 +45,11 @@ def stop_be_fan(request, slug):
         proposal.deleteUserFromFans(request.user)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
-        request.user.message_set.create(message="Nie jesteś studentem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonEmployeeException:
-        request.user.message_set.create(message="Nie jesteś pracownkiem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś pracownkiem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @login_required
 def stop_be_teacher(request, slug):
@@ -57,16 +58,16 @@ def stop_be_teacher(request, slug):
         proposal.deleteUserFromTeachers(request.user)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
-        request.user.message_set.create(message="Nie jesteś studentem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonEmployeeException:
-        request.user.message_set.create(message="Nie jesteś pracownkiem")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Nie jesteś pracownkiem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @login_required
 def proposals(request):
     proposals = Proposal.objects.all()
-    return render_to_response( 'offer/proposal/proposal_base.html',
+    return render_to_response( 'offer/proposal/base.html',
         {
             'proposals' : proposals,
             'mode' : 'list'
@@ -99,7 +100,7 @@ def proposal( request, slug, descid = None ):
             'fans'          : proposal.fansCount(),
             'teachers'      : proposal.teachersCount(),
     }
-    return render_to_response( 'offer/proposal/proposal_view.html', data, context_instance = RequestContext( request ) )
+    return render_to_response( 'offer/proposal/view.html', data, context_instance = RequestContext( request ) )
 
 
 def proposal_form(request, sid = None):
@@ -264,7 +265,7 @@ def proposal_form(request, sid = None):
     if success:
         return redirect("proposal-page" , slug=proposal.slug)
     else:
-        return render_to_response( 'offer/proposal/proposal_form.html', data, context_instance = RequestContext(request));
+        return render_to_response( 'offer/proposal/form.html', data, context_instance = RequestContext(request));
 
 @login_required
 def proposal_history( request, sid ):
@@ -274,14 +275,7 @@ def proposal_history( request, sid ):
         'proposals'    : Proposal.objects.all()
     }
     
-    return render_to_response ('offer/proposal/proposal_history.html', data, context_instance = RequestContext(request)) 
-    
-@login_required
-def proposal_view_archival( request, descid ):
-    desc = ProposalDescription.objects.get( pk = descid )
-    data = {'desc' : desc}
-    
-    return render_to_response ('offer/proposal/proposal_archival.html', data)
+    return render_to_response ('offer/proposal/history.html', data, context_instance = RequestContext(request)) 
     
 @login_required
 def proposal_restore ( request, descid ):
@@ -305,7 +299,7 @@ def offerCreate( request ):
         'subjects' : Proposal.objects.order_by('name'),
     }    
     
-    return render_to_response('offer/proposal/offerCreate.html', data, context_instance = RequestContext( request ))
+    return render_to_response('offer/proposal/create_offer.html', data, context_instance = RequestContext( request ))
     
 @permission_required('proposal.can_create_offer')
 def offerCreateTeachers( request, subjectId ):

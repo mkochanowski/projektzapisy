@@ -50,7 +50,7 @@ def subject( request, slug ):
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
     except NonSubjectException:
         request.user.message_set.create(message="Przedmiot nie istnieje.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 
 

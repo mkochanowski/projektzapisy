@@ -24,7 +24,7 @@ def render_items(request, items):
     c = RequestContext(request, {
         'object_list':items,
     } )
-    t = get_template('offer/news/news_ajax_list.html')
+    t = get_template('offer/news/ajax_list.html')
     return t.render(c)
 
 def render_newer_group(beginwith, quantity):
@@ -32,7 +32,7 @@ def render_newer_group(beginwith, quantity):
         'newer_no':quantity,
         'newer_beginwith':beginwith,
     } )
-    t = get_template('offer/news/news_newer_group.html')
+    t = get_template('offer/news/newer_group.html')
     return t.render(c)
 
 def render_older_group(beginwith, quantity):
@@ -40,7 +40,7 @@ def render_older_group(beginwith, quantity):
         'older_no':quantity,
         'older_beginwith':beginwith,
     } )
-    t = get_template('offer/news/news_older_group.html')
+    t = get_template('offer/news/older_group.html')
     return t.render(c)
 
 def prepare_data(request, items,
@@ -64,7 +64,7 @@ def render_search_newer_group(page, query):
         'page':  page,
         'query': query,
     } )
-    t = get_template('offer/news/news_search_newer_group.html')
+    t = get_template('offer/news/search_newer_group.html')
     return t.render(c)
 
 def render_search_older_group(page, query):
@@ -72,7 +72,7 @@ def render_search_older_group(page, query):
         'page':  page,
         'query': query,
     } )
-    t = get_template('offer/news/news_search_older_group.html')
+    t = get_template('offer/news/search_older_group.html')
     return t.render(c)
 
 def get_search_results_data(request):
@@ -112,9 +112,9 @@ def render_email_from_news(news):
                   str(Site.objects.get_current().domain) +
                   reverse('news-item', args=[news.id])
     } )
-    t = get_template('offer/news/news_email_plaintext.html')
+    t = get_template('offer/news/email_plaintext.html')
     plaintext_body = t.render(c)
-    t = get_template('offer/news/news_email_html.html')
+    t = get_template('offer/news/email_html.html')
     html_body = t.render(c)
     from_email = mass_mail_from
     subject = settings.EMAIL_SUBJECT_PREFIX + news.title

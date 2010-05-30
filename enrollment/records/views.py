@@ -122,19 +122,19 @@ def assign(request, group_id):
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AssignedInThisTypeGroupException:
         request.user.message_set.create(message="Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @login_required
 def change(request, old_id, new_id):
@@ -144,13 +144,13 @@ def change(request, old_id, new_id):
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś studentem.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo podana grupa nie istnieje.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyNotAssignedException:
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś zapisany.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @login_required
 def resign(request, group_id):
@@ -160,13 +160,13 @@ def resign(request, group_id):
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyNotAssignedException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 def records(request, group_id):
     try:
@@ -179,7 +179,7 @@ def records(request, group_id):
         return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Podana grupa nie istnieje.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
         
 @login_required
 def own(request):
@@ -191,7 +191,7 @@ def own(request):
         return render_to_response('enrollment/records/schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
  
 @login_required       
 def schedulePrototype(request):
@@ -209,7 +209,7 @@ def schedulePrototype(request):
         return render_to_response('enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
-        return render_to_response('errorpage.html', context_instance=RequestContext(request))
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
         
     
     

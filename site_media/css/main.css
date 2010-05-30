@@ -366,6 +366,7 @@ a.main-sidebar-toggle-button:hover
 	float: left;
 	padding-left: 20px;
 	background: white url('/site_media/images/search-ico.png') no-repeat 3px 4px;
+    padding: 1px 4px 1px 20px;
 
 	-moz-border-radius: 4px 0 0 4px;
 	-webkit-border-radius: 4px 0 0 4px;

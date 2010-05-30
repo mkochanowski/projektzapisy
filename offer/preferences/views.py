@@ -87,12 +87,13 @@ def undecided_list(request):
 
 @employee_required
 def tree_view(request):
-    return view(request, 'offer/preferences/tree_view.html')
+    return view(request, 'offer/preferences/view_tree.html')
 
 @employee_required
 def list_view(request):
-    return view(request, 'offer/preferences/list_view.html')
+    return view(request, 'offer/preferences/view_list.html')
 
+# TODO: czy ten widok jest wykorzystywany
 @employee_required
 def description(request, proposal_id):
     """

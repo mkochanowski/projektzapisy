@@ -14,7 +14,7 @@ from offer.vote.voteForm   import VoteForm
 @student_required
 def voteMain( request ):
     data = { 'isVoteActive' : SystemState.is_vote_active() }
-    return render_to_response ('offer/vote/voteMain.html', data, context_instance = RequestContext( request ))
+    return render_to_response ('offer/vote/index.html', data, context_instance = RequestContext( request ))
 
 @student_required
 def voteView( request ):
@@ -36,7 +36,7 @@ def voteView( request ):
               'winter_votes'  : winter_votes,
               'unknown_votes' : unknown_votes,
               'vote_sum'      : sum }
-    return render_to_response ('offer/vote/voteView.html', data, context_instance = RequestContext( request ))
+    return render_to_response ('offer/vote/view.html', data, context_instance = RequestContext( request ))
 
 @student_required
 def vote( request ):
@@ -85,17 +85,17 @@ def vote( request ):
                         singleVote.save()
             
 #                data['message'] = u'Głos został pomyślnie zapisany.'
-#                return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
+#                return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
                 return voteView( request )
             else:
                 data['message'] = u'Przekroczono limit głosowania.\
                                   Limit wynosi ' + str(SystemState.get_maxVote()) +\
                                   u', a oddano głos o watości: ' + str(sum) + '.'
-                return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
+                return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
     else:
         data['form'] = VoteForm( winter  = winter_subs,
                          summer  = summer_subs,
                          unknown = unknown_subs,
                          voter   = request.user.student )
             
-    return render_to_response('offer/vote/voteForm.html', data, context_instance = RequestContext( request ))
+    return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))

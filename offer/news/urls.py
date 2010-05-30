@@ -16,7 +16,7 @@ urlpatterns = patterns('offer.news.views',
     url(r'^delete/(?P<object_id>\d+)/$', delete_object, {
                            'model': News,
                            'post_delete_redirect': '/news/',
-                           'template_name': 'offer/news/news_confirm_delete.html',
+                           'template_name': 'offer/news/confirm_delete.html',
                            'template_object_name': 'news',
                            }, name='news-delete'),
 )

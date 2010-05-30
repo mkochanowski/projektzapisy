@@ -14,7 +14,7 @@ from offer.news.utils import news_per_page, prepare_data, \
      render_items, get_search_results_data, mail_news_to_employees
 
 def mainPage( request ):
-    return render_to_response( 'mainPage.html', context_instance = RequestContext( request ) )
+    return render_to_response( 'common/index.html', context_instance = RequestContext( request ) )
 
 def ajax_latest_news(request):
     items = News.objects.new()
@@ -67,7 +67,7 @@ def news_item(request, id):
 
 def display_news_list(request, data={}):
     return render_to_response(
-        'offer/news/news_list.html',
+        'offer/news/list.html',
         data,
         context_instance = RequestContext(request))
 
@@ -84,7 +84,7 @@ def add(request):
             return redirect(latest_news)
     else:
         form = NewsForm()
-    return render_to_response('offer/news/news_form.html', {
+    return render_to_response('offer/news/form.html', {
         'form': form,
         'adding': True,
         },
@@ -107,7 +107,7 @@ def edit(request, id):
     else:
         news_instance = get_object_or_404(News, pk=id)
         form = NewsForm(instance = news_instance)
-    return render_to_response('offer/news/news_form.html', {
+    return render_to_response('offer/news/form.html', {
         'form': form,
         },
         context_instance = RequestContext(request))
