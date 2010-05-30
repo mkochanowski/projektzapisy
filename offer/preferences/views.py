@@ -7,7 +7,7 @@ from django.utils import simplejson
 from offer.preferences.exceptions import *
 from offer.preferences.models import Preference
 from offer.preferences.utils import *
-from offer.proposal.models import Proposal, PROPOSAL_TYPE
+from offer.proposal.models import Proposal#, PROPOSAL_TYPE WTF?!
 from users.decorators import employee_required
 
 from django.core.urlresolvers import reverse

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import offer.proposal.models
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http                    import HttpResponse
@@ -65,7 +66,7 @@ def stop_be_teacher(request, slug):
 @login_required
 def proposals(request):
     proposals = Proposal.objects.all()
-    return render_to_response( 'offer/proposal/proposal_list.html',
+    return render_to_response( 'offer/proposal/proposal_base.html',
         {
             'proposals' : proposals,
             'mode' : 'list'
@@ -98,7 +99,7 @@ def proposal( request, slug, descid = None ):
             'fans'          : proposal.fansCount(),
             'teachers'      : proposal.teachersCount(),
     }
-    return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext( request ) )
+    return render_to_response( 'offer/proposal/proposal_view.html', data, context_instance = RequestContext( request ) )
 
 
 def proposal_form(request, sid = None):
@@ -183,41 +184,50 @@ def proposal_form(request, sid = None):
             description.date = datetime.now()
             description.proposal = proposal
             description.save()
-            
-            bookOrder = request.POST['bookOrder'].split(';')
-            newBooksOrder = []
-            oldBooksOrder = {}            
-            newBookCounter = 0
-            orderNumber = 1            
+
+            # TODO: to poniżej było przekombinowane (szczególnie pod względem
+            # ilości danych, jakie przesyłaliśmy przez formularz). Nie wywalam
+            # kodu, na wypadek, jakbyśmy chcieli oszczędzić usuwanych książek.
+
+#            bookOrder = request.POST['bookOrder'].split(';')
+#            newBooksOrder = []
+#            oldBooksOrder = {}
+#            newBookCounter = 0
+#            orderNumber = 1
                         
-            for order in bookOrder:
-                if order == '_':
-                    if books[newBookCounter] != "":                                                   
-                        newBooksOrder.append(orderNumber)
-                        orderNumber += 1
-                        
-                    newBookCounter += 1
-                else:
-                    book = request.POST.get('book' + str(order), None)
-                    if book:
-                        oldBooksOrder[int(order)] = orderNumber
-                        orderNumber += 1                        
+#            for order in bookOrder:
+#                if order == '_':
+#                    if books[newBookCounter] != "":
+#                        newBooksOrder.append(orderNumber)
+#                        orderNumber += 1
+#
+#                    newBookCounter += 1
+#                else:
+#                    book = request.POST.get('book' + str(order), None)
+#                    if book:
+#                        oldBooksOrder[int(order)] = orderNumber
+#                        orderNumber += 1
             
+#            for book in proposal.books.all():
+#                fieldValue =  request.POST.get('book' + str(book.id), None)
+#                if fieldValue != None:
+#                    if fieldValue == "":
+#                        book.delete()
+#                    else:
+#                        book.name = fieldValue
+#                        book.order = oldBooksOrder[book.id]
+#                        book.save()
+
+            # to tutaj można sobie pooszczędzać na usuwanych obiektach
+            # (patrz TODO kilkadziesiąt linijek wyżej)
             for book in proposal.books.all():
-                fieldValue =  request.POST.get('book' + str(book.id), None)                                                
-                if fieldValue != None:
-                    if fieldValue == "":                    
-                        book.delete()
-                    else:
-                        book.name = fieldValue
-                        book.order = oldBooksOrder[book.id]                        
-                        book.save()
-                                                                       
-          
+                book.delete()
+
             newBookCounter = 0
             for bookName in books:
                 if bookName != "":
-                    book = Book(name = bookName, proposal = proposal, order = newBooksOrder[newBookCounter]).save()                
+#                    book = Book(name = bookName, proposal = proposal, order = newBooksOrder[newBookCounter]).save()
+                    Book(name = bookName, proposal = proposal, order = newBookCounter).save()
                     newBookCounter += 1
                                         
                     
@@ -236,7 +246,6 @@ def proposal_form(request, sid = None):
         for bookName in request.POST.getlist('books[]'):
             booksToForm.append({ "id" : None, "name" : bookName})
     
-    
     data = {
         'editForm'  : True,
         'editMode'  : editMode,
@@ -248,20 +257,22 @@ def proposal_form(request, sid = None):
         'proposalComments'      : proposalComments,
         'mode'          : 'form',
         'proposals'     : Proposal.objects.all(),
-        'proposalTypes' : PROPOSAL_TYPES,
-        'proposalHours' : PROPOSAL_HOURS,
+        'proposalTypes' : offer.proposal.models.proposal.PROPOSAL_TYPES,
+        'proposalHours' : offer.proposal.models.proposal.PROPOSAL_HOURS,
     }
     
     if success:
         return redirect("proposal-page" , slug=proposal.slug)
     else:
-        return render_to_response( 'offer/proposal/proposal_list.html', data, context_instance = RequestContext(request));
+        return render_to_response( 'offer/proposal/proposal_form.html', data, context_instance = RequestContext(request));
 
 @login_required
 def proposal_history( request, sid ):
-    proposal      = Proposal.objects.get( pk = sid)
-    descriptions = proposal.descriptions.order_by( '-date' )
-    data         = { 'descriptions' : descriptions }
+    proposal = Proposal.objects.get( pk = sid)
+    data = {
+        'descriptions' : proposal.descriptions.order_by( '-date' ),
+        'proposals'    : Proposal.objects.all()
+    }
     
     return render_to_response ('offer/proposal/proposal_history.html', data, context_instance = RequestContext(request)) 
     

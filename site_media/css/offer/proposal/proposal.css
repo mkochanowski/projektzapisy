@@ -2,7 +2,7 @@
  * Kształtowanie oferty dydaktycznej - propozycje przedmiotów
  */
 
-#od-proposaloffer-contents
+#od-proposal-contents
 {
 	border: 1px solid #cccccc;
 
@@ -14,29 +14,37 @@
 	padding: 20px 40px;
 }
 
+/* Komunikat widoczny, jeżeli user nie wybierze przedmiotu. */
+#od-proposal-mainMessage
+{
+    text-align: center;
+    font-size: 18px;
+    padding-top: 20px;
+}
+
 /*** LISTA PROPOZYCJI ***/
 
-#od-proposaloffer-proposalmenu
+#od-proposal-proposalmenu
 {
 	margin-top: 30px;
 	width: 170px;
 	float: left;
 }
 
-#od-proposaloffer-proposalmenu #od-proposaloffer-addlink
+#od-proposal-proposalmenu #od-proposal-addlink
 {
 	display:block;
 	margin: 10px 5px;
 }
 
-#od-proposaloffer-proposallist
+#od-proposal-proposallist
 {
 	margin: 0;
 	padding: 0;
 	list-style-type: none;
 }
 
-#od-proposaloffer-proposallist li
+#od-proposal-proposallist li
 {
 	border: 1px solid #cccccc;
 	border-right: 0;
@@ -44,14 +52,14 @@
 	overflow: hidden;
 }
 
-#od-proposaloffer-proposallist li:first-child
+#od-proposal-proposallist li:first-child
 {
 	-moz-border-radius-topleft: 4px;
 	-webkit-border-top-left-radius: 4px;
 	border-top-left-radius: 4px;
 }
 
-#od-proposaloffer-proposallist li:last-child
+#od-proposal-proposallist li:last-child
 {
 	-moz-border-radius-bottomleft: 4px;
 	-webkit-border-bottom-left-radius: 4px;
@@ -59,21 +67,21 @@
 	border-bottom: 1px solid #cccccc;
 }
 
-#od-proposaloffer-proposallist li:first-child a
+#od-proposal-proposallist li:first-child a
 {
 	-moz-border-radius-topleft: 3px;
 	-webkit-border-top-left-radius: 3px;
 	border-top-left-radius: 3px;
 }
 
-#od-proposaloffer-proposallist li:last-child a
+#od-proposal-proposallist li:last-child a
 {
 	-moz-border-radius-bottomleft: 3px;
 	-webkit-border-bottom-left-radius: 3px;
 	border-bottom-left-radius: 3px;
 }
 
-#od-proposaloffer-proposallist li a, #od-proposaloffer-proposallist li span
+#od-proposal-proposallist li a, #od-proposal-proposallist li span
 {
 	padding: 2px;
 	background: #F8F8F8;
@@ -82,12 +90,12 @@
 	text-decoration: none;
 }
 
-#od-proposaloffer-proposallist li a:hover
+#od-proposal-proposallist li a:hover
 {
 	background: #eeeeee;
 }
 
-#od-proposaloffer-proposallist li.active a
+#od-proposal-proposallist li.active a
 {
 	background: white;
 }
@@ -96,86 +104,252 @@
 
 /*** FORMULARZ DODAWANIA / EDYCJI ***/
 
-#od-proposaloffer-form textarea
+#od-proposal-form hr
 {
-	font-family: Arial, Helvetica, sans-serif;
-	width: 100%;
+    margin-top: 30px;
 }
 
-#od-proposaloffer-form table input
-{
-	width: 40px; /* ilości godzin */
-	margin-left: 20px;
-}
-
-
-#od-proposaloffer-form .books .book input
-{
-	width: 300px;	
-}
-
-#od-proposaloffer-form .books  a
-{
-	padding-left: 20px;	
-}
-
-#od-proposaloffer-form .books .label
-{	
-    
-    float: left;
-    width: 100px;
-}
-
-#od-proposaloffer-form .books .field
-{	
-    float: left;
-    
-}
-
-#od-proposaloffer-form .books .book
-{	
-    clear: both;
-}
-
-
-#od-proposaloffer-form-title input
+#od-proposal-form .title input
 {
 	width: 100%;
 	font-size: 30px;
 }
 
-#od-proposaloffer-form-submit
+#od-proposal-form .infoBox
 {
-	text-align: right;
+    font-size: 12px;
+    padding: 0;
+    list-style: none;
+    height: 100%;
+    overflow: hidden;
+    padding: 10px 0;
 }
 
-.proposalField span {
+#od-proposal-form .infoBox li
+{
+    float: right;
+    clear: right;
     width: 300px;
+    text-align: right;
+    padding: 2px;
+
+    height: 100%;
+    overflow: hidden;
+}
+
+#od-proposal-form .infoBox li label
+{
     float: left;
+    padding: 4px;
+}
+
+#od-proposal-form .infoBox .proposedTime select
+{
+    width: 45px;
+}
+
+#od-proposal-form-ects
+{
+    width: 30px;
+}
+
+#od-proposal-form h3
+{
+    font-size: 10px;
+    padding-top: 20px;
+}
+
+#od-proposal-form textarea
+{
+	width: 100%;
+}
+
+#od-proposal-form .mceEditor
+{
     display: block;
 }
 
-.proposalField {
-    height: 100%;
-    overflow: hidden;
-    padding-top: 5px;
+#od-proposal-form .mceLayout
+{
+    width: 100% !important;
 }
 
-.proposalField select {
-    width: 100px;
+#od-proposal-form-books ul
+{
+    list-style: none;
+    padding: 0;
+    padding-left: 20px;
 }
 
-.proposalField input {
-    width: 100px;
+#od-proposal-form-books ul input
+{
+    width: 85%;
 }
 
-.proposalField .mceEditor {
-    clear: both;
-    float: none;
+#od-proposal-form-books li
+{
+    padding: 3px 0;
 }
 
-#books { list-style-type: none; margin: 0; padding: 0; padding-left: 20px;}	
+#od-proposal-form-books img
+{
+    position: relative;
+    top: 2px;
+    margin-left: 3px;
+}
 
+#od-proposal-form-books > input
+{
+    margin-top: 10px;
+    margin-left: 20px;
+    padding: 2px 15px;
+}
 
+#od-proposal-form-submitBar
+{
+    text-align: right;
+}
 
 /*** FORMULARZ DODAWANIA / EDYCJI - koniec ***/
+
+/*** HISTORIA ZMIAN PROPOZYCJI ***/
+
+#od-proposal-history { }
+
+#od-proposal-history .back
+{
+    padding: 0 15px;
+}
+
+#od-proposal-history h2
+{
+    font-weight: normal;
+    font-size: 30px;
+    display: inline;
+}
+
+#od-proposal-history h3
+{
+    padding-top: 20px;
+    padding-bottom: 10px;
+    font-weight: normal;
+}
+
+#od-proposal-history .author
+{
+    padding-left: 10px;
+    color: #999999;
+}
+
+#od-proposal-history .subjectrestore
+{
+    padding-left: 10px;
+}
+
+/*** HISTORIA ZMIAN PROPOZYCJI - koniec ***/
+
+/*** PODGLĄD PROPOZYCJI ***/
+
+#od-proposal-view
+{
+    height: 100%;
+    overflow: hidden;
+}
+
+#od-proposal-view h2
+{
+    font-weight: normal;
+    font-size: 30px;
+}
+
+#od-proposal-view-editBtn
+{
+    float: right;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+    text-indent: 1000px;
+
+    background: #e6e6e6 url('/site_media/images/edit-ico.png') no-repeat center;
+
+    border: 1px solid #cccccc;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+#od-proposal-view .infoBox
+{
+    padding: 0;
+    list-style: none;
+    text-align: right;
+}
+
+#od-proposal-view .infoBox .proposedTime span:first-child:before
+{
+    content: '(';
+}
+
+#od-proposal-view .infoBox .proposedTime span:after
+{
+    content: ',';
+}
+
+#od-proposal-view .infoBox .proposedTime span:last-child:after
+{
+    content: ')';
+}
+
+#od-proposal-view h3
+{
+    font-size: 10px;
+    padding-top: 20px;
+}
+
+#od-proposal-view .books
+{
+    padding-left: 20px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+#od-proposal-view .interested
+{
+    float: left;
+    font-size: 12px;
+    list-style: none;
+    padding: 0;
+}
+
+#od-proposal-view .interested li
+{
+    padding-bottom: 3px;
+}
+
+#od-proposal-view .actions
+{
+    padding-top: 7px;
+    text-align: right;
+    font-size: 12px;
+}
+
+#od-proposal-view .actions p
+{
+    padding-bottom: 3px;
+}
+
+#od-proposal-view .actions a
+{
+    border-right: 1px solid #cccccc;
+    padding-right: 6px;
+    padding-left: 3px;
+}
+
+#od-proposal-view .actions a:last-child
+{
+    border-right: 0;
+    padding-right: 0;
+}
+
+/*** PODGLĄD PROPOZYCJI - koniec ***/
