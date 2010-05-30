@@ -12,6 +12,11 @@ body, html
 	min-width: 1000px;
 }
 
+input, textarea
+{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 body
 {
 	background: #f0f0f0 url('/site_media/images/main-bg.png') repeat-x top;

@@ -12,10 +12,12 @@
 	
 	<script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
 
-	<script type="text/javascript" src="/site_media/js/offer/proposal/form.js"></script>
 	<script type="text/javascript" src="/site_media/js/offer/proposal/history.js"></script>
 	
 	{% include "tinymcebbcode.html" %}
+
+    {% block proposal-scripts %}
+    {% endblock %}
 {% endblock %}
 
 {% block main-navigation %}
@@ -37,8 +39,8 @@
 
 {% block content %}
 	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
-	<div id="od-proposaloffer-proposalmenu">
-		<ul id="od-proposaloffer-proposallist">
+	<div id="od-proposal-proposalmenu">
+		<ul id="od-proposal-proposallist">
 			{% for sub in proposals %}
 				<li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}>
 					<a href="{% url proposal-page slug=sub.slug %}">{{sub.name}}</a>
@@ -46,18 +48,12 @@
 			   {% empty %}<li>Brak przedmiotów</li>
 			{% endfor %}
 		</ul>
-		<a href="/proposal/add/" id="od-proposaloffer-addlink">Dodaj przedmiot</a>
+		<a href="/proposal/add/" id="od-proposal-addlink">Dodaj przedmiot</a>
 	</div>
-	<div id="od-proposaloffer-contents">
-		{% ifequal mode 'form' %}
-			{% include 'offer/proposal/proposal_form.html' %}
-		{% else %}
-			{% ifequal mode 'details' %}
-				{% include 'offer/proposal/proposal.html' %}
-			{% else %}
-				<p>Wybierz przedmiot z menu po lewej.</p>
-			{% endifequal %}
-		{% endifequal %}
+	<div id="od-proposal-contents">
+        {% block proposal-content %}
+            <p id="od-proposal-mainMessage">Wybierz przedmiot z menu po lewej lub dodaj nowy.</p>
+        {% endblock %}
 		<div style="clear: left"></div>
 	</div>
 {% endblock %}

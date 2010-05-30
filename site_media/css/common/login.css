@@ -21,21 +21,7 @@
 #common-login-form td input
 {
     width: 200px;
-    border: 1px solid #999999;
     padding: 4px 7px;
-
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-}
-
-#common-login-form td input:focus
-{
-	outline: 1px solid #A8D6FF;
-
-	-moz-outline-radius: 5px;
-	-webkit-outline-radius: 5px;
-	outline-radius: 5px;
 }
 
 #common-login-form p
