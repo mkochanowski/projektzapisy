@@ -15,7 +15,7 @@
         {% endfor %}
     </ul>
     {% endif %}
-    <h1>{{subject.name}}</h1>
+    <h1>{{subject.name}} {{subject.lol}}</h1>
     <h3>Prowadzący:</h3>
     {% for teacher in subject.teachers.all %}
     	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
@@ -51,13 +51,15 @@
 		        <td>{{ lec.get_group_limit }}</td>
 		        <td>{{ lec.enrolled }}</td>
 	        	<td>
-	        	{% if not lec.signed %}
-		            {% ifnotequal lec.get_group_limit lec.enrolled %}
-		                <a class="subject-details-link" link="{% url record-assign lec.id %}">zapisz</a>
-		            {% endifnotequal %}
-	        	{% else %}
-	            	<a class="subject-details-link" link="{% url record-resign lec.id %}">wypisz</a>
-	        	{% endif %}
+	        	{% if subject.is_recording_open %}
+		        	{% if not lec.signed %}
+			            {% ifnotequal lec.get_group_limit lec.enrolled %}
+			                <a class="subject-details-link" link="{% url record-assign lec.id %}">zapisz</a>
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign lec.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
 	        	</td>
 	        	<td><a class="subject-details-link" link="{% url group-records lec.id %}">Lista zapisanych osób</a></td>
 	        </tr>
@@ -87,17 +89,19 @@
 		        <td>{{ exe.get_group_limit }}</td>
 		        <td>{{ exe.enrolled }}</td>
 	        	<td>
-	        	{% if not exe.signed %}
-		            {% ifnotequal exe.get_group_limit exe.enrolled %}
-		            	{% if subject.user_enrolled_to_exercise %}
-	        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_exercise exe.id %}">przenieś</a>
-	        			{% else %}
-		                	<a class="subject-details-link" link="{% url record-assign exe.id %}">zapisz</a>
-		                {% endif %}
-		            {% endifnotequal %}
-	        	{% else %}
-	            	<a class="subject-details-link" link="{% url record-resign exe.id %}">wypisz</a>
-	        	{% endif %}
+	        	{% if subject.is_recording_open %}
+		        	{% if not exe.signed %}
+			            {% ifnotequal exe.get_group_limit exe.enrolled %}
+			            	{% if subject.user_enrolled_to_exercise %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_exercise exe.id %}">przenieś</a>
+		        			{% else %}
+			                	<a class="subject-details-link" link="{% url record-assign exe.id %}">zapisz</a>
+			                {% endif %}
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign exe.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
 	        	</td>
 	        	<td><a class="subject-details-link" link="{% url group-records exe.id %}">Lista zapisanych osób</a></td>
 	        </tr>
@@ -127,17 +131,19 @@
 		        <td>{{ lab.get_group_limit }}</td>
 		        <td>{{ lab.enrolled }}</td>
 	        	<td>
-	        	{% if not lab.signed %}
-		            {% ifnotequal lab.get_group_limit lab.enrolled %}
-		            	{% if subject.user_enrolled_to_laboratory %}
-	        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_laboratory lab.id %}">przenieś</a>
-	        			{% else %}
-		                	<a class="subject-details-link" link="{% url record-assign lab.id %}">zapisz</a>
-		                {% endif %}
-		            {% endifnotequal %}
-	        	{% else %}
-	            	<a class="subject-details-link" link="{% url record-resign lab.id %}">wypisz</a>
-	        	{% endif %}
+	        	{% if subject.is_recording_open %}
+		        	{% if not lab.signed %}
+			            {% ifnotequal lab.get_group_limit lab.enrolled %}
+			            	{% if subject.user_enrolled_to_laboratory %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_laboratory lab.id %}">przenieś</a>
+		        			{% else %}
+			                	<a class="subject-details-link" link="{% url record-assign lab.id %}">zapisz</a>
+			                {% endif %}
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign lab.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
 	        	</td>
 	        	<td><a class="subject-details-link" link="{% url group-records lab.id %}">Lista zapisanych osób</a></td>
 	        </tr>

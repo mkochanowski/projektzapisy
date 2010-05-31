@@ -24,7 +24,6 @@ def ajaxPin(request):
         group_id = request.POST["GroupId"]
         record = Record.pin_student_to_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś przypięty do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -46,7 +45,6 @@ def ajaxUnpin(request):
         group_id = request.POST["GroupId"]
         record = Record.unpin_student_from_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś wypięty do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -68,7 +66,6 @@ def ajaxAssign(request):
         group_id = request.POST["GroupId"]
         record = Record.add_student_to_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś zapisany do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -99,7 +96,6 @@ def ajaxResign(request):
         group_id = request.POST["GroupId"]
         record = Record.remove_student_from_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś wypisany z grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -132,6 +128,9 @@ def assign(request, group_id):
     except AlreadyAssignedException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except OutOfLimitException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa jest pełna.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
@@ -150,6 +149,12 @@ def change(request, old_id, new_id):
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyNotAssignedException:
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś zapisany.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except OutOfLimitException:
+        request.user.message_set.create(message="Nie możesz się przenieść, bo podana grupa jest pełna.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except RecordsNotOpenException:
+        request.user.message_set.create(message="Nie możesz się przenieść, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @login_required

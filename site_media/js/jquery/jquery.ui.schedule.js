@@ -246,7 +246,7 @@ $.widget("ui.schedule", {
 				},
 				success: function(resp){
 					if(resp.Success) {
-						alert(resp.Success.Message);
+						//alert(resp.Success.Message);
 						successCallback();
 					} 
 					else {

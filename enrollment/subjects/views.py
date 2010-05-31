@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from fereol.enrollment.records.models          import *
 from fereol.enrollment.subjects.models         import *
-from enrollment.subjects.exceptions import NonSubjectException
+from enrollment.subjects.exceptions import NonSubjectException, NonStudentOptionsException
 
 def make_it_json_friendly(element):
     element['entity__name'] = unicode(element['entity__name'])
@@ -30,12 +30,17 @@ def subjects(request):
 
    
 @login_required
-def subject( request, slug ):
+def subject(request, slug):
     try:
         subject = Subject.visible.get(slug=slug)
-        
         subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
         subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
+        
+        try:
+            student_options = StudentOptions.get_student_options_for_subject(request.user.student.id, subject.id)
+            subject.is_recording_open = student_options.is_recording_open()
+        except NonStudentOptionsException:
+            subject.is_recording_open = False
         
         lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
         exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
