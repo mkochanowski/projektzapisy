@@ -192,7 +192,8 @@
         "fields": {
             "visible": true, 
             "type": "l", 
-            "year": 2010
+            "year": 2010,
+			"records_opening" : "2010-01-01 00:00:00"
         }
     }, 
     {
@@ -201,7 +202,8 @@
         "fields": {
             "visible": true, 
             "type": "z", 
-            "year": 2010
+            "year": 2010,
+			"records_opening" : "2010-01-01 00:00:00"
         }
     }
 ]

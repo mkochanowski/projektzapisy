@@ -38,11 +38,8 @@ class Student(BaseUser):
     ''' 
     Student.
     '''
-    matricula = models.CharField(max_length=20, default="", unique=True)
-    records_opening_hour = models.DateTimeField(blank = True, null = True)
+    matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
+    records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
     
     def __unicode__(self):
         return str(self.user)
-
-# tutsj oczywiscie bedziemy dodawac pola wg uznania
-# widok w adminie rowniez do zaprojektownia (na podstawie w/w pol)

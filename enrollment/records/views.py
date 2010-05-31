@@ -48,11 +48,11 @@ def ajaxUnpin(request):
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
-        data['Exception']['Message'] = "Nie możesz się wypięty, bo nie jesteś studentem."
+        data['Exception']['Message'] = "Nie możesz zostać wypięty, bo nie jesteś studentem."
     except NonGroupException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonGroup"
-        data['Exception']['Message'] = "Nie możesz się wypięty, bo podana grupa nie istnieje."
+        data['Exception']['Message'] = "Nie możesz zostać wypięty, bo podana grupa nie istnieje."
     except AlreadyUnPinnedException:
         data['Exception'] = {}
         data['Exception']['Code'] = "AlreadyNotUnPinned"

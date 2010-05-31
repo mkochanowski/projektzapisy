@@ -119,7 +119,7 @@
         "pk": 1, 
         "model": "users.student", 
         "fields": {
-			"records_opening_hour": "2010-05-25 10:35:31",
+			"records_opening_delay_hours": 0,
             "matricula": "221135", 
             "user": 5
         }

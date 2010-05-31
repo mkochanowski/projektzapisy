@@ -18,24 +18,8 @@ class StudentOptions( models.Model ):
     
     def get_opening_delay_hours(self):
         """ returns records opening delay as imteger standing for hours """
-        return self.records_opening_delay_hours
-
-    def is_recording_open(self):
-        """ gives the answer to question: is student enrolling open for this subject at the very moment? """
-        records_opening = self.get_records_opening_datetime()
-        if records_opening == None:
-            return False
-        else:
-            return records_opening < datetime.now()
-        
-    def get_records_opening_datetime(self):
-        """ returns datetime meaning when records for particular subject starts to be open for student """
-        student_records_opening_hour = self.student.records_opening_hour
-        if student_records_opening_hour == None:
-            return None
-        else:
-            return student_records_opening_hour + self.get_opening_delay_timedelta()
-
+        student_records_opening_delay_hours = self.student.records_opening_delay_hours
+        return student_records_opening_delay_hours + self.records_opening_delay_hours
     
     @staticmethod
     def get_student_options_for_subject(student_id, subject_id):

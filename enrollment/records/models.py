@@ -156,8 +156,7 @@ class Record( models.Model ):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            student_options = StudentOptions.get_student_options_for_subject(student.id, group.subject.id)
-            if not student_options.is_recording_open():
+            if not group.subject.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             if Record.number_of_students(group=group) < group.limit:
                 if (Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
@@ -191,8 +190,7 @@ class Record( models.Model ):
             student = user.student  
             old_group = Group.objects.get(id=old_id)
             new_group = Group.objects.get(id=new_id)
-            student_options = StudentOptions.get_student_options_for_subject(student.id, new_group.subject.id)
-            if not student_options.is_recording_open():
+            if not new_group.subject.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             if Record.number_of_students(group=new_group) < new_group.limit:
                 record = Record.enrolled.get(group=old_group, student=student)

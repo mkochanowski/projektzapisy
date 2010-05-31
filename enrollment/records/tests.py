@@ -42,9 +42,11 @@ class AddUserToGroupTest(TestCase):
         self.group.save()
         self.assertRaises(OutOfLimitException, Record.add_student_to_group, self.user.id, self.group.id)
         
-    def testSubjectWithWithRecordsNotOpenForStudent(self):
-        self.user.student.records_opening_hour = datetime.now()
+    def testSubjectWithRecordsNotOpenForStudent(self):
+        self.user.student.records_opening_delay_hours = 0
         self.user.student.save()
+        self.group.subject.semester.records_opening = datetime.now()
+        self.group.subject.semester.save()
         student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
         student_options.records_opening_delay_hours = 10
         student_options.save()
