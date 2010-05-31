@@ -24,13 +24,13 @@
 
         <ul class="infoBox">
             <li>Sugerowany rodzaj: {{ proposal.get_type_display }}</li>
-            {% if proposal.lectures > 0 or proposal.repetitories > 0 or proposal.exercises > 0 or proposal.laboratories > 0 %}
+            {% if proposal.lectures or proposal.repetitories or proposal.exercises or proposal.laboratories %}
             <li class="proposedTime">
                 Wymiar godzin:
-                {% if proposal.lectures > 0 %}<span title="sugerowana ilość godzin wykładów">{{ proposal.lectures }}w.</span>{% endif %}
-                {% if proposal.repetitories > 0 %}<span title="sugerowana ilość godzin repetytoriów">{{ proposal.repetitories }}r.</span>{% endif %}
-                {% if proposal.exercises > 0 %}<span title="sugerowana ilość godzin ćwiczeń">{{ proposal.exercises }}ćw.</span>{% endif %}
-                {% if proposal.laboratories > 0 %}<span title="sugerowana ilość godzin pracowni">{{ proposal.laboratories }}p.</span>{% endif %}
+                {% if proposal.lectures %}<span title="sugerowana ilość godzin wykładów">{{ proposal.lectures }}w.</span>{% endif %}
+                {% if proposal.repetitories %}<span title="sugerowana ilość godzin repetytoriów">{{ proposal.repetitories }}r.</span>{% endif %}
+                {% if proposal.exercises %}<span title="sugerowana ilość godzin ćwiczeń">{{ proposal.exercises }}ćw.</span>{% endif %}
+                {% if proposal.laboratories %}<span title="sugerowana ilość godzin pracowni">{{ proposal.laboratories }}p.</span>{% endif %}
             </li>
             {% endif %}
             <li>Sugerowana ilość punktów ECTS: {{ proposal.ects }}</li>

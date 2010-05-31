@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import datetime
 import offer.proposal.models
 
+from datetime                       import datetime
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http                    import HttpResponse
 from django.shortcuts               import render_to_response
