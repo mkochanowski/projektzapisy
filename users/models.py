@@ -29,6 +29,8 @@ class Employee(BaseUser):
         verbose_name="otrzymuje mailem ogłoszenia OD")
     
     class Meta:
+        verbose_name = 'pracownik'
+        verbose_name_plural = 'Pracownicy'
         app_label = 'users'
         
     def __unicode__(self):
@@ -40,6 +42,11 @@ class Student(BaseUser):
     '''
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
+    
+    class Meta:
+        verbose_name = 'student'
+        verbose_name_plural = 'studenci'
+        app_label = 'users'
     
     def __unicode__(self):
         return str(self.user)
