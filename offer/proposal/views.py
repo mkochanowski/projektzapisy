@@ -179,6 +179,7 @@ def proposal_form(request, sid = None):
             proposal.save()
             
             description = ProposalDescription()
+            description.author = request.user
             description.description = proposalDescription
             description.requirements = proposalRequirements
             description.comments = proposalComments
@@ -286,6 +287,7 @@ def proposal_restore ( request, descid ):
     newdesc.comments    = olddesc.comments
     newdesc.date        = datetime.now()
     newdesc.proposal    = olddesc.proposal
+    newdesc.author      = olddesc.author # czy oznaczac jakos osobe przywracajaca?
     newdesc.save()
     
     return proposal( request, olddesc.proposal.slug )

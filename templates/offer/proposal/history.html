@@ -17,7 +17,7 @@
 						<a href="{% url proposal-page-archival slug=descriptions.0.proposal.slug descid=desc.id  %}">{{ desc.date|date:"Y F d G:i:s" }}</a>
 					</strong>
                     <span class="author">
-                        (Jan Kowalski) {# @Todo: name of author #}
+                        <a href={% url profile desc.author.id %}>{{desc.author.get_full_name}}</a>
                     </span>
 					<a class="subjectrestore" href="{% url proposal-restore descid=desc.id %}">przywróć</a>
 				</li>

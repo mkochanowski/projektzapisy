@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.contrib.auth.models import User
 
 from offer.proposal.models.proposal_description_tag import ProposalDescriptionTag
 
@@ -11,7 +12,8 @@ class ProposalDescription(models.Model):
     comments = models.TextField( verbose_name = 'uwagi' )
     date = models.DateTimeField(verbose_name = 'data dodania')
     tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
-    
+    author = models.ForeignKey(User, related_name = 'autor')
+
     class Meta:
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
