@@ -4,6 +4,21 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from offer.proposal.models.proposal_description_tag import ProposalDescriptionTag
+          
+PROPOSAL_TYPES = (
+    ('seminar', 'Seminarium'),
+    ('req',  'Obowiązkowy'),
+    ('cs_1', 'Informatyczny'),
+    ('cs_2', 'Informatyczny 2'),
+)
+
+PROPOSAL_HOURS = (
+    (0, 0),
+    (15, 15),
+    (30, 30),
+    (45, 45),
+    (60, 60),
+)
 
 class ProposalDescription(models.Model):
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
@@ -13,6 +28,17 @@ class ProposalDescription(models.Model):
     date = models.DateTimeField(verbose_name = 'data dodania')
     tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
     author = models.ForeignKey(User, related_name = 'autor')
+    type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
+        verbose_name = 'typ')
+    ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
+    lectures = models.IntegerField(verbose_name='ilość godzin wykładów', 
+        choices = PROPOSAL_HOURS)
+    repetitories = models.IntegerField(verbose_name='ilość godzin repetytoriów', 
+        choices = PROPOSAL_HOURS)
+    exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń', 
+        choices = PROPOSAL_HOURS)
+    laboratories = models.IntegerField(verbose_name='ilość godzin pracowni', 
+        choices = PROPOSAL_HOURS)
 
     class Meta:
         verbose_name = 'opis przedmiotu'

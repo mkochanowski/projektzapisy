@@ -8,7 +8,7 @@ from offer.preferences.exceptions import *
 from offer.preferences.models import Preference
 from offer.preferences.utils import *
 from offer.proposal.models import Proposal
-from offer.proposal.models.proposal import PROPOSAL_TYPES
+from offer.proposal.models.proposal_description import PROPOSAL_TYPES
 from users.decorators import employee_required
 
 from django.core.urlresolvers import reverse
@@ -45,7 +45,7 @@ def view(request, template):
             obj['tutorial'] = pref.tutorial
             obj['lab']      = pref.lab
             obj['hidden']   = pref.hidden
-            obj['type']     = pref.proposal.type
+            obj['type']     = pref.proposal.description.type
             return obj
         data['prefs'] = map(process_pref, data['prefs'])
         return HttpResponse(simplejson.dumps(data))
@@ -108,7 +108,7 @@ def description(request, proposal_id):
     if format == 'json':
         data = {}
         data['name'] = description.proposal.name
-        data['type'] = description.proposal.type
+        data['type'] = description.type
         data['description'] = description.description
         data['requirements'] = description.requirements
         data['comments'] = description.comments

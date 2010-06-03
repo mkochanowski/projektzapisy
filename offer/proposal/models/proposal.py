@@ -9,21 +9,6 @@ import re
 
 from proposal_tag import ProposalTag
 from users.models import Employee, Student
-          
-PROPOSAL_TYPES = (
-    ('seminar', 'Seminarium'),
-    ('req',  'Obowiązkowy'),
-    ('cs_1', 'Informatyczny'),
-    ('cs_2', 'Informatyczny 2'),
-)
-
-PROPOSAL_HOURS = (
-    (0, 0),
-    (15, 15),
-    (30, 30),
-    (45, 45),
-    (60, 60),
-)
 
 class Proposal( models.Model ):
     name = models.CharField(max_length = 255,
@@ -35,17 +20,6 @@ class Proposal( models.Model ):
     teachers = models.ManyToManyField('users.Employee', blank=True, 
                                       verbose_name='poprowadziliby to')
     tags = models.ManyToManyField(ProposalTag, blank = True)
-    type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
-        verbose_name = 'typ')
-    ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
-    lectures = models.IntegerField(verbose_name='ilość godzin wykładów', 
-        choices = PROPOSAL_HOURS)
-    repetitories = models.IntegerField(verbose_name='ilość godzin repetytoriów', 
-        choices = PROPOSAL_HOURS)
-    exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń', 
-        choices = PROPOSAL_HOURS)
-    laboratories = models.IntegerField(verbose_name='ilość godzin pracowni', 
-        choices = PROPOSAL_HOURS)
                 
     class Meta:
         verbose_name = 'przedmiot'
@@ -121,7 +95,7 @@ class Proposal( models.Model ):
     
     def __unicode__(self):
         return self.name
-        
+  
     def createSlug(self, name):
         slug = name.lower()
         slug = re.sub(u'ą', "a", slug)

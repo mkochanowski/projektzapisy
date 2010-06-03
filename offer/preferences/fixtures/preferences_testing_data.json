@@ -10,18 +10,12 @@
     "pk": 1, 
     "model": "proposal.proposal", 
     "fields": {
-      "lectures": 15, 
       "name": "Kurs 1", 
-      "ects": 6, 
       "tags": [
         1
       ], 
-      "repetitories": 15, 
       "fans": [], 
       "teachers": [], 
-      "exercises": 15, 
-      "laboratories": 15, 
-      "type": "cs_1", 
       "slug": "kurs1"
     }
   }, 
@@ -29,18 +23,12 @@
     "pk": 2, 
     "model": "proposal.proposal", 
     "fields": {
-      "lectures": 15, 
       "name": "Kurs 2", 
-      "ects": 6, 
       "tags": [
         1
       ], 
-      "repetitories": 15, 
       "fans": [], 
       "teachers": [], 
-      "exercises": 15, 
-      "laboratories": 15, 
-      "type": "cs_2", 
       "slug": "kurs2"
     }
   }, 
@@ -48,18 +36,12 @@
     "pk": 3, 
     "model": "proposal.proposal", 
     "fields": {
-      "lectures": 15, 
       "name": "Seminarium 1", 
-      "ects": 3, 
       "tags": [
         1
       ], 
-      "repetitories": 0, 
       "fans": [], 
       "teachers": [], 
-      "exercises": 0, 
-      "laboratories": 0, 
-      "type": "seminar", 
       "slug": "seminarium1"
     }
   }, 
@@ -73,6 +55,12 @@
       "comments": "Uwagi", 
       "date": "2010-05-15 18:37:00", 
       "proposal": 1,
+      "lectures": 15, 
+      "repetitories": 15, 
+      "exercises": 15, 
+      "laboratories": 15, 
+      "type": "cs_1", 
+      "ects": 6, 
       "author": 1
     }
   }, 
@@ -86,6 +74,12 @@
       "comments": "Uwagi", 
       "date": "2010-05-15 18:37:37", 
       "proposal": 2,
+      "lectures": 15, 
+      "ects": 6, 
+      "repetitories": 15, 
+      "exercises": 15, 
+      "laboratories": 15, 
+      "type": "cs_2", 
       "author": 1
     }
   }, 
@@ -99,6 +93,12 @@
       "comments": "Uwagi", 
       "date": "2010-05-15 18:38:10", 
       "proposal": 3,
+      "lectures": 15, 
+      "ects": 3, 
+      "repetitories": 0, 
+      "exercises": 0, 
+      "laboratories": 0, 
+      "type": "seminar", 
       "author": 1
     }
   }, 

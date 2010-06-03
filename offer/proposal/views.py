@@ -153,14 +153,7 @@ def proposal_form(request, sid = None):
         books = request.POST.getlist('books[]')
         
         proposal.name = proposalName
-        proposal.slug = proposal.createSlug(proposal.name)
-                
-        proposal.type = proposalType
-        proposal.ects = proposalEcts
-        proposal.lectures = proposalLectures
-        proposal.repetitories = proposalRepetitories
-        proposal.exercises = proposalExercises
-        proposal.laboratories = proposalLaboratories                
+        proposal.slug = proposal.createSlug(proposal.name)             
         
         if Proposal.objects.filter(slug = proposal.slug).exclude(id = proposal.id).count() > 0:                
             message = 'Istnieje już przedmiot o takiej nazwie'
@@ -182,6 +175,12 @@ def proposal_form(request, sid = None):
             description.author = request.user
             description.description = proposalDescription
             description.requirements = proposalRequirements
+            description.type = proposalType
+            description.ects = proposalEcts
+            description.lectures = proposalLectures
+            description.repetitories = proposalRepetitories
+            description.exercises = proposalExercises
+            description.laboratories = proposalLaboratories   
             description.comments = proposalComments
             description.date = datetime.now()
             description.proposal = proposal
@@ -259,8 +258,8 @@ def proposal_form(request, sid = None):
         'proposalComments'      : proposalComments,
         'mode'          : 'form',
         'proposals'     : Proposal.objects.all(),
-        'proposalTypes' : offer.proposal.models.proposal.PROPOSAL_TYPES,
-        'proposalHours' : offer.proposal.models.proposal.PROPOSAL_HOURS,
+        'proposalTypes' : offer.proposal.models.proposal_description.PROPOSAL_TYPES,
+        'proposalHours' : offer.proposal.models.proposal_description.PROPOSAL_HOURS,
     }
     
     if success:
@@ -281,13 +280,19 @@ def proposal_history( request, sid ):
 @login_required
 def proposal_restore ( request, descid ):
     olddesc             = ProposalDescription.objects.get( pk = descid )
-    newdesc             = ProposalDescription()
-    newdesc.description = olddesc.description
-    newdesc.requirements = olddesc.requirements
-    newdesc.comments    = olddesc.comments
+    newdesc             = olddesc.copy()
+#    newdesc.description = olddesc.description
+#    newdesc.requirements = olddesc.requirements
+#    newdesc.comments    = olddesc.comments
     newdesc.date        = datetime.now()
-    newdesc.proposal    = olddesc.proposal
-    newdesc.author      = olddesc.author # czy oznaczac jakos osobe przywracajaca?
+#    newdesc.proposal    = olddesc.proposal
+#    newdesc.author      = olddesc.author # czy oznaczac jakos osobe przywracajaca?
+#    newdesc.type = proposalType
+#    newdesc.ects = proposalEcts
+#    newdesc.lectures = proposalLectures
+#    newdesc.repetitories = proposalRepetitories
+#    newdesc.exercises = proposalExercises
+#    newdesc.laboratories = proposalLaboratories  
     newdesc.save()
     
     return proposal( request, olddesc.proposal.slug )

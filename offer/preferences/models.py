@@ -27,7 +27,7 @@ class PreferenceManager(models.Manager):
         if not hidden:
             prefs = prefs.exclude(hidden=True)
         if types:
-            prefs = prefs.filter(proposal__type__in=types)
+            prefs = prefs.filter(proposal__descriptions__type__in=types)
         if query: # TODO: zaawansowane filtrowanie
             prefs = prefs.filter(proposal__name__icontains=query)
         return prefs
