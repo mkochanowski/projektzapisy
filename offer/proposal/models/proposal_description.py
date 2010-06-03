@@ -64,7 +64,7 @@ class ProposalDescription(models.Model):
         description = ProposalDescription.objects.filter(proposal = proposal, 
                                                          pk__lt = self.id)
         if description:
-            return description[0]
+            return description[description.count()-1]
         else:
             return None
     
