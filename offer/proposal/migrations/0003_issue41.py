@@ -7,30 +7,6 @@ from django.core.management import call_command
 class Migration(SchemaMigration):
    
     def forwards(self, orm):
-        
-        # Adding field 'Proposal.lectures'
-        db.add_column('proposal_proposal', 'lectures', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-
-        # Adding field 'Proposal.laboratories'
-        db.add_column('proposal_proposal', 'laboratories', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-
-        # Adding field 'Proposal.ects'
-        db.add_column('proposal_proposal', 'ects', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-
-        # Adding field 'Proposal.exercises'
-        db.add_column('proposal_proposal', 'exercises', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-
-        # Adding field 'Proposal.repetitories'
-        db.add_column('proposal_proposal', 'repetitories', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-
-        # Adding field 'Proposal.type'
-        db.add_column('proposal_proposal', 'type', self.gf('django.db.models.fields.CharField')(default='cs_2', max_length=30), keep_default=False)
-
-        # Adding field 'ProposalDescription.requirements'
-        db.add_column('proposal_proposaldescription', 'requirements', self.gf('django.db.models.fields.TextField')(default=''), keep_default=False)
-
-        # Adding field 'ProposalDescription.comments'
-        db.add_column('proposal_proposaldescription', 'comments', self.gf('django.db.models.fields.TextField')(default=''), keep_default=False)
 
         # Adding M2M table for field fans on 'Proposal'
         db.create_table('proposal_proposal_fans', (
@@ -52,30 +28,6 @@ class Migration(SchemaMigration):
    
    
     def backwards(self, orm):
-        
-        # Deleting field 'Proposal.lectures'
-        db.delete_column('proposal_proposal', 'lectures')
-
-        # Deleting field 'Proposal.laboratories'
-        db.delete_column('proposal_proposal', 'laboratories')
-
-        # Deleting field 'Proposal.ects'
-        db.delete_column('proposal_proposal', 'ects')
-
-        # Deleting field 'Proposal.exercises'
-        db.delete_column('proposal_proposal', 'exercises')
-
-        # Deleting field 'Proposal.repetitories'
-        db.delete_column('proposal_proposal', 'repetitories')
-
-        # Deleting field 'Proposal.type'
-        db.delete_column('proposal_proposal', 'type')
-
-        # Deleting field 'ProposalDescription.requirements'
-        db.delete_column('proposal_proposaldescription', 'requirements')
-
-        # Deleting field 'ProposalDescription.comments'
-        db.delete_column('proposal_proposaldescription', 'comments')
        
         # Removing M2M table for field fans on 'Proposal'
         db.delete_table('proposal_proposal_fans')

@@ -101,7 +101,8 @@
       "tags": [2], 
       "comments": "Uwagi", 
       "date": "2010-05-15 18:37:00", 
-      "proposal": 1
+      "proposal": 1,
+      "author": 1
     }
   }, 
   {
@@ -113,7 +114,9 @@
       "tags": [], 
       "comments": "Uwagi", 
       "date": "2010-05-15 18:37:37", 
-      "proposal": 2
+      "proposal": 2,
+      "author": 1
+
     }
   }, 
   {
@@ -125,7 +128,8 @@
       "tags": [], 
       "comments": "Uwagi", 
       "date": "2010-05-15 18:38:10", 
-      "proposal": 3
+      "proposal": 3,
+      "author": 1
     }
   }, 
   {
