@@ -70,7 +70,7 @@ class Record( models.Model ):
             return groups
         except Student.DoesNotExist:
             raise NonStudentException()
-    
+         
     @staticmethod
     def get_groups_with_records_for_subject(slug, user_id, group_type):
         try:

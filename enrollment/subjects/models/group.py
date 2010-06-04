@@ -21,7 +21,7 @@ class Group(models.Model):
             return u'(nieznany prowadzący)'
         else:
             return self.teacher.user.get_full_name()
-
+    
     def get_all_terms(self):
         """return all terms of current group""" 
         return self.term.all()

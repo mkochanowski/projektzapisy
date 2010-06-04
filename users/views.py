@@ -8,7 +8,8 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from users.exceptions import NonUserException
+from users.exceptions import NonUserException, NonEmployeeException
+from users.models import Employee
 from users.forms import EmailChangeForm
 
 def profile(request, user_id):
@@ -21,12 +22,6 @@ def profile(request, user_id):
     #dodac redirecta
 
 @login_required
-# to ma dostac inna nazwe, poniewaz pod "profile" zrobilem profil uzytkownika o podanym id, 
-# ktory nie jest koniecznie planem zajec np. profil wykladowcy       - P.Kacprzak
-
-#def profile(request):
-#   return redirect('/records/schedule', context_instance = RequestContext( request ))
-
 def email_change(request):
     '''function that enables mail changing'''
     if request.POST:
@@ -50,6 +45,35 @@ def password_change_done(request):
 def my_profile(request):
     '''profile site'''
     return render_to_response('users/my_profile.html', context_instance = RequestContext( request ))
+
+@login_required
+def employee_schedule(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        employee = Employee.objects.get(user=user)
+        groups = Employee.get_schedule(user.id)
+        data = {
+            'groups' : groups,
+            'employee' : employee,
+        }
+        return render_to_response('users/employee_schedule.html', data, context_instance=RequestContext(request))
+    except Employee.DoesNotExist:
+        request.user.message_set.create(message="Nie ma takiego pracownika")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonEmployeeException:
+        request.user.message_set.create(message="Nie ma takiego pracownika 1.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except User.DoesNotExist:
+        request.user.message_set.create(message="Nie ma takiego użytkownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+@login_required
+def employees_list(request):
+    employees = Employee.objects.all()
+    data = {
+            "employees" : employees,
+            }  
+    return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
 
 @login_required
 def logout(request):

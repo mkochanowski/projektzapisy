@@ -1,0 +1,18 @@
+{% extends "enrollment/base-enrollment.html" %}
+
+{% block main-navigation %}
+<li>
+    Zapisy
+</li>
+<li>
+    <a href="{% url employees-list %}">Pracownicy</a>
+</li>
+{% endblock %}
+
+{% block content %}
+<ul>
+{% for e in employees %}
+	<li><a href="{% url employee-schedule e.user.id %}">{{e.get_full_name}}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -37,6 +37,7 @@ def subject(request, slug):
         subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
         
         try:
+            student = Student.objects.get(user=request.user)
             student_options = StudentOptions.get_student_options_for_subject(request.user.student.id, subject.id)
             subject.is_recording_open = student_options.is_recording_open()
         except NonStudentOptionsException:
@@ -60,7 +61,7 @@ def subject(request, slug):
 
 
 @login_required
-def list_of_subjects( request ):
+def list_of_subjects(request):
     semester_name, list_of_types = "", []
     keyword, semester = "", None
     response = Subject.visible.all()      
@@ -91,5 +92,4 @@ def list_of_subjects( request ):
         result = {'semester_name' : semester_name, 'subjects' : response }
 
         return HttpResponse(simplejson.dumps(result), mimetype="application/javascript")
- 
  

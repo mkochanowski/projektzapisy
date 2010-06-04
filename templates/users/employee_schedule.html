@@ -1,0 +1,40 @@
+{% extends "enrollment/base-enrollment.html" %}
+
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/jquery/jquery.ui.schedule.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/enrollment/records/schedule.css" type="text/css" />
+{% endblock %}
+{% block scripts %}
+    <script src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js" type="text/javascript"></script>
+	<script src="/site_media/js/jquery/jquery.ui.employee-schedule.js" type="text/javascript"></script>
+	<script src="/site_media/js/enrollment/records/schedule.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block main-navigation %}
+<li>Zapisy</li>
+<li><a href="{% url employees-list %}">Pracownicy</a></li>
+<li>{{employee.user.first_name}} {{employee.user.last_name}}</li>
+{% endblock %}
+
+{% block content %}
+	<div id="schedule-wrapper">
+		{% for group in groups %}
+			{% for term in group.terms_ %}
+				<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}" 
+					subjectID="{{group.subject_.pk}}"
+					groupID="{{group.pk}}"
+					termID="{{term.pk}}"
+					from="{{ term.time_from_in_minutes }}" 
+					minutes="{{ term.length_in_minutes }}" 
+					day="{{ term.day_in_zero_base }}">
+					{{group}}<br/>
+					(s.{{term.classroom}})
+				</div>
+			{% endfor %}
+		{% endfor %}
+	</div>
+	<br/>
+	<h3>Konsultacje:</h3>
+	<p>{{employee.consultations}}</p>
+{% endblock %}
+
