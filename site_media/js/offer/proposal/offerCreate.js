@@ -4,6 +4,7 @@ $(document).ready(
     {
         $('[name=selectSubject]').click(selectSubject);
         $('.teachersDetails').each(showTeachersDetails);
+        $('.helpersDetails').each(showHelpersDetails);
         //$('.teachersDetails').click(showTeachersDetails);
     }
 );
@@ -57,3 +58,13 @@ function showTeachersDetails()
     
     $(this).colorbox({ "inline" : true, "href" : "#teachers" + id, "title" : ""});
 }
+
+function showHelpersDetails()
+{
+    var id = $(this).attr('subject');
+    
+    $(this).colorbox({ "inline" : true, "href" : "#helpers" + id, "title" : ""});
+}
+
+
+

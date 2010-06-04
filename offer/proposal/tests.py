@@ -16,32 +16,32 @@ class ProposalFansTest(TestCase):
         self.proposall = Proposal.objects.get( name='Kurs 1' )
 
     def testUserJoinToFans(self):
-        self.proposall.addUserToFans(self.firstUser)
+        self.proposall.add_user_to_group(self.firstUser, 'fans')
         self.assertEqual(self.proposall.fans.count(), 1)
 
     def testUsersJoinToFans(self):
-        self.proposall.addUserToFans(self.firstUser)
-        self.proposall.addUserToFans(self.secondUser)
+        self.proposall.add_user_to_group(self.firstUser, 'fans')
+        self.proposall.add_user_to_group(self.secondUser, 'fans')
         self.assertEqual(self.proposall.fans.count(), 2)
 
     def testUserStopBeFan1(self):
-        self.proposall.addUserToFans(self.firstUser)
-        self.proposall.deleteUserFromFans(self.firstUser)
+        self.proposall.add_user_to_group(self.firstUser, 'fans')
+        self.proposall.delete_user_from_group(self.firstUser, 'fans')
         self.assertEqual(self.proposall.fans.all().count(), 0)
 
     def testUserStopBeFan2(self):
-        self.proposall.addUserToFans(self.firstUser)
-        self.proposall.addUserToFans(self.secondUser)
-        self.proposall.deleteUserFromFans(self.firstUser)
+        self.proposall.add_user_to_group(self.firstUser, 'fans')
+        self.proposall.add_user_to_group(self.secondUser, 'fans')
+        self.proposall.delete_user_from_group(self.firstUser, 'fans')
         self.assertEqual(self.proposall.fans.all().count(), 1)
 
 # sprawdzanie uprawnien:
     def testUserIsntFan(self):
-        self.assertRaises(NonStudentException, self.proposall.addUserToFans, self.thirdUser)
+        self.assertRaises(NonStudentException, self.proposall.add_user_to_group, self.thirdUser, 'fans')
     def testUserIsntFan2(self):
-        self.assertRaises(NonStudentException, self.proposall.deleteUserFromFans, self.thirdUser)
+        self.assertRaises(NonStudentException, self.proposall.add_user_to_group, self.thirdUser, 'fans')
         
-class ProposalTeachersTest(TestCase):
+class ProposalhelpersTest(TestCase):
     fixtures = ['proposal_testing_users.json', 'proposal_testing.json']
     
     def setUp(self):
@@ -50,31 +50,67 @@ class ProposalTeachersTest(TestCase):
         self.thirdUser  = User.objects.get(pk=5) 
         self.proposal   = Proposal.objects.get(pk=1)
         
-    def testUserJoinToTeachers(self):
-        self.proposal.addUserToTeachers(self.firstUser)
-        self.assertEqual(self.proposal.teachers.count(), 1)
+    def testUserJoinTohelpers(self):
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 1)
 
-    def testUsersJoinToTeachers(self):
-        self.proposal.addUserToTeachers(self.firstUser)
-        self.proposal.addUserToTeachers(self.secondUser)
-        self.assertEqual(self.proposal.teachers.count(), 2)
+    def testUsersJoinTohelpers(self):
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.proposal.add_user_to_group(self.secondUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 2)
 
     def testUserStopBeTeacher1(self):
-        self.proposal.addUserToTeachers(self.firstUser)
-        self.proposal.deleteUserFromTeachers(self.firstUser)
-        self.assertEqual(self.proposal.teachers.count(), 0)
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.proposal.delete_user_from_group(self.firstUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 0)
 
     def testUserStopBeTeacher2(self):
-        self.proposal.addUserToTeachers(self.firstUser)
-        self.proposal.addUserToTeachers(self.secondUser)
-        self.proposal.deleteUserFromTeachers(self.firstUser)
-        self.assertEqual(self.proposal.teachers.count(), 1)
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.proposal.add_user_to_group(self.secondUser, 'helpers')
+        self.proposal.delete_user_from_group(self.firstUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 1)
 
     def testUserIsntTeacher(self):
-        self.assertRaises(NonEmployeeException, self.proposal.addUserToTeachers, self.thirdUser)
+        self.assertRaises(NonEmployeeException, self.proposal.add_user_to_group, self.thirdUser, 'helpers')
 
     def testUserIsntTeacher2(self):
-        self.assertRaises(NonEmployeeException, self.proposal.deleteUserFromTeachers, self.thirdUser)
+        self.assertRaises(NonEmployeeException, self.proposal.delete_user_from_group, self.thirdUser, 'helpers')
+
+class ProposalHelpersTest(TestCase):
+    fixtures = ['proposal_testing_users.json', 'proposal_testing.json']
+    
+    def setUp(self):
+        self.firstUser  = User.objects.get(pk=4)
+        self.secondUser = User.objects.get(pk=3)
+        self.thirdUser  = User.objects.get(pk=5) 
+        self.proposal   = Proposal.objects.get(pk=1)
+        
+    def testUserJoinToHelpers(self):
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 1)
+
+    def testUsersJoinToHelpers(self):
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.proposal.add_user_to_group(self.secondUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 2)
+
+    def testUserStopBeHepler1(self):
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.proposal.delete_user_from_group(self.firstUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 0)
+
+    def testUserStopBeHepler2(self):
+        self.proposal.add_user_to_group(self.firstUser, 'helpers')
+        self.proposal.add_user_to_group(self.secondUser, 'helpers')
+        self.proposal.delete_user_from_group(self.firstUser, 'helpers')
+        self.assertEqual(self.proposal.helpers.count(), 1)
+
+    def testUserIsntEmployee(self):
+        self.assertRaises(NonEmployeeException, self.proposal.add_user_to_group, self.thirdUser, 'helpers')
+
+    def testUserIsntEmployee(self):
+        self.assertRaises(NonEmployeeException, self.proposal.delete_user_from_group, self.thirdUser, 'helpers')
+
 
 class ProposalTaggingTest(TestCase):
     fixtures = ['proposal_testing_users.json', 'proposal_testing.json']

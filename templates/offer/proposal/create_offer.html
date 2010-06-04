@@ -25,6 +25,7 @@
 				<th style="text-align: left;">Przedmiot</th>
 				<th>Poparcie</th>
 				<th>Chętni do poprowadzenia</th>
+				<th>Chętni do pomocy</th>
 			</tr>
 			{% for subject in subjects %}
 			<tr {% if subject.inOffer %}class="selected"{% endif %}>
@@ -32,11 +33,17 @@
 					<input type="checkbox" name="selectSubject" value="{{ subject.id }}" autocomplete="off" {% if subject.inOffer %}checked{% endif %} />
 				</td>
 				<td>{{ subject.name }}</td>
-				<td class="cen">{{ subject.fansCount }}</td>
+				<td class="cen">{{ subject.fans_count }}</td>
 				<td class="cen">
-				    {% ifequal subject.teachersCount 0 %}0
+				    {% ifequal subject.teachers_count 0 %}0
                     {% else %}
-                        <a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachersCount }}</a>
+                        <a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachers_count }}</a>
+                    {% endifequal %}
+                </td>
+				<td class="cen">
+				    {% ifequal subject.helpers_count 0 %}0
+                    {% else %}
+                        <a href="#" subject="{{ subject.id }}" class="helpersDetails">{{ subject.helpers_count }}</a>
                     {% endifequal %}
                 </td>
 			</tr>
@@ -48,6 +55,18 @@
 				<div class="teacher" id="teachers{{ subject.id }}">
 				    {% for teacher in subject.teachers.all %}
 					<div>{{ teacher.first_name }} {{ teacher.last_name }}</div>
+					{% endfor %}
+				</div>
+			{% empty %}
+			     <div>- brak -</div>
+			{% endfor %}
+		</div>
+
+		<div class="helpers">
+			{% for subject in subjects %}
+				<div class="helper" id="helpers{{ subject.id }}">
+				    {% for helper in subject.helpers.all %}
+					<div>{{ helper.first_name }} {{ helper.last_name }}</div>
 					{% endfor %}
 				</div>
 			{% empty %}

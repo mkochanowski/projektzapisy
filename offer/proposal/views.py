@@ -13,10 +13,10 @@ from offer.proposal.models          import *
 from offer.proposal.exceptions      import *
 
 @login_required
-def become_fan(request, slug):
+def become(request, slug, group):
     try:
         proposal = Proposal.objects.get(slug=slug)
-        proposal.addUserToFans(request.user)
+        proposal.add_user_to_group(request.user, group)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
         request.user.message_set.create(message="Nie jesteś studentem.")
@@ -26,36 +26,10 @@ def become_fan(request, slug):
         return render_to_response('common/error.html', context_instance=RequestContext(request))
         
 @login_required
-def become_teacher(request, slug):
+def stop_be(request, slug, group):
     try:
         proposal = Proposal.objects.get(slug=slug)
-        proposal.addUserToTeachers(request.user)
-        return redirect("proposal-page" , slug=slug)
-    except NonStudentException:
-        request.user.message_set.create(message="Nie jesteś studentem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-    except NonEmployeeException:
-        request.user.message_set.create(message="Nie jesteś pracownkiem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-
-@login_required
-def stop_be_fan(request, slug):
-    try:
-        proposal = Proposal.objects.get(slug=slug)
-        proposal.deleteUserFromFans(request.user)
-        return redirect("proposal-page" , slug=slug)
-    except NonStudentException:
-        request.user.message_set.create(message="Nie jesteś studentem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-    except NonEmployeeException:
-        request.user.message_set.create(message="Nie jesteś pracownkiem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-
-@login_required
-def stop_be_teacher(request, slug):
-    try:
-        proposal = Proposal.objects.get(slug=slug)
-        proposal.deleteUserFromTeachers(request.user)
+        proposal.delete_user_from_group(request.user, group)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
         request.user.message_set.create(message="Nie jesteś studentem.")
@@ -76,15 +50,13 @@ def proposals(request):
 @login_required
 def proposal( request, slug, descid = None ):
     proposal = Proposal.objects.get(slug=slug)
-    newest = proposal.description()
+    newest   = proposal.description()
+
     if descid:
         proposal.description = ProposalDescription.objects.get( pk = descid )
     else:
         proposal.description = newest
         descid = proposal.description.id
-        
-    next = proposal.description.getNewer( proposal )
-    prev = proposal.description.getOlder( proposal )
 
     data = {
             'proposal'      : proposal,
@@ -93,12 +65,14 @@ def proposal( request, slug, descid = None ):
             'descid'        : int(descid),
             'newest'        : newest,
             'id'            : proposal.id,
-            'next'          : next,
-            'prev'          : prev,
-            'isFan'         : proposal.isFan(request.user),
-            'isTeacher'     : proposal.isTeacher(request.user),
-            'fans'          : proposal.fansCount(),
-            'teachers'      : proposal.teachersCount(),
+            'next'          : proposal.description.getNewer( proposal ),
+            'prev'          : proposal.description.getOlder( proposal ),
+            'isFan'         : proposal.is_in_group(request.user, 'fans'),
+            'isTeacher'     : proposal.is_in_group(request.user, 'teachers'),
+            'isHelper'      : proposal.is_in_group(request.user, 'helpers'),
+            'fans'          : proposal.fans_count(),
+            'teachers'      : proposal.teachers_count(),
+            'helpers'       : proposal.helpers_count()
     }
     return render_to_response( 'offer/proposal/view.html', data, context_instance = RequestContext( request ) )
 
@@ -281,20 +255,8 @@ def proposal_history( request, sid ):
 def proposal_restore ( request, descid ):
     olddesc             = ProposalDescription.objects.get( pk = descid )
     newdesc             = olddesc.copy()
-#    newdesc.description = olddesc.description
-#    newdesc.requirements = olddesc.requirements
-#    newdesc.comments    = olddesc.comments
     newdesc.date        = datetime.now()
-#    newdesc.proposal    = olddesc.proposal
-#    newdesc.author      = olddesc.author # czy oznaczac jakos osobe przywracajaca?
-#    newdesc.type = proposalType
-#    newdesc.ects = proposalEcts
-#    newdesc.lectures = proposalLectures
-#    newdesc.repetitories = proposalRepetitories
-#    newdesc.exercises = proposalExercises
-#    newdesc.laboratories = proposalLaboratories  
     newdesc.save()
-    
     return proposal( request, olddesc.proposal.slug )
 
 @permission_required('proposal.can_create_offer')

@@ -16,6 +16,7 @@
       ], 
       "fans": [], 
       "teachers": [], 
+      "helpers": [],
       "slug": "kurs1"
     }
   }, 
@@ -28,7 +29,8 @@
         1
       ], 
       "fans": [], 
-      "teachers": [], 
+      "teachers": [],  
+      "helpers": [],
       "slug": "kurs2"
     }
   }, 
@@ -41,7 +43,8 @@
         1
       ], 
       "fans": [], 
-      "teachers": [], 
+      "teachers": [],  
+      "helpers": [],
       "slug": "seminarium1"
     }
   }, 

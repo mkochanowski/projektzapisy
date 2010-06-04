@@ -26,6 +26,9 @@
 #offerCreate tr.selected td {
     background: #E9F7EF;
 }
+.helpers div {
+    display: none;
+}
 
 .teachers div {
     display: none;
@@ -35,6 +38,13 @@
     width: 500px;
 }
 
+.helper {
+    width: 500px;
+}
 .teacher div {
+padding: 3px 5px;
+}
+
+.helper div {
 padding: 3px 5px;
 }

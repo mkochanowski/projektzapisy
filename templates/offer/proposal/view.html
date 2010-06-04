@@ -27,10 +27,10 @@
             {% if proposal.description.lectures or proposal.description.repetitories or proposal.description.exercises or proposal.laboratories %}
             <li class="proposedTime">
                 Wymiar godzin:
-                {% if proposal.description.lectures %}<span title="sugerowana ilość godzin wykładów">{{ proposal.description.lectures }}w.</span>{% endif %}
-                {% if proposal.description.repetitories %}<span title="sugerowana ilość godzin repetytoriów">{{ proposal.description.repetitories }}r.</span>{% endif %}
-                {% if proposal.description.exercises %}<span title="sugerowana ilość godzin ćwiczeń">{{ proposal.description.exercises }}ćw.</span>{% endif %}
-                {% if proposal.description.laboratories %}<span title="sugerowana ilość godzin pracowni">{{ proposal.description.laboratories }}p.</span>{% endif %}
+                {% if proposal.description.lectures %}<span title="sugerowana liczba godzin wykładów">{{ proposal.description.lectures }}w.</span>{% endif %}
+                {% if proposal.description.repetitories %}<span title="sugerowana liczba godzin repetytoriów">{{ proposal.description.repetitories }}r.</span>{% endif %}
+                {% if proposal.description.exercises %}<span title="sugerowana liczba godzin ćwiczeń">{{ proposal.description.exercises }}ćw.</span>{% endif %}
+                {% if proposal.description.laboratories %}<span title="sugerowana liczba godzin pracowni">{{ proposal.description.laboratories }}p.</span>{% endif %}
             </li>
             {% endif %}
             <li>Sugerowana ilość punktów ECTS: {{ proposal.description.ects }}</li>
@@ -79,21 +79,26 @@
             </li>
             <li>
                 {% if user.employee %}
-                    <a onclick="alert('TODO: Nie zaimplementowano')">Poprowadzę to</a> (chętnych: 3)
+                    {% if isTeacher %}
+                        <a href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
+                    {% else %}
+                        <a href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
+                    {% endif %}
+                    (chętnych: {{teachers}})
                 {% else %}
-                    Poprowadzą: 3
+                    Poprowadzą: {{teachers}})
                 {% endif %}
             </li>
             <li>
                 {% if user.employee %}
-                    {% if isTeacher %}
-                        <a href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie pomogę poprowadzić</a>
+                    {% if isHelper %}
+                        <a href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
                     {% else %}
-                        <a href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
+                        <a href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
                     {% endif %}
-                    (chętnych: {{teachers}})
+                    (chętnych: {{helpers}})
                 {% else %}
-                    Pomogą prowadzić: {{teachers}}
+                    Pomogą prowadzić: {{helpers}}
                 {% endif %}
             </li>
         </ul>

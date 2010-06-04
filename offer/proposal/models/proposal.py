@@ -17,8 +17,10 @@ class Proposal( models.Model ):
                             unique = True, verbose_name='odnośnik' )
     fans     = models.ManyToManyField('users.Student', blank=True, 
                                       verbose_name='poszli by na to')
-    teachers = models.ManyToManyField('users.Employee', blank=True, 
+    teachers = models.ManyToManyField('users.Employee', blank=True, related_name='proposal_teachers_related',
                                       verbose_name='poprowadziliby to')
+    helpers = models.ManyToManyField('users.Employee', blank=True,  related_name='proposal_helpers_related',
+                                      verbose_name='pomogliby poprowadzić to')
     tags = models.ManyToManyField(ProposalTag, blank = True)
                 
     class Meta:
@@ -38,65 +40,103 @@ class Proposal( models.Model ):
         else:
             return None            
 
-    def isFan(self, user):
+    def is_in_group(self, user, group):
+        """
+            Is true when user is in group.
+            Possible groups:
+            fans
+            teachers
+            helpers
+        """
+        if group == 'fans':
+            field = self.fans
+        elif group == 'teachers':
+            field = self.teachers
+        elif group == 'helpers':
+            field = self.helpers
+
         try:
-            if self.fans.get(user = user):
+            if field.get(user = user):
                 return True
             else:
                 return False
         except Student.DoesNotExist:
             return False
-            
-    def isTeacher(self, user):
-        try:
-            if self.teachers.get(user = user):
-                return True
-            else:
-                return False
         except Employee.DoesNotExist:
             return False            
-    def addUserToFans(self, user):
-        try:
-            student = user.student
-            self.fans.add(student)
-            self.save()
-        except Student.DoesNotExist:
-            raise NonStudentException()
-
-    def deleteUserFromFans(self, user):
-        try:
-            student = user.student
-            self.fans.remove(student)
-            self.save()
-        except Student.DoesNotExist:
-            raise NonStudentException()
             
-    def addUserToTeachers(self, user):
+    def add_user_to_group(self, user, group):
+        """
+            Add user to group
+            Possible group:
+            fans
+            teachers
+            helpers
+        """
         try:
-            teacher = user.employee
-            self.teachers.add(teacher)
+            if group == 'fans':
+                field = self.fans
+                person = user.student
+            elif group == 'teachers':
+                field = self.teachers
+                person = user.employee
+            elif group == 'helpers':
+                field = self.helpers
+                person = user.employee
+            field.add(person)
             self.save()
+        except Student.DoesNotExist:
+            raise NonStudentException()
         except Employee.DoesNotExist:
             raise NonEmployeeException()
 
-    def deleteUserFromTeachers(self, user):
+    def delete_user_from_group(self, user, group):
+        """
+            Delete user from group
+            Possible group:
+            fans
+            teachers
+            helpers
+        """
         try:
-            teacher = user.employee
-            self.teachers.remove(teacher)
+            if group == 'fans':
+                field = self.fans
+                person = user.student
+            elif group == 'teachers':
+                field = self.teachers
+                person = user.employee
+            elif group == 'helpers':
+                field = self.helpers
+                person = user.employee
+            field.remove(person)
             self.save()
+        except Student.DoesNotExist:
+            raise NonStudentException()
         except Employee.DoesNotExist:
-            raise NonEmployeeException()
+            raise NonEmployeeException()            
                 
-    def fansCount(self):
+    def fans_count(self):
+        """
+            Count fans
+        """
         return self.fans.all().count()
         
-    def teachersCount(self):
+    def teachers_count(self):
+        """
+            Count teachers
+        """
         return self.teachers.all().count()
+        
+    def helpers_count(self):
+        """
+            Count helpers
+        """
+        return self.helpers.all().count()
     
     def __unicode__(self):
         return self.name
   
-    def createSlug(self, name):
+    def createSlug(self,name):
         slug = name.lower()
         slug = re.sub(u'ą', "a", slug)
         slug = re.sub(u'ę', "e", slug)
