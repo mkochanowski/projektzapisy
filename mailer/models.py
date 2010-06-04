@@ -1,13 +1,15 @@
+# -*- coding: utf8 -*-
+
 from datetime import datetime
 
 from django.db import models
 
 
 PRIORITIES = (
-    ('1', 'high'),
-    ('2', 'medium'),
-    ('3', 'low'),
-    ('4', 'deferred'),
+    ('1', 'wysoki'),
+    ('2', 'średni'),
+    ('3', 'niski'),
+    ('4', 'odroczona'),
 )
 
 
@@ -61,16 +63,20 @@ class Message(models.Model):
     
     objects = MessageManager()
     
-    to_address = models.CharField(max_length=50)
-    from_address = models.CharField(max_length=50)
-    subject = models.CharField(max_length=100)
-    message_body = models.TextField()
-    message_body_html = models.TextField(blank=True)
-    when_added = models.DateTimeField(default=datetime.now)
-    priority = models.CharField(max_length=1, choices=PRIORITIES, default='2')
+    to_address = models.CharField(max_length=50, verbose_name = 'odbiorca')
+    from_address = models.CharField(max_length=50, verbose_name = 'nadawca')
+    subject = models.CharField(max_length=100, verbose_name = 'temat')
+    message_body = models.TextField(verbose_name = 'treść')
+    message_body_html = models.TextField(blank=True, verbose_name = 'treść html')
+    when_added = models.DateTimeField(default=datetime.now, verbose_name = 'dodano')
+    priority = models.CharField(max_length=1, choices=PRIORITIES, default='2', verbose_name = 'priorytet')
     # @@@ campaign?
     # @@@ content_type?
     
+    class Meta:
+        verbose_name        = 'wiadomość'
+        verbose_name_plural = 'wiadomości'
+
     def defer(self):
         self.priority = '4'
         self.save()
@@ -101,20 +107,20 @@ class DontSendEntry(models.Model):
     
     objects = DontSendEntryManager()
     
-    to_address = models.CharField(max_length=50)
-    when_added = models.DateTimeField()
+    to_address = models.CharField(max_length=50,  verbose_name = 'adres')
+    when_added = models.DateTimeField(verbose_name = 'od kiedy')
     # @@@ who added?
     # @@@ comment field?
     
     class Meta:
-        verbose_name = 'don\'t send entry'
-        verbose_name_plural = 'don\'t send entries'
+        verbose_name = 'blokada'
+        verbose_name_plural = 'blokady'
 
 
 RESULT_CODES = (
-    ('1', 'success'),
-    ('2', 'don\'t send'),
-    ('3', 'failure'),
+    ('1', 'sukces'),
+    ('2', 'nie wysłane'),
+    ('3', 'niepowodzenie'),
     # @@@ other types of failure?
 )
 
@@ -147,17 +153,20 @@ class MessageLog(models.Model):
     objects = MessageLogManager()
     
     # fields from Message
-    to_address = models.CharField(max_length=50)
-    from_address = models.CharField(max_length=50)
-    subject = models.CharField(max_length=100)
-    message_body = models.TextField()
-    message_body_html = models.TextField(blank=True)
-    when_added = models.DateTimeField()
-    priority = models.CharField(max_length=1, choices=PRIORITIES)
+    to_address = models.CharField(max_length=50, verbose_name = 'odbiorca')
+    from_address = models.CharField(max_length=50, verbose_name = 'nadawca')
+    subject = models.CharField(max_length=100, verbose_name = 'temat')
+    message_body = models.TextField(verbose_name = 'treść')
+    message_body_html = models.TextField(blank=True, verbose_name = 'treść html')
+    when_added = models.DateTimeField(verbose_name = 'dodano')
+    priority = models.CharField(max_length=1, choices=PRIORITIES, verbose_name = 'priorytet')
     # @@@ campaign?
     
     # additional logging fields
-    when_attempted = models.DateTimeField(default=datetime.now)
-    result = models.CharField(max_length=1, choices=RESULT_CODES)
-    log_message = models.TextField()
+    when_attempted = models.DateTimeField(default=datetime.now, verbose_name = 'czas próby')
+    result = models.CharField(max_length=1, choices=RESULT_CODES, verbose_name = 'wynik')
+    log_message = models.TextField(verbose_name = 'wiadomość') # jakaś lepsza nazwa?
     
+    class Meta:
+        verbose_name = 'log'
+        verbose_name_plural = 'logi'
