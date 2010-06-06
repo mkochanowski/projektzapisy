@@ -32,12 +32,18 @@ EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
 #django-loggin settings:
 
-LOG_FILE = "./logs/log.log"
-LOG_LEVEL = logging.NOTSET 
-INTERNAL_IPS = ('127.0.0.1','156.17.4.35',)
-LOGGING_LOG_SQL = True
+# LOG_FILE = "./logs/log.log"
+# LOG_LEVEL = logging.NOTSET 
+INTERNAL_IPS = ('127.0.0.1',)
 
-logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
+def custom_show_toolbar(request):
+    return DEBUG
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+}
+
+# logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -84,8 +90,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'djangologging.middleware.LoggingMiddleware',
-    'djangologging.middleware.SuppressLoggingOnAjaxRequestsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'fereol.urls'
@@ -110,6 +115,7 @@ INSTALLED_APPS = (
     'fereol.offer.proposal',
     'fereol.offer.vote',
     'fereol.users',
+    'fereol.debug_toolbar',
 )
 FIXTURE_DIRS = (
     './offer/proposal/fixtures',
