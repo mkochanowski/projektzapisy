@@ -27,6 +27,9 @@ PROPOSAL_HOURS = (
     (60, 60),
 )
 
+def get_some_user():
+    return User.objects.all()[0]
+
 class ProposalDescription(models.Model):
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
     description = models.TextField( verbose_name = 'opis' )
@@ -34,7 +37,7 @@ class ProposalDescription(models.Model):
     comments = models.TextField( verbose_name = 'uwagi' )
     date = models.DateTimeField(verbose_name = 'data dodania')
     tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
-    author = models.ForeignKey(User, related_name = 'autor')
+    author  = models.ForeignKey(User, default=get_some_user, related_name='autor')
     type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
         verbose_name = 'typ')
     ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
