@@ -34,7 +34,7 @@ EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
 LOG_FILE = "./logs/log.log"
 LOG_LEVEL = logging.NOTSET 
-INTERNAL_IPS = ('127.0.0.1',)
+INTERNAL_IPS = ('127.0.0.1','156.17.4.35',)
 LOGGING_LOG_SQL = True
 
 logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
