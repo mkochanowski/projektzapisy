@@ -35,7 +35,7 @@ class ProposalDescription(models.Model):
     comments = models.TextField( verbose_name = 'uwagi' )
     date = models.DateTimeField(verbose_name = 'data dodania')
     tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
-    authors = models.ForeignKey(User, related_name='autor')
+    author= models.ForeignKey(User, related_name='autor', null = True)
     type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
         verbose_name = 'typ')
     ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')

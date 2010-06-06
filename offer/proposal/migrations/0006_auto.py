@@ -79,7 +79,7 @@ class Migration(SchemaMigration):
         },
         'proposal.proposaldescription': {
             'Meta': {'object_name': 'ProposalDescription'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'autor'", 'to': "orm['auth.User']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'autor'", 'to': "orm['auth.User']", 'null': 'True'}),
             'comments': ('django.db.models.fields.TextField', [], {}),
             'date': ('django.db.models.fields.DateTimeField', [], {}),
             'description': ('django.db.models.fields.TextField', [], {}),

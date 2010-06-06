@@ -9,8 +9,10 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding field 'ProposalDescription.author'
-        db.add_column('proposal_proposaldescription', 'author', self.gf('django.db.models.fields.related.ForeignKey')(default='orm.User.objects.all()[0]', related_name='autor', to=orm['auth.User']), keep_default=False)
-    
+       db.add_column('proposal_proposaldescription', 'author', self.gf('django.db.models.fields.related.ForeignKey')(null=True, related_name='autor', to=orm['auth.User']), keep_default=False)
+       for desc in orm.ProposalDescription.objects.all():
+            desc.author = orm.User.objects.all()[0]
+            desc.save()
     
     def backwards(self, orm):
         
@@ -79,7 +81,7 @@ class Migration(SchemaMigration):
         },
         'proposal.proposaldescription': {
             'Meta': {'object_name': 'ProposalDescription'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'autor'", 'to': "orm['auth.User']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'autor'", 'to': "orm['auth.User']", 'null': 'True'}),
             'comments': ('django.db.models.fields.TextField', [], {}),
             'date': ('django.db.models.fields.DateTimeField', [], {}),
             'description': ('django.db.models.fields.TextField', [], {}),
