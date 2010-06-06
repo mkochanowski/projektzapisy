@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding field 'ProposalDescription.author'
-        db.add_column('proposal_proposaldescription', 'author', self.gf('django.db.models.fields.related.ForeignKey')(default=orm.User.objects.all()[0], related_name='autor', to=orm['auth.User']), keep_default=False)
+        db.add_column('proposal_proposaldescription', 'author', self.gf('django.db.models.fields.related.ForeignKey')(default='orm.User.objects.all()[0]', related_name='autor', to=orm['auth.User']), keep_default=False)
     
     
     def backwards(self, orm):
