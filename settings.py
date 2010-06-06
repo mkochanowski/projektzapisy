@@ -30,7 +30,7 @@ EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
-#django-loggin settings:
+#loggin settings:
 
 # LOG_FILE = "./logs/log.log"
 # LOG_LEVEL = logging.NOTSET 
