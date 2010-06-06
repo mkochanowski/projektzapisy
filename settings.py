@@ -1,6 +1,7 @@
 # Django settings for fereol project.
 
 import os
+import logging
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -28,6 +29,15 @@ EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
+
+#django-loggin settings:
+
+LOG_FILE = "./logs/log.log"
+LOG_LEVEL = logging.NOTSET 
+INTERNAL_IPS = ('127.0.0.1',)
+LOGGING_LOG_SQL = True
+
+logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -74,6 +84,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'djangologging.middleware.LoggingMiddleware',
+    'djangologging.middleware.SuppressLoggingOnAjaxRequestsMiddleware',
 )
 
 ROOT_URLCONF = 'fereol.urls'
