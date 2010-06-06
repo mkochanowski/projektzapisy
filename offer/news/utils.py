@@ -15,7 +15,7 @@ from haystack.query import SearchQuerySet
 from mailer import send_html_mail
 
 from offer.news.models import News
-from users.models import Employee
+from users.models import Employee, Student
 
 mass_mail_from = 'noreply@example.com'
 news_per_page = 5
@@ -130,6 +130,17 @@ def send_mass_mail_to_employees(msg_parts):
     for email in emails:
         send_html_mail(subject, text_body, html_body, 
                        mass_mail_from, [email])
+                       
+def send_mass_mail_to_students(msg_parts):
+    """
+    Queue mass mail to students who haven't opted out.
+    """
+    (subject, text_body, html_body) = msg_parts
+    emails = [emp.user.email for emp in
+              Student.objects.filter(receive_mass_mail_offer=True)]
+    for email in emails:
+        send_html_mail(subject, text_body, html_body, 
+                       mass_mail_from, [email])
 
 def mail_news_to_employees(news):
     """
@@ -137,3 +148,10 @@ def mail_news_to_employees(news):
     that haven't opted out.
     """
     send_mass_mail_to_employees(render_email_from_news(news))
+    
+def mail_news_to_students(news):
+    """
+    Queue news in form of a mail message to all students
+    that haven't opted out.
+    """
+    send_mass_mail_to_students(render_email_from_news(news))
