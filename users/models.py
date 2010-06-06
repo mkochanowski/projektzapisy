@@ -74,6 +74,9 @@ class Student(BaseUser):
     '''
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
+    receive_mass_mail_offer = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia OD")
     
     class Meta:
         verbose_name = 'student'

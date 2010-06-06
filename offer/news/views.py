@@ -11,7 +11,7 @@ from django.utils import simplejson
 from offer.news.forms import NewsForm
 from offer.news.models import News
 from offer.news.utils import news_per_page, prepare_data, \
-     render_items, get_search_results_data, mail_news_to_employees
+     render_items, get_search_results_data, mail_news_to_employees, mail_news_to_students
 
 def mainPage( request ):
     return render_to_response( 'common/index.html', context_instance = RequestContext( request ) )
@@ -81,6 +81,7 @@ def add(request):
             news.save()
             request.user.message_set.create(message="Opublikowano ogłoszenie.")
             mail_news_to_employees(news)
+            mail_news_to_students(news)
             return redirect(latest_news)
     else:
         form = NewsForm()
@@ -103,6 +104,7 @@ def edit(request, id):
             news.save()
             request.user.message_set.create(message="Zapisano zmiany w ogłoszeniu.")
             mail_news_to_employees(news)
+            mail_news_to_students(news)
             return redirect(latest_news)
     else:
         news_instance = get_object_or_404(News, pk=id)
