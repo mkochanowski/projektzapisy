@@ -7,16 +7,9 @@ from offer.proposal.models.proposal_description_tag import ProposalDescriptionTa
           
 PROPOSAL_TYPES = (
     ('seminar', 'Seminarium'),
-    ('req_1',  'Obowiązkowy I'),
-    ('req_2',  'Obowiązkowy II'),
-    ('req_3',  'Obowiązkowy III'),
+    ('req',  'Obowiązkowy'),
     ('cs_1', 'Informatyczny I'),
     ('cs_2', 'Informatyczny II'),
-    ('cou', 'Kurs'),
-    ('noi', 'Nieinformatyczny'),
-    ('pro', 'Projekt'),
-    ('lek', 'Lektorat'),
-    ('wf', 'WF'),
 )
 
 PROPOSAL_HOURS = (
@@ -35,7 +28,7 @@ class ProposalDescription(models.Model):
     comments = models.TextField( verbose_name = 'uwagi' )
     date = models.DateTimeField(verbose_name = 'data dodania')
     tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
-    author= models.ForeignKey(User, related_name='autor', null = True)
+    author= models.ForeignKey(User, related_name='autor')
     type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
         verbose_name = 'typ')
     ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
