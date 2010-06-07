@@ -112,7 +112,49 @@
     	</tbody>
     </table>
     {% endif %}
-    
+	
+	{% if exercises_adv %}
+	<h3>Ćwiczenia (poziom zaawansowany):</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for ea in exercises_adv %}
+	        <tr>
+		        <td>{{ ea.get_teacher_full_name }}</td>
+		        <td>
+		            {% for d in ea.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
+		            {% endfor %}
+		        </td>
+		        <td>{{ ea.classroom.all|join:", " }}</td> 
+		        <td>{{ ea.get_group_limit }}</td>
+		        <td>{{ ea.enrolled }}</td>
+	        	<td>
+	        	{% if subject.is_recording_open %}
+		        	{% if not ea.signed %}
+			            {% ifnotequal ea.get_group_limit ea.enrolled %}
+			            	{% if subject.user_enrolled_to_eaoratory %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_eaoratory ea.id %}">przenieś</a>
+		        			{% else %}
+			                	<a class="subject-details-link" link="{% url record-assign ea.id %}">zapisz</a>
+			                {% endif %}
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign ea.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
+	        	</td>
+	        	<td><a class="subject-details-link" link="{% url group-records ea.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table> 
+    {% endif %}   
+	
     {% if laboratories %}
 	<h3>Pracownia:</h3>
     <table>
@@ -149,6 +191,176 @@
 		        {% endif %}
 	        	</td>
 	        	<td><a class="subject-details-link" link="{% url group-records lab.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table> 
+    {% endif %} 
+
+
+{% if exer_exlabs %}
+	<h3>Ćwiczenio-pracownie:</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for exlab in exer_exlabs %}
+	        <tr>
+		        <td>{{ exlab.get_teacher_full_name }}</td>
+		        <td>
+		            {% for d in exlab.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
+		            {% endfor %}
+		        </td>
+		        <td>{{ exlab.classroom.all|join:", " }}</td> 
+		        <td>{{ exlab.get_group_limit }}</td>
+		        <td>{{ exlab.enrolled }}</td>
+	        	<td>
+	        	{% if subject.is_recording_open %}
+		        	{% if not exlab.signed %}
+			            {% ifnotequal exlab.get_group_limit exlab.enrolled %}
+			            	{% if subject.user_enrolled_to_exlaboratory %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_exlaboratory exlab.id %}">przenieś</a>
+		        			{% else %}
+			                	<a class="subject-details-link" link="{% url record-assign exlab.id %}">zapisz</a>
+			                {% endif %}
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign exlab.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
+	        	</td>
+	        	<td><a class="subject-details-link" link="{% url group-records exlab.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table> 
+    {% endif %}   
+	
+	
+	{% if seminar %}
+	<h3>Seminarium:</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for ea in seminar %}
+	        <tr>
+		        <td>{{ sem.get_teacher_full_name }}</td>
+		        <td>
+		            {% for d in sem.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
+		            {% endfor %}
+		        </td>
+		        <td>{{ sem.classroom.all|join:", " }}</td> 
+		        <td>{{ sem.get_group_limit }}</td>
+		        <td>{{ sem.enrolled }}</td>
+	        	<td>
+	        	{% if subject.is_recording_open %}
+		        	{% if not sem.signed %}
+			            {% ifnotequal sem.get_group_limit sem.enrolled %}
+			            	{% if subject.user_enrolled_to_eaoratory %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_eaoratory sem.id %}">przenieś</a>
+		        			{% else %}
+			                	<a class="subject-details-link" link="{% url record-assign sem.id %}">zapisz</a>
+			                {% endif %}
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign sem.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
+	        	</td>
+	        	<td><a class="subject-details-link" link="{% url group-records sem.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table> 
+    {% endif %}   
+
+	{% if language %}
+	<h3>Lektorat:</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for lang in language %}
+	        <tr>
+		        <td>{{ lang.get_teacher_full_name }}</td>
+		        <td>
+		            {% for d in lang.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
+		            {% endfor %}
+		        </td>
+		        <td>{{ lang.classroom.all|join:", " }}</td> 
+		        <td>{{ lang.get_group_limit }}</td>
+		        <td>{{ lang.enrolled }}</td>
+	        	<td>
+	        	{% if subject.is_recording_open %}
+		        	{% if not lang.signed %}
+			            {% ifnotequal lang.get_group_limit lang.enrolled %}
+			            	{% if subject.user_enrolled_to_langoratory %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_langoratory lang.id %}">przenieś</a>
+		        			{% else %}
+			                	<a class="subject-details-link" link="{% url record-assign lang.id %}">zapisz</a>
+			                {% endif %}
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign lang.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
+	        	</td>
+	        	<td><a class="subject-details-link" link="{% url group-records lang.id %}">Lista zapisanych osób</a></td>
+	        </tr>
+    	{% endfor %}
+    	</tbody>
+    </table> 
+    {% endif %}   
+	
+	{% if sport %}
+	<h3>Pracownia:</h3>
+    <table>
+    	<thead>
+    		<tr>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    		</tr>
+    	</thead>
+    	<tbody>
+	    {% for ss in sport %}
+	        <tr>
+		        <td>{{ ss.get_teacher_full_name }}</td>
+		        <td>
+		            {% for d in ss.get_all_terms|dictsort:"dayOfWeek" %}
+		               {{d}}<br/>
+		            {% endfor %}
+		        </td>
+		        <td>{{ ss.classroom.all|join:", " }}</td> 
+		        <td>{{ ss.get_group_limit }}</td>
+		        <td>{{ ss.enrolled }}</td>
+	        	<td>
+	        	{% if subject.is_recording_open %}
+		        	{% if not ss.signed %}
+			            {% ifnotequal ss.get_group_limit ss.enrolled %}
+			            	{% if subject.user_enrolled_to_ssoratory %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_ssoratory ss.id %}">przenieś</a>
+		        			{% else %}
+			                	<a class="subject-details-link" link="{% url record-assign ss.id %}">zapisz</a>
+			                {% endif %}
+			            {% endifnotequal %}
+		        	{% else %}
+		            	<a class="subject-details-link" link="{% url record-resign ss.id %}">wypisz</a>
+		        	{% endif %}
+		        {% endif %}
+	        	</td>
+	        	<td><a class="subject-details-link" link="{% url group-records ss.id %}">Lista zapisanych osób</a></td>
 	        </tr>
     	{% endfor %}
     	</tbody>
