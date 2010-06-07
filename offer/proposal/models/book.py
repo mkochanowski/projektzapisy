@@ -1,5 +1,9 @@
 # -*- coding: utf8 -*-
 
+"""
+    Book for bibliography
+"""
+
 from django.db import models
 
 class Book( models.Model ):

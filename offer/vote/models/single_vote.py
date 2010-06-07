@@ -8,9 +8,12 @@ from datetime  import date
 from django.db import models
 
 from offer.proposal.models import Proposal
-from systemState           import SystemState
+from system_state          import SystemState
 
 class SingleVote ( models.Model ):
+    """
+        Student's single vote
+    """
     student = models.ForeignKey  ( 'users.Student',
                                     verbose_name = 'głosujący' )
                                     
