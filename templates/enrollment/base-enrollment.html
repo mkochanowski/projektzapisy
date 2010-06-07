@@ -24,7 +24,11 @@
 	<li><a href="{% url employees-list %}">Pracownicy</a></li>
 	<li><a href="#">Inne</a></li>
 	{% if user.is_authenticated %}
-	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a> ({{user.student.matricula}}) </li>
+	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
+        {% if user.student %}
+           ({{user.student.matricula}})
+        {% endif %}
+        </li>
 	<li><a href="{% url user-logout %}">(wyloguj)</a></li>
 	{% else %}
 	<li><a href="{% url user-login %}">Zaloguj</a></li>
