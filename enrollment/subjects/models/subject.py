@@ -31,6 +31,7 @@ class Subject( models.Model ):
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik')
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
+    ects = models.IntegerField(verbose_name="punkty ECTS", null=True)
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     description = models.TextField(verbose_name='opis') 
     lectures = models.IntegerField(verbose_name='ilość godzin wykładów')

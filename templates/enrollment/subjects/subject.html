@@ -20,7 +20,10 @@
     {% for teacher in subject.teachers.all %}
     	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
-    
+    {% if subject.ects %}
+    <h4>Punkty ECTS: {{subject.ects}}</h4>
+    {% endif %}
+    <h4>Ilość godzin:</h4>
     <ul>
         {% if subject.lectures %}<li>Wykłady: {{subject.lectures}} godz.</li>{% endif %}
         {% if subject.exercises %}<li>Ćwiczenia: {{subject.exercises}} godz.</li>{% endif %}
