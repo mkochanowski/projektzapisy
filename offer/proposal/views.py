@@ -12,9 +12,10 @@ from django.http                    import HttpResponse
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
+from copy                           import deepcopy
 
 from offer.proposal.models          import Proposal, Book, ProposalDescription
-from offer.proposal.exceptions      import NonStudentException, NonEmployeeException
+from offer.proposal.exceptions      import NonStudentException, NonEmployeeException, NotOwnerException
 
 @login_required
 def become(request, slug, group):
@@ -74,6 +75,9 @@ def proposal( request, slug, descid = None ):
         proposal_.description = newest
         descid = proposal_.description.id
 
+    can_edit = (proposal_.owner == None 
+               or request.user.is_staff
+               or request.user == proposal_.owner)
     data = {
             'proposal'      : proposal_,
             'mode'          : 'details',            
@@ -88,7 +92,8 @@ def proposal( request, slug, descid = None ):
             'isHelper'      : proposal_.is_in_group(request.user, 'helpers'),
             'fans'          : proposal_.fans_count(),
             'teachers'      : proposal_.teachers_count(),
-            'helpers'       : proposal_.helpers_count()
+            'helpers'       : proposal_.helpers_count(),
+            'can_edit'      : can_edit
     }
     return render_to_response( 'offer/proposal/view.html', data, context_instance = RequestContext( request ) )
 
@@ -127,9 +132,22 @@ def proposal_form(request, sid = None):
         proposal_description = request.POST.get('description', '')
         proposal_requirements = request.POST.get('requirements', '')
         proposal_comments = request.POST.get('comments', '')
-        
+        proposal_owner = request.POST.get('owner', 'no')
         proposal_type = request.POST.get('type', '')
         
+        
+        if (proposal_owner == "yes"
+           and proposal_.owner == None):
+            proposal_.owner = request.user
+        
+        if (proposal_.owner != None
+           and proposal_.owner != request.user
+           and not request.user.is_staff):
+            raise NotOwnerException
+        
+        if proposal_owner == "no":
+            proposal_.owner = None
+
         try:
             proposal_ects = int(request.POST.get('ects', 0))
         except:
@@ -263,9 +281,14 @@ def proposal_history( request, sid ):
         Edition history
     """
     proposal_ = Proposal.objects.get( pk = sid)
+    can_edit = (proposal_.owner == None
+               or request.user.is_staff
+	       or proposal_.owner == request.user)
+
     data = {
         'descriptions' : proposal_.descriptions.order_by( '-date' ),
-        'proposals'    : Proposal.objects.all()
+        'proposals'    : Proposal.objects.all(),
+        'can_edit'     : can_edit
     }
     
     return render_to_response ('offer/proposal/history.html', data, context_instance = RequestContext(request)) 
@@ -276,10 +299,18 @@ def proposal_restore ( request, descid ):
         Description restore
     """
     olddesc             = ProposalDescription.objects.get( pk = descid )
-    newdesc             = olddesc.copy()
+
+    if (olddesc.proposal.owner != None
+       and not request.user.is_staff
+       and request.user != olddesc.proposal.owner):
+        raise NotOwnerException
+
+    newdesc             = deepcopy(olddesc)
+    newdesc.id          = None
     newdesc.date        = datetime.now()
+    newdesc.author      = request.user
     newdesc.save()
-    return proposal( request, olddesc.proposal.slug )
+    return redirect("proposal-page", olddesc.proposal.slug )
 
 @permission_required('proposal.can_create_offer')
 def offer_create( request ):

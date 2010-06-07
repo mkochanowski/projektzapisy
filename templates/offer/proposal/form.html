@@ -22,6 +22,12 @@
                     {% endfor %}
                 </select>
             </li>
+            <li class="proposedOwner">
+                <label>Zablokuj innym edycję:</label>
+                <select class="main-labelledSelect" name="owner" title="ograniczona edycja">
+                   <option value="no">Nie</option>
+                   <option value="yes" {% if proposal.owner %}selected="selected"{% endif %}>Tak</option>
+            </li>
             <li class="proposedTime">
                 <label>Wymiar godzin:</label>
                 <select class="main-labelledSelect" name="lectures" title="sugerowana ilość godzin wykładów">

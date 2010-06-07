@@ -3,3 +3,7 @@ class NonStudentException(Exception):
 
 class NonEmployeeException(Exception):
     pass
+
+class NotOwnerException(Exception):
+    pass
+

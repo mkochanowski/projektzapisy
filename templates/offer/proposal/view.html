@@ -13,16 +13,17 @@
         {% ifnotequal descid newest.id %}
             <p class="main-message">
                 Wersja archiwalna!
-                <a class="subjectrestore" href="{% url proposal-restore descid=descid %}">Przywróć</a> lub
+                {% if can_edit %}<a class="subjectrestore" href="{% url proposal-restore descid=descid %}">Przywróć</a> lub{% endif %}
                 <a href="{% url proposal-page slug=proposal.slug %}">przejdź do bieżącej</a>.
             </p>
         {% endifnotequal %}
-
+        {% if can_edit %}
         <a id="od-proposal-view-editBtn" href="{% url proposal-edit sid=id %}">Edytuj</a>
-
+        {% endif %}
         <h2>{{proposal.name}}</h2>
 
         <ul class="infoBox">
+           {% if proposal.owner %} <li>Właściciel: <a href="{% url profile proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
             <li>Sugerowany rodzaj: {{ proposal.description.get_type_display }}</li>
             {% if proposal.description.lectures or proposal.description.repetitories or proposal.description.exercises or proposal.laboratories %}
             <li class="proposedTime">
@@ -72,7 +73,7 @@
                     {% else %}
                         <a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
                     {% endif %}
-                    (chętnych: {{fans}})
+                    chętnych: {{fans}}
                 {% else %}
                     Chętnych do nauki: {{fans}}
                 {% endif %}
@@ -84,9 +85,9 @@
                     {% else %}
                         <a href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
                     {% endif %}
-                    (chętnych: {{teachers}})
+                    chętnych: {{teachers}}
                 {% else %}
-                    Poprowadzą: {{teachers}})
+                    Poprowadzą: {{teachers}}
                 {% endif %}
             </li>
             <li>
@@ -96,7 +97,7 @@
                     {% else %}
                         <a href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
                     {% endif %}
-                    (chętnych: {{helpers}})
+                    chętnych: {{helpers}}
                 {% else %}
                     Pomogą prowadzić: {{helpers}}
                 {% endif %}
@@ -120,7 +121,7 @@
 
             <p>
                 <a href="{% url proposal-history sid=id %}">historia</a>
-                <a href="{% url proposal-edit sid=id %}">edytuj</a>
+                {% if can_edit %}<a href="{% url proposal-edit sid=id %}">edytuj</a>{% endif %}
             </p>
         </div>
 

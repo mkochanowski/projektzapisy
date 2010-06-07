@@ -5,9 +5,9 @@
 """
 
 from django.db                  import models
-#from django.contrib.auth.models import *
+from django.contrib.auth.models import User
 
-from offer.proposal.exceptions import *
+from offer.proposal.exceptions import NonStudentException, NonEmployeeException
 
 import re
 
@@ -29,6 +29,7 @@ class Proposal( models.Model ):
     helpers = models.ManyToManyField('users.Employee', blank=True,  related_name='proposal_helpers_related',
                                       verbose_name='pomogliby poprowadzić to')
     tags = models.ManyToManyField(ProposalTag, blank = True)
+    owner = models.ForeignKey(User, related_name='wlasciciel', verbose_name='wlasciciel', null = True)
                 
     class Meta:
         verbose_name = 'przedmiot'
