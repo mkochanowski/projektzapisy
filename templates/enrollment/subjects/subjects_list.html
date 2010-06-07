@@ -2,6 +2,7 @@
 
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/enrollment/subjects/subjects-list.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/offer/prefs.css" type="text/css" />
 {% endblock %}
 
 {% block scripts %}
@@ -23,40 +24,40 @@
 <li>
     <a href="{% url subject-list %}">Przedmioty</a>
 </li>
-<br/>
-<table id="subject-filter-bar" cellspacing="0">
-    <tr>
-        <td>
-            <label>
-                <input type="text" id="keyword" name="keyword" />
-                <br/>
-                <sub>
-                    Tutaj wpisz fragment nazwy lub prowadzącego
-                </sub>
-            </label>
-        </td>
-        <td>
-        	<label for="semester">Semestr</label>
-            <select id="semester" name="semester">
+
+<div id="subject-filter-bar">
+	<div id="od-prefs-top-bar" class="main-top-bar">
+		<fieldset id="od-prefs-filter">
+			<legend><span>Filtrowanie</span></legend>
+			<div class="main-filter-input">
+				<input class="text od-filter" id="keyword" type="text" name="keyword" />
+				<input class="reset" type="reset" value="X" style="display:block;" />
+			</div>
+		</fieldset>
+		
+		<fieldset id="od-prefs-subjtype">
+			<legend><span>Rodzaj przedmiotu</span></legend>
+			{% for key, name in types_list %}
+				<span class="checkbox od-filter-checkbox"><input type="checkbox" value="{{ key }}" checked /><label>{{ name }}</label></span>
+			{% endfor %}
+		</fieldset>
+		<fieldset>
+			<legend><span>pozostałe</span></legend>
+		<div style='width: 300px'>
+			<span class="selectbox">
+		    <select id="semester" name="semester">
                 {% for key, name in semesters_list %}<option value='{{ key }}'>{{ name }} </option>
                 {% endfor %}
             </select>
-        </td>
-        <td>
-            {% for key, name in types_list %}
-            <label>
-                <input type='checkbox' class='type-list' name='type[{{ forloop.counter0 }}]' value='{{ key }}' checked />
-                {{ name }}
-            </label>{% endfor %}
-        </td>
-        <td>
-            <label>
-                <input type="checkbox" name="">Schowaj przedmioty na które już byłem zapisany
-            </label>
-        </td>
-    </tr>
-</table>
+			</span><br />
+			<span class='checkbox'><input type='checkbox' disabled />Przedmioty na ktore bylem zapisany</span>
+	    </div>
+	</div>
+</div>
 {% endblock %}
+
+
+
 
 {% block content %}
 <div id="subject-details">
