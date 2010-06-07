@@ -1,5 +1,9 @@
 # -*- coding:utf-8 -*-
 
+"""
+    Preferences views
+"""
+
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import Context, RequestContext, Template
 from django.utils import simplejson
@@ -15,14 +19,14 @@ from django.core.urlresolvers import reverse
 
 def view(request, template):
     """
-    Employee preferences' view renderend using the given template.
-    Base view for tree_view and list_view. Do not use directly.
-    
-    Optional GET args:
-    * format={json,html}
-    * hidden={True,False}
-    * types=<comma-separated course types list> (ex. =cs_1,seminar)
-    * query=<filter>
+        Employee preferences' view renderend using the given template.
+        Base view for tree_view and list_view. Do not use directly.
+        
+        Optional GET args:
+        * format={json,html}
+        * hidden={True,False}
+        * types=<comma-separated course types list> (ex. =cs_1,seminar)
+        * query=<filter>
     """
     format = request.GET.get('format', None)
     hidden = request.GET.get('hidden', True)
@@ -38,6 +42,9 @@ def view(request, template):
 	}
     if format == 'json':
         def process_pref(pref):
+            """
+                Processes preference
+            """
             obj = {}
             obj['name']           = pref.proposal.name
             obj['lecture']        = pref.lecture
@@ -70,6 +77,9 @@ def undecided_list(request):
     employee = request.user.employee
     unset = get_employees_unset(employee)
     def process_proposal(prop):
+        """
+            Process proposal
+        """
         obj = {}
         obj['id']   = prop.id
         obj['name'] = prop.name
@@ -87,36 +97,42 @@ def undecided_list(request):
 
 @employee_required
 def tree_view(request):
+    """
+        Preferences as tree
+    """
     return view(request, 'offer/preferences/view_tree.html')
 
 @employee_required
 def list_view(request):
+    """
+        Preferences as list
+    """
     return view(request, 'offer/preferences/view_list.html')
 
 # TODO: czy ten widok jest wykorzystywany
 @employee_required
 def description(request, proposal_id):
     """
-    Renders subjects description.
+        Renders subjects description.
 
-    * when format=json is passed via GET:
-      return ProposalDescription data as json
-      instead of rendering the template
+        * when format=json is passed via GET:
+          return ProposalDescription data as json
+          instead of rendering the template
     """
     format = request.GET.get('format', None)
-    description = get_object_or_404(Proposal, pk=proposal_id).description()
+    description_ = get_object_or_404(Proposal, pk=proposal_id).description()
     if format == 'json':
         data = {}
-        data['name'] = description.proposal.name
-        data['type'] = description.type
-        data['description'] = description.description
-        data['requirements'] = description.requirements
-        data['comments'] = description.comments
+        data['name'] = description_.proposal.name
+        data['type'] = description_.type
+        data['description'] = description_.description
+        data['requirements'] = description_.requirements
+        data['comments'] = description_.comments
         data['books'] = dict(
             [(book.order,book.name) for book
-             in description.proposal.books.all()])
+             in description_.proposal.books.all()])
         return HttpResponse(simplejson.dumps(data))
-    data = {'description': description}
+    data = {'description': description_}
     return render_to_response(
         'offer/preferences/description.html',
         data)
@@ -164,16 +180,23 @@ def set_pref(request, pref_id):
     try:
         if request.method == 'POST':
             pref = Preference.objects.get(pk=pref_id)
-            pref.set_preference(lecture=int(request.POST['lecture']), tutorial=int(request.POST['tutorial']), review_lecture=int(request.POST['review_lecture']), lab = int(request.POST['lab']))
+            pref.set_preference( lecture=int(request.POST['lecture']), 
+                                 tutorial=int(request.POST['tutorial']), 
+                                 review_lecture=int(request.POST['review_lecture']), 
+                                 lab = int(request.POST['lab']))
             data = {'Success': "OK"}
         else:
             data = {'Failure': 'Use POST'}
     except (Preference.DoesNotExist, UnknownPreferenceValue):
         data = {'Failure': 'Preference does not exist'}
     return HttpResponse(simplejson.dumps(data))
-'lecture', 'review_lecture', 'tutorial', 'lab'
+
+# ? CO TO JEST ? -> 'lecture', 'review_lecture', 'tutorial', 'lab'
 @employee_required
 def init_pref(request, prop_id):
+    """
+        Initialize preference
+    """
     try:
         if request.method == 'POST':
             employee = request.user.employee

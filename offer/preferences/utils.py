@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+    Preferences utilities
+"""
+
 from django.http import HttpResponse
 from django.template import loader
 from django.template.loader_tags import ExtendsNode
