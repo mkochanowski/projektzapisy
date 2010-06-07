@@ -1,45 +1,60 @@
 # -*- coding: utf-8 -*-
+
+"""
+    Vote views
+"""
+
 from django.contrib.auth.decorators import login_required
 from django.http                    import HttpResponseRedirect
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 
-from offer.vote.models     import *
-from offer.proposal.models import *
+from offer.vote.models                   import SingleVote, SystemState
+from offer.proposal.models               import Proposal
+from offer.proposal.models.proposal_description import PROPOSAL_TYPES
 
 from users.decorators      import student_required
-from offer.vote.voteForm   import VoteForm
+from offer.vote.vote_form  import VoteForm
 
 @student_required
-def voteMain( request ):
+def vote_main( request ):
+    """
+        Vote main page
+    """
     data = { 'isVoteActive' : SystemState.is_vote_active() }
     return render_to_response ('offer/vote/index.html', data, context_instance = RequestContext( request ))
 
 @student_required
-def voteView( request ):
+def vote_view( request ):
+    """
+        View of once given vote
+    """
     votes = SingleVote.get_votes( request.user )
     summer_votes  = []
     winter_votes  = []
     unknown_votes = []
-    sum           = 0
-    for vote in votes:
-        sum = sum + vote.value
-        if   vote.subject.in_summer():
-            summer_votes.append(vote)
-        elif vote.subject.in_winter():
-            winter_votes.append(vote)
+    vote_sum      = 0
+    for vote_ in votes:
+        vote_sum = vote_sum + vote_.value
+        if   vote_.subject.in_summer():
+            summer_votes.append(vote_)
+        elif vote_.subject.in_winter():
+            winter_votes.append(vote_)
         else:
-            unknown_votes.append(vote)
+            unknown_votes.append(vote_)
             
     data = {  'summer_votes'  : summer_votes,
               'winter_votes'  : winter_votes,
               'unknown_votes' : unknown_votes,
-              'vote_sum'      : sum }
+              'vote_sum'      : vote_sum}
     return render_to_response ('offer/vote/view.html', data, context_instance = RequestContext( request ))
 
 @student_required
 def vote( request ):
+    """
+        Voting
+    """
     subs = Proposal.get_by_tag('vote')
     winter_subs  = []
     summer_subs  = []
@@ -54,7 +69,7 @@ def vote( request ):
             unknown_subs.append(sub)
 
     data = {
-		'proposalTypes': proposal.PROPOSAL_TYPES
+		'proposalTypes': PROPOSAL_TYPES
 	}
 
     if request.method == "POST":
@@ -66,30 +81,31 @@ def vote( request ):
         data['form'] = form
         
         if form.is_valid():
-            sum = 0
+            vote_sum = 0
             for name, points in form.vote_points(): 
-                sum = sum + int(points)
+                vote_sum = vote_sum+ int(points)
             
-            if sum <= SystemState.get_maxVote():
+            if vote_sum <= SystemState.get_max_vote():
                 votes = SingleVote.get_votes(request.user.student)
-                for vote in votes: vote.delete()
+                for vote_ in votes: 
+                    vote_.delete()
                 
                 for name, points in form.vote_points():
                     if int(points) > 0:
                         subject = Proposal.objects.get(name=name)
-                        singleVote = SingleVote()
-                        singleVote.student = request.user.student
-                        singleVote.subject = subject
-                        singleVote.state   = SystemState.get_state()
-                        singleVote.value   = int(points)
-                        singleVote.save()
+                        single_vote = SingleVote()
+                        single_vote.student = request.user.student
+                        single_vote.subject = subject
+                        single_vote.state   = SystemState.get_state()
+                        single_vote.value   = int(points)
+                        single_vote.save()
             
 #                data['message'] = u'Głos został pomyślnie zapisany.'
 #                return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
-                return voteView( request )
+                return vote_view( request )
             else:
                 data['message'] = u'Przekroczono limit głosowania.\
-                                  Limit wynosi ' + str(SystemState.get_maxVote()) +\
+                                  Limit wynosi ' + str(SystemState.get_max_vote()) +\
                                   u', a oddano głos o watości: ' + str(sum) + '.'
                 return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
     else:

@@ -65,8 +65,8 @@ def proposal( request, slug, descid = None ):
             'descid'        : int(descid),
             'newest'        : newest,
             'id'            : proposal.id,
-            'next'          : proposal.description.getNewer( proposal ),
-            'prev'          : proposal.description.getOlder( proposal ),
+            'next'          : proposal.description.get_newer( proposal ),
+            'prev'          : proposal.description.get_older( proposal ),
             'isFan'         : proposal.is_in_group(request.user, 'fans'),
             'isTeacher'     : proposal.is_in_group(request.user, 'teachers'),
             'isHelper'      : proposal.is_in_group(request.user, 'helpers'),
@@ -127,7 +127,7 @@ def proposal_form(request, sid = None):
         books = request.POST.getlist('books[]')
         
         proposal.name = proposalName
-        proposal.slug = proposal.createSlug(proposal.name)             
+        proposal.slug = proposal.create_slug(proposal.name)             
         
         if Proposal.objects.filter(slug = proposal.slug).exclude(id = proposal.id).count() > 0:                
             message = 'Istnieje już przedmiot o takiej nazwie'

@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+    Form for vote
+"""
+
 from django                   import forms
 from django.core.exceptions   import ObjectDoesNotExist
 from django.utils.safestring  import SafeUnicode
@@ -9,7 +13,10 @@ from offer.vote.models import SingleVote
 
 
 class VoteForm( forms.Form ):
-    choices = [(str(i), i) for i in range(SystemState.get_maxPoints()+1)]
+    """
+        Voting form
+    """
+    choices = [(str(i), i) for i in range(SystemState.get_max_points()+1)]
     subject_types = {}
     subject_fan_flag = {}
     
@@ -37,8 +44,8 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Zimowy',
                                             initial   = choosed)
-            self.subject_types['winter_%s' % sub.pk] = sub.type
-            self.subject_fan_flag['winter_%s' % sub.pk] = sub.isFan(voter)
+            self.subject_types['winter_%s' % sub.pk] = sub.description().type
+            self.subject_fan_flag['winter_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
                                             
         for sub in summer:
             try:
@@ -54,8 +61,8 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Letni',
                                             initial   = choosed)
-            self.subject_types['summer_%s' % sub.pk] = sub.type
-            self.subject_fan_flag['summer_%s' % sub.pk] = sub.isFan(voter)
+            self.subject_types['summer_%s' % sub.pk] = sub.description().type
+            self.subject_fan_flag['summer_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
         
         for sub in unknown:
             try:
@@ -71,10 +78,13 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Nieokreślony',
                                             initial   = choosed)
-            self.subject_types['unknown_%s' % sub.pk] = sub.type
-            self.subject_fan_flag['unknown_%s' % sub.pk] = sub.isFan(voter)
+            self.subject_types['unknown_%s' % sub.pk] = sub.description().type
+            self.subject_fan_flag['unknown_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
     
     def vote_points( self ):
+        """
+            Calculates points
+        """
         for name, value in self.cleaned_data.items():
             if name.startswith('winter_') or \
                name.startswith('summer_') or \
@@ -82,21 +92,24 @@ class VoteForm( forms.Form ):
                 yield (self.fields[name].label, value)
     
     def as_lists( self ):
+        """
+            Creates html form
+        """
         winter   = u'<div class="od-vote-semester" id="od-vote-semester-winter"><h2>Semestr zimowy</h2><ul>'
         summer   = u'<div class="od-vote-semester" id="od-vote-semester-summer"><h2>Semestr letni</h2><ul>'
         unknown  = u'<div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr nieokreślony</h2><ul>'
 
-        winterEmpty = True
-        summerEmpty = True
-        unknownEmpty = True
+        winter_empty = True
+        summer_empty = True
+        unknown_empty = True
         
         maksimum  = u'<p id="od-vote-maxPoints">Maksymalna liczba punktów do wykorzystania: <span>'
-        maksimum += str(SystemState.get_maxVote())
+        maksimum += str(SystemState.get_max_vote())
         maksimum += u' </span></p>'
         
         for key in self.fields.iterkeys():
             field = self.fields[key]
-            subject_class = self.subject_types[key];
+            subject_class = self.subject_types[key]
             if self.subject_fan_flag[key]:
                 subject_class += " isFan"
             field_str = \
@@ -115,21 +128,21 @@ class VoteForm( forms.Form ):
             field_str += ' </select></li>'
                     
             if   key.startswith('winter_'):
-                winterEmpty = False
+                winter_empty = False
                 winter += field_str
             elif key.startswith('summer_'):
-                summerEmpty = False
+                summer_empty = False
                 summer += field_str
             elif key.startswith('unknown_'):
-                unknownEmpty = False
+                unknown_empty = False
                 unknown += field_str
 
         list = SafeUnicode(u'')
-        if (not winterEmpty):
+        if (not winter_empty):
             list += SafeUnicode(winter) + SafeUnicode(u'</ul></div>')
-        if (not summerEmpty):
+        if (not summer_empty):
             list += SafeUnicode(summer) + SafeUnicode(u'</ul></div>')
-        if (not unknownEmpty):
+        if (not unknown_empty):
             list += SafeUnicode(unknown) + SafeUnicode(u'</ul></div>')
 
         return  list + SafeUnicode(maksimum)

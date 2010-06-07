@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 
 
 urlpatterns = patterns( 'fereol.offer.vote.views',
-    url('^$',     'voteMain', name='vote-main' ),
-    url('view/$', 'voteView', name='vote-view'),
-    url('vote/$', 'vote',     name='vote')
+    url('^$',     'vote_main', name='vote-main' ),
+    url('view/$', 'vote_view', name='vote-view'),
+    url('vote/$', 'vote',      name='vote')
 )
