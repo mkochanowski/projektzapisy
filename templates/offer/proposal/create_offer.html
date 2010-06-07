@@ -28,9 +28,9 @@
 				<th>Chętni do pomocy</th>
 			</tr>
 			{% for subject in subjects %}
-			<tr {% if subject.inOffer %}class="selected"{% endif %}>
+			<tr {% if subject.in_offer %}class="selected"{% endif %}>
 				<td>
-					<input type="checkbox" name="selectSubject" value="{{ subject.id }}" autocomplete="off" {% if subject.inOffer %}checked{% endif %} />
+					<input type="checkbox" name="selectSubject" value="{{ subject.id }}" autocomplete="off" {% if subject.in_offer %}checked{% endif %} />
 				</td>
 				<td>{{ subject.name }}</td>
 				<td class="cen">{{ subject.fans_count }}</td>

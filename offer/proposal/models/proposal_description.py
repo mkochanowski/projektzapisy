@@ -64,8 +64,8 @@ class ProposalDescription(models.Model):
             Gets next description (by date) if exists
         """
         description = ProposalDescription.objects.filter(
-            proposal = proposal, 
-            pk__gt = self.id)
+                                                proposal = proposal, 
+                                                pk__gt   = self.id)
         if description:
             return description[0]
         else:

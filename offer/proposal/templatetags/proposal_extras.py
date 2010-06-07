@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+    Extras for proposal
+"""
+
 from django.template import Library, Node, TemplateSyntaxError
 
 register = Library()
@@ -7,7 +11,9 @@ register = Library()
 from offer.proposal.models import Proposal
 
 class SubjectsInOfferNode(Node):
-    """Adds a list of subjects to template context"""
+    """
+        Adds a list of subjects to template context
+    """
     def __init__(self, varname):
         self.varname = varname
     

@@ -21,7 +21,6 @@ urlpatterns = patterns('',
     (r'^proposal/', include('fereol.offer.proposal.urls')),
     (r'^news/', include('fereol.offer.news.urls')),
     (r'^vote/', include('fereol.offer.vote.urls')),
-    url( '^offer/create/$', 'fereol.offer.proposal.views.offerCreate', name='offer-create' ),
     #
     (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
     (r'^users/', include('fereol.users.urls')),
