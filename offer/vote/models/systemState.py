@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+"""
+    System State for vote
+    Default values are dafined as module variables
+"""
+
 from django.db import models
 from datetime  import date
 
@@ -14,25 +19,27 @@ DEFAULT_VOTE_BEG   = date(DEFAULT_YEAR, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
 DEFAULT_VOTE_END   = date(DEFAULT_YEAR, DEFAULT_MONTH_END, DEFAULT_DAY_END)
 
 class SystemState( models.Model ):
-     
+    """
+        System state for vote
+    """
     year      = models.IntegerField(
                     verbose_name = 'Rok akademicki',
                     unique       = True,
                     default      = DEFAULT_YEAR)
 
-    maxPoints = models.IntegerField( 
+    max_points = models.IntegerField( 
                     verbose_name = 'Maksimum punktów na przedmiot',
                     default      = DEFAULT_MAX_POINTS )
                     
-    maxVote   = models.IntegerField(
+    max_vote   = models.IntegerField(
                     verbose_name = 'Maksymalna wartość głosu',
                     default      =  DEFAULT_MAX_VOTE)
                     
-    voteBeg   = models.DateField(
+    vote_beg   = models.DateField(
                     verbose_name = 'Początek głosowania',
                     default      = DEFAULT_VOTE_BEG )
     
-    voteEnd   = models.DateField(
+    vote_end   = models.DateField(
                     verbose_name = 'Koniec głosowania',
                     default      = DEFAULT_VOTE_END)
                     
@@ -44,55 +51,70 @@ class SystemState( models.Model ):
     def __unicode__( self ):
         return "Ustawienia systemu na rok " + str(self.year)
     
-    # pobiera aktualny stan systemu    
     @staticmethod
-    def get_state(yearC = date.today().year):
+    def get_state(year = date.today().year):
+        """
+            Gets actual system state from database
+            Creates one if necessary
+        """
         try:
-            return SystemState.objects.filter(year=yearC)[0]
+            return SystemState.objects.filter(year=year)[0]
         except IndexError:
-            return SystemState.create_default_state(yearC)
+            return SystemState.create_default_state(year)
     
-    
-    # tworzy stan systemu o wartościach domyślnych
     @staticmethod
     def create_default_state(year = date.today().year):
-        newState = SystemState()
-        newState.year      = year
-        newState.maxPoints = DEFAULT_MAX_POINTS
-        newState.maxVote   = DEFAULT_MAX_VOTE
-        newState.voteBeg   = date(year, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
-        newState.voteEnd   = date(year, DEFAULT_MONTH_END, DEFAULT_DAY_END)
-        newState.save()
-        return newState
-        
-    # poniższe funkcje służa do uzyskania odpowiednich danych ze stanu
-    # systemu na podany rok. Jeśli stan nie istenieje to zostanie 
-    # automatycznie utworzony
-    @staticmethod
-    def get_maxPoints(year = date.today().year):
-        state = SystemState.get_state(year)
-        return state.maxPoints
+        """
+            Creates system state from default variables
+        """
+        new_state = SystemState()
+        new_state.year      = year
+        new_state.max_points = DEFAULT_MAX_POINTS
+        new_state.max_vote   = DEFAULT_MAX_VOTE
+        new_state.vote_beg   = date(year, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
+        new_state.vote_end   = date(year, DEFAULT_MONTH_END, DEFAULT_DAY_END)
+        new_state.save()
+        return new_state
         
     @staticmethod
-    def get_maxVote(year = date.today().year):
+    def get_max_points(year = date.today().year):
+        """
+            Get max points per subject
+        """
         state = SystemState.get_state(year)
-        return state.maxVote
+        return state.max_points
+        
+    @staticmethod
+    def get_max_vote(year = date.today().year):
+        """
+            Get max vote value
+        """
+        state = SystemState.get_state(year)
+        return state.max_vote
         
     
     @staticmethod
-    def get_voteBeg(year = date.today().year):
+    def get_vote_beg(year = date.today().year):
+        """
+            Get vote beggining date
+        """
         state = SystemState.get_state(year)
-        return state.voteBeg
+        return state.vote_beg
         
     @staticmethod
-    def get_voteEnd(year = date.today().year):
+    def get_vote_end(year = date.today().year):
+        """
+            Get vote ending date
+        """
         state = SystemState.get_state(year)
-        return state.voteEnd
+        return state.vote_end
         
-    # sprawdza czy głosowanie jest aktywne
     @staticmethod
     def is_vote_active():
-        voteBeg = SystemState.get_voteBeg()
-        voteEnd = SystemState.get_voteEnd()
+        """
+            Checks if vote is active
+        """
+        vote_beg = SystemState.get_vote_beg()
+        vote_end = SystemState.get_vote_end()
         
-        return voteBeg <= date.today() <= voteEnd
+        return vote_beg <= date.today() <= vote_end

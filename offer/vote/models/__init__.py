@@ -1,3 +1,3 @@
-from offer.vote.models.systemState import SystemState
-from offer.vote.models.singleVote  import SingleVote
+from systemState import SystemState
+from singleVote  import SingleVote
 

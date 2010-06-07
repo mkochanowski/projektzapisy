@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
-from datetime  import date
 
+"""
+    Single vote
+"""
+
+from datetime  import date
 from django.db import models
 
 from offer.proposal.models import Proposal
-from offer.vote.models import SystemState
+from systemState           import SystemState
 
 class SingleVote ( models.Model ):
     student = models.ForeignKey  ( 'users.Student',
@@ -33,6 +37,9 @@ class SingleVote ( models.Model ):
 
     @staticmethod
     def get_votes( voter, year=date.today().year ):
+        """
+            Gets user votes in specified year
+        """
         current_state = SystemState.get_state(year)
         votes = SingleVote.objects.filter( student=voter, state=current_state)
         return votes
