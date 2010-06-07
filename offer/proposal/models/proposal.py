@@ -11,8 +11,8 @@ from offer.proposal.exceptions import *
 
 import re
 
-from proposal_tag import ProposalTag
-from users.models import Employee, Student
+from offer.proposal.models.proposal_tag import ProposalTag
+from users.models                       import Employee, Student
 
 class Proposal( models.Model ):
     """

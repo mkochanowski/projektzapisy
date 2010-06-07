@@ -7,7 +7,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from proposal_description_tag import ProposalDescriptionTag
+from offer.proposal.models.proposal_description_tag import ProposalDescriptionTag
           
 PROPOSAL_TYPES = (
     ('seminar', 'Seminarium'),

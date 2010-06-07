@@ -1,28 +1,43 @@
 # -*- coding: utf-8 -*-
 
-from django.db import models
+"""
+    News models
+"""
+
+from django.db                  import models
 from django.contrib.auth.models import User
 
 from datetime import datetime, timedelta
 
 class NewsManager(models.Manager):
+    """
+        News management
+    """
     def new(self):
-        '''Zwraca ogłoszenia oznaczone jako nowe.'''
+        """
+            Returns news marked as new
+        """
         if self.count_new() >= 3:
             begin = datetime.now() - timedelta(days=7)
             return self.filter(date__gte=begin)
         else:
-           return self.get_successive_news(0, 3)
+            return self.get_successive_news(0, 3)
     def count_new(self):
-        '''Zwraca liczbę ogłoszeń oznaczonych jako nowe.
-
-        Zwraca liczbę ogłoszeń z ostatnich 7 dni.'''
+        """
+            Returns number of news marked as new
+        """
         begin = datetime.now() - timedelta(days=7)
         return self.filter(date__gte=begin).count()
     def get_successive_news(self, beginwith, quantity=1):
+        """
+            Get a number of news 
+        """
         return News.objects.all()[beginwith:(beginwith+quantity)]
 
 class News(models.Model):
+    """
+        Single news
+    """
     title = models.CharField(max_length=255,
                              verbose_name=u'Tytuł')
     body = models.TextField(verbose_name=u'Treść',
@@ -34,7 +49,7 @@ class News(models.Model):
     
     class Meta:
         get_latest_by = 'date'
-        ordering = ['-date','-id']
+        ordering = ['-date', '-id']
         verbose_name = u'Ogłoszenie'
         verbose_name_plural = u'Ogłoszenia'
     

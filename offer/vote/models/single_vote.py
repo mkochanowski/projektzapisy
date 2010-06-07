@@ -7,8 +7,8 @@
 from datetime  import date
 from django.db import models
 
-from offer.proposal.models import Proposal
-from system_state          import SystemState
+from offer.proposal.models          import Proposal
+from offer.vote.models.system_state import SystemState
 
 class SingleVote ( models.Model ):
     """

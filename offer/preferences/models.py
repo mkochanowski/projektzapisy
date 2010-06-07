@@ -1,5 +1,9 @@
 # -*- coding:utf-8 -*-
 
+"""
+    Preferences models
+"""
+
 from django.db import models
 
 from users.models import Employee
@@ -14,13 +18,16 @@ PREFERENCE_CHOICES = (
 )
 
 class PreferenceManager(models.Manager):
+    """
+        Manages preferences
+    """
     def get_employees_prefs(self, employee, hidden=None, types=None, query=None):
         """
-        Returns employee's preferences.
+            Returns employee's preferences.
 
-        hidden - include hidden
-        types  - accepted type of the related proposal
-        q      - substring of the related proposal's name
+            hidden - include hidden
+            types  - accepted type of the related proposal
+            q      - substring of the related proposal's name
         """
         prefs = Preference.objects.filter(
             employee=employee)
@@ -34,8 +41,8 @@ class PreferenceManager(models.Manager):
 
     def init_preference(self, employee, course):
         """
-        Sets initial values for employee's preferences with regard
-        to the given course.
+            Sets initial values for employee's preferences with regard
+            to the given course.
         """
         try:
             Preference.objects.get(employee=employee, proposal=course)
@@ -54,8 +61,8 @@ class PreferenceManager(models.Manager):
 
 class Preference(models.Model):
     """
-    A model representing employee's will to give lectures and tutor
-    for a course.
+        A model representing employee's will to give lectures and tutor
+        for a course.
     """
     employee   = models.ForeignKey(Employee, verbose_name='pracownik')
     proposal   = models.ForeignKey(Proposal, verbose_name='przedmiot')
@@ -86,26 +93,26 @@ class Preference(models.Model):
     
     def hide(self):
         """
-        Hides this preference in a default employee's view.
+            Hides this preference in a default employee's view.
         """
         self.hidden = True
         self.save()
     
     def unhide(self):
         """
-        Unhides this preference in a default employee's view.
+            Unhides this preference in a default employee's view.
         """
         self.hidden = False
         self.save()
     
     def set_preference(self, **kwargs):
         """
-        Sets employee's preferences.
+            Sets employee's preferences.
 
-        Example usage:
-        p.set_preference(lecture=2, tutorial=0)
+            Example usage:
+            p.set_preference(lecture=2, tutorial=0)
 
-        Values are restricted with PREFERENCE_CHOICES.
+            Values are restricted with PREFERENCE_CHOICES.
         """
         valid_prefs = ['lecture', 'review_lecture', 'tutorial', 'lab']
         valid_values = dict(PREFERENCE_CHOICES).keys()
@@ -114,4 +121,3 @@ class Preference(models.Model):
                 raise UnknownPreferenceValue
             self.__setattr__(pref, kwargs[pref])
         self.save()
-                       
