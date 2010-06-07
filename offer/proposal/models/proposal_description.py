@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
+"""
+    Description of proposal
+"""
+
 from django.db import models
 from django.contrib.auth.models import User
 
-from offer.proposal.models.proposal_description_tag import ProposalDescriptionTag
+from proposal_description_tag import ProposalDescriptionTag
           
 PROPOSAL_TYPES = (
     ('seminar', 'Seminarium'),
@@ -22,13 +26,16 @@ PROPOSAL_HOURS = (
 
 
 class ProposalDescription(models.Model):
+    """
+        Description of proposal
+    """
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
     description = models.TextField( verbose_name = 'opis' )
     requirements = models.TextField( verbose_name = 'wymagania' )
     comments = models.TextField( verbose_name = 'uwagi' )
     date = models.DateTimeField(verbose_name = 'data dodania')
     tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
-    author= models.ForeignKey(User, related_name='autor')
+    author = models.ForeignKey(User, related_name='autor')
     type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
         verbose_name = 'typ')
     ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
@@ -52,16 +59,22 @@ class ProposalDescription(models.Model):
     def __unicode__(self):
         return self.description
 
-    def getNewer( self, proposal ):
-        nextDescription = ProposalDescription.objects.filter(
+    def get_newer( self, proposal ):
+        """
+            Gets next description (by date) if exists
+        """
+        description = ProposalDescription.objects.filter(
             proposal = proposal, 
             pk__gt = self.id)
-        if nextDescription:
-            return nextDescription[0]
+        if description:
+            return description[0]
         else:
             return None
 
-    def getOlder( self, proposal ):
+    def get_older( self, proposal ):
+        """
+            Gets previous description (by date) if exists
+        """
         description = ProposalDescription.objects.filter(proposal = proposal, 
                                                          pk__lt = self.id)
         if description:
@@ -71,11 +84,15 @@ class ProposalDescription(models.Model):
     
     @staticmethod
     def get_by_tag(tag):
-        "Return proposal descriptions by tag."
+        """
+            Return proposal descriptions by tag.
+        """
         return ProposalDescription.objects.filter(tags__name=tag)
     
     def add_tag(self, tag_name):
-        """Apply tag to the proposal description."""
+        """
+            Apply tag to the proposal description.
+        """
         try:
             tag = ProposalDescriptionTag.objects.get(name=tag_name) 
         except ProposalDescriptionTag.DoesNotExist:
@@ -84,7 +101,9 @@ class ProposalDescription(models.Model):
             self.tags.add(tag)
     
     def remove_tag(self, tag_name):
-        """Remove tag from the proposal description."""
+        """
+            Remove tag from the proposal description.
+        """
         try:
             tag = ProposalDescriptionTag.objects.get(name=tag_name)
             self.tags.remove(tag)

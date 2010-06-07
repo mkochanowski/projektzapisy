@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
+"""
+    Tag for propoasal
+"""
+
 from django.db import models
 
 class ProposalTag(models.Model):
-    "Tag for a proposal"
+    """
+        Tag for a proposal
+    """
     name = models.CharField(max_length = 255,
                             verbose_name = 'etykieta',
                             unique = True)

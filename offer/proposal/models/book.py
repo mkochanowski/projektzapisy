@@ -7,6 +7,10 @@
 from django.db import models
 
 class Book( models.Model ):
+    """
+        Book for bibliography
+    """
+    
     proposal = models.ForeignKey('Proposal', verbose_name = 'przedmiot', related_name = 'books')
     name = models.TextField( verbose_name = 'nazwa' )
     order = models.IntegerField(verbose_name = 'kolejność')
