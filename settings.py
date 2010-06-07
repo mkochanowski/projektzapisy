@@ -15,7 +15,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'              # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = './database/db.sqlite3'  # Or path to database file if using sqlite3.
+DATABASE_NAME = os.path.join(PROJECT_PATH, 'database/db.sqlite3') # Or path to database file if using sqlite3.
 DATABASE_USER = ''                       # Not used with sqlite3.
 DATABASE_PASSWORD = ''                   # Not used with sqlite3.
 DATABASE_HOST = ''                       # Set to empty string for localhost. Not used with sqlite3.
@@ -32,7 +32,7 @@ EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
 #loggin settings:
 
-# LOG_FILE = "./logs/log.log"
+# LOG_FILE = os.path.join(PROJECT_PATH, "logs/log.log")
 # LOG_LEVEL = logging.NOTSET 
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -118,7 +118,7 @@ INSTALLED_APPS = (
     'fereol.debug_toolbar',
 )
 FIXTURE_DIRS = (
-    './offer/proposal/fixtures',
+    os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
 )
 
 LOGIN_URL = '/users/login/'
@@ -128,5 +128,5 @@ SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
 
 HAYSTACK_SITECONF = 'search_sites'
 HAYSTACK_SEARCH_ENGINE = 'whoosh'
-HAYSTACK_WHOOSH_PATH = 'search_index'
+HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
