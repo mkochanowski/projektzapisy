@@ -47,6 +47,7 @@ class ProposalDescription(models.Model):
         choices = PROPOSAL_HOURS)
     laboratories = models.IntegerField(verbose_name='ilość godzin pracowni', 
         choices = PROPOSAL_HOURS)
+    deleted = models.BooleanField(verbose_name='usunięty', default=False)
 
     class Meta:
         verbose_name = 'opis przedmiotu'
@@ -109,3 +110,4 @@ class ProposalDescription(models.Model):
             self.tags.remove(tag)
         except ProposalDescriptionTag.DoesNotExist:
             pass
+

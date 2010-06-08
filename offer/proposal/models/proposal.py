@@ -29,7 +29,8 @@ class Proposal( models.Model ):
     helpers = models.ManyToManyField('users.Employee', blank=True,  related_name='proposal_helpers_related',
                                       verbose_name='pomogliby poprowadzić to')
     tags = models.ManyToManyField(ProposalTag, blank = True)
-    owner = models.ForeignKey(User, related_name='wlasciciel', verbose_name='wlasciciel', null = True)
+    owner = models.ForeignKey(User, related_name='wlasciciel', verbose_name='wlasciciel', null = True, blank=True)
+    deleted = models.BooleanField(default=False, verbose_name="usuniety")
                 
     class Meta:
         verbose_name = 'przedmiot'
@@ -37,14 +38,15 @@ class Proposal( models.Model ):
         app_label = 'proposal'
         permissions = (
             ("can_create_offer", u"Może tworzyć ofertę dydaktyczną"),
+            ("can_delete_proposal", u"Może usuwać propozycje"),
         )
     
     def description(self):
         """
             Get last description.
         """
-        if self.descriptions.count() > 0:
-            return self.descriptions.order_by('-date')[0]
+        if self.descriptions.filter(deleted=False).count() > 0:
+            return self.descriptions.filter(deleted=False).order_by('-date')[0]
         else:
             return None            
 

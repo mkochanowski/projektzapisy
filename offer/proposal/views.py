@@ -54,7 +54,7 @@ def proposals(request):
     """
         Proposal list
     """
-    proposals_ = Proposal.objects.all()
+    proposals_ = Proposal.objects.filter(deleted=False)
     return render_to_response( 'offer/proposal/base.html',
         {
             'proposals' : proposals_,
@@ -66,7 +66,7 @@ def proposal( request, slug, descid = None ):
     """
         Single proposal
     """
-    proposal_ = Proposal.objects.get(slug=slug)
+    proposal_ = Proposal.objects.get(slug=slug, deleted=False)
     newest   = proposal_.description()
 
     if descid:
@@ -280,13 +280,13 @@ def proposal_history( request, sid ):
     """
         Edition history
     """
-    proposal_ = Proposal.objects.get( pk = sid)
+    proposal_ = Proposal.objects.get( pk = sid, deleted = False)
     can_edit = (proposal_.owner == None
                or request.user.is_staff
 	       or proposal_.owner == request.user)
 
     data = {
-        'descriptions' : proposal_.descriptions.order_by( '-date' ),
+        'descriptions' : proposal_.descriptions.order_by( '-date' ).filter(deleted = False),
         'proposals'    : Proposal.objects.all(),
         'can_edit'     : can_edit
     }
@@ -298,7 +298,7 @@ def proposal_restore ( request, descid ):
     """
         Description restore
     """
-    olddesc             = ProposalDescription.objects.get( pk = descid )
+    olddesc             = ProposalDescription.objects.get( pk = descid, deleted=False )
 
     if (olddesc.proposal.owner != None
        and not request.user.is_staff
@@ -312,13 +312,42 @@ def proposal_restore ( request, descid ):
     newdesc.save()
     return redirect("proposal-page", olddesc.proposal.slug )
 
+@permission_required('proposal.can_delete_proposal')
+def delete_proposal( request, slug ):
+   """
+      Usuwamy dana propozycje
+   """
+   proposal = Proposal.objects.get(slug=slug)
+   proposal.deleted = True
+   proposal.save()
+   return redirect("proposal-list")
+
+@permission_required('proposal.can_delete_proposal')
+def delete_description( request, pid ):
+   """
+      Usuwamy dany opis
+   """
+   description = ProposalDescription.objects.get(id=pid)
+   how_many    = ProposalDescription.objects.filter(proposal = description.proposal, deleted=False).count()
+   if (how_many == 1):
+      description.proposal.deleted = True
+      description.proposal.save()
+   description.deleted = True
+   description.save()
+   request.user.message_set.create(message="Opis został usunięty.")
+
+   if (how_many > 1):
+       return redirect("proposal-page", description.proposal.slug )
+   else:
+       return redirect("proposal-list")
+
 @permission_required('proposal.can_create_offer')
 def offer_create( request ):
     """
         Widok listy przedmiotów, które można wybrać w ramach oferty dydaktycznej
     """
     data = {
-        'subjects' : Proposal.objects.order_by('name'),
+        'subjects' : Proposal.objects.filter(deleted=False).order_by('name'),
     }    
     
     return render_to_response('offer/proposal/create_offer.html', data, context_instance = RequestContext( request ))
@@ -342,7 +371,7 @@ def offer_select(request):
     action = request.POST['action']
     id = request.POST['id']
     
-    proposal_ = Proposal.objects.get(pk = id)
+    proposal_ = Proposal.objects.get(pk = id, deleted = False)
     
     if action == 'select':
         proposal_.add_tag("offer")

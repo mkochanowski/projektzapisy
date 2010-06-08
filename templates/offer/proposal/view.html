@@ -2,6 +2,10 @@
 
 {% load news_extras %} {# WTF?! po co tu newsy? #}
 
+{% block proposal-scripts %}
+	<script type="text/javascript" src=/site_media/js/offer/proposal/view.js></script>
+{% endblock %}
+
 {% block proposal-content %}
     <div id="od-proposal-view">
         {% if messages %}
@@ -123,6 +127,14 @@
                 <a href="{% url proposal-history sid=id %}">historia</a>
                 {% if can_edit %}<a href="{% url proposal-edit sid=id %}">edytuj</a>{% endif %}
             </p>
+            {% if perms.can_delete_proposal %}
+            <p>
+                <a class="proposal-delete" href="{% url proposal-delete slug=proposal.slug %}">Usuń tę propozycję</a>
+            </p>
+            <p>
+                <a class="proposal-delete" href="{% url proposal-description-delete pid=proposal.description.id %}">Usuń tę wersję</a>
+            </p>
+            {% endif %}           
         </div>
 
     </div>
