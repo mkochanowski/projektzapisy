@@ -45,12 +45,16 @@
 
 {% block sidebar-class %}{% if unset_offer %}sidebar-right sidebar-visible{% endif %}{% endblock %}
 {% block sidebar %}
-
 	{% if unset_offer %}
 		<div id="main-sidebar">
 			<h2>Przedmioty bez ustalonych preferencji</h2>
 			<ul id="od-prefs-undecided">
-
+                {% for prop in unset_offer %}
+                    <li>
+                        <input type="button" value="<" onclick="Prefs.initPref(this, '{% url prefs-init-pref prop.id %}')" />
+                        {{ prop.name }}
+                    </li>
+                {% endfor %}
 			</ul>
 		</div>
 	{% endif %}
