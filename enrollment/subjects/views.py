@@ -39,7 +39,7 @@ def subject(request, slug):
         try:
             student = Student.objects.get(user=request.user)
             student_options = StudentOptions.get_student_options_for_subject(request.user.student.id, subject.id)
-            subject.is_recording_open = student_options.is_recording_open()
+            subject.is_recording_open = subject.is_recording_open_for_student(student)
         except NonStudentOptionsException:
             subject.is_recording_open = False
         
