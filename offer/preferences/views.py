@@ -40,21 +40,22 @@ def view(request, template):
 		'prefs': prefs,
 		'proposalTypes': PROPOSAL_TYPES
 	}
+    def process_pref(pref):
+        """
+            Processes preference
+        """
+        obj = {}
+        obj['name']           = pref.proposal.name
+        obj['id']             = pref.id
+        obj['lecture']        = pref.lecture
+        obj['review_lecture'] = pref.review_lecture
+        obj['tutorial'] = pref.tutorial
+        obj['lab']      = pref.lab
+        obj['hidden']   = pref.hidden
+        obj['desc']     = pref.proposal.description()
+        return obj
+    data['prefs'] = map(process_pref, data['prefs'])
     if format == 'json':
-        def process_pref(pref):
-            """
-                Processes preference
-            """
-            obj = {}
-            obj['name']           = pref.proposal.name
-            obj['lecture']        = pref.lecture
-            obj['review_lecture'] = pref.review_lecture
-            obj['tutorial'] = pref.tutorial
-            obj['lab']      = pref.lab
-            obj['hidden']   = pref.hidden
-            obj['type']     = pref.proposal.description.type
-            return obj
-        data['prefs'] = map(process_pref, data['prefs'])
         return HttpResponse(simplejson.dumps(data))
     if format == 'html':
         return render_to_response_wo_extends(

@@ -10,49 +10,54 @@
         <li ><select id="od-prefs-list-option">{% prefs_form_options %}</select></li>
     </ul>
 </div>
-		
-	<ul id="od-prefs-list-tree" class="od-prefs-list">
-		{% for pref in prefs %}
-			<li{% if pref.hidden %} class="od-prefs-tree-hidden" {% else %} class="od-prefs-tree-show"{% endif %}>
-				<input type="button" class="od-prefs-toggleCollapse" value="+" onclick="Prefs.toggleCollapse(this)" />
-		{{pref.proposal.name}}
+        
+    <ul id="od-prefs-list-tree" class="od-prefs-list">
+        {% for pref in prefs %}
+            <li{% if pref.hidden %} class="od-prefs-tree-hidden" {% else %} class="od-prefs-tree-show"{% endif %}>
+                <input type="button" class="od-prefs-toggleCollapse" value="+" onclick="Prefs.toggleCollapse(this)" />
+        {{pref.name}}
 
-					<input type="button" class="od-prefs-toggleHidden {% if pref.hidden %}{% else %} hidden {%endif %}" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
-					<input type="button" class="od-prefs-toggleHidden {% if pref.hidden %} hidden {%endif %}" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
+                    <input type="button" class="od-prefs-toggleHidden {% if pref.hidden %}{% else %} hidden {%endif %}" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
+                    <input type="button" class="od-prefs-toggleHidden {% if pref.hidden %} hidden {%endif %}" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
 
                 <input type="hidden" class="pref_id" value="{{pref.id }}">
                 <input type="hidden" class="pref_name" value="{{pref.proposal.name }}">
                 <input type="hidden" class="pref_type" value="{{pref.proposal.type }}">
-				<ul>
-					<li>
-						Wykład:
-						<select class="lecture_select" id="id_{{ pref.id }}_lecture_select">
-							{% prefs_form_options selected pref.lecture %}
-						</select>
-					</li>
-
-					<li>
-						Repetytorium:
-						<select class="review_lecture_select" id="id_{{ pref.id }}_review_lecture_select">
-							{% prefs_form_options selected pref.review_lecture %}
-						</select>
-					</li>
-
-					<li>
-						Ćwiczenia:
-						<select class="tutorial_select" id="id_{{ pref.id }}_tutorial_select">
-							{% prefs_form_options selected pref.tutorial %}
-						</select>
-					</li>
-
-					<li>
-						Pracownia:
-						<select class="lab_select" id="id_{{ pref.id }}_lab_select">
-							{% prefs_form_options selected pref.lab %}
-						</select>
-					</li>
-				</ul>
-			</li>
-		{% endfor %}
-	</ul>
+                <ul>
+                    {% ifnotequal pref.desc.lectures 0 %}
+                    <li>
+                        Wykład:
+                        <select class="lecture_select" id="id_{{ pref.id }}_lecture_select">
+                            {% prefs_form_options selected pref.lecture %}
+                        </select>
+                    </li>
+                    {% endifnotequal %}
+                    {% ifnotequal pref.desc.repetitories 0 %}
+                    <li>
+                        Repetytorium:
+                        <select class="review_lecture_select" id="id_{{ pref.id }}_review_lecture_select">
+                            {% prefs_form_options selected pref.review_lecture %}
+                        </select>
+                    </li>
+                    {% endifnotequal %}
+                    {% ifnotequal pref.desc.exercises 0 %}
+                    <li>
+                        Ćwiczenia:
+                        <select class="tutorial_select" id="id_{{ pref.id }}_tutorial_select">
+                            {% prefs_form_options selected pref.tutorial %}
+                        </select>
+                    </li>
+                    {% endifnotequal %}
+                    {% ifnotequal pref.desc.laboratories 0 %}
+                    <li>
+                        Pracownia:
+                        <select class="lab_select" id="id_{{ pref.id }}_lab_select">
+                            {% prefs_form_options selected pref.lab %}
+                        </select>
+                    </li>
+                    {% endifnotequal %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}

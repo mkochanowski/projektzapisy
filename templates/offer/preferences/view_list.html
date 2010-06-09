@@ -3,38 +3,45 @@
 {% load preferences_extras %}
 
 {% block pref_list %}
-	<ul id="od-prefs-list-list" class="od-prefs-list">
-		{% for pref in prefs %}
-				<li><span>{{pref.proposal.name}} wykład:</span>
-
-					{% if pref.hidden %}
-						<input type="button" class="od-prefs-toggleHidden" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
-					{% else %}
-						<input type="button" class="od-prefs-toggleHidden" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
-					{% endif %}
-
-					<select class="lecture_select" id="id_{{ pref.id }}_lecture_select">
-						{% prefs_form_options selected pref.lecture %}
-					</select>
-				</li>
-
-				<li><span>{{pref.proposal.name}} repetytorium:</span>
-					<select class="review_lecture_select" id="id_{{ pref.id }}_review_lecture_select">
-						{% prefs_form_options selected pref.review_lecture %}
-					</select>
-				</li>
-
-				<li><span>{{pref.proposal.name}} ćwiczenia:</span>
-					<select class="tutorial_select" id="id_{{ pref.id }}_tutorial_select">
-						{% prefs_form_options selected pref.tutorial %}
-					</select>
-				</li>
-
-				<li><span>{{pref.proposal.name}} pracownia:</span>
-					<select class="lab_select" id="id_{{ pref.id }}_lab_select">
-						{% prefs_form_options selected pref.lab %}
-					</select>
-				</li>
-		{% endfor %}
+    <ul id="od-prefs-list-list" class="od-prefs-list">
+        {% for pref in prefs %}
+            <li>
+            {% if pref.hidden %}
+                <input type="button" class="od-prefs-toggleHidden" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
+            {% else %}
+                <input type="button" class="od-prefs-toggleHidden" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
+            {% endif %}
+            {% ifnotequal pref.desc.lectures 0 %}
+                <span>{{pref.name}} wykład:</span>
+                <select class="lecture_select" id="id_{{ pref.id }}_lecture_select">
+                    {% prefs_form_options selected pref.lecture %}
+                </select>
+            {% endifnotequal %}
+            </li>
+            {% ifnotequal pref.desc.repetitories 0 %}
+            <li>
+                <span>{{pref.name}} repetytorium:</span>
+                    <select class="review_lecture_select" id="id_{{ pref.id }}_review_lecture_select">
+                        {% prefs_form_options selected pref.review_lecture %}
+                </select>
+            </li>
+            {% endifnotequal %}
+            {% ifnotequal pref.desc.exercises 0 %}
+            <li>
+                <span>{{pref.name}} ćwiczenia:</span>
+                <select class="tutorial_select" id="id_{{ pref.id }}_tutorial_select">
+                    {% prefs_form_options selected pref.tutorial %}
+                </select>
+            </li>
+            {% endifnotequal %}
+            {% ifnotequal pref.desc.laboratories 0 %}
+            <li>
+                <span>{{pref.name}} pracownia:</span>
+                <select class="lab_select" id="id_{{ pref.id }}_lab_select">
+                    {% prefs_form_options selected pref.lab %}
+                </select>
+            </li>
+            {% endifnotequal %}
+        {% endfor %}
 	</ul>
 {% endblock %}
