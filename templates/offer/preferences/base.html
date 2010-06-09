@@ -60,12 +60,11 @@
 	{% endif %}
 {% endblock %}
 
-{% block content %} {% comment %}
+{% block content %}
 	<p id="od-prefs-viewmode-selection">Widok:
 		<a href="{% url prefs-list-view %}">listy</a>
 		<a href="{% url prefs-tree-view %}">drzewa</a>
 	</p>
-{% endcomment %}
 	{% if prefs %}
 		<h2>Przedmioty z ustalonymi preferencjami</h2>
 
