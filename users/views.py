@@ -12,10 +12,13 @@ from users.exceptions import NonUserException, NonEmployeeException
 from users.models import Employee
 from users.forms import EmailChangeForm
 
-def profile(request, user_id):
+def profile(request, user_id = None):
     '''profile'''
     try:
-        user = User.objects.get(id=user_id)
+        if user_id:
+            user = User.objects.get(id=user_id)
+        else:
+            user = request.user
         return render_to_response('users/profile.html', {'profile' : user})
     except NonUserException:
         pass
