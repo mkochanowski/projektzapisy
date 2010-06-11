@@ -39,6 +39,13 @@
 			<xs:enumeration value="exercise"/>
 			<xs:enumeration value="laboratory"/>
 			<xs:enumeration value="lecture"/>
+			<!-- advanced exercise -->
+			<xs:enumeration value="exercise_adv"/>
+			<!-- exercise+laboratory -->
+			<xs:enumeration value="exer_lab"/>
+			<xs:enumeration value="seminar"/>
+			<xs:enumeration value="language"/>
+			<xs:enumeration value="sport"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="TermDay">
@@ -72,6 +79,7 @@
 	</xs:complexType>
 	<xs:complexType name="Group">
 		<xs:sequence>
+			<!-- teacher must exist in database (as employee) -->
 			<xs:element name="teacher" type="Teacher" minOccurs="0"/>
 			<xs:element name="type" type="GroupType"/>
 			<xs:element name="limit" type="xs:nonNegativeInteger"/>
@@ -92,6 +100,7 @@
 		<xs:sequence>
 			<!-- slug is automatically generated -->
 			<xs:element name="name" type="char255"/>
+			<!-- each teacher must exist in database (as employee) -->
 			<xs:element name="teachers" type="Teachers"/>
 			<xs:element name="type" type="char30"/>
 			<xs:element name="ects" type="xs:nonNegativeInteger"/>

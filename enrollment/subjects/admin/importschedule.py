@@ -93,6 +93,16 @@ def import_semester_schedule(xmlfile):
                 gr_type = '2'
             elif el_type_text == 'laboratory':
                 gr_type = '3'
+            elif el_type_text == 'exercise_adv':
+                gr_type = '4'
+            elif el_type_text == 'exer_lab':
+                gr_type = '5'
+            elif el_type_text == 'seminar':
+                gr_type = '6'
+            elif el_type_text == 'language':
+                gr_type = '7'
+            elif el_type_text == 'sport':
+                gr_type = '8'
 
             limit = el_group.find('limit').text
 
