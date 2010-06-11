@@ -37,7 +37,7 @@ Vote.init = function()
             {
                 var voteValue = parseInt($.trim(votes[i].value));
                 if (isNaN(voteValue) || voteValue < 0)
-                    throw new Exception('Vote.refreshCounters: nieprawidłowa wartość głosu');
+                    throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
                 count += voteValue;
             }
 
@@ -69,10 +69,10 @@ Vote.init = function()
     if (cookieFilter)
     {
         Vote.currentFilter = cookieFilter;
-        Vote.saveFilterToForm(cookieFilter);
+        cookieFilter.saveFilterToForm();
     }
     else
-        Vote.currentFilter = Vote.readFilterFromForm();
+        Vote.currentFilter = Vote.Filter.readFilterFromForm();
     Vote.doFilter(Vote.currentFilter);
     Vote.filterThread();
 
@@ -81,7 +81,7 @@ Vote.init = function()
     var maxPointsNode = $('#od-vote-maxPoints');
     Vote.maxPoints = parseInt($.trim(maxPointsNode.children('span').text()));
     if (isNaN(Vote.maxPoints))
-        throw new Exception('Vote.init: Niepoprawna wartość maxPoints');
+        throw new Error('Vote.init: Niepoprawna wartość maxPoints');
 
     maxPointsNode.empty();
     maxPointsNode = maxPointsNode[0];
@@ -130,7 +130,7 @@ Vote.refreshCounters = function()
     {
         var voteValue = parseInt($.trim(votes[i].value));
         if (isNaN(voteValue) || voteValue < 0)
-            throw new Exception('Vote.refreshCounters: nieprawidłowa wartość głosu');
+            throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
         totalPoints += voteValue;
     }
 
@@ -140,13 +140,18 @@ Vote.refreshCounters = function()
     Vote.totalPoints = totalPoints;
 };
 
+
+/*******************************************************************************
+ * Filtrowanie
+ ******************************************************************************/
+
 /**
  * "Wątek" sprawdza, czy formularz nie zmienił zawartości - jeżeli tak, to
  * aplikuje filtr.
  */
 Vote.filterThread = function()
 {
-    var newFilter = Vote.readFilterFromForm();
+    var newFilter = Vote.Filter.readFilterFromForm();
 
     if (!Vote.currentFilter.isEqual(newFilter))
     {
@@ -156,61 +161,6 @@ Vote.filterThread = function()
     }
 
     setTimeout(Vote.filterThread, 50);
-};
-
-/**
- * Generuje filtr na podstawie zawartości formularza.
- *
- * @return Vote.Filter obiekt filtra z odczytaną zawartością
- */
-Vote.readFilterFromForm = function()
-{
-    var newFilter = new Vote.Filter();
-
-    var phrase = $('#od-vote-q')[0].value;
-    if (phrase != TopBarFilter.emptyFilterText)
-        newFilter.setPhrase(phrase);
-    newFilter.setOnlyWanted($('#od-vote-onlywanted')[0].checked);
-
-    var subjectTypes = $("#od-vote-subjtype").find('input[type=checkbox]');
-    for (var i = 0; i < subjectTypes.length; i++)
-    {
-        var subKey = subjectTypes[i].id;
-        if (subKey.substr(0, 13) != 'od-vote-type-')
-            throw new Exception('Vote.filterThread: Nieprawidłowy id pola');
-        subKey = subKey.substr(13);
-        if (subjectTypes[i].checked)
-            newFilter.enableSubjectType(subKey);
-        else
-            newFilter.disableSubjectType(subKey);
-    }
-
-    return newFilter;
-};
-
-/**
- * Ustawia formularz na podstawie filtra.
- *
- * @param filter filtr, który chcemy ustawić w formularzu
- */
-Vote.saveFilterToForm = function(filter)
-{
-    if (filter.phrase == '')
-        $('#od-vote-q')[0].value = TopBarFilter.emptyFilterText;
-    else
-        $('#od-vote-q')[0].value = filter.phrase;
-
-    $('#od-vote-onlywanted')[0].checked = filter.onlyWanted;
-
-    var subjectTypes = $("#od-vote-subjtype").find('input[type=checkbox]');
-    for (var i = 0; i < subjectTypes.length; i++)
-    {
-        var subKey = subjectTypes[i].id;
-        if (subKey.substr(0, 13) != 'od-vote-type-')
-            throw new Exception('Vote.filterThread: Nieprawidłowy id pola');
-        subKey = subKey.substr(13);
-        subjectTypes[i].checked = filter.subjectTypes[subKey];
-    }
 };
 
 /**
@@ -237,15 +187,7 @@ Vote.doFilter = function(filter)
             isVisible = true;
 
         if (isVisible)
-        {
-            isVisible = false;
-            for (var visibleType in filter.subjectTypes)
-                if ($(subject).hasClass(visibleType))
-                {
-                    isVisible = true;
-                    break;
-                }
-        }
+            isVisible = filter.subjectTypes.haveEnabledTypeClass(subject);
 
         if (isVisible && filter.phrase != '')
             isVisible = ($(subject).children('label').text().toLowerCase().
@@ -283,7 +225,7 @@ Vote.doFilter = function(filter)
     }
 };
 
-/******************************************************************************/
+/*** Filtrowanie - klasa filtra ***********************************************/
 
 /**
  * Klasa filtra przy głosowaniu - konstruktor.
@@ -291,7 +233,7 @@ Vote.doFilter = function(filter)
 Vote.Filter = function()
 {
     this.phrase = '';
-    this.subjectTypes = new Object();
+    this.subjectTypes = new SubjectTypeFilter();
     this.onlyWanted = false;
 };
 
@@ -309,12 +251,44 @@ Vote.Filter.deserialize = function(serializedFilter)
     var deserializedFilter = new Vote.Filter();
     deserializedFilter.setPhrase(serializedFilter.phrase);
     deserializedFilter.setOnlyWanted(serializedFilter.onlyWanted);
-
-    for (var subjectType in serializedFilter.subjectTypes)
-        if (serializedFilter.subjectTypes[subjectType])
-            deserializedFilter.enableSubjectType(subjectType);
+    deserializedFilter.subjectTypes = SubjectTypeFilter.
+        deserialize(serializedFilter.subjectTypes);
 
     return deserializedFilter;
+};
+
+/**
+ * Generuje filtr na podstawie zawartości formularza.
+ *
+ * @return Vote.Filter obiekt filtra z odczytaną zawartością
+ */
+Vote.Filter.readFilterFromForm = function()
+{
+    var newFilter = new Vote.Filter();
+
+    var phrase = $('#od-vote-q')[0].value;
+    if (phrase != TopBarFilter.emptyFilterText)
+        newFilter.setPhrase(phrase);
+    newFilter.setOnlyWanted($('#od-vote-onlywanted')[0].checked);
+
+    newFilter.subjectTypes = SubjectTypeFilter.readFilterFromForm($('#od-vote-subjtype'));
+
+    return newFilter;
+};
+
+/**
+ * Ustawia formularz na podstawie filtra.
+ */
+Vote.Filter.prototype.saveFilterToForm = function()
+{
+    if (this.phrase == '')
+        $('#od-vote-q')[0].value = TopBarFilter.emptyFilterText;
+    else
+        $('#od-vote-q')[0].value = this.phrase;
+
+    $('#od-vote-onlywanted')[0].checked = this.onlyWanted;
+
+    this.subjectTypes.saveFilterToForm($('#od-vote-subjtype'));
 };
 
 /**
@@ -325,26 +299,6 @@ Vote.Filter.deserialize = function(serializedFilter)
 Vote.Filter.prototype.setPhrase = function(phrase)
 {
     this.phrase = $.trim(phrase).toLowerCase();
-};
-
-/**
- * Dodaje typ przedmiotu do listy filtra.
- *
- * @param subKey identyfikator typu przedmiotu
- */
-Vote.Filter.prototype.enableSubjectType = function(subKey)
-{
-    this.subjectTypes[$.trim(subKey)] = true;
-};
-
-/**
- * Usuwa typ przedmiotu z listy filtra.
- *
- * @param subKey identyfikator typu przedmiotu
- */
-Vote.Filter.prototype.disableSubjectType = function(subKey)
-{
-    delete this.subjectTypes[$.trim(subKey)];
 };
 
 /**
@@ -370,11 +324,7 @@ Vote.Filter.prototype.isEqual = function(filter)
         return false;
     if (this.onlyWanted != filter.onlyWanted)
         return false;
-    for (var subjectType1 in this.subjectTypes)
-        if (!filter.subjectTypes[subjectType1])
-            return false;
-    for (var subjectType2 in filter.subjectTypes)
-        if (!this.subjectTypes[subjectType2])
-            return false;
+    if (!this.subjectTypes.isEqual(filter.subjectTypes))
+        return false;
     return true;
 };

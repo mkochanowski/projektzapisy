@@ -15,6 +15,7 @@
 
 	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
     <script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
+    <script type="text/javascript" src="/site_media/js/common/subjectTypeFilter.js"></script>
     <script type="text/javascript" src="/site_media/js/offer/vote.js"></script>
 {% endblock %}
 
@@ -30,7 +31,7 @@
 		<fieldset id="od-vote-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in proposalTypes %}
-                <span class="checkbox"><input type="checkbox" id="od-vote-type-{{ type.0 }}" checked="checked" /><label for="od-vote-type-{{ type.0 }}">{{ type.1 }}</label></span>
+                <span class="checkbox"><input type="checkbox" id="filter-subject-type-{{ type.0 }}" checked="checked" /><label for="filter-subject-type-{{ type.0 }}">{{ type.1 }}</label></span>
 			{% endfor %}
 		</fieldset>
 		<fieldset id="od-vote-other">
