@@ -19,6 +19,7 @@ from offer.preferences.models import PREFERENCE_CHOICES
 
 from django.core.urlresolvers import reverse
 
+@employee_required
 def view(request, template):
     """
         Employee preferences' view renderend using the given template.

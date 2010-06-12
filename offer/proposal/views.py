@@ -97,7 +97,7 @@ def proposal( request, slug, descid = None ):
     }
     return render_to_response( 'offer/proposal/view.html', data, context_instance = RequestContext( request ) )
 
-
+@login_required
 def proposal_form(request, sid = None):
     """
         Form to add and edit proposal
