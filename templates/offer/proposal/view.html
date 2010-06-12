@@ -39,6 +39,9 @@
             </li>
             {% endif %}
             <li>Sugerowana ilość punktów ECTS: {{ proposal.description.ects }}</li>
+            <li>
+                {% if proposal.description.web_page %}<a href="{{ proposal.description.web_page }}">Strona przedmiotu</a>{% endif %}
+            </li>
         </ul>
 
         <h3>Opis przedmiotu</h3>

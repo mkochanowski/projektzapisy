@@ -22,12 +22,15 @@
                     {% endfor %}
                 </select>
             </li>
+{% comment %}
+Wykomentowałem, bo coś jest nie tak i nie działa
             <li class="proposedOwner">
                 <label>Zablokuj innym edycję:</label>
                 <select class="main-labelledSelect" name="owner" title="ograniczona edycja">
                    <option value="no">Nie</option>
                    <option value="yes" {% if proposal.owner %}selected="selected"{% endif %}>Tak</option>
-            </li>
+            </li> 
+{% endcomment %}
             <li class="proposedTime">
                 <label>Wymiar godzin:</label>
                 <select class="main-labelledSelect" name="lectures" title="sugerowana ilość godzin wykładów">
@@ -77,7 +80,10 @@
 
         <h3>Uwagi do potencjalnych prowadzących i dyrekcji</h3>
         <p><textarea name="comments" rows="5" cols="70">{{ proposalComments }}</textarea></p>
-
+        
+        <h3>Strona przedmiotu</h3>
+        <p><input id="od-proposal-web-page" type="text" name="web-page" value="{{ proposalWWW }}"></p>
+        
         <h3>Literatura:</h3>
         <div id="od-proposal-form-books">
             <ul>

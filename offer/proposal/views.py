@@ -109,6 +109,7 @@ def proposal_form(request, sid = None):
     proposal_description = ""
     proposal_requirements = ""
     proposal_comments = ""
+    proposal_www = ""
     
     proposal_ = None
     if edit_mode:
@@ -117,6 +118,7 @@ def proposal_form(request, sid = None):
             proposal_description = proposal_.description().description 
             proposal_requirements = proposal_.description().requirements
             proposal_comments = proposal_.description().comments
+            proposal_www      = proposal_.description().web_page
         except:            
             edit_mode = False
     
@@ -134,7 +136,7 @@ def proposal_form(request, sid = None):
         proposal_comments = request.POST.get('comments', '')
         proposal_owner = request.POST.get('owner', 'no')
         proposal_type = request.POST.get('type', '')
-        
+        proposal_www = request.POST.get('web-page', '')
         
         if (proposal_owner == "yes"
            and proposal_.owner == None):
@@ -188,7 +190,8 @@ def proposal_form(request, sid = None):
             description.lectures = proposal_lectures
             description.repetitories = proposal_repetitories
             description.exercises = proposal_exercises
-            description.laboratories = proposal_laboratories   
+            description.laboratories = proposal_laboratories
+            description.web_page = proposal_www   
             description.comments = proposal_comments
             description.date = datetime.now()
             description.proposal = proposal_
@@ -264,6 +267,7 @@ def proposal_form(request, sid = None):
         'proposalDescription'   : proposal_description,
         'proposalRequirements'  : proposal_requirements,
         'proposalComments'      : proposal_comments,
+        'proposalWWW'           : proposal_www,
         'mode'          : 'form',
         'proposals'     : Proposal.objects.all(),
         'proposalTypes' : offer.proposal.models.proposal_description.PROPOSAL_TYPES,

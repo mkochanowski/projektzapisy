@@ -30,35 +30,41 @@ class ProposalDescription(models.Model):
         Description of proposal
     """
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
-    description = models.TextField( verbose_name = 'opis' )
+    description  = models.TextField( verbose_name = 'opis' )
     requirements = models.TextField( verbose_name = 'wymagania' )
-    comments = models.TextField( verbose_name = 'uwagi' )
-    date = models.DateTimeField(verbose_name = 'data dodania')
-    tags = models.ManyToManyField(ProposalDescriptionTag, blank = True)
-    author = models.ForeignKey(User, related_name='autor')
-    type = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
-        verbose_name = 'typ')
-    ects = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
-    lectures = models.IntegerField(verbose_name='ilość godzin wykładów', 
-        choices = PROPOSAL_HOURS)
-    repetitories = models.IntegerField(verbose_name='ilość godzin repetytoriów', 
-        choices = PROPOSAL_HOURS)
-    exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń', 
-        choices = PROPOSAL_HOURS)
-    laboratories = models.IntegerField(verbose_name='ilość godzin pracowni', 
-        choices = PROPOSAL_HOURS)
+    comments     = models.TextField( verbose_name = 'uwagi' )
+    
+    date         = models.DateTimeField(verbose_name = 'data dodania')
+    tags         = models.ManyToManyField(ProposalDescriptionTag, blank = True)
+    author       = models.ForeignKey(User, related_name='autor')
+    
+    type         = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
+                                     verbose_name = 'typ')
+    ects         = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
+    
+    lectures     = models.IntegerField(verbose_name = 'ilość godzin wykładów', 
+                                            choices = PROPOSAL_HOURS)
+    repetitories = models.IntegerField(verbose_name = 'ilość godzin repetytoriów', 
+                                            choices = PROPOSAL_HOURS)
+    exercises    = models.IntegerField(verbose_name = 'ilość godzin ćwiczeń', 
+                                            choices = PROPOSAL_HOURS)
+    laboratories = models.IntegerField(verbose_name =' ilość godzin pracowni', 
+                                            choices = PROPOSAL_HOURS)
     deleted = models.BooleanField(verbose_name='usunięty', default=False)
-
+    
+    web_page = models.CharField( verbose_name = 'Strona WWW', 
+                                max_length   = 200,
+                                blank        = True,
+                                null         = True )
+                                
+    
     class Meta:
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
         app_label = 'proposal'
 
-    def __str__(self):
-        return self.description
-
     def __unicode__(self):
-        return self.description
+        return '[' + self.author.__unicode__() + ']' + self.proposal.name 
 
     def get_newer( self, proposal ):
         """
