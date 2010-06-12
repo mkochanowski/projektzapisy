@@ -23,13 +23,6 @@
 	width: 300px;
 }
 
-.hidden {
-    display:none;
-}
-
-.od-filter-hide {
-    display:none;
-}
 /******************************************************************************/
 
 ul#od-prefs-undecided
@@ -72,12 +65,41 @@ ul#od-prefs-undecided input:hover
 	left: 3px;
 }
 
+#od-prefs-submitBar
+{
+    padding-top: 30px;
+    clear: both;
+    text-align: center;
+}
+
+#od-prefs-submitBar input
+{
+    padding: 5px 40px;
+}
+
+#od-prefs-form .emptyFilterWarning
+{
+    border: 1px solid #cccccc;
+    background: #FFF5B3;
+
+    padding: 5px 10px;
+    font-size: 13px;
+    width: 380px;
+    margin: auto;
+    margin-top: 20px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
 /******************************************************************************/
 
-.od-prefs-list
+#od-prefs-list
 {
 	list-style: none;
 	padding: 0;
+    padding-bottom: 7px;
 	width: 400px;
 	border: 1px solid #cccccc;
 	background: #f8f8f8;
@@ -90,19 +112,21 @@ ul#od-prefs-undecided input:hover
 	border-radius: 4px;
 }
 
-.od-prefs-list > li
+#od-prefs-list > li
 {
 	border-bottom: 1px solid #cccccc;
 	min-height: 25px;
 }
 
-.od-prefs-list > li:last-child
+#od-prefs-list > li > span
 {
-	border-bottom: 0;
+    display: inline-block;
+    padding: 4px;
+    padding-bottom: 2px;
 }
 
-.od-prefs-list .od-prefs-toggleHidden,
-.od-prefs-list .od-prefs-toggleCollapse
+#od-prefs-list .od-prefs-toggleHidden,
+#od-prefs-list .od-prefs-toggleCollapse
 {
 	height: 25px;
 	border: 0;
@@ -112,112 +136,68 @@ ul#od-prefs-undecided input:hover
 	cursor: pointer;
 }
 
-.od-prefs-list .od-prefs-toggleHidden
+#od-prefs-list .od-prefs-toggleHidden
 {
 	float: right;
 	border-left: 1px solid #cccccc;
 	width: 90px;
 }
 
-.od-prefs-list .od-prefs-toggleCollapse
+#od-prefs-list .od-prefs-toggleCollapse
 {
 	border-right: 1px solid #cccccc;
 	width: 25px;
 }
 
-.od-prefs-list li:first-child .od-prefs-toggleHidden
+#od-prefs-list li:first-child .od-prefs-toggleHidden
 {
 	-moz-border-radius-topright: 3px;
 	-webkit-border-top-right-radius: 3px;
 	border-top-right-radius: 3px;
 }
 
-.od-prefs-list li:last-child .od-prefs-toggleHidden
-{
-	-moz-border-radius-bottomright: 3px;
-	-webkit-border-bottom-right-radius: 3px;
-	border-bottom-right-radius: 3px;
-}
-
-.od-prefs-list li.subtree-visible .od-prefs-toggleHidden
-{
-	-moz-border-radius-bottomright: 0;
-	-webkit-border-bottom-right-radius: 0;
-	border-bottom-right-radius: 0;
-}
-
-.od-prefs-list li:first-child .od-prefs-toggleCollapse
+#od-prefs-list li:first-child .od-prefs-toggleCollapse
 {
 	-moz-border-radius-topleft: 3px;
 	-webkit-border-top-left-radius: 3px;
 	border-top-left-radius: 3px;
 }
 
-.od-prefs-list li:last-child .od-prefs-toggleCollapse
-{
-	-moz-border-radius-bottomleft: 3px;
-	-webkit-border-bottom-left-radius: 3px;
-	border-bottom-left-radius: 3px;
-}
-
-.od-prefs-list li.subtree-visible .od-prefs-toggleCollapse
-{
-	-moz-border-radius-bottomleft: 0;
-	-webkit-border-bottom-left-radius: 0;
-	border-bottom-left-radius: 0;
-}
-
-.od-prefs-list .od-prefs-toggleHidden:hover,
-.od-prefs-list .od-prefs-toggleCollapse:hover
+#od-prefs-list .od-prefs-toggleHidden:hover,
+#od-prefs-list .od-prefs-toggleCollapse:hover
 {
 	background-color: #cccccc;
 }
 
-#od-prefs-list-tree ul
+#od-prefs-list ul
 {
 	border-top: 1px solid #cccccc;
-	display: none;
 	list-style: none;
 	padding: 10px;
 	background: white;
 }
 
-#od-prefs-list-tree li.subtree-visible ul
+#od-prefs-list li.collapsed ul
 {
-	display: block;
+	display: none;
 }
 
-#od-prefs-list-tree ul li
+#od-prefs-list li.hidden
+{
+    display: none;
+}
+
+#od-prefs-list ul li
 {
 	padding-left: 130px;
 	padding-right: 50px;
 	height: 30px;
 }
 
-#od-prefs-list-tree ul li select
+#od-prefs-list ul li select
 {
 	float: right;
 	height: 25px;
-}
-
-#od-prefs-list-list li
-{
-	position: relative;
-}
-
-#od-prefs-list-list li span
-{
-	position: relative;
-	top: 4px;
-	left: 4px;
-}
-
-#od-prefs-list-list li select
-{
-	position: absolute;
-	top: 2px;
-	left: 200px;
-	height: 21px;
 }
 
 /******************************************************************************/

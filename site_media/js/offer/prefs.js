@@ -1,264 +1,470 @@
-Filtr = new Object();
+/**
+ * Funkcje i klasy odpowiedzialne za preferencje pracowników na temat
+ * przedmiotów z oferty dydaktycznej.
+ */
 
-Filtr.work = function()
+Prefs = Object();
+
+/**
+ * Zainicjowanie formularza preferencji.
+ */
+Prefs.init = function()
 {
-    function strpos (haystack, needle) {
-        var i = (haystack+'').indexOf(needle);
-        return i;
-    }
-   var query = $("#od-prefs-q").val();
-   var q;
-   if (query=='Filtruj'||query=='') q = false;
-        else q = true;
-        
-   var types = $('.od-filter-checkbox');
-   var t = false;
-   var typesArray = new Array();
-   jQuery.each(types, function(){
-        if($(this).children('input')[0].checked){
-            t = true;
-            typesArray.push($(this).children('input').val());
-        }
-   });
-   var all = $("#od-prefs-list-tree").children();
-   jQuery.each(all, function(){
-        var name = $(this).children(".pref_name").val();
-        var type = $(this).children(".pref_type").val();
-        if(q && strpos(name.toLowerCase(), query.toLowerCase())<0){
-            $(this).addClass('od-filter-hide');
-            return true;
-        }
-        if(t && jQuery.inArray(type, typesArray)<0){
-            $(this).addClass('od-filter-hide');
-            return true;
-        }
-        $(this).removeClass('od-filter-hide');
-   });
-}
+    var i;
 
-$(document).ready(function(){
-     Filtr.work();
-    $(".od-filter").keypress(function(e) {
-            if(e.which == 10 || e.which == 13) {
-                return false;
+    $('#od-prefs-top-bar')[0].style.display = 'block';
+
+    var prefsList = $('#od-prefs-list');
+    Prefs.prefsList = prefsList[0];
+
+    Prefs.subjects = new Array();
+    var subjectElements = prefsList.children('li');
+    for (i = 0; i < subjectElements.length; i++)
+    {
+        var sub = Prefs.Subject.fromElement(subjectElements[i]);
+        sub.attachControls();
+        sub.setCollapsed(true);
+        Prefs.subjects.push(sub);
+    }
+
+    Prefs.emptyFilterWarning = document.createElement('p');
+    Prefs.emptyFilterWarning.className = 'emptyFilterWarning';
+    Prefs.emptyFilterWarning.style.display = 'none';
+    $(Prefs.emptyFilterWarning).insertAfter(prefsList);
+    Prefs.emptyFilterWarning.appendChild(document.createTextNode(
+        'Do podanego filtra nie pasuje żaden z przedmiotów.'));
+
+    // ustawianie początkowego filtra
+    var cookieFilter = Prefs.Filter.deserialize($.cookies.get('prefs-filter'));
+    if (cookieFilter)
+    {
+        Prefs.currentFilter = cookieFilter;
+        cookieFilter.saveFilterToForm();
+    }
+    else
+        Prefs.currentFilter = Prefs.Filter.readFilterFromForm();
+    Prefs.doFilter(Prefs.currentFilter);
+    Prefs.filterThread();
+
+    // panel rozwiń / zwiń wszystko
+    var viewmodeSelectionBar = document.createElement('p');
+    viewmodeSelectionBar.id = 'od-prefs-viewmode-selection';
+    $('#main-content').prepend(viewmodeSelectionBar);
+
+    var uncollapseAll = document.createElement('a');
+    uncollapseAll.appendChild(document.createTextNode('Rozwiń wszystko'));
+    viewmodeSelectionBar.appendChild(uncollapseAll);
+    viewmodeSelectionBar.appendChild(document.createTextNode(' '));
+
+    var collapseAll = document.createElement('a');
+    collapseAll.appendChild(document.createTextNode('Zwiń wszystko'));
+    viewmodeSelectionBar.appendChild(collapseAll);
+
+    var toggleCollapseAll = function(collapse)
+    {
+        for (i = 0; i < Prefs.subjects.length; i++)
+            Prefs.subjects[i].setCollapsed(collapse);
+    };
+    $(collapseAll).click(function()
+    {
+        toggleCollapseAll(true);
+    });
+    $(uncollapseAll).click(function()
+    {
+        toggleCollapseAll(false);
+    });
+
+    // nie ustalone preferencje
+
+    var undecidedList = $('#od-prefs-undecided');
+    Prefs.undecidedList = undecidedList;
+
+    var undecidedElements = undecidedList.children('li');
+    for (i = 0; i < undecidedElements.length; i++)
+    {
+        var und = Prefs.Undecided.fromElement(undecidedElements[i]);
+        und.attachControls();
+    }
+};
+
+$(Prefs.init);
+
+/*******************************************************************************
+ * Model przedmiotu bez ustalonych preferencji
+ ******************************************************************************/
+
+Prefs.Undecided = function()
+{
+    this.initURL = null;
+    this.container = null;
+};
+
+Prefs.Undecided.fromElement = function(element)
+{
+    var el = $(element);
+
+    var und = new Prefs.Undecided();
+    und.initURL = el.children('.initURL').val().trim();
+    und.container = el[0];
+
+    return und;
+};
+
+Prefs.Undecided.prototype.attachControls = function()
+{
+    var thisObj = this;
+
+    var initBtn = document.createElement('input');
+    initBtn.type = 'button';
+    initBtn.value = '<';
+    $(initBtn).click(function()
+    {
+        thisObj.init();
+    });
+
+    $(this.container).prepend(initBtn);
+};
+
+Prefs.Undecided.prototype.init = function()
+{
+    $(this.container).remove();
+    if (Prefs.undecidedList.children('li').length == 0)
+        Sidebar.detach();
+
+    $.ajax({
+        type: 'post',
+        url: this.initURL,
+        success: function(data)
+        {
+            var i;
+
+            data = $.parseJSON(data);
+            if (data.Success != 'OK')
+                throw Error('Prefs.Undecided.prototype.init: błąd w komunikacji');
+            
+            var sub = new Prefs.Subject();
+            sub.id = data.id;
+            sub.type = data.type;
+            sub.name = data.name;
+            sub.hideURL = data.hideurl;
+            sub.unhideURL = data.unhideurl;
+
+            sub.container = document.createElement('li');
+            Prefs.prefsList.appendChild(sub.container);
+
+            var name = document.createElement('span');
+            name.className = 'name';
+            name.appendChild(document.createTextNode(sub.name));
+            sub.container.appendChild(name);
+            sub.attachControls();
+
+            sub.prefContainer = document.createElement('ul');
+            sub.container.appendChild(sub.prefContainer);
+
+            var options = new Object();
+            for (i = 0; i < data.prefchoices.length; i++)
+            {
+                var choice = data.prefchoices[i];
+                options[choice[0]] = choice[1];
+            }
+
+            var appendSelect = function(label, className)
+            {
+                var li = document.createElement('li');
+                li.appendChild(document.createTextNode(label + ' '));
+
+                var select = document.createElement('select');
+                select.name = className + '-' + sub.id;
+                select.className = className;
+                li.appendChild(select);
+
+                for (var v in options)
+                {
+                    var option = document.createElement('option');
+                    option.value = v;
+                    if (v == 0)
+                        option.selected = true;
+                    option.appendChild(document.createTextNode(options[v]));
+                    select.appendChild(option);
+                }
+
+                sub.prefContainer.appendChild(li);
+            };
+
+            if (data.showlectures)
+                appendSelect('Wykład:', 'lecture');
+            if (data.showrepetitories)
+                appendSelect('Repetytorium:', 'review-lecture');
+            if (data.showexercises)
+                appendSelect('Ćwiczenia:', 'tutorial');
+            if (data.showlaboratories)
+                appendSelect('Pracownia:', 'lab');
+
+            Prefs.subjects.push(sub);
+        }
+    });
+};
+
+/*******************************************************************************
+ * Model preferencji przedmiotu
+ ******************************************************************************/
+
+Prefs.Subject = function()
+{
+    this.id = null;
+    this.type = null;
+    this.name = null;
+    this.collapsed = false;
+    this.hidden = false;
+    this.container = null;
+    this.prefContainer = null;
+    this.hideURL = null;
+    this.unhideURL = null;
+};
+
+Prefs.Subject.fromElement = function(element)
+{
+    var el = $(element);
+
+    var sub = new Prefs.Subject();
+    sub.id = Number(el.children('.pref-id').val());
+    sub.type = el.children('.pref-type').val();
+    sub.name = el.children('.name').text().trim();
+    sub.hideURL = el.children('.pref-hide-url').val().trim();
+    sub.unhideURL = el.children('.pref-unhide-url').val().trim();
+    sub.collapsed = el.hasClass('collapsed');
+    sub.hidden = el.hasClass('hidden');
+
+    sub.container = el[0];
+    sub.prefContainer = el.children('ul')[0];
+
+    return sub;
+};
+
+Prefs.Subject.prototype.attachControls = function()
+{
+    var thisObj = this;
+    var label = $(this.container).children('.name');
+
+    var collapseBtn = document.createElement('input');
+    collapseBtn.type = 'button';
+    collapseBtn.value = (this.collapsed?'+':'-');
+    collapseBtn.className = 'od-prefs-toggleCollapse';
+    this.collapseBtn = collapseBtn;
+    collapseBtn = $(collapseBtn);
+    collapseBtn.insertBefore(label);
+    collapseBtn.click(function()
+    {
+        thisObj.setCollapsed(!thisObj.collapsed);
+    });
+
+    var hideBtn = document.createElement('input');
+    hideBtn.type = 'button';
+    hideBtn.value = (this.hidden?'Nie ukrywaj':'Ukryj');
+    hideBtn.className = 'od-prefs-toggleHidden';
+    this.hideBtn = hideBtn;
+    hideBtn = $(hideBtn);
+    hideBtn.insertAfter(label);
+    hideBtn.click(function()
+    {
+        var hidden = !thisObj.hidden;
+
+        $.ajax({
+            type: 'post',
+            url: (hidden?thisObj.hideURL:thisObj.unhideURL),
+            success: function()
+            {
+                thisObj.hidden = hidden;
+                if (hidden)
+                {
+                    $(thisObj.container).addClass('hidden');
+                    thisObj.hideBtn.value = 'Nie ukrywaj';
+                }
+                else
+                {
+                    $(thisObj.container).removeClass('hidden');
+                    thisObj.hideBtn.value = 'Ukryj';
+                }
+                Prefs.doFilter(Prefs.currentFilter);
             }
         });
 
-    $(".od-filter").keyup(function(){
-        Filtr.work();
-    });
-    
-    $('.od-filter-checkbox').change(function(){
-        Filtr.work();
-    });
-    
-    if( !$("#od-prefs-hidden")[0].checked ){
-        $(".od-prefs-tree-hidden").hide();
-    }
-    if( $("#od-prefs-only-new")[0].checked ){
-        $(".od-prefs-tree-hidden").hide();
-        $(".od-prefs-tree-show").hide();    
-    }
-    $("#od-prefs-hidden").change(function(){
-        if( this.checked && ! ($("#od-prefs-only-new")[0].checked)) {
-            $(".od-prefs-tree-hidden").show();
-        }
-        else {
-            $(".od-prefs-tree-hidden").hide();
-        }
-    });
-    $("#od-prefs-only-new").change(function(){
-            if( this.checked ) {
-                $(".od-prefs-tree-hidden").hide();
-                $(".od-prefs-tree-show").hide();
-            }
-            else {
-                $(".od-prefs-tree-show").show();
-                if($("#od-prefs-hidden")[0].checked){
-                    $(".od-prefs-tree-hidden").show();
-                }
-            }
-    });
-    url = $("#od-prefs-undecided-list").text();
-    if (url)
-        Prefs.getList( url );
-});
-
-Prefs = new Object();
-Prefs.unset = new Array();
-Prefs.getList = function( url )
-{
- $.ajax({
-   url: url,
-   dataType: 'json',
-   async: false,  
-   success: function(data){ 
-                list = Prefs.generateList(data);
-                $.each(list, function(key, value){
-                    $("#od-prefs-undecided").append(value);
-                });
-                }  
- });  
-}
-
-Prefs.generateList = function( data )
-{
-    result = new Array();
-    $.each(data.unset, function(){
-        result.push( Prefs.generateElem(this) );
-    });
-    return result;
-}
-
-Prefs.generateElem = function( elem )
-{
-    Prefs.unset[elem.id] = new Object();
-    Prefs.unset[elem.id].name = elem.name;
-    Prefs.unset[elem.id].type = elem.type;
-    Prefs.unset[elem.id].hideUrl  = elem.hideUrl;
-    Prefs.unset[elem.id].showUrl  = elem.showUrl;
-    // more???
-    return "<li><input type=\"button\" value=\"&lt\" onclick=\"Prefs.initPref(this, '" + elem.url + "', " + elem.id + ")\" /> " + elem.name +"</li>";
-}
-
-Prefs.savePref = function ( elem )
-{
-    data = new Object();
-    data.lecture        = $(elem).parent().children().children("li:nth-child(1)").children("select").val();
-    data.review_lecture = $(elem).parent().children().children("li:nth-child(2)").children("select").val();
-    data.tutorial       = $(elem).parent().children().children("li:nth-child(3)").children("select").val();
-    data.lab            = $(elem).parent().children().children("li:nth-child(4)").children("select").val();
-    id = $(elem).parent().children("input:nth-child(4)").val();
-    url =  $("#od-prefs-save-url").text().replace(/0/, id);
- 
-
- $.post(url,
-           { lecture: data.lecture, review_lecture: data.review_lecture, tutorial:data.tutorial, lab:data.lab },
-           function(result){
-           }
-          );
-    
-}
-
-Prefs.initPref = function(elem, url, id)
-{
-    $.ajax({
-        type: 'post',
-        url: url,
-        success: function(data)
-        {
-            var li = elem.parentNode;
-            var ul = li.parentNode;
-            $(li).remove();
-            Prefs.addPref( id );
-        }
     });
 };
 
-Prefs.addPref = function( id )
+Prefs.Subject.prototype.setCollapsed = function(collapsed)
 {
-    var elem = $("<li>"); 
-    $(elem).addClass("od-refs-tree-new");
-    
-    var button = $('<input type="button">');
-    $(button).addClass("od-prefs-toggleCollapse");
-    $(button).val("+");
-    $(button).attr( "onclick", "Prefs.toggleCollapse(this)" );
-    $(button).appendTo(elem);
-    
-    $(elem).append(" " + Prefs.unset[id].name);
+    collapsed = !!collapsed;
+    if (collapsed == this.collapsed)
+        return;
+    this.collapsed = collapsed;
 
-    button = $('<input type="button">');
-    button.addClass("od-prefs-toggleHidden hidden");
-    $(button).attr( "onclick", "Prefs.toggleHidden(this, false, '" + Prefs.unset[id].showUrl + "')" );
-    $(button).val("Nie ukrywaj");
-    $(button).appendTo(elem);
-    
-    button = $('<input type="button">');
-    button.addClass("od-prefs-toggleHidden");
-    $(button).attr( "onclick", "Prefs.toggleHidden(this, true, '" + Prefs.unset[id].hideUrl + "')" );
-    $(button).val("Ukryj");
-    $(button).appendTo(elem);
-
-    hidden = $('<input type="hidden">');
-    hidden.addClass("pref_id");
-    $(hidden).val(id);
-    $(hidden).appendTo(elem);
-
-    hidden = $('<input type="hidden">');
-    hidden.addClass("pref_name");
-    $(hidden).val(Prefs.unset[id].name);
-    $(hidden).appendTo(elem);
-    
-    hidden = $('<input type="hidden">');
-    hidden.addClass("pref_type");
-    $(hidden).val(Prefs.unset[id].type);
-    $(hidden).appendTo(elem);
-    
-    var ul = $("<ul>");
-    
-    Prefs.generateSelect(ul, id, "Wykład:", "lecture_select");
-    Prefs.generateSelect(ul, id, "Repetytorium:", "review_lecture_select");
-    Prefs.generateSelect(ul, id, "Ćwiczenia:", "tutorial_select");
-    Prefs.generateSelect(ul, id, "Pracownia:", "lab_select");
-
-    $(ul).appendTo(elem);
-    
-    $("#od-prefs-list-tree").append(elem); 
-}
-
-Prefs.generateSelect = function (parent, id, name, type)
-{
-    var li =  $("<li>");
-    $(li).append(name);
-    var select = $("<select>"); 
-    $(select).addClass(type);
-    $(select).attr("id", "id_"+ id +"_"+ type);
-    $(select).append( $("#od-prefs-list-option").html() );
-    $(select).appendTo(li);
-    $(li).appendTo(parent); 
-}
-
-Prefs.toggleHidden = function(elem, hide, url)
-{
-    $.ajax({
-        type: 'post',
-        url: url,
-        success: function(data)
-        {
-            var li = elem.parentNode;
-            $(elem).addClass('hidden');
-            if(hide){    
-                $(elem).prev('input').removeClass('hidden');
-                $(li).removeClass("od-prefs-tree-show");
-                $(li).addClass("od-prefs-tree-hidden");
-                if( !$("#od-prefs-hidden")[0].checked ){
-                    $(".od-prefs-tree-hidden").hide();
-                }
-                Prefs.savePref(elem);
-            } else {
-                $(elem).next().removeClass('hidden');
-                $(li).addClass("od-prefs-tree-show");
-                $(li).removeClass("od-prefs-tree-hidden");
-            }
-            
-        }
-    });
-
-};
-
-Prefs.toggleCollapse = function(elem)
-{
-    var coll = $(elem.parentNode);
-    if (coll.hasClass('subtree-visible'))
+    var cont = $(this.container);
+    if (collapsed)
     {
-        elem.value = '+';
-        coll.removeClass('subtree-visible');
+        cont.addClass('collapsed');
+        this.collapseBtn.value = '+';
     }
     else
     {
-        elem.value = '-';
-        coll.addClass('subtree-visible');
+        cont.removeClass('collapsed');
+        this.collapseBtn.value = '-';
     }
 };
 
+/*******************************************************************************
+ * Filtrowanie
+ ******************************************************************************/
+
+/**
+ * "Wątek" sprawdza, czy formularz nie zmienił zawartości - jeżeli tak, to
+ * aplikuje filtr.
+ */
+Prefs.filterThread = function()
+{
+    var newFilter = Prefs.Filter.readFilterFromForm();
+
+    if (!Prefs.currentFilter.isEqual(newFilter))
+    {
+        Prefs.currentFilter = newFilter;
+        $.cookies.set('prefs-filter', Prefs.currentFilter);
+        Prefs.doFilter(Prefs.currentFilter);
+    }
+
+    setTimeout(Prefs.filterThread, 50);
+};
+
+/**
+ * Aplikuje wybrany filtr do listy przedmiotów.
+ *
+ * @param filter filtr, który chcemy zaaplikować do listy przedmiotów
+ */
+Prefs.doFilter = function(filter)
+{
+    var i;
+
+    var anyVisible = false;
+
+    for (i = 0; i < Prefs.subjects.length; i++)
+    {
+        var sub = Prefs.subjects[i];
+
+        var isVisible = true;
+
+        if (isVisible && !filter.showHidden)
+            if (sub.hidden)
+                isVisible = false;
+
+        if (isVisible)
+            isVisible = filter.subjectTypes.isEnabled(sub.type);
+
+        if (isVisible && filter.phrase != '')
+           isVisible = (sub.name.toLowerCase().indexOf(filter.phrase) >= 0);
+
+        sub.container.style.display = isVisible?'block':'none';
+        if (isVisible)
+            anyVisible = true;
+    }
+
+    Prefs.emptyFilterWarning.style.display = anyVisible?'none':'block';
+    Prefs.prefsList.style.display = anyVisible?'block':'none';
+};
+
+/*** Filtrowanie - klasa filtra ***********************************************/
+
+/**
+ * Klasa filtra przy głosowaniu - konstruktor.
+ */
+Prefs.Filter = function()
+{
+    this.phrase = '';
+    this.subjectTypes = new SubjectTypeFilter();
+    this.showHidden = false;
+};
+
+/**
+ * Deserializacja filtra, np. z cookie.
+ *
+ * @param serializedFilter filtr w postaci surowej
+ * @return Prefs.Filter obiekt filtra
+ */
+Prefs.Filter.deserialize = function(serializedFilter)
+{
+    if (!serializedFilter)
+        return null;
+
+    var deserializedFilter = new Prefs.Filter();
+    deserializedFilter.setPhrase(serializedFilter.phrase);
+    deserializedFilter.subjectTypes = SubjectTypeFilter.
+        deserialize(serializedFilter.subjectTypes);
+    deserializedFilter.setShowHidden(serializedFilter.showHidden);
+
+    return deserializedFilter;
+};
+
+/**
+ * Generuje filtr na podstawie zawartości formularza.
+ *
+ * @return Vote.Filter obiekt filtra z odczytaną zawartością
+ */
+Prefs.Filter.readFilterFromForm = function()
+{
+    var newFilter = new Prefs.Filter();
+
+    var phrase = $('#od-prefs-q')[0].value;
+    if (phrase != TopBarFilter.emptyFilterText)
+        newFilter.setPhrase(phrase);
+
+    newFilter.subjectTypes = SubjectTypeFilter.readFilterFromForm($('#od-prefs-subjtype'));
+
+    newFilter.setShowHidden($('#od-prefs-hidden')[0].checked);
+
+    return newFilter;
+};
+
+/**
+ * Ustawia formularz na podstawie filtra.
+ */
+Prefs.Filter.prototype.saveFilterToForm = function()
+{
+    if (this.phrase == '')
+        $('#od-prefs-q')[0].value = TopBarFilter.emptyFilterText;
+    else
+        $('#od-prefs-q')[0].value = this.phrase;
+
+    this.subjectTypes.saveFilterToForm($('#od-prefs-subjtype'));
+
+    $('#od-prefs-hidden')[0].checked = this.showHidden;
+};
+
+/**
+ * Ustawia frazę, której szukamy w nazwach przedmiotów.
+ *
+ * @param phrase fraza, której chcemy szukać
+ */
+Prefs.Filter.prototype.setPhrase = function(phrase)
+{
+    this.phrase = $.trim(phrase).toLowerCase();
+};
+
+Prefs.Filter.prototype.setShowHidden = function(showHidden)
+{
+    this.showHidden = !!showHidden;
+};
+
+/**
+ * Porównuje filtr z innym.
+ *
+ * @param filter filtr do porównania
+ * @return boolean filtry są równe
+ */
+Prefs.Filter.prototype.isEqual = function(filter)
+{
+    if (this.phrase != filter.phrase)
+        return false;
+    if (this.showHidden != filter.showHidden)
+        return false;
+    if (!this.subjectTypes.isEqual(filter.subjectTypes))
+        return false;
+    return true;
+};

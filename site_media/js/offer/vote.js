@@ -191,7 +191,7 @@ Vote.doFilter = function(filter)
 
         if (isVisible && filter.phrase != '')
             isVisible = ($(subject).children('label').text().toLowerCase().
-                indexOf(filter.phrase) >= 0)
+                indexOf(filter.phrase) >= 0);
 
         if (isVisible)
         {

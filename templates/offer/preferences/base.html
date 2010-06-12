@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
 	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
 
+    <script type="text/javascript" src="/site_media/js/common/subjectTypeFilter.js"></script>
 	<script type="text/javascript" src="/site_media/js/offer/prefs.js"></script>
 {% endblock %}
 
@@ -19,8 +20,7 @@
 {% endblock %}
 
 {% block top-bar %}
-	<div id="od-prefs-top-bar" class="main-top-bar">
-		<form id="od-prefs-filtering" action="{% url prefs-default-view %}" method="get">
+	<div id="od-prefs-top-bar" class="main-top-bar" style="display: none">
 		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
@@ -31,15 +31,14 @@
 		<fieldset id="od-prefs-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in proposalTypes %}
-				<span class="checkbox od-filter-checkbox"><input type="checkbox" id="od-prefs-type-{{ type.0 }}" value="{{ type.0 }}"/><label for="od-prefs-type-{{ type.0 }}">{{ type.1 }}</label></span>
+				<span class="checkbox od-filter-checkbox"><input type="checkbox" checked="checked" id="filter-subject-type-{{ type.0 }}" value="{{ type.0 }}"/><label for="filter-subject-type-{{ type.0 }}">{{ type.1 }}</label></span>
 			{% endfor %}
 		</fieldset>
 		<fieldset id="od-prefs-other">
 			<legend><span>Inne</span></legend>
 			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/><label for="od-prefs-hidden">Pokaż ukryte przedmioty</label></span>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-only-new"/><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
+            <span class="checkbox"><input type="checkbox" id="od-prefs-only-new" disabled="disabled" /><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
 		</fieldset>
-		</form>
 	</div>
 {% endblock %}
 
@@ -51,7 +50,7 @@
 			<ul id="od-prefs-undecided">
                 {% for prop in unset_offer %}
                     <li>
-                        <input type="button" value="<" onclick="Prefs.initPref(this, '{% url prefs-init-pref prop.id %}')" />
+                        <input type="hidden" class="initURL" value="{% url prefs-init-pref prop.id %}" />
                         {{ prop.name }}
                     </li>
                 {% endfor %}
@@ -60,18 +59,25 @@
 	{% endif %}
 {% endblock %}
 
-{% block content %}
-	<p id="od-prefs-viewmode-selection">Widok:
-		<a href="{% url prefs-list-view %}">listy</a>
-		<a href="{% url prefs-tree-view %}">drzewa</a>
-	</p>
-	{% if prefs %}
-		<h2>Przedmioty z ustalonymi preferencjami</h2>
+{% block comment %} TODO: do usunięcia (wraz z linkami)
+    <p id="od-prefs-viewmode-selection">Widok:
+        <a href="{% url prefs-list-view %}">listy</a>
+        <a href="{% url prefs-tree-view %}">drzewa</a>
+    </p>
+{% endblock %}
 
-		{% block pref_list %}
-		{% endblock %}
-	{% else %}
-		<p>Jeszcze nie ustaliłeś preferencji dla żadnego przedmiotu. Możesz to
-			zrobić, dodając je z menu po prawej.</p>
-	{% endif %}
+{% block content %}
+    {% if prefs %}
+        <h2>Przedmioty z ustalonymi preferencjami</h2>
+
+        <form action="" method="post" id="od-prefs-form">
+            {% block pref-list %}
+            {% endblock %}
+
+            <p id="od-prefs-submitBar"><input type="submit" value="Zapisz" /></p>
+        </form>
+    {% else %}
+        <p>Jeszcze nie ustaliłeś preferencji dla żadnego przedmiotu. Możesz to
+            zrobić, dodając je z menu po prawej.</p>
+    {% endif %}
 {% endblock %}

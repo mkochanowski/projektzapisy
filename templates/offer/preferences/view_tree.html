@@ -1,33 +1,30 @@
 {% extends "offer/preferences/base.html" %}
 {% load preferences_extras %}
 
-
-{% block pref_list %}
-<div style="display:none">
-    <ul>
-        <li id="od-prefs-undecided-list">{% url prefs-undecided-list %}</li>
-        <li id="od-prefs-save-url">{% url prefs-set-pref 0 %}</li>
-        <li ><select id="od-prefs-list-option">{% prefs_form_options %}</select></li>
+{% block comment %} TODO: zbędne, do usunięcia (wraz z linkami)
+    <ul style="display:none">
+        <li id="od-prefs-undecided-list">{% url prefs-undecided-list %}</li> <!-- TODO: zbędne - ta lista jest wczytywana na stałe -->
+        <li id="od-prefs-save-url">{% url prefs-set-pref 0 %}</li> <!-- TODO: zbędne - nie chcemy zapisywać ajaxem -->
+        <li><select id="od-prefs-list-option">{% prefs_form_options %}</select></li> <!-- TODO: zbędne - pobieramy wraz z dodawaniem z sidebara -->
     </ul>
-</div>
-        
-    <ul id="od-prefs-list-tree" class="od-prefs-list">
+{% endblock %}
+
+{% block pref-list %}
+    <ul id="od-prefs-list">
         {% for pref in prefs %}
-            <li{% if pref.hidden %} class="od-prefs-tree-hidden" {% else %} class="od-prefs-tree-show"{% endif %}>
-                <input type="button" class="od-prefs-toggleCollapse" value="+" onclick="Prefs.toggleCollapse(this)" />
-        {{pref.name}}
+            <li {% if pref.hidden %}class="hidden"{% endif %}>
+                <span class="name">{{pref.name}}</span>
 
-                    <input type="button" class="od-prefs-toggleHidden {% if pref.hidden %}{% else %} hidden {%endif %}" value="Nie ukrywaj" onclick="Prefs.toggleHidden(this, false, '{% url prefs-unhide pref.id %}')" />
-                    <input type="button" class="od-prefs-toggleHidden {% if pref.hidden %} hidden {%endif %}" value="Ukryj" onclick="Prefs.toggleHidden(this, true, '{% url prefs-hide pref.id %}')" />
-
-                <input type="hidden" class="pref_id" value="{{pref.id }}">
-                <input type="hidden" class="pref_name" value="{{pref.proposal.name }}">
-                <input type="hidden" class="pref_type" value="{{pref.proposal.type }}">
+                <input type="hidden" class="pref-id" value="{{ pref.id }}" />
+                <input type="hidden" class="pref-type" value="{{ pref.desc.type }}" />
+                <input type="hidden" class="pref-hide-url" value="{% url prefs-hide pref.id %}" />
+                <input type="hidden" class="pref-unhide-url" value="{% url prefs-unhide pref.id %}" />
+                
                 <ul>
                     {% ifnotequal pref.desc.lectures 0 %}
                     <li>
                         Wykład:
-                        <select class="lecture_select" id="id_{{ pref.id }}_lecture_select">
+                        <select name="lecture-{{ pref.id }}" class="lecture">
                             {% prefs_form_options selected pref.lecture %}
                         </select>
                     </li>
@@ -35,7 +32,7 @@
                     {% ifnotequal pref.desc.repetitories 0 %}
                     <li>
                         Repetytorium:
-                        <select class="review_lecture_select" id="id_{{ pref.id }}_review_lecture_select">
+                        <select name="review-lecture-{{ pref.id }}" class="review-lecture">
                             {% prefs_form_options selected pref.review_lecture %}
                         </select>
                     </li>
@@ -43,7 +40,7 @@
                     {% ifnotequal pref.desc.exercises 0 %}
                     <li>
                         Ćwiczenia:
-                        <select class="tutorial_select" id="id_{{ pref.id }}_tutorial_select">
+                        <select name="tutorial-{{ pref.id }}" class="tutorial">
                             {% prefs_form_options selected pref.tutorial %}
                         </select>
                     </li>
@@ -51,7 +48,7 @@
                     {% ifnotequal pref.desc.laboratories 0 %}
                     <li>
                         Pracownia:
-                        <select class="lab_select" id="id_{{ pref.id }}_lab_select">
+                        <select name="lab-{{ pref.id }}" class="lab">
                             {% prefs_form_options selected pref.lab %}
                         </select>
                     </li>

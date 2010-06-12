@@ -15,6 +15,8 @@ from offer.proposal.models import Proposal
 from offer.proposal.models.proposal_description import PROPOSAL_TYPES
 from users.decorators import employee_required
 
+from offer.preferences.models import PREFERENCE_CHOICES
+
 from django.core.urlresolvers import reverse
 
 def view(request, template):
@@ -203,7 +205,19 @@ def init_pref(request, prop_id):
             employee = request.user.employee
             course = Proposal.objects.get(pk=prop_id)
             Preference.objects.init_preference(employee, course)
-            data = {'Success': 'OK'}
+            data = {
+                'Success': 'OK',
+                'name': course.name,
+                'id': course.id,
+                'type': course.description().type,
+                'hideurl': reverse('prefs-hide', args = [ course.id ] ),
+                'unhideurl': reverse('prefs-unhide', args = [ course.id ] ),
+                'prefchoices': PREFERENCE_CHOICES,
+                'showlectures': (course.description().lectures > 0),
+                'showrepetitories': (course.description().repetitories > 0),
+                'showexercises': (course.description().exercises > 0),
+                'showlaboratories': (course.description().laboratories > 0),
+            }
         else:
             data = {'Failure': 'Use POST'}
     except Proposal.DoesNotExist:

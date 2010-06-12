@@ -60,4 +60,14 @@ Sidebar.setVisible = function(visible)
 		
 };
 
+Sidebar.detach = function()
+{
+    $(Sidebar.mainContentContainer).removeClass('sidebar-visible');
+    $(Sidebar.mainContentContainer).removeClass('sidebar-right');
+    $(Sidebar.mainContentContainer).removeClass('sidebar-left');
+    $(Sidebar.hideButton).remove();
+    $(Sidebar.showButton).remove();
+    $(Sidebar.sidebarNode).remove();
+};
+
 $(Sidebar.init);
