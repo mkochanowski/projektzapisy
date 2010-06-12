@@ -67,17 +67,16 @@
 {% endblock %}
 
 {% block content %}
-    {% if prefs %}
-        <h2>Przedmioty z ustalonymi preferencjami</h2>
-
-        <form action="" method="post" id="od-prefs-form">
-            {% block pref-list %}
-            {% endblock %}
-
-            <p id="od-prefs-submitBar"><input type="submit" value="Zapisz" /></p>
-        </form>
-    {% else %}
-        <p>Jeszcze nie ustaliłeś preferencji dla żadnego przedmiotu. Możesz to
+    {% if not prefs %}
+        <p class="main-message" id="od-prefs-emptyMessage">Jeszcze nie ustaliłeś preferencji dla żadnego przedmiotu. Możesz to
             zrobić, dodając je z menu po prawej.</p>
     {% endif %}
+    <form action="" method="post" id="od-prefs-form" {% if not prefs %} style="display:none" {% endif %}>
+        <h2>Przedmioty z ustalonymi preferencjami</h2>
+
+        {% block pref-list %}
+        {% endblock %}
+
+        <p id="od-prefs-submitBar"><input type="submit" value="Zapisz" /></p>
+    </form>
 {% endblock %}

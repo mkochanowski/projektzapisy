@@ -85,6 +85,12 @@ Prefs.init = function()
         var und = Prefs.Undecided.fromElement(undecidedElements[i]);
         und.attachControls();
     }
+
+    Prefs.emptyMessage = $('#od-prefs-emptyMessage');
+    if (Prefs.emptyMessage)
+        Prefs.emptyMessage = Prefs.emptyMessage[0];
+    else
+        Prefs.emptyMessage = null;
 };
 
 $(Prefs.init);
@@ -156,7 +162,6 @@ Prefs.Undecided.prototype.init = function()
             name.className = 'name';
             name.appendChild(document.createTextNode(sub.name));
             sub.container.appendChild(name);
-            sub.attachControls();
 
             sub.prefContainer = document.createElement('ul');
             sub.container.appendChild(sub.prefContainer);
@@ -201,6 +206,15 @@ Prefs.Undecided.prototype.init = function()
                 appendSelect('Pracownia:', 'lab');
 
             Prefs.subjects.push(sub);
+            sub.attachControls();
+            Prefs.doFilter(Prefs.currentFilter);
+
+            if (Prefs.emptyMessage)
+            {
+                $(Prefs.emptyMessage).remove();
+                Prefs.emptyMessage = null;
+                $('#od-prefs-form')[0].style.display = 'block';
+            }
         }
     });
 };

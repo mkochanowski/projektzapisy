@@ -300,6 +300,38 @@
         }
     }, 
     {
+        "pk": 11, 
+        "model": "proposal.proposal", 
+        "fields": {
+            "name": "Kurs system\u00f3w wspomagaj\u0105cych obliczenia: Maple i Matlab", 
+            "tags": [
+                1
+            ], 
+            "deleted": false, 
+            "fans": [], 
+            "helpers": [], 
+            "teachers": [], 
+            "owner": null, 
+            "slug": "kurs-systemow-wspomagajacych-obliczenia-maple-i-matlab"
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "proposal.proposal", 
+        "fields": {
+            "name": "Zastosowanie teorii kategorii do konstruowania program\u00f3w", 
+            "tags": [
+                1
+            ], 
+            "deleted": false, 
+            "fans": [], 
+            "helpers": [], 
+            "teachers": [], 
+            "owner": null, 
+            "slug": "zastosowanie-teorii-kategorii-do-konstruowania-programow"
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "proposal.proposaldescription", 
         "fields": {
@@ -500,6 +532,46 @@
         }
     }, 
     {
+        "pk": 11, 
+        "model": "proposal.proposaldescription", 
+        "fields": {
+            "lectures": 15, 
+            "requirements": "Algebra\r\nAnaliza matematyczna", 
+            "description": "Rozwi\u0105zywanie mniej lub bardziej skomplikowanych problem\u00f3w z zakresu matematyki jest w dzisiejszych czasach nieod\u0142\u0105cznym elementem pracy ka\u017cdego programisty. R\u0119czne rozwi\u0105zywanie tego typu problem\u00f3w cz\u0119sto bywa czasoch\u0142onne i jest obarczone ryzykiem pope\u0142nienia b\u0142\u0119du. W trakcie tego kursu przedstawione zostan\u0105 dwa popularne systemy wspomagania oblicze\u0144 matematycznych: Maple i Matlab. J\u0119zyk Maple dzi\u0119ki zaawansowanemu mechanizmowi oblicze\u0144 symbolicznych pozwala prosto i szybko rozwi\u0105zywa\u0107 problemy mi\u0119dzy innymi z zakresu matematyki dyskretnej oraz analizy matematycznej. J\u0119zyk Matlab zosta\u0142 natomiast stworzony z my\u015bl\u0105 o \u0142atwym i skutecznym rozwi\u0105zywaniu problem\u00f3w obliczeniowych g\u0142ownie z zakresu algebry. Oba omawiane j\u0119zyki programowania s\u0105 \u0142atwe do opanowania, posiadaj\u0105 bardzo intuicyjn\u0105 sk\u0142adni\u0119, dzi\u0119ki czemu ich u\u017cytkownik mo\u017ce koncentrowa\u0107 si\u0119 na rozwi\u0105zywaniu problemu, a nie na zawi\u0142o\u015bciach zwi\u0105zanych z tworzeniem samego programu. Bogaty zestaw narz\u0119dzi wizualizacyjnych daje mo\u017cliwo\u015b\u0107 tworzenia atrakcyjnych graficznych prezentacji obliczanych rozwi\u0105za\u0144.", 
+            "author": 1, 
+            "deleted": false, 
+            "ects": 5, 
+            "comments": "", 
+            "repetitories": 0, 
+            "exercises": 0, 
+            "date": "2010-06-12 11:04:23", 
+            "proposal": 11, 
+            "laboratories": 45, 
+            "type": "cs_1", 
+            "tags": []
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "proposal.proposaldescription", 
+        "fields": {
+            "lectures": 30, 
+            "requirements": "Programowanie", 
+            "description": "Application of category theory to program construction", 
+            "author": 1, 
+            "deleted": false, 
+            "ects": 9, 
+            "comments": "", 
+            "repetitories": 0, 
+            "exercises": 30, 
+            "date": "2010-06-12 11:05:37", 
+            "proposal": 12, 
+            "laboratories": 0, 
+            "type": "cs_2", 
+            "tags": []
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "proposal.book", 
         "fields": {
@@ -568,6 +640,15 @@
         "fields": {
             "proposal": 9, 
             "name": "A. Bia\u0142ynicki-Birula, Algebra, PWN, Warszawa 1980.", 
+            "order": 0
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "proposal.book", 
+        "fields": {
+            "proposal": 11, 
+            "name": "Martha L. Abell, James Braselton, Maple V by example, Boston 1994", 
             "order": 0
         }
     }, 
@@ -644,6 +725,15 @@
         }
     }, 
     {
+        "pk": 36, 
+        "model": "proposal.book", 
+        "fields": {
+            "proposal": 11, 
+            "name": "First Leaves: a tutorial introduction to Maple, Waterloo Maple Publ.", 
+            "order": 1
+        }
+    }, 
+    {
         "pk": 3, 
         "model": "proposal.book", 
         "fields": {
@@ -707,6 +797,15 @@
         }
     }, 
     {
+        "pk": 37, 
+        "model": "proposal.book", 
+        "fields": {
+            "proposal": 11, 
+            "name": "Maple V language reference manual", 
+            "order": 2
+        }
+    }, 
+    {
         "pk": 7, 
         "model": "proposal.book", 
         "fields": {
@@ -743,6 +842,15 @@
         }
     }, 
     {
+        "pk": 38, 
+        "model": "proposal.book", 
+        "fields": {
+            "proposal": 11, 
+            "name": "Desmond J. Higham, Nicholas J. Higham, Matlab guide, Philadelphia 2000", 
+            "order": 3
+        }
+    }, 
+    {
         "pk": 8, 
         "model": "proposal.book", 
         "fields": {
@@ -770,6 +878,15 @@
         }
     }, 
     {
+        "pk": 39, 
+        "model": "proposal.book", 
+        "fields": {
+            "proposal": 11, 
+            "name": "Bogumi\u0142a Mrozek, Zbigniew Mrozek, Matlab: uniwersalne \u015brodowisko do oblicze\u0144 naukowo-technicznych, Krak\u00f3w, 1995", 
+            "order": 4
+        }
+    }, 
+    {
         "pk": 9, 
         "model": "proposal.book", 
         "fields": {
@@ -784,6 +901,15 @@
         "fields": {
             "proposal": 3, 
             "name": "I. Graham, Metody obiektowe w teorii i praktyce, WNT Warszawa 2004", 
+            "order": 5
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "proposal.book", 
+        "fields": {
+            "proposal": 11, 
+            "name": "Patrick Marchand, Graphics and GUIs with Matlab, CRC Press 1999", 
             "order": 5
         }
     }, 

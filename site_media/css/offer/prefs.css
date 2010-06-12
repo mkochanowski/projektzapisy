@@ -100,7 +100,7 @@ ul#od-prefs-undecided input:hover
 	list-style: none;
 	padding: 0;
     padding-bottom: 7px;
-	width: 400px;
+	width: 550px;
 	border: 1px solid #cccccc;
 	background: #f8f8f8;
 
@@ -134,6 +134,12 @@ ul#od-prefs-undecided input:hover
 	padding: 1px;
 
 	cursor: pointer;
+}
+
+#od-prefs-list .name
+{
+    max-width: 420px;
+    vertical-align: top;
 }
 
 #od-prefs-list .od-prefs-toggleHidden
@@ -189,15 +195,18 @@ ul#od-prefs-undecided input:hover
 
 #od-prefs-list ul li
 {
-	padding-left: 130px;
-	padding-right: 50px;
-	height: 30px;
+	padding-left: 220px;
+	padding-right: 90px;
+	height: 25px;
+    padding-top: 5px;
 }
 
 #od-prefs-list ul li select
 {
 	float: right;
 	height: 25px;
+    position: relative;
+    top: -3px;
 }
 
 /******************************************************************************/
