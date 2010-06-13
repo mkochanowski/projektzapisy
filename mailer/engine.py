@@ -10,6 +10,8 @@ from django.conf import settings
 from django.core.mail import send_mail as core_send_mail
 from django.core.mail import EmailMultiAlternatives
 
+logger = logging.getLogger('mailer.engine')
+
 # when queue is empty, how long to wait (in seconds) before checking again
 EMPTY_QUEUE_SLEEP = getattr(settings, "MAILER_EMPTY_QUEUE_SLEEP", 30)
 
@@ -43,16 +45,16 @@ def send_all():
     
     lock = FileLock("send_mail")
     
-    logging.debug("acquiring lock...")
+    logger.debug("acquiring lock...")
     try:
         lock.acquire(LOCK_WAIT_TIMEOUT)
     except AlreadyLocked:
-        logging.debug("lock already in place. quitting.")
+        logger.debug("lock already in place. quitting.")
         return
     except LockTimeout:
-        logging.debug("waiting for the lock timed out. quitting.")
+        logger.debug("waiting for the lock timed out. quitting.")
         return
-    logging.debug("acquired.")
+    logger.debug("acquired.")
     
     start_time = time.time()
     
@@ -63,13 +65,13 @@ def send_all():
     try:
         for message in prioritize():
             if DontSendEntry.objects.has_address(message.to_address):
-                logging.info("skipping email to %s as on don't send list " % message.to_address.encode("utf-8"))
+                logger.info("skipping email to %s as on don't send list " % message.to_address.encode("utf-8"))
                 MessageLog.objects.log(message, 2) # @@@ avoid using literal result code
                 message.delete()
                 dont_send += 1
             else:
                 try:
-                    logging.info("sending message '%s' to %s" % (message.subject.encode("utf-8"), message.to_address.encode("utf-8")))
+                    logger.info("sending message '%s' to %s" % (message.subject.encode("utf-8"), message.to_address.encode("utf-8")))
                     if not message.message_body_html:
                         core_send_mail(message.subject, message.message_body, message.from_address, [message.to_address])
                     else:
@@ -81,17 +83,17 @@ def send_all():
                     sent += 1
                 except (socket_error, smtplib.SMTPSenderRefused, smtplib.SMTPRecipientsRefused, smtplib.SMTPAuthenticationError), err:
                     message.defer()
-                    logging.info("message deferred due to failure: %s" % err)
+                    logger.info("message deferred due to failure: %s" % err)
                     MessageLog.objects.log(message, 3, log_message=str(err)) # @@@ avoid using literal result code
                     deferred += 1
     finally:
-        logging.debug("releasing lock...")
+        logger.debug("releasing lock...")
         lock.release()
-        logging.debug("released.")
+        logger.debug("released.")
     
-    logging.info("")
-    logging.info("%s sent; %s deferred; %s don't send" % (sent, deferred, dont_send))
-    logging.info("done in %.2f seconds" % (time.time() - start_time))
+    logger.info("")
+    logger.info("%s sent; %s deferred; %s don't send" % (sent, deferred, dont_send))
+    logger.info("done in %.2f seconds" % (time.time() - start_time))
 
 def send_loop():
     """
@@ -101,6 +103,6 @@ def send_loop():
     
     while True:
         while not Message.objects.all():
-            logging.debug("sleeping for %s seconds before checking queue again" % EMPTY_QUEUE_SLEEP)
+            logger.debug("sleeping for %s seconds before checking queue again" % EMPTY_QUEUE_SLEEP)
             time.sleep(EMPTY_QUEUE_SLEEP)
         send_all()
