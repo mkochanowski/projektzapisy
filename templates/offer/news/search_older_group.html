@@ -1,6 +1,0 @@
-{% if page.has_next %}
-<a href="{% url news-search %}?q={{query}}&page={{page.next_page_number}}" title="Starsze"
- onClick="load_data('{% url news-ajax-search %}?q={{query}}&page={{page.next_page_number}}'); return false;">
-  Starsze
-</a>
-{% endif %}

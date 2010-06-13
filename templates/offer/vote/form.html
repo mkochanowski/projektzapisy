@@ -2,7 +2,7 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url latest_news %}">Oferta</a></li>
+    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
 	<li>Głosuj</li>
 {% endblock %}

@@ -3,7 +3,7 @@
 """
 
 from django.forms import ModelForm
-from offer.news.models import News
+from news.models import News
 
 class NewsForm(ModelForm):
     """

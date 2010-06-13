@@ -13,26 +13,38 @@ class NewsManager(models.Manager):
     """
         News management
     """
-    def new(self):
+    def new(self, category):
         """
             Returns news marked as new
         """
-        if self.count_new() >= 3:
+        if self.count_new(category) >= 3:
             begin = datetime.now() - timedelta(days=7)
-            return self.filter(date__gte=begin)
+            return self.category(category).filter(date__gte=begin)
         else:
-            return self.get_successive_news(0, 3)
-    def count_new(self):
+            return self.get_successive_news(category, 0, 3)
+    def count_new(self, category):
         """
             Returns number of news marked as new
         """
         begin = datetime.now() - timedelta(days=7)
-        return self.filter(date__gte=begin).count()
-    def get_successive_news(self, beginwith, quantity=1):
+        return self.category(category).filter(date__gte=begin).count()
+    def get_successive_news(self, category, beginwith, quantity=1):
         """
             Get a number of news 
         """
-        return News.objects.all()[beginwith:(beginwith+quantity)]
+        return self.category(category)[beginwith:(beginwith+quantity)]
+    def category(self, category):
+        """
+            Return news tagged with a given tag.
+        """
+        return self.filter(category = category)
+
+# suggested news items categories - not enforced
+CATEGORIES = (
+    ('-', 'Hidden'),
+    ('offer', 'Oferta'),
+    ('enrollment', 'Zapisy'),
+)
 
 class News(models.Model):
     """
@@ -44,6 +56,9 @@ class News(models.Model):
                             blank=True)
     date = models.DateTimeField(default=datetime.now)
     author = models.ForeignKey(User)
+    category = models.SlugField(max_length=15,
+                                verbose_name=u'Kategoria',
+                                default='-')
     
     objects = NewsManager()
     
@@ -55,5 +70,3 @@ class News(models.Model):
     
     def __unicode__(self):
         return self.title
-
-    

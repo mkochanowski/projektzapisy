@@ -23,7 +23,7 @@
     <div class="od-news-footer">
       {{ news.author.first_name }} {{ news.author.last_name }}
       {% if perms.news.change_news %}
-      <a href="{% url news-edit news.id %}">Edytuj</a>
+      <a href="{% url news-edit news.category news.id %}">Edytuj</a>
       {% endif %}
       {% if perms.news.delete_news %}
       <a href="{% url news-delete news.id %}">Usuń</a>

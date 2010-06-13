@@ -3,7 +3,7 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url latest_news %}">Oferta</a></li>
+    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
 	<li>Preferencje</li>
 {% endblock %}
 

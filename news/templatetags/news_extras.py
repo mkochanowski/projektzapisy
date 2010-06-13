@@ -5,12 +5,12 @@ from libs import postmarkup
 
 register = template.Library()
 
-from offer.news.models import News
+from news.models import News
 
 @register.simple_tag
-def newscount():
+def newscount(category):
     """Wyświetla liczbę nowych ogłoszeń."""
-    return(str(News.objects.count_new()))
+    return(str(News.objects.count_new(category)))
     
 @register.filter
 def bbcode(str):

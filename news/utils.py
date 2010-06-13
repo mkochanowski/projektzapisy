@@ -7,19 +7,28 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.paginator import Paginator, InvalidPage
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.template import Context, RequestContext
 from django.template.loader import get_template
 from haystack.forms import SearchForm
 from haystack.query import SearchQuerySet
 from mailer import send_html_mail
 
-from offer.news.models import News
+from news.models import News
 from users.models import Employee, Student
 
 MASS_MAIL_FROM = 'noreply@example.com'
 NEWS_PER_PAGE = 5
 
+def render_with_category_template(temp, context):
+    """ Switch beetween top menus based on context['category'].
+
+    Changes base ExtendsNode when needed."""
+    temp = get_template(temp)
+    if context.get('category', '') == 'enrollment':
+        temp.nodelist[0].parent_name = 'enrollment/base-enrollment.html'
+    return HttpResponse(temp.render(context))
+    
 def render_items(request, items):
     """
         Renders items
@@ -27,90 +36,96 @@ def render_items(request, items):
     con = RequestContext(request, {
         'object_list':items,
     } )
-    tem = get_template('offer/news/ajax_list.html')
+    tem = get_template('news/ajax_list.html')
     return tem.render(con)
 
-def render_newer_group(beginwith, quantity):
+def render_newer_group(category, beginwith, quantity):
     """
         Renders newer group
     """
     con = Context( {
+        'category':category,
         'newer_no':quantity,
         'newer_beginwith':beginwith,
     } )
-    tem = get_template('offer/news/newer_group.html')
+    tem = get_template('news/newer_group.html')
     return tem.render(con)
 
-def render_older_group(beginwith, quantity):
+def render_older_group(category, beginwith, quantity):
     """
         Renders older group
     """
     con = Context( {
+        'category':category,
         'older_no':quantity,
         'older_beginwith':beginwith,
     } )
-    tem = get_template('offer/news/older_group.html')
+    tem = get_template('news/older_group.html')
     return tem.render(con)
 
 def prepare_data(request, items,
                  beginwith=0, quantity=NEWS_PER_PAGE,
-                 archive_view=False):
+                 archive_view=False, category = None):
     """
         Prepares data
     """
-    news_count = News.objects.count()
+    news_count = News.objects.category(category).count()
     data = {}
+    data['category']    = category
     data['content']     = render_items(request, items)
-    data['older_group'] = render_older_group(
+    data['older_group'] = render_older_group(category,
         beginwith + quantity, 
         max(news_count-(beginwith+quantity),0))
-    data['newer_group'] = render_newer_group(
+    data['newer_group'] = render_newer_group(category,
         max(beginwith - quantity, 0),
         beginwith)
     data['archive_view'] = archive_view
     data['search_view']  = False
     return data
 
-def render_search_newer_group(page, query):
+def render_search_newer_group(category, page, query):
     """
         Renders search result
     """
     con = Context( {
+        'category': category,
         'page':  page,
         'query': query,
     } )
-    tem = get_template('offer/news/search_newer_group.html')
+    tem = get_template('news/search_newer_group.html')
     return tem.render(con)
 
-def render_search_older_group(page, query):
+def render_search_older_group(category, page, query):
     """
         Renders search result
     """
     con = Context( {
+        'category': category,
         'page':  page,
         'query': query,
     } )
-    tem = get_template('offer/news/search_older_group.html')
+    tem = get_template('news/search_older_group.html')
     return tem.render(con)
 
-def get_search_results_data(request):
+def get_search_results_data(request, category):
     """
         Gets search result
     """
     try:
         page_n = request.GET.get('page', 1)
-        sqs  = SearchQuerySet().order_by('-date')
+        sqs  = SearchQuerySet().filter(category=category).order_by('-date')
         form = SearchForm(request.GET, searchqueryset=sqs,
                           load_all=False)
+        data = {}
+        data['category'] = category
         if 'q' in request.GET and request.GET['q'] and form.is_valid():
             query = form.cleaned_data['q']
             results = map(lambda r: r.object, form.search())
             paginator = Paginator(results, NEWS_PER_PAGE)
             page = paginator.page(page_n)
-            data = {}
             data['content'] = render_items(request, page.object_list)
-            data['newer_group']  = render_search_newer_group(page, query)
-            data['older_group']  = render_search_older_group(page, query)
+            data['newer_group']  = render_search_newer_group(category, page, query)
+            data['older_group']  = render_search_older_group(category, page, query)
             data['archive_view'] = False
             data['search_view']  = True
             return data
@@ -133,9 +148,9 @@ def render_email_from_news(news):
                   str(Site.objects.get_current().domain) +
                   reverse('news-item', args=[news.id])
     } )
-    tem = get_template('offer/news/email_plaintext.html')
+    tem = get_template('news/email_plaintext.html')
     plaintext_body = tem.render(con)
-    tem = get_template('offer/news/email_html.html')
+    tem = get_template('news/email_html.html')
     html_body = tem.render(con)
     from_email = MASS_MAIL_FROM
     subject = settings.EMAIL_SUBJECT_PREFIX + news.title
@@ -149,7 +164,8 @@ def send_mass_mail_to_employees(msg_parts):
     emails = [emp.user.email for emp in
               Employee.objects.filter(receive_mass_mail_offer=True)]
     for email in emails:
-        send_html_mail(subject, text_body, html_body, 
+        if email:
+            send_html_mail(subject, text_body, html_body, 
                        MASS_MAIL_FROM, [email])
                        
 def send_mass_mail_to_students(msg_parts):
@@ -160,7 +176,8 @@ def send_mass_mail_to_students(msg_parts):
     emails = [emp.user.email for emp in
               Student.objects.filter(receive_mass_mail_offer=True)]
     for email in emails:
-        send_html_mail(subject, text_body, html_body, 
+        if email:
+            send_html_mail(subject, text_body, html_body, 
                        MASS_MAIL_FROM, [email])
 
 def mail_news_to_employees(news):

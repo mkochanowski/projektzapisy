@@ -3,7 +3,7 @@
 {% load news_extras %}
 
 {% block main-menu %}
-	<li><a href="{% url offer.news.views.latest_news %}">Aktualności</a> ({% newscount %})</li>
+	<li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li>
 	{% if user.student %}
         <li><a href="{% url vote-main %}">Głosowanie</a></li>
     {% endif %}

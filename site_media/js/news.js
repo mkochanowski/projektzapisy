@@ -21,12 +21,13 @@ function load_data(url) {
 };
 
 $(document).ready(function() {
+    var category = $('#od-news-search-form').attr('action').split('/')[2]
     $('#od-news-search-form').submit(function() {
-	load_data('/news/ajax/search/' +
-		  '?q=' + $('#od-news-search-q').attr('value'));
+	load_data('/news/' + category + '/search/?json=true&' +
+		  'q=' + $('#od-news-search-q').attr('value'));
 	return false;
     });
     $('#od-news-search-reset').click(function() {
-	load_data('/news/ajax/latest/');
+	load_data('/news/' + category + '/?json=true');
     });
 });

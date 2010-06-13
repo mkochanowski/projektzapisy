@@ -1,0 +1,6 @@
+{% ifnotequal older_no 0 %}
+<a href="{% url news-page category older_beginwith %}" title="Starsze"
+ onClick="load_data('{% url news-page category older_beginwith %}?json=true'); return false;">
+  Starsze ({{ older_no }})
+</a>
+{% endifnotequal %}

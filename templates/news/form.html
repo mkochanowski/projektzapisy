@@ -1,7 +1,7 @@
 {% extends "offer/base.html" %}
 
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/offer/news.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/news.css" type="text/css" />
 {% endblock %}
 
 {% block scripts %}
@@ -10,7 +10,8 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona Główna</a></li>
-	<li><a href="{% url latest_news %}">Oferta</a></li>
+	<li><a href="{% url latest_news category %}">
+	{% ifequal category "enrollment" %}Zapisy{% else %}Oferta{% endifequal %}</a></li>
 	{% if adding %}
 		<li>Dodaj ogłoszenie</li>
 	{% else %}

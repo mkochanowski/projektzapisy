@@ -110,7 +110,7 @@ INSTALLED_APPS = (
     'fereol.south',
     'fereol.enrollment.subjects',
     'fereol.enrollment.records',
-    'fereol.offer.news',
+    'fereol.news',
     'fereol.offer.preferences',
     'fereol.offer.proposal',
     'fereol.offer.vote',
