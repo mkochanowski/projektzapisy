@@ -9,11 +9,38 @@ http://www.djangoproject.com/
 - fedora: Django
 - debian/ubuntu: python-django
 
-* south >= 0.7
+* lxml >= 2.2.4
+http://codespeak.net/lxml/
+- fedora, debian/ubuntu: python-lxml
+
+* south >= 0.7 (dołączone w repozytorium projektu)
 http://south.aeracode.org/
 - fedora: Django-south
 - debian/ubuntu: python-django-south
 
-* lxml >= 2.2.4
-http://codespeak.net/lxml/
-- fedora, debian/ubuntu: python-lxml
+* haystack >= 1.0.1 (dołączone w repozytorium projektu)
+http://haystacksearch.org/
+
+* whoosh >= 0.3.18 (dołączone w repozytorium projektu)
+http://bitbucket.org/mchaput/whoosh/wiki/Home
+
+* django-mailer >= 0.2.0 (dołączone w repozytorium projektu)
+http://github.com/jtauber/django-mailer/
+
+* debug-toolbar >= 0.8.3 (dołączone w repozytorium projektu)
+http://github.com/robhudson/django-debug-toolbar
+
+Konfiguracja:
+
+* Wyszukiwanie aktualności
+
+Aby poprawnie działała aplikacja aktualności, należy ustawić
+uprawnienia odczytu/zapisu dla procesu serwera http do katalogu
+wskazywanego przez zmienną HAYSTACK_WHOOSH_PATH.
+
+* Rozsyłanie maili
+
+Maile (rozsyłane np. przy dodawaniu ogłoszeń) są kolejkowane i
+wysyłane po uruchomieniu komend manage.py send_mail, manage.py
+retry_deferred. Należy np. umieścić wywołanie skryptu w cronie. Przy
+rozsyłaniu poczty użyte jest konto skonfigurowane w zmiennych EMAIL_*.
