@@ -480,4 +480,9 @@ input.bigButton
     padding: 5px 20px;
 }
 
+.mcePlaceHolder
+{
+    display: inline-block !important;
+}
+
 /*** KOMPONENTY - koniec ***/
