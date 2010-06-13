@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, render_to_response, \
      redirect
 from django.template import RequestContext
 from django.utils import simplejson
+from django.views.generic.create_update import delete_object
 
 from news.forms import NewsForm
 from news.models import News
@@ -134,7 +135,11 @@ def edit(request, cat, nid):
         news_instance = get_object_or_404(News, pk=nid)
         form = NewsForm(instance = news_instance)
     return render_with_category_template('news/form.html',
-        RequestContext({
+        RequestContext(request, {
         'category': cat,
         'form': form,
         }))
+
+@permission_required('news.delete_news')
+def delete(*args, **kwargs):
+    return delete_object(*args, **kwargs)
