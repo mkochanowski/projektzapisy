@@ -9,10 +9,5 @@ urlpatterns = patterns('news.views',
     url(r'^(?P<cat>[\w\-_]+)/archive/from/(?P<beginwith>\d+)/$', 'paginated_news', name='news-page'),
     url(r'^archive/(?P<nid>\d+)/$', 'news_item', name='news-item'),
     url(r'^(?P<cat>[\w\-_]+)/search/$', 'search_page', name='news-search'),
-    url(r'^delete/(?P<object_id>\d+)/$', 'delete', {
-                           'model': News,
-                           'post_delete_redirect': '/news/',
-                           'template_name': 'news/confirm_delete.html',
-                           'template_object_name': 'news',
-                           }, name='news-delete'),
+    url(r'^delete/(?P<nid>\d+)/$', 'delete', name='news-delete'),
 )

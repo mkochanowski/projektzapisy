@@ -141,5 +141,16 @@ def edit(request, cat, nid):
         }))
 
 @permission_required('news.delete_news')
-def delete(*args, **kwargs):
-    return delete_object(*args, **kwargs)
+def delete(request, nid):
+    """ Delete news item"""
+    news = get_object_or_404(News, pk=nid)
+    category = news.category
+    if request.method == 'POST':
+        news.delete()
+        request.user.message_set.create(message="Usunięto ogłoszenie.")
+        return redirect(latest_news, category)
+    return render_with_category_template('news/confirm_delete.html',
+        RequestContext(request, {
+            'category': category,
+            'news': news,
+        }))
