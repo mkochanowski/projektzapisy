@@ -33,14 +33,16 @@ def subjects(request):
 def subject(request, slug):
     try:
         subject = Subject.visible.get(slug=slug)
-        subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
-        subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
         
         try:
+            subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
+            subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
+            
             student = Student.objects.get(user=request.user)
             student_options = StudentOptions.get_student_options_for_subject(request.user.student.id, subject.id)
             subject.is_recording_open = subject.is_recording_open_for_student(student)
-        except NonStudentOptionsException:
+            
+        except NonStudentException, NonStudentOptionsException:
             subject.is_recording_open = False
         
         lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
@@ -51,7 +53,7 @@ def subject(request, slug):
         exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
         language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
         sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
-        
+                    
         data = {
                 'subject' : subject,
                 'lectures' : lectures,
@@ -64,12 +66,12 @@ def subject(request, slug):
                 'sport' : sport
         }         
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
-    except NonSubjectException:
+    
+    except Subject.DoesNotExist, NonSubjectException:
         request.user.message_set.create(message="Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
-
-
+    
 @login_required
 def list_of_subjects(request):
     semester_name, list_of_types = "", []

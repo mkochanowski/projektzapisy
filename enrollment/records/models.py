@@ -76,7 +76,10 @@ class Record( models.Model ):
         try:
             subject = Subject.objects.get(slug=slug)
             groups = Group.objects.filter(subject=subject).filter(type=group_type)
-            student_groups = Record.get_groups_for_student(user_id)
+            try:
+                student_groups = Record.get_groups_for_student(user_id)
+            except NonStudentException:
+                student_groups = {}
             for g in groups:
                 g.limit = g.get_group_limit()
                 g.classrooms = g.get_all_terms()

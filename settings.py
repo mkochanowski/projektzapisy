@@ -40,7 +40,8 @@ def custom_show_toolbar(request):
     return DEBUG
 
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar, 
+    'INTERCEPT_REDIRECTS' : False,
 }
 
 # logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
