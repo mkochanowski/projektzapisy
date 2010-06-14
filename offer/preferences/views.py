@@ -4,7 +4,7 @@
     Preferences views
 """
 
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import Context, RequestContext, Template
 from django.utils import simplejson
 
@@ -195,7 +195,33 @@ def set_pref(request, pref_id):
         data = {'Failure': 'Preference does not exist'}
     return HttpResponse(simplejson.dumps(data))
 
-# ? CO TO JEST ? -> 'lecture', 'review_lecture', 'tutorial', 'lab'
+@employee_required
+def save_all_prefs(request):
+    """ Saves all preferences. """
+    if request.method == 'POST':
+        # collect posted data
+        posted_data = {}
+        for key, value in request.POST.items():
+            try:
+                key = key.split('-')
+                if (len(key) < 2): raise ValueError
+                pid = int(key[-1])
+                category = '_'.join(key[:-1])
+                if not posted_data.has_key(pid):
+                    posted_data[pid] = {}
+                posted_data[pid][category] = int(value)
+            except (ValueError, IndexError,):
+                pass
+        # save preferences
+        for pid, new_pref_values in posted_data.items():
+            try:
+                pref = Preference.objects.get(pk=pid)
+                pref.set_preference(**new_pref_values)
+            except (Preference.DoesNotExist, UnknownPreferenceValue,):
+                pass
+        request.user.message_set.create(message='Zapisano preferencje.')
+    return redirect('prefs-default-view')
+
 @employee_required
 def init_pref(request, prop_id):
     """
