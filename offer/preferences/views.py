@@ -216,6 +216,7 @@ def save_all_prefs(request):
         for pid, new_pref_values in posted_data.items():
             try:
                 pref = Preference.objects.get(pk=pid)
+                new_pref_values = dict([(k.encode('utf-8'), v) for k,v in new_pref_values.items()])
                 pref.set_preference(**new_pref_values)
             except (Preference.DoesNotExist, UnknownPreferenceValue,):
                 pass
