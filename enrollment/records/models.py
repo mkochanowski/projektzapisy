@@ -22,7 +22,7 @@ class EnrolledManager(models.Manager):
 
 class Record( models.Model ):
     group = models.ForeignKey(Group, verbose_name = 'grupa')
-    student = models.ForeignKey(Student, verbose_name = 'student')
+    student = models.ForeignKey(Student, verbose_name = 'student', related_name='records')
     status = models.CharField(max_length = 1, choices = RECORD_STATUS, verbose_name = 'status')
     
     objects = models.Manager()

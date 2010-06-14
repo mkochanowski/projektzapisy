@@ -18,7 +18,7 @@
     <h1>{{subject.name}} {{subject.lol}}</h1>
     <h3>Prowadzący:</h3>
     {% for teacher in subject.teachers.all %}
-    	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
+    	<a href="#">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
     {% if subject.ects %}
     <h4>Punkty ECTS: {{subject.ects}}</h4>

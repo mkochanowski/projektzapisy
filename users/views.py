@@ -8,22 +8,51 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from users.exceptions import NonUserException, NonEmployeeException
-from users.models import Employee
+from users.exceptions import NonUserException, NonEmployeeException, NonStudentException
+from users.models import Employee, Student
+
 from users.forms import EmailChangeForm
 
-def profile(request, user_id = None):
-    '''profile'''
+def student_profile(request, user_id):
+    """student profile"""
     try:
-        if user_id:
-            user = User.objects.get(id=user_id)
-        else:
-            user = request.user
-        return render_to_response('users/profile.html', {'profile' : user})
-    except NonUserException:
-        pass
-    #dodac redirecta
+        user = User.objects.get(id=user_id)
+        student = user.student
+        groups = Student.get_schedule(user.id)
+        
+        data = {
+            'groups' : groups,
+            'student' : student,
+        }
+        return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
+    except NonStudentException:
+        request.user.message_set.create(message="Nie ma takiego studenta.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except User.DoesNotExist:
+        request.user.message_set.create(message="Nie ma takiego użytkownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        
+def employee_profile(request, user_id):
+    """student profile"""
+    try:
+        user = User.objects.get(id=user_id)
+        employee = user.employee
+        groups = Employee.get_schedule(user.id)
+        
+        data = {
+            'groups' : groups,
+            'employee' : employee,
+        }
+        return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
+
+    except NonEmployeeException:
+        request.user.message_set.create(message="Nie ma takiego pracownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except User.DoesNotExist:
+        request.user.message_set.create(message="Nie ma takiego użytkownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    
 @login_required
 def email_change(request):
     '''function that enables mail changing'''
@@ -50,33 +79,20 @@ def my_profile(request):
     return render_to_response('users/my_profile.html', context_instance = RequestContext( request ))
 
 @login_required
-def employee_schedule(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-        employee = Employee.objects.get(user=user)
-        groups = Employee.get_schedule(user.id)
-        data = {
-            'groups' : groups,
-            'employee' : employee,
-        }
-        return render_to_response('users/employee_schedule.html', data, context_instance=RequestContext(request))
-    except Employee.DoesNotExist:
-        request.user.message_set.create(message="Nie ma takiego pracownika")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-    except NonEmployeeException:
-        request.user.message_set.create(message="Nie ma takiego pracownika 1.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-    except User.DoesNotExist:
-        request.user.message_set.create(message="Nie ma takiego użytkownika.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-
-@login_required
 def employees_list(request):
     employees = Employee.objects.all()
     data = {
             "employees" : employees,
             }  
     return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
+
+@login_required
+def students_list(request):
+    students = Student.objects.all()
+    data = {
+            "students" : students,
+            }  
+    return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
 @login_required
 def logout(request):

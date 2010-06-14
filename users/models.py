@@ -3,8 +3,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from users.exceptions import NonEmployeeException
+from users.exceptions import NonEmployeeException, NonStudentException
 from enrollment.subjects.models import Group
+
 
 class BaseUser(models.Model):
     '''
@@ -79,6 +80,30 @@ class Student(BaseUser):
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia OD")
     
+    @staticmethod
+    def get_all_groups(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            groups = map(lambda x: x.group, student.records.all())
+        except Student.DoesNotExist:
+             raise NonStudentException()
+        return groups
+    
+    @staticmethod
+    def get_schedule(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            groups = Student.get_all_groups(user_id)
+            subjects = set([group.subject for group in groups])
+            for group in groups:
+                group.terms_ = group.get_all_terms()
+                group.subject_ = group.subject
+            return groups
+        except Student.DoesNotExist:
+             raise NonStudentException()
+         
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'

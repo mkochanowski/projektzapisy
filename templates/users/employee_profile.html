@@ -13,14 +13,14 @@
 {% block main-navigation %}
 <li>Zapisy</li>
 <li><a href="{% url employees-list %}">Pracownicy</a></li>
-<li>{{employee.user.first_name}} {{employee.user.last_name}}</li>
+<li>{{employee.get_full_name}}</li>
 {% endblock %}
 
 {% block content %}
 	<h3>Dane:</h3>
 	<ul>
-		<li>{{profile.get_full_name}}</li>
-		<li>email: {{profile.email}}</li>
+		<li>{{employee.get_full_name}}</li>
+		<li>email: {{employee.user.email}}</li>
 	</ul>
 	<div id="schedule-wrapper">
 		{% for group in groups %}
@@ -39,10 +39,8 @@
 		{% endfor %}
 	</div>
 	<br/>
-	{% if profile.consultations %}
 	<h3>Konsultacje:</h3>
-	<p>{{profile.consultations}}</p>
-	{% endif %}
+	<p>{{employee.consultations}}</p>
 {% endblock %}
 
 

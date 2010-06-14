@@ -5,14 +5,14 @@
     Zapisy
 </li>
 <li>
-    <a href="{% url employees-list %}">Pracownicy</a>
+    <a href="{% url students-list %}">Studenci</a>
 </li>
 {% endblock %}
 
 {% block content %}
 <ul>
-{% for e in employees %}
-	<li><a href="{% url employee-profile e.user.id %}">{{e.get_full_name}}</a></li>
+{% for s in students %}
+	<li><a href="{% url student-profile s.user.id %}">{{s.get_full_name}}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}
