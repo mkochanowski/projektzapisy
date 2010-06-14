@@ -78,10 +78,11 @@ def proposal( request, slug, descid = None ):
     can_edit = (proposal_.owner == None 
                or request.user.is_staff
                or request.user == proposal_.owner)
+    proposals_ = Proposal.objects.filter(deleted=False)
     data = {
             'proposal'      : proposal_,
             'mode'          : 'details',            
-            'proposals'     : Proposal.objects.all(),
+            'proposals'     : proposals_,
             'descid'        : int(descid),
             'newest'        : newest,
             'id'            : proposal_.id,
@@ -258,6 +259,7 @@ def proposal_form(request, sid = None):
         for book_name in request.POST.getlist('books[]'):
             books_to_form.append({ "id" : None, "name" : book_name})
     
+    proposals_ = Proposal.objects.filter(deleted=False)
     data = {
         'editForm'  : True,
         'editMode'  : edit_mode,
@@ -269,7 +271,7 @@ def proposal_form(request, sid = None):
         'proposalComments'      : proposal_comments,
         'proposalWWW'           : proposal_www,
         'mode'          : 'form',
-        'proposals'     : Proposal.objects.all(),
+        'proposals'     : proposals_,
         'proposalTypes' : offer.proposal.models.proposal_description.PROPOSAL_TYPES,
         'proposalHours' : offer.proposal.models.proposal_description.PROPOSAL_HOURS,
     }
