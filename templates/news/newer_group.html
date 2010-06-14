@@ -1,6 +1,6 @@
 {% ifnotequal newer_no 0 %}
-<a href="{% url latest_news category %}" title="Najnowsze"
- onClick="load_data('{% url latest_news category %}?json=true'); return false;">
+<a href="{% url news-page category 0 %}" title="Najnowsze"
+ onClick="load_data('{% url news-page category 0 %}?json=true'); return false;">
   Najnowsze
 </a>
 <a href="{% url news-page category newer_beginwith %}" title="Nowsze"
