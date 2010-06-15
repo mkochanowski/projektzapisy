@@ -1,5 +1,16 @@
 {% extends "enrollment/base-enrollment.html" %}
 
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/enrollment/users/users-list.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
+<script type="text/javascript" src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js"></script>
+<script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
+<script src="/site_media/js/enrollment/users/students-list.js" type="text/javascript"></script>
+{% endblock %}
+
 {% block main-navigation %}
 <li>
     Zapisy
@@ -10,9 +21,21 @@
 {% endblock %}
 
 {% block content %}
-<ul>
-{% for s in students %}
-	<li><a href="{% url student-profile s.user.id %}">{{s.get_full_name}}</a></li>
-{% endfor %}
-</ul>
+<div id="student-profile">
+Wybierz studenta z menu po prawej.
+</div>
+{% endblock %}
+
+{% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
+{% block sidebar %}
+<div id="main-sidebar">
+	<div id="students-list">
+		<h2>Lista studentów</h2>
+		<ul>
+			{% for s in students %}
+			<li><a href="#" link="{% url student-profile s.user.id %}" class="student-profile-link">{{s.get_full_name}}</a></li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
 {% endblock %}

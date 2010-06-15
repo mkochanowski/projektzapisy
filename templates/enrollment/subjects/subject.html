@@ -1,13 +1,4 @@
 <div>
-{% comment %}
-{% extends "enrollment/base-enrollment.html" %}
-
-{% block main-navigation %}
-	<li><a href="{% url subject-list %}">Przedmioty</a></li>
-	<li>{{subject.name}}</li>
-{% endblock %}
-{% block content %}
-{% endcomment %}
     {% if messages %}
     <ul>
         {% for message in messages %}

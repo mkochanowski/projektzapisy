@@ -4,9 +4,13 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+
+from django.http import QueryDict, HttpResponse 
+from django.utils import simplejson
+from django.db.models import Q 
 
 from users.exceptions import NonUserException, NonEmployeeException, NonStudentException
 from users.models import Employee, Student
@@ -81,9 +85,11 @@ def my_profile(request):
 @login_required
 def employees_list(request):
     employees = Employee.objects.all()
+    
     data = {
             "employees" : employees,
             }  
+    
     return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
 
 @login_required
