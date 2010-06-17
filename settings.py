@@ -32,9 +32,10 @@ EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
 #loggin settings:
 
-# LOG_FILE = os.path.join(PROJECT_PATH, "logs/log.log")
-# LOG_LEVEL = logging.NOTSET 
-INTERNAL_IPS = ('127.0.0.1',)
+#LOG_FILE = os.path.join(PROJECT_PATH, "logs/log.log")
+#LOG_LEVEL = logging.NOTSET 
+#INTERNAL_IPS = ('127.0.0.1',)
+#logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
 def custom_show_toolbar(request):
     return DEBUG
@@ -44,7 +45,6 @@ DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS' : False,
 }
 
-# logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

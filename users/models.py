@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from users.exceptions import NonEmployeeException, NonStudentException
 from enrollment.subjects.models import Group
 
+import logging
+logger = logging.getLogger()
 
 class BaseUser(models.Model):
     '''
@@ -22,6 +24,7 @@ class BaseUser(models.Model):
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
+            logger.error('Getter(user_id = %d) in BaseUser throws User.DoesNotExist exception.' % user_id )
             raise NonUserException
         return user
     
@@ -44,6 +47,7 @@ class Employee(BaseUser):
             employee = user.employee
             groups = Group.objects.filter(teacher=employee)
         except Employee.DoesNotExist:
+             logger.error('Function Employee.get_all_groups(user_id = %d) wthrows Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
         return groups
     
@@ -59,6 +63,7 @@ class Employee(BaseUser):
                 group.subject_ = group.subject
             return groups
         except Employee.DoesNotExist:
+             logger.error('Function Employee.get_schedule(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
          
     class Meta:
@@ -87,6 +92,7 @@ class Student(BaseUser):
             student = user.student
             groups = map(lambda x: x.group, student.records.all())
         except Student.DoesNotExist:
+             logger.error('Function Student.get_all_groups(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
         return groups
     
@@ -102,6 +108,7 @@ class Student(BaseUser):
                 group.subject_ = group.subject
             return groups
         except Student.DoesNotExist:
+             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
          
     class Meta:

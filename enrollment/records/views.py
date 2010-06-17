@@ -110,6 +110,39 @@ def ajaxResign(request):
         data['Exception']['Message'] = "Nie możesz się wypisać, bo nie jesteś zapisany."
     return HttpResponse(simplejson.dumps(data))
 
+def deleteStudentFromGroup(request, user_id, group_id):
+    try:
+        
+        logged_as_staff = request.user.is_staff
+
+        if(logged_as_staff): 
+           user_id_, group_id_ = user_id, group_id
+           Records.remove_student_from_group(user_id = user_id_, group_id = group_id_)
+
+           group = Group.objects.get(id=group_id)
+           students_in_group = Record.get_students_in_group(group_id)
+           all_students = Student.objects.all()
+           data = {
+              'all_students' : all_students,
+              'students_in_group' : students_in_group,
+              'group' : group,
+           }
+        else:
+           raise AdminActionException()
+
+    except AdminActionException:
+        request.user.message_set.create(message="Nie masz wystarczających praw by wykonać tą akcję.")
+        return render_to_response('common/error-window.html', context_instance=RequestContext(request))
+    except NonStudentException:
+        request.user.message_set.create(message="Podany student nie istnieje.")
+        return render_to_response('common/error-window.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Podana grupa nie istnieje.")
+        return render_to_response('common/error-window.html', context_instance=RequestContext(request))
+    else:    
+        return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
+
+
 @login_required
 def assign(request, group_id):
     try:
@@ -176,9 +209,11 @@ def resign(request, group_id):
 def records(request, group_id):
     try:
         group = Group.objects.get(id=group_id)
-        students = Record.get_students_in_group(group_id)
+        students_in_group = Record.get_students_in_group(group_id)
+        all_students = Student.objects.all()
         data = {
-            'students' : students,
+            'all_students' : all_students,
+            'students_in_group' : students_in_group,
             'group' : group,
         }
         return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))

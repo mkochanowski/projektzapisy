@@ -7,6 +7,9 @@ from enrollment.subjects.exceptions import NonStudentOptionsException
 
 from datetime import timedelta, datetime
 
+import logging
+logger = logging.getLogger()
+
 class SubjectEntity(models.Model):
     """entity of particular subject title"""
     name = models.CharField(max_length=100)
@@ -62,12 +65,14 @@ class Subject( models.Model ):
                     else:
                         return datetime.now() < records_closing
         except NonStudentOptionsException:
+            logger.info('Subject.is_recording_open_for_student(student = %s) throws NonStudentOptionsException exception.' % str(student) )
             return False
                 
     
     def get_semester_name(self):
         """ returns name of semester subject is linked to """
         if self.semester is None:
+            logger.warning('Subject.get_semester_name() was invoked with non unknown semester.')
             return "nieznany semestr"
         else:
             return self.semester.get_name()

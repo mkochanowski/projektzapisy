@@ -12,6 +12,9 @@ from fereol.enrollment.records.models          import *
 from fereol.enrollment.subjects.models         import *
 from enrollment.subjects.exceptions import NonSubjectException, NonStudentOptionsException
 
+import logging
+logger = logging.getLogger()
+
 def make_it_json_friendly(element):
     element['entity__name'] = unicode(element['entity__name'])
     element['slug'] = unicode(element['slug'])
@@ -65,6 +68,7 @@ def subject(request, slug):
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
     
     except Subject.DoesNotExist, NonSubjectException:
+        logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % slug )
         request.user.message_set.create(message="Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
@@ -78,21 +82,25 @@ def list_of_subjects(request):
     try:
         if request.POST.has_key('keyword'):
             keyword = request.POST['keyword']
-  
-            if keyword != "":
-               response = response.filter(Q(entity__name__icontains=keyword) | Q(teachers__user__last_name__icontains=keyword))
+            response = response.filter(Q(entity__name__icontains=keyword) | Q(teachers__user__last_name__icontains=keyword))
 
         if request.POST.has_key('semester'):
             semester = request.POST['semester']
             semester_name = Semester.objects.get(id=semester).get_name()
             response = response.filter(semester__id__exact=semester)
-
+        else:
+            logger.warning('Function list_of_subjects(request) was called with empty parameter: semester')
+       
         if request.POST.has_key('type'):
             list_of_types = request.POST.getlist('type')
             if list_of_types:
                response = response.filter(type__id__in=list_of_types)
+        else:
+            logger.warning('Function list_of_subjects(request) was called with empty parameter: type')
+    
    
-    except Semester.DoesNotExist:
+    except Semester.DoesNotExist: 
+        logger.warning('Function list_of_subjects(request = {%s}) throws Semester.DoesNotExist exception.' % str(request.POST) )
         return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
     else:
         response = response.order_by('entity__name').values('id', 'entity__name', 'slug')

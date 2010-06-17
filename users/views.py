@@ -17,6 +17,9 @@ from users.models import Employee, Student
 
 from users.forms import EmailChangeForm
 
+import logging
+logger = logging.getLogger()
+
 def student_profile(request, user_id):
     """student profile"""
     try:
@@ -31,9 +34,11 @@ def student_profile(request, user_id):
         return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except NonStudentException:
+        logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % user_id )
         request.user.message_set.create(message="Nie ma takiego studenta.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
+        logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % user_id )
         request.user.message_set.create(message="Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
         
@@ -51,9 +56,11 @@ def employee_profile(request, user_id):
         return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
 
     except NonEmployeeException:
+        logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % user_id )
         request.user.message_set.create(message="Nie ma takiego pracownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
+        logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % user_id )
         request.user.message_set.create(message="Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     
@@ -65,6 +72,7 @@ def email_change(request):
         form = EmailChangeForm(data, instance=request.user)
         if form.is_valid():
             form.save()
+            logger.info('User (%s) changed email' % request.user.get_full_name())
             request.user.message_set.create(message="Twój adres e-mail został zmieniony.")
             return HttpResponseRedirect(reverse('my-profile'))
     else:
@@ -74,12 +82,14 @@ def email_change(request):
 @login_required  
 def password_change_done(request):
     '''informs if password were changed'''
+    logger.info('User (%s) changed password' % request.user.get_full_name())
     request.user.message_set.create(message="Twóje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
  
 @login_required  
 def my_profile(request):
     '''profile site'''
+    logger.info('User (%s) is logged in ' % request.user.get_full_name())
     return render_to_response('users/my_profile.html', context_instance = RequestContext( request ))
 
 @login_required
@@ -103,5 +113,6 @@ def students_list(request):
 @login_required
 def logout(request):
     '''logout'''
+    logger.info('User (%s) is logged off ' % request.user.get_full_name())
     auth.logout(request)
     return HttpResponseRedirect('/')
