@@ -94,7 +94,7 @@ def my_profile(request):
 
 @login_required
 def employees_list(request):
-    employees = Employee.objects.all()
+    employees = Employee.objects.order_by('user__last_name', 'user__first_name')
     
     data = {
             "employees" : employees,
@@ -104,7 +104,7 @@ def employees_list(request):
 
 @login_required
 def students_list(request):
-    students = Student.objects.all()
+    students = Student.objects.order_by('user__last_name', 'user__first_name')
     data = {
             "students" : students,
             }  
