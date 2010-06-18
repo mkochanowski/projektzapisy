@@ -269,4 +269,4 @@ class Record( models.Model ):
         unique_together = (('student', 'group'),)
 
     def __unicode__(self):
-        return "%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())
+        return u"%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())
