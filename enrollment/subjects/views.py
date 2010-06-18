@@ -49,8 +49,8 @@ def subject(request, slug):
         exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
         laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
         exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
-        seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
-        exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
+        exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
+        seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
         language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
         sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
                         
