@@ -51,22 +51,33 @@ class Subject( models.Model ):
     
     def is_recording_open_for_student(self, student):
         """ gives the answer to question: is student enrolling open for this subject at the very moment? """
-        try:
-            stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
-            records_opening = self.semester.records_opening 
-            records_closing = self.semester.records_closing
-            if records_opening == None:
-                return False
+        records_opening = self.semester.records_opening
+        records_closing = self.semester.records_closing
+
+        if records_opening < datetime.now():
+            if records_closing == None:
+                return True
             else:
-                student_records_opening = records_opening + stud_opt.get_opening_delay_timedelta()
-                if student_records_opening < datetime.now():
-                    if records_closing == None:
-                        return True
-                    else:
-                        return datetime.now() < records_closing
-        except NonStudentOptionsException:
-            logger.info('Subject.is_recording_open_for_student(student = %s) throws NonStudentOptionsException exception.' % str(student) )
+                return datetime.now() < records_closing
+        else:
             return False
+
+#       try:
+#           stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
+#           records_opening = self.semester.records_opening 
+#           records_closing = self.semester.records_closing
+#           if records_opening == None:
+#               return False
+#           else:
+#               student_records_opening = records_opening + stud_opt.get_opening_delay_timedelta()
+#               if student_records_opening < datetime.now():
+#                   if records_closing == None:
+#                       return True
+#                   else:
+#                       return datetime.now() < records_closing
+#       except NonStudentOptionsException:
+#           logger.info('Subject.is_recording_open_for_student(student = %s) throws NonStudentOptionsException exception.' % str(student) )
+#           return False
                 
     
     def get_semester_name(self):

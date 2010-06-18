@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -157,7 +157,7 @@ class Record( models.Model ):
             student = user.student
             group = Group.objects.get(id=group_id)
             record = Record.objects.get(group=group, student=student, status=STATUS_PINNED)
-            logger.info('User (%s) is not yet pinned to group (%d - [%s])' % (user.get_full_name(), group_id, str(group)) )           
+            logger.info('User (%s) is not yet pinned to group (%d - [%s])' % (user.get_full_name(), group_id, unicode(group)) )           
             record.delete()
             return record
         except Record.DoesNotExist:
@@ -207,7 +207,6 @@ class Record( models.Model ):
             logger.error('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (user_id, group_id) ) 
             raise NonGroupException()
         except Record.DoesNotExist:
-            logger.error('Record.add_student_to_group()  throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (user_id, group_id) ) 
             return Record.objects.create(group=group, student=student, status=STATUS_ENROLLED)
 
     @staticmethod
@@ -248,7 +247,7 @@ class Record( models.Model ):
             group = Group.objects.get(id=group_id)
             record = Record.enrolled.get(group=group, student=student)
             record.delete()
-            logger.info('User (%s) is now removed from group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), str(group), user_id, group_id) ) 
+            logger.info('User (%s) is now removed from group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)) ) 
             return record
         except Record.DoesNotExist:
             logger.error('Record.remove_student_from_group() throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (user_id, group_id) ) 
