@@ -58,10 +58,10 @@ def subject(request, slug):
                 'subject' : subject,
                 'lectures' : lectures,
                 'exercises' : exercises,
-                'exercises-adv' : exercises_adv,
+                'exercises_adv' : exercises_adv,
                 'laboratories' : laboratories,
                 'seminar' : seminar,
-                'exer-labs' : exer_labs,
+                'exer_labs' : exer_labs,
                 'language' : language,
                 'sport' : sport
         }         

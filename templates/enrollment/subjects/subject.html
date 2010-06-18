@@ -186,7 +186,7 @@
     {% endif %} 
 
 
-{% if exer_exlabs %}
+{% if exer_labs %}
 	<h3>Ćwiczenio-pracownie:</h3>
     <table>
     	<thead>
@@ -195,7 +195,7 @@
     		</tr>
     	</thead>
     	<tbody>
-	    {% for exlab in exer_exlabs %}
+	    {% for exlab in exer_labs %}
 	        <tr>
 		        <td>{{ exlab.get_teacher_full_name }}</td>
 		        <td>
