@@ -207,7 +207,6 @@ class Record( models.Model ):
             logger.error('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (user_id, group_id) ) 
             raise NonGroupException()
         except Record.DoesNotExist:
-            logger.error('Record.add_student_to_group()  throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (user_id, group_id) ) 
             return Record.objects.create(group=group, student=student, status=STATUS_ENROLLED)
 
     @staticmethod
