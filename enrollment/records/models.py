@@ -247,7 +247,7 @@ class Record( models.Model ):
             group = Group.objects.get(id=group_id)
             record = Record.enrolled.get(group=group, student=student)
             record.delete()
-            logger.info('User (%s) is now removed from group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), user_id, group_id) ) 
+            logger.info('User (%s) is now removed from group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)) ) 
             return record
         except Record.DoesNotExist:
             logger.error('Record.remove_student_from_group() throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (user_id, group_id) ) 
