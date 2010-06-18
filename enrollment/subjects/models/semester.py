@@ -42,6 +42,7 @@ class Semester( models.Model ):
         verbose_name_plural = 'semestry'
         app_label = 'subjects'
         unique_together = (('type', 'year'),)
+        ordering = ['-year', 'type']
 
     def __unicode__(self):
         return self.get_name()
