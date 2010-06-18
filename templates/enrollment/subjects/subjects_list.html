@@ -19,7 +19,10 @@
 
 {% block main-navigation %}
 <li>
-    Zapisy
+    <a href="{% url main-page %}">Strona Główna</a>
+</li>
+<li>
+    <a href="{% url latest_news 'enrollment' %}">Zapisy</a>
 </li>
 <li>
     <a href="{% url subject-list %}">Przedmioty</a>

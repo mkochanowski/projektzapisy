@@ -13,8 +13,15 @@
 {% endblock %}
  
 {% block main-navigation %}
-<li>Przedmioty:</li>
-<li>Prototyp Planu</li>
+<li>
+    <a href="{% url main-page %}">Strona Główna</a>
+</li>
+<li>
+    <a href="{% url latest_news 'enrollment' %}">Zapisy</a>
+</li>
+<li>
+    <a href="{% url schedule-prototype %}">Prototyp Planu</a>
+</li>
 {% endblock %}
 
 {% block content %}
