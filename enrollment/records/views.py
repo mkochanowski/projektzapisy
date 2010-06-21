@@ -21,9 +21,10 @@ from datetime import time
 def ajaxPin(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.pin_student_to_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś przypiety do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -42,9 +43,10 @@ def ajaxPin(request):
 def ajaxUnpin(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.unpin_student_from_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś wypienty z grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -63,9 +65,10 @@ def ajaxUnpin(request):
 def ajaxAssign(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.add_student_to_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś zapisany do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -74,6 +77,10 @@ def ajaxAssign(request):
         data['Exception'] = {}
         data['Exception']['Code'] = "NonGroup"
         data['Exception']['Message'] = "Nie możesz się zapisać, bo podana grupa nie istnieje."
+    except AssignedInThisTypeGroupException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "AssignedInThisTypeGroup"
+        data['Exception']['Message'] = "Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu."
     except AlreadyAssignedException:
         data['Exception'] = {}
         data['Exception']['Code'] = "AlreadyAssigned"
@@ -88,14 +95,14 @@ def ajaxAssign(request):
         data['Exception']['Message'] = "Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte."
     return HttpResponse(simplejson.dumps(data))
 
-
 @login_required
 def ajaxResign(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.remove_student_from_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś wypisany z grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"

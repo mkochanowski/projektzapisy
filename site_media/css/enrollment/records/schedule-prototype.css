@@ -4,3 +4,24 @@
 .schedule-prototype-subject { cursor:pointer; }
 .schedule-prototype-subject:hover { text-decoration:underline; }
 .schedule-prototype-subject-hide:after { content: ' schowaj '; }
+
+.schedule-buttons-wrapper { text-align: right; padding: 10px; }
+.schedule-buttons-wrapper input {padding: 10px;}
+
+.schedule-message {
+	background: white;
+	border: 1px solid black;
+	border-bottom-left-radius: 4px 4px;
+	border-bottom-right-radius: 4px 4px;
+	border-top-left-radius: 4px 4px;
+	border-top-right-radius: 4px 4px;
+	color: white;
+	font-size: 12px;
+	font-weight: bold;
+	margin: 10px 60px;
+	padding: 5px;
+	text-align: center;
+	display:none;
+}
+.success { background: green; display:block; }
+.error { background: #B00000; display:block; }

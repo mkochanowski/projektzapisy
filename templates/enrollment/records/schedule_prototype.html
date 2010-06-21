@@ -25,6 +25,7 @@
 {% endblock %}
 
 {% block content %}
+	<p id="schedule-message" class="schedule-message">haha</p>
 
 	<div id="schedule-wrapper" 
 		pinUrl="{% url schedule-prototype-pin %}" 
@@ -40,13 +41,15 @@
 					minutes="{{ term.length_in_minutes }}" 
 					day="{{ term.day_in_zero_base }}"
 					status="{{ record.schedule_widget_status_ }}">
-					{{record.group_}}<br/>
-					(s.{{term.classroom}})
+					<span>{{record.group_}}<br/>
+					(s.{{term.classroom}})</span>
 				</div>
 			{% endfor %}
 		{% endfor %}
 	</div>
-	
+	<div class="schedule-buttons-wrapper">
+		<input id="btnAssignToAll" type="button" value="Zapisz mnie na przypiete przedmioty">
+	</div>
 {% endblock %}
  
 {% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
