@@ -136,6 +136,7 @@
         "pk": 1, 
         "model": "users.student", 
         "fields": {
+            "receive_mass_mail_offer": true, 
             "matricula": "221135", 
             "user": 5
         }
@@ -144,6 +145,7 @@
         "pk": 2, 
         "model": "users.student", 
         "fields": {
+            "receive_mass_mail_offer": true, 
             "matricula": "221335", 
             "user": 6
         }

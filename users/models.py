@@ -15,6 +15,12 @@ class BaseUser(models.Model):
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
     user = models.OneToOneField(User)
+    receive_mass_mail_enrollment = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia Zapisów")
+    receive_mass_mail_offer = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia OD")
     
     def get_full_name(self):
         return self.user.get_full_name()
@@ -36,9 +42,6 @@ class Employee(BaseUser):
     Employee.
     '''
     consultations = models.TextField(verbose_name="konsultacje")
-    receive_mass_mail_offer = models.BooleanField(
-        default = True, 
-        verbose_name="otrzymuje mailem ogłoszenia OD")
     
     @staticmethod
     def get_all_groups(user_id):
@@ -81,9 +84,6 @@ class Student(BaseUser):
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
-    receive_mass_mail_offer = models.BooleanField(
-        default = True, 
-        verbose_name="otrzymuje mailem ogłoszenia OD")
     
     @staticmethod
     def get_all_groups(user_id):
