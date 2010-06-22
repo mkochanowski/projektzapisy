@@ -244,7 +244,7 @@ def own(request):
 def schedulePrototype(request):
     try:
         student_records = Record.get_student_all_detiled_records(request.user.id)
-        subjects = Subject.objects.select_related(depth=2).all()
+        subjects = Subject.objects.select_related().all()
         #all_terms = Term.objects.select_related(depth = 2).all()
         #group_with_subjects = Group.objects.select_related(depth = 2).all()
         #subjects = set([g.subject for g in group_with_subjects])
