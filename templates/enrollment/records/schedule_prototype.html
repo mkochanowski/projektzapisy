@@ -59,7 +59,8 @@
 	 	{% for sub in subjects %}
 			{% if forloop.first %}<ul>{% endif %}
 				<li>
-					<span subjectid="{{sub.pk}}" class="schedule-prototype-subject" id="subject{{sub.pk}}">{{sub.name}}</span>
+					<span subjectid="{{sub.pk}}" class="schedule-prototype-subject" id="subject{{sub.pk}}">{{sub.name}}
+					<span class="hide">Schowaj</span></span>
 					<div style="display:none;">
 					{% for group in sub.groups_ %}
 						{% for term in group.terms_ %}

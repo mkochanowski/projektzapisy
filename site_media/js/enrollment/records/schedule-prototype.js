@@ -21,7 +21,8 @@ $(function(){
 	$('#schedule-wrapper').schedule({
 		hourColumnWidth: 40,
 		dayColumnWidth: Math.floor(($('#schedule-wrapper').width() - 100)/5),
-		messageBoxId: 'schedule-message'
+		messageBoxId: 'schedule-message',
+		showMenu: true
 	});
 	
 	$('.schedule-prototype-subject').click(function(){

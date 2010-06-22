@@ -46,7 +46,7 @@ td.schedule-day-cell
 	
 .toolBox div 
 	{ border: 1px solid black; border-bottom-left-radius: 3px 3px;border-bottom-right-radius: 3px 3px;border-top-left-radius: 3px 3px;border-top-right-radius: 3px 3px;
-	height: 7px;margin: 3px;width: 8px;}
+	height: 7px;margin: 3px;width: 8px; cursor:pointer;}
 
 .schedule-fixed .toolPin { display:none; }
 .schedule-fixed .toolUnPin { display:none; }

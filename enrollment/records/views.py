@@ -244,11 +244,15 @@ def own(request):
 def schedulePrototype(request):
     try:
         student_records = Record.get_student_all_detiled_records(request.user.id)
-        subjects = Subject.objects.all()
+        #subjects = Subject.objects.all()
+        all_terms = Term.objects.select_related(depth = 2).all()
+        group_with_subjects = Group.objects.select_related(depth = 2).all()
+        subjects = set([g.subject for g in group_with_subjects])
+        
         for subject in subjects:
-            subject.groups_ = Group.objects.filter(subject=subject)
+            subject.groups_ = group_with_subjects.filter(subject = subject)
             for group in subject.groups_:
-                group.terms_ = group.get_all_terms()
+                group.terms_ = all_terms.filter(group = group)
         data = {
             'student_records': student_records,
             'subjects': subjects,

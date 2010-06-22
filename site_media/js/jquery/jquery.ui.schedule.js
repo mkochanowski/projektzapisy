@@ -17,7 +17,8 @@ $.widget("ui.schedule", {
 		unpinUrl: undefined,
 		assignUrl: undefined,
 		resignUrl: undefined,
-		messageBoxId: undefined
+		messageBoxId: undefined,
+		showMenu: false
 	},
 	
 	_create: function() {
@@ -293,8 +294,7 @@ $.widget("ui.schedule", {
 			});
 		}
 	},
-	
-	
+
 	deleteSubjectTerms: function(subjectID){
 		var self = this;
 		self.element.find(self._subjectTermsToDeleteSelector(subjectID)).remove();
@@ -304,66 +304,50 @@ $.widget("ui.schedule", {
 	},
 	
 	_toolBox: function(divTerm) {
-		var self = this,
-			$toolBox = $('<div></div>')
-				.addClass('toolBox')
-				.append($('<div></div>')
-					.attr({"title":"Zapisz", "alt":"Zapisz"})
-					.addClass('toolAssign')
-					.click(function(){
-						self._ajaxGroupOperation(
-							'Assign',
-							divTerm.attr('groupid'),
-							function() {
-								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
-									self._makeTermFixed($(this));
-								});
-							}
-						);
-					}))
-				.append($('<div></div>')
-					.attr({"title":"Wypisz", "alt":"Wypisz"})
-					.addClass('toolResign')
-					.click(function(){
-						self._ajaxGroupOperation(
-							'Resign',
-							divTerm.attr('groupid'),
-							function() {
-								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
-									self._makeTermUnPinned($(this));
-								});
-							}
-						);
-					}))
-				.append($('<div></div>')
-					.attr({"title":"Przypnij", "alt":"Przypnij"})
-					.addClass('toolPin')
-					.click(function(){
-						self._ajaxGroupOperation(
-							'Pin',
-							divTerm.attr('groupid'),
-							function() {
-								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
-									self._makeTermPinned($(this));
-								});
-							}
-						);
-					}))
-				.append($('<div></div>')
-					.attr({"title":"Wypnij", "alt":"Wypnij"})
-					.addClass('toolUnPin')
-					.click(function(){
-						self._ajaxGroupOperation(
-							'Unpin',
-							divTerm.attr('groupid'),
-							function() {
-								self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
-									self._makeTermUnPinned($(this));
-								});
-							}
-						);
-					}));
-		return $toolBox;
+		var self = this;
+		if (self.options.showMenu) {
+			$toolBox = $('<div></div>').addClass('toolBox').append($('<div></div>').attr({
+				"title": "Zapisz",
+				"alt": "Zapisz"
+			}).addClass('toolAssign').click(function(){
+				self._ajaxGroupOperation('Assign', divTerm.attr('groupid'), function(){
+					self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
+						self._makeTermFixed($(this));
+					});
+				});
+			})).append($('<div></div>').attr({
+				"title": "Wypisz",
+				"alt": "Wypisz"
+			}).addClass('toolResign').click(function(){
+				self._ajaxGroupOperation('Resign', divTerm.attr('groupid'), function(){
+					self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
+						self._makeTermUnPinned($(this));
+					});
+				});
+			})).append($('<div></div>').attr({
+				"title": "Przypnij",
+				"alt": "Przypnij"
+			}).addClass('toolPin').click(function(){
+				self._ajaxGroupOperation('Pin', divTerm.attr('groupid'), function(){
+					self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
+						self._makeTermPinned($(this));
+					});
+				});
+			})).append($('<div></div>').attr({
+				"title": "Wypnij",
+				"alt": "Wypnij"
+			}).addClass('toolUnPin').click(function(){
+				self._ajaxGroupOperation('Unpin', divTerm.attr('groupid'), function(){
+					self.element.find(self._groupSelector(divTerm.attr('groupid'))).each(function(){
+						self._makeTermUnPinned($(this));
+					});
+				});
+			}));
+			return $toolBox;
+		}
+		else {
+			return $('<div></div>');
+		}
 	},
 	
 	_addDivTerm: function(divTerm) {
