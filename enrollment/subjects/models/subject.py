@@ -54,13 +54,16 @@ class Subject( models.Model ):
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
 
-        if records_opening < datetime.now():
-            if records_closing == None:
-                return True
-            else:
-                return datetime.now() < records_closing
-        else:
+        if records_opening == None:
             return False
+        else:
+            if records_opening < datetime.now():
+                if records_closing == None:
+                    return True
+                else:
+                    return datetime.now() < records_closing
+            else:
+                return False
 
 #       try:
 #           stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
