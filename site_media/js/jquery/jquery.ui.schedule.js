@@ -28,7 +28,7 @@ $.widget("ui.schedule", {
 		
 		self.subjectList = [];	
 		
-		self.initialTerms = self.element.find('div');
+		self.initialTerms = self.element.children().filter('div');
 		
 		var pinUrl = self.element.attr('pinUrl'),
 			unpinUrl = self.element.attr('unpinUrl'),

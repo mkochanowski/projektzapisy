@@ -22,12 +22,12 @@
     </ul>
         
     <h3>Opis przedmiotu:</h3>
-    <p>{{subject.description}}</p>
+    <p class="subject-description">{{subject.description}}</p>
     <a>pokaż więcej...</a>
     
     {% if lectures %}
     <h3>Wykład:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -64,7 +64,7 @@
 	
 	{% if exercises %}
 	<h3>Ćwiczenia:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -105,7 +105,7 @@
 	
 	{% if exercises_adv %}
 	<h3>Ćwiczenia (poziom zaawansowany):</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -146,7 +146,7 @@
 	
     {% if laboratories %}
 	<h3>Pracownia:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -188,7 +188,7 @@
 
 {% if exer_labs %}
 	<h3>Ćwiczenio-pracownie:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -230,7 +230,7 @@
 	
 	{% if seminar %}
 	<h3>Seminarium:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -271,7 +271,7 @@
 
 	{% if language %}
 	<h3>Lektorat:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -312,7 +312,7 @@
 	
 	{% if sport %}
 	<h3>Zajęcia:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>

@@ -17,6 +17,7 @@ function loadSubjectDetails(detailsUrl){
 				//sessionStorage.setItem('loaded-subject-detail-url', detailsUrl);
 				jaaulde.utils.cookies.set('loaded-subject-detail-url', detailsUrl);
 			} catch(ex) {}
+			$('.subject-details-table tbody tr:even').addClass('even');
         },
         complete: function(){
             //$detailsDiv.removeClass('subject-details-loading');
