@@ -26,6 +26,7 @@
         {% else %}
             <p class="disabled-link">Głosowanie nie jest w tej chwili aktywne.</p>
         {% endif %}
+        <p class="link"><a href="{% url vote-summary %}">Podsumowanie głosowania</a></p>
         <p class="link"><a href="{% url vote-view %}">Pokaż mój głos</a></p>
     </div>
 {% endblock %}

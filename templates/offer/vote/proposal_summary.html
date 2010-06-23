@@ -1,0 +1,38 @@
+{% extends "offer/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	<li><a href="{% url vote-main %}">Głosowanie</a></li>
+    <li><a href="{% url vote-summary %}">Podsumowanie głosowania</a></li>
+    <li>{{ proposal.name }}</li>
+{% endblock %}
+
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
+{% endblock %}
+
+{% block content-class %}narrow{% endblock %}
+{% block content %}
+<div>
+    <h3>{{ proposal.name }}</h3>
+    <h4>Podsumowanie głosowania</h4>
+    <li>Liczba punktów: {{ points }}</li>
+    <li>Liczba głosów: {{ votes }}</li>
+    <h4>Głosowali na ten przedmiot:</h4>
+    {% if users %}
+    <table>
+        <tr>
+            <th>Imię</th><th>Nazwisko</th>
+        </tr>
+        {% for us in users %}
+        <tr>
+            <td>{{ us.first_name }}</td><td>{{ us.last_name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    Nikt nie oddał głosu na ten przedmiot
+    {% endif %}
+</div>
+{% endblock %}

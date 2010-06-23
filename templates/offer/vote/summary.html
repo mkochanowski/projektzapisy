@@ -1,0 +1,65 @@
+{% extends "offer/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	<li><a href="{% url vote-main %}">Głosowanie</a></li>
+    <li>Podsumowanie głosowania</li>
+{% endblock %}
+
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
+{% endblock %}
+
+{% block content-class %}narrow{% endblock %}
+{% block content %}
+        {% if winter %}
+        <div>
+        <h2>Semestr zimowy</h2>        
+        <table>
+            <tr>
+                <th>Przedmiot</th><th>Punktów</th><th>Głosowało</th><th></th>
+            </tr>
+            {% for row in winter %}
+            <tr>
+                <td>{{ row.2.name }}</td><td>{{ row.0 }}</td><td>{{ row.1 }}</td><td><a href="{% url proposal-vote-summary slug=row.2.slug %}">Szczegóły</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+        <br>
+        {% endif %}
+        {% if summer %}
+        <div>
+        <h2>Semestr letni</h2>
+        <table>
+            <tr>
+                <th>Przedmiot</th><th>Punktów</th><th>Głosowało</th><th></th>
+            </tr>
+            {% for row in summer %}
+            <tr>
+                <td>{{ row.2.name }}</td><td>{{ row.0 }}</td><td>{{ row.1 }}</td><td><a href="{% url proposal-vote-summary slug=row.2.slug %}">Szczegóły</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+        <br>
+        {% endif %}
+        {% if unknown %}
+        <div>
+        <h2>Semestr nieokreślony</h2>
+        <table>
+            <tr>
+                <th>Przedmiot</th><th>Punktów</th><th>Głosowało</th><th></th>
+            </tr>
+            {% for row in unknown %}
+            <tr>
+                <td>{{ row.2.name }}</td><td>{{ row.0 }}</td><td>{{ row.1 }}</td><td><a href="{% url proposal-vote-summary slug=row.2.slug %}">Szczegóły</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        </div>
+        <br>
+        {% endif %}
+
+{% endblock %}
