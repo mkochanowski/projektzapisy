@@ -120,6 +120,11 @@ def proposal_form(request, sid = None):
             proposal_requirements = proposal_.description().requirements
             proposal_comments = proposal_.description().comments
             proposal_www      = proposal_.description().web_page
+            if proposal_.is_exam(): proposal_exam   = 'yes' 
+            else:                   proposal_exam   = 'no'
+            if proposal_.in_english(): proposal_english = 'yes' 
+            else:                      proposal_english = 'no'
+        
         except:            
             edit_mode = False
     
@@ -138,6 +143,8 @@ def proposal_form(request, sid = None):
         proposal_owner = request.POST.get('owner', 'no')
         proposal_type = request.POST.get('type', '')
         proposal_www = request.POST.get('web-page', '')
+        proposal_exam = request.POST.get('exam', 'no')
+        proposal_english = request.POST.get('classes-in-english', 'no')
         
         if (proposal_owner == "yes"
            and proposal_.owner == None):
@@ -179,7 +186,16 @@ def proposal_form(request, sid = None):
             correct_form = False
                                 
         if correct_form:
-                        
+            if proposal_exam == 'yes':
+                proposal_.add_tag('exam')
+            else:
+                proposal_.remove_tag('exam')
+                
+            if proposal_english == 'yes':
+                proposal_.add_tag('english')
+            else:
+                proposal_.remove_tag('english')
+                
             proposal_.save()
             
             description = ProposalDescription()

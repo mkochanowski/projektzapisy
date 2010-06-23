@@ -68,6 +68,20 @@
                 <label for="od-proposal-form-ects">Sugerowana ilość punktów ECTS:</label>
                 <input type="text" name="ects" id="od-proposal-form-ects" value="{{ proposal.description.ects }}" />
             </li>
+            <li class="exam">
+                <label>Egzamin:</label>
+                <select class="main-labelledSelect" name="exam" title="egzamin ">
+                   <option value="no">Nie</option>
+                   <option value="yes" {% if proposal.is_exam %}selected="selected"{% endif %}>Tak</option>
+                </select>
+            </li> 
+            <li class="classesInEnglish">
+                <label>Możliwe zajęcia w języku angielskim:</label>
+                <select class="main-labelledSelect" name="classes-in-english" title="zajęcia po angielsku">
+                   <option value="no">Nie</option>
+                   <option value="yes" {% if proposal.in_english %}selected="selected"{% endif %}>Tak</option>
+                </select>
+            </li> 
         </ul>
 
         <h3>Opis przedmiotu</h3>
