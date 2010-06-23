@@ -41,7 +41,7 @@
 		<fieldset id="od-prefs-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for key, name in types_list %}
-				<span class="checkbox od-filter-checkbox"><input type="checkbox" value="{{ key }}" checked /><label>{{ name }}</label></span>
+				<span class="checkbox od-filter-checkbox"><input class='type-list' type="checkbox" value="{{ key }}" checked /><label>{{ name }}</label></span>
 			{% endfor %}
 		</fieldset>
 		<fieldset>

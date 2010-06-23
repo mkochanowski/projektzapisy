@@ -1,8 +1,12 @@
 $(document).ready(function(){  // add listeners to events and invoke ajax function after first loading 
 
-    $.each([$('#semester'), $('.type-list')], function(index, element) { 
+    $.each([$('input:checkbox[class:type-list]')], function(index, element) { 
        element.click(function() { getSearchedSubjects(ajaxUrl); })
     });
+
+    $('#semester').change(function(){
+       getSearchedSubjects(ajaxUrl);
+    })
 
     $('#keyword').keydown(function(){
        getSearchedSubjects(ajaxUrl);
