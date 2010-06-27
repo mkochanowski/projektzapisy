@@ -19,6 +19,9 @@ from offer.preferences.models import PREFERENCE_CHOICES
 
 from django.core.urlresolvers import reverse
 
+import logging
+logger = logging.getLogger()
+
 @employee_required
 def view(request, template):
     """
@@ -154,6 +157,7 @@ def hide(request, pref_id):
         else:
             data = {'Failure': 'Use POST'}
     except Preference.DoesNotExist:
+        logger.error('Ukrycie preferencji - nie znaleziono preferencji o id = %s.' % str(pref_id) )
         data = {'Failure': 'Preference does not exist'}
     return HttpResponse(simplejson.dumps(data))
 
@@ -170,6 +174,7 @@ def unhide(request, pref_id):
         else:
             data = {'Failure': 'Use POST'}
     except Preference.DoesNotExist:
+        logger.error('Pokazanie preferencji - nie znaleziono preferencji o id = %s.' % str(pref_id) )
         data = {'Failure': 'Preference does not exist'}
     return HttpResponse(simplejson.dumps(data))
 
@@ -192,6 +197,7 @@ def set_pref(request, pref_id):
         else:
             data = {'Failure': 'Use POST'}
     except (Preference.DoesNotExist, UnknownPreferenceValue):
+        logger.error('Zaznaczenie preferencji - nie znaleziono preferencji o id = %s.' % str(pref_id) )
         data = {'Failure': 'Preference does not exist'}
     return HttpResponse(simplejson.dumps(data))
 
@@ -218,7 +224,7 @@ def save_all_prefs(request):
                 pref = Preference.objects.get(pk=pid)
                 new_pref_values = dict([(k.encode('utf-8'), v) for k,v in new_pref_values.items()])
                 pref.set_preference(**new_pref_values)
-            except (Preference.DoesNotExist, UnknownPreferenceValue,):
+            except (Preference.DoesNotExist, UnknownPreferenceValue,):                
                 pass
         request.user.message_set.create(message='Zapisano preferencje.')
     return redirect('prefs-default-view')
@@ -249,5 +255,6 @@ def init_pref(request, prop_id):
         else:
             data = {'Failure': 'Use POST'}
     except Proposal.DoesNotExist:
+        logger.error('Preferencje - nie znaleziono propozycji przedmiotu o id = %s.' % str(prop_id) )
         data = {'Failure': 'Proposal does not exist'}
     return HttpResponse(simplejson.dumps(data))

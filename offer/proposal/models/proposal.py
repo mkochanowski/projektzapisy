@@ -229,7 +229,7 @@ class Proposal( models.Model ):
         """
             Checks if proposal has exam
             (if it has tag exam)
-        """
+        """               
         return self.has_tag('exam')
         
     def in_english( self ):
