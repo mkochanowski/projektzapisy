@@ -147,7 +147,27 @@ Prefs.Undecided.prototype.init = function()
             data = $.parseJSON(data);
             if (data.Success != 'OK')
                 throw Error('Prefs.Undecided.prototype.init: błąd w komunikacji');
-            
+
+            // workaround dla buga w Chrome i Chromium
+            if (jQuery.browser.webkit)
+            {
+                var prefsForm = $('#od-prefs-form');
+                var prefsFormURL = prefsForm[0].action;
+
+                $.ajax({
+                    type: 'post',
+                    url: prefsFormURL,
+                    data: prefsForm.serialize(),
+                    dataType: 'html',
+                    success: function()
+                    {
+                        document.location.href = prefsFormURL;
+                    }
+                });
+
+                return;
+            }
+
             var sub = new Prefs.Subject();
             sub.id = data.id;
             sub.type = data.type;
