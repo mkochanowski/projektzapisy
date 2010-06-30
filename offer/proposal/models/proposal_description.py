@@ -9,13 +9,6 @@ from django.contrib.auth.models import User
 
 from offer.proposal.models.proposal_description_tag import ProposalDescriptionTag
           
-PROPOSAL_TYPES = (
-    ('seminar', 'Seminarium'),
-    ('req',  'Obowiązkowy'),
-    ('cs_1', 'Informatyczny I'),
-    ('cs_2', 'Informatyczny II'),
-)
-
 PROPOSAL_HOURS = (
     (0, 0),
     (15, 15),
@@ -118,8 +111,13 @@ class ProposalDescription(models.Model):
         """
             Return proposal types
         """
+
+        # TODO: WTF?! po co to przypisywanie .type w getterze?! No i nie było
+        # returna - dodałem
         tmp = {}
         for types in self.descriptiontypes.all():
             tmp[types.id] = types
         self.type = tmp
+        
+        return self.descriptiontypes.all()
 

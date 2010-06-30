@@ -109,7 +109,9 @@ class VoteForm( forms.Form ):
         
         for key in self.fields.iterkeys():
             field = self.fields[key]
-            subject_class = self.subject_types[key]
+            subject_class = u''
+            for type in self.subject_types[key]:
+                subject_class += str(type.lecture_type.id) + u' '
             if self.subject_fan_flag[key]:
                 subject_class += " isFan"
             field_str = \

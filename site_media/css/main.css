@@ -327,6 +327,9 @@ a.main-sidebar-toggle-button:hover
 	min-height: 30px;
 
 	padding-top: 20px;
+
+    padding-bottom: 110px;
+    margin-bottom: -100px;
 }
 
 .main-top-bar fieldset:last-child

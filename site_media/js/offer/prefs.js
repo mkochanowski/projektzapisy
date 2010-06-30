@@ -170,7 +170,7 @@ Prefs.Undecided.prototype.init = function()
 
             var sub = new Prefs.Subject();
             sub.id = data.id;
-            sub.type = data.type;
+            sub.type = data.types;
             sub.name = data.name;
             sub.hideURL = data.hideurl;
             sub.unhideURL = data.unhideurl;

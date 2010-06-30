@@ -3,6 +3,7 @@
 """
     Preferences views
 """
+import types
 
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import Context, RequestContext, Template
@@ -12,7 +13,7 @@ from offer.preferences.exceptions import *
 from offer.preferences.models import Preference
 from offer.preferences.utils import *
 from offer.proposal.models import Proposal
-from offer.proposal.models.proposal_description import PROPOSAL_TYPES
+from offer.proposal.models.types import Types
 from users.decorators import employee_required
 
 from offer.preferences.models import PREFERENCE_CHOICES
@@ -44,7 +45,7 @@ def view(request, template):
     prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query)
     data = {
 		'prefs': prefs,
-		'proposalTypes': PROPOSAL_TYPES
+		'proposalTypes': Types.objects.all(),
 	}
     def process_pref(pref):
         """
@@ -75,6 +76,7 @@ def view(request, template):
         data,
         context_instance = RequestContext(request))
 
+# TODO: czy ten widok jest wykorzystywany
 @employee_required
 def undecided_list(request):
     """
@@ -109,6 +111,7 @@ def tree_view(request):
     """
     return view(request, 'offer/preferences/view_tree.html')
 
+# TODO: ten widok będzie prawdopodobnie zbędny
 @employee_required
 def list_view(request):
     """
@@ -239,11 +242,14 @@ def init_pref(request, prop_id):
             employee = request.user.employee
             course = Proposal.objects.get(pk=prop_id)
             Preference.objects.init_preference(employee, course)
+            types = []
+            for type in course.description().types():
+                types.append(type.lecture_type.id)
             data = {
                 'Success': 'OK',
                 'name': course.name,
                 'id': course.id,
-                'type': course.description().type,
+                'types': types,
                 'hideurl': reverse('prefs-hide', args = [ course.id ] ),
                 'unhideurl': reverse('prefs-unhide', args = [ course.id ] ),
                 'prefchoices': PREFERENCE_CHOICES,

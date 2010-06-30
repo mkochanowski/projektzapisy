@@ -16,7 +16,7 @@
                 <span class="name">{{pref.name}}</span>
 
                 <input type="hidden" class="pref-id" value="{{ pref.id }}" />
-                <input type="hidden" class="pref-type" value="{{ pref.desc.type }}" />
+                <input type="hidden" class="pref-type" value="{% for type in pref.desc.types %}{{ type.lecture_type.id }} {% endfor %}" />
                 <input type="hidden" class="pref-hide-url" value="{% url prefs-hide pref.id %}" />
                 <input type="hidden" class="pref-unhide-url" value="{% url prefs-unhide pref.id %}" />
                 
