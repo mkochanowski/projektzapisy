@@ -44,7 +44,7 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Zimowy',
                                             initial   = choosed)
-            self.subject_types['winter_%s' % sub.pk] = sub.description().type
+            self.subject_types['winter_%s' % sub.pk] = sub.description().types()
             self.subject_fan_flag['winter_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
                                             
         for sub in summer:
@@ -61,7 +61,7 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Letni',
                                             initial   = choosed)
-            self.subject_types['summer_%s' % sub.pk] = sub.description().type
+            self.subject_types['summer_%s' % sub.pk] = sub.description().types()
             self.subject_fan_flag['summer_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
         
         for sub in unknown:
@@ -78,7 +78,7 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Nieokreślony',
                                             initial   = choosed)
-            self.subject_types['unknown_%s' % sub.pk] = sub.description().type
+            self.subject_types['unknown_%s' % sub.pk] = sub.description().types()
             self.subject_fan_flag['unknown_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
     
     def vote_points( self ):
