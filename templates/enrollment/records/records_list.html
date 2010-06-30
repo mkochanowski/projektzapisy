@@ -1,8 +1,17 @@
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li class="main-message">{{ message }}</li>
+        {% endfor %}
+    </ul>
+   {% endif %}
+   
 <div>
+
 <h2><a class="subject-details-link" link="{% url subject-page group.subject_slug %}">{{group.subject}}</a> {{group.type_and_teacher}} - Lista zapisanych osób </h2>
-{% for student in students %}
+{% for student in students_in_group %}
 <li>
-    <a href="{% url profile student.user.id %}">{{student.user.get_full_name}}</a>
+    <a class="subject-details-link" link="{% url student-profile student.user.id %}">{{student.user.get_full_name}}</a>
 </li>
 {% empty %}brak zapisanych osób
 {% endfor %}

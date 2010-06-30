@@ -30,7 +30,7 @@
 			<div id="main-menu">
 				<ul id="main-menu-list">
 					{% block main-menu %}
-                        <li><a href="/subjects/">System zapisów</a></li>
+                        <li><a href="{% url latest_news 'enrollment' %}">System zapisów</a></li>
                         <li><a href="{% url latest_news 'offer' %}">Kształtowanie oferty dydaktycznej</a></li>
 					{% endblock %}
 				</ul>

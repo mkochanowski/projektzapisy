@@ -16,7 +16,7 @@
                 <ul>
                             {% if types %}
                                 {% for type in types %}
-                                <li class="type">{{type.lecture_type}} {{typeName}}
+                                <li class="type">
                                     <select name="types[]">
                                       {% for typeName in typesName %} 
                                          <option value="{{ typeName.id }}"{% ifequal typeName.id type.lecture_type.id %} selected="selected"{% endifequal %}>{{ typeName.name }}</option>
@@ -38,51 +38,77 @@
             </li>
             </li>
             <li class="proposedOwner">
-                <label>Zablokuj innym edycję:</label>
-                <select class="main-labelledSelect" name="owner" title="ograniczona edycja">
+                <label for="od-proposal-form-lock">Zablokuj innym edycję:</label>
+                <select class="main-labelledSelect" id="od-proposal-form-lock" name="owner">
                    <option value="no">Nie</option>
                    <option value="yes" {% if proposal.owner %}selected="selected"{% endif %}>Tak</option>
                 </select>
             </li> 
             <li class="proposedTime">
                 <label>Wymiar godzin:</label>
-                <select class="main-labelledSelect" name="lectures" title="sugerowana ilość godzin wykładów">
-                    {% if not proposal.description.lectures %}{% ifnotequal proposal.description.lectures proposalHours.0.0 %}
-                        <option class="label" value="-1">w.</option>
-                    {% endifnotequal %}{% endif %}
-                    {% for hour in proposalHours %}
-                        <option value="{{ hour.0 }}" {% ifequal proposal.description.lectures hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
-                    {% endfor %}
-                </select>
-                <select class="main-labelledSelect" name="repetitories" title="sugerowana ilość godzin repetytoriów">
-                    {% if not proposal.description.repetitories %}{% ifnotequal proposal.description.repetitories proposalHours.0.0 %}
-                        <option class="label" value="-1">r.</option>
-                    {% endifnotequal %}{% endif %}
-                    {% for hour in proposalHours %}
-                        <option value="{{ hour.0 }}" {% ifequal proposal.description.repetitories hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
-                    {% endfor %}
-                </select>
-                <select class="main-labelledSelect" name="exercises" title="sugerowana ilość godzin ćwiczeń">
-                    {% if not proposal.description.exercises %}{% ifnotequal proposal.description.exercises proposalHours.0.0 %}
-                        <option class="label" value="-1">ćw</option>
-                    {% endifnotequal %}{% endif %}
-                    {% for hour in proposalHours %}
-                        <option value="{{ hour.0 }}" {% ifequal proposal.description.exercises hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
-                    {% endfor %}
-                </select>
-                <select class="main-labelledSelect" name="laboratories" title="sugerowana ilość godzin pracowni">
-                    {% if not proposal.description.laboratories %}{% ifnotequal proposal.description.laboratories proposalHours.0.0 %}
-                        <option class="label" value="-1">p.</option>
-                    {% endifnotequal %}{% endif %}
-                    {% for hour in proposalHours %}
-                        <option value="{{ hour.0 }}" {% ifequal proposal.description.laboratories hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
-                    {% endfor %}
-                </select>
+                <span>
+                    <label for="od-proposal-form-time-lectures">wyk.</label>
+                    <select class="main-labelledSelect" id="od-proposal-form-time-lectures" name="lectures" title="sugerowana ilość godzin wykładów">
+                        {% if not proposal.description.lectures %}{% ifnotequal proposal.description.lectures proposalHours.0.0 %}
+                            <option class="label" value="-1">w.</option>
+                        {% endifnotequal %}{% endif %}
+                        {% for hour in proposalHours %}
+                            <option value="{{ hour.0 }}" {% ifequal proposal.description.lectures hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span>
+                    <label for="od-proposal-form-time-repetitories">rep.</label>
+                    <select class="main-labelledSelect" id="od-proposal-form-time-repetitories" name="repetitories" title="sugerowana ilość godzin repetytoriów">
+                        {% if not proposal.description.repetitories %}{% ifnotequal proposal.description.repetitories proposalHours.0.0 %}
+                            <option class="label" value="-1">r.</option>
+                        {% endifnotequal %}{% endif %}
+                        {% for hour in proposalHours %}
+                            <option value="{{ hour.0 }}" {% ifequal proposal.description.repetitories hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span>
+                    <label for="od-proposal-form-time-exercises">ćw.</label>
+                    <select class="main-labelledSelect" id="od-proposal-form-time-exercises" name="exercises" title="sugerowana ilość godzin ćwiczeń">
+                        {% if not proposal.description.exercises %}{% ifnotequal proposal.description.exercises proposalHours.0.0 %}
+                            <option class="label" value="-1">ćw</option>
+                        {% endifnotequal %}{% endif %}
+                        {% for hour in proposalHours %}
+                            <option value="{{ hour.0 }}" {% ifequal proposal.description.exercises hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </span>
+                <span>
+                    <label for="od-proposal-form-time-laboratories">lab.</label>
+                    <select class="main-labelledSelect" id="od-proposal-form-time-laboratories" name="laboratories" title="sugerowana ilość godzin pracowni">
+                        {% if not proposal.description.laboratories %}{% ifnotequal proposal.description.laboratories proposalHours.0.0 %}
+                            <option class="label" value="-1">p.</option>
+                        {% endifnotequal %}{% endif %}
+                        {% for hour in proposalHours %}
+                            <option value="{{ hour.0 }}" {% ifequal proposal.description.laboratories hour.0 %}selected="selected"{% endifequal %}>{{ hour.1 }}</option>
+                        {% endfor %}
+                    </select>
+                 </span>
             </li>
             <li>
                 <label for="od-proposal-form-ects">Sugerowana ilość punktów ECTS:</label>
                 <input type="text" name="ects" id="od-proposal-form-ects" value="{{ proposal.description.ects }}" />
             </li>
+            <li class="exam">
+                <label for="od-proposal-form-exam">Egzamin:</label>
+                <select class="main-labelledSelect" id="od-proposal-form-exam" name="exam">
+                   <option value="no">Nie</option>
+                   <option value="yes" {% if proposal.is_exam %}selected="selected"{% endif %}>Tak</option>
+                </select>
+            </li> 
+            <li class="classesInEnglish">
+                <label for="od-proposal-form-classes-in-english">Możliwe zajęcia w języku angielskim:</label>
+                <select class="main-labelledSelect" id="od-proposal-form-classes-in-english" name="classes-in-english">
+                   <option value="no">Nie</option>
+                   <option value="yes" {% if proposal.in_english %}selected="selected"{% endif %}>Tak</option>
+                </select>
+            </li> 
         </ul>
 
         <h3>Opis przedmiotu</h3>
@@ -95,7 +121,7 @@
         <p><textarea name="comments" rows="5" cols="70">{{ proposalComments }}</textarea></p>
         
         <h3>Strona przedmiotu</h3>
-        <p><input id="od-proposal-web-page" type="text" name="web-page" value="{{ proposalWWW }}"></p>
+        <p><input id="od-proposal-web-page" type="text" name="web-page" {% if proposalWWW %} value="{{ proposalWWW }}" {% endif %} /></p>
         
         <h3>Literatura:</h3>
         <div id="od-proposal-form-books">

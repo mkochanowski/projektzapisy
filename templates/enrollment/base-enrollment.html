@@ -22,6 +22,7 @@
 	</ul>
 	</li>
 	<li><a href="{% url employees-list %}">Pracownicy</a></li>
+	<li><a href="{% url students-list %}">Studenci</a></li>
 	<li><a href="#">Inne</a></li>
 	{% if user.is_authenticated %}
 	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>

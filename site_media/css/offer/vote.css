@@ -209,3 +209,54 @@
 }
 
 /*** LISTY PRZEDMIOTÓW W SEMESTRZE - FORMULARZ - koniec ***/
+
+
+/*** PODSUMOWANIE GŁOSOWANIA ***/
+
+#od-vote-summary table
+{
+    margin: auto;
+    margin-top: 20px;
+}
+
+#od-vote-summary table th
+{
+    padding-right: 5px;
+    padding-top: 10px;
+}
+
+#od-vote-summary table tr.semester th
+{
+    text-align: center;
+}
+
+#od-vote-summary table td.number,
+#od-vote-summary-proposal  table td.number
+{
+    text-align: center;
+}
+
+#od-vote-summary-proposal table
+{
+    margin: auto;
+}
+
+#od-vote-summary-proposal table td,
+#od-vote-summary-proposal table th
+{
+    padding-right: 25px;
+    padding-: 25px;
+}
+
+#od-vote-summary-proposal h2
+{
+    padding-bottom: 10px;
+}
+
+#od-vote-summary-proposal h3
+{
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+/*** PODSUMOWANIE GŁOSOWANIA - koniec ***/

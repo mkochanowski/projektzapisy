@@ -156,40 +156,32 @@ def render_email_from_news(news):
     subject = settings.EMAIL_SUBJECT_PREFIX + news.title
     return (subject, plaintext_body, html_body)
 
-def send_mass_mail_to_employees(msg_parts):
+def send_mass_mail(msg_parts, users):
     """
-    Queue mass mail to employees who haven't opted out.
+    Queue mass mail to the specified users.
     """
     (subject, text_body, html_body) = msg_parts
-    emails = [emp.user.email for emp in
-              Employee.objects.filter(receive_mass_mail_offer=True)]
+    emails = set([user.user.email for user in users])
     for email in emails:
         if email:
             send_html_mail(subject, text_body, html_body, 
                        MASS_MAIL_FROM, [email])
                        
-def send_mass_mail_to_students(msg_parts):
+def mail_news_enrollment(news):
     """
-    Queue mass mail to students who haven't opted out.
+    Queue news in form of a mail message to all users
+    that haven't opted out.
     """
-    (subject, text_body, html_body) = msg_parts
-    emails = [emp.user.email for emp in
-              Student.objects.filter(receive_mass_mail_offer=True)]
-    for email in emails:
-        if email:
-            send_html_mail(subject, text_body, html_body, 
-                       MASS_MAIL_FROM, [email])
+    users  = list(Student.objects.filter(receive_mass_mail_enrollment=True).select_related())
+    users += list(Employee.objects.filter(receive_mass_mail_enrollment=True).select_related())    
+    send_mass_mail(render_email_from_news(news), users)
 
-def mail_news_to_employees(news):
+def mail_news_offer(news):
     """
-    Queue news in form of a mail message to all employees
+    Queue news in form of a mail message to all users
     that haven't opted out.
     """
-    send_mass_mail_to_employees(render_email_from_news(news))
+    users  = list(Student.objects.filter(receive_mass_mail_offer=True).select_related())
+    users += list(Employee.objects.filter(receive_mass_mail_offer=True).select_related())
+    send_mass_mail(render_email_from_news(news), users)
     
-def mail_news_to_students(news):
-    """
-    Queue news in form of a mail message to all students
-    that haven't opted out.
-    """
-    send_mass_mail_to_students(render_email_from_news(news))

@@ -16,8 +16,8 @@ from django.views.generic.create_update import delete_object
 from news.forms import NewsForm
 from news.models import News
 from news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
-     get_search_results_data, mail_news_to_employees, \
-     mail_news_to_students, render_with_category_template
+     get_search_results_data, mail_news_enrollment, \
+     mail_news_offer, render_with_category_template
 
 def main_page( request ):
     """
@@ -100,8 +100,10 @@ def add(request, cat):
             news.category    = cat
             news.save()
             request.user.message_set.create(message="Opublikowano ogłoszenie.")
-            mail_news_to_employees(news)
-            mail_news_to_students(news)
+            if cat == 'offer':
+                mail_news_offer(news)
+            elif cat == 'enrollment':
+                mail_news_enrollment(news)
             return redirect(latest_news, cat)
     else:
         form = NewsForm()
@@ -128,8 +130,10 @@ def edit(request, cat, nid):
             news.category  = old_news.category
             news.save()
             request.user.message_set.create(message="Zapisano zmiany w ogłoszeniu.")
-            mail_news_to_employees(news)
-            mail_news_to_students(news)
+            if cat == 'offer':
+                mail_news_offer(news)
+            elif cat == 'enrollment':
+                mail_news_enrollment(news)
             return redirect(latest_news, news.category)
     else:
         news_instance = get_object_or_404(News, pk=nid)

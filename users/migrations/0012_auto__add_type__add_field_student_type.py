@@ -8,20 +8,24 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Deleting field 'Type.type'
-        db.delete_column('users_type', 'type')
+        # Adding model 'Type'
+        db.create_table('users_type', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
+        ))
+        db.send_create_signal('users', ['Type'])
 
-        # Adding field 'Type.name'
-        db.add_column('users_type', 'name', self.gf('django.db.models.fields.CharField')(default='', unique=True, max_length=30), keep_default=False)
+        # Adding field 'Student.type'
+        db.add_column('users_student', 'type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Type'], null=True, blank=True), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Adding field 'Type.type'
-        db.add_column('users_type', 'type', self.gf('django.db.models.fields.CharField')(default='', max_length=30, unique=True), keep_default=False)
+        # Deleting model 'Type'
+        db.delete_table('users_type')
 
-        # Deleting field 'Type.name'
-        db.delete_column('users_type', 'name')
+        # Deleting field 'Student.type'
+        db.delete_column('users_student', 'type_id')
     
     
     models = {
@@ -65,13 +69,16 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Employee'},
             'consultations': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
+            'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'records_opening_delay_hours': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),

@@ -166,24 +166,13 @@ class Proposal( models.Model ):
         slug = re.sub("^-", "", slug)
         slug = re.sub("-$", "", slug)
         return slug
-
-    def in_summer( self ):
+        
+    def has_tag( self, tag_name ):
         """
-            Checks if subject is in summer semester
-            (if it has tag summer)
-        """
-        for tag in self.tags.all():
-            if tag.__unicode__() == 'summer':
-                return True
-        return False
-    
-    def in_winter( self ):
-        """
-            Checks if subject is in winter semester
-            (if it has tag winter)
+            Checks if proposal has specified tag
         """
         for tag in self.tags.all():
-            if tag.__unicode__() == 'winter':
+            if tag.__unicode__() == tag_name:
                 return True
         return False
     
@@ -220,7 +209,32 @@ class Proposal( models.Model ):
             Checks if subject is in offer
             (if it has tag offer)
         """
-        for tag in self.tags.all():
-            if tag.__unicode__() == 'offer':
-                return True
-        return False
+        return self.has_tag('offer')
+    
+    def in_summer( self ):
+        """
+            Checks if subject is in summer semester
+            (if it has tag summer)
+        """
+        return self.has_tag('summer')
+        
+    def in_winter( self ):
+        """
+            Checks if subject is in winter semester
+            (if it has tag winter)
+        """
+        return self.has_tag('winter')
+        
+    def is_exam( self ):
+        """
+            Checks if proposal has exam
+            (if it has tag exam)
+        """               
+        return self.has_tag('exam')
+        
+    def in_english( self ):
+        """
+            Checks if classes in english are possible
+            (if it has tag english)
+        """
+        return self.has_tag('english')

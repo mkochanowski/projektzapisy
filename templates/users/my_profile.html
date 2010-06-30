@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block main-navigation %}
-<li><a href="{% url my-profile %}">Profil</a></li>
+<li>
+    <a href="{% url main-page %}">Strona Główna</a>
+</li>
+<li><a href="{% url my-profile %}">Mój profil</a></li>
 {% endblock %}
 
 {% block content %}

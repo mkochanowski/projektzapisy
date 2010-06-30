@@ -19,6 +19,10 @@ from fereol.users.models            import Type
 from offer.proposal.models          import Proposal, Book, ProposalDescription, Types, DescriptionTypes
 from offer.proposal.exceptions      import NonStudentException, NonEmployeeException, NotOwnerException
 
+
+import logging
+logger = logging.getLogger("")
+
 @login_required
 def become(request, slug, group):
     """
@@ -29,9 +33,11 @@ def become(request, slug, group):
         proposal_.add_user_to_group(request.user, group)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
+        logger.error("Dodawanie uzytkownika do grupy przy propozycji. NonStudentException. Id = %d" % proposal_.id)
         request.user.message_set.create(message="Nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonEmployeeException:
+        logger.error("Dodawanie uzytkownika do grupy przy propozycji. NonEmployeeException. Id = %d" % proposal_.id)
         request.user.message_set.create(message="Nie jesteś pracownkiem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
         
@@ -45,9 +51,11 @@ def stop_be(request, slug, group):
         proposal_.delete_user_from_group(request.user, group)
         return redirect("proposal-page" , slug=slug)
     except NonStudentException:
+        logger.error("Usuwanie uzytkownika z grupy przy propozycji. NonStudentException. Id = %d" % proposal_.id)
         request.user.message_set.create(message="Nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonEmployeeException:
+        logger.error("Usuwanie uzytkownika z grupy przy propozycji. NonEmployeeException. Id = %d" % proposal_.id)
         request.user.message_set.create(message="Nie jesteś pracownkiem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
@@ -130,6 +138,10 @@ def proposal_form(request, sid = None):
             proposal_requirements = proposal_.description().requirements
             proposal_comments = proposal_.description().comments
             proposal_www      = proposal_.description().web_page
+            if proposal_.is_exam(): proposal_exam   = 'yes' 
+            else:                   proposal_exam   = 'no'
+            if proposal_.in_english(): proposal_english = 'yes' 
+            else:                      proposal_english = 'no'
         
         except:            
             edit_mode = False
@@ -148,6 +160,8 @@ def proposal_form(request, sid = None):
         proposal_comments = request.POST.get('comments', '')
         proposal_owner = request.POST.get('owner', 'no')
         proposal_www = request.POST.get('web-page', '')
+        proposal_exam = request.POST.get('exam', 'no')
+        proposal_english = request.POST.get('classes-in-english', 'no')
         
         if (proposal_owner == "yes"
            and proposal_.owner == None):
@@ -196,7 +210,19 @@ def proposal_form(request, sid = None):
             correct_form = False
                                         
         if correct_form:
-            proposal_.save()                
+
+            proposal_.save()
+            
+            if proposal_exam == 'yes':
+                proposal_.add_tag('exam')
+            else:
+                proposal_.remove_tag('exam')
+                
+            if proposal_english == 'yes':
+                proposal_.add_tag('english')
+            else:
+                proposal_.remove_tag('english')
+                
             description = ProposalDescription()
             description.author = request.user
             description.description = proposal_description
@@ -211,7 +237,15 @@ def proposal_form(request, sid = None):
             description.date = datetime.now()
             description.proposal = proposal_
             description.save()
+
             
+            
+            if edit_mode:                
+                logger.debug('Edycja propozycji przedmiotu id = %d, %s' % (proposal_.id, proposal_.name))
+            else:
+                logger.debug('Dodanie propozycji przedmiotu id = %d, %s' % (proposal_.id, proposal_.name))
+                
+                        
 
             # to tutaj można sobie pooszczędzać na usuwanych obiektach
             # (patrz TODO kilkadziesiąt linijek wyżej)
@@ -295,8 +329,10 @@ def proposal_restore ( request, descid ):
     if (olddesc.proposal.owner != None
        and not request.user.is_staff
        and request.user != olddesc.proposal.owner):
+        logger.error('NotOwnerException przy przywracaniu opisu o id = %d' % descid)
         raise NotOwnerException
-
+    
+    logger.debug('Przywrocenie opisu o id = %d' % descid)
     newdesc             = deepcopy(olddesc)
     newdesc.id          = None
     newdesc.date        = datetime.now()
@@ -312,10 +348,12 @@ def proposal_restore ( request, descid ):
 def delete_proposal( request, slug ):
     """
        Usuwamy dana propozycje
-    """
+    """    
     proposal = Proposal.objects.get(slug=slug)
+    logger.debug('Usuniecie propozycji przedmiotu id = %d, %s' % (proposal.id, proposal.name))
     proposal.deleted = True
-    proposal.save()
+    proposal.save()        
+    
     return redirect("proposal-list")
 
 @permission_required('proposal.can_delete_proposal')
@@ -329,7 +367,7 @@ def delete_description( request, pid ):
        description.proposal.deleted = True
        description.proposal.save()
     description.deleted = True
-    description.save()
+    description.save()    
     request.user.message_set.create(message="Opis został usunięty.")
 
     if (how_many > 1):

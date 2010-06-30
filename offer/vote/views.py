@@ -115,3 +115,44 @@ def vote( request ):
                          voter   = request.user.student )
             
     return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
+
+def vote_summary( request ):
+    """
+        summary for vote
+    """
+    subs = Proposal.get_by_tag('vote')
+    
+    summer = []
+    winter = []
+    unknown = []
+    
+    for sub in subs:
+        points, voters = SingleVote.get_points_and_voters( sub )
+        
+        if sub.in_winter():
+            winter.append( (points, voters, sub) )
+        elif sub.in_summer():
+            summer.append( (points, voters, sub) )
+        else:
+            unknown.append( (points, voters, sub) )
+            
+    data = { 'winter'  : winter,
+             'summer'  : summer,
+             'unknown' : unknown, }
+            
+    return render_to_response('offer/vote/summary.html', data, context_instance = RequestContext( request ))
+    
+def proposal_vote_summary( request, slug ):
+    """
+        Summary for given subject
+    """
+    subject = Proposal.objects.get( slug=slug )
+    points, voters = SingleVote.get_points_and_voters( subject )
+    users = SingleVote.get_voters( subject )
+    
+    data = { 'proposal' : subject,
+             'points'   : points,
+             'votes'    : voters,
+             'users'    : users}
+           
+    return render_to_response('offer/vote/proposal_summary.html', data, context_instance = RequestContext( request ))

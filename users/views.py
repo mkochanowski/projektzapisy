@@ -4,26 +4,66 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from users.exceptions import NonUserException, NonEmployeeException
-from users.models import Employee
+from django.http import QueryDict, HttpResponse 
+from django.utils import simplejson
+from django.db.models import Q 
+
+from users.exceptions import NonUserException, NonEmployeeException, NonStudentException
+from users.models import Employee, Student
+
 from users.forms import EmailChangeForm
 
-def profile(request, user_id = None):
-    '''profile'''
-    try:
-        if user_id:
-            user = User.objects.get(id=user_id)
-        else:
-            user = request.user
-        return render_to_response('users/profile.html', {'profile' : user})
-    except NonUserException:
-        pass
-    #dodac redirecta
+import logging
+logger = logging.getLogger()
 
+def student_profile(request, user_id):
+    """student profile"""
+    try:
+        user = User.objects.get(id=user_id)
+        student = user.student
+        groups = Student.get_schedule(user.id)
+        
+        data = {
+            'groups' : groups,
+            'student' : student,
+        }
+        return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
+
+    except NonStudentException:
+        logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % user_id )
+        request.user.message_set.create(message="Nie ma takiego studenta.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except User.DoesNotExist:
+        logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % user_id )
+        request.user.message_set.create(message="Nie ma takiego użytkownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        
+def employee_profile(request, user_id):
+    """student profile"""
+    try:
+        user = User.objects.get(id=user_id)
+        employee = user.employee
+        groups = Employee.get_schedule(user.id)
+        
+        data = {
+            'groups' : groups,
+            'employee' : employee,
+        }
+        return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
+
+    except NonEmployeeException:
+        logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % user_id )
+        request.user.message_set.create(message="Nie ma takiego pracownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except User.DoesNotExist:
+        logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % user_id )
+        request.user.message_set.create(message="Nie ma takiego użytkownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    
 @login_required
 def email_change(request):
     '''function that enables mail changing'''
@@ -32,6 +72,7 @@ def email_change(request):
         form = EmailChangeForm(data, instance=request.user)
         if form.is_valid():
             form.save()
+            logger.info('User (%s) changed email' % request.user.get_full_name())
             request.user.message_set.create(message="Twój adres e-mail został zmieniony.")
             return HttpResponseRedirect(reverse('my-profile'))
     else:
@@ -41,45 +82,37 @@ def email_change(request):
 @login_required  
 def password_change_done(request):
     '''informs if password were changed'''
+    logger.info('User (%s) changed password' % request.user.get_full_name())
     request.user.message_set.create(message="Twóje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
  
 @login_required  
 def my_profile(request):
     '''profile site'''
+    logger.info('User (%s) is logged in ' % request.user.get_full_name())
     return render_to_response('users/my_profile.html', context_instance = RequestContext( request ))
 
 @login_required
-def employee_schedule(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-        employee = Employee.objects.get(user=user)
-        groups = Employee.get_schedule(user.id)
-        data = {
-            'groups' : groups,
-            'employee' : employee,
-        }
-        return render_to_response('users/employee_schedule.html', data, context_instance=RequestContext(request))
-    except Employee.DoesNotExist:
-        request.user.message_set.create(message="Nie ma takiego pracownika")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-    except NonEmployeeException:
-        request.user.message_set.create(message="Nie ma takiego pracownika 1.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-    except User.DoesNotExist:
-        request.user.message_set.create(message="Nie ma takiego użytkownika.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-
-@login_required
 def employees_list(request):
-    employees = Employee.objects.all()
+    employees = Employee.objects.select_related().order_by('user__last_name', 'user__first_name')
+    
     data = {
             "employees" : employees,
             }  
+    
     return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
+
+@login_required
+def students_list(request):
+    students = Student.objects.select_related().order_by('user__last_name', 'user__first_name')
+    data = {
+            "students" : students,
+            }  
+    return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
 @login_required
 def logout(request):
     '''logout'''
+    logger.info('User (%s) is logged off ' % request.user.get_full_name())
     auth.logout(request)
     return HttpResponseRedirect('/')

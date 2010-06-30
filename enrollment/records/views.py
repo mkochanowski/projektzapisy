@@ -21,9 +21,10 @@ from datetime import time
 def ajaxPin(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.pin_student_to_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś przypiety do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -42,9 +43,10 @@ def ajaxPin(request):
 def ajaxUnpin(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.unpin_student_from_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś wypienty z grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -63,9 +65,10 @@ def ajaxUnpin(request):
 def ajaxAssign(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.add_student_to_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś zapisany do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -74,6 +77,10 @@ def ajaxAssign(request):
         data['Exception'] = {}
         data['Exception']['Code'] = "NonGroup"
         data['Exception']['Message'] = "Nie możesz się zapisać, bo podana grupa nie istnieje."
+    except AssignedInThisTypeGroupException:
+        data['Exception'] = {}
+        data['Exception']['Code'] = "AssignedInThisTypeGroup"
+        data['Exception']['Message'] = "Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu."
     except AlreadyAssignedException:
         data['Exception'] = {}
         data['Exception']['Code'] = "AlreadyAssigned"
@@ -88,14 +95,14 @@ def ajaxAssign(request):
         data['Exception']['Message'] = "Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte."
     return HttpResponse(simplejson.dumps(data))
 
-
 @login_required
 def ajaxResign(request):
     data = {}
     try:
-        group_id = request.POST["GroupId"]
+        group_id = int(request.POST["GroupId"])
         record = Record.remove_student_from_group(request.user.id, group_id)
         data['Success'] = {}
+        data['Success']['Message'] = "Zostałeś wypisany z grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -109,6 +116,39 @@ def ajaxResign(request):
         data['Exception']['Code'] = "AlreadyNotAssigned"
         data['Exception']['Message'] = "Nie możesz się wypisać, bo nie jesteś zapisany."
     return HttpResponse(simplejson.dumps(data))
+
+def deleteStudentFromGroup(request, user_id, group_id):
+    try:
+        
+        logged_as_staff = request.user.is_staff
+
+        if(logged_as_staff): 
+           user_id_, group_id_ = user_id, group_id
+           Records.remove_student_from_group(user_id = user_id_, group_id = group_id_)
+
+           group = Group.objects.get(id=group_id)
+           students_in_group = Record.get_students_in_group(group_id)
+           all_students = Student.objects.all()
+           data = {
+              'all_students' : all_students,
+              'students_in_group' : students_in_group,
+              'group' : group,
+           }
+        else:
+           raise AdminActionException()
+
+    except AdminActionException:
+        request.user.message_set.create(message="Nie masz wystarczających praw by wykonać tą akcję.")
+        return render_to_response('common/error-window.html', context_instance=RequestContext(request))
+    except NonStudentException:
+        request.user.message_set.create(message="Podany student nie istnieje.")
+        return render_to_response('common/error-window.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Podana grupa nie istnieje.")
+        return render_to_response('common/error-window.html', context_instance=RequestContext(request))
+    else:    
+        return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
+
 
 @login_required
 def assign(request, group_id):
@@ -176,9 +216,11 @@ def resign(request, group_id):
 def records(request, group_id):
     try:
         group = Group.objects.get(id=group_id)
-        students = Record.get_students_in_group(group_id)
+        students_in_group = Record.get_students_in_group(group_id)
+        all_students = Student.objects.all()
         data = {
-            'students' : students,
+            'all_students' : all_students,
+            'students_in_group' : students_in_group,
             'group' : group,
         }
         return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
@@ -202,11 +244,14 @@ def own(request):
 def schedulePrototype(request):
     try:
         student_records = Record.get_student_all_detiled_records(request.user.id)
-        subjects = Subject.objects.all()
-        for subject in subjects:
-            subject.groups_ = Group.objects.filter(subject=subject)
-            for group in subject.groups_:
-                group.terms_ = group.get_all_terms()
+        subjects = Subject.objects.select_related().all()
+        #all_terms = Term.objects.select_related(depth = 2).all()
+        #group_with_subjects = Group.objects.select_related(depth = 2).all()
+        #subjects = set([g.subject for g in group_with_subjects])
+        
+#       for subject in subjects:
+#           for group in subject.groups_:
+#               group.terms_ = all_terms.filter(group = group)
         data = {
             'student_records': student_records,
             'subjects': subjects,

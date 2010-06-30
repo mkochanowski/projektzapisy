@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block main-navigation %}
+    <li>B³¹d</li>
+{% endblock %}
+
+{% block content %}
+    {% for message in messages %}
+        <p class="main-message">{{ message }}</p>
+    {% endfor %}
+{% endblock %}

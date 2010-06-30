@@ -62,7 +62,6 @@
       "repetitories": 15, 
       "exercises": 15, 
       "laboratories": 15, 
-      "type": "cs_1", 
       "ects": 6, 
       "author": 1
     }
@@ -82,7 +81,6 @@
       "repetitories": 15, 
       "exercises": 15, 
       "laboratories": 15, 
-      "type": "cs_2", 
       "author": 1
     }
   }, 
@@ -101,7 +99,6 @@
       "repetitories": 0, 
       "exercises": 0, 
       "laboratories": 0, 
-      "type": "seminar", 
       "author": 1
     }
   }, 

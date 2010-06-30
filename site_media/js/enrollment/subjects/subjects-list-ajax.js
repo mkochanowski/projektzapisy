@@ -1,8 +1,12 @@
 $(document).ready(function(){  // add listeners to events and invoke ajax function after first loading 
 
-    $.each([$('#semester'), $('.type-list')], function(index, element) { 
+    $.each([$('input:checkbox[class:type-list]')], function(index, element) { 
        element.click(function() { getSearchedSubjects(ajaxUrl); })
     });
+
+    $('#semester').change(function(){
+       getSearchedSubjects(ajaxUrl);
+    })
 
     $('#keyword').keydown(function(){
        getSearchedSubjects(ajaxUrl);
@@ -32,7 +36,7 @@ $.ajax({
 		   var size = 0;
            
 		   $.each(data.subjects, function(i,item){
-               str += "<li><a class=\"subject-link\" id=\"subject-9"+ item.id +"\" href=\"#\" link=\"/subjects/"+ item.slug +"\">" + item.entity__name + "</a></li>";
+               str += "<li><a class=\"subject-link\" id=\"subject-9"+ item.id +"\" link=\"/subjects/"+ item.slug +"\">" + item.entity__name + "</a></li>";
 			   size += 1;
             });
            

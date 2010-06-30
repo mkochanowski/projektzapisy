@@ -5,7 +5,10 @@ from django.db import models
 from enrollment.subjects.exceptions import NonStudentOptionsException
 
 from datetime import timedelta, datetime
-           
+
+import logging
+logger = logging.getLogger()
+
 class StudentOptions( models.Model ):
     """ Used for defining relation between Student and Subject """
     subject = models.ForeignKey('Subject', verbose_name = 'przedmiot')
@@ -27,6 +30,7 @@ class StudentOptions( models.Model ):
         try:    
             return StudentOptions.objects.get(subject__id=subject_id, student__id=student_id)
         except StudentOptions.DoesNotExist:
+            logger.error('StudentOptions.get_student_options_for_subject(student_id = %d, subject_id = %d) throws StudentOptions.DoesNotExist exception.' % (student_id, subject_id) )
             raise NonStudentOptionsException()
 
 

@@ -79,23 +79,7 @@ class PreferenceManagerGettersTest(TestCase):
         self.assertProps(
             Preference.objects.get_employees_prefs(self.emp3, hidden=True),
             [self.course1])
-    
-    def test_get_set_by_type(self):
-        self.assertProps(
-            Preference.objects.get_employees_prefs(self.emp2, types=['seminar']),
-            [self.seminar])
-        self.assertProps(
-            Preference.objects.get_employees_prefs(self.emp2, types=['cs_1']),
-            [self.course1])
-        self.assertProps(
-            Preference.objects.get_employees_prefs(self.emp2, types=['cs_1','seminar']),
-            [self.seminar, self.course1])
-        self.assertProps(
-            Preference.objects.get_employees_prefs(self.emp2,
-                                                   hidden=True,
-                                                   types=['cs_2']),
-            [self.course2])
-    
+        
     def test_get_set_filtered_without_hidden(self):
         self.assertProps(
             Preference.objects.get_employees_prefs(self.emp2, query='kurs'),

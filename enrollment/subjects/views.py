@@ -12,6 +12,9 @@ from fereol.enrollment.records.models          import *
 from fereol.enrollment.subjects.models         import *
 from enrollment.subjects.exceptions import NonSubjectException, NonStudentOptionsException
 
+import logging
+logger = logging.getLogger()
+
 def make_it_json_friendly(element):
     element['entity__name'] = unicode(element['entity__name'])
     element['slug'] = unicode(element['slug'])
@@ -33,43 +36,43 @@ def subjects(request):
 def subject(request, slug):
     try:
         subject = Subject.visible.get(slug=slug)
-        subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
-        subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
         
         try:
-            student = Student.objects.get(user=request.user)
-            student_options = StudentOptions.get_student_options_for_subject(request.user.student.id, subject.id)
+            student = request.user.student
+            #subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
+            #subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
             subject.is_recording_open = subject.is_recording_open_for_student(student)
-        except NonStudentOptionsException:
-            subject.is_recording_open = False
-        
+        except Student.DoesNotExist:
+            pass
+            
         lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
         exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
         laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
         exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
-        seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
-        exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
+        exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
+        seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
         language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
         sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
-        
+                        
         data = {
                 'subject' : subject,
                 'lectures' : lectures,
                 'exercises' : exercises,
-                'exercises-adv' : exercises_adv,
+                'exercises_adv' : exercises_adv,
                 'laboratories' : laboratories,
                 'seminar' : seminar,
-                'exer-labs' : exer_labs,
+                'exer_labs' : exer_labs,
                 'language' : language,
                 'sport' : sport
         }         
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
-    except NonSubjectException:
+    
+    except Subject.DoesNotExist, NonSubjectException:
+        logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % slug )
         request.user.message_set.create(message="Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
-
-
+    
 @login_required
 def list_of_subjects(request):
     semester_name, list_of_types = "", []
@@ -79,21 +82,25 @@ def list_of_subjects(request):
     try:
         if request.POST.has_key('keyword'):
             keyword = request.POST['keyword']
-  
-            if keyword != "":
-               response = response.filter(Q(entity__name__icontains=keyword) | Q(teachers__user__last_name__icontains=keyword))
+            response = response.filter(Q(entity__name__icontains=keyword) | Q(teachers__user__last_name__icontains=keyword))
 
         if request.POST.has_key('semester'):
             semester = request.POST['semester']
             semester_name = Semester.objects.get(id=semester).get_name()
             response = response.filter(semester__id__exact=semester)
-
+        else:
+            logger.warning('Function list_of_subjects(request) was called with empty parameter: semester')
+       
         if request.POST.has_key('type'):
             list_of_types = request.POST.getlist('type')
             if list_of_types:
                response = response.filter(type__id__in=list_of_types)
+        else:
+            logger.warning('Function list_of_subjects(request) was called with empty parameter: type')
+    
    
-    except Semester.DoesNotExist:
+    except Semester.DoesNotExist: 
+        logger.warning('Function list_of_subjects(request = {%s}) throws Semester.DoesNotExist exception.' % str(request.POST) )
         return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
     else:
         response = response.order_by('entity__name').values('id', 'entity__name', 'slug')

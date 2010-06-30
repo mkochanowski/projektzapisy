@@ -122,7 +122,8 @@
         "pk": 1, 
         "model": "users.student", 
         "fields": {
-			"records_opening_delay_hours": 0,
+            "receive_mass_mail_offer": true, 
+	    "records_opening_delay_hours": 0,
             "matricula": "221135", 
             "user": 5
         }

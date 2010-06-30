@@ -141,6 +141,29 @@
 {
     float: left;
     padding: 4px;
+    padding-top: 6px;
+}
+
+#od-proposal-form .infoBox .proposedTime label
+{
+    padding-top: 19px;
+}
+
+#od-proposal-form .infoBox .proposedTime span
+{
+    display: inline-block;
+}
+
+#od-proposal-form .infoBox .proposedTime span label
+{
+    padding: 0;
+    float: none;
+    
+    display: block;
+    font-size: 10px;
+    text-align: center;
+    height: 13px;
+    overflow: hidden;
 }
 
 #od-proposal-form .infoBox .proposedTime select
@@ -203,6 +226,11 @@
     margin-top: 10px;
     margin-left: 20px;
     padding: 2px 15px;
+}
+
+#od-proposal-form #od-proposal-web-page
+{
+    width: 95%;
 }
 
 #od-proposal-form-submitBar

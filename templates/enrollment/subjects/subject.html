@@ -1,13 +1,4 @@
 <div>
-{% comment %}
-{% extends "enrollment/base-enrollment.html" %}
-
-{% block main-navigation %}
-	<li><a href="{% url subject-list %}">Przedmioty</a></li>
-	<li>{{subject.name}}</li>
-{% endblock %}
-{% block content %}
-{% endcomment %}
     {% if messages %}
     <ul>
         {% for message in messages %}
@@ -18,7 +9,7 @@
     <h1>{{subject.name}} {{subject.lol}}</h1>
     <h3>Prowadzący:</h3>
     {% for teacher in subject.teachers.all %}
-    	<a href="{% url profile teacher.user.id %}">{{teacher.user.get_full_name}}</a> 
+    	<a href="#">{{teacher.user.get_full_name}}</a> 
     {% endfor %}
     {% if subject.ects %}
     <h4>Punkty ECTS: {{subject.ects}}</h4>
@@ -31,12 +22,12 @@
     </ul>
         
     <h3>Opis przedmiotu:</h3>
-    <p>{{subject.description}}</p>
+    <p class="subject-description">{{subject.description}}</p>
     <a>pokaż więcej...</a>
     
     {% if lectures %}
     <h3>Wykład:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
     			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
@@ -73,10 +64,10 @@
 	
 	{% if exercises %}
 	<h3>Ćwiczenia:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
@@ -88,7 +79,6 @@
 		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ exe.classroom.all|join:", " }}</td> 
 		        <td>{{ exe.get_group_limit }}</td>
 		        <td>{{ exe.enrolled }}</td>
 	        	<td>
@@ -115,10 +105,10 @@
 	
 	{% if exercises_adv %}
 	<h3>Ćwiczenia (poziom zaawansowany):</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
@@ -130,7 +120,6 @@
 		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ ea.classroom.all|join:", " }}</td> 
 		        <td>{{ ea.get_group_limit }}</td>
 		        <td>{{ ea.enrolled }}</td>
 	        	<td>
@@ -157,10 +146,10 @@
 	
     {% if laboratories %}
 	<h3>Pracownia:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
@@ -172,7 +161,6 @@
 		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ lab.classroom.all|join:", " }}</td> 
 		        <td>{{ lab.get_group_limit }}</td>
 		        <td>{{ lab.enrolled }}</td>
 	        	<td>
@@ -198,16 +186,16 @@
     {% endif %} 
 
 
-{% if exer_exlabs %}
+{% if exer_labs %}
 	<h3>Ćwiczenio-pracownie:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
-	    {% for exlab in exer_exlabs %}
+	    {% for exlab in exer_labs %}
 	        <tr>
 		        <td>{{ exlab.get_teacher_full_name }}</td>
 		        <td>
@@ -215,7 +203,6 @@
 		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ exlab.classroom.all|join:", " }}</td> 
 		        <td>{{ exlab.get_group_limit }}</td>
 		        <td>{{ exlab.enrolled }}</td>
 	        	<td>
@@ -243,14 +230,14 @@
 	
 	{% if seminar %}
 	<h3>Seminarium:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
-	    {% for ea in seminar %}
+	    {% for sem in seminar %}
 	        <tr>
 		        <td>{{ sem.get_teacher_full_name }}</td>
 		        <td>
@@ -258,7 +245,6 @@
 		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ sem.classroom.all|join:", " }}</td> 
 		        <td>{{ sem.get_group_limit }}</td>
 		        <td>{{ sem.enrolled }}</td>
 	        	<td>
@@ -285,10 +271,10 @@
 
 	{% if language %}
 	<h3>Lektorat:</h3>
-    <table>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
@@ -300,7 +286,6 @@
 		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ lang.classroom.all|join:", " }}</td> 
 		        <td>{{ lang.get_group_limit }}</td>
 		        <td>{{ lang.enrolled }}</td>
 	        	<td>
@@ -326,11 +311,11 @@
     {% endif %}   
 	
 	{% if sport %}
-	<h3>Pracownia:</h3>
-    <table>
+	<h3>Zajęcia:</h3>
+    <table class="subject-details-table">
     	<thead>
     		<tr>
-    			<th>Prowadzący</th><th>Termin zajęć</th><th>Sala</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
+    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th></th><th></th>
     		</tr>
     	</thead>
     	<tbody>
@@ -342,7 +327,6 @@
 		               {{d}}<br/>
 		            {% endfor %}
 		        </td>
-		        <td>{{ ss.classroom.all|join:", " }}</td> 
 		        <td>{{ ss.get_group_limit }}</td>
 		        <td>{{ ss.enrolled }}</td>
 	        	<td>

@@ -3,8 +3,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from users.exceptions import NonEmployeeException
+from users.exceptions import NonEmployeeException, NonStudentException
 from enrollment.subjects.models import Group
+
+import logging
+logger = logging.getLogger()
 
 class BaseUser(models.Model):
     '''
@@ -12,6 +15,12 @@ class BaseUser(models.Model):
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
     user = models.OneToOneField(User)
+    receive_mass_mail_enrollment = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia Zapisów")
+    receive_mass_mail_offer = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia OD")
     
     def get_full_name(self):
         return self.user.get_full_name()
@@ -21,6 +30,7 @@ class BaseUser(models.Model):
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
+            logger.error('Getter(user_id = %d) in BaseUser throws User.DoesNotExist exception.' % user_id )
             raise NonUserException
         return user
     
@@ -32,9 +42,6 @@ class Employee(BaseUser):
     Employee.
     '''
     consultations = models.TextField(verbose_name="konsultacje")
-    receive_mass_mail_offer = models.BooleanField(
-        default = True, 
-        verbose_name="otrzymuje mailem ogłoszenia OD")
     
     @staticmethod
     def get_all_groups(user_id):
@@ -43,6 +50,7 @@ class Employee(BaseUser):
             employee = user.employee
             groups = Group.objects.filter(teacher=employee)
         except Employee.DoesNotExist:
+             logger.error('Function Employee.get_all_groups(user_id = %d) wthrows Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
         return groups
     
@@ -58,6 +66,7 @@ class Employee(BaseUser):
                 group.subject_ = group.subject
             return groups
         except Employee.DoesNotExist:
+             logger.error('Function Employee.get_schedule(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
          
     class Meta:
@@ -73,12 +82,37 @@ class Student(BaseUser):
     Student.
     '''
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
+    ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
-    receive_mass_mail_offer = models.BooleanField(
-        default = True, 
-        verbose_name="otrzymuje mailem ogłoszenia OD")
     type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
 
+    
+    @staticmethod
+    def get_all_groups(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            groups = map(lambda x: x.group, student.records.all())
+        except Student.DoesNotExist:
+             logger.error('Function Student.get_all_groups(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             raise NonStudentException()
+        return groups
+    
+    @staticmethod
+    def get_schedule(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            groups = Student.get_all_groups(user_id)
+            subjects = set([group.subject for group in groups])
+            for group in groups:
+                group.terms_ = group.get_all_terms()
+                group.subject_ = group.subject
+            return groups
+        except Student.DoesNotExist:
+             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             raise NonStudentException()
+         
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'

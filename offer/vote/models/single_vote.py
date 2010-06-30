@@ -46,3 +46,30 @@ class SingleVote ( models.Model ):
         current_state = SystemState.get_state(year)
         votes = SingleVote.objects.filter( student=voter, state=current_state)
         return votes
+
+    @staticmethod
+    def get_points_and_voters( proposal, year=date.today().year ):
+        """
+            Gets proposal points and voters count in specified year
+        """
+        current_state = SystemState.get_state(year)
+        votes = SingleVote.objects.filter( subject = proposal, state=current_state )
+        value = 0
+        voters = votes.count()
+        for vote in votes:
+            value += vote.value
+            
+        return value, voters
+
+    @staticmethod
+    def get_voters( proposal, year=date.today().year ):
+        """
+            Gets users who voted for specified proposal
+        """
+        current_state = SystemState.get_state(year)
+        votes = SingleVote.objects.filter( subject = proposal, state=current_state )
+        
+        users = []
+        for vote in votes:
+            users.append(vote.student.user)
+        return users
