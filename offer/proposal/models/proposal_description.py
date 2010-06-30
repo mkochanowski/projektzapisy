@@ -38,8 +38,6 @@ class ProposalDescription(models.Model):
     tags         = models.ManyToManyField(ProposalDescriptionTag, blank = True)
     author       = models.ForeignKey(User, related_name='autor')
     
-    type         = models.CharField(max_length = 30, choices = PROPOSAL_TYPES, 
-                                     verbose_name = 'typ')
     ects         = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
     
     lectures     = models.IntegerField(verbose_name = 'ilość godzin wykładów', 
@@ -51,7 +49,6 @@ class ProposalDescription(models.Model):
     laboratories = models.IntegerField(verbose_name =' ilość godzin pracowni', 
                                             choices = PROPOSAL_HOURS)
     deleted = models.BooleanField(verbose_name='usunięty', default=False)
-    
     web_page = models.CharField( verbose_name = 'Strona WWW', 
                                 max_length   = 200,
                                 blank        = True,
@@ -116,4 +113,13 @@ class ProposalDescription(models.Model):
             self.tags.remove(tag)
         except ProposalDescriptionTag.DoesNotExist:
             pass
+
+    def types(self):
+        """
+            Return proposal types
+        """
+        tmp = {}
+        for types in self.descriptiontypes.all():
+            tmp[types.id] = types
+        self.type = tmp
 

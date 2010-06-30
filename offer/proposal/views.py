@@ -14,7 +14,9 @@ from django.template                import RequestContext
 from django.shortcuts               import redirect
 from copy                           import deepcopy
 
-from offer.proposal.models          import Proposal, Book, ProposalDescription
+from fereol.users.models            import Type
+
+from offer.proposal.models          import Proposal, Book, ProposalDescription, Types, DescriptionTypes
 from offer.proposal.exceptions      import NonStudentException, NonEmployeeException, NotOwnerException
 
 @login_required
@@ -94,7 +96,8 @@ def proposal( request, slug, descid = None ):
             'fans'          : proposal_.fans_count(),
             'teachers'      : proposal_.teachers_count(),
             'helpers'       : proposal_.helpers_count(),
-            'can_edit'      : can_edit
+            'can_edit'      : can_edit,
+            'types'         : proposal_.description.descriptiontypes.all()
     }
     return render_to_response( 'offer/proposal/view.html', data, context_instance = RequestContext( request ) )
 
@@ -103,6 +106,7 @@ def proposal_form(request, sid = None):
     """
         Form to add and edit proposal
     """
+    
     edit_mode = True if sid else False    
     message = None
     books_to_form = []
@@ -111,7 +115,13 @@ def proposal_form(request, sid = None):
     proposal_requirements = ""
     proposal_comments = ""
     proposal_www = ""
-    
+    types_name = Types.get_types()
+
+    types_table = {}
+
+    for type_name in types_name:
+        types_table[type_name.id] = type_name
+
     proposal_ = None
     if edit_mode:
         try:
@@ -120,6 +130,7 @@ def proposal_form(request, sid = None):
             proposal_requirements = proposal_.description().requirements
             proposal_comments = proposal_.description().comments
             proposal_www      = proposal_.description().web_page
+        
         except:            
             edit_mode = False
     
@@ -136,7 +147,6 @@ def proposal_form(request, sid = None):
         proposal_requirements = request.POST.get('requirements', '')
         proposal_comments = request.POST.get('comments', '')
         proposal_owner = request.POST.get('owner', 'no')
-        proposal_type = request.POST.get('type', '')
         proposal_www = request.POST.get('web-page', '')
         
         if (proposal_owner == "yes"
@@ -162,31 +172,35 @@ def proposal_form(request, sid = None):
         proposal_laboratories = int(request.POST.get('laboratories', -1))        
         
         books = request.POST.getlist('books[]')
-        
+        types = request.POST.getlist('types[]')
+
         proposal_.name = proposal_name
         proposal_.slug = proposal_.create_slug(proposal_.name)             
         
         if Proposal.objects.filter(slug = proposal_.slug).exclude(id = proposal_.id).count() > 0:                
             message = 'Istnieje już przedmiot o takiej nazwie'
             correct_form = False                                                 
-            
-        if  (proposal_name == "" or proposal_ects == "" or proposal_description == ""
-            or proposal_requirements == "" or proposal_type == ""
-            or proposal_lectures == -1 or proposal_repetitories == -1
-            or proposal_exercises == -1 or proposal_laboratories == -1):
+
+        number_of_types = 0
+        for one_type in types:
+            if one_type != "":
+                number_of_types = number_of_types + 1
+        print number_of_types
+
+        if  ( proposal_name == "" or proposal_ects == "" or proposal_description == ""
+            or proposal_requirements == "" or proposal_lectures == -1
+            or proposal_repetitories == -1 or proposal_exercises == -1
+            or proposal_laboratories == -1):
             message = ('Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' +
                 'punktów ECTS oraz liczbę godzin zajęć.')
             correct_form = False
-                                
+                                        
         if correct_form:
-                        
-            proposal_.save()
-            
+            proposal_.save()                
             description = ProposalDescription()
             description.author = request.user
             description.description = proposal_description
             description.requirements = proposal_requirements
-            description.type = proposal_type
             description.ects = proposal_ects
             description.lectures = proposal_lectures
             description.repetitories = proposal_repetitories
@@ -197,39 +211,7 @@ def proposal_form(request, sid = None):
             description.date = datetime.now()
             description.proposal = proposal_
             description.save()
-
-            # TODO: to poniżej było przekombinowane (szczególnie pod względem
-            # ilości danych, jakie przesyłaliśmy przez formularz). Nie wywalam
-            # kodu, na wypadek, jakbyśmy chcieli oszczędzić usuwanych książek.
-
-#            bookOrder = request.POST['bookOrder'].split(';')
-#            newBooksOrder = []
-#            oldBooksOrder = {}
-#            new_book_counter = 0
-#            orderNumber = 1
-                        
-#            for order in bookOrder:
-#                if order == '_':
-#                    if books[new_book_counter] != "":
-#                        newBooksOrder.append(orderNumber)
-#                        orderNumber += 1
-#
-#                    new_book_counter += 1
-#                else:
-#                    book = request.POST.get('book' + str(order), None)
-#                    if book:
-#                        oldBooksOrder[int(order)] = orderNumber
-#                        orderNumber += 1
             
-#            for book in proposal.books.all():
-#                fieldValue =  request.POST.get('book' + str(book.id), None)
-#                if fieldValue != None:
-#                    if fieldValue == "":
-#                        book.delete()
-#                    else:
-#                        book.name = fieldValue
-#                        book.order = oldBooksOrder[book.id]
-#                        book.save()
 
             # to tutaj można sobie pooszczędzać na usuwanych obiektach
             # (patrz TODO kilkadziesiąt linijek wyżej)
@@ -243,14 +225,17 @@ def proposal_form(request, sid = None):
                     Book(name = book_name, proposal = proposal_, order = new_book_counter).save()
                     new_book_counter += 1
                                         
-                    
+            for type_id in types:
+                if type_id != "":
+                    DescriptionTypes(description = description, lecture_type = types_table[int(type_id)]).save()
+
             success = True                                     
                                                
             if edit_mode:
                 message = 'Zmiany zostały wprowadzone.'
             else:
                 message = 'Przedmiot został dodany.'
-        
+    
     if proposal_ and proposal_.id:
         books_to_form = list(proposal_.books.all())
         
@@ -258,7 +243,7 @@ def proposal_form(request, sid = None):
     if request.method == "POST" and not success:
         for book_name in request.POST.getlist('books[]'):
             books_to_form.append({ "id" : None, "name" : book_name})
-    
+
     proposals_ = Proposal.objects.filter(deleted=False)
     data = {
         'editForm'  : True,
@@ -272,8 +257,9 @@ def proposal_form(request, sid = None):
         'proposalWWW'           : proposal_www,
         'mode'          : 'form',
         'proposals'     : proposals_,
-        'proposalTypes' : offer.proposal.models.proposal_description.PROPOSAL_TYPES,
         'proposalHours' : offer.proposal.models.proposal_description.PROPOSAL_HOURS,
+        'types': proposal_.description().descriptiontypes.all(),
+        'typesName' : types_name
     }
     
     if success:
@@ -316,6 +302,10 @@ def proposal_restore ( request, descid ):
     newdesc.date        = datetime.now()
     newdesc.author      = request.user
     newdesc.save()
+    
+    for proposal_type in olddesc.descriptiontypes.all():
+        DescriptionTypes(description = newdesc, lecture_type = proposal_type.lecture_type).save()
+
     return redirect("proposal-page", olddesc.proposal.slug )
 
 @permission_required('proposal.can_delete_proposal')

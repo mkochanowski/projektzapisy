@@ -11,16 +11,31 @@
         </p>
 
         <ul class="infoBox">
-            <li>
-                <label for="od-proposal-form-type">Sugerowany rodzaj:</label>
-                <select name="type" id="od-proposal-form-type" class="main-labelledSelect">
-                    {% if not proposal.description.type %}
-                        <option class="label" value="">- wybierz -</option> {# TODO: usuwać przez js po wybraniu #}
-                    {% endif %}
-                    {% for type in proposalTypes %}
-                        <option value="{{ type.0 }}" {% ifequal proposal.description.type type.0 %}selected="selected"{% endifequal %}>{{ type.1 }}</option>
-                    {% endfor %}
-                </select>
+            <li id="od-proposal-form-types">
+                Typ przedmiotu:
+                <ul>
+                            {% if types %}
+                                {% for type in types %}
+                                <li class="type">{{type.lecture_type}} {{typeName}}
+                                    <select name="types[]">
+                                      {% for typeName in typesName %} 
+                                         <option value="{{ typeName.id }}"{% ifequal typeName.id type.lecture_type.id %} selected="selected"{% endifequal %}>{{ typeName.name }}</option>
+                                      {% endfor %}
+                                     </select>
+                                </li>
+                                {% endfor %}
+                            {% else %}
+                    <li class="type">
+                        <select name="types[]">
+                                 <option class="label" value="">- wybierz -</option>
+                                 {% for typeName in typesName %}
+                                 <option value="{{ typeName.id }}">{{ typeName.name }}</option>
+                                 {% endfor %}
+                            {% endif %}
+                         </select>
+                    </li>
+                </ul>
+            </li>
             </li>
             <li class="proposedOwner">
                 <label>Zablokuj innym edycję:</label>

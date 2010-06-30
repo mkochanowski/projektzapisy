@@ -77,7 +77,8 @@ class Student(BaseUser):
     receive_mass_mail_offer = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia OD")
-    
+    type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
+
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'
@@ -85,3 +86,29 @@ class Student(BaseUser):
     
     def __unicode__(self):
         return str(self.user)
+
+class Type( models.Model ):
+    """
+        Model przechowuje informacje o typie studiow
+    """
+    name = models.CharField(max_length=30, unique=True, verbose_name="Typ")
+
+    class Meta:
+        """
+            Klasa django
+        """
+        verbose_name = 'Typ studiów'
+        verbose_name_plural = 'Typy studiów'
+
+    def __unicode__(self):
+        """
+            metoda django
+        """
+        return self.name
+
+    @staticmethod
+    def get_types():
+        """
+            Typy studiow
+        """
+        return Type.objects.all()

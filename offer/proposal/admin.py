@@ -9,7 +9,9 @@ from django.contrib import admin
 from offer.proposal.models import Proposal, \
                                   ProposalDescription, \
                                   ProposalTag, \
-                                  ProposalDescriptionTag
+                                  ProposalDescriptionTag,\
+                                  Types, \
+                                  DescriptionTypes
 
 class ProposalAdmin( admin.ModelAdmin ):
     """
@@ -22,3 +24,5 @@ admin.site.register( Proposal, ProposalAdmin )
 admin.site.register( ProposalDescription )
 admin.site.register( ProposalTag )
 admin.site.register( ProposalDescriptionTag )
+admin.site.register( Types )
+admin.site.register( DescriptionTypes )
