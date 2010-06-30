@@ -272,7 +272,9 @@ def proposal_form(request, sid = None):
     
     if proposal_ and proposal_.id:
         books_to_form = list(proposal_.books.all())
-        
+        types = proposal_.description().descriptiontypes.all()
+    else:
+        types = None
         
     if request.method == "POST" and not success:
         for book_name in request.POST.getlist('books[]'):
@@ -292,7 +294,7 @@ def proposal_form(request, sid = None):
         'mode'          : 'form',
         'proposals'     : proposals_,
         'proposalHours' : offer.proposal.models.proposal_description.PROPOSAL_HOURS,
-        'types': proposal_.description().descriptiontypes.all(),
+        'types': types,
         'typesName' : types_name
     }
     
