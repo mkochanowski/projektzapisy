@@ -113,6 +113,7 @@ class Student(BaseUser):
              logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
          
+
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'
