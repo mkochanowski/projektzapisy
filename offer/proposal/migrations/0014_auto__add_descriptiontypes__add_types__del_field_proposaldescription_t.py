@@ -8,14 +8,37 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Changing field 'DescriptionTypes.description'
-        db.alter_column('proposal_descriptiontypes', 'description_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.ProposalDescription']))
+        # Adding model 'DescriptionTypes'
+        db.create_table('proposal_descriptiontypes', (
+            ('lecture_type', self.gf('django.db.models.fields.related.ForeignKey')(related_name='descriptionstypes', to=orm['proposal.Types'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('description', self.gf('django.db.models.fields.related.ForeignKey')(related_name='descriptiontypes', to=orm['proposal.ProposalDescription'])),
+        ))
+        db.send_create_signal('proposal', ['DescriptionTypes'])
+
+        # Adding model 'Types'
+        db.create_table('proposal_types', (
+            ('meta_type', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Types'], null=True, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.TextField')()),
+        ))
+        db.send_create_signal('proposal', ['Types'])
+
+        # Deleting field 'ProposalDescription.type'
+        db.delete_column('proposal_proposaldescription', 'type')
     
     
     def backwards(self, orm):
         
-        # Changing field 'DescriptionTypes.description'
-        db.alter_column('proposal_descriptiontypes', 'description_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal']))
+        # Deleting model 'DescriptionTypes'
+        db.delete_table('proposal_descriptiontypes')
+
+        # Deleting model 'Types'
+        db.delete_table('proposal_types')
+
+        # Adding field 'ProposalDescription.type'
+        db.add_column('proposal_proposaldescription', 'type', self.gf('django.db.models.fields.CharField')(default='cs_1', max_length=30), keep_default=False)
     
     
     models = {
@@ -66,8 +89,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'DescriptionTypes'},
             'description': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptiontypes'", 'to': "orm['proposal.ProposalDescription']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'lecture_type': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptionstypes'", 'to': "orm['proposal.Types']"}),
-            'study_type': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptionstype'", 'to': "orm['users.Type']"})
+            'lecture_type': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptionstypes'", 'to': "orm['proposal.Types']"})
         },
         'proposal.proposal': {
             'Meta': {'object_name': 'Proposal'},
@@ -97,7 +119,6 @@ class Migration(SchemaMigration):
             'repetitories': ('django.db.models.fields.IntegerField', [], {}),
             'requirements': ('django.db.models.fields.TextField', [], {}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalDescriptionTag']", 'blank': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'web_page': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         },
         'proposal.proposaldescriptiontag': {
@@ -121,13 +142,16 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Employee'},
             'consultations': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
+            'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'records_opening_delay_hours': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
