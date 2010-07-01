@@ -285,10 +285,14 @@ def proposal_form(request, sid = None):
         exam = proposal_.is_exam()
     except ValueError:
         exam = False
+    except AttributeError:
+        exam = False
         
     try:
         english = proposal_.in_english()
     except ValueError:
+        english = False
+    except AttributeError:
         english = False
     
     data = {
