@@ -15,12 +15,17 @@
 
 #od-prefs-subjtype
 {
-	width: 350px;
+	width: 300px;
 }
 
 #od-prefs-other
 {
-	width: 300px;
+	width: 400px;
+}
+
+#od-prefs-other span.checkbox
+{
+    width: 390px;
 }
 
 /******************************************************************************/
@@ -84,7 +89,7 @@ ul#od-prefs-undecided input:hover
 
     padding: 5px 10px;
     font-size: 13px;
-    width: 380px;
+    width: 530px;
     margin: auto;
     margin-top: 20px;
 

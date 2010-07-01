@@ -18,6 +18,8 @@ Vote.init = function()
         $('#od-vote-q')[0].value = TopBarFilter.emptyFilterText;
     });
 
+    Vote.typeFilterForm = new SubjectTypeFilterForm($('#od-vote-subjtype')[0]);
+
     // licznik punktów dla konkretnego semestru
     var assignSemesterCounter = function(semesterNode)
     {
@@ -113,6 +115,8 @@ Vote.init = function()
             Vote.maxPoints + ', a oddano głos o watości ' + Vote.totalPoints + '.');
         return false;
     });
+
+    $('#od-prefs-top-bar').find('label').each(DisableControlDrag.jQueryCallback);
 };
 
 $(Vote.init);
@@ -271,7 +275,7 @@ Vote.Filter.readFilterFromForm = function()
         newFilter.setPhrase(phrase);
     newFilter.setOnlyWanted($('#od-vote-onlywanted')[0].checked);
 
-    newFilter.subjectTypes = SubjectTypeFilter.readFilterFromForm($('#od-vote-subjtype'));
+    newFilter.subjectTypes = Vote.typeFilterForm.readFilter();
 
     return newFilter;
 };
@@ -288,7 +292,7 @@ Vote.Filter.prototype.saveFilterToForm = function()
 
     $('#od-vote-onlywanted')[0].checked = this.onlyWanted;
 
-    this.subjectTypes.saveFilterToForm($('#od-vote-subjtype'));
+    Vote.typeFilterForm.saveFilter(this.subjectTypes);
 };
 
 /**

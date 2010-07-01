@@ -138,6 +138,13 @@
         }
     }, 
     {
+        "pk": 5, 
+        "model": "proposal.proposaltag", 
+        "fields": {
+            "name": "exam"
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "proposal.proposal", 
         "fields": {
@@ -339,6 +346,25 @@
             "teachers": [], 
             "owner": null, 
             "slug": "zastosowanie-teorii-kategorii-do-konstruowania-programow"
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "proposal.proposal", 
+        "fields": {
+            "name": "Fizyka dla informatyk\u00f3w", 
+            "tags": [
+                1, 
+                2, 
+                4, 
+                5
+            ], 
+            "deleted": false, 
+            "fans": [], 
+            "helpers": [], 
+            "teachers": [], 
+            "owner": null, 
+            "slug": "fizyka-dla-informatykow"
         }
     }, 
     {
@@ -577,6 +603,26 @@
             "web_page": null, 
             "date": "2010-06-12 11:05:37", 
             "proposal": 12, 
+            "laboratories": 0, 
+            "tags": []
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "proposal.proposaldescription", 
+        "fields": {
+            "lectures": 30, 
+            "requirements": "analiza matematyczna", 
+            "description": "Przedmiot obowi\u0105zkowy dla studi\u00f3w in\u017cynierskich \r\n\r\n Tre\u015bci kszta\u0142cenia: Elementy mechaniki klasycznej. Grawitacja. Elementy elektryczno\u015bci, optyki i akustyki. Wprowadzenie do mechaniki kwantowej. Podstawy oblicze\u0144 kwantowych. \r\n\r\n Umiej\u0119tno\u015bci: Analizowania i wyja\u015bniania obserwowanych zjawisk; tworzenia i wery\u001ckacji modeli \u015bwiata rzeczywistego oraz pos\u0142ugiwania si\u0119 nimi w celu predykcji zdarze\u0144 i stan\u00f3w.", 
+            "author": 1, 
+            "deleted": false, 
+            "ects": 6, 
+            "comments": "", 
+            "repetitories": 0, 
+            "exercises": 30, 
+            "web_page": "", 
+            "date": "2010-06-30 19:25:15", 
+            "proposal": 13, 
             "laboratories": 0, 
             "tags": []
         }
@@ -1143,6 +1189,22 @@
         "fields": {
             "lecture_type": 7, 
             "description": 12
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "proposal.descriptiontypes", 
+        "fields": {
+            "lecture_type": 3, 
+            "description": 13
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "proposal.descriptiontypes", 
+        "fields": {
+            "lecture_type": 12, 
+            "description": 13
         }
     }
 ]

@@ -31,10 +31,9 @@
 		</fieldset>
 		<fieldset id="od-vote-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
-			{% for type in proposalTypes %}
-                <span class="checkbox">
-                    <input type="checkbox" checked="checked" id="filter-subject-type-{{ type.id }}" value="{{ type.id }}"/>
-                    <input type="hidden" class="meta-type" value="{{ type.meta_type }}" />
+            {% for type in proposalTypes %}
+				<span class="checkbox">
+                    <input type="checkbox" checked="checked" id="filter-subject-type-{{ type.id }}" {% if type.meta_type %} class="filter-subject-type-meta" {% endif %} value="{{ type.id }}"/>
                     <input type="hidden" class="group-id" value="{{ type.group.id }}" />
                     <label for="filter-subject-type-{{ type.id }}">{{ type.name }}</label>
                 </span>

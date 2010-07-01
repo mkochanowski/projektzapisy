@@ -28,7 +28,7 @@
 
         <ul class="infoBox">
            {% if proposal.owner %} <li>Właściciel: <a href="{% url profile proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
-            <li>Sugerowany rodzaj: {% for type in types %} {{ type.lecture_type }} {% endfor %}</li>
+            <li>Sugerowany rodzaj: {% for type in types %}{{ type.lecture_type }}{% if not forloop.last %}; {% endif %}{% endfor %}</li>
             {% if proposal.description.lectures or proposal.description.repetitories or proposal.description.exercises or proposal.laboratories %}
             <li class="proposedTime">
                 Wymiar godzin:
@@ -82,7 +82,7 @@
                     {% else %}
                         <a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
                     {% endif %}
-                    chętnych: {{fans}}
+                    (chętnych: {{fans}})
                 {% else %}
                     Chętnych do nauki: {{fans}}
                 {% endif %}
@@ -94,7 +94,7 @@
                     {% else %}
                         <a href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
                     {% endif %}
-                    chętnych: {{teachers}}
+                    (chętnych: {{teachers}})
                 {% else %}
                     Poprowadzą: {{teachers}}
                 {% endif %}
@@ -106,7 +106,7 @@
                     {% else %}
                         <a href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
                     {% endif %}
-                    chętnych: {{helpers}}
+                    (chętnych: {{helpers}})
                 {% else %}
                     Pomogą prowadzić: {{helpers}}
                 {% endif %}

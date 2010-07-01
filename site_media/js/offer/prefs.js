@@ -27,6 +27,8 @@ Prefs.init = function()
         Prefs.subjects.push(sub);
     }
 
+    Prefs.typeFilterForm = new SubjectTypeFilterForm($('#od-prefs-subjtype')[0]);
+
     Prefs.emptyFilterWarning = document.createElement('p');
     Prefs.emptyFilterWarning.className = 'emptyFilterWarning';
     Prefs.emptyFilterWarning.style.display = 'none';
@@ -91,6 +93,8 @@ Prefs.init = function()
         Prefs.emptyMessage = Prefs.emptyMessage[0];
     else
         Prefs.emptyMessage = null;
+
+    $('#od-prefs-top-bar').find('label').each(DisableControlDrag.jQueryCallback);
 };
 
 $(Prefs.init);
@@ -170,7 +174,7 @@ Prefs.Undecided.prototype.init = function()
 
             var sub = new Prefs.Subject();
             sub.id = data.id;
-            sub.type = data.types;
+            sub.types = data.types;
             sub.name = data.name;
             sub.hideURL = data.hideurl;
             sub.unhideURL = data.unhideurl;
@@ -246,7 +250,7 @@ Prefs.Undecided.prototype.init = function()
 Prefs.Subject = function()
 {
     this.id = null;
-    this.type = null;
+    this.types = new Array();
     this.name = null;
     this.collapsed = false;
     this.hidden = false;
@@ -262,7 +266,7 @@ Prefs.Subject.fromElement = function(element)
 
     var sub = new Prefs.Subject();
     sub.id = Number(el.children('.pref-id').val());
-    sub.type = el.children('.pref-type').val();
+    sub.types = el.children('.pref-type').val().trim().split(new RegExp(' +'));
     sub.name = el.children('.name').text().trim();
     sub.hideURL = el.children('.pref-hide-url').val().trim();
     sub.unhideURL = el.children('.pref-unhide-url').val().trim();
@@ -390,7 +394,7 @@ Prefs.doFilter = function(filter)
                 isVisible = false;
 
         if (isVisible)
-            isVisible = filter.subjectTypes.isEnabled(sub.type);
+            isVisible = filter.subjectTypes.isAnyEnabled(sub.types);
 
         if (isVisible && filter.phrase != '')
            isVisible = (sub.name.toLowerCase().indexOf(filter.phrase) >= 0);
@@ -449,7 +453,7 @@ Prefs.Filter.readFilterFromForm = function()
     if (phrase != TopBarFilter.emptyFilterText)
         newFilter.setPhrase(phrase);
 
-    newFilter.subjectTypes = SubjectTypeFilter.readFilterFromForm($('#od-prefs-subjtype'));
+    newFilter.subjectTypes = Prefs.typeFilterForm.readFilter();
 
     newFilter.setShowHidden($('#od-prefs-hidden')[0].checked);
 
@@ -466,7 +470,7 @@ Prefs.Filter.prototype.saveFilterToForm = function()
     else
         $('#od-prefs-q')[0].value = this.phrase;
 
-    this.subjectTypes.saveFilterToForm($('#od-prefs-subjtype'));
+    Prefs.typeFilterForm.saveFilter(this.subjectTypes);
 
     $('#od-prefs-hidden')[0].checked = this.showHidden;
 };

@@ -478,6 +478,11 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus
 	outline-radius: 5px;
 }
 
+input[type=checkbox].partialCheck
+{
+    opacity: 0.6;
+}
+
 input.bigButton
 {
     padding: 5px 20px;
@@ -486,6 +491,14 @@ input.bigButton
 .mcePlaceHolder
 {
     display: inline-block !important;
+}
+
+.filter-subject-type-metaSwitch
+{
+    float: right;
+    clear: left;
+    font-size: 10px;
+    margin-bottom: -6px;
 }
 
 /*** KOMPONENTY - koniec ***/
