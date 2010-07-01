@@ -205,14 +205,14 @@ def proposal_form(request, sid = None):
             or proposal_requirements == "" or proposal_lectures == -1
             or proposal_repetitories == -1 or proposal_exercises == -1
             or proposal_laboratories == -1):
-            message = ('Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' +
-                'punktów ECTS oraz liczbę godzin zajęć.')
-            correct_form = False
-                                        
+                message = ('Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' +
+                    'punktów ECTS oraz liczbę godzin zajęć.')
+                correct_form = False
+        
         if correct_form:
-
-            proposal_.save()
             
+            proposal_.save()
+ 
             if proposal_exam == 'yes':
                 proposal_.add_tag('exam')
             else:
@@ -222,7 +222,7 @@ def proposal_form(request, sid = None):
                 proposal_.add_tag('english')
             else:
                 proposal_.remove_tag('english')
-                
+        
             description = ProposalDescription()
             description.author = request.user
             description.description = proposal_description
@@ -281,21 +281,33 @@ def proposal_form(request, sid = None):
             books_to_form.append({ "id" : None, "name" : book_name})
 
     proposals_ = Proposal.objects.filter(deleted=False)
+    try:
+        exam = proposal_.is_exam()
+    except ValueError:
+        exam = False
+        
+    try:
+        english = proposal_.in_english()
+    except ValueError:
+        english = False
+    
     data = {
-        'editForm'  : True,
-        'editMode'  : edit_mode,
-        'message'   : message,
-        'proposal'  : proposal_,
-        'books'     : books_to_form,
+        'editForm'              : True,
+        'editMode'              : edit_mode,
+        'message'               : message,
+        'proposal'              : proposal_,
+        'books'                 : books_to_form,
         'proposalDescription'   : proposal_description,
         'proposalRequirements'  : proposal_requirements,
         'proposalComments'      : proposal_comments,
         'proposalWWW'           : proposal_www,
-        'mode'          : 'form',
-        'proposals'     : proposals_,
-        'proposalHours' : offer.proposal.models.proposal_description.PROPOSAL_HOURS,
-        'types': types,
-        'typesName' : types_name
+        'exam'                  : exam,
+        'english'               : english,
+        'mode'                  : 'form',
+        'proposals'             : proposals_,
+        'proposalHours'         : offer.proposal.models.proposal_description.PROPOSAL_HOURS,
+        'types'                 : types,
+        'typesName'             : types_name
     }
     
     if success:

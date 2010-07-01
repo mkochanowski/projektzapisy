@@ -99,14 +99,14 @@
                 <label for="od-proposal-form-exam">Egzamin:</label>
                 <select class="main-labelledSelect" id="od-proposal-form-exam" name="exam">
                    <option value="no">Nie</option>
-                   <option value="yes" {% if proposal.is_exam %}selected="selected"{% endif %}>Tak</option>
+                   <option value="yes" {% if exam %}selected="selected"{% endif %}>Tak</option>
                 </select>
             </li> 
             <li class="classesInEnglish">
                 <label for="od-proposal-form-classes-in-english">Możliwe zajęcia w języku angielskim:</label>
                 <select class="main-labelledSelect" id="od-proposal-form-classes-in-english" name="classes-in-english">
                    <option value="no">Nie</option>
-                   <option value="yes" {% if proposal.in_english %}selected="selected"{% endif %}>Tak</option>
+                   <option value="yes" {% if english %}selected="selected"{% endif %}>Tak</option>
                 </select>
             </li> 
         </ul>
