@@ -39,8 +39,13 @@ def subject(request, slug):
         
         try:
             student = request.user.student
-            #subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
-            #subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
+            subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
+            subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
+            subject.user_enrolled_to_eaoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '4')
+            subject.user_enrolled_to_exlaboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '5')
+            subject.user_enrolled_to_seminar = Record.is_student_in_subject_group_type(request.user.id, slug, '6')
+            subject.user_enrolled_to_langoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '7')
+            subject.user_enrolled_to_ssoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '8')
             subject.is_recording_open = subject.is_recording_open_for_student(student)
         except Student.DoesNotExist:
             pass
