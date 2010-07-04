@@ -46,7 +46,6 @@ class EmployeeScheduleTest(TestCase):
     def testEmployeeSchedule(self):
         subject_1 = Subject.objects.get(id=1)
         subject_1.semester.date = datetime.now().year
-        subject_1.semester.type = "z"
         subject_1.semester.save()
         
         groups = Employee.get_schedule(self.user.id)
@@ -81,7 +80,6 @@ class StudentScheduleTest(TestCase):
     def testStudentSchedule(self):
         subject_1 = Subject.objects.get(id=1)
         subject_1.semester.date = datetime.now().year
-        subject_1.semester.type = "z"
         subject_1.semester.save()
         
         groups = Student.get_schedule(self.user.id)
