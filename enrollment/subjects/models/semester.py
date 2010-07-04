@@ -28,9 +28,9 @@ class Semester( models.Model ):
         return '%s %i/%i' % (self.get_type_display() , self.year, self.year + 1)
 
     def is_current_semester(self):
-        """ Answers to question: is semester current semester"""
-        return (self.year == datetime.now().year and self.type == TYPE_WINTER) or (self.year+1 == datetime.now().year and self.type == TYPE_SUMMER)
-
+        """ Answers to question: is semester current semester""" 
+        return (self.year == datetime.now().year and self.type == self.TYPE_WINTER) or (self.year + 1 == datetime.now().year and self.type == self.TYPE_SUMMER)
+    
     @staticmethod
     def is_visible(id):
         """ Answers if subject is sat as visible (displayed on subject lists) """

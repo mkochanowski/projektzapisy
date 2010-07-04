@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 
@@ -42,8 +44,13 @@ class EmployeeScheduleTest(TestCase):
         self.assertRaises(NonEmployeeException, Employee.get_schedule, self.user.id)
         
     def testEmployeeSchedule(self):
-        groups = Employee.get_schedule(self.user.id)
         subject_1 = Subject.objects.get(id=1)
+        subject_1.semester.date = datetime.now().year
+        subject_1.semester.type = "z"
+        subject_1.semester.save()
+        
+        groups = Employee.get_schedule(self.user.id)
+        
         term_1 = Term.objects.get(id=1).id
         term_2 = Term.objects.get(id=3).id
         
@@ -72,8 +79,13 @@ class StudentScheduleTest(TestCase):
         self.assertRaises(NonStudentException, Student.get_schedule, self.user.id)
         
     def testStudentSchedule(self):
-        groups = Student.get_schedule(self.user.id)
         subject_1 = Subject.objects.get(id=1)
+        subject_1.semester.date = datetime.now().year
+        subject_1.semester.type = "z"
+        subject_1.semester.save()
+        
+        groups = Student.get_schedule(self.user.id)
+        
         term_1 = Term.objects.get(id=1).id
         term_2 = Term.objects.get(id=3).id
         
