@@ -92,7 +92,7 @@ class Student(BaseUser):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            groups = map(lambda x: x.group, student.records.all().filter(status=1))
+            groups = map(lambda x: x.group, student.records.filter(status="1"))
         except Student.DoesNotExist:
              logger.error('Function Student.get_all_groups(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
