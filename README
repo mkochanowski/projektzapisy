@@ -4,7 +4,7 @@ Zależności:
 http://www.python.org/
 - fedora, debian/ubuntu: python
 
-* django >= 1.1
+* django = 1.1.x
 http://www.djangoproject.com/
 - fedora: Django
 - debian/ubuntu: python-django
