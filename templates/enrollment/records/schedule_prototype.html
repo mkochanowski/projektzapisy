@@ -1,15 +1,16 @@
 {% extends "enrollment/base-enrollment.html" %}
  
 {% block styles %}
-    <link rel="stylesheet" href="/site_media/css/jquery/jquery.ui.schedule.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/enrollment/records/schedule-prototype.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="/site_media/css/jquery/jquery.ui.schedule.css" />
+    <link rel="stylesheet" type="text/css" href="/site_media/css/enrollment/records/schedule-prototype.css" />
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
     <script type="text/javascript" src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js"></script>
-    <script src="/site_media/js/jquery/jquery.ui.schedule.js" type="text/javascript"></script>
-    <script src="/site_media/js/enrollment/records/schedule-prototype.js" type="text/javascript"></script>
-    <script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery.ui.schedule.js"></script>
+	<script type="text/javascript" src="/site_media/js/jquery/jquery.ui.filter.js"></script>
+    <script type="text/javascript" src="/site_media/js/enrollment/records/schedule-prototype.js"></script>
+    <script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
 {% endblock %}
  
 {% block main-navigation %}
@@ -24,6 +25,46 @@
 </li>
 {% endblock %}
 
+{% block top-bar %}
+	<div class="main-top-bar">
+		<div id="filter-wrapper">
+		<fieldset id="f-subject-keyword">
+			<legend><span>Filtrowanie</span></legend>
+			<div class="main-filter-input">
+				<input class="text" id="txt-keyword" name="txt-keyword" matchtype="starts" filtrattrs="subjectname,lecturername" onmatch="show" onmismatch="hide" default="Filtruj" type="text" title="Tutaj wpisz fragment nazwy lub prowadzącego" alt="Tutaj wpisz fragment nazwy lub prowadzącego"/>
+				<input class="reset" id="keyword-reset" type="button" value="X" style="display:none;"/>
+			</div>
+		</fieldset>
+		<fieldset id="f-semester">
+			<legend><span>Semestr</span></legend>
+			<select id="cbo-semester" name="cbo-semester" matchtype="exact" filtrattrs="semesterid" onmatch="show" onmismatch="hide">
+                {% for key, name in semesters_list %}
+					<option value='{{ key }}'>{{ name }} </option>
+                {% endfor %}
+            </select>
+		</fieldset>
+		<fieldset id="f-subject-type">
+			<legend><span>Rodzaj przedmiotu</span></legend>
+			{% for key, name in types_list %}
+	            <span class="checkbox">
+	                <input type='checkbox' id="chk-subject-type-{{ forloop.counter0 }}" name='chk-type[{{ forloop.counter0 }}]' matchtype="exact" filtrattrs="subjecttypeid" oncheckedmatch="show" oncheckedmismatch="hide" onuncheckedmatch="hide" onuncheckedmismatch="show" class='subject-type' value='{{ key }}' checked="checked" />
+	                <label for="chk-subject-type-{{ forloop.counter0 }}">{{ name }}</label>
+	            </span>
+			{% endfor %}
+		</fieldset>
+		<fieldset id="f-other">
+			<legend><span>Inne</span></legend>
+            <span class="checkbox">
+            	<input disabled type="checkbox" id="chk-hide-was-assigned" name="chk-hide-was-assigned" matchtype="exact" filtrattrs="wasassigned" oncheckedmatch="hide" oncheckedmismatch="show" onuncheckedmatch="show" onuncheckedmismatch="show" value="1"  />
+				<label for="chk-already-assigned">
+					Schowaj przedmioty na które już byłem zapisany
+				</label>
+			</span>
+		</fieldset>
+		</div>
+	</div>
+{% endblock %}
+
 {% block content %}
     <p id="schedule-message" class="schedule-message">haha</p>
 
@@ -34,9 +75,9 @@
         resignUrl="{% url schedule-prototype-resign %}">
         {% for record in student_records %}
             {% for term in record.group_.terms_ %}
-                <div subjectID="{{record.group_.subject_.pk}}"
-                    groupID="{{record.group_.pk}}"
-                    termID="{{term.pk}}"
+                <div subjectID="{{ record.group_.subject_.pk }}"
+                    groupID="{{ record.group_.pk }}"
+                    termID="{{ term.pk}}"
                     from="{{ term.time_from_in_minutes }}" 
                     minutes="{{ term.length_in_minutes }}" 
                     day="{{ term.day_in_zero_base }}"
@@ -58,28 +99,30 @@
         <h2>Przedmioty:</h2>
         {% for sub in subjects %}
             {% if forloop.first %}<ul>{% endif %}
-                <li>
-                    <span subjectid="{{sub.pk}}" class="schedule-prototype-subject" id="subject{{sub.pk}}">{{sub.name}}
-                    <span class="hide">Schowaj</span></span>
-                    <div style="display:none;">
-                    {% for group in sub.groups.all %}
-                        {% for term in group.term.all %}
-                            <div class="subject{{sub.pk}}"
-                                subjectID="{{sub.pk}}"
-                                groupID="{{group.pk}}"
-                                termID="{{term.pk}}"
-                                from="{{ term.time_from_in_minutes }}" 
-                                minutes="{{ term.length_in_minutes }}" 
-                                day="{{ term.day_in_zero_base }}">
-                                {{group}}<br/>
-                                ({{term.classroom}})
-                            </div>
-                        {% endfor %}
-                    {% endfor %}
-                    </div>
-                </li>
+               <li subjectid="{{ sub.pk }}" class="schedule-prototype-subject" id="subject{{ sub.pk }}"
+						subjectname="{{ sub.name }}" 
+						lecturername="{{ sub.lecturers }}"
+						semesterid="{{ sub.semester.pk }}"
+						subjecttypeid="{{ sub.type.pk }}"
+						wasassigned="0">
+					<span>{{sub.name}}</span>
+					<span class="hide">Schowaj</span>
+				</li>
             {% if forloop.end %}</ul>{% endif %}        
             {% empty %}Brak przedmiotów
         {% endfor %}
+		<div style="display:none;">
+			{% for term in terms %}
+				<div class="subject{{ term.group.subject.pk }}"
+					subjectID="{{ term.group.subject.pk }}"
+					groupID="{{ term.group.pk }}"
+					termID="{{ term.pk }}"
+					from="{{ term.time_from_in_minutes }}" 
+					minutes="{{ term.length_in_minutes }}" 
+					day="{{ term.day_in_zero_base }}">
+					{{term.description}}
+				</div>
+			{% endfor %}
+		</div>
     </div>
 {% endblock %}

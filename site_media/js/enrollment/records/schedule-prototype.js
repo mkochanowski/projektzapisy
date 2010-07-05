@@ -8,7 +8,6 @@ function addSubject(id) {
 			subjectID = $(this).attr('subjectID'), 
 			groupID = $(this).attr('groupID');
 			termID = $(this).attr('termID');
-
 		$('#schedule-wrapper').schedule('addTerm', content, day, from, minutes, subjectID, groupID, termID );
 	});
 }
@@ -42,4 +41,5 @@ $(function(){
 		$('#schedule-wrapper').schedule('tryAssignToPinned');
 	});
 
+	$('#filter-wrapper').filter({elemsToFilterSelector:".schedule-prototype-subject"});
 });

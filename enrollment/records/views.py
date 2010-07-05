@@ -244,17 +244,31 @@ def own(request):
 def schedulePrototype(request):
     try:
         student_records = Record.get_student_all_detiled_records(request.user.id)
-        subjects = Subject.objects.select_related().all()
-        #all_terms = Term.objects.select_related(depth = 2).all()
+        subjects = Subject.objects.select_related(depth = 10).all()
+        for sub in subjects:
+            sub.lecturers = ''
+            for teacher in sub.teachers.all():
+                sub.lecturers =  teacher.user.get_full_name() + ',' + sub.lecturers
+        all_terms = Term.objects.select_related().all()
+        for term in all_terms:
+            term.description = term.group
+        
         #group_with_subjects = Group.objects.select_related(depth = 2).all()
         #subjects = set([g.subject for g in group_with_subjects])
-        
-#       for subject in subjects:
-#           for group in subject.groups_:
-#               group.terms_ = all_terms.filter(group = group)
+        #for subject in subjects:
+        #    for group in subject.groups_:
+        #        group.terms_ = all_terms.filter(group = group)
+        semesters = Semester.objects.filter(visible=True)
+        semesters_list = [(sem.pk, sem.get_name()) for sem in semesters]
+        types = Type.get_all_types_of_subjects()
+        types_list = [(type.pk, type.name) for type in Type.objects.all()] 
+  
         data = {
             'student_records': student_records,
             'subjects': subjects,
+            'semesters_list' : semesters_list, 
+            'types_list' : types_list,
+            'terms' : all_terms
         }
         return render_to_response('enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))
     except NonStudentException:
