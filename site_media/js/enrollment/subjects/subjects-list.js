@@ -14,14 +14,14 @@ function ajaxSuccessCallBack(data) {
    $("#subject-list").append("<ul>" + str + "</ul>");
    
    	$('.subject-link').click(function(){
-      loadSubjectDetails($(this).attr('link'));
+      loadSubjectDetails($(this).attr('link'), $(this));
    })
    
     $("#subject-list").append("<i>Przedmiotow: " + size);
 
 }
 
-function loadSubjectDetails(detailsUrl){
+function loadSubjectDetails(detailsUrl, obj){
     var $detailsDiv = $('#subject-details'),
     $loadingDiv = $('<div>&nbsp;</div>').addClass('subject-details-loading');
     $detailsDiv.append($loadingDiv);
@@ -34,11 +34,13 @@ function loadSubjectDetails(detailsUrl){
             $detailsDiv.empty();
             $detailsDiv.append($(resp));
             $('.subject-details-link').click(function(){
-                loadSubjectDetails($(this).attr('link'));
+                loadSubjectDetails($(this).attr('link'), $(this));
             });
 			try {
 				//sessionStorage.setItem('loaded-subject-detail-url', detailsUrl);
-				jaaulde.utils.cookies.set('loaded-subject-detail-url', detailsUrl);
+        if (obj != null && !obj.hasClass("forget")) {
+          jaaulde.utils.cookies.set('loaded-subject-detail-url', detailsUrl);
+        }
 			} catch(ex) {}
 			$('.subject-details-table tbody tr:even').addClass('even');
         },
@@ -53,7 +55,7 @@ $(function(){
 		//var url = sessionStorage.getItem('loaded-subject-detail-url');
 		var url = jaaulde.utils.cookies.get('loaded-subject-detail-url');
 		if (url != null) {
-			loadSubjectDetails(url);
+			loadSubjectDetails(url, null);
 		}
 	} catch(ex) {}
 });

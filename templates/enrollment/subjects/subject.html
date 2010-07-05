@@ -48,10 +48,10 @@
 	        	{% if subject.is_recording_open %}
 		        	{% if not lec.signed %}
 			            {% ifnotequal lec.get_group_limit lec.enrolled %}
-			                <a class="subject-details-link" link="{% url record-assign lec.id %}">zapisz</a>
+			                <a class="subject-details-link forget" link="{% url record-assign lec.id %}">zapisz</a>
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign lec.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign lec.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
