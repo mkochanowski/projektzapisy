@@ -39,7 +39,6 @@ function loadSubjectDetails(detailsUrl, obj){
 			try {
 				//sessionStorage.setItem('loaded-subject-detail-url', detailsUrl);
         if (obj == null || !obj.hasClass("forget")) {
-          alert(obj.attr("class"));
           jaaulde.utils.cookies.set('loaded-subject-detail-url', detailsUrl);
         }
 			} catch(ex) {}

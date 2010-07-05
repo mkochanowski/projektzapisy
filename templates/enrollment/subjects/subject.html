@@ -86,13 +86,13 @@
 		        	{% if not exe.signed %}
 			            {% ifnotequal exe.get_group_limit exe.enrolled %}
 			            	{% if subject.user_enrolled_to_exercise %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_exercise exe.id %}">przenieś</a>
+		        				<a class="subject-details-link forget" link="{% url record-change subject.user_enrolled_to_exercise exe.id %}">przenieś</a>
 		        			{% else %}
-			                	<a class="subject-details-link" link="{% url record-assign exe.id %}">zapisz</a>
+			                	<a class="subject-details-link forget" link="{% url record-assign exe.id %}">zapisz</a>
 			                {% endif %}
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign exe.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign exe.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
@@ -127,13 +127,13 @@
 		        	{% if not ea.signed %}
 			            {% ifnotequal ea.get_group_limit ea.enrolled %}
 			            	{% if subject.user_enrolled_to_eaoratory %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_eaoratory ea.id %}">przenieś</a>
+		        				<a class="subject-details-link forget" link="{% url record-change subject.user_enrolled_to_eaoratory ea.id %}">przenieś</a>
 		        			{% else %}
-			                	<a class="subject-details-link" link="{% url record-assign ea.id %}">zapisz</a>
+			                	<a class="subject-details-link forget" link="{% url record-assign ea.id %}">zapisz</a>
 			                {% endif %}
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign ea.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign ea.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
@@ -168,13 +168,13 @@
 		        	{% if not lab.signed %}
 			            {% ifnotequal lab.get_group_limit lab.enrolled %}
 			            	{% if subject.user_enrolled_to_laboratory %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_laboratory lab.id %}">przenieś</a>
+		        				<a class="subject-details-link forget" link="{% url record-change subject.user_enrolled_to_laboratory lab.id %}">przenieś</a>
 		        			{% else %}
-			                	<a class="subject-details-link" link="{% url record-assign lab.id %}">zapisz</a>
+			                	<a class="subject-details-link forget" link="{% url record-assign lab.id %}">zapisz</a>
 			                {% endif %}
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign lab.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign lab.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
@@ -210,13 +210,13 @@
 		        	{% if not exlab.signed %}
 			            {% ifnotequal exlab.get_group_limit exlab.enrolled %}
 			            	{% if subject.user_enrolled_to_exlaboratory %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_exlaboratory exlab.id %}">przenieś</a>
+		        				<a class="subject-details-link forget" link="{% url record-change subject.user_enrolled_to_exlaboratory exlab.id %}">przenieś</a>
 		        			{% else %}
-			                	<a class="subject-details-link" link="{% url record-assign exlab.id %}">zapisz</a>
+			                	<a class="subject-details-link forget" link="{% url record-assign exlab.id %}">zapisz</a>
 			                {% endif %}
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign exlab.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign exlab.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
@@ -252,13 +252,13 @@
 		        	{% if not sem.signed %}
 			            {% ifnotequal sem.get_group_limit sem.enrolled %}
 			            	{% if subject.user_enrolled_to_seminar %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_seminar sem.id %}">przenieś</a>
+		        				<a class="subject-details-link forget" link="{% url record-change subject.user_enrolled_to_seminar sem.id %}">przenieś</a>
 		        			{% else %}
-			                	<a class="subject-details-link" link="{% url record-assign sem.id %}">zapisz</a>
+			                	<a class="subject-details-link forget" link="{% url record-assign sem.id %}">zapisz</a>
 			                {% endif %}
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign sem.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign sem.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
@@ -293,13 +293,13 @@
 		        	{% if not lang.signed %}
 			            {% ifnotequal lang.get_group_limit lang.enrolled %}
 			            	{% if subject.user_enrolled_to_langoratory %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_langoratory lang.id %}">przenieś</a>
+		        				<a class="subject-details-link forget" link="{% url record-change subject.user_enrolled_to_langoratory lang.id %}">przenieś</a>
 		        			{% else %}
-			                	<a class="subject-details-link" link="{% url record-assign lang.id %}">zapisz</a>
+			                	<a class="subject-details-link forget" link="{% url record-assign lang.id %}">zapisz</a>
 			                {% endif %}
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign lang.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign lang.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
@@ -334,13 +334,13 @@
 		        	{% if not ss.signed %}
 			            {% ifnotequal ss.get_group_limit ss.enrolled %}
 			            	{% if subject.user_enrolled_to_ssoratory %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_ssoratory ss.id %}">przenieś</a>
+		        				<a class="subject-details-link forget" link="{% url record-change subject.user_enrolled_to_ssoratory ss.id %}">przenieś</a>
 		        			{% else %}
-			                	<a class="subject-details-link" link="{% url record-assign ss.id %}">zapisz</a>
+			                	<a class="subject-details-link forget" link="{% url record-assign ss.id %}">zapisz</a>
 			                {% endif %}
 			            {% endifnotequal %}
 		        	{% else %}
-		            	<a class="subject-details-link" link="{% url record-resign ss.id %}">wypisz</a>
+		            	<a class="subject-details-link forget" link="{% url record-resign ss.id %}">wypisz</a>
 		        	{% endif %}
 		        {% endif %}
 	        	</td>
