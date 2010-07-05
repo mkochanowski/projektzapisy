@@ -8,7 +8,7 @@ from enrollment.subjects.exceptions import NonSubjectException
 
 from users.models import Employee, Student
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class AddUserToGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']
@@ -46,6 +46,7 @@ class AddUserToGroupTest(TestCase):
         self.user.student.records_opening_delay_hours = 0
         self.user.student.save()
         self.group.subject.semester.records_opening = datetime.now()
+        self.group.subject.semester.records_closing = datetime.now()
         self.group.subject.semester.save()
         student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
         student_options.records_opening_delay_hours = 10
