@@ -1,3 +1,26 @@
+function ajaxSuccessCallBack(data) {
+		    
+   $("#subject-list").text("");  
+   $("#subject-list").append("<h2>Semestr: " + data.semester_name + "</h2>");    
+   
+   var str = "";
+   var size = 0;
+   
+   $.each(data.subjects, function(i,item){
+       str += "<li><a class=\"subject-link\" id=\"subject-9"+ item.id +"\" link=\"/subjects/"+ item.slug +"\">" + item.entity__name + "</a></li>";
+	   size += 1;
+   });
+   
+   $("#subject-list").append("<ul>" + str + "</ul>");
+   
+   	$('.subject-link').click(function(){
+      loadSubjectDetails($(this).attr('link'));
+   })
+   
+    $("#subject-list").append("<i>Przedmiotow: " + size);
+
+}
+
 function loadSubjectDetails(detailsUrl){
     var $detailsDiv = $('#subject-details'),
     $loadingDiv = $('<div>&nbsp;</div>').addClass('subject-details-loading');
@@ -33,7 +56,4 @@ $(function(){
 			loadSubjectDetails(url);
 		}
 	} catch(ex) {}
-	$('.subject-link').click(function(){
-		loadSubjectDetails($(this).attr('link'));
-	});
 });

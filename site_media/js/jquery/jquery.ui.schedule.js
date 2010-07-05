@@ -138,6 +138,27 @@ $.widget("ui.schedule", {
 		return $column;
 	},
 	
+	subjectsOnSchedule: function() {
+		var arr  = [];
+		$('.schedule-group-term').each(function(){
+			var subid = $(this).attr('subjectid');
+			if(subid != undefined) {
+				arr.push(subid);
+			}
+		});
+		return arr;
+	},
+	
+	showOnlyOneSemestr: function(semestrID) {
+		$('.schedule-group-term').each(function(){
+			 if($(this).attr('semestrid') == semestrID) {
+			 	$(this).removeClass('schedule-hide');
+			 } else {
+			 	$(this).addClass('schedule-hide')
+			 }
+		});
+	},
+	
 	_groupSelector: function(groupID) {
 		return '.schedule-group-term[groupid="' + groupID + '"]';
 	},
@@ -190,7 +211,7 @@ $.widget("ui.schedule", {
 		});
 	},
 	
-	addTerm: function(content, day, from, minutes, subjectID, groupID, termID, status) {
+	addTerm: function(content, day, from, minutes, subjectID, groupID, termID, status, semestrID) {
 		var self = this;
 		
 		if(!self._termWithSameIdAlreadyAdded(groupID, termID)) {
@@ -200,6 +221,7 @@ $.widget("ui.schedule", {
 					day: day,
 					from: from,
 					subjectID: subjectID,
+					semestrID : semestrID,
 					groupID: groupID,
 					termID: termID,
 					status: status})

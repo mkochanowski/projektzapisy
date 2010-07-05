@@ -244,11 +244,11 @@ def own(request):
 def schedulePrototype(request):
     try:
         student_records = Record.get_student_all_detiled_records(request.user.id)
-        subjects = Subject.objects.select_related(depth = 10).all()
-        for sub in subjects:
-            sub.lecturers = ''
-            for teacher in sub.teachers.all():
-                sub.lecturers =  teacher.user.get_full_name() + ',' + sub.lecturers
+        #subjects = Subject.visible.select_related().all()
+        #for sub in subjects:
+        #    sub.lecturers = ''
+        #    for teacher in sub.teachers.all():
+        #        sub.lecturers =  teacher.user.get_full_name() + ',' + sub.lecturers
         all_terms = Term.objects.select_related().all()
         for term in all_terms:
             term.description = term.group
@@ -265,7 +265,7 @@ def schedulePrototype(request):
   
         data = {
             'student_records': student_records,
-            'subjects': subjects,
+            #'subjects': subjects,
             'semesters_list' : semesters_list, 
             'types_list' : types_list,
             'terms' : all_terms

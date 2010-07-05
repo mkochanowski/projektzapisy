@@ -3,14 +3,15 @@
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="/site_media/css/jquery/jquery.ui.schedule.css" />
     <link rel="stylesheet" type="text/css" href="/site_media/css/enrollment/records/schedule-prototype.css" />
+	<link rel="stylesheet" href="/site_media/css/offer/prefs.css" type="text/css" />
 {% endblock %}
 {% block scripts %}
     <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
     <script type="text/javascript" src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js"></script>
     <script type="text/javascript" src="/site_media/js/jquery/jquery.ui.schedule.js"></script>
-	<script type="text/javascript" src="/site_media/js/jquery/jquery.ui.filter.js"></script>
     <script type="text/javascript" src="/site_media/js/enrollment/records/schedule-prototype.js"></script>
     <script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
+	<script type="text/javascript" src="/site_media/js/enrollment/subjects/subjects-list-ajax.js" ></script>
 {% endblock %}
  
 {% block main-navigation %}
@@ -27,41 +28,36 @@
 
 {% block top-bar %}
 	<div class="main-top-bar">
-		<div id="filter-wrapper">
-		<fieldset id="f-subject-keyword">
+	<div id="od-prefs-top-bar" class="main-top-bar">
+		<input type="hidden" id="ajaxUrl" value="{% url subject-ajax %}"/>
+		
+		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text" id="txt-keyword" name="txt-keyword" matchtype="starts" filtrattrs="subjectname,lecturername" onmatch="show" onmismatch="hide" default="Filtruj" type="text" title="Tutaj wpisz fragment nazwy lub prowadzącego" alt="Tutaj wpisz fragment nazwy lub prowadzącego"/>
-				<input class="reset" id="keyword-reset" type="button" value="X" style="display:none;"/>
+				<input class="text od-filter" id="keyword" type="text" name="keyword" />
+				<input class="reset" type="reset" value="X" style="display:block;" />
 			</div>
 		</fieldset>
-		<fieldset id="f-semester">
-			<legend><span>Semestr</span></legend>
-			<select id="cbo-semester" name="cbo-semester" matchtype="exact" filtrattrs="semesterid" onmatch="show" onmismatch="hide">
-                {% for key, name in semesters_list %}
-					<option value='{{ key }}'>{{ name }} </option>
-                {% endfor %}
-            </select>
-		</fieldset>
-		<fieldset id="f-subject-type">
+		
+		<fieldset id="od-prefs-subjtype">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for key, name in types_list %}
-	            <span class="checkbox">
-	                <input type='checkbox' id="chk-subject-type-{{ forloop.counter0 }}" name='chk-type[{{ forloop.counter0 }}]' matchtype="exact" filtrattrs="subjecttypeid" oncheckedmatch="show" oncheckedmismatch="hide" onuncheckedmatch="hide" onuncheckedmismatch="show" class='subject-type' value='{{ key }}' checked="checked" />
-	                <label for="chk-subject-type-{{ forloop.counter0 }}">{{ name }}</label>
-	            </span>
+				<span class="checkbox"><input class='type-list' type="checkbox" value="{{ key }}" checked /><label>{{ name }}</label></span>
 			{% endfor %}
 		</fieldset>
-		<fieldset id="f-other">
-			<legend><span>Inne</span></legend>
-            <span class="checkbox">
-            	<input disabled type="checkbox" id="chk-hide-was-assigned" name="chk-hide-was-assigned" matchtype="exact" filtrattrs="wasassigned" oncheckedmatch="hide" oncheckedmismatch="show" onuncheckedmatch="show" onuncheckedmismatch="show" value="1"  />
-				<label for="chk-already-assigned">
-					Schowaj przedmioty na które już byłem zapisany
-				</label>
-			</span>
+		<fieldset>
+			<legend><span>pozostałe</span></legend>
+			<div style='width: 300px'>
+				<span class="selectbox">
+			    <select id="semester" name="semester">
+	                {% for key, name in semesters_list %}<option value='{{ key }}'>{{ name }} </option>
+	                {% endfor %}
+	            </select>
+				</span><br />
+				<span class='checkbox'><input type='checkbox' disabled />Schowaj przedmioty na ktore bylem zapisany</span>
+		    </div>
 		</fieldset>
-		</div>
+	</div>
 	</div>
 {% endblock %}
 
@@ -76,6 +72,7 @@
         {% for record in student_records %}
             {% for term in record.group_.terms_ %}
                 <div subjectID="{{ record.group_.subject_.pk }}"
+					semestrID="{{ record.group_.subject_.semester.pk }}"
                     groupID="{{ record.group_.pk }}"
                     termID="{{ term.pk}}"
                     from="{{ term.time_from_in_minutes }}" 
@@ -97,24 +94,12 @@
 {% block sidebar %}
     <div id="main-sidebar">
         <h2>Przedmioty:</h2>
-        {% for sub in subjects %}
-            {% if forloop.first %}<ul>{% endif %}
-               <li subjectid="{{ sub.pk }}" class="schedule-prototype-subject" id="subject{{ sub.pk }}"
-						subjectname="{{ sub.name }}" 
-						lecturername="{{ sub.lecturers }}"
-						semesterid="{{ sub.semester.pk }}"
-						subjecttypeid="{{ sub.type.pk }}"
-						wasassigned="0">
-					<span>{{sub.name}}</span>
-					<span class="hide">Schowaj</span>
-				</li>
-            {% if forloop.end %}</ul>{% endif %}        
-            {% empty %}Brak przedmiotów
-        {% endfor %}
+        <ul id="schedule-prototype-subject-list"></ul>
 		<div style="display:none;">
 			{% for term in terms %}
 				<div class="subject{{ term.group.subject.pk }}"
 					subjectID="{{ term.group.subject.pk }}"
+					semestrID="{{ term.group.subject.semester.pk }}"
 					groupID="{{ term.group.pk }}"
 					termID="{{ term.pk }}"
 					from="{{ term.time_from_in_minutes }}" 

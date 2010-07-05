@@ -131,5 +131,7 @@ td.schedule-day-cell
 	{ background: white url(../../images/loading-black.gif) bottom right no-repeat; }
 .loading .box .toolBox
 	{ background: white; }
+	
+.schedule-hide {display:none;}
 
 
