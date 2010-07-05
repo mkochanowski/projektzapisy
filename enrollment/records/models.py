@@ -84,7 +84,7 @@ class Record( models.Model ):
             try:
                 student_groups = Record.get_groups_for_student(user_id)
             except NonStudentException:
-                logger.warning('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (str(slug), int(user_id), str(group_type)) )                 
+                logger.warning('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)) )                 
                 student_groups = {}
             for g in groups:
                 g.limit = g.get_group_limit()
@@ -93,7 +93,7 @@ class Record( models.Model ):
                 if g in student_groups:
                     g.signed = True
         except Subject.DoesNotExist:
-            logger.error('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (str(slug), int(user_id), str(group_type)) )                 
+            logger.error('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)) )                 
             raise NonSubjectException()
         return groups
     
@@ -125,10 +125,10 @@ class Record( models.Model ):
                 return user_subject_group_type[0]
             return False
         except Student.DoesNotExist:
-            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (str(slug), int(user_id), str(group_type)))           
+            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))           
             raise NonStudentException()
         except Subject.DoesNotExist:
-            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Subject.DoesNotExist exception.' % (str(slug), int(user_id), str(group_type)) )           
+            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Subject.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)) )           
             raise NonSubjectException()
 
     @staticmethod
@@ -177,8 +177,8 @@ class Record( models.Model ):
             student = user.student
             group = Group.objects.get(id=group_id)
             if not group.subject.is_recording_open_for_student(student):
-                logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )           
                 raise RecordsNotOpenException()
+               # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )           
             if Record.number_of_students(group=group) < group.limit:
                 if (Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
                     logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised AssignedInThisTypeGroupException exception.' % (int(user_id), int(group_id)) )           
@@ -223,7 +223,7 @@ class Record( models.Model ):
                 record = Record.enrolled.get(group=old_group, student=student)
                 record.delete()
                 new_record = Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
-                logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), str(old_group), str(new_group)) )
+                logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), unicode(old_group), unicode(new_group)) )
             else:
                 raise OutOfLimitException()
                 logger.info('User (%s) tried to enroll to group [%s] but OutOfLimitException was raised' % user.get_full_name() )               
