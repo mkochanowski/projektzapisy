@@ -103,7 +103,6 @@ class Record( models.Model ):
             group = Group.objects.get(id=group_id)
             return map(lambda x: x.student, Record.enrolled.filter(group=group))
         except Group.DoesNotExist:
-            logger.error('Record.get_students_in_group(group_id = %d) throws Group.DoesNotExist exception.' % int(group_id) )           
             raise NonGroupException()
     
     @staticmethod
@@ -224,7 +223,7 @@ class Record( models.Model ):
                 record = Record.enrolled.get(group=old_group, student=student)
                 record.delete()
                 new_record = Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
-                logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), int(old_group), int(new_group)) )
+                logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), str(old_group), str(new_group)) )
             else:
                 raise OutOfLimitException()
                 logger.info('User (%s) tried to enroll to group [%s] but OutOfLimitException was raised' % user.get_full_name() )               
