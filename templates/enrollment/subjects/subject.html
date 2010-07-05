@@ -251,8 +251,8 @@
 	        	{% if subject.is_recording_open %}
 		        	{% if not sem.signed %}
 			            {% ifnotequal sem.get_group_limit sem.enrolled %}
-			            	{% if subject.user_enrolled_to_eaoratory %}
-		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_eaoratory sem.id %}">przenieś</a>
+			            	{% if subject.user_enrolled_to_seminar %}
+		        				<a class="subject-details-link" link="{% url record-change subject.user_enrolled_to_seminar sem.id %}">przenieś</a>
 		        			{% else %}
 			                	<a class="subject-details-link" link="{% url record-assign sem.id %}">zapisz</a>
 			                {% endif %}
