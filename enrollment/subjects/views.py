@@ -73,7 +73,7 @@ def subject(request, slug):
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
     
     except Subject.DoesNotExist, NonSubjectException:
-        logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % slug )
+        logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % unicode(slug) )
         request.user.message_set.create(message="Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
@@ -105,7 +105,7 @@ def list_of_subjects(request):
     
    
     except Semester.DoesNotExist: 
-        logger.warning('Function list_of_subjects(request = {%s}) throws Semester.DoesNotExist exception.' % str(request.POST) )
+        logger.warning('Function list_of_subjects(request = {%s}) throws Semester.DoesNotExist exception.' % unicode(request.POST) )
         return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
     else:
         response = response.order_by('entity__name').values('id', 'entity__name', 'slug')

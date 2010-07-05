@@ -30,7 +30,7 @@ class StudentOptions( models.Model ):
         try:    
             return StudentOptions.objects.get(subject__id=subject_id, student__id=student_id)
         except StudentOptions.DoesNotExist:
-            logger.error('StudentOptions.get_student_options_for_subject(student_id = %d, subject_id = %d) throws StudentOptions.DoesNotExist exception.' % (student_id, subject_id) )
+            logger.error('StudentOptions.get_student_options_for_subject(student_id = %d, subject_id = %d) throws StudentOptions.DoesNotExist exception.' % (int(student_id), int(subject_id)) )
             raise NonStudentOptionsException()
 
 
