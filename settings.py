@@ -117,6 +117,7 @@ INSTALLED_APPS = (
     'fereol.offer.vote',
     'fereol.users',
     'fereol.debug_toolbar',
+    'fereol.grade.poll',
 )
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
