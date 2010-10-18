@@ -8,7 +8,7 @@
 from django.db import models
 from datetime  import date
 
-DEFAULT_YEAR       = date.today().year
+DEFAULT_YEAR       = date.today().year 
 DEFAULT_MAX_POINTS = 3
 DEFAULT_MAX_VOTE   = 30
 DEFAULT_DAY_BEG    = 1          #
@@ -25,7 +25,7 @@ class SystemState( models.Model ):
     year      = models.IntegerField(
                     verbose_name = 'Rok akademicki',
                     unique       = True,
-                    default      = DEFAULT_YEAR)
+                    default      = date.today.year())
 
     max_points = models.IntegerField( 
                     verbose_name = 'Maksimum punktów na przedmiot',
@@ -52,21 +52,25 @@ class SystemState( models.Model ):
         return "Ustawienia systemu na rok " + str(self.year)
     
     @staticmethod
-    def get_state(year = date.today().year):
+    def get_state(year = None):
         """
             Gets actual system state from database
             Creates one if necessary
         """
+        if not year:
+            year = date.today().year
         try:
             return SystemState.objects.filter(year=year)[0]
         except IndexError:
             return SystemState.create_default_state(year)
     
     @staticmethod
-    def create_default_state(year = date.today().year):
+    def create_default_state(year = None):
         """
             Creates system state from default variables
         """
+        if not year:
+            year = date.today().year
         new_state = SystemState()
         new_state.year      = year
         new_state.max_points = DEFAULT_MAX_POINTS
@@ -77,7 +81,7 @@ class SystemState( models.Model ):
         return new_state
         
     @staticmethod
-    def get_max_points(year = date.today().year):
+    def get_max_points(year = None):
         """
             Get max points per subject
         """
@@ -85,7 +89,7 @@ class SystemState( models.Model ):
         return state.max_points
         
     @staticmethod
-    def get_max_vote(year = date.today().year):
+    def get_max_vote(year = None):
         """
             Get max vote value
         """
@@ -94,7 +98,7 @@ class SystemState( models.Model ):
         
     
     @staticmethod
-    def get_vote_beg(year = date.today().year):
+    def get_vote_beg(year = None):
         """
             Get vote beggining date
         """
@@ -102,7 +106,7 @@ class SystemState( models.Model ):
         return state.vote_beg
         
     @staticmethod
-    def get_vote_end(year = date.today().year):
+    def get_vote_end(year = None):
         """
             Get vote ending date
         """

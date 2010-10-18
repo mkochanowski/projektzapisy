@@ -106,7 +106,7 @@ def vote( request ):
             else:
                 data['message'] = u'Przekroczono limit głosowania.\
                                   Limit wynosi ' + str(SystemState.get_max_vote()) +\
-                                  u', a oddano głos o watości: ' + str(sum) + '.'
+                                  u', a oddano głos o watości: ' + str(vote_sum) + '.'
                 return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
     else:
         data['form'] = VoteForm( winter  = winter_subs,

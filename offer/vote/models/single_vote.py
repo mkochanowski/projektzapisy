@@ -39,19 +39,23 @@ class SingleVote ( models.Model ):
 				'; ' + str(self.value)
 
     @staticmethod
-    def get_votes( voter, year=date.today().year ):
+    def get_votes( voter, year=None ):
         """
             Gets user votes in specified year
         """
+        if not year:
+            year = date.today().year
         current_state = SystemState.get_state(year)
         votes = SingleVote.objects.filter( student=voter, state=current_state)
         return votes
 
     @staticmethod
-    def get_points_and_voters( proposal, year=date.today().year ):
+    def get_points_and_voters( proposal, year=None ):
         """
             Gets proposal points and voters count in specified year
         """
+        if not year:
+            year = date.today().year
         current_state = SystemState.get_state(year)
         votes = SingleVote.objects.filter( subject = proposal, state=current_state )
         value = 0
@@ -62,10 +66,12 @@ class SingleVote ( models.Model ):
         return value, voters
 
     @staticmethod
-    def get_voters( proposal, year=date.today().year ):
+    def get_voters( proposal, year=None ):
         """
             Gets users who voted for specified proposal
         """
+        if not year:
+            year = date.today().year
         current_state = SystemState.get_state(year)
         votes = SingleVote.objects.filter( subject = proposal, state=current_state )
         
