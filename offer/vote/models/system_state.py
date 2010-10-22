@@ -120,5 +120,6 @@ class SystemState( models.Model ):
         """
         vote_beg = SystemState.get_vote_beg()
         vote_end = SystemState.get_vote_end()
+        today = date.today()
         
-        return vote_beg <= date.today() <= vote_end
+        return vote_beg <= today <= vote_end
