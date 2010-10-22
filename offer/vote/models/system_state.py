@@ -25,7 +25,7 @@ class SystemState( models.Model ):
     year      = models.IntegerField(
                     verbose_name = 'Rok akademicki',
                     unique       = True,
-                    default      = date.today.year())
+                    default      = date.today().year)
 
     max_points = models.IntegerField( 
                     verbose_name = 'Maksimum punktów na przedmiot',
