@@ -1,10 +1,10 @@
-Zależności:
+== Zależności ==
 
 * python = 2.6.x
 http://www.python.org/
 - fedora, debian/ubuntu: python
 
-* django = 1.1.x
+* django = 1.2.x
 http://www.djangoproject.com/
 - fedora: Django
 - debian/ubuntu: python-django
@@ -30,7 +30,23 @@ http://github.com/jtauber/django-mailer/
 * debug-toolbar >= 0.8.3 (dołączone w repozytorium projektu)
 http://github.com/robhudson/django-debug-toolbar
 
-Konfiguracja:
+
+== Uruchomienie (dla developerów) ==
+
+Przed pierwszym uruchomieniem należy przygotować bazę danych
+i załadować dane:
+$ python manage.py syncdb
+$ python manage.py migrate
+$ python manage.py loaddata database/fixtures/initial_data.json
+$ python manage.py runserver
+
+Teraz można uruchomić serwer:
+$ python manage.py runserver
+
+Więcej na http://iiuwr.indefero.net/p/fereol/page/PrzykladoweDane/
+
+
+== Konfiguracja ==
 
 * Wyszukiwanie aktualności
 
@@ -44,3 +60,4 @@ Maile (rozsyłane np. przy dodawaniu ogłoszeń) są kolejkowane i
 wysyłane po uruchomieniu komend manage.py send_mail, manage.py
 retry_deferred. Należy np. umieścić wywołanie skryptu w cronie. Przy
 rozsyłaniu poczty użyte jest konto skonfigurowane w zmiennych EMAIL_*.
+
