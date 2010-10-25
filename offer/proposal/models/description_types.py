@@ -17,4 +17,5 @@ class DescriptionTypes( models.Model ):
                 
     class Meta:
         verbose_name = 'Typ propozycji'
+	verbose_name_plural ='Typy propozycji'
         app_label = 'proposal'
