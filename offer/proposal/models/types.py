@@ -20,7 +20,7 @@ class Types( models.Model ):
             Django Class
         """
         verbose_name = 'Typ przedmiotu'
-        verbose_name_plural = 'Typy przedmiotu'
+        verbose_name_plural = 'Typy przedmiotów'
         app_label = 'proposal'
 
     def __str__(self):

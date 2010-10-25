@@ -50,7 +50,7 @@ class ProposalDescription(models.Model):
     
     class Meta:
         verbose_name = 'opis przedmiotu'
-        verbose_name_plural = 'opisy przedmiotu'
+        verbose_name_plural = 'opisy przedmiotów'
         app_label = 'proposal'
 
     def __unicode__(self):
