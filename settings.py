@@ -94,6 +94,7 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
+	'libs.mobile_detector.MobileDetectionMiddleware'
 )
 
 ROOT_URLCONF = 'fereol.urls'
@@ -119,7 +120,7 @@ INSTALLED_APPS = (
     'fereol.offer.vote',
     'fereol.users',
     'fereol.debug_toolbar',
-    'fereol.grade.poll',
+    'fereol.grade.poll'
 )
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),

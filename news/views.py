@@ -18,12 +18,23 @@ from news.models import News
 from news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
      get_search_results_data, mail_news_enrollment, \
      mail_news_offer, render_with_category_template
-
+	 
+def getTemplate(request, full_tpl, mobi_tpl):
+    """
+        Akutalnie zaimplementowany wybor na podstawie UID, nadrzedny wybor ma uzytkownik
+		Mozemy tez uznac, ze wszystkie pliki koncza sie sufiksem  'm'   
+    """
+    if not request.is_mobile:
+	    return full_tpl
+    return mobi_tpl	 
+	 
 def main_page( request ):
     """
         Main page
     """
-    return render_to_response( 'common/index.html', context_instance = RequestContext( request ) )
+    filename=getTemplate(request,'common/index.html','common/index_m.html')
+    return render_to_response(filename, context_instance = RequestContext( request ) )
+
 
 def search_page(request, cat):
     """
