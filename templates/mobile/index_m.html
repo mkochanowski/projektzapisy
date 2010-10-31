@@ -1,14 +1,10 @@
-<!--  extends "base.html" -->
-
+{% extends "mobile/base_m.html" %}
 {% block styles %}
 	<!--<link rel="stylesheet" href="mobileMain.css" type="text/css" />-->
 {% endblock %}
 
 {% block content %}
 	<div id="mainPage-container">
-		<div align="right">
-			Take me back!
-		</div>
 		<div>
 			<a href="{% url latest_news 'enrollment' %}">Mobilny system zapisów</a>
 		</div>

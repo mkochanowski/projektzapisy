@@ -6,7 +6,7 @@
 
 from django.contrib.auth.decorators import permission_required
 # from django.core.urlresolvers import reverse
-from django.http import HttpResponse # , Http404
+from django.http import HttpResponse, HttpResponseRedirect # , Http404
 from django.shortcuts import get_object_or_404, render_to_response, \
      redirect
 from django.template import RequestContext
@@ -24,15 +24,24 @@ def getTemplate(request, full_tpl, mobi_tpl):
         Akutalnie zaimplementowany wybor na podstawie UID, nadrzedny wybor ma uzytkownik
 		Mozemy tez uznac, ze wszystkie pliki koncza sie sufiksem  'm'   
     """
-    if not request.is_mobile:
+    if not request.mobile:
+	    print full_tpl
 	    return full_tpl
-    return mobi_tpl	 
+    return mobi_tpl
+
+def noMobile(request):
+	request.mobile = False
+	request.session.set_expiry(0)
+	request.session['no_mobile'] = True
+	domain = request.META.get('HTTP_HOST', '')
+	request.META['HTTP_HOST'] = domain.replace('www.', '').replace('m.', '')
+	return HttpResponseRedirect('/')
 	 
 def main_page( request ):
     """
         Main page
     """
-    filename=getTemplate(request,'common/index.html','common/index_m.html')
+    filename=getTemplate(request,'common/index.html','mobile/index_m.html')
     return render_to_response(filename, context_instance = RequestContext( request ) )
 
 

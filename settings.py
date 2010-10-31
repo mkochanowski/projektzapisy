@@ -94,7 +94,8 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
-	'libs.mobile_detector.MobileDetectionMiddleware'
+    'fereol.middleware.mobile_detector.MobileDetectionMiddleware',
+    'fereol.middleware.mobileMiddleware.SubdomainMiddleware'
 )
 
 ROOT_URLCONF = 'fereol.urls'
@@ -135,3 +136,5 @@ HAYSTACK_SITECONF = 'search_sites'
 HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
+
+#SESSION_COOKIE_DOMAIN = '.mysite.com'
