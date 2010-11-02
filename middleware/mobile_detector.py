@@ -15,7 +15,7 @@ class MobileDetectionMiddleware(object):
             user_agent = request.META['HTTP_USER_AGENT']
 
             # Test common mobile values.
-            pattern = "(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|windows ce|pda|mobile|mini|palm|netfront)"
+            pattern = "(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|windows ce|pda|mobile|opera mobi|mini|palm|netfront)"
             prog = re.compile(pattern, re.IGNORECASE)
             match = prog.search(user_agent)
 
