@@ -12,7 +12,7 @@ class SubdomainMiddleware:
 			if 'no_mobile' in request.session and request.session['no_mobile'] == True:
 				#adres mobilny wybrany bezpośrednio
 				if parts[0] == 'm':
-					request.META['HTTP_HOST'] = 'm.' + domain.replace('www.', '')
+					request.META['HTTP_HOST'] = domain
 					request.mobile = True
 				else:
 					request.mobile = False
@@ -21,7 +21,7 @@ class SubdomainMiddleware:
 				request.mobile = True
 			
 			#wiadomość przekazana z MobileDetection
-			elif request.is_mobile: 
+			elif request.is_mobile:
 				request.META['HTTP_HOST'] = 'm.' + domain.replace('www.', '')
 				request.mobile = True
 				return HttpResponseRedirect(request.path)
