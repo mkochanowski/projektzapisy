@@ -1,0 +1,33 @@
+{% extends "mobile/base_m.html" %}
+
+
+{% block styles %}
+	/*custom stylesheet*/
+{% endblock %}
+
+{% block content %}
+
+    {% if form.errors %}
+        <div class="main-message">Podany identyfikator i hasło się nie zgadzają. <br/> Spróbuj ponownie.</div><br/>
+    {% endif %}
+
+    <form class="high-res-cent" method="post" action="{% url django.contrib.auth.views.login %}" >
+		<div>
+			{{ form.username.label_tag }}:<br/>
+             {{ form.username }}
+		</div>
+      <div>{{ form.password.label_tag }}:<br/>
+          {{ form.password }}
+       </div>
+        
+
+        <div>
+		<input type="checkbox"  class="clear" value="1" checked="yes " style="float: left"/> Zapamiętaj mnie
+			<input type="submit" class="clear" value="Zaloguj" style="float: right" />
+            <input type="hidden" name="next" value="{{ next }}" />
+        </div>
+    </form>
+
+
+    
+{% endblock %}

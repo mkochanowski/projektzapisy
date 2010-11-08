@@ -1,12 +1,42 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
-<head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN"
+    "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="Description" content="Opis dokumentu" />
+    <meta name="Author" content="Autor" />
+	<link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
+	
+	<title>
+		Zapisy II UWr - wersja mobilna
+	</title>
 </head>
 
 <body>
-	<div align="right">
-		<a href="{% url no-mobile %}">Do wersji standardowej</a>
+	<div id="main-container">
+	
+		<div id="main-header">
+			<a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
+		</div>
+		
+		<div id="main-container-content">
+			<div id="main-content">
+				{% block content %}
+				{% endblock %}
+			</div>
+		</div>
+
+		<div id="main-footer">
+			<div style="margin:3px 5px;">
+				<a href="{% url no-mobile %}"> przejdz do pelnej wersji</a>
+				<div class="version-info">
+				</div>
+			</div>
+			
+		</div>
 	</div>
-	{% block content %}
-	{% endblock %}
+	
+
+</body>
 </html>

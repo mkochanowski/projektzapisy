@@ -1,16 +1,21 @@
 {% extends "mobile/base_m.html" %}
+
 {% block styles %}
-	<!--<link rel="stylesheet" href="mobileMain.css" type="text/css" />-->
+	<!--custom stylesheet-->
 {% endblock %}
 
 {% block content %}
-	<div id="mainPage-container">
-		<div>
-			<a href="{% url latest_news 'enrollment' %}">Mobilny system zapisów</a>
-		</div>
-		
-		<div>
-			<a href="{% url latest_news 'offer' %}">Kształtowanie oferty dydaktycznej</a>
+
+	<div style="width:40%; padding: 10% 30%; text-align: center; ">
+		<div style="width:100%; padding: 15px 0px; border: 1px solid black; background: aqua;">
+			<a href="/records/schedule">Moj plan</a>
 		</div>
 	</div>
+	<br/>
+	<div style="width:40%; padding: 0% 30%; text-align: center; ">
+		<div style="width:100%; padding: 15px 0px; border: 1px solid black; background: green;">
+			<a href="{% url latest_news 'enrollment' %}">Zapisy</a>
+		</div>
+	</div>
+
 {% endblock %}

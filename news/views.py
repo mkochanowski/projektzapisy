@@ -17,17 +17,9 @@ from news.forms import NewsForm
 from news.models import News
 from news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
      get_search_results_data, mail_news_enrollment, \
-     mail_news_offer, render_with_category_template
+     mail_news_offer, render_with_category_template, render_with_device_detection
 	 
-def getTemplate(request, full_tpl, mobi_tpl):
-    """
-        Akutalnie zaimplementowany wybor na podstawie UID, nadrzedny wybor ma uzytkownik
-		Mozemy tez uznac, ze wszystkie pliki koncza sie sufiksem  'm'   
-    """
-    if not request.mobile:
-	    print full_tpl
-	    return full_tpl
-    return mobi_tpl
+
 
 def noMobile(request):
 	request.mobile = False
@@ -36,13 +28,12 @@ def noMobile(request):
 	domain = request.META.get('HTTP_HOST', '')
 	request.META['HTTP_HOST'] = domain.replace('www.', '').replace('m.', '')
 	return HttpResponseRedirect('/')
-	 
+
 def main_page( request ):
     """
         Main page
     """
-    filename=getTemplate(request,'common/index.html','mobile/index_m.html')
-    return render_to_response(filename, context_instance = RequestContext( request ) )
+    return render_with_device_detection(request,'common/index.html','mobile/index_m.html')
 
 
 def search_page(request, cat):
