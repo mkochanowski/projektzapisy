@@ -18,22 +18,12 @@ from news.models import News
 from news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
      get_search_results_data, mail_news_enrollment, \
      mail_news_offer, render_with_category_template, render_with_device_detection
-	 
-
-
-def noMobile(request):
-	request.mobile = False
-	request.session.set_expiry(0)
-	request.session['no_mobile'] = True
-	domain = request.META.get('HTTP_HOST', '')
-	request.META['HTTP_HOST'] = domain.replace('www.', '').replace('m.', '')
-	return HttpResponseRedirect('/')
 
 def main_page( request ):
     """
         Main page
     """
-    return render_with_device_detection(request,'common/index.html','mobile/index_m.html')
+    return render_to_response('common/index.html', context_instance = RequestContext(request))
 
 
 def search_page(request, cat):
