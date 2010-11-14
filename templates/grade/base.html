@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load news_extras %}
+
+{% block main-menu %}
+	<li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li>
+        <li><a href="{% url grade-poll-add %}">Dodaj ankietę</a></li>
+	<li style="display: none"><a>więcej</a></li>
+	{% if user.is_authenticated %}
+	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
+        {% if user.student %}
+            ({{user.student.matricula}})
+        {% endif %}
+         </li>
+	<li><a href="{% url user-logout %}">(wyloguj)</a></li>
+	{% else %}
+	<li><a href="{% url user-login %}">Zaloguj</a></li>
+	{% endif %}
+{% endblock %}
+
