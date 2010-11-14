@@ -1,14 +1,50 @@
 # -*- coding: utf-8 -*-
-from fereol.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_PINNED
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
 
+from fereol.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_PINNED
+from fereol.enrollment.subjects.models import Semester
+from fereol.offer.vote.models import SingleVote
+
+
+@login_required
 def studentSubjectList(request):
 	student = request.user.student
-	records = Records.objects.filter(student = student, group__subject__semester__is_current = True).select_related('group', 'group__subject').order_by('group__subject')
+	semester = Semester.objects.filter(visible = True)
+	semester = filter(lambda s : s.is_current_semester(), semester)
+	records = Record.objects.filter(student = student, group__subject__semester__in = semester).select_related('group', 'group__subject').order_by('group__subject')
 	records_enr = filter(lambda r: r.status == STATUS_ENROLLED, records)
-	subjects_enrolled = set([record.group.subject for record in records_enr ])
+	groups_enrolled = [record.group for record in records_enr]
+	subjects_enrolled = [record.group.subject for record in records_enr]
+
+
+#do uzupełnienia: wstawianie "wykrzykników"
+#	_subjects_enrolled = []	
+#	for s in subjects_enrolled:
+#		groups = s.groups.all()
+#		allGroups = True
+#		for g in groups:
+#			if g not in groups_enrolled and :
+#				allGroups = False
+#				break
+		
+#		_subjects_enrolled.append({'subject':s, 'allGroups': allGroups})
+
+#	subjects_enrolled = _subjects_enrolled
+				
+				
 	
 	records_pin = filter(lambda r: r.status == STATUS_PINNED, records)
-	subjects_pinned = set([records.group.subject for record in records_pin])
-	
+	subjects_pinned = [records.group.subject for record in records_pin]
 
+	#votes = SingleVote.objects.filter(student = student, subject__semester__in = semester).select_related('subject')
+	#subjects_voted = [vote.subject for vote in votes]
+	#tymczasowo
+	subjects_voted = []
+	
+	return render_to_response("mobile/student_subjects.html", {'enrolled': subjects_enrolled, 'pinned': subjects_pinned, 'voted': subjects_voted}, context_instance = RequestContext(request))
+	
+@login_required
 def otherSubjects(request):
+	pass

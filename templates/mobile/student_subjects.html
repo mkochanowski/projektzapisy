@@ -1,0 +1,17 @@
+{% extends "mobile/base_m.html" %}
+
+{% block content %}
+
+	{% for e in enrolled %}
+		{{ e.name }}
+	{% endfor %}
+
+	{% for p in pinned %}
+		{{ p.name }}
+	{% endfor %}
+
+	{% for v in voted %}
+		{{ v.name }}
+	{% endfor %}
+
+{% endblock %}
