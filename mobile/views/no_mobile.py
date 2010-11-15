@@ -7,4 +7,5 @@ def noMobile(request):
 	request.session['no_mobile'] = True
 	domain = request.META.get('HTTP_HOST', '')
 	request.META['HTTP_HOST'] = domain.replace('www.', '').replace('m.', '')
+	request.urlconf = 'fereol.urls'
 	return HttpResponseRedirect('/')
