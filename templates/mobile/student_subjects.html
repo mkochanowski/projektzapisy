@@ -3,7 +3,7 @@
 {% block content %}
 
 	{% for e in enrolled %}
-		{{ e.name }}
+		{{ e.subject.name }} {{ e.allGroups }}
 	{% endfor %}
 
 	{% for p in pinned %}

@@ -12,26 +12,26 @@ from fereol.offer.vote.models import SingleVote
 def studentSubjectList(request):
 	student = request.user.student
 	semester = Semester.objects.filter(visible = True)
-	semester = filter(lambda s : s.is_current_semester(), semester)
-	records = Record.objects.filter(student = student, group__subject__semester__in = semester).select_related('group', 'group__subject').order_by('group__subject')
+	semester = filter(lambda s : s.is_current_semester(), semester) #???
+	records = Record.objects.filter(student = student, group__subject__semester__in = semester).select_related('group', 'group__type', 'group__subject').order_by('group__subject')
 	records_enr = filter(lambda r: r.status == STATUS_ENROLLED, records)
 	groups_enrolled = [record.group for record in records_enr]
-	subjects_enrolled = [record.group.subject for record in records_enr]
-
+	subjects_enrolled_types = [{'subject': record.group.subject, 'types': [r.group.type for r in records if r.group.subject == record.group.subject]} for record in records_enr]
 
 #do uzupełnienia: wstawianie "wykrzykników"
-#	_subjects_enrolled = []	
-#	for s in subjects_enrolled:
-#		groups = s.groups.all()
-#		allGroups = True
-#		for g in groups:
-#			if g not in groups_enrolled and :
-#				allGroups = False
-#				break
+	_subjects_enrolled = []	
+	for s in subjects_enrolled_types:
+		groups = s['subject'].groups.all()
+		types = [g.type for g in groups]
+		allGroups = True
+		for t in types:
+			if t not in s['types']:
+				allGroups = False
+				break
 		
-#		_subjects_enrolled.append({'subject':s, 'allGroups': allGroups})
+		_subjects_enrolled.append({'subject':s['subject'], 'allGroups': allGroups})
 
-#	subjects_enrolled = _subjects_enrolled
+	subjects_enrolled = _subjects_enrolled
 				
 				
 	
