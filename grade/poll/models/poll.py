@@ -7,7 +7,7 @@
 from django.db import models
 
 from grade.poll.models.questions import OpenQuestion
-from grade.poll.models.questions import SingleChoiceQustion 
+from grade.poll.models.questions import SingleChoiceQuestion 
 from grade.poll.models.questions import MultipleChoiceQuestion
 
 from users.models               import Employee
@@ -23,7 +23,7 @@ class Poll( models.Model ):
                                  verbose_name = "grupa" )
     
     single_choice_questions = models.ManyToManyField( 
-                          SingleChoiceQustion,
+                          SingleChoiceQuestion,
                           verbose_name = "pytania jednokrotnego wyboru")
     multiple_choice_question = models.ManyToManyField(
                           MultipleChoiceQuestion,
@@ -35,4 +35,4 @@ class Poll( models.Model ):
     class Meta:
         verbose_name        = "ankieta"
         verbose_name_plural = "ankiety"
-        app_label           = "grade"
+        app_label           = "poll"
