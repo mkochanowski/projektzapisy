@@ -2,16 +2,19 @@
 
 {% block content %}
 
+	<p>
 	{% for e in enrolled %}
 		{{ e.subject.name }} {{ e.allGroups }}
 	{% endfor %}
-
+	</p>
+	<p>
 	{% for p in pinned %}
 		{{ p.name }}
 	{% endfor %}
-
+	</p>
+	<p>
 	{% for v in voted %}
 		{{ v.name }}
 	{% endfor %}
-
+	</p>
 {% endblock %}
