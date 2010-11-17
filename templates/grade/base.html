@@ -2,11 +2,22 @@
 
 {% load news_extras %}
 
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
+{% endblock %}
+
+
 {% block main-menu %}
-	<li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li>
-        <li><a href="{% url grade-poll-add %}">Dodaj ankietę</a></li>
-	<li style="display: none"><a>więcej</a></li>
+	<!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
+	<!-- <li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li> -->
+	
+	{% if user.employee %}        
+	<li><a href="{% url grade-poll-add %}">Dodaj ankietę</a></li>
+	{% endif %}
+	<li><a href="#">Pobieranie kluczy</a></li>
+	<li><a href="#">Ocena zajęć</a></li>
 	{% if user.is_authenticated %}
+	<li><a href="#">Wyniki oceny</a></li>
 	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
         {% if user.student %}
             ({{user.student.matricula}})
