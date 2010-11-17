@@ -19,10 +19,8 @@
 		<p class="link"><a href="{% url grade-poll-add %}">Dodaj ankietę</a></p>	
 		{% endif %}
 		<p class="link"><a href="#">Pobieranie kluczy</a></p>
-		<p class="link"><a href="#">Ocena zajęć</a></p>
-		{% if user.is_authenticated %}	
+		<p class="link"><a href="{% url grade-poll-verify-keys %}">Ocena zajęć</a></p>
 		<p class="link"><a href="#">Wyniki oceny</a></p>
-		{% endif %}
 	</div>
 {% endblock %}
 

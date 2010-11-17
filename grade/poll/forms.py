@@ -12,4 +12,6 @@ from grade.poll.models        import Poll, \
                                      MultipleChoiceQuestion
 
 class KeysForm( forms.Form ):
-    keysfield = forms.TextField( label="Podaj wygenerowane klucze" )
+    keysfield = forms.CharField( widget    = forms.Textarea(), 
+                                 label     = "Podaj wygenerowane klucze",
+                                 help_text = "Wklej tutaj pobrane wcześniej klucze." )
