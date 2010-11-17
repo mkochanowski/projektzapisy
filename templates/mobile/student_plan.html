@@ -1,0 +1,31 @@
+{% extends "mobile/base_m.html" %}
+
+{% block content %}
+
+  <div style="width:40%; padding: 0% 30%; text-align: center; ">
+    TWÓJ PLAN
+  </div>
+  <div style="width:80%; padding: 10% 10%; text-align: center; ">
+         
+        <div style="width:100%; padding: 15px 0px; border: 1px solid black; background: gray;">
+          <a href="{% url student-plan-delta left%}"> [poprzedni]</a>
+          [{{ weekday_name }}]
+          <a href="{% url student-plan-delta right%}"> [nastepny]</a>   
+        </div>
+        <div style="width:100%; padding: 15px 0px; border: 1px solid black; background: white;">
+         <table>
+        <tr>
+            <th>Godzina</th>
+            <th>Przedmiot</th>
+        </tr>
+        {% for subject in subjects %}
+          <tr>
+                <td>{{subject.term}} </td>
+                <td>{{subject.group}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+        </div>
+    </div>
+    
+{% endblock %}
