@@ -2,19 +2,37 @@
 
 {% block content %}
 
-	<p>
-	{% for e in enrolled %}
-		{{ e.subject.name }} {{ e.allGroups }}
-	{% endfor %}
-	</p>
-	<p>
-	{% for p in pinned %}
-		{{ p.name }}
-	{% endfor %}
-	</p>
-	<p>
-	{% for v in voted %}
-		{{ v.name }}
-	{% endfor %}
-	</p>
+	<div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
+		<strong> Przedmioty, na które jesteś zapisany:</strong>
+	</div>
+	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
+		<ul>
+		{% for e in enrolled %}
+			<li><a href= "/enrollment/{{ e.subject.slug }}/" >{{ e.subject.name }} {{ e.allGroups }}</a></li>
+		{% endfor %}
+		</ul>
+	</div>
+	<div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
+		<strong> Przedmioty przypięte:</strong>
+	</div>
+	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
+		<ul>
+		{% for p in pinned %}
+			<li><a href= "/enrollment/{{ p.subject.slug }}/" >{{ p.name }}</a></li>
+		{% endfor %}
+		</ul>
+	</div>
+	<div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
+		<strong> Przedmioty, na które głosowałeś:</strong>
+	</div>
+	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
+		<ul>
+		{% for v in voted %}
+			<li><a href= "/enrollment/{{ v.subject.slug }}"/" >{{ v.name }}</a></li>
+		{% endfor %}
+		</ul>
+	</div>
+	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
+		<strong><a href= {% url enrollment-other %} >Pozostałe przedmioty</a></strong>
+	</div>
 {% endblock %}

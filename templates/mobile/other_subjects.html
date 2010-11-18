@@ -1,0 +1,15 @@
+{% extends "mobile/base_m.html" %}
+
+{% block content %}
+	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
+		<strong><a href= {% url enrollment-other %} >Pozostałe przedmioty</a></strong>
+	</div>
+	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
+		<ul>
+		{% for s in subjects %}
+			<li><a href= "/enrollment/{{ s.slug }}"/" >{{ s.name }}</a></li>
+		{% endfor %}
+		</ul>
+	</div>
+
+{% endblock %}

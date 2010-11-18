@@ -25,7 +25,7 @@ def otherSubjects(request):
 	other_subjects = filter(lambda s : s.semester.is_current_semester() and s not in subj, other_subjects)
 
 	#podmienić templatkę!
-	return render_to_response("mobile/student_subjects.html", {'subjects': other_subjects}, context_instance = RequestContext(request))
+	return render_to_response("mobile/other_subjects.html", {'subjects': other_subjects}, context_instance = RequestContext(request))
 
 
 
