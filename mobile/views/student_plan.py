@@ -14,24 +14,27 @@ def studentPlan(request, delta=0):
         Main page
     """
     try:
-        #obsluga dni tygodnia
-        delta = int(delta) % 7
-        today = date.today()
-        weekday = (today.weekday()+delta+7) % 7
-        weekday_name = DAYS_OF_WEEK[weekday]
+        #choosing correct weekday
+        delta = int(delta)%7
         left  = (delta+6)%7
         right = (delta+1)%7
+        weekday = (date.today().weekday()+delta+7) % 7
+        
+        #receiving subjects for given weekday
         groups = Record.get_student_all_detiled_enrollings(request.user.id)
         subjects = []
         for group in groups:
             for term in group.terms_:
                 if term.day_in_zero_base() == weekday :
                     subjects.append({'group': group,'term':term})
-        #tutaj przefiltrować grupy na dany dzień tygodnia (dzisiejszy albo przekazany?)
+                    
+        #sorting by hour of beginning
+        subjects.sort(key=lambda student: student['term'].time_from_in_minutes())
+        
+        #in future - insert empty element when You have longere break between subjects
         data = {
-            'groups': groups,
             'subjects': subjects,
-            'weekday_name': weekday_name,
+            'weekday_name': DAYS_OF_WEEK[weekday],
             'left': left,
             'right': right,
         }

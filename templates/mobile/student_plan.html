@@ -2,25 +2,27 @@
 
 {% block content %}
 
-  <div style="width:40%; padding: 0% 30%; text-align: center; ">
-    TWÓJ PLAN
+  <div style="width:50%; padding: 0% 30%; text-align: center; ">
+    </br>
+    Plan Studenta: {{user.get_full_name}}
   </div>
   <div style="width:80%; padding: 10% 10%; text-align: center; ">
          
-        <div style="width:100%; padding: 15px 0px; border: 1px solid black; background: gray;">
-          <a href="{% url student-plan-delta left%}"> [poprzedni]</a>
-          [{{ weekday_name }}]
-          <a href="{% url student-plan-delta right%}"> [nastepny]</a>   
+        <div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
+          <a href="{% url student-plan-delta left%}"><img src="/site_media/images/larrow.png"/> </a>
+          ||<strong> {{ weekday_name }}</strong> ||
+          <a href="{% url student-plan-delta right%}"> <img src="/site_media/images/rarrow.png"/> </a>   
         </div>
-        <div style="width:100%; padding: 15px 0px; border: 1px solid black; background: white;">
-         <table>
+        <div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
+
+         <table style="border-collapse:collapse;" border=1 width=100%>
         <tr>
-            <th>Godzina</th>
-            <th>Przedmiot</th>
+            <th width=30%> Godzina (sala) </th>
+            <th width=70%>Przedmiot</th>
         </tr>
         {% for subject in subjects %}
-          <tr>
-                <td>{{subject.term}} </td>
+             <tr>
+                <td>{{subject.term.period_string}} s.{{subject.term.classroom}}</td>
                 <td>{{subject.group}}</td>
             </tr>
         {% endfor %}
