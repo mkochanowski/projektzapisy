@@ -8,7 +8,7 @@ import os
 
 urlpatterns = patterns('',
     #MAIN PAGE
-	url('^login/$', login, {'template_name': 'mobile/login.html'}, 'user-mobile-login'),
+	url('login/', login, {'template_name': 'mobile/login.html'}),
 	url('^logout/$', logout, {'template_name': 'mobile/logout.html'}, name='user-mobile-logout'),
     url('^$', 'fereol.mobile.views.main_page', name='main-page'),
     url(r'^nomobile/$', 'fereol.mobile.views.noMobile', name = 'no-mobile'),
