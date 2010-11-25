@@ -13,7 +13,10 @@ from itertools import cycle
 
 STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
-RECORD_STATUS = [( STATUS_ENROLLED, u'zapisany' ), ( STATUS_PINNED, u'oczekujący' )]
+STATUS_QUEUED = '1'
+RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'oczekujący')]
+
+QUEUE_STATUS = [(STATUS_QUEUED, u'zakolejkowany'), (STATUS_PINNED, u'oczekujący')]
 
 import logging
 logger = logging.getLogger()
@@ -21,28 +24,28 @@ logger = logging.getLogger()
 class EnrolledManager(models.Manager):
     def get_query_set(self):
         """ Returns only enrolled students. """
-        return super(EnrolledManager, self).get_query_set().filter(status = STATUS_ENROLLED)
+        return super(EnrolledManager, self).get_query_set().filter(status=STATUS_ENROLLED)
 
-class Record( models.Model ):
-    group = models.ForeignKey(Group, verbose_name = 'grupa')
-    student = models.ForeignKey(Student, verbose_name = 'student', related_name='records')
-    status = models.CharField(max_length = 1, choices = RECORD_STATUS, verbose_name = 'status')
-    
+class Record(models.Model):
+    group = models.ForeignKey(Group, verbose_name='grupa')
+    student = models.ForeignKey(Student, verbose_name='student', related_name='records')
+    status = models.CharField(max_length=1, choices=RECORD_STATUS, verbose_name='status')
+
     objects = models.Manager()
     enrolled = EnrolledManager()
-    
+
     @staticmethod
     def number_of_students(group):
         """Returns number of students enrolled to particular group"""
         group_ = group
-        return Record.enrolled.filter(group = group_).count()
+        return Record.enrolled.filter(group=group_).count()
 
     @staticmethod
     def get_student_all_detiled_records(user_id):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            records = Record.objects.filter(student = student).\
+            records = Record.objects.filter(student=student).\
                 select_related('group', 'group__subject').order_by('group__subject')
             for record in records:
                 record.group_ = record.group
@@ -56,15 +59,15 @@ class Record( models.Model ):
                     record.schedule_widget_status_ = ''
             return records
         except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detiled_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id) )
+            logger.error('Record.get_student_all_detiled_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
-    
-    @staticmethod    
+
+    @staticmethod
     def get_student_all_detiled_enrollings(user_id):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            records = Record.enrolled.filter(student = student).\
+            records = Record.enrolled.filter(student=student).\
                 select_related('group', 'group__subject').order_by('group__subject')
             groups = [record.group for record in records]
             subjects = set([group.subject for group in groups])
@@ -73,9 +76,9 @@ class Record( models.Model ):
                 group.subject_ = group.subject
             return groups
         except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detiled_enrollings(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id) )           
+            logger.error('Record.get_student_all_detiled_enrollings(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
-         
+
     @staticmethod
     def get_groups_with_records_for_subject(slug, user_id, group_type):
         try:
@@ -84,7 +87,7 @@ class Record( models.Model ):
             try:
                 student_groups = Record.get_groups_for_student(user_id)
             except NonStudentException:
-                logger.warning('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)) )                 
+                logger.warning('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
                 student_groups = {}
             for g in groups:
                 g.limit = g.get_group_limit()
@@ -93,10 +96,10 @@ class Record( models.Model ):
                 if g in student_groups:
                     g.signed = True
         except Subject.DoesNotExist:
-            logger.error('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)) )                 
+            logger.error('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
             raise NonSubjectException()
         return groups
-    
+
     @staticmethod
     def get_students_in_group(group_id):
         try:
@@ -104,7 +107,7 @@ class Record( models.Model ):
             return map(lambda x: x.student, Record.enrolled.filter(group=group))
         except Group.DoesNotExist:
             raise NonGroupException()
-    
+
     @staticmethod
     def get_groups_for_student(user_id):
         user = User.objects.get(id=user_id)
@@ -112,9 +115,9 @@ class Record( models.Model ):
             student = user.student
             return map(lambda x: x.group, Record.enrolled.filter(student=student))
         except Student.DoesNotExist:
-            logger.error('Record.get_groups_for_student(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id) )           
+            logger.error('Record.get_groups_for_student(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
-    
+
     @staticmethod
     def is_student_in_subject_group_type(user_id, slug, group_type):
         try:
@@ -125,10 +128,10 @@ class Record( models.Model ):
                 return user_subject_group_type[0]
             return False
         except Student.DoesNotExist:
-            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))           
+            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
             raise NonStudentException()
         except Subject.DoesNotExist:
-            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Subject.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)) )           
+            logger.error('Record.is_student_in_subject_group_type(slug = %s, user_id = %d, group_type = %s) throws Subject.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
             raise NonSubjectException()
 
     @staticmethod
@@ -138,15 +141,15 @@ class Record( models.Model ):
             student = user.student
             group = Group.objects.get(id=group_id)
             record, is_created = Record.objects.get_or_create(group=group, student=student, status=STATUS_PINNED)
-            if is_created == False:            
-                logger.error('Record.pin_student_to_group(user_id = %d, group_id = %d) raised AlreadyPinnedException exception.' % (int(user_id), int(group_id)) )           
+            if is_created == False:
+                logger.error('Record.pin_student_to_group(user_id = %d, group_id = %d) raised AlreadyPinnedException exception.' % (int(user_id), int(group_id)))
                 raise AlreadyPinnedException()
             return record
         except Student.DoesNotExist:
-            logger.error('Record.pin_student_to_group(user_id = %d, group_id = %d) throws Student.DoesNotExists exception.' % (int(user_id), int(group_id)) )           
+            logger.error('Record.pin_student_to_group(user_id = %d, group_id = %d) throws Student.DoesNotExists exception.' % (int(user_id), int(group_id)))
             raise NonStudentException()
-        except Group.DoesNotExist: 
-            logger.error('Record.pin_student_to_group(user_id = %d, group_id = %d) throws Group.DoesNotExists exception.' % (int(user_id), int(group_id)) )           
+        except Group.DoesNotExist:
+            logger.error('Record.pin_student_to_group(user_id = %d, group_id = %d) throws Group.DoesNotExists exception.' % (int(user_id), int(group_id)))
             raise NonGroupException()
 
     @staticmethod
@@ -156,17 +159,17 @@ class Record( models.Model ):
             student = user.student
             group = Group.objects.get(id=group_id)
             record = Record.objects.get(group=group, student=student, status=STATUS_PINNED)
-            logger.info('User (%s) is not yet pinned to group (%d - [%s])' % (user.get_full_name(), int(group_id), unicode(group)) )           
+            logger.info('User (%s) is not yet pinned to group (%d - [%s])' % (user.get_full_name(), int(group_id), unicode(group)))
             record.delete()
             return record
         except Record.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) )           
+            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise AlreadyNotPinnedException()
         except Student.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) )           
+            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) )           
+            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
 
     @staticmethod
@@ -178,32 +181,32 @@ class Record( models.Model ):
             group = Group.objects.get(id=group_id)
             if not group.subject.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
-               # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )           
+            # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
             if Record.number_of_students(group=group) < group.limit:
                 if (Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
-                    logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised AssignedInThisTypeGroupException exception.' % (int(user_id), int(group_id)) )           
-                    raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException 
-                
+                    logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised AssignedInThisTypeGroupException exception.' % (int(user_id), int(group_id)))
+                    raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException
+
                 record = Record.objects.get(group=group, student=student)
-                
+
                 if record.status == STATUS_ENROLLED:
                     raise AlreadyAssignedException()
-                             
+
                 record.status = STATUS_ENROLLED
                 record.save()
-                
+
             else:
-                logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) )           
+                logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
             return record
         except NonStudentOptionsException:
-            logger.error('Record.add_student_to_group()  throws NonStudentOptionsException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) )           
+            logger.error('Record.add_student_to_group()  throws NonStudentOptionsException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise RecordsNotOpenException()
         except Student.DoesNotExist:
-            logger.error('Record.add_student_to_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) ) 
+            logger.error('Record.add_student_to_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) ) 
+            logger.error('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
         except Record.DoesNotExist:
             return Record.objects.create(group=group, student=student, status=STATUS_ENROLLED)
@@ -213,31 +216,31 @@ class Record( models.Model ):
         """ Deletes old student record and returns new record with changed group. """
         user = User.objects.get(id=user_id)
         try:
-            student = user.student  
+            student = user.student
             old_group = Group.objects.get(id=old_id)
             new_group = Group.objects.get(id=new_id)
             if not new_group.subject.is_recording_open_for_student(student):
-                logger.warning('Record.change_student_group() raised RecordsNotOpenException exception (parameters: user_id = %d, old_id = %d, new_id = %d)' % (int(user_id), int(old_id), int(new_id)) )           
+                logger.warning('Record.change_student_group() raised RecordsNotOpenException exception (parameters: user_id = %d, old_id = %d, new_id = %d)' % (int(user_id), int(old_id), int(new_id)))
                 raise RecordsNotOpenException()
             if Record.number_of_students(group=new_group) < new_group.limit:
                 record = Record.enrolled.get(group=old_group, student=student)
                 record.delete()
                 new_record = Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
-                logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), unicode(old_group), unicode(new_group)) )
+                logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), unicode(old_group), unicode(new_group)))
             else:
                 raise OutOfLimitException()
-                logger.info('User (%s) tried to enroll to group [%s] but OutOfLimitException was raised' % user.get_full_name() )               
-            return new_record   
+                logger.info('User (%s) tried to enroll to group [%s] but OutOfLimitException was raised' % user.get_full_name())
+            return new_record
         except Student.DoesNotExist:
-            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Student.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id))) 
+            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Student.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Group.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id) ) ) 
+            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Group.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id)))
             raise NonGroupException()
         except Record.DoesNotExist:
-            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Record.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id) ) ) 
+            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Record.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id)))
             raise AlreadyNotAssignedException()
-        
+
     @staticmethod
     def remove_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)
@@ -246,16 +249,16 @@ class Record( models.Model ):
             group = Group.objects.get(id=group_id)
             record = Record.enrolled.get(group=group, student=student)
             record.delete()
-            logger.info('User (%s) is now removed from group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)) ) 
+            logger.info('User (%s) is now removed from group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)))
             return record
         except Record.DoesNotExist:
-            logger.error('Record.remove_student_from_group() throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) ) 
+            logger.error('Record.remove_student_from_group() throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise AlreadyNotAssignedException()
         except Student.DoesNotExist:
-            logger.error('Record.remove_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) ) 
+            logger.error('Record.remove_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)) )  
+            logger.error('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
 
     def group_slug(self):
@@ -264,7 +267,84 @@ class Record( models.Model ):
     class Meta:
         verbose_name = 'zapis'
         verbose_name_plural = 'zapisy'
+        unique_together = (('student', 'group'), )
+
+    def __unicode__(self):
+        return u"%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())
+
+class QueueManager(models.Manager):
+    def get_query_set(self):
+        """ Returns only queued students. """
+        return super(QueueManager, self).get_query_set().filter(status=STATUS_QUEUED)
+
+class Queue(models.Model):
+    group = models.ForeignKey(Group, verbose_name='grupa')
+    student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
+    status = models.CharField(max_length=1, choices=QUEUE_STATUS, verbose_name='status')
+    time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
+
+    objects = models.Manager()
+    queued = QueueManager()
+
+    @staticmethod
+    def add_student_to_queue(user_id, group_id):
+        """ assignes student to queue."""
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            group = Group.objects.get(id=group_id)
+            """
+            Podwórkowe rozwiązanie |
+                                                   V
+            """
+            if queued.get_query_set().filter(group=group, student=student).count > 0 :
+                raise AlreadyQueuedException()
+            record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now())
+            if is_created == False:
+                logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyQueuedException exception.' % (int(user_id), int(group_id)))
+                raise AlreadyQueuedException()
+            return record
+
+            if record.status == STATUS_QUEUED:
+                raise AlreadyAssignedException()
+
+            record.status = STATUS_QUEUED
+            record.save()
+
+            return record
+        except Student.DoesNotExist:
+            logger.error('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonStudentException()
+        except Group.DoesNotExist:
+            logger.error('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonGroupException()
+
+    @staticmethod
+    def remove_student_from_queue(user_id, group_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            group = Group.objects.get(id=group_id)
+            record = Queue.queued.get(group=group, student=student)
+            record.delete()
+            logger.info('User (%s) is now removed from queue to group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)))
+            return record
+        except Queue.DoesNotExist:
+            logger.error('Queue.remove_student_from_queue() throws Queue.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise AlreadyNotAssignedException()
+        except Student.DoesNotExist:
+            logger.error('Queue.remove_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonStudentException()
+        except Group.DoesNotExist:
+            logger.error('Queue.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonGroupException()
+
+
+    class Meta:
+        verbose_name = 'kolejka'
+        verbose_name_plural = 'kolejki'
         unique_together = (('student', 'group'),)
 
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())
+
