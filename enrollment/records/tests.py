@@ -199,7 +199,7 @@ class AssignmentToGroupsWithSameTypes(TestCase):
         self.assertRaises(AssignedInThisTypeGroupException, Record.add_student_to_group, self.user.id, self.group2.id)
 
 class AddStudentToQueue(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
+    fixtures =  ['fixtures__queue']
     
     def setUp(self):
         self.student = User.objects.get(id=100)
@@ -223,9 +223,9 @@ class AddStudentToQueue(TestCase):
 
     def testStudentAssignedToGroup(self):
         Queue.add_student_to_queue(self.student.id, self.group.id)
-        self.assertEqual(Queue.objects.count(), 0)
-        self.assertRaises(AlreadyAssignedException, Record.add_student_to_queue, self.student.id, self.group.id)
-        self.assertEqual(Queue.objects.count(), 0)
+        self.assertEqual(Queue.objects.count(), 1)
+        self.assertRaises(AlreadyAssignedException, Queue.add_student_to_queue, self.student.id, self.group.id)
+        self.assertEqual(Queue.objects.count(), 1)
     
     def testStudentNotAssignedToGroup(self):
         Queue.add_student_to_queue(self.student.id, self.group.id)

@@ -297,18 +297,12 @@ class Queue(models.Model):
             Podwórkowe rozwiązanie |
                                                    V
             """
-            if queued.get_query_set().filter(group=group, student=student).count > 0 :
-                raise AlreadyQueuedException()
+            if Queue.queued.get_query_set().filter(group=group, student=student).count() > 0 :
+                raise AlreadyAssignedException()
             record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now())
             if is_created == False:
                 logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyQueuedException exception.' % (int(user_id), int(group_id)))
                 raise AlreadyQueuedException()
-            return record
-
-            if record.status == STATUS_QUEUED:
-                raise AlreadyAssignedException()
-
-            record.status = STATUS_QUEUED
             record.save()
 
             return record
