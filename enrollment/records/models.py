@@ -293,11 +293,7 @@ class Queue(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            """
-            Podwórkowe rozwiązanie |
-                                                   V
-            """
-            if Queue.queued.get_query_set().filter(group=group, student=student).count() > 0 :
+            if Queue.queued.filter(group=group, student=student).count() > 0 :
                 raise AlreadyAssignedException()
             record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now())
             if is_created == False:
