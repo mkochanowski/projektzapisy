@@ -1,0 +1,29 @@
+{% extends "mobile/base_m.html" %}
+
+{% block content %}
+{% for message in messages %}
+        <p class="main-message">{{ message }}</p>
+    {% endfor %}
+{{e}}
+{{su}}
+	{{subject.name}}
+	{{"<br/>"}}
+	{% for g,z in g2 %}
+
+		{{ g.get_type_display }}		
+		prowadzący:
+
+		{{ g.get_teacher_full_name }}
+		<br/>
+		{% if not z %}
+			<a href="/group/{{g.id}}/assign/">Zapisz</a>
+		{% endif %}
+		{% if z %}
+			<a href="/group/{{g.id}}/resign/">Wypisz</a>
+		{% endif %} 
+		<br/>
+		<br/>
+	{% endfor %}
+
+
+{% endblock %}

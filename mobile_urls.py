@@ -19,4 +19,7 @@ urlpatterns = patterns('',
 	url(r'records/schedule/(?P<delta>\-?\d+)/$', 'fereol.mobile.views.studentPlan', name = 'student-plan-delta'),
     url(r'^(?P<cat>[\w\-_]+)/$', 'news.views.latest_news', name='latest_news'),
 	(r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
+url(r'^subject/(?P<subject_id>\d+)/$', 'fereol.mobile.views.subjectTerms', name = 'subject-terms'),
+(r'^group/(?P<group_id>\d+)/assign/$', 'fereol.mobile.views.assign'),
+(r'^group/(?P<group_id>\d+)/resign/$', 'fereol.mobile.views.resign'),
 )
