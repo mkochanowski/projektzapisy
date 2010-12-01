@@ -282,12 +282,12 @@ class Queue(models.Model):
     student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
     status = models.CharField(max_length=1, choices=QUEUE_STATUS, verbose_name='status')
     time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
-
+    priority = models.PositiveSmallIntegerField(default=0, verbose_name='priorytet')
     objects = models.Manager()
     queued = QueueManager()
 
     @staticmethod
-    def add_student_to_queue(user_id, group_id):
+    def add_student_to_queue(user_id, group_id,priority=0):
         """ assignes student to queue."""
         user = User.objects.get(id=user_id)
         try:
@@ -295,7 +295,7 @@ class Queue(models.Model):
             group = Group.objects.get(id=group_id)
             if Queue.queued.filter(group=group, student=student).count() > 0 :
                 raise AlreadyAssignedException()
-            record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now())
+            record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now(), priority=priority)
             if is_created == False:
                 logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyQueuedException exception.' % (int(user_id), int(group_id)))
                 raise AlreadyQueuedException()
@@ -310,12 +310,31 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
+    def change_student_priority(user_id, group_id,priority) :
+        """change student priority in group queue"""
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            group = Group.objects.get(Did=group_id)
+            record = Queue.objects.get(group=group, student=student, status=STATUS_QUEUED)
+            record.priority = priority
+            record.save()
+            return record
+        except Student.DoesNotExist:
+            logger.error('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonStudentException()
+        except Group.DoesNotExist:
+            logger.error('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonGroupException()
+
+    @staticmethod
     def remove_student_from_queue(user_id, group_id):
+        """remove student from queue"""
         user = User.objects.get(id=user_id)
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            record = Queue.queued.get(group=group, student=student)
+            record =Queue.queued.get(group=group, student=student)
             record.delete()
             logger.info('User (%s) is now removed from queue to group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)))
             return record
@@ -328,7 +347,6 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.error('Queue.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
-
 
     class Meta:
         verbose_name = 'kolejka'

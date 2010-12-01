@@ -24,9 +24,10 @@ class Migration(SchemaMigration):
         db.create_table('records_queue', (
             ('status', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('priority', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0)),
             ('student', self.gf('django.db.models.fields.related.ForeignKey')(related_name='queues', to=orm['users.Student'])),
             ('time', self.gf('django.db.models.fields.DateTimeField')()),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
         db.send_create_signal('records', ['Queue'])
 
@@ -90,6 +91,7 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('student', 'group'),)", 'object_name': 'Queue'},
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'priority': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0'}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'queues'", 'to': "orm['users.Student']"}),
             'time': ('django.db.models.fields.DateTimeField', [], {})
