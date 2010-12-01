@@ -315,7 +315,7 @@ class Queue(models.Model):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            group = Group.objects.get(Did=group_id)
+            group = Group.objects.get(id=group_id)
             record = Queue.objects.get(group=group, student=student, status=STATUS_QUEUED)
             record.priority = priority
             record.save()
