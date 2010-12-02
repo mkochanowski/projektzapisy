@@ -1,6 +1,95 @@
 /**
  * Style odpowiadające za wygląd głównego szablonu (logo, menu, stopka itp)
  */
+
+ .subject-alert{
+ 	float: right;
+ 	padding: 0% 3% 0% 0%;
+ }
+ 
+
+ 
+ #day-switch {
+
+	text-align: center;
+	padding: 2% 0%
+ 
+ }
+ 
+#larrow{width: 5%; padding: 0% 2%;}
+ 
+
+ 
+ .schedule-table-container
+ {
+ 	text-align: center;
+ 	margin-left: auto;
+	margin-right: auto;
+  	margin-top: 4%;
+  	margin-bottom: 4%;
+ }
+ 
+
+ .middle{margin:10% 0%}
+ 
+
+   .subject-inner-clear{
+		width:100%; padding: 1% 1%;  border: 0px solid black;
+	}
+
+	A:link {text-decoration: none} 
+	 
+  .subject-inner {
+  	width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
+   
+  	/*font-size: 16px;*/
+  
+  }
+  
+  .subject-outer {
+  	width:70%; padding: 1% 15%; text-align: center; border: 0px solid black;
+ } 
+ 
+
+
+ #center-container
+ {
+ 	text-align: center;
+ 	width: 100%;
+ 	margin-left: auto;
+	margin-right: auto;
+ }
+ 
+   #center-container th
+  {
+  	border: 0.1em solid black;
+  	text-align: center;
+ } 
+ 
+  #center-container table, tr, td
+ { 
+  	margin-left: auto;
+	margin-right: auto;
+ 	text-align:left;
+ 	border: 1px solid black;
+ }
+
+ .inne-button {
+	margin: 5%;
+ 	width: 50%;
+	padding:3% 0%;
+ 	
+ }
+ 
+
+
+
+li{float:left;}
+
+form{padding: 2% 0%}
+
+
+
 body{
 	margin: 0.5em;
 }
@@ -11,6 +100,19 @@ body{
 	border: 0.1em solid #cccccc;
 
 }
+
+.subject-inner-clear{
+	width:100%; padding: 1% 1%;  border: 0px solid black;
+}
+
+A:link {text-decoration: none} 
+	 
+.subject-inner {
+	width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
+   
+  	/*font-size: 16px;*/
+}
+
 
 
 /*** NAGŁÓWEK ***/

@@ -1,38 +1,43 @@
 {% extends "mobile/base_m.html" %}
 
 {% block content %}
+<div id="main-content">
+<div id="center-container">
 
-	<div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
-		<strong> Przedmioty, na które jesteś zapisany:</strong>
-	</div>
-	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
-		<ul>
+	<div>
+	<h3>Przedmioty, na które jesteś zapisany:</h3>
+	
 		{% for e in enrolled %}
-			<li><a href= "/enrollment/{{ e.subject.slug }}/" >{{ e.subject.name }} {{ e.allGroups }}</a></li>
+			<div class="subject-outer">
+			<a href= "/subject/{{ e.subject.id }}/" >
+			<div class="subject-inner">{{ e.subject.name }} <!--{{ e.allGroups }}--></div></a></div>
 		{% endfor %}
-		</ul>
 	</div>
-	<div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
-		<strong> Przedmioty przypięte:</strong>
-	</div>
-	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
-		<ul>
+	
+	<div>
+	<h3>Przedmioty przypięte:</h3>
+
 		{% for p in pinned %}
-			<li><a href= "/enrollment/{{ p.subject.slug }}/" >{{ p.name }}</a></li>
+			<div class="subject-outer">
+			<a href= "/subject/{{ p.subject.id }}/" >
+			<div class="subject-inner">{{ p.name }} </div></a></div>
 		{% endfor %}
-		</ul>
 	</div>
-	<div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
-		<strong> Przedmioty, na które głosowałeś:</strong>
-	</div>
-	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
-		<ul>
+
+	<div>
+	<h3>Przedmioty, na które głosowałeś:</h3>
+
 		{% for v in voted %}
-			<li><a href= "/enrollment/{{ v.subject.slug }}"/" >{{ v.name }}</a></li>
+			<div class="subject-outer">
+			<a href= "/subject/{{ v.subject.id }}/" >
+			<div class="subject-inner">{{ v.name }} </div></a></div>
 		{% endfor %}
-		</ul>
 	</div>
-	<div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
-		<strong><a href= {% url enrollment-other %} >Pozostałe przedmioty</a></strong>
-	</div>
+
+	
+	<form method="get" action="{% url enrollment-other %}">
+		<input class="inne-button" type="submit" value = "Inne">
+	</form>
+</div>
+</div>
 {% endblock %}

@@ -28,7 +28,7 @@ class SubdomainMiddleware:
 			request.META['HTTP_HOST'] = 'm.' + domain.replace('www.', '')
 			request.mobile = True
 			request.urlconf = 'fereol.mobile_urls'
-			#return HttpResponseRedirect(request.path)
+			return HttpResponseRedirect(request.path)
 
 		else:
 			request.mobile = False

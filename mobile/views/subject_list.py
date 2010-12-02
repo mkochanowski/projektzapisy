@@ -21,7 +21,7 @@ def otherSubjects(request):
 	(subjects_enrolled, subjects_pinned, subjects_voted) = subjectsEnrolled(request)
 	subjects_enrolled = [s['subject'] for s in subjects_enrolled]
 	subj = subjects_enrolled + subjects_pinned + subjects_voted
-	other_subjects = Subject.objects.all()
+	other_subjects = Subject.objects.all().order_by('name')
 	other_subjects = filter(lambda s : s.semester.is_current_semester() and s not in subj, other_subjects)
 
 	#podmienić templatkę!
