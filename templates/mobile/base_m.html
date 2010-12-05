@@ -6,40 +6,40 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="Description" content="Opis dokumentu" />
     <meta name="Author" content="Autor" />
-	<link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
-	
-	<title>
-		Zapisy II UWr - wersja mobilna
-	</title>
+    <link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
+    
+    <title>
+        Zapisy II UWr - wersja mobilna
+    </title>
 </head>
 
 <body>
-	<div id="main-container">
-	
-		<div id="main-header">
-			<a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
-			{% if user.is_authenticated %}
-				<a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
-			{% endif %}
-		</div>
-		
-		<div id="main-container-content">
-			<div id="main-content">
-				{% block content %}
-				{% endblock %}
-			</div>
-		</div>
+    <div id="main-container">
+    
+        <div id="main-header">
+            <a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
+            {% if user.is_authenticated %}
+                <a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
+            {% endif %}
+        </div>
+        
+        <div id="main-container-content">
+            <div id="main-content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
 
-		<div id="main-footer">
-			<div style="margin:3px 5px;">
-				<a href="{% url no-mobile %}"> przejdz do pelnej wersji</a>
-				<div class="version-info">
-				</div>
-			</div>
-			
-		</div>
-	</div>
-	
+        <div id="main-footer">
+            <div style="margin:3px 5px;">
+                <a href="{% url no-mobile %}"> przejdz do pelnej wersji</a>
+                <div class="version-info">
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
 
 </body>
 </html>

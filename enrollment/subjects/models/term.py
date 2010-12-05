@@ -44,7 +44,7 @@ class Term( models.Model ):
         return time(hour=hour, minute=minute)
     
     def period_string(self):
-        return "%s - %s" % (self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"))
+        return "%s – %s" % (self.start_time.strftime("%H"), self.end_time.strftime("%H"))
         
     def __unicode__(self):
         return "%s (%s-%s) s.%s" % (self.get_dayOfWeek_display(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom)

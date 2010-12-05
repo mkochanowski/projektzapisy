@@ -141,3 +141,5 @@ HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
 SESSION_COOKIE_DOMAIN = '.localhost.localhost'
+
+#SESSION_COOKIE_DOMAIN = 'm.localhost'

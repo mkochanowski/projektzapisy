@@ -1,33 +1,53 @@
 {% extends "mobile/base_m.html" %}
 
 {% block content %}
-
-  <div style="width:50%; padding: 0% 30%; text-align: center; ">
-    </br>
-    Plan Studenta: {{user.get_full_name}}
-  </div>
-  <div style="width:80%; padding: 10% 10%; text-align: center; ">
-         
-        <div id="main-header" style="padding: 10px 0px; border: 1px solid black;">
-          <a href="{% url student-plan-delta left%}"><img src="/site_media/images/larrow.png"/> </a>
-          ||<strong> {{ weekday_name }}</strong> ||
-          <a href="{% url student-plan-delta right%}"> <img src="/site_media/images/rarrow.png"/> </a>   
-        </div>
-        <div style="width:100%; padding: 0px; border: 1px solid black; background: white;">
-
-         <table style="border-collapse:collapse;" border=1 width=100%>
-        <tr>
-            <th width=30%> Godzina (sala) </th>
-            <th width=70%>Przedmiot</th>
-        </tr>
-        {% for subject in subjects %}
-             <tr>
-                <td>{{subject.term.period_string}} s.{{subject.term.classroom}}</td>
-                <td>{{subject.group}}</td>
-            </tr>
-        {% endfor %}
-    </table>
-        </div>
+<div class="plan_content" style="width: 80%; margin: 10% 0% 0% 10%; border-top: 1px solid black; border-left: 1px solid black; border-right: 1px solid black;">
+    <div class="plan_header" style="height: 10%; text-align: center; border-bottom: 1px solid black;">
+        <h2 style="">Plan Zajęć </h2>
     </div>
+    <div class="plan_panel" style="height: 10%; text-align: center; border-bottom: 1px solid black;">
+        <a href="{% url student-plan-delta ruser left%}">
+        <div class="plan_left" style="float: left; width: 25%;">
+            <h3>wstecz</h3>
+        </div>
+        </a>
+        <div class="plan_center" style="float: left; width: 50%;">
+            <h2>{{ weekday_name }}</h2>
+        </div>
+        <a href="{% url student-plan-delta ruser right %}">
+        <div class="plan_left" style="float: left; width: 25%;">
+            <h3>dalej</h3>
+        </div>
+        </a>
+        <div style="clear: both;"></div>
+    </div>
+    <div class="plan_left" style="float: left; width: 24%;text-align: center;">
+        <h3> termin </h3>
+    </div>
+    <div class="plan_right" style="float: right; width: 75%;text-align: center;border-left: 1px solid black;">
+        <h3> przedmiot </h3>
+    </div>
+    <div style="clear: both;"></div>
+    <div class="plan_content" style="border-top: 1px solid black;">
+        {% for subject in subjects %}
+        {% if subject.term == 0 %}
+            <div style="border-bottom:1px solid black; height: 1em;"></div>
+        {% else %}
+          <a href= "/subject/{{ subject.group.subject.id }}/" >
+            <div style="border-bottom:1px solid black;">
+                <div class="plan_left" style="float: left; width: 24%;text-align: center;">
+                    <p> {{subject.term.period_string}}</br> s. {{subject.term.classroom}}</p>
+                </div>
+                <div class="plan_right" style="float: right; width: 75%;text-align: center; border-left: 1px solid black;">
+                    <p> {{subject.group}}</p>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+          </a>
+    {% endif %}
+  {% endfor %}
+  </div>
+  
+</div>
     
 {% endblock %}
