@@ -3,10 +3,10 @@
 {% block content %}
 <div class="plan_content" style="width: 80%; margin: 10% 0% 0% 10%; border-top: 1px solid black; border-left: 1px solid black; border-right: 1px solid black;">
     <div class="plan_header" style="height: 10%; text-align: center; border-bottom: 1px solid black;">
-        <h2 style="">Plan Zajęć </h2>
+        <h2 style="">Plan zajęć </h2>
     </div>
     <div class="plan_panel" style="height: 10%; text-align: center; border-bottom: 1px solid black;">
-        <a href="{% url student-plan-delta ruser left%}">
+        <a href="{% url student-schedule-delta owner left%}">
         <div class="plan_left" style="float: left; width: 25%;">
             <h3>wstecz</h3>
         </div>
@@ -14,32 +14,32 @@
         <div class="plan_center" style="float: left; width: 50%;">
             <h2>{{ weekday_name }}</h2>
         </div>
-        <a href="{% url student-plan-delta ruser right %}">
+        <a href="{% url student-schedule-delta owner right %}">
         <div class="plan_left" style="float: left; width: 25%;">
             <h3>dalej</h3>
         </div>
         </a>
         <div style="clear: both;"></div>
     </div>
-    <div class="plan_left" style="float: left; width: 24%;text-align: center;">
+    <div class="plan_left" style="float: left; height: 4em; width: 24%;text-align: center;">
         <h3> termin </h3>
     </div>
-    <div class="plan_right" style="float: right; width: 75%;text-align: center;border-left: 1px solid black;">
+    <div class="plan_right" style="float: right; width: 75%; height: 4em; text-align: center;border-left: 1px solid black;">
         <h3> przedmiot </h3>
     </div>
     <div style="clear: both;"></div>
     <div class="plan_content" style="border-top: 1px solid black;">
-        {% for subject in subjects %}
-        {% if subject.term == 0 %}
+        {% for event in schedule %}
+        {% if event.term == 0 %}
             <div style="border-bottom:1px solid black; height: 1em;"></div>
         {% else %}
-          <a href= "/subject/{{ subject.group.subject.id }}/" >
+          <a href= "/subject/{{ event.group.subject.id }}/" >
             <div style="border-bottom:1px solid black;">
-                <div class="plan_left" style="float: left; width: 24%;text-align: center;">
-                    <p> {{subject.term.period_string}}</br> s. {{subject.term.classroom}}</p>
+                <div class="plan_left" style="float: left; height: 4em; width: 24%;text-align: center;">
+                    <p> {{event.term.period_string}}</br> s. {{event.term.classroom}}</p>
                 </div>
-                <div class="plan_right" style="float: right; width: 75%;text-align: center; border-left: 1px solid black;">
-                    <p> {{subject.group}}</p>
+                <div class="plan_right" style="float: right; height: 4em; width: 75%;text-align: center; border-left: 1px solid black;">
+                    <p style = ""> {{event.group.subject.name}} ({{event.group.get_type_display}})</p>
                 </div>
                 <div style="clear: both;"></div>
             </div>

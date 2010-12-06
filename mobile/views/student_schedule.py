@@ -9,7 +9,7 @@ from datetime import date
 DAYS_OF_WEEK = ['poniedziałek','wtorek','środa','czwartek','piątek','sobota','niedziela']
 
 @login_required
-def studentPlan(request, gosciu=0, delta=0):
+def studentSchedule(request, schedule_owner=None, delta=0):
     """
         Main page
     """
@@ -19,45 +19,49 @@ def studentPlan(request, gosciu=0, delta=0):
         left  = (delta+6)%7
         right = (delta+1)%7
         weekday = (date.today().weekday()+delta+7) % 7
-        if gosciu == 0 :
-            ruser = request.user
+        #choosing user
+        if schedule_owner == None :
+            owner = request.user
         else :
-            ruser = User.objects.get(username=gosciu)
-            
+            owner = User.objects.get(username=schedule_owner)
+        
         #receiving subjects for given weekday
-        groups = Record.get_student_all_detiled_enrollings(ruser.id)
-        subjects = []
+        groups = Record.get_student_all_detiled_enrollings(owner.id)
+        schedule = []
         for group in groups:
             for term in group.terms_:
                 if term.day_in_zero_base() == weekday :
-                    subjects.append({'group': group,'term':term})
+                    schedule.append({'group': group,'term':term})
 
         #sorting by hour of beginning
-        subjects.sort(key=lambda student: student['term'].time_from_in_minutes())
+        schedule.sort(key=lambda student: student['term'].time_from_in_minutes())
         #creating empty entries for formating
-        subjects_form = []
+        schedule_form = []
         jump = True
         last_time = None
         null = {'group' : 0, 'term': 0}
-        for subject in subjects:
+        for subject in schedule:
             if jump == True :
                 jump = False
             else :
                 if subject['term'].start_time > last_time :
-                    subjects_form.append(null)
+                    schedule_form.append(null)
                     jump = False
             last_time = subject['term'].end_time
-            subjects_form.append(subject)
+            schedule_form.append(subject)
 
         data = {
-            'subjects': subjects_form,
+            'schedule': schedule_form,
             'weekday_name': DAYS_OF_WEEK[weekday],
             'left': left,
             'right': right,
-            'ruser':ruser.username,
+            'owner':owner.username,
         }
-        return render_to_response('mobile/student_plan.html', data, context_instance=RequestContext(request))
+        return render_to_response('mobile/student_schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
-        request.user.message_set.create(message="Nie jesteś studentem lub nie wybrałeś poprawnego numeru indeksu.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        request.user.message_set.create(message="Użytkownik nie posiada planu bo nie jest studentem.")
+        return render_to_response('mobile/error.html', context_instance=RequestContext(request))
+    except User.DoesNotExist:
+        request.user.message_set.create(message="Użytkownik nie istnieje.")
+        return render_to_response('mobile/error.html', context_instance=RequestContext(request))
         
