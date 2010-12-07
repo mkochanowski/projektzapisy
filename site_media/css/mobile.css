@@ -3,16 +3,16 @@
  */
 
  .subject-alert{
- 	float: right;
- 	padding: 0% 3% 0% 0%;
+    float: right;
+    padding: 0% 3% 0% 0%;
  }
  
 
  
  #day-switch {
 
-	text-align: center;
-	padding: 2% 0%
+    text-align: center;
+    padding: 2% 0%
  
  }
  
@@ -22,11 +22,11 @@
  
  .schedule-table-container
  {
- 	text-align: center;
- 	margin-left: auto;
-	margin-right: auto;
-  	margin-top: 4%;
-  	margin-bottom: 4%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4%;
+    margin-bottom: 4%;
  }
  
 
@@ -34,51 +34,51 @@
  
 
    .subject-inner-clear{
-		width:100%; padding: 1% 1%;  border: 0px solid black;
-	}
+        width:100%; padding: 1% 1%;  border: 0px solid black;
+    }
 
-	A:link {text-decoration: none} 
-	 
+    A:link {text-decoration: none} 
+     
   .subject-inner {
-  	width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
+    width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
    
-  	/*font-size: 16px;*/
+    /*font-size: 16px;*/
   
   }
   
   .subject-outer {
-  	width:70%; padding: 1% 15%; text-align: center; border: 0px solid black;
+    width:70%; padding: 1% 15%; text-align: center; border: 0px solid black;
  } 
  
 
 
  #center-container
  {
- 	text-align: center;
- 	width: 100%;
- 	margin-left: auto;
-	margin-right: auto;
+    text-align: center;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
  }
  
    #center-container th
   {
-  	border: 0.1em solid black;
-  	text-align: center;
+    border: 0.1em solid black;
+    text-align: center;
  } 
  
   #center-container table, tr, td
  { 
-  	margin-left: auto;
-	margin-right: auto;
- 	text-align:left;
- 	border: 1px solid black;
+    margin-left: auto;
+    margin-right: auto;
+    text-align:left;
+    border: 1px solid black;
  }
 
  .inne-button {
-	margin: 5%;
- 	width: 50%;
-	padding:3% 0%;
- 	
+    margin: 5%;
+    width: 50%;
+    padding:3% 0%;
+    
  }
  
 
@@ -91,26 +91,26 @@ form{padding: 2% 0%}
 
 
 body{
-	margin: 0.5em;
+    margin: 0.5em;
 }
 
 #main-container
 {
-	background: white;
-	border: 0.1em solid #cccccc;
+    background: white;
+    border: 0.1em solid #cccccc;
 
 }
 
 .subject-inner-clear{
-	width:100%; padding: 1% 1%;  border: 0px solid black;
+    width:100%; padding: 1% 1%;  border: 0px solid black;
 }
 
 A:link {text-decoration: none} 
-	 
+     
 .subject-inner {
-	width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
+    width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
    
-  	/*font-size: 16px;*/
+    /*font-size: 16px;*/
 }
 
 
@@ -119,23 +119,23 @@ A:link {text-decoration: none}
 
 #main-header
 {
-	width:100%;
-	border-bottom: 0.1em solid #cccccc;
-	background: #fff5b3 url('/site_media/images/top-bg.png') repeat-x;
+    width:100%;
+    border-bottom: 0.1em solid #cccccc;
+    background: #fff5b3 url('/site_media/images/top-bg.png') repeat-x;
 }
 
 
 /*** TREŚĆ ***/
 
 #main-container-content
-{ 	
-	margin:0.5em;
+{   
+    margin:0.5em;
 }
 
 #main-content
 {
-	text-align:left;
-	width:100%;
+    text-align:left;
+    width:100%;
 }
 
 
@@ -143,15 +143,15 @@ A:link {text-decoration: none}
 
 #main-footer
 {
-	width:100%;
-	color: #999999;
-	background: #f8f8f8;
-	border-top: 0.1em solid #cccccc;
+    width:100%;
+    color: #999999;
+    background: #f8f8f8;
+    border-top: 0.1em solid #cccccc;
 }
 
 #main-footer a
-{	
-	color: #999999;
+{   
+    color: #999999;
 }
 
 
@@ -159,25 +159,25 @@ A:link {text-decoration: none}
 
 .main-message
 {
-	text-align:center;
+    text-align:center;
     border: 0.1em solid #cccccc;
     background: #FFF5B3;
-	padding: 0.3em 0em;
-	color:red;
-	width:100%;
-	border-radius: 0.4em;
+    padding: 0.3em 0em;
+    color:red;
+    width:100%;
+    border-radius: 0.4em;
 }
 
 .version-info
 {
-	float:right;
+    float:right;
 }
 /*** KOMPONENTY ***/
 
 #logo{
-	width:100%;
-	border: 0em solid black;
-	
+    width:100%;
+    border: 0em solid black;
+    
 }
 
 
@@ -185,114 +185,157 @@ input[type=text], input[type=password], textarea
 {
     border: 0.1em solid #cccccc;
     background: white;
-	padding:0em;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	height:1.7em;
-	width:99%;
+    padding:0em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    height:1.7em;
+    width:99%;
 }
 
 
 .clear{ 
 
     background: white;
-	border: 1px solid #cccccc;
+    border: 1px solid #cccccc;
 
 } 
 
+/*** Student Schedule ***/
+
+.sschedule
+{
+text-align: center; 
+width: 80%; 
+margin: 10% 0% 0% 10%; 
+border: 1px solid black; 
+border-bottom: none;
+}
+.sschedule .right
+{
+  float: right;
+  height: 4em;
+  width: 75%;
+  border-left: 1px solid black;
+}
+
+.sschedule .left{
+  float: left; 
+  height: 4em; 
+  width: 24%;
+}
+
+.sschedule .break{
+  border-bottom:1px solid black; 
+  height: 1em;
+}
+
+.sschedule .row{
+ border-bottom: 1px solid black;
+}
+.sschedule .row .nav {
+  float: left; 
+  width: 25%;
+}
+.sschedule .row .center{
+  float: left; 
+  width: 50%;
+}
+.align{
+  clear: both;
+}
 
 /*** ROZDZIELCZOSCI ***/
 
 
 
 @media handheld and (min-device-width: 128px), screen and (min-device-width: 128px)  {
-	#main-container{
-		width:128px;
-	}
-	#main-content{
-		height:140px; /*screen.height - logo.height*/
-	}
-	
-	.main-message{ content: "Spróbuj ponownie."}
-	.version-info{ content: "128x160";}
-	
-	div{ font-size: 7px; }
+    #main-container{
+        width:128px;
+    }
+    #main-content{
+        height:140px; /*screen.height - logo.height*/
+    }
+    
+    .main-message{ content: "Spróbuj ponownie."}
+    .version-info{ content: "128x160";}
+    
+    div{ font-size: 7px; }
 }
 
 @media handheld and (min-device-width: 176px), screen and (min-device-width: 176px)  {
-	#main-container{
-		width:176px;
-	}
-	#main-content{
-		height:176px;
-	}
-	
-	.version-info{content: "176x220";}
-	
-	div{ font-size: 8px; }
+    #main-container{
+        width:176px;
+    }
+    #main-content{
+        height:176px;
+    }
+    
+    .version-info{content: "176x220";}
+    
+    div{ font-size: 8px; }
 }
 
 @media handheld and (min-device-width: 240px), screen and (min-device-width: 240px)  {
-	#main-container{
-		width:240px;
-	}
-	#main-content{
-		height:240px;
-	}
-	.main-message{ font-weight: bold; }
-	.version-info{content: "240x320";}
-	
-	div{ font-size: 11px; }
-	input{ font-size: 11px; }
+    #main-container{
+        width:240px;
+    }
+    #main-content{
+        height:240px;
+    }
+    .main-message{ font-weight: bold; }
+    .version-info{content: "240x320";}
+    
+    div{ font-size: 11px; }
+    input{ font-size: 11px; }
 }
 
 
 /* */ 
 
 @media handheld and (min-device-width: 320px), screen and (min-device-width: 320px)  {
-	#main-container{
-		width:320px;
-	}
-	#main-content{
-		height:320px;
-	}
-	.high-res-cent{
-		width:60%; padding: 10% 20%; 
-	}
-	
-	.version-info{content: "320x480";}
-	
-	div{ font-size: 11px; }
-	input{ font-size: 11px; }
-	input[type=text], input[type=password], textarea{height: 25px;}
+    #main-container{
+        width:320px;
+    }
+    #main-content{
+        height:320px;
+    }
+    .high-res-cent{
+        width:60%; padding: 10% 20%; 
+    }
+    
+    .version-info{content: "320x480";}
+    
+    div{ font-size: 11px; }
+    input{ font-size: 11px; }
+    input[type=text], input[type=password], textarea{height: 25px;}
 }
 
 @media handheld and (min-device-width: 480px), screen and (min-device-width: 480px)  {
-	#main-container{
-		width:480px;
-	}
-	#main-content{
-		height:480px;
-	}
-	.version-info{content: "480x720";}
-	
-	div{ font-size: 16px; }
-	input{ font-size: 16px; }
-	input[type=text], input[type=password], textarea{height: 30px;}
+    #main-container{
+        width:480px;
+    }
+    #main-content{
+        height:480px;
+    }
+    .version-info{content: "480x720";}
+    
+    div{ font-size: 16px; }
+    input{ font-size: 16px; }
+    input[type=text], input[type=password], textarea{height: 30px;}
 
 }
 
 @media handheld and (min-device-width: 640px), screen and (min-device-width: 640px)  {
-	#main-container{
-		width:640px;
-	}
-	#main-content{
-		height:640px;
-	}
-	.version-info{content: "640x960";}
-	
-	div{ font-size: 22px; }
-	input{ font-size: 22px; }
-	input[type=text], input[type=password], textarea{height: 40px;}
+    #main-container{
+        width:640px;
+    }
+    #main-content{
+        height:640px;
+    }
+    .version-info{content: "640x960";}
+    
+    div{ font-size: 22px; }
+    input{ font-size: 22px; }
+    input[type=text], input[type=password], textarea{height: 40px;}
 
 }

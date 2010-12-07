@@ -1,53 +1,53 @@
 {% extends "mobile/base_m.html" %}
 
 {% block content %}
-<div class="plan_content" style="width: 80%; margin: 10% 0% 0% 10%; border-top: 1px solid black; border-left: 1px solid black; border-right: 1px solid black;">
-    <div class="plan_header" style="height: 10%; text-align: center; border-bottom: 1px solid black;">
+<div class="sschedule">
+    <div class="row">
         <h2 style="">Plan zajęć </h2>
     </div>
-    <div class="plan_panel" style="height: 10%; text-align: center; border-bottom: 1px solid black;">
+    <div class="row">
         <a href="{% url student-schedule-delta owner left%}">
-        <div class="plan_left" style="float: left; width: 25%;">
+        <div class="nav">
             <h3>wstecz</h3>
         </div>
         </a>
-        <div class="plan_center" style="float: left; width: 50%;">
+        <div class="center">
             <h2>{{ weekday_name }}</h2>
         </div>
         <a href="{% url student-schedule-delta owner right %}">
-        <div class="plan_left" style="float: left; width: 25%;">
+        <div class="nav">
             <h3>dalej</h3>
         </div>
         </a>
-        <div style="clear: both;"></div>
+        <div class="align"></div>
     </div>
-    <div class="plan_left" style="float: left; height: 4em; width: 24%;text-align: center;">
+    <div>
+        <div style="border-bottom:1px solid black;">
+        <div class="left">
         <h3> termin </h3>
-    </div>
-    <div class="plan_right" style="float: right; width: 75%; height: 4em; text-align: center;border-left: 1px solid black;">
-        <h3> przedmiot </h3>
-    </div>
-    <div style="clear: both;"></div>
-    <div class="plan_content" style="border-top: 1px solid black;">
+        </div>
+        <div class="right">
+            <h3> przedmiot </h3>
+        </div>
+        <div class="align"></div>
+        </div>
         {% for event in schedule %}
         {% if event.term == 0 %}
-            <div style="border-bottom:1px solid black; height: 1em;"></div>
+            <div class="break"></div>
         {% else %}
           <a href= "/subject/{{ event.group.subject.id }}/" >
             <div style="border-bottom:1px solid black;">
-                <div class="plan_left" style="float: left; height: 4em; width: 24%;text-align: center;">
+                <div class="left">
                     <p> {{event.term.period_string}}</br> s. {{event.term.classroom}}</p>
                 </div>
-                <div class="plan_right" style="float: right; height: 4em; width: 75%;text-align: center; border-left: 1px solid black;">
+                <div class="right">
                     <p style = ""> {{event.group.subject.name}} ({{event.group.get_type_display}})</p>
                 </div>
-                <div style="clear: both;"></div>
+                <div class="align"></div>
             </div>
           </a>
     {% endif %}
   {% endfor %}
   </div>
-  
 </div>
-    
 {% endblock %}
