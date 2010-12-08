@@ -26,9 +26,75 @@ from datetime import time
 
 
 @login_required
-def subjectTerms(request,subject_id):
+def subjectTerms(request,slug):
+        try:
+            #subject = Subject.objects.get(id = slug)
+            #sprint subject.slug
+            subject = Subject.visible.get(slug=slug)
+            try:
+                student = request.user.student
+                subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
+                subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
+                subject.user_enrolled_to_eaoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '4')
+                subject.user_enrolled_to_exlaboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '5')
+                subject.user_enrolled_to_seminar = Record.is_student_in_subject_group_type(request.user.id, slug, '6')
+                subject.user_enrolled_to_langoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '7')
+                subject.user_enrolled_to_ssoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '8')
+                subject.is_recording_open = subject.is_recording_open_for_student(student)
+            except Student.DoesNotExist:
+                pass
+
+            lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
+            exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
+            laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
+            exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
+            exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
+            seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
+            language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
+            sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
+
+            data = {
+                'subject' : subject,
+                'lectures' : lectures,
+                'exercises' : exercises,
+                'exercises_adv' : exercises_adv,
+                'laboratories' : laboratories,
+                'seminar' : seminar,
+                'exer_labs' : exer_labs,
+                'language' : language,
+                'sport' : sport
+            }
+            return render_to_response( 'mobile/subject_terms.html', data, context_instance = RequestContext( request ) )
+        except Subject.DoesNotExist, NonSubjectException:
+            logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % unicode(slug) )
+            request.user.message_set.create(message="Przedmiot nie istnieje.")
+            return render_to_response('mobile/subject_terms.html', context_instance=RequestContext(request))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	"""Wyświetla stronę zapisów na wybrany przedmiot"""
-	student = request.user.student
+	"""student = request.user.student
 	semester = Semester.objects.filter(visible = True)
 	subject = Subject.objects.get(id = subject_id)
 	groups = Group.objects.filter(subject = subject).select_related().order_by('type')
@@ -44,51 +110,71 @@ def subjectTerms(request,subject_id):
 		else:
 			enrolled_by_type[g.type] = z
 	show_unsigned = True in enrolled_by_type.values()				
-	return render_to_response("mobile/subject_terms.html",{'e': enrolled_by_type,'subject': subject,'groups' : records,'g2': groups_final,'su': show_unsigned},context_instance = RequestContext(request))
+	return render_to_response("mobile/subject_terms.html",{'e': enrolled_by_type,'subject': subject,'groups' : records,'g2': groups_final,'su': show_unsigned},context_instance = RequestContext(request))"""
 
 @login_required
 def assign(request,group_id):
+    group = Group.objects.get(id=group_id)
+    subject = Subject.objects.get(id = group.subject.id)
     try:
         record = Record.add_student_to_group(request.user.id, group_id)
         request.user.message_set.create(message="Zostałeś zapisany do grupy.")
-	group = Group.objects.get(id=group_id)
-	subject = group.subject.id
-        return redirect("subject-terms", subject_id=subject)
+        return redirect("subject-terms", slug=subject.slug)
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
     except AssignedInThisTypeGroupException:
         request.user.message_set.create(message="Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
     except AlreadyAssignedException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
     except OutOfLimitException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa jest pełna.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
     except RecordsNotOpenException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
 	
 @login_required
 def resign(request, group_id):
-
+    group = Group.objects.get(id=group_id)
+    subject = Subject.objects.get(id = group.subject.id)
     try:
         record = Record.remove_student_from_group(request.user.id, group_id)
         request.user.message_set.create(message="Zostałeś wypisany z grupy.")
-	group = Group.objects.get(id=group_id)
-	subject = group.subject.id
-        return redirect("subject-terms", subject_id=subject)
+	return redirect("subject-terms", slug=subject.slug)
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
     except NonGroupException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
     except AlreadyNotAssignedException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return redirect("subject-terms", slug=subject.slug)
 
+@login_required
+def reassign(request,group_from,group_to):
+    try:
+        record = Record.change_student_group(request.user.id, group_from, group_to)
+        request.user.message_set.create(message="Zostałeś przepisany do innej grupy.")
+        return redirect("subject-terms", slug=record.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś studentem.")
+        return redirect("subject-terms", slug=record.group_slug())
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz zmienić grupy, bo podana grupa nie istnieje.")
+        return redirect("subject-terms", slug=record.group_slug())
+    except AlreadyNotAssignedException:
+        request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś zapisany.")
+        return redirect("subject-terms", slug=record.group_slug())
+    except OutOfLimitException:
+        request.user.message_set.create(message="Nie możesz się przenieść, bo podana grupa jest pełna.")
+        return redirect("subject-terms", slug=record.group_slug())
+    except RecordsNotOpenException:
+        request.user.message_set.create(message="Nie możesz się przenieść, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
+        return redirect("subject-terms", slug=record.group_slug())
