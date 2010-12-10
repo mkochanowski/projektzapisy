@@ -8,7 +8,7 @@
 {% block content %}
 
     {% if form.errors %}
-        <div class="main-message">Podany identyfikator i hasło się nie zgadzają. <br/> Spróbuj ponownie.</div><br/>
+        <div id="login-message" class="main-message">Podany identyfikator i hasło się nie zgadzają. <br/> Spróbuj ponownie.</div>
     {% endif %}
 
     <form class="high-res-cent" method="post" action="{% url django.contrib.auth.views.login %}" >
@@ -22,8 +22,8 @@
         
 
         <div>
-		<input type="checkbox"  class="clear" value="1" checked="yes " style="float: left"/> Zapamiętaj mnie
-			<input type="submit" class="clear" value="Zaloguj" style="float: right" />
+		<input type="checkbox"  class="clear" value="1" checked="yes " style="float: left"/> Zapamiętaj mnie<br/>
+			<input type="submit"  value="Zaloguj"  />
             <input type="hidden" name="next" value="{{ next }}" />
         </div>
     </form>

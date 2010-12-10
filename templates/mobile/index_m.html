@@ -1,20 +1,27 @@
 {% extends "mobile/base_m.html" %}
 
 {% block styles %}
-    <!--custom stylesheet-->
+	<!--custom stylesheet-->
 {% endblock %}
 
 {% block content %}
-    <a href="/records/schedule">
-    <div class="plan_header" style="width: 80%; height: 10%; text-align: center; margin: 10% 10% 10% 10%; border: 1px solid black;">
-        <h2>Plan zajęć</h2>
-    </div>
-    </a>
-    <a href="{% url latest_news 'enrollment' %}">
-    <div class="plan_header" style="width: 80%; height: 10%; text-align: center; margin: 10% 10% 10% 10%; border: 1px solid black;">
-        <h2>Zapisy</h2>
-    </div>
-    </a>
-    </a>
+
+<div class="middle">
+	<div style="width:40%; padding: 5% 30%; text-align: center; ">
+		<a href="/records/schedule">
+			<div style="width:100%; padding: 5% 0%; border: 0.1em solid black; background: aqua;">
+				Moj plan
+			</div>
+		</a>
+	</div>
+	<br/>
+	<div style="width:40%; padding: 5% 30%; text-align: center; ">
+		<a href="{% url latest_news 'enrollment' %}">
+			<div style="width:100%;padding: 5% 0%; border: 0.1em solid black; background: green;">
+				Zapisy
+			</div>
+		</a>
+	</div>
+</div>
 
 {% endblock %}

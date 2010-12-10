@@ -1,40 +1,44 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN"
-    "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="Description" content="Opis dokumentu" />
+    <meta name="Author" content="Autor" />
     <link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
-    
+    <link rel="stylesheet" href="/site_media/css/m_portrait.css" type="text/css" />	
+	<link rel="stylesheet" media="all and (orientation: landscape)" href="/site_media/css/m_landscape.css" />     
+	
     <title>
-        Fereol mobile &copy;
+        Zapisy II UWr - wersja mobilna
     </title>
 </head>
 
 <body>
     <div id="main-container">
     
-        <div id="main-header">
+        <div id="main-header" >
             <a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
-            {% if user.is_authenticated %}
-                <a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
-            {% endif %}
+            <div class="inner-clear">
+				{% if user.is_authenticated %}
+					<a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
+				{% endif %}
+			</div>
         </div>
         
-        <div id="main-container-content">
-            <div id="main-content">
+        <div id="main-content" >
+			
                 {% block content %}
                 {% endblock %}
-            </div>
+   
         </div>
 
+		<div style="clear:both"></div>
+		
         <div id="main-footer">
-            <div style="margin:3px 5px;">
                 <a href="{% url no-mobile %}"> przejdz do pelnej wersji</a>
                 <div class="version-info">
                 </div>
-            </div>
-            
         </div>
     </div>
     
