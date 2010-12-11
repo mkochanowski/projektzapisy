@@ -60,19 +60,7 @@
     margin-right: auto;
  }
  
-   #center-container th
-  {
-    border: 0.1em solid black;
-    text-align: center;
- } 
- 
-  #center-container table, tr, td
- { 
-    margin-left: auto;
-    margin-right: auto;
-    text-align:left;
-    border: 1px solid black;
- }
+
 
  .inne-button {
     margin: 5%;
@@ -91,7 +79,7 @@ form{padding: 2% 0%}
 
 
 body{
-    margin: 0.5em;
+	margin: 0em 0em 2em 0em;
 }
 
 #main-container
@@ -127,10 +115,7 @@ A:link {text-decoration: none}
 
 /*** TREŚĆ ***/
 
-#main-container-content
-{   
-    margin:0.5em;
-}
+
 
 #main-content
 {
@@ -159,13 +144,13 @@ A:link {text-decoration: none}
 
 .main-message
 {
-    text-align:center;
-    border: 0.1em solid #cccccc;
+	text-align:center;
+    border: 0.1em solid red;
     background: #FFF5B3;
-    padding: 0.3em 0em;
-    color:red;
-    width:100%;
-    border-radius: 0.4em;
+	padding: 0.3em 0em;
+	color:red;
+	width:100%;
+	border-radius: 0.4em;
 }
 
 .version-info
@@ -180,7 +165,12 @@ A:link {text-decoration: none}
     
 }
 
-
+input[type=submit] {
+	margin: 5%;
+	width: 90%;
+	padding:3% 0%;
+}
+		
 input[type=text], input[type=password], textarea
 {
     border: 0.1em solid #cccccc;
