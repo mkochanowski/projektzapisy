@@ -19,7 +19,7 @@
     
         <div id="main-header" >
             <a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
-            <div class="inner-clear">
+            <div class="subject-inner-clear">
 				{% if user.is_authenticated %}
 					<a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
 				{% endif %}
