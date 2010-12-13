@@ -1,0 +1,26 @@
+/**
+ * Style odpowiadające za panel oceny
+ */
+
+
+/*** GŁOWNA STRONA OCENY ***/
+
+#grade-main-rules
+{
+    text-align: justify;
+    margin-bottom: 30px;
+}
+
+#grade-main .link, #grade-main .disabled-link
+{
+    text-align: center;
+}
+
+#grade-main .link
+{
+    font-size: 20px;
+    padding-top: 10px;
+}
+
+/*** GŁOWNA STRONA OCENY - koniec ***/
+
