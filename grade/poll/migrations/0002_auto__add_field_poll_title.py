@@ -8,126 +8,14 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'Answer'
-        db.create_table('poll_answer', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('poll', ['Answer'])
-
-        # Adding model 'OpenQuestion'
-        db.create_table('poll_openquestion', (
-            ('reason', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('poll', ['OpenQuestion'])
-
-        # Adding model 'SingleChoiceQuestion'
-        db.create_table('poll_singlechoicequestion', (
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('has_other', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('reason', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('poll', ['SingleChoiceQuestion'])
-
-        # Adding M2M table for field answers on 'SingleChoiceQuestion'
-        db.create_table('poll_singlechoicequestion_answers', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('singlechoicequestion', models.ForeignKey(orm['poll.singlechoicequestion'], null=False)),
-            ('answer', models.ForeignKey(orm['poll.answer'], null=False))
-        ))
-        db.create_unique('poll_singlechoicequestion_answers', ['singlechoicequestion_id', 'answer_id'])
-
-        # Adding model 'MultipleChoiceQuestion'
-        db.create_table('poll_multiplechoicequestion', (
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('has_other', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('reason', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('poll', ['MultipleChoiceQuestion'])
-
-        # Adding M2M table for field answers on 'MultipleChoiceQuestion'
-        db.create_table('poll_multiplechoicequestion_answers', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('multiplechoicequestion', models.ForeignKey(orm['poll.multiplechoicequestion'], null=False)),
-            ('answer', models.ForeignKey(orm['poll.answer'], null=False))
-        ))
-        db.create_unique('poll_multiplechoicequestion_answers', ['multiplechoicequestion_id', 'answer_id'])
-
-        # Adding model 'Poll'
-        db.create_table('poll_poll', (
-            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'])),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
-        ))
-        db.send_create_signal('poll', ['Poll'])
-
-        # Adding M2M table for field open_questions on 'Poll'
-        db.create_table('poll_poll_open_questions', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('poll', models.ForeignKey(orm['poll.poll'], null=False)),
-            ('openquestion', models.ForeignKey(orm['poll.openquestion'], null=False))
-        ))
-        db.create_unique('poll_poll_open_questions', ['poll_id', 'openquestion_id'])
-
-        # Adding M2M table for field multiple_choice_question on 'Poll'
-        db.create_table('poll_poll_multiple_choice_question', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('poll', models.ForeignKey(orm['poll.poll'], null=False)),
-            ('multiplechoicequestion', models.ForeignKey(orm['poll.multiplechoicequestion'], null=False))
-        ))
-        db.create_unique('poll_poll_multiple_choice_question', ['poll_id', 'multiplechoicequestion_id'])
-
-        # Adding M2M table for field single_choice_questions on 'Poll'
-        db.create_table('poll_poll_single_choice_questions', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('poll', models.ForeignKey(orm['poll.poll'], null=False)),
-            ('singlechoicequestion', models.ForeignKey(orm['poll.singlechoicequestion'], null=False))
-        ))
-        db.create_unique('poll_poll_single_choice_questions', ['poll_id', 'singlechoicequestion_id'])
+        # Adding field 'Poll.title'
+        db.add_column('poll_poll', 'title', self.gf('django.db.models.fields.CharField')(default='', max_length=250), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Answer'
-        db.delete_table('poll_answer')
-
-        # Deleting model 'OpenQuestion'
-        db.delete_table('poll_openquestion')
-
-        # Deleting model 'SingleChoiceQuestion'
-        db.delete_table('poll_singlechoicequestion')
-
-        # Removing M2M table for field answers on 'SingleChoiceQuestion'
-        db.delete_table('poll_singlechoicequestion_answers')
-
-        # Deleting model 'MultipleChoiceQuestion'
-        db.delete_table('poll_multiplechoicequestion')
-
-        # Removing M2M table for field answers on 'MultipleChoiceQuestion'
-        db.delete_table('poll_multiplechoicequestion_answers')
-
-        # Deleting model 'Poll'
-        db.delete_table('poll_poll')
-
-        # Removing M2M table for field open_questions on 'Poll'
-        db.delete_table('poll_poll_open_questions')
-
-        # Removing M2M table for field multiple_choice_question on 'Poll'
-        db.delete_table('poll_poll_multiple_choice_question')
-
-        # Removing M2M table for field single_choice_questions on 'Poll'
-        db.delete_table('poll_poll_single_choice_questions')
+        # Deleting field 'Poll.title'
+        db.delete_column('poll_poll', 'title')
     
     
     models = {
@@ -198,7 +86,8 @@ class Migration(SchemaMigration):
             'multiple_choice_question': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.MultipleChoiceQuestion']", 'symmetrical': 'False'}),
             'open_questions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.OpenQuestion']", 'symmetrical': 'False'}),
             'single_choice_questions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.SingleChoiceQuestion']", 'symmetrical': 'False'}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"})
+            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '250'})
         },
         'poll.singlechoicequestion': {
             'Meta': {'object_name': 'SingleChoiceQuestion'},
