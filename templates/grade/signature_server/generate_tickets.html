@@ -1,0 +1,14 @@
+{% extends "grade/base.html" %}
+
+{% block content %}
+<h4>Twoje wygenerowane bilety to:</h4>
+{% for ticket in tickets %}
+    {{ ticket.0 }} <br>
+    {{ ticket.1 }} <br>
+    {{ ticket.2 }} <br>
+{% endfor %}
+<br />
+Zapisz je w bezpiecznym miejscu!
+{% endblock %}
+
+

@@ -1,0 +1,15 @@
+{% extends "grade/base.html" %}
+
+{% block content %}
+<form method="post">
+<table>
+{% for form in forms %}
+    {{ form.as_table }}
+{% endfor %}
+</table>
+<input type="submit" value="Pobierz klucze">
+</form>
+
+<div>{{ p }}</div>
+{% endblock %}
+

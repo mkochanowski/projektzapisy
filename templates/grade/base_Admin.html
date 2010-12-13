@@ -11,22 +11,13 @@
     <!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
     <!-- <li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li> -->
     
-<!--
-    DODAĆ WARUNEK NA OTWARCIE / ZAKOŃCZENIE OCENY
--->
-    {% if user.is_superuser %}
-    <li><a href="{% url grade-cryptography-start-grading %}">Przygotowanie oceny zajęć</a></li> 
-    {% endif %}
-<!---->
-    {% if user.employee %}       
+    
+    
+    {% if user.employee %}        
     <li><a href="{% url grade-poll-add %}">Dodaj ankietę</a></li>
     {% endif %}
-<!--
-    TO UMOŻLIWIAĆ TYLKO JAK OCENA JEST OTWARTA
--->
-    <li><a href="{% url grade-signature_server-sign-tickets %}">Pobieranie kluczy</a></li>
+    <li><a href="#">Pobieranie kluczy</a></li>
     <li><a href="{% url grade-poll-verify-keys %}">Ocena zajęć</a></li>
-<!---->
     <li><a href="#">Wyniki oceny</a></li>
     {% if user.is_authenticated %}
     <li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
