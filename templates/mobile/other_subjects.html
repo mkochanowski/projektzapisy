@@ -13,7 +13,7 @@
 		<h3>Wszystkie przedmioty: </h3>
 		{% for s in subjects %}
 			<div class="subject-outer">
-				<a href= "/subject/{{ s.id }}/" ><div class="subject-inner">{{ s.name }}</div></a>
+				<a href= "/subject/{{ s.slug }}/" ><div class="subject-inner">{{ s.name }}</div></a>
 			</div>
 		{% endfor %}
 	</div>
