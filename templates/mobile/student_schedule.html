@@ -35,7 +35,7 @@
         {% if event.term == 0 %}
             <div class="break"></div>
         {% else %}
-          <a href= "/subject/{{ event.group.subject.id }}/" >
+          <a href= "/subject/{{ event.group.subject.slug }}/" >
             <div style="border-bottom:1px solid black;">
                 <div class="left">
                     <p> {{event.term.period_string}}</br> s. {{event.term.classroom}}</p>

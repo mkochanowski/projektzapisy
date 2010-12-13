@@ -6,9 +6,9 @@
     <meta name="Description" content="Opis dokumentu" />
     <meta name="Author" content="Autor" />
     <link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/m_portrait.css" type="text/css" />	
-	<link rel="stylesheet" media="all and (orientation: landscape)" href="/site_media/css/m_landscape.css" />     
-	
+    <link rel="stylesheet" href="/site_media/css/m_portrait.css" type="text/css" /> 
+    <link rel="stylesheet" media="all and (orientation: landscape)" href="/site_media/css/m_landscape.css" />     
+    
     <title>
         Zapisy II UWr - wersja mobilna
     </title>
@@ -20,21 +20,21 @@
         <div id="main-header" >
             <a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
             <div class="subject-inner-clear">
-				{% if user.is_authenticated %}
-					<a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
-				{% endif %}
-			</div>
+                {% if user.is_authenticated %}
+                    <a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
+                {% endif %}
+            </div>
         </div>
         
         <div id="main-content" >
-			
+            
                 {% block content %}
                 {% endblock %}
    
         </div>
 
-		<div style="clear:both"></div>
-		
+        <div style="clear:both"></div>
+        
         <div id="main-footer">
                 <a href="{% url no-mobile %}"> przejdz do pelnej wersji</a>
                 <div class="version-info">

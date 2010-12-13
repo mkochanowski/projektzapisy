@@ -7,14 +7,16 @@ from enrollment.records.exceptions import *
 from datetime import date
 
 DAYS_OF_WEEK = ['poniedziałek','wtorek','środa','czwartek','piątek','sobota','niedziela']
-
+DAYS_SIMPLE= ['poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek', 'sobota', 'niedziela']
 @login_required
-def studentSchedule(request, schedule_owner=None, delta=0):
+def studentSchedule(request, schedule_owner=None, delta=None):
     """
         Main page
     """
     try:
         #choosing correct weekday
+        if delta == None:
+            delta = 0
         delta = int(delta)%7
         left  = (delta+6)%7
         right = (delta+1)%7
@@ -60,8 +62,10 @@ def studentSchedule(request, schedule_owner=None, delta=0):
         return render_to_response('mobile/student_schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Użytkownik nie posiada planu bo nie jest studentem.")
+        logger.error('User (name = %s) throws NonStudentException on student schedule.' % unicode(schedule_owner) )
         return render_to_response('mobile/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
         request.user.message_set.create(message="Użytkownik nie istnieje.")
+        logger.error('User (name = %s) throws DoesNotExist on student schedule.' % unicode(schedule_owner) )
         return render_to_response('mobile/error.html', context_instance=RequestContext(request))
         

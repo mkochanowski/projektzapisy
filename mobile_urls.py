@@ -14,8 +14,11 @@ urlpatterns = patterns('',
     url(r'^nomobile/$', 'fereol.mobile.views.noMobile', name = 'no-mobile'),
     url(r'^enrollment/$', 'fereol.mobile.views.studentSubjectList', name = 'student-enrollment'),
     url(r'^enrollment/other/', 'fereol.mobile.views.otherSubjects', name = 'enrollment-other'),
+    #STUDENT-SCHEDULE
     url(r'records/schedule/$', 'fereol.mobile.views.studentSchedule', name = 'student-schedule'),
-    url(r'records/schedule/(?P<schedule_owner>\d+)/(?P<delta>\-?\d+)/$', 'fereol.mobile.views.studentSchedule', name = 'student-schedule-delta'),
+    url(r'records/schedule/(?P<schedule_owner>\w+)/$', 'fereol.mobile.views.studentSchedule', name = 'student-schedule-owner'),
+    url(r'records/schedule/(?P<schedule_owner>\w+)/(?P<delta>\-?\d+)/$', 'fereol.mobile.views.studentSchedule', name = 'student-schedule-delta'),
+    
     url(r'^(?P<cat>[\w\-_]+)/$', 'news.views.latest_news', name='latest_news'),
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
     url(r'^subject/(?P<slug>[\w\-_]+)', 'fereol.mobile.views.subjectTerms', name='subject-terms'),
