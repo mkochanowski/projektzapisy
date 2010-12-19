@@ -303,6 +303,14 @@ class Queue(models.Model):
     queued = QueueManager()
 
     @staticmethod
+    def get_students_in_queue(group_id):
+        try:
+            group = Group.objects.get(id=group_id)
+            return map(lambda x: x.student, Queue.queued.filter(group=group))
+        except Group.DoesNotExist:
+            raise NonGroupException()
+
+    @staticmethod
     def add_student_to_queue(user_id, group_id,priority=0):
         """ assignes student to queue."""
         user = User.objects.get(id=user_id)
