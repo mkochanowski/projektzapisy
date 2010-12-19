@@ -5,3 +5,4 @@ from fereol.enrollment.records.models import *
 
 
 admin.site.register( Record )
+admin.site.register( Queue )

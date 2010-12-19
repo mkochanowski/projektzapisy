@@ -11,6 +11,8 @@ from enrollment.subjects.exceptions import NonSubjectException, NonStudentOption
 
 from itertools import cycle
 
+from django.db import transaction
+
 STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
 STATUS_QUEUED = '1'
@@ -198,6 +200,7 @@ class Record(models.Model):
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
+            logger.info('User %d is now added to group %d' % (int(user_id), int(group_id)))
             return record
         except NonStudentOptionsException:
             logger.error('Record.add_student_to_group()  throws NonStudentOptionsException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
@@ -212,6 +215,38 @@ class Record(models.Model):
             return Record.objects.create(group=group, student=student, status=STATUS_ENROLLED)
 
     @staticmethod
+    @transaction.commit_on_success
+    def remove_student_from_group(user_id, group_id):
+        user = User.objects.get(id=user_id)
+        try:
+
+            student = user.student
+            group = Group.objects.get(id=group_id)
+            record = Record.enrolled.get(group=group, student=student)
+            queued = Queue.remove_first_student_from_queue(group_id)
+            logger.info('%s', (unicode(queued)))
+                            # removing student from group + adding first from queue
+            record.delete()
+            if queued and (Record.number_of_students(group=group) < group.limit) :
+                new_student = queued.student
+                Record.add_student_to_group(new_student.user.id, group.id)
+                logger.info('User (%s) replaced user (%s) in group [%s] ' % (user.get_full_name(), queued.student.get_full_name, unicode(group)))
+                   
+#czy można się zapisać na ten sam przedmiot - do kilku kolejek? otwarcie zapisów? ECTSy - jak przekracza, to wylatuje z kolejki, jak nie ma otwartych zapisów, to nie zapisuje się do kolejki; ostrzeżenie przy przypinaniu - ectsy; po otwarciu zapisów przypinanie staje się zapisem/zapisem do kolejki
+            return record
+
+        except Record.DoesNotExist:
+            logger.error('Record.remove_student_from_group() throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise AlreadyNotAssignedException()
+        except Student.DoesNotExist:
+            logger.error('Record.remove_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonStudentException()
+        except Group.DoesNotExist:
+            logger.error('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonGroupException()
+
+    @staticmethod
+    @transaction.commit_on_success
     def change_student_group(user_id, old_id, new_id):
         """ Deletes old student record and returns new record with changed group. """
         user = User.objects.get(id=user_id)
@@ -223,9 +258,8 @@ class Record(models.Model):
                 logger.warning('Record.change_student_group() raised RecordsNotOpenException exception (parameters: user_id = %d, old_id = %d, new_id = %d)' % (int(user_id), int(old_id), int(new_id)))
                 raise RecordsNotOpenException()
             if Record.number_of_students(group=new_group) < new_group.limit:
-                record = Record.enrolled.get(group=old_group, student=student)
-                record.delete()
-                new_record = Record.objects.create(group=new_group, student=student, status=STATUS_ENROLLED)
+                Record.remove_student_from_group(user_id, old_id)
+                new_record = Record.add_student_to_group(user_id, new_id)
                 logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), unicode(old_group), unicode(new_group)))
             else:
                 raise OutOfLimitException()
@@ -241,25 +275,7 @@ class Record(models.Model):
             logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Record.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id)))
             raise AlreadyNotAssignedException()
 
-    @staticmethod
-    def remove_student_from_group(user_id, group_id):
-        user = User.objects.get(id=user_id)
-        try:
-            student = user.student
-            group = Group.objects.get(id=group_id)
-            record = Record.enrolled.get(group=group, student=student)
-            record.delete()
-            logger.info('User (%s) is now removed from group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)))
-            return record
-        except Record.DoesNotExist:
-            logger.error('Record.remove_student_from_group() throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
-            raise AlreadyNotAssignedException()
-        except Student.DoesNotExist:
-            logger.error('Record.remove_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
-            raise NonStudentException()
-        except Group.DoesNotExist:
-            logger.error('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
-            raise NonGroupException()
+
 
     def group_slug(self):
         return self.group.subject_slug()
@@ -310,7 +326,7 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
-    def change_student_priority(user_id, group_id,priority) :
+    def change_student_priority(user_id, group_id, priority) :
         """change student priority in group queue"""
         user = User.objects.get(id=user_id)
         try:
@@ -334,7 +350,7 @@ class Queue(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            record =Queue.queued.get(group=group, student=student)
+            record = Queue.queued.get(group=group, student=student)
             record.delete()
             logger.info('User (%s) is now removed from queue to group (%s) (parameters: user_id = %d, group_id = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id)))
             return record
@@ -347,6 +363,29 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.error('Queue.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
+
+    @staticmethod
+    def remove_first_student_from_queue(group_id):
+        """remove FIRST student from queue"""
+        try:
+            group = Group.objects.get(id=group_id)
+            queue = Queue.objects.filter(group=group).order_by('time')
+            if queue :
+                first = queue[0]
+                student_id = first.student.user.id
+                return Queue.remove_student_from_queue(student_id, group_id)
+            else :
+                return False
+        except Queue.DoesNotExist:
+            logger.error('Queue.remove_first_student_from_queue() throws Queue.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise AlreadyNotAssignedException()
+        except Student.DoesNotExist:
+            logger.error('Queue.remove_first_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonStudentException()
+        except Group.DoesNotExist:
+            logger.error('Queue.remove_first_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonGroupException()
+            
 
     class Meta:
         verbose_name = 'kolejka'
