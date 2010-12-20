@@ -120,8 +120,7 @@ INSTALLED_APPS = (
     'fereol.users',
     'fereol.debug_toolbar',
     'fereol.grade.poll',
-    'fereol.grade.cryptography',
-    'fereol.grade.signature_server',
+    'fereol.grade.ticket_create',
 )
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
