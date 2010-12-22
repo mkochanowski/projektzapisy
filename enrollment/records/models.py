@@ -1,5 +1,7 @@
+import Queue
 #-*- coding: utf-8 -*-
 
+from fereol.enrollment.subjects.models.subject import Subject
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -344,6 +346,9 @@ class Queue(models.Model):
             record.priority = priority
             record.save()
             return record
+        except Queue.DoesNotExist:
+            logger.error('Queue.change_student_priority() throws Queue.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise AlreadyNotAssignedException()
         except Student.DoesNotExist:
             logger.error('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonStudentException()
@@ -394,6 +399,31 @@ class Queue(models.Model):
             logger.error('Queue.remove_first_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
             
+    @staticmethod
+    def get_groups_for_student(user_id):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            return map(lambda x: x.group, Queue.queued.filter(student=student))
+        except Student.DoesNotExist:
+            logger.error('Record.get_groups_for_student(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
+            raise NonStudentException()
+
+    @staticmethod
+    def clear_queues_from_student(user_id, group_id, priority) :
+        """ Prototyp, wersja tymczasowa. Nie wiem w którym momencie ta funkcja ma być uruchamiana"""
+        #student = User.objects.get(id = student_id).student
+        try :
+            group = Group.objects.get(id = group_id)
+            subject = Subject.objects.get(slug = group.subject_slug())
+            queued_group = [g.id for g in get_groups_for_student(user_id) if g.subject == subject and g.type == group.type]
+            for q_g in queued_group :
+                record = Queue.queued.get(user_id,q_g.id)
+                if (record.priority <= priority) :
+                    Queue.remove_student_from_queue(user_id,q_g.id)
+        except Group.DoesNotExist:
+            logger.error('Queue.remove_first_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            raise NonGroupException()
 
     class Meta:
         verbose_name = 'kolejka'
