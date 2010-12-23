@@ -406,23 +406,26 @@ class Queue(models.Model):
             student = user.student
             return map(lambda x: x.group, Queue.queued.filter(student=student))
         except Student.DoesNotExist:
-            logger.error('Record.get_groups_for_student(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
+            logger.error('Queue.get_groups_for_student(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
 
     @staticmethod
-    def clear_queues_from_student(user_id, group_id, priority) :
-        """ Prototyp, wersja tymczasowa. Nie wiem w którym momencie ta funkcja ma być uruchamiana"""
-        #student = User.objects.get(id = student_id).student
+    def remove_student_low_priority_records(user_id, group_id, priority) :
+        """ Funkcja, która czyści kolejkę z wpisów do grup z tego samego przedmiotu o tym samym rodzaju ale mniejszym priorytecie"""
         try :
+            student = User.objects.get(id = user_id).student
             group = Group.objects.get(id = group_id)
             subject = Subject.objects.get(slug = group.subject_slug())
-            queued_group = [g.id for g in get_groups_for_student(user_id) if g.subject == subject and g.type == group.type]
+            queued_group = [g for g in Queue.get_groups_for_student(user_id) if g.subject == subject and g.type == group.type]
             for q_g in queued_group :
-                record = Queue.queued.get(user_id,q_g.id)
+                record = Queue.queued.get(student = student,group = q_g)
                 if (record.priority <= priority) :
                     Queue.remove_student_from_queue(user_id,q_g.id)
+        except Student.DoesNotExist:
+            logger.error('Queue.remove_student_low_priority_records throws Student.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % int(user_id), int(group_id), int(priority))
+            raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Queue.remove_first_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Queue.remove_student_low_priority_records throws Group.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % int(user_id), int(group_id), int(priority))
             raise NonGroupException()
 
     class Meta:
