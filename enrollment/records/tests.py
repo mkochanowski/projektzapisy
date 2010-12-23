@@ -172,6 +172,7 @@ class GetStudentsInGroupTest(TestCase):
     def testWithNonExistsGroup(self):
         self.group.delete()
         self.assertRaises(NonGroupException, Record.get_students_in_group, self.group.id)
+        
 
 class AssignmentToGroupsWithSameTypes(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']
@@ -197,53 +198,77 @@ class AssignmentToGroupsWithSameTypes(TestCase):
     def testAssignToCurrentlyBookedGroupWithSameType(self):
         Record.add_student_to_group(self.user.id, self.group1.id)
         self.assertRaises(AssignedInThisTypeGroupException, Record.add_student_to_group, self.user.id, self.group2.id)
+        
 
-class AddStudentToQueue(TestCase):
+
+class GetStudentsInQueue(TestCase):
     fixtures =  ['fixtures__queue']
     
     def setUp(self):
+        self.user = User.objects.get(id=100)
         self.student = User.objects.get(id=100)
-        self.employee = User.objects.get(id=1000)
-        self.group = Group.objects.get(id=186)
-        self.record_number = Record.objects.count()
-        self.group.limit = 4
-        self.group.save()
+        self.group = Group.objects.get(id=100)
         self.semester=Semester.objects.get(id=100)
         self.semester.records_opening = datetime.now()
         self.semester.records_closing = datetime.now() + timedelta(days=7)
         self.semester.save()
         
+    def testWithoutGivenGroup(self):
+        group_id = self.group.id
+        self.group.delete()
+        self.assertRaises(NonGroupException, Queue.get_students_in_queue, group_id)
     
+    def testWithEmptyGroup(self):
+	self.assertEqual(Queue.objects.filter(group=100).count(), 0)
+	queued_students = Queue.get_students_in_queue(self.group.id)
+        self.assertEqual(len(queued_students),0)
+    
+    def testWithNonEmptyGroup(self):
+	Queue.add_student_to_queue(self.student.id, self.group.id)
+	self.assertEqual(Queue.objects.count(), 2)
+	queued_students = Queue.get_students_in_queue(self.group.id)
+        self.assertEqual(len(queued_students),1)
+
+class AddStudentToQueue(TestCase):
+    fixtures =  ['fixtures__queue']
+    
+    def setUp(self):
+        self.user = User.objects.get(id=100)
+        self.student = User.objects.get(id=100)
+        self.employee = User.objects.get(id=1000)
+        self.group = Group.objects.get(id=100)
+        self.semester=Semester.objects.get(id=100)
+        self.semester.records_opening = datetime.now()
+        self.semester.records_closing = datetime.now() + timedelta(days=7)
+        self.semester.save()
+
     def testWithNonStudentUser(self):
-        self.assertRaises(NonStudentException, Queue.add_student_to_queue, self.employee.id, self.group.id)
+        self.user.student.delete()
+        self.assertRaises(NonStudentException, Queue.add_student_to_queue, self.user.id, self.group.id)
 
     def testWithoutGivenGroup(self):
-        group_id = 500 # such group doesn't exist
-        self.assertRaises(NonGroupException, Record.add_student_to_group, self.student.id, group_id)
+        group_id = self.group.id
+        self.group.delete()
+        self.assertRaises(NonGroupException, Queue.add_student_to_queue, self.student.id, group_id)
 
     def testStudentAssignedToGroup(self):
-        Queue.add_student_to_queue(self.student.id, self.group.id)
-        self.assertEqual(Queue.objects.count(), 1)
+        Record.add_student_to_group(self.student.id, self.group.id)
+        self.assertEqual(Queue.objects.filter(group=100).count(), 0)
         self.assertRaises(AlreadyAssignedException, Queue.add_student_to_queue, self.student.id, self.group.id)
-        self.assertEqual(Queue.objects.count(), 1)
+        self.assertEqual(Queue.objects.filter(group=100).count(), 0)
     
-    def testStudentNotAssignedToGroup(self):
+    def testStudentNotAssignedToQueue(self):
         Queue.add_student_to_queue(self.student.id, self.group.id)
-        self.assertEqual(Queue.objects.count(), 1)
+        self.assertEqual(Queue.objects.filter(group=100).count(), 1)
     
-    def testStudentAssignedToQueue(self):
+
+    def testStudenAssignedToQueue(self):
         Queue.add_student_to_queue(self.student.id, self.group.id)
-        self.assertEqual(Queue.objects.count(), 1)
-        
-     
-    
-    
-"""    def testGroupWithStudentLimitExceeded(self):
-        self.group.limit = 0
-        self.group.save()
-        self.assertRaises(OutOfLimitException, Record.add_student_to_group, self.user.id, self.group.id)
-        
-    def testSubjectWithRecordsNotOpenForStudent(self):
+        self.assertEqual(Queue.objects.filter(group=100).count(), 1)
+        self.assertRaises(AlreadyQueuedException, Queue.add_student_to_queue, self.student.id, self.group.id)
+        self.assertEqual(Queue.objects.filter(group=100).count(), 1)
+          
+"""    def testWithRecordsNotOpenForStudent(self):
         self.user.student.records_opening_delay_hours = 0
         self.user.student.save()
         self.group.subject.semester.records_opening = datetime.now()
@@ -252,6 +277,6 @@ class AddStudentToQueue(TestCase):
         student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
         student_options.records_opening_delay_hours = 10
         student_options.save()
-        self.assertRaises(RecordsNotOpenException, Record.add_student_to_group, self.user.id, self.group.id)"""
+        self.assertRaises(RecordsNotOpenException, Queue.add_student_to_queue, self.user.id, self.group.id) """
 
     
