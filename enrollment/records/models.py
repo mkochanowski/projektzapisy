@@ -198,7 +198,9 @@ class Record(models.Model):
 
                 record.status = STATUS_ENROLLED
                 record.save()
-
+                if Queue.queued.filter(student=student, group=goup).count > 0 :
+                    priority = Queue.queued.get(student=student, group=goup).priority
+                    Queue.remove_student_low_priority_records(user_id, group_id, priority)
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
@@ -319,10 +321,14 @@ class Queue(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            if Queue.queued.filter(group=group, student=student).count() > 0 :
+            if Record.enrolled.filter(group=group, student=student).count() > 0 :
+                logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyAssignedException exception.' % (int(user_id), int(group_id)))
                 raise AlreadyAssignedException()
+            if Queue.queued.filter(group=group, student=student).count() > 0 :
+                logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyQueuedException exception.' % (int(user_id), int(group_id)))
+                raise AlreadyQueuedException()
             record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now(), priority=priority)
-            if is_created == False:
+            if is_created == False: # Nie wiem czy ten warunek ma sens z tym powyżej
                 logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyQueuedException exception.' % (int(user_id), int(group_id)))
                 raise AlreadyQueuedException()
             record.save()

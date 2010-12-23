@@ -4,9 +4,8 @@ from django.contrib.auth.models import User
 
 from enrollment.subjects.models import Subject, Group, StudentOptions, Semester
 from enrollment.records.models import Record, Queue
-from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException
+from enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException
 from enrollment.subjects.exceptions import NonSubjectException
-
 from users.models import Employee, Student
 
 from datetime import datetime, timedelta
