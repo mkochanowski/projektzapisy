@@ -448,15 +448,20 @@ class Queue(models.Model):
         return u"%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())
 
 #adding people from queue to group, after limits' change
-
-#@receiver(post_save, sender=Group)
 def add_people_from_queue(sender, instance, **kwargs):
-    num_of_people = Record.objects.filter(group=instance).count()
-    queued = True
-    while queued and (num_of_people < instance.limit) :
-        queued = Queue.remove_first_student_from_queue(instance.id)
-        if queued :
-            Record.add_student_to_group(queued.student.user.id, instance.id)
-            num_of_people = Record.objects.filter(group=instance).count()
+    try:
+        num_of_people = Record.objects.filter(group=instance).count()
+        queued = True
+        while queued and (num_of_people < instance.limit) :
+            queued = Queue.remove_first_student_from_queue(instance.id)
+            if queued :
+                Record.add_student_to_group(queued.student.user.id, instance.id)
+                num_of_people = Record.objects.filter(group=instance).count()
+    except Queue.DoesNotExist:
+        raise AlreadyNotAssignedException()
+    except Student.DoesNotExist:
+        raise NonStudentException()
+    except Group.DoesNotExist:
+        raise NonGroupException()
 
 signals.post_save.connect(add_people_from_queue, sender=Group)
