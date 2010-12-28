@@ -180,7 +180,7 @@ def queue_assign(request, group_id):
     try:
         queue = Queue.add_student_to_queue(request.user.id, group_id)
         request.user.message_set.create(message="Zostałeś zapisany do kolejki.")
-        return redirect("subject-page", slug=record.group_slug())
+        return redirect("subject-page", slug=queue.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))

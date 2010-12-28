@@ -466,6 +466,9 @@ class Queue(models.Model):
             logger.error('Queue.remove_student_low_priority_records throws Group.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % int(user_id), int(group_id), int(priority))
             raise NonGroupException()
 
+    def group_slug(self):
+        return self.group.subject_slug()
+
     class Meta:
         verbose_name = 'kolejka'
         verbose_name_plural = 'kolejki'
