@@ -95,19 +95,17 @@ class Record(models.Model):
             groups = Group.objects.filter(subject=subject).filter(type=group_type)
             try:
                 student_groups = Record.get_groups_for_student(user_id)
-                student_queues = Queue.get_groups_for_student(user_id)
             except NonStudentException:
                 logger.warning('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
                 student_groups = {}
             for g in groups:
+                g.priority = Queue.get_priority(user_id, g)
                 g.limit = g.get_group_limit()
                 g.classrooms = g.get_all_terms()
                 g.enrolled = Record.number_of_students(g)
                 g.queued = Queue.number_of_students(g)
                 if g in student_groups:
                     g.signed = True
-                if g in student_queues:
-                    g.is_in_queue = True
                 if (g.enrolled >= g.limit):
                     g.is_full = True
                 else:
@@ -309,12 +307,16 @@ class QueueManager(models.Manager):
         """ Returns only queued students. """
         return super(QueueManager, self).get_query_set().filter(status=STATUS_QUEUED)
 
+def queue_priority(value):
+    if value <= 0 or value > 5:
+        raise ValidationError(u'%s is not a priority' % value)
+
 class Queue(models.Model):
     group = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
     status = models.CharField(max_length=1, choices=QUEUE_STATUS, verbose_name='status')
     time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
-    priority = models.PositiveSmallIntegerField(default=0, verbose_name='priorytet')
+    priority = models.PositiveSmallIntegerField(default=1, validators=[queue_priority], verbose_name='priorytet')
     objects = models.Manager()
     queued = QueueManager()
 
@@ -325,6 +327,20 @@ class Queue(models.Model):
         return Queue.queued.filter(group=group_).count()
 
     @staticmethod
+    def get_priority(user_id, group):
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            queue = Queue.queued.filter(student=student, group=group)
+            if queue:
+                return queue[0].priority
+            else:
+                return False
+        except Student.DoesNotExist:
+            raise NonStudentException()
+
+
+    @staticmethod
     def get_students_in_queue(group_id):
         try:
             group = Group.objects.get(id=group_id)
@@ -333,7 +349,7 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
-    def add_student_to_queue(user_id, group_id,priority=0):
+    def add_student_to_queue(user_id, group_id,priority=1):
         """ assignes student to queue."""
         user = User.objects.get(id=user_id)
         try:

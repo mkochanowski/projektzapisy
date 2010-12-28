@@ -33,7 +33,7 @@
                     <table class="subject-details-table">
                     	<thead>
                     		<tr>
-                    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th>Liczba osób w kolejce</th><th></th><th></th>
+                    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th>Liczba osób w kolejce</th>
                     		</tr>
                     	</thead>
                     	<tbody>
@@ -54,8 +54,9 @@
 		                            	<a class="subject-details-link forget" link="{% url record-resign t.id %}">wypisz</a>
 		                        	{% else %}
                                         {% if t.is_full %}
-                                            {% if t.is_in_queue %}
-                    			                <a class="subject-details-link forget" link="{% url queue-resign t.id %}">wypisz z kolejki</a>
+                                            {% if t.priority %}
+                    			                <a class="subject-details-link forget" link="{% url queue-resign t.id %}">wypisz z kolejki</a></td>
+                                                <td> priorytet <br /> - {{ t.priority }} +
                                             {% else %}
                     			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
                                             {% endif %}
