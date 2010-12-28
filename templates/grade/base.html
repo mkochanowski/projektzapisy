@@ -1,31 +1,69 @@
+<!--
+PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
+-->
 {% extends "base.html" %}
 
 {% load news_extras %}
 
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
 {% endblock %}
 
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+{% endblock %}
 
 {% block main-menu %}
-	<!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
-	<!-- <li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li> -->
-	
-	{% if user.employee %}        
-	<li><a href="{% url grade-poll-add %}">Dodaj ankietę</a></li>
-	{% endif %}
-	<li><a href="#">Pobieranie kluczy</a></li>
-	<li><a href="{% url grade-poll-verify-keys %}">Ocena zajęć</a></li>
-	<li><a href="#">Wyniki oceny</a></li>
-	{% if user.is_authenticated %}
-	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
+    <!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
+    <!-- <li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li> -->
+    
+<!--
+    DODAĆ WARUNEK NA OTWARCIE / ZAKOŃCZENIE OCENY
+-->
+    {% if user.is_superuser %}
+    <li><a href="{% url grade-prepare-grade %}">Przygotowanie oceny zajęć</a></li> 
+    <li><a href="{% url grade-enable-grade %}">Otwarcie oceny zajęć</a></li> 
+    <li><a href="{% url grade-disable-grade %}">Zamknięcie oceny zajęć</a></li> 
+    <li><a href="{% url grade-poll-poll-create %}">Zarządzanie ankietami</a></li>
+    {% endif %}
+<!---->
+
+<!--
+    TO UMOŻLIWIAĆ TYLKO JAK OCENA JEST OTWARTA
+-->
+    {% if user.student %}     
+    <li><a href="{% url grade-ticket-connections-choice %}">Pobieranie biletów</a></li>
+    {% endif %}
+<!---->
+    <li><a href="{% url grade-poll-tickets-enter %}">Ocena zajęć</a></li>
+    {% if user.is_authenticated %}
+    <li><a href="{% url grade-poll-poll-results %}">Wyniki oceny</a></li>
+    <li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
         {% if user.student %}
             ({{user.student.matricula}})
         {% endif %}
          </li>
-	<li><a href="{% url user-logout %}">(wyloguj)</a></li>
-	{% else %}
-	<li><a href="{% url user-login %}">Zaloguj</a></li>
-	{% endif %}
+    <li><a href="{% url user-logout %}">(wyloguj)</a></li>
+    {% else %}
+    <li><a href="{% url user-login %}">Zaloguj</a></li>
+    {% endif %}
 {% endblock %}
 
+{% block content %}
+<!--
+    OSTYLOWAĆ TĄ WIADOMOŚĆ!
+-->
+    {% if message %} 
+    <h3>{{ message }}</h3>
+    {% endif %}
+    <div id="grade-main">
+	    <h2>Zasady Oceny Zajęć</h2>
+        <div id="grade-main-rules">
+                <!--
+                    TU FAJNIE BYŁOBY DAĆ JAKIEŚ PRAWDZIWE ZASADY :)
+                -->
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas fringilla nulla sed nibh porta ultricies. Fusce lobortis nibh at ante consectetur gravida. Cras varius, nibh sit amet semper ornare, metus velit euismod eros, a lobortis ipsum sem eget nulla. Ut sagittis sodales ligula, ac congue erat mattis ut. Proin velit massa, dapibus venenatis rutrum vitae, malesuada id lacus. Suspendisse potenti. Etiam fermentum eros a lacus facilisis pulvinar. Phasellus interdum aliquet lacus, quis molestie arcu interdum commodo. Integer pellentesque sodales lorem, in suscipit metus imperdiet vel. Aliquam erat volutpat. Integer pharetra vestibulum odio eget congue. Pellentesque pellentesque enim eget nisl pulvinar vitae fringilla nisi molestie.
+        </div>
+	</div>
+{% endblock %}
