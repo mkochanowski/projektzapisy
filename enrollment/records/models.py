@@ -102,8 +102,13 @@ class Record(models.Model):
                 g.limit = g.get_group_limit()
                 g.classrooms = g.get_all_terms()
                 g.enrolled = Record.number_of_students(g)
+                g.queued = Queue.number_of_students(g)
                 if g in student_groups:
                     g.signed = True
+                if (g.enrolled >= g.limit):
+                    g.is_full = True
+                else:
+                    g.is_full = False
         except Subject.DoesNotExist:
             logger.error('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
             raise NonSubjectException()
@@ -285,7 +290,6 @@ class Record(models.Model):
             raise AlreadyNotAssignedException()
 
 
-
     def group_slug(self):
         return self.group.subject_slug()
 
@@ -310,6 +314,12 @@ class Queue(models.Model):
     priority = models.PositiveSmallIntegerField(default=0, verbose_name='priorytet')
     objects = models.Manager()
     queued = QueueManager()
+
+    @staticmethod
+    def number_of_students(group):
+        """Returns number of students queued to particular group"""
+        group_ = group
+        return Queue.queued.filter(group=group_).count()
 
     @staticmethod
     def get_students_in_queue(group_id):

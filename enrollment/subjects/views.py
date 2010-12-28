@@ -51,6 +51,7 @@ def subject(request, slug):
             pass
             
         lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
+        lectures.name = "Wykłady"
         exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
         laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
         exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
@@ -58,17 +59,12 @@ def subject(request, slug):
         seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
         language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
         sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
+
+        tutorials = [lectures, exercises, exercises_adv, laboratories, seminar, exer_labs, language, sport]
                         
         data = {
                 'subject' : subject,
-                'lectures' : lectures,
-                'exercises' : exercises,
-                'exercises_adv' : exercises_adv,
-                'laboratories' : laboratories,
-                'seminar' : seminar,
-                'exer_labs' : exer_labs,
-                'language' : language,
-                'sport' : sport
+                'tutorials' : tutorials,
         }         
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
     

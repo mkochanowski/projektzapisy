@@ -2,6 +2,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns( 'fereol.enrollment.records.views',
     url('(?P<group_id>[\d]+)/assign', 'assign', name='record-assign'),
+    url('(?P<group_id>[\d]+)/queue_assign', 'queue_assign', name='queue-assign'),
     url('(?P<old_id>[\d]+)/change/(?P<new_id>[\d]+)/', 'change', name='record-change'),
     url('(?P<group_id>[\d]+)/resign', 'resign', name='record-resign'),
     url('^(?P<user_id>[0-9]+)/(?P<group_id>[0-9]+)/?$', 'deleteStudentFromGroup', name='delete-student-from-group'),
