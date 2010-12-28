@@ -56,7 +56,10 @@
                                         {% if t.is_full %}
                                             {% if t.priority %}
                     			                <a class="subject-details-link forget" link="{% url queue-resign t.id %}">wypisz z kolejki</a></td>
-                                                <td> priorytet <br /> - {{ t.priority }} +
+                                                <td> priorytet <br /> 
+                                                <a class="subject-details-link forget" link="{% url dec-priority t.id %}"> - </a>
+                                                {{ t.priority }}
+                                                <a class="subject-details-link forget" link="{% url inc-priority t.id %}"> + </a>
                                             {% else %}
                     			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
                                             {% endif %}

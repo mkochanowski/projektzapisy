@@ -194,6 +194,61 @@ def queue_assign(request, group_id):
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+
+
+
+
+@login_required
+def queue_inc_priority(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+        queue = Queue.objects.get(student=request.user.student, group=group)
+        if queue.priority < 10 :
+            queue.change_priority(1)
+        else:
+            request.user.message_set.create(message="Nie można zwiększyć priorytetu.")
+        return redirect("subject-page", slug=queue.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except RecordsNotOpenException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+@login_required
+def queue_dec_priority(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+        queue = Queue.objects.get(student=request.user.student, group=group)
+        if queue.priority > 1 :
+            queue.change_priority(-1)
+        else:
+            request.user.message_set.create(message="Nie można zmniejszyć priorytetu.")
+        return redirect("subject-page", slug=queue.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except RecordsNotOpenException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+
+
+
+
+
 @login_required
 def change(request, old_id, new_id):
     try:

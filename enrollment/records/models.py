@@ -306,7 +306,7 @@ class QueueManager(models.Manager):
         return super(QueueManager, self).get_query_set().filter(status=STATUS_QUEUED)
 
 def queue_priority(value):
-    if value <= 0 or value > 5:
+    if value <= 0 or value > 10:
         raise ValidationError(u'%s is not a priority' % value)
 
 class Queue(models.Model):
@@ -317,6 +317,11 @@ class Queue(models.Model):
     priority = models.PositiveSmallIntegerField(default=1, validators=[queue_priority], verbose_name='priorytet')
     objects = models.Manager()
     queued = QueueManager()
+
+    def change_priority(self, value):
+        self.priority += value
+        self.save()
+        return self
 
     @staticmethod
     def number_of_students(group):
