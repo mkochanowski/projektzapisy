@@ -52,13 +52,27 @@ def subject(request, slug):
             
         lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
         lectures.name = "Wykłady"
+
         exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
+        exercises.name = "Ćwiczenia"
+
         laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
+        laboratories.name = "Pracownia"
+
         exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
+        exercises_adv.name = "Ćwiczenia (poziom zaawansowany)"
+
         exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
+        exer_labs.name = "Ćwiczenio-pracownie"
+
         seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
+        seminar.name = "Seminarium"
+
         language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
+        language.name = "Lektorat"
+
         sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
+        sport.name = "Zajęcia"
 
         tutorials = [lectures, exercises, exercises_adv, laboratories, seminar, exer_labs, language, sport]
                         

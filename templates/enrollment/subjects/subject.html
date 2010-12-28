@@ -28,43 +28,45 @@
 
     {% for tutorial in tutorials %}
         {% if tutorial %}
-            <h3>Typ:</h3>
-            <table class="subject-details-table">
-            	<thead>
-            		<tr>
-            			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th>Liczba osób w kolejce</th><th></th><th></th>
-            		</tr>
-            	</thead>
-            	<tbody>
-	            {% for t in tutorial %}
-	                <tr>
-		                <td>{{ t.get_teacher_full_name }}</td>
-		                <td>
-		                    {% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
-		                       {{d}}<br/>
-		                    {% endfor %}
-		                </td>
-		                <td>{{ t.get_group_limit }}</td>
-		                <td>{{ t.enrolled }}</td>
-                        <td>{{ t.queued }}</td>
-	                	<td>
-	                	{% if subject.is_recording_open %}
-		                	{% if t.signed %}
-		                    	<a class="subject-details-link forget" link="{% url record-resign t.id %}">wypisz</a>
-		                	{% else %}
-                                {% if t.is_full %}
-        			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
-                                {% else %}
-        			                <a class="subject-details-link forget" link="{% url record-assign t.id %}">zapisz</a>
-                                {% endif %}
-		                	{% endif %}
-		                {% endif %}
-	                	</td>
-	                	<td><a class="subject-details-link forget" link="{% url group-records t.id %}">Lista</a></td>
-	                </tr>
-            	{% endfor %}
-            	</tbody>
-            </table>
+            <h3>{{tutorial.name}}:</h3>
+                <div>
+                    <table class="subject-details-table">
+                    	<thead>
+                    		<tr>
+                    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th>Liczba osób w kolejce</th><th></th><th></th>
+                    		</tr>
+                    	</thead>
+                    	<tbody>
+	                    {% for t in tutorial %}
+	                        <tr>
+		                        <td>{{ t.get_teacher_full_name }}</td>
+		                        <td>
+		                            {% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
+		                               {{d}}<br/>
+		                            {% endfor %}
+		                        </td>
+		                        <td>{{ t.get_group_limit }}</td>
+		                        <td>{{ t.enrolled }}</td>
+                                <td>{{ t.queued }}</td>
+	                        	<td>
+	                        	{% if subject.is_recording_open %}
+		                        	{% if t.signed %}
+		                            	<a class="subject-details-link forget" link="{% url record-resign t.id %}">wypisz</a>
+		                        	{% else %}
+                                        {% if t.is_full %}
+                			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
+                                        {% else %}
+                			                <a class="subject-details-link forget" link="{% url record-assign t.id %}">zapisz</a>
+                                        {% endif %}
+		                        	{% endif %}
+		                        {% endif %}
+	                        	</td>
+	                        	<td><a class="subject-details-link forget" link="{% url group-records t.id %}">Lista</a></td>
+	                        </tr>
+                    	{% endfor %}
+                    	</tbody>
+                    </table>
+                </div>
         {% endif %}
     {% endfor %}
 
