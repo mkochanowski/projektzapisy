@@ -6,14 +6,12 @@
 
 from django.contrib import admin
 
-from grade.poll.models import Answer
-from grade.poll.models import OpenQuestion
-from grade.poll.models import SingleChoiceQuestion
-from grade.poll.models import MultipleChoiceQuestion
 from grade.poll.models import Poll
+from grade.poll.models import Section
+from grade.poll.models import Question
+from grade.poll.models import Option
                               
-admin.site.register( Answer )
-admin.site.register( OpenQuestion )
-admin.site.register( SingleChoiceQuestion )
-admin.site.register( MultipleChoiceQuestion )
+admin.site.register( Option )
+admin.site.register( Question )
+admin.site.register( Section )
 admin.site.register( Poll )

@@ -31,7 +31,55 @@ def poll_create(request):
     pass
     
 def questionset_create(request):
-    pass
+    def parse_form(post):
+        poll          = Poll()
+        poll.title    = post.get("poll[title]")
+        poll.author   = request.user.employee
+        poll.save()
+        print ("in parse")
+        sections = int(post.get("poll[sections]"))
+        for section_id in range(1, sections+1):
+            print (u"in sections")
+            print (section_id) 
+            section       = Section()
+            section.poll  = poll
+
+            section_name = "poll[section][" + str(section_id) + "]"
+            section.title = post.get(section_name + "[title]")
+            section.save()
+
+            questions = int( post.get(section_name + "[questions]") )
+
+            for question_id in range(1, questions+1):
+                question             = Question()
+                question.section     = section
+                question.poll        = poll
+
+                question_name        = section_name + "[question][" + str(question_id) +"]"
+
+                question.type        = post.get(question_name + "[type]")
+                question.title       = post.get(question_name + "[title]")
+                question.description = post.get(question_name + "[description]", 'brak')
+                question.save()
+                options = int(post.get(question_name + "[options]"))
+                print("opsions: " + str(options))
+                for option_id in range (1, options+1):
+                    option          = Option()
+                    option.question = question
+                    print ("in:" + str(question_id))
+                    option_name     = question_name + "[option][" + str(option_id) + "]"
+                    option.title    = post.get(option_name + "[title]")
+                    option.save()
+                question.save()
+            section.save()
+        poll.save()
+
+
+    if request.method == "POST":
+          parse_form(request.POST)
+          # TODO: przekierowac do listy
+    return render_to_response ('grade/poll/poll_create.html', context_instance = RequestContext( request ))
+
 
 def questionset_assign(request):
     pass
