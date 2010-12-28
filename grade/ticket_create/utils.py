@@ -211,9 +211,24 @@ def get_valid_tickets( tl ):
 def to_plaintext( vtl ):
     res = ""
     for g, t, st in vtl:
-        res += g.subject.name + " &#10; "
-        res += g.get_type_display() + ": " + g.get_teacher_full_name() + " &#10; "
-        res += unicode( t ) + " &#10; "
-        res += unicode( st ) + " &#10; "
-        res += "---------------------------------- &#10; "
+        res += g.subject.name + " &#10;"
+        res += g.get_type_display() + ": " + g.get_teacher_full_name() + " &#10;"
+        res += unicode( t ) + " &#10;"
+        res += unicode( st ) + " &#10;"
+        res += "---------------------------------- &#10;"
     return SafeUnicode( res )
+
+def from_plaintext( tickets_plaintext ):
+    pre_tickets = tickets_plaintext.split('\n')
+    tickets_and_signed = []
+    tickets = []
+    for pre_ticket in pre_tickets:
+        try:
+            t = int( pre_ticket )
+            tickets_and_signed.append( t )
+        except:
+            pass
+    for i in range(0, len( tickets_and_signed )-1, 2):
+        ( t, st ) = ( tickets_and_signed[ i ], tickets_and_signed[ i+1 ] )
+        tickets.append(( t, st ))
+    return tickets

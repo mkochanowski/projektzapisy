@@ -7,6 +7,8 @@ urlpatterns = patterns('',
     url(r'^enable_grade$',  'fereol.grade.poll.views.enable_grade',           name='grade-enable-grade'),
     url(r'^disable_grade$', 'fereol.grade.poll.views.disable_grade',          name='grade-disable-grade'),
     
+    url(r'^grade_logout$',  'fereol.grade.poll.views.grade_logout',           name='grade-logout'),
+    
     (r'^poll/',   include('fereol.grade.poll.urls')),
     (r'^ticket/', include('fereol.grade.ticket_create.urls')),
 )

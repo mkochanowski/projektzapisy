@@ -11,7 +11,9 @@ from grade.poll.models        import Poll, \
                                      SingleChoiceQuestion, \
                                      MultipleChoiceQuestion
 
-class KeysForm( forms.Form ):
-    keysfield = forms.CharField( widget    = forms.Textarea(), 
+class TicketsForm( forms.Form ):
+    ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 
+                                                    attrs = {'cols' : 80, 
+                                                             'rows' : 20 }), 
                                  label     = "Podaj wygenerowane klucze",
                                  help_text = "Wklej tutaj pobrane wcześniej klucze." )
