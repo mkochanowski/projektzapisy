@@ -246,8 +246,6 @@ class Record(models.Model):
                 new_student = queued.student
                 Record.add_student_to_group(new_student.user.id, group.id)
                 logger.info('User (%s) replaced user (%s) in group [%s] ' % (user.get_full_name(), queued.student.get_full_name, unicode(group)))
-                   
-#czy można się zapisać na ten sam przedmiot - do kilku kolejek? otwarcie zapisów? ECTSy - jak przekracza, to wylatuje z kolejki, jak nie ma otwartych zapisów, to nie zapisuje się do kolejki; ostrzeżenie przy przypinaniu - ectsy; po otwarciu zapisów przypinanie staje się zapisem/zapisem do kolejki
             return record
 
         except Record.DoesNotExist:
