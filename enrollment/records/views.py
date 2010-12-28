@@ -232,6 +232,19 @@ def resign(request, group_id):
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+@login_required
+def queue_resign(request, group_id):
+    try:
+        record = Queue.remove_student_from_queue(request.user.id, group_id)
+        request.user.message_set.create(message="Zostałeś wypisany z kolejki.")
+        return redirect("subject-page", slug=record.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
 def records(request, group_id):
     try:
         group = Group.objects.get(id=group_id)

@@ -54,7 +54,11 @@
 		                            	<a class="subject-details-link forget" link="{% url record-resign t.id %}">wypisz</a>
 		                        	{% else %}
                                         {% if t.is_full %}
-                			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
+                                            {% if t.is_in_queue %}
+                    			                <a class="subject-details-link forget" link="{% url queue-resign t.id %}">wypisz z kolejki</a>
+                                            {% else %}
+                    			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
+                                            {% endif %}
                                         {% else %}
                 			                <a class="subject-details-link forget" link="{% url record-assign t.id %}">zapisz</a>
                                         {% endif %}
