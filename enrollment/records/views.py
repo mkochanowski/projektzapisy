@@ -178,8 +178,11 @@ def assign(request, group_id):
 @login_required
 def queue_assign(request, group_id):
     try:
-        queue = Queue.add_student_to_queue(request.user.id, group_id)
-        request.user.message_set.create(message="Zostałeś zapisany do kolejki.")
+        if Group.objects.get(id=group_id).subject.is_recording_open_for_student(request.user.student):
+            queue = Queue.add_student_to_queue(request.user.id, group_id)
+            request.user.message_set.create(message="Zostałeś zapisany do kolejki.")
+        else:
+            request.user.message_set.create(message="Nie możesz zapisać się do kolejki, bo nie masz otwartych zapisów.")
         return redirect("subject-page", slug=queue.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
@@ -193,8 +196,6 @@ def queue_assign(request, group_id):
     except RecordsNotOpenException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
-
-
 
 
 
