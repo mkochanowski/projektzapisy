@@ -1,4 +1,4 @@
-{% extends "enrollment/base-enrollment.html" %}
+{% extends "enrollment/base.html" %}
  
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="/site_media/css/jquery/jquery.ui.schedule.css" />
@@ -16,13 +16,13 @@
  
 {% block main-navigation %}
 <li>
-    <a href="{% url main-page %}">Strona Główna</a>
+    <a href="{% url main-page %}">Strona główna</a>
 </li>
 <li>
     <a href="{% url latest_news 'enrollment' %}">Zapisy</a>
 </li>
 <li>
-    <a href="{% url schedule-prototype %}">Prototyp Planu</a>
+    <a href="{% url schedule-prototype %}">Prototyp planu</a>
 </li>
 {% endblock %}
 

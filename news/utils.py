@@ -26,7 +26,7 @@ def render_with_category_template(temp, context):
     Changes base ExtendsNode when needed."""
     temp = get_template(temp)
     if context.get('category', '') == 'enrollment':
-        temp.nodelist[0].parent_name = 'enrollment/base-enrollment.html'
+        temp.nodelist[0].parent_name = 'enrollment/base.html'
     return HttpResponse(temp.render(context))
     
 def render_items(request, items):

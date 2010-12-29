@@ -16,6 +16,30 @@
 	border-radius: 4px;
 }
 
+/*** PASEK LOGOWANIA I NAZWY PODSYSTEMU ***/
+#main-topContainer
+{
+	width: 996px; /* 1000px - 2 * 2px */
+	margin: auto;
+	padding-top: 7px;
+
+	color: #666666;
+	font-size: 12px;
+}
+
+#main-topContainer #main-systemTypeBar
+{
+	float: left;
+	font-weight: bold;
+}
+
+#main-topContainer #main-signinBar
+{
+	text-align: right;
+}
+
+/*** PASEK LOGOWANIA I NAZWY PODSYSTEMU - koniec ***/
+
 /*** NAGŁÓWEK ***/
 
 #main-header

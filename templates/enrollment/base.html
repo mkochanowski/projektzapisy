@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% load news_extras %}
+
+{% block main-subsystemname %}
+	System zapisów
+{% endblock %}
+
+{% block content-class %}wide{% endblock %}
+
+{% block main-menu %}
+	<li><a href="{% url news.views.latest_news 'enrollment' %}">Aktualności</a> ({% newscount "enrollment" %})</li>
+	<li><a href="{% url subject-list %}">Przedmioty</a></li>
+	<li><a href="{% url schedule-own %}">Plan zajęć</a></li>
+	<li><a href="{% url schedule-prototype %}">Prototyp planu</a></li>
+	<li><a href="{% url employees-list %}">Pracownicy</a></li>
+	<li><a href="{% url students-list %}">Studenci</a></li>
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "enrollment/base-enrollment.html" %}
+{% extends "enrollment/base.html" %}
 
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/enrollment/users/users-list.css" type="text/css" />
@@ -13,7 +13,7 @@
 
 {% block main-navigation %}
 <li>
-    <a href="{% url main-page %}">Strona Główna</a>
+    <a href="{% url main-page %}">Strona główna</a>
 </li>
 <li>
     <a href="{% url latest_news 'enrollment' %}">Zapisy</a>
