@@ -25,3 +25,6 @@ class Poll( models.Model ):
         verbose_name_plural = "ankiety"
         app_label           = "poll"
 
+    def __unicode__( self ):
+        return u'[' + unicode( self.author ) + u'] ' + unicode( self.title )
+

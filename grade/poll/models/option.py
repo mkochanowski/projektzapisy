@@ -6,7 +6,6 @@
 
 from django.db import models
 
-
 from fereol.grade.poll.models.question import Question
 
 class Option( models.Model ):
@@ -18,3 +17,5 @@ class Option( models.Model ):
         verbose_name_plural = "odpowiedzi ankiety"
         app_label           = "poll"
 
+    def __unicode__( self ):
+        return u'[' + unicode( self.question ) + u'] ' + unicode( self.title )

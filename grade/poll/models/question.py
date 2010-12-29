@@ -23,4 +23,6 @@ class Question( models.Model ):
         verbose_name_plural = "pytania ankiety"
         app_label           = "poll"
 
-
+    
+    def __unicode__( self ):
+        return unicode( self.title )
