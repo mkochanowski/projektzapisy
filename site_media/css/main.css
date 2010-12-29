@@ -386,6 +386,13 @@ a.main-sidebar-toggle-button:hover
 
 /*** PANEL FILTROWANIA - KOMPONENTY ***/
 
+.main-top-bar fieldset .main-filter-input
+{ /* Przy podziale na sekcje (fieldset) panel jest trochę wyższy, więc pole
+   * filtra powinno być trochę niżej.
+   */
+	margin-top: 7px;
+}
+
 .main-filter-input .text
 {
 	border: 1px solid #999999;
