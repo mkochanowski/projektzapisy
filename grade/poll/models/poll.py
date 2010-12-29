@@ -16,6 +16,9 @@ class Poll( models.Model ):
                                  verbose_name = "tytuł" )
     author  = models.ForeignKey( Employee,
                                  verbose_name = "autor" )
+    date    = models.DateTimeField( auto_now = True,
+                                    auto_now_add = True,
+                                    verbose_name = "utworzono" )
                          
     class Meta:
         verbose_name        = "ankieta"
