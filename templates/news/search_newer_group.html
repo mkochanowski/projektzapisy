@@ -1,6 +1,5 @@
 {% if page.has_previous %}
 <a href="{% url news-search category %}?q={{query}}&page={{page.previous_page_number}}" title="Nowsze"
- onClick="load_data('{% url news-search category %}?q={{query}}&page={{page.previous_page_number}}&json=true'); return false;">
-  Nowsze
-</a>
+	onclick="News.loadPage('{% url news-search category %}?q={{query}}&page={{page.previous_page_number}}&json=true'); return false;">
+	Nowsze</a>
 {% endif %}

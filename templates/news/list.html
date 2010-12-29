@@ -41,10 +41,12 @@ u
 		{% endif %}
 
 		<div class="od-news-navigator">
-			<span id="news-nav-groups">
+			{% if newer_group or older_group%}
+			<ul id="news-nav-groups">
 				{{ newer_group }}
 				{{ older_group }}
-			</span>
+			</ul>
+			{% endif %}
 			<a href="/feeds/news/{{category}}/" title="Aktualności RSS" id="od-news-rss-icon">
 				<img src="/site_media/images/rss.png" alt="RSS" />
 			</a>
