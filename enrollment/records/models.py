@@ -104,6 +104,7 @@ class Record(models.Model):
                 g.classrooms = g.get_all_terms()
                 g.enrolled = Record.number_of_students(g)
                 g.queued = Queue.number_of_students(g)
+                g.is_in_diff = Record.is_student_in_subject_group_type(user_id=user_id, slug=slug, group_type=group_type)
                 if g in student_groups:
                     g.signed = True
                 if (g.enrolled >= g.limit):
@@ -188,6 +189,7 @@ class Record(models.Model):
             raise NonGroupException()
 
     @staticmethod
+    @transaction.commit_on_success
     def add_student_to_group(user_id, group_id):
         """ assignes student to group if his records for subject are open. If student is pinned to group, pinned becomes enrolled """
         user = User.objects.get(id=user_id)
@@ -198,9 +200,11 @@ class Record(models.Model):
                 raise RecordsNotOpenException()
             # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
             if Record.number_of_students(group=group) < group.limit:
-                if (Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type) and group.type != '1'):
-                    logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised AssignedInThisTypeGroupException exception.' % (int(user_id), int(group_id)))
-                    raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException
+                g_id = Record.is_student_in_subject_group_type(user_id=user.id, slug=group.subject_slug(), group_type=group.type)
+                if g_id and group.type != '1':
+                    #logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised AssignedInThisTypeGroupException exception.' % (int(user_id), int(group_id)))
+                    #raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException
+                    Record.remove_student_from_group(user_id, g_id)
 
                 record = Record.objects.get(group=group, student=student)
 
@@ -257,36 +261,6 @@ class Record(models.Model):
         except Group.DoesNotExist:
             logger.error('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
-
-    @staticmethod
-    @transaction.commit_on_success
-    def change_student_group(user_id, old_id, new_id):
-        """ Deletes old student record and returns new record with changed group. """
-        user = User.objects.get(id=user_id)
-        try:
-            student = user.student
-            old_group = Group.objects.get(id=old_id)
-            new_group = Group.objects.get(id=new_id)
-            if not new_group.subject.is_recording_open_for_student(student):
-                logger.warning('Record.change_student_group() raised RecordsNotOpenException exception (parameters: user_id = %d, old_id = %d, new_id = %d)' % (int(user_id), int(old_id), int(new_id)))
-                raise RecordsNotOpenException()
-            if Record.number_of_students(group=new_group) < new_group.limit:
-                Record.remove_student_from_group(user_id, old_id)
-                new_record = Record.add_student_to_group(user_id, new_id)
-                logger.info('User (%s) changed his group from [%s] to [%s] ' % (user.get_full_name(), unicode(old_group), unicode(new_group)))
-            else:
-                raise OutOfLimitException()
-                logger.info('User (%s) tried to enroll to group [%s] but OutOfLimitException was raised' % user.get_full_name())
-            return new_record
-        except Student.DoesNotExist:
-            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Student.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id)))
-            raise NonStudentException()
-        except Group.DoesNotExist:
-            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Group.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id)))
-            raise NonGroupException()
-        except Record.DoesNotExist:
-            logger.error('Record.add_student_to_group(user_id = %d, old_id = %d, new_id = %d) throws Record.DoesNotExist exception.' % (int(user_id), int(old_id), int(new_id)))
-            raise AlreadyNotAssignedException()
 
 
     def group_slug(self):
@@ -400,6 +374,7 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
+    @transaction.commit_on_success
     def remove_student_from_queue(user_id, group_id):
         """remove student from queue"""
         user = User.objects.get(id=user_id)

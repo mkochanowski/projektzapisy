@@ -52,21 +52,25 @@
 	                        	{% if subject.is_recording_open %}
 		                        	{% if t.signed %}
 		                            	<a class="subject-details-link forget" link="{% url record-resign t.id %}">wypisz</a>
-		                        	{% else %}
-                                        {% if t.is_full %}
-                                            {% if t.priority %}
-                    			                <a class="subject-details-link forget" link="{% url queue-resign t.id %}">wypisz z kolejki</a></td>
-                                                <td> priorytet <br /> 
-                                                <a class="subject-details-link forget" link="{% url dec-priority t.id %}"> - </a>
-                                                {{ t.priority }}
-                                                <a class="subject-details-link forget" link="{% url inc-priority t.id %}"> + </a>
+                                    {% else %}
+                                        {% if t.is_in_diff %}
+              			                    <a class="subject-details-link forget" link="{% url record-assign t.id %}">przenieś</a>
+		                            	{% else %}
+                                            {% if t.is_full %}
+                                                {% if t.priority %}
+                        			                <a class="subject-details-link forget" link="{% url queue-resign t.id %}">wypisz z kolejki</a></td>
+                                                    <td> priorytet <br /> 
+                                                    <a class="subject-details-link forget" link="{% url dec-priority t.id %}"> - </a>
+                                                    {{ t.priority }}
+                                                    <a class="subject-details-link forget" link="{% url inc-priority t.id %}"> + </a>
+                                                {% else %}
+                        			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
+                                                {% endif %}
                                             {% else %}
-                    			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
+                    			                <a class="subject-details-link forget" link="{% url record-assign t.id %}">zapisz</a>
                                             {% endif %}
-                                        {% else %}
-                			                <a class="subject-details-link forget" link="{% url record-assign t.id %}">zapisz</a>
-                                        {% endif %}
-		                        	{% endif %}
+		                            	{% endif %}
+                                    {% endif %}
 		                        {% endif %}
 	                        	</td>
 	                        	<td><a class="subject-details-link forget" link="{% url group-records t.id %}">Lista</a></td>
