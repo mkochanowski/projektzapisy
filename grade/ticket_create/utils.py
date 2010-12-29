@@ -17,6 +17,7 @@ from fereol.grade.ticket_create.models import PublicKey, \
 from fereol.grade.ticket_create.exceptions import *
 
 from django.utils.safestring           import SafeUnicode
+from commands import *
 
 RAND_BITS = 512 
 
@@ -71,10 +72,19 @@ def generate_rsa_key():
     """ 
         Generates RSA key - that is, a pair (public key, private key)
         both exported in PEM format 
-    """
-    key_length = 2048
-    RSAkey     = RSA.generate(key_length)
-    privateKey = RSAkey.exportKey()
+    """    
+    
+    #wersja bezpieczniejsza
+    #~ key_length = 1024
+    #~ RSAkey     = RSA.generate(key_length)    
+    
+    #wersja szybsza
+    #do poprawki: tworzenie i usuwanie pliku test_rsa...
+    getstatusoutput('ssh-keygen -b 1024 -t "rsa" -f test_rsa -N "" -q')
+    RSAkey = RSA.importKey( open('test_rsa').read() )
+    getstatusoutput('rm test_rsa*')
+        
+    privateKey = RSAkey.exportKey()        
     publicKey  = RSAkey.publickey().exportKey()
     return (publicKey, privateKey)
     
@@ -94,6 +104,8 @@ def generate_keys_for_groups( sem ):
     group_list = Group.objects.filter( subject__semester = sem )
     pub_list  = []
     priv_list = []
+    print "Grupy:"
+    print len(group_list)
     for el in group_list:
         (pub, priv) = generate_rsa_key()
         pub_list.append(pub)
@@ -101,6 +113,7 @@ def generate_keys_for_groups( sem ):
     save_public_keys(zip(group_list, pub_list))
     save_private_keys(zip(group_list, priv_list))
     return 
+    
 def split_groups_by_subject( group_list ):
     if group_list == []: return []
     res       = []
