@@ -14,7 +14,7 @@ class Option( models.Model ):
     title       = models.CharField ( max_length = 250, verbose_name = 'odpowiedz' )
 
     class Meta:
-        verbose_name    = "odpowiedz ankiety"
-        verbose_name    = "odpowiedz ankiety"
-        app_label       = "poll"
+        verbose_name        = "odpowiedz ankiety"
+        verbose_name_plural = "odpowiedzi ankiety"
+        app_label           = "poll"
 

@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
+from django.contrib                 import auth
+from django.contrib.auth.decorators import login_required
+
 from django.http                import HttpResponse, \
                                        HttpResponseRedirect
 from django.shortcuts           import render_to_response
 from django.template            import RequestContext
 
 from fereol.users.decorators    import student_required, employee_required
+
+from fereol.grade.poll.models   import Poll
+
 from fereol.grade.poll.forms    import TicketsForm
 
 from fereol.grade.ticket_create.utils import from_plaintext
-
-from django.contrib import auth
-from django.contrib.auth.decorators import login_required
 
 def default(request):
     return render_to_response ('grade/base.html', context_instance = RequestContext ( request ))
@@ -106,7 +109,6 @@ def tickets_enter(request):
         if form.is_valid():
             tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
             tickets = from_plaintext( tickets_plaintext )
-            print tickets
             ## TERAZ TRZEBA Z TYMI PODPISANYMI BILETAMI PRZEJŚĆ DALEJ
     else:
         form = TicketsForm()

@@ -22,11 +22,11 @@ from commands import *
 RAND_BITS = 512 
 
 def gcd( a, b ):
-        if b > a:
-            a, b = b, a
-        while a:
-                a, b = b%a, a
-        return b
+    if b > a:
+        a, b = b, a
+    while a:
+            a, b = b%a, a
+    return b
       
 def gcwd( u, v ):
 	u1 = 1
@@ -91,13 +91,13 @@ def generate_rsa_key():
 def save_public_keys(groups_public_keys):
     for (group, key) in groups_public_keys:
         pkey = PublicKey(   group = group,
-                            public_key_PEM = key)
+                            public_key = key)
         pkey.save()
     
 def save_private_keys(groups_private_keys):
     for (group, key) in groups_private_keys:
         pkey = PrivateKey(  group = group,
-                            private_key_PEM = key)
+                            private_key = key)
         pkey.save()
 
 def generate_keys_for_groups( sem ):
@@ -137,7 +137,7 @@ def generate_ticket( group_list ):
     blinded = []
     
     for group in group_list:
-        key =  RSA.importKey( PublicKey.objects.get( group = group ).public_key_PEM )
+        key =  RSA.importKey( PublicKey.objects.get( group = group ).public_key )
         n   = key.n
         e   = key.e
         k   = randint( 2, n )
@@ -166,7 +166,7 @@ def find_rsa_private_key( group ):
         Returns RSAobj object for specified group; if no such group is
         found within the system, throws an error 
     """
-    rsa_private = PrivateKey.objects.get( group = group ).private_key_PEM
+    rsa_private = PrivateKey.objects.get( group = group ).private_key
     RSAImpl     = RSA.RSAImplementation()
     return RSAImpl.importKey( rsa_private )
     
@@ -204,7 +204,7 @@ def unblind( group, st, k ):
         return st
     else:
         st  = st[0]
-        key =  RSA.importKey( PublicKey.objects.get( group = group ).public_key_PEM )
+        key =  RSA.importKey( PublicKey.objects.get( group = group ).public_key )
         n   = key.n
         rk  = revMod( k, n )
         return ((st % n) * (rk % n)) % n

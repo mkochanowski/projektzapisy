@@ -15,7 +15,7 @@ class Section( models.Model ):
     poll    = models.ForeignKey ( Poll, verbose_name = 'ankieta' )
 
     class Meta:
-        verbose_name    = "sekcja ankiety"
-        verbose_name    = "sekcje ankiety"
-        app_label       = "poll"
+        verbose_name        = "sekcja ankiety"
+        verbose_name_plural = "sekcje ankiety"
+        app_label           = "poll"
 

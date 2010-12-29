@@ -9,8 +9,8 @@ from fereol.grade.poll.models.section import Section, Poll
 from fereol.grade.poll.models.poll import Poll
 
 class Question( models.Model ):
-    section     = models.ForeignKey (Section, verbose_name = 'sekcja' )
-    poll        = models.ForeignKey ( Poll, verbose_name = 'ankieta' )
+    section     = models.ForeignKey( Section, verbose_name = 'sekcja' )
+    poll        = models.ForeignKey( Poll, verbose_name = 'ankieta' )
     title       = models.CharField(  max_length   = 250,
                                  verbose_name = "tytuł" )
     type        = models.CharField(  max_length   = 250,
@@ -19,8 +19,8 @@ class Question( models.Model ):
                                  verbose_name = "opis" )
 
     class Meta:
-        verbose_name    = "pytanie ankiety"
-        verbose_name    = "pytania ankiety"
-        app_label       = "poll"
+        verbose_name        = "pytanie ankiety"
+        verbose_name_plural = "pytania ankiety"
+        app_label           = "poll"
 
 

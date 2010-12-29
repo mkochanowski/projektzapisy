@@ -5,12 +5,6 @@
 from django                   import forms
 from django.utils.safestring  import SafeUnicode
 
-from grade.poll.models        import Poll, \
-                                     Answer, \
-                                     OpenQuestion, \
-                                     SingleChoiceQuestion, \
-                                     MultipleChoiceQuestion
-
 class TicketsForm( forms.Form ):
     ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 
                                                     attrs = {'cols' : 80, 

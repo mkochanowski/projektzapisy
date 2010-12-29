@@ -7,7 +7,7 @@ from enrollment.subjects.models import Group, \
         
 class PublicKey( models.Model ):
     group = models.ForeignKey( Group, verbose_name = 'grupa' )
-    public_key_PEM = models.TextField(  verbose_name = 'klucz' )
+    public_key = models.TextField(  verbose_name = 'klucz' )
     
     def __unicode__(self):
         return u"Klucz publiczny: " + unicode(self.group)
@@ -19,7 +19,7 @@ class PublicKey( models.Model ):
 
 class PrivateKey( models.Model ):
     group = models.ForeignKey( Group, verbose_name = 'grupa' )
-    private_key_PEM = models.TextField( verbose_name = 'klucz prywatny' )
+    private_key = models.TextField( verbose_name = 'klucz prywatny' )
 
     def __unicode__(self):
         return u"Klucz przywatny: " + unicode(self.group)
