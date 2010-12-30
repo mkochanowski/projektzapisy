@@ -1,10 +1,11 @@
 /**
- * Funkcje odpowiedzialne za panel filtrowania.
+ * Funkcje odpowiedzialne za panel filtrowania. TODO: Do poprawienia (trzeba
+ * dodawać tło z tekstem "filtruj", zamiast wklejać taki tekst).
  */
 
 TopBarFilter = new Object();
 
-TopBarFilter.emptyFilterText = 'Filtruj';
+TopBarFilter.emptyFilterText = ''; /* TODO: do wywalenia */
 
 TopBarFilter.init = function()
 {

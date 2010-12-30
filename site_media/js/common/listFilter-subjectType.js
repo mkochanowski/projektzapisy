@@ -1,132 +1,114 @@
 /**
- * Model filtra po typach przedmiotów.
- */
-
-function SubjectTypeFilter()
-{
-    this.enabledTypes = new Object();
-    this.metaMode = true;
-};
-
-/// GETTERY I SETTERY //////////////////////////////////////////////////////////
-
-/**
- * Dodaje typ przedmiotu do listy filtra.
+ * Rozszerzenie klasy ListFilter o możliwość filtrowania po typach przedmiotów.
  *
- * @param type identyfikator typu przedmiotu
+ * @author Tomasz Wasilczyk (www.wasilczyk.pl)
  */
-SubjectTypeFilter.prototype.enableType = function(type)
-{
-    this.enabledTypes[$.trim(type)] = true;
-};
 
 /**
- * Usuwa typ przedmiotu z listy filtra.
+ * Tworzy filtr typów przedmiotów. Filtr ma przypisaną nazwę "subjectType"
+ * i element ".subject-type-filter".
  *
- * @param type identyfikator typu przedmiotu
- */
-SubjectTypeFilter.prototype.disableType = function(type)
-{
-    delete this.enabledTypes[$.trim(type)];
-};
-
-/**
- * Sprawdza, czy dany typ przedmiotu jest wybrany.
+ * Po przypisaniu do formularza przekształca element (zawierający odpowiednie
+ * kontrolki typów przedmiotów), grupując typy przedmiotów.
  *
- * @param type identyfikator typu przedmiotu
- * @return podany typ przedmiotu jest wybrany
+ * @param matchCallback funkcja typu function(subject, subjectType)
+ *        stwierdzająca, czy przedmiot "subject" jest typu subjectType
  */
-SubjectTypeFilter.prototype.isEnabled = function(type)
+ListFilter.CustomFilters.createSubjectTypeFilter = function(matchCallback)
 {
-    return !!this.enabledTypes[$.trim(type + '')];
-}
+	var filter = new ListFilter.Filter('subjectType', '.subject-type-filter');
+	filter.enabledTypes = new Object();
+    filter.metaMode = true;
+	filter.filterFormModel = null;
 
-/**
- * Sprawdza, czy którykolwiek z podanych typów przedmiotów jest wybrany.
- *
- * @param types tablica identyfikatorów typów przedmiotów
- * @return jeden z podanych typów przedmiotów jest wybrany
- */
-SubjectTypeFilter.prototype.isAnyEnabled = function(types)
-{
-    for (var i = 0; i < types.length; i++)
-        if (this.isEnabled(types[i]))
-            return true;
-    return false;
-}
+	var typeListIsEqual = function(typeList1, typeList2)
+	{
+		var type;
+		for (type in typeList1)
+			if (!typeList2[type])
+				return false;
+		for (type in typeList2)
+			if (!typeList1[type])
+				return false;
+		return true;
+	};
 
-SubjectTypeFilter.prototype.setMetaMode = function(enabled)
-{
-    this.metaMode = !!enabled;
+	filter.onAssign = function()
+	{
+		this.filterFormModel = new SubjectTypeFilterForm(this.formElement.getDOM());
+	};
+
+	filter.serialize = function()
+	{
+		var enabledTypes = new Array();
+		for (var type in this.enabledTypes)
+			enabledTypes.push(type);
+		return {
+			metaMode: this.metaMode,
+			enabledTypes: enabledTypes
+		};
+	};
+
+	filter.deserialize = function(serialized)
+	{
+		/* jeżeli w zserializowanej wersji nie ma danych, to wczytujemy
+		 * z formularza. TODO: przydało by się odczytywanie z formularza
+		 * wszystkich typów (nie tylko zaznaczonych) i ustawienie ich
+		 * (wszystkich) jako wybrane (czyli domyślnie wszystko pokazujemy)
+		 */
+		if (!serialized)
+			return this.loadFromForm();
+
+		var thisObj = this;
+
+		var oldMetaMode = this.metaMode;
+		this.metaMode = !!serialized.metaMode;
+		
+		var oldEnabledTypes = this.enabledTypes;
+		this.enabledTypes = new Object();
+
+		serialized.enabledTypes.forEach(function(type)
+		{
+			thisObj.enabledTypes[type] = true;
+		});
+
+		if (oldMetaMode != this.metaMode)
+			return true;
+		return !typeListIsEqual(oldEnabledTypes, this.enabledTypes);
+	};
+
+	filter.saveToForm = function()
+	{
+		this.filterFormModel.saveFilter(this);
+	};
+
+	filter.loadFromForm = function()
+	{
+		var oldMetaMode = this.metaMode;
+		var oldEnabledTypes = this.enabledTypes;
+
+		this.filterFormModel.readFilter(this);
+
+		if (oldMetaMode != this.metaMode)
+			return true;
+		return !typeListIsEqual(oldEnabledTypes, this.enabledTypes);
+	};
+
+	filter.match = function(element)
+	{
+		for (var type in filter.enabledTypes)
+			if (matchCallback(element, type))
+				return true;
+		return false;
+	};
+
+	return filter;
 };
 
-/// GETTERY I SETTERY - koniec /////////////////////////////////////////////////
 
-/// SERIALIZACJA ///////////////////////////////////////////////////////////////
-
-/**
- * Deserializacja filtra, np. z cookie.
- *
- * @param serializedFilter filtr w postaci surowej
- * @return SubjectTypeFilter obiekt filtra
- */
-SubjectTypeFilter.deserialize = function(serializedFilter)
-{
-    if (!serializedFilter)
-        return null;
-
-    var deserializedFilter = new SubjectTypeFilter();
-    deserializedFilter.setMetaMode(serializedFilter.metaMode);
-
-    for (var subjectType in serializedFilter.enabledTypes)
-        if (serializedFilter.enabledTypes[subjectType])
-            deserializedFilter.enableType(subjectType);
-
-    return deserializedFilter;
-};
-
-/// SERIALIZACJA - koniec //////////////////////////////////////////////////////
-
-/**
- * Porównuje filtr z innym.
- *
- * @param filter filtr do porównania
- * @return boolean filtry są równe
- */
-SubjectTypeFilter.prototype.isEqual = function(filter)
-{
-    if (filter.metaMode != this.metaMode)
-        return false;
-    for (var subjectType1 in this.enabledTypes)
-        if (!filter.enabledTypes[subjectType1])
-            return false;
-    for (var subjectType2 in filter.enabledTypes)
-        if (!this.enabledTypes[subjectType2])
-            return false;
-    return true;
-};
-
-/**
- * Sprawdza, czy element ma klasę (css) któregoś ze znajdujących się w filtrze
- * typów przedmiotu.
- */
-SubjectTypeFilter.prototype.haveEnabledTypeClass = function(element)
-{
-    for (var visibleType in this.enabledTypes)
-        if ($(element).hasClass('subject-type-' + visibleType))
-            return true;
-    return false;
-};
-
-
-
-/******************************************************************************/
-
-
-
-/**
- * Model formularza z filtrem po typach przedmiotów
- */
+/*******************************************************************************
+ * Model formularza filtrującego typy przedmiotów.
+ ******************************************************************************/
 
 /**
  * Konstruktor modelu formularza z filtrem po typach przedmiotów.
@@ -145,18 +127,18 @@ function SubjectTypeFilterForm(container)
 
     // generowanie nowej grupy - inne
     var otherSpanBox = document.createElement('span');
-    this.container.appendChild(otherSpanBox);
     otherSpanBox.className = 'checkbox';
     var otherCheck = document.createElement('input');
-    otherSpanBox.appendChild(otherCheck);
     otherCheck.type = 'checkbox';
+	this.container.appendChild(otherSpanBox);
+	otherSpanBox.appendChild(otherCheck);
     otherCheck.value = '0';
     otherCheck.id = 'filter-subject-type-0';
     otherCheck.className = 'filter-subject-type-meta';
     var otherGroup = document.createElement('input');
-    otherSpanBox.appendChild(otherGroup);
     otherGroup.type = 'hidden';
     otherGroup.className = 'group-id';
+	otherSpanBox.appendChild(otherGroup);
     var otherLabel = document.createElement('label');
     otherSpanBox.appendChild(document.createTextNode(' '));
     otherSpanBox.appendChild(otherLabel);
@@ -241,7 +223,7 @@ SubjectTypeFilterForm.prototype.setMetaMode = function(enabled)
     var i;
 
     enabled = !!enabled;
-    
+
     this.metaMode = enabled;
     $(this.metaSwitch).text(enabled?'więcej':'mniej');
 
@@ -300,11 +282,14 @@ SubjectTypeFilterForm.prototype.setMetaMode = function(enabled)
 /**
  * Odczytuje filtr z formularza.
  *
- * @return SubjectTypeFilter odczytany filtr
+ * @param filter filtr (wygenerowany przez ListFilter.CustomFilters.
+ *        createSubjectTypeFilter()), który ma być ustawiony według danych
+ *        z formularza
  */
-SubjectTypeFilterForm.prototype.readFilter = function()
+SubjectTypeFilterForm.prototype.readFilter = function(filter)
 {
-    var deserializedFilter = new SubjectTypeFilter();
+	filter.metaMode = this.metaMode;
+    filter.enabledTypes = new Object();
 
     var subjectTypes = $(this.container).find('input[type=checkbox]');
     for (var i = 0; i < subjectTypes.length; i++)
@@ -314,23 +299,19 @@ SubjectTypeFilterForm.prototype.readFilter = function()
 
         var subKey = subjectTypes[i].id;
         if (subKey.substr(0, 20) != 'filter-subject-type-')
-            throw new Error('SubjectTypeFilter.readFilterFromForm: Nieprawidłowy id pola');
+            throw new Error('Nieprawidłowy id pola');
         subKey = subKey.substr(20);
         if (subjectTypes[i].checked)
-            deserializedFilter.enableType(subKey);
-        else
-            deserializedFilter.disableType(subKey);
+			filter.enabledTypes[subKey] = true;
     }
-
-    deserializedFilter.setMetaMode(this.metaMode);
-
-    return deserializedFilter;
 };
 
 /**
  * Ustawia formularz zgodnie z podanym filtrem.
  *
- * @param filter filtr, do ustawienia w formularzu
+ * @param filter filter filtr (wygenerowany przez ListFilter.CustomFilters.
+ *        createSubjectTypeFilter()), według którego ma zostać ustawiony
+ *        formularz
  */
 SubjectTypeFilterForm.prototype.saveFilter = function(filter)
 {
@@ -341,7 +322,7 @@ SubjectTypeFilterForm.prototype.saveFilter = function(filter)
         if (subKey.substr(0, 20) != 'filter-subject-type-')
             throw new Error('SubjectTypeFilter.readFilterFromForm: Nieprawidłowy id pola');
         subKey = subKey.substr(20);
-        subjectTypes[i].checked = filter.isEnabled(subKey);
+        subjectTypes[i].checked = !!filter.enabledTypes[subKey];
     }
 
     this.setMetaMode(filter.metaMode);
@@ -361,7 +342,7 @@ SubjectTypeFilterForm.Type = function(container)
     this.isMeta = jqCheckbox.hasClass('filter-subject-type-meta')
     this.checkbox = jqCheckbox[0];
     this.id = parseInt(this.checkbox.value);
-    this.name = jqContainer.children('label').text().trim();
+	this.name = jqContainer.children('label').text().trim();
 
     var groupID = jqContainer.children('input.group-id')[0].value.trim();
     if (groupID == '')

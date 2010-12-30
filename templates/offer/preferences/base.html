@@ -13,7 +13,8 @@
 	<script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
 	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
 
-    <script type="text/javascript" src="/site_media/js/common/subjectTypeFilter.js"></script>
+	<script type="text/javascript" src="/site_media/js/common/listFilter.js"></script>
+	<script type="text/javascript" src="/site_media/js/common/listFilter-subjectType.js"></script>
 	<script type="text/javascript" src="/site_media/js/offer/prefs.js"></script>
 {% endblock %}
 
@@ -26,11 +27,11 @@
 		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text od-filter" id="od-prefs-q" type="text" name="q" />
-				<input class="reset" id="od-prefs-reset" type="reset" value="X" style="display:none;" />
+				<input class="text filter-phrase" type="text" name="q" />
+				<input class="reset filter-phrase-reset" type="reset" value="X" style="display:none;" />
 			</div>
 		</fieldset>
-		<fieldset id="od-prefs-subjtype">
+		<fieldset class="subject-type-filter">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in proposalTypes %}
 				<span class="checkbox">

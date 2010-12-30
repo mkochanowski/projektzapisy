@@ -1,6 +1,8 @@
 /**
  * Funkcje i klasy odpowiedzialne za preferencje pracowników na temat
  * przedmiotów z oferty dydaktycznej.
+ *
+ * @author Tomasz Wasilczyk (www.wasilczyk.pl)
  */
 
 Prefs = Object();
@@ -12,10 +14,8 @@ Prefs.init = function()
 {
     var i;
 
-    $('#od-prefs-top-bar')[0].style.display = 'block';
-
     var prefsList = $('#od-prefs-list');
-    Prefs.prefsList = prefsList[0];
+    Prefs.prefsList = prefsList.getDOM();
 
     Prefs.subjects = new Array();
     var subjectElements = prefsList.children('li');
@@ -26,27 +26,6 @@ Prefs.init = function()
         sub.setCollapsed(true);
         Prefs.subjects.push(sub);
     }
-
-    Prefs.typeFilterForm = new SubjectTypeFilterForm($('#od-prefs-subjtype')[0]);
-
-    Prefs.emptyFilterWarning = document.createElement('p');
-    Prefs.emptyFilterWarning.className = 'emptyFilterWarning';
-    Prefs.emptyFilterWarning.style.display = 'none';
-    $(Prefs.emptyFilterWarning).insertAfter(prefsList);
-    Prefs.emptyFilterWarning.appendChild(document.createTextNode(
-        'Do podanego filtra nie pasuje żaden z przedmiotów.'));
-
-    // ustawianie początkowego filtra
-    var cookieFilter = Prefs.Filter.deserialize($.cookies.get('prefs-filter'));
-    if (cookieFilter)
-    {
-        Prefs.currentFilter = cookieFilter;
-        cookieFilter.saveFilterToForm();
-    }
-    else
-        Prefs.currentFilter = Prefs.Filter.readFilterFromForm();
-    Prefs.doFilter(Prefs.currentFilter);
-    Prefs.filterThread();
 
     // panel rozwiń / zwiń wszystko
     var viewmodeSelectionBar = document.createElement('p');
@@ -89,15 +68,20 @@ Prefs.init = function()
     }
 
     Prefs.emptyMessage = $('#od-prefs-emptyMessage');
-    if (Prefs.emptyMessage)
-        Prefs.emptyMessage = Prefs.emptyMessage[0];
+    if (Prefs.emptyMessage.length)
+        Prefs.emptyMessage = Prefs.emptyMessage.getDOM();
     else
         Prefs.emptyMessage = null;
 
-    $('#od-prefs-top-bar').find('label').each(DisableControlDrag.jQueryCallback);
+	// reszta ustawień
+
+    $('#od-prefs-top-bar').find('label').disableDragging();
+
+	Prefs.initFilter();
 };
 
 $(Prefs.init);
+
 
 /*******************************************************************************
  * Model przedmiotu bez ustalonych preferencji
@@ -231,7 +215,6 @@ Prefs.Undecided.prototype.init = function()
 
             Prefs.subjects.push(sub);
             sub.attachControls();
-            Prefs.doFilter(Prefs.currentFilter);
 
             if (Prefs.emptyMessage)
             {
@@ -242,6 +225,7 @@ Prefs.Undecided.prototype.init = function()
         }
     });
 };
+
 
 /*******************************************************************************
  * Model preferencji przedmiotu
@@ -323,7 +307,7 @@ Prefs.Subject.prototype.attachControls = function()
                     $(thisObj.container).removeClass('hidden');
                     thisObj.hideBtn.value = 'Ukryj';
                 }
-                Prefs.doFilter(Prefs.currentFilter);
+                Prefs.subjectFilter.doFilter();
             }
         });
 
@@ -350,159 +334,68 @@ Prefs.Subject.prototype.setCollapsed = function(collapsed)
     }
 };
 
+
 /*******************************************************************************
  * Filtrowanie
  ******************************************************************************/
 
-/**
- * "Wątek" sprawdza, czy formularz nie zmienił zawartości - jeżeli tak, to
- * aplikuje filtr.
- */
-Prefs.filterThread = function()
+Prefs.initFilter = function()
 {
-    var newFilter = Prefs.Filter.readFilterFromForm();
+	var subjectFilterForm = $('#od-prefs-top-bar').assertOne();
 
-    if (!Prefs.currentFilter.isEqual(newFilter))
+    subjectFilterForm.css('display', 'block');
+
+    subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
     {
-        Prefs.currentFilter = newFilter;
-        $.cookies.set('prefs-filter', Prefs.currentFilter);
-        Prefs.doFilter(Prefs.currentFilter);
-    }
+        subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+    });
 
-    setTimeout(Prefs.filterThread, 50);
-};
+	// komunikat o pustym filtrze
+    Prefs.emptyFilterWarning = document.createElement('p');
+    Prefs.emptyFilterWarning.className = 'emptyFilterWarning';
+    Prefs.emptyFilterWarning.style.display = 'none';
+    $(Prefs.emptyFilterWarning).insertAfter(Prefs.prefsList);
+    Prefs.emptyFilterWarning.appendChild(document.createTextNode(
+        'Do podanego filtra nie pasuje żaden z przedmiotów.'));
 
-/**
- * Aplikuje wybrany filtr do listy przedmiotów.
- *
- * @param filter filtr, który chcemy zaaplikować do listy przedmiotów
- */
-Prefs.doFilter = function(filter)
-{
-    var i;
+	// konfiguracja filtra
 
-    var anyVisible = false;
+	Prefs.subjectFilter = new ListFilter('prefs-subjects', subjectFilterForm.getDOM());
+	Prefs.subjectFilter.afterFilter = function(matchedElementsCount)
+	{
+		Prefs.emptyFilterWarning.style.display = matchedElementsCount?'none':'block';
+		Prefs.prefsList.style.display = matchedElementsCount?'block':'none';
+	};
 
-    for (i = 0; i < Prefs.subjects.length; i++)
-    {
-        var sub = Prefs.subjects[i];
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
+		'phrase', '.filter-phrase', function(element, value)
+	{
+		var subject = element.data;
+		return (subject.name.toLowerCase().indexOf(value) >= 0);
+	}));
 
-        var isVisible = true;
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showHidden', '#od-prefs-hidden', function(element, value)
+	{
+		if (value)
+			return true;
+		var subject = element.data;
+		return !subject.hidden;
+	}));
 
-        if (isVisible && !filter.showHidden)
-            if (sub.hidden)
-                isVisible = false;
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
+		function(element, subjectType)
+	{
+		var subject = element.data;
+		return (subject.types.indexOf(subjectType) >= 0);
+	}));
 
-        if (isVisible)
-            isVisible = filter.subjectTypes.isAnyEnabled(sub.types);
+    for (var i = 0; i < Prefs.subjects.length; i++)
+		Prefs.subjectFilter.addElement(new ListFilter.Element(Prefs.subjects[i], function(visible)
+		{
+			var subject = this.data;
+			$(subject.container).css('display', visible?'block':'none')
+		}));
 
-        if (isVisible && filter.phrase != '')
-           isVisible = (sub.name.toLowerCase().indexOf(filter.phrase) >= 0);
-
-        sub.container.style.display = isVisible?'block':'none';
-        if (isVisible)
-            anyVisible = true;
-    }
-
-    Prefs.emptyFilterWarning.style.display = anyVisible?'none':'block';
-    Prefs.prefsList.style.display = anyVisible?'block':'none';
-};
-
-/*** Filtrowanie - klasa filtra ***********************************************/
-
-/**
- * Klasa filtra przy głosowaniu - konstruktor.
- */
-Prefs.Filter = function()
-{
-    this.phrase = '';
-    this.subjectTypes = new SubjectTypeFilter();
-    this.showHidden = false;
-};
-
-/**
- * Deserializacja filtra, np. z cookie.
- *
- * @param serializedFilter filtr w postaci surowej
- * @return Prefs.Filter obiekt filtra
- */
-Prefs.Filter.deserialize = function(serializedFilter)
-{
-    if (!serializedFilter)
-        return null;
-
-    var deserializedFilter = new Prefs.Filter();
-    deserializedFilter.setPhrase(serializedFilter.phrase);
-    deserializedFilter.subjectTypes = SubjectTypeFilter.
-        deserialize(serializedFilter.subjectTypes);
-    deserializedFilter.setShowHidden(serializedFilter.showHidden);
-
-    return deserializedFilter;
-};
-
-/**
- * Generuje filtr na podstawie zawartości formularza.
- *
- * @return Vote.Filter obiekt filtra z odczytaną zawartością
- */
-Prefs.Filter.readFilterFromForm = function()
-{
-    var newFilter = new Prefs.Filter();
-
-    var phrase = $('#od-prefs-q')[0].value;
-    if (phrase != TopBarFilter.emptyFilterText)
-        newFilter.setPhrase(phrase);
-
-    newFilter.subjectTypes = Prefs.typeFilterForm.readFilter();
-
-    newFilter.setShowHidden($('#od-prefs-hidden')[0].checked);
-
-    return newFilter;
-};
-
-/**
- * Ustawia formularz na podstawie filtra.
- */
-Prefs.Filter.prototype.saveFilterToForm = function()
-{
-    if (this.phrase == '')
-        $('#od-prefs-q')[0].value = TopBarFilter.emptyFilterText;
-    else
-        $('#od-prefs-q')[0].value = this.phrase;
-
-    Prefs.typeFilterForm.saveFilter(this.subjectTypes);
-
-    $('#od-prefs-hidden')[0].checked = this.showHidden;
-};
-
-/**
- * Ustawia frazę, której szukamy w nazwach przedmiotów.
- *
- * @param phrase fraza, której chcemy szukać
- */
-Prefs.Filter.prototype.setPhrase = function(phrase)
-{
-    this.phrase = $.trim(phrase).toLowerCase();
-};
-
-Prefs.Filter.prototype.setShowHidden = function(showHidden)
-{
-    this.showHidden = !!showHidden;
-};
-
-/**
- * Porównuje filtr z innym.
- *
- * @param filter filtr do porównania
- * @return boolean filtry są równe
- */
-Prefs.Filter.prototype.isEqual = function(filter)
-{
-    if (this.phrase != filter.phrase)
-        return false;
-    if (this.showHidden != filter.showHidden)
-        return false;
-    if (!this.subjectTypes.isEqual(filter.subjectTypes))
-        return false;
-    return true;
+	Prefs.subjectFilter.runThread();
 };

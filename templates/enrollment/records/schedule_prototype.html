@@ -34,12 +34,12 @@
 		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text od-filter" id="keyword" type="text" name="keyword" />
+				<input class="text" id="keyword" type="text" name="keyword" />
 				<input class="reset" type="reset" value="X" style="display:block;" />
 			</div>
 		</fieldset>
 		
-		<fieldset id="od-prefs-subjtype">
+		<fieldset class="subject-type-filter">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for key, name in types_list %}
 				<span class="checkbox"><input class='type-list' type="checkbox" value="{{ key }}" checked /><label>{{ name }}</label></span>

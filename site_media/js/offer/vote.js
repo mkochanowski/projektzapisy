@@ -1,28 +1,44 @@
 /**
  * Funkcje i klasy odpowiedzialne za głosowanie studentów na ofertę dydaktyczną.
+ *
+ * @author Tomasz Wasilczyk (www.wasilczyk.pl)
  */
 
 Vote = Object();
 
 /**
- * Zainicjowanie formularza głosowania.
+ * Inicjuje formularz głosowania.
  */
 Vote.init = function()
 {
-    var i;
-
-    $('#od-vote-top-bar')[0].style.display = 'block';
-
-    $('#od-vote-reset').click(function()
+    // weryfikacja formularza (i tak potem jest to sprawdzane po stronie serwera)
+    $('#od-vote-form').submit(function()
     {
-        $('#od-vote-q')[0].value = TopBarFilter.emptyFilterText;
+        MessageBox.clear();
+        Vote.refreshCounters();
+        if (Vote.totalPoints <= Vote.maxPoints)
+            return true;
+        MessageBox.display('Przekroczono limit głosowania. Limit wynosi ' +
+            Vote.maxPoints + ', a oddano głos o watości ' + Vote.totalPoints + '.');
+        return false;
     });
 
-    Vote.typeFilterForm = new SubjectTypeFilterForm($('#od-vote-subjtype')[0]);
+    $('#od-vote-top-bar').find('label').disableDragging();
 
-    // licznik punktów dla konkretnego semestru
-    var assignSemesterCounter = function(semesterNode)
-    {
+	Vote.initCounters();
+	Vote.initFilter();
+};
+
+$(Vote.init);
+
+/**
+ * Inicjuje liczniki punktów.
+ */
+Vote.initCounters = function()
+{
+	// licznik punktów dla konkretnego semestru
+	$('div.od-vote-semester').each(function(i, semesterNode)
+	{
         var counterContainer = document.createElement('span');
         $(semesterNode).children('h2').append(counterContainer);
         counterContainer.appendChild(document.createTextNode(' (punktów: '));
@@ -48,38 +64,9 @@ Vote.init = function()
         countSemester();
 
         votes.change(countSemester);
-    };
+	});
 
-    // dodawanie do semestrów komunikatów o pustym filtrze oraz liczników punktów
-    var semesters = $('div.od-vote-semester');
-    for (i = 0; i < semesters.length; i++)
-    {
-        var semester = semesters[i];
-
-        var emptyFilterWarning = document.createElement('p');
-        emptyFilterWarning.className = 'emptyFilterWarning';
-        emptyFilterWarning.style.display = 'none';
-        semester.appendChild(emptyFilterWarning);
-        emptyFilterWarning.appendChild(document.createTextNode(
-            'Do podanego filtra nie pasuje żaden przedmiot z tego semestru.'));
-
-        assignSemesterCounter(semester);
-    }
-
-    // ustawianie początkowego filtra
-    var cookieFilter = Vote.Filter.deserialize($.cookies.get('vote-filter'));
-    if (cookieFilter)
-    {
-        Vote.currentFilter = cookieFilter;
-        cookieFilter.saveFilterToForm();
-    }
-    else
-        Vote.currentFilter = Vote.Filter.readFilterFromForm();
-    Vote.doFilter(Vote.currentFilter);
-    Vote.filterThread();
-
-
-    // ogólne liczniki punktów
+	// ogólne liczniki punktów
     var maxPointsNode = $('#od-vote-maxPoints');
     Vote.maxPoints = parseInt($.trim(maxPointsNode.children('span').text()));
     if (isNaN(Vote.maxPoints))
@@ -95,31 +82,16 @@ Vote.init = function()
     Vote.totalSubjectsCount = $('#od-vote-form').find('select').length;
     Vote.wantedSubjectsCount = $('#od-vote-form').find('.isFan').length;
 
-    var onlyWantedLabel = $('#od-vote-onlywanted').parent().children('label')[0];
+    var onlyWantedLabel = $('#od-vote-onlywanted').parent().children('label').getDOM();
     onlyWantedLabel.appendChild(document.createTextNode(' (' +
         Vote.wantedSubjectsCount + ' z ' + Vote.totalSubjectsCount + ')'));
+
+	// włączenie liczników
 
     $('#od-vote-form').find('select').change(Vote.refreshCounters);
 
     Vote.refreshCounters();
-
-    // weryfikacja formularza (i tak potem jest to sprawdzane po stronie serwera)
-
-    $('#od-vote-form').submit(function()
-    {
-        MessageBox.clear();
-        Vote.refreshCounters();
-        if (Vote.totalPoints <= Vote.maxPoints)
-            return true;
-        MessageBox.display('Przekroczono limit głosowania. Limit wynosi ' +
-            Vote.maxPoints + ', a oddano głos o watości ' + Vote.totalPoints + '.');
-        return false;
-    });
-
-    $('#od-prefs-top-bar').find('label').each(DisableControlDrag.jQueryCallback);
 };
-
-$(Vote.init);
 
 /**
  * Odświeża liczniki w formularzu (wykorzystane punkty, przedmioty "na które
@@ -144,191 +116,92 @@ Vote.refreshCounters = function()
     Vote.totalPoints = totalPoints;
 };
 
-
-/*******************************************************************************
- * Filtrowanie
- ******************************************************************************/
-
 /**
- * "Wątek" sprawdza, czy formularz nie zmienił zawartości - jeżeli tak, to
- * aplikuje filtr.
+ * Inicjuje filtrowanie.
  */
-Vote.filterThread = function()
+Vote.initFilter = function()
 {
-    var newFilter = Vote.Filter.readFilterFromForm();
+	var subjectFilterForm = $('#od-vote-top-bar').assertOne();
 
-    if (!Vote.currentFilter.isEqual(newFilter))
+    subjectFilterForm.css('display', 'block');
+
+    subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
     {
-        Vote.currentFilter = newFilter;
-        $.cookies.set('vote-filter', Vote.currentFilter);
-        Vote.doFilter(Vote.currentFilter);
+        subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+    });
+
+	// dodawanie do semestrów komunikatów o pustym filtrze
+    var semesters = $('div.od-vote-semester');
+    for (i = 0; i < semesters.length; i++)
+    {
+        var semester = semesters[i];
+
+        var emptyFilterWarning = document.createElement('p');
+        emptyFilterWarning.className = 'emptyFilterWarning';
+        emptyFilterWarning.style.display = 'none';
+        semester.appendChild(emptyFilterWarning);
+        emptyFilterWarning.appendChild(document.createTextNode(
+            'Do podanego filtra nie pasuje żaden przedmiot z tego semestru.'));
     }
 
-    setTimeout(Vote.filterThread, 50);
-};
+	// konfiguracja filtra
 
-/**
- * Aplikuje wybrany filtr do listy przedmiotów.
- *
- * @param filter filtr, który chcemy zaaplikować do listy przedmiotów
- */
-Vote.doFilter = function(filter)
-{
-    var i;
+	Vote.subjectFilter = new ListFilter('vote-subjects', subjectFilterForm.getDOM());
+	Vote.subjectFilter.afterFilter = function()
+	{
+		var lists = $('#od-vote-form').find('ul');
+		for (i = 0; i < lists.length; i++)
+		{
+			var visibleElements = $(lists[i]).children('li.visible');
+			if (visibleElements.length == 0)
+			{
+				lists[i].style.display = 'none';
+				$(lists[i].parentNode).children('.emptyFilterWarning')[0].style.display = 'block';
+			}
+			else
+			{
+				$(lists[i].parentNode).children('.emptyFilterWarning')[0].style.display = 'none';
+				lists[i].style.display = '';
+				for (var j = 0; j < visibleElements.length - 1; j++)
+					visibleElements[j].style.borderBottomWidth = '1px';
+				visibleElements[visibleElements.length - 1].style.borderBottomWidth = '0';
+			}
+		}
+	};
 
-    var subjects = $('#od-vote-form').find('li.od-vote-subject');
+	Vote.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
+		'phrase', '.filter-phrase', function(element, value)
+	{
+		var subject = $(element.data);
+		return (subject.children('label').text().toLowerCase().indexOf(value) >= 0);
+	}));
+
+	Vote.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'onlyWanted', '#od-vote-onlywanted', function(element, value)
+	{
+		if (!value)
+			return true;
+		var subject = $(element.data);
+		return subject.hasClass('isFan');
+	}));
+
+	Vote.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
+		function(element, subjectType)
+	{
+		var subject = $(element.data);
+		return subject.hasClass('subject-type-' + subjectType);
+	}));
+	
+	var subjects = $('#od-vote-form').find('li.od-vote-subject');
     for (i = 0; i < subjects.length; i++)
-    {
-        var isVisible = false;
-        var subject = subjects[i];
+		Vote.subjectFilter.addElement(new ListFilter.Element(subjects[i], function(visible)
+		{
+			var subject = $(this.data);
+			if (visible)
+				subject.addClass('visible').removeClass('hidden');
+			else
+				subject.removeClass('visible').addClass('hidden');
+		}));
 
-        if (filter.onlyWanted)
-        {
-            if ($(subject).hasClass('isFan'))
-                isVisible = true;
-        }
-        else
-            isVisible = true;
-
-        if (isVisible)
-            isVisible = filter.subjectTypes.haveEnabledTypeClass(subject);
-
-        if (isVisible && filter.phrase != '')
-            isVisible = ($(subject).children('label').text().toLowerCase().
-                indexOf(filter.phrase) >= 0);
-
-        if (isVisible)
-        {
-            $(subject).addClass('visible');
-            $(subject).removeClass('hidden');
-        }
-        else
-        {
-            $(subject).removeClass('visible');
-            $(subject).addClass('hidden');
-        }
-    }
-
-    var lists = $('#od-vote-form').find('ul');
-    for (i = 0; i < lists.length; i++)
-    {
-        var visibleElements = $(lists[i]).children('li.visible');
-        if (visibleElements.length == 0)
-        {
-            lists[i].style.display = 'none';
-            $(lists[i].parentNode).children('.emptyFilterWarning')[0].style.display = 'block';
-        }
-        else
-        {
-            $(lists[i].parentNode).children('.emptyFilterWarning')[0].style.display = 'none';
-            lists[i].style.display = '';
-            for (var j = 0; j < visibleElements.length - 1; j++)
-                visibleElements[j].style.borderBottomWidth = '1px';
-            visibleElements[visibleElements.length - 1].style.borderBottomWidth = '0';
-        }
-    }
-};
-
-/*** Filtrowanie - klasa filtra ***********************************************/
-
-/**
- * Klasa filtra przy głosowaniu - konstruktor.
- */
-Vote.Filter = function()
-{
-    this.phrase = '';
-    this.subjectTypes = new SubjectTypeFilter();
-    this.onlyWanted = false;
-};
-
-/**
- * Deserializacja filtra, np. z cookie.
- *
- * @param serializedFilter filtr w postaci surowej
- * @return Vote.Filter obiekt filtra
- */
-Vote.Filter.deserialize = function(serializedFilter)
-{
-    if (!serializedFilter)
-        return null;
-
-    var deserializedFilter = new Vote.Filter();
-    deserializedFilter.setPhrase(serializedFilter.phrase);
-    deserializedFilter.setOnlyWanted(serializedFilter.onlyWanted);
-    deserializedFilter.subjectTypes = SubjectTypeFilter.
-        deserialize(serializedFilter.subjectTypes);
-
-    return deserializedFilter;
-};
-
-/**
- * Generuje filtr na podstawie zawartości formularza.
- *
- * @return Vote.Filter obiekt filtra z odczytaną zawartością
- */
-Vote.Filter.readFilterFromForm = function()
-{
-    var newFilter = new Vote.Filter();
-
-    var phrase = $('#od-vote-q')[0].value;
-    if (phrase != TopBarFilter.emptyFilterText)
-        newFilter.setPhrase(phrase);
-    newFilter.setOnlyWanted($('#od-vote-onlywanted')[0].checked);
-
-    newFilter.subjectTypes = Vote.typeFilterForm.readFilter();
-
-    return newFilter;
-};
-
-/**
- * Ustawia formularz na podstawie filtra.
- */
-Vote.Filter.prototype.saveFilterToForm = function()
-{
-    if (this.phrase == '')
-        $('#od-vote-q')[0].value = TopBarFilter.emptyFilterText;
-    else
-        $('#od-vote-q')[0].value = this.phrase;
-
-    $('#od-vote-onlywanted')[0].checked = this.onlyWanted;
-
-    Vote.typeFilterForm.saveFilter(this.subjectTypes);
-};
-
-/**
- * Ustawia frazę, której szukamy w nazwach przedmiotów.
- *
- * @param phrase fraza, której chcemy szukać
- */
-Vote.Filter.prototype.setPhrase = function(phrase)
-{
-    this.phrase = $.trim(phrase).toLowerCase();
-};
-
-/**
- * Ustawia flagę przepuszczającą przez filtr tylko przedmioty, na które
- * zagłosowano (głos > 0).
- *
- * @param onlyWanted czy wyświetlać tylko przedmioty, na które zagłosowano
- */
-Vote.Filter.prototype.setOnlyWanted = function(onlyWanted)
-{
-    this.onlyWanted = !!onlyWanted;
-};
-
-/**
- * Porównuje filtr z innym.
- *
- * @param filter filtr do porównania
- * @return boolean filtry są równe
- */
-Vote.Filter.prototype.isEqual = function(filter)
-{
-    if (this.phrase != filter.phrase)
-        return false;
-    if (this.onlyWanted != filter.onlyWanted)
-        return false;
-    if (!this.subjectTypes.isEqual(filter.subjectTypes))
-        return false;
-    return true;
+	Vote.subjectFilter.runThread();
 };
