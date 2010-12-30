@@ -30,13 +30,14 @@ def subjects(request):
         semester_subjects.append({
             'id': semester.pk,
             'name': semester.get_name(),
+            'is_current': semester.is_current_semester(),
             'subjects': subjects.filter(semester__id__exact=semester.pk).
                 order_by('entity__name').values('id', 'name', 'type', 'slug')
         })
 
     render_data = {
         'semester_subjects': semester_subjects,
-        'types_list' : [(type.pk, type.name) for type in Type.objects.all()]
+        'types_list' : Type.objects.all()
     }
 
     return render_to_response('enrollment/subjects/subjects_list.html',

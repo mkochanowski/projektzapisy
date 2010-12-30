@@ -298,6 +298,92 @@ ListFilter.CustomFilters.createSimpleBooleanFilter = function(name, formElementS
 	return filter;
 };
 
+/**
+ * Tworzy prosty filtr wyboru z listy.
+ *
+ * @param name nazwa filtra
+ * @param formElementSelector nazwa klasy elementu formularza, przechowującego wybór (select)
+ * @param matchCallback funkcja typu function(element, option) stwierdzająca, czy
+ *        element "element" pasuje do filtra w stanie "option"
+ */
+ListFilter.CustomFilters.createSimpleComboFilter = function(name, formElementSelector, matchCallback)
+{
+	var filter = new ListFilter.Filter(name, 'select' + formElementSelector);
+	filter.value = null;
+	filter.controlValue = null; // wartość ustawiona na kontrolce
+	filter.valueList = new Array();
+
+	filter.onAssign = function()
+	{
+		var thisObj = this;
+		this.valueList = new Array();
+		this.formElement.children('option').each(function(i, option)
+		{
+			option = $(option);
+			thisObj.valueList.push(option.attr('value'));
+		});
+
+		var onChange = function()
+		{
+			thisObj.controlValue = thisObj.formElement.attr('value');
+		};
+		this.formElement.change(onChange);
+		onChange();
+	};
+
+	filter.serialize = function()
+	{
+		return filter.value;
+	};
+
+	/**
+	 * Sprawdza, czy wartość jest poprawna.
+	 *
+	 * @param rawValue sprawdzana wartość
+	 * @return rawValue, jeżeli wartość jest poprawna; null w p. p.
+	 */
+	filter.validateValue = function(rawValue)
+	{
+		if (filter.valueList.indexOf(rawValue + '') >= 0)
+			return rawValue;
+		return null;
+	};
+
+	filter.deserialize = function(serialized)
+	{
+		if (filter.value == serialized)
+			return false;
+
+		filter.value = this.validateValue(serialized);
+		return true;
+	};
+
+	filter.saveToForm = function()
+	{
+		this.controlValue = this.value;
+		this.formElement.attr('value', this.value);
+	};
+
+	filter.loadFromForm = function()
+	{
+		var newValue = this.controlValue;//this.formElement.attr('value');
+		if (this.value == newValue)
+			return false;
+		if (!this.validateValue(newValue))
+			throw new Error('Wartość odczytana z formularza nie przechodzi walidacji');
+
+		this.value = newValue;
+		return true;
+	};
+
+	filter.match = function(element)
+	{
+		return matchCallback(element, filter.value);
+	};
+
+	return filter;
+};
+
 
 /*******************************************************************************
  * Obiekt (do "dziedziczenia") elementu listy.

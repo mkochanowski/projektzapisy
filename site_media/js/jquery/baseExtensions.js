@@ -14,6 +14,23 @@ if (!String.prototype.trim) // IE8 <3
 		return this.replace(new RegExp('^' + charList + '+|' + charList + '+$', 'g'), '');
 	};
 
+String.prototype.castToInt = function(acceptNull)
+{
+	if (acceptNull && !this.trim())
+		return null;
+	var val = parseInt(this.trim());
+	if (isNaN(val))
+		throw new Error('Nieprawidłowa wartość');
+	return val;
+};
+
+String.prototype.removePrefix = function(prefix)
+{
+	if (this.indexOf(prefix) != 0)
+		throw new Error('Prefiks nie pasuje do ciągu');
+	return this.substr(prefix.length);
+};
+
 if (!Array.prototype.indexOf)
 	Array.prototype.indexOf = function(value)
 	{
