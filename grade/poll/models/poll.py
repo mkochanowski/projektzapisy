@@ -2,8 +2,12 @@
 from django.db                         import models
 from fereol.users.models               import Employee, \
                                               Type
-from fereol.enrollment.subjects.models import Group
-from fereol.enrollment.records.models  import Record, STATUS_ENROLLED
+
+from fereol.enrollment.subjects.models import Group, \
+                                              Subject, \
+                                              Semester
+from fereol.enrollment.records.models  import Record, \
+                                              STATUS_ENROLLED
 
 class Poll( models.Model ):
     author       = models.ForeignKey( Employee, verbose_name = 'autor' )
@@ -43,9 +47,12 @@ class Poll( models.Model ):
         pass
         
     @staticmethod
-    def get_current_semester_polls():
+    def get_current_polls():
         pass
         
     @staticmethod
-    def get_current_polls():
-        pass
+    def get_current_semester_polls():
+        semester = Semester.get_current_semester()
+        current_semester_subjects = Subject.objects.filter(semester = semester)
+        current_semester_groups = Group.objects.filter(subject__in = current_semester_subjects)
+        return Poll.objects.filter(group__in = current_semester_groups) 

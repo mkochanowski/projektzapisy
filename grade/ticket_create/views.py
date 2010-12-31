@@ -10,7 +10,7 @@ from fereol.enrollment.subjects.models   import Semester, \
                                                 
 from fereol.enrollment.records.models    import Record
 
-from fereol.grade.ticket_create.utils    import generate_keys_for_groups, \
+from fereol.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 split_groups_by_subject, \
                                                 generate_ticket, \
                                                 secure_signer, \
@@ -25,12 +25,8 @@ from fereol.grade.ticket_create.exceptions import *
 def prepare_grade( request ):
     return render_to_response( 'grade/ticket_create/prepare_grade.html', {}, context_instance = RequestContext( request ))
         
-def keys_generate( request ):
-    ## TODO: Porawić semestr na bieżący
-    semesters = Semester.objects.all() 
-    semester  = semesters[ len(semesters) - 1 ]
-    
-    generate_keys_for_groups( semester )
+def keys_generate( request ):   
+    generate_keys_for_polls( )
     return render_to_response( 'grade/ticket_create/prepare_grade.html', { 'msg': 'Wygenerowano klucze RSA' }, context_instance = RequestContext( request ))
 
 @student_required
