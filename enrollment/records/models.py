@@ -55,7 +55,7 @@ class Record(models.Model):
         try:
             student = user.student
             records = Record.objects.filter(student=student).\
-                select_related('group', 'group__subject').order_by('group__subject')
+                select_related('group', 'group__subject').order_by('group__subject__name')
             for record in records:
                 record.group_ = record.group
                 record.group_.terms_ = record.group.get_all_terms()
@@ -77,7 +77,7 @@ class Record(models.Model):
         try:
             student = user.student
             records = Record.enrolled.filter(student=student).\
-                select_related('group', 'group__subject').order_by('group__subject')
+                select_related('group', 'group__subject').order_by('group__subject__name')
             groups = [record.group for record in records]
             subjects = set([group.subject for group in groups])
             for group in groups:

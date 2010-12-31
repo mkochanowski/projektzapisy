@@ -32,7 +32,7 @@ def subjects(request):
             'name': semester.get_name(),
             'is_current': semester.is_current_semester(),
             'subjects': subjects.filter(semester__id__exact=semester.pk).
-                order_by('entity__name').values('id', 'name', 'type', 'slug')
+                order_by('name').values('id', 'name', 'type', 'slug')
         })
 
     render_data = {
@@ -131,7 +131,7 @@ def list_of_subjects(request):
         logger.warning('Function list_of_subjects(request = {%s}) throws Semester.DoesNotExist exception.' % unicode(request.POST) )
         return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
     else:
-        response = response.order_by('entity__name').values('id', 'entity__name', 'slug')
+        response = response.order_by('name').values('id', 'entity__name', 'slug')
     
         response = map(make_it_json_friendly, response)
         result = {'semester_name' : semester_name, 'subjects' : response }

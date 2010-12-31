@@ -64,7 +64,7 @@ def proposals(request):
     """
         Proposal list
     """
-    proposals_ = Proposal.objects.filter(deleted=False)
+    proposals_ = Proposal.objects.filter(deleted=False).order_by('name')
     return render_to_response( 'offer/proposal/base.html',
         {
             'proposals' : proposals_,
