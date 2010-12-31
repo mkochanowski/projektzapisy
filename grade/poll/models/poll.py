@@ -3,6 +3,7 @@ from django.db                         import models
 from fereol.users.models               import Employee, \
                                               Type
 from fereol.enrollment.subjects.models import Group
+from fereol.enrollment.records.models  import Record, STATUS_ENROLLED
 
 class Poll( models.Model ):
     author       = models.ForeignKey( Employee, verbose_name = 'autor' )
@@ -20,12 +21,29 @@ class Poll( models.Model ):
         return u'[' + unicode( self.group ) + u']' + unicode( self.title )
         
     def is_student_entitled_to_poll( self, student ):
-        pass
+        if self.group:
+            rec = Record.objects.filter( student = student, 
+                                         group   = self.group,
+                                         status  = STATUS_ENROLLED )
+            try:
+                rec[ 0 ]
+            except:
+                return False
+                
+        if self.studies_type:
+            if self.studies_type != student.type:
+                return False
         
+        return True 
+               
     def all_sections( self ):
         pass
     
     def get_semester( self ):
+        pass
+        
+    @staticmethod
+    def get_current_semester_polls():
         pass
         
     @staticmethod

@@ -2,11 +2,10 @@
 from django.db     import models
 
 from base_question          import BaseQuestion
-from section                import Section
 
 class OpenQuestionOrdering( models.Model ):
     question = models.ForeignKey( 'OpenQuestion', verbose_name = 'pytanie' )
-    section  = models.ForeignKey( Section,        verbose_name = 'sekcja' )
+    section  = models.ForeignKey( 'Section', verbose_name = 'sekcja' )
     position = models.IntegerField( verbose_name = 'pozycja' )
 
     class Meta:
@@ -15,9 +14,13 @@ class OpenQuestionOrdering( models.Model ):
         ordering            = [ 'section', 'position' ]
         unique_together     = [ 'section', 'position' ]
         app_label           = 'poll' 
+    
+    def __unicode__( self ):
+        return unicode( self.position ) + u'[' + unicode( self.section ) + u']' + unicode( self.question )
         
 class OpenQuestion( BaseQuestion ):
-    section = models.ManyToManyField( Section,    verbose_name = 'sekcje', 
+    section = models.ManyToManyField( 'Section',    
+                                      verbose_name = 'sekcje', 
                                       through = OpenQuestionOrdering )
     class Meta:
         abstract            = False
