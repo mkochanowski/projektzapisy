@@ -52,6 +52,7 @@ def view(request):
         obj = {}
         obj['name']           = pref.proposal.name
         obj['id']             = pref.id
+        obj['is_new']         = pref.proposal.is_new()
         obj['lecture']        = pref.lecture
         obj['review_lecture'] = pref.review_lecture
         obj['tutorial'] = pref.tutorial
@@ -175,6 +176,7 @@ def init_pref(request, prop_id):
                 'Success': 'OK',
                 'name': course.name,
                 'id': course.id,
+                'is_new': course.is_new(),
                 'types': types,
                 'hideurl': reverse('prefs-hide', args = [ course.id ] ),
                 'unhideurl': reverse('prefs-unhide', args = [ course.id ] ),

@@ -162,9 +162,11 @@ Prefs.Undecided.prototype.init = function()
             sub.name = data.name;
             sub.hideURL = data.hideurl;
             sub.unhideURL = data.unhideurl;
+            sub.isNew = !!data.is_new;
 
             sub.container = document.createElement('li');
             Prefs.prefsList.appendChild(sub.container);
+            Prefs.setEmptyFilterWarningVisible(false);
 
             var name = document.createElement('span');
             name.className = 'name';
@@ -242,6 +244,7 @@ Prefs.Subject = function()
     this.prefContainer = null;
     this.hideURL = null;
     this.unhideURL = null;
+    this.isNew = false;
 };
 
 Prefs.Subject.fromElement = function(element)
@@ -256,6 +259,7 @@ Prefs.Subject.fromElement = function(element)
     sub.unhideURL = el.children('.pref-unhide-url').val().trim();
     sub.collapsed = el.hasClass('collapsed');
     sub.hidden = el.hasClass('hidden');
+    sub.isNew = !!el.children('.pref-is-new').assertOne().val().castToInt();
 
     sub.container = el[0];
     sub.prefContainer = el.children('ul')[0];
@@ -339,6 +343,18 @@ Prefs.Subject.prototype.setCollapsed = function(collapsed)
  * Filtrowanie
  ******************************************************************************/
 
+/**
+ * Pokazuje lub ukrywa ostrzeżenie o pustym filtrze.
+ */
+Prefs.setEmptyFilterWarningVisible = function(visible)
+{
+	Prefs.emptyFilterWarning.style.display = visible?'block':'none';
+	Prefs.prefsList.style.display = visible?'none':'block';
+}
+
+/**
+ * Inicjuje filtrowanie.
+ */
 Prefs.initFilter = function()
 {
 	var subjectFilterForm = $('#od-prefs-top-bar').assertOne();
@@ -363,8 +379,7 @@ Prefs.initFilter = function()
 	Prefs.subjectFilter = new ListFilter('prefs-subjects', subjectFilterForm.getDOM());
 	Prefs.subjectFilter.afterFilter = function(matchedElementsCount)
 	{
-		Prefs.emptyFilterWarning.style.display = matchedElementsCount?'none':'block';
-		Prefs.prefsList.style.display = matchedElementsCount?'block':'none';
+		Prefs.setEmptyFilterWarningVisible(matchedElementsCount == 0);
 	};
 
 	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
@@ -381,6 +396,15 @@ Prefs.initFilter = function()
 			return true;
 		var subject = element.data;
 		return !subject.hidden;
+	}));
+
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'onlyNew', '#od-prefs-only-new', function(element, value)
+	{
+		if (!value)
+			return true;
+		var subject = element.data;
+		return subject.isNew;
 	}));
 
 	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(

@@ -28,7 +28,7 @@
 		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text filter-phrase" type="text" name="q" />
+				<input class="text filter-phrase" type="text" />
 				<input class="reset filter-phrase-reset" type="reset" value="X" style="display:none;" />
 			</div>
 		</fieldset>
@@ -44,8 +44,8 @@
 		</fieldset>
 		<fieldset id="od-prefs-other">
 			<legend><span>Inne</span></legend>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/><label for="od-prefs-hidden">Pokaż ukryte przedmioty</label></span>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-only-new" disabled="disabled" /><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" /><label for="od-prefs-hidden">Pokaż ukryte przedmioty</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-only-new" /><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -84,6 +84,7 @@
 					<input type="hidden" class="pref-type" value="{% for type in pref.desc.types %}{{ type.lecture_type.id }} {% endfor %}" />
 					<input type="hidden" class="pref-hide-url" value="{% url prefs-hide pref.id %}" />
 					<input type="hidden" class="pref-unhide-url" value="{% url prefs-unhide pref.id %}" />
+					<input type="hidden" class="pref-is-new" value="{% if pref.is_new %}1{% else %}0{% endif %}" />
 
 					<ul>
 						{% ifnotequal pref.desc.lectures 0 %}
