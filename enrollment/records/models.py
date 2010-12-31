@@ -213,9 +213,11 @@ class Record(models.Model):
 
                 record.status = STATUS_ENROLLED
                 record.save()
-                if Queue.queued.filter(student=student, group=goup).count > 0 :
-                    priority = Queue.queued.get(student=student, group=goup).priority
-                    Queue.remove_student_low_priority_records(user_id, group_id, priority)
+                #TODO: ten kod nie miał prawa działać. Poprawiłem, ale nie
+				#      sprawdziłem czy działa dokładnie tak, jak trzeba
+                #if Queue.queued.filter(student=student, group=group).count() > 0 :
+                #    priority = Queue.queued.get(student=student, group=group).priority
+                #    Queue.remove_student_low_priority_records(user_id, group_id, priority)
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
