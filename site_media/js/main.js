@@ -6,10 +6,10 @@ Fereol = new Object();
 
 Fereol.init = function()
 {
-    $('.main-labelledSelect').change(function()
-    {
-        $(this).children('.label').remove();
-    });
+	$('.main-labelledSelect').change(function()
+	{
+		$(this).children('.label').remove();
+	});
 };
 
 $(Fereol.init);

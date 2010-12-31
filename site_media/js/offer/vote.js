@@ -11,19 +11,19 @@ Vote = Object();
  */
 Vote.init = function()
 {
-    // weryfikacja formularza (i tak potem jest to sprawdzane po stronie serwera)
-    $('#od-vote-form').submit(function()
-    {
-        MessageBox.clear();
-        Vote.refreshCounters();
-        if (Vote.totalPoints <= Vote.maxPoints)
-            return true;
-        MessageBox.display('Przekroczono limit głosowania. Limit wynosi ' +
-            Vote.maxPoints + ', a oddano głos o watości ' + Vote.totalPoints + '.');
-        return false;
-    });
+	// weryfikacja formularza (i tak potem jest to sprawdzane po stronie serwera)
+	$('#od-vote-form').submit(function()
+	{
+		MessageBox.clear();
+		Vote.refreshCounters();
+		if (Vote.totalPoints <= Vote.maxPoints)
+			return true;
+		MessageBox.display('Przekroczono limit głosowania. Limit wynosi ' +
+			Vote.maxPoints + ', a oddano głos o watości ' + Vote.totalPoints + '.');
+		return false;
+	});
 
-    $('#od-vote-top-bar').find('label').disableDragging();
+	$('#od-vote-top-bar').find('label').disableDragging();
 
 	Vote.initCounters();
 	Vote.initFilter();
@@ -39,58 +39,58 @@ Vote.initCounters = function()
 	// licznik punktów dla konkretnego semestru
 	$('div.od-vote-semester').each(function(i, semesterNode)
 	{
-        var counterContainer = document.createElement('span');
-        $(semesterNode).children('h2').append(counterContainer);
-        counterContainer.appendChild(document.createTextNode(' (punktów: '));
-        var counter = document.createElement('span');
-        counterContainer.appendChild(counter);
-        counterContainer.appendChild(document.createTextNode(')'));
+		var counterContainer = document.createElement('span');
+		$(semesterNode).children('h2').append(counterContainer);
+		counterContainer.appendChild(document.createTextNode(' (punktów: '));
+		var counter = document.createElement('span');
+		counterContainer.appendChild(counter);
+		counterContainer.appendChild(document.createTextNode(')'));
 
-        var votes = $(semesterNode).find('select');
+		var votes = $(semesterNode).find('select');
 
-        var countSemester = function()
-        {
-            var count = 0;
-            for (var i = 0; i < votes.length; i++)
-            {
-                var voteValue = parseInt($.trim(votes[i].value));
-                if (isNaN(voteValue) || voteValue < 0)
-                    throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
-                count += voteValue;
-            }
+		var countSemester = function()
+		{
+			var count = 0;
+			for (var i = 0; i < votes.length; i++)
+			{
+				var voteValue = parseInt($.trim(votes[i].value));
+				if (isNaN(voteValue) || voteValue < 0)
+					throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
+				count += voteValue;
+			}
 
-            $(counter).text(count);
-        };
-        countSemester();
+			$(counter).text(count);
+		};
+		countSemester();
 
-        votes.change(countSemester);
+		votes.change(countSemester);
 	});
 
 	// ogólne liczniki punktów
-    var maxPointsNode = $('#od-vote-maxPoints');
-    Vote.maxPoints = parseInt($.trim(maxPointsNode.children('span').text()));
-    if (isNaN(Vote.maxPoints))
-        throw new Error('Vote.init: Niepoprawna wartość maxPoints');
+	var maxPointsNode = $('#od-vote-maxPoints');
+	Vote.maxPoints = parseInt($.trim(maxPointsNode.children('span').text()));
+	if (isNaN(Vote.maxPoints))
+		throw new Error('Vote.init: Niepoprawna wartość maxPoints');
 
-    maxPointsNode.empty();
-    maxPointsNode = maxPointsNode[0];
-    maxPointsNode.appendChild(document.createTextNode('Wykorzystane punkty w sumie: '));
-    Vote.maxPointsNode = document.createElement('span');
-    maxPointsNode.appendChild(Vote.maxPointsNode);
-    maxPointsNode.appendChild(document.createTextNode('.'));
+	maxPointsNode.empty();
+	maxPointsNode = maxPointsNode[0];
+	maxPointsNode.appendChild(document.createTextNode('Wykorzystane punkty w sumie: '));
+	Vote.maxPointsNode = document.createElement('span');
+	maxPointsNode.appendChild(Vote.maxPointsNode);
+	maxPointsNode.appendChild(document.createTextNode('.'));
 
-    Vote.totalSubjectsCount = $('#od-vote-form').find('select').length;
-    Vote.wantedSubjectsCount = $('#od-vote-form').find('.isFan').length;
+	Vote.totalSubjectsCount = $('#od-vote-form').find('select').length;
+	Vote.wantedSubjectsCount = $('#od-vote-form').find('.isFan').length;
 
-    var onlyWantedLabel = $('#od-vote-onlywanted').parent().children('label').getDOM();
-    onlyWantedLabel.appendChild(document.createTextNode(' (' +
-        Vote.wantedSubjectsCount + ' z ' + Vote.totalSubjectsCount + ')'));
+	var onlyWantedLabel = $('#od-vote-onlywanted').parent().children('label').getDOM();
+	onlyWantedLabel.appendChild(document.createTextNode(' (' +
+		Vote.wantedSubjectsCount + ' z ' + Vote.totalSubjectsCount + ')'));
 
 	// włączenie liczników
 
-    $('#od-vote-form').find('select').change(Vote.refreshCounters);
+	$('#od-vote-form').find('select').change(Vote.refreshCounters);
 
-    Vote.refreshCounters();
+	Vote.refreshCounters();
 };
 
 /**
@@ -99,21 +99,21 @@ Vote.initCounters = function()
  */
 Vote.refreshCounters = function()
 {
-    var votes = $('#od-vote-form').find('select');
-    var totalPoints = 0;
+	var votes = $('#od-vote-form').find('select');
+	var totalPoints = 0;
 
-    for (var i = 0; i < votes.length; i++)
-    {
-        var voteValue = parseInt($.trim(votes[i].value));
-        if (isNaN(voteValue) || voteValue < 0)
-            throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
-        totalPoints += voteValue;
-    }
+	for (var i = 0; i < votes.length; i++)
+	{
+		var voteValue = parseInt($.trim(votes[i].value));
+		if (isNaN(voteValue) || voteValue < 0)
+			throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
+		totalPoints += voteValue;
+	}
 
-    $(Vote.maxPointsNode).text(totalPoints + ' z ' + Vote.maxPoints);
-    Vote.maxPointsNode.className = (totalPoints > Vote.maxPoints)?'warning':'';
+	$(Vote.maxPointsNode).text(totalPoints + ' z ' + Vote.maxPoints);
+	Vote.maxPointsNode.className = (totalPoints > Vote.maxPoints)?'warning':'';
 
-    Vote.totalPoints = totalPoints;
+	Vote.totalPoints = totalPoints;
 };
 
 /**
@@ -123,26 +123,26 @@ Vote.initFilter = function()
 {
 	var subjectFilterForm = $('#od-vote-top-bar').assertOne();
 
-    subjectFilterForm.css('display', 'block');
+	subjectFilterForm.css('display', 'block');
 
-    subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
-    {
-        subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
-    });
+	subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
+	{
+		subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+	});
 
 	// dodawanie do semestrów komunikatów o pustym filtrze
-    var semesters = $('div.od-vote-semester');
-    for (i = 0; i < semesters.length; i++)
-    {
-        var semester = semesters[i];
+	var semesters = $('div.od-vote-semester');
+	for (i = 0; i < semesters.length; i++)
+	{
+		var semester = semesters[i];
 
-        var emptyFilterWarning = document.createElement('p');
-        emptyFilterWarning.className = 'emptyFilterWarning';
-        emptyFilterWarning.style.display = 'none';
-        semester.appendChild(emptyFilterWarning);
-        emptyFilterWarning.appendChild(document.createTextNode(
-            'Do podanego filtra nie pasuje żaden przedmiot z tego semestru.'));
-    }
+		var emptyFilterWarning = document.createElement('p');
+		emptyFilterWarning.className = 'emptyFilterWarning';
+		emptyFilterWarning.style.display = 'none';
+		semester.appendChild(emptyFilterWarning);
+		emptyFilterWarning.appendChild(document.createTextNode(
+			'Do podanego filtra nie pasuje żaden przedmiot z tego semestru.'));
+	}
 
 	// konfiguracja filtra
 
@@ -191,9 +191,9 @@ Vote.initFilter = function()
 		var subject = $(element.data);
 		return subject.hasClass('subject-type-' + subjectType);
 	}));
-	
+
 	var subjects = $('#od-vote-form').find('li.od-vote-subject');
-    for (i = 0; i < subjects.length; i++)
+	for (i = 0; i < subjects.length; i++)
 		Vote.subjectFilter.addElement(new ListFilter.Element(subjects[i], function(visible)
 		{
 			var subject = $(this.data);

@@ -12,9 +12,9 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
-    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
-    <li><a href="{% url proposal-list %}">Propozycje</a></li>
-    <li>Wybór przedmiotów do oferty dydaktycznej</li>
+	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	<li><a href="{% url proposal-list %}">Propozycje</a></li>
+	<li>Wybór przedmiotów do oferty dydaktycznej</li>
 {% endblock %}
 
 
@@ -36,17 +36,17 @@
 				<td>{{ subject.name }}</td>
 				<td class="cen">{{ subject.fans_count }}</td>
 				<td class="cen">
-				    {% ifequal subject.teachers_count 0 %}0
-                    {% else %}
-                        <a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachers_count }}</a>
-                    {% endifequal %}
-                </td>
+					{% ifequal subject.teachers_count 0 %}0
+					{% else %}
+						<a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachers_count }}</a>
+					{% endifequal %}
+				</td>
 				<td class="cen">
-				    {% ifequal subject.helpers_count 0 %}0
-                    {% else %}
-                        <a href="#" subject="{{ subject.id }}" class="helpersDetails">{{ subject.helpers_count }}</a>
-                    {% endifequal %}
-                </td>
+					{% ifequal subject.helpers_count 0 %}0
+					{% else %}
+						<a href="#" subject="{{ subject.id }}" class="helpersDetails">{{ subject.helpers_count }}</a>
+					{% endifequal %}
+				</td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -54,24 +54,24 @@
 		<div class="teachers">
 			{% for subject in subjects %}
 				<div class="teacher" id="teachers{{ subject.id }}">
-				    {% for teacher in subject.teachers.all %}
+					{% for teacher in subject.teachers.all %}
 					<div>{{ teacher.first_name }} {{ teacher.last_name }}</div>
 					{% endfor %}
 				</div>
 			{% empty %}
-			     <div>- brak -</div>
+				 <div>- brak -</div>
 			{% endfor %}
 		</div>
 
 		<div class="helpers">
 			{% for subject in subjects %}
 				<div class="helper" id="helpers{{ subject.id }}">
-				    {% for helper in subject.helpers.all %}
+					{% for helper in subject.helpers.all %}
 					<div>{{ helper.first_name }} {{ helper.last_name }}</div>
 					{% endfor %}
 				</div>
 			{% empty %}
-			     <div>- brak -</div>
+				 <div>- brak -</div>
 			{% endfor %}
 		</div>
 	</div>

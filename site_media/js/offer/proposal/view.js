@@ -1,5 +1,5 @@
 if (typeof Proposal == 'undefined') // todo scalić/wywalić
-    Proposal = new Object();
+	Proposal = new Object();
 
 Proposal.view = new Object();
 
@@ -7,15 +7,14 @@ Proposal.view.deleteButtonsAreReady = false;
 
 Proposal.view.initDeleteButtons = function()
 {
-    if (Proposal.view.deleteButtonsAreReady)
-        return;
-    Proposal.view.deleteButtonsAreReady = true;
+	if (Proposal.view.deleteButtonsAreReady)
+		return;
+	Proposal.view.deleteButtonsAreReady = true;
 
-    $('.proposal-delete').click(function()
-    {
-        return !!confirm("Jesteś pewien?");
-    });
+	$('.proposal-delete').click(function()
+	{
+		return !!confirm("Jesteś pewien?");
+	});
 };
 
 $(Proposal.view.initDeleteButtons);
-

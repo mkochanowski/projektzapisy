@@ -11,6 +11,8 @@ SubjectsList.init = function()
 {
 	SubjectsList.initSubjectLists();
 	SubjectsList.initFilter();
+
+	$('#enr-subjectsList-top-bar').find('label').disableDragging();
 };
 
 $(SubjectsList.init);
@@ -61,12 +63,12 @@ SubjectsList.initFilter = function()
 {
 	var subjectFilterForm = $('#enr-subjectsList-top-bar').assertOne();
 
-    subjectFilterForm.css('display', 'block');
+	subjectFilterForm.css('display', 'block');
 
-    subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
-    {
-        subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
-    });
+	subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
+	{
+		subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+	});
 
 	// komunikat o pustym filtrze
 	SubjectsList.emptyFilterWarning =
@@ -134,33 +136,33 @@ SubjectsList.initFilter = function()
  ******************************************************************************/
 
 function loadSubjectDetails(detailsUrl, obj){
-    var $detailsDiv = $('#subject-details'),
-    $loadingDiv = $('<div>&nbsp;</div>').addClass('subject-details-loading');
-    $detailsDiv.append($loadingDiv);
-    //$detailsDiv.addClass('subject-details-loading');
-    $.ajax({
-        type: "POST",
-        dataType: "html",
-        url: detailsUrl,
-        success: function(resp){
-            $detailsDiv.empty();
-            $detailsDiv.append($(resp));
-            $('.subject-details-link').click(function(){
-                loadSubjectDetails($(this).attr('link'), $(this));
-            });
+	var $detailsDiv = $('#subject-details'),
+	$loadingDiv = $('<div>&nbsp;</div>').addClass('subject-details-loading');
+	$detailsDiv.append($loadingDiv);
+	//$detailsDiv.addClass('subject-details-loading');
+	$.ajax({
+		type: "POST",
+		dataType: "html",
+		url: detailsUrl,
+		success: function(resp){
+			$detailsDiv.empty();
+			$detailsDiv.append($(resp));
+			$('.subject-details-link').click(function(){
+				loadSubjectDetails($(this).attr('link'), $(this));
+			});
 			try {
 				//sessionStorage.setItem('loaded-subject-detail-url', detailsUrl);
-        if (obj == null || !obj.hasClass("forget")) {
-          jaaulde.utils.cookies.set('loaded-subject-detail-url', detailsUrl);
-        }
+		if (obj == null || !obj.hasClass("forget")) {
+		  jaaulde.utils.cookies.set('loaded-subject-detail-url', detailsUrl);
+		}
 			} catch(ex) {}
 			$('.subject-details-table tbody tr:even').addClass('even');
-        },
-        complete: function(){
-            //$detailsDiv.removeClass('subject-details-loading');
-            $loadingDiv.remove();
-        }
-    });
+		},
+		complete: function(){
+			//$detailsDiv.removeClass('subject-details-loading');
+			$loadingDiv.remove();
+		}
+	});
 };
 
 /*******************************************************************************

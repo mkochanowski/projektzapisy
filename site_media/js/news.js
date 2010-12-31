@@ -23,8 +23,8 @@ $(News.init);
 
 News.loadPage = function(url)
 {
-    MessageBox.clear();
-    $.getJSON(url, function(data)
+	MessageBox.clear();
+	$.getJSON(url, function(data)
 	{
 		if (typeof(data.message) != "undefined")
 			MessageBox.display(data.message);
@@ -41,5 +41,5 @@ News.loadPage = function(url)
 			else
 				$('#news-search-nav').css("display", "none");
 		}
-    });
+	});
 };
