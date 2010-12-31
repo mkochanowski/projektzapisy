@@ -321,7 +321,7 @@ def records(request, group_id):
 @login_required
 def own(request):
     try:
-        groups = Record.get_student_all_detiled_enrollings(request.user.id)
+        groups = Record.get_student_all_detailed_enrollings(request.user.id)
         data = {
             'groups': groups,
         }
@@ -333,7 +333,7 @@ def own(request):
 @login_required       
 def schedulePrototype(request):
     try:
-        student_records = Record.get_student_all_detiled_records(request.user.id)
+        student_records = Record.get_student_all_detailed_records(request.user.id)
         #subjects = Subject.visible.select_related().all()
         #for sub in subjects:
         #    sub.lecturers = ''

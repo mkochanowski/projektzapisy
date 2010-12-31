@@ -50,7 +50,7 @@ class Record(models.Model):
         return Record.enrolled.filter(group=group_).count()
 
     @staticmethod
-    def get_student_all_detiled_records(user_id):
+    def get_student_all_detailed_records(user_id):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
@@ -68,11 +68,11 @@ class Record(models.Model):
                     record.schedule_widget_status_ = ''
             return records
         except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detiled_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
+            logger.error('Record.get_student_all_detailed_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
 
     @staticmethod
-    def get_student_all_detiled_enrollings(user_id):
+    def get_student_all_detailed_enrollings(user_id):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
@@ -85,7 +85,7 @@ class Record(models.Model):
                 group.subject_ = group.subject
             return groups
         except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detiled_enrollings(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
+            logger.error('Record.get_student_all_detailed_enrollings(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
 
     @staticmethod
