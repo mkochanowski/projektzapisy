@@ -28,12 +28,14 @@ class AddUserToGroupTest(TestCase):
         self.assertRaises(NonGroupException, Record.add_student_to_group, self.user.id, group_id)
 
     def testStudentAssignedToGroup(self):
+        self.assertEqual(Record.objects.count(), 0)
         Record.add_student_to_group(self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 1)
-        self.assertRaises(AlreadyAssignedException, Record.add_student_to_group, self.user.id, self.group.id)
+        Record.add_student_to_group(self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 1)
 
     def testStudentNotAssignedToGroup(self):
+        self.assertEqual(Record.objects.count(), 0)
         Record.add_student_to_group(self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 1)
 
@@ -161,8 +163,11 @@ class AssignmentToGroupsWithSameTypes(TestCase):
         self.assertEqual(Record.objects.count(), 2)
 		
     def testAssignToCurrentlyBookedGroupWithSameType(self):
+        self.assertEqual(Record.objects.count(), 1)
         Record.add_student_to_group(self.user.id, self.group1.id)
-        self.assertRaises(AssignedInThisTypeGroupException, Record.add_student_to_group, self.user.id, self.group2.id)
+        self.assertEqual(Record.objects.count(), 2)
+        Record.add_student_to_group(self.user.id, self.group2.id)
+        self.assertEqual(Record.objects.count(), 2)
         
 class MoveStudentFromQueueToGroup(TestCase):
     fixtures =  ['fixtures__queue']
