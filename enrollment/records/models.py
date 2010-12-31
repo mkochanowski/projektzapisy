@@ -396,17 +396,41 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
+    def is_ECTS_points_limit_exceeded(user_id, group_id):
+      """check if the sum of ECTS points for every subject student is enrolled on, exceeds limit"""
+      try:
+            point_limit_duration = 14 # number of days from records openning when 40 ECTS point limit is in force
+            group = Group.objects.get(id=group_id)
+            if group.subject.semester.records_opening + timedelta(days=point_limit_duration) < datetime.now():
+		return False
+            groups = Record.get_groups_for_student(user_id)
+            subjects = set([g.subject for g in groups])
+            ects = sum([s.ects for s in subjects])
+            if group.subject not in subjects:
+	        ects += group.subject.ects
+	    if ects <= 40:
+	        return False
+	    else:
+	        return True 
+      except Student.DoesNotExist:
+            logger.error('Queue.count_ECTS_points(user_id)  throws Student.DoesNotExist exception (parameters: user_id = %d)' % (int(user_id)))
+            raise NonStudentException()
+
+
+    @staticmethod
     def remove_first_student_from_queue(group_id):
-        """remove FIRST student from queue"""
+        """return FIRST student from queue whose ECTS points limit is not excedeed, remove this student and all students
+        before him from queue"""
         try:
             group = Group.objects.get(id=group_id)
             queue = Queue.objects.filter(group=group).order_by('time')
-            if queue :
-                first = queue[0]
-                student_id = first.student.user.id
-                return Queue.remove_student_from_queue(student_id, group_id)
-            else :
-                return False
+            for q in queue:
+                student_id = q.student.user.id
+                if Queue.is_ECTS_points_limit_exceeded(student_id, group_id):
+		    Queue.remove_student_from_queue(student_id, group_id)
+	        else:
+                    return Queue.remove_student_from_queue(student_id, group_id)
+            return False
         except Queue.DoesNotExist:
             logger.error('Queue.remove_first_student_from_queue() throws Queue.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise AlreadyNotAssignedException()
@@ -414,7 +438,7 @@ class Queue(models.Model):
             logger.error('Queue.remove_first_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Queue.remove_first_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Queue.remove_first_student_from_group() throws Group.DoesNotExist exception (parameters: group_id = %d)' % (int(group_id)))
             raise NonGroupException()
             
     @staticmethod
@@ -443,7 +467,7 @@ class Queue(models.Model):
             logger.error('Queue.remove_student_low_priority_records throws Student.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % int(user_id), int(group_id), int(priority))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Queue.remove_student_low_priority_records throws Group.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % int(user_id), int(group_id), int(priority))
+            logger.error('Queue.remove_student_low_priority_records throws Group.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
             raise NonGroupException()
 
     def group_slug(self):

@@ -53,40 +53,6 @@ class AddUserToGroupTest(TestCase):
         student_options.save()
         self.assertRaises(RecordsNotOpenException, Record.add_student_to_group, self.user.id, self.group.id)
 
-class ChangeUserGroupTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
-
-    
-    def setUp(self):
-        self.user = User.objects.get(id=5)
-        self.old_group = Group.objects.get(id=1)
-        self.new_group = Group.objects.get(id=2)
-        self.old_record = Record.add_student_to_group(self.user.id, self.old_group.id)
-    
-    def testWithNonStudentUser(self):
-        self.user.student.delete()
-        self.assertRaises(NonStudentException, Record.change_student_group, self.user.id, self.old_group.id, self.new_group.id)
-    
-    def testWithoutGivenOldGroup(self):
-        group_id = self.old_group.id
-        self.old_group.delete()
-        self.assertRaises(NonGroupException, Record.change_student_group, self.user.id, group_id, self.new_group.id)
-    
-    def testWithoutGivenNewGroup(self):
-        group_id = self.new_group.id
-        self.new_group.delete()
-        self.assertRaises(NonGroupException, Record.change_student_group, self.user.id, self.old_group.id, group_id)
-    
-    def testStudentChangeGroup(self):
-        new_record = Record.change_student_group(self.user.id, self.old_group.id, self.new_group.id)
-        self.assertEqual(new_record.group, self.new_group)
-        self.assertEqual(new_record.student, self.user.student)
-        
-    def testStudentNotAssignedChangeGroup(self):
-        self.old_record.delete()
-        self.assertEqual(Record.objects.count(), 0)
-        self.assertRaises(AlreadyNotAssignedException, Record.change_student_group, self.user.id, self.old_group.id, self.new_group.id)
-        self.assertEqual(Record.objects.count(), 0)
            
 class RemoveUserToGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']
@@ -351,9 +317,11 @@ class RemoveFirstStudentFromQueue(TestCase):
         self.student1 = User.objects.get(id=100)
         self.student2 = User.objects.get(id=101)
         self.student3 = User.objects.get(id=102)
+        self.student4 = User.objects.get(id=105)
         self.employee = User.objects.get(id=1000)
         self.group = Group.objects.get(id=100)
         self.group2 = Group.objects.get(id=103)
+        self.group3 = Group.objects.get(id=104)
         self.semester=Semester.objects.get(id=100)
         self.semester.records_opening = datetime.now()
         self.semester.records_closing = datetime.now() + timedelta(days=7)
@@ -362,7 +330,7 @@ class RemoveFirstStudentFromQueue(TestCase):
 
     def testWithoutGivenGroup(self):
         group_id = self.group2.id
-        self.group.delete()
+        self.group2.delete()
         self.assertRaises(NonGroupException, Queue.remove_first_student_from_queue, group_id)
     
     def testEmptyQueue(self):
@@ -371,7 +339,10 @@ class RemoveFirstStudentFromQueue(TestCase):
     def testStudenAssignedToQueue(self):
 	removed = Queue.objects.get(group=self.group2.id, student=self.student2.id).student
         self.assertEqual(Queue.remove_first_student_from_queue(self.group2.id).student,removed)
-        
+    
+    def testWithEctsLimitExceeded(self):
+        removed = Queue.objects.get(group=self.group3.id, student=self.student4.id).student
+        self.assertEqual(Queue.remove_first_student_from_queue(self.group3.id).student,removed)
 
 class RemoveStudentLowPriorityRecords(TestCase):
     fixtures =  ['fixtures__queue']
@@ -392,8 +363,8 @@ class RemoveStudentLowPriorityRecords(TestCase):
 
     def testWithoutGivenGroup(self):
         group_id = self.group2.id
-        self.group.delete()
-        self.assertRaises(NonGroupException, Queue.remove_student_low_priority_records, self.student1.id, group_id,10)
+        self.group2.delete()
+        self.assertRaises(NonGroupException, Queue.remove_student_low_priority_records, self.student1.id, group_id, 10)
 
     def testStudenAssignedToQueue(self):
 	Queue.remove_student_low_priority_records(self.student2.id, self.group2.id,10)
