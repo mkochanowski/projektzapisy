@@ -1,21 +1,13 @@
-# -*- coding: utf-8 -*-
-
-"""
-    Polls
-"""
-
+# -*- coding: utf8 -*-
 from django.db import models
 
-from fereol.grade.poll.models.question import Question
-
 class Option( models.Model ):
-    question    = models.ForeignKey (Question, verbose_name = 'pytanie' )
-    title       = models.CharField ( max_length = 250, verbose_name = 'odpowiedz' )
-
+    content  = models.CharField( max_length = 250, verbose_name = 'treść' )
+    
     class Meta:
-        verbose_name        = "odpowiedz ankiety"
-        verbose_name_plural = "odpowiedzi ankiety"
-        app_label           = "poll"
-
+        verbose_name_plural = 'opcje'
+        verbose_name        = 'opcja'
+        app_label           = 'poll'
+        
     def __unicode__( self ):
-        return u'[' + unicode( self.question ) + u'] ' + unicode( self.title )
+        return unicode( self.content )

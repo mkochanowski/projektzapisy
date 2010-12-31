@@ -8,25 +8,25 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'PrivateKey'
-        db.create_table('ticket_create_privatekey', (
-            ('private_key', self.gf('django.db.models.fields.TextField')()),
-            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Poll'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('ticket_create', ['PrivateKey'])
-
         # Adding model 'PublicKey'
         db.create_table('ticket_create_publickey', (
-            ('public_key', self.gf('django.db.models.fields.TextField')()),
-            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Poll'])),
+            ('public_key_PEM', self.gf('django.db.models.fields.TextField')()),
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
         db.send_create_signal('ticket_create', ['PublicKey'])
 
+        # Adding model 'PrivateKey'
+        db.create_table('ticket_create_privatekey', (
+            ('private_key_PEM', self.gf('django.db.models.fields.TextField')()),
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+        ))
+        db.send_create_signal('ticket_create', ['PrivateKey'])
+
         # Adding model 'UsedTicketStamp'
         db.create_table('ticket_create_usedticketstamp', (
-            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Poll'])),
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Student'])),
         ))
@@ -35,11 +35,11 @@ class Migration(SchemaMigration):
     
     def backwards(self, orm):
         
-        # Deleting model 'PrivateKey'
-        db.delete_table('ticket_create_privatekey')
-
         # Deleting model 'PublicKey'
         db.delete_table('ticket_create_publickey')
+
+        # Deleting model 'PrivateKey'
+        db.delete_table('ticket_create_privatekey')
 
         # Deleting model 'UsedTicketStamp'
         db.delete_table('ticket_create_usedticketstamp')
@@ -81,15 +81,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'poll.poll': {
-            'Meta': {'object_name': 'Poll'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Employee']"}),
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '500'}),
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']", 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'studies_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '40'})
         },
         'subjects.group': {
             'Meta': {'object_name': 'Group'},
@@ -143,20 +134,20 @@ class Migration(SchemaMigration):
         },
         'ticket_create.privatekey': {
             'Meta': {'object_name': 'PrivateKey'},
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'poll': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Poll']"}),
-            'private_key': ('django.db.models.fields.TextField', [], {})
+            'private_key_PEM': ('django.db.models.fields.TextField', [], {})
         },
         'ticket_create.publickey': {
             'Meta': {'object_name': 'PublicKey'},
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'poll': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Poll']"}),
-            'public_key': ('django.db.models.fields.TextField', [], {})
+            'public_key_PEM': ('django.db.models.fields.TextField', [], {})
         },
         'ticket_create.usedticketstamp': {
             'Meta': {'object_name': 'UsedTicketStamp'},
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'poll': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Poll']"}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Student']"})
         },
         'users.employee': {
