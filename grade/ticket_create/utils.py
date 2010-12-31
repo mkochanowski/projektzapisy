@@ -10,6 +10,8 @@ from fereol.enrollment.subjects.models import Subject, \
                                               
 from fereol.enrollment.records.models  import Record 
 
+from fereol.grade.poll.models import Poll
+
 from fereol.grade.ticket_create.models import PublicKey, \
                                               PrivateKey, \
                                               UsedTicketStamp 
@@ -88,30 +90,28 @@ def generate_rsa_key():
     publicKey  = RSAkey.publickey().exportKey()
     return (publicKey, privateKey)
     
-def save_public_keys(groups_public_keys):
-    for (group, key) in groups_public_keys:
-        pkey = PublicKey(   group = group,
+def save_public_keys(polls_public_keys):
+    for (poll, key) in polls_public_keys:
+        pkey = PublicKey(   poll = poll,
                             public_key = key)
         pkey.save()
     
-def save_private_keys(groups_private_keys):
-    for (group, key) in groups_private_keys:
-        pkey = PrivateKey(  group = group,
+def save_private_keys(polls_private_keys):
+    for (poll, key) in polls_private_keys:
+        pkey = PrivateKey(  poll = poll,
                             private_key = key)
         pkey.save()
 
-def generate_keys_for_groups( sem ):
-    group_list = Group.objects.filter( subject__semester = sem )
+def generate_keys_for_polls( ):
+    poll_list = Poll.get_current_semester_polls()
     pub_list  = []
     priv_list = []
-    print "Grupy:"
-    print len(group_list)
-    for el in group_list:
+    for el in poll_list:
         (pub, priv) = generate_rsa_key()
         pub_list.append(pub)
         priv_list.append(priv)
-    save_public_keys(zip(group_list, pub_list))
-    save_private_keys(zip(group_list, priv_list))
+    save_public_keys(zip(poll_list, pub_list))
+    save_private_keys(zip(poll_list, priv_list))
     return 
     
 def split_groups_by_subject( group_list ):
