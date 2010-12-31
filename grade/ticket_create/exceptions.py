@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class InvalidGroupException( BaseException ):
+class InvalidPollException( BaseException ):
     pass
 
 class TicketUsed( BaseException ):

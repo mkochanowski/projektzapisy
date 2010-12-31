@@ -1,9 +1,8 @@
 # -*- coding: utf8 -*-
 from django.db                import models
-from fereol.grade.poll.models import Poll
 
 class PublicKey( models.Model ):
-    poll       = models.ForeignKey( Poll, verbose_name = 'ankieta' )
+    poll       = models.ForeignKey( 'poll.Poll', verbose_name = 'ankieta' )
     public_key = models.TextField(  verbose_name = 'klucz publiczny' )
     
     class Meta:

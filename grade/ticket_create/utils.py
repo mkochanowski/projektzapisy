@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
-from Crypto.PublicKey                  import RSA
-from Crypto.Random.random              import getrandbits, \
-                                              randint
-from itertools                         import product
-from django.db.models                  import Q
+from Crypto.PublicKey                      import RSA
+from Crypto.Random.random                  import getrandbits, \
+                                                  randint
+from itertools                             import product
+from commands                              import *
+ 
+from django.db.models                      import Q
+from django.utils.safestring               import SafeUnicode
 
-from fereol.enrollment.subjects.models import Subject, \
-                                              Group
-                                              
-from fereol.enrollment.records.models  import Record 
-
-from fereol.grade.poll.models import Poll
-
-from fereol.grade.ticket_create.models import PublicKey, \
-                                              PrivateKey, \
-                                              UsedTicketStamp 
-
+from fereol.enrollment.subjects.models     import Subject, \
+                                                  Group                                              
+from fereol.enrollment.records.models      import Record 
+from fereol.grade.poll.models              import Poll
+from fereol.grade.ticket_create.models     import PublicKey, \
+                                                  PrivateKey, \
+                                                  UsedTicketStamp 
 from fereol.grade.ticket_create.exceptions import *
-
-from django.utils.safestring           import SafeUnicode
-from commands import *
 
 RAND_BITS = 512 
 
@@ -68,7 +64,18 @@ def revMod( a, m ):
     x %= m
     if x < 0: x += m
     return x
-    
+
+def poll_cmp( poll1, poll2 ):
+    if poll1.group:
+        if poll2.group:
+            return cmp( poll1.group.subject, poll2.group.subject )
+        else:
+            return 1
+    else:
+        if poll2.group:
+            return -1
+        else:
+            return 0
          
 def generate_rsa_key():
     """ 
@@ -102,7 +109,7 @@ def save_private_keys(polls_private_keys):
                             private_key = key)
         pkey.save()
 
-def generate_keys_for_polls( ):
+def generate_keys_for_polls():
     poll_list = Poll.get_current_semester_polls()
     pub_list  = []
     priv_list = []
@@ -114,30 +121,47 @@ def generate_keys_for_polls( ):
     save_private_keys(zip(poll_list, priv_list))
     return 
     
-def split_groups_by_subject( group_list ):
-    if group_list == []: return []
+def group_polls_by_subject( poll_list ):
+    if poll_list == []: return []
+    
+    poll_list.sort( poll_cmp )
+    
     res       = []
-    act_groups =[]
-    act_sub    = group_list[ 0 ].subject
+    act_polls = []
+    act_group = poll_list[ 0 ].group
     
-    for group in group_list:
-        if group.subject == act_sub:
-           act_groups.append( group )
+    for poll in poll_list:
+        if not act_group:
+            if not poll.group:
+                act_polls.append( poll )
+            else:
+                act_group = poll.group
+                res.append( act_polls )
+                act_polls = [ poll ]
         else:
-            res.append( act_groups )
-            act_groups = [ group ]
-            act_sub    = group.subject
+            if poll.group:
+                if act_group.subject == poll.group.subject:
+                    act_polls.append( poll )
+                else:
+                    act_group = poll.group
+                    res.append( act_polls )
+                    act_polls = [ poll ]
+            else:
+                act_group = poll.group
+                res.append( act_polls )
+                act_polls = [ poll ]
+                
+    res.append( act_polls )
     
-    res.append( act_groups )
     return res
 
-def generate_ticket( group_list ):
+def generate_ticket( poll_list ):
     ## TODO: Docelowo ma być po stronie przeglądarki
     m       = getrandbits( RAND_BITS )
     blinded = []
     
-    for group in group_list:
-        key =  RSA.importKey( PublicKey.objects.get( group = group ).public_key )
+    for poll in poll_list:
+        key =  RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
         n   = key.n
         e   = key.e
         k   = randint( 2, n )
@@ -148,63 +172,49 @@ def generate_ticket( group_list ):
         b = expMod( k, e, n )
         t = ( a * b) % n
         
-        blinded.append(( group, t, (m, k) ))
+        blinded.append(( poll, t, (m, k) ))
     return blinded
     
-def check_group_assignment( user, group ):
-    ## TODO: zapisany, a nie oczekujący; grupy z tego semestru
-    r = Record.objects.get( group = group, student = user.student )
-    if not r: raise InvalidGroupException
+def check_poll_visiblity( user, poll ):
+    if not poll.is_student_entitled_to_poll( user ): 
+        raise InvalidPollException
     
-def check_ticket_not_signed( user, group ):
-    ## TODO: obecny semestr
-    u = UsedTicketStamp.objects.filter( student = user.student, group = group )
+def check_ticket_not_signed( user, poll ):
+    u = UsedTicketStamp.objects.filter( student = user.student, poll = poll )
     if u: raise TicketUsed
-    
-def find_rsa_private_key( group ):
-    """ 
-        Returns RSAobj object for specified group; if no such group is
-        found within the system, throws an error 
-    """
-    rsa_private = PrivateKey.objects.get( group = group ).private_key
-    RSAImpl     = RSA.RSAImplementation()
-    return RSAImpl.importKey( rsa_private )
-    
-def sign_ticket( ticket, key ):
-    return key.sign( ticket, 0 )
-    
-def mark_group_used( user, group ):
+        
+def mark_poll_used( user, poll ):
     ## TODO: dodać semestr
     u = UsedTicketStamp( student = user.student,
-                         group   = group )
+                         poll    = poll )
     u.save()
     
-def ticket_check_and_sign( user, group, ticket ):
-    check_group_assignment( user, group )
-    check_ticket_not_signed( user, group )
-    key    = find_rsa_private_key( group )
-    signed = sign_ticket( ticket, key )
-    mark_group_used( user, group )
+def ticket_check_and_sign( user, poll, ticket ):
+    check_poll_visiblity( user, poll )
+    check_ticket_not_signed( user, poll )
+    key    = PrivateKey.objects.get( poll = poll )
+    signed = key.sign_ticket( ticket )
+    mark_poll_used( user, poll )
     return signed
 
 def secure_signer( user, g, t ):
     try:
         return ticket_check_and_sign( user, g, t ), 
-    except InvalidGroupException:
-        return u"Nie jesteś zapisany do tej grupy",
+    except InvalidPollException:
+        return u"Nie masz uprawnień do tej ankiety",
     except TicketUsed:
         return u"Bilet już pobrano",
 
-def unblind( group, st, k ):
+def unblind( poll, st, k ):
     # TODO: To ma być po stronie przeglądarki 
     st  = st[0]
-    if   st == u"Nie jesteś zapisany do tej grupy":
+    if   st == u"Nie masz uprawnień do tej ankiety":
         return st
     elif st == u"Bilet już pobrano":
         return st
     else:
         st  = st[0]
-        key =  RSA.importKey( PublicKey.objects.get( group = group ).public_key )
+        key = RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
         n   = key.n
         rk  = revMod( k, n )
         return ((st % n) * (rk % n)) % n
@@ -213,7 +223,7 @@ def get_valid_tickets( tl ):
     err = []
     val = []
     for g, t, st in tl:
-        if st == u"Nie jesteś zapisany do tej grupy" or \
+        if st == u"Nie masz uprawnień do tej ankiety" or \
            st == u"Bilet już pobrano":
                 err.append(( g, st ))
         else:
@@ -223,13 +233,21 @@ def get_valid_tickets( tl ):
         
 def to_plaintext( vtl ):
     res = ""
-    for g, t, st in vtl:
-        res += g.subject.name + " &#10;"
-        res += g.get_type_display() + ": " + g.get_teacher_full_name() + " &#10;"
+    for p, t, st in vtl:
+        res += '[' + p.title + ']'
+        if not p.group:
+            res += u'Ankieta ogólna &#10;'
+        else:
+            res += p.group.subject.name + " &#10;"
+            res += p.group.get_type_display() + ": "
+            res += p.group.get_teacher_full_name() + " &#10;"
+        if p.studies_type:
+            res += u'dla studiów ' + p.studies_type + " &#10;"
+            
         res += unicode( t ) + " &#10;"
         res += unicode( st ) + " &#10;"
         res += "---------------------------------- &#10;"
-    return SafeUnicode( res )
+    return SafeUnicode( unicode( res ))
 
 def from_plaintext( tickets_plaintext ):
     pre_tickets = tickets_plaintext.split('\n')

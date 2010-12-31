@@ -8,11 +8,14 @@ from fereol.enrollment.subjects.models import Group, \
                                               Semester
 from fereol.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
+from fereol.grade.ticket_create.models import PublicKey                                              
+from section                           import SectionOrdering
 
 class Poll( models.Model ):
     author       = models.ForeignKey( Employee, verbose_name = 'autor' )
     title        = models.CharField( max_length = 40, verbose_name = 'tytuł' )
     description  = models.TextField( blank = True, verbose_name = 'opis' )
+    semester     = models.ForeignKey( Semester, verbose_name = 'semestr' )
     group        = models.ForeignKey( Group, verbose_name = 'grupa', blank = True, null = True )
     studies_type = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
     
@@ -22,7 +25,10 @@ class Poll( models.Model ):
         app_label           = 'poll'
         
     def __unicode__( self ):
-        return u'[' + unicode( self.group ) + u']' + unicode( self.title )
+        res = unicode( self.title )
+        if self.group: res += u', grupa: ' + unicode( self.group )
+        if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
+        return res
         
     def is_student_entitled_to_poll( self, student ):
         if self.group:
@@ -41,18 +47,19 @@ class Poll( models.Model ):
         return True 
                
     def all_sections( self ):
-        pass
+        return self.section_set.all()
     
-    def get_semester( self ):
-        pass
-        
     @staticmethod
     def get_current_polls():
-        pass
+        pks = PublicKey.objects.all() 
+        return Poll.objects.filter( pk__in = pks )
         
     @staticmethod
     def get_current_semester_polls():
         semester = Semester.get_current_semester()
-        current_semester_subjects = Subject.objects.filter(semester = semester)
-        current_semester_groups = Group.objects.filter(subject__in = current_semester_subjects)
-        return Poll.objects.filter(group__in = current_semester_groups) 
+        return Poll.objects.filter( semester = semester ) 
+
+    @staticmethod
+    def get_all_polls_for_student( student ):
+        return filter( lambda x: x.is_student_entitled_to_poll( student), 
+                       Poll.get_current_polls())

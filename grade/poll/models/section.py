@@ -2,18 +2,14 @@
 from sys       import maxint
 from django.db import models
 
-from poll                     import Poll
-from open_question            import OpenQuestionOrdering, \
-                                     OpenQuestion
-from single_choice_question   import SingleChoiceQuestionOrdering, \
-                                     SingleChoiceQuestion
-from multiple_choice_question import MultipleChoiceQuestionOrdering, \
-                                     MultipleChoiceQuestion
+from open_question            import OpenQuestionOrdering
+from single_choice_question   import SingleChoiceQuestionOrdering
+from multiple_choice_question import MultipleChoiceQuestionOrdering
                         
 class Section( models.Model ):
     title       = models.CharField( max_length = 50,  verbose_name = 'tytuł' )
     description = models.TextField( blank = True, verbose_name = 'opis' ) 
-    poll        = models.ManyToManyField( Poll, verbose_name = 'ankieta',
+    poll        = models.ManyToManyField( 'Poll', verbose_name = 'ankieta',
                                           through = 'SectionOrdering' )
     
     class Meta:
@@ -65,18 +61,18 @@ class Section( models.Model ):
                 op  = maxint
             
             if min( op, mcp, scp ) == scp:
-                questions.append( sc )
+                questions.append( sc.question )
                 si += 1
             elif min( op, mcp, scp ) == mcp:
-                questions.append( mc )
+                questions.append( mc.question )
                 mi += 1
             else:
-                questions.append( o )
+                questions.append( o.question )
                 oi += 1
         return questions
         
 class SectionOrdering( models.Model ):
-    poll     = models.ForeignKey( Poll,      verbose_name = 'ankieta' )
+    poll     = models.ForeignKey( 'Poll',      verbose_name = 'ankieta' )
     section  = models.ForeignKey( Section, verbose_name = 'sekcja' )
     position = models.IntegerField( verbose_name = 'pozycja' )
 
