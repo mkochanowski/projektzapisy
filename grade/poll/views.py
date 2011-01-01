@@ -1,37 +1,36 @@
 # -*- coding: utf-8 -*-
-from django.contrib                 import auth
-from django.contrib.auth.decorators import login_required
+from django.contrib                    import auth
+from django.contrib.auth.decorators    import login_required
+from django.http                       import HttpResponse, \
+                                              HttpResponseRedirect
+from django.shortcuts                  import render_to_response
+from django.template                   import RequestContext
 
-from django.http                import HttpResponse, \
-                                       HttpResponseRedirect
-from django.shortcuts           import render_to_response
-from django.template            import RequestContext
-from fereol.grade.poll.models   import Poll
-from fereol.users.decorators    import student_required, employee_required
-
-from fereol.grade.poll.models   import Poll
-
-from fereol.grade.poll.forms    import TicketsForm
-
-from fereol.grade.ticket_create.utils import from_plaintext
+from fereol.users.decorators           import student_required, employee_required
+from fereol.enrollment.subjects.models import Semester
+from fereol.grade.ticket_create.utils  import from_plaintext
+from fereol.grade.ticket_create.models import PublicKey, \
+                                              PrivateKey
+from fereol.grade.poll.models          import Poll
+from fereol.grade.poll.forms           import TicketsForm
 
 def default(request):
     return render_to_response ('grade/base.html', context_instance = RequestContext ( request ))
 
 def enable_grade( request ):
-    ############################################################################
-    ##      TODO:                                                             ##
-    ##              USTAWIĆ STATUS OCENY NA AKTYWNY                           ##
-    ############################################################################    
+    semester = Semester.get_current_semester()
+    semester.is_grade_active = True
+    semester.save()   
     return render_to_response ('grade/base.html', { 'message' : "Otwarto ocenę zajęć" }, context_instance = RequestContext ( request ))
     
 def disable_grade( request ):
-    ############################################################################
-    ##      TODO:                                                             ##
-    ##              USTWIĆ STATUS OCENY NA NIEAKTYWNY                         ##
-    ##              usunąć wygenerowane klucze                                ##
-    ##              zrobić coś z wynikami oceny                               ##
-    ############################################################################
+    semester = Semester.get_current_semester()
+    semester.is_grade_active = False
+    semester.save()
+    
+    PublicKey.objects.all().delete()
+    PrivateKey.objects.all().delete()
+    
     return render_to_response ('grade/base.html', { 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
 
 

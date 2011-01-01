@@ -21,6 +21,8 @@ class Semester( models.Model ):
     semester_begining = models.DateField(blank = True, null = False, verbose_name='Data rozpoczęcia semestru')
     semester_ending = models.DateField(blank = True, null = False, verbose_name='Data zakończenia semestru')
 
+    is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna' )
+
     def get_subjects(self):
         """ gets all subjects linked to semester """
         return Subject.objects.filter(semester=self.pk)
