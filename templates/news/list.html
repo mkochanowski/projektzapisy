@@ -21,10 +21,13 @@ u
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
     <li><a href="{% url latest_news category %}">
-	{% ifequal category "enrollment" %}Zapisy{% else %}Oferta{% endifequal %}</a></li>
-    <li id="news-archive-nav" style="{% if not archive_view %}display:none{% endif %}">Archiwum</li>
-    <li id="news-search-nav" style="{% if not search_view %}display:none{% endif %}">Wyniki wyszukiwania</li>
-
+		{% ifequal category "enrollment" %}Zapisy{% else %}Oferta{% endifequal %}</a>
+	</li>
+    <li id="news-nav">
+		{% if archive_view %}Archiwum aktualności{% endif %}
+		{% if search_view %}Wyniki wyszukiwania aktualności{% endif %}
+		{% if not archive_view and not search_view %}Aktualności{% endif %}
+	</li>
 {% endblock %}
 
 {% block top-bar %}

@@ -11,15 +11,9 @@
 {% endblock %}
 
 {% block main-navigation %}
-<li>
-    <a href="{% url main-page %}">Strona główna</a>
-</li>
-<li>
-    <a href="{% url latest_news 'enrollment' %}">Zapisy</a>
-</li>
-<li>
-    <a href="{% url schedule-own %}">Plan zajęć</a>
-</li>
+	<li><a href="{% url main-page %}">Strona główna</a></li>
+	<li><a href="{% url latest_news 'enrollment' %}">Zapisy</a></li>
+	<li>Plan zajęć</li>
 {% endblock %}
 
 {% block content %}

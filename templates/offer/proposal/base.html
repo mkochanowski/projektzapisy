@@ -23,17 +23,20 @@
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
 	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
-	<li><a href="{% url proposal-list %}">Propozycje</a></li>
-	{% if proposal %}
-		{% if proposal.pk %}
+	{% if proposal and proposal.pk %}
+		<li><a href="{% url proposal-list %}">Propozycje</a></li>
+		{% if editMode %}
 			<li><a href="{% url proposal-page slug=proposal.slug %}">{{proposal.name}}</a></li>
-			{% if editMode %}
-				<li>Edycja</li>
-			{% endif %}
+			<li>Edycja</li>
 		{% else %}
-			{% if editForm %}
-				<li>Dodaj nową</li>
-			{% endif %}
+			<li>{{proposal.name}}</li>
+		{% endif %}
+	{% else %}
+		{% if editForm %}
+			<li><a href="{% url proposal-list %}">Propozycje</a></li>
+			<li>Dodaj nową</li>
+		{% else %}
+			<li>Propozycje</li>
 		{% endif %}
 	{% endif %}
 {% endblock %}

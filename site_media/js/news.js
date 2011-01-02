@@ -33,13 +33,11 @@ News.loadPage = function(url)
 			$('#news-nav-groups').html(data.newer_group + data.older_group);
 			$('#news-content').html(data.content);
 			if (data.archive_view)
-				$('#news-archive-nav').css("display", "inline");
+				$('#news-nav').text('Archiwum aktualności');
+			else if (data.search_view)
+				$('#news-nav').text('Wyniki wyszukiwania aktualności');
 			else
-				$('#news-archive-nav').css("display", "none");
-			if (data.search_view)
-				$('#news-search-nav').css("display", "inline");
-			else
-				$('#news-search-nav').css("display", "none");
+				$('#news-nav').text('Aktualności');
 		}
 	});
 };
