@@ -1,9 +1,9 @@
-Feature: User wants to sign in in order to use non publicly available functions
+Feature: User wants to sign in in order to use functions which aren't publicly available
 
   Background:
-    Given I am on http://nowe-zapisy.ii.uni.wroc.pl
+    Given I am on the home page
     
-  Scenario: Successfull signing in with student credentials 
+  Scenario: Successful signing in with student credentials 
     When I follow "System zapisów"
     And I follow "Zaloguj"
     And I fill in "Nazwa użytkownika" with "student-test"
@@ -11,7 +11,7 @@ Feature: User wants to sign in in order to use non publicly available functions
     And I press "Zaloguj"
     Then I should be on my profile page
 
-  Scenario: Signing in with invalid user name
+  Scenario: Unsuccessful igning in with invalid user name
     When I follow "System zapisów"
     And I follow "Zaloguj"
     And I fill in "Nazwa użytkownika" with "student-test-invalid"
@@ -26,5 +26,3 @@ Feature: User wants to sign in in order to use non publicly available functions
     And I fill in "Hasło" with "bbb"
     And I press "Zaloguj"
     Then I should see "Podany identyfikator i hasło się nie zgadzają. Spróbuj ponownie"
-
-

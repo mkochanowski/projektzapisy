@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'uri'
 require 'cgi'
 
@@ -42,7 +43,7 @@ When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
   fill_in(field, :with => value)
 end
 
-Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")?$/ do |text, selector|
+Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")$/ do |text, selector|
   with_scope(selector) do
     page.should have_content(text)    
   end

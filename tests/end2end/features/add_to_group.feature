@@ -21,7 +21,5 @@ Feature: Student wants to add himself to group in order to learn something
   Scenario: Successful adding to group
     When I am on subjects page
     And I click on "Algebra"
-    Then show me the page
     And I click on link which points to "/records/199/assign"
-    
     
