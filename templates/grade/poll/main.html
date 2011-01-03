@@ -1,4 +1,4 @@
-{% extends "grade/base.html" %}
+﻿{% extends "grade/base.html" %}
 
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
@@ -7,8 +7,8 @@
 
 {% block content %}
 	<div id="grade-main">
+<div id="grade-main-rules">
 	    <h2>Zasady Oceny Zajęć</h2>
-            <div id="grade-main-rules">
                 <!--
                     TU FAJNIE BYŁOBY DAĆ JAKIEŚ PRAWDZIWE ZASADY :)
                 -->
@@ -20,7 +20,7 @@
 		{% endif %}
 		<p class="link"><a href="#">Pobieranie kluczy</a></p>
 		<p class="link"><a href="{% url grade-poll-verify-keys %}">Ocena zajęć</a></p>
-		<p class="link"><a href="#">Wyniki oceny</a></p>
+		<p class="link"><a href="{% url grade-poll-show %}">Wyniki oceny</a></p>
 	</div>
 {% endblock %}
 

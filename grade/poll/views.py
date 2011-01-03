@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 from django.http                import HttpResponse
 from django.shortcuts           import render_to_response
@@ -25,6 +25,11 @@ def get_keys( request ):
     #       Pobieranie kluczy
     #       Tu musi być podpięcie do kryptografii i generowania
     pass
+
+def declaration( request ):
+    # TODO:
+    #       Wyświetlanie wyników oceny
+    return render_to_response ('grade/poll/show.html', context_instance = RequestContext( request ))
     
 def check_keys( request ):
     data = {}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% load news_extras %}
 
@@ -16,7 +16,7 @@
 	{% endif %}
 	<li><a href="#">Pobieranie kluczy</a></li>
 	<li><a href="{% url grade-poll-verify-keys %}">Ocena zajęć</a></li>
-	<li><a href="#">Wyniki oceny</a></li>
+	<li><a href="{% url grade-poll-show %}">Wyniki oceny</a></li>
 	{% if user.is_authenticated %}
 	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
         {% if user.student %}

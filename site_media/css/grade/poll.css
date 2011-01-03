@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Style odpowiadające za panel oceny
  */
 
@@ -20,6 +20,19 @@
 {
     font-size: 20px;
     padding-top: 10px;
+}
+
+#grade-main
+{
+border: 1px solid #CCC;
+padding:10px;
+}
+
+#grade-main-rules
+{
+background:#F8F8F8;
+border: 1px solid #CCC;
+padding:10px;
 }
 
 /*** GŁOWNA STRONA OCENY - koniec ***/
