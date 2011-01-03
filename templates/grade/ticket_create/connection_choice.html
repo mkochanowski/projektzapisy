@@ -1,0 +1,19 @@
+{% extends "grade/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+	<li><a href="{% url grade-ticket-keys-generate %}">Pobieranie Biletów</a></li>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <table>
+            {{ form.as_table }}
+        </table>
+        <input type="submit" value="Pobierz bilety">
+    </form>
+
+    <div>{{ p }}</div>
+{% endblock %}
+

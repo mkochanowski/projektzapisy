@@ -1,0 +1,41 @@
+{% extends "grade/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+	<li><a href="{% url grade-ticket-keys-generate %}">Pobieranie Biletów</a></li>
+{% endblock %}
+
+{% block content %}
+<!-- OSTYLOWAĆ -->
+    {% if errors %}
+        <div>
+            <h4> Nie udało się pobrać następujących biletów </h4>
+            <ul>
+                {% for err in errors %}
+                    <li>
+                        {{ err.0.subject.name }}: <br>
+                        {{ err.0.get_type_display }}: {{ err.0.get_teacher_full_name }} <br>
+                        <b>{{ err.1 }}</b> 
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %} 
+    
+    {% if tickets %}
+        <div>
+            <h4> Oto Twoje bilety.<br>Zapisz je w bezpiecznym miejscu.</h4>
+            <form action="">
+    	        <textarea name="keys" cols="80" rows="20" readonly="readonly">{{ tickets }}
+                </textarea>
+            </form>
+        </div>
+    {% else %}
+        <div>
+            <h4>Niestety nie możesz pobrać żadnych biletów.</h4>
+        </div>
+    {% endif %}
+    
+    
+{% endblock %}

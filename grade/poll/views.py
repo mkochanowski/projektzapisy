@@ -1,29 +1,41 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+from django.contrib                    import auth
+from django.contrib.auth.decorators    import login_required
+from django.http                       import HttpResponse, \
+                                              HttpResponseRedirect
+from django.shortcuts                  import render_to_response
+from django.template                   import RequestContext
+from fereol.users.decorators           import student_required, employee_required
+from fereol.enrollment.subjects.models import Semester
+from fereol.grade.ticket_create.utils  import from_plaintext
+from fereol.grade.ticket_create.models import PublicKey, \
+                                              PrivateKey
+from fereol.grade.poll.models          import Poll
+from fereol.grade.poll.forms           import TicketsForm
 
-from django.http                import HttpResponse
-from django.shortcuts           import render_to_response
-from django.template            import RequestContext
+def default(request):
+    return render_to_response ('grade/base.html', context_instance = RequestContext ( request ))
 
-from fereol.grade.poll.forms    import KeysForm
-from fereol.users.decorators    import student_required, employee_required
+def enable_grade( request ):
+    semester = Semester.get_current_semester()
+    semester.is_grade_active = True
+    semester.save()   
+    return render_to_response ('grade/base.html', { 'message' : "Otwarto ocenę zajęć" }, context_instance = RequestContext ( request ))
+    
+def disable_grade( request ):
+    semester = Semester.get_current_semester()
+    semester.is_grade_active = False
+    semester.save()
+    
+    PublicKey.objects.all().delete()
+    PrivateKey.objects.all().delete()
+    
+    return render_to_response ('grade/base.html', { 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
 
-from fereol.grade.poll.crypto   import validate_key, \
-                                       link_name
-                                                     # TODO: 
-                                                     #      być może to trzeba będzie
-                                                     #      zrobić w osobnej apce
 
-@employee_required
-def create( request ):
-    # TODO:
-    #       Obsługa formularza
-    return render_to_response ('grade/poll/add.html', context_instance = RequestContext( request ))
+#### Poll creation ####
 
-@student_required
-def get_keys( request ):
-    # TODO:
-    #       Pobieranie kluczy
-    #       Tu musi być podpięcie do kryptografii i generowania
+def poll_create(request):
     pass
 
 def declaration( request ):
@@ -31,32 +43,91 @@ def declaration( request ):
     #       Wyświetlanie wyników oceny
     return render_to_response ('grade/poll/show.html', context_instance = RequestContext( request ))
     
-def check_keys( request ):
-    data = {}
+def questionset_create(request):
+    def parse_form(post):
+        poll          = Poll()
+        
+        poll.title    = post.get("poll[title]")
+        poll.author   = request.user.employee
+        poll.save()
+        print ("in parse")
+        sections = int(post.get("poll[sections]"))
+        for section_id in range(1, sections+1):
+            print (u"in sections")
+            print (section_id) 
+            section       = Section()
+            section.poll  = poll
+
+            section_name = "poll[section][" + str(section_id) + "]"
+            section.title = post.get(section_name + "[title]")
+            section.save()
+
+            questions = int( post.get(section_name + "[questions]") )
+
+            for question_id in range(1, questions+1):
+                question             = Question()
+                question.section     = section
+                question.poll        = poll
+
+                question_name        = section_name + "[question][" + str(question_id) +"]"
+
+                question.type        = post.get(question_name + "[type]")
+                question.title       = post.get(question_name + "[title]")
+                question.description = post.get(question_name + "[description]")
+                question.save()
+                options = int(post.get(question_name + "[options]"))
+                
+                for option_id in range (1, options+1):
+                    option          = Option()
+                    option.question = question
+                    option_name     = question_name + "[option][" + str(option_id) + "]"
+                    option.title    = post.get(option_name + "[title]")
+                    option.save()
+                
+                question.save()
+            section.save()
+        poll.save()
+
+
     if request.method == "POST":
-        form = KeysForm( request.POST )
-        data['form'] = form
+          parse_form(request.POST)
+          # TODO: przekierowac do listy
+    return render_to_response ('grade/poll/poll_create.html', context_instance = RequestContext( request ))
+
+
+def questionset_assign(request):
+    pass
+    
+#### Poll answering ####
+@login_required
+def grade_logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect('/grade/poll/tickets_enter')
+
+def tickets_enter(request):
+    data = {}
+    
+    if request.method == "POST":
+        form = TicketsForm( request.POST )
         
         if form.is_valid():
-            keys = form.cleaned_data[ 'keysfield' ]
-            
-            cands = keys.split( '\n' )
-            links = []
-            
-            for key in cands:
-                if validate_key( key ):
-                # TODO:
-                #       Prawdziwa weryfikacja kluczy
-                #       Tu musi być podpięcie do kryptografii i weryfikacji
-                    links.append( (key, link_name( key ) ) )
-                    
-            return render_to_response ('grade/poll/form_links.html', { 'links' : links }, context_instance = RequestContext ( request ))
+            tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
+            tickets = from_plaintext( tickets_plaintext )
+            ## TERAZ TRZEBA Z TYMI PODPISANYMI BILETAMI PRZEJŚĆ DALEJ
     else:
-        form = KeysForm()
-        data['form'] = form        
+        form = TicketsForm()
     
-    return render_to_response ('grade/poll/keys_verify.html', data, context_instance = RequestContext ( request ))
+    data[ 'form' ] = form
+    return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
+    
+def poll_answer(request):
+    pass
+    
+def poll_save(request):
+    pass
+    
+#### Poll results ####
 
-def default( request ):
-    return render_to_response ('grade/poll/main.html', context_instance = RequestContext ( request ))
+def poll_results(request):
+    pass
 

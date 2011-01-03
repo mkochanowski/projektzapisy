@@ -39,4 +39,4 @@ class Group(models.Model):
         app_label = 'subjects'
 
     def __unicode__(self):
-        return "%s: %s - %s" % (self.subject.name, self.get_type_display(), self.get_teacher_full_name())
+        return "%s: %s - %s" % (unicode(self.subject.name), unicode(self.get_type_display()), unicode(self.get_teacher_full_name()))

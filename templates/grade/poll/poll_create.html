@@ -13,10 +13,17 @@
 
 {% block content %}
 	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
+<<<<<<< HEAD:templates/grade/poll/add.html
 		<form url="" id="create_main">
 			<input type="text" value="Tytuł ankiety" id="tytul_ankiety">
 			<ol id="poll-form">
 			</ol>
+=======
+		<form url="" method="POST">
+			<input type="text" value="Tytuł ankiety">
+			<ul id="poll-form">
+			</ul>
+>>>>>>> a6122eb4bbbd9e76b75cd04b436376d8923930d3:templates/grade/poll/poll_create.html
 		<input type="button" value="dodaj pytanie" id="add-question">
 		<select id="add-question-type">
 			<option value="open">Otwarte</option>
