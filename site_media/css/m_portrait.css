@@ -4,7 +4,7 @@
 #main-header{	width:100%;}
 
 
-@media all and (min-device-width: 128px)  {
+@media all and (min-width: 128px)  {
 	#main-container{
 		width:128px;
 	}
@@ -19,7 +19,7 @@
 	div{ font-size: 7px; }
 }
 
-@media all  and (min-device-width: 176px) {
+@media all  and (min-width: 176px) {
 	#main-container{
 		width:176px;
 	}
@@ -30,7 +30,7 @@
 	div{ font-size: 8px; }
 }
 
-@media all and (min-device-width: 240px)  {
+@media all and (min-width: 240px)  {
 	#main-container{
 		width:240px;
 	}
@@ -45,7 +45,7 @@
 
 /* ---- */ 
 
-@media all and (min-device-width: 320px)  {
+@media all and (min-width: 320px)  {
 	#main-container{
 		width:320px;
 	}
@@ -61,7 +61,7 @@
 	input[type=text], input[type=password], textarea{height: 25px;}
 }
 
-@media all and (min-device-width: 480px)  {
+@media all and (min-width: 480px)  {
 	#main-container{
 		width:480px;
 	}
@@ -74,7 +74,7 @@
 
 }
 
-@media all and (min-device-width: 640px) {
+@media all and (min-width: 640px) {
 	#main-container{
 		width:640px;
 	}
