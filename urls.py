@@ -31,7 +31,8 @@ urlpatterns = patterns('',
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
 
     (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
-
+    #CHANGE TO MOBILE
+    url(r'^mobile/$', 'fereol.mobile.views.onMobile', name = 'on-mobile'),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

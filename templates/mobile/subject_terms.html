@@ -1,37 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN"
-    "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+{% extends "mobile/base_m.html" %}
 
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="Description" content="Opis dokumentu" />
-    <meta name="Author" content="Autor" />
-	<link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
+{% block content %}
+<div id="main-container-content">
 
-	<title>
-		Zapisy II UWr - wersja mobilna
-	</title>
-</head>
-
-<body>
-	<div id="main-container">
-
-		<div id="main-header">
-			<a href="menu.html"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
-				<div class="subject-inner-clear">
-					{% if user.is_authenticated %}
-                                            <a href = {% url user-mobile-logout %}>Wyloguj {{ user.username }}</a>
-                                        {% else %}
-                                            <a href="index.html">Zaloguj</a>
-                                        {% endif %}
-					
-				</div>
-		</div>
-
-		<div id="main-container-content">
-
-				<div >
-						<a href="subjects.html">
+				<div class="nav">
+						<a href="{% url student-enrollment %}">
 							<div class="subject-inner-clear">
 								<img src="/site_media/images/larrow.gif" width="5%" alt="left arrow"  />
 								Lista przedmiotów 
@@ -69,7 +42,6 @@
 							<br/>
 							{% if exercises %}
 							<li>  Cwiczenia </li>
-							<span style="float: right; padding: 0% 10%"><img src="/site_media/images/alert-icon.gif" alt="!"></span>
 							<br/>
 							<div style="padding: 1% 0% 0%  10%">
 								{% for ex in exercises %}
@@ -100,7 +72,6 @@
                                                         {% endif %}
                                                         {% if exer_labs %}
                                                         <li>  Cwiczenio - Pracownie </li>
-							<span style="float: right; padding: 0% 10%"><img src="/site_media/images/alert-icon.gif" alt="!"></span>
 							<br/>
 							<div style="padding: 1% 0% 0%  10%">
 								{% for ex in exer_labs %}
@@ -133,7 +104,6 @@
 
                                                         {% if laboratories %}
 							<li>  Pracownia </li>
-							<span style="float: right; padding: 0% 10%"><img src="/site_media/images/alert-icon.gif" alt="!"></span>
 							<br/>
 							<div style="padding: 1% 0% 0%  10%">
 								{% for lab in laboratories %}
@@ -165,7 +135,6 @@
 
                                                         {% if exercises_adv %}
 							<li>  Cwiczenia - zaawansowane </li>
-							<span style="float: right; padding: 0% 10%"><img src="/site_media/images/alert-icon.gif" alt="!"></span>
 							<br/>
 							<div style="padding: 1% 0% 0%  10%">
 								{% for ex in exercises_adv %}
@@ -197,7 +166,6 @@
 
                                                         {% if seminar %}
 							<li>  Seminarium </li>
-							<span style="float: right; padding: 0% 10%"><img src="/site_media/images/alert-icon.gif" alt="!"></span>
 							<br/>
 							<div style="padding: 1% 0% 0%  10%">
 								{% for ex in seminar %}
@@ -229,7 +197,6 @@
 
                                                         {% if language %}
 							<li>  Lektorat </li>
-							<span style="float: right; padding: 0% 10%"><img src="/site_media/images/alert-icon.gif" alt="!"></span>
 							<br/>
 							<div style="padding: 1% 0% 0%  10%">
 								{% for ex in language %}
@@ -258,23 +225,38 @@
                                                                 {% endfor %}
 							</div>
                                                         {% endif %}
+                                                        {% if sport %}
+                                                        <li>  Zajęcia sportowe </li>
+							<br/>
+							<div style="padding: 1% 0% 0%  10%">
+								{% for ex in sport %}
+                                                                {% for term in ex.get_all_terms%}
+                                                                {{ term }}
+                                                                {% endfor %}
+                                                        <br/>
+								{{ ex.get_teacher_full_name }}<br/>
+
+                                                                {% if subject.user_enrolled_to_exercise == ex.id %}
+                                                                        <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
+                                                                            <input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
+                                                                        </form>
+                                                                    {% else %}
+                                                                        {% if subject.user_enrolled_to_langoratory %}
+                                                                            <form action='/group/{{subject.user_enrolled_to_langoratory}}/{{ex.id}}/reassign/' name='enrol_unenrol' method="post">
+                                                                                <input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
+                                                                            </form>
+                                                                        {% else %}
+                                                                            <form action='/group/{{ex.id}}/assign/' name='enrol_unenrol' method="post">
+                                                                                <input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
+                                                                            </form>
+                                                                        {% endif %}
+								    {% endif %}
+
+                                                                {% endfor %}
+							</div>
+                                                        {% endif %}
 					</div>
 	
 				</div>
-
-	
-		</div>
-		
-		<div id="main-footer">
-				<div><a href="#"> przejdz do pelnej wersji</a></div>
-				<div><a href="#"> trwale wylacz wersje mobilna</a></div>
-
-
-				<div class="version-info">
-				</div>
-
-
-		</div>
-	</div>
-</body>
-</html>
+</div>
+{% endblock %}

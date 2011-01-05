@@ -71,47 +71,6 @@ def subjectTerms(request,slug):
             return render_to_response('mobile/subject_terms.html', context_instance=RequestContext(request))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	"""Wyświetla stronę zapisów na wybrany przedmiot"""
-	"""student = request.user.student
-	semester = Semester.objects.filter(visible = True)
-	subject = Subject.objects.get(id = subject_id)
-	groups = Group.objects.filter(subject = subject).select_related().order_by('type')
-	records = Record.objects.filter(student = student).select_related()
-	groups_enr = [record.group for record in records]
-	groups_enr = filter(lambda x: x.subject.id == subject.id,groups_enr)
-#	groups_signed = map(lambda x: x in groups_enr,groups)
-	groups_final = map(lambda x: (x,x in groups_enr),groups)
-	enrolled_by_type ={}
-	for g,z in groups_final:
-		if g.type in enrolled_by_type.keys():
-			enrolled_by_type[g.type] = enrolled_by_type[g.type] or z
-		else:
-			enrolled_by_type[g.type] = z
-	show_unsigned = True in enrolled_by_type.values()				
-	return render_to_response("mobile/subject_terms.html",{'e': enrolled_by_type,'subject': subject,'groups' : records,'g2': groups_final,'su': show_unsigned},context_instance = RequestContext(request))"""
-
 @login_required
 def assign(request,group_id):
     group = Group.objects.get(id=group_id)
