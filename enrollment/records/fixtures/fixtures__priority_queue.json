@@ -125,15 +125,6 @@
             "date_joined": "2010-11-04 14:42:09"
         }
     }, 
-    {
-        "pk": 100, 
-        "model": "subjects.studentoptions", 
-        "fields": {
-            "records_opening_delay_hours": 8, 
-            "student": 100, 
-            "subject": 100
-        }
-    }, 
    {
         "pk": 1, 
         "model": "subjects.type", 
@@ -191,13 +182,6 @@
         }
     }, 
     {
-        "pk": 101, 
-        "model": "subjects.subjectentity", 
-        "fields": {
-            "name": "Logika dla informatyk\u00f3w"
-        }
-    }, 
-    {
         "pk": 100, 
         "model": "subjects.subject", 
         "fields": {
@@ -217,30 +201,11 @@
         }
     }, 
     {
-        "pk": 102, 
-        "model": "subjects.subject", 
-        "fields": {
-            "lectures": 30, 
-            "name": "Logika dla informatyk\u00f3w", 
-            "ects": 40, 
-            "entity": 101, 
-            "semester": 100, 
-            "teachers": [
-                1000
-            ], 
-            "exercises": 30, 
-            "laboratories": 0, 
-            "type": 5, 
-            "slug": "logika-dla-informatyk\u00f3w", 
-            "description": "Opis"
-        }
-    }, 
-    {
         "pk": 100, 
         "model": "subjects.group", 
         "fields": {
-            "limit": 20, 
-            "type": "1", 
+            "limit": 1, 
+            "type": "2", 
             "teacher": 1000, 
             "subject": 100
         }
@@ -254,22 +219,22 @@
             "teacher": 1000, 
             "subject": 100
         }
-    }, 
+    },
     {
         "pk": 102, 
         "model": "subjects.group", 
         "fields": {
-            "limit": 20, 
-            "type": "2", 
+            "limit": 1, 
+            "type": "1", 
             "teacher": 1000, 
             "subject": 100
         }
-    }, 
+    },
     {
         "pk": 103, 
         "model": "subjects.group", 
         "fields": {
-            "limit": 20, 
+            "limit": 1, 
             "type": "2", 
             "teacher": 1000, 
             "subject": 100
@@ -280,9 +245,19 @@
         "model": "subjects.group", 
         "fields": {
             "limit": 1, 
-            "type": "1", 
+            "type": "2", 
             "teacher": 1000, 
-            "subject": 102
+            "subject": 100
+        }
+    },
+    {
+        "pk": 105, 
+        "model": "subjects.group", 
+        "fields": {
+            "limit": 1, 
+            "type": "3", 
+            "teacher": 1000, 
+            "subject": 100
         }
     },
     {
@@ -301,17 +276,6 @@
             "start_time": "16:00:00", 
             "group": 100, 
             "end_time": "18:00:00"
-        }
-    }, 
-    {
-        "pk": 101, 
-        "model": "subjects.term", 
-        "fields": {
-            "dayOfWeek": "2", 
-            "classroom": 100, 
-            "start_time": "10:00:00", 
-            "group": 101, 
-            "end_time": "12:00:00"
         }
     }, 
     {
@@ -397,7 +361,7 @@
             "type": 1, 
             "receive_mass_mail_enrollment": true
         }
-    }, 
+    },
     {
         "pk": 104, 
         "model": "users.student", 
@@ -410,7 +374,7 @@
             "type": 1, 
             "receive_mass_mail_enrollment": true
         }
-    }, 
+    },
     {
         "pk": 105, 
         "model": "users.student", 
@@ -423,7 +387,7 @@
             "type": 1, 
             "receive_mass_mail_enrollment": true
         }
-    }, 
+    },
     {
         "pk": 0, 
         "model": "users.type", 
@@ -457,7 +421,7 @@
         "model": "records.record", 
         "fields": {
             "status": "1", 
-            "group": 101, 
+            "group": 100, 
             "student": 100
         }
     }, 
@@ -469,27 +433,69 @@
             "group": 102, 
             "student": 100
         }
-    },
+    }, 
     {
         "pk": 3, 
         "model": "records.record", 
         "fields": {
             "status": "1", 
-            "group": 104, 
+            "group": 101, 
             "student": 103
         }
-    }, 
+    },
     {
         "pk": 4, 
         "model": "records.record", 
         "fields": {
             "status": "1", 
-            "group": 100, 
+            "group": 103, 
             "student": 104
         }
-    }, 
+    },
+    {
+        "pk": 5, 
+        "model": "records.record", 
+        "fields": {
+            "status": "1", 
+            "group": 105, 
+            "student": 100
+        }
+    },
     {
         "pk": 1, 
+        "model": "records.queue", 
+        "fields": {
+            "status": "1", 
+            "priority": 5, 
+            "group": 100, 
+            "student": 101, 
+            "time": "2010-12-23 15:32:20"
+        }
+    },
+    {
+        "pk": 2, 
+        "model": "records.queue", 
+        "fields": {
+            "status": "1", 
+            "priority": 5, 
+            "group": 100, 
+            "student": 102, 
+            "time": "2010-12-23 15:40:20"
+        }
+    },
+    {
+        "pk": 3, 
+        "model": "records.queue", 
+        "fields": {
+            "status": "1", 
+            "priority": 0, 
+            "group": 102, 
+            "student": 101, 
+            "time": "2010-12-23 15:32:20"
+        }
+    },
+    {
+        "pk": 4, 
         "model": "records.queue", 
         "fields": {
             "status": "1", 
@@ -500,47 +506,14 @@
         }
     },
     {
-        "pk": 2, 
-        "model": "records.queue", 
-        "fields": {
-            "status": "1", 
-            "priority": 0, 
-            "group": 103, 
-            "student": 100, 
-            "time": "2010-12-23 15:32:20"
-        }
-    },
-    {
-        "pk": 3, 
-        "model": "records.queue", 
-        "fields": {
-            "status": "1", 
-            "priority": 0, 
-            "group": 103, 
-            "student": 101, 
-            "time": "2010-12-23 14:12:20"
-        }
-    },
-    {
-        "pk": 4, 
-        "model": "records.queue", 
-        "fields": {
-            "status": "1", 
-            "priority": 0, 
-            "group": 103, 
-            "student": 102, 
-            "time": "2010-12-23 14:20:20"
-        }
-    },
-    {
         "pk": 5, 
         "model": "records.queue", 
         "fields": {
             "status": "1", 
-            "priority": 0, 
-            "group": 104, 
-            "student": 104, 
-            "time": "2010-12-23 14:20:20"
+            "priority": 6, 
+            "group": 103, 
+            "student": 101, 
+            "time": "2010-12-23 15:32:20"
         }
     },
     {
@@ -548,11 +521,12 @@
         "model": "records.queue", 
         "fields": {
             "status": "1", 
-            "priority": 0, 
+            "priority": 5, 
             "group": 104, 
-            "student": 105, 
-            "time": "2010-12-23 14:20:20"
+            "student": 101, 
+            "time": "2010-12-23 15:32:20"
         }
     }
+
 ]
 
