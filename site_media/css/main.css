@@ -29,6 +29,7 @@
 
 #main-topContainer #main-systemTypeBar
 {
+	position: relative;
 	float: left;
 	font-weight: bold;
 }
@@ -36,6 +37,55 @@
 #main-topContainer #main-signinBar
 {
 	text-align: right;
+}
+
+#main-systemTypeBar span
+{
+	background: url('/site_media/images/main-system-selector-arrow.png') no-repeat right;
+	padding-right: 13px;
+}
+
+#main-systemTypeBar ul
+{
+	position: absolute;
+	left: -6px;
+	top: -3px;
+	width: 220px;
+	z-index: 1000;
+
+	list-style: none;
+	
+	display: none;
+	opacity: .95;
+
+	padding: 0;
+	padding-bottom: 5px;
+	background: #f8f8f8;
+	border: 1px solid #cccccc;
+
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+
+}
+
+#main-systemTypeBar ul li.current
+{
+	padding: 2px 5px;
+
+	color: black;
+
+	border-bottom: 1px solid #cccccc;
+	margin-bottom: 5px;
+	cursor: default;
+}
+
+#main-systemTypeBar ul li a
+{
+	display: block;
+	padding: 2px 5px;
+
+	color: black;
 }
 
 /*** PASEK LOGOWANIA I NAZWY PODSYSTEMU - koniec ***/
