@@ -44,8 +44,10 @@ $ python manage.py runserver
 Teraz można uruchomić serwer:
 $ python manage.py runserver
 
-Więcej na http://iiuwr.indefero.net/p/fereol/page/PrzykladoweDane/
+Po uruchomieniu należy ustawić odpowiednią domenę w panelu django (sekcja
+Sites), lub bezpośrednio w tabeli django_site.
 
+Więcej na http://iiuwr.indefero.net/p/fereol/page/PrzykladoweDane/
 
 == Konfiguracja ==
 

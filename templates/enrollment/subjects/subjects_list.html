@@ -71,7 +71,7 @@
 				<div class="semester">
 					<h2>Semestr <span>{{ semester.name }}</span></h2>
 					<input type="hidden" name="semester-id" value="{{ semester.id }}" />
-					<ul>
+					<ul class="subjects-list">
 						{% for subject in semester.subjects %}
 							<li>
 								<a onclick="loadSubjectDetails('{{ subject.slug }}', this)" id="subject-{{ subject.id }}">{{ subject.name }}</a>
