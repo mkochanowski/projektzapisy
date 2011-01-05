@@ -27,7 +27,7 @@
 		<h2>{{proposal.name}}</h2>
 
 		<ul class="infoBox">
-		   {% if proposal.owner %} <li>Właściciel: <a href="{% url profile proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
+		   {% if proposal.owner %} <li>Właściciel: <a href="{% url employee-profile proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
 			<li>Sugerowany rodzaj: {% for type in types %}{{ type.lecture_type }}{% if not forloop.last %}; {% endif %}{% endfor %}</li>
 			{% if proposal.description.lectures or proposal.description.repetitories or proposal.description.exercises or proposal.laboratories %}
 			<li class="proposedTime">
