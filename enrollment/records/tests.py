@@ -161,7 +161,7 @@ class AssignmentToGroupsWithSameTypes(TestCase):
     def testAssignToGroupForFirstTime(self):
         Record.add_student_to_group(self.user.id, self.group1.id)
         self.assertEqual(Record.objects.count(), 2)
-		
+        
     def testAssignToCurrentlyBookedGroupWithSameType(self):
         self.assertEqual(Record.objects.count(), 1)
         Record.add_student_to_group(self.user.id, self.group1.id)
@@ -190,7 +190,7 @@ class MoveStudentFromQueueToGroup(TestCase):
     
 
     def testEmptyQueue(self):
-	self.assertEqual(Record.objects.filter(group=self.empty_queue_group.id).count(), 1)
+        self.assertEqual(Record.objects.filter(group=self.empty_queue_group.id).count(), 1)
         Record.remove_student_from_group(self.student_to_remove.id, self.empty_queue_group.id)
         self.assertEqual(Record.objects.filter(group=self.empty_queue_group.id).count(), 0)
         self.assertEqual(Queue.objects.filter(group=self.empty_queue_group.id).count(), 0)
@@ -202,25 +202,25 @@ class MoveStudentFromQueueToGroup(TestCase):
         self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.full_group.id).count(), 0)
     
     def testRemoveStudentLowerPriorityRecords(self):
-	self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group.id).count(), 1)
-	Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
-	self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group.id).count(), 0)
-	
+        self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group.id).count(), 1)
+        Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
+        self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group.id).count(), 0)
+        
     def testRemoveStudentEqualPriorityRecords(self):
-	self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_ep.id).count(), 1)
-	Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
-	self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_ep.id).count(), 0)
+        self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_ep.id).count(), 1)
+        Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
+        self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_ep.id).count(), 0)
 
     def testNotRemoveStudentLowerPriorityRecordsWithOtherGroupType(self):
-	self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.other_type_group.id).count(), 1)
-	Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
-	self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.other_type_group.id).count(), 1)
-	
+        self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.other_type_group.id).count(), 1)
+        Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
+        self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.other_type_group.id).count(), 1)
+        
     def testNotRemoveStudentHigherPriorityRecords(self):
         self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_hp.id).count(), 1)
-	Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
-	self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_hp.id).count(), 1)
-	
+        Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
+        self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_hp.id).count(), 1)
+        
     def testChangeStudentGroup(self):
         """ if student is enrolled to some group and there is a free place in the same type group and student is in that group queue than enroll student to group"""
         Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
@@ -249,12 +249,12 @@ class GetStudentsInQueue(TestCase):
         self.assertRaises(NonGroupException, Queue.get_students_in_queue, group_id)
     
     def testWithEmptyGroup(self):
-	self.assertEqual(Queue.objects.filter(group=100).count(), 0)
-	queued_students = Queue.get_students_in_queue(self.group.id)
+        self.assertEqual(Queue.objects.filter(group=100).count(), 0)
+        queued_students = Queue.get_students_in_queue(self.group.id)
         self.assertEqual(len(queued_students),0)
     
     def testWithNonEmptyGroup(self):
-	queued_students = Queue.get_students_in_queue(self.group2.id)
+        queued_students = Queue.get_students_in_queue(self.group2.id)
         self.assertEqual(len(queued_students),3)
 
 class AddStudentToQueue(TestCase):
@@ -297,7 +297,7 @@ class AddStudentToQueue(TestCase):
         self.assertRaises(AlreadyQueuedException, Queue.add_student_to_queue, self.student.id, self.group.id)
         self.assertEqual(Queue.objects.filter(group=self.group.id).count(), 1)
           
-	'''def testWithRecordsNotOpenForStudent(self):
+        '''def testWithRecordsNotOpenForStudent(self):
         self.user.student.records_opening_delay_hours = 0
         self.user.student.save()
         self.group.subject.semester.records_opening = datetime.now()
@@ -367,7 +367,7 @@ class RemoveFirstStudentFromQueue(TestCase):
         self.assertEqual(Queue.remove_first_student_from_queue(self.group.id),False)
     
     def testStudenAssignedToQueue(self):
-	removed = Queue.objects.get(group=self.group2.id, student=self.student2.id).student
+        removed = Queue.objects.get(group=self.group2.id, student=self.student2.id).student
         self.assertEqual(Queue.remove_first_student_from_queue(self.group2.id).student,removed)
     
     def testWithEctsLimitExceeded(self):
@@ -397,7 +397,7 @@ class RemoveStudentLowPriorityRecords(TestCase):
         self.assertRaises(NonGroupException, Queue.remove_student_low_priority_records, self.student1.id, group_id, 10)
 
     def testStudenAssignedToQueue(self):
-	Queue.remove_student_low_priority_records(self.student2.id, self.group2.id,10)
+        Queue.remove_student_low_priority_records(self.student2.id, self.group2.id,10)
         self.assertEqual(Queue.objects.filter(group=101, student=self.student2).count(), 0)
     
     
