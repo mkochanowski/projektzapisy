@@ -110,7 +110,7 @@ def save_private_keys(polls_private_keys):
         pkey.save()
 
 def generate_keys_for_polls():
-    poll_list = Poll.get_current_semester_polls()
+    poll_list = Poll.get_current_semester_polls_without_keys()
     pub_list  = []
     priv_list = []
     for el in poll_list:
@@ -181,10 +181,10 @@ def check_poll_visiblity( user, poll ):
     
 def check_ticket_not_signed( user, poll ):
     u = UsedTicketStamp.objects.filter( student = user.student, poll = poll )
-    if u: raise TicketUsed
+    if u: 
+        raise TicketUsed
         
 def mark_poll_used( user, poll ):
-    ## TODO: dodać semestr
     u = UsedTicketStamp( student = user.student,
                          poll    = poll )
     u.save()
