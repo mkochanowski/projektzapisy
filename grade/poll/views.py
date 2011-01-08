@@ -30,6 +30,8 @@ def disable_grade( request ):
     PublicKey.objects.all().delete()
     PrivateKey.objects.all().delete()
     
+    # TODO: Coś robić z odpowiedziami
+    
     return render_to_response ('grade/base.html', { 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
 
 
