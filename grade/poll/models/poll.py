@@ -78,12 +78,13 @@ class Poll( models.Model ):
         return Poll.objects.filter( pk__in = pks )
         
     @staticmethod
-    def get_current_semester_polls():
+    def get_current_semester_polls_without_keys():
         semester = Semester.get_current_semester()
-        return Poll.objects.filter( semester = semester ) 
+        polls_with_keys = PublicKey.objects.all().values_list( 'poll' )
+        return Poll.objects.filter( semester = semester ).exclude( pk__in = polls_with_keys)        
 
     @staticmethod
     def get_all_polls_for_student( student ):
-        return filter( lambda x: x.is_student_entitled_to_poll( student), 
+        return filter( lambda x: x.is_student_entitled_to_poll( student ), 
                        Poll.get_current_polls())
     
