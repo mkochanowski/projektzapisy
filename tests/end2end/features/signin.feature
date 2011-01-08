@@ -11,7 +11,7 @@ Feature: User wants to sign in in order to use functions which aren't publicly a
     And I press "Zaloguj"
     Then I should be on my profile page
 
-  Scenario: Unsuccessful igning in with invalid user name
+  Scenario: Unsuccessful signing in with invalid user name
     When I follow "System zapisów"
     And I follow "Zaloguj"
     And I fill in "Nazwa użytkownika" with "student-test-invalid"

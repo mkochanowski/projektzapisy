@@ -16,6 +16,9 @@ module NavigationHelpers
       
     when /subjects page/
       '/subjects/'
+      
+    when /schedule page/
+      '/records/schedule/'
     
     else
           begin
