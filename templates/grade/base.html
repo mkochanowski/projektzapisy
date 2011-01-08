@@ -1,6 +1,6 @@
 
 <!--
-PRZEMYĹšLEÄ† UKĹ�AD I DO POPRAWKI
+PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
 -->
 {% extends "base.html" %}
  
@@ -12,34 +12,34 @@ PRZEMYĹšLEÄ† UKĹ�AD I DO POPRAWKI
 {% endblock %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona GĹ‚Ăłwna</a></li>
-	<li><a href="{% url grade-default %}">Ocena ZajÄ™Ä‡</a></li>
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
 {% endblock %}
 
 {% block main-menu %}
 
-    <!-- TRZEBA ZROBIÄ† NEWSY DLA OCENY I TO POPRAWIÄ† -->
+    <!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
     <!-- <li><a href="{% url news.views.latest_news 'offer' %}">AktualnoĹ›ci</a> ({% newscount "offer" %})</li> -->
     
 <!--
-    DODAÄ† WARUNEK NA OTWARCIE / ZAKOĹ�CZENIE OCENY
+    DODAĆ WARUNEK NA OTWARCIE / ZAKOŃCZENIE OCENY
 -->
     {% if user.is_superuser %}
-    <li><a href="{% url grade-prepare-grade %}">Przygotowanie oceny zajÄ™Ä‡</a></li> 
-    <li><a href="{% url grade-enable-grade %}">Otwarcie oceny zajÄ™Ä‡</a></li> 
-    <li><a href="{% url grade-disable-grade %}">ZamkniÄ™cie oceny zajÄ™Ä‡</a></li> 
-    <li><a href="{% url grade-poll-poll-create %}">ZarzÄ…dzanie ankietami</a></li>
+    <li><a href="{% url grade-prepare-grade %}">Przygotowanie oceny zajęć</a></li> 
+    <li><a href="{% url grade-enable-grade %}">Otwarcie oceny zajęć</a></li> 
+    <li><a href="{% url grade-disable-grade %}">Zamknięcie oceny zajęć</a></li> 
+    <li><a href="{% url grade-poll-poll-create %}">Zarządzanie ankietami</a></li>
     {% endif %}
 <!---->
 
 <!--
-    TO UMOĹ»LIWIAÄ† TYLKO JAK OCENA JEST OTWARTA
+    TO UMOĹ»LIWIAĆ TYLKO JAK OCENA JEST OTWARTA
 -->
     {% if user.student %}     
-    <li><a href="{% url grade-ticket-connections-choice %}">Pobieranie biletĂłw</a></li>
+    <li><a href="{% url grade-ticket-connections-choice %}">Pobieranie biletów</a></li>
     {% endif %}
 <!---->
-    <li><a href="{% url grade-poll-tickets-enter %}">Ocena zajÄ™Ä‡</a></li>
+    <li><a href="{% url grade-poll-tickets-enter %}">Ocena zajęć</a></li>
     {% if user.is_authenticated %}
     <li><a href="{% url grade-poll-poll-results %}">Wyniki oceny</a></li>
     <li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
@@ -56,16 +56,16 @@ PRZEMYĹšLEÄ† UKĹ�AD I DO POPRAWKI
 
 {% block content %}
 <!--
-    OSTYLOWAÄ† TÄ„ WIADOMOĹšÄ†!
+    OSTYLOWAĆ TĄ WIADOMOŚĆ!
 -->
     {% if message %} 
     <h3>{{ message }}</h3>
     {% endif %}
     <div id="grade-main">
-	    <h2>Zasady Oceny ZajÄ™Ä‡</h2>
+	    <h2>Zasady Oceny Zajęć</h2>
         <div id="grade-main-rules">
                 <!--
-                    TU FAJNIE BYĹ�OBY DAÄ† JAKIEĹš PRAWDZIWE ZASADY :)
+                    TU FAJNIE BYŁOBY DAĆ JAKIEŚ PRAWDZIWE ZASADY :)
                 -->
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas fringilla nulla sed nibh porta ultricies. Fusce lobortis nibh at ante consectetur gravida. Cras varius, nibh sit amet semper ornare, metus velit euismod eros, a lobortis ipsum sem eget nulla. Ut sagittis sodales ligula, ac congue erat mattis ut. Proin velit massa, dapibus venenatis rutrum vitae, malesuada id lacus. Suspendisse potenti. Etiam fermentum eros a lacus facilisis pulvinar. Phasellus interdum aliquet lacus, quis molestie arcu interdum commodo. Integer pellentesque sodales lorem, in suscipit metus imperdiet vel. Aliquam erat volutpat. Integer pharetra vestibulum odio eget congue. Pellentesque pellentesque enim eget nisl pulvinar vitae fringilla nisi molestie.
         </div>

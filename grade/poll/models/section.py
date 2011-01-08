@@ -27,48 +27,48 @@ class Section( models.Model ):
         
         questions = []
         
-        oi = si = mi = 0
+        open_ind = single_ind = multi_ind = 0
         
         try:
             if single_choice[0].is_leading:
-                si = 1
+                single_ind = 1
                 questions.append( single_choice[0] )
         except:
             pass
         
         max_ = max( len( open ), len( single_choice ), len( multiple_choice ))
         
-        while ( oi < max_ and si <= max_ and mi <= max_ ) or \
-              ( oi <= max_ and si < max_ and mi <= max_ ) or \
-              ( oi <= max_ and si <= max_ and mi < max_ ):
+        while ( open_ind < max_ and single_ind <= max_ and multi_ind <= max_ ) or \
+              ( open_ind <= max_ and single_ind < max_ and multi_ind <= max_ ) or \
+              ( open_ind <= max_ and single_ind <= max_ and multi_ind < max_ ):
                   
             try:
-                sc  = single_choice[ si ]
+                sc  = single_choice[ single_ind ]
                 scp = sc.position
             except:
                 scp = maxint
             
             try:
-                mc  = multiple_choice[ mi ]
+                mc  = multiple_choice[ multi_ind ]
                 mcp = mc.position
             except:
                 mcp = maxint
                 
             try:
-                o   = open[ oi ]
+                o   = open[ open_ind ]
                 op  = o.position
             except:
                 op  = maxint
             
             if min( op, mcp, scp ) == scp:
                 questions.append( sc.question )
-                si += 1
+                single_ind += 1
             elif min( op, mcp, scp ) == mcp:
                 questions.append( mc.question )
-                mi += 1
+                multi_ind += 1
             else:
                 questions.append( o.question )
-                oi += 1
+                open_ind += 1
         return questions
         
 class SectionOrdering( models.Model ):

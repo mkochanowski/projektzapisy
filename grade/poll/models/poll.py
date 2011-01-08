@@ -1,8 +1,9 @@
 # -*- coding: utf8 -*-
 from django.db                         import models
+from django.utils.safestring           import SafeUnicode
+
 from fereol.users.models               import Employee, \
                                               Type
-
 from fereol.enrollment.subjects.models import Group, \
                                               Subject, \
                                               Semester
@@ -10,6 +11,7 @@ from fereol.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
 from fereol.grade.ticket_create.models import PublicKey                                              
 from section                           import SectionOrdering
+
 
 class Poll( models.Model ):
     author       = models.ForeignKey( Employee, verbose_name = 'autor' )
@@ -49,6 +51,27 @@ class Poll( models.Model ):
     def all_sections( self ):
         return self.section_set.all()
     
+    def as_row( self ):
+        res  = u"<tr><td>"
+        res += unicode( self.pk ) + u'</td><td>'
+        res += unicode( self.title ) + u'</td><td>'
+        
+        if self.group:
+            res += unicode( self.group.subject.name ) + u'</td><td>'
+            res += unicode( self.group.get_type_display()) + u'</td><td>'
+            res += unicode( self.group.get_teacher_full_name()) + u'</td><td>'
+        else:
+            res += u'-</td><td>-</td><td>-</td><td>'
+        
+        if self.studies_type:
+            res += unicode( self.studies_type ) + u'</td><td>'
+        else:
+            res += u'-</td><td>'
+            
+        res += unicode( " &#10;".join(PublicKey.objects.get( poll = self.pk ).public_key.split('\n')))
+        res += u'</td></tr>'
+        return SafeUnicode( res )
+        
     @staticmethod
     def get_current_polls():
         pks = PublicKey.objects.all() 
@@ -63,3 +86,4 @@ class Poll( models.Model ):
     def get_all_polls_for_student( student ):
         return filter( lambda x: x.is_student_entitled_to_poll( student), 
                        Poll.get_current_polls())
+    

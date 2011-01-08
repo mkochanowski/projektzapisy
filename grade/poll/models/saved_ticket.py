@@ -12,3 +12,13 @@ class SavedTicket( models.Model ):
         verbose_name_plural = 'zapisane bilety'
         verbose_name        = 'zapisany bilet'
         app_label           = 'poll'
+        
+    def __unicode__( self ):
+        if self.finished:
+            res = u'[Zakończona]'
+        else:
+            res = ''
+            
+        res += unicode( self.poll )
+        res += u' (' + unicode( self.ticket ) + ')'
+        return res

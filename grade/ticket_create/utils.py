@@ -161,7 +161,7 @@ def generate_ticket( poll_list ):
     blinded = []
     
     for poll in poll_list:
-        key =  RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
+        key = RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
         n   = key.n
         e   = key.e
         k   = randint( 2, n )
