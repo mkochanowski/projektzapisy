@@ -176,7 +176,7 @@ def generate_ticket( poll_list ):
     return blinded
     
 def check_poll_visiblity( user, poll ):
-    if not poll.is_student_entitled_to_poll( user ): 
+    if not poll.is_student_entitled_to_poll( user.student ): 
         raise InvalidPollException
     
 def check_ticket_not_signed( user, poll ):

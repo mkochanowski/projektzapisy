@@ -37,7 +37,7 @@ class Poll( models.Model ):
             rec = Record.objects.filter( student = student, 
                                          group   = self.group,
                                          status  = STATUS_ENROLLED )
-            try:
+            try:                
                 rec[ 0 ]
             except:
                 return False

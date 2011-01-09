@@ -52,7 +52,6 @@ def connections_choice( request ):
                 else:
                     for poll in polls:
                         connected_groups.append([ poll ])
-            
             request.method = "GET"
             tickets = reduce(list.__add__, 
                              map( lambda gs: generate_ticket( gs ), 
@@ -66,6 +65,9 @@ def connections_choice( request ):
     
 @student_required
 def tickets_save( request, ticket_list ):
+    # m i k są pamiętane po stronie przeglądarki (i mają stąd zniknąć); 
+    # t jest tym, co zostało wysłane do serwera;
+    # g to poll
     signed = map( lambda ( g, t, ( m, k )): 
                         (g, t, secure_signer( request.user, g, t ), (m, k)),
                   ticket_list )
