@@ -49,3 +49,12 @@ class PollCombineForm( forms.Form ):
             result += u"<tr><th>" + unicode( name )+ u"</th></tr>"
         result += super( PollCombineForm, self ).as_table()
         return SafeUnicode( result )
+
+class ContactForm(forms.Form):
+    idUser = forms.CharField()
+    passwordUser = forms.CharField()
+    groupNumber = forms.CharField()
+    groupKey = forms.CharField()
+
+class GetKey(forms.Form):
+    n = forms.CharField()

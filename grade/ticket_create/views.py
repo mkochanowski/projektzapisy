@@ -21,6 +21,14 @@ from fereol.grade.ticket_create.forms    import PollCombineForm
 
 from fereol.grade.ticket_create.exceptions import *
 
+from fereol.grade.ticket_create.models     import PublicKey
+
+from django.contrib.auth                   import authenticate, login, logout
+
+from fereol.grade.ticket_create.forms      import *
+
+from django.views.decorators.csrf          import csrf_exempt
+
 def prepare_grade( request ):
     return render_to_response( 'grade/ticket_create/prepare_grade.html', {}, context_instance = RequestContext( request ))
         
@@ -82,3 +90,53 @@ def tickets_save( request, ticket_list ):
              'tickets' : to_plaintext( tickets_to_serve )}
              
     return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
+@csrf_exempt
+def client_connection( request ):
+    
+    if request.method == 'POST':
+        
+        form = ContactForm(request.POST)
+        
+        if form.is_valid():
+            
+            idUser = form.cleaned_data['idUser']
+            passwordUser = form.cleaned_data['passwordUser']
+            grupNumber = form.cleaned_data['groupNumber']
+            grupKey = long(form.cleaned_data['groupKey'])
+        
+            user = authenticate(username=idUser, password=passwordUser)
+
+
+
+            if user:
+                pass
+            else:
+                return HttpResponse(u"nie ma takiego użytkownika")
+            
+
+
+            record_groups   = Record.objects.filter( student = user )
+            record_groups   = record_groups.values_list( 'group', flat = True )
+            student_groups  = Group.objects.filter( pk = grupNumber, pk__in = record_groups ).order_by( 'subject' )
+
+    
+            if len(student_groups)>0:
+                student_group = student_groups[0]
+                st = secure_signer( user, student_group, grupKey )
+            else:
+                st = u"Nie jesteś zapisany do tej grupy"
+
+                
+            if   st == u"Nie jesteś zapisany do tej grupy":
+                return HttpResponse(st)
+            elif st == u"Bilet już pobrano":
+                return HttpResponse(st)
+            else:
+                s = student_group.subject.name + " &#10; "+ student_group.get_type_display() + ": " + student_group.get_teacher_full_name() + " &#10; "+unicode(st[0][0])
+                return HttpResponse(s)
+
+            
+@csrf_exempt
+def keys_list( request ):
+    l = PublicKey.objects.all()
+    return render_to_response('grade/ticket_create/keys_list.html', {'list': l,},context_instance = RequestContext( request ))
