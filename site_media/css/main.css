@@ -67,6 +67,9 @@
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
 
+	-moz-box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
+	-webkit-box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
+	box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
 }
 
 #main-systemTypeBar ul li.current
