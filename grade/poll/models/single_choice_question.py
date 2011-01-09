@@ -5,9 +5,9 @@ from base_question import BaseQuestion
 from option        import Option
     
 class SingleChoiceQuestion( BaseQuestion ):
-    section = models.ManyToManyField( 'Section',    
-                                      verbose_name = 'sekcje', 
-                                      through = 'SingleChoiceQuestionOrdering' )
+    sections = models.ManyToManyField( 'Section',    
+                                       verbose_name = 'sekcje', 
+                                       through = 'SingleChoiceQuestionOrdering' )
                                       
     is_scale = models.BooleanField(    verbose_name = 'skala' )
     options  = models.ManyToManyField( Option, 
@@ -22,7 +22,7 @@ class SingleChoiceQuestion( BaseQuestion ):
 class SingleChoiceQuestionOrdering( models.Model ):
     question   = models.ForeignKey( SingleChoiceQuestion, 
                                     verbose_name = 'pytanie' )
-    section    = models.ForeignKey( 'Section', verbose_name = 'sekcja' )
+    sections   = models.ForeignKey( 'Section', verbose_name = 'sekcja' )
     position   = models.IntegerField( verbose_name = 'pozycja' )
     is_leading = models.BooleanField( verbose_name = 'pytanie wiodące' )
     hide_on    = models.ManyToManyField( Option,
@@ -32,9 +32,9 @@ class SingleChoiceQuestionOrdering( models.Model ):
     class Meta:
         verbose_name_plural = 'pozycje pytań jednokrotnego wyboru'
         verbose_name        = 'pozycja pytań jednokrotnego wyboru'
-        ordering            = [ 'section', '-is_leading', 'position' ]
-        unique_together     = [ 'section', 'is_leading', 'position' ]
+        ordering            = [ 'sections', '-is_leading', 'position' ]
+        unique_together     = [ 'sections', 'is_leading', 'position' ]
         app_label           = 'poll' 
 
     def __unicode__( self ):
-        return unicode( self.position ) + u'[' + unicode( self.section ) + u']' + unicode( self.question )
+        return unicode( self.position ) + u'[' + unicode( self.sections ) + u']' + unicode( self.question )
