@@ -101,8 +101,8 @@ def client_connection( request ):
             
             idUser = form.cleaned_data['idUser']
             passwordUser = form.cleaned_data['passwordUser']
-            grupNumber = form.cleaned_data['groupNumber']
-            grupKey = long(form.cleaned_data['groupKey'])
+            groupNumber = form.cleaned_data['groupNumber']
+            groupKey = long(form.cleaned_data['groupKey'])
         
             user = authenticate(username=idUser, password=passwordUser)
 
@@ -112,28 +112,48 @@ def client_connection( request ):
                 pass
             else:
                 return HttpResponse(u"nie ma takiego użytkownika")
-            
 
-
-            record_groups   = Record.objects.filter( student = user )
-            record_groups   = record_groups.values_list( 'group', flat = True )
-            student_groups  = Group.objects.filter( pk = grupNumber, pk__in = record_groups ).order_by( 'subject' )
-
-    
-            if len(student_groups)>0:
-                student_group = student_groups[0]
-                st = secure_signer( user, student_group, grupKey )
+            if user.student:
+                pass
             else:
-                st = u"Nie jesteś zapisany do tej grupy"
+                return HttpResponse(u"nie jesteś studentem")
 
-                
-            if   st == u"Nie jesteś zapisany do tej grupy":
+            
+            students_polls = Poll.get_all_polls_for_student( user.student )
+
+            st = ""
+            
+            for students_poll in students_polls:
+                if int(students_poll.pk) == int(groupNumber):
+                    
+                    st = secure_signer( user, students_poll, groupKey )
+                    p = students_poll
+                    break
+            if st == "":
+                st = u"Nie jesteś zapisany do tej ankiety"
+
+
+            try:
+                a=long(st[0][0])
+            except ValueError, err:
+                return HttpResponse(st)
+            if   st == u"Nie jesteś zapisany do tej ankiety":
                 return HttpResponse(st)
             elif st == u"Bilet już pobrano":
                 return HttpResponse(st)
             else:
-                s = student_group.subject.name + " &#10; "+ student_group.get_type_display() + ": " + student_group.get_teacher_full_name() + " &#10; "+unicode(st[0][0])
-                return HttpResponse(s)
+                res = ''
+                res += '[' + p.title + ']'
+                if not p.group:
+                    res += u'Ankieta ogólna &#10;'
+                else:
+                    res += p.group.subject.name + " &#10;"
+                    res += p.group.get_type_display() + ": "
+                    res += p.group.get_teacher_full_name() + " &#10;"
+                if p.studies_type:
+                    res += u'dla studiów ' + unicode(p.studies_type) + " &#10;"
+                res += unicode(st[0][0])
+                return HttpResponse(res)
 
             
 @csrf_exempt

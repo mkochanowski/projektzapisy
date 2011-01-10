@@ -7,17 +7,6 @@
 
 {% block content %}
 
-info: 
-<ul>
-<li> 1 - wyklad </li>
-<li> 2 - cwiczenia </li>
-<li> 3 - pracownia </li>
-<li> 4 - cwiczenia (grupa zaawansowana)</li>
-<li> 5 - cwiczenio-pracownia </li> 
-<li> 6 - seminarium </li> 
-<li> 7 - lektorat </li> 
-<li> 8 - WF </li>
-</ul>
 <table border="1">
 {% for l in list %}
 {{ l.poll.as_row }}
