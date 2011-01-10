@@ -12,7 +12,9 @@ logger = logging.getLogger()
 
 class SubjectEntity(models.Model):
     """entity of particular subject title"""
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='nazwa')
+    shortName = models.CharField(max_length=30, null=True, verbose_name='skrócona nazwa')
+
     class Meta:
         verbose_name = 'Podstawa przedmiotu'
         verbose_name_plural = 'Podstawy przedmiotów'
@@ -20,7 +22,12 @@ class SubjectEntity(models.Model):
         
     def __unicode__(self):
         return '%s' % (self.name, )
-    
+
+    def get_short_name(self):
+        if self.shortName is None:
+            return self.name
+        else:
+            return self.shortName
 
 class VisibleManager(models.Manager):
     """ Manager for subject objects with visible semester """

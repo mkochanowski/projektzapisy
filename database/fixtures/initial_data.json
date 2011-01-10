@@ -3839,6 +3839,7 @@
         "pk": 100, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Wdra\u017canie ERP",
             "name": "Wdra\u017canie system\u00f3w klasy ERP"
         }
     }, 
@@ -3846,6 +3847,7 @@
         "pk": 101, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Text mining"
         }
     }, 
@@ -3853,6 +3855,7 @@
         "pk": 102, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Alg. tekstowe",
             "name": "Algorytmy tekstowe"
         }
     }, 
@@ -3860,6 +3863,7 @@
         "pk": 103, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Zast. w. Czebyszewa",
             "name": "Zastosowania wielomian\u00f3w Czebyszewa"
         }
     }, 
@@ -3867,6 +3871,7 @@
         "pk": 104, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Logika formalna",
             "name": "Wprowadzenie do logiki formalnej"
         }
     }, 
@@ -3874,6 +3879,7 @@
         "pk": 105, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Tpjp",
             "name": "Teoretyczne podstawy j\u0119zyk\u00f3w programowania"
         }
     }, 
@@ -3881,6 +3887,7 @@
         "pk": 106, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Sem: Protoko\u0142y R. E.",
             "name": "Seminarium: Protoko\u0142y Rynku Elektronicznego"
         }
     }, 
@@ -3888,6 +3895,7 @@
         "pk": 107, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "CUDA",
             "name": "\tProcesory graficzne w obliczeniach r\u00f3wnoleg\u0142ych (CUDA)"
         }
     }, 
@@ -3895,6 +3903,7 @@
         "pk": 108, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Kurs LUA",
             "name": "Kurs j\u0119zyka Lua"
         }
     }, 
@@ -3902,6 +3911,7 @@
         "pk": 109, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Sem: k. i p. w graf. komp.",
             "name": "Seminarium: Krzywe i powierzchnie w grafice komputerowej"
         }
     }, 
@@ -3909,6 +3919,7 @@
         "pk": 110, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Sem: algorytmika",
             "name": "Seminarium: Algorytmika: nowe osi\u0105gni\u0119cia i trendy"
         }
     }, 
@@ -3916,6 +3927,7 @@
         "pk": 111, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Kurs C",
             "name": "Kurs j\u0119zyka ANSI C z elementami C++ (ang.)"
         }
     }, 
@@ -3923,6 +3935,7 @@
         "pk": 112, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Rachunek lambda"
         }
     }, 
@@ -3930,6 +3943,7 @@
         "pk": 113, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Logika",
             "name": "Logika dla informatyk\u00f3w"
         }
     }, 
@@ -3937,6 +3951,7 @@
         "pk": 114, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Funkcyjne",
             "name": "Programowanie funkcyjne"
         }
     }, 
@@ -3944,6 +3959,7 @@
         "pk": 115, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Bazy danych 2"
         }
     }, 
@@ -3951,6 +3967,7 @@
         "pk": 116, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Analiza numeryczna (M)"
         }
     }, 
@@ -3958,6 +3975,7 @@
         "pk": 117, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Programowanie"
         }
     }, 
@@ -3965,6 +3983,7 @@
         "pk": 118, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Modelowanie",
             "name": "Modelowanie zjawisk przyrodniczych"
         }
     }, 
@@ -3972,6 +3991,7 @@
         "pk": 119, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "LPP",
             "name": "Licencjacki projekt programistyczny"
         }
     }, 
@@ -3979,6 +3999,7 @@
         "pk": 120, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Analiza matematyczna"
         }
     }, 
@@ -3986,6 +4007,7 @@
         "pk": 121, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Sieci neuronowe"
         }
     }, 
@@ -3993,6 +4015,7 @@
         "pk": 122, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Kurs: UNIX",
             "name": "Kurs: UNIX - \u015brodowisko i narz\u0119dzia programowania"
         }
     }, 
@@ -4000,6 +4023,7 @@
         "pk": 123, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Sem: alg. ewolucyjne",
             "name": "Seminarium: Zastosowania algorytm\u00f3w ewolucyjnych"
         }
     }, 
@@ -4007,6 +4031,7 @@
         "pk": 124, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Kurs .NET",
             "name": "Kurs programowania pod Windows w technologii .NET"
         }
     }, 
@@ -4014,6 +4039,7 @@
         "pk": 125, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "JFiZO",
             "name": "\tJ\u0119zyki formalne i z\u0142o\u017cono\u015b\u0107 obliczeniowa"
         }
     }, 
@@ -4021,6 +4047,7 @@
         "pk": 126, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Bazy danych"
         }
     }, 
@@ -4028,6 +4055,7 @@
         "pk": 127, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Sem: bezpiecze\u0144",
             "name": "\tSeminarium: Bezpiecze\u0144stwo i ochrona informacji"
         }
     }, 
@@ -4035,6 +4063,7 @@
         "pk": 128, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": null,
             "name": "Algebra"
         }
     }, 
@@ -4042,6 +4071,7 @@
         "pk": 129, 
         "model": "subjects.subjectentity", 
         "fields": {
+            "shortName": "Teoria kategorii",
             "name": "Zastosowanie teorii kategorii do konstruowania program\u00f3w"
         }
     }, 
