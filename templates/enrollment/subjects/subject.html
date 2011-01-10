@@ -1,87 +1,85 @@
-<div>
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <h1>{{subject.name}} {{subject.lol}}</h1>
-    <h3>Prowadzący:</h3>
-    {% for teacher in subject.teachers.all %}
-    	<a href="#">{{teacher.user.get_full_name}}</a> 
-    {% endfor %}
-    {% if subject.ects %}
-    <h4>Punkty ECTS: {{subject.ects}}</h4>
-    {% endif %}
-    <h4>Ilość godzin:</h4>
-    <ul>
-        {% if subject.lectures %}<li>Wykłady: {{subject.lectures}} godz.</li>{% endif %}
-        {% if subject.exercises %}<li>Ćwiczenia: {{subject.exercises}} godz.</li>{% endif %}
-        {% if subject.laboratories %}<li>Pracownia: {{subject.laboratories}} godz.</li>{% endif %}  
-    </ul>
-        
-    <h3>Opis przedmiotu:</h3>
-    <p class="subject-description">{{subject.description}}</p>
-    <a>pokaż więcej...</a>
+{% extends "enrollment/subjects/base.html" %}
 
+{% block content %}
+	{% if messages %}
+		{% for message in messages %}
+			<p class="main-message">{{ message }}</p>
+		{% endfor %}
+	{% endif %}
 
-    {% for tutorial in tutorials %}
-        {% if tutorial %}
-            <h3>{{tutorial.name}}:</h3>
-                <div>
-                    <table class="subject-details-table">
-                    	<thead>
-                    		<tr>
-                    			<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th>Liczba osób w kolejce</th>
-                    		</tr>
-                    	</thead>
-                    	<tbody>
-	                    {% for t in tutorial %}
-	                        <tr>
-		                        <td>{{ t.get_teacher_full_name }}</td>
-		                        <td>
-		                            {% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
-		                               {{d}}<br/>
-		                            {% endfor %}
-		                        </td>
-		                        <td>{{ t.get_group_limit }}</td>
-		                        <td>{{ t.enrolled }}</td>
-                                <td>{{ t.queued }}</td>
-	                        	<td>
-	                        	{% if subject.is_recording_open %}
-		                        	{% if t.signed %}
-		                            	<a class="subject-details-link forget" link="{% url record-resign t.id %}">wypisz</a>
-                                    {% else %}
-                                        {% if t.is_in_diff %}
-              			                    <a class="subject-details-link forget" link="{% url record-assign t.id %}">przenieś</a>
-		                            	{% else %}
-                                            {% if t.is_full %}
-                                                {% if t.priority %}
-                        			                <a class="subject-details-link forget" link="{% url queue-resign t.id %}">wypisz z kolejki</a></td>
-                                                    <td> priorytet <br /> 
-                                                    <a class="subject-details-link forget" link="{% url dec-priority t.id %}"> - </a>
-                                                    {{ t.priority }}
-                                                    <a class="subject-details-link forget" link="{% url inc-priority t.id %}"> + </a>
-                                                {% else %}
-                        			                <a class="subject-details-link forget" link="{% url queue-assign t.id %}">zapisz do kolejki</a>
-                                                {% endif %}
-                                            {% else %}
-                    			                <a class="subject-details-link forget" link="{% url record-assign t.id %}">zapisz</a>
-                                            {% endif %}
-		                            	{% endif %}
-                                    {% endif %}
-		                        {% endif %}
-	                        	</td>
-	                        	<td><a class="subject-details-link forget" link="{% url group-records t.id %}">Lista</a></td>
-	                        </tr>
-                    	{% endfor %}
-                    	</tbody>
-                    </table>
-                </div>
-        {% endif %}
-    {% endfor %}
+<div id="subject-details">
+	<h1>{{subject.name}}</h1>
+	<h3>Prowadzący:</h3>
+	{% for teacher in subject.teachers.all %}
+		<a href="#">{{teacher.user.get_full_name}}</a>
+	{% endfor %}
+	{% if subject.ects %}
+	<h4>Punkty ECTS: {{subject.ects}}</h4>
+	{% endif %}
+	<h4>Ilość godzin:</h4>
+	<ul>
+		{% if subject.lectures %}<li>Wykłady: {{subject.lectures}} godz.</li>{% endif %}
+		{% if subject.exercises %}<li>Ćwiczenia: {{subject.exercises}} godz.</li>{% endif %}
+		{% if subject.laboratories %}<li>Pracownia: {{subject.laboratories}} godz.</li>{% endif %}
+	</ul>
 
-{% comment %}   
+	<h3>Opis przedmiotu:</h3>
+	<p class="subject-description">{{subject.description}}</p>
+
+	{% for tutorial in tutorials %}
+		{% if tutorial %}
+			<h3>{{tutorial.name}}:</h3>
+				<div>
+					<table class="subject-details-table">
+						<thead>
+							<tr>
+								<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th>Liczba osób w kolejce</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% for t in tutorial %}
+							<tr>
+								<td>{{ t.get_teacher_full_name }}</td>
+								<td>
+									{% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
+									   {{d}}<br/>
+									{% endfor %}
+								</td>
+								<td>{{ t.get_group_limit }}</td>
+								<td>{{ t.enrolled }}</td>
+								<td>{{ t.queued }}</td>
+								<td>
+								{% if subject.is_recording_open %}
+									{% if t.signed %}
+										<a class="subject-details-link forget" href="{% url record-resign t.id %}">wypisz</a>
+									{% else %}
+										{% if t.is_in_diff %}
+			  								<a class="subject-details-link forget" href="{% url record-assign t.id %}">przenieś</a>
+										{% else %}
+											{% if t.is_full %}
+												{% if t.priority %}
+													<a class="subject-details-link forget" href="{% url queue-resign t.id %}">wypisz z kolejki</a></td>
+													<td> priorytet <br />
+													<a class="subject-details-link forget" href="{% url dec-priority t.id %}"> - </a>
+													{{ t.priority }}
+													<a class="subject-details-link forget" href="{% url inc-priority t.id %}"> + </a>
+												{% else %}
+													<a class="subject-details-link forget" href="{% url queue-assign t.id %}">zapisz do kolejki</a>
+												{% endif %}
+											{% else %}
+												<a class="subject-details-link forget" href="{% url record-assign t.id %}">zapisz</a>
+											{% endif %}
+										{% endif %}
+									{% endif %}
+								{% endif %}
+								</td>
+								<td><a class="subject-details-link forget" href="{% url group-records t.id %}">Lista</a></td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+		{% endif %}
+	{% endfor %}
+</div>
 {% endblock %}
-{% endcomment %}

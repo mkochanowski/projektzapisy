@@ -20,8 +20,8 @@ def make_it_json_friendly(element):
     element['slug'] = unicode(element['slug'])
     return element
 
-@login_required
-def subjects(request):
+''' generates template data for filtering and list of subjects '''
+def prepare_subjects_list_to_render():
     semesters = Semester.objects.filter(visible=True)
     subjects = Subject.visible.all()
 
@@ -39,9 +39,13 @@ def subjects(request):
         'semester_subjects': semester_subjects,
         'types_list' : Type.objects.all()
     }
+    return render_data
 
+
+@login_required
+def subjects(request):
     return render_to_response('enrollment/subjects/subjects_list.html',
-        render_data, context_instance=RequestContext(request))
+        prepare_subjects_list_to_render(), context_instance=RequestContext(request))
 
    
 @login_required
@@ -87,11 +91,13 @@ def subject(request, slug):
         sport.name = "Zajęcia"
 
         tutorials = [lectures, exercises, exercises_adv, laboratories, seminar, exer_labs, language, sport]
-                        
-        data = {
-                'subject' : subject,
-                'tutorials' : tutorials,
-        }         
+
+        data = prepare_subjects_list_to_render()
+        data.update({
+            'subject' : subject,
+            'tutorials' : tutorials,
+        })
+
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
     
     except Subject.DoesNotExist, NonSubjectException:
