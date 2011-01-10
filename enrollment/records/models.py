@@ -77,11 +77,11 @@ class Record(models.Model):
         try:
             student = user.student
             records = Record.enrolled.filter(student=student).\
-                select_related('group', 'group__subject').order_by('group__subject__name')
+                select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user').order_by('group__subject__name')
             groups = [record.group for record in records]
             subjects = set([group.subject for group in groups])
             for group in groups:
-                group.terms_ = group.get_all_terms()
+                group.terms_ = group.get_all_terms() # TODO: generuje osobne zapytanie dla każdej grupy, powinno być pobierane w jednym
                 group.subject_ = group.subject
             return groups
         except Student.DoesNotExist:
