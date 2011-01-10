@@ -350,8 +350,7 @@ def schedulePrototype(request):
         #        group.terms_ = all_terms.filter(group = group)
         semesters = Semester.objects.filter(visible=True)
         semesters_list = [(sem.pk, sem.get_name()) for sem in semesters]
-        types = Type.get_all_types_of_subjects()
-        types_list = [(type.pk, type.name) for type in Type.objects.all()] 
+        types_list = [(type.pk, type.name) for type in Type.get_all_types()]
   
         data = {
             'student_records': student_records,

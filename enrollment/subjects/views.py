@@ -37,7 +37,7 @@ def prepare_subjects_list_to_render():
 
     render_data = {
         'semester_subjects': semester_subjects,
-        'types_list' : Type.objects.all()
+        'types_list' : Type.get_all_types()
     }
     return render_data
 
