@@ -2,7 +2,8 @@
 
 {% block scripts %}
 
-<script src="/site_media/js/grade/grade.js" type="text/javascript"></script> 
+<script src="/site_media/js/grade/poll/create.js" type="text/javascript"></script> 
+<script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
 	
 {% endblock %}
 
@@ -13,17 +14,48 @@
 
 {% block content %}
 	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
-		<form url="" id="create_main">
-			<input type="text" value="Tytuł ankiety" id="tytul_ankiety">
-			<ol id="poll-form">
-			</ol>
-		<input type="button" value="dodaj pytanie" id="add-question">
-		<select id="add-question-type">
-			<option value="open">Otwarte</option>
-			<option value="checkbox">Jednokrotnego wyboru</option>
-			<option value="radiobox">Wielokrotnego wyboru</option>
-		</select><br/><br/>
-		<input type="submit" value="wyslij">
-	</form>
+        <form method="POST">
+            <fieldset>
+                <select name="semestr">
+                    <option value="0">Semestr obecny</option>
+                    {% for semester in semesters %}
+                    <option value="{{semester.pk}}">{{semester}}</option>
+                    {% endfor %}
+                </select>
+                <select name="subject">
+                    <option value="0">Wszystkie przedmioty</option>
+                    {% for subject in subjects %}
+                    <option value="{{subject.pk}}">{{subject}}</option>
+                    {% endfor %}
+                </select>
+                <select name="type">
+                    <option value="0">Wszystkie typy</option>
+                    {% for k, v in types %}
+                        <option value="{{k}}">{{v}}</option>
+                    {% endfor %}
+                    </select>
+                <select name="group"><option value="0">Wszystkie grupy</option></select>
+            </fieldset>
+            <label for="title">Tytuł:</label>
+
+            <input type="text" name="title">
+            
+            <div id="sections-list">
+                Wybrane sekcje: <!-- TODO: brak, gdy puste -->
+                <ul>
+                </ul>
+                <small>Przeciągnij aby zmienić kolejność</small>
+            </div><br/>
+            <label for="section">Wybierz sekcję:</label>
+            <select name="section" id="sections">
+                {% for section in sections%}
+                <option value="{{section.pk}}">{{section}}</option>
+                {% endfor %}
+            </select>
+            <input id="section-add" type="button" value="Dodaj sekcję"><br/>
+            <label for="description">Opis</label>
+            <textarea name="description"></textarea>
+            <input type="submit" value="Stwórz ankietę">
+        </form>
 {% endblock %}
 
