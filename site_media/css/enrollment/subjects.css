@@ -81,7 +81,7 @@
 
 #enr-subject-view .details ul.properties li
 {
-	border-bottom: 1px solid #cccccc;
+	border-bottom: 1px dotted #cccccc;
 	padding: 3px 5px;
 	font-size: 12px;
 

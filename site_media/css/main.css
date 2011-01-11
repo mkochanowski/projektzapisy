@@ -78,7 +78,7 @@
 
 	color: black;
 
-	border-bottom: 1px solid #cccccc;
+	border-bottom: 1px dotted #cccccc;
 	margin-bottom: 5px;
 	cursor: default;
 }
@@ -398,7 +398,7 @@ a.main-sidebar-toggle-button:hover
 	position: relative;
 	border: 0;
 	float: left;
-	border-right: 1px solid #cccccc;
+	border-right: 1px dotted #cccccc;
 	margin: 0;
 	padding: 10px;
 	display: block;
@@ -480,6 +480,7 @@ a.main-sidebar-toggle-button:hover
 .main-filter-input .reset
 {
 	border: 1px solid #999999;
+	border-left: 1px dotted #999999;
 	height: 24px;
 	background-color: white;
 	font-weight: bold;

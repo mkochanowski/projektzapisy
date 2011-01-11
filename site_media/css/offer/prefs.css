@@ -145,13 +145,13 @@ ul#od-prefs-undecided input:hover
 #od-prefs-list .od-prefs-toggleHidden
 {
 	float: right;
-	border-left: 1px solid #cccccc;
+	border-left: 1px dotted #cccccc;
 	width: 90px;
 }
 
 #od-prefs-list .od-prefs-toggleCollapse
 {
-	border-right: 1px solid #cccccc;
+	border-right: 1px dotted #cccccc;
 	width: 25px;
 }
 
@@ -177,7 +177,7 @@ ul#od-prefs-undecided input:hover
 
 #od-prefs-list ul
 {
-	border-top: 1px solid #cccccc;
+	border-top: 1px dotted #cccccc;
 	list-style: none;
 	padding: 10px;
 	background: white;
