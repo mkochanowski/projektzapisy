@@ -50,7 +50,7 @@
 	position: absolute;
 	left: -6px;
 	top: -3px;
-	width: 220px;
+	width: 230px;
 	z-index: 1000;
 
 	list-style: none;
@@ -238,7 +238,7 @@
 
 #main-content.wide
 {
-	padding: 10px;
+	padding: 15px 20px;
 }
 
 /*** ZAWARTOŚĆ - koniec ***/
@@ -273,8 +273,8 @@
 #main-content-container.sidebar-visible.sidebar-right #main-content
 {
 	margin-right: 250px;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding-left: 20px;
+	padding-right: 20px;
 	border-right: 1px solid #cccccc;
 }
 

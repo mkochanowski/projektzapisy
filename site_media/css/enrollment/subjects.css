@@ -1,0 +1,127 @@
+/**
+ * Style odpowiedzialne za widoki dotyczące przeglądania i zapisów na
+ * przedmioty.
+ */
+
+/*******************************************************************************
+ * Panel filtrowania
+ ******************************************************************************/
+
+#enr-subjectsList-other
+{
+	width: 390px;
+}
+
+
+/*******************************************************************************
+ * Lista przedmiotów
+ ******************************************************************************/
+
+.subjects-list li
+{
+	margin-bottom: 7px;
+}
+
+
+/*******************************************************************************
+ * Widok przedmiotu - ogólne
+ ******************************************************************************/
+
+#enr-subject-view h1
+{
+	font-weight: normal;
+	font-size: 29px;
+	padding-bottom: 10px;
+}
+
+
+/*******************************************************************************
+ * Widok przedmiotu - szczegóły
+ ******************************************************************************/
+
+#enr-subject-view
+{
+	position: relative;
+}
+
+#enr-subject-view .details
+{
+	position: relative;
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+#enr-subject-view .details h2
+{
+	font-size: 14px;
+	color: #999999;
+	font-weight: bold;
+
+	margin-bottom: 10px;
+}
+
+#enr-subject-view .details ul.properties
+{
+	list-style: none;
+
+	padding: 0;
+	margin-right: 15px;
+	margin-bottom: 12px;
+	width: 320px;
+
+	border: 1px solid #cccccc;
+	background: none repeat scroll 0 0 #f8f8f8;
+
+	float: left;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+#enr-subject-view .details ul.properties li
+{
+	border-bottom: 1px solid #cccccc;
+	padding: 3px 5px;
+	font-size: 12px;
+
+	/* dziwne, ale bez tego nie da się zaznaczać tego bloku */
+	z-index: 1;
+	position: relative;
+}
+
+#enr-subject-view .details ul.properties li:last-child
+{
+	border-bottom: 0;
+}
+
+#enr-subject-view .details ul.properties li span
+{
+	color: #666666;
+}
+
+#enr-subject-view .details .description
+{
+	position: relative;
+	margin-bottom: 12px;
+}
+
+#enr-subject-view .details .description .more
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: white;
+	padding-left: 7px;
+}
+
+#enr-subject-view .details .footer
+{
+	clear: left;
+}
+
+#enr-subject-view .details-toggle
+{
+	font-size: 12px;
+	float: right;
+}
