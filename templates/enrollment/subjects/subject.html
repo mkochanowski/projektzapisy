@@ -1,5 +1,7 @@
 {% extends "enrollment/subjects/base.html" %}
 
+{% block main-subtitle %}{{subject.name}}{% endblock %}
+
 {% block enrollment-subjects-scripts %}
 	<script src="/site_media/js/enrollment/views/subject.js" type="text/javascript"></script>
 {% endblock %}

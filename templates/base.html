@@ -2,9 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
 
 {% load fereol_common %}
+{% captureas subsystemname %}{% block main-subsystemname %}{% endblock %}{% endcaptureas %}
+{% captureas subtitle %}{% block main-subtitle %}{% endblock %}{% endcaptureas %}
 
 <head>
-	<title>Fereol</title>
+	<title>
+		{%if subtitle %} {{ subtitle }} &ndash {% endif %}
+		{%if subsystemname %} {{ subsystemname }} (Fereol) {% else %} Fereol {% endif %}
+	</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
 	<link rel="stylesheet" href="/site_media/css/general.css" type="text/css" />
@@ -29,10 +34,9 @@
 </head>
 <body>
 	<div id="main-topContainer">
-		<p id="main-systemTypeBar">
-			{% block main-subsystemname %}
-			{% endblock %}
-		</p>
+		{%if subsystemname %}
+			<p id="main-systemTypeBar">{{ subsystemname }}</p>
+		{% endif %}
 		<p id="main-signinBar">
 			{% if user.is_authenticated %}
 				Jesteś zalogowany jako

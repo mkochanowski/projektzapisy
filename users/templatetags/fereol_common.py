@@ -30,6 +30,8 @@ def do_captureas(parser, token):
         Example use:
         {% captureas examplevar %}{% url exampleurl %}{% endcaptureas %}
         URL: {{ examplevar }}
+
+        Source: http://djangosnippets.org/snippets/545/
     '''
     try:
         tag_name, args = token.contents.split(None, 1)

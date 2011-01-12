@@ -2,9 +2,7 @@
 
 {% load news_extras %}
 
-{% block main-subsystemname %}
-	Kształtowanie oferty dydaktycznej
-{% endblock %}
+{% block main-subsystemname %}Kształtowanie oferty dydaktycznej{% endblock %}
 
 {% block main-menu %}
 	<li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li>
