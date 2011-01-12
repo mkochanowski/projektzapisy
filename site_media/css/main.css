@@ -50,7 +50,6 @@
 	position: absolute;
 	left: -6px;
 	top: -3px;
-	width: 230px;
 	z-index: 1000;
 
 	list-style: none;
@@ -70,6 +69,11 @@
 	-moz-box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
 	-webkit-box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
 	box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
+}
+
+#main-systemTypeBar ul li
+{
+	white-space: nowrap;
 }
 
 #main-systemTypeBar ul li.current
