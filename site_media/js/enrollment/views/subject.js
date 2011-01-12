@@ -10,81 +10,113 @@ SubjectView = new Object();
  */
 SubjectView.init = function()
 {
-	SubjectView.initDetails();
+	SubjectView._detailsContainer = $('#enr-subject-view .details').assertOne();
+
+	// wysokość panelu szczegółów (w stanie "widoczny")
+	SubjectView._detailsCurrentHeight = SubjectView._detailsContainer.height();
+
+	// czy panel szczegółów jest wyświetlony
+	SubjectView.detailsVisible = null;
+
+	SubjectView._initDetailsToggleSwitch();
+	SubjectView._initExpandableDescription();
 };
 
 $(SubjectView.init);
 
 /**
- * Inicjuje panel szczegółów (tabelka z właściwościami i opis).
+ * Inicjuje zwijanie długich opisów przedmiotów.
  */
-SubjectView.initDetails = function()
+SubjectView._initExpandableDescription = function()
 {
-	var detailsContainer = $('#enr-subject-view .details').assertOne();
-	var descriptionContainer = detailsContainer.children('.description').
+	var descriptionContainer = SubjectView._detailsContainer.children('.description').
 		assertOne();
-	var propertiesContainer = detailsContainer.children('ul').assertOne();
+	var propertiesContainer = SubjectView._detailsContainer.children('ul').assertOne();
 
-	var prefferedHeight = propertiesContainer.outerHeight();
+	var propertiesHeight = propertiesContainer.outerHeight();
 	var descriptionHeight = descriptionContainer.outerHeight();
 
-	// rozmiary panelu szczegółów przed modyfikacjami
-	var originalHeight = detailsContainer.height() + 'px';
-	var originalMarginBottom = detailsContainer.css('margin-bottom');
+	// rozmiary panelu szczegółów w stanie "rozwinięty opis"
+	var fullHeight = Math.max(descriptionHeight, propertiesHeight);
 
-	// aktualne rozmiary panelu w stanie "widoczny"
-	var currentHeight = originalHeight;
-	var currentMarginBottom = originalMarginBottom;
+	// generowanie przycisku "pokaż więcej..." dla opisu
+	var moreDescriptionButton = $.create('a', { className: 'more' }).
+		text('pokaż więcej...').appendTo(descriptionContainer);
+	moreDescriptionButton.css('top',
+		(propertiesHeight - moreDescriptionButton.outerHeight()) + 'px');
 
-	if (descriptionHeight > prefferedHeight + 10)
+	// czy opis został już rozwinięty
+	SubjectView._descriptionExpanded = false;
+
+	// akcja rozwijania opisu
+	moreDescriptionButton.disableDragging().click(function()
 	{
-		currentHeight = prefferedHeight + 'px'
-		currentMarginBottom = (parseInt(originalMarginBottom) +
-			parseInt(propertiesContainer.css('margin-bottom'))) + 'px';
+		if (SubjectView._descriptionExpanded)
+			return;
+		SubjectView._descriptionExpanded = true;
 
-		detailsContainer.css({
-			height: currentHeight,
-			marginBottom: currentMarginBottom
-		});
+		moreDescriptionButton.remove();
+		SubjectView._detailsContainer.stop().animate({
+			height: fullHeight + 'px'
+		}, 150);
 
-		var moreDescriptionButton = $.create('a', { className: 'more' }).
-			text('pokaż więcej...').appendTo(descriptionContainer);
-		moreDescriptionButton.css('top',
-			(prefferedHeight - moreDescriptionButton.outerHeight()) + 'px');
-		moreDescriptionButton.css('left',
-			(descriptionContainer.innerWidth() -
-				moreDescriptionButton.outerWidth()) + 'px');
+		SubjectView._detailsCurrentHeight = fullHeight;
+	});
 
-		var moreDescriptionButtonClicked = false;
-		moreDescriptionButton.disableDragging().click(function()
+	// zwijanie/rozwijanie opisu, w zależności od potrzeby (rozmiaru opisu
+	// i dostępnego miejsca)
+	var initMoreDescriptionSwitch = function()
+	{
+		descriptionHeight = descriptionContainer.outerHeight();
+		fullHeight = Math.max(descriptionHeight, propertiesHeight);
+
+		if (descriptionHeight > propertiesHeight + 15 &&
+			!SubjectView._descriptionExpanded)
 		{
-			if (moreDescriptionButtonClicked)
-				return;
-			moreDescriptionButtonClicked = true;
+			SubjectView._detailsCurrentHeight = propertiesHeight;
+			
+			moreDescriptionButton.css({
+				display: 'block',
+				left: (descriptionContainer.innerWidth() -
+					moreDescriptionButton.outerWidth()) + 'px'
+			});
+		}
+		else
+		{
+			SubjectView._detailsCurrentHeight = fullHeight;
+			
+			moreDescriptionButton.css('display', 'none');
+		}
+		if (SubjectView.detailsVisible)
+			SubjectView._detailsContainer.css('height', SubjectView._detailsCurrentHeight + 'px');
+	};
+	initMoreDescriptionSwitch();
+	var moreDescriptionObserver = { update: initMoreDescriptionSwitch };
+	Sidebar.addObserver(moreDescriptionObserver);
+};
 
-			moreDescriptionButton.remove();
-			detailsContainer.stop().animate({
-				height: originalHeight,
-				marginBottom: originalMarginBottom
-			}, 150);
+/**
+ * Inicjuje ukrywanie panelu szczegółów przedmiotu.
+ */
+SubjectView._initDetailsToggleSwitch = function()
+{
+	// wysokość marginesu będzie potrzebna, bo chcemy zwijać panel razem z nim
+	SubjectView._detailsContainerMargin =
+		SubjectView._detailsContainer.css('margin-bottom');
 
-			currentHeight = originalHeight;
-			currentMarginBottom = originalMarginBottom;
-		});
-	}
-
-	// ukrywanie panelu szczegółów
-
+	// ustawienie widoczności panelu na podstawie cookie
 	SubjectView.detailsVisible = !$.cookies.get('SubjectView-details-hidden');
 	if (!SubjectView.detailsVisible)
-		detailsContainer.css({
+		SubjectView._detailsContainer.css({
 			height: 0,
 			marginBottom: 0
 		});
 
+	// wygenerowanie przycisku chowania panelu
 	var detailsVisibleToggle = $.create('a', { className: 'details-toggle' }).
 		prependTo($('#enr-subject-view').assertOne()).text('blabla');
 
+	// aktualizacja napisu na przycisku chowania
 	var detailsVisibleToggleUpdateText = function()
 	{
 		detailsVisibleToggle.text(SubjectView.detailsVisible ?
@@ -92,14 +124,15 @@ SubjectView.initDetails = function()
 	};
 	detailsVisibleToggleUpdateText();
 
+	// akcja chowania/pokazywania panelu szczegółów
 	detailsVisibleToggle.disableDragging().click(function()
 	{
 		var visible = SubjectView.detailsVisible = !SubjectView.detailsVisible;
 		$.cookies.set('SubjectView-details-hidden', !visible);
 
-		detailsContainer.stop().animate({
-			height: visible ? currentHeight : 0,
-			marginBottom: visible? currentMarginBottom : 0
+		SubjectView._detailsContainer.stop().animate({
+			height: visible ? SubjectView._detailsCurrentHeight : 0,
+			marginBottom: visible ? SubjectView._detailsContainerMargin : 0
 		}, 150);
 
 		detailsVisibleToggleUpdateText();

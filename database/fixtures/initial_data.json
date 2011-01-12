@@ -4585,7 +4585,7 @@
             "laboratories": 15, 
             "type": 4, 
             "slug": "bazy-danych", 
-            "description": "Opis"
+            "description": "Celem wyk\u0142adu jest om\u00f3wienie zasad konstrukcji relacyjnych baz danych oraz opanowanie przez s\u0142uchaczy umiej\u0119tno\u015bci profesjonalnej obs\u0142ugi systemu baz danych od strony u\u017cytkownika, czyli:\r\n\r\n* umiej\u0119tno\u015bci zaprojektowania i zdefiniowania relacyjnej bazy danych dla rzeczywistego zagadnienia;\r\n\r\n* sprawnego wyszukiwania i odzyskiwania informacji z baz danych przypomocy j\u0119zyka SQL;\r\n\r\n* pisania aplikacji z dost\u0119pem do bazy danych;\r\n\r\n* efektywnego wykorzystania dodatkowych mo\u017cliwo\u015bci systemu (perspektyw, transakcji, wi\u0119z\u00f3w, itp.).\r\n\r\nPonadto wyk\u0142ad pozwala s\u0142uchaczom pozna\u0107 elementy system\u00f3w baz danych spoza warstwy u\u017cytkownika (system zarz\u0105dzania transakcjami, zapewnienia bezpiecze\u0144stwa i optymalizacji)."
         }
     }, 
     {

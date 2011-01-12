@@ -47,7 +47,7 @@
 #enr-subject-view .details
 {
 	position: relative;
-	margin-bottom: 10px;
+	margin-bottom: 20px;
 	overflow: hidden;
 }
 
@@ -111,13 +111,19 @@
 	position: absolute;
 	top: 0;
 	left: 0;
+
+	display: none;
+
 	background: white;
 	padding-left: 7px;
+
+	white-space: nowrap;
 }
 
 #enr-subject-view .details .footer
 {
 	clear: left;
+	margin-top: -12px;
 }
 
 #enr-subject-view .details-toggle

@@ -337,9 +337,11 @@ a.main-sidebar-toggle-button
 
 #main-content-container.sidebar-right a.main-sidebar-toggle-button.show
 {
-	position: absolute;
-	top: 20px;
-	left: 979px;
+	float: right;
+	position: relative;
+	z-index: 1;
+	top: 5px;
+	left: 20px;
 }
 
 #main-content-container.sidebar-left a.main-sidebar-toggle-button.show
