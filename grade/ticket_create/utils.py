@@ -155,26 +155,33 @@ def group_polls_by_subject( poll_list ):
     
     return res
 
-def generate_ticket( poll_list ):
-    ## TODO: Docelowo ma być po stronie przeglądarki
-    m       = getrandbits( RAND_BITS )
-    blinded = []
-    
+def connect_groups( groupped_polls, form ):
+    connected_groups = []
+    for polls in groupped_polls:
+        if not polls[ 0 ].group:
+            label = 'join_common'
+        else:
+            label = u'join_' + unicode( polls[ 0 ].group.subject.pk )
+        
+        if len( polls ) == 1:
+            connected_groups.append( polls )
+        elif form.cleaned_data[ label ]:
+            connected_groups.append( polls )
+        else:
+            for poll in polls:
+                connected_groups.append([ poll ])
+    return connected_groups
+
+def generate_keys( poll_list ):
+    keys = []
+
     for poll in poll_list:
-        key = RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
-        n   = key.n
-        e   = key.e
-        k   = randint( 2, n )
-        while gcd( n, k ) != 1:
-            k = randint( 1, n )
-        
-        a = ( m % n )
-        b = expMod( k, e, n )
-        t = ( a * b) % n
-        
-        blinded.append(( poll, t, (m, k) ))
-    return blinded
-    
+        key =  RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
+        keys.append((unicode(key.n), unicode(key.e)))
+
+    return keys
+
+
 def check_poll_visiblity( user, poll ):
     if not poll.is_student_entitled_to_poll( user.student ): 
         raise InvalidPollException
@@ -188,6 +195,11 @@ def mark_poll_used( user, poll ):
     u = UsedTicketStamp( student = user.student,
                          poll    = poll )
     u.save()
+
+def ticket_check_and_mark( user, poll, ticket ):
+    check_poll_visiblity( user, poll )
+    check_ticket_not_signed( user, poll )
+    mark_poll_used( user, poll )
     
 def ticket_check_and_sign( user, poll, ticket ):
     check_poll_visiblity( user, poll )
@@ -195,7 +207,29 @@ def ticket_check_and_sign( user, poll, ticket ):
     key    = PrivateKey.objects.get( poll = poll )
     signed = key.sign_ticket( ticket )
     mark_poll_used( user, poll )
+
+def ticket_check_and_sign_without_mark( user, poll, ticket ):
+    check_poll_visiblity( user, poll )
+    check_ticket_not_signed( user, poll )
+    key    = PrivateKey.objects.get( poll = poll )
+    signed = key.sign_ticket( ticket )
     return signed
+
+def secure_signer_without_save( user, g, t ):
+    try:
+        return ticket_check_and_sign_without_mark( user, g, t ), 
+    except InvalidPollException:
+        return u"Nie masz uprawnień do tej ankiety",
+    except TicketUsed:
+        return u"Bilet już pobrano",
+
+def secure_mark ( user, g, t ):    
+    try:
+        return ticket_check_and_mark( user, g, t ), 
+    except InvalidPollException:
+        return u"Nie masz uprawnień do tej ankiety",
+    except TicketUsed:
+        return u"Bilet już pobrano",
 
 def secure_signer( user, g, t ):
     try:
@@ -205,8 +239,7 @@ def secure_signer( user, g, t ):
     except TicketUsed:
         return u"Bilet już pobrano",
 
-def unblind( poll, st, k ):
-    # TODO: To ma być po stronie przeglądarki 
+def unblind( poll, st ):
     st  = st[0]
     if   st == u"Nie masz uprawnień do tej ankiety":
         return st
@@ -215,9 +248,7 @@ def unblind( poll, st, k ):
     else:
         st  = st[0]
         key = RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
-        n   = key.n
-        rk  = revMod( k, n )
-        return ((st % n) * (rk % n)) % n
+        return (unicode(st), unicode(key.n))
         
 def get_valid_tickets( tl ):
     err = []

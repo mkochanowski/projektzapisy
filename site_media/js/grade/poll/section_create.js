@@ -112,9 +112,6 @@ Poll.section.createOptionSet = function(question)
     $(question).append(ul);
     
     Poll.section.createOption(ul);
-
-    $(question).append(ul);
-
     Poll.section.createAddOptionButton(question, ul)
 }
 
