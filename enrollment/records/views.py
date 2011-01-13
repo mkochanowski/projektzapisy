@@ -66,9 +66,12 @@ def ajaxAssign(request):
     data = {}
     try:
         group_id = int(request.POST["GroupId"])
-        record = Record.add_student_to_group(request.user.id, group_id)
+        records_list = Record.add_student_to_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś zapisany do grupy."
+        if len(records_list) == 1:
+            data['Success']['Message'] = "Zostałeś zapisany do grupy."
+        else:
+            data['Success']['Message'] = "Zostałeś zapisany do wybranej grupy i grupy wykładowej."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -153,9 +156,12 @@ def deleteStudentFromGroup(request, user_id, group_id):
 @login_required
 def assign(request, group_id):
     try:
-        record = Record.add_student_to_group(request.user.id, group_id)
-        request.user.message_set.create(message="Zostałeś zapisany do grupy.")
-        return redirect("subject-page", slug=record.group_slug())
+        records_list = Record.add_student_to_group(request.user.id, group_id)
+        if len(records_list) == 1:
+            request.user.message_set.create(message="Zostałeś zapisany do grupy.")
+        else:
+            request.user.message_set.create(message="Zostałeś zapisany do wybranej grupy i grupy wykładowej.")
+        return redirect("subject-page", slug=records_list[0].group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))

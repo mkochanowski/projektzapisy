@@ -73,7 +73,7 @@ class StudentScheduleTest(TestCase):
         self.group_1 = Group.objects.get(id=1)
         self.group_2 = Group.objects.get(id=3)
         self.record_1 = Record.add_student_to_group(self.user.id, self.group_1.id)
-        self.record_2 = Record.add_student_to_group(self.user.id, self.group_2.id)
+       # self.record_2 = Record.add_student_to_group(self.user.id, self.group_2.id)
         
     def testWithNotStudentUser(self):
         self.user.student.delete()
