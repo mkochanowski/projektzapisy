@@ -1,10 +1,10 @@
 {% extends "offer/base.html" %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
-    <li>Podsumowanie głosowania</li>
+	<li>Podsumowanie głosowania</li>
 {% endblock %}
 
 {% block styles %}
@@ -13,56 +13,56 @@
 
 {% block content-class %}narrow{% endblock %}
 {% block content %}
-    <div id="od-vote-summary">
-        <h2>Podsumowanie głosowania</h2>
+	<div id="od-vote-summary">
+		<h2>Podsumowanie głosowania</h2>
 
-        {% if winter or summer or unknown %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Przedmiot</th>
-                        <th title="Suma punktów w głosach oddanych na przedmiot">Punktów</th>
-                        <th title="Ilość osób głosujących na przedmiot">Głosów</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if winter %}
-                        <tr class="semester"><th colspan="4">Semestr zimowy</th></tr>
-                        {% for row in winter %}
-                            <tr>
-                                <td>{{ row.2.name }}</td>
-                                <td class="number">{{ row.0 }}</td>
-                                <td class="number">{{ row.1 }}</td>
-                                <td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                    {% if summer %}
-                        <tr class="semester"><th colspan="4">Semestr letni</th></tr>
-                        {% for row in summer %}
-                            <tr>
-                                <td>{{ row.2.name }}</td>
-                                <td class="number">{{ row.0 }}</td>
-                                <td class="number">{{ row.1 }}</td>
-                                <td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                    {% if unknown %}
-                        <tr class="semester"><th colspan="4">Semestr nieokreślony</th></tr>
-                        {% for row in unknown %}
-                            <tr>
-                                <td>{{ row.2.name }}</td>
-                                <td class="number">{{ row.0 }}</td>
-                                <td class="number">{{ row.1 }}</td>
-                                <td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="main-message">Jeszcze nikt na nic nie zagłosował.</div>
-        {% endif %}
-    </div>
+		{% if winter or summer or unknown %}
+			<table>
+				<thead>
+					<tr>
+						<th>Przedmiot</th>
+						<th title="Suma punktów w głosach oddanych na przedmiot">Punktów</th>
+						<th title="Ilość osób głosujących na przedmiot">Głosów</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% if winter %}
+						<tr class="semester"><th colspan="4">Semestr zimowy</th></tr>
+						{% for row in winter %}
+							<tr>
+								<td>{{ row.2.name }}</td>
+								<td class="number">{{ row.0 }}</td>
+								<td class="number">{{ row.1 }}</td>
+								<td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+					{% if summer %}
+						<tr class="semester"><th colspan="4">Semestr letni</th></tr>
+						{% for row in summer %}
+							<tr>
+								<td>{{ row.2.name }}</td>
+								<td class="number">{{ row.0 }}</td>
+								<td class="number">{{ row.1 }}</td>
+								<td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+					{% if unknown %}
+						<tr class="semester"><th colspan="4">Semestr nieokreślony</th></tr>
+						{% for row in unknown %}
+							<tr>
+								<td>{{ row.2.name }}</td>
+								<td class="number">{{ row.0 }}</td>
+								<td class="number">{{ row.1 }}</td>
+								<td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
+							</tr>
+						{% endfor %}
+					{% endif %}
+				</tbody>
+			</table>
+		{% else %}
+			<div class="main-message">Jeszcze nikt na nic nie zagłosował.</div>
+		{% endif %}
+	</div>
 {% endblock %}

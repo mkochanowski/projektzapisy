@@ -7,140 +7,140 @@
 {% endblock %}
 
 {% block proposal-content %}
-    <div id="od-proposal-view">
-        {% if messages %}
-            {% for message in messages %}
-                <p class="main-message">{{ message }}</p>
-            {% endfor %}
-        {% endif %}
+	<div id="od-proposal-view">
+		{% if messages %}
+			{% for message in messages %}
+				<p class="main-message">{{ message }}</p>
+			{% endfor %}
+		{% endif %}
 
-        {% ifnotequal descid newest.id %}
-            <p class="main-message">
-                Wersja archiwalna!
-                {% if can_edit %}<a class="subjectrestore" href="{% url proposal-restore descid=descid %}">Przywróć</a> lub{% endif %}
-                <a href="{% url proposal-page slug=proposal.slug %}">przejdź do bieżącej</a>.
-            </p>
-        {% endifnotequal %}
-        {% if can_edit %}
-        <a id="od-proposal-view-editBtn" href="{% url proposal-edit sid=id %}">Edytuj</a>
-        {% endif %}
-        <h2>{{proposal.name}}</h2>
+		{% ifnotequal descid newest.id %}
+			<p class="main-message">
+				Wersja archiwalna!
+				{% if can_edit %}<a class="subjectrestore" href="{% url proposal-restore descid=descid %}">Przywróć</a> lub{% endif %}
+				<a href="{% url proposal-page slug=proposal.slug %}">przejdź do bieżącej</a>.
+			</p>
+		{% endifnotequal %}
+		{% if can_edit %}
+		<a id="od-proposal-view-editBtn" href="{% url proposal-edit sid=id %}">Edytuj</a>
+		{% endif %}
+		<h2>{{proposal.name}}</h2>
 
-        <ul class="infoBox">
-           {% if proposal.owner %} <li>Właściciel: <a href="{% url profile proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
-            <li>Sugerowany rodzaj: {% for type in types %}{{ type.lecture_type }}{% if not forloop.last %}; {% endif %}{% endfor %}</li>
-            {% if proposal.description.lectures or proposal.description.repetitories or proposal.description.exercises or proposal.laboratories %}
-            <li class="proposedTime">
-                Wymiar godzin:
-                {% if proposal.description.lectures %}<span title="sugerowana liczba godzin wykładów">{{ proposal.description.lectures }}w.</span>{% endif %}
-                {% if proposal.description.repetitories %}<span title="sugerowana liczba godzin repetytoriów">{{ proposal.description.repetitories }}r.</span>{% endif %}
-                {% if proposal.description.exercises %}<span title="sugerowana liczba godzin ćwiczeń">{{ proposal.description.exercises }}ćw.</span>{% endif %}
-                {% if proposal.description.laboratories %}<span title="sugerowana liczba godzin pracowni">{{ proposal.description.laboratories }}p.</span>{% endif %}
-            </li>
-            {% endif %}
-            <li>Sugerowana ilość punktów ECTS: {{ proposal.description.ects }}</li>
-            <li>Egzamin: {% if proposal.is_exam %}Tak{% else %}Nie{% endif %}</li>
-            <li>Możliwe zajęcia w języku angielskim: {% if proposal.in_english %}Tak{% else %}Nie{% endif %}</li>
-            <li>
-                {% if proposal.description.web_page %}<a href="{{ proposal.description.web_page }}">Strona przedmiotu</a>{% endif %}
-            </li>
-        </ul>
+		<ul class="infoBox">
+		   {% if proposal.owner %} <li>Właściciel: <a href="{% url employee-profile proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
+			<li>Sugerowany rodzaj: {% for type in types %}{{ type.lecture_type }}{% if not forloop.last %}; {% endif %}{% endfor %}</li>
+			{% if proposal.description.lectures or proposal.description.repetitories or proposal.description.exercises or proposal.laboratories %}
+			<li class="proposedTime">
+				Wymiar godzin:
+				{% if proposal.description.lectures %}<span title="sugerowana liczba godzin wykładów">{{ proposal.description.lectures }}w.</span>{% endif %}
+				{% if proposal.description.repetitories %}<span title="sugerowana liczba godzin repetytoriów">{{ proposal.description.repetitories }}r.</span>{% endif %}
+				{% if proposal.description.exercises %}<span title="sugerowana liczba godzin ćwiczeń">{{ proposal.description.exercises }}ćw.</span>{% endif %}
+				{% if proposal.description.laboratories %}<span title="sugerowana liczba godzin pracowni">{{ proposal.description.laboratories }}p.</span>{% endif %}
+			</li>
+			{% endif %}
+			<li>Sugerowana ilość punktów ECTS: {{ proposal.description.ects }}</li>
+			<li>Egzamin: {% if proposal.is_exam %}Tak{% else %}Nie{% endif %}</li>
+			<li>Możliwe zajęcia w języku angielskim: {% if proposal.in_english %}Tak{% else %}Nie{% endif %}</li>
+			<li>
+				{% if proposal.description.web_page %}<a href="{{ proposal.description.web_page }}">Strona przedmiotu</a>{% endif %}
+			</li>
+		</ul>
 
-        <h3>Opis przedmiotu</h3>
-        <div class="textField">
-            {{ proposal.description.description|bbcode|safe }}
-        </div>
+		<h3>Opis przedmiotu</h3>
+		<div class="textField">
+			{{ proposal.description.description|bbcode|safe }}
+		</div>
 
-        <h3>Wymagania</h3>
-        <div class="textField">
-            {{ proposal.description.requirements|bbcode|safe }}
-        </div>
+		<h3>Wymagania</h3>
+		<div class="textField">
+			{{ proposal.description.requirements|bbcode|safe }}
+		</div>
 
-        {% if proposal.description.comments %}
-            <h3>Uwagi do potencjalnych prowadzących i dyrekcji</h3>
-            <div class="textField">
-                {{ proposal.description.comments|bbcode|safe }}
-            </div>
-        {% endif %}
+		{% if proposal.description.comments %}
+			<h3>Uwagi do potencjalnych prowadzących i dyrekcji</h3>
+			<div class="textField">
+				{{ proposal.description.comments|bbcode|safe }}
+			</div>
+		{% endif %}
 
-        {% if proposal.books.all %}
-            <h3>Literatura</h3>
-            <ul class="books">
-                {% for book in proposal.books.all %}
-                    <li>{{ book.name }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+		{% if proposal.books.all %}
+			<h3>Literatura</h3>
+			<ul class="books">
+				{% for book in proposal.books.all %}
+					<li>{{ book.name }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
 
-        <hr />
+		<hr />
 
-        <ul class="interested">
-            <li>
-                {% if user.student %}
-                    {% if isFan %}
-                        <a href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
-                    {% else %}
-                        <a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
-                    {% endif %}
-                    (chętnych: {{fans}})
-                {% else %}
-                    Chętnych do nauki: {{fans}}
-                {% endif %}
-            </li>
-            <li>
-                {% if user.employee %}
-                    {% if isTeacher %}
-                        <a href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
-                    {% else %}
-                        <a href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
-                    {% endif %}
-                    (chętnych: {{teachers}})
-                {% else %}
-                    Poprowadzą: {{teachers}}
-                {% endif %}
-            </li>
-            <li>
-                {% if user.employee %}
-                    {% if isHelper %}
-                        <a href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
-                    {% else %}
-                        <a href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
-                    {% endif %}
-                    (chętnych: {{helpers}})
-                {% else %}
-                    Pomogą prowadzić: {{helpers}}
-                {% endif %}
-            </li>
-        </ul>
+		<ul class="interested">
+			<li>
+				{% if user.student %}
+					{% if isFan %}
+						<a href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
+					{% else %}
+						<a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
+					{% endif %}
+					(chętnych: {{fans}})
+				{% else %}
+					Chętnych do nauki: {{fans}}
+				{% endif %}
+			</li>
+			<li>
+				{% if user.employee %}
+					{% if isTeacher %}
+						<a href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
+					{% else %}
+						<a href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
+					{% endif %}
+					(chętnych: {{teachers}})
+				{% else %}
+					Poprowadzą: {{teachers}}
+				{% endif %}
+			</li>
+			<li>
+				{% if user.employee %}
+					{% if isHelper %}
+						<a href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
+					{% else %}
+						<a href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
+					{% endif %}
+					(chętnych: {{helpers}})
+				{% else %}
+					Pomogą prowadzić: {{helpers}}
+				{% endif %}
+			</li>
+		</ul>
 
-        <div class="actions">
-            {% if prev or next %}
-                <p>
-                    Wersja:
-                    
-                    {% if prev %}
-                        <a href="{% url proposal-page-archival slug=proposal.slug descid=prev.id  %}">starsza</a>
-                    {% endif %}
+		<div class="actions">
+			{% if prev or next %}
+				<p>
+					Wersja:
 
-                    {% if next %}
-                        <a href="{% url proposal-page-archival slug=proposal.slug descid=next.id  %}">nowsza</a>
-                    {% endif %}
-                </p>
-            {% endif %}
+					{% if prev %}
+						<a href="{% url proposal-page-archival slug=proposal.slug descid=prev.id  %}">starsza</a>
+					{% endif %}
 
-            <p>
-                <a href="{% url proposal-history sid=id %}">historia</a>
-                {% if can_edit %}<a href="{% url proposal-edit sid=id %}">edytuj</a>{% endif %}
-            </p>
-            {% if perms.can_delete_proposal %}
-            <p>
-                <a class="proposal-delete" href="{% url proposal-delete slug=proposal.slug %}">Usuń tę propozycję</a>
-            </p>
-            <p>
-                <a class="proposal-delete" href="{% url proposal-description-delete pid=proposal.description.id %}">Usuń tę wersję</a>
-            </p>
-            {% endif %}           
-        </div>
+					{% if next %}
+						<a href="{% url proposal-page-archival slug=proposal.slug descid=next.id  %}">nowsza</a>
+					{% endif %}
+				</p>
+			{% endif %}
 
-    </div>
+			<p>
+				<a href="{% url proposal-history sid=id %}">historia</a>
+				{% if can_edit %}<a href="{% url proposal-edit sid=id %}">edytuj</a>{% endif %}
+			</p>
+			{% if perms.can_delete_proposal %}
+			<p>
+				<a class="proposal-delete" href="{% url proposal-delete slug=proposal.slug %}">Usuń tę propozycję</a>
+			</p>
+			<p>
+				<a class="proposal-delete" href="{% url proposal-description-delete pid=proposal.description.id %}">Usuń tę wersję</a>
+			</p>
+			{% endif %}
+		</div>
+
+	</div>
 {% endblock %}

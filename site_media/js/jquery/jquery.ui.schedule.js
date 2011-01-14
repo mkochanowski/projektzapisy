@@ -7,7 +7,7 @@ $.widget("ui.schedule", {
 		minPerCell: 60,
 		startMinute: 480,
 		endMinute: 1380,
-		dayList: ['Poniedzialek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek'],
+		dayList: ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek'],
 		minutesPerCell : 60, 
 		cellHeight: 32,
 		hourColumnWidth: 40,

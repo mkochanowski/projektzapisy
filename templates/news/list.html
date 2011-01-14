@@ -19,12 +19,15 @@
 {% endblock %}
 u
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
+	<li><a href="/">Strona główna</a></li>
     <li><a href="{% url latest_news category %}">
-	{% ifequal category "enrollment" %}Zapisy{% else %}Oferta{% endifequal %}</a></li>
-    <li id="news-archive-nav" style="{% if not archive_view %}display:none{% endif %}">Archiwum</li>
-    <li id="news-search-nav" style="{% if not search_view %}display:none{% endif %}">Wyniki wyszukiwania</li>
-
+		{% ifequal category "enrollment" %}Zapisy{% else %}Oferta{% endifequal %}</a>
+	</li>
+    <li id="news-nav">
+		{% if archive_view %}Archiwum aktualności{% endif %}
+		{% if search_view %}Wyniki wyszukiwania aktualności{% endif %}
+		{% if not archive_view and not search_view %}Aktualności{% endif %}
+	</li>
 {% endblock %}
 
 {% block top-bar %}
@@ -41,10 +44,12 @@ u
 		{% endif %}
 
 		<div class="od-news-navigator">
-			<span id="news-nav-groups">
+			{% if newer_group or older_group%}
+			<ul id="news-nav-groups">
 				{{ newer_group }}
 				{{ older_group }}
-			</span>
+			</ul>
+			{% endif %}
 			<a href="/feeds/news/{{category}}/" title="Aktualności RSS" id="od-news-rss-icon">
 				<img src="/site_media/images/rss.png" alt="RSS" />
 			</a>

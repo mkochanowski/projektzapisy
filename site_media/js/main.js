@@ -6,28 +6,110 @@ Fereol = new Object();
 
 Fereol.init = function()
 {
-    $('.main-labelledSelect').change(function()
-    {
-        $(this).children('.label').remove();
-    });
+	$('.main-labelledSelect').change(function()
+	{
+		$(this).children('.label').remove();
+	});
+
+	Fereol.initSubsystemTypeSelector();
 };
 
 $(Fereol.init);
 
-function DisableControlDrag(control)
-{
-	if (typeof control != 'object')
-		throw new Exception('disableControlDraggable: zły parametr');
-    $(control).bind('mousedown mousemove', function(e)
-    {
-        if (e && e.preventDefault)
-            e.preventDefault();
-    });
-    $(control).bind('selectstart mousedown', function() { return false; });
-	control.style.MozUserSelect = 'none';
-}
+/*******************************************************************************
+ * Zarządzanie podsystemami.
+ ******************************************************************************/
 
-DisableControlDrag.jQueryCallback = function(index, element)
+/**
+ * Obiekt podsystemu.
+ */
+Fereol.Subsystem = function(name, baseHref)
 {
-    DisableControlDrag(element);
+	this.name = name;
+	this.baseHref = baseHref;
+};
+
+/**
+ * Lista używanych podsystemów
+ */
+Fereol.Subsystems = {
+	ENROLLMENT: new Fereol.Subsystem('System zapisów', '/news/enrollment/'),
+	OFFER: new Fereol.Subsystem('Kształtowanie oferty dydaktycznej', '/news/offer/'),
+	GRADE: new Fereol.Subsystem('Ocena zajęć', '/grade/')
+};
+
+/**
+ * Inicjuje listę wyboru podsystemu.
+ */
+Fereol.initSubsystemTypeSelector = function()
+{
+	var systemTypeBar = $('#main-systemTypeBar').assertOne();
+	var currentSubsystem = Fereol.getCurrentSubsystem();
+	if (!currentSubsystem)
+		return;
+
+	systemTypeBar.empty();
+	var subsystemSelectorButton = $.create('span').
+		text(currentSubsystem.name).
+		appendTo(systemTypeBar);
+
+	var subsystemList = $.create('ul').appendTo(systemTypeBar);
+
+	var currentSubsystemElement = $.create('li', { className: 'current' }).
+		text(currentSubsystem.name).appendTo(subsystemList);
+
+	for (var id in Fereol.Subsystems)
+	{
+		var subsystem = Fereol.Subsystems[id];
+		if (subsystem == currentSubsystem)
+			continue;
+		
+		var subsystemElement = $.create('li').appendTo(subsystemList);
+		$.create('a').text(subsystem.name).attr('href', subsystem.baseHref).
+			appendTo(subsystemElement);
+	}
+
+	Fereol.subsystemSelectorVisible = false;
+
+	subsystemSelectorButton.mouseenter(function()
+	{
+		if (Fereol.subsystemSelectorVisible)
+			return;
+		Fereol.subsystemSelectorVisible = true;
+		subsystemList.css('display', 'block');
+		subsystemSelectorButton.css('display', 'none');
+	});
+
+	subsystemList.mouseleave(function()
+	{
+		if (!Fereol.subsystemSelectorVisible)
+			return;
+		Fereol.subsystemSelectorVisible = false;
+		subsystemList.css('display', 'none');
+		subsystemSelectorButton.css('display', 'block');
+	});
+};
+
+/**
+ * Pobiera identyfikator bieżącego podsystemu.
+ */
+Fereol.getCurrentSubsystem = function()
+{
+	if (typeof Fereol.currentSubsystem != 'undefined')
+		return Fereol.currentSubsystem;
+
+	var currentSystemName = $('#main-systemTypeBar').assertOne().text().trim();
+	var currentSystem = null;
+
+	for (var id in Fereol.Subsystems)
+	{
+		var subsystem = Fereol.Subsystems[id];
+		if (subsystem.name == currentSystemName)
+		{
+			currentSystem = subsystem;
+			break;
+		}
+	}
+
+	return Fereol.currentSubsystem = currentSystem;
 };

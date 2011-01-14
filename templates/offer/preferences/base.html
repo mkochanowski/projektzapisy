@@ -1,20 +1,22 @@
 {% extends "offer/base.html" %}
 
+{% load preferences_extras %}
 
 {% block main-navigation %}
-    <li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
 	<li>Preferencje</li>
 {% endblock %}
 
 {% block scripts %}
-	<script type="text/javascript" src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js"></script>
+	<script src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js" type="text/javascript"></script>
 
-	<script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
-	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
+	<script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
+	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
 
-    <script type="text/javascript" src="/site_media/js/common/subjectTypeFilter.js"></script>
-	<script type="text/javascript" src="/site_media/js/offer/prefs.js"></script>
+	<script src="/site_media/js/common/listFilter.js" type="text/javascript"></script>
+	<script src="/site_media/js/common/listFilter-subjectType.js" type="text/javascript"></script>
+	<script src="/site_media/js/offer/prefs.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block styles %}
@@ -26,24 +28,24 @@
 		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text od-filter" id="od-prefs-q" type="text" name="q" />
-				<input class="reset" id="od-prefs-reset" type="reset" value="X" style="display:none;" />
+				<input class="text filter-phrase" type="text" />
+				<input class="reset filter-phrase-reset" type="reset" value="X" style="display:none;" />
 			</div>
 		</fieldset>
-		<fieldset id="od-prefs-subjtype">
+		<fieldset class="subject-type-filter">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in proposalTypes %}
 				<span class="checkbox">
-                    <input type="checkbox" checked="checked" id="filter-subject-type-{{ type.id }}" {% if type.meta_type %} class="filter-subject-type-meta" {% endif %} value="{{ type.id }}"/>
-                    <input type="hidden" class="group-id" value="{{ type.group.id }}" />
-                    <label for="filter-subject-type-{{ type.id }}">{{ type.name }}</label>
-                </span>
+					<input type="checkbox" checked="checked" id="filter-subject-type-{{ type.id }}" {% if type.meta_type %} class="filter-subject-type-meta" {% endif %} value="{{ type.id }}"/>
+					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
+					<label for="filter-subject-type-{{ type.id }}">{{ type.name }}</label>
+				</span>
 			{% endfor %}
 		</fieldset>
 		<fieldset id="od-prefs-other">
 			<legend><span>Inne</span></legend>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" name="hidden" value="True"/><label for="od-prefs-hidden">Pokaż ukryte przedmioty</label></span>
-            <span class="checkbox"><input type="checkbox" id="od-prefs-only-new" disabled="disabled" /><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" /><label for="od-prefs-hidden">Pokaż ukryte przedmioty</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-prefs-only-new" /><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -54,35 +56,74 @@
 		<div id="main-sidebar">
 			<h2>Przedmioty bez ustalonych preferencji</h2>
 			<ul id="od-prefs-undecided">
-                {% for prop in unset_offer %}
-                    <li>
-                        <input type="hidden" class="initURL" value="{% url prefs-init-pref prop.id %}" />
-                        {{ prop.name }}
-                    </li>
-                {% endfor %}
+				{% for prop in unset_offer %}
+					<li>
+						<input type="hidden" class="initURL" value="{% url prefs-init-pref prop.id %}" />
+						{{ prop.name }}
+					</li>
+				{% endfor %}
 			</ul>
 		</div>
 	{% endif %}
 {% endblock %}
 
-{% block comment %} TODO: do usunięcia (wraz z linkami)
-    <p id="od-prefs-viewmode-selection">Widok:
-        <a href="{% url prefs-list-view %}">listy</a>
-        <a href="{% url prefs-tree-view %}">drzewa</a>
-    </p>
-{% endblock %}
-
 {% block content %}
-    {% if not prefs %}
-        <p class="main-message" id="od-prefs-emptyMessage">Jeszcze nie ustaliłeś preferencji dla żadnego przedmiotu. Możesz to
-            zrobić, dodając je z menu po prawej.</p>
-    {% endif %}
-    <form action="{% url prefs-save-all %}" method="post" id="od-prefs-form" {% if not prefs %} style="display:none" {% endif %}>
-        <h2>Przedmioty z ustalonymi preferencjami</h2>
+	{% if not prefs %}
+		<p class="main-message" id="od-prefs-emptyMessage">Jeszcze nie ustaliłeś preferencji dla żadnego przedmiotu. Możesz to
+			zrobić, dodając je z menu po prawej.</p>
+	{% endif %}
+	<form action="{% url prefs-save-all %}" method="post" id="od-prefs-form" {% if not prefs %} style="display:none" {% endif %}>
+		<h2>Przedmioty z ustalonymi preferencjami</h2>
 
-        {% block pref-list %}
-        {% endblock %}
+		<ul id="od-prefs-list">
+			{% for pref in prefs %}
+				<li {% if pref.hidden %}class="hidden"{% endif %}>
+					<span class="name">{{pref.name}}</span>
 
-        <p id="od-prefs-submitBar"><input type="submit" value="Zapisz" /></p>
-    </form>
+					<input type="hidden" class="pref-id" value="{{ pref.id }}" />
+					<input type="hidden" class="pref-type" value="{% for type in pref.desc.types %}{{ type.lecture_type.id }} {% endfor %}" />
+					<input type="hidden" class="pref-hide-url" value="{% url prefs-hide pref.id %}" />
+					<input type="hidden" class="pref-unhide-url" value="{% url prefs-unhide pref.id %}" />
+					<input type="hidden" class="pref-is-new" value="{% if pref.is_new %}1{% else %}0{% endif %}" />
+
+					<ul>
+						{% ifnotequal pref.desc.lectures 0 %}
+						<li>
+							Wykład:
+							<select name="lecture-{{ pref.id }}" class="lecture">
+								{% prefs_form_options selected pref.lecture %}
+							</select>
+						</li>
+						{% endifnotequal %}
+						{% ifnotequal pref.desc.repetitories 0 %}
+						<li>
+							Repetytorium:
+							<select name="review-lecture-{{ pref.id }}" class="review-lecture">
+								{% prefs_form_options selected pref.review_lecture %}
+							</select>
+						</li>
+						{% endifnotequal %}
+						{% ifnotequal pref.desc.exercises 0 %}
+						<li>
+							Ćwiczenia:
+							<select name="tutorial-{{ pref.id }}" class="tutorial">
+								{% prefs_form_options selected pref.tutorial %}
+							</select>
+						</li>
+						{% endifnotequal %}
+						{% ifnotequal pref.desc.laboratories 0 %}
+						<li>
+							Pracownia:
+							<select name="lab-{{ pref.id }}" class="lab">
+								{% prefs_form_options selected pref.lab %}
+							</select>
+						</li>
+						{% endifnotequal %}
+					</ul>
+				</li>
+			{% endfor %}
+		</ul>
+
+		<p id="od-prefs-submitBar"><input type="submit" value="Zapisz" /></p>
+	</form>
 {% endblock %}

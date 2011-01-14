@@ -1,4 +1,4 @@
-{% extends "enrollment/base-enrollment.html" %}
+{% extends "enrollment/base.html" %}
  
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="/site_media/css/jquery/jquery.ui.schedule.css" />
@@ -11,19 +11,13 @@
     <script type="text/javascript" src="/site_media/js/jquery/jquery.ui.schedule.js"></script>
     <script type="text/javascript" src="/site_media/js/enrollment/records/schedule-prototype.js"></script>
     <script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
-	<script type="text/javascript" src="/site_media/js/enrollment/subjects/subjects-list-ajax.js" ></script>
+	<script type="text/javascript" src="/site_media/js/enrollment/subjects-list-ajax.js" ></script>
 {% endblock %}
  
 {% block main-navigation %}
-<li>
-    <a href="{% url main-page %}">Strona Główna</a>
-</li>
-<li>
-    <a href="{% url latest_news 'enrollment' %}">Zapisy</a>
-</li>
-<li>
-    <a href="{% url schedule-prototype %}">Prototyp Planu</a>
-</li>
+<li><a href="{% url main-page %}">Strona główna</a></li>
+<li><a href="{% url latest_news 'enrollment' %}">Zapisy</a></li>
+<li>Prototyp planu</li>
 {% endblock %}
 
 {% block top-bar %}
@@ -34,12 +28,12 @@
 		<fieldset id="od-prefs-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text od-filter" id="keyword" type="text" name="keyword" />
+				<input class="text" id="keyword" type="text" name="keyword" />
 				<input class="reset" type="reset" value="X" style="display:block;" />
 			</div>
 		</fieldset>
 		
-		<fieldset id="od-prefs-subjtype">
+		<fieldset class="subject-type-filter">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for key, name in types_list %}
 				<span class="checkbox"><input class='type-list' type="checkbox" value="{{ key }}" checked /><label>{{ name }}</label></span>
@@ -54,7 +48,7 @@
 	                {% endfor %}
 	            </select>
 				</span><br />
-				<span class='checkbox'><input type='checkbox' disabled />Schowaj przedmioty na ktore bylem zapisany</span>
+				<span class='checkbox'><input type='checkbox' disabled />Schowaj przedmioty, na które byłem zapisany</span>
 		    </div>
 		</fieldset>
 	</div>
@@ -86,7 +80,7 @@
         {% endfor %}
     </div>
     <div class="schedule-buttons-wrapper">
-        <input id="btnAssignToAll" type="button" value="Zapisz mnie na przypiete przedmioty">
+        <input id="btnAssignToAll" type="button" value="Zapisz mnie na przypięte przedmioty">
     </div>
 {% endblock %}
  

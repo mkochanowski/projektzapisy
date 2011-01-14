@@ -2,27 +2,20 @@
 
 {% load news_extras %}
 
+{% block main-subsystemname %}
+	Kształtowanie oferty dydaktycznej
+{% endblock %}
+
 {% block main-menu %}
 	<li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li>
 	{% if user.student %}
-        <li><a href="{% url vote-main %}">Głosowanie</a></li>
-    {% endif %}
-    {% if user.employee %}
-        <li><a href="{% url prefs-default-view %}">Preferencje</a></li>
+		<li><a href="{% url vote-main %}">Głosowanie</a></li>
 	{% endif %}
-    <li><a href="{% url proposal-list %}">Propozycje</a></li>
-    {% if perms.can_create_offer %}
-    <li><a href="{% url proposal-offer-create %}">Oferta dydaktyczna</a></li>
-    {% endif %}
-	<li style="display: none"><a>więcej</a></li>
-	{% if user.is_authenticated %}
-	<li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
-        {% if user.student %}
-            ({{user.student.matricula}})
-        {% endif %}
-         </li>
-	<li><a href="{% url user-logout %}">(wyloguj)</a></li>
-	{% else %}
-	<li><a href="{% url user-login %}">Zaloguj</a></li>
+	{% if user.employee %}
+		<li><a href="{% url prefs-default-view %}">Preferencje</a></li>
+	{% endif %}
+	<li><a href="{% url proposal-list %}">Propozycje</a></li>
+	{% if perms.can_create_offer %}
+		<li><a href="{% url proposal-offer-create %}">Wybór oferty</a></li>
 	{% endif %}
 {% endblock %}

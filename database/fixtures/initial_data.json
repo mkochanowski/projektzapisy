@@ -2291,49 +2291,108 @@
         "pk": 1, 
         "model": "subjects.type", 
         "fields": {
-            "name": "obowi\u0105zkowy.O1"
+            "meta_type": false, 
+            "group": 8, 
+            "name": "Obowi\u0105zkowy 1"
         }
     }, 
     {
         "pk": 2, 
         "model": "subjects.type", 
         "fields": {
-            "name": "obowi\u0105zkowy.O2"
+            "meta_type": false, 
+            "group": 8, 
+            "name": "Obowi\u0105zkowy 2"
         }
     }, 
     {
         "pk": 3, 
         "model": "subjects.type", 
         "fields": {
-            "name": "obowi\u0105zkowy.O3"
+            "meta_type": false, 
+            "group": 8, 
+            "name": "Obowi\u0105zkowy 3"
         }
     }, 
     {
         "pk": 4, 
         "model": "subjects.type", 
         "fields": {
-            "name": "informatyczny.I1"
+            "meta_type": false, 
+            "group": 9, 
+            "name": "Informatyczny 1"
         }
     }, 
     {
         "pk": 5, 
         "model": "subjects.type", 
         "fields": {
-            "name": "informatyczny.I2"
+            "meta_type": false, 
+            "group": 9, 
+            "name": "Informatyczny 2"
         }
     }, 
     {
         "pk": 6, 
         "model": "subjects.type", 
         "fields": {
-            "name": "kurs"
+            "meta_type": false, 
+            "group": 10, 
+            "name": "Kurs"
         }
     }, 
     {
         "pk": 7, 
         "model": "subjects.type", 
         "fields": {
-            "name": "seminarium"
+            "meta_type": false, 
+            "group": null, 
+            "name": "Seminarium"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "subjects.type", 
+        "fields": {
+            "meta_type": true, 
+            "group": null, 
+            "name": "Obowi\u0105zkowy"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "subjects.type", 
+        "fields": {
+            "meta_type": true, 
+            "group": null, 
+            "name": "Informatyczny"
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "subjects.type", 
+        "fields": {
+            "meta_type": true, 
+            "group": null, 
+            "name": "Kurs"
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "subjects.type", 
+        "fields": {
+            "meta_type": false, 
+            "group": 10, 
+            "name": "Projekt"
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "subjects.type", 
+        "fields": {
+            "meta_type": false, 
+            "group": null, 
+            "name": "Nieinformatyczny"
         }
     }, 
     {

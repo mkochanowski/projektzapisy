@@ -9,31 +9,34 @@
 {% block scripts %}
 	<script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
 	<script type="text/javascript" src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js"></script>
-	
+
 	<script type="text/javascript" src="/site_media/js/components/sidebar.js"></script>
 
 	<script type="text/javascript" src="/site_media/js/offer/proposal/history.js"></script>
-	
+
 	{% include "common/tinymce.html" %}
 
-    {% block proposal-scripts %}
-    {% endblock %}
+	{% block proposal-scripts %}
+	{% endblock %}
 {% endblock %}
 
 {% block main-navigation %}
-    <li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
-	<li><a href="{% url proposal-list %}">Propozycje</a></li>
-	{% if proposal %}
-		{% if proposal.pk %}
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	{% if proposal and proposal.pk %}
+		<li><a href="{% url proposal-list %}">Propozycje</a></li>
+		{% if editMode %}
 			<li><a href="{% url proposal-page slug=proposal.slug %}">{{proposal.name}}</a></li>
-			{% if editMode %}
-				<li>Edycja</li>
-			{% endif %}
+			<li>Edycja</li>
 		{% else %}
-			{% if editForm %}
-				<li>Dodaj nową</li>
-			{% endif %}
+			<li>{{proposal.name}}</li>
+		{% endif %}
+	{% else %}
+		{% if editForm %}
+			<li><a href="{% url proposal-list %}">Propozycje</a></li>
+			<li>Dodaj nową</li>
+		{% else %}
+			<li>Propozycje</li>
 		{% endif %}
 	{% endif %}
 {% endblock %}
@@ -52,9 +55,9 @@
 		<a href="/proposal/add/" id="od-proposal-addlink">Dodaj przedmiot</a>
 	</div>
 	<div id="od-proposal-contents">
-        {% block proposal-content %}
-            <p id="od-proposal-mainMessage">Wybierz przedmiot z menu po lewej lub dodaj nowy.</p>
-        {% endblock %}
+		{% block proposal-content %}
+			<p id="od-proposal-mainMessage">Wybierz przedmiot z menu po lewej lub dodaj nowy.</p>
+		{% endblock %}
 		<div style="clear: left"></div>
 	</div>
 {% endblock %}

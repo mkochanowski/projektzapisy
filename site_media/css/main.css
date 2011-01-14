@@ -16,6 +16,83 @@
 	border-radius: 4px;
 }
 
+/*** PASEK LOGOWANIA I NAZWY PODSYSTEMU ***/
+#main-topContainer
+{
+	width: 996px; /* 1000px - 2 * 2px */
+	margin: auto;
+	padding-top: 7px;
+
+	color: #666666;
+	font-size: 12px;
+}
+
+#main-topContainer #main-systemTypeBar
+{
+	position: relative;
+	float: left;
+	font-weight: bold;
+}
+
+#main-topContainer #main-signinBar
+{
+	text-align: right;
+}
+
+#main-systemTypeBar span
+{
+	background: url('/site_media/images/main-system-selector-arrow.png') no-repeat right;
+	padding-right: 13px;
+}
+
+#main-systemTypeBar ul
+{
+	position: absolute;
+	left: -6px;
+	top: -3px;
+	width: 220px;
+	z-index: 1000;
+
+	list-style: none;
+	
+	display: none;
+	opacity: .95;
+
+	padding: 0;
+	padding-bottom: 5px;
+	background: #f8f8f8;
+	border: 1px solid #cccccc;
+
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+
+	-moz-box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
+	-webkit-box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
+	box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
+}
+
+#main-systemTypeBar ul li.current
+{
+	padding: 2px 5px;
+
+	color: black;
+
+	border-bottom: 1px solid #cccccc;
+	margin-bottom: 5px;
+	cursor: default;
+}
+
+#main-systemTypeBar ul li a
+{
+	display: block;
+	padding: 2px 5px;
+
+	color: black;
+}
+
+/*** PASEK LOGOWANIA I NAZWY PODSYSTEMU - koniec ***/
+
 /*** NAGŁÓWEK ***/
 
 #main-header
@@ -67,9 +144,9 @@
 
 #main-header li:before
 {
-    content: '| ';
-    padding: 10px;
-    font-size: 16px;
+	content: '| ';
+	padding: 10px;
+	font-size: 16px;
 	color: #cccccc;
 }
 
@@ -172,7 +249,9 @@
 #main-sidebar
 {
 	position: relative;
-	width: 250px;
+	width: 245px;
+	padding-bottom: 20px;
+	padding-right: 5px;
 }
 
 #main-content-container.sidebar-visible.sidebar-right,
@@ -296,10 +375,10 @@ a.main-sidebar-toggle-button:hover
 /*** KOMUNIKATY ***/
 
 .message { /* TODO: zastąpić main-message */
-    text-align: center;
-    font-weight: bold;
-    color: red;
-    margin: 10px 0px;    
+	text-align: center;
+	font-weight: bold;
+	color: red;
+	margin: 10px 0px;
 }
 
 /*** KOMUNIKATY - koniec ***/
@@ -328,8 +407,8 @@ a.main-sidebar-toggle-button:hover
 
 	padding-top: 20px;
 
-    padding-bottom: 110px;
-    margin-bottom: -100px;
+	padding-bottom: 110px;
+	margin-bottom: -100px;
 }
 
 .main-top-bar fieldset:last-child
@@ -358,9 +437,22 @@ a.main-sidebar-toggle-button:hover
 	float: left;
 }
 
+.main-top-bar .selectbox
+{
+	overflow: hidden;
+	height: 100%;
+}
+
 /*** PANEL FILTROWANIA - koniec ***/
 
 /*** PANEL FILTROWANIA - KOMPONENTY ***/
+
+.main-top-bar fieldset .main-filter-input
+{ /* Przy podziale na sekcje (fieldset) panel jest trochę wyższy, więc pole
+   * filtra powinno być trochę niżej.
+   */
+	margin-top: 7px;
+}
 
 .main-filter-input .text
 {
@@ -369,7 +461,7 @@ a.main-sidebar-toggle-button:hover
 	float: left;
 	padding-left: 20px;
 	background: white url('/site_media/images/search-ico.png') no-repeat 3px 4px;
-    padding: 1px 4px 1px 20px;
+	padding: 1px 4px 1px 20px;
 
 	-moz-border-radius: 4px 0 0 4px;
 	-webkit-border-radius: 4px 0 0 4px;
@@ -434,19 +526,30 @@ a.main-sidebar-toggle-button:hover
 
 /*** KOMUNIKAT ***/
 
-.main-message
+.main-message, .main-side-message
 {
-    border: 1px solid #cccccc;
-    background: #FFF5B3;
-    font-size: 16px;
-
-    margin: 10px;
-    margin-bottom: 35px;
-    padding: 20px 40px;
+	border: 1px solid #cccccc;
+	background: #FFF5B3;
+	font-size: 16px;
 
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
+}
+
+.main-message
+{
+	margin: 10px;
+	margin-bottom: 35px;
+	padding: 20px 40px;
+}
+
+/* komunikaty w sidebarze */
+.main-side-message
+{
+	margin: 5px;
+	margin-bottom: 10px;
+	padding: 10px 20px;
 }
 
 /*** KOMUNIKAT - koniec ***/
@@ -456,17 +559,17 @@ a.main-sidebar-toggle-button:hover
 
 input[type=text], input[type=password], textarea
 {
-    border: 1px solid #cccccc;
-    background: white;
+	border: 1px solid #cccccc;
+	background: white;
 
-    -moz-border-radius: 4px;
+	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 }
 
 input[type=text], input[type=password]
 {
-    padding: 2px 4px;
+	padding: 2px 4px;
 }
 
 input[type=text]:focus, input[type=password]:focus, textarea:focus
@@ -480,25 +583,35 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus
 
 input[type=checkbox].partialCheck
 {
-    opacity: 0.6;
+	opacity: 0.3;
 }
 
 input.bigButton
 {
-    padding: 5px 20px;
+	padding: 5px 20px;
 }
 
 .mcePlaceHolder
 {
-    display: inline-block !important;
+	display: inline-block !important;
 }
 
 .filter-subject-type-metaSwitch
 {
-    float: right;
-    clear: left;
-    font-size: 10px;
-    margin-bottom: -6px;
+	float: right;
+	clear: left;
+	font-size: 10px;
+	margin-bottom: -6px;
+}
+
+.subject-type-filter
+{
+	width: 300px;
+}
+
+.subject-type-filter > span
+{
+	min-width: 150px;
 }
 
 /*** KOMPONENTY - koniec ***/

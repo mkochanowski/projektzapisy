@@ -4,6 +4,8 @@
     Proposal of subject
 """
 
+from datetime import datetime
+
 from django.db                  import models
 from django.contrib.auth.models import User
 
@@ -49,6 +51,19 @@ class Proposal( models.Model ):
             return self.descriptions.filter(deleted=False).order_by('-date')[0]
         else:
             return None            
+
+    def entry_date(self):
+        """
+            Get date of first "description" - when this proposal was entered.
+        """
+        return self.descriptions.filter(deleted=False).order_by('date').values('date')[0]['date']
+
+    def is_new(self):
+        """
+            Is true, when proposal is newer than half of year.
+        """
+        diff = (datetime.now() - self.entry_date())
+        return diff.days < 30 * 6
 
     def is_in_group(self, user, group):
         """

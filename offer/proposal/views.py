@@ -64,7 +64,7 @@ def proposals(request):
     """
         Proposal list
     """
-    proposals_ = Proposal.objects.filter(deleted=False)
+    proposals_ = Proposal.objects.filter(deleted=False).order_by('name')
     return render_to_response( 'offer/proposal/base.html',
         {
             'proposals' : proposals_,
@@ -88,7 +88,7 @@ def proposal( request, slug, descid = None ):
     can_edit = (proposal_.owner == None 
                or request.user.is_staff
                or request.user == proposal_.owner)
-    proposals_ = Proposal.objects.filter(deleted=False)
+    proposals_ = Proposal.objects.filter(deleted=False).order_by('name')
     data = {
             'proposal'      : proposal_,
             'mode'          : 'details',            

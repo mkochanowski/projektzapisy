@@ -24,13 +24,11 @@ import logging
 logger = logging.getLogger()
 
 @employee_required
-def view(request, template):
+def view(request):
     """
-        Employee preferences' view renderend using the given template.
-        Base view for tree_view and list_view. Do not use directly.
+        Employee preferences' view.
         
         Optional GET args:
-        * format={json,html}
         * hidden={True,False}
         * types=<comma-separated course types list> (ex. =cs_1,seminar)
         * query=<filter>
@@ -42,7 +40,7 @@ def view(request, template):
     employee = request.user.employee
     if types:
         types = types.split(',')
-    prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query)
+    prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query).order_by('proposal__name')
     data = {
 		'prefs': prefs,
 		'proposalTypes': Types.objects.all(),
@@ -54,6 +52,7 @@ def view(request, template):
         obj = {}
         obj['name']           = pref.proposal.name
         obj['id']             = pref.id
+        obj['is_new']         = pref.proposal.is_new()
         obj['lecture']        = pref.lecture
         obj['review_lecture'] = pref.review_lecture
         obj['tutorial'] = pref.tutorial
@@ -62,64 +61,15 @@ def view(request, template):
         obj['desc']     = pref.proposal.description()
         return obj
     data['prefs'] = map(process_pref, data['prefs'])
-    if format == 'json':
-        return HttpResponse(simplejson.dumps(data))
-    if format == 'html':
-        return render_to_response_wo_extends(
-            template,
-            data,
-            RequestContext(request))
     unset = get_employees_unset(employee)
     data['unset_offer'] = unset
     return render_to_response(
-        template,
+        'offer/preferences/base.html',
         data,
         context_instance = RequestContext(request))
 
-# TODO: czy ten widok jest wykorzystywany
-@employee_required
-def undecided_list(request):
-    """
-        Return json with list of unset preferences
-    """
-
-    employee = request.user.employee
-    unset = get_employees_unset(employee)
-    def process_proposal(prop):
-        """
-            Process proposal
-        """
-        obj = {}
-        obj['id']   = prop.id
-        obj['name'] = prop.name
-        obj['hideUrl']  = reverse('prefs-hide', args = [ prop.id ] )
-        obj['showUrl']  = reverse('prefs-unhide', args = [ prop.id ] )
-        obj['url']      = reverse('prefs-init-pref', args = [ prop.id ] )
-        obj['type']     = prop.type
-        # obj['tags'] ?
-        return obj
-    unset = map(process_proposal, unset)
-    data = {
-        'unset': unset
-    }
-    return HttpResponse(simplejson.dumps(data))
-
-@employee_required
-def tree_view(request):
-    """
-        Preferences as tree
-    """
-    return view(request, 'offer/preferences/view_tree.html')
-
-# TODO: ten widok będzie prawdopodobnie zbędny
-@employee_required
-def list_view(request):
-    """
-        Preferences as list
-    """
-    return view(request, 'offer/preferences/view_list.html')
-
-# TODO: czy ten widok jest wykorzystywany
+# TODO: ten widok w tej chwili nie jest wykorzystywany, ale ma/miał być do
+#       wyświetlania szczegółów przedmiotu w preferencjach przedmiotów
 @employee_required
 def description(request, proposal_id):
     """
@@ -182,29 +132,6 @@ def unhide(request, pref_id):
     return HttpResponse(simplejson.dumps(data))
 
 @employee_required
-def set_pref(request, pref_id):
-    """
-    Sets preferences.
-
-    Preferences to change are passed via POST, e.g.
-      lecture=2&tutorial=0.
-    """
-    try:
-        if request.method == 'POST':
-            pref = Preference.objects.get(pk=pref_id)
-            pref.set_preference( lecture=int(request.POST['lecture']), 
-                                 tutorial=int(request.POST['tutorial']), 
-                                 review_lecture=int(request.POST['review_lecture']), 
-                                 lab = int(request.POST['lab']))
-            data = {'Success': "OK"}
-        else:
-            data = {'Failure': 'Use POST'}
-    except (Preference.DoesNotExist, UnknownPreferenceValue):
-        logger.error('Zaznaczenie preferencji - nie znaleziono preferencji o id = %s.' % str(pref_id) )
-        data = {'Failure': 'Preference does not exist'}
-    return HttpResponse(simplejson.dumps(data))
-
-@employee_required
 def save_all_prefs(request):
     """ Saves all preferences. """
     if request.method == 'POST':
@@ -249,6 +176,7 @@ def init_pref(request, prop_id):
                 'Success': 'OK',
                 'name': course.name,
                 'id': course.id,
+                'is_new': course.is_new(),
                 'types': types,
                 'hideurl': reverse('prefs-hide', args = [ course.id ] ),
                 'unhideurl': reverse('prefs-unhide', args = [ course.id ] ),

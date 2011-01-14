@@ -24,7 +24,7 @@ def ajaxPin(request):
         group_id = int(request.POST["GroupId"])
         record = Record.pin_student_to_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś przypiety do grupy."
+        data['Success']['Message'] = "Zostałeś przypięty do grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -46,7 +46,7 @@ def ajaxUnpin(request):
         group_id = int(request.POST["GroupId"])
         record = Record.unpin_student_from_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś wypienty z grupy."
+        data['Success']['Message'] = "Zostałeś wypięty z grupy."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -92,7 +92,7 @@ def ajaxAssign(request):
     except RecordsNotOpenException:
         data['Exception'] = {}
         data['Exception']['Code'] = "RecordsNotOpen"
-        data['Exception']['Message'] = "Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte."
+        data['Exception']['Message'] = "Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte."
     return HttpResponse(simplejson.dumps(data))
 
 @login_required
@@ -172,8 +172,83 @@ def assign(request, group_id):
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa jest pełna.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
-        request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
+        request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+@login_required
+def queue_assign(request, group_id):
+    try:
+        if Group.objects.get(id=group_id).subject.is_recording_open_for_student(request.user.student):
+            queue = Queue.add_student_to_queue(request.user.id, group_id)
+            request.user.message_set.create(message="Zostałeś zapisany do kolejki.")
+        else:
+            request.user.message_set.create(message="Nie możesz zapisać się do kolejki, bo nie masz otwartych zapisów.")
+        return redirect("subject-page", slug=queue.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except RecordsNotOpenException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+
+
+@login_required
+def queue_inc_priority(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+        queue = Queue.objects.get(student=request.user.student, group=group)
+        if queue.priority < 10 :
+            queue.change_priority(1)
+        else:
+            request.user.message_set.create(message="Nie można zwiększyć priorytetu.")
+        return redirect("subject-page", slug=queue.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except RecordsNotOpenException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+@login_required
+def queue_dec_priority(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+        queue = Queue.objects.get(student=request.user.student, group=group)
+        if queue.priority > 1 :
+            queue.change_priority(-1)
+        else:
+            request.user.message_set.create(message="Nie można zmniejszyć priorytetu.")
+        return redirect("subject-page", slug=queue.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except AlreadyAssignedException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except RecordsNotOpenException:
+        request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+
+
+
+
 
 @login_required
 def change(request, old_id, new_id):
@@ -194,7 +269,7 @@ def change(request, old_id, new_id):
         request.user.message_set.create(message="Nie możesz się przenieść, bo podana grupa jest pełna.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
-        request.user.message_set.create(message="Nie możesz się przenieść, bo zapisy na ten przedmiot nie sa dla ciebie otwarte.")
+        request.user.message_set.create(message="Nie możesz się przenieść, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @login_required
@@ -213,14 +288,29 @@ def resign(request, group_id):
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+@login_required
+def queue_resign(request, group_id):
+    try:
+        record = Queue.remove_student_from_queue(request.user.id, group_id)
+        request.user.message_set.create(message="Zostałeś wypisany z kolejki.")
+        return redirect("subject-page", slug=record.group_slug())
+    except NonStudentException:
+        request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except NonGroupException:
+        request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
 def records(request, group_id):
     try:
         group = Group.objects.get(id=group_id)
         students_in_group = Record.get_students_in_group(group_id)
+        students_in_queue = Queue.get_students_in_queue(group_id)
         all_students = Student.objects.all()
         data = {
             'all_students' : all_students,
             'students_in_group' : students_in_group,
+            'students_in_queue' : students_in_queue,
             'group' : group,
         }
         return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
@@ -231,7 +321,7 @@ def records(request, group_id):
 @login_required
 def own(request):
     try:
-        groups = Record.get_student_all_detiled_enrollings(request.user.id)
+        groups = Record.get_student_all_detailed_enrollings(request.user.id)
         data = {
             'groups': groups,
         }
@@ -243,7 +333,7 @@ def own(request):
 @login_required       
 def schedulePrototype(request):
     try:
-        student_records = Record.get_student_all_detiled_records(request.user.id)
+        student_records = Record.get_student_all_detailed_records(request.user.id)
         #subjects = Subject.visible.select_related().all()
         #for sub in subjects:
         #    sub.lecturers = ''
@@ -273,9 +363,4 @@ def schedulePrototype(request):
         return render_to_response('enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-        
-    
-    
-    
-    
+        return render_to_response('common/error.html', context_instance=RequestContext(request))   

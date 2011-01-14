@@ -12,43 +12,43 @@
 
 {% block content-class %}narrow{% endblock %}
 {% block content %}
-    <div id="od-vote-view">
-        <h2>Podsumowanie głosowania</h2>
-        {% if winter_votes or summer_votes or unknown_votes %}
-            <ul>
-                {% if winter_votes %}
-                    <li><span>Semestr zimowy</span>
-                        <ul>
-                            {% for vote in winter_votes %}
-                                <li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
+	<div id="od-vote-view">
+		<h2>Podsumowanie głosowania</h2>
+		{% if winter_votes or summer_votes or unknown_votes %}
+			<ul>
+				{% if winter_votes %}
+					<li><span>Semestr zimowy</span>
+						<ul>
+							{% for vote in winter_votes %}
+								<li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+							{% endfor %}
+						</ul>
+					</li>
+				{% endif %}
 
-                {% if summer_votes %}
-                    <li><span>Semestr letni</span>
-                        <ul>
-                            {% for vote in summer_votes %}
-                                <li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
+				{% if summer_votes %}
+					<li><span>Semestr letni</span>
+						<ul>
+							{% for vote in summer_votes %}
+								<li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+							{% endfor %}
+						</ul>
+					</li>
+				{% endif %}
 
-                {% if unknown_votes %}
-                    <li><span>Semestr nieokreślony</span>
-                        <ul>
-                            {% for vote in unknown_votes %}
-                                <li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endif %}
-            </ul>
-        {% else %}
-            <p class="emptyList">Nie zagłosowałeś jeszcze na żaden przedmiot.</p>
-        {% endif %}
-        <p class="sum">Suma: {{ vote_sum }}</p>
-    </div>
+				{% if unknown_votes %}
+					<li><span>Semestr nieokreślony</span>
+						<ul>
+							{% for vote in unknown_votes %}
+								<li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+							{% endfor %}
+						</ul>
+					</li>
+				{% endif %}
+			</ul>
+		{% else %}
+			<p class="emptyList">Nie zagłosowałeś jeszcze na żaden przedmiot.</p>
+		{% endif %}
+		<p class="sum">Suma: {{ vote_sum }}</p>
+	</div>
 {% endblock %}

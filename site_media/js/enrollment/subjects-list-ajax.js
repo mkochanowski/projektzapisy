@@ -1,3 +1,10 @@
+/**
+ * Kod odpowiedzialny za listę przedmiotów w prototypie planu.
+ *
+ * TODO: trzeba się pozbyć całego tego pliku - po przepisaniu frontendu
+ * prototypu planu.
+ */
+
 $(document).ready(function(){  // add listeners to events and invoke ajax function after first loading 
 	var ajaxUrl = $('#ajaxUrl').val();
 

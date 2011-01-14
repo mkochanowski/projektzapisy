@@ -18,7 +18,7 @@ class SubjectsInOfferNode(Node):
         self.varname = varname
     
     def render(self, context):
-        context[self.varname] = Proposal.get_by_tag("offer")
+        context[self.varname] = Proposal.get_by_tag("offer").order_by('name')
         return ''
 
 @register.tag

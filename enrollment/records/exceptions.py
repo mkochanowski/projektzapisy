@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class NonStudentException(Exception):
     """is thrown when student does not exists"""
     pass
@@ -36,4 +37,8 @@ class RecordsNotOpenException(Exception):
 
 class AdminActionException(Exception):
     """is thrown when normal user tries to call forbidden action """
+    pass
+
+class AlreadyQueuedException(Exception):
+    """is thrown when user tries to queue for the same group twice """
     pass

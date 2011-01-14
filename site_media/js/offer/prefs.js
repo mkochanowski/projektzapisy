@@ -1,6 +1,8 @@
 /**
  * Funkcje i klasy odpowiedzialne za preferencje pracowników na temat
  * przedmiotów z oferty dydaktycznej.
+ *
+ * @author Tomasz Wasilczyk (www.wasilczyk.pl)
  */
 
 Prefs = Object();
@@ -10,94 +12,76 @@ Prefs = Object();
  */
 Prefs.init = function()
 {
-    var i;
+	var i;
 
-    $('#od-prefs-top-bar')[0].style.display = 'block';
+	var prefsList = $('#od-prefs-list');
+	Prefs.prefsList = prefsList.getDOM();
 
-    var prefsList = $('#od-prefs-list');
-    Prefs.prefsList = prefsList[0];
+	Prefs.subjects = new Array();
+	var subjectElements = prefsList.children('li');
+	for (i = 0; i < subjectElements.length; i++)
+	{
+		var sub = Prefs.Subject.fromElement(subjectElements[i]);
+		sub.attachControls();
+		sub.setCollapsed(true);
+		Prefs.subjects.push(sub);
+	}
 
-    Prefs.subjects = new Array();
-    var subjectElements = prefsList.children('li');
-    for (i = 0; i < subjectElements.length; i++)
-    {
-        var sub = Prefs.Subject.fromElement(subjectElements[i]);
-        sub.attachControls();
-        sub.setCollapsed(true);
-        Prefs.subjects.push(sub);
-    }
+	// panel rozwiń / zwiń wszystko
+	var viewmodeSelectionBar = document.createElement('p');
+	viewmodeSelectionBar.id = 'od-prefs-viewmode-selection';
+	$('#main-content').prepend(viewmodeSelectionBar);
 
-    Prefs.typeFilterForm = new SubjectTypeFilterForm($('#od-prefs-subjtype')[0]);
+	var uncollapseAll = document.createElement('a');
+	uncollapseAll.appendChild(document.createTextNode('Rozwiń wszystko'));
+	viewmodeSelectionBar.appendChild(uncollapseAll);
+	viewmodeSelectionBar.appendChild(document.createTextNode(' '));
 
-    Prefs.emptyFilterWarning = document.createElement('p');
-    Prefs.emptyFilterWarning.className = 'emptyFilterWarning';
-    Prefs.emptyFilterWarning.style.display = 'none';
-    $(Prefs.emptyFilterWarning).insertAfter(prefsList);
-    Prefs.emptyFilterWarning.appendChild(document.createTextNode(
-        'Do podanego filtra nie pasuje żaden z przedmiotów.'));
+	var collapseAll = document.createElement('a');
+	collapseAll.appendChild(document.createTextNode('Zwiń wszystko'));
+	viewmodeSelectionBar.appendChild(collapseAll);
 
-    // ustawianie początkowego filtra
-    var cookieFilter = Prefs.Filter.deserialize($.cookies.get('prefs-filter'));
-    if (cookieFilter)
-    {
-        Prefs.currentFilter = cookieFilter;
-        cookieFilter.saveFilterToForm();
-    }
-    else
-        Prefs.currentFilter = Prefs.Filter.readFilterFromForm();
-    Prefs.doFilter(Prefs.currentFilter);
-    Prefs.filterThread();
+	var toggleCollapseAll = function(collapse)
+	{
+		for (i = 0; i < Prefs.subjects.length; i++)
+			Prefs.subjects[i].setCollapsed(collapse);
+	};
+	$(collapseAll).click(function()
+	{
+		toggleCollapseAll(true);
+	});
+	$(uncollapseAll).click(function()
+	{
+		toggleCollapseAll(false);
+	});
 
-    // panel rozwiń / zwiń wszystko
-    var viewmodeSelectionBar = document.createElement('p');
-    viewmodeSelectionBar.id = 'od-prefs-viewmode-selection';
-    $('#main-content').prepend(viewmodeSelectionBar);
+	// nie ustalone preferencje
 
-    var uncollapseAll = document.createElement('a');
-    uncollapseAll.appendChild(document.createTextNode('Rozwiń wszystko'));
-    viewmodeSelectionBar.appendChild(uncollapseAll);
-    viewmodeSelectionBar.appendChild(document.createTextNode(' '));
+	var undecidedList = $('#od-prefs-undecided');
+	Prefs.undecidedList = undecidedList;
 
-    var collapseAll = document.createElement('a');
-    collapseAll.appendChild(document.createTextNode('Zwiń wszystko'));
-    viewmodeSelectionBar.appendChild(collapseAll);
+	var undecidedElements = undecidedList.children('li');
+	for (i = 0; i < undecidedElements.length; i++)
+	{
+		var und = Prefs.Undecided.fromElement(undecidedElements[i]);
+		und.attachControls();
+	}
 
-    var toggleCollapseAll = function(collapse)
-    {
-        for (i = 0; i < Prefs.subjects.length; i++)
-            Prefs.subjects[i].setCollapsed(collapse);
-    };
-    $(collapseAll).click(function()
-    {
-        toggleCollapseAll(true);
-    });
-    $(uncollapseAll).click(function()
-    {
-        toggleCollapseAll(false);
-    });
+	Prefs.emptyMessage = $('#od-prefs-emptyMessage');
+	if (Prefs.emptyMessage.length)
+		Prefs.emptyMessage = Prefs.emptyMessage.getDOM();
+	else
+		Prefs.emptyMessage = null;
 
-    // nie ustalone preferencje
+	// reszta ustawień
 
-    var undecidedList = $('#od-prefs-undecided');
-    Prefs.undecidedList = undecidedList;
+	$('#od-prefs-top-bar').find('label').disableDragging();
 
-    var undecidedElements = undecidedList.children('li');
-    for (i = 0; i < undecidedElements.length; i++)
-    {
-        var und = Prefs.Undecided.fromElement(undecidedElements[i]);
-        und.attachControls();
-    }
-
-    Prefs.emptyMessage = $('#od-prefs-emptyMessage');
-    if (Prefs.emptyMessage)
-        Prefs.emptyMessage = Prefs.emptyMessage[0];
-    else
-        Prefs.emptyMessage = null;
-
-    $('#od-prefs-top-bar').find('label').each(DisableControlDrag.jQueryCallback);
+	Prefs.initFilter();
 };
 
 $(Prefs.init);
+
 
 /*******************************************************************************
  * Model przedmiotu bez ustalonych preferencji
@@ -105,143 +89,145 @@ $(Prefs.init);
 
 Prefs.Undecided = function()
 {
-    this.initURL = null;
-    this.container = null;
+	this.initURL = null;
+	this.container = null;
 };
 
 Prefs.Undecided.fromElement = function(element)
 {
-    var el = $(element);
+	var el = $(element);
 
-    var und = new Prefs.Undecided();
-    und.initURL = el.children('.initURL').val().trim();
-    und.container = el[0];
+	var und = new Prefs.Undecided();
+	und.initURL = el.children('.initURL').val().trim();
+	und.container = el[0];
 
-    return und;
+	return und;
 };
 
 Prefs.Undecided.prototype.attachControls = function()
 {
-    var thisObj = this;
+	var thisObj = this;
 
-    var initBtn = document.createElement('input');
-    initBtn.type = 'button';
-    initBtn.value = '<';
-    $(initBtn).click(function()
-    {
-        thisObj.init();
-    });
+	var initBtn = document.createElement('input');
+	initBtn.type = 'button';
+	initBtn.value = '<';
+	$(initBtn).click(function()
+	{
+		thisObj.init();
+	});
 
-    $(this.container).prepend(initBtn);
+	$(this.container).prepend(initBtn);
 };
 
 Prefs.Undecided.prototype.init = function()
 {
-    $(this.container).remove();
-    if (Prefs.undecidedList.children('li').length == 0)
-        Sidebar.detach();
+	$(this.container).remove();
+	if (Prefs.undecidedList.children('li').length == 0)
+		Sidebar.detach();
 
-    $.ajax({
-        type: 'post',
-        url: this.initURL,
-        success: function(data)
-        {
-            var i;
+	$.ajax({
+		type: 'post',
+		url: this.initURL,
+		success: function(data)
+		{
+			var i;
 
-            data = $.parseJSON(data);
-            if (data.Success != 'OK')
-                throw Error('Prefs.Undecided.prototype.init: błąd w komunikacji');
+			data = $.parseJSON(data);
+			if (data.Success != 'OK')
+				throw Error('Prefs.Undecided.prototype.init: błąd w komunikacji');
 
-            // workaround dla buga w Chrome i Chromium
-            if (jQuery.browser.webkit)
-            {
-                var prefsForm = $('#od-prefs-form');
-                var prefsFormURL = prefsForm[0].action;
+			// workaround dla buga w Chrome i Chromium
+			if (jQuery.browser.webkit)
+			{
+				var prefsForm = $('#od-prefs-form');
+				var prefsFormURL = prefsForm[0].action;
 
-                $.ajax({
-                    type: 'post',
-                    url: prefsFormURL,
-                    data: prefsForm.serialize(),
-                    dataType: 'html',
-                    success: function()
-                    {
-                        document.location.href = prefsFormURL;
-                    }
-                });
+				$.ajax({
+					type: 'post',
+					url: prefsFormURL,
+					data: prefsForm.serialize(),
+					dataType: 'html',
+					success: function()
+					{
+						document.location.href = prefsFormURL;
+					}
+				});
 
-                return;
-            }
+				return;
+			}
 
-            var sub = new Prefs.Subject();
-            sub.id = data.id;
-            sub.types = data.types;
-            sub.name = data.name;
-            sub.hideURL = data.hideurl;
-            sub.unhideURL = data.unhideurl;
+			var sub = new Prefs.Subject();
+			sub.id = data.id;
+			sub.types = data.types;
+			sub.name = data.name;
+			sub.hideURL = data.hideurl;
+			sub.unhideURL = data.unhideurl;
+			sub.isNew = !!data.is_new;
 
-            sub.container = document.createElement('li');
-            Prefs.prefsList.appendChild(sub.container);
+			sub.container = document.createElement('li');
+			Prefs.prefsList.appendChild(sub.container);
+			Prefs.setEmptyFilterWarningVisible(false);
 
-            var name = document.createElement('span');
-            name.className = 'name';
-            name.appendChild(document.createTextNode(sub.name));
-            sub.container.appendChild(name);
+			var name = document.createElement('span');
+			name.className = 'name';
+			name.appendChild(document.createTextNode(sub.name));
+			sub.container.appendChild(name);
 
-            sub.prefContainer = document.createElement('ul');
-            sub.container.appendChild(sub.prefContainer);
+			sub.prefContainer = document.createElement('ul');
+			sub.container.appendChild(sub.prefContainer);
 
-            var options = new Object();
-            for (i = 0; i < data.prefchoices.length; i++)
-            {
-                var choice = data.prefchoices[i];
-                options[choice[0]] = choice[1];
-            }
+			var options = new Object();
+			for (i = 0; i < data.prefchoices.length; i++)
+			{
+				var choice = data.prefchoices[i];
+				options[choice[0]] = choice[1];
+			}
 
-            var appendSelect = function(label, className)
-            {
-                var li = document.createElement('li');
-                li.appendChild(document.createTextNode(label + ' '));
+			var appendSelect = function(label, className)
+			{
+				var li = document.createElement('li');
+				li.appendChild(document.createTextNode(label + ' '));
 
-                var select = document.createElement('select');
-                select.name = className + '-' + sub.id;
-                select.className = className;
-                li.appendChild(select);
+				var select = document.createElement('select');
+				select.name = className + '-' + sub.id;
+				select.className = className;
+				li.appendChild(select);
 
-                for (var v in options)
-                {
-                    var option = document.createElement('option');
-                    option.value = v;
-                    if (v == 0)
-                        option.selected = true;
-                    option.appendChild(document.createTextNode(options[v]));
-                    select.appendChild(option);
-                }
+				for (var v in options)
+				{
+					var option = document.createElement('option');
+					option.value = v;
+					if (v == 0)
+						option.selected = true;
+					option.appendChild(document.createTextNode(options[v]));
+					select.appendChild(option);
+				}
 
-                sub.prefContainer.appendChild(li);
-            };
+				sub.prefContainer.appendChild(li);
+			};
 
-            if (data.showlectures)
-                appendSelect('Wykład:', 'lecture');
-            if (data.showrepetitories)
-                appendSelect('Repetytorium:', 'review-lecture');
-            if (data.showexercises)
-                appendSelect('Ćwiczenia:', 'tutorial');
-            if (data.showlaboratories)
-                appendSelect('Pracownia:', 'lab');
+			if (data.showlectures)
+				appendSelect('Wykład:', 'lecture');
+			if (data.showrepetitories)
+				appendSelect('Repetytorium:', 'review-lecture');
+			if (data.showexercises)
+				appendSelect('Ćwiczenia:', 'tutorial');
+			if (data.showlaboratories)
+				appendSelect('Pracownia:', 'lab');
 
-            Prefs.subjects.push(sub);
-            sub.attachControls();
-            Prefs.doFilter(Prefs.currentFilter);
+			Prefs.subjects.push(sub);
+			sub.attachControls();
 
-            if (Prefs.emptyMessage)
-            {
-                $(Prefs.emptyMessage).remove();
-                Prefs.emptyMessage = null;
-                $('#od-prefs-form')[0].style.display = 'block';
-            }
-        }
-    });
+			if (Prefs.emptyMessage)
+			{
+				$(Prefs.emptyMessage).remove();
+				Prefs.emptyMessage = null;
+				$('#od-prefs-form')[0].style.display = 'block';
+			}
+		}
+	});
 };
+
 
 /*******************************************************************************
  * Model preferencji przedmiotu
@@ -249,260 +235,191 @@ Prefs.Undecided.prototype.init = function()
 
 Prefs.Subject = function()
 {
-    this.id = null;
-    this.types = new Array();
-    this.name = null;
-    this.collapsed = false;
-    this.hidden = false;
-    this.container = null;
-    this.prefContainer = null;
-    this.hideURL = null;
-    this.unhideURL = null;
+	this.id = null;
+	this.types = new Array();
+	this.name = null;
+	this.collapsed = false;
+	this.hidden = false;
+	this.container = null;
+	this.prefContainer = null;
+	this.hideURL = null;
+	this.unhideURL = null;
+	this.isNew = false;
 };
 
 Prefs.Subject.fromElement = function(element)
 {
-    var el = $(element);
+	var el = $(element);
 
-    var sub = new Prefs.Subject();
-    sub.id = Number(el.children('.pref-id').val());
-    sub.types = el.children('.pref-type').val().trim().split(new RegExp(' +'));
-    sub.name = el.children('.name').text().trim();
-    sub.hideURL = el.children('.pref-hide-url').val().trim();
-    sub.unhideURL = el.children('.pref-unhide-url').val().trim();
-    sub.collapsed = el.hasClass('collapsed');
-    sub.hidden = el.hasClass('hidden');
+	var sub = new Prefs.Subject();
+	sub.id = Number(el.children('.pref-id').val());
+	sub.types = el.children('.pref-type').val().trim().split(new RegExp(' +'));
+	sub.name = el.children('.name').text().trim();
+	sub.hideURL = el.children('.pref-hide-url').val().trim();
+	sub.unhideURL = el.children('.pref-unhide-url').val().trim();
+	sub.collapsed = el.hasClass('collapsed');
+	sub.hidden = el.hasClass('hidden');
+	sub.isNew = !!el.children('.pref-is-new').assertOne().val().castToInt();
 
-    sub.container = el[0];
-    sub.prefContainer = el.children('ul')[0];
+	sub.container = el[0];
+	sub.prefContainer = el.children('ul')[0];
 
-    return sub;
+	return sub;
 };
 
 Prefs.Subject.prototype.attachControls = function()
 {
-    var thisObj = this;
-    var label = $(this.container).children('.name');
+	var thisObj = this;
+	var label = $(this.container).children('.name');
 
-    var collapseBtn = document.createElement('input');
-    collapseBtn.type = 'button';
-    collapseBtn.value = (this.collapsed?'+':'-');
-    collapseBtn.className = 'od-prefs-toggleCollapse';
-    this.collapseBtn = collapseBtn;
-    collapseBtn = $(collapseBtn);
-    collapseBtn.insertBefore(label);
-    collapseBtn.click(function()
-    {
-        thisObj.setCollapsed(!thisObj.collapsed);
-    });
+	var collapseBtn = document.createElement('input');
+	collapseBtn.type = 'button';
+	collapseBtn.value = (this.collapsed?'+':'-');
+	collapseBtn.className = 'od-prefs-toggleCollapse';
+	this.collapseBtn = collapseBtn;
+	collapseBtn = $(collapseBtn);
+	collapseBtn.insertBefore(label);
+	collapseBtn.click(function()
+	{
+		thisObj.setCollapsed(!thisObj.collapsed);
+	});
 
-    var hideBtn = document.createElement('input');
-    hideBtn.type = 'button';
-    hideBtn.value = (this.hidden?'Nie ukrywaj':'Ukryj');
-    hideBtn.className = 'od-prefs-toggleHidden';
-    this.hideBtn = hideBtn;
-    hideBtn = $(hideBtn);
-    hideBtn.insertAfter(label);
-    hideBtn.click(function()
-    {
-        var hidden = !thisObj.hidden;
+	var hideBtn = document.createElement('input');
+	hideBtn.type = 'button';
+	hideBtn.value = (this.hidden?'Nie ukrywaj':'Ukryj');
+	hideBtn.className = 'od-prefs-toggleHidden';
+	this.hideBtn = hideBtn;
+	hideBtn = $(hideBtn);
+	hideBtn.insertAfter(label);
+	hideBtn.click(function()
+	{
+		var hidden = !thisObj.hidden;
 
-        $.ajax({
-            type: 'post',
-            url: (hidden?thisObj.hideURL:thisObj.unhideURL),
-            success: function()
-            {
-                thisObj.hidden = hidden;
-                if (hidden)
-                {
-                    $(thisObj.container).addClass('hidden');
-                    thisObj.hideBtn.value = 'Nie ukrywaj';
-                }
-                else
-                {
-                    $(thisObj.container).removeClass('hidden');
-                    thisObj.hideBtn.value = 'Ukryj';
-                }
-                Prefs.doFilter(Prefs.currentFilter);
-            }
-        });
+		$.ajax({
+			type: 'post',
+			url: (hidden?thisObj.hideURL:thisObj.unhideURL),
+			success: function()
+			{
+				thisObj.hidden = hidden;
+				if (hidden)
+				{
+					$(thisObj.container).addClass('hidden');
+					thisObj.hideBtn.value = 'Nie ukrywaj';
+				}
+				else
+				{
+					$(thisObj.container).removeClass('hidden');
+					thisObj.hideBtn.value = 'Ukryj';
+				}
+				Prefs.subjectFilter.doFilter();
+			}
+		});
 
-    });
+	});
 };
 
 Prefs.Subject.prototype.setCollapsed = function(collapsed)
 {
-    collapsed = !!collapsed;
-    if (collapsed == this.collapsed)
-        return;
-    this.collapsed = collapsed;
+	collapsed = !!collapsed;
+	if (collapsed == this.collapsed)
+		return;
+	this.collapsed = collapsed;
 
-    var cont = $(this.container);
-    if (collapsed)
-    {
-        cont.addClass('collapsed');
-        this.collapseBtn.value = '+';
-    }
-    else
-    {
-        cont.removeClass('collapsed');
-        this.collapseBtn.value = '-';
-    }
+	var cont = $(this.container);
+	if (collapsed)
+	{
+		cont.addClass('collapsed');
+		this.collapseBtn.value = '+';
+	}
+	else
+	{
+		cont.removeClass('collapsed');
+		this.collapseBtn.value = '-';
+	}
 };
+
 
 /*******************************************************************************
  * Filtrowanie
  ******************************************************************************/
 
 /**
- * "Wątek" sprawdza, czy formularz nie zmienił zawartości - jeżeli tak, to
- * aplikuje filtr.
+ * Pokazuje lub ukrywa ostrzeżenie o pustym filtrze.
  */
-Prefs.filterThread = function()
+Prefs.setEmptyFilterWarningVisible = function(visible)
 {
-    var newFilter = Prefs.Filter.readFilterFromForm();
-
-    if (!Prefs.currentFilter.isEqual(newFilter))
-    {
-        Prefs.currentFilter = newFilter;
-        $.cookies.set('prefs-filter', Prefs.currentFilter);
-        Prefs.doFilter(Prefs.currentFilter);
-    }
-
-    setTimeout(Prefs.filterThread, 50);
-};
+	Prefs.emptyFilterWarning.style.display = visible?'block':'none';
+	Prefs.prefsList.style.display = visible?'none':'block';
+}
 
 /**
- * Aplikuje wybrany filtr do listy przedmiotów.
- *
- * @param filter filtr, który chcemy zaaplikować do listy przedmiotów
+ * Inicjuje filtrowanie.
  */
-Prefs.doFilter = function(filter)
+Prefs.initFilter = function()
 {
-    var i;
+	var subjectFilterForm = $('#od-prefs-top-bar').assertOne();
 
-    var anyVisible = false;
+	subjectFilterForm.css('display', 'block');
 
-    for (i = 0; i < Prefs.subjects.length; i++)
-    {
-        var sub = Prefs.subjects[i];
+	subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
+	{
+		subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+	});
 
-        var isVisible = true;
+	// komunikat o pustym filtrze
+	Prefs.emptyFilterWarning = document.createElement('p');
+	Prefs.emptyFilterWarning.className = 'emptyFilterWarning';
+	Prefs.emptyFilterWarning.style.display = 'none';
+	$(Prefs.emptyFilterWarning).insertAfter(Prefs.prefsList);
+	Prefs.emptyFilterWarning.appendChild(document.createTextNode(
+		'Do podanego filtra nie pasuje żaden z przedmiotów.'));
 
-        if (isVisible && !filter.showHidden)
-            if (sub.hidden)
-                isVisible = false;
+	// konfiguracja filtra
 
-        if (isVisible)
-            isVisible = filter.subjectTypes.isAnyEnabled(sub.types);
+	Prefs.subjectFilter = new ListFilter('prefs-subjects', subjectFilterForm.getDOM());
+	Prefs.subjectFilter.afterFilter = function(matchedElementsCount)
+	{
+		Prefs.setEmptyFilterWarningVisible(matchedElementsCount == 0);
+	};
 
-        if (isVisible && filter.phrase != '')
-           isVisible = (sub.name.toLowerCase().indexOf(filter.phrase) >= 0);
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
+		'phrase', '.filter-phrase', function(element, value)
+	{
+		var subject = element.data;
+		return (subject.name.toLowerCase().indexOf(value) >= 0);
+	}));
 
-        sub.container.style.display = isVisible?'block':'none';
-        if (isVisible)
-            anyVisible = true;
-    }
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showHidden', '#od-prefs-hidden', function(element, value)
+	{
+		if (value)
+			return true;
+		var subject = element.data;
+		return !subject.hidden;
+	}));
 
-    Prefs.emptyFilterWarning.style.display = anyVisible?'none':'block';
-    Prefs.prefsList.style.display = anyVisible?'block':'none';
-};
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'onlyNew', '#od-prefs-only-new', function(element, value)
+	{
+		if (!value)
+			return true;
+		var subject = element.data;
+		return subject.isNew;
+	}));
 
-/*** Filtrowanie - klasa filtra ***********************************************/
+	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
+		function(element, subjectType)
+	{
+		var subject = element.data;
+		return (subject.types.indexOf(subjectType) >= 0);
+	}));
 
-/**
- * Klasa filtra przy głosowaniu - konstruktor.
- */
-Prefs.Filter = function()
-{
-    this.phrase = '';
-    this.subjectTypes = new SubjectTypeFilter();
-    this.showHidden = false;
-};
+	for (var i = 0; i < Prefs.subjects.length; i++)
+		Prefs.subjectFilter.addElement(new ListFilter.Element(Prefs.subjects[i], function(visible)
+		{
+			var subject = this.data;
+			$(subject.container).css('display', visible?'block':'none')
+		}));
 
-/**
- * Deserializacja filtra, np. z cookie.
- *
- * @param serializedFilter filtr w postaci surowej
- * @return Prefs.Filter obiekt filtra
- */
-Prefs.Filter.deserialize = function(serializedFilter)
-{
-    if (!serializedFilter)
-        return null;
-
-    var deserializedFilter = new Prefs.Filter();
-    deserializedFilter.setPhrase(serializedFilter.phrase);
-    deserializedFilter.subjectTypes = SubjectTypeFilter.
-        deserialize(serializedFilter.subjectTypes);
-    deserializedFilter.setShowHidden(serializedFilter.showHidden);
-
-    return deserializedFilter;
-};
-
-/**
- * Generuje filtr na podstawie zawartości formularza.
- *
- * @return Vote.Filter obiekt filtra z odczytaną zawartością
- */
-Prefs.Filter.readFilterFromForm = function()
-{
-    var newFilter = new Prefs.Filter();
-
-    var phrase = $('#od-prefs-q')[0].value;
-    if (phrase != TopBarFilter.emptyFilterText)
-        newFilter.setPhrase(phrase);
-
-    newFilter.subjectTypes = Prefs.typeFilterForm.readFilter();
-
-    newFilter.setShowHidden($('#od-prefs-hidden')[0].checked);
-
-    return newFilter;
-};
-
-/**
- * Ustawia formularz na podstawie filtra.
- */
-Prefs.Filter.prototype.saveFilterToForm = function()
-{
-    if (this.phrase == '')
-        $('#od-prefs-q')[0].value = TopBarFilter.emptyFilterText;
-    else
-        $('#od-prefs-q')[0].value = this.phrase;
-
-    Prefs.typeFilterForm.saveFilter(this.subjectTypes);
-
-    $('#od-prefs-hidden')[0].checked = this.showHidden;
-};
-
-/**
- * Ustawia frazę, której szukamy w nazwach przedmiotów.
- *
- * @param phrase fraza, której chcemy szukać
- */
-Prefs.Filter.prototype.setPhrase = function(phrase)
-{
-    this.phrase = $.trim(phrase).toLowerCase();
-};
-
-Prefs.Filter.prototype.setShowHidden = function(showHidden)
-{
-    this.showHidden = !!showHidden;
-};
-
-/**
- * Porównuje filtr z innym.
- *
- * @param filter filtr do porównania
- * @return boolean filtry są równe
- */
-Prefs.Filter.prototype.isEqual = function(filter)
-{
-    if (this.phrase != filter.phrase)
-        return false;
-    if (this.showHidden != filter.showHidden)
-        return false;
-    if (!this.subjectTypes.isEqual(filter.subjectTypes))
-        return false;
-    return true;
+	Prefs.subjectFilter.runThread();
 };

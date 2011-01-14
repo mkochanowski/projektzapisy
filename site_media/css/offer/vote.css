@@ -9,21 +9,6 @@
 	min-height: 40px;
 }
 
-#od-vote-top-bar fieldset > span
-{
-	min-width: 150px;
-}
-
-#od-vote-filter .main-filter-input
-{
-	margin-top: 7px;
-}
-
-#od-vote-subjtype
-{
-	width: 300px;
-}
-
 #od-vote-other
 {
 	width: 400px;
@@ -144,7 +129,7 @@
 	border-radius: 4px;
 }
 
-#od-vote-form .od-vote-semester:nth-child(3)
+#od-vote-form .od-vote-semester:nth-child(4)
 {
     float: none;
     clear: both;

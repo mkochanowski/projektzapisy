@@ -23,13 +23,25 @@ def make_it_json_friendly(element):
 @login_required
 def subjects(request):
     semesters = Semester.objects.filter(visible=True)
+    subjects = Subject.visible.all()
 
-    semesters_list = [(sem.pk, sem.get_name()) for sem in semesters]
+    semester_subjects = []
+    for semester in semesters:
+        semester_subjects.append({
+            'id': semester.pk,
+            'name': semester.get_name(),
+            'is_current': semester.is_current_semester(),
+            'subjects': subjects.filter(semester__id__exact=semester.pk).
+                order_by('name').values('id', 'name', 'type', 'slug')
+        })
 
-    types = Type.get_all_types_of_subjects()
-    types_list = [(type.pk, type.name) for type in Type.objects.all()] 
+    render_data = {
+        'semester_subjects': semester_subjects,
+        'types_list' : Type.objects.all()
+    }
 
-    return render_to_response('enrollment/subjects/subjects_list.html', {'semesters_list' : semesters_list, 'types_list' : types_list}, context_instance=RequestContext(request))
+    return render_to_response('enrollment/subjects/subjects_list.html',
+        render_data, context_instance=RequestContext(request))
 
    
 @login_required
@@ -51,24 +63,34 @@ def subject(request, slug):
             pass
             
         lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
+        lectures.name = "Wykłady"
+
         exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
+        exercises.name = "Ćwiczenia"
+
         laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
+        laboratories.name = "Pracownia"
+
         exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
+        exercises_adv.name = "Ćwiczenia (poziom zaawansowany)"
+
         exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
+        exer_labs.name = "Ćwiczenio-pracownie"
+
         seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
+        seminar.name = "Seminarium"
+
         language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
+        language.name = "Lektorat"
+
         sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
+        sport.name = "Zajęcia"
+
+        tutorials = [lectures, exercises, exercises_adv, laboratories, seminar, exer_labs, language, sport]
                         
         data = {
                 'subject' : subject,
-                'lectures' : lectures,
-                'exercises' : exercises,
-                'exercises_adv' : exercises_adv,
-                'laboratories' : laboratories,
-                'seminar' : seminar,
-                'exer_labs' : exer_labs,
-                'language' : language,
-                'sport' : sport
+                'tutorials' : tutorials,
         }         
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
     
@@ -80,6 +102,7 @@ def subject(request, slug):
     
 @login_required
 def list_of_subjects(request):
+    # TODO: zbędne?
     semester_name, list_of_types = "", []
     keyword, semester = "", None
     response = Subject.visible.all()      
@@ -108,7 +131,7 @@ def list_of_subjects(request):
         logger.warning('Function list_of_subjects(request = {%s}) throws Semester.DoesNotExist exception.' % unicode(request.POST) )
         return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
     else:
-        response = response.order_by('entity__name').values('id', 'entity__name', 'slug')
+        response = response.order_by('name').values('id', 'entity__name', 'slug')
     
         response = map(make_it_json_friendly, response)
         result = {'semester_name' : semester_name, 'subjects' : response }

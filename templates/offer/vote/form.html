@@ -1,8 +1,8 @@
 {% extends "offer/base.html" %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
 	<li>Głosuj</li>
 {% endblock %}
@@ -15,34 +15,36 @@
 	<script type="text/javascript" src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js"></script>
 
 	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
-    <script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
-    <script type="text/javascript" src="/site_media/js/common/subjectTypeFilter.js"></script>
-    <script type="text/javascript" src="/site_media/js/offer/vote.js"></script>
+	<script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
+
+	<script type="text/javascript" src="/site_media/js/common/listFilter.js"></script>
+	<script type="text/javascript" src="/site_media/js/common/listFilter-subjectType.js"></script>
+	<script type="text/javascript" src="/site_media/js/offer/vote.js"></script>
 {% endblock %}
 
 {% block top-bar %}
-    <div id="od-vote-top-bar" class="main-top-bar" style="display: none">
+	<div id="od-vote-top-bar" class="main-top-bar" style="display: none">
 		<fieldset id="od-vote-filter">
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text" id="od-vote-q" type="text" />
-				<input class="reset" id="od-vote-reset" type="button" value="X" style="display:none;" />
+				<input class="text filter-phrase" type="text" />
+				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
 			</div>
 		</fieldset>
-		<fieldset id="od-vote-subjtype">
+		<fieldset class="subject-type-filter">
 			<legend><span>Rodzaj przedmiotu</span></legend>
-            {% for type in proposalTypes %}
+			{% for type in proposalTypes %}
 				<span class="checkbox">
-                    <input type="checkbox" checked="checked" id="filter-subject-type-{{ type.id }}" {% if type.meta_type %} class="filter-subject-type-meta" {% endif %} value="{{ type.id }}"/>
-                    <input type="hidden" class="group-id" value="{{ type.group.id }}" />
-                    <label for="filter-subject-type-{{ type.id }}">{{ type.name }}</label>
-                </span>
+					<input type="checkbox" checked="checked" id="filter-subject-type-{{ type.id }}" {% if type.meta_type %} class="filter-subject-type-meta" {% endif %} value="{{ type.id }}"/>
+					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
+					<label for="filter-subject-type-{{ type.id }}">{{ type.name }}</label>
+				</span>
 			{% endfor %}
 		</fieldset>
 		<fieldset id="od-vote-other">
 			<legend><span>Inne</span></legend>
-            <span class="checkbox"><input type="checkbox" id="od-vote-onlywanted" /><label for="od-vote-onlywanted" title="Pokazuje tylko te propozycje przedmiotów, które oznaczyłeś przyciskiem &quot;Pójdę na to&quot;">Pokaż tylko przedmioty, na które chcę iść</label></span>
-            <span class="checkbox"><input type="checkbox" id="od-vote-withoutcompleted" disabled="disabled" /><label for="od-vote-withoutcompleted">Nie pokazuj przedmiotów, na które już chodziłem</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-vote-onlywanted" /><label for="od-vote-onlywanted" title="Pokazuje tylko te propozycje przedmiotów, które oznaczyłeś przyciskiem &quot;Pójdę na to&quot;">Pokaż tylko przedmioty, na które chcę iść</label></span>
+			<span class="checkbox"><input type="checkbox" id="od-vote-withoutcompleted" disabled="disabled" /><label for="od-vote-withoutcompleted">Nie pokazuj przedmiotów, na które już chodziłem</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -54,6 +56,6 @@
 
 	<form action="" method="post" id="od-vote-form">
 		{{ form.as_lists }}
-        <p id="od-vote-submitBar"><input type="submit" value="Głosuj" /></p>
+		<p id="od-vote-submitBar"><input type="submit" value="Głosuj" /></p>
 	</form>
 {% endblock %}

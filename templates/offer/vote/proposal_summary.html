@@ -2,10 +2,10 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
+	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
-    <li><a href="{% url vote-summary %}">Podsumowanie głosowania</a></li>
-    <li>{{ proposal.name }}</li>
+	<li><a href="{% url vote-summary %}">Podsumowanie głosowania</a></li>
+	<li>{{ proposal.name }}</li>
 {% endblock %}
 
 {% block styles %}
@@ -14,34 +14,34 @@
 
 {% block content-class %}narrow{% endblock %}
 {% block content %}
-    <div id="od-vote-summary-proposal">
-        <h2>Podsumowanie głosowania: {{ proposal.name }}</h2>
-        <p>
-            Na ten przedmiot zagłosowało osób: <strong>{{ votes }}</strong>;
-            oddając punktów: <strong>{{ points }}</strong>.
-        </p>
-        {% if users %}
-            <h3>Lista głosujących na ten przedmiot</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Imię</th>
-                        <th>Nazwisko</th>
-                        <th title="Ilość punktów, jakie student przeznaczył na ten przedmiot">Punkty</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for us in users %}
-                        <tr>
-                            <td>{{ us.first_name }}</td>
-                            <td>{{ us.last_name }}</td>
-                            <td class="number" title="TODO">?</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="main-message">Nikt nie zagłosował na ten przedmiot.</div>
-        {% endif %}
-    </div>
+	<div id="od-vote-summary-proposal">
+		<h2>Podsumowanie głosowania: {{ proposal.name }}</h2>
+		<p>
+			Na ten przedmiot zagłosowało osób: <strong>{{ votes }}</strong>;
+			oddając punktów: <strong>{{ points }}</strong>.
+		</p>
+		{% if users %}
+			<h3>Lista głosujących na ten przedmiot</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Imię</th>
+						<th>Nazwisko</th>
+						<th title="Ilość punktów, jakie student przeznaczył na ten przedmiot">Punkty</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for us in users %}
+						<tr>
+							<td>{{ us.first_name }}</td>
+							<td>{{ us.last_name }}</td>
+							<td class="number" title="TODO">?</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% else %}
+			<div class="main-message">Nikt nie zagłosował na ten przedmiot.</div>
+		{% endif %}
+	</div>
 {% endblock %}

@@ -8,12 +8,22 @@
    
 <div>
 
-<h2><a class="subject-details-link" link="{% url subject-page group.subject_slug %}">{{group.subject}}</a> {{group.type_and_teacher}} - Lista zapisanych osób </h2>
+<h2><a class="subject-details-link" link="{% url subject-page group.subject_slug %}">{{group.subject}}</a> {{group.type_and_teacher}} <br /> <br /> Lista zapisanych osób </h2>
+<br />
 {% for student in students_in_group %}
 <li>
     <a class="subject-details-link" link="{% url student-profile student.user.id %}">{{student.user.get_full_name}}</a>
 </li>
-{% empty %}brak zapisanych osób
+{% empty %}Brak zapisanych osób.
+{% endfor %}
+<br />
+<h2> Kolejka </h2>
+<br />
+{% for student in students_in_queue %}
+<li>
+    <a class="subject-details-link" link="{% url student-profile student.user.id %}">{{student.user.get_full_name}}</a>
+</li>
+{% empty %}Brak osób zapisanych do kolejki.
 {% endfor %}
 </ul>
 </div>
