@@ -62,8 +62,8 @@
 		{% endfor %}
 
 		{% for tutorial in tutorials %}
-			{% if tutorial %}
-				<h3>{{tutorial.name}}:</h3>
+			{% if tutorial.groups %}
+				<h3>{{tutorial.name}}</h3>
 					<div>
 						<table class="subject-details-table">
 							<thead>
@@ -72,7 +72,7 @@
 								</tr>
 							</thead>
 							<tbody>
-							{% for t in tutorial %}
+							{% for t in tutorial.groups %}
 								<tr>
 									<td>{{ t.get_teacher_full_name }}</td>
 									<td>
@@ -114,6 +114,7 @@
 							</tbody>
 						</table>
 					</div>
+            <br />
 			{% endif %}
 		{% endfor %}
 	</div>
