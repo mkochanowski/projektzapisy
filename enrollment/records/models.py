@@ -189,6 +189,32 @@ class Record(models.Model):
             raise NonGroupException()
 
     @staticmethod
+    def add_student_to_lecture_group(user_id, subject_id):
+        """ assignes student to lectures group for a given subject """
+        user = User.objects.get(id=user_id)
+        try:
+            student = user.student
+            lectures = Group.objects.filter(subject=subject_id, type='1')
+            groups = Record.get_groups_for_student(user_id)
+            new_records = []
+            for l in lectures:
+                if (l not in groups) and (Record.number_of_students(group=l) < l.limit):
+                    record = Record.objects.get(group=l, student=student)
+                    if record: 
+                        if record.status == STATUS_PINNED:
+                            record.status = STATUS_ENROLLED
+                            record.save()
+                            new_records.append(record)
+            return new_records
+        except Student.DoesNotExist:
+            logger.error('Record.add_student_to_lecture_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, subject_id = %d)' % (int(user_id), int(subject_id)))
+            raise NonStudentException()
+        except Record.DoesNotExist:
+            new_records.append(Record.objects.create(group=l, student=student, status=STATUS_ENROLLED))
+            return new_records
+          
+
+    @staticmethod
     @transaction.commit_on_success
     def add_student_to_group(user_id, group_id):
         """ assignes student to group if his records for subject are open. If student is pinned to group, pinned becomes enrolled """
@@ -196,6 +222,7 @@ class Record(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
+            new_records = []
             if not group.subject.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
@@ -206,6 +233,9 @@ class Record(models.Model):
                     #raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException
                     Record.remove_student_from_group(user_id, g_id)
 
+                if group.type != '1':
+                    new_records = Record.add_student_to_lecture_group(user_id, group.subject.id)
+                    
                 record = Record.objects.get(group=group, student=student)
 
                 if record.status == STATUS_ENROLLED:
@@ -213,6 +243,9 @@ class Record(models.Model):
 
                 record.status = STATUS_ENROLLED
                 record.save()
+                
+                new_records.append(record)
+                return new_records
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
@@ -228,7 +261,8 @@ class Record(models.Model):
             logger.error('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
         except Record.DoesNotExist:
-            return Record.objects.create(group=group, student=student, status=STATUS_ENROLLED)
+            new_records.append(Record.objects.create(group=group, student=student, status=STATUS_ENROLLED))
+            return new_records
 
     @staticmethod
     @transaction.commit_on_success

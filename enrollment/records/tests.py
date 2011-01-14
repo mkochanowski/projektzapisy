@@ -30,14 +30,14 @@ class AddUserToGroupTest(TestCase):
     def testStudentAssignedToGroup(self):
         self.assertEqual(Record.objects.count(), 0)
         Record.add_student_to_group(self.user.id, self.group.id)
-        self.assertEqual(Record.objects.count(), 1)
+        self.assertEqual(Record.objects.count(), 2)
         Record.add_student_to_group(self.user.id, self.group.id)
-        self.assertEqual(Record.objects.count(), 1)
+        self.assertEqual(Record.objects.count(), 2)
 
     def testStudentNotAssignedToGroup(self):
         self.assertEqual(Record.objects.count(), 0)
         Record.add_student_to_group(self.user.id, self.group.id)
-        self.assertEqual(Record.objects.count(), 1)
+        self.assertEqual(Record.objects.count(), 2)
 
     def testGroupWithStudentLimitExceeded(self):
         self.group.limit = 0
@@ -56,14 +56,14 @@ class AddUserToGroupTest(TestCase):
         self.assertRaises(RecordsNotOpenException, Record.add_student_to_group, self.user.id, self.group.id)
 
            
-class RemoveUserToGroupTest(TestCase):
+class RemoveUserFromGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']
 
         
     def setUp(self):
         self.user = User.objects.get(id=5)
-        self.group = Group.objects.get(id=1)
-        self.record = Record.add_student_to_group(self.user.id, self.group.id)
+        self.group = Group.objects.get(id=3)
+        self.records = Record.add_student_to_group(self.user.id, self.group.id)
 
     def testWithNonStudentUser(self):
         self.user.student.delete()
@@ -79,7 +79,7 @@ class RemoveUserToGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
 
     def testStudentNotAssignedToGroup(self):
-        self.record.delete()
+        self.records[0].delete()
         self.assertEqual(Record.objects.count(), 0)
         self.assertRaises(AlreadyNotAssignedException, Record.remove_student_from_group, self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 0)
@@ -90,8 +90,8 @@ class IsStudentInSubjectGroupTypeTest(TestCase):
     
     def setUp(self):
         self.user = User.objects.get(id=5)
-        self.group = Group.objects.get(id=1)
-        self.group2 = Group.objects.get(id=3)
+        self.group = Group.objects.get(id=3)
+        self.group2 = Group.objects.get(id=1)
         self.subject = Subject.objects.get(id=1)
         self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
@@ -113,7 +113,7 @@ class GetGroupsForStudentTest(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(id=5)
-        self.group = Group.objects.get(id=1)
+        self.group = Group.objects.get(id=3)
         self.record = Record.add_student_to_group(self.user.id, self.group.id)
     
     def testStudentAssignedToGroup(self):
