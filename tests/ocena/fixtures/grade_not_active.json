@@ -1,0 +1,1 @@
+[{"pk": 1, "model": "subjects.semester", "fields": {"records_opening": "2011-01-01 22:24:30", "semester_ending": "2011-02-28", "records_closing": "2011-02-28 22:24:30", "visible": false, "year": 2010, "type": "z", "semester_begining": "2011-01-01", "is_grade_active": false}}]
