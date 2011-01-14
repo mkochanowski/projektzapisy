@@ -3,7 +3,10 @@
 PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
 -->
 {% extends "base.html" %}
- 
+
+{% block main-subsystemname %}
+	Ocena zajęć
+{% endblock %} 
 
 {% load news_extras %}
 
@@ -40,18 +43,6 @@ PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
     {% endif %}
 <!---->
     <li><a href="{% url grade-poll-tickets-enter %}">Ocena zajęć</a></li>
-    {% if user.is_authenticated %}
-    <li><a href="{% url grade-poll-poll-results %}">Wyniki oceny</a></li>
-    <li><a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
-
-        {% if user.student %}
-            ({{user.student.matricula}})
-        {% endif %}
-         </li>
-    <li><a href="{% url user-logout %}">(wyloguj)</a></li>
-    {% else %}
-    <li><a href="{% url user-login %}">Zaloguj</a></li>
-    {% endif %}
 {% endblock %}
 
 {% block content %}
