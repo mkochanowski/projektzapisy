@@ -42,6 +42,11 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
 	page.should have_content(text)
 end
 
+Then /^(?:|I )should not see "([^"]*)"$/ do |text|  
+  sleep 10
+  page.should have_no_content(text)
+end
+
 Given /^(?:|I )am on (.+)$/ do |page|
 	visit path_to(page)
 end
@@ -63,6 +68,7 @@ When /^(?:|I )click on "([^"]*)"$/ do |link|
 end
 
 When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
+	value.gsub(/\n/, '<br/>')
 	fill_in(field, :with => value)
 end
 
@@ -108,3 +114,6 @@ When /^I uncheck "([^"]*)" checkboxes$/ do |arg|
 	end
 end
 
+Given /^I have previously saved some data in polls using "([^"]*)"$/ do |ticket|
+  #  provide fixture or use this ticket to fill a fake poll in polls filling test ;)
+end

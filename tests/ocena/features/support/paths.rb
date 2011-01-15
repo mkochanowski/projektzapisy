@@ -16,7 +16,7 @@ module NavigationHelpers
     
     when /pool management page/
 		'/grade/poll_manage'
-    
+		
     else
           begin
             page_name =~ /the (.*) page/
