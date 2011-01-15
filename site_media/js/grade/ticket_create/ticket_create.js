@@ -10,7 +10,7 @@ Ticket.create = Object()
 Ticket.create.init   = function()
 {
     Ticket.create.t_array        = new Array();
-    Ticket.create.unblinds_array  = new Array();
+    Ticket.create.unblinds_array = new Array();
     Ticket.create.k_array        = new Array();
     Ticket.create.RAND_BITS      = 512;
     $("#connection_choice_button").click(Ticket.create.step1);
