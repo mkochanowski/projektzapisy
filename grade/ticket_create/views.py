@@ -70,7 +70,7 @@ def ajax_get_rsa_keys_step2( request ):
                 groups           = reduce(list.__add__, connected_groups )
                 tickets          = zip( groups, ts)
                 signed = map( lambda ( g, t): 
-                            (g, int(t), secure_signer_without_save( request.user, g, int(t) )),
+                            (g, long(t), secure_signer_without_save( request.user, g, long(t) )),
                              tickets )
                 unblinds = map ( lambda ( g, t, st ): 
                                 (unicode(t), unblind( g, st ) ),

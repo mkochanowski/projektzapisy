@@ -256,7 +256,7 @@ def get_valid_tickets( tl ):
     for g, t, st in tl:
         if st == u"Nie masz uprawnień do tej ankiety" or \
            st == u"Bilet już pobrano":
-                err.append(( g, st ))
+                err.append(( unicode( g ), st ))
         else:
                 val.append(( g, t, st ))
     
@@ -269,12 +269,13 @@ def to_plaintext( vtl ):
         if not p.group:
             res += u'Ankieta ogólna &#10;'
         else:
-            res += p.group.subject.name + " &#10;"
-            res += p.group.get_type_display() + ": "
-            res += p.group.get_teacher_full_name() + " &#10;"
+            res += unicode( p.group.subject.name ) + " &#10;"
+            res += unicode( p.group.get_type_display()) + ": "
+            res += unicode( p.group.get_teacher_full_name()) + " &#10;"
         if p.studies_type:
-            res += u'dla studiów ' + p.studies_type + " &#10;"
-            
+            res += u'dla studiów ' + unicode( p.studies_type ) + " &#10;"
+        
+        res += u'id: ' + unicode( p.pk ) + '&#10;'
         res += unicode( t ) + " &#10;"
         res += unicode( st ) + " &#10;"
         res += "---------------------------------- &#10;"
@@ -284,13 +285,43 @@ def from_plaintext( tickets_plaintext ):
     pre_tickets = tickets_plaintext.split('\n')
     tickets_and_signed = []
     tickets = []
+    ids     = []
     for pre_ticket in pre_tickets:
         try:
             t = int( pre_ticket )
             tickets_and_signed.append( t )
         except:
-            pass
+            if pre_ticket.startswith( 'id' ):
+                id = int( pre_ticket.split( ':' )[ 1 ] )
+                ids.append( id )
+            else:
+                pass
+                
     for i in range(0, len( tickets_and_signed )-1, 2):
         ( t, st ) = ( tickets_and_signed[ i ], tickets_and_signed[ i+1 ] )
         tickets.append(( t, st ))
-    return tickets
+    return zip( ids, tickets )
+
+#- 
+#- 
+#- 
+
+def generate_ticket( poll_list ):
+    ## TODO: Docelowo ma być po stronie przeglądarki
+    m       = getrandbits( RAND_BITS )
+    blinded = []
+    
+    for poll in poll_list:
+        key = RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
+        n   = key.n
+        e   = key.e
+        k   = randint( 2, n )
+        while gcd( n, k ) != 1:
+            k = randint( 1, n )
+        
+        a = ( m % n )
+        b = expMod( k, e, n )
+        t = ( a * b) % n
+        
+        blinded.append(( poll, t, (m, k) ))
+    return blinded

@@ -16,9 +16,11 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               OpenQuestionOrdering, Option, \
                                               SingleChoiceQuestionOrdering, \
                                               MultipleChoiceQuestion, \
-                                              MultipleChoiceQuestionOrdering
-from fereol.grade.poll.forms           import TicketsForm
-
+                                              MultipleChoiceQuestionOrdering, \
+                                              SavedTicket
+from fereol.grade.poll.forms           import TicketsForm, \
+                                              generate_forms_for_poll
+from fereol.grade.poll.utils           import check_signature
 
 def default(request):
     return render_to_response ('grade/base.html', context_instance = RequestContext ( request ))
@@ -207,14 +209,47 @@ def tickets_enter(request):
         form = TicketsForm( request.POST )
         
         if form.is_valid():
-            tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
-            tickets = from_plaintext( tickets_plaintext )
-            ## TERAZ TRZEBA Z TYMI PODPISANYMI BILETAMI PRZEJŚĆ DALEJ
+            tickets_plaintext  = form.cleaned_data[ 'ticketsfield' ]
+            titles_and_tickets = from_plaintext( tickets_plaintext )
+            
+            request.method = "GET"
+            return all_poll_forms( request, titles_and_tickets )
     else:
         form = TicketsForm()
-    
     data[ 'form' ] = form
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
+    
+def all_poll_forms( request, titles_and_tickets ):
+    form_list     = []
+    finished_list = []
+    errors        = []
+    
+    for (id, (ticket, signed_ticket)) in titles_and_tickets:
+        try:
+            poll       = Poll.objects.get( pk = id )
+            public_key = PublicKey.objects.get( poll = poll )
+            if check_signature( ticket, signed_ticket, public_key ):
+                try:
+                    st = SavedTicket.objects.get( ticket = unicode( ticket ), 
+                                                  poll   = poll )
+                    if st.finished:
+                        finished.append( generate_forms_for_poll( poll, request, st ))
+                    else:
+                        form_list.append( generate_forms_for_poll( poll, request, st ))
+                except:
+                    st = SavedTicket( ticket   = unicode( ticket ),
+                                      poll     = poll,
+                                      finished = False )
+                    st.save()
+                    form_list.append( generate_forms_for_poll( poll, request, st ))
+            else:
+                errors.append( u"Nieprawidłowy podpis pod biletem na ankietę %s!" % title )
+        except:
+            errors.append( u"Ankieta %s nie istnieje!" % title )
+    data = { 'errors' : errors,
+             'polls'  : form_list }
+    return render_to_response( 'grade/poll/all_forms.html', data, context_instance = RequestContext( request ))
+    
     
 def poll_answer(request):
     pass

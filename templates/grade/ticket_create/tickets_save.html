@@ -14,8 +14,7 @@
             <ul>
                 {% for err in errors %}
                     <li>
-                        {{ err.0.subject.name }}: <br>
-                        {{ err.0.get_type_display }}: {{ err.0.get_teacher_full_name }} <br>
+                        {{ err.0 }} <br>
                         <b>{{ err.1 }}</b> 
                     </li>
                 {% endfor %}
