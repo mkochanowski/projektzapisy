@@ -273,7 +273,7 @@ def to_plaintext( vtl ):
             res += p.group.get_type_display() + ": "
             res += p.group.get_teacher_full_name() + " &#10;"
         if p.studies_type:
-            res += u'dla studiów ' + p.studies_type + " &#10;"
+            res += u'dla studiów ' + unicode( p.studies_type ) + " &#10;"
             
         res += unicode( t ) + " &#10;"
         res += unicode( st ) + " &#10;"

@@ -27,12 +27,14 @@ def default(request):
 	return render_to_response ('grade/base.html', {'grade' : grade }, context_instance = RequestContext ( request ))
 
 def enable_grade( request ):
+    grade = Semester.get_current_semester().is_grade_active
     semester = Semester.get_current_semester()
     semester.is_grade_active = True
     semester.save()   
-    return render_to_response ('grade/base.html', { 'message' : "Otwarto ocenę zajęć" }, context_instance = RequestContext ( request ))
+    return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Otwarto ocenę zajęć" }, context_instance = RequestContext ( request ))
     
 def disable_grade( request ):
+    grade = Semester.get_current_semester().is_grade_active
     semester = Semester.get_current_semester()
     semester.is_grade_active = False
     semester.save()
@@ -42,7 +44,7 @@ def disable_grade( request ):
     
     # TODO: Coś robić z odpowiedziami
     
-    return render_to_response ('grade/base.html', { 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
+    return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
 
 
 #### Poll creation ####
@@ -82,7 +84,7 @@ def subjects_list( subjects ):
 
 @employee_required
 def poll_create(request):
-
+    grade = Semester.get_current_semester().is_grade_active
     # TODO: przeniesc do modeli - porozmawiaz z grupa
     def getGroups(semester, group = None, type = None, subject = None):
         if group:
@@ -162,18 +164,22 @@ def poll_create(request):
     data['message']    = message
     data['sections']   = Section.objects.all()
     data['types']   = GROUP_TYPE_CHOICES
+    data['grade'] =  grade
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 
 def poll_manage(request):
+    grade = Semester.get_current_semester().is_grade_active
     pass
 
 def declaration( request ):
     # TODO:
     #       Wyświetlanie wyników oceny
-    return render_to_response ('grade/poll/show.html', context_instance = RequestContext( request ))
+    grade = Semester.get_current_semester().is_grade_active
+    return render_to_response ('grade/poll/show.html', {'grade' : grade}, context_instance = RequestContext( request ))
 
 @employee_required    
 def questionset_create(request):
+    grade = Semester.get_current_semester().is_grade_active
     def parse_form(post):
         def choicebox_is_on(value):
             if value == 'on':
@@ -242,7 +248,8 @@ def questionset_create(request):
     if request.method == "POST":
         parse_form(request.POST)
         data['message']  = 'Sekcja dodana'
-
+    
+    data['grade'] = grade
     return render_to_response ('grade/poll/section_create.html', data, context_instance = RequestContext( request ))
 
 
@@ -256,6 +263,7 @@ def grade_logout(request):
     return HttpResponseRedirect('/grade/poll/tickets_enter')
 
 def tickets_enter(request):
+    grade = Semester.get_current_semester().is_grade_active
     data = {}
     
     if request.method == "POST":
@@ -269,6 +277,7 @@ def tickets_enter(request):
         form = TicketsForm()
     
     data[ 'form' ] = form
+    data['grade'] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
     
 def poll_answer(request):

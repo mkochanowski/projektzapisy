@@ -5,11 +5,11 @@ Feature: Behaviour of the system after closing grading /przenieść do odpowiedn
 		
 	
 	Scenario: Student tries to present a ticket		
-		When I go to page "/grade/poll/tickets_enter"
+		When I go to /grade/poll/tickets_enter
 		Then I should see "Ocena zajęć jest w tej chwili zamknięta; nie można przestawić biletu na ankietę"
 	
 	Scenario: Student tries to edit a poll				
-		When I go to page "/grade/poll/edit/1"
+		When I go to /grade/poll/edit/1
 		Then I should see "Ocena zajęć jest w tej chwili zamknięta"
 		
 	Scenario: Administrator can see the grading results

@@ -28,15 +28,14 @@ end
 
 Given /^the grading protocol is "([^"]*)"$/ do |state|
 	if state == "on"
-		
+		# fixtures: grade_active.json
 	elsif state == "off"
-		
+		# fixtures: grade_not_active.json
 	end
 end
 
 Then /^(?:|I )should see link "([^"]*)"$/ do |link|  
-	page.should have_content(link)
-	#powinno być też sprawdzanie, czy to jest link..
+	page.should have_link(link)
 end
 
 Then /^(?:|I )should see "([^"]*)"$/ do |text|  
@@ -79,3 +78,33 @@ end
 Then /^show me the page$/ do
     save_and_open_page
 end
+
+Given /^there are polls generated$/ do
+	# fixtures: groups.json, polls.json
+end
+
+Given /^there are keys generated for polls$/ do
+	# fixtures:  keys_for_polls.json
+end
+
+When /^I add new poll$/ do
+	# stworzenie nowej ankiety w kodzie
+end
+
+Given /^I am signed for groups with polls$/ do
+	# fixtures: groups.json, polls.json, records.json, keys_for_polls.json
+end
+
+When /^I uncheck "([^"]*)" checkboxes$/ do |arg|
+	if arg == "all" then
+		# odznaczenie obu checkboxów
+		uncheck("join_common")
+		uncheck("join_1")		
+	elsif arg == "some" then
+		# odznaczenie pierwszego checkboxa (w teście są dwa)	
+		uncheck("join_common")
+	elsif arg == "no" then
+		# we do not touch anything then
+	end
+end
+
