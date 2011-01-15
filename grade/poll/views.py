@@ -21,7 +21,8 @@ from fereol.grade.poll.forms           import TicketsForm
 
 
 def default(request):
-    return render_to_response ('grade/base.html', context_instance = RequestContext ( request ))
+	grade = Semester.get_current_semester().is_grade_active
+	return render_to_response ('grade/base.html', {'grade' : grade }, context_instance = RequestContext ( request ))
 
 def enable_grade( request ):
     semester = Semester.get_current_semester()
@@ -111,6 +112,8 @@ def poll_create(request):
     data['types']   = GROUP_TYPE_CHOICES
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 
+def poll_manage(request):
+    pass
 
 def declaration( request ):
     # TODO:
