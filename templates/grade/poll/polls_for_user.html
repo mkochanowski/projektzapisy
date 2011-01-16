@@ -1,0 +1,48 @@
+{% extends "grade/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+	<li><a href="{% url grade-poll-polls-for-user %}">Twoje ankiety</a></li>
+{% endblock %}
+
+{% block content %}
+{% if errors %}
+    <div class="error-message">
+        Błąd nastepujących ankiet.
+        <ul>
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<div id="grade-poll-choose-menu">
+{% if polls or finished %}
+    <h3>Twoje ankiety</h3>
+{% endif %}
+{% if polls %}
+    <h4>Ankiety dostępne</h4>
+    <ul id="grade-fillable-poll-list">
+    {% for poll in polls %}
+        <li><a href="{% url grade-poll-poll-answer poll.0 poll.1 %}">{{ poll.2 }}</a></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if finished %}
+    <h4>Ankiety zakończone</h4>
+    <ul id="grade-not-fillable-poll-list">>
+    {% for poll in finished %}
+        <li><a href="{% url grade-poll-poll-answer poll.0 poll.1 %}">{{ poll.2 }}</a></li>
+    {% endfor %}
+    </ul>
+{% endif %}
+</div>
+
+<div id="grade-poll-content">
+{% block poll-content %}
+{% endblock %}
+</div>
+{% endblock %}

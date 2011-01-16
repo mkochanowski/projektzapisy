@@ -12,6 +12,7 @@ class SavedTicket( models.Model ):
         verbose_name_plural = 'zapisane bilety'
         verbose_name        = 'zapisany bilet'
         app_label           = 'poll'
+        unique_together     = [ 'ticket', 'poll' ]
         
     def __unicode__( self ):
         if self.finished:

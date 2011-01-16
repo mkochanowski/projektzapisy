@@ -1,0 +1,31 @@
+{% extends "grade/poll/polls_for_user.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+	<li><a href="{% url grade-poll-polls-for-user %}">Twoje ankiety</a></li>
+    <li><a href="{% url grade-poll-poll-answer pid ticket %}">{{ link_name }}</a></li>
+{% endblock %}
+
+
+{% block poll-content %}
+    <form action="" method="post">
+        <table>
+            <tr><th>{{ forms.0 }}</th></tr>
+            <tr><td>{{ forms.1 }}</td></tr>
+            {% for form in forms.2 %}
+                {{ form.as_table }}
+            {% endfor %}
+            <tr>
+                <th>
+                    <label for="id_finish_grading">Zakończ oceniać:</label>
+                </th>
+                <td>
+                    <input type="checkbox" name="finish_grading" id="id_finish_grading" /><br>
+                    Jeśli zaznaczysz to pole, utracisz mozliwość edycji ankiety po zapisaniu.
+                </td>
+            </tr> 
+        </table>
+        <input type="submit" value="Zapisz ankietę" />
+    </form>
+{% endblock %}

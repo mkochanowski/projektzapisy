@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- 
-from Crypto.PublicKey import RSA
+from Crypto.PublicKey         import RSA
 
 def ordering_cmp( ord_1, ord_2 ):
     if str( type( ord_1 )) == \

@@ -19,7 +19,6 @@ from fereol.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 connect_groups, \
                                                 secure_signer_without_save, \
                                                 secure_mark
-
 from fereol.grade.ticket_create.forms    import PollCombineForm
 
 from fereol.grade.ticket_create.exceptions import *
@@ -31,7 +30,7 @@ from django.contrib.auth                   import authenticate, login, logout
 from fereol.grade.ticket_create.forms      import *
 
 from django.views.decorators.csrf          import csrf_exempt
-
+from Crypto.PublicKey import RSA
 def prepare_grade( request ):
     return render_to_response( 'grade/ticket_create/prepare_grade.html', {}, context_instance = RequestContext( request ))
         
@@ -123,7 +122,7 @@ def tickets_save( request, ticket_list ):
     prepared_tickets = map ( lambda ( g, t, st, ( m, k ) ): 
                                 (g, m, unblind( g, st, k ) ),
                              signed )
- 
+     
     errors, tickets_to_serve = get_valid_tickets( prepared_tickets )
 
     data = { 'errors'  : errors,

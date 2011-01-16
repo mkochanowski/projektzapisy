@@ -5,6 +5,7 @@ from django.http                       import HttpResponse, \
                                               HttpResponseRedirect
 from django.shortcuts                  import render_to_response
 from django.template                   import RequestContext
+
 from fereol.users.decorators           import student_required, employee_required
 from fereol.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
                                               
@@ -19,7 +20,7 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               MultipleChoiceQuestionOrdering, \
                                               SavedTicket
 from fereol.grade.poll.forms           import TicketsForm, \
-                                              generate_forms_for_poll
+                                              SectionForm
 from fereol.grade.poll.utils           import check_signature
 
 def default(request):
@@ -212,50 +213,104 @@ def tickets_enter(request):
             tickets_plaintext  = form.cleaned_data[ 'ticketsfield' ]
             titles_and_tickets = from_plaintext( tickets_plaintext )
             
-            request.method = "GET"
-            return all_poll_forms( request, titles_and_tickets )
+            errors   = []
+            polls    = []
+            finished = []
+            
+            for (id, (ticket, signed_ticket)) in titles_and_tickets:
+                try:
+                    poll       = Poll.objects.get( pk = id )
+                    public_key = PublicKey.objects.get( poll = poll )
+                    if check_signature( ticket, signed_ticket, public_key ):
+                        try:
+                            st = SavedTicket.objects.get( poll   = poll,
+                                                          ticket = ticket )
+                            if st.finished:
+                                finished.append(( id, ticket ))
+                            else:
+                                polls.append(( id, ticket ))
+                        except:
+                            st = SavedTicket( poll = poll, ticket = ticket )
+                            st.save()
+                            polls.append(( id, ticket ))
+                    else:
+                        errors.append(( id, "Nie udało się zweryfikować podpisu pod biletem." ))
+                except:
+                    errors.append(( id, "Podana ankieta nie istnieje" ))
+            
+            request.session[ "polls" ]    = polls
+            request.session[ "errors" ]   = errors
+            request.session[ "finished" ] = finished
+            
+            return HttpResponseRedirect( '/grade/poll/polls' )
     else:
         form = TicketsForm()
     data[ 'form' ] = form
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
     
-def all_poll_forms( request, titles_and_tickets ):
-    form_list     = []
-    finished_list = []
-    errors        = []
+def prepare_data( request ):
+    data = { 'errors'   : [], 
+             'polls'    : [],
+             'finished' : [] }
     
-    for (id, (ticket, signed_ticket)) in titles_and_tickets:
+    for id, error in request.session.get( 'errors', default = [] ):
         try:
-            poll       = Poll.objects.get( pk = id )
-            public_key = PublicKey.objects.get( poll = poll )
-            if check_signature( ticket, signed_ticket, public_key ):
-                try:
-                    st = SavedTicket.objects.get( ticket = unicode( ticket ), 
-                                                  poll   = poll )
-                    if st.finished:
-                        finished.append( generate_forms_for_poll( poll, request, st ))
-                    else:
-                        form_list.append( generate_forms_for_poll( poll, request, st ))
-                except:
-                    st = SavedTicket( ticket   = unicode( ticket ),
-                                      poll     = poll,
-                                      finished = False )
-                    st.save()
-                    form_list.append( generate_forms_for_poll( poll, request, st ))
-            else:
-                errors.append( u"Nieprawidłowy podpis pod biletem na ankietę %s!" % title )
+            p = Poll.objects.get( pk = id )
+            data[ 'errors' ].append( "%s: %s" % ( unicode( p ), error ))
         except:
-            errors.append( u"Ankieta %s nie istnieje!" % title )
-    data = { 'errors' : errors,
-             'polls'  : form_list }
-    return render_to_response( 'grade/poll/all_forms.html', data, context_instance = RequestContext( request ))
+            data[ 'errors' ].append( error )
     
+    try:
+        del request.session[ 'errors' ]
+    except KeyError:
+        pass
+   
+    data[ 'polls' ]   = request.session.get( 'polls', default = [] )
+    data['finished' ] = request.session.get( 'finished', default = [] )
     
-def poll_answer(request):
-    pass
+    data[ 'polls' ] = map( lambda (id, t): 
+                                (id, t, Poll.objects.get( pk = id ).to_url_title( True )), 
+                           data[ 'polls' ])
+    data[ 'finished' ] = map( lambda (id, t): 
+                                (id, t, Poll.objects.get( pk = id ).to_url_title( True )), 
+                              data[ 'finished' ])
+    return data
+
+
+def polls_for_user( request ):
+    if not 'polls' in request.session.keys():
+        return HttpResponseRedirect( '/grade/poll/tickets_enter' )
     
-def poll_save(request):
-    pass
+    data = prepare_data( request )
+    
+    return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
+    
+def poll_answer( request, pid, ticket ):
+    poll = Poll.objects.get( pk = pid )
+    data = prepare_data( request )
+    data[ 'pid' ]       = pid
+    data[ 'ticket' ]    = ticket
+    data[ 'link_name' ] = poll.to_url_title()
+                   
+    st = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
+    
+    title   = poll.title
+    desc    = poll.description
+    s_forms = []
+    
+    for section in poll.all_sections():
+        if request.method == "POST":
+            s_forms.append( SectionForm( request.POST, section = section, 
+                                                       poll    = poll.pk,
+                                                       ticket  = st ))
+        else: 
+            s_forms.append( SectionForm( section = section, 
+                                         poll    = poll.pk,
+                                         ticket  = st ))
+        
+    data[ 'forms' ] = (title, desc, s_forms )
+    
+    return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     
 #### Poll results ####
 
