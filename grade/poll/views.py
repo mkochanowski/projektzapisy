@@ -21,8 +21,9 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SavedTicket
 from fereol.users.models               import Type
 from fereol.grade.poll.forms           import TicketsForm, \
-                                              SectionForm
-from fereol.grade.poll.utils           import check_signature
+                                              PollForm
+from fereol.grade.poll.utils           import check_signature, \
+                                              prepare_data
 
 def default(request):
 	grade = Semester.get_current_semester().is_grade_active
@@ -47,7 +48,6 @@ def disable_grade( request ):
     # TODO: Coś robić z odpowiedziami
     
     return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
-
 
 #### Poll creation ####
 
@@ -254,7 +254,6 @@ def questionset_create(request):
     data['grade'] = grade
     return render_to_response ('grade/poll/section_create.html', data, context_instance = RequestContext( request ))
 
-
 def questionset_assign(request):
     pass
     
@@ -310,35 +309,6 @@ def tickets_enter(request):
     data[ 'form' ] = form
     data['grade'] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
-    
-def prepare_data( request ):
-    data = { 'errors'   : [], 
-             'polls'    : [],
-             'finished' : [] }
-    
-    for id, error in request.session.get( 'errors', default = [] ):
-        try:
-            p = Poll.objects.get( pk = id )
-            data[ 'errors' ].append( "%s: %s" % ( unicode( p ), error ))
-        except:
-            data[ 'errors' ].append( error )
-    
-    try:
-        del request.session[ 'errors' ]
-    except KeyError:
-        pass
-   
-    data[ 'polls' ]   = request.session.get( 'polls', default = [] )
-    data['finished' ] = request.session.get( 'finished', default = [] )
-    
-    data[ 'polls' ] = map( lambda (id, t): 
-                                (id, t, Poll.objects.get( pk = id ).to_url_title( True )), 
-                           data[ 'polls' ])
-    data[ 'finished' ] = map( lambda (id, t): 
-                                (id, t, Poll.objects.get( pk = id ).to_url_title( True )), 
-                              data[ 'finished' ])
-    return data
-
 
 def polls_for_user( request ):
     if not 'polls' in request.session.keys():
@@ -357,21 +327,26 @@ def poll_answer( request, pid, ticket ):
                    
     st = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
     
-    title   = poll.title
-    desc    = poll.description
-    s_forms = []
+    data[ 'title' ] = poll.title
+    data[ 'desc' ]  = poll.description
     
-    for section in poll.all_sections():
-        if request.method == "POST":
-            s_forms.append( SectionForm( request.POST, section = section, 
-                                                       poll    = poll.pk,
-                                                       ticket  = st ))
-        else: 
-            s_forms.append( SectionForm( section = section, 
-                                         poll    = poll.pk,
-                                         ticket  = st ))
+    if request.method == "POST":
+        form = PollForm( request.POST )
+        form.setFields( poll, st )
+        if form.is_valid():
+            for key, value in form.cleaned_data.items():
+                
+                if key == 'finish':
+                    if value:
+                        st.finished = True
+                        st.save()
+                else:
+                    [ poll, section, question ] = key.split( '_' )
+    else:
+        form = PollForm()
+        form.setFields( poll, st )
         
-    data[ 'forms' ] = (title, desc, s_forms )
+    data[ 'form' ] = form
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     

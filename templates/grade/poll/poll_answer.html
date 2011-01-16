@@ -11,20 +11,9 @@
 {% block poll-content %}
     <form action="" method="post">
         <table>
-            <tr><th>{{ forms.0 }}</th></tr>
-            <tr><td>{{ forms.1 }}</td></tr>
-            {% for form in forms.2 %}
-                {{ form.as_table }}
-            {% endfor %}
-            <tr>
-                <th>
-                    <label for="id_finish_grading">Zakończ oceniać:</label>
-                </th>
-                <td>
-                    <input type="checkbox" name="finish_grading" id="id_finish_grading" /><br>
-                    Jeśli zaznaczysz to pole, utracisz mozliwość edycji ankiety po zapisaniu.
-                </td>
-            </tr> 
+            <tr><th>{{ title }}</th></tr>
+            <tr><td>{{ desc }}</td></tr>
+            {{ form.as_table }}
         </table>
         <input type="submit" value="Zapisz ankietę" />
     </form>

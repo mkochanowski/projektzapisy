@@ -7,7 +7,7 @@ from option                   import Option
 
 class MultipleChoiceQuestionAnswer( BaseAnswer ):
     question = models.ForeignKey( MultipleChoiceQuestion, verbose_name = 'pytanie' )
-    options  = models.ManyToManyField( Option, verbose_name = 'odpowiedzi' )
+    options  = models.ManyToManyField( Option, verbose_name = 'odpowiedzi', blank = True )
     other    = models.CharField( max_length = 100, verbose_name = 'inne', blank = True )
     
     class Meta:
@@ -16,4 +16,4 @@ class MultipleChoiceQuestionAnswer( BaseAnswer ):
         app_label           = 'poll'
         
     def __unicode__( self ):
-        return unicode( self.options ) + unicode( self.other )
+        return unicode( list( self.options.all())) + unicode( self.other )
