@@ -8,10 +8,7 @@ Poll.section.init = function()
 	Poll.section.questions         = 0;
     Poll.section.questionContainer = $("#poll-form");
 
-	$("#add-question").click(function()
-    {
-		Poll.section.addQuestion();
-    })
+	$("#add-question").click(Poll.section.addQuestion)
 }
 
 Poll.section.addQuestion = function()
