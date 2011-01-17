@@ -326,7 +326,7 @@ def poll_answer( request, pid, ticket ):
     poll = Poll.objects.get( pk = pid )
     st   = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
     
-    if request.method == "POST":
+    if request.method == "POST" and not st.finished:
         form = PollForm( request.POST )
         form.setFields( poll, st )
         if form.is_valid():
