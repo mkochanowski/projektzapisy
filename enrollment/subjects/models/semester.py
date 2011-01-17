@@ -18,6 +18,8 @@ class Semester( models.Model ):
     # implies academic year: year/(year+1)
     records_opening = models.DateTimeField(blank = True, null = True, verbose_name='Czas otwarcia zapisów')
     records_closing = models.DateTimeField(blank = True, null = True, verbose_name='Czas zamkniecia zapisów')
+    semester_begining = models.DateField(blank = True, null = False, verbose_name='Data rozpoczęcia semestru')
+    semester_ending = models.DateField(blank = True, null = False, verbose_name='Data zakończenia semestru')
 
     def get_subjects(self):
         """ gets all subjects linked to semester """
@@ -29,8 +31,13 @@ class Semester( models.Model ):
 
     def is_current_semester(self):
         """ Answers to question: is semester current semester""" 
-        return (self.year == datetime.now().year and self.type == self.TYPE_WINTER) or (self.year + 1 == datetime.now().year and self.type == self.TYPE_SUMMER)
+        return (self.semester_begining <= datetime.now().date() and self.semester_ending >= datetime.now().date())
     
+    @staticmethod
+    def get_current_semester():
+        """ returns current semester """ 
+        return Semester.objects.get(semester_begining__lt =datetime.now().date(), semester_ending__gt= datetime.now().date())
+
     @staticmethod
     def is_visible(id):
         """ Answers if subject is sat as visible (displayed on subject lists) """
