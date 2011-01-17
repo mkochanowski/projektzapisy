@@ -1,7 +1,7 @@
 
 == Zależności ==
 
-* python = 2.6.x
+* python =  2.6.x
 http://www.python.org/
 - fedora, debian/ubuntu: python
 
