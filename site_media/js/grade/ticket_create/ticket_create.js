@@ -10,7 +10,9 @@ Ticket.create = Object()
 Ticket.create.init   = function()
 {
     Ticket.create.t_array        = new Array();
-    Ticket.create.unblinds_array = new Array();
+    Ticket.create.m_array        = new Array();
+    Ticket.create.unblindst_array = new Array();
+    Ticket.create.unblindt_array = new Array();
     Ticket.create.k_array        = new Array();
     Ticket.create.RAND_BITS      = 512;
     $("#connection_choice_button").click(Ticket.create.step1);
@@ -55,9 +57,14 @@ Ticket.create.step3  = function(unblinds)
     $.each(unblinds, Ticket.create.unblinds_generator);
 
     var hidden = document.createElement('input')
-    hidden.name = 'unblinds'
+    hidden.name = 'unblindst'
     hidden.type = 'hidden'
-    hidden.value = JSON.stringify(Ticket.create.unblinds_array)
+    hidden.value = JSON.stringify(Ticket.create.unblindst_array)
+    $("#connection_choice").append(hidden);
+    var hidden = document.createElement('input')
+    hidden.name = 'unblindt'
+    hidden.type = 'hidden'
+    hidden.value = JSON.stringify(Ticket.create.unblindt_array)
     $("#connection_choice").append(hidden);
 }
 
@@ -65,18 +72,19 @@ Ticket.create.unblinds_generator = function(index, unblind)
 {
     if (unblind[1] == "Nie masz uprawnień do tej ankiety")
     {
-        Ticket.create.unblinds_array.push(unblind[1])
+        Ticket.create.unblindst_array.push(unblind[1])
     }
     else if (unblind[1] == "Bilet już pobrano")
     {
-        Ticket.create.unblinds_array.push(unblind[1])
+        Ticket.create.unblindst_array.push(unblind[1])
     }
     else
     { 
         var st  = str2bigInt(unblind[1][0], 10, 10)
         var n   = str2bigInt(unblind[1][1], 10, 10)
         var rk  = inverseMod( Ticket.create.k_array[index], n )
-        Ticket.create.unblinds_array.push( bigInt2str(multMod(mod(st, n), mod(rk, n), n ), 10) )
+        Ticket.create.unblindst_array.push( bigInt2str(multMod(mod(st, n), mod(rk, n), n ), 10) )
+        Ticket.create.unblindt_array.push( bigInt2str(multMod(mod(Ticket.create.t_array[index], n), mod(rk, n), n ), 10) )
     }   
 }
 
@@ -95,6 +103,7 @@ Ticket.create.t_generator = function(key, val)
         } while((greater(k, n) || greater(int2bigInt(2, 2, 1), k)) && ! equalsInt(GCD(k, n), 1)) ;
 
         Ticket.create.k_array.push(k);
+        Ticket.create.m_array.push(m);
         var a = mod(m, n)
         var b = powMod( k, e, n )
         var t = multMod( a, b, n )

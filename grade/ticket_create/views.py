@@ -77,7 +77,6 @@ def ajax_get_rsa_keys_step2( request ):
                                 (unicode(t), unblind( g, st ) ),
                              signed )
                 message = simplejson.dumps(unblinds)
-                print message   
     return HttpResponse(message)
 
 @student_required
@@ -91,11 +90,12 @@ def connections_choice( request ):
                                 polls = groupped_polls )
          
         if form.is_valid():
-            unblinds = simplejson.loads( request.POST.get('unblinds', '') )
-            ts       = simplejson.loads( request.POST.get('ts', '') )
+            unblindst = simplejson.loads( request.POST.get('unblindst', '') )
+            unblindt  = simplejson.loads( request.POST.get('unblindt', '') )
+            ts        = simplejson.loads( request.POST.get('ts', '') )
             connected_groups = connect_groups( groupped_polls, form)
             groups           = reduce(list.__add__, connected_groups )
-            prepared_tickets = zip( groups, map(lambda (x): (int(x)), ts), unblinds )
+            prepared_tickets = zip( groups, unblindt, unblindst )
             #### final mark:
 
             for g, t, unblind in prepared_tickets:
