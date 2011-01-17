@@ -23,7 +23,7 @@ class TicketsForm( forms.Form ):
 
 class PollForm( forms.Form ):
     def setFields( self, poll, st ):
-        self.ticket = st
+        self.finished = st.finished
         for section in poll.all_sections():
             title     = 'poll-%d_section-%d' % ( poll.pk, section.pk )
             questions = section.all_questions()

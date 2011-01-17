@@ -7,7 +7,7 @@ from option                 import Option
 
 class SingleChoiceQuestionAnswer( BaseAnswer ):
     question = models.ForeignKey( SingleChoiceQuestion, verbose_name = 'pytanie' )
-    option   = models.ForeignKey( Option, verbose_name = 'odpowiedź' )
+    option   = models.ForeignKey( Option, verbose_name = 'odpowiedź', blank = True, null = True )
     
     class Meta:
         verbose_name_plural = 'odpowiedzi na pytania jednokrotnego wyboru'

@@ -15,6 +15,8 @@
             <tr><td>{{ desc }}</td></tr>
             {{ form.as_table }}
         </table>
-        <input type="submit" value="Zapisz ankietę" />
+        {% if not form.finished %}
+            <input type="submit" value="Zapisz ankietę" />
+        {% endif %}
     </form>
 {% endblock %}

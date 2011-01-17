@@ -24,8 +24,8 @@ def prepare_data( request ):
     except KeyError:
         pass
 	   
-    data[ 'polls' ]   = request.session.get( 'polls', default = [] )
-    data['finished' ] = request.session.get( 'finished', default = [] )
+    data[ 'polls' ]    = request.session.get( 'polls', default = [] )
+    data[ 'finished' ] = request.session.get( 'finished', default = [] )
     
     data[ 'polls' ] = map( lambda (id, t): 
                                 (id, t, Poll.objects.get( pk = id ).to_url_title( True )), 

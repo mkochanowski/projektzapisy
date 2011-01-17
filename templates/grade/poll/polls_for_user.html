@@ -33,7 +33,7 @@
 
 {% if finished %}
     <h4>Ankiety zakończone</h4>
-    <ul id="grade-not-fillable-poll-list">>
+    <ul id="grade-not-fillable-poll-list">
     {% for poll in finished %}
         <li><a href="{% url grade-poll-poll-answer poll.0 poll.1 %}">{{ poll.2 }}</a></li>
     {% endfor %}

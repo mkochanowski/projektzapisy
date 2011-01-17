@@ -6,7 +6,7 @@ from open_question import OpenQuestion
 
 class OpenQuestionAnswer( BaseAnswer ):
     question = models.ForeignKey( OpenQuestion, verbose_name = 'pytanie' )
-    content  = models.TextField( verbose_name = 'treść' )
+    content  = models.TextField( verbose_name = 'treść', blank = True, null = True )
     
     class Meta:
         verbose_name_plural = 'odpowiedzi na pytania otwarte'
