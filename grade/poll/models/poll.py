@@ -32,6 +32,25 @@ class Poll( models.Model ):
         if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
         return res
         
+    def to_url_title( self, break_lines = False ):
+        res = unicode( self.title )
+        if break_lines:
+            sep = u'<br>'
+        else:
+            sep = u', '
+            
+        if self.group: 
+            res += sep + self.group.subject.name
+            res += sep + self.group.get_type_display()
+            res += u': '   + self.group.get_teacher_full_name()
+        else:
+            res += sep + u'Ankieta ogólna'
+            
+        if self.studies_type: 
+            res += sep + u'typ studiów: ' + unicode( self.studies_type )
+        
+        return SafeUnicode( res )
+        
     def is_student_entitled_to_poll( self, student ):
         if self.group:
             rec = Record.objects.filter( student = student, 

@@ -1,0 +1,22 @@
+{% extends "grade/poll/polls_for_user.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+	<li><a href="{% url grade-poll-polls-for-user %}">Twoje ankiety</a></li>
+    <li><a href="{% url grade-poll-poll-answer pid ticket %}">{{ link_name }}</a></li>
+{% endblock %}
+
+
+{% block poll-content %}
+    <form action="" method="post">
+        <table>
+            <tr><th>{{ title }}</th></tr>
+            <tr><td>{{ desc }}</td></tr>
+            {{ form.as_table }}
+        </table>
+        {% if not form.finished %}
+            <input type="submit" value="Zapisz ankietę" />
+        {% endif %}
+    </form>
+{% endblock %}

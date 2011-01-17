@@ -5,7 +5,7 @@ from django.db import models
 from open_question            import OpenQuestionOrdering
 from single_choice_question   import SingleChoiceQuestionOrdering
 from multiple_choice_question import MultipleChoiceQuestionOrdering
-from fereol.grade.poll.utils  import ordering_cmp
+from utils                    import ordering_cmp
                         
 class Section( models.Model ):
     title       = models.CharField( max_length = 50,  verbose_name = 'tytuł' )

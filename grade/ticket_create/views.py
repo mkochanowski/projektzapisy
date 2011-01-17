@@ -19,7 +19,6 @@ from fereol.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 connect_groups, \
                                                 secure_signer_without_save, \
                                                 secure_mark
-
 from fereol.grade.ticket_create.forms    import PollCombineForm
 
 from fereol.grade.ticket_create.exceptions import *
@@ -31,7 +30,7 @@ from django.contrib.auth                   import authenticate, login, logout
 from fereol.grade.ticket_create.forms      import *
 
 from django.views.decorators.csrf          import csrf_exempt
-
+from Crypto.PublicKey import RSA
 def prepare_grade( request ):
     grade = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/ticket_create/prepare_grade.html', {'grade' : grade}, context_instance = RequestContext( request ))
@@ -72,7 +71,7 @@ def ajax_get_rsa_keys_step2( request ):
                 groups           = reduce(list.__add__, connected_groups )
                 tickets          = zip( groups, ts)
                 signed = map( lambda ( g, t): 
-                            (g, int(t), secure_signer_without_save( request.user, g, int(t) )),
+                            (g, long(t), secure_signer_without_save( request.user, g, long(t) )),
                              tickets )
                 unblinds = map ( lambda ( g, t, st ): 
                                 (unicode(t), unblind( g, st ) ),
@@ -128,7 +127,7 @@ def tickets_save( request, ticket_list ):
     prepared_tickets = map ( lambda ( g, t, st, ( m, k ) ): 
                                 (g, m, unblind( g, st, k ) ),
                              signed )
- 
+     
     errors, tickets_to_serve = get_valid_tickets( prepared_tickets )
 
     data = { 'errors'  : errors,
