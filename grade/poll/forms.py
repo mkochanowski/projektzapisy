@@ -52,7 +52,7 @@ class PollForm( forms.Form ):
                                 required = False,
                                 widget   = forms.widgets.RadioSelect(),
                                 initial  = answer )
-                    field.widget.attrs[ 'disabled' ] = self.finished
+                    if self.finished: field.widget.attrs[ 'disabled' ] = True
                     self.fields[ unicode( title ) ]  = field
                     questions = questions[ 1: ]
                     
@@ -81,7 +81,7 @@ class PollForm( forms.Form ):
                                                required = False,
                                                widget   = forms.widgets.RadioSelect(),
                                                initial  = answer )
-                    field.widget.attrs[ 'disabled' ] = self.finished
+                    if self.finished: field.widget.attrs[ 'disabled' ] = True
                     self.fields[ unicode( title ) ] = field
                 elif str( type( question )) == \
                     "<class 'fereol.grade.poll.models.multiple_choice_question.MultipleChoiceQuestion'>":
@@ -108,7 +108,7 @@ class PollForm( forms.Form ):
                                         label    = u'', 
                                         initial  = other_ans,
                                         required = False )
-                        other_field.widget.attrs[ 'disabled' ] = self.finished
+                        if self.finished: other_field.widget.attrs[ 'disabled' ] = True
                         if other_ans: answer.append( -1 )
                     
                     field = forms.MultipleChoiceField( 
@@ -118,7 +118,7 @@ class PollForm( forms.Form ):
                                 widget     = forms.widgets.CheckboxSelectMultiple(),
                                 initial    = answer,
                                 validators = [ MaxLengthValidator( question.choice_limit )])
-                    field.widget.attrs[ 'disabled' ] = self.finished
+                    if self.finished: field.widget.attrs[ 'disabled' ] = True
                     self.fields[ unicode( title ) ] = field
                     if question.has_other:
                         self.fields[ unicode( title + '-other' ) ] = other_field
@@ -141,7 +141,7 @@ class PollForm( forms.Form ):
                                 label  = unicode( question.content ),
                                 required = False,
                                 initial  = answer )
-                    field.widget.attrs[ 'disabled' ] = self.finished
+                    if self.finished: field.widget.attrs[ 'disabled' ] = True
                     self.fields[ unicode( title ) ] = field
         
         if not self.finished:
