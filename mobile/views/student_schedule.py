@@ -28,7 +28,7 @@ def studentSchedule(request, schedule_owner=None, delta=None):
             owner = User.objects.get(username=schedule_owner)
         
         #receiving subjects for given weekday
-        groups = Record.get_student_all_detiled_enrollings(owner.id)
+        groups = Record.get_student_all_detailed_enrollings(owner.id)
         schedule = []
         for group in groups:
             for term in group.terms_:
