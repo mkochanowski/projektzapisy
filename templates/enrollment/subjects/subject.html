@@ -61,61 +61,63 @@
 			<p class="main-message">{{ message }}</p>
 		{% endfor %}
 
-		{% for tutorial in tutorials %}
-			{% if tutorial.groups %}
-				<h3>{{tutorial.name}}</h3>
-					<div>
-						<table class="subject-details-table">
-							<thead>
-								<tr>
-									<th>Prowadzący</th><th>Termin zajęć</th><th>Max. liczba osób</th><th>Akt. liczba osób</th><th>Liczba osób w kolejce</th>
-								</tr>
-							</thead>
-							<tbody>
-							{% for t in tutorial.groups %}
-								<tr>
-									<td>{{ t.get_teacher_full_name }}</td>
-									<td>
-										{% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
-										   {{d}}<br/>
-										{% endfor %}
-									</td>
-									<td>{{ t.get_group_limit }}</td>
-									<td>{{ t.enrolled }}</td>
-									<td>{{ t.queued }}</td>
-									<td>
-									{% if subject.is_recording_open %}
-										{% if t.signed %}
-											<a class="subject-details-link forget" href="{% url record-resign t.id %}">wypisz</a>
+		{% for tutorial in tutorials %}{% if tutorial.groups %}
+			<div class="tutorial">
+				<h2>{{tutorial.name}}</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Prowadzący</th>
+							<th class="term">Termin zajęć</th>
+							<th title="Maksymalna liczba osób, które mogą zapisać się na przedmiot" class="number">Limit</th>
+							<th title="Liczba aktualnie zapisanych osób" class="number">Zapisanych</th>
+							<th title="Liczba osób oczekujących na zapis" class="number">W kolejce</th>
+							<td class="controls"></td>
+						</tr>
+					</thead>
+					<tbody>
+					{% for t in tutorial.groups %}
+						<tr {% if t.signed %} class="signed" {% endif %} >
+							<td>{{ t.get_teacher_full_name }}</td>
+							<td class="term">
+								{% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
+									<span>{{d}}</span>
+								{% endfor %}
+							</td>
+							<td class="number">{{ t.get_group_limit }}</td>
+							<td class="number">{{ t.enrolled }}</td>
+							<td class="number">{{ t.queued }}</td>
+							<td class="controls">
+								{% if subject.is_recording_open %}
+									{% if t.signed %}
+										<a href="{% url record-resign t.id %}">wypisz</a>
+									{% else %}
+										{% if t.is_in_diff %}
+											<a href="{% url record-assign t.id %}">przenieś</a>
 										{% else %}
-											{% if t.is_in_diff %}
-												<a class="subject-details-link forget" href="{% url record-assign t.id %}">przenieś</a>
-											{% else %}
-												{% if t.is_full %}
-													{% if t.priority %}
-														<a class="subject-details-link forget" href="{% url queue-resign t.id %}">wypisz z kolejki</a></td>
-														<td> priorytet <br />
-														<a class="subject-details-link forget" href="{% url dec-priority t.id %}"> - </a>
-														{{ t.priority }}
-														<a class="subject-details-link forget" href="{% url inc-priority t.id %}"> + </a>
-													{% else %}
-														<a class="subject-details-link forget" href="{% url queue-assign t.id %}">zapisz do kolejki</a>
-													{% endif %}
+											{% if t.is_full %}
+												{% if t.priority %}
+													<a href="{% url queue-resign t.id %}">wypisz z kolejki</a>
+													<td> priorytet <br />
+													<a href="{% url dec-priority t.id %}"> - </a>
+													{{ t.priority }}
+													<a href="{% url inc-priority t.id %}"> + </a>
 												{% else %}
-													<a class="subject-details-link forget" href="{% url record-assign t.id %}">zapisz</a>
+													<a href="{% url queue-assign t.id %}">zapisz do kolejki</a>
 												{% endif %}
+											{% else %}
+												<a href="{% url record-assign t.id %}">zapisz</a>
 											{% endif %}
 										{% endif %}
 									{% endif %}
-									</td>
-									<td><a class="subject-details-link forget" href="{% url group-records t.id %}">Lista</a></td>
-								</tr>
-							{% endfor %}
-							</tbody>
-						</table>
-					</div>
-            <br />
-			{% endif %}
-		{% endfor %}
+								{% endif %}
+								<a href="{% url group-records t.id %}">lista</a>
+							</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% endif %}{% endfor %}
 	</div>
 {% endblock %}

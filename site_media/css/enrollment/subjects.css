@@ -131,3 +131,115 @@
 	font-size: 12px;
 	float: right;
 }
+
+/*******************************************************************************
+ * Widok przedmiotu - listy terminów
+ ******************************************************************************/
+
+#enr-subject-view .tutorial
+{
+	padding-bottom: 20px;
+}
+
+#enr-subject-view .tutorial h2
+{
+	font-size: 18px;
+	font-weight: normal;
+	padding-bottom: 5px;
+}
+
+#enr-subject-view .tutorial table
+{
+	width: 100%;
+
+	background: #f8f8f8;
+	border: 1px solid #cccccc;
+
+	border-spacing: 0;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+#enr-subject-view .tutorial table tr.signed
+{
+	background: #e9e9e9;
+}
+
+#enr-subject-view .tutorial table th.term
+{
+	width: 230px;
+}
+
+#enr-subject-view .tutorial table td.term span
+{
+	display: block;
+}
+
+#enr-subject-view .tutorial table td.controls
+{
+	width: 100px;
+	white-space: nowrap;
+	text-align: right;
+}
+
+#enr-subject-view .tutorial table td.controls a
+{
+	padding: 0 3px;
+}
+
+#enr-subject-view .tutorial table th.number
+{
+	white-space: nowrap;
+	width: 30px;
+	padding: 0 5px;
+}
+
+#enr-subject-view .tutorial table .number
+{
+	text-align: center;
+}
+
+/*******************************************************************************
+ * Widok przedmiotu - listy terminów - padding tabeli i obramowania
+ ******************************************************************************/
+
+#enr-subject-view .tutorial table thead th
+{
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+#enr-subject-view .tutorial table thead th:first-child,
+#enr-subject-view .tutorial table tbody td:first-child
+{
+	padding-left: 5px;
+}
+
+#enr-subject-view .tutorial table tbody td:last-child
+{
+	padding-right: 5px;
+}
+
+#enr-subject-view .tutorial table thead th,
+#enr-subject-view .tutorial table thead td
+{
+	border-bottom: 1px solid #cccccc;
+}
+
+#enr-subject-view .tutorial table tbody td
+{
+	border-bottom: 1px dotted #cccccc;
+}
+
+#enr-subject-view .tutorial table tbody tr:first-child td
+{
+	padding-top: 3px;
+}
+
+#enr-subject-view .tutorial table tbody tr:last-child td
+{
+	border-bottom: 0;
+	padding-bottom: 3px;
+}
