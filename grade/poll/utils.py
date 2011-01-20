@@ -3,9 +3,8 @@ from Crypto.PublicKey         import RSA
 from fereol.grade.poll.models import Poll
 
 def check_signature( ticket, signed_ticket, public_key ):
-    #- pk = RSA.importKey( public_key.public_key )
-    #- return pk.verify( ticket, (signed_ticket,) )
-    return True
+    pk = RSA.importKey( public_key.public_key )
+    return pk.verify( ticket, (signed_ticket,) )
 
 def prepare_data( request ):
     data = { 'errors'   : [], 
