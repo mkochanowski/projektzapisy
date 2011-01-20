@@ -101,16 +101,27 @@ def prepare_data( request, slug ):
                                         (id, t, Poll.objects.get( pk = id ).to_url_title( True )), 
                                     l)), 
                             request.session.get( "finished", default = [] ))
-        
-    #- map( lambda (sub, polls_and_tickets):
-                                #- (sub, map( lambda (id, t): 
-                                    #- (id, t, Poll.objects.get( pk = id ).to_url_title( True )), 
-                                #- polls_and_tickets)),
-                              #- request.session.get( 'finished', default = [] ))
-    import pprint
-    print "OTWARTE"
-    pprint.pprint( data[ 'polls' ] )
-    print "ZAKOŃCZONE"
-    pprint.pprint( data[ 'finished' ] )
     
     return data
+
+def get_next( poll_list, finished_list, poll_id ):
+    ret = False
+    for (p_id, t, s) in poll_list:
+        if ret: return (p_id, t, s)
+        ret = p_id == poll_id
+    
+    ret = False
+    for (p_id, t, s) in finished_list:
+        if ret: return (p_id, t, s)
+        ret = p_id == poll_id
+        
+    return None
+    
+    
+def get_prev( poll_list, finished_list, poll_id ):
+    p = poll_list
+    p.reverse()
+    f = finished_list
+    f.reverse()
+    
+    return get_next( p, f, poll_id )

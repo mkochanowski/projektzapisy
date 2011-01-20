@@ -29,7 +29,9 @@ from fereol.grade.poll.forms           import TicketsForm, \
 from fereol.grade.poll.utils           import check_signature, \
                                               prepare_data, \
                                               group_polls_and_tickets_by_subject, \
-                                              create_slug
+                                              create_slug, \
+                                              get_next, \
+                                              get_prev
 
 def default(request):
 	grade = Semester.get_current_semester().is_grade_active
@@ -331,6 +333,7 @@ def poll_answer( request, slug, pid, ticket ):
     if request.method == "POST" and not st.finished:
         form = PollForm( request.POST )
         form.setFields( poll, st )
+        
         if form.is_valid():
             for key, value in form.cleaned_data.items():
                 
@@ -438,8 +441,6 @@ def poll_answer( request, slug, pid, ticket ):
                         
                         ans.content = value
                         ans.save()
-                        
-            return HttpResponseRedirect( 'grade/poll/poll_answer/' + pid + '/' + ticket )
     else:
         form = PollForm()
         form.setFields( poll, st )
@@ -450,6 +451,23 @@ def poll_answer( request, slug, pid, ticket ):
     data[ 'title' ]     = poll.title
     data[ 'desc' ]      = poll.description
     data[ 'form' ]      = form
+    
+    try:
+        poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
+    except IndexError:
+        poll_cands = []
+        
+    try:
+        finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
+    except:
+        finished_cands = []
+    
+    data[ 'next' ]      = get_next( poll_cands, finished_cands, int( pid ))
+    data[ 'prev' ]      = get_prev( poll_cands, finished_cands, int( pid ))
+
+    if request.method == "POST" and (data[ 'form' ].is_valid() or st.finished):
+        print unicode( data[ 'next' ])
+        print unicode( data[ 'prev' ])
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     

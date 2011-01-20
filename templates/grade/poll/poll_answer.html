@@ -15,8 +15,20 @@
             <tr><td>{{ desc }}</td></tr>
             {{ form.as_table }}
         </table>
+        <input  type="submit" 
+                name="Prev" 
+                {% if not prev %}
+                    disabled="True"
+                {% endif %}
+                value="<< Poprzednia ankieta" />
         {% if not form.finished %}
-            <input type="submit" value="Zapisz ankietę" />
+            <input type="submit" name="Save" value="Zapisz ankietę" />
         {% endif %}
+        <input type="submit" 
+               name="Next" 
+               {% if not next %}
+                    disabled="True"
+               {% endif %}
+               value="Następna ankieta >>" />
     </form>
 {% endblock %}
