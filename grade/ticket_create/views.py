@@ -135,6 +135,8 @@ def tickets_save( request, ticket_list ):
              'grade' : grade}
              
     return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
+
+
 @csrf_exempt
 def client_connection( request ):
     
@@ -151,17 +153,32 @@ def client_connection( request ):
         
             user = authenticate(username=idUser, password=passwordUser)
 
-
-
             if user:
                 pass
             else:
                 return HttpResponse(u"nie ma takiego użytkownika")
 
-            if user.student:
-                pass
-            else:
-                return HttpResponse(u"nie jesteś studentem")
+
+            if groupNumber == u"*":
+                st=u""
+                students_polls = Poll.get_all_polls_for_student( user.student )
+                for students_poll in students_polls:
+                    st += unicode( students_poll.pk ) + u'\n'
+                    st += unicode( students_poll.title ) + u' '
+        
+                    if students_poll.group:
+                        st += unicode( students_poll.group.subject.name ) + u' '
+                        st += unicode( students_poll.group.get_type_display()) + u' '
+                        st += unicode( students_poll.group.get_teacher_full_name()) + u' '
+                    
+                    if students_poll.studies_type:
+                        st += unicode( students_poll.studies_type ) + ' '
+
+                    st +=unicode( '\n' )
+                        
+                    st += unicode( PublicKey.objects.get( poll = students_poll.pk ).public_key ) + '\n'
+
+                return HttpResponse( st )
 
             
             students_polls = Poll.get_all_polls_for_student( user.student )
@@ -171,7 +188,8 @@ def client_connection( request ):
             for students_poll in students_polls:
                 if int(students_poll.pk) == int(groupNumber):
                     
-                    st = secure_signer( user, students_poll, groupKey )
+                    st = secure_signer_without_save( user, students_poll, groupKey)
+                    secure_signer( user, students_poll, groupKey )
                     p = students_poll
                     break
             if st == "":
@@ -197,11 +215,11 @@ def client_connection( request ):
                     res += p.group.get_teacher_full_name() + " &#10;"
                 if p.studies_type:
                     res += u'dla studiów ' + unicode(p.studies_type) + " &#10;"
-                res += unicode(st[0][0])
+                res += unicode(a)
                 return HttpResponse(res)
 
             
 @csrf_exempt
 def keys_list( request ):
     l = PublicKey.objects.all()
-    return render_to_response('grade/ticket_create/keys_list.html', {'list': l, 'grade' : grade},context_instance = RequestContext( request ))
+    return render_to_response('grade/ticket_create/keys_list.html', {'list': l,},context_instance = RequestContext( request ))

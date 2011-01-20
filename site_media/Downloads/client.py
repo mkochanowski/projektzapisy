@@ -5,7 +5,8 @@ from Crypto.Random.random              import getrandbits, \
 import urllib
 import urllib2
 import sys
-
+import getpass
+import os
 
 
 RAND_BITS = 512
@@ -70,11 +71,24 @@ def generate_sygnature( n , e , m ):
     return (t,k)
 
 def get_url():
-    file_with_url = open("url.txt","r")
-    return file_with_url.read()
+    """
+
+    Get server adress from text file
+
+    """
+    try:
+        file_with_url = open("url.txt","r")
+    except IOError, err:
+        return u'http://localhost:8000/grade/ticket/client_connection'
+    return file_with_url.read() + u'grade/ticket/client_connection'
 
 
 def send_package(idUser, passwordUser, i, e, n, m = getrandbits( RAND_BITS ) ):
+    """
+
+    Send keys and get encrypted ticket.
+        
+    """
     
     t,k = generate_sygnature(n,e,m)
     
@@ -89,7 +103,7 @@ def send_package(idUser, passwordUser, i, e, n, m = getrandbits( RAND_BITS ) ):
     
     data = urllib.urlencode(values)
 
-    url = get_url()
+    url = get_url()  
     
     req = urllib2.Request(url, data, headers)
     
@@ -112,7 +126,25 @@ def send_package(idUser, passwordUser, i, e, n, m = getrandbits( RAND_BITS ) ):
         print "nie udało się pobrać klucza"
         print st_response
 
+def get_user():
+    """
+
+    Enter id and password from keyboard.
+        
+    """
+    userId=""
+    userPassword=""
+    userId=raw_input(u"id:")
+    userPassword = getpass.getpass()
+    return userId,userPassword
+
 def save_result(k, n, m, st_response):
+    """
+
+    Save a ticket in text file.
+    File is appended.
+        
+    """
     rk  = revMod( k, n )
     sp_response = (st_response).split(" &#10;")
     last = sp_response.pop()
@@ -120,30 +152,126 @@ def save_result(k, n, m, st_response):
     w = ""
     for txt in sp_response:
         w += txt + " \n"
-    file_with_result = open("wynik.txt","w")
+    file_with_result = open("wynik.txt","a")
     file_with_result.write(w + str(m) + " \n" + str(st) + " \n---------------------------------- \n")
     file_with_result.close()
 
 
-def get_key():
-    file_with_key = open("klucz.txt","r")
-    file_string = file_with_key.read()
-    
-    begin_string = file_string[:26]
-    key_string = file_string[26:(len(file_string)-24)]
-    end_string = file_string[(len(file_string)-24):]
-    
-    key_string = key_string.replace(" ","\n")
+def get_key(pollList,sendList):
+    """
 
-    key = RSA.importKey (begin_string+key_string+end_string)
-    
-    file_with_key.close()
-    
-    return key
+    Get list of pairs ( poll id, poll public key ) from response and list of chosen polls
+        
+    """
+    keys=[]
+    while len(sendList)>0:
+        pos = sendList.pop(0)
+        if (int(pos)-1) < len(pollList):
+            n,v,k = pollList[int(pos)-1]
+            keys.append((n,k))
+    return keys
 
-def client(idUser, passwordUser, nr):
-    key = get_key()
-    send_package( idUser, passwordUser, nr ,key.e, key.n)
+def get_poll_list(idUser, passwordUser):
+    """
+
+    Get polls of user.
+        
+    """
+        
+    url = get_url() 
+    
+    
+    values = {
+        'idUser'        : idUser,
+        'passwordUser'  : passwordUser,
+        'groupNumber'    : u'*',
+        'groupKey'       : u'0'
+    }
+
+    headers = { 'User-Agent' : 'firefox' }
+    
+    data = urllib.urlencode(values)
+    
+    req = urllib2.Request(url, data, headers)
+    
+    
+    try: response = urllib2.urlopen(req)
+    except urllib2.HTTPError, er:
+        print er.code
+        print er.msg
+        print er.headers
+        print er.fp.read()
+
+    st = response.read()
+    return st
+
+def menu(st):
+    """
+
+    Chose poll from list.
+    User innterface.
+        
+    """
+    pos = 1
+    poll_list = []
+    while int(pos)>0 :
+        if os.name == "posix":
+                os.system('clear')
+        elif os.name in ("nt", "dos", "ce"):
+                os.system('CLS')
+        i = 1
+        for n,v,s in st:
+            print i
+            i+=1
+            print v
+            print "------"
+        print "ankiety do wysłania:"
+        choosen_list = u"["
+        for p in poll_list:
+            choosen_list += unicode(p)+","
+        choosen_list += u"]"
+        print choosen_list
+        print "podaj numer ankiety do wysłania (  0 - wysyła dane, -1 - konczy działanie )"
+        pos=raw_input()
+        poll_list.append(int(pos))
+    return poll_list
+
+def to_list(st):
+    """
+
+    Convert response to list.
+        
+    """
+    result =[]
+    st_l = st.split("\n")
+    while len(st_l)>2 :
+        nr = st_l.pop(0)
+        view = st_l.pop(0)
+        key = st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0)
+        result.append((nr,view,RSA.importKey(key)))
+    return  result
+        
+def client():
+    """
+
+    Main client function.
+        
+    """
+    idUser,passwordUser = get_user()
+    pollSt = get_poll_list(idUser, passwordUser)
+    try:
+        x = long(pollSt.split("\n")[0])
+    except ValueError, err:
+        print "nie udało się pobrać klucza"
+        print pollSt
+        return
+    pollList = to_list(pollSt)
+    sendList = menu(pollList)
+    if sendList.pop(len(sendList)-1) == '-1':
+        return
+    keys = get_key(pollList,sendList)
+    for nr,key in keys:
+        send_package( idUser, passwordUser, nr ,key.e, key.n)
 
 if __name__ == "__main__":
-     client( sys.argv[1], sys.argv[2], sys.argv[3])
+    client()
