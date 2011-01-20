@@ -27,7 +27,9 @@ from fereol.users.models               import Type
 from fereol.grade.poll.forms           import TicketsForm, \
                                               PollForm
 from fereol.grade.poll.utils           import check_signature, \
-                                              prepare_data
+                                              prepare_data, \
+                                              group_polls_and_tickets_by_subject, \
+                                              create_slug
 
 def default(request):
 	grade = Semester.get_current_semester().is_grade_active
@@ -275,14 +277,14 @@ def tickets_enter(request):
         form = TicketsForm( request.POST )
         
         if form.is_valid():
-            tickets_plaintext  = form.cleaned_data[ 'ticketsfield' ]
-            titles_and_tickets = from_plaintext( tickets_plaintext )
+            tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
+            ids_and_tickets   = from_plaintext( tickets_plaintext )
             
             errors   = []
             polls    = []
             finished = []
             
-            for (id, (ticket, signed_ticket)) in titles_and_tickets:
+            for (id, (ticket, signed_ticket)) in ids_and_tickets:
                 try:
                     poll       = Poll.objects.get( pk = id )
                     public_key = PublicKey.objects.get( poll = poll )
@@ -291,38 +293,38 @@ def tickets_enter(request):
                             st = SavedTicket.objects.get( poll   = poll,
                                                           ticket = ticket )
                             if st.finished:
-                                finished.append(( id, ticket ))
+                                finished.append(( poll, ticket ))
                             else:
-                                polls.append(( id, ticket ))
+                                polls.append(( poll, ticket ))
                         except:
                             st = SavedTicket( poll = poll, ticket = ticket )
                             st.save()
-                            polls.append(( id, ticket ))
+                            polls.append(( poll, ticket ))
                     else:
                         errors.append(( id, "Nie udało się zweryfikować podpisu pod biletem." ))
                 except:
                     errors.append(( id, "Podana ankieta nie istnieje" ))
+                    
+            request.session[ "errors" ]            = errors
+            request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_subject( polls ))
+            request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_subject( finished ))
             
-            request.session[ "polls" ]    = polls
-            request.session[ "errors" ]   = errors
-            request.session[ "finished" ] = finished
-            
-            return HttpResponseRedirect( '/grade/poll/polls' )
+            return HttpResponseRedirect( '/grade/poll/polls/all' )
     else:
         form = TicketsForm()
     data[ 'form' ] = form
     data['grade'] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
 
-def polls_for_user( request ):
+def polls_for_user( request, slug ):
     if not 'polls' in request.session.keys():
         return HttpResponseRedirect( '/grade/poll/tickets_enter' )
     
-    data = prepare_data( request )
+    data = prepare_data( request, slug )
     
     return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
     
-def poll_answer( request, pid, ticket ):
+def poll_answer( request, slug, pid, ticket ):
     poll = Poll.objects.get( pk = pid )
     st   = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
     
@@ -442,13 +444,12 @@ def poll_answer( request, pid, ticket ):
         form = PollForm()
         form.setFields( poll, st )
     
-    data = prepare_data( request )
-    data[ 'pid' ]       = pid
-    data[ 'ticket' ]    = ticket
+    data = prepare_data( request, slug )
     data[ 'link_name' ] = poll.to_url_title()
-    data[ 'title' ] = poll.title
-    data[ 'desc' ]  = poll.description
-    data[ 'form' ] = form
+    data[ 'slug' ]      = slug
+    data[ 'title' ]     = poll.title
+    data[ 'desc' ]      = poll.description
+    data[ 'form' ]      = form
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     

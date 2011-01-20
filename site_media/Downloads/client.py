@@ -6,10 +6,7 @@ import urllib
 import urllib2
 import sys
 
-
-
 RAND_BITS = 512
-
 
 def gcwd( u, v ):
 	u1 = 1
