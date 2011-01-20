@@ -25,9 +25,12 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               OpenQuestionAnswer
 from fereol.users.models               import Type
 from fereol.grade.poll.forms           import TicketsForm, \
-                                              PollForm
+                                              PollForm, \
+                                              FilterMenu
 from fereol.grade.poll.utils           import check_signature, \
                                               prepare_data
+
+from fereol.users.models                 import Employee
 
 def default(request):
 	grade = Semester.get_current_semester().is_grade_active
@@ -454,6 +457,13 @@ def poll_answer( request, pid, ticket ):
     
 #### Poll results ####
 
+@login_required
 def poll_results(request):
-    pass
+        
+    group = Employee.get_all_groups( request.user.id )
+    
+    form = FilterMenu( request.POST )
+    data = { 'form' : form, 'list' : group }
+    return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))
+
 
