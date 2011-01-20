@@ -5,9 +5,8 @@ from fereol.grade.poll.models         import Poll
 from fereol.grade.ticket_create.utils import poll_cmp
 
 def check_signature( ticket, signed_ticket, public_key ):
-    #- pk = RSA.importKey( public_key.public_key )
-    #- return pk.verify( ticket, (signed_ticket,) )
-    return True
+    pk = RSA.importKey( public_key.public_key )
+    return pk.verify( ticket, (signed_ticket,) )
 
 def group_polls_and_tickets_by_subject( poll_and_ticket_list ):
     if poll_and_ticket_list == []: return []

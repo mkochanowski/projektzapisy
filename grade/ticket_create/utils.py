@@ -248,7 +248,7 @@ def unblind( poll, st ):
     else:
         st  = st[0]
         key = RSA.importKey( PublicKey.objects.get( poll = poll ).public_key )
-        return (unicode(st), unicode(key.n))
+        return (unicode(st), unicode(key.n), unicode(key.e))
         
 def get_valid_tickets( tl ):
     err = []
