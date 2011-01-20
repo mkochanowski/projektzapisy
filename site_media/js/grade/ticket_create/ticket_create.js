@@ -105,7 +105,6 @@ Ticket.create.t_generator = function(key, val)
 
         Ticket.create.k_array.push(k);
         Ticket.create.m_array.push(m);
-        Ticket.create.mtext_array.push(bigInt2str(m,10));
         var a = mod(m, n)
         var b = powMod( k, e, n )
         var t = multMod( a, b, n )
