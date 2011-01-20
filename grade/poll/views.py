@@ -466,8 +466,13 @@ def poll_answer( request, slug, pid, ticket ):
     data[ 'prev' ]      = get_prev( poll_cands, finished_cands, int( pid ))
 
     if request.method == "POST" and (data[ 'form' ].is_valid() or st.finished):
-        print unicode( data[ 'next' ])
-        print unicode( data[ 'prev' ])
+        if request.POST.get( 'Next', default=None ):
+            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]) + '/' + str( data['next'][1]))
+        if request.POST.get( 'Prev', default=None ):
+            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['prev'][0]) + '/' + str( data['prev'][1]))
+        if request.POST.get( 'Save', default=None ):
+            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + pid + '/' + ticket )
+            
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     

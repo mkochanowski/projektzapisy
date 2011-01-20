@@ -18,8 +18,8 @@ class TicketsForm( forms.Form ):
     ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 
                                                     attrs = {'cols' : 80, 
                                                              'rows' : 20 }), 
-                                 label     = "Podaj wygenerowane klucze",
-                                 help_text = "Wklej tutaj pobrane wcześniej klucze." )
+                                 label     = "Podaj wygenerowane bilety",
+                                 help_text = "Wklej tutaj pobrane wcześniej bilety." )
 
 class PollForm( forms.Form ):
     def setFields( self, poll, st ):
