@@ -1,0 +1,1 @@
+[{"pk": 1, "model": "records.record", "fields": {"status": "1", "group": 1, "student": 1}}, {"pk": 2, "model": "records.record", "fields": {"status": "1", "group": 2, "student": 1}}]
