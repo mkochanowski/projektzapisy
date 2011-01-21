@@ -1,0 +1,247 @@
+/**
+ * Style odpowiedzialne za widoki dotyczące przeglądania i zapisów na
+ * przedmioty.
+ */
+
+/*******************************************************************************
+ * Panel filtrowania
+ ******************************************************************************/
+
+#enr-subjectsList-other
+{
+	width: 390px;
+}
+
+
+/*******************************************************************************
+ * Lista przedmiotów
+ ******************************************************************************/
+
+.subjects-list li
+{
+	margin-bottom: 7px;
+}
+
+
+/*******************************************************************************
+ * Widok przedmiotu - ogólne
+ ******************************************************************************/
+
+#enr-subject-view h1
+{
+	font-weight: normal;
+	font-size: 29px;
+	padding-bottom: 10px;
+}
+
+
+/*******************************************************************************
+ * Widok przedmiotu - szczegóły
+ ******************************************************************************/
+
+#enr-subject-view
+{
+	position: relative;
+}
+
+#enr-subject-view .details
+{
+	position: relative;
+	margin-bottom: 20px;
+	overflow: hidden;
+}
+
+#enr-subject-view .details h2
+{
+	font-size: 14px;
+	color: #999999;
+	font-weight: bold;
+
+	margin-bottom: 10px;
+}
+
+#enr-subject-view .details ul.properties
+{
+	list-style: none;
+
+	padding: 0;
+	margin-right: 15px;
+	margin-bottom: 12px;
+	width: 320px;
+
+	border: 1px solid #cccccc;
+	background: none repeat scroll 0 0 #f8f8f8;
+
+	float: left;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+#enr-subject-view .details ul.properties li
+{
+	border-bottom: 1px dotted #cccccc;
+	padding: 3px 5px;
+	font-size: 12px;
+
+	/* dziwne, ale bez tego nie da się zaznaczać tego bloku */
+	z-index: 1;
+	position: relative;
+}
+
+#enr-subject-view .details ul.properties li:last-child
+{
+	border-bottom: 0;
+}
+
+#enr-subject-view .details ul.properties li span
+{
+	color: #666666;
+}
+
+#enr-subject-view .details .description
+{
+	position: relative;
+	margin-bottom: 12px;
+}
+
+#enr-subject-view .details .description .more
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	display: none;
+
+	background: white;
+	padding-left: 7px;
+
+	white-space: nowrap;
+}
+
+#enr-subject-view .details .footer
+{
+	clear: left;
+	margin-top: -12px;
+}
+
+#enr-subject-view .details-toggle
+{
+	font-size: 12px;
+	float: right;
+}
+
+/*******************************************************************************
+ * Widok przedmiotu - listy terminów
+ ******************************************************************************/
+
+#enr-subject-view .tutorial
+{
+	padding-bottom: 20px;
+}
+
+#enr-subject-view .tutorial h2
+{
+	font-size: 18px;
+	font-weight: normal;
+	padding-bottom: 5px;
+}
+
+#enr-subject-view .tutorial table
+{
+	width: 100%;
+
+	background: #f8f8f8;
+	border: 1px solid #cccccc;
+
+	border-spacing: 0;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+#enr-subject-view .tutorial table tr.signed
+{
+	background: #e9e9e9;
+}
+
+#enr-subject-view .tutorial table th.term
+{
+	width: 230px;
+}
+
+#enr-subject-view .tutorial table td.term span
+{
+	display: block;
+}
+
+#enr-subject-view .tutorial table td.controls
+{
+	width: 100px;
+	white-space: nowrap;
+	text-align: right;
+}
+
+#enr-subject-view .tutorial table td.controls a
+{
+	padding: 0 3px;
+}
+
+#enr-subject-view .tutorial table th.number
+{
+	white-space: nowrap;
+	width: 30px;
+	padding: 0 5px;
+}
+
+#enr-subject-view .tutorial table .number,
+#enr-subject-view .tutorial table td.priority
+{
+	text-align: center;
+}
+
+/*******************************************************************************
+ * Widok przedmiotu - listy terminów - padding tabeli i obramowania
+ ******************************************************************************/
+
+#enr-subject-view .tutorial table thead th
+{
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+#enr-subject-view .tutorial table thead th:first-child,
+#enr-subject-view .tutorial table tbody td:first-child
+{
+	padding-left: 5px;
+}
+
+#enr-subject-view .tutorial table thead th:last-child,
+#enr-subject-view .tutorial table tbody td:last-child
+{
+	padding-right: 5px;
+}
+
+#enr-subject-view .tutorial table thead th,
+#enr-subject-view .tutorial table thead td
+{
+	border-bottom: 1px solid #cccccc;
+}
+
+#enr-subject-view .tutorial table tbody td
+{
+	border-bottom: 1px dotted #cccccc;
+}
+
+#enr-subject-view .tutorial table tbody tr:first-child td
+{
+	padding-top: 3px;
+}
+
+#enr-subject-view .tutorial table tbody tr:last-child td
+{
+	border-bottom: 0;
+	padding-bottom: 3px;
+}

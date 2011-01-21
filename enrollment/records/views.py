@@ -14,6 +14,7 @@ from enrollment.subjects.models import *
 from users.models import *
 from enrollment.records.models import *
 from enrollment.records.exceptions import *
+from enrollment.subjects.views import prepare_subjects_list_to_render
 
 from datetime import time
 
@@ -66,9 +67,12 @@ def ajaxAssign(request):
     data = {}
     try:
         group_id = int(request.POST["GroupId"])
-        record = Record.add_student_to_group(request.user.id, group_id)
+        records_list = Record.add_student_to_group(request.user.id, group_id)
         data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś zapisany do grupy."
+        if len(records_list) == 1:
+            data['Success']['Message'] = "Zostałeś zapisany do grupy."
+        else:
+            data['Success']['Message'] = "Zostałeś zapisany do wybranej grupy i grupy wykładowej."
     except NonStudentException:
         data['Exception'] = {}
         data['Exception']['Code'] = "NonStudent"
@@ -153,9 +157,12 @@ def deleteStudentFromGroup(request, user_id, group_id):
 @login_required
 def assign(request, group_id):
     try:
-        record = Record.add_student_to_group(request.user.id, group_id)
-        request.user.message_set.create(message="Zostałeś zapisany do grupy.")
-        return redirect("subject-page", slug=record.group_slug())
+        records_list = Record.add_student_to_group(request.user.id, group_id)
+        if len(records_list) == 1:
+            request.user.message_set.create(message="Zostałeś zapisany do grupy.")
+        else:
+            request.user.message_set.create(message="Zostałeś zapisany do wybranej grupy i grupy wykładowej.")
+        return redirect("subject-page", slug=records_list[0].group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
@@ -181,9 +188,11 @@ def queue_assign(request, group_id):
         if Group.objects.get(id=group_id).subject.is_recording_open_for_student(request.user.student):
             queue = Queue.add_student_to_queue(request.user.id, group_id)
             request.user.message_set.create(message="Zostałeś zapisany do kolejki.")
+            slug=queue.group_slug()
         else:
             request.user.message_set.create(message="Nie możesz zapisać się do kolejki, bo nie masz otwartych zapisów.")
-        return redirect("subject-page", slug=queue.group_slug())
+            slug=Group.objects.get(id=group_id).subject_slug()
+        return redirect("subject-page", slug=slug)
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
@@ -307,13 +316,15 @@ def records(request, group_id):
         students_in_group = Record.get_students_in_group(group_id)
         students_in_queue = Queue.get_students_in_queue(group_id)
         all_students = Student.objects.all()
-        data = {
+        data = prepare_subjects_list_to_render()
+        data.update({
             'all_students' : all_students,
             'students_in_group' : students_in_group,
             'students_in_queue' : students_in_queue,
             'group' : group,
-        }
-        return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
+        })
+        return render_to_response('enrollment/records/records_list.html', data,
+            context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
@@ -350,8 +361,7 @@ def schedulePrototype(request):
         #        group.terms_ = all_terms.filter(group = group)
         semesters = Semester.objects.filter(visible=True)
         semesters_list = [(sem.pk, sem.get_name()) for sem in semesters]
-        types = Type.get_all_types_of_subjects()
-        types_list = [(type.pk, type.name) for type in Type.objects.all()] 
+        types_list = [(type.pk, type.name) for type in Type.get_all_types()]
   
         data = {
             'student_records': student_records,

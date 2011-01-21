@@ -1,73 +1,154 @@
-Sidebar = new Object();
+/**
+ * Klasa (statyczna) sidebara.
+ */
 
-Sidebar.shown = true;
+Sidebar = {
+	/**
+	 * Czy sidebar jest widoczny.
+	 */
+	visible: null,
 
+	/**
+	 * Czy sidebar jest po prawej (false, jeżeli po lewej).
+	 */
+	isRightSidebar: null
+};
+
+/**
+ * Inicjowanie sidebara.
+ */
 Sidebar.init = function()
 {
-	var sidebarNode = $('#main-sidebar');
-	if (sidebarNode.length != 1)
+	var sidebarContainer = $('#main-sidebar');
+	if (sidebarContainer.length != 1)
 		return;
-	sidebarNode = sidebarNode[0];
 
-	Sidebar.sidebarNode = sidebarNode;
-	Sidebar.mainContentContainer = $('#main-content-container')[0];
-	Sidebar.mainContent = $('#main-content')[0];
+	// lista obserwatorów sidebara
+	Sidebar._observers = new Array();
 
-	Sidebar.isRightSidebar = $(Sidebar.mainContentContainer).hasClass('sidebar-right');
-	if (!Sidebar.isRightSidebar &&
-		!$(Sidebar.mainContentContainer).hasClass('sidebar-left'))
-		throw 'Błąd: mainContentContainer powinien mieć przynajmniej jedną z klas: sidebar-right, sidebar-left';
+	Sidebar._sidebarContainer = sidebarContainer;
+	Sidebar._mainContentContainer = $('#main-content-container').assertOne();
+	Sidebar._mainContent = $('#main-content').assertOne();
 
-	Sidebar.hideButton = document.createElement('a');
-	sidebarNode.appendChild(Sidebar.hideButton);
-	Sidebar.hideButton.className = 'main-sidebar-toggle-button hide';
-	Sidebar.hideButton.appendChild(document.createTextNode(Sidebar.isRightSidebar?'>':'<'));
-	$(Sidebar.hideButton).click(Sidebar.toggleVisibility);
+	// ustalenie, czy jest po prawej, czy po lewej
+	if (Sidebar._mainContentContainer.hasClass('sidebar-right') ==
+		Sidebar._mainContentContainer.hasClass('sidebar-left'))
+		throw 'Błąd: _mainContentContainer powinien mieć dokładnie jedną z' +
+			'klas: sidebar-right, sidebar-left';
+	Sidebar.isRightSidebar = Sidebar._mainContentContainer.
+		hasClass('sidebar-right');
 
-	Sidebar.showButton = document.createElement('a');
-	Sidebar.showButton.style.display = 'none';
-	Sidebar.mainContent.appendChild(Sidebar.showButton);
-	Sidebar.showButton.className = 'main-sidebar-toggle-button show';
-	Sidebar.showButton.appendChild(document.createTextNode(Sidebar.isRightSidebar?'<':'>'));
-	$(Sidebar.showButton).click(Sidebar.toggleVisibility);
+	// akcja chowania lub ukrywania sidebara
+	var toggleVisibility = function()
+	{
+		Sidebar.setVisible(!Sidebar.visible);
+	};
 
+	// generowanie przycisków ukrywania i pokazywania sidebara
+	Sidebar._hideButton = $.create('a',
+		{ className: 'main-sidebar-toggle-button hide' }).
+		appendTo(Sidebar._sidebarContainer).text(Sidebar.isRightSidebar?'>':'<').
+		disableDragging().click(toggleVisibility);
+	Sidebar._showButton = $.create('a',
+		{ className: 'main-sidebar-toggle-button show' }).
+		prependTo($(Sidebar._mainContent)).text(Sidebar.isRightSidebar?'<':'>').
+		disableDragging().click(toggleVisibility);
+
+	// ustalenie widoczności sidebara na podstawie cookie, lub (jeżeli
+	// niedostępne) kodu html (czy główny kontener ma klasę sidebar-visible)
 	var cookieStatus = $.cookies.get('sidebar-visible');
 	if (cookieStatus !== null)
 		Sidebar.setVisible(cookieStatus);
 	else
-		Sidebar.setVisible($(Sidebar.mainContentContainer).hasClass('sidebar-visible'));
-};
-
-Sidebar.toggleVisibility = function()
-{
-	Sidebar.setVisible(!Sidebar.shown);
-};
-
-Sidebar.setVisible = function(visible)
-{
-	visible = !!visible;
-	
-	Sidebar.shown = visible;
-	$.cookies.set('sidebar-visible', Sidebar.shown);
-
-	Sidebar.sidebarNode.style.display = visible?'block':'none';
-	Sidebar.showButton.style.display = visible?'none':'block';
-
-	if (visible)
-		$(Sidebar.mainContentContainer).addClass('sidebar-visible');
-	else
-		$(Sidebar.mainContentContainer).removeClass('sidebar-visible');
-		
-};
-
-Sidebar.detach = function()
-{
-    $(Sidebar.mainContentContainer).removeClass('sidebar-visible');
-    $(Sidebar.mainContentContainer).removeClass('sidebar-right');
-    $(Sidebar.mainContentContainer).removeClass('sidebar-left');
-    $(Sidebar.hideButton).remove();
-    $(Sidebar.showButton).remove();
-    $(Sidebar.sidebarNode).remove();
+		Sidebar.setVisible(Sidebar._mainContentContainer.
+			hasClass('sidebar-visible'));
 };
 
 $(Sidebar.init);
+
+/**
+ * Pokazuje, lub ukrywa sidebar.
+ *
+ * @param visible true, jeżeli sidebar ma zostać pokazany; false w p. p.
+ */
+Sidebar.setVisible = function(visible)
+{
+	visible = !!visible;
+	if (visible === Sidebar.visible)
+		return;
+	Sidebar.visible = visible;
+	$.cookies.set('sidebar-visible', Sidebar.visible);
+
+	// najpierw ukrywamy oba przyciski
+	Sidebar._showButton.css('display', 'none');
+	Sidebar._hideButton.css('display', 'none');
+
+	// ukrywamy lub chowamy sidebar
+	Sidebar._sidebarContainer.css('display', visible?'block':'none');
+
+	// zmieniamy klasę głównego kontenera i pokazujemy odpowiedni przycisk
+	if (visible)
+	{
+		Sidebar._mainContentContainer.addClass('sidebar-visible');
+		Sidebar._hideButton.css('display', 'block');
+	}
+	else
+	{
+		Sidebar._mainContentContainer.removeClass('sidebar-visible');
+		Sidebar._showButton.css('display', 'block');
+	}
+
+	Sidebar._notifyObservers();
+};
+
+/**
+ * Usuwa sidebar.
+ */
+Sidebar.detach = function()
+{
+    Sidebar._mainContentContainer.
+		removeClass('sidebar-visible sidebar-right sidebar-left');
+    Sidebar._hideButton.remove();
+    Sidebar._showButton.remove();
+    Sidebar._sidebarContainer.remove();
+
+	for (var property in this)
+		delete this[property];
+};
+
+/**
+ * Dodaje obserwatora. Obserwatorzy są powiadamiani po każdym pokazaniu lub
+ * ukryciu sidebara. Każdy obserwator musi implementować metodę update(source),
+ * gdzie parametr source to obserwowany obiekt.
+ *
+ * @param observer obserwator do dodania
+ */
+Sidebar.addObserver = function(observer)
+{
+	if (typeof observer.update != 'function')
+		throw new Error('Obserwator nie posiada metody update(source)');
+	Sidebar._observers.push(observer);
+};
+
+/**
+ * Usuwa obserwatora. Wymaga się, żeby usuwany obserwator rzeczywiście był na
+ * liście.
+ *
+ * @param observer obserwator do usunięcia
+ */
+Sidebar.removeObserver = function(observer)
+{
+	Sidebar._observers.removeElement(observer);
+};
+
+/**
+ * Wysyła do obserwatorów powiadomienie.
+ */
+Sidebar._notifyObservers = function()
+{
+	var thisObj = this;
+	Sidebar._observers.forEach(function(observer)
+	{
+		observer.update(thisObj);
+	});
+};

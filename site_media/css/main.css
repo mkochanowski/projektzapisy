@@ -50,7 +50,6 @@
 	position: absolute;
 	left: -6px;
 	top: -3px;
-	width: 220px;
 	z-index: 1000;
 
 	list-style: none;
@@ -72,13 +71,18 @@
 	box-shadow: 0 0 6px rgba(204, 204, 204, 0.6);
 }
 
+#main-systemTypeBar ul li
+{
+	white-space: nowrap;
+}
+
 #main-systemTypeBar ul li.current
 {
 	padding: 2px 5px;
 
 	color: black;
 
-	border-bottom: 1px solid #cccccc;
+	border-bottom: 1px dotted #cccccc;
 	margin-bottom: 5px;
 	cursor: default;
 }
@@ -238,7 +242,7 @@
 
 #main-content.wide
 {
-	padding: 5px;
+	padding: 15px 20px;
 }
 
 /*** ZAWARTOŚĆ - koniec ***/
@@ -273,8 +277,8 @@
 #main-content-container.sidebar-visible.sidebar-right #main-content
 {
 	margin-right: 250px;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding-left: 20px;
+	padding-right: 20px;
 	border-right: 1px solid #cccccc;
 }
 
@@ -337,9 +341,11 @@ a.main-sidebar-toggle-button
 
 #main-content-container.sidebar-right a.main-sidebar-toggle-button.show
 {
-	position: absolute;
-	top: 20px;
-	left: 979px;
+	float: right;
+	position: relative;
+	z-index: 1;
+	top: 5px;
+	left: 20px;
 }
 
 #main-content-container.sidebar-left a.main-sidebar-toggle-button.show
@@ -398,7 +404,7 @@ a.main-sidebar-toggle-button:hover
 	position: relative;
 	border: 0;
 	float: left;
-	border-right: 1px solid #cccccc;
+	border-right: 1px dotted #cccccc;
 	margin: 0;
 	padding: 10px;
 	display: block;
@@ -480,6 +486,7 @@ a.main-sidebar-toggle-button:hover
 .main-filter-input .reset
 {
 	border: 1px solid #999999;
+	border-left: 1px dotted #999999;
 	height: 24px;
 	background-color: white;
 	font-weight: bold;

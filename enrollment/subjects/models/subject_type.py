@@ -10,8 +10,8 @@ class Type(models.Model):
     meta_type = models.BooleanField(default = False, verbose_name ='Grupa typow')
     
     @staticmethod
-    def get_all_types_of_subjects():
-        Type.objects.all()
+    def get_all_types():
+        return Type.objects.select_related('group').all()
     
     def get_name(self):
         self.name

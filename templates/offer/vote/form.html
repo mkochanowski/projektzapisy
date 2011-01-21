@@ -1,10 +1,12 @@
 {% extends "offer/base.html" %}
 
+{% block main-subtitle %}Formularz głosowania{% endblock %}
+
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
 	<li><a href="{% url latest_news 'offer' %}">Oferta</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
-	<li>Głosuj</li>
+	<li>Formularz głosowania</li>
 {% endblock %}
 
 {% block styles %}
