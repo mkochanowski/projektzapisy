@@ -85,7 +85,7 @@ Ticket.create.unblinds_generator = function(index, unblind)
         var e   = str2bigInt(unblind[1][2], 10, 10)
         var rk  = inverseMod( Ticket.create.k_array[index], n )
         Ticket.create.unblindst_array.push( bigInt2str(multMod(mod(st, n), mod(rk, n), n ), 10) )
-        Ticket.create.unblindt_array.push( powMod(Ticket.create.m_array[index], e , n)  )
+        Ticket.create.unblindt_array.push( bigInt2str (powMod(Ticket.create.m_array[index], e , n)  ), 10)
     }   
 }
 

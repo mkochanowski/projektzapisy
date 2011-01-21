@@ -95,23 +95,23 @@ Then /^show me the page$/ do
 end
 
 Given /^there are polls generated$/ do
-	When I load a fixture named "groups.json"
-	And I load a fixture named "polls.json"
+	load_fixture "groups"
+	load_fixture "polls"
 end
 
 Given /^there are keys generated for polls$/ do
-	When I load a fixture named "keys_for_polls.json"
+	load_fixture "keys_for_polls"
 end
 
 When /^I add new poll$/ do
-	When I load a fixture named "new_poll.json"
+	load_fixture "new_poll"
 end
 
 Given /^I am signed for groups with polls$/ do
-	When I load a fixture named "groups.json"
-	And I load a fixture named "polls.json"
-	And I load a fixture named "records.json"
-    And I load a fixture named "keys_for_polls.json"
+	load_fixture "groups"
+	load_fixture "polls"
+	load_fixture "records"
+    load_fixture "keys_for_polls"
 end
 
 When /^I uncheck "([^"]*)" checkboxes$/ do |arg|
