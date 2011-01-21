@@ -2,6 +2,7 @@ Feature: Student (or anyone, really) wants to present tickets for polls in order
 
     Background:
         Given I am on grade main page
+        And I start new scenario
         
     Scenario Outline: First entrance of all the tickets
         When I follow "Oceń zajęcia"

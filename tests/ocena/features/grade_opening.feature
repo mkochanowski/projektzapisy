@@ -4,6 +4,7 @@ Feature: Behaviour of the system when trying to open grading
 		Given I am logged in with "administrator" privileges
 		And the grading protocol is "off"		
 		And I am on grade main page
+        And I start new scenario
 
 
 	Scenario: No polls in the system - failure

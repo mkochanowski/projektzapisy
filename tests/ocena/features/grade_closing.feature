@@ -2,6 +2,7 @@ Feature: Behaviour of the system after closing grading /przenieść do odpowiedn
 
 	Background:
 		Given the grading protocol is "off"
+        And I start new scenario
 		
 	
 	Scenario: Student tries to present a ticket		
