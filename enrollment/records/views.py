@@ -67,6 +67,8 @@ def ajaxAssign(request):
     data = {}
     try:
         group_id = int(request.POST["GroupId"])
+        logger.info('User %s  <id: %s> uses AJAX to enroll himself to group with id: <%s>' % (request.user.username, request.user.id, group_id))
+
         records_list = Record.add_student_to_group(request.user.id, group_id)
         data['Success'] = {}
         if len(records_list) == 1:
@@ -104,6 +106,7 @@ def ajaxResign(request):
     data = {}
     try:
         group_id = int(request.POST["GroupId"])
+        logger.info('User %s  <id: %s> uses AJAX to resign from group with id: <%s>' % (request.user.username, request.user.id, group_id))
         record = Record.remove_student_from_group(request.user.id, group_id)
         data['Success'] = {}
         data['Success']['Message'] = "Zostałeś wypisany z grupy."
@@ -336,6 +339,7 @@ def own(request):
         data = {
             'groups': groups,
         }
+        logger.info('User %s <id: %s> looked at his schedule' % (request.user.username, request.user.id))
         return render_to_response('enrollment/records/schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
