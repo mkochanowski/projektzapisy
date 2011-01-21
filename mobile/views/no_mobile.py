@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponseRedirect
+import logging
+logger = logging.getLogger()
+
 
 def noMobile(request):
 	request.mobile = False
@@ -10,6 +13,7 @@ def noMobile(request):
 	# TODO: wywalić urlconf, jeżeli się da (patrz: problemy np. z djdt).
 	# więcej info, w razie potrzeby: Tomek Wasilczyk
 	request.urlconf = 'fereol.urls'
+	logger.info('User %s switch to fereol' % (request.user)) 
 	return HttpResponseRedirect('/')
 
 def onMobile(request):
@@ -19,4 +23,5 @@ def onMobile(request):
 	domain = request.META.get('HTTP_HOST', '')
 	request.META['HTTP_HOST'] = 'm.'+domain
 	request.urlconf = 'fereol.mobile_urls'
+	logger.info('User %s switch to mobile fereol' % (request.user))
 	return HttpResponseRedirect('/')

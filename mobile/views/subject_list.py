@@ -6,13 +6,14 @@ from django.contrib.auth.decorators import login_required
 from fereol.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_PINNED
 from fereol.enrollment.subjects.models import Semester, Subject
 from fereol.offer.vote.models import SingleVote
-
+import logging
+logger = logging.getLogger()
 
 @login_required
 def studentSubjectList(request):
 	
 	(subjects_enrolled, subjects_pinned, subjects_voted) = subjectsEnrolled(request)
-
+	logger.info('User %s looked at his subject list' % (unicode(request.user.username)))
 	return render_to_response("mobile/student_subjects.html", {'enrolled': subjects_enrolled, 'pinned': subjects_pinned, 'voted': subjects_voted}, context_instance = RequestContext(request))
 
 
@@ -23,7 +24,7 @@ def otherSubjects(request):
 	subj = subjects_enrolled + subjects_pinned + subjects_voted
 	other_subjects = Subject.objects.all().order_by('name')
 	other_subjects = filter(lambda s : s.semester.is_current_semester() and s not in subj, other_subjects)
-
+	logger.info('User %s looked at other subject' % (unicode(request.user.username)))
 	#podmienić templatkę!
 	return render_to_response("mobile/other_subjects.html", {'subjects': other_subjects}, context_instance = RequestContext(request))
 
@@ -63,5 +64,5 @@ def subjectsEnrolled(request):
 	subjects_voted = Subject.objects.filter(name__in = proposals_voted).order_by('name').reverse()
 	subjects_voted = filter(lambda s : s.semester.is_current_semester(), subjects_voted)
 	#subjects_voted = [vote.subject for vote in votes]
-
+	logger.info('User %s looked at his enrolled subject' % (unicode(request.user.username)))
 	return (subjects_enrolled, subjects_pinned, subjects_voted)

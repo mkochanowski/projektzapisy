@@ -23,6 +23,8 @@ from enrollment.records.models import *
 from enrollment.records.exceptions import *
 
 from datetime import time
+import logging
+logger = logging.getLogger()
 
 
 @login_required
@@ -78,6 +80,7 @@ def assign(request,group_id):
     try:
         record = Record.add_student_to_group(request.user.id, group_id)
         request.user.message_set.create(message="Zostałeś zapisany do grupy.")
+	logger.info('User %s assign to group with id: %d (mobile fereol)' % (request.user,int(group_id)))
         return redirect("subject-terms", slug=subject.slug)
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
@@ -105,6 +108,7 @@ def resign(request, group_id):
     try:
         record = Record.remove_student_from_group(request.user.id, group_id)
         request.user.message_set.create(message="Zostałeś wypisany z grupy.")
+	logger.info('User %s resign from group with id: %d (mobile fereol)' % (request.user,int(group_id)))
 	return redirect("subject-terms", slug=subject.slug)
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
@@ -121,6 +125,7 @@ def reassign(request,group_from,group_to):
     try:
         record = Record.change_student_group(request.user.id, group_from, group_to)
         request.user.message_set.create(message="Zostałeś przepisany do innej grupy.")
+	logger.info('User %s reassign from group with id: %d to group with id: %d (mobile fereol)' % (request.user,int(group_from),int(group_to)))
         return redirect("subject-terms", slug=record.group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś studentem.")

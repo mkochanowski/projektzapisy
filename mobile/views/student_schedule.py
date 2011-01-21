@@ -59,6 +59,7 @@ def studentSchedule(request, schedule_owner=None, delta=None):
             'right': right,
             'owner':owner.username,
         }
+        logger.info('User %s looked at his mobile schedule on %s' % (unicode(owner.username), unicode(DAYS_SIMPLE[weekday]))) 
         return render_to_response('mobile/student_schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Użytkownik nie posiada planu bo nie jest studentem.")
