@@ -3,6 +3,7 @@ Feature: Creating keys for polls in the grading protocol
 	Background:
 		Given I am logged in with "administrator" privileges
 		And I am on grade main page
+        And I start new scenario
 	
 	
 	Scenario: Successfully creating keys for all the polls

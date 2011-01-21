@@ -3,6 +3,7 @@ Feature: Student wants to create tickets for polls
 	Background:
 		Given I am logged in with "student" privileges		
 		And I am on grade main page
+        And I start new scenario
 
 	Scenario: Student successfully creates tickets for all his polls (with grouping)
 		Given the grading protocol is "on"

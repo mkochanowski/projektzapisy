@@ -9,6 +9,12 @@ module WithinHelpers
 end
 World(WithinHelpers)
 
+Given /I start new scenario/ do
+    path = "../../"
+    system "#{path}manage.py flush --noinput"
+    system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/core_dump.json"
+end
+
 Given /I am logged in with "([^"]*)" privileges/ do |privileges|
   Given %{I am on the home page}
     And %{I follow "Ocena zajęć"}
@@ -23,14 +29,14 @@ Given /I am logged in with "([^"]*)" privileges/ do |privileges|
 			And %{I fill in "Nazwa użytkownika" with "administrator-test"}
 			And %{I fill in "Hasło" with "administrator-test"}		
 	end    
-    And %{I press "Zaloguj"}	
+    And %{I press "Zaloguj"}
 end
 
 Given /^the grading protocol is "([^"]*)"$/ do |state|
 	if state == "on"
-		# fixtures: grade_active.json
+		load_fixture("grade_active")
 	elsif state == "off"
-		# fixtures: grade_not_active.json
+		load_fixture("grade_not_active")
 	end
 end
 
@@ -42,8 +48,11 @@ Then /^(?:|I )should see "([^"]*)"$/ do |text|
 	page.should have_content(text)
 end
 
+Then /^(?:|I )should not see link "([^"]*)"$/ do |link|  
+  page.should have_no_link(link)
+end
+
 Then /^(?:|I )should not see "([^"]*)"$/ do |text|  
-  sleep 10
   page.should have_no_content(text)
 end
 
@@ -86,19 +95,23 @@ Then /^show me the page$/ do
 end
 
 Given /^there are polls generated$/ do
-	# fixtures: groups.json, polls.json
+	When I load a fixture named "groups.json"
+	And I load a fixture named "polls.json"
 end
 
 Given /^there are keys generated for polls$/ do
-	# fixtures:  keys_for_polls.json
+	When I load a fixture named "keys_for_polls.json"
 end
 
 When /^I add new poll$/ do
-	# stworzenie nowej ankiety w kodzie
+	When I load a fixture named "new_poll.json"
 end
 
 Given /^I am signed for groups with polls$/ do
-	# fixtures: groups.json, polls.json, records.json, keys_for_polls.json
+	When I load a fixture named "groups.json"
+	And I load a fixture named "polls.json"
+	And I load a fixture named "records.json"
+    And I load a fixture named "keys_for_polls.json"
 end
 
 When /^I uncheck "([^"]*)" checkboxes$/ do |arg|
