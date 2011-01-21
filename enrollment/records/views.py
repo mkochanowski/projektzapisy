@@ -165,6 +165,7 @@ def assign(request, group_id):
             request.user.message_set.create(message="Zostałeś zapisany do grupy.")
         else:
             request.user.message_set.create(message="Zostałeś zapisany do wybranej grupy i grupy wykładowej.")
+        print records_list
         return redirect("subject-page", slug=records_list[0].group_slug())
     except NonStudentException:
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")

@@ -235,7 +235,7 @@ class Record(models.Model):
                     Record.remove_student_from_group(user_id, g_id)
 
                 if group.type != '1':
-                    new_records = Record.add_student_to_lecture_group(user_id, group.subject.id)
+                    new_records.extend(Record.add_student_to_lecture_group(user_id, group.subject.id))
                 if Queue.is_ECTS_points_limit_exceeded(user_id, group_id) :
                     raise ECTS_Limit_Exception()
                 record = Record.objects.get(group=group, student=student)
@@ -247,12 +247,11 @@ class Record(models.Model):
                 record.save()
                 
                 new_records.append(record)
-                return new_records
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
             logger.info('User %d is now added to group %d' % (int(user_id), int(group_id)))
-            return record
+            return new_records
         except NonStudentOptionsException:
             logger.error('Record.add_student_to_group()  throws NonStudentOptionsException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise RecordsNotOpenException()
@@ -264,6 +263,7 @@ class Record(models.Model):
             raise NonGroupException()
         except Record.DoesNotExist:
             new_records.append(Record.objects.create(group=group, student=student, status=STATUS_ENROLLED))
+            logger.info('User [%s] (id=%d) is now (but DoesNotExist?!) added to group [%s] (id=%d)', student.get_full_name(), student.id, unicode(group), group.id)
             return new_records
 
     @staticmethod
@@ -276,14 +276,13 @@ class Record(models.Model):
             group = Group.objects.get(id=group_id)
             record = Record.enrolled.get(group=group, student=student)
             queued = Queue.remove_first_student_from_queue(group_id)
-            logger.info('%s', (unicode(queued)))
-                            # removing student from group + adding first from queue
+            logger.info('Removing student [%s] (id=%s) from group [%s] (id=%s). Queued: %s.', user.get_full_name(), user.id, unicode(group), group.id, ('yes' if queued else 'no'))
             record.delete()
             if queued and (Record.number_of_students(group=group) < group.limit) :
                 new_student = queued.student
                 Record.add_student_to_group(new_student.user.id, group_id)
                 Queue.remove_student_low_priority_records(new_student.user.id, group_id, queued.priority)
-                logger.info('User (%s) replaced user (%s) in group [%s] ' % (user.get_full_name(), queued.student.get_full_name, unicode(group)))
+                logger.info('User [%s] (id=%s) replaced user [%s] (id=%s) in group [%s] (id=%s).',  user.get_full_name(), user.id, queued.student.get_full_name(), user.id, unicode(group), group.id)
             return record
 
         except Record.DoesNotExist:
