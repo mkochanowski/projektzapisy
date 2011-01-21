@@ -41,17 +41,17 @@ def default(request):
 	return render_to_response ('grade/base.html', {'grade' : grade }, context_instance = RequestContext ( request ))
 
 def enable_grade( request ):
-    grade = Semester.get_current_semester().is_grade_active
     semester = Semester.get_current_semester()
     semester.is_grade_active = True
     semester.save()   
+    grade = True
     return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Otwarto ocenę zajęć" }, context_instance = RequestContext ( request ))
     
 def disable_grade( request ):
-    grade = Semester.get_current_semester().is_grade_active
     semester = Semester.get_current_semester()
     semester.is_grade_active = False
     semester.save()
+    grade = False
     
     PublicKey.objects.all().delete()
     PrivateKey.objects.all().delete()
@@ -483,11 +483,11 @@ def poll_answer( request, slug, pid, ticket ):
 
 @login_required
 def poll_results(request):
-        
+    grade = Semester.get_current_semester().is_grade_active
     group = Employee.get_all_groups( request.user.id )
     
     form = FilterMenu( request.POST )
-    data = { 'form' : form, 'list' : group }
+    data = { 'form' : form, 'list' : group, 'grade' : grade }
     return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))
 
 
