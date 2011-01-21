@@ -528,6 +528,11 @@ a.main-sidebar-toggle-button:hover
 	color: #999999;
 }
 
+#main-footer .go-mobile
+{
+	float: right;
+}
+
 /*** STOPKA - koniec ***/
 
 
