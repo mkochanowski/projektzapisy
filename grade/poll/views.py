@@ -283,8 +283,17 @@ def tickets_enter(request):
         
         if form.is_valid():
             tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
-            ids_and_tickets   = from_plaintext( tickets_plaintext )
+            try:
+                ids_and_tickets   = from_plaintext( tickets_plaintext )
+            except:
+                ids_and_tickets   = []
             
+            if not ids_and_tickets:
+                data[ 'error' ] = "Podano niepoprawne bilety."
+                data[ 'form' ]  = form
+                data[ 'grade' ] = grade
+                return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
+                
             errors   = []
             polls    = []
             finished = []
@@ -317,8 +326,8 @@ def tickets_enter(request):
             return HttpResponseRedirect( '/grade/poll/polls/all' )
     else:
         form = TicketsForm()
-    data[ 'form' ] = form
-    data['grade'] = grade
+    data[ 'form' ]  = form
+    data[ 'grade' ] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
 
 def polls_for_user( request, slug ):
