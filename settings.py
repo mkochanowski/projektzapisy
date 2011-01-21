@@ -40,7 +40,7 @@ EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
 def custom_show_toolbar(request):
-    if request.META['HTTP_HOST'][0:2] == 'm.':
+    if ('HTTP_HOST' in request.META) and (request.META['HTTP_HOST'][0:2] == 'm.'):
         return False
     return DEBUG
 

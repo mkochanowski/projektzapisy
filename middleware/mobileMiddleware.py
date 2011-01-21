@@ -4,9 +4,7 @@ from django.http import HttpResponseRedirect
 class SubdomainMiddleware:
 	 def process_request(self, request):
 		domain = request.META.get('HTTP_HOST', '')
-		#print request.session['no_mobile']
 		parts = domain.replace('www.', '').split('.')
-		print parts
 		#jeśli użytkownik zdecydował, że nie chce wersji mobilnej
 		if 'no_mobile' in request.session and request.session['no_mobile'] == True:
 			"TUTUTUTUTUT 5"
