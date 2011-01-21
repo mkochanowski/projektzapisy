@@ -16,6 +16,9 @@ module NavigationHelpers
     
     when /pool management page/
 		'/grade/poll_manage'
+        
+    when /grade keys generator/
+        '/grade/ticket/keys_generate'
 		
     else
           begin

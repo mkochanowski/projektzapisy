@@ -1,10 +1,10 @@
 Feature: Behaviour of the system when trying to open grading
 
 	Background:
-		Given I am logged in with "administrator" privileges
-		And the grading protocol is "off"		
+        Given I start new scenario      
+        And the grading protocol is "off"		
+		And I am logged in with "administrator" privileges
 		And I am on grade main page
-        And I start new scenario
 
 
 	Scenario: No polls in the system - failure
@@ -25,4 +25,5 @@ Feature: Behaviour of the system when trying to open grading
 		And there are keys generated for polls
 		When I follow "Otwórz ocenę"
 		Then I should see "Ocena zajęć otwarta"
+        And I should see link "Zamknij ocenę"        
 		And I should be on grade main page
