@@ -25,9 +25,16 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               OpenQuestionAnswer
 from fereol.users.models               import Type
 from fereol.grade.poll.forms           import TicketsForm, \
-                                              PollForm
+                                              PollForm, \
+                                              FilterMenu
 from fereol.grade.poll.utils           import check_signature, \
-                                              prepare_data
+                                              prepare_data, \
+                                              group_polls_and_tickets_by_subject, \
+                                              create_slug, \
+                                              get_next, \
+                                              get_prev
+
+from fereol.users.models                 import Employee
 
 def default(request):
 	grade = Semester.get_current_semester().is_grade_active
@@ -275,14 +282,14 @@ def tickets_enter(request):
         form = TicketsForm( request.POST )
         
         if form.is_valid():
-            tickets_plaintext  = form.cleaned_data[ 'ticketsfield' ]
-            titles_and_tickets = from_plaintext( tickets_plaintext )
+            tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
+            ids_and_tickets   = from_plaintext( tickets_plaintext )
             
             errors   = []
             polls    = []
             finished = []
             
-            for (id, (ticket, signed_ticket)) in titles_and_tickets:
+            for (id, (ticket, signed_ticket)) in ids_and_tickets:
                 try:
                     poll       = Poll.objects.get( pk = id )
                     public_key = PublicKey.objects.get( poll = poll )
@@ -291,44 +298,45 @@ def tickets_enter(request):
                             st = SavedTicket.objects.get( poll   = poll,
                                                           ticket = ticket )
                             if st.finished:
-                                finished.append(( id, ticket ))
+                                finished.append(( poll, ticket ))
                             else:
-                                polls.append(( id, ticket ))
+                                polls.append(( poll, ticket ))
                         except:
                             st = SavedTicket( poll = poll, ticket = ticket )
                             st.save()
-                            polls.append(( id, ticket ))
+                            polls.append(( poll, ticket ))
                     else:
                         errors.append(( id, "Nie udało się zweryfikować podpisu pod biletem." ))
                 except:
                     errors.append(( id, "Podana ankieta nie istnieje" ))
+                    
+            request.session[ "errors" ]            = errors
+            request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_subject( polls ))
+            request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_subject( finished ))
             
-            request.session[ "polls" ]    = polls
-            request.session[ "errors" ]   = errors
-            request.session[ "finished" ] = finished
-            
-            return HttpResponseRedirect( '/grade/poll/polls' )
+            return HttpResponseRedirect( '/grade/poll/polls/all' )
     else:
         form = TicketsForm()
     data[ 'form' ] = form
     data['grade'] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
 
-def polls_for_user( request ):
+def polls_for_user( request, slug ):
     if not 'polls' in request.session.keys():
         return HttpResponseRedirect( '/grade/poll/tickets_enter' )
     
-    data = prepare_data( request )
+    data = prepare_data( request, slug )
     
     return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
     
-def poll_answer( request, pid, ticket ):
+def poll_answer( request, slug, pid, ticket ):
     poll = Poll.objects.get( pk = pid )
     st   = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
     
     if request.method == "POST" and not st.finished:
         form = PollForm( request.POST )
         form.setFields( poll, st )
+        
         if form.is_valid():
             for key, value in form.cleaned_data.items():
                 
@@ -436,24 +444,50 @@ def poll_answer( request, pid, ticket ):
                         
                         ans.content = value
                         ans.save()
-                        
-            return HttpResponseRedirect( 'grade/poll/poll_answer/' + pid + '/' + ticket )
     else:
         form = PollForm()
         form.setFields( poll, st )
     
-    data = prepare_data( request )
-    data[ 'pid' ]       = pid
-    data[ 'ticket' ]    = ticket
+    data = prepare_data( request, slug )
     data[ 'link_name' ] = poll.to_url_title()
-    data[ 'title' ] = poll.title
-    data[ 'desc' ]  = poll.description
-    data[ 'form' ] = form
+    data[ 'slug' ]      = slug
+    data[ 'title' ]     = poll.title
+    data[ 'desc' ]      = poll.description
+    data[ 'form' ]      = form
+    
+    try:
+        poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
+    except IndexError:
+        poll_cands = []
+        
+    try:
+        finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
+    except:
+        finished_cands = []
+    
+    data[ 'next' ]      = get_next( poll_cands, finished_cands, int( pid ))
+    data[ 'prev' ]      = get_prev( poll_cands, finished_cands, int( pid ))
+
+    if request.method == "POST" and (data[ 'form' ].is_valid() or st.finished):
+        if request.POST.get( 'Next', default=None ):
+            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]) + '/' + str( data['next'][1]))
+        if request.POST.get( 'Prev', default=None ):
+            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['prev'][0]) + '/' + str( data['prev'][1]))
+        if request.POST.get( 'Save', default=None ):
+            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + pid + '/' + ticket )
+            
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     
 #### Poll results ####
 
+@login_required
 def poll_results(request):
-    pass
+        
+    group = Employee.get_all_groups( request.user.id )
+    
+    form = FilterMenu( request.POST )
+    data = { 'form' : form, 'list' : group }
+    return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))
+
 

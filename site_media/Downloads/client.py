@@ -8,9 +8,7 @@ import sys
 import getpass
 import os
 
-
 RAND_BITS = 512
-
 
 def gcwd( u, v ):
 	u1 = 1

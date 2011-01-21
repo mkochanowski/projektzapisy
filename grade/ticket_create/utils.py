@@ -302,10 +302,6 @@ def from_plaintext( tickets_plaintext ):
         tickets.append(( t, st ))
     return zip( ids, tickets )
 
-#- 
-#- 
-#- 
-
 def generate_ticket( poll_list ):
     ## TODO: Docelowo ma być po stronie przeglądarki
     m       = getrandbits( RAND_BITS )
@@ -323,5 +319,5 @@ def generate_ticket( poll_list ):
         b = expMod( k, e, n )
         t = ( a * b) % n
         
-        blinded.append(( poll, t, (m, k) ))
+        blinded.append(( poll, t, ( m, k )))
     return blinded

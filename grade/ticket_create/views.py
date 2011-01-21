@@ -19,16 +19,11 @@ from fereol.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 connect_groups, \
                                                 secure_signer_without_save, \
                                                 secure_mark
-from fereol.grade.ticket_create.forms    import PollCombineForm
-
+from fereol.grade.ticket_create.forms      import PollCombineForm
 from fereol.grade.ticket_create.exceptions import *
-
 from fereol.grade.ticket_create.models     import PublicKey
-
 from django.contrib.auth                   import authenticate, login, logout
-
 from fereol.grade.ticket_create.forms      import *
-
 from django.views.decorators.csrf          import csrf_exempt
 from Crypto.PublicKey import RSA
 def prepare_grade( request ):

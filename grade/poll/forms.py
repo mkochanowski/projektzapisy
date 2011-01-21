@@ -14,12 +14,15 @@ from fereol.grade.poll.models import OpenQuestionAnswer, \
                                      SingleChoiceQuestionAnswer, \
                                      MultipleChoiceQuestionAnswer
 
+
+from fereol.enrollment.subjects.models      import Semester
+
 class TicketsForm( forms.Form ):
     ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 
                                                     attrs = {'cols' : 80, 
                                                              'rows' : 20 }), 
-                                 label     = "Podaj wygenerowane klucze",
-                                 help_text = "Wklej tutaj pobrane wcześniej klucze." )
+                                 label     = "Podaj wygenerowane bilety",
+                                 help_text = "Wklej tutaj pobrane wcześniej bilety." )
 
 class PollForm( forms.Form ):
     def setFields( self, poll, st ):
@@ -151,4 +154,44 @@ class PollForm( forms.Form ):
                             initial   = False,
                             help_text = u'Jeśli zaznaczysz to pole, utracisz mozliwość edycji ankiety po zapisaniu.' )
             self.fields[ u'finish' ] = field
+
+
+class FilterMenu( forms.Form ):
+    
+    sem = Semester.objects.all()
+    
+    li = []
+    
+    for s in  sem:
+        li.append(s.year)
+        
+    li.sort()
+    
+    li = list(set(li))
+    
+    begin = []
+    end = []
+    
+    for l in li:
+        begin.append((l,l))
+        end.append((l,l))
+
+    semestr_date_begin  =   forms.ChoiceField( label = 'od', choices = begin )
+    semestr_date_end    =   forms.ChoiceField( label = 'do', choices = begin )
+
+    semestr_winter      =   forms.BooleanField( label = 'zimowy' )    
+    semestr_summer      =   forms.BooleanField( label = 'letni' )
+
+    own_resource        =   forms.BooleanField( label = 'własne' )
+    available_resource  =   forms.BooleanField( label = 'udostępnione' )
+    
+    lecture             =   forms.BooleanField( label = 'wykłady' )
+    tutorial            =   forms.BooleanField( label = 'ćwiczenia' )
+    lab                 =   forms.BooleanField( label = 'pracownie')
+
+    order               =   forms.TypedChoiceField( widget=forms.RadioSelect, choices=((1,"wg nazwisk prowadzących"),(2,"wg nazw przedmiotów")))
+
+    special             =   forms.BooleanField()
+        
+    
     

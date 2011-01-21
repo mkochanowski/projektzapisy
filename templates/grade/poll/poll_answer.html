@@ -3,8 +3,8 @@
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
 	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
-	<li><a href="{% url grade-poll-polls-for-user %}">Twoje ankiety</a></li>
-    <li><a href="{% url grade-poll-poll-answer pid ticket %}">{{ link_name }}</a></li>
+	<li><a href="{% url grade-poll-polls-for-user slug %}">Twoje ankiety</a></li>
+    <li>{{ link_name }}</li>
 {% endblock %}
 
 
@@ -15,8 +15,20 @@
             <tr><td>{{ desc }}</td></tr>
             {{ form.as_table }}
         </table>
+        <input  type="submit" 
+                name="Prev" 
+                {% if not prev %}
+                    disabled="True"
+                {% endif %}
+                value="<< Poprzednia ankieta" />
         {% if not form.finished %}
-            <input type="submit" value="Zapisz ankietę" />
+            <input type="submit" name="Save" value="Zapisz ankietę" />
         {% endif %}
+        <input type="submit" 
+               name="Next" 
+               {% if not next %}
+                    disabled="True"
+               {% endif %}
+               value="Następna ankieta >>" />
     </form>
 {% endblock %}
