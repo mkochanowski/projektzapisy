@@ -17,7 +17,6 @@ class SubdomainMiddleware:
 				request.urlconf = 'fereol.mobile_urls'#'fereol.mobile.urls'
 			else:
 				request.mobile = False
-				request.urlconf = 'fereol.urls'
 
 		elif parts[0] == 'm':
 			request.mobile = True
@@ -32,4 +31,3 @@ class SubdomainMiddleware:
 
 		else:
 			request.mobile = False
-			request.urlconf = 'fereol.urls'

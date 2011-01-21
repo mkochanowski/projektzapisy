@@ -40,6 +40,8 @@ EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
 def custom_show_toolbar(request):
+    if request.META['HTTP_HOST'][0:2] == 'm.':
+        return False
     return DEBUG
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -93,7 +95,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
     'fereol.middleware.mobile_detector.MobileDetectionMiddleware',
@@ -140,5 +142,12 @@ HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
-SESSION_COOKIE_DOMAIN = '.localhost.localhost'
+# that's only the example of settings_local.py file contents:
+#SESSION_COOKIE_DOMAIN = '.nowe-zapisy.ii.uni.wroc.pl'
+#DEBUG = False
+#TEMPLATE_DEBUG = DEBUG
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+local_settings_file = '%s/settings_local.py' % BASE_DIR
+if os.path.isfile(local_settings_file):
+    execfile(local_settings_file)
