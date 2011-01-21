@@ -75,7 +75,7 @@
 					<ul class="subjects-list">
 						{% for subject in semester.subjects %}
 							<li>
-								<a href="{{ subject.slug }}" id="subject-{{ subject.id }}">{{ subject.name }}</a>
+								<a href="{% url subject-page subject.slug %}" id="subject-{{ subject.id }}">{{ subject.name }}</a>
 								<input type="hidden" name="type" value="{{ subject.type }}" />
 							</li>
 						{% endfor %}

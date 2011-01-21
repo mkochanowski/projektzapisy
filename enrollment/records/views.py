@@ -14,6 +14,7 @@ from enrollment.subjects.models import *
 from users.models import *
 from enrollment.records.models import *
 from enrollment.records.exceptions import *
+from enrollment.subjects.views import prepare_subjects_list_to_render
 
 from datetime import time
 
@@ -315,13 +316,15 @@ def records(request, group_id):
         students_in_group = Record.get_students_in_group(group_id)
         students_in_queue = Queue.get_students_in_queue(group_id)
         all_students = Student.objects.all()
-        data = {
+        data = prepare_subjects_list_to_render()
+        data.update({
             'all_students' : all_students,
             'students_in_group' : students_in_group,
             'students_in_queue' : students_in_queue,
             'group' : group,
-        }
-        return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
+        })
+        return render_to_response('enrollment/records/records_list.html', data,
+            context_instance=RequestContext(request))
     except NonGroupException:
         request.user.message_set.create(message="Podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
