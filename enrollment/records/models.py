@@ -1,5 +1,6 @@
-import Queue
 #-*- coding: utf-8 -*-
+from fereol.enrollment.records.exceptions import NonGroupException
+from fereol.enrollment.records.exceptions import ECTS_Limit_Exception
 
 from fereol.enrollment.subjects.models.subject import Subject
 from django.contrib.auth.models import User
@@ -99,7 +100,7 @@ class Record(models.Model):
                 logger.warning('Record.get_groups_with_records_for_subject(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
                 student_groups = {}
             for g in groups:
-                g.priority = Queue.get_priority(user_id, g)
+                g.priority = Queue.get_priority(user_id, g.id)
                 g.limit = g.get_group_limit()
                 g.classrooms = g.get_all_terms()
                 g.enrolled = Record.number_of_students(g)
@@ -235,7 +236,8 @@ class Record(models.Model):
 
                 if group.type != '1':
                     new_records = Record.add_student_to_lecture_group(user_id, group.subject.id)
-                    
+                if Queue.is_ECTS_points_limit_exceeded(user_id, group_id) :
+                    raise ECTS_Limit_Exception()
                 record = Record.objects.get(group=group, student=student)
 
                 if record.status == STATUS_ENROLLED:
@@ -336,17 +338,22 @@ class Queue(models.Model):
         return Queue.queued.filter(group=group_).count()
 
     @staticmethod
-    def get_priority(user_id, group):
+    def get_priority(user_id, group_id):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
+            group = Group.get(id = group_id)
             queue = Queue.queued.filter(student=student, group=group)
             if queue:
                 return queue[0].priority
             else:
                 return False
         except Student.DoesNotExist:
+            logger.error('Queue.get_priority() throws Student.DoesNotExist(parameters : user_id = %d, group_id = %d)' %(int(user_id), int(group_id)))
             raise NonStudentException()
+        except Group.DoesNotExist:
+            logger.error('Queue.get_priority() throws Group.DoesNotExist(parameters : user_id = %d, group_id = %d)' %(int(user_id), int(group_id)))
+            raise NonGroupException()
 
 
     @staticmethod
@@ -355,6 +362,7 @@ class Queue(models.Model):
             group = Group.objects.get(id=group_id)
             return map(lambda x: x.student, Queue.queued.filter(group=group))
         except Group.DoesNotExist:
+            logger.error('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
             raise NonGroupException()
 
     @staticmethod
@@ -365,44 +373,45 @@ class Queue(models.Model):
             student = user.student
             group = Group.objects.get(id=group_id)
             if Record.enrolled.filter(group=group, student=student).count() > 0 :
-                logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyAssignedException exception.' % (int(user_id), int(group_id)))
+                logger.warning('Queue.add_student_to_queue() throws AlreadyAssignedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
                 raise AlreadyAssignedException()
             if Queue.queued.filter(group=group, student=student).count() > 0 :
-                logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyQueuedException exception.' % (int(user_id), int(group_id)))
+                logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
                 raise AlreadyQueuedException()
             record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now(), priority=priority)
             if is_created == False: # Nie wiem czy ten warunek ma sens z tym powyżej
-                logger.error('Queue.add_student_to_queue(user_id = %d, group_id = %d) raised AlreadyQueuedException exception.' % (int(user_id), int(group_id)))
+                logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
                 raise AlreadyQueuedException()
             record.save()
-
+            logger.info('User (%s) is added to queue to group (%s) (parameters: user_id = %d, group_id = %d, priority = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id), int(priority)))
             return record
         except Student.DoesNotExist:
-            logger.error('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
             raise NonGroupException()
 
     @staticmethod
-    def change_student_priority(user_id, group_id, priority) :
+    def change_student_priority(user_id, group_id, new_priority) :
         """change student priority in group queue"""
         user = User.objects.get(id=user_id)
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
             record = Queue.objects.get(group=group, student=student, status=STATUS_QUEUED)
-            record.priority = priority
+            record.priority = new_priority
             record.save()
+            logger.info('User (%s) changed priority for queue to group (%s) (parameters: user_id = %d, group_id = %d, new_priority = %d)' % (user.get_full_name(), unicode(group), int(user_id), int(group_id), int(new_priority)))
             return record
         except Queue.DoesNotExist:
-            logger.error('Queue.change_student_priority() throws Queue.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Queue.change_student_priority() throws Queue.DoesNotExist exception (parameters: user_id = %d, group_id = %d, new_priority = %d)' % (int(user_id), int(group_id), int(new_priority)))
             raise AlreadyNotAssignedException()
         except Student.DoesNotExist:
-            logger.error('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d, new_priority = %d)' % (int(user_id), int(group_id), int(new_priority)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d, new_priority = %d)' % (int(user_id), int(group_id), int(new_priority)))
             raise NonGroupException()
 
     @staticmethod
@@ -459,8 +468,10 @@ class Queue(models.Model):
             for q in queue:
                 student_id = q.student.user.id
                 if Queue.is_ECTS_points_limit_exceeded(student_id, group_id):
+                    logger.info('User (%s) is now removed as first from queue to group but he exceeded ECTS limit (%s) (parameters: group_id = %d)' % (q.student.user.get_full_name(), unicode(group), int(group_id)))
 		    Queue.remove_student_from_queue(student_id, group_id)
 	        else:
+                    logger.info('User (%s) is now removed as first from queue to group (%s) (parameters: group_id = %d)' % (q.student.user.get_full_name(), unicode(group), int(group_id)))
                     return Queue.remove_student_from_queue(student_id, group_id)
             return False
         except Queue.DoesNotExist:
@@ -486,17 +497,20 @@ class Queue(models.Model):
     @staticmethod
     def remove_student_low_priority_records(user_id, group_id, priority) :
         """ Funkcja, która czyści kolejkę z wpisów do grup z tego samego przedmiotu o tym samym rodzaju ale mniejszym priorytecie"""
+        user = User.objects.get(id = user_id)
         try :
-            student = User.objects.get(id = user_id).student
+            student = user.student
             group = Group.objects.get(id = group_id)
             subject = Subject.objects.get(slug = group.subject_slug())
             queued_group = [g for g in Queue.get_groups_for_student(user_id) if g.subject == subject and g.type == group.type]
             for q_g in queued_group :
                 record = Queue.queued.get(student = student,group = q_g)
                 if (record.priority <= priority) :
+                    logger.info('User (%s) is now removed from queue to group (%s) because of low priority (parameters: user_id = %d, group_id = %d, priority = %d)' \
+                    % (user.get_full_name(), unicode(q_g), int(user_id), int(group_id), int(priority)))
                     Queue.remove_student_from_queue(user_id,q_g.id)
         except Student.DoesNotExist:
-            logger.error('Queue.remove_student_low_priority_records throws Student.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % int(user_id), int(group_id), int(priority))
+            logger.error('Queue.remove_student_low_priority_records throws Student.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
             raise NonStudentException()
         except Group.DoesNotExist:
             logger.error('Queue.remove_student_low_priority_records throws Group.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
@@ -521,13 +535,17 @@ def add_people_from_queue(sender, instance, **kwargs):
         while queued and (num_of_people < instance.limit) :
             queued = Queue.remove_first_student_from_queue(instance.id)
             if queued :
+                logger.info('User (%s) is now added to group(%s) because of limits\' change (parameters instance = %d)' %(queued.student.get_full_name(), unicode(queued.group), int(instance.id))) #prosze o sprawdzenie, czy sie nie pomylilem
                 Record.add_student_to_group(queued.student.user.id, instance.id)
                 num_of_people = Record.objects.filter(group=instance).count()
     except Queue.DoesNotExist:
+        logger.error('Queue.add_people_from_queue throws Queue.DoesNotExist exception (parameters instance = %d)' % (int(instance.id)))
         raise AlreadyNotAssignedException()
     except Student.DoesNotExist:
+        logger.error('Queue.add_people_from_queue throws Student.DoesNotExist exception (parameters instance = %d)' % (int(instance.id)))
         raise NonStudentException()
     except Group.DoesNotExist:
+        logger.error('Queue.add_people_from_queue throws Group.DoesNotExist exception (parameters instance = %d)' % (int(instance.id)))
         raise NonGroupException()
 
 signals.post_save.connect(add_people_from_queue, sender=Group)
