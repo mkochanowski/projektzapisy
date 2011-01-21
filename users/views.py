@@ -89,7 +89,7 @@ def password_change_done(request):
 @login_required  
 def my_profile(request):
     '''profile site'''
-    logger.info('User (%s) is logged in ' % request.user.get_full_name())
+    logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
     return render_to_response('users/my_profile.html', context_instance = RequestContext( request ))
 
 @login_required
@@ -113,6 +113,6 @@ def students_list(request):
 @login_required
 def logout(request):
     '''logout'''
-    logger.info('User (%s) is logged off ' % request.user.get_full_name())
+    logger.info('User %s <id: %s> is logged out ' % (request.user.username, request.user.id))    
     auth.logout(request)
     return HttpResponseRedirect('/')
