@@ -4,6 +4,7 @@ from Crypto.Random.random                  import getrandbits, \
                                                   randint
 from itertools                             import product
 from commands                              import *
+from string                                import whitespace
  
 from django.db.models                      import Q
 from django.utils.safestring               import SafeUnicode
@@ -17,8 +18,18 @@ from fereol.grade.ticket_create.models     import PublicKey, \
                                                   UsedTicketStamp 
 from fereol.grade.ticket_create.exceptions import *
 
-RAND_BITS = 512 
-
+RAND_BITS = 512
+ 
+def flatten( x ):
+    result = []
+    for el in x:
+        #if isinstance(el, (list, tuple)):
+        if hasattr(el, "__iter__") and not isinstance(el, basestring):
+            result.extend(flatten(el))
+        else:
+            result.append(el)
+    return result    
+    
 def gcd( a, b ):
     if b > a:
         a, b = b, a
@@ -282,26 +293,59 @@ def to_plaintext( vtl ):
     return SafeUnicode( unicode( res ))
 
 def from_plaintext( tickets_plaintext ):
-    pre_tickets = tickets_plaintext.split('\n')
-    tickets_and_signed = []
-    tickets = []
-    ids     = []
-    for pre_ticket in pre_tickets:
-        try:
-            t = int( pre_ticket )
-            tickets_and_signed.append( t )
-        except:
-            if pre_ticket.startswith( 'id' ):
-                id = int( pre_ticket.split( ':' )[ 1 ] )
-                ids.append( id )
-            else:
-                pass
-                
-    for i in range(0, len( tickets_and_signed )-1, 2):
-        ( t, st ) = ( tickets_and_signed[ i ], tickets_and_signed[ i+1 ] )
-        tickets.append(( t, st ))
-    return zip( ids, tickets )
+    pre_tickets = tickets_plaintext.split( '----------------------------------' )
+    pre_tickets = map( lambda x: [ x ], pre_tickets )
+    for sign in whitespace:
+        pre_tickets = map( lambda ls: 
+                            flatten( 
+                                map( 
+                                    lambda x: 
+                                        x.split( sign ), 
+                                    ls )), 
+                            pre_tickets )
 
+    convert            = False
+    ids_tickets_signed = []
+    for poll_info in pre_tickets:
+        i = 0
+        while i < len( poll_info ):
+            if convert:
+                j  = i
+                id = -1
+                t  = -1
+                st = -1
+                while True:
+                    try:
+                        id =  int(  poll_info[ j ])
+                        break
+                    except:
+                        j += 1
+
+                j += 1
+                while True:
+                    try:
+                        t  = long( poll_info[ j ])
+                        break
+                    except:
+                        j += 1
+
+                j += 1
+                while True:
+                    try:
+                        st = long( poll_info[ j ])
+                        break
+                    except:
+                        j += 1
+
+                i = j+1
+                convert = False
+                ids_tickets_signed.append((id, (t, st)))
+            elif poll_info[ i ].startswith( 'id:' ):
+                convert = True
+            i += 1
+    
+    return ids_tickets_signed
+        
 def generate_ticket( poll_list ):
     ## TODO: Docelowo ma być po stronie przeglądarki
     m       = getrandbits( RAND_BITS )
