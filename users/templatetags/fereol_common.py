@@ -2,8 +2,10 @@
 
 from django import template
 from libs import postmarkup
+import logging
 
 register = template.Library()
+logger = logging.getLogger()
 
 @register.filter
 def bbcode(str):
@@ -19,6 +21,33 @@ def bbcode(str):
 @register.filter
 def nl2br(str):
     return str.replace("\n", "<br />")
+
+# filter checks url validity, and:
+# - if it's ok (modulo "http://" prefix) - returns it
+# - in the other case - returns "/" and logs it
+@register.filter
+def validate_url(str):
+	from django.core.validators import URLValidator, ValidationError
+	from StringIO import StringIO
+	import traceback
+	import string
+	validate = URLValidator(verify_exists=False)
+	try:
+		validate(str)
+	except ValidationError:
+		try:
+			validate('http://' + str)
+			str = 'http://' + str
+		except ValidationError:
+			trace = StringIO()
+			traceback.print_stack(file=trace)
+			trace = trace.getvalue().split('\n')
+			trace = filter(lambda str: str.find('html') >= 0, trace)
+			trace = string.join(trace, '\n')
+			logger.warning('Invalid URL couldn\'t be displayed in template: '
+				+ str + '\n' + trace)
+			return '/'
+	return str
 
 @register.tag(name='captureas')
 def do_captureas(parser, token):
