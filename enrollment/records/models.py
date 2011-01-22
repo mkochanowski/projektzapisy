@@ -344,7 +344,7 @@ class Queue(models.Model):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
-            group = Group.get(id = group_id)
+            group = Group.objects.get(id = group_id)
             queue = Queue.queued.filter(student=student, group=group)
             if queue:
                 return queue[0].priority
