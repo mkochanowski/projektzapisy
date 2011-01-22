@@ -19,7 +19,7 @@
 
 		{% for p in pinned %}
 			<div class="subject-outer">
-			<a href= "/subject/{{ p.subject.slug }}/" >
+			<a href= "/subject/{{ p.slug }}/" >
 			<div class="subject-inner">{{ p.name }} </div></a></div>
 		{% endfor %}
 	</div>
@@ -29,7 +29,7 @@
 
 		{% for v in voted %}
 			<div class="subject-outer">
-			<a href= "/subject/{{ v.subject.slug }}/" >
+			<a href= "/subject/{{ v.slug }}/" >
 			<div class="subject-inner">{{ v.name }} </div></a></div>
 		{% endfor %}
 	</div>
