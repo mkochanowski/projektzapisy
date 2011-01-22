@@ -99,7 +99,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
     'fereol.middleware.mobile_detector.MobileDetectionMiddleware',
-    'fereol.middleware.mobileMiddleware.SubdomainMiddleware'
+    'fereol.middleware.mobileMiddleware.SubdomainMiddleware',
+    'fereol.middleware.error_handling.ErrorHandlerMiddleware'
 )
 
 ROOT_URLCONF = 'fereol.urls'
