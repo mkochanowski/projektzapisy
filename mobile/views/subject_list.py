@@ -55,7 +55,7 @@ def subjectsEnrolled(request):
 	subjects_enrolled = _subjects_enrolled
 
 	records_pin = filter(lambda r: r.status == STATUS_PINNED, records)
-	subjects_pinned = [records.group.subject for record in records_pin]
+	subjects_pinned = [record.group.subject for record in records_pin]
 
 
 	#votes = SingleVote.objects.filter(student = student, subject__semester__in = semester).select_related('subject')
