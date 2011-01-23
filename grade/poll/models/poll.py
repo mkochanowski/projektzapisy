@@ -14,12 +14,13 @@ from section                           import SectionOrdering
 
 
 class Poll( models.Model ):
-    author       = models.ForeignKey( Employee, verbose_name = 'autor' )
-    title        = models.CharField( max_length = 40, verbose_name = 'tytuł' )
-    description  = models.TextField( blank = True, verbose_name = 'opis' )
-    semester     = models.ForeignKey( Semester, verbose_name = 'semestr' )
-    group        = models.ForeignKey( Group, verbose_name = 'grupa', blank = True, null = True )
-    studies_type = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
+    author            = models.ForeignKey( Employee, verbose_name = 'autor', related_name = 'author' )
+    title             = models.CharField( max_length = 40, verbose_name = 'tytuł' )
+    description       = models.TextField( blank = True, verbose_name = 'opis' )
+    semester          = models.ForeignKey( Semester, verbose_name = 'semestr' )
+    group             = models.ForeignKey( Group, verbose_name = 'grupa', blank = True, null = True )
+    studies_type      = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
+    sharing_employees = models.ManyToManyField( Employee, verbose_name = 'udostępniający pracownicy', blank = True, null = True )
     
     class Meta:
         verbose_name        = 'ankieta' 
