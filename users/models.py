@@ -83,7 +83,7 @@ class Student(BaseUser):
     '''
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
-    records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
+    records_opening_delay_minutes = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (minuty)")
     type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
 
     

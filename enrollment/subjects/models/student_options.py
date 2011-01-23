@@ -13,16 +13,16 @@ class StudentOptions( models.Model ):
     """ Used for defining relation between Student and Subject """
     subject = models.ForeignKey('Subject', verbose_name = 'przedmiot')
     student = models.ForeignKey('users.Student', verbose_name = 'student')
-    records_opening_delay_hours = models.IntegerField(verbose_name='opóźnienie w otwarciu zapisu (godziny)')
+    records_opening_delay_minutes = models.IntegerField(verbose_name='Opóźnienie w otwarciu zapisów na ten przedmiot (minuty)')
 
     def get_opening_delay_timedelta(self):
         """ returns records opening delay as timedelta """
-        return timedelta(hours=self.get_opening_delay_hours())
+        return timedelta(minutes=self.get_opening_delay_minutes())
     
-    def get_opening_delay_hours(self):
+    def get_opening_delay_minutes(self):
         """ returns records opening delay as imteger standing for hours """
-        student_records_opening_delay_hours = self.student.records_opening_delay_hours
-        return student_records_opening_delay_hours + self.records_opening_delay_hours
+        student_records_opening_delay_minutes = self.student.records_opening_delay_minutes
+        return student_records_opening_delay_minutes + self.records_opening_delay_minutes
     
     @staticmethod
     def get_student_options_for_subject(student_id, subject_id):

@@ -109,7 +109,7 @@
 		"pk": 1,
 		"model": "subjects.studentoptions",
 		"fields": {
-			"records_opening_delay_hours": 0,
+			"records_opening_delay_minutes": 0,
 			"student": 1,
 			"subject": 1
 		}
@@ -118,7 +118,7 @@
 		"pk": 2,
 		"model": "subjects.studentoptions",
 		"fields": {
-			"records_opening_delay_hours": 0,
+			"records_opening_delay_minutes": 0,
 			"student": 1,
 			"subject": 2
 		}
