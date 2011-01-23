@@ -230,11 +230,17 @@ def questionset_create(request):
             question.save()
 
             options = post.getlist(question_name + "[answers][]")
+            hideOn  = map( lambda (x):( int(x)), post.getlist(question_name + "[hideOn][]"))
+            hidenAnswers = []
+            i = 1
             for option_name in options:
                 option          = Option()
                 option.content  = option_name
                 option.save()
                 question.options.add(option)
+                if i in hideOn:
+                    hidenAnswers.append(option)
+                i = i + 1
 
             question.save()
             
@@ -246,9 +252,12 @@ def questionset_create(request):
 
             elif type == 'single':
                 container = SingleChoiceQuestionOrdering()
-                container.question   = question
+                container.question    = question
                 container.sections    = section
-                container.is_leading = choicebox_is_on(post.get(question_name + "[isLeading]"))
+                container.is_leading  = choicebox_is_on(post.get(question_name + "[isLeading]"))
+                container.save()
+                for opt in hidenAnswers:
+                    container.hide_on.add(opt)
                 container.save()
 
             elif type == 'multi':

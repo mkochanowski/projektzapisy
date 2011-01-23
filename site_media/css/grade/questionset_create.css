@@ -1,0 +1,53 @@
+﻿/**
+ * Style odpowiadające za tworzenie zbioru
+ */
+
+
+/*** TWORZENIE ANKIETY ***/
+
+#tytul_ankiety
+{
+margin:10px;
+}
+
+#questionset
+{
+background:#F8F8F8;
+border: 1px solid #CCC;
+padding:15px 20px 10px 10px; 
+}
+
+#section-title
+{
+    width:830px;
+    font-size:14px;
+    font-weight:bold;
+    color: #666666;
+}
+
+#section-desc
+{
+    margin-top:5px;
+    font-size:12px;
+    width:838px;
+    color: #666666;
+}
+
+
+
+.poll-question-answer
+{
+margin:10px;
+}
+
+.poll-question
+{
+margin:15px;
+}
+
+.poll-question-answers
+{
+}
+
+/*** TWORZENIE ANKIETY - koniec ***/
+
