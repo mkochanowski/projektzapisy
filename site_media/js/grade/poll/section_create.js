@@ -65,7 +65,7 @@ Poll.section.changeType = function(parent, div)
         Poll.section.removeElement(optionset, 'hasOther');
         Poll.section.removeElement(optionset, 'choiceLimit');
         Poll.section.removeElement(optionset, 'isScale');
-        $(div).children('button[name$="addQuestion"]').remove();        
+        $(div).children('input[name$="addQuestion"]').remove();        
         $(answerset).children().remove();
         // Poll.section.createCheckbox  (optionset, 'required', 'Pytanie wymagane');
     }
