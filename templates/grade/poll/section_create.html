@@ -8,21 +8,20 @@
 {% endblock %}
 
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/grade/create.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/grade/questionset_create.css" type="text/css" />
 {% endblock %}
 
 
 {% block content %}
 	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
-		<form url="" id="create_main" method="Post">
-            <label for="poll[title]">Tytuł sekcji:</label>
-			<input type="text" name="poll[title]">
+		<form url="" id="questionset" method="Post">
+			<input type="text" id="section-title" name="poll[title]" value="Tytuł sekcji">
+            <textarea id="section-desc" name="poll[description]">Wstaw tutaj opis sekcji</textarea>
 			<ol id="poll-form">
 			</ol>
 		<input type="button" value="dodaj pytanie" id="add-question">
     <br/><br/>
         <label for="description">Opis:</label><br>
-        <textarea name="poll[description]"></textarea>
 		<input type="submit" value="wyslij">
 	</form>
 {% endblock %}
