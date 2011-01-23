@@ -291,10 +291,10 @@ Poll.section.createOptionSet = function(question)
 
 Poll.section.createAddOptionButton = function(elem, set, id)
 {
-    var button = document.createElement('button')
+    var button = document.createElement('input')
     button.type = 'button';
     button.name = 'addQuestion';
-    $(button).text('Dodaj odpowiedź');
+    $(button).val('Dodaj odpowiedź');
     $(button).click(function()
     {
         Poll.section.createAnswer(set, id, 'odpowiedź');
