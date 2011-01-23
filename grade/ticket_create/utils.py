@@ -181,6 +181,7 @@ def connect_groups( groupped_polls, form ):
         else:
             for poll in polls:
                 connected_groups.append([ poll ])
+    
     return connected_groups
 
 def generate_keys( poll_list ):
@@ -284,9 +285,9 @@ def to_plaintext( vtl ):
             res += unicode( p.group.get_type_display()) + ": "
             res += unicode( p.group.get_teacher_full_name()) + " &#10;"
         if p.studies_type:
-            res += u'dla studiów ' + unicode( p.studies_type ) + " &#10;"
+            res += u'typ studiów: ' + unicode( p.studies_type ) + " &#10;"
         
-        res += u'id: ' + unicode( p.pk ) + '&#10;'
+        res += u'id: ' + unicode( p.pk ) + ' &#10;'
         res += unicode( t ) + " &#10;"
         res += unicode( st ) + " &#10;"
         res += "---------------------------------- &#10;"

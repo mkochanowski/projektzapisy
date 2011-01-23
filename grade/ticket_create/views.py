@@ -131,13 +131,11 @@ def tickets_save( request, ticket_list ):
 
 @csrf_exempt
 def client_connection( request ):
-    
     if request.method == 'POST':
         
         form = ContactForm(request.POST)
         
         if form.is_valid():
-            
             idUser = form.cleaned_data['idUser']
             passwordUser = form.cleaned_data['passwordUser']
             groupNumber = form.cleaned_data['groupNumber']
@@ -205,6 +203,7 @@ def client_connection( request ):
                     res += p.group.subject.name + " &#10;"
                     res += p.group.get_type_display() + ": "
                     res += p.group.get_teacher_full_name() + " &#10;"
+                res += u'id: ' + unicode( p.pk ) + ' &#10;'
                 if p.studies_type:
                     res += u'dla studiów ' + unicode(p.studies_type) + " &#10;"
                 res += unicode(a)
