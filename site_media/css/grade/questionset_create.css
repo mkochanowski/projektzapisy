@@ -17,6 +17,11 @@ border: 1px solid #CCC;
 padding:15px 20px 10px 10px; 
 }
 
+.hideOnCheckbox
+{
+    display:inline;
+}
+
 #section-title
 {
     width:830px;
@@ -33,7 +38,24 @@ padding:15px 20px 10px 10px;
     color: #666666;
 }
 
+.section-option
+{
+    width:600px;
+}
 
+.section-edit
+{
+    background: #FFF4C2;
+}
+
+.section-show
+{
+}
+
+.section-mouseover
+{
+    background: #FFF4C2;
+}
 
 .poll-question-answer
 {

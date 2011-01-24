@@ -9,6 +9,13 @@ Poll.section.init = function()
     Poll.section.questionContainer = $("#poll-form");
 
 	$("#add-question").click(Poll.section.addQuestion)
+    $("input[type=text]").focus(function(){
+        // Select field contents
+        this.select();
+    });
+    $("textarea").focus(function(){
+        this.select();
+    });
     $(Poll.section.questionContainer).sortable({handle : 'div'});
 }
 
@@ -16,15 +23,13 @@ Poll.section.addQuestion = function()
 {
 	Poll.section.questions++;
     
-    var type = 'open'
-	var div  = document.createElement('div');
-    var li   = document.createElement('li');
-    var option_fieldset = document.createElement('fieldset');
+    var type            = 'open'
+	var div             = document.createElement('div');
+    var li              = document.createElement('li');
     var answerset       = document.createElement('ul');
     var optionset       = document.createElement('ul');
     $(answerset).addClass('answerset');
 
-    option_fieldset.class = 'options';
 
 	li.className = "poll-question";
 
@@ -42,32 +47,49 @@ Poll.section.addQuestion = function()
     Poll.section.createTr(tbody, type,  'Typ pytania: ')
     
     $(table).append(tbody);
-    var isLeading   = Poll.section.createSectionOption('isLeading', 'checkbox', 'Pytanie wiodące')
     var isScale     = Poll.section.createSectionOption('isScale', 'checkbox', 'Odpowiedź w formie skali')
     var choiceLimit = Poll.section.createSectionOption('choiceLimit', 'text', 'Limit odpowiedzi')
     var hasOther    = Poll.section.createSectionOption('hasOther', 'checkbox', 'Odpowiedź inne')
 
 
-    $(optionset).append(isLeading)
+
     $(optionset).append(isScale)
     $(optionset).append(choiceLimit)
     $(optionset).append(hasOther)
 
-    $(isLeading).hide();
+    $(answerset).sortable({handle : 'input'});
+
     $(isScale).hide();
     $(choiceLimit).hide();
     $(hasOther).hide();
 
-    $(li).append(table);
-    $(li).append(answerset);
-    $(li).append(optionset);
+    $(div).append(table);
+    $(div).append(answerset);
+    $(div).append(optionset);
+    $(li).append(div);
     $(Poll.section.questionContainer).append(li);
 
+    var ready = Poll.section.createButton('Gotowe', 'section-question-ready');
+    var del   = Poll.section.createButton('Usuń',   'section-question-delete');
 
-    $(isLeading).change(function() {   $(answerset).children().children('.hideOnCheckbox').toggle() } );
-    $(li).mouseover(function(){ $(li).addClass('section-mouseover'); });
-    $(type).change(function(){Poll.section.changeType(li, type, answerset, isLeading, isScale, choiceLimit, hasOther)});
+    $(div).append(ready);
+    $(div).append(del);
+
+    $(ready).click(function()
+    { 
+        $(div).removeClass('section-edit');
+        $(div).addClass('section-show');
+        Poll.section.makeStandardView(li, div, type);
+    });
+    $(del).click(function()
+    {
+        Poll.section.remove(li);
+    });
+    $(li).mouseover(function(){ $(div).addClass('section-mouseover'); });
+    $(type).change(function(){Poll.section.changeType(div, type, answerset, isScale, choiceLimit, hasOther)});
     
+
+    $(div).addClass('section-edit');
     return li; 
 }
 
@@ -111,107 +133,60 @@ Poll.section.createSectionOption = function(name, type, text)
     return li;
 }
 
-Poll.section.changeType = function(parent, type, answerset, isLeading, isScale, choiceLimit, hasOther)
+Poll.section.changeType = function(parent, type, answerset, isScale, choiceLimit, hasOther)
 {
     var id = $(parent).children('input[name="poll[question][order][]"]').val();
-    if ($(type).val() != 'open')
-    {
-        if ( $(answerset).children().size() == 0 )
-        {
-            Poll.section.createAnswer(answerset, id, 'odpowiedź');
-            Poll.section.createAddOptionButton(parent, answerset, id);
-        }
-    }
-    else
-    {
-        $(parent).children('input[name$="addQuestion"]').remove();        
-        $(answerset).children().remove();
-    }
 
     if ($(type).val() == 'single')
     {
-        $(isLeading).parent().children('label').show();
-        $(isLeading).show();
+        $(answerset).children('li').children('.hideOnCheckbox, label').hide();
         $(isScale).show();
         $(choiceLimit).hide();
         $(hasOther).show();
-
+        if ( $(answerset).children().size() == 0 )
+        {
+            Poll.section.createAnswer(answerset, id, 'odpowiedź', type);
+            Poll.section.createAddOptionButton(parent, answerset, id, type);
+        }
 
     }
     else if ($(type).val() == 'multi')
     {
-        $(isLeading).hide();
-        $(isLeading).parent().children('label').hide();
-        $(answerset).children().children('.hideOnCheckbox').hide()
+        //$(isLeading).parent().children('label').hide();
+        $(answerset).children('li').children('.hideOnCheckbox, label').hide();
         $(isScale).hide();
         $(choiceLimit).show();
         $(hasOther).show();
+        if ( $(answerset).children().size() == 0 )
+        {
+            Poll.section.createAnswer(answerset, id, 'odpowiedź', type);
+            Poll.section.createAddOptionButton(parent, answerset, id, type);
+        }
+    }
+    else if ($(type).val() == 'leading')
+    {
 
+        $(isScale).show();
+        $(choiceLimit).hide();
+        $(hasOther).show();
+        if ( $(answerset).children().size() == 0 )
+        {
+            Poll.section.createAnswer(answerset, id, 'odpowiedź', type );
+            Poll.section.createAddOptionButton(parent, answerset, id, type );
+        }
+        $(answerset).children('li').children().show();
     }
     else
     {
-        $(isLeading).hide();
-        $(isLeading).parent().children('label').hide();
-        $(answerset).children().children('.hideOnCheckbox').hide()
+        $(answerset).children('li').children('.hideOnCheckbox, label').hide();
         $(isScale).hide();
         $(choiceLimit).hide();
         $(hasOther).hide();
-    }
-
-}
-
-/*
-Poll.section.changeType = function(parent, div, type, answerset)
-{
-
-    var optionset = $(div).children('fieldset');
-    var oldType   = $(div).children('input[name$="[type]"]').val();
-    var newType   = $(type).val();
-    var id        = 2//$(div).children('input[name="poll[question][order][]"]').val();
-
-    $(div).children('input[name$="[type]"]').val(newType);
-    alert(newType);
-    if ( newType == 'open')
-    {
-/        Poll.section.removeElement(optionset, 'hasOther');
-        Poll.section.removeElement(optionset, 'choiceLimit');
-        Poll.section.removeElement(optionset, 'isScale');
-        $(div).children('input[name$="addQuestion"]').remove();        
-/
+        $(parent).children('input[name$="addQuestion"]').remove();        
         $(answerset).children().remove();
-        // 
-    }
-    else if ( newType == 'multi')
-    {
-        Poll.section.removeElement(optionset, 'isScale');
-        if ( oldType != 'multi' )
-        {  
-        }
-
-        if (oldType == 'open')
-        {
-            Poll.section.createAnswer(answerset, id, 'odpowiedź');
-            Poll.section.createAddOptionButton($(answerset).parent(), answerset, id);
-
-        }
-    }
-    else
-    {
-//        if ( oldType != 'single' )
-  //      {
-    //
-      //  }
-        //Poll.section.removeElement(optionset, 'hasOther');
-        ///Poll.section.removeElement(optionset, 'choiceLimit');
-        if (oldType == 'open')
-        {
-            Poll.section.createAnswer(answerset, id, 'odpowiedź');
-            Poll.section.createAddOptionButton($(answerset).parent(), answerset, id);
-            Poll.section.createAnswer(answerset, id, 'odpowiedź');
-        }
     }
 }
-*/
+
 Poll.section.removeElement = function(element, name)
 {
     var el  =  $(element).children('input[name$="['+ name +']"]');
@@ -219,16 +194,6 @@ Poll.section.removeElement = function(element, name)
     $(el).remove()
 }
 
-Poll.section.createTextArea = function(name)
-{
-    var area = document.createElement('textarea');
-    $(area).attr(
-    {
-        name: 'poll[question]['+ Poll.section.questions  +'][description]',
-        id: 'poll[question]['+ Poll.section.questions  +'][description]'
-    });
-    return area;
-}
 
 Poll.section.createTypeSelect = function()
 {
@@ -237,36 +202,26 @@ Poll.section.createTypeSelect = function()
     Poll.section.createOption(select, 'open', 'Otwarte')
     Poll.section.createOption(select, 'single', 'Jednokrotnego wyboru')
     Poll.section.createOption(select, 'multi', 'Wielokrotnego wyboru')
+    Poll.section.createOption(select, 'leading', 'Pytanie wiodące')
     $(select).addClass('typeSelect');
     $(select).addClass('options');
     return select;
 }
 
-Poll.section.breakLine = function(parent)
-{
-    var br = document.createElement('br');
-    $(parent).append(br);
-}
-
-Poll.section.makeStandardView = function(parent, element)
+Poll.section.makeStandardView = function(parent, element, question_type)
 {
     var div = document.createElement('div')
-    div.class = 'aa'
-    div.id    = 'aa'
+    div.class = 'section-show'
 
-    var id          = $(element).children('input[name="poll[question][order][]"]').val();
-    var title       = $(element).children('input[name$="[title]"]').val();
-    
-    var description = $(element).children('textarea[name$="[description]"]').val();
-    var required    = $(element).children('fieldset').children('input[name$="[required]"]').val();
-    var type        = $(element).children('fieldset').children('input[name$="[type]"]').val();
+    var id          = $(parent).children('input[name="poll[question][order][]"]').val();
+    var title       = $(element).children('table') .children('tbody') .children('tr') .children('td').children( 'input[name$="[title]"]').val();
+    var description = $(element).children('table') .children('tbody') .children('tr') .children('td').children('input[name$="[description]"]').val();
+    var type        = $(question_type).val();
 
-    if ( required == 'on' )
-    {
-        title = title + ' <em>*</em>';
-    }
-    Poll.section.createElement(div, 'small', description);
     Poll.section.createElement(div, 'h2', title);
+    Poll.section.createElement(div, 'small', description);
+    $(div).append( document.createElement('br') )
+
     if (type == 'open')
     {
         var textarea = document.createElement('textarea');
@@ -293,15 +248,15 @@ Poll.section.makeStandardView = function(parent, element)
                 input.type = 'checkbox'
             }
             input.name = 'poll[question][' + id + ']';
-            $(li).append(label);
             $(li).append(input);
+            $(li).append(label);
             $(ul).append(li)
         });
         $(div).append(ul);
     }
 
     
-    var button   = Poll.section.createButton(div, 'Edytuj');
+    var button   = Poll.section.createButton('Edytuj', 'section-button-edit');
     $(button).hide();
     $(button).click(function(){ $(element).show(); $(div).remove(); });
     $(div).append(button);
@@ -311,12 +266,12 @@ Poll.section.makeStandardView = function(parent, element)
     $(element).hide();
 }
 
-Poll.section.createButton = function(parent, value)
+Poll.section.createButton = function(value, class)
 {
     var button   = document.createElement('input');
     button.value = value;
     button.type  = 'button';
-    $(parent).append(button);
+    button.class = ''
     return button;
 }
 
@@ -348,7 +303,9 @@ Poll.section.createOption = function(select, value, text)
 
 Poll.section.createInput = function(varname, text)
 {
-    return Poll.section.createBaseElement('text', Poll.section.questions, varname, text)
+    var input = Poll.section.createBaseElement('text', Poll.section.questions, varname, text)
+    $(input).addClass('section-option');
+    return input;
 }
 
 Poll.section.createIdInput = function(id, varname, text)
@@ -393,7 +350,7 @@ Poll.section.createOptionSet = function(question)
     Poll.section.createAddOptionButton(question, ul)
 }
 
-Poll.section.createAddOptionButton = function(elem, set, id)
+Poll.section.createAddOptionButton = function(elem, set, id, type)
 {
     var button = document.createElement('input')
     button.type = 'button';
@@ -401,16 +358,17 @@ Poll.section.createAddOptionButton = function(elem, set, id)
     $(button).val('Dodaj odpowiedź');
     $(button).click(function()
     {
-        Poll.section.createAnswer(set, id, 'odpowiedź');
+        Poll.section.createAnswer(set, id, 'odpowiedź', type);
     });
-    $(elem).append(button);
+    $(set).after(button);
 }
 
-Poll.section.createAnswer = function(ul, id, value)
+Poll.section.createAnswer = function(ul, id, value, type)
 {
 	var li     = document.createElement('li');
     var check  = document.createElement('input');
 	var answer = document.createElement('input');
+    var label  = document.createElement('label');
 
     li.className = 'poll-question-answer';
     answer.name =  'poll[question][' + id + '][answers][]';
@@ -418,18 +376,55 @@ Poll.section.createAnswer = function(ul, id, value)
 
     check.type = 'checkbox'
     check.name =   'poll[question][' + id + '][hideOn][]';
+
+    $(check).attr('id', check.name);
     $(check).val( $(ul).children().size() + 1 )
     $(check).addClass('hideOnCheckbox');
-    $(check).hide();  
-    
+    $(check).css('display', 'inline');
+
+    $(label).attr(
+    {
+        for: check.name,
+    });    
+
+    $(label).text('Ukryj sekcję');
+    $(label).css('display', 'inline');
+
+    if( $(type).val() != 'leading')
+    {
+        $(label).hide();
+        $(check).hide();  
+    }
+
     $(answer).val(value);
+
+    var sectionRemoveButton = document.createElement('img');
+    sectionRemoveButton.alt = 'usuń';
+    sectionRemoveButton.className = 'remove';
+    sectionRemoveButton.src = '/site_media/images/remove-ico.png';
+
+    $(sectionRemoveButton).click(function()
+    {
+        Poll.section.removeQuestion( li );
+    });
     
-	$(li).append(answer);
-    $(li).append(check);
-	$(ul).append(li);
+	$(li).append( answer );
+    $(li).append( check );
+    $(li).append( label );
+    $(li).append( sectionRemoveButton )
+	$(ul).append( li );
 }
 
 
+Poll.section.removeQuestion = function( element )
+{
+    $(element).remove();
+}
+
+Poll.section.remove = function ( element )
+{
+    $(element).remove();
+}
 
 $(Poll.section.init);
 
