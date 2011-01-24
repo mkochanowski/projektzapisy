@@ -148,7 +148,6 @@ def poll_create(request):
             studies_type = None
 
         groups = getGroups(semester, group, type, subject)
-        print groups
         for group in groups:
             poll = Poll()
             poll.author       = request.user.employee
@@ -156,6 +155,24 @@ def poll_create(request):
             poll.description  = request.POST.get('description', '')
             poll.semester     = semester
             poll.group        = group
+            poll.studies_type = studies_type
+            poll.save()
+
+            i = 1
+            for section in request.POST.getlist('sections[]'):
+                pollSection = SectionOrdering()
+                pollSection.poll = poll
+                pollSection.position = i
+                pollSection.section = Section.objects.get(pk = section)
+                pollSection.save()
+                i = i + 1
+
+        if not groups:
+            poll = Poll()
+            poll.author       = request.user.employee
+            poll.title        = request.POST.get('title', '')
+            poll.description  = request.POST.get('description', '')
+            poll.semester     = semester
             poll.studies_type = studies_type
             poll.save()
 
@@ -214,7 +231,7 @@ def questionset_create(request):
             if type == 'open':
                 question = OpenQuestion()
 
-            elif type == 'single':
+            elif type == 'single' or type == 'leading':
                 question = SingleChoiceQuestion()
                 question.is_scale = choicebox_is_on(post.get(question_name + "[isScale]"))
 
@@ -250,11 +267,11 @@ def questionset_create(request):
                 container.sections   = section
                 container.save()
 
-            elif type == 'single':
+            elif type == 'single' or type == 'leading':
                 container = SingleChoiceQuestionOrdering()
                 container.question    = question
                 container.sections    = section
-                container.is_leading  = choicebox_is_on(post.get(question_name + "[isLeading]"))
+                container.is_leading  = (type == 'leading')
                 container.save()
                 for opt in hidenAnswers:
                     container.hide_on.add(opt)
