@@ -16,10 +16,10 @@ class Semester( models.Model ):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.PositiveIntegerField(default=lambda: datetime.now().year, verbose_name='rok akademicki')
     # implies academic year: year/(year+1)
-    records_opening = models.DateTimeField(blank = True, null = True, verbose_name='Czas otwarcia zapisów')
-    records_closing = models.DateTimeField(blank = True, null = True, verbose_name='Czas zamkniecia zapisów')
-    semester_begining = models.DateField(blank = True, null = False, verbose_name='Data rozpoczęcia semestru')
-    semester_ending = models.DateField(blank = True, null = False, verbose_name='Data zakończenia semestru')
+    records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów')
+    records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
+    semester_beginning = models.DateField(null = False, verbose_name='Data rozpoczęcia semestru')
+    semester_ending = models.DateField(null = False, verbose_name='Data zakończenia semestru')
 
     def get_subjects(self):
         """ gets all subjects linked to semester """
@@ -31,14 +31,12 @@ class Semester( models.Model ):
 
     def is_current_semester(self):
         """ Answers to question: is semester current semester""" 
-        if self.semester_begining==None or self.semester_ending==None:
-            return False
-        return (self.semester_begining <= datetime.now().date() and self.semester_ending >= datetime.now().date())
+        return (self.semester_beginning <= datetime.now().date() and self.semester_ending >= datetime.now().date())
     
     @staticmethod
     def get_current_semester():
         """ returns current semester """ 
-        return Semester.objects.get(semester_begining__lt =datetime.now().date(), semester_ending__gt= datetime.now().date())
+        return Semester.objects.get(semester_beginning__lt =datetime.now().date(), semester_ending__gt= datetime.now().date())
 
     @staticmethod
     def is_visible(id):

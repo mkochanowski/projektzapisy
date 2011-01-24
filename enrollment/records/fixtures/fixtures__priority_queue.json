@@ -285,7 +285,9 @@
             "records_opening": "2010-02-01 00:00:00", 
             "visible": true, 
             "type": "l", 
-            "records_closing": "2010-02-15 00:00:00", 
+            "records_closing": "2010-02-15 00:00:00",
+            "semester_beginning": "2011-02-26",
+            "semester_ending": "2011-06-21",
             "year": 2009
         }
     }, 
@@ -296,7 +298,9 @@
             "records_opening": "2010-09-25 00:00:00", 
             "visible": true, 
             "type": "z", 
-            "records_closing": "2010-10-15 00:00:00", 
+            "records_closing": "2010-10-15 00:00:00",
+            "semester_beginning": "2010-10-01",
+            "semester_ending": "2011-02-02",
             "year": 2010
         }
     }, 
