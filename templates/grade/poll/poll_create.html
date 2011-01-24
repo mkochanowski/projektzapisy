@@ -15,33 +15,33 @@
 {% block content %}
 	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
         <form method="POST">
-            <fieldset>
+            <fieldset>{{ semester }}
+                <label for="semester">Semestr: </label>
+                <select name="semester" id="semester">
+                    {% for sem in semesters %}
+                    <option value="{{sem.pk}}"{% if semester.pl == sem.pl %} selected{% endif %}>{{sem}}</option>
+                    {% endfor %}
+                </select>
                 <label for="studies-type">Typ studiów: </label>
                 <select name="studies-type">
                     <option value="-1">Dowolny</option>
                     {% for type in studies_type %}
-                    <option value="{{type.pk}}">{{type}}</option>
+                    <option value="{{type.pk}}"{% if studies_type.pk == type.pk %} selected{% endif %}>{{type}}</option>
                     {% endfor %}
-                </select>
-                <label for="semester">Semestr: </label>
-                <select name="semester" id="semester">
-                    {% for semester in semesters %}
-                    <option value="{{semester.pk}}">{{semester}}</option>
-                    {% endfor %}
-                </select>
+                </select><br>
                 <label for="subject">Przedmiot: </label>
                 <select name="subject" id="subjects">
                     <option value="-1">Nie przypisane do przedmiotu</option>
                     <option value="0">Wszystkie przedmioty</option>
                     {% for subject in subjects %}
-                    <option value="{{subject.pk}}">{{subject.name}}</option>
+                    <option value="{{subject.pk}}"{% if subject_id.pk == subject.pk %} selected{% endif %}>{{subject.name}}</option>
                     {% endfor %}
                 </select>
-                <label for="type" class="type-visibility">Typ: </label>
+                <label for="type" class="type-visibility">Typ zajęć: </label>
                 <select name="type" id="type" class="type-visibility">
                     <option value="0">Wszystkie typy</option>
                     {% for k, v in types %}
-                        <option value="{{k}}">{{v}}</option>
+                        <option value="{{k}}"{% if type.pk == k %} selected{% endif %}>{{v}}</option>
                     {% endfor %}
                     </select>
                 <label for="group" class="group-visibility">Grupa: </label>
@@ -51,13 +51,15 @@
             </fieldset>
             <label for="title">Tytuł:</label>
 
-            <input type="text" name="title">
+            <input type="text" name="title"><br>
+            <label for="description">Opis</label>
+            <textarea name="description"></textarea>
             
             <div id="sections-list">
+                
                 Wybrane sekcje: <!-- TODO: brak, gdy puste -->
                 <ul>
-                </ul>
-                <small>Przeciągnij aby zmienić kolejność</small>
+                </ul><small>(Przeciągnij aby zmienić kolejność)</small>
             </div><br/>
             <label for="section">Wybierz sekcję:</label>
             <select name="section" id="sections">
@@ -66,8 +68,6 @@
                 {% endfor %}
             </select>
             <input id="section-add" type="button" value="Dodaj sekcję"><br/>
-            <label for="description">Opis</label>
-            <textarea name="description"></textarea>
             <input type="submit" value="Stwórz ankietę">
         </form>
 {% endblock %}

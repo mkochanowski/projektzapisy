@@ -24,7 +24,7 @@ $(Poll.create.init);
 Poll.create.changeSubjects = function()
 {
     var subject = $('#subjects').val();
-    if ( subject > 0 )
+    if ( subject > -1 )
     {
         $('.type-visibility').show();
         Poll.create.changeTypes();
