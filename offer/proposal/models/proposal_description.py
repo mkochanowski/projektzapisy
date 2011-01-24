@@ -25,7 +25,7 @@ class ProposalDescription(models.Model):
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
     description  = models.TextField( verbose_name = 'opis' )
     requirements = models.TextField( verbose_name = 'wymagania' )
-    comments     = models.TextField( verbose_name = 'uwagi' )
+    comments     = models.TextField( verbose_name = 'uwagi', blank = True )
     
     date         = models.DateTimeField(verbose_name = 'data dodania')
     tags         = models.ManyToManyField(ProposalDescriptionTag, blank = True)
@@ -42,9 +42,9 @@ class ProposalDescription(models.Model):
     laboratories = models.IntegerField(verbose_name =' liczba godzin pracowni',
                                             choices = PROPOSAL_HOURS)
     deleted = models.BooleanField(verbose_name='usunięty', default=False)
-    web_page = models.CharField( verbose_name = 'Strona WWW', 
-                                max_length   = 200,
-                                blank        = True,
+    web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+                                verify_exists= True,
+								blank        = True,
                                 null         = True )
                                 
     
