@@ -76,6 +76,8 @@ MEDIA_ROOT = 'site_media'
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = ''
 
+USE_ETAGS = True
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -135,6 +137,8 @@ FIXTURE_DIRS = (
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
 
