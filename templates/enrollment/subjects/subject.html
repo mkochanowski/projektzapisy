@@ -38,7 +38,7 @@
 				{% endif %}
 				{% if subject.lectures or subject.exercises or subject.laboratories %}
 					<li>
-						<span>Ilość godzin:</span>
+						<span>Liczba godzin:</span>
 						{% if subject.lectures %}{{subject.lectures}} (wyk) {%if subject.lectures or subject.laboratories %}+{% endif %}{% endif %}
 						{% if subject.exercises %}{{subject.exercises}} (ćw) {%if subject.laboratories %}+{% endif %}{% endif %}
 						{% if subject.laboratories %}{{subject.laboratories}} (prac){% endif %}

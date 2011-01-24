@@ -33,13 +33,13 @@ class ProposalDescription(models.Model):
     
     ects         = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
     
-    lectures     = models.IntegerField(verbose_name = 'ilość godzin wykładów', 
+    lectures     = models.IntegerField(verbose_name = 'liczba godzin wykładów',
                                             choices = PROPOSAL_HOURS)
-    repetitories = models.IntegerField(verbose_name = 'ilość godzin repetytoriów', 
+    repetitories = models.IntegerField(verbose_name = 'liczba godzin repetytoriów',
                                             choices = PROPOSAL_HOURS)
-    exercises    = models.IntegerField(verbose_name = 'ilość godzin ćwiczeń', 
+    exercises    = models.IntegerField(verbose_name = 'liczba godzin ćwiczeń',
                                             choices = PROPOSAL_HOURS)
-    laboratories = models.IntegerField(verbose_name =' ilość godzin pracowni', 
+    laboratories = models.IntegerField(verbose_name =' liczba godzin pracowni',
                                             choices = PROPOSAL_HOURS)
     deleted = models.BooleanField(verbose_name='usunięty', default=False)
     web_page = models.CharField( verbose_name = 'Strona WWW', 
