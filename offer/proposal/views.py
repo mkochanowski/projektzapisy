@@ -280,7 +280,7 @@ def proposal_form(request, sid = None):
         for book_name in request.POST.getlist('books[]'):
             books_to_form.append({ "id" : None, "name" : book_name})
 
-    proposals_ = Proposal.objects.filter(deleted=False)
+    proposals_ = Proposal.objects.filter(deleted=False).order_by('name')
     try:
         exam = proposal_.is_exam()
     except ValueError:
@@ -331,7 +331,7 @@ def proposal_history( request, sid ):
 
     data = {
         'descriptions' : proposal_.descriptions.order_by( '-date' ).filter(deleted = False),
-        'proposals'    : Proposal.objects.all(),
+        'proposals'    : Proposal.objects.filter(deleted=False).order_by('name'),
         'can_edit'     : can_edit
     }
     
