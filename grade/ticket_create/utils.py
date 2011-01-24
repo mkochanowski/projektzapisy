@@ -79,7 +79,7 @@ def revMod( a, m ):
 def poll_cmp( poll1, poll2 ):
     if poll1.group:
         if poll2.group:
-            return cmp( poll1.group.subject, poll2.group.subject )
+            return cmp( poll1.group.subject.name, poll2.group.subject.name )
         else:
             return 1
     else:
@@ -95,14 +95,14 @@ def generate_rsa_key():
     """    
     
     #wersja bezpieczniejsza
-    key_length = 1024
-    RSAkey     = RSA.generate(key_length)    
+    #- key_length = 1024
+    #- RSAkey     = RSA.generate(key_length)    
     
     #wersja szybsza
     #do poprawki: tworzenie i usuwanie pliku test_rsa...
-    #getstatusoutput('ssh-keygen -b 1024 -t "rsa" -f test_rsa -N "" -q')
-    #RSAkey = RSA.importKey( open('test_rsa').read() )
-    #getstatusoutput('rm test_rsa*')
+    getstatusoutput('ssh-keygen -b 1024 -t "rsa" -f test_rsa -N "" -q')
+    RSAkey = RSA.importKey( open('test_rsa').read() )
+    getstatusoutput('rm test_rsa*')
         
     privateKey = RSAkey.exportKey()        
     publicKey  = RSAkey.publickey().exportKey()
@@ -141,7 +141,7 @@ def group_polls_by_subject( poll_list ):
     act_polls = []
     act_group = poll_list[ 0 ].group
     
-    for poll in poll_list:
+    for poll in poll_list:        
         if not act_group:
             if not poll.group:
                 act_polls.append( poll )
