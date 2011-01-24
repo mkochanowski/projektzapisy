@@ -98,6 +98,11 @@ def subjects_list( subjects ):
 @employee_required
 def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active
+    semester = None
+    group    = None
+    type     = None
+    studies_type = None
+    subject      = None
     # TODO: przeniesc do modeli - porozmawiaz z grupa
     def getGroups(semester, group = None, type = None, subject = None):
         if group:
@@ -148,7 +153,6 @@ def poll_create(request):
             studies_type = None
 
         groups = getGroups(semester, group, type, subject)
-        print groups
         for group in groups:
             poll = Poll()
             poll.author       = request.user.employee
@@ -168,21 +172,53 @@ def poll_create(request):
                 pollSection.save()
                 i = i + 1
 
+        if not groups:
+            poll = Poll()
+            poll.author       = request.user.employee
+            poll.title        = request.POST.get('title', '')
+            poll.description  = request.POST.get('description', '')
+            poll.semester     = semester
+            poll.studies_type = studies_type
+            poll.save()
+
+            i = 1
+            for section in request.POST.getlist('sections[]'):
+                pollSection = SectionOrdering()
+                pollSection.poll = poll
+                pollSection.position = i
+                pollSection.section = Section.objects.get(pk = section)
+                pollSection.save()
+                i = i + 1
+
         message = "Utworzono ankietę!"
     data = {}
-    data['studies_type'] = Type.objects.all()
-    data['semesters']  = Semester.objects.all()    
-    last_semester      = Semester.objects.all().order_by('-pk')[0]
-    data['subjects']   = Subject.objects.filter(semester = last_semester).order_by('name')
-    data['message']    = message
-    data['sections']   = Section.objects.all()
-    data['types']   = GROUP_TYPE_CHOICES
+    if semester:   
+        sem       = Subject.objects.filter(semester = semester).order_by('name')
+    else:
+        semester_id = Semester.get_current_semester()
+        sem         = Subject.objects.filter(semester = semester_id).order_by('name')
+
+    data['studies_types'] = Type.objects.all()
+    data['semesters']    = Semester.objects.all()
+    data['subjects']     = sem
+    data['message']      = message
+    data['sections']     = Section.objects.all()
+    data['types']        = GROUP_TYPE_CHOICES
+    data['group']        = group
+    data['type']         = type
+    data['studies_type'] = studies_type
+    data['subject_id']   = subject
+    data['semester']     = semester
+
     data['grade'] =  grade
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 
 def poll_manage(request):
     grade = Semester.get_current_semester().is_grade_active
-    pass
+    data = {}
+    data['semesters']  = Semester.objects.all() 
+    return render_to_response ('grade/poll/manage.html', {'grade' : grade}, context_instance = RequestContext( request ))
+
 
 def declaration( request ):
     # TODO:
@@ -214,7 +250,7 @@ def questionset_create(request):
             if type == 'open':
                 question = OpenQuestion()
 
-            elif type == 'single':
+            elif type == 'single' or type == 'leading':
                 question = SingleChoiceQuestion()
                 question.is_scale = choicebox_is_on(post.get(question_name + "[isScale]"))
 
@@ -250,11 +286,11 @@ def questionset_create(request):
                 container.sections   = section
                 container.save()
 
-            elif type == 'single':
+            elif type == 'single' or type == 'leading':
                 container = SingleChoiceQuestionOrdering()
                 container.question    = question
                 container.sections    = section
-                container.is_leading  = choicebox_is_on(post.get(question_name + "[isLeading]"))
+                container.is_leading  = (type == 'leading')
                 container.save()
                 for opt in hidenAnswers:
                     container.hide_on.add(opt)

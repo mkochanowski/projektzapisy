@@ -91,7 +91,13 @@ class Poll( models.Model ):
         res += unicode( " &#10;".join(PublicKey.objects.get( poll = self.pk ).public_key.split('\n')))
         res += u'</td></tr>'
         return SafeUnicode( res )
-        
+    
+    @staticmethod
+    def get_polls_for_semester( semester = None):
+        if not semester:
+            semester = Semester.get_current_semester()
+        return Poll.objects.filter( semester = semester )
+
     @staticmethod
     def get_current_polls():
         pks = PublicKey.objects.all() 
