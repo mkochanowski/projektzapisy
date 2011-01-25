@@ -15,7 +15,7 @@
 {% block content %}
 	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
         <form method="POST">
-            <fieldset>{{ semester }}
+            <fieldset>
                 <label for="semester">Semestr: </label>
                 <select name="semester" id="semester">
                     {% for sem in semesters %}
@@ -25,8 +25,8 @@
                 <label for="studies-type">Typ studiów: </label>
                 <select name="studies-type">
                     <option value="-1">Dowolny</option>
-                    {% for type in studies_type %}
-                    <option value="{{type.pk}}"{% if studies_type.pk == type.pk %} selected{% endif %}>{{type}}</option>
+                    {% for study_type in studies_types %}
+                    <option value="{{study_type.pk}}"{% if study_type.pk == type.pk %} selected{% endif %}>{{study_type}}</option>
                     {% endfor %}
                 </select><br>
                 <label for="subject">Przedmiot: </label>
