@@ -81,14 +81,48 @@ def revMod( a, m ):
 def poll_cmp( poll1, poll2 ):
     if poll1.group:
         if poll2.group:
-            return cmp( poll1.group.subject.name, poll2.group.subject.name )
+            c = cmp( poll1.group.subject.name, poll2.group.subject.name )
+            if c == 0:
+                c = cmp( poll1.group.type, poll2.group.type )
+                if c == 0:
+                    if poll1.studies_type:
+                        if poll2.studies_type:
+                            c = cmp( poll1.studies_type, poll2.studies_type )
+                            if c == 0:
+                                return cmp( poll1.title, poll2.title )
+                            else:
+                                return c
+                        else:
+                            return 1
+                    else:
+                        if poll2.studies_type:
+                            return -1
+                        else:
+                            return cmp( poll1.title, poll2.title )
+                else:
+                    return c
+            else:
+                return c
         else:
             return 1
     else:
         if poll2.group:
             return -1
         else:
-            return 0
+            if poll1.studies_type:
+                if poll2.studies_type:
+                    c = cmp( poll1.studies_type, poll2.studies_type )
+                    if c == 0:
+                        return cmp( poll1.title, poll2.title )
+                    else:
+                        return c
+                else:
+                    return 1
+            else:
+                if poll2.studies_type:
+                    return -1
+                else:
+                    return cmp( poll1.title, poll2.title )
          
 def generate_rsa_key():
     """ 

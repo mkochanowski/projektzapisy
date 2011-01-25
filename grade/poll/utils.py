@@ -119,12 +119,15 @@ def get_next( poll_list, finished_list, poll_id ):
     
     
 def get_prev( poll_list, finished_list, poll_id ):
-    p = poll_list
-    p.reverse()
-    f = finished_list
-    f.reverse()
+    poll_list.reverse()
+    finished_list.reverse()
     
-    return get_next( p, f, poll_id )
+    prev = get_next( poll_list, finished_list, poll_id )
+    
+    poll_list.reverse()
+    finished_list.reverse()
+    
+    return prev
 
 def get_ticket_and_signed_ticket_from_session( session, slug, poll_id ):
     polls    = session.get( 'polls', default = [])
