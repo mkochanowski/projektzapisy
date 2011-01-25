@@ -135,8 +135,7 @@ Poll.section.createSectionOption = function(name, type, text)
 
 Poll.section.changeType = function(parent, type, answerset, isScale, choiceLimit, hasOther)
 {
-    var id = $(parent).children('input[name="poll[question][order][]"]').val();
-
+    var id = $(parent).parent().children('input[name="poll[question][order][]"]').val();
     if ($(type).val() == 'single')
     {
         $(answerset).children('li').children('.hideOnCheckbox, label').hide();
