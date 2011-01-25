@@ -146,3 +146,8 @@ padding:10px;
 {
 	background: #eeeeee;
 }
+
+#grade-end-grading
+{
+    float: right
+}
