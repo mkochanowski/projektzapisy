@@ -22,11 +22,14 @@ RAND_BITS = 512
 def flatten( x ):
     result = []
     for el in x:
-        #if isinstance(el, (list, tuple)):
-        if hasattr(el, "__iter__") and not isinstance(el, basestring):
-            result.extend(flatten(el))
+        if isinstance(el, list):
+            if hasattr(el, "__iter__") and not isinstance(el, basestring):
+                result.extend(flatten(el))
+            else:
+                result.append(el)
         else:
             result.append(el)
+
     return result    
     
 def gcd( a, b ):
@@ -37,24 +40,24 @@ def gcd( a, b ):
     return b
       
 def gcwd( u, v ):
-	u1 = 1
-	u2 = 0
-	u3 = u
-	v1 = 0
-	v2 = 1
-	v3 = v
-	while v3 != 0:
-		q = u3 / v3
-		t1 = u1 - q * v1
-		t2 = u2 - q * v2
-		t3 = u3 - q * v3
-		u1 = v1
-		u2 = v2
-		u3 = v3
-		v1 = t1
-		v2 = t2
-		v3 = t3
-	return u1, u2, u3
+    u1 = 1
+    u2 = 0
+    u3 = u
+    v1 = 0
+    v2 = 1
+    v3 = v
+    while v3 != 0:
+        q = u3 / v3
+        t1 = u1 - q * v1
+        t2 = u2 - q * v2
+        t3 = u3 - q * v3
+        u1 = v1
+        u2 = v2
+        u3 = v3
+        v1 = t1
+        v2 = t2
+        v3 = t3
+    return u1, u2, u3
     
 def expMod( a, b, q ):
     p = 1

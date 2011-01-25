@@ -1,9 +1,9 @@
 {% extends "grade/base.html" %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
-	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
-	<li>Twoje ankiety</li>
+    <li><a href="/">Strona Główna</a></li>
+    <li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+    <li>Twoje ankiety</li>
 {% endblock %}
 
 {% block content %}
@@ -30,7 +30,7 @@
         {% if poll_sub.1 %}
             <ul id="grade-fillable-poll-sublist">
             {% for poll in poll_sub.2 %}
-                <li><a href="{% url grade-poll-poll-answer poll_sub.0.1 poll.0 poll.1 %}">{{ poll.2 }}</a></li>
+                <li><a href="{% url grade-poll-poll-answer poll_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
             {% endfor %}
             </ul>
         {% endif %}
@@ -47,7 +47,7 @@
         {% if fin_sub.1 %}
         <ul id="grade-not-fillable-poll-sublist">
             {% for poll in fin_sub.2 %}
-                <li><a href="{% url grade-poll-poll-answer fin_sub.0.1 poll.0 poll.1 %}">{{ poll.2 }}</a></li>
+                <li><a href="{% url grade-poll-poll-answer fin_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -61,4 +61,6 @@
 {% block poll-content %}
 {% endblock %}
 </div>
+
+<div id="grade-end-grading"><a href="{% url poll-end-grading %}">Zakończ oceniać</a></div>
 {% endblock %}

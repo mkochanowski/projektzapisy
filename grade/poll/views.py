@@ -32,13 +32,14 @@ from fereol.grade.poll.utils           import check_signature, \
                                               group_polls_and_tickets_by_subject, \
                                               create_slug, \
                                               get_next, \
-                                              get_prev
+                                              get_prev, \
+                                              get_ticket_and_signed_ticket_from_session
 
 from fereol.users.models                 import Employee
 
 def default(request):
-	grade = Semester.get_current_semester().is_grade_active
-	return render_to_response ('grade/base.html', {'grade' : grade }, context_instance = RequestContext ( request ))
+    grade = Semester.get_current_semester().is_grade_active
+    return render_to_response ('grade/base.html', {'grade' : grade }, context_instance = RequestContext ( request ))
 
 def enable_grade( request ):
     semester = Semester.get_current_semester()
@@ -356,13 +357,13 @@ def tickets_enter(request):
                             st = SavedTicket.objects.get( poll   = poll,
                                                           ticket = ticket )
                             if st.finished:
-                                finished.append(( poll, ticket ))
+                                finished.append(( poll, ticket, signed_ticket ))
                             else:
-                                polls.append(( poll, ticket ))
+                                polls.append(( poll, ticket, signed_ticket ))
                         except:
                             st = SavedTicket( poll = poll, ticket = ticket )
                             st.save()
-                            polls.append(( poll, ticket ))
+                            polls.append(( poll, ticket, signed_ticket ))
                     else:
                         errors.append(( id, "Nie udało się zweryfikować podpisu pod biletem." ))
                 except:
@@ -372,9 +373,11 @@ def tickets_enter(request):
             request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_subject( polls ))
             request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_subject( finished ))
             
+
             return HttpResponseRedirect( '/grade/poll/polls/all' )
     else:
         form = TicketsForm()
+        
     data[ 'form' ]  = form
     data[ 'grade' ] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
@@ -387,156 +390,168 @@ def polls_for_user( request, slug ):
     
     return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
     
-def poll_answer( request, slug, pid, ticket ):
-    poll = Poll.objects.get( pk = pid )
-    st   = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
-    
-    if request.method == "POST" and not st.finished:
-        form = PollForm( request.POST )
-        form.setFields( poll, st )
-        
-        if form.is_valid():
-            for key, value in form.cleaned_data.items():
-                
-                if key == 'finish':
-                    if value:
-                        finit = request.session.get( 'finished', default = [])
-                        polls = request.session.get( 'polls',    default = [( int( pid ), long( ticket ))])
-                        
-                        finit.append(( int( pid ), long( ticket )))
-                        polls.remove(( int( pid ), long( ticket )))
-                        
-                        request.session[ 'finished' ] = finit
-                        request.session[ 'polls' ]    = polls
-                        
-                        st.finished = True
-                        st.save()
-                        
-                else:
-                    [ poll_data, section_data, question_data ] = key.split( '_' )
-                    poll_id       = poll_data.split( '-' )[ 1 ]
-                    section_id    = section_data.split( '-' )[ 1 ]
-                    question_id   = question_data.split( '-' )[ 1 ]
-                    question_type = question_data.split( '-' )[ 2 ]
-                    other         = len( question_data.split( '-' )) == 4
-                    
-                    section = Section.objects.get( pk = section_id )
-                    
-                    if   ( question_type == 'leading' or \
-                           question_type == 'single' ) and \
-                         value:
-                        question = SingleChoiceQuestion.objects.get( 
-                                        pk = question_id )
-                        try:
-                            ans = SingleChoiceQuestionAnswer.objects.get(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                        except ObjectDoesNotExist:
-                            ans = SingleChoiceQuestionAnswer(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                            ans.save()
-                            
-                        option = Option.objects.get( pk = value )
-                        ans.option = option
-                        ans.save()
-                    elif question_type == 'multi' and value and other:
-                        question = MultipleChoiceQuestion.objects.get( 
-                                        pk = question_id )
-                        try:
-                            ans = MultipleChoiceQuestionAnswer.objects.get(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                        except ObjectDoesNotExist:
-                            ans = MultipleChoiceQuestionAnswer(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                            ans.save()
-                        
-                        ans.other = value
-                        ans.save()
-                    elif question_type == 'multi' and value:
-                        question = MultipleChoiceQuestion.objects.get( 
-                                        pk = question_id )
-                        try:
-                            ans = MultipleChoiceQuestionAnswer.objects.get(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                        except ObjectDoesNotExist:
-                            ans = MultipleChoiceQuestionAnswer(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                            ans.save()
-                        
-                        ids = map( int, value )
-                        
-                        if -1 in ids:
-                            ids.remove( -1 )
-                        else:
-                            ans.other = None
-                        
-                        options = map( lambda id: Option.objects.get( pk = id ),
-                                       ids )
-                        ans.options = options
-                        ans.save()
-                    elif question_type == 'open' and value:
-                        question = OpenQuestion.objects.get( 
-                                        pk = question_id )
-                        try:
-                            ans = OpenQuestionAnswer.objects.get(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                        except ObjectDoesNotExist:
-                            ans = OpenQuestionAnswer(
-                                    section      = section,
-                                    question     = question,
-                                    saved_ticket = st )
-                            ans.save()
-                        
-                        ans.content = value
-                        ans.save()
-    else:
-        form = PollForm()
-        form.setFields( poll, st )
-    
-    data = prepare_data( request, slug )
-    data[ 'link_name' ] = poll.to_url_title()
-    data[ 'slug' ]      = slug
-    data[ 'title' ]     = poll.title
-    data[ 'desc' ]      = poll.description
-    data[ 'form' ]      = form
-    
-    try:
-        poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
-    except IndexError:
-        poll_cands = []
-        
-    try:
-        finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
-    except:
-        finished_cands = []
-    
-    data[ 'next' ]      = get_next( poll_cands, finished_cands, int( pid ))
-    data[ 'prev' ]      = get_prev( poll_cands, finished_cands, int( pid ))
+def poll_answer( request, slug, pid ):
+    poll       = Poll.objects.get( pk = pid )
+    public_key = PublicKey.objects.get( poll = poll )
 
-    if request.method == "POST" and (data[ 'form' ].is_valid() or st.finished):
-        if request.POST.get( 'Next', default=None ):
-            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]) + '/' + str( data['next'][1]))
-        if request.POST.get( 'Prev', default=None ):
-            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['prev'][0]) + '/' + str( data['prev'][1]))
-        if request.POST.get( 'Save', default=None ):
-            return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + pid + '/' + ticket )
+    (ticket, signed_ticket) = get_ticket_and_signed_ticket_from_session( request.session, slug, pid )
+    
+    if ticket and signed_ticket and check_signature( ticket, signed_ticket, public_key ):
+        st   = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
+    
+        if request.method == "POST" and not st.finished:
+            form = PollForm( request.POST )
+            form.setFields( poll, st )
             
+            if form.is_valid():
+                for key, value in form.cleaned_data.items():
+                    
+                    if key == 'finish':
+                        if value:
+                            finit = request.session.get( 'finished', default = [])
+                            polls = request.session.get( 'polls',    default = [( int( pid ), long( ticket ))])
+                            
+                            finit.append(( int( pid ), long( ticket )))
+                            polls.remove(( int( pid ), long( ticket )))
+                            
+                            request.session[ 'finished' ] = finit
+                            request.session[ 'polls' ]    = polls
+                            
+                            st.finished = True
+                            st.save()
+                            
+                    else:
+                        [ poll_data, section_data, question_data ] = key.split( '_' )
+                        poll_id       = poll_data.split( '-' )[ 1 ]
+                        section_id    = section_data.split( '-' )[ 1 ]
+                        question_id   = question_data.split( '-' )[ 1 ]
+                        question_type = question_data.split( '-' )[ 2 ]
+                        other         = len( question_data.split( '-' )) == 4
+                        
+                        section = Section.objects.get( pk = section_id )
+                        
+                        if   ( question_type == 'leading' or \
+                               question_type == 'single' ) and \
+                             value:
+                            question = SingleChoiceQuestion.objects.get( 
+                                            pk = question_id )
+                            try:
+                                ans = SingleChoiceQuestionAnswer.objects.get(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                            except ObjectDoesNotExist:
+                                ans = SingleChoiceQuestionAnswer(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                                ans.save()
+                                
+                            option = Option.objects.get( pk = value )
+                            ans.option = option
+                            ans.save()
+                        elif question_type == 'multi' and value and other:
+                            question = MultipleChoiceQuestion.objects.get( 
+                                            pk = question_id )
+                            try:
+                                ans = MultipleChoiceQuestionAnswer.objects.get(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                            except ObjectDoesNotExist:
+                                ans = MultipleChoiceQuestionAnswer(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                                ans.save()
+                            
+                            ans.other = value
+                            ans.save()
+                        elif question_type == 'multi' and value:
+                            question = MultipleChoiceQuestion.objects.get( 
+                                            pk = question_id )
+                            try:
+                                ans = MultipleChoiceQuestionAnswer.objects.get(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                            except ObjectDoesNotExist:
+                                ans = MultipleChoiceQuestionAnswer(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                                ans.save()
+                            
+                            ids = map( int, value )
+                            
+                            if -1 in ids:
+                                ids.remove( -1 )
+                            else:
+                                ans.other = None
+                            
+                            options = map( lambda id: Option.objects.get( pk = id ),
+                                           ids )
+                            ans.options = options
+                            ans.save()
+                        elif question_type == 'open' and value:
+                            question = OpenQuestion.objects.get( 
+                                            pk = question_id )
+                            try:
+                                ans = OpenQuestionAnswer.objects.get(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                            except ObjectDoesNotExist:
+                                ans = OpenQuestionAnswer(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                                ans.save()
+                            
+                            ans.content = value
+                            ans.save()
+        else:
+            form = PollForm()
+            form.setFields( poll, st )
+
+        data = prepare_data( request, slug )
+        data[ 'link_name' ] = poll.to_url_title()
+        data[ 'slug' ]      = slug
+        data[ 'title' ]     = poll.title
+        data[ 'desc' ]      = poll.description
+        data[ 'form' ]      = form
+
+        try:
+            poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
+        except IndexError:
+            poll_cands = []
+            
+        try:
+            finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
+        except:
+            finished_cands = []
+
+        data[ 'next' ]      = get_next( poll_cands, finished_cands, int( pid ))
+        data[ 'prev' ]      = get_prev( poll_cands, finished_cands, int( pid ))
+
+        if request.method == "POST" and (data[ 'form' ].is_valid() or st.finished):
+            if request.POST.get( 'Next', default=None ):
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]) + '/' + str( data['next'][1]))
+            if request.POST.get( 'Prev', default=None ):
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['prev'][0]) + '/' + str( data['prev'][1]))
+            if request.POST.get( 'Save', default=None ):
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + pid + '/' + ticket )
+    else:
+        data = { 'errors': [ u"Nie masz uprawnień do wypełnienia ankiety " + poll.to_url_title() ], 
+                 'slug' : slug,
+                 'link_name' : poll.to_url_title() }
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     
+def poll_end_grading( request ):
+    request.session.clear()
+    
+    return HttpResponseRedirect( '/grade/' )
 #### Poll results ####
 
 @login_required
