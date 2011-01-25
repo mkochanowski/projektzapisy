@@ -25,7 +25,6 @@ def otherSubjects(request):
 	other_subjects = Subject.objects.all().order_by('name')
 	other_subjects = filter(lambda s : s.semester.is_current_semester() and s not in subj, other_subjects)
 	logger.info('User %s looked at other subject' % (unicode(request.user.username)))
-	#podmienić templatkę!
 	return render_to_response("mobile/other_subjects.html", {'subjects': other_subjects}, context_instance = RequestContext(request))
 
 
