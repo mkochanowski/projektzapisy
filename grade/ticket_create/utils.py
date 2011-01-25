@@ -2,7 +2,6 @@
 from Crypto.PublicKey                      import RSA
 from Crypto.Random.random                  import getrandbits, \
                                                   randint
-from itertools                             import product
 from commands                              import *
 from string                                import whitespace
  
