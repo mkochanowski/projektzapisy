@@ -99,7 +99,7 @@ class Poll( models.Model ):
 
     @staticmethod
     def get_current_polls():
-        pks = PublicKey.objects.all() 
+        pks = map( lambda (x,): x, PublicKey.objects.all().values_list( 'poll' ))
         return Poll.objects.filter( pk__in = pks )
         
     @staticmethod
