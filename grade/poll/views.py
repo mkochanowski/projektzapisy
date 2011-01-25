@@ -108,27 +108,31 @@ def poll_create(request):
         if group:
             return group
         if type:
+            print 'ok'
             if subject:
-                print type
                 groups = Group.objects.filter(type=type, subject=subject)
             else:
-                print type
                 groups = Group.objects.filter(type=type)
         else:
+            print 'bla'
             if subject:
+                print 'tutaj'
                 groups = Group.objects.filter(subject=subject)
+                print subject
             else:
-                roups = Group.objects.filter(subject__semester = semester)
+                groups = Group.objects.filter(subject__semester = semester)
+                
+        
         return groups
 
     message = ""
     if request.method == "POST":
         semester = int(request.POST.get('semester', 0))
         group    = int(request.POST.get('group', 0))
-        type     = str(request.POST.get('type', 0))
+        type     = int(request.POST.get('type', 0))
         studies_type = int(request.POST.get('studies-type', -1))
+        
         subject  = int(request.POST.get('subject', 0))
- 
         if semester > 0:
             semester = Semester.objects.get(pk = semester)
         else:
