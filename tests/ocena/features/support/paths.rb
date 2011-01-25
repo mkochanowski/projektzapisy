@@ -19,6 +19,9 @@ module NavigationHelpers
         
     when /grade keys generator/
         '/grade/ticket/keys_generate'
+    
+    when /polls filling page/
+        '/grade/poll/polls/all'
 		
     else
           begin

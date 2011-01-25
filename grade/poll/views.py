@@ -46,7 +46,7 @@ def enable_grade( request ):
     semester.is_grade_active = True
     semester.save()   
     grade = True
-    return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Otwarto ocenę zajęć" }, context_instance = RequestContext ( request ))
+    return render_to_response ('grade/base.html', {'grade' : grade, 'success' : "Ocena zajęć otwarta" }, context_instance = RequestContext ( request ))
     
 def disable_grade( request ):
     semester = Semester.get_current_semester()

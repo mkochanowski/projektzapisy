@@ -10,7 +10,7 @@
 <!-- OSTYLOWAĆ -->
     {% if errors %}
         <div>
-            <h4> Nie udało się pobrać następujących biletów </h4>
+            <h4> Nie udało się pobrać następujących biletów: </h4>
             <ul>
                 {% for err in errors %}
                     <li>
@@ -24,7 +24,7 @@
     
     {% if tickets %}
         <div>
-            <h4> Oto Twoje bilety.<br>Zapisz je w bezpiecznym miejscu.</h4>
+            <h4> Pomyślnie wygenerowano bilety.<br>Zapisz je w bezpiecznym miejscu.</h4>
             <form action="">
     	        <textarea name="keys" cols="80" rows="20" readonly="readonly">{{ tickets }}
                 </textarea>
