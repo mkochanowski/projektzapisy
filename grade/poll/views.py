@@ -397,7 +397,26 @@ def poll_answer( request, slug, pid ):
     public_key = PublicKey.objects.get( poll = poll )
 
     (ticket, signed_ticket) = get_ticket_and_signed_ticket_from_session( request.session, slug, pid )
-    
+
+    data = prepare_data( request, slug )
+    data[ 'link_name' ] = poll.to_url_title()
+    data[ 'slug' ]      = slug
+    data[ 'title' ]     = poll.title
+    data[ 'desc' ]      = poll.description
+        
+    try:
+        poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
+    except IndexError:
+        poll_cands = []
+            
+    try:
+        finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
+    except:
+        finished_cands = []
+
+    data[ 'next' ]      = get_next( poll_cands, finished_cands, int( pid ))
+    data[ 'prev' ]      = get_prev( poll_cands, finished_cands, int( pid ))
+        
     if ticket and signed_ticket and check_signature( ticket, signed_ticket, public_key ):
         st   = SavedTicket.objects.get( ticket = unicode( ticket ), poll = poll )
     
@@ -422,8 +441,8 @@ def poll_answer( request, slug, pid ):
                                 pd = filter( lambda x: x == (int(pid), ticket, signed_ticket), ls )
                                 if pd:
                                     polls.remove(((n, s), ls ))
-                                    for data in pd:
-                                        ls.remove( data )
+                                    for poll_data in pd:
+                                        ls.remove( poll_data )
                                     if ls: polls.append(((n, s), ls))
                                     name = n
                                     break 
@@ -546,26 +565,8 @@ def poll_answer( request, slug, pid ):
             form = PollForm()
             form.setFields( poll, st )
 
-        data = prepare_data( request, slug )
-        data[ 'link_name' ] = poll.to_url_title()
-        data[ 'slug' ]      = slug
-        data[ 'title' ]     = poll.title
-        data[ 'desc' ]      = poll.description
         data[ 'form' ]      = form
-
-        try:
-            poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
-        except IndexError:
-            poll_cands = []
-            
-        try:
-            finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
-        except:
-            finished_cands = []
-
-        data[ 'next' ]      = get_next( poll_cands, finished_cands, int( pid ))
-        data[ 'prev' ]      = get_prev( poll_cands, finished_cands, int( pid ))
-
+        
         if request.method == "POST" and (data[ 'form' ].is_valid() or st.finished):
             if request.POST.get( 'Next', default=None ):
                 return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]))
