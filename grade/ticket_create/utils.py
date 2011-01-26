@@ -2,7 +2,6 @@
 from Crypto.PublicKey                      import RSA
 from Crypto.Random.random                  import getrandbits, \
                                                   randint
-from itertools                             import product
 from commands                              import *
 from string                                import whitespace
  
@@ -23,11 +22,14 @@ RAND_BITS = 512
 def flatten( x ):
     result = []
     for el in x:
-        #if isinstance(el, (list, tuple)):
-        if hasattr(el, "__iter__") and not isinstance(el, basestring):
-            result.extend(flatten(el))
+        if isinstance(el, list):
+            if hasattr(el, "__iter__") and not isinstance(el, basestring):
+                result.extend(flatten(el))
+            else:
+                result.append(el)
         else:
             result.append(el)
+
     return result    
     
 def gcd( a, b ):
@@ -38,24 +40,24 @@ def gcd( a, b ):
     return b
       
 def gcwd( u, v ):
-	u1 = 1
-	u2 = 0
-	u3 = u
-	v1 = 0
-	v2 = 1
-	v3 = v
-	while v3 != 0:
-		q = u3 / v3
-		t1 = u1 - q * v1
-		t2 = u2 - q * v2
-		t3 = u3 - q * v3
-		u1 = v1
-		u2 = v2
-		u3 = v3
-		v1 = t1
-		v2 = t2
-		v3 = t3
-	return u1, u2, u3
+    u1 = 1
+    u2 = 0
+    u3 = u
+    v1 = 0
+    v2 = 1
+    v3 = v
+    while v3 != 0:
+        q = u3 / v3
+        t1 = u1 - q * v1
+        t2 = u2 - q * v2
+        t3 = u3 - q * v3
+        u1 = v1
+        u2 = v2
+        u3 = v3
+        v1 = t1
+        v2 = t2
+        v3 = t3
+    return u1, u2, u3
     
 def expMod( a, b, q ):
     p = 1
@@ -79,14 +81,48 @@ def revMod( a, m ):
 def poll_cmp( poll1, poll2 ):
     if poll1.group:
         if poll2.group:
-            return cmp( poll1.group.subject.name, poll2.group.subject.name )
+            c = cmp( poll1.group.subject.name, poll2.group.subject.name )
+            if c == 0:
+                c = cmp( poll1.group.type, poll2.group.type )
+                if c == 0:
+                    if poll1.studies_type:
+                        if poll2.studies_type:
+                            c = cmp( poll1.studies_type, poll2.studies_type )
+                            if c == 0:
+                                return cmp( poll1.title, poll2.title )
+                            else:
+                                return c
+                        else:
+                            return 1
+                    else:
+                        if poll2.studies_type:
+                            return -1
+                        else:
+                            return cmp( poll1.title, poll2.title )
+                else:
+                    return c
+            else:
+                return c
         else:
             return 1
     else:
         if poll2.group:
             return -1
         else:
-            return 0
+            if poll1.studies_type:
+                if poll2.studies_type:
+                    c = cmp( poll1.studies_type, poll2.studies_type )
+                    if c == 0:
+                        return cmp( poll1.title, poll2.title )
+                    else:
+                        return c
+                else:
+                    return 1
+            else:
+                if poll2.studies_type:
+                    return -1
+                else:
+                    return cmp( poll1.title, poll2.title )
          
 def generate_rsa_key():
     """ 
@@ -206,7 +242,7 @@ def check_ticket_not_signed( user, poll ):
 def mark_poll_used( user, poll ):
     u = UsedTicketStamp( student = user.student,
                          poll    = poll )
-    u.save()
+    #- u.save()
 
 def ticket_check_and_mark( user, poll, ticket ):
     check_poll_visiblity( user, poll )

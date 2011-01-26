@@ -50,4 +50,4 @@ Feature: Student wants to create tickets for polls
         And  I am logged in with "student" privileges	
         And I am on grade main page
 		When I go to /grade/ticket/connections_choice
-		Then I should see "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletu"		
+		Then I should see "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów"		

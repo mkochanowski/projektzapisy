@@ -63,6 +63,7 @@ class PollForm( forms.Form ):
                     choices = []
                     for option in questions[ 0 ].options.all():
                         choices.append(( option.pk, unicode( option.content )))
+                    
                     field = forms.ChoiceField( 
                                 choices  = choices,
                                 label    = unicode( questions[ 0 ].content ),
@@ -93,13 +94,14 @@ class PollForm( forms.Form ):
                         answer = SingleChoiceQuestionAnswer.objects.get( 
                                     saved_ticket = st,
                                     section      = section,
-                                    question     = question )
+                                    question     = question ).option.pk
                     except ObjectDoesNotExist:
                         answer = None
                         
                     choices = []
                     for option in question.options.all():
                         choices.append(( option.pk, unicode( option.content )))
+                    
                     field = forms.ChoiceField( choices  = choices,
                                                label    = unicode( question.content ),
                                                required = False,

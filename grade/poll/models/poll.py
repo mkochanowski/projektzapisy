@@ -12,7 +12,6 @@ from fereol.enrollment.records.models  import Record, \
 from fereol.grade.ticket_create.models import PublicKey                                              
 from section                           import SectionOrdering
 
-
 class Poll( models.Model ):
     author            = models.ForeignKey( Employee, verbose_name = 'autor', related_name = 'author' )
     title             = models.CharField( max_length = 40, verbose_name = 'tytuł' )
@@ -100,7 +99,7 @@ class Poll( models.Model ):
 
     @staticmethod
     def get_current_polls():
-        pks = PublicKey.objects.all() 
+        pks = map( lambda (x,): x, PublicKey.objects.all().values_list( 'poll' ))
         return Poll.objects.filter( pk__in = pks )
         
     @staticmethod
