@@ -116,9 +116,6 @@ class PollForm( forms.Form ):
                         if self.finished: other_field.widget.attrs[ 'disabled' ] = True
                         if other_ans: answer.append( -1 )
                     
-                    print answer
-                    print choices
-                    
                     field = forms.MultipleChoiceField( 
                                 choices    = choices,
                                 label      = unicode( question.content ),
