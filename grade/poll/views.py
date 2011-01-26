@@ -410,10 +410,40 @@ def poll_answer( request, slug, pid ):
                     if key == 'finish':
                         if value:
                             finit = request.session.get( 'finished', default = [])
-                            polls = request.session.get( 'polls',    default = [( int( pid ), long( ticket ))])
+                            polls = request.session.get( 'polls',    default = [])
                             
-                            finit.append(( int( pid ), long( ticket )))
-                            polls.remove(( int( pid ), long( ticket )))
+                            slug_polls = filter( lambda ((x, s), ls): slug == s, polls)
+                            slug_finit = filter( lambda ((x, s), ls): slug == s, finit) 
+                            
+                            name = None
+                            
+                            for ((n, s), ls) in slug_polls: 
+                                pd = filter( lambda x: x == (int(pid), ticket, signed_ticket), ls )
+                                if pd:
+                                    polls.remove(((n, s), ls ))
+                                    for data in pd:
+                                        ls.remove( data )
+                                    if ls: polls.append(((n, s), ls))
+                                    name = n
+                                    break 
+                                    
+                            if slug_finit:
+                                for ((n, s), ls) in slug_finit:
+                                    if n == name:
+                                        finit.remove(((n, s), ls))
+                                        ls.append((int(pid), ticket, signed_ticket))
+                                        finit.append(((n,s), ls))
+                                        break
+                            else:
+                                finit.append(((name, slug), [(int(pid), ticket, signed_ticket)]))
+                            
+                            def slug_cmp((n1,slug1), (n2,slug2)):
+                                if slug1 == "common": return -1
+                                if slug2 == "common": return 1
+                                return cmp((n1, slug1), (n2,slug2))
+                            
+                            polls.sort( lambda (x, lx), (y, ly): slug_cmp( x, y ))
+                            finit.sort( lambda (x, lx), (y, ly): slug_cmp( x, y ))
                             
                             request.session[ 'finished' ] = finit
                             request.session[ 'polls' ]    = polls
