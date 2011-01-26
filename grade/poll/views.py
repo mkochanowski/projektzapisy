@@ -388,6 +388,7 @@ def polls_for_user( request, slug ):
         return HttpResponseRedirect( '/grade/poll/tickets_enter' )
     
     data = prepare_data( request, slug )
+    data[ 'grade' ] = Semester.get_current_semester().is_grade_active
     
     return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
     
@@ -576,6 +577,8 @@ def poll_answer( request, slug, pid ):
         data = { 'errors': [ u"Nie masz uprawnień do wypełnienia ankiety " + poll.to_url_title() ], 
                  'slug' : slug,
                  'link_name' : poll.to_url_title() }
+    
+    data[ 'grade' ] = Semester.get_current_semester().is_grade_active
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
     
