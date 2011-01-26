@@ -16,9 +16,8 @@
 
 {% block poll-content %}
     <form action="" method="post">
-        <table>
-            <tr><th>{{ title }}</th></tr>
-            <tr><td>{{ desc }}</td></tr>
+        <h1>{{ title }}</h1>
+        <span>{{ desc }}</span>
             {{ form.as_divs }}
         <div class="fieldWrapper">
             {{ form.finish.errors }}
