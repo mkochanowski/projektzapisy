@@ -162,33 +162,6 @@
         }
     }, 
     {
-        "pk": 31, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_dontsendentry", 
-            "name": "Can add blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 32, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_dontsendentry", 
-            "name": "Can change blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 33, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_dontsendentry", 
-            "name": "Can delete blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
         "pk": 28, 
         "model": "auth.permission", 
         "fields": {
@@ -216,30 +189,57 @@
         }
     }, 
     {
-        "pk": 34, 
+        "pk": 25, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_messagelog", 
-            "name": "Can add log", 
-            "content_type": 12
+            "codename": "add_migrationhistory", 
+            "name": "Can add migration history", 
+            "content_type": 9
         }
     }, 
     {
-        "pk": 35, 
+        "pk": 26, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_messagelog", 
-            "name": "Can change log", 
-            "content_type": 12
+            "codename": "change_migrationhistory", 
+            "name": "Can change migration history", 
+            "content_type": 9
         }
     }, 
     {
-        "pk": 36, 
+        "pk": 27, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_messagelog", 
-            "name": "Can delete log", 
-            "content_type": 12
+            "codename": "delete_migrationhistory", 
+            "name": "Can delete migration history", 
+            "content_type": 9
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_dontsendentry", 
+            "name": "Can add blokada", 
+            "content_type": 11
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_dontsendentry", 
+            "name": "Can change blokada", 
+            "content_type": 11
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_dontsendentry", 
+            "name": "Can delete blokada", 
+            "content_type": 11
         }
     }, 
     {
@@ -990,30 +990,30 @@
         }
     }, 
     {
-        "pk": 25, 
+        "pk": 34, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_migrationhistory", 
-            "name": "Can add migration history", 
-            "content_type": 9
+            "codename": "add_messagelog", 
+            "name": "Can add log", 
+            "content_type": 12
         }
     }, 
     {
-        "pk": 26, 
+        "pk": 35, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_migrationhistory", 
-            "name": "Can change migration history", 
-            "content_type": 9
+            "codename": "change_messagelog", 
+            "name": "Can change log", 
+            "content_type": 12
         }
     }, 
     {
-        "pk": 27, 
+        "pk": 36, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_migrationhistory", 
-            "name": "Can delete migration history", 
-            "content_type": 9
+            "codename": "delete_messagelog", 
+            "name": "Can delete log", 
+            "content_type": 12
         }
     }, 
     {
@@ -1485,7 +1485,7 @@
             "is_active": true, 
             "is_superuser": true, 
             "is_staff": true, 
-            "last_login": "2011-01-25 20:38:46", 
+            "last_login": "2011-01-26 04:25:43", 
             "groups": [], 
             "user_permissions": [], 
             "password": "sha1$b6c11$bc8d9ea4eedccf3d68fe9e7d31a32db3bb4b76b4", 
@@ -11337,15 +11337,15 @@
         "model": "poll.multiplechoicequestion", 
         "fields": {
             "content": "Jak oceniasz stosunek wyk\u0142adowcy do student\u00f3w?", 
-            "choice_limit": 0, 
+            "choice_limit": 4, 
             "options": [
-                11, 
-                10, 
-                12, 
-                7, 
                 6, 
+                7, 
+                8, 
                 9, 
-                8
+                10, 
+                11, 
+                12
             ], 
             "has_other": true
         }
@@ -11355,14 +11355,14 @@
         "model": "poll.multiplechoicequestion", 
         "fields": {
             "content": "Kt\u00f3re okre\u015blenia najlepiej opisuj\u0105 Twoje wra\u017cenia po egzaminie?", 
-            "choice_limit": 0, 
+            "choice_limit": 3, 
             "options": [
-                48, 
-                46, 
-                47, 
+                43, 
                 44, 
                 45, 
-                43
+                46, 
+                47, 
+                48
             ], 
             "has_other": true
         }
@@ -11372,14 +11372,14 @@
         "model": "poll.multiplechoicequestion", 
         "fields": {
             "content": "Kt\u00f3re z poni\u017cszych by\u0142y wymagane w projekcie?", 
-            "choice_limit": 0, 
+            "choice_limit": 7, 
             "options": [
                 66, 
                 67, 
-                71, 
-                70, 
                 68, 
-                69
+                69, 
+                70, 
+                71
             ], 
             "has_other": true
         }
@@ -11389,16 +11389,16 @@
         "model": "poll.multiplechoicequestion", 
         "fields": {
             "content": "Z kt\u00f3rych dziedzin wydaje si\u0119 by\u0107 za ma\u0142o przedmiot\u00f3w?", 
-            "choice_limit": 0, 
+            "choice_limit": 9, 
             "options": [
-                108, 
+                101, 
                 102, 
                 103, 
-                101, 
+                104, 
+                105, 
                 106, 
                 107, 
-                104, 
-                105
+                108
             ], 
             "has_other": true
         }
