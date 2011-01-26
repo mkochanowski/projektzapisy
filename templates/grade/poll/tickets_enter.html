@@ -5,20 +5,21 @@
 	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
 	<li>Weryfikacja biletów</li>
 {% endblock %}
-<!-- OSTYLOWAĆ -->
 {% block content %}
-    <div id="error-message">
-        <h4>{{ error }}</h4>
+    <div class="grade-error-message">
+	<h4>{{ error }}</h4>
     </div>
 	{% if user.is_authenticated %}
-		<h3>Uwaga</h3>
-		<div>Aby ankieta pozostała anonimowa należy się <a href="{% url grade-logout %}">wylogować</a>
+		<div class='main-message'><h3>Uwaga</h3>
+		Aby ankieta pozostała anonimowa należy się <a href="{% url grade-logout %}">wylogować</a></div>
 	{% else %}
+		<div id='grade-tickets-enter'>
 		<form action="" method="post">
-		<table>
+		<table id='grade-tickets-enter-form'>
 			{{ form.as_table }}
 		</table>
-		<input type="submit" value="Wyślij" />
+		<input id= "grade-tickets-enter-button" type="submit" value="Wyślij" />
 		</form>
+		</div>
 	{% endif %}
 {% endblock %}

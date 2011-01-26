@@ -1,5 +1,9 @@
 {% extends "grade/base.html" %}
 
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/tickets_save.css" type="text/css" />
+{% endblock %}
+
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
 	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
@@ -9,8 +13,8 @@
 {% block content %}
 <!-- OSTYLOWAĆ -->
     {% if errors %}
-        <div>
-            <h4> Nie udało się pobrać następujących biletów: </h4>
+        <div class='grade-error-message'>
+            <h4> Nie udało się pobrać następujących biletów </h4>
             <ul>
                 {% for err in errors %}
                     <li>
@@ -23,15 +27,15 @@
     {% endif %} 
     
     {% if tickets %}
-        <div>
-            <h4> Pomyślnie wygenerowano bilety.<br>Zapisz je w bezpiecznym miejscu.</h4>
+        <div id='grade-tickets-save-form'>
+            <h3> Oto Twoje bilety.<br>Zapisz je w bezpiecznym miejscu.</h3>
             <form action="">
     	        <textarea name="keys" cols="80" rows="20" readonly="readonly">{{ tickets }}
                 </textarea>
             </form>
         </div>
     {% else %}
-        <div>
+        <div class='grade-error-message'>
             <h4>Niestety nie możesz pobrać żadnych biletów.</h4>
         </div>
     {% endif %}

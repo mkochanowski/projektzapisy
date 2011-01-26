@@ -25,6 +25,12 @@
 #grade-main
 {
 border: 1px solid #CCC;
+        border: 1px solid #cccccc;
+
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        border-radius: 4px;
+
 padding:10px;
 }
 
@@ -52,7 +58,7 @@ padding:10px;
 
 #grade-poll-choose-menu
 {
-	margin-top: 30px;
+	margin-top: 0px;
 	width: 170px;
 	float: left;
 }
@@ -64,7 +70,7 @@ padding:10px;
 	list-style-type: none;
 }
 
-#grade-fillable-poll-list li
+#grade-fillable-poll-list li 
 {
 	border: 1px solid #cccccc;
 	border-right: 0;
@@ -72,14 +78,15 @@ padding:10px;
 	overflow: hidden;
 }
 
-#grade-fillable-poll-list li:first-child
+
+#grade-fillable-poll-list li:first-child 
 {
 	-moz-border-radius-topleft: 4px;
 	-webkit-border-top-left-radius: 4px;
 	border-top-left-radius: 4px;
 }
 
-#grade-fillable-poll-list li:last-child
+#grade-fillable-poll-list li:last-child 
 {
 	-moz-border-radius-bottomleft: 4px;
 	-webkit-border-bottom-left-radius: 4px;
@@ -99,6 +106,25 @@ padding:10px;
 #grade-fillable-poll-list li a:hover
 {
 	background: #eeeeee;
+}
+
+#grade-fillable-poll-sublist
+{
+	margin: 0;
+	padding: 0;
+}
+
+#grade-fillable-poll-sublist li, #grade-fillable-poll-sublist li:first-child, #grade-fillable-poll-sublist li:last-child
+{
+	border-left:0;
+	border-top 1px solid #cccccc;
+	border-bottom: 0;
+}
+
+#grade-fillable-poll-sublist li a, #grade-fillable-poll-sublist li span
+{
+	display: block;
+	padding-left: 25px;
 }
 
 
@@ -150,4 +176,74 @@ padding:10px;
 #grade-end-grading
 {
     float: right
+}
+
+.grade-message{
+	border: 1px solid #cccccc;
+	background: #FFF5B3;
+	font-size: 16px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+/*** STRONA DO WKLEJENIA WYGENEROWANYCH BILETOW ***/
+
+#grade-tickets-enter{
+        border: 1px solid #cccccc;
+        padding: 10px;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        border-radius: 4px;
+        text-align: center;
+}
+
+#grade-tickets-enter-form {
+	width: 100%;
+}
+
+#grade-tickets-enter-form td{
+        text-align: center;
+}
+
+
+#grade-tickets-enter-form th{
+        position: absolute;
+        display: block;
+        font-size: 22px;
+        font-weight: bold;
+}
+
+
+#id_ticketsfield
+{
+       	
+	display: block;
+	margin-top: 40px;
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#grade-tickets-enter-button{
+        margin-top: 10px;
+        padding: 5px 40px;
+}
+
+/*  ERRORY - zmienic kolor na wlasciwy - nie moglem znalezc odpowiedzialnego za nie stylu*/
+
+.grade-error-message
+{
+	border: 1px solid #cccccc;
+	background: #FFF5B3;
+	font-size: 16px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	margin: 10px;
+	margin-bottom: 35px;
+	padding: 20px 40px;
+
 }
