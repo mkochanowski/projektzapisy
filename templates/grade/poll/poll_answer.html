@@ -20,6 +20,11 @@
             <tr><th>{{ title }}</th></tr>
             <tr><td>{{ desc }}</td></tr>
             {{ form.as_divs }}
+        <div class="fieldWrapper">
+            {{ form.finish.errors }}
+            {{ form.finish.label_tag }}: {{ form.finish }}
+        </div>
+
         </table>
         {% if not errors %}
             <input  type="submit" 
@@ -38,5 +43,6 @@
                    {% endif %}
                    value="Następna ankieta >>" /> 
         {% endif %}
+
     </form>
 {% endblock %}

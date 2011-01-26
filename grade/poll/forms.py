@@ -189,6 +189,7 @@ class PollForm( forms.Form ):
                             initial   = False,
                             help_text = u'Jeśli zaznaczysz to pole, utracisz mozliwość edycji ankiety po zapisaniu.' )
             self.finish = field
+            self.fields[ u'finish' ] = field
 
 
 class FilterMenu( forms.Form ):
