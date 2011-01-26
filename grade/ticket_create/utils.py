@@ -242,7 +242,7 @@ def check_ticket_not_signed( user, poll ):
 def mark_poll_used( user, poll ):
     u = UsedTicketStamp( student = user.student,
                          poll    = poll )
-    u.save()
+    #- u.save()
 
 def ticket_check_and_mark( user, poll, ticket ):
     check_poll_visiblity( user, poll )

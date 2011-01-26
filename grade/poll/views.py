@@ -58,6 +58,7 @@ def disable_grade( request ):
     PrivateKey.objects.all().delete()
     
     # TODO: Coś robić z odpowiedziami
+    #       Unieaktywnić ankiety!!!
     
     return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
 
@@ -536,11 +537,11 @@ def poll_answer( request, slug, pid ):
 
         if request.method == "POST" and (data[ 'form' ].is_valid() or st.finished):
             if request.POST.get( 'Next', default=None ):
-                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]) + '/' + str( data['next'][1]))
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]))
             if request.POST.get( 'Prev', default=None ):
-                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['prev'][0]) + '/' + str( data['prev'][1]))
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['prev'][0]))
             if request.POST.get( 'Save', default=None ):
-                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + pid + '/' + ticket )
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( pid ))
     else:
         data = { 'errors': [ u"Nie masz uprawnień do wypełnienia ankiety " + poll.to_url_title() ], 
                  'slug' : slug,
