@@ -396,8 +396,10 @@ def poll_answer( request, slug, pid, ticket ):
         form.setFields( poll, st )
         
         if form.is_valid():
+            print form.cleaned_data
             for key, value in form.cleaned_data.items():
-                
+                print key
+                print 'blaaa'
                 if key == 'finish':
                     if value:
                         finit = request.session.get( 'finished', default = [])
@@ -419,7 +421,7 @@ def poll_answer( request, slug, pid, ticket ):
                     question_id   = question_data.split( '-' )[ 1 ]
                     question_type = question_data.split( '-' )[ 2 ]
                     other         = len( question_data.split( '-' )) == 4
-                    
+                    print question_data
                     section = Section.objects.get( pk = section_id )
                     
                     if   ( question_type == 'leading' or \

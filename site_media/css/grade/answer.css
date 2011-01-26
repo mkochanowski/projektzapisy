@@ -1,0 +1,32 @@
+.poll-section-title
+{
+    display: block;
+    font-weight: bold;
+    text-align: left;
+}
+
+.poll-section-description
+{
+    color: #666666;
+    display: block;
+    margin: 0.1em 0 0.25em;
+}
+
+.poll-section-answer-list
+{
+    list-style: none outside none;
+    margin: 0.5em 0 0;
+    padding: 0; 
+}
+
+.poll-section-answer-item
+{
+    line-height: 1.3em;
+    margin: 0;
+    padding-bottom: 0.5em;
+}
+
+.poll-section-field
+{
+    margin: 15px;
+}

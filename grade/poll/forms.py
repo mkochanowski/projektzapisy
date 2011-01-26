@@ -25,19 +25,33 @@ class TicketsForm( forms.Form ):
                                  help_text = "Wklej tutaj pobrane wcześniej bilety." )
 
 class PollForm( forms.Form ):
+    class myObject:
+        pass
+    
+    def as_divs(self):
+        from django.template import loader
+        return loader.render_to_string('grade/poll/poll_show.html', {"sections": self.sections, "finish": self.finish})
+    
     def setFields( self, poll, st ):
         self.finished = st.finished
+        self.sections = []
+        
         for section in poll.all_sections():
             title     = 'poll-%d_section-%d' % ( poll.pk, section.pk )
             questions = section.all_questions()
-            
+            fields    = []
+            poll_section             = self.myObject()
+            poll_section.title       = section.title
+            poll_section.description = section.description
+            poll_section.questions   = []
             if str( type( questions[ 0 ])) == \
                 "<class 'fereol.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
-                if SingleChoiceQuestionOrdering.objects.get( 
+                questionOrdering  = SingleChoiceQuestionOrdering.objects.get( 
                         sections = section,
-                        question = questions[ 0 ]).is_leading:
-                    title += '_question-%d-leading' % questions[ 0 ].pk
-                    
+                        question = questions[ 0 ])
+               
+                if questionOrdering.is_leading:
+                    title   += '_question-%d-leading' % questions[ 0 ].pk
                     try:
                         answer = SingleChoiceQuestionAnswer.objects.get( 
                                     saved_ticket = st,
@@ -55,8 +69,15 @@ class PollForm( forms.Form ):
                                 required = False,
                                 widget   = forms.widgets.RadioSelect(),
                                 initial  = answer )
+                    
+                    field.is_leading = True
+                    field.hide_on    = map(lambda x: x.pk, questionOrdering.hide_on.all())
+                    field.title      = title
+                    #field.is_scale   = question.is_scale
+                    field.type       = u'single'
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
-                    self.fields[ unicode( title ) ]  = field
+                    poll_section.questions.append( field )
+                    self.fields[ unicode( title ) ] = field
                     questions = questions[ 1: ]
                     
             for question in questions:
@@ -84,7 +105,11 @@ class PollForm( forms.Form ):
                                                required = False,
                                                widget   = forms.widgets.RadioSelect(),
                                                initial  = answer )
+                    field.type = 'single'
+                    if question.is_scale: field.is_scale  = True
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
+                    field.title = title
+                    poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
                 elif str( type( question )) == \
                     "<class 'fereol.grade.poll.models.multiple_choice_question.MultipleChoiceQuestion'>":
@@ -121,10 +146,15 @@ class PollForm( forms.Form ):
                                 widget     = forms.widgets.CheckboxSelectMultiple(),
                                 initial    = answer,
                                 validators = [ MaxLengthValidator( question.choice_limit )])
+                    field.choice_limit     = question.choice_limit 
+                    field.has_other        = question.has_other
+                    field.type             = 'multi'
+                    field.title = title 
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
-                    self.fields[ unicode( title ) ] = field
                     if question.has_other:
-                        self.fields[ unicode( title + '-other' ) ] = other_field
+                        field.other = other_field
+                    poll_section.questions.append( field )
+                    self.fields[ unicode( title ) ] = field
                 elif str( type( question )) == \
                     "<class 'fereol.grade.poll.models.open_question.OpenQuestion'>":
                     title += '-open'
@@ -145,15 +175,18 @@ class PollForm( forms.Form ):
                                 required = False,
                                 initial  = answer )
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
+                    field.type    =  'open'
+                    field.title = title
+                    poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
-        
+            self.sections.append(poll_section)
         if not self.finished:
             field = forms.BooleanField(
                             label     = u'Zakończ oceniać',
                             required  = False,
                             initial   = False,
                             help_text = u'Jeśli zaznaczysz to pole, utracisz mozliwość edycji ankiety po zapisaniu.' )
-            self.fields[ u'finish' ] = field
+            self.finish = field
 
 
 class FilterMenu( forms.Form ):

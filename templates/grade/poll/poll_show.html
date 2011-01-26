@@ -1,0 +1,37 @@
+{% for section in sections %}
+	<div class="poll-section">
+	        <h2 class="poll-section-title">{{section.title}}</h2>
+	        <span class="poll-section-description">{{section.description}}</span>
+	    {% for field in section.questions %}
+	    <div class="poll-section-field{% if field.is_leading %} poll-section-leading{% endif %}">
+            <h4>{{field.label}}</h4>
+	        {% if field.type == 'single' %}
+                <ul class="poll-section-answer-list">
+                {% for key, radio in field.widget.choices %}
+                    <li  class="poll-section-answer-item">
+                        <input type="radio" id="{{field.title}}-{{key}}" class="poll-section-radio{% if key in  field.hide_on %} poll-section-radio-hideon{% else %} poll-section-radio-all{% endif %}" name="{{field.title}}" value="{{key}}">
+                        <label for="{{field.title}}-{{key}}">{{radio}}</label>
+                    </li>
+                {% endfor %}
+                </ul>
+	        {% else %}{% if field.type == 'multi' %}
+                <ul  class="poll-section-answer-list">
+                {% for key, radio in field.widget.choices %}
+                    <li  class="poll-section-answer-item"><input type="checkbox" id="{{field.title}}-{{key}}" name="{{field.title}}" value="{{key}}">
+                    <label for="{{field.title}}-{{key}}">{{radio}}</label>
+                    </li>
+                {% endfor %}
+                {% if field.has_other %}
+                <li  class="poll-section-answer-item">
+                    <textarea cols="40" rows="10"></textarea>
+                </li>
+                {% endif %}
+                </ul>
+	       	{% else %}{% if field.type == 'open'  %}
+	       		<textarea name="{{field.title}}" cols="40" rows="10"></textarea>
+	       	{% endif %}{% endif %}{% endif %}
+	    </div>
+	    {% endfor %}
+    <hr>
+	</div>
+{% endfor %}
