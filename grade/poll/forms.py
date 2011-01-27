@@ -30,7 +30,7 @@ class PollForm( forms.Form ):
     
     def as_divs(self):
         from django.template import loader
-        return loader.render_to_string('grade/poll/poll_show.html', {"sections": self.sections, "finish": self.finish})
+        return loader.render_to_string('grade/poll/poll_show.html', {"sections": self.sections})
     
     def setFields( self, poll, st ):
         self.finished = st.finished
@@ -78,6 +78,8 @@ class PollForm( forms.Form ):
                     field.type       = u'single'
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
                     poll_section.questions.append( field )
+                    
+                    if self.finished: field.disabled = True
                     self.fields[ unicode( title ) ] = field
                     questions = questions[ 1: ]
                     
@@ -111,6 +113,7 @@ class PollForm( forms.Form ):
                     if question.is_scale: field.is_scale  = True
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
                     field.title = title
+                    if self.finished: field.disabled = True
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
                 elif str( type( question )) == \
@@ -152,7 +155,7 @@ class PollForm( forms.Form ):
                     field.has_other        = question.has_other
                     field.type             = 'multi'
                     field.title = title 
-                    if self.finished: field.widget.attrs[ 'disabled' ] = True
+                    if self.finished: field.disabled = True
                     if question.has_other:
                         field.other = other_field
                     poll_section.questions.append( field )
@@ -179,6 +182,7 @@ class PollForm( forms.Form ):
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
                     field.type    =  'open'
                     field.title = title
+                    if self.finished: field.disabled = True
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
             self.sections.append(poll_section)

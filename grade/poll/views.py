@@ -571,6 +571,7 @@ def poll_answer( request, slug, pid ):
                             else:
                                 ans.delete()
         else:
+            print 'ok'
             form = PollForm()
             form.setFields( poll, st )
 

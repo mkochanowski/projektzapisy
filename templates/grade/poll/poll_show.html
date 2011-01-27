@@ -9,7 +9,7 @@
                 <ul class="poll-section-answer-list">
                 {% for key, radio in field.widget.choices %}
                     <li  class="poll-section-answer-item">
-                        <input type="radio" id="{{field.title}}-{{key}}" class="poll-section-radio{% if key in  field.hide_on %} poll-section-radio-hideon{% else %} poll-section-radio-all{% endif %}" name="{{field.title}}" value="{{key}}"{% if field.initial == key%} checked{% endif %}>
+                        <input type="radio" id="{{field.title}}-{{key}}" class="poll-section-radio{% if key in  field.hide_on %} poll-section-radio-hideon{% else %} poll-section-radio-all{% endif %}" name="{{field.title}}" value="{{key}}"{% if field.initial == key%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>
                         <label for="{{field.title}}-{{key}}">{{radio}}</label>
                     </li>
                 {% endfor %}
@@ -17,18 +17,18 @@
 	        {% else %}{% if field.type == 'multi' %}
                 <ul  class="poll-section-answer-list">
                 {% for key, radio in field.widget.choices %}
-                    <li  class="poll-section-answer-item"><input type="checkbox" id="{{field.title}}-{{key}}" name="{{field.title}}" value="{{key}}"{% if  key in field.initial%} checked{% endif %}>
+                    <li  class="poll-section-answer-item"><input type="checkbox" id="{{field.title}}-{{key}}" name="{{field.title}}" value="{{key}}"{% if  key in field.initial%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>
                     <label for="{{field.title}}-{{key}}">{{radio}}</label>
                     </li>
                 {% endfor %}
                 {% if field.has_other %}
                 <li  class="poll-section-answer-item">
-                    <textarea cols="40" rows="10"></textarea>
+                    <textarea cols="40" rows="10"{% if field.disabled %} disabled="disabled"{% endif %}></textarea>
                 </li>
                 {% endif %}
                 </ul>
 	       	{% else %}{% if field.type == 'open'  %}
-	       		<textarea name="{{field.title}}" cols="40" rows="10">{{field.initial}}</textarea>
+	       		<textarea name="{{field.title}}" cols="40" rows="10"{% if field.disabled %} disabled="disabled"{% endif %}>{{field.initial}}</textarea>
 	       	{% endif %}{% endif %}{% endif %}
 	    </div>
 	    {% endfor %}
