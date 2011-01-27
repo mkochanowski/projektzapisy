@@ -301,12 +301,14 @@ def questionset_create(request):
                 container = OpenQuestionOrdering()
                 container.question   = question
                 container.sections   = section
+                container.position   = position
                 container.save()
 
             elif type == 'single' or type == 'leading':
                 container = SingleChoiceQuestionOrdering()
                 container.question    = question
                 container.sections    = section
+                container.position   = position
                 container.is_leading  = (type == 'leading')
                 container.save()
                 for opt in hidenAnswers:
@@ -317,8 +319,10 @@ def questionset_create(request):
                 container = MultipleChoiceQuestionOrdering()
                 container.question   = question
                 container.sections    = section
+                container.position   = position
                 container.save()
 
+            position   = position + 1
     data = {}
     if request.method == "POST":
         parse_form(request.POST)
