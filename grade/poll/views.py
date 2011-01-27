@@ -364,11 +364,13 @@ def tickets_enter(request):
             errors   = []
             polls    = []
             finished = []
-            
+            print ids_and_tickets
             for (id, (ticket, signed_ticket)) in ids_and_tickets:
                 try:
                     poll       = Poll.objects.get( pk = id )
+                    print poll
                     public_key = PublicKey.objects.get( poll = poll )
+                    print signed_key
                     if check_signature( ticket, signed_ticket, public_key ):
                         try:
                             st = SavedTicket.objects.get( poll   = poll,
@@ -399,7 +401,7 @@ def tickets_enter(request):
     data[ 'grade' ] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
 
-@login_required
+
 def polls_for_user( request, slug ):
     if not 'polls' in request.session.keys():
         return HttpResponseRedirect( '/grade/poll/tickets_enter' )
