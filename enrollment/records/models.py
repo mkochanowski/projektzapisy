@@ -362,7 +362,7 @@ class Queue(models.Model):
     def get_students_in_queue(group_id):
         try:
             group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Queue.queued.filter(group=group).order_by('student__user__last_name','student__user__first_name'))
+            return map(lambda x: x.student, Queue.queued.filter(group=group).order_by('time'))
         except Group.DoesNotExist:
             logger.error('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
             raise NonGroupException()
@@ -466,7 +466,7 @@ class Queue(models.Model):
         before him from queue"""
         try:
             group = Group.objects.get(id=group_id)
-            queue = Queue.objects.filter(group=group).order_by('time')
+            queue = Queue.queued.filter(group=group).order_by('time')
             for q in queue:
                 student_id = q.student.user.id
                 if Queue.is_ECTS_points_limit_exceeded(student_id, group_id):
