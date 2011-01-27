@@ -240,7 +240,7 @@ Poll.section.makeStandardView = function(parent, element, question_type)
             var input = document.createElement('input');
             if( type == 'single' )
             {
-                input.type = 'radiobox'
+                input.type = 'radio'
             }
             else
             {
