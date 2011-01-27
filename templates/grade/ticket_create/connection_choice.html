@@ -16,6 +16,16 @@
 {% endblock %}
 
 {% block content %}
+    {% if success %}
+    <div class="main-message">{{ success }}</div>
+    {% endif %}
+    {% if message %} 
+    <div class="main-message">{{ message }}</div>
+    {% endif %}
+    {% if error %} 
+    <div class="main-error">{{ error }}</div>
+    {% endif %}
+    {% if grade %}
 	<div id="grade-connection-choice">
 	<form method="post" id="connection_choice">
         <table id="grade-connection-choice-form">
@@ -26,5 +36,6 @@
 	</div>
 
     <div>{{ p }}</div>
+    {% endif %}
 {% endblock %}
 

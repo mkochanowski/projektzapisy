@@ -77,34 +77,37 @@ def connections_choice( request ):
     students_polls = Poll.get_all_polls_for_student( request.user.student )
     groupped_polls = group_polls_by_subject( students_polls )
     
-    if request.method == "POST":
-        form = PollCombineForm( request.POST, 
-                                polls = groupped_polls )
-         
-        if form.is_valid():
-            unblindst = simplejson.loads( request.POST.get('unblindst', '') )
-            unblindt  = simplejson.loads( request.POST.get('unblindt', '') )
-            ts        = simplejson.loads( request.POST.get('ts', '') )
-            connected_groups = connect_groups( groupped_polls, form)
-            groups           = reduce(list.__add__, connected_groups )
-            prepared_tickets = zip( groups, unblindt, unblindst )
-            #### final mark:
-
-            for g, t, unblind in prepared_tickets:
-                secure_mark(request.user, g, t )
-
-            errors, tickets_to_serve = get_valid_tickets( prepared_tickets )
-            data = { 'errors'  : errors,
-                     'tickets' : to_plaintext( tickets_to_serve ),
-                     'grade' : grade }
-                     
-            return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
+    if grade:
+        if request.method == "POST":
+            form = PollCombineForm( request.POST, 
+                                    polls = groupped_polls )
+             
+            if form.is_valid():
+                unblindst = simplejson.loads( request.POST.get('unblindst', '') )
+                unblindt  = simplejson.loads( request.POST.get('unblindt', '') )
+                ts        = simplejson.loads( request.POST.get('ts', '') )
+                connected_groups = connect_groups( groupped_polls, form)
+                groups           = reduce(list.__add__, connected_groups )
+                prepared_tickets = zip( groups, unblindt, unblindst )
+                #### final mark:
+    
+                for g, t, unblind in prepared_tickets:
+                    secure_mark(request.user, g, t )
+    
+                errors, tickets_to_serve = get_valid_tickets( prepared_tickets )
+                data = { 'errors'  : errors,
+                         'tickets' : to_plaintext( tickets_to_serve ),
+                         'grade' : grade }
+                         
+                return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
+                
+        else:
+            form = PollCombineForm( polls = groupped_polls )
             
+        data = { 'form' : form, 'grade' : grade}
+        return render_to_response ('grade/ticket_create/connection_choice.html', data, context_instance = RequestContext ( request ))
     else:
-        form = PollCombineForm( polls = groupped_polls )
-        
-    data = { 'form' : form, 'grade' : grade}
-    return render_to_response ('grade/ticket_create/connection_choice.html', data, context_instance = RequestContext ( request ))
+        return render_to_response ('grade/ticket_create/connection_choice.html', {'grade': grade, 'error': "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów"}, context_instance = RequestContext ( request ))
     
 @student_required
 def tickets_save( request, ticket_list ):
