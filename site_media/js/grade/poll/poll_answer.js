@@ -7,12 +7,10 @@ Poll.answer.init = function()
 {
 	$('.poll-section-radio-hideon:checked').each(function()
     {
-
     	$(this).parents('.poll-section-leading').nextAll().hide()
     })
     $('.poll-section-radio-hideon').change(function()
     {
-
     	$(this).parents('.poll-section-leading').nextAll().hide()
     })
     
@@ -22,6 +20,21 @@ Poll.answer.init = function()
     	var father = $(this).parents('.poll-section-leading');
         $(father).nextAll().show()
     })
+    
+    $('#poll-form').submit(Poll.answer.cleanup);
+}
+
+Poll.answer.cleanup = function()
+{
+	$('.poll-section-radio-hideon:checked').each(function()
+    {
+    	$(this).parents('.poll-section-leading').nextAll().each(function()
+    	{
+    		$(this).find('input:checked').attr('checked', false);
+			$(this).find('textarea').val('');
+    	})
+    })
 }
 
 $(Poll.answer.init)
+

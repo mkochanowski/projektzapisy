@@ -483,8 +483,7 @@ def poll_answer( request, slug, pid ):
                         section = Section.objects.get( pk = section_id )
                         
                         if   ( question_type == 'leading' or \
-                               question_type == 'single' ) and \
-                             value:
+                               question_type == 'single' ):
                             question = SingleChoiceQuestion.objects.get( 
                                             pk = question_id )
                             try:
@@ -498,54 +497,61 @@ def poll_answer( request, slug, pid ):
                                         question     = question,
                                         saved_ticket = st )
                                 ans.save()
-                                
-                            option = Option.objects.get( pk = value )
-                            ans.option = option
-                            ans.save()
-                        elif question_type == 'multi' and value and other:
-                            question = MultipleChoiceQuestion.objects.get( 
-                                            pk = question_id )
-                            try:
-                                ans = MultipleChoiceQuestionAnswer.objects.get(
-                                        section      = section,
-                                        question     = question,
-                                        saved_ticket = st )
-                            except ObjectDoesNotExist:
-                                ans = MultipleChoiceQuestionAnswer(
-                                        section      = section,
-                                        question     = question,
-                                        saved_ticket = st )
+                            if value:
+                                option = Option.objects.get( pk = value )
+                                ans.option = option
                                 ans.save()
-                            
-                            ans.other = value
-                            ans.save()
-                        elif question_type == 'multi' and value:
-                            question = MultipleChoiceQuestion.objects.get( 
-                                            pk = question_id )
-                            try:
-                                ans = MultipleChoiceQuestionAnswer.objects.get(
-                                        section      = section,
-                                        question     = question,
-                                        saved_ticket = st )
-                            except ObjectDoesNotExist:
-                                ans = MultipleChoiceQuestionAnswer(
-                                        section      = section,
-                                        question     = question,
-                                        saved_ticket = st )
-                                ans.save()
-                            
-                            ids = map( int, value )
-                            
-                            if -1 in ids:
-                                ids.remove( -1 )
                             else:
-                                ans.other = None
-                            
-                            options = map( lambda id: Option.objects.get( pk = id ),
-                                           ids )
-                            ans.options = options
-                            ans.save()
-                        elif question_type == 'open' and value:
+                                ans.delete()
+                        elif question_type == 'multi' and other:
+                            question = MultipleChoiceQuestion.objects.get( 
+                                            pk = question_id )
+                            try:
+                                ans = MultipleChoiceQuestionAnswer.objects.get(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                            except ObjectDoesNotExist:
+                                ans = MultipleChoiceQuestionAnswer(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                                ans.save()
+                            if value:
+                                ans.other = value
+                                ans.save()
+                            else:
+                                ans.delete()
+                                
+                        elif question_type == 'multi':
+                            question = MultipleChoiceQuestion.objects.get( 
+                                            pk = question_id )
+                            try:
+                                ans = MultipleChoiceQuestionAnswer.objects.get(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                            except ObjectDoesNotExist:
+                                ans = MultipleChoiceQuestionAnswer(
+                                        section      = section,
+                                        question     = question,
+                                        saved_ticket = st )
+                                ans.save()
+                            if value:
+                                ids = map( int, value )
+                                
+                                if -1 in ids:
+                                    ids.remove( -1 )
+                                else:
+                                    ans.other = None
+                                
+                                options = map( lambda id: Option.objects.get( pk = id ),
+                                               ids )
+                                ans.options = options
+                                ans.save()
+                            else:
+                                ans.delete()
+                        elif question_type == 'open':
                             question = OpenQuestion.objects.get( 
                                             pk = question_id )
                             try:
@@ -559,9 +565,11 @@ def poll_answer( request, slug, pid ):
                                         question     = question,
                                         saved_ticket = st )
                                 ans.save()
-                            
-                            ans.content = value
-                            ans.save()
+                            if value:
+                                ans.content = value
+                                ans.save()
+                            else:
+                                ans.delete()
         else:
             form = PollForm()
             form.setFields( poll, st )
