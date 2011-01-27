@@ -16,13 +16,24 @@ Poll.answer.init = function()
     
     $('.poll-section-radio-all').change(function()
     {
-
     	var father = $(this).parents('.poll-section-leading');
         $(father).nextAll().show()
-    })
+    });
     
+    $('input[value="-1"].poll-section-choice:not(:checked)').each(Poll.answer.hideOther);
     $('#poll-form').submit(Poll.answer.cleanup);
     $('.poll-section-choicelimit-choice').change(Poll.answer.choices_limit)
+    $('input[value="-1"].poll-section-choice').change(Poll.answer.other)
+}
+
+Poll.answer.hideOther = function()
+{
+	$(this).siblings('.poll-section-other').hide();
+}
+
+Poll.answer.other = function()
+{
+	$(this).siblings('.poll-section-other').toggle();
 }
 
 Poll.answer.cleanup = function()
@@ -32,7 +43,7 @@ Poll.answer.cleanup = function()
     	$(this).parents('.poll-section-leading').nextAll().each(function()
     	{
     		$(this).find('input:checked').attr('checked', false);
-			$(this).find('textarea').val('');
+			$(this).find('input[type=text]').val('');
     	})
     })
 }
