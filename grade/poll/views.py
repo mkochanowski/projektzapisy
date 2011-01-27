@@ -207,12 +207,21 @@ def poll_create(request):
                 i = i + 1
 
         message = "Utworzono ankietę!"
+        request.session['message'] = 'Sekcja dodana'
+
+        #TODO: check 'is OK?'
+        return HttpResponseRedirect('grade/poll/poll_create')        
     data = {}
     if semester:   
         sem       = Subject.objects.filter(semester = semester).order_by('name')
     else:
         semester_id = Semester.get_current_semester()
         sem         = Subject.objects.filter(semester = semester_id).order_by('name')
+
+    message_sesion = request.session.get('message', None)
+    if message_sesion:
+        message = message_sesion
+        del request.session['message']
 
     data['studies_types'] = Type.objects.all()
     data['semesters']    = Semester.objects.all()
@@ -327,8 +336,14 @@ def questionset_create(request):
     data = {}
     if request.method == "POST":
         parse_form(request.POST)
-        data['message']  = 'Sekcja dodana'
-    
+        request.session['message'] = 'Sekcja dodana'
+
+        #TODO: check 'is OK?'
+        return HttpResponseRedirect('grade/poll/questionset_create')
+    if request.session.get('message', None):
+        data['message'] = request.session.get('message', None)
+        del request.session['message']
+          
     data['grade'] = grade
     return render_to_response ('grade/poll/section_create.html', data, context_instance = RequestContext( request ))
 

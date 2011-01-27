@@ -32,8 +32,12 @@ class PollForm( forms.Form ):
         from django.template import loader
         return loader.render_to_string('grade/poll/poll_show.html', {"sections": self.sections})
     
-    def setFields( self, poll, st ):
-        self.finished = st.finished
+    def setFields( self, poll, st = None ):
+    	if st:
+        	self.finished = st.finished
+        else:
+        	self.finished = True
+
         self.sections = []
         
         for section in poll.all_sections():
