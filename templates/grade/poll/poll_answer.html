@@ -22,7 +22,8 @@
         {% if form.finish %}
         <div class="fieldWrapper">
             {{ form.finish.errors }}
-            {{ form.finish.label_tag }}: {{ form.finish }}
+            {{ form.finish }}
+            <helptext>{{form.finish.help_text}}</helptext>
         </div>
         {% endif %}
         {% if not errors %}
