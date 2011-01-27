@@ -33,7 +33,8 @@ from fereol.grade.poll.utils           import check_signature, \
                                               create_slug, \
                                               get_next, \
                                               get_prev, \
-                                              get_ticket_and_signed_ticket_from_session
+                                              get_ticket_and_signed_ticket_from_session, \
+                                              check_enable_grade
 
 from fereol.users.models                 import Employee
 
@@ -41,13 +42,18 @@ def default(request):
     grade = Semester.get_current_semester().is_grade_active
     return render_to_response ('grade/base.html', {'grade' : grade }, context_instance = RequestContext ( request ))
 
+@employee_required
 def enable_grade( request ):
-    semester = Semester.get_current_semester()
-    semester.is_grade_active = True
-    semester.save()   
-    grade = True
-    return render_to_response ('grade/base.html', {'grade' : grade, 'success' : "Ocena zajęć otwarta" }, context_instance = RequestContext ( request ))
-    
+    if check_enable_grade():
+        semester = Semester.get_current_semester()
+        semester.is_grade_active = True
+        semester.save()   
+        grade = True
+        return render_to_response ('grade/base.html', {'grade' : grade, 'success' : "Ocena zajęć otwarta" }, context_instance = RequestContext ( request ))
+    else:
+        return render_to_response ('grade/base.html', {'grade' : False, 'error' : "Oceny nie można otworzyć: brak wygenerowanych kluczy lub ankiet" }, context_instance = RequestContext ( request ))
+
+@employee_required
 def disable_grade( request ):
     semester = Semester.get_current_semester()
     semester.is_grade_active = False

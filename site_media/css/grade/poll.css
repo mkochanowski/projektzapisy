@@ -188,6 +188,16 @@ padding:10px;
 	border-radius: 4px;
 }
 
+.grade-error{
+	border: 1px solid #cccccc;
+	background: #FFF5B3;
+	font-size: 16px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
 /*** STRONA DO WKLEJENIA WYGENEROWANYCH BILETOW ***/
 
 #grade-tickets-enter{
