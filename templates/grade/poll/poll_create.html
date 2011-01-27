@@ -26,22 +26,22 @@
                 <select name="studies-type">
                     <option value="-1">Dowolny</option>
                     {% for study_type in studies_types %}
-                    <option value="{{study_type.pk}}"{% if study_type.pk == type.pk %} selected{% endif %}>{{study_type}}</option>
+                    <option value="{{study_type.pk}}"{% if study_type.pk == studies_type %} selected{% endif %}>{{study_type}}</option>
                     {% endfor %}
                 </select><br>
                 <label for="subject">Przedmiot: </label>
                 <select name="subject" id="subjects">
                     <option value="-1">Nie przypisane do przedmiotu</option>
-                    <option value="0">Wszystkie przedmioty</option>
+                    <option value="0"{% if subject_id == 0 %} selected{% endif %}>Wszystkie przedmioty</option>
                     {% for subject in subjects %}
-                    <option value="{{subject.pk}}"{% if subject_id.pk == subject.pk %} selected{% endif %}>{{subject.name}}</option>
+                    <option value="{{subject.pk}}"{% if subject_id == subject.pk %} selected{% endif %}>{{subject.name}}</option>
                     {% endfor %}
                 </select>
                 <label for="type" class="type-visibility">Typ zajęć: </label>
                 <select name="type" id="type" class="type-visibility">
                     <option value="0">Wszystkie typy</option>
-                    {% for k, v in types %}
-                        <option value="{{k}}"{% if type.pk == k %} selected{% endif %}>{{v}}</option>
+                    {% for k, v in types %}{{k}}
+                        <option value="{{k}}"{% if type == k %} selected{% endif %}>{{v}}</option>
                     {% endfor %}
                     </select>
                 <label for="group" class="group-visibility">Grupa: </label>

@@ -109,9 +109,9 @@ def subjects_list( subjects ):
 @employee_required
 def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active
-    semester = None
-    group    = None
-    type     = None
+    semester     = None
+    group        = None
+    type         = None
     studies_type = None
     subject      = None
     # TODO: przeniesc do modeli - porozmawiaz z grupa
@@ -138,12 +138,17 @@ def poll_create(request):
     message = ""
     if request.method == "POST":
         semester = int(request.POST.get('semester', 0))
-        print request.POST.get('group')
         group    = int(request.POST.get('group', 0))
         type     = int(request.POST.get('type', 0))
         studies_type = int(request.POST.get('studies-type', -1))
-        
         subject  = int(request.POST.get('subject', 0))
+        
+        request.session['studies_type'] = studies_type
+        request.session['semester']     = semester
+        request.session['group']        = group
+        request.session['type']         = type
+        request.session['subject']      = subject
+        
         if semester > 0:
             semester = Semester.objects.get(pk = semester)
         else:
@@ -229,12 +234,12 @@ def poll_create(request):
     data['message']      = message
     data['sections']     = Section.objects.all()
     data['types']        = GROUP_TYPE_CHOICES
-    data['group']        = group
-    data['type']         = type
-    data['studies_type'] = studies_type
-    data['subject_id']   = subject
-    data['semester']     = semester
-
+    data['group']        = request.session.get('group', None)
+    data['type']         = unicode(request.session.get('type', None))
+    data['studies_type'] = request.session.get('studies_type', None)
+    data['subject_id']   = request.session.get('subject', None)
+    data['semester']     = request.session.get('semester', None)
+    print data
     data['grade'] =  grade
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 

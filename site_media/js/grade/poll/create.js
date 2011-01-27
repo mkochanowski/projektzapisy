@@ -8,13 +8,16 @@ Poll.create.init = function()
     Poll.create.sections      = $('#sections');
     Poll.create.chosenSection = $('#sections-list').children('ul')[0];
 
+    $('.type-visibility').hide();
+    $('.group-visibility').hide();
+    
+    
+    $(Poll.create.changeSubjects)
     $('#section-add').click(Poll.create.addSection);
     $('#semester').change(Poll.create.changeSemester);
     $('#subjects').change(Poll.create.changeSubjects);
     $('#type').change(Poll.create.changeTypes);
 
-    $('.type-visibility').hide();
-    $('.group-visibility').hide();
 
     $(Poll.create.chosenSection).sortable({handle : 'p'});
 }
@@ -24,12 +27,8 @@ $(Poll.create.init);
 Poll.create.changeSubjects = function()
 {
     var subject = $('#subjects').val();
+    
     if ( subject > -1 )
-    {
-        $('.type-visibility').show();
-        Poll.create.changeTypes();
-    }
-    else if (subject == 0)
     {
         $('.type-visibility').show();
         Poll.create.changeTypes();
@@ -43,8 +42,8 @@ Poll.create.changeSubjects = function()
 
 Poll.create.changeTypes = function()
 {
-    var type    = $('#type').val();
-    var subject = $('#subjects').val();
+    var type    = parseInt($('#type').val());
+    var subject = parseInt($('#subjects').val());
     if ( type > 0 && subject > 0 )
     {
         $('.group-visibility').show();
@@ -58,7 +57,7 @@ Poll.create.changeTypes = function()
             success: Poll.create.loadGroups
         });
     }
-    if (type < 1)
+    if (type < 0)
     {
         $('.group-visibility').hide();
         
