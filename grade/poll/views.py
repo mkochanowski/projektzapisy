@@ -116,18 +116,17 @@ def poll_create(request):
     subject      = None
     # TODO: przeniesc do modeli - porozmawiaz z grupa
     def getGroups(semester, group = None, type = None, subject = None):
+        if subject == -1:
+            return {}
         if group:
             return group
         if type:
-            print 'ok'
             if subject:
                 groups = Group.objects.filter(type=type, subject=subject)
             else:
                 groups = Group.objects.filter(type=type)
         else:
-            print 'bla'
             if subject:
-                print 'tutaj'
                 groups = Group.objects.filter(subject=subject)
                 print subject
             else:
@@ -139,6 +138,7 @@ def poll_create(request):
     message = ""
     if request.method == "POST":
         semester = int(request.POST.get('semester', 0))
+        print request.POST.get('group')
         group    = int(request.POST.get('group', 0))
         type     = int(request.POST.get('type', 0))
         studies_type = int(request.POST.get('studies-type', -1))
@@ -148,7 +148,6 @@ def poll_create(request):
             semester = Semester.objects.get(pk = semester)
         else:
             semester = Semester.get_current_semester()
-
         if group > 0:
             group    = Group.objects.get(pk = group)
         else:
@@ -159,8 +158,10 @@ def poll_create(request):
 
         if subject > 0:
             subject = Subject.objects.get(pk = subject)
+        elif subject == 0:
+            subject    = None
         else:
-            subject = None
+            subject = -1
 
         if studies_type > -1:
             studies_type = Type.objects.get(pk=studies_type)
