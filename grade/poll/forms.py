@@ -61,7 +61,7 @@ class PollForm( forms.Form ):
                         answer = None
                     
                     choices = []
-                    for option in questions[ 0 ].options.all():
+                    for option in questions[ 0 ].options.all().order_by('pk'):
                         choices.append(( option.pk, unicode( option.content )))
                     
                     field = forms.ChoiceField( 
@@ -101,7 +101,7 @@ class PollForm( forms.Form ):
                         answer = None
                         
                     choices = []
-                    for option in question.options.all():
+                    for option in question.options.all().order_by('pk'):
                         choices.append(( option.pk, unicode( option.content )))
                     
                     field = forms.ChoiceField( choices  = choices,
@@ -132,7 +132,7 @@ class PollForm( forms.Form ):
                         other_ans = None
                     
                     choices = []
-                    for option in question.options.all():
+                    for option in question.options.all().order_by('pk'):
                         choices.append(( option.pk, unicode( option.content )))
                     
                     if question.has_other:
