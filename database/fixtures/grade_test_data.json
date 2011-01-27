@@ -162,6 +162,33 @@
         }
     }, 
     {
+        "pk": 31, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_dontsendentry", 
+            "name": "Can add blokada", 
+            "content_type": 11
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_dontsendentry", 
+            "name": "Can change blokada", 
+            "content_type": 11
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_dontsendentry", 
+            "name": "Can delete blokada", 
+            "content_type": 11
+        }
+    }, 
+    {
         "pk": 28, 
         "model": "auth.permission", 
         "fields": {
@@ -189,57 +216,30 @@
         }
     }, 
     {
-        "pk": 25, 
+        "pk": 34, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_migrationhistory", 
-            "name": "Can add migration history", 
-            "content_type": 9
+            "codename": "add_messagelog", 
+            "name": "Can add log", 
+            "content_type": 12
         }
     }, 
     {
-        "pk": 26, 
+        "pk": 35, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_migrationhistory", 
-            "name": "Can change migration history", 
-            "content_type": 9
+            "codename": "change_messagelog", 
+            "name": "Can change log", 
+            "content_type": 12
         }
     }, 
     {
-        "pk": 27, 
+        "pk": 36, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_migrationhistory", 
-            "name": "Can delete migration history", 
-            "content_type": 9
-        }
-    }, 
-    {
-        "pk": 31, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_dontsendentry", 
-            "name": "Can add blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 32, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_dontsendentry", 
-            "name": "Can change blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 33, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_dontsendentry", 
-            "name": "Can delete blokada", 
-            "content_type": 11
+            "codename": "delete_messagelog", 
+            "name": "Can delete log", 
+            "content_type": 12
         }
     }, 
     {
@@ -990,30 +990,30 @@
         }
     }, 
     {
-        "pk": 34, 
+        "pk": 25, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_messagelog", 
-            "name": "Can add log", 
-            "content_type": 12
+            "codename": "add_migrationhistory", 
+            "name": "Can add migration history", 
+            "content_type": 9
         }
     }, 
     {
-        "pk": 35, 
+        "pk": 26, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_messagelog", 
-            "name": "Can change log", 
-            "content_type": 12
+            "codename": "change_migrationhistory", 
+            "name": "Can change migration history", 
+            "content_type": 9
         }
     }, 
     {
-        "pk": 36, 
+        "pk": 27, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_messagelog", 
-            "name": "Can delete log", 
-            "content_type": 12
+            "codename": "delete_migrationhistory", 
+            "name": "Can delete migration history", 
+            "content_type": 9
         }
     }, 
     {
@@ -1485,7 +1485,7 @@
             "is_active": true, 
             "is_superuser": true, 
             "is_staff": true, 
-            "last_login": "2011-01-26 04:25:43", 
+            "last_login": "2011-01-27 01:30:59", 
             "groups": [], 
             "user_permissions": [], 
             "password": "sha1$b6c11$bc8d9ea4eedccf3d68fe9e7d31a32db3bb4b76b4", 
@@ -11338,16 +11338,17 @@
         "fields": {
             "content": "Jak oceniasz stosunek wyk\u0142adowcy do student\u00f3w?", 
             "choice_limit": 4, 
+            "description": null, 
+            "has_other": true, 
             "options": [
-                6, 
-                7, 
-                8, 
-                9, 
-                10, 
                 11, 
-                12
-            ], 
-            "has_other": true
+                10, 
+                12, 
+                7, 
+                6, 
+                9, 
+                8
+            ]
         }
     }, 
     {
@@ -11356,15 +11357,16 @@
         "fields": {
             "content": "Kt\u00f3re okre\u015blenia najlepiej opisuj\u0105 Twoje wra\u017cenia po egzaminie?", 
             "choice_limit": 3, 
+            "description": null, 
+            "has_other": true, 
             "options": [
-                43, 
-                44, 
-                45, 
+                48, 
                 46, 
                 47, 
-                48
-            ], 
-            "has_other": true
+                44, 
+                45, 
+                43
+            ]
         }
     }, 
     {
@@ -11373,15 +11375,16 @@
         "fields": {
             "content": "Kt\u00f3re z poni\u017cszych by\u0142y wymagane w projekcie?", 
             "choice_limit": 7, 
+            "description": null, 
+            "has_other": true, 
             "options": [
                 66, 
                 67, 
-                68, 
-                69, 
+                71, 
                 70, 
-                71
-            ], 
-            "has_other": true
+                68, 
+                69
+            ]
         }
     }, 
     {
@@ -11390,17 +11393,18 @@
         "fields": {
             "content": "Z kt\u00f3rych dziedzin wydaje si\u0119 by\u0107 za ma\u0142o przedmiot\u00f3w?", 
             "choice_limit": 9, 
+            "description": null, 
+            "has_other": true, 
             "options": [
-                101, 
+                108, 
                 102, 
                 103, 
-                104, 
-                105, 
+                101, 
                 106, 
                 107, 
-                108
-            ], 
-            "has_other": true
+                104, 
+                105
+            ]
         }
     }, 
     {
@@ -11445,6 +11449,7 @@
         "fields": {
             "content": "Czy chodzi\u0142e\u015b regularnie na wyk\u0142ad?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 1, 
                 3, 
@@ -11460,6 +11465,7 @@
         "fields": {
             "content": "Czy zachowania wyk\u0142adowcy przeszkadza\u0142y Ci w przyswajaniu materia\u0142u z wyk\u0142adu?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 13, 
                 14
@@ -11472,6 +11478,7 @@
         "fields": {
             "content": "Czy chodzi\u0142e\u015b na wyk\u0142ad regularnie?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 15, 
                 17, 
@@ -11485,6 +11492,7 @@
         "fields": {
             "content": "Czy wyk\u0142ad by\u0142 prowadzony w spos\u00f3b zrozumia\u0142y?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 19, 
                 18
@@ -11497,6 +11505,7 @@
         "fields": {
             "content": "Czy korzysta\u0142e\u015b z konsultacji?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 20, 
                 21, 
@@ -11511,6 +11520,7 @@
         "fields": {
             "content": "Czy do wyk\u0142adu by\u0142y przygotowane materia\u0142y elektroniczne/notatki?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 24, 
                 25, 
@@ -11524,6 +11534,7 @@
         "fields": {
             "content": "Czy zakres materia\u0142u na wyk\u0142adzie by\u0142 dobrze dobrany?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 27, 
                 28, 
@@ -11537,6 +11548,7 @@
         "fields": {
             "content": "Czy egzamin by\u0142 trudny?", 
             "is_scale": true, 
+            "description": null, 
             "options": [
                 33, 
                 32, 
@@ -11553,6 +11565,7 @@
         "fields": {
             "content": "Czy materia\u0142 z wyk\u0142adu pokrywa\u0142 si\u0119 z materia\u0142em na egzaminie?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 38, 
                 37, 
@@ -11566,6 +11579,7 @@
         "fields": {
             "content": "Jak oceniasz przygotowanie egzaminu?", 
             "is_scale": true, 
+            "description": null, 
             "options": [
                 39, 
                 42, 
@@ -11580,6 +11594,7 @@
         "fields": {
             "content": "Czy system zaliczania \u0107wicze\u0144 by\u0142 jasny i znany?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 49, 
                 51, 
@@ -11594,6 +11609,7 @@
         "fields": {
             "content": "Czy \u0107wiczeniowiec pomaga\u0142 zrozumie\u0107 rozwi\u0105zania?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 55, 
                 54, 
@@ -11609,6 +11625,7 @@
         "fields": {
             "content": "Czy odbywa\u0142y si\u0119 regularne konsultacje, podczas kt\u00f3rych omawiane by\u0142y plany implementacji", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 59, 
                 58
@@ -11621,6 +11638,7 @@
         "fields": {
             "content": "Czy prowadz\u0105cy sprawdza\u0142 zadania w odpowiednim tempie?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 60, 
                 61, 
@@ -11634,6 +11652,7 @@
         "fields": {
             "content": "Czy prowadz\u0105cy pomaga\u0142 wybra\u0107 temat projektu?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 63, 
                 64, 
@@ -11647,6 +11666,7 @@
         "fields": {
             "content": "Jak oceniasz pomoc prowadz\u0105cego podczas realizacji projektu?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 75, 
                 74, 
@@ -11661,6 +11681,7 @@
         "fields": {
             "content": "Jak oceniasz og\u00f3lne zaanga\u017cowanie prowadz\u0105cego w przekazanie wiedzy", 
             "is_scale": true, 
+            "description": null, 
             "options": [
                 77, 
                 76, 
@@ -11675,6 +11696,7 @@
         "fields": {
             "content": "Czy zadania do wykonania by\u0142y ciekawe?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 82, 
                 80, 
@@ -11688,6 +11710,7 @@
         "fields": {
             "content": "Czy prowadz\u0105cy przygotowywa\u0142 w\u0142asne listy, czy korzysta\u0142 z list wyk\u0142adowcy?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 83, 
                 84, 
@@ -11701,6 +11724,7 @@
         "fields": {
             "content": "Czy chodzi\u0142e\u015b na seminaria inne, ni\u017c w\u0142asne", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 86, 
                 87
@@ -11713,6 +11737,7 @@
         "fields": {
             "content": "Czy seminaria te by\u0142y przygotowane ciekawie?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 90, 
                 88, 
@@ -11726,6 +11751,7 @@
         "fields": {
             "content": "Czy prowadz\u0105cy wymaga\u0142 pokazania mu wcze\u015bniej, o czym b\u0119dzie si\u0119 m\u00f3wi\u0107?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 91, 
                 92
@@ -11738,6 +11764,7 @@
         "fields": {
             "content": "Czy prowadz\u0105cy narzuci\u0142 tematy seminarium?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 93, 
                 95, 
@@ -11751,6 +11778,7 @@
         "fields": {
             "content": "Czy prowadz\u0105cy dostarcza\u0142 materia\u0142y?", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 97, 
                 96
@@ -11763,6 +11791,7 @@
         "fields": {
             "content": "Czy oferta jest wystarczaj\u0105co zr\u00f3\u017cnicowana", 
             "is_scale": false, 
+            "description": null, 
             "options": [
                 99, 
                 98, 
@@ -11776,7 +11805,8 @@
         "fields": {
             "sections": 2, 
             "hide_on": [
-                4
+                4, 
+                5
             ], 
             "question": 1, 
             "is_leading": true, 
@@ -12152,77 +12182,88 @@
         "pk": 1, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Co Ci si\u0119 najbardziej podoba\u0142o?"
+            "content": "Co Ci si\u0119 najbardziej podoba\u0142o?", 
+            "description": null
         }
     }, 
     {
         "pk": 2, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Co Ci si\u0119 najbardziej nie podoba\u0142o?"
+            "content": "Co Ci si\u0119 najbardziej nie podoba\u0142o?", 
+            "description": null
         }
     }, 
     {
         "pk": 3, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Jakie wprowadzi\u0142by\u015b zmiany?"
+            "content": "Jakie wprowadzi\u0142by\u015b zmiany?", 
+            "description": null
         }
     }, 
     {
         "pk": 4, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Kt\u00f3re tre\u015bci by\u0142y dla Ciebie najbardziej interesuj\u0105ce?"
+            "content": "Kt\u00f3re tre\u015bci by\u0142y dla Ciebie najbardziej interesuj\u0105ce?", 
+            "description": null
         }
     }, 
     {
         "pk": 5, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Kt\u00f3re tre\u015bci by\u0142y dla Ciebie najmniej interesuj\u0105ce?"
+            "content": "Kt\u00f3re tre\u015bci by\u0142y dla Ciebie najmniej interesuj\u0105ce?", 
+            "description": null
         }
     }, 
     {
         "pk": 6, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Co s\u0105dzisz o poziomie trudno\u015bci zada\u0144 przedstawianych do zaprogramowania na pracowni?"
+            "content": "Co s\u0105dzisz o poziomie trudno\u015bci zada\u0144 przedstawianych do zaprogramowania na pracowni?", 
+            "description": null
         }
     }, 
     {
         "pk": 7, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Kt\u00f3re seminarium (i dlaczego) podoba\u0142o Ci si\u0119 najbardziej?"
+            "content": "Kt\u00f3re seminarium (i dlaczego) podoba\u0142o Ci si\u0119 najbardziej?", 
+            "description": null
         }
     }, 
     {
         "pk": 8, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Jakie przedmioty chcia\u0142by\u015b, \u017ceby zosta\u0142y wprowadzone do oferty dydaktycznej?"
+            "content": "Jakie przedmioty chcia\u0142by\u015b, \u017ceby zosta\u0142y wprowadzone do oferty dydaktycznej?", 
+            "description": null
         }
     }, 
     {
         "pk": 9, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Kt\u00f3rzy wyk\u0142adowcy s\u0105 Twoimi ulubionymi i dlaczego?"
+            "content": "Kt\u00f3rzy wyk\u0142adowcy s\u0105 Twoimi ulubionymi i dlaczego?", 
+            "description": null
         }
     }, 
     {
         "pk": 10, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Jakich wyk\u0142adowc\u00f3w raczej unikasz? Jakie s\u0105 tego powody?"
+            "content": "Jakich wyk\u0142adowc\u00f3w raczej unikasz? Jakie s\u0105 tego powody?", 
+            "description": null
         }
     }, 
     {
         "pk": 11, 
         "model": "poll.openquestion", 
         "fields": {
-            "content": "Uwagi dotycz\u0105ce prowadzenia zaj\u0119\u0107 w instytucie"
+            "content": "Uwagi dotycz\u0105ce prowadzenia zaj\u0119\u0107 w instytucie", 
+            "description": null
         }
     }, 
     {
