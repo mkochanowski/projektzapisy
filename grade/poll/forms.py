@@ -112,7 +112,7 @@ class PollForm( forms.Form ):
                     field.type = 'single'
                     if question.is_scale: field.is_scale  = True
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
-                    field.title = title
+                    field.title        = title
                     if self.finished: field.disabled = True
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field

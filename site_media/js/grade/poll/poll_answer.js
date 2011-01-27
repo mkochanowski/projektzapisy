@@ -22,6 +22,7 @@ Poll.answer.init = function()
     })
     
     $('#poll-form').submit(Poll.answer.cleanup);
+    $('.poll-section-choicelimit-choice').change(Poll.answer.choices_limit)
 }
 
 Poll.answer.cleanup = function()
@@ -34,6 +35,26 @@ Poll.answer.cleanup = function()
 			$(this).find('textarea').val('');
     	})
     })
+}
+
+Poll.answer.choices_limit = function()
+{
+	if( $(this).attr('checked') )
+	{
+		var parent  = $(this).parent().parent()
+		var limit   = $(parent).siblings('.poll-section-answer-limit').val()
+		var checked = $(parent).find('.poll-section-choicelimit-choice:checked').length
+		
+		if (limit == null || limit == 0)
+		{
+			limit = checked
+		}
+		if (limit < checked)
+		{
+			alert("Podałeś za dużo odpowiedzi");
+			$(this).attr('checked', false);
+		}
+	}
 }
 
 $(Poll.answer.init)
