@@ -121,7 +121,7 @@ class Record(models.Model):
     def get_students_in_group(group_id):
         try:
             group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Record.enrolled.filter(group=group))
+            return map(lambda x: x.student, Record.enrolled.filter(group=group).order_by('student__user__last_name','student__user__first_name'))
         except Group.DoesNotExist:
             raise NonGroupException()
 
@@ -362,7 +362,7 @@ class Queue(models.Model):
     def get_students_in_queue(group_id):
         try:
             group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Queue.queued.filter(group=group))
+            return map(lambda x: x.student, Queue.queued.filter(group=group).order_by('student__user__last_name','student__user__first_name'))
         except Group.DoesNotExist:
             logger.error('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
             raise NonGroupException()

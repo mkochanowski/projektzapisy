@@ -24,34 +24,48 @@
 
 		<h1>{{group.subject.name}}</h1>
 		<h2>{{group.get_type_display}}:
-			{{group.get_teacher_full_name}}</h2>
+			{{group.get_teacher_full_name}} </h2>
 
 		<p>
 			<a href="{% url subject-page group.subject_slug %}">powrót do przedmiotu</a>
 		</p>
 
+		<br/>
 		<h3>Lista osób zapisanych na przedmiot:</h3>
-		<ul>
-			{% for student in students_in_group %}
-				<li>
-					<a href="{% url student-profile student.user.id %}"
-					   >{{student.user.get_full_name}}</a>
-				</li>
-			{% empty %}
-				Brak zapisanych osób.
-			{% endfor %}
-		</ul>
-
+		<p>Liczba zapisanych osób: {{students_in_group|length}} / {{group.get_group_limit}}</p>
+		<br/>
+		
+		<table>
+			<tbody>
+				{% for student in students_in_group %}
+					<tr>
+						<td><a href="{% url student-profile student.user.id %}">
+						    {{student.user.get_full_name}}</a></td>
+						<td>{{student.matricula}}</td>
+					</tr>
+			
+				{% empty %}
+					Brak zapisanych osób.
+				{% endfor %}
+			</tbody>
+		</table>
+     
+		<br/>
 		{%if students_in_queue %}
 			<h3>Lista osób oczekujących na zapis:</h3>
-			<ul>
-				{% for student in students_in_queue %}
-					<li>
-						<a href="{% url student-profile student.user.id %}"
-						   >{{student.user.get_full_name}}</a>
-					</li>
-				{% endfor %}
-			</ul>
+			<p> Liczba osób oczekujących na zapis: {{students_in_queue|length}} </p>
+			<br/>
+			<table>
+				<tbody>
+					{% for student in students_in_queue %}
+						<tr>
+							<td><a href="{% url student-profile student.user.id %}">
+							    {{student.user.get_full_name}}</a></td>
+							<td>{{student.matricula}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		{% endif %}
 	</div>
 {% endblock %}
