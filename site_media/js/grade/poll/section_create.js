@@ -141,7 +141,7 @@ Poll.section.changeType = function(parent, type, answerset, isScale, choiceLimit
         $(answerset).children('li').children('.hideOnCheckbox, label').hide();
         $(isScale).show();
         $(choiceLimit).hide();
-        $(hasOther).show();
+        $(hasOther).hide();
         if ( $(answerset).children().size() == 0 )
         {
             Poll.section.createAnswer(answerset, id, 'odpowiedź', type);
@@ -167,7 +167,7 @@ Poll.section.changeType = function(parent, type, answerset, isScale, choiceLimit
 
         $(isScale).show();
         $(choiceLimit).hide();
-        $(hasOther).show();
+        $(hasOther).hide();
         if ( $(answerset).children().size() == 0 )
         {
             Poll.section.createAnswer(answerset, id, 'odpowiedź', type );
