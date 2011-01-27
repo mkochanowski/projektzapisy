@@ -7,7 +7,9 @@ from django.http                       import HttpResponse, \
 from django.shortcuts                  import render_to_response
 from django.template                   import RequestContext
 from django.utils                      import simplejson
-from fereol.users.decorators           import student_required, employee_required, login_required
+from fereol.users.decorators           import student_required, employee_required
+from django.contrib.auth.decorators    import login_required
+
 from fereol.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
                                               
 from fereol.grade.ticket_create.utils  import from_plaintext
