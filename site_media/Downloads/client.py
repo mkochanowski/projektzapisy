@@ -81,12 +81,14 @@ def get_url():
     return file_with_url.read() + u'grade/ticket/client_connection'
 
 
-def send_package(idUser, passwordUser, i, e, n, m = getrandbits( RAND_BITS ) ):
+def send_package(idUser, passwordUser, i, e, n):
     """
 
     Send keys and get encrypted ticket.
         
     """
+    
+    m = getrandbits( RAND_BITS )
     
     t,k = generate_sygnature(n,e,m)
     
@@ -113,16 +115,15 @@ def send_package(idUser, passwordUser, i, e, n, m = getrandbits( RAND_BITS ) ):
         print er.msg
         print er.headers
         print er.fp.read()
-    
     try:
         st_response = response.read()
         save_result(k, n, m, st_response)
     except ValueError, err:
-        print "nie udało się pobrać klucza"
-        print st_response
+        print u"nie udało się pobrać klucza."
+        print st_response.decode('utf-8')
     except IndexError, err:
-        print "nie udało się pobrać klucza"
-        print st_response
+        print u"nie udało się pobrać klucza,"
+        print st_response.decode('utf-8')
 
 def get_user():
     """
@@ -130,10 +131,13 @@ def get_user():
     Enter id and password from keyboard.
         
     """
+    
     userId=""
     userPassword=""
+    
     userId=raw_input(u"id:")
     userPassword = getpass.getpass()
+    
     return userId,userPassword
 
 def save_result(k, n, m, st_response):
@@ -144,15 +148,15 @@ def save_result(k, n, m, st_response):
         
     """
     rk  = revMod( k, n )
-    sp_response = (st_response).split(" &#10;")
-    last = sp_response.pop()
-    st = ((long(last) % n) * (rk % n)) % n
-    w = ""
-    for txt in sp_response:
-        w += txt + " \n"
-    file_with_result = open("wynik.txt","a")
-    file_with_result.write(w + str(m) + " \n" + str(st) + " \n---------------------------------- \n")
+    sp_response = st_response.split("???")
+    st = ((long(sp_response[1]) % n) * (rk % n)) % n
+    sp_response[0] = sp_response[0].replace("***",str(m))
+    sp_response[0] = sp_response[0].replace("%%%",str(st))
+    sp_response[0] = sp_response[0].replace("&#10;","\n")
+    file_with_result = open( "tickets.txt", "a" )
+    file_with_result.write( sp_response[0] )
     file_with_result.close()
+    print u"pobrano bilet: \n" + sp_response[0].decode('utf-8') + u'\n'
 
 
 def get_key(pollList,sendList):
@@ -161,7 +165,9 @@ def get_key(pollList,sendList):
     Get list of pairs ( poll id, poll public key ) from response and list of chosen polls
         
     """
+    
     keys=[]
+    
     while len(sendList)>0:
         pos = sendList.pop(0)
         if (int(pos)-1) < len(pollList):
@@ -210,7 +216,7 @@ def menu(st):
     User innterface.
         
     """
-    pos = 1
+    pos = '1'
     poll_list = []
     while int(pos)>0 :
         if os.name == "posix":
@@ -221,17 +227,26 @@ def menu(st):
         for n,v,s in st:
             print i
             i+=1
-            print v
-            print "------"
-        print "ankiety do wysłania:"
+            print v.decode('utf-8')
+            print u"------"
+        print u"ankiety do wysłania:"
         choosen_list = u"["
         for p in poll_list:
-            choosen_list += unicode(p)+","
+            choosen_list += unicode(p)+u","
         choosen_list += u"]"
         print choosen_list
-        print "podaj numer ankiety do wysłania (  0 - wysyła dane, -1 - konczy działanie )"
+        print u"podaj numer ankiety do wysłania"
+        print u"u 'nr_ankiety' usuwa numer ankiety z listy"
+        print u"(  0 - wysyła dane, -1 - konczy działanie )"
         pos=raw_input()
-        poll_list.append(int(pos))
+        try:
+            if (len(pos.split(" "))==2) and (pos.split(" ")[0]=='u'):
+                pos=pos.split(" ")[1]
+                poll_list.remove(int (pos))
+            elif int(pos) <= len(st):
+                poll_list.append(int(pos))
+        except ValueError, err:
+            pos='50'
     return poll_list
 
 def to_list(st):
@@ -255,19 +270,25 @@ def client():
     Main client function.
         
     """
+    
     idUser,passwordUser = get_user()
     pollSt = get_poll_list(idUser, passwordUser)
+    
     try:
         x = long(pollSt.split("\n")[0])
     except ValueError, err:
-        print "nie udało się pobrać klucza"
-        print pollSt
+        print u"nie udało się pobrać klucza"
+        print pollSt.decode("utf-8")
         return
+
     pollList = to_list(pollSt)
     sendList = menu(pollList)
-    if sendList.pop(len(sendList)-1) == '-1':
+    if sendList.pop(len(sendList)-1) == -1:
+        print u"Pobieranie biletów zostało anulowane"
         return
+
     keys = get_key(pollList,sendList)
+    
     for nr,key in keys:
         send_package( idUser, passwordUser, nr ,key.e, key.n)
 
