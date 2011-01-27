@@ -128,7 +128,6 @@ def poll_create(request):
         else:
             if subject:
                 groups = Group.objects.filter(subject=subject)
-                print subject
             else:
                 groups = Group.objects.filter(subject__semester = semester)
                 
@@ -239,7 +238,6 @@ def poll_create(request):
     data['studies_type'] = request.session.get('studies_type', None)
     data['subject_id']   = request.session.get('subject', None)
     data['semester']     = request.session.get('semester', None)
-    print data
     data['grade'] =  grade
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 
@@ -384,7 +382,6 @@ def tickets_enter(request):
             errors   = []
             polls    = []
             finished = []
-            print ids_and_tickets
             for (id, (ticket, signed_ticket)) in ids_and_tickets:
                 try:
                     poll       = Poll.objects.get( pk = id )
@@ -607,7 +604,6 @@ def poll_answer( request, slug, pid ):
                             else:
                                 ans.delete()
         else:
-            print 'ok'
             form = PollForm()
             form.setFields( poll, st )
 
