@@ -388,9 +388,7 @@ def tickets_enter(request):
             for (id, (ticket, signed_ticket)) in ids_and_tickets:
                 try:
                     poll       = Poll.objects.get( pk = id )
-                    print poll
                     public_key = PublicKey.objects.get( poll = poll )
-                    print signed_key
                     if check_signature( ticket, signed_ticket, public_key ):
                         try:
                             st = SavedTicket.objects.get( poll   = poll,
