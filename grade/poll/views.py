@@ -268,7 +268,8 @@ def questionset_create(request):
             else:
                 raise WrongType(type)
 
-            question.content = post.get(question_name + "[title]")
+            question.content     = post.get(question_name + "[title]")
+            question.description =  post.get(question_name + "[description]")
             question.save()
 
             options = post.getlist(question_name + "[answers][]")

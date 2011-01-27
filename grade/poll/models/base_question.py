@@ -2,8 +2,8 @@
 from django.db import models
 
 class BaseQuestion( models.Model ):
-    content = models.CharField( max_length = 250, verbose_name = 'treść' )
-    
+    content     = models.CharField( max_length = 250, verbose_name = 'treść' )
+    description = models.CharField( max_length = 1000, verbose_name = 'opis', blank = True, null=True )
     class Meta:
         abstract = True
         
