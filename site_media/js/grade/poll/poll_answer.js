@@ -33,7 +33,15 @@ Poll.answer.hideOther = function()
 
 Poll.answer.other = function()
 {
-	$(this).siblings('.poll-section-other').toggle();
+	if($(this).attr('checked'))
+	{
+		$(this).siblings('.poll-section-other').show();
+	}
+	else
+	{
+		$(this).siblings('.poll-section-other').hide();
+		
+	}
 }
 
 Poll.answer.cleanup = function()
@@ -62,8 +70,11 @@ Poll.answer.choices_limit = function()
 		}
 		if (limit < checked)
 		{
-			alert("Podałeś za dużo odpowiedzi");
 			$(this).attr('checked', false);
+			if( $(this).hasClass('poll-section-choice') )
+			{
+				$(this).siblings('.poll-section-other').hide();
+			}
 		}
 	}
 }
