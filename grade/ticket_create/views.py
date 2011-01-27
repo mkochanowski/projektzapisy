@@ -26,7 +26,8 @@ from django.contrib.auth                   import authenticate, login, logout
 from fereol.grade.ticket_create.forms      import *
 from django.views.decorators.csrf          import csrf_exempt
 from Crypto.PublicKey import RSA
-      
+
+@employee_required
 def keys_generate( request ):   
     grade = Semester.get_current_semester().is_grade_active
     generate_keys_for_polls()

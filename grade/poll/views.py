@@ -7,7 +7,7 @@ from django.http                       import HttpResponse, \
 from django.shortcuts                  import render_to_response
 from django.template                   import RequestContext
 from django.utils                      import simplejson
-from fereol.users.decorators           import student_required, employee_required
+from fereol.users.decorators           import student_required, employee_required, login_required
 from fereol.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
                                               
 from fereol.grade.ticket_create.utils  import from_plaintext
@@ -80,6 +80,7 @@ def ajax_get_groups(request):
             groups  = groups_list( Group.objects.filter(type=type, subject=subject).order_by('teacher'))
             message = simplejson.dumps( groups )
     return HttpResponse(message)
+
 
 def groups_list( groups ):
     group_list = []
@@ -225,13 +226,14 @@ def poll_create(request):
     data['grade'] =  grade
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 
+@employee_required
 def poll_manage(request):
     grade = Semester.get_current_semester().is_grade_active
     data = {}
     data['semesters']  = Semester.objects.all() 
     return render_to_response ('grade/poll/manage.html', {'grade' : grade}, context_instance = RequestContext( request ))
 
-
+@login_required
 def declaration( request ):
     # TODO:
     #       Wyświetlanie wyników oceny
@@ -390,6 +392,7 @@ def tickets_enter(request):
     data[ 'grade' ] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
 
+@login_required
 def polls_for_user( request, slug ):
     if not 'polls' in request.session.keys():
         return HttpResponseRedirect( '/grade/poll/tickets_enter' )
@@ -598,7 +601,7 @@ def poll_answer( request, slug, pid ):
     data[ 'grade' ] = Semester.get_current_semester().is_grade_active
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
-    
+   
 def poll_end_grading( request ):
     request.session.clear()
     
