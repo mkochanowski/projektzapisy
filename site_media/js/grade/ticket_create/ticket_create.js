@@ -9,6 +9,7 @@ if (typeof Ticket == 'undefined')
 Ticket.create = Object()
 Ticket.create.init   = function()
 {
+	$("#progressbar").progressbar({ value: 0 });
     Ticket.create.t_array        = new Array();
     Ticket.create.m_array        = new Array();
     Ticket.create.unblindst_array = new Array();
@@ -23,18 +24,20 @@ Ticket.create.init   = function()
 Ticket.create.step1  = function()
 {
     dataString = $("#connection_choice").serialize()
+	$( "#progressbar" ).progressbar( "option", "value", 10 );
     $.ajax({
         type: "POST",
         url: "grade/ticket/ajax_ticets1",
-        async: false,
         dataType: 'json',
         data: dataString,
         success: Ticket.create.step2
     });
+    return false;
 }
 
 Ticket.create.step2  = function(keys)
 {
+	$( "#progressbar" ).progressbar( "option", "value", 30 );
     $.each(keys, Ticket.create.t_generator);
     var hidden = document.createElement('input')
     hidden.name = 'ts'
@@ -45,7 +48,6 @@ Ticket.create.step2  = function(keys)
     $.ajax({
         type: "POST",
         url: "grade/ticket_create/ajax_ticets2",
-        async: false,
         dataType: 'json',
         data: dataString,
         success: Ticket.create.step3
@@ -54,6 +56,7 @@ Ticket.create.step2  = function(keys)
 
 Ticket.create.step3  = function(unblinds)
 {
+	$( "#progressbar" ).progressbar( "option", "value", 70 );
     $.each(unblinds, Ticket.create.unblinds_generator);
 
     var hidden = document.createElement('input')
@@ -66,6 +69,8 @@ Ticket.create.step3  = function(unblinds)
     hidden.type = 'hidden'
     hidden.value = JSON.stringify(Ticket.create.unblindt_array)
     $("#connection_choice").append(hidden);
+	$( "#progressbar" ).progressbar( "option", "value", 100 );
+	$('#connection_choice').submit();
 }
 
 Ticket.create.unblinds_generator = function(index, unblind)
