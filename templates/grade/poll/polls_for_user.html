@@ -28,7 +28,7 @@
     {% for poll_sub in polls %}
         <li><a href="{% url grade-poll-polls-for-user poll_sub.0.1 %}">{{ poll_sub.0.0 }}</a>
             <ul id="grade-fillable-poll-sublist">
-            {% for poll in poll_sub.1 %}
+            {% for poll in poll_sub.2 %}
                 <li><a href="{% url grade-poll-poll-answer poll_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
             {% endfor %}
             </ul>
@@ -43,7 +43,7 @@
     {% for fin_sub in finished %}
         <li><a href="{% url grade-poll-polls-for-user fin_sub.0.1 %}">{{ fin_sub.0.0 }}</a>
         <ul id="grade-not-fillable-poll-sublist">
-            {% for poll in fin_sub.1 %}
+            {% for poll in fin_sub.2 %}
                 <li><a href="{% url grade-poll-poll-answer fin_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
             {% endfor %}
         </ul>
@@ -52,7 +52,8 @@
     </ul>
 {% endif %}
 </div>
-
+<div id="progressbar"></div>
+Zakończono <span id="finished-polls">{{finished_polls}}</span> spośród <span id="all-polls">{{all_polls}}</span>
 <div id="grade-poll-content">
 {% block poll-content %}
 {% endblock %}

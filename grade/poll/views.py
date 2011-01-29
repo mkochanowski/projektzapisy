@@ -442,7 +442,7 @@ def poll_answer( request, slug, pid ):
         poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
     except IndexError:
         poll_cands = []
-            
+    
     try:
         finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
     except:

@@ -97,17 +97,22 @@ def prepare_data( request, slug ):
     
     data[ 'polls' ]    = map( lambda ((x, s), l): 
                                 ((x, s),
+                                slug==s,
                                 map( lambda (id, t, st):
                                         (id, t, st, Poll.objects.get( pk = id ).to_url_title( True )), 
                                     l)),
                             request.session.get( "polls", default = [] ))
     data[ 'finished' ] = map( lambda ((x, s), l): 
                                 ((x, s),
+                                slug==s,
                                 map( lambda (id, t, st):
                                         (id, t, st, Poll.objects.get( pk = id ).to_url_title( True )), 
                                     l)), 
                             request.session.get( "finished", default = [] ))
-    
+    data[ 'finished_polls' ] = len(request.session.get( "finished", default = [] ))
+    data[ 'all_polls']  = reduce(lambda x, y: x + y,
+                                   map( lambda (p, l): len(l),
+                                    request.session.get( "polls", default = [] )), data[ 'finished_polls' ])
     return data
 
 def get_next( poll_list, finished_list, poll_id ):

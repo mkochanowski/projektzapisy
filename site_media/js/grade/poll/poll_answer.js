@@ -24,6 +24,10 @@ Poll.answer.init = function()
     $('#poll-form').submit(Poll.answer.cleanup);
     $('.poll-section-choicelimit-choice').change(Poll.answer.choices_limit)
     $('input[value="-1"].poll-section-choice').change(Poll.answer.other)
+    var finished = parseInt($('#finished-polls').text())
+    var all      = parseInt($('#all-polls').text())
+    var percent  = parseInt(finished/all * 100)
+    $("#progressbar").progressbar({ value: percent });
 }
 
 Poll.answer.hideOther = function()
