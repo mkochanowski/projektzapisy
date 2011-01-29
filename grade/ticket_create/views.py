@@ -28,12 +28,26 @@ from django.contrib.auth                   import authenticate, login, logout
 from fereol.grade.ticket_create.forms      import *
 from django.views.decorators.csrf          import csrf_exempt
 from Crypto.PublicKey import RSA
+from django.core.cache import cache
+
+
+### KEYS generate:
+
+@employee_required
+def ajax_keys_generate( request ):
+    generate_keys_for_polls()
+    return HttpResponse("ok")
+    
+@employee_required
+def ajax_keys_progress( request ):
+    count = cache.get('generated-keys', 0)
+    return HttpResponse(str(count))
 
 @employee_required
 def keys_generate( request ):   
     grade = Semester.get_current_semester().is_grade_active
-    generate_keys_for_polls()
-    return render_to_response( 'grade/base.html', { 'grade' : grade, 'message': 'Wygenerowano klucze RSA' }, context_instance = RequestContext( request ))
+    count = Poll.get_current_semester_polls_without_keys().all().count()
+    return render_to_response( 'grade/ticket_create/keys_generate.html', { 'grade' : grade, 'keys': count }, context_instance = RequestContext( request ))
 
 @student_required
 def ajax_get_rsa_keys_step1( request ):

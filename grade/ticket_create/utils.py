@@ -16,6 +16,8 @@ from fereol.grade.ticket_create.models     import PublicKey, \
                                                   PrivateKey, \
                                                   UsedTicketStamp 
 from fereol.grade.ticket_create.exceptions import *
+from time import sleep
+from django.core.cache import cache
 
 RAND_BITS = 512
  
@@ -160,10 +162,14 @@ def generate_keys_for_polls():
     poll_list = Poll.get_current_semester_polls_without_keys()
     pub_list  = []
     priv_list = []
+    cache.set('generated-keys', '0')
+    i = 1
     for el in poll_list:
+        cache.set('generated-keys', i)
         (pub, priv) = generate_rsa_key()
         pub_list.append(pub)
         priv_list.append(priv)
+        i = i + 1
     save_public_keys(zip(poll_list, pub_list))
     save_private_keys(zip(poll_list, priv_list))
     return 

@@ -1,0 +1,39 @@
+{% extends "grade/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/connections_choice.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script src="/site_media/js/grade/ticket_create/BigInt.js" type="application/javascript"></script>
+<script src="/site_media/js/grade/ticket_create/keys_generate.js" type="application/javascript"></script>
+<script type="application/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>
+
+
+{% endblock %}
+
+{% block main-navigation %}
+    <li><a href="/">Strona Główna</a></li>
+    <li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+    <li>Pobieranie Biletów</li>
+{% endblock %}
+
+{% block content %}
+
+    {% if keys != 0 %}
+    <div id="progressbar"></div>
+    <span id="generated-keys">0</span> / <span id="all-keys">{{keys}}</span> (<span id="keys-percent">0</span>%)
+        {% if not grade %}
+        <div id="grade-keys-generate">
+        <form method="post" id="keys-generate">
+            <input id="keys_generate_button" type="submit" value="Generuj bilety">
+            </form>
+        </div>
+
+        {% endif %}
+    {% else %}
+        Brak kluczy do wygenerowania!
+    {% endif %}
+{% endblock %}
+
