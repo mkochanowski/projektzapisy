@@ -96,15 +96,13 @@ def prepare_data( request, slug ):
         pass
     
     data[ 'polls' ]    = map( lambda ((x, s), l): 
-                                ((x, s), 
-                                slug==s, 
+                                ((x, s),
                                 map( lambda (id, t, st):
                                         (id, t, st, Poll.objects.get( pk = id ).to_url_title( True )), 
                                     l)),
                             request.session.get( "polls", default = [] ))
     data[ 'finished' ] = map( lambda ((x, s), l): 
-                                ((x, s), 
-                                slug==s, 
+                                ((x, s),
                                 map( lambda (id, t, st):
                                         (id, t, st, Poll.objects.get( pk = id ).to_url_title( True )), 
                                     l)), 

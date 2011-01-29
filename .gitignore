@@ -7,3 +7,4 @@ search_index/*
 *.tmp*
 *.log
 *~
+/apache
