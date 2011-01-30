@@ -65,6 +65,7 @@ Poll.section.addQuestion = function()
     $(optionset).append(isScale)
     $(optionset).append(choiceLimit)
     $(optionset).append(hasOther)
+    $(optionset).addClass('optionset')
 
     $(answerset).sortable({handle : 'input'});
 
@@ -258,9 +259,29 @@ Poll.section.makeStandardView = function(parent, element, question_type)
             input.name = 'poll[question][' + id + ']';
             $(li).append(input);
             $(li).append(label);
+
             $(ul).append(li)
         });
+        if( type == 'multi')
+        {
+        	var other = $(element).children('.optionset').find('input[name$="[hasOther]"]')
+        	if ($(other).attr('checked'))
+        	{
+        		alert('dwa')
+        		var input = document.createElement('input');
+            	var li    = document.createElement('li');
+            	var label = document.createElement('label');
+            	
+            	$(label).text('Inne')
+				input.type = 'checkbox'
+	            $(li).append(input);
+	            $(li).append(label);
+
+	            $(ul).append(li)        		 
+        	}
+        }
         $(div).append(ul);
+        
     }
 
     
