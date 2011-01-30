@@ -24,7 +24,7 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SavedTicket, \
                                               SingleChoiceQuestionAnswer, \
                                               MultipleChoiceQuestionAnswer, \
-                                              OpenQuestionAnswer
+                                              OpenQuestionAnswer, Option
 from fereol.users.models               import Type
 from fereol.grade.poll.forms           import TicketsForm, \
                                               PollForm, \
@@ -71,6 +71,20 @@ def disable_grade( request ):
     return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
 
 #### Poll creation ####
+
+@employee_required
+def autocomplete(request):
+    results = []
+    if request.method == "GET":
+        if request.GET.has_key(u'term'):
+            value = request.GET[u'term']
+            # Ignore queries shorter than length 3
+            #if len(value) > 2:
+            model_results = Option.objects.filter(content__icontains=value)
+            results = [ x.content for x in model_results ]
+    json = simplejson.dumps(results)
+    return HttpResponse(json, mimetype='application/javascript')
+
 
 @employee_required
 def ajax_get_groups(request):

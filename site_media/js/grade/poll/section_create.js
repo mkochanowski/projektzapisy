@@ -26,6 +26,7 @@ Poll.section.init = function()
         }
         Poll.section.submitted = true;
     })
+	
 }
 
 Poll.section.addQuestion = function()
@@ -426,7 +427,13 @@ Poll.section.createAnswer = function(ul, id, value, type)
     }
 
     $(answer).val(value);
-
+    $(answer).addClass('autocomplete')
+    $(answer).autocomplete(
+    	{
+    	 source:'http://localhost:8000/grade/poll/autocomplete',
+         delay:10
+     }
+	);
     var sectionRemoveButton = document.createElement('img');
     sectionRemoveButton.alt = 'usuń';
     sectionRemoveButton.className = 'remove';
@@ -436,7 +443,6 @@ Poll.section.createAnswer = function(ul, id, value, type)
     {
         Poll.section.removeQuestion( li );
     });
-    
 	$(li).append( answer );
     $(li).append( check );
     $(li).append( label );
