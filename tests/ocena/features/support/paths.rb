@@ -14,7 +14,7 @@ module NavigationHelpers
     when /grade main page/
       '/grade/'
     
-    when /pool management page/
+    when /poll management page/
 		'/grade/poll_manage'
         
     when /grade keys generator/
