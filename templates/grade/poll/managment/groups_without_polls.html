@@ -1,0 +1,25 @@
+﻿{% extends "grade/base.html" %}
+
+{% block scripts %}
+    {% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/managment.css" type="text/css" />
+{% endblock %}
+
+
+{% block content %}
+  
+    {% if message %}<div class="main-message">{{ message }}</div>{% endif %}
+    {% if groups %}
+        <h3>Następujące grupy nie posiadają przypisanych ankiet:</h3>
+        <ul>
+        {% for group in groups%}
+            <li>{{group}}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <h3>Wszystkie grupy mają przypisaną ankietę</h3>
+    {% endif %}
+{% endblock %}
+

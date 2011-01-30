@@ -96,7 +96,15 @@ class Poll( models.Model ):
         if not semester:
             semester = Semester.get_current_semester()
         return Poll.objects.filter( semester = semester )
-
+    
+    @staticmethod
+    def get_groups_without_poll():
+        semester = Semester.get_current_semester()
+        polls    = Poll.objects.filter( semester = semester, group__isnull=False ).order_by('pk') 
+        polls    = map( lambda p: p.group_id, polls)
+        groups   = Group.objects.filter(subject__semester = semester).order_by('pk')
+        return filter( lambda g: g.pk not in polls, groups)
+    
     @staticmethod
     def get_current_polls():
         pks = map( lambda (x,): x, PublicKey.objects.all().values_list( 'poll' ))

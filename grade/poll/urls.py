@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     #- url(r'poll_save$', 'fereol.grade.poll.views.poll_save', name='grade-poll-poll-save'),
     
     url(r'poll_results$', 'fereol.grade.poll.views.poll_results', name='grade-poll-poll-results'),
+    url(r'managment/groups_without_polls$', 'fereol.grade.poll.views.groups_without_poll', name='grade-poll-groups_without_polls'),
     url(r'poll_manage$', 'fereol.grade.poll.views.poll_manage', name='grade-poll-poll-manage'),
     url(r'autocomplete$', 'fereol.grade.poll.views.autocomplete', name='grade-poll-autocomplete'),
 )

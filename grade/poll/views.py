@@ -281,7 +281,10 @@ def poll_create(request):
 
 @employee_required
 def groups_without_poll( request ):
-    pass 
+    data = {}
+    data['groups'] = Poll.get_groups_without_poll()
+    data['grade']  = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/poll/managment/groups_without_polls.html', data, context_instance = RequestContext( request ))
 
 @employee_required
 def poll_manage(request):
