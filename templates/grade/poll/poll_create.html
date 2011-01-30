@@ -14,7 +14,7 @@
 
 {% block content %}
 	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
-        <form method="POST">
+        <form method="POST" id="poll-create">
             <fieldset>
                 <label for="semester">Semestr: </label>
                 <select name="semester" id="semester">
@@ -68,7 +68,7 @@
                 {% endfor %}
             </select>
             <input id="section-add" type="button" value="Dodaj sekcję"><br/>
-            <input type="submit" value="Stwórz ankietę">
+            <input id="poll-create-submit" type="submit" value="Stwórz ankietę">
         </form>
 {% endblock %}
 
