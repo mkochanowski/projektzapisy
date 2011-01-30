@@ -15,6 +15,5 @@ urlpatterns = patterns('',
 
 
     # feature do poprawienia w przyszłości
-    url(r'connections_choice$', 'fereol.grade.ticket_create.views.connections_choice', name='grade-ticket-connections-choice'),
-    url(r'tickets_save$',       'fereol.grade.ticket_create.views.tickets_save',       name='grade-ticket-tickets-save'),
+    url(r'connections_choice$', 'fereol.grade.ticket_create.views.connections_choice', name='grade-ticket-connections-choice')
 )

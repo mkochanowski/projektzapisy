@@ -273,7 +273,7 @@ def secure_signer_without_save( user, g, t ):
     try:
         return ticket_check_and_sign_without_mark( user, g, t ), 
     except InvalidPollException:
-        return u"Nie masz uprawnień do tej ankiety",
+        return u"Nie jesteś przypisany do tej ankiety",
     except TicketUsed:
         return u"Bilet już pobrano",
 
@@ -281,7 +281,7 @@ def secure_mark ( user, g, t ):
     try:
         return ticket_check_and_mark( user, g, t ), 
     except InvalidPollException:
-        return u"Nie masz uprawnień do tej ankiety",
+        return u"Nie jesteś przypisany do tej ankiety",
     except TicketUsed:
         return u"Bilet już pobrano",
 
@@ -289,13 +289,13 @@ def secure_signer( user, g, t ):
     try:
         return ticket_check_and_sign( user, g, t ), 
     except InvalidPollException:
-        return u"Nie masz uprawnień do tej ankiety",
+        return u"Nie jesteś przypisany do tej ankiety",
     except TicketUsed:
         return u"Bilet już pobrano",
 
 def unblind( poll, st ):
     st  = st[0]
-    if   st == u"Nie masz uprawnień do tej ankiety":
+    if   st == u"Nie jesteś przypisany do tej ankiety":
         return st
     elif st == u"Bilet już pobrano":
         return st
@@ -308,7 +308,7 @@ def get_valid_tickets( tl ):
     err = []
     val = []
     for g, t, st in tl:
-        if st == u"Nie masz uprawnień do tej ankiety" or \
+        if st == u"Nie jesteś przypisany do tej ankiety" or \
            st == u"Bilet już pobrano":
                 err.append(( unicode( g ), st ))
         else:

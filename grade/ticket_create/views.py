@@ -115,7 +115,6 @@ def connections_choice( request ):
                 data = { 'errors'  : errors,
                          'tickets' : to_plaintext( tickets_to_serve ),
                          'grade' : grade }
-                         
                 return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
                 
         else:
@@ -126,28 +125,6 @@ def connections_choice( request ):
     else:
         return render_to_response ('grade/ticket_create/connection_choice.html', {'grade': grade, 'error': "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów"}, context_instance = RequestContext ( request ))
     
-@student_required
-def tickets_save( request, ticket_list ):
-    grade = Semester.get_current_semester().is_grade_active
-    # m i k są pamiętane po unicodeonie przeglądarki (i mają stąd zniknąć); 
-    # t jest tym, co zostało wysłane do serwera;
-    # g to poll
-    signed = map( lambda ( g, t, ( m, k )): 
-                        (g, t, secure_signer( request.user, g, t ), (m, k)),
-                  ticket_list )
-    
-    prepared_tickets = map ( lambda ( g, t, st, ( m, k ) ): 
-                                (g, m, unblind( g, st, k ) ),
-                             signed )
-     
-    errors, tickets_to_serve = get_valid_tickets( prepared_tickets )
-
-    data = { 'errors'  : errors,
-             'tickets' : to_plaintext( tickets_to_serve ),
-             'grade' : grade}
-             
-    return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
-
 
 @csrf_exempt
 def client_connection( request ):
@@ -203,14 +180,14 @@ def client_connection( request ):
                     p = students_poll
                     break
             if st == "":
-                st = u"Nie jesteś zapisany do tej ankiety"
+                st = u"Nie jesteś przypisany do tej ankiety"
 
 
             try:
                 a=long(st[0][0])
             except ValueError, err:
                 return HttpResponse(st)
-            if   st == u"Nie jesteś zapisany do tej ankiety":
+            if   st == u"Nie jesteś przypisany do tej ankiety":
                 return HttpResponse(st)
             elif st == u"Bilet już pobrano":
                 return HttpResponse(st)

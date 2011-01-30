@@ -75,13 +75,15 @@ Ticket.create.step3  = function(unblinds)
 
 Ticket.create.unblinds_generator = function(index, unblind)
 {
-    if (unblind[1] == "Nie masz uprawnień do tej ankiety")
+    if (unblind[1] == "Nie jesteś przypisany do tej ankiety")
     {
         Ticket.create.unblindst_array.push(unblind[1])
+        Ticket.create.unblindt_array.push( bigInt2str( Ticket.create.m_array[index], 10) )
     }
     else if (unblind[1] == "Bilet już pobrano")
     {
         Ticket.create.unblindst_array.push(unblind[1])
+        Ticket.create.unblindt_array.push( bigInt2str( Ticket.create.m_array[index], 10) )
     }
     else
     { 

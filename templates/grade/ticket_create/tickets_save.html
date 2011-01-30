@@ -14,12 +14,12 @@
 <!-- OSTYLOWAĆ -->
     {% if errors %}
         <div class='grade-error-message'>
-            <h4> Nie udało się pobrać następujących biletów </h4>
+            <h3> Nie udało się pobrać następujących biletów:</h3>
             <ul>
                 {% for err in errors %}
                     <li>
-                        {{ err.0 }} <br>
-                        <b>{{ err.1 }}</b> 
+                        Ankieta: <b>{{ err.0 }}</b> <br>
+                        Powód: {{ err.1 }}
                     </li>
                 {% endfor %}
             </ul>
