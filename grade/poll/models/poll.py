@@ -113,3 +113,7 @@ class Poll( models.Model ):
         return filter( lambda x: x.is_student_entitled_to_poll( student ), 
                        Poll.get_current_polls())
     
+    @staticmethod
+    def get_all_polls_for_group( group ):
+        semester = Semester.get_current_semester()
+        return Poll.objects.filter( semester = semester, group = group )

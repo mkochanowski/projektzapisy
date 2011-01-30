@@ -143,11 +143,14 @@ def poll_create(request):
         studies_type = int(request.POST.get('studies-type', -1))
         subject  = int(request.POST.get('subject', 0))
         
+        groups_without = request.POST.get('poll-only-without', None)
+        
         request.session['studies_type'] = studies_type
         request.session['semester']     = semester
         request.session['group']        = group
         request.session['type']         = type
         request.session['subject']      = subject
+        request.session['poll_without'] = (groups_without == 'on')
         
         if semester > 0:
             semester = Semester.objects.get(pk = semester)
@@ -175,6 +178,8 @@ def poll_create(request):
 
         groups = getGroups(semester, group, type, subject)
         for group in groups:
+            if groups_without == 'on' and Poll.get_all_polls_for_group(group):
+                continue
             poll = Poll()
             poll.author       = request.user.employee
             poll.title        = request.POST.get('title', '')
@@ -252,6 +257,7 @@ def poll_create(request):
     data['studies_type'] = request.session.get('studies_type', None)
     data['subject_id']   = request.session.get('subject', None)
     data['semester']     = request.session.get('semester', None)
+    data['poll_without'] = request.session.get('poll_without', None)
     data['grade'] =  grade
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 

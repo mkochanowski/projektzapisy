@@ -67,6 +67,8 @@
                 <select name="group" id="group" class="group-visibility">
                     <option value="0">Wszystkie grupy</option>
                 </select>
+                <input type="checkbox" name="poll-only-without" id="poll-only-without"{% if poll_without %} checked{% endif %}>
+                <label for="poll-only-without">Utwórz dla grup bez ankiet</label>
             </fieldset>
             <label for="title">Tytuł:</label>
 
