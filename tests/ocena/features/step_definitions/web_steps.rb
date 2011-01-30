@@ -137,5 +137,5 @@ Given /^I have previously saved some data in polls using "([^"]*)"$/ do |ticket|
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
-    wait_until(15) { page.should have_content("text") }
+    wait_until(15) { page.should have_content(text) }
 end
