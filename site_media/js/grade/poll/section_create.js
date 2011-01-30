@@ -5,6 +5,7 @@ Poll.section = Object();
 
 Poll.section.init = function()
 {
+    Poll.section.submitted         = false;
 	Poll.section.questions         = 0;
     Poll.section.questionContainer = $("#poll-form");
 
@@ -17,6 +18,14 @@ Poll.section.init = function()
         this.select();
     });
     $(Poll.section.questionContainer).sortable({handle : 'div'});
+    $('#questionset-submit').click(function()
+    {
+        if( Poll.section.submitted )
+        {
+            return false;
+        }
+        Poll.section.submitted = true;
+    })
 }
 
 Poll.section.addQuestion = function()
