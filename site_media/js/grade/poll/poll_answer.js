@@ -5,6 +5,14 @@ Poll.answer = Object()
 
 Poll.answer.init = function()
 {
+	$('.grade-fillable-poll-sublist').hide();
+	var pid = $('#poll-form-id').val();
+	$('.grade-fillable-poll-link').click(function()
+	{
+		$(this).siblings('ul').toggle(1000);
+		return false;
+	})
+	$('#grade-fillable-poll-link-'+pid).parent().parent().show();
 	$('.poll-section-radio-hideon:checked').each(function()
     {
     	$(this).parents('.poll-section-leading').nextAll().hide()

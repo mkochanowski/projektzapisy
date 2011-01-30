@@ -275,6 +275,14 @@ def poll_create(request):
     data['grade'] =  grade
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 
+#
+# Poll managment
+#
+
+@employee_required
+def groups_without_poll( request ):
+    pass 
+
 @employee_required
 def poll_manage(request):
     grade = Semester.get_current_semester().is_grade_active
@@ -471,6 +479,7 @@ def poll_answer( request, slug, pid ):
     data[ 'slug' ]      = slug
     data[ 'title' ]     = poll.title
     data[ 'desc' ]      = poll.description
+    data[ 'pid']    = pid
         
     try:
         poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]

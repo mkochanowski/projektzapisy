@@ -17,6 +17,7 @@
 
 {% block poll-content %}
     <form id="poll-form" action="" method="post">
+    	<input type="hidden" id="poll-form-id" value="{{pid}}">
         <h1>{{ title }}</h1>
         <span>{{ desc }}</span>
             {{ form.as_divs }}
