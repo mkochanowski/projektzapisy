@@ -9,6 +9,11 @@ module WithinHelpers
 end
 World(WithinHelpers)
 
+def load_fixture(fixture)
+    path = "../../"
+    system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/#{fixture}.json"
+end
+
 Given /I start new scenario/ do
     path = "../../"
     system "#{path}manage.py flush --noinput"
@@ -77,7 +82,7 @@ When /^(?:|I )click on "([^"]*)"$/ do |link|
 end
 
 When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
-	value.gsub(/\n/, '<br/>')
+	value.gsub!(/\n/, '<br/>')
 	fill_in(field, :with => value)
 end
 
@@ -114,7 +119,7 @@ Given /^I am signed for groups with polls$/ do
     load_fixture "keys_for_polls"
 end
 
-When /^I uncheck "([^"]*)" checkboxes$/ do |arg|
+When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 	if arg == "all" then
 		# odznaczenie obu checkboxów
 		uncheck("join_common")
@@ -129,4 +134,8 @@ end
 
 Given /^I have previously saved some data in polls using "([^"]*)"$/ do |ticket|
   #  provide fixture or use this ticket to fill a fake poll in polls filling test ;)
+end
+
+Then /^I wait for a while to see "([^"]*)"$/ do |text|  
+    wait_until(15) { page.should have_content("text") }
 end

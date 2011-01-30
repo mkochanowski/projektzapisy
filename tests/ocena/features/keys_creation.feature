@@ -9,9 +9,8 @@ Feature: Creating keys for polls in the grading protocol
 		And I am logged in with "administrator" privileges
 		And I am on grade main page        
 		When I follow "Generuj klucze"		
-		And I sleep for 5 seconds
-		Then I should see "Wygenerowano klucze RSA"
-		And I should be on pool management page
+		Then I wait for a while to see "Wygenerowano klucze RSA"
+		And I should be on poll management page
 	
 	Scenario: Successfully creating additional keys for added polls
 		Given the grading protocol is "off"
@@ -21,9 +20,8 @@ Feature: Creating keys for polls in the grading protocol
 		And there are keys generated for polls
 		When I add new poll
 		And I follow "Generuj klucze"
-		And I sleep for 2 seconds
-		Then I should see "Wygenerowano klucze RSA"
-		And I should be on pool management page
+		Then I wait for a while to see "Wygenerowano klucze RSA"
+		And I should be on poll management page
 	
 	Scenario: Failing to create keys - all the polls already have them
 		Given the grading protocol is "off"
@@ -32,10 +30,9 @@ Feature: Creating keys for polls in the grading protocol
 		And I am on grade main page        
 		And there are keys generated for polls
 		When I follow "Generuj klucze"
-		And I sleep for 2 seconds
-		Then I should see "Brak nowych ankiet"
+		Then I wait for a while to see "Brak nowych ankiet"
         And I should not see "Wygenerowano klucze RSA"
-		And I should be on pool management page
+		And I should be on poll management page
 		
 	Scenario: Failing to create keys after the grading protocol is started
 		Given the grading protocol is "on"

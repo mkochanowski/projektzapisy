@@ -9,7 +9,7 @@ Feature: Student wants to create tickets for polls
 		And I am logged in with "student" privileges				        
         And I am on grade main page		
 		When I follow "Pobierz bilety"
-		And I uncheck "no" checkboxes
+		And I uncheck "no" checkboxes in tickets grouping options
 		And I press "Pobierz bilety"
 		Then I should see "Pomyślnie wygenerowano bilety"
 	
@@ -19,7 +19,7 @@ Feature: Student wants to create tickets for polls
         And  I am logged in with "student" privileges		
         And I am on grade main page
 		When I follow "Pobierz bilety"
-		And I uncheck "all" checkboxes
+		And I uncheck "all" checkboxes in tickets grouping options
 		And I press "Pobierz bilety"
 		Then I should see "Pomyślnie wygenerowano bilety"
 		
@@ -29,7 +29,7 @@ Feature: Student wants to create tickets for polls
         And I am logged in with "student" privileges	
         And I am on grade main page
 		When I follow "Pobierz bilety"
-		And I uncheck "some" checkboxes
+		And I uncheck "some" checkboxes in tickets grouping options
 		And I press "Pobierz bilety"		
 		Then I should see "Pomyślnie wygenerowano bilety"
 			
