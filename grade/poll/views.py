@@ -214,7 +214,7 @@ def poll_create(request):
         request.session['message'] = 'Sekcja dodana'
 
         #TODO: check 'is OK?'
-        return HttpResponseRedirect('grade/poll/poll_create')        
+        return HttpResponseRedirect('/grade/poll/poll_create')        
     data = {}
     if semester:   
         sem       = Subject.objects.filter(semester = semester).order_by('name')
@@ -342,7 +342,7 @@ def questionset_create(request):
         request.session['message'] = 'Sekcja dodana'
 
         #TODO: check 'is OK?'
-        return HttpResponseRedirect('grade/poll/questionset_create')
+        return HttpResponseRedirect('/grade/poll/questionset_create')
     if request.session.get('message', None):
         data['message'] = request.session.get('message', None)
         del request.session['message']
