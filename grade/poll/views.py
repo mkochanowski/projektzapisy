@@ -135,6 +135,7 @@ def poll_create(request):
         return groups
 
     message = ""
+    polls   = []
     if request.method == "POST":
         semester = int(request.POST.get('semester', 0))
         group    = int(request.POST.get('group', 0))
@@ -182,6 +183,7 @@ def poll_create(request):
             poll.group        = group
             poll.studies_type = studies_type
             poll.save()
+            polls.append(unicode(poll))
 
             i = 1
             for section in request.POST.getlist('sections[]'):
@@ -200,6 +202,7 @@ def poll_create(request):
             poll.semester     = semester
             poll.studies_type = studies_type
             poll.save()
+            polls.append(unicode(poll))
 
             i = 1
             for section in request.POST.getlist('sections[]'):
@@ -210,8 +213,10 @@ def poll_create(request):
                 pollSection.save()
                 i = i + 1
 
-        message = "Utworzono ankietę!"
-        request.session['message'] = 'Sekcja dodana'
+        message = "Utworzono ankiety!"
+        request.session['message'] = message
+        request.session['polls_len']   = len(polls)
+        request.session['polls']       = polls
 
         #TODO: check 'is OK?'
         return HttpResponseRedirect('/grade/poll/poll_create')        
@@ -223,14 +228,23 @@ def poll_create(request):
         sem         = Subject.objects.filter(semester = semester_id).order_by('name')
 
     message_sesion = request.session.get('message', None)
+    polls     = request.session.get('polls', None)
+    polls_len = request.session.get('polls_len', None)
+    
     if message_sesion:
-        message = message_sesion
+        message   = message_sesion
+        polls     = request.session['polls']
+        polls_len = request.session['polls_len']
         del request.session['message']
+        del request.session['polls']
+        del request.session['polls_len']
 
     data['studies_types'] = Type.objects.all()
     data['semesters']    = Semester.objects.all()
     data['subjects']     = sem
     data['message']      = message
+    data['polls_len']    = polls_len
+    data['polls']        = polls
     data['sections']     = Section.objects.all()
     data['types']        = GROUP_TYPE_CHOICES
     data['group']        = request.session.get('group', None)

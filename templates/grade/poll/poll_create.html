@@ -13,7 +13,26 @@
 
 
 {% block content %}
-	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
+	{% if message == "Utworzono ankiety!" %}
+		<div class="main-message">
+			{% if polls_len == 0 %}
+				Nie utworzono żadnej ankiety.
+			{% else %}
+				Liczba utworzonych ankiet: {{polls_len}}
+				<ul>
+					{% for poll in polls %}
+						<li>{{poll}}</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+		</div>
+	{% else %}
+		{% if message %}
+		<div class="main-message">
+				{{ message }}
+		</div>
+		{% endif %}
+	{% endif %}
         <form method="POST" id="poll-create">
             <fieldset>
                 <label for="semester">Semestr: </label>
