@@ -21,6 +21,9 @@ urlpatterns = patterns('',
     
 	url(r'employees/$', 'fereol.mobile.views.employeesList', name = 'employees-list'),
     url(r'employees/(?P<key>\w+)$', 'fereol.mobile.views.employeesList', name = 'employees-list'),
+    
+    url(r'employees/schedule/(?P<schedule_owner>\w+)/$', 'fereol.mobile.views.employeeSchedule', name = 'employee-schedule-owner'),
+    url(r'employees/schedule/(?P<schedule_owner>\w+)/(?P<delta>\-?\d+)/$', 'fereol.mobile.views.employeeSchedule', name = 'employee-schedule-delta'),
 	
 	url(r'students/$', 'fereol.mobile.views.studentsList', name = 'students-list'),
     url(r'students/(?P<key>\w+)$', 'fereol.mobile.views.studentsList', name = 'students-list'),

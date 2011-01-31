@@ -3,10 +3,10 @@
 {% block content %}
 <div class="sschedule">
     <div class="row">
-        <h2 style="">Plan zajęć {% if owner != user %}: {{ owner.first_name }} {{ owner.last_name }} {% endif %}</h2>
+        <h2 style="">Plan zajęć: {{ owner.first_name }} {{ owner.last_name }} </h2>
     </div>
     <div class="row">
-        <a href="{% url student-schedule-delta owner.username left%}">
+        <a href="{% url employee-schedule-delta owner.username left%}">
         <div class="nav">
             <h3>wstecz</h3>
         </div>
@@ -14,7 +14,7 @@
         <div class="center">
             <h2>{{ weekday_name }}</h2>
         </div>
-        <a href="{% url student-schedule-delta owner.username right %}">
+        <a href="{% url employee-schedule-delta owner.username right %}">
         <div class="nav">
             <h3>dalej</h3>
         </div>

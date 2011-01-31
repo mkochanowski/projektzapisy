@@ -7,7 +7,6 @@ class SubdomainMiddleware:
 		parts = domain.replace('www.', '').split('.')
 		#jeśli użytkownik zdecydował, że nie chce wersji mobilnej
 		if 'no_mobile' in request.session and request.session['no_mobile'] == True:
-			"TUTUTUTUTUT 5"
 			#adres mobilny wybrany bezpośrednio
 			if parts[0] == 'm':
 				request.META['HTTP_HOST'] = domain

@@ -4,12 +4,13 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from enrollment.records.models import *
 from enrollment.records.exceptions import *
+from users.models import Employee
 from datetime import date
 
 DAYS_OF_WEEK = ['poniedziałek','wtorek','środa','czwartek','piątek','sobota','niedziela']
 DAYS_SIMPLE= ['poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek', 'sobota', 'niedziela']
 @login_required
-def studentSchedule(request, schedule_owner=None, delta=None):
+def employeeSchedule(request, schedule_owner=None, delta=None):
     """
         Main page
     """
@@ -25,10 +26,10 @@ def studentSchedule(request, schedule_owner=None, delta=None):
         if schedule_owner == None :
             owner = request.user
         else :
-            owner = User.objects.get(username=schedule_owner)
+            owner = Employee.objects.get(user__username=schedule_owner)
         
         #receiving subjects for given weekday
-        groups = Record.get_student_all_detailed_enrollings(owner.id)
+        groups = owner.get_schedule(owner.user.id)
         schedule = []
         for group in groups:
             for term in group.terms_:
@@ -57,10 +58,9 @@ def studentSchedule(request, schedule_owner=None, delta=None):
             'weekday_name': DAYS_OF_WEEK[weekday],
             'left': left,
             'right': right,
-            'owner':owner,
+            'owner':owner.user,
         }
-        logger.info('User %s looked at his mobile schedule on %s' % (unicode(owner.username), unicode(DAYS_SIMPLE[weekday]))) 
-        return render_to_response('mobile/student_schedule.html', data, context_instance=RequestContext(request))
+        return render_to_response('mobile/employee_schedule.html', data, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Użytkownik nie posiada planu bo nie jest studentem.")
         logger.error('User (name = %s) throws NonStudentException on student schedule.' % unicode(schedule_owner) )

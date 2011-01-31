@@ -29,7 +29,7 @@
 			<hr>
 			{% for e in employees %}
 				<div style="margin: 1% 4%;" >
-					<a href="/" style="float:left">{{e.get_full_name}}</a><br/>
+					<a href="/employees/schedule/{{ e.user.username }}/" style="float:left">{{e.get_full_name}}</a><br/>
 					<hr>
 				</div>
 			{% endfor %}
