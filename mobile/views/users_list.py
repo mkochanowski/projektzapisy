@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+Ôªø# -*- coding: utf-8 -*-
 
 from django.contrib import auth
 from django.contrib.auth.models import User
@@ -51,7 +51,7 @@ def employeesList(request,key=None):
         return render_to_response('mobile/keyboard_employees.html', None, context_instance=RequestContext(request))
 	
     employees = {
-    '1' : employees.filter(Q(user__last_name__startswith='∆') | Q(user__last_name__startswith='£') | Q(user__last_name__startswith='å')),
+    '1' : employees.filter(Q(user__last_name__startswith='ƒÜ') | Q(user__last_name__startswith='≈Å') | Q(user__last_name__startswith='≈ö')),
     '2' : employees.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C')),
     '3' : employees.filter(Q(user__last_name__startswith='D') | Q(user__last_name__startswith='E') | Q(user__last_name__startswith='F')),
     '4' : employees.filter(Q(user__last_name__startswith='G') | Q(user__last_name__startswith='H') | Q(user__last_name__startswith='I')),
@@ -77,7 +77,7 @@ def studentsList(request, key=None):
         return render_to_response('mobile/keyboard_students.html', None, context_instance=RequestContext(request))
 		
     students = {
-    '1' : students.filter(Q(user__last_name__startswith='∆') | Q(user__last_name__startswith='£') | Q(user__last_name__startswith='å')),
+    '1' : students.filter(Q(user__last_name__startswith='ƒÜ') | Q(user__last_name__startswith='≈Å') | Q(user__last_name__startswith='≈ö')),
     '2' : students.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C')),
     '3' : students.filter(Q(user__last_name__startswith='D') | Q(user__last_name__startswith='E') | Q(user__last_name__startswith='F')),
     '4' : students.filter(Q(user__last_name__startswith='G') | Q(user__last_name__startswith='H') | Q(user__last_name__startswith='I')),
