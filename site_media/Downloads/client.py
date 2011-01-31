@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
+
+# moduł do kodawania 
 from Crypto.PublicKey                  import RSA
 from Crypto.Random.random              import getrandbits, \
                                               randint
+# moduły do komunikacji sieciowej
 import urllib
 import urllib2
+
+
+# moduły pomocnicze
 import sys
 import getpass
 import os
@@ -71,9 +77,11 @@ def generate_sygnature( n , e , m ):
 def get_url():
     """
 
-    Get server adress from text file
+    Get server adress from text file. Default value is http://localhost:8000/
 
     """
+
+    # pobieranie adresu serwera. Jeżeli plik z adresem nie istnieje podawana jest wartość domyślna
     try:
         file_with_url = open("url.txt","r")
     except IOError, err:
@@ -81,17 +89,17 @@ def get_url():
     return file_with_url.read() + u'grade/ticket/client_connection'
 
 
-def send_package(idUser, passwordUser, i, e, n):
+def send_package(idUser, passwordUser, i, e, n, m ):
     """
 
     Send keys and get encrypted ticket.
         
     """
     
-    m = getrandbits( RAND_BITS )
-    
+    # zakodowywanie kluczy do ankiet za pomocą m
     t,k = generate_sygnature(n,e,m)
-    
+
+    # dane do przesłania na serwer
     values = {
         'idUser'        : idUser,
         'passwordUser'  : passwordUser,
@@ -103,11 +111,15 @@ def send_package(idUser, passwordUser, i, e, n):
     
     data = urllib.urlencode(values)
 
+    # pobieranie adresu serwera ( z pliku url.txt )
     url = get_url()  
-    
+
+    # wysyłania zapytania na serwer
     req = urllib2.Request(url, data, headers)
     
-    
+
+
+    # odbieranie i analiza odpowiedzi serwera
     try:
         response = urllib2.urlopen(req)
     except urllib2.HTTPError, er:
@@ -115,6 +127,8 @@ def send_package(idUser, passwordUser, i, e, n):
         print er.msg
         print er.headers
         print er.fp.read()
+
+    # zapisywanie wyników
     try:
         st_response = response.read()
         save_result(k, n, m, st_response)
@@ -134,7 +148,9 @@ def get_user():
     
     userId=""
     userPassword=""
-    
+
+
+    # pobieranie danych o użytkowniku z klawiatury
     userId=raw_input(u"id:")
     userPassword = getpass.getpass()
     
@@ -147,15 +163,25 @@ def save_result(k, n, m, st_response):
     File is appended.
         
     """
-    rk  = revMod( k, n )
+
+    
+    # dzielenie odpowiedzi serwera
     sp_response = st_response.split("???")
+
+    # odkodowywanie biletu
+    rk  = revMod( k, n )
     st = ((long(sp_response[1]) % n) * (rk % n)) % n
+
+    # zapisywanie odkodowanych biletów
     sp_response[0] = sp_response[0].replace("***",str(m))
     sp_response[0] = sp_response[0].replace("%%%",str(st))
     sp_response[0] = sp_response[0].replace("&#10;","\n")
+
+    # dopisywanie biletów do pliku tickets.txt
     file_with_result = open( "tickets.txt", "a" )
     file_with_result.write( sp_response[0] )
     file_with_result.close()
+    # wyświetlanie informacji, że pobieranie biletu zakończyło się sukcesem
     print u"pobrano bilet: \n" + sp_response[0].decode('utf-8') + u'\n'
 
 
@@ -165,14 +191,24 @@ def get_key(pollList,sendList):
     Get list of pairs ( poll id, poll public key ) from response and list of chosen polls
         
     """
+
+    # wybieranie kluczy publicznych do ankiet wybranych przez użytkownika w funkcji menu(st)
     
     keys=[]
-    
-    while len(sendList)>0:
-        pos = sendList.pop(0)
-        if (int(pos)-1) < len(pollList):
-            n,v,k = pollList[int(pos)-1]
-            keys.append((n,k))
+
+    for p in sendList:
+        if p.split('.')[1]=='0':
+            # wersja dla ankiet powiązanych
+            m = getrandbits( RAND_BITS )
+            for s in pollList[int(p.split('.')[0])-1]:
+                n,v,k = s
+                keys.append((n,m,k))
+        else:
+            # wersja dla ankiet powiązanych
+            n,v,k = pollList[int(p.split('.')[0])-1][int(p.split('.')[1])-1]
+            m = getrandbits( RAND_BITS )
+            keys.append((n,m,k))
+
     return keys
 
 def get_poll_list(idUser, passwordUser):
@@ -181,10 +217,11 @@ def get_poll_list(idUser, passwordUser):
     Get polls of user.
         
     """
-        
+
+    # pobieranie adresu serwera ( z pliku url.txt )
     url = get_url() 
     
-    
+    # dane do przesłania na serwer
     values = {
         'idUser'        : idUser,
         'passwordUser'  : passwordUser,
@@ -193,12 +230,15 @@ def get_poll_list(idUser, passwordUser):
     }
 
     headers = { 'User-Agent' : 'firefox' }
-    
+
+    # kodowanie danych
     data = urllib.urlencode(values)
-    
+
+    # przesyłanie zapytania na serwer
     req = urllib2.Request(url, data, headers)
     
-    
+
+    # analiza odpowiedzi serwera
     try: response = urllib2.urlopen(req)
     except urllib2.HTTPError, er:
         print er.code
@@ -209,26 +249,64 @@ def get_poll_list(idUser, passwordUser):
     st = response.read()
     return st
 
-def menu(st):
+def menu(st_m):
     """
 
     Chose poll from list.
-    User innterface.
+    User interface.
         
     """
+
+    # menu użytkownika do wybierania ankiet
+
+    # lista poprawnych danych wejściowych, aktualizowana podczas działania programu    
+    good_res=['0','-1']
+
+    # zmienna przechowująca polecenie użytkownika
     pos = '1'
+
+    # lista ankiet do wysłania
     poll_list = []
-    while int(pos)>0 :
+
+    # główna pętla
+    while float(pos)>0 :
+        # czyszczenie ekranu w zależności od systemu operacyjnego
         if os.name == "posix":
                 os.system('clear')
         elif os.name in ("nt", "dos", "ce"):
                 os.system('CLS')
+
+
+        # wyświetanie menu
         i = 1
-        for n,v,s in st:
-            print i
-            i+=1
-            print v.decode('utf-8')
-            print u"------"
+        for st in st_m:
+            if len(st)==1:
+                for n,v,s in st:
+                    txt =""
+                    for t in v.decode('utf-8').split("%%%"):
+                        txt+= t + " "
+                    print "  " + str(i)+ '.0 ' + txt
+                    good_res.append(str(i)+'.0')
+                    i+=1
+                print "------"
+            else:
+                n1, v1, s1 = st[0]
+                print str(i)+'.0'+ " " +v1.decode('utf-8').split("%%%").pop(0) + u' ( powiązane )'
+                good_res.append(str(i)+'.0')
+                j=1
+                for n,v,s in st:
+                    
+                    vl = v.decode('utf-8').split("%%%")
+                    vl.pop(0)
+                    txt =""
+                    for t in vl:
+                        txt+= t + " "
+                    print "  " + str(i)+'.'+str(j)+ " " + txt
+                    good_res.append(str(i)+'.'+str(j))
+                    j+=1
+                i+=1
+                print "------"
+                
         print u"ankiety do wysłania:"
         choosen_list = u"["
         for p in poll_list:
@@ -238,30 +316,59 @@ def menu(st):
         print u"podaj numer ankiety do wysłania"
         print u"u 'nr_ankiety' usuwa numer ankiety z listy"
         print u"(  0 - wysyła dane, -1 - konczy działanie )"
+
+        # pobieranie polecenia użytkownika
         pos=raw_input()
         try:
             if (len(pos.split(" "))==2) and (pos.split(" ")[0]=='u'):
                 pos=pos.split(" ")[1]
-                poll_list.remove(int (pos))
-            elif int(pos) <= len(st):
-                poll_list.append(int(pos))
+                poll_list.remove(pos)
+            elif (pos in good_res) and not(pos in poll_list):
+                poll_list.append(pos)
         except ValueError, err:
-            pos='50'
+            pos='50.0'
+            
+        try:
+            float(pos)
+        except ValueError, err:
+            pos='50.0'
+        poll_list.sort()
+    poll_list.sort()
     return poll_list
 
 def to_list(st):
+        
     """
 
     Convert response to list.
         
     """
+
+    # sprowadzamy odpowiedz serwera do listy
+    # kożystamy z tego ze elementy listy są oddzielone separatorami: ??? &&& ***
+    
     result =[]
-    st_l = st.split("\n")
-    while len(st_l)>2 :
-        nr = st_l.pop(0)
-        view = st_l.pop(0)
-        key = st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0) +"\n"+ st_l.pop(0)
-        result.append((nr,view,RSA.importKey(key)))
+    st_l = st.split("???")
+    for blocks in st_l:
+            blocks_l = blocks.split("&&&")
+            if len(blocks_l)<2:
+                block = blocks_l[0].split("***")
+                if block[0] != "":
+                    nr = block.pop(0)
+                    view = block.pop(0)
+                    key = block.pop(0)
+                    result.append([(nr,view,RSA.importKey(key))])
+            else:
+                block_result = []
+                for block in blocks_l:
+                    b = block.split("***")
+                    if b[0] != "":
+                        nr = b.pop(0)
+                        view = b.pop(0)
+                        key = b.pop(0)
+                        block_result.append((nr,view,RSA.importKey(key)))
+                if block_result!=[]:
+                    result.append(block_result)
     return  result
         
 def client():
@@ -270,27 +377,39 @@ def client():
     Main client function.
         
     """
-    
+
+    # pobieramy użytkownika
     idUser,passwordUser = get_user()
+    # przesyłamy dane użytkownika i otrzymujemy listę ankiet
     pollSt = get_poll_list(idUser, passwordUser)
-    
-    try:
-        x = long(pollSt.split("\n")[0])
-    except ValueError, err:
+
+
+    # sprawdzenie czy w trakcie pobierania kluczy do ankiet nie powstał błąd
+    if len(pollSt.split('???'))<2:
         print u"nie udało się pobrać klucza"
         print pollSt.decode("utf-8")
         return
 
+    # zamiana odpowiedzi servera na postać listową
     pollList = to_list(pollSt)
+
+    # menu do wybierania ankiet
     sendList = menu(pollList)
-    if sendList.pop(len(sendList)-1) == -1:
+
+    # -1 kończy działanie bez wysyłania zapytania
+    if sendList.pop(0) == '-1':
         print u"Pobieranie biletów zostało anulowane"
         return
 
+    # wybieranie odpowiednich kluczy publicznych
     keys = get_key(pollList,sendList)
-    
-    for nr,key in keys:
-        send_package( idUser, passwordUser, nr ,key.e, key.n)
+
+    # przesyłanie kolejnych zestawów kluczy
+    # nr - numer ankiety
+    # m - klucz do kodowania
+    # key - klucz publiczny ankiety
+    for nr,m,key in keys:
+        send_package( idUser, passwordUser, nr ,key.e, key.n, m)
 
 if __name__ == "__main__":
     client()

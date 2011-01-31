@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from django.http                         import HttpResponse
 from django.shortcuts                    import render_to_response
 from django.template                     import RequestContext
@@ -149,21 +149,34 @@ def client_connection( request ):
             if groupNumber == u"*":
                 st=u""
                 students_polls = Poll.get_all_polls_for_student( user.student )
-                for students_poll in students_polls:
-                    st += unicode( students_poll.pk ) + u'\n'
-                    st += unicode( students_poll.title ) + u' '
-        
-                    if students_poll.group:
-                        st += unicode( students_poll.group.subject.name ) + u' '
-                        st += unicode( students_poll.group.get_type_display()) + u' '
-                        st += unicode( students_poll.group.get_teacher_full_name()) + u' '
+                groupped_polls = group_polls_by_subject( students_polls )
+                for polls in groupped_polls:
                     
-                    if students_poll.studies_type:
-                        st += unicode( students_poll.studies_type ) + ' '
-
-                    st +=unicode( '\n' )
+                    if len( polls ) == 1:
                         
-                    st += unicode( PublicKey.objects.get( poll = students_poll.pk ).public_key ) + '\n'
+                        st += unicode( polls[0].pk ) + u'***'
+                        st += u'[' + unicode( polls[0].title ) + u']%%%'
+            
+                        if polls[0].group:
+                            st += unicode( polls[0].group.subject.name ) + u'%%%'
+                            st += unicode( polls[0].group.get_type_display()) + u': %%%'
+                            st += unicode( polls[0].group.get_teacher_full_name()) + u'%%%'
+
+                        st +=unicode( '***' )
+                            
+                        st += unicode( PublicKey.objects.get( poll = polls[0].pk ).public_key ) + u'???'
+                        
+                    else:
+                        for poll in polls:
+                            st += unicode( poll.pk ) + u'***'
+                            if not poll.group:
+                                st += u'Ankiety ogólne: %%%   [' + poll.title + '] '
+                            else:
+                                st += u'Przedmiot: ' + polls[ 0 ].group.subject.name + u'%%%    [' + poll.title + u'] ' + \
+                                         poll.group.get_type_display() + u': ' + \
+                                         poll.group.get_teacher_full_name() + u'***'
+                                st += unicode( PublicKey.objects.get( poll = poll.pk ).public_key ) + '&&&'
+                        st += u'???'
 
                 return HttpResponse( st )
 
@@ -180,14 +193,14 @@ def client_connection( request ):
                     p = students_poll
                     break
             if st == "":
-                st = u"Nie jesteś przypisany do tej ankiety"
+                st = u"Nie jesteś zapisany do tej ankiety"
 
 
             try:
                 a=long(st[0][0])
             except ValueError, err:
                 return HttpResponse(st)
-            if   st == u"Nie jesteś przypisany do tej ankiety":
+            if   st == u"Nie jesteś zapisany do tej ankiety":
                 return HttpResponse(st)
             elif st == u"Bilet już pobrano":
                 return HttpResponse(st)
