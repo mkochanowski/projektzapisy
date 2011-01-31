@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from fereol.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_PINNED
 from fereol.enrollment.subjects.models import Semester, Subject
 from fereol.offer.vote.models import SingleVote
+from users.models import Student
+
 import logging
 logger = logging.getLogger()
 
@@ -30,7 +32,10 @@ def otherSubjects(request):
 
 
 def subjectsEnrolled(request):
-	student = request.user.student
+	try:
+		student = request.user.student
+	except Student.DoesNotExist:
+		return ([], [], [])
 	semester = Semester.objects.filter(visible = True)
 	semester = filter(lambda s : s.is_current_semester(), semester) #???
 	records = Record.objects.filter(student = student, group__subject__semester__in = semester).select_related('group', 'group__type', 'group__subject').order_by('group__subject').reverse()
