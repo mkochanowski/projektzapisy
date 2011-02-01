@@ -221,29 +221,47 @@ Poll.section.createTypeSelect = function()
 Poll.section.makeStandardView = function(parent, element, question_type)
 {
     var div = document.createElement('div')
-    div.class = 'section-show'
+    $(div).addClass('section-show').addClass('poll-section-field')
 
     var id          = $(parent).children('input[name="poll[question][order][]"]').val();
     var title       = $(element).children('table') .children('tbody') .children('tr') .children('td').children( 'input[name$="[title]"]').val();
     var description = $(element).children('table') .children('tbody') .children('tr') .children('td').children('input[name$="[description]"]').val();
+    var choice_limit = parseInt( $(element).find('input[name$="[choiceLimit]"]').val() )
     var type        = $(question_type).val();
 
     Poll.section.createElement(div, 'h2', title);
     Poll.section.createElement(div, 'small', description);
     $(div).append( document.createElement('br') )
-
+	if( type == 'multi')
+    {
+    	if( choice_limit > 0)
+    	{
+    		var html = $(div).html()
+    		$(div).html( html + '<span class="poll-section-description">Możesz podać maksymalnie '+ choice_limit +' odpowiedzi</span>')
+    	}
+    		
+    }
     if (type == 'open')
     {
         var textarea = document.createElement('textarea');
+        $(textarea).attr({
+        	'cols': 40,
+        	'rows': 5
+        });
         $(div).append(textarea);
     }
     else
     {
+    	
         var option = $(element).children('.answerset').children('li');
         var ul     = document.createElement('ul');
+        $(ul).addClass('poll-section-answer-list');
+        
         $.each(option, function(index, v)
         {
             var li    = document.createElement('li');
+            $(li).addClass('poll-section-answer-item');
+            
             var label = document.createElement('label');
             var txt   = $(v).children().val();
             $(label).text( txt );
@@ -252,12 +270,15 @@ Poll.section.makeStandardView = function(parent, element, question_type)
             if( type == 'single' )
             {
                 input.type = 'radio'
+                $(input).addClass('poll-section-radio');
             }
             else
             {
                 input.type = 'checkbox'
+                $(input).addClass('poll-section-choice');
             }
             input.name = 'poll[question][' + id + ']';
+            $(input).attr({'id': input.name })
             $(li).append(input);
             $(li).append(label);
 
@@ -268,13 +289,13 @@ Poll.section.makeStandardView = function(parent, element, question_type)
         	var other = $(element).children('.optionset').find('input[name$="[hasOther]"]')
         	if ($(other).attr('checked'))
         	{
-        		alert('dwa')
         		var input = document.createElement('input');
             	var li    = document.createElement('li');
             	var label = document.createElement('label');
             	
             	$(label).text('Inne')
 				input.type = 'checkbox'
+				$(input).addClass('poll-section-choice');
 	            $(li).append(input);
 	            $(li).append(label);
 
