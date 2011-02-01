@@ -10,7 +10,7 @@ from django.core.validators   import MaxLengthValidator
 
 from fereol.grade.poll.models import SingleChoiceQuestionOrdering
 
-from fereol.grade.poll.models import OpenQuestionAnswer, \
+from fereol.grade.poll.models import Section, OpenQuestionAnswer, \
                                      SingleChoiceQuestionAnswer, \
                                      MultipleChoiceQuestionAnswer
 
@@ -32,16 +32,29 @@ class PollForm( forms.Form ):
         from django.template import loader
         return loader.render_to_string('grade/poll/poll_show.html', {"sections": self.sections})
     
-    def setFields( self, poll, st = None ):
+    def setFields( self, poll = None, st = None, section_id = None ):
     	if st:
         	self.finished = st.finished
         else:
         	self.finished = True
 
+        if poll:
+            ppk = poll.pk
+        else:
+            ppk = 0
+            
         self.sections = []
         
-        for section in poll.all_sections():
-            title     = 'poll-%d_section-%d' % ( poll.pk, section.pk )
+        if section_id:
+            sections_set = []
+            sections_set.append( Section.objects.get(pk = section_id) )
+        elif poll:
+            sections_set = poll.all_sections()
+        else:
+            section_set = {}
+        
+        for section in sections_set:
+            title     = 'poll-%d_section-%d' % ( ppk, section.pk )
             questions = section.all_questions()
             fields    = []
             poll_section             = self.myObject()
@@ -88,7 +101,7 @@ class PollForm( forms.Form ):
                     questions = questions[ 1: ]
                     
             for question in questions:
-                title = 'poll-%d_section-%d_question-%d' % ( poll.pk, section.pk, question.pk )
+                title = 'poll-%d_section-%d_question-%d' % ( ppk, section.pk, question.pk )
                 if str( type( question )) == \
                     "<class 'fereol.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
                     title += '-single'

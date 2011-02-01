@@ -120,6 +120,12 @@ def subjects_list( subjects ):
         subject_list.append( (subject.pk , unicode(subject.name)) )
     return subject_list 
 
+def get_section(request, section_id):
+    from django.template import loader
+    form = PollForm()
+    form.setFields( None, None, section_id )
+    return render_to_response( 'grade/poll/poll_section.html', {"form": form}, context_instance = RequestContext( request ))
+
 @employee_required
 def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active

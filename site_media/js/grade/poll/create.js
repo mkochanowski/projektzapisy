@@ -116,33 +116,6 @@ Poll.create.createOption = function(value, text)
     $(item).text(text)
     return item
 }
-Poll.create.initSection = function(sectionElement)
-{
-
-
-    /*
-        TODO: rozwin
-        TODO: zwin
-        TODO: edytuj
-     */
-
-    var sectionLabel = document.createElement('p');
-    label = $('#sections option:selected').text();
-    $(sectionLabel).text(label);
-
-    var sectionRemoveButton = document.createElement('img');
-    sectionRemoveButton.alt = 'usuń';
-    sectionRemoveButton.className = 'remove';
-    sectionRemoveButton.src = '/site_media/images/remove-ico.png';
-    sectionLabel.appendChild(sectionRemoveButton);
-
-    sectionElement.appendChild(sectionLabel);
-    $(sectionRemoveButton).click(function()
-    {
-        Poll.create.removeSection(sectionElement);
-    });
-
-}
 
 Poll.create.addSection = function()
 {
@@ -153,9 +126,46 @@ Poll.create.addSection = function()
     sectionId.name  = 'sections[]'
 
     newSection.appendChild(sectionId);
-    Poll.create.initSection(newSection);
-    Poll.create.chosenSection.appendChild(newSection);
+    
+    var section = Poll.create.getSection( sectionId.value, newSection )
+    
+    var sectionLabel = document.createElement('p');
+    label = $('#sections option:selected').text();
+    $(sectionLabel).text(label);
+
+    var sectionRemoveButton = document.createElement('img');
+    sectionRemoveButton.alt = 'usuń';
+    sectionRemoveButton.className = 'remove';
+    sectionRemoveButton.src = '/site_media/images/remove-ico.png';
+    sectionLabel.appendChild(sectionRemoveButton);
+
+    var Lilabel = $(sectionLabel).html();
+    $(newSection).append( $(sectionLabel) )
+    $(newSection).append( $(section) )
+	$(Poll.create.chosenSection).append(newSection)
+	
+    $(newSection).find('.remove').click(function()
+    {
+        Poll.create.removeSection(newSection);
+    });    
+    
 }
+
+Poll.create.getSection = function( section_id, li )
+{
+	var result;
+	$.ajax({
+        type: "POST",
+        url: "grade/poll/get_section/" + section_id + "/",
+        async: false,
+        success: function(data)
+        {
+			result = data;
+        }
+    });
+    return result
+}
+
 
 Poll.create.removeSection = function(sectionElement)
 {

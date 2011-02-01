@@ -125,3 +125,6 @@ class Poll( models.Model ):
     def get_all_polls_for_group( group ):
         semester = Semester.get_current_semester()
         return Poll.objects.filter( semester = semester, group = group )
+    
+    def get_section_by_id(self, section_id):
+        return self.section_set.get(section__pk = section_id)

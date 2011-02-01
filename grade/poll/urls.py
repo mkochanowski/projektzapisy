@@ -20,4 +20,6 @@ urlpatterns = patterns('',
     url(r'managment/groups_without_polls$', 'fereol.grade.poll.views.groups_without_poll', name='grade-poll-groups_without_polls'),
     url(r'poll_manage$', 'fereol.grade.poll.views.poll_manage', name='grade-poll-poll-manage'),
     url(r'autocomplete$', 'fereol.grade.poll.views.autocomplete', name='grade-poll-autocomplete'),
+    
+    url(r'get_section/(?P<section_id>[1-9][0-9]*)/$', 'fereol.grade.poll.views.get_section', name='grade-poll-get-section'),
 )
