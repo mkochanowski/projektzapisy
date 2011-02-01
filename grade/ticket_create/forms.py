@@ -3,6 +3,7 @@ from django                            import forms
 from django.utils.safestring           import SafeUnicode
 
 class PollCombineForm( forms.Form ):
+    forms.label_suffix = "->"
     def __init__( self, *args, **kwargs ):
         polls_by_s       = kwargs.pop( "polls" )
         self.poll_groups = []
@@ -34,22 +35,24 @@ class PollCombineForm( forms.Form ):
                     else:
                         title += u'<li>[' + poll.title + u'] ' + \
                                  poll.group.get_type_display() + u': ' + \
-                                 poll.group.get_teacher_full_name()
-                
+                                 poll.group.get_teacher_full_name() + u'</li>' 
+                title += u'</ul>'
+
                 field = forms.BooleanField( label     = SafeUnicode( title ),
                                             required  = False,
                                             initial   = True,
-                                            help_text = u'Powiąż ocenę' )
+                                            help_text = u'Powiąż ocenę' 
+					  )
                 
                 self.fields[ label ] = field
                 
     def as_table( self ):
-        result  = u"<tr><th>Pobieranie biletów na następujące ankiety:</th></tr>"
+        result = ""
         for name in self.poll_groups:
-            result += u"<tr><th>" + unicode( name )+ u"</th></tr>"
+            result += u"<tr><td colspan='2'>" + unicode( name )+ u"</td></tr>"
         result += super( PollCombineForm, self ).as_table()
         return SafeUnicode( result )
-
+	
 class ContactForm(forms.Form):
     idUser = forms.CharField()
     passwordUser = forms.CharField()
