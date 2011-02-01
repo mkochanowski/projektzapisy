@@ -3,12 +3,16 @@
 {% block content %}
 
 <div id="center-container">
-
-	<div class="menu-outer">
-		<a href= {% url enrollment-other %} >
-			<div class="menu-inner">Lista przedmiotów</div>
+	
+	<div class="nav">
+		<a href = {% url student-enrollment %}>
+			<div class="subject-inner-clear">
+				<img src="/site_media/images/larrow.gif" width="5%" alt="left arrow"  />
+				Powrót
+			</div>
 		</a>
 	</div>
+	
 	<div>
 		<h3>Wszystkie przedmioty: </h3>
 		{% for s in subjects %}

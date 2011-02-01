@@ -11,6 +11,10 @@
 			<div class="subject-outer">
 			<a href= "/subject/{{ e.subject.slug }}/" >
 			<div class="subject-inner">{{ e.subject.name }} <!--{{ e.allGroups }}--></div></a></div>
+		{% empty %}
+			<div style="font-style:italic;">
+				Brak przedmiotów w tej kategorii.
+			</div>
 		{% endfor %}
 	</div>
 	
@@ -21,6 +25,10 @@
 			<div class="subject-outer">
 			<a href= "/subject/{{ p.slug }}/" >
 			<div class="subject-inner">{{ p.name }} </div></a></div>
+		{% empty %}
+			<div style="font-style:italic;">
+				Brak przedmiotów w tej kategorii.
+			</div>
 		{% endfor %}
 	</div>
 
@@ -31,12 +39,17 @@
 			<div class="subject-outer">
 			<a href= "/subject/{{ v.slug }}/" >
 			<div class="subject-inner">{{ v.name }} </div></a></div>
+		{% empty %}
+			<div style="font-style:italic;">
+				Brak przedmiotów w tej kategorii.
+			</div>
 		{% endfor %}
 	</div>
 
+	<h3>Wszystkie przedmioty:</h3>
 	<div class="subject-outer">
 		<a href= "{% url enrollment-other %}" >
-			<div class="subject-inner">Inne przedmioty</div>
+			<div class="subject-inner">Przejdź do listy ... </div>
 		</a>
 	</div>
 
