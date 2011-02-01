@@ -33,7 +33,6 @@ def otherSubjects(request):
 
 
 def subjectsEnrolled(request):
-	return ([], [], [])
 	try:
 		student = request.user.student
 	except Student.DoesNotExist:
