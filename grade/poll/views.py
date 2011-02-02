@@ -293,7 +293,14 @@ def poll_create(request):
 
 @employee_required
 def sections_list( request ):
-    pass
+    data = {}
+    data['sections'] = Section.objects.all().order_by('pk')
+    data['grade']  = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
+
+@employee_required
+def show_section( request, section_id):
+    pass    
 
 @employee_required
 def polls_list( request ):

@@ -21,7 +21,8 @@ urlpatterns = patterns('',
     url(r'managment/groups_without_polls$', 'fereol.grade.poll.views.groups_without_poll', name='grade-poll-groups_without_polls'),
     url(r'managment/poll_create$', 'fereol.grade.poll.views.poll_create', name='grade-poll-poll-create'),
     url(r'managment/questionset_create$', 'fereol.grade.poll.views.questionset_create', name='grade-poll-questionset-create'),  
-       
+    url(r'show_section/(?P<section_id>[1-9][0-9]*)/$', 'fereol.grade.poll.views.show_section', name='grade-poll-show_section'),
+           
     url(r'poll_manage$', 'fereol.grade.poll.views.poll_manage', name='grade-poll-poll-manage'),
     url(r'autocomplete$', 'fereol.grade.poll.views.autocomplete', name='grade-poll-autocomplete'),
     
