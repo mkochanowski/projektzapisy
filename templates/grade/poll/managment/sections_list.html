@@ -1,6 +1,7 @@
 ﻿{% extends "grade/poll/managment/base.html" %}
 
 {% block poll-managment %}
+<form method="POST" action="{% url grade-poll-delete_section %}">
 <div class="actions">
     <label>Akcja: <select name="action">
 <option selected="selected" value="">---------</option>
@@ -31,5 +32,6 @@
     {% endfor %}
 </tbody>
 </table>
+</form>
 <p>{{sections.count}} sekcje</p>
 {% endblock %}

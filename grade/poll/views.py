@@ -2,6 +2,7 @@
 from django.contrib                    import auth
 from django.contrib.auth.decorators    import login_required
 from django.core.exceptions            import ObjectDoesNotExist
+from django.core.urlresolvers          import reverse
 from django.http                       import HttpResponse, \
                                               HttpResponseRedirect
 from django.shortcuts                  import render_to_response
@@ -272,7 +273,7 @@ def poll_create(request):
     data['message']      = message
     data['polls_len']    = polls_len
     data['polls']        = polls
-    data['sections']     = Section.objects.all()
+    data['sections']     = Section.objects.filter(deleted=False)
     data['types']        = GROUP_TYPE_CHOICES
     data['group']        = request.session.get('group', None)
     data['type']         = unicode(request.session.get('type', None))
@@ -290,7 +291,7 @@ def poll_create(request):
 @employee_required
 def sections_list( request ):
     data = {}
-    data['sections'] = Section.objects.all().order_by('pk')
+    data['sections'] = Section.objects.filter(deleted=False).order_by('pk')
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
@@ -299,8 +300,10 @@ def show_section( request, section_id):
     form = PollForm()
     form.setFields( None, None, section_id )
     data = {}
-    data['form']  = form
-    data['grade']  = Semester.get_current_semester().is_grade_active
+    data['form']    = form
+    data['grade']   = Semester.get_current_semester().is_grade_active
+    data['message'] = request.session.get('message', None)
+    del request.session['message'] 
     return render_to_response( 'grade/poll/managment/show_section.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -308,6 +311,21 @@ def get_section(request, section_id):
     form = PollForm()
     form.setFields( None, None, section_id )
     return render_to_response( 'grade/poll/poll_section.html', {"form": form}, context_instance = RequestContext( request ))
+
+@employee_required
+def delete_section( request ):
+    counter = 0
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'delete_selected':
+            pks = request.POST.getlist('_selected_action')
+            for pk in pks:
+                section = Section.objects.get(pk=pk)
+                section.deleted = True
+                section.save()
+                counter = counter + 1
+    request.session['message'] = u'Usunięto ' + unicode(counter) + u'sekcji'
+    return HttpResponseRedirect(reverse('grade-poll-sections-list'))
 
 @employee_required
 def polls_list( request ):

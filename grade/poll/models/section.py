@@ -12,6 +12,7 @@ class Section( models.Model ):
     description = models.TextField( blank = True, verbose_name = 'opis' ) 
     poll        = models.ManyToManyField( 'Poll', verbose_name = 'ankieta',
                                           through = 'SectionOrdering' )
+    deleted     = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
     
     class Meta:
         verbose_name        = 'sekcja'

@@ -47,7 +47,11 @@
 {% endblock %}
 
 {% block content %}
-
+        {% if message %}
+        <div class="main-message">
+                {{ message }}
+        </div>
+        {% endif %}
     <div id="grade-main">
         <div id="poll-managment-menu">
             <menu>
