@@ -16,16 +16,8 @@
 {% block poll-managment %}
 
     {% if keys != 0 %}
-    <div id="progressbar"></div>
-    <span id="generated-keys">0</span> / <span id="all-keys">{{keys}}</span> (<span id="keys-percent">0</span>%)
-        {% if not grade %}
-        <div id="grade-keys-generate">
-        <form method="post" id="keys-generate">
-            <input id="keys_generate_button" type="submit" value="Generuj bilety">
-            </form>
-        </div>
-
-        {% endif %}
+        <div id="progressbar"></div>
+        <span id="generated-keys">0</span> / <span id="all-keys">{{keys}}</span> (<span id="keys-percent">0</span>%)
     {% else %}
         Brak kluczy do wygenerowania!
     {% endif %}

@@ -7,15 +7,11 @@ Ticket.keys_generate.init = function()
 {
 	$("#progressbar").progressbar({ value: 0 });
 	Ticket.keys_generate.keys   = $('#all-keys').text();
-    Ticket.keys_generate.closed = false
-	// TODO: only one click!
-	$("#keys_generate_button").click(function(){ Ticket.keys_generate.start(this); return false;});
+    Ticket.keys_generate.start();
 }
 
-Ticket.keys_generate.start = function(button)
+Ticket.keys_generate.start = function()
 {
-    if ( Ticket.keys_generate.closed ) return false;
-    Ticket.keys_generate.closed = true;
 	$.ajax({
         type: "POST",
         url: "grade/ticket/ajax_keys_generate",
@@ -37,14 +33,6 @@ Ticket.keys_generate.finish = function(result)
 {
 	clearInterval(Ticket.keys_generate.interval)
 	$( "#progressbar" ).progressbar( "option", "value", 100 );
-	if( result == "ok")
-	{
-		alert("Operacja zakończona powodzeniem")
-	}
-	else
-	{
-		alert("Wystąpił błąd")
-	}
 }
 
 Ticket.keys_generate.update = function(result)
