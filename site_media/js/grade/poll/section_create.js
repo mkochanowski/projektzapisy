@@ -26,6 +26,14 @@ Poll.section.init = function()
         Poll.section.submitted = true;
     })
 	Poll.section.editParser();
+	
+	$("form").keypress(function(e)
+	{
+  		if (e.which == 13)
+  		{
+    		return false;
+  		}
+	});
 }
 
 Poll.section.editParser = function()
