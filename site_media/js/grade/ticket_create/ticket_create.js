@@ -17,12 +17,28 @@ Ticket.create.init   = function()
     Ticket.create.k_array        = new Array();
     Ticket.create.RAND_BITS      = 512;
     $("#connection_choice_button").click(Ticket.create.step1);
+
+    // for Chrome:
+    if ($.browser.webkit)
+    {
+	    $('#grade-connection-choice-form').find('th').children('label').each(function()
+	    {
+
+	         var html = $(this).html()
+		     html = html.slice(0, -1)
+	    	 $(this).html(html)
+	    });
+    }
+    else
+    {
     $('#grade-connection-choice-form').find('th').each(function()
     {
+
          var html = $(this).html()
 	     html = html.slice(0, -1)
     	 $(this).html(html)
-    });
+    });    	
+}
 }
 
 
