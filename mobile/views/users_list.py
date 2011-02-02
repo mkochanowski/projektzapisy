@@ -51,15 +51,14 @@ def employeesList(request,key=None):
         return render_to_response('mobile/keyboard_employees.html', None, context_instance=RequestContext(request))
 	
     employees = {
-    '1' : employees.filter(Q(user__last_name__startswith='Ć') | Q(user__last_name__startswith='Ł') | Q(user__last_name__startswith='Ś')),
-    '2' : employees.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C')),
+    '2' : employees.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C') | Q(user__last_name__startswith='Ć')),
     '3' : employees.filter(Q(user__last_name__startswith='D') | Q(user__last_name__startswith='E') | Q(user__last_name__startswith='F')),
     '4' : employees.filter(Q(user__last_name__startswith='G') | Q(user__last_name__startswith='H') | Q(user__last_name__startswith='I')),
-    '5' : employees.filter(Q(user__last_name__startswith='J') | Q(user__last_name__startswith='K') | Q(user__last_name__startswith='L')),
+    '5' : employees.filter(Q(user__last_name__startswith='J') | Q(user__last_name__startswith='K') | Q(user__last_name__startswith='L') | Q(user__last_name__startswith='Ł')),
     '6' : employees.filter(Q(user__last_name__startswith='M') | Q(user__last_name__startswith='N') | Q(user__last_name__startswith='O')),
-    '7' : employees.filter(Q(user__last_name__startswith='P') | Q(user__last_name__startswith='Q') | Q(user__last_name__startswith='R')| Q(user__last_name__startswith='S')),
+    '7' : employees.filter(Q(user__last_name__startswith='P') | Q(user__last_name__startswith='Q') | Q(user__last_name__startswith='R')| Q(user__last_name__startswith='S') | Q(user__last_name__startswith='Ś')),
     '8' : employees.filter(Q(user__last_name__startswith='T') | Q(user__last_name__startswith='U') | Q(user__last_name__startswith='V')),
-    '9' : employees.filter(Q(user__last_name__startswith='W') | Q(user__last_name__startswith='X') | Q(user__last_name__startswith='Y') | Q(user__last_name__startswith='Z')),
+    '9' : employees.filter(Q(user__last_name__startswith='W') | Q(user__last_name__startswith='X') | Q(user__last_name__startswith='Y') | Q(user__last_name__startswith='Z') | Q(user__last_name__startswith='Ź') | Q(user__last_name__startswith='Ż')),
     }.get(key, None )
     
     data = {
@@ -77,15 +76,14 @@ def studentsList(request, key=None):
         return render_to_response('mobile/keyboard_students.html', None, context_instance=RequestContext(request))
 		
     students = {
-    '1' : students.filter(Q(user__last_name__startswith='Ć') | Q(user__last_name__startswith='Ł') | Q(user__last_name__startswith='Ś')),
-    '2' : students.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C')),
+    '2' : students.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C') | Q(user__last_name__startswith='Ć')),
     '3' : students.filter(Q(user__last_name__startswith='D') | Q(user__last_name__startswith='E') | Q(user__last_name__startswith='F')),
     '4' : students.filter(Q(user__last_name__startswith='G') | Q(user__last_name__startswith='H') | Q(user__last_name__startswith='I')),
-    '5' : students.filter(Q(user__last_name__startswith='J') | Q(user__last_name__startswith='K') | Q(user__last_name__startswith='L')),
+    '5' : students.filter(Q(user__last_name__startswith='J') | Q(user__last_name__startswith='K') | Q(user__last_name__startswith='L') | Q(user__last_name__startswith='Ł')),
     '6' : students.filter(Q(user__last_name__startswith='M') | Q(user__last_name__startswith='N') | Q(user__last_name__startswith='O')),
-    '7' : students.filter(Q(user__last_name__startswith='P') | Q(user__last_name__startswith='Q') | Q(user__last_name__startswith='R')| Q(user__last_name__startswith='S')),
+    '7' : students.filter(Q(user__last_name__startswith='P') | Q(user__last_name__startswith='Q') | Q(user__last_name__startswith='R')| Q(user__last_name__startswith='S') | Q(user__last_name__startswith='Ś')),
     '8' : students.filter(Q(user__last_name__startswith='T') | Q(user__last_name__startswith='U') | Q(user__last_name__startswith='V')),
-    '9' : students.filter(Q(user__last_name__startswith='W') | Q(user__last_name__startswith='X') | Q(user__last_name__startswith='Y') | Q(user__last_name__startswith='Z')),
+    '9' : students.filter(Q(user__last_name__startswith='W') | Q(user__last_name__startswith='X') | Q(user__last_name__startswith='Y') | Q(user__last_name__startswith='Z') | Q(user__last_name__startswith='Ź') | Q(user__last_name__startswith='Ż')),
     }.get(key, None )		
 	
 	

@@ -250,8 +250,10 @@ border-bottom: none;
 
 
 .square{
-margin: 7%;
+margin:5%;
+width:21%;
 float: left;
-padding: 6%;
+
+padding: 5% 0% 5% 0%;
 border: 1px solid black;
 }
