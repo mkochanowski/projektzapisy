@@ -28,6 +28,11 @@ class PollForm( forms.Form ):
     class myObject:
         pass
     
+    #- wydzielic do forma Section
+    def as_edit(self):
+        from django.template import loader
+        return loader.render_to_string('grade/poll/section_as_edit.html', {"sections": self.sections})
+            
     def as_divs(self):
         from django.template import loader
         return loader.render_to_string('grade/poll/poll_show.html', {"sections": self.sections})

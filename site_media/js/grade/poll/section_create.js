@@ -1,6 +1,6 @@
-if (typeof Poll == 'undefined')
+if (typeof Poll == 'undefined'){
     Poll = new Object();﻿
-
+}
 Poll.section = Object();
 
 Poll.section.init = function()

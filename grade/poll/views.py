@@ -120,6 +120,12 @@ def subjects_list( subjects ):
         subject_list.append( (subject.pk , unicode(subject.name)) )
     return subject_list 
 
+def edit_section(request, section_id):
+    from django.template import loader
+    form = PollForm()
+    form.setFields( None, None, section_id )
+    return render_to_response( 'grade/poll/section_edit.html', {"form": form}, context_instance = RequestContext( request ))
+
 def get_section(request, section_id):
     from django.template import loader
     form = PollForm()

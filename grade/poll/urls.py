@@ -22,4 +22,5 @@ urlpatterns = patterns('',
     url(r'autocomplete$', 'fereol.grade.poll.views.autocomplete', name='grade-poll-autocomplete'),
     
     url(r'get_section/(?P<section_id>[1-9][0-9]*)/$', 'fereol.grade.poll.views.get_section', name='grade-poll-get-section'),
+    url(r'edit_section/(?P<section_id>[1-9][0-9]*)/$', 'fereol.grade.poll.views.edit_section', name='grade-poll-edit-section'),
 )
