@@ -96,7 +96,8 @@ class PollForm( forms.Form ):
                     field.is_leading = True
                     field.hide_on    = map(lambda x: x.pk, questionOrdering.hide_on.all())
                     field.title      = title
-                    #field.is_scale   = question.is_scale
+                    field.description = questions[ 0 ].description
+                    field.is_scale    = questions[ 0 ].is_scale
                     field.type       = u'single'
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
                     poll_section.questions.append( field )
@@ -132,6 +133,7 @@ class PollForm( forms.Form ):
                                                widget   = forms.widgets.RadioSelect(),
                                                initial  = answer )
                     field.type = 'single'
+                    field.description      = question.description
                     if question.is_scale: field.is_scale  = True
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
                     field.title        = title
@@ -175,6 +177,7 @@ class PollForm( forms.Form ):
                                 validators = [ MaxLengthValidator( question.choice_limit )])
                     field.choice_limit     = question.choice_limit 
                     field.has_other        = question.has_other
+                    field.description      = question.description
                     field.type             = 'multi'
                     field.title = title 
                     if self.finished: field.disabled = True
@@ -204,6 +207,7 @@ class PollForm( forms.Form ):
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
                     field.type    =  'open'
                     field.title = title
+                    field.description      = question.description
                     if self.finished: field.disabled = True
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
