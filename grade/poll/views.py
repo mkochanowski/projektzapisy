@@ -247,7 +247,7 @@ def poll_create(request):
         request.session['polls']       = polls
 
         #TODO: check 'is OK?'
-        return HttpResponseRedirect('/grade/poll/poll_create')        
+        return HttpResponseRedirect(reverse('grade-poll-poll-create'))        
     data = {}
     if semester:   
         sem       = Subject.objects.filter(semester = semester).order_by('name')
@@ -468,7 +468,7 @@ def questionset_create(request):
         request.session['message'] = 'Sekcja dodana'
 
         #TODO: check 'is OK?'
-        return HttpResponseRedirect('/grade/poll/questionset_create')
+        return HttpResponseRedirect(reverse('grade-poll-questionset-create'))
     if request.session.get('message', None):
         data['message'] = request.session.get('message', None)
         del request.session['message']
@@ -483,7 +483,7 @@ def questionset_assign(request):
 @login_required
 def grade_logout(request):
     auth.logout(request)
-    return HttpResponseRedirect('/grade/poll/tickets_enter')
+    return HttpResponseRedirect(reverse('grade-poll-tickets-enter'))
 
 def tickets_enter(request):
     grade = Semester.get_current_semester().is_grade_active
@@ -545,7 +545,7 @@ def tickets_enter(request):
 
 def polls_for_user( request, slug ):
     if not 'polls' in request.session.keys():
-        return HttpResponseRedirect( '/grade/poll/tickets_enter' )
+        return HttpResponseRedirect( reverse('grade-poll-tickets-enter') )
     
     data = prepare_data( request, slug )
     data[ 'grade' ] = Semester.get_current_semester().is_grade_active
