@@ -9,7 +9,7 @@ Poll.answer.init = function()
 	var pid = $('#poll-form-id').val();
 	$('.grade-fillable-poll-link').click(function()
 	{
-		$(this).siblings('ul').toggle(1000);
+		$(this).siblings('ul').slideToggle(250);
 		return false;
 	})
 	$('#grade-fillable-poll-link-'+pid).parent().parent().show();
