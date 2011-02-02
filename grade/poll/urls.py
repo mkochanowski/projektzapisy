@@ -26,7 +26,6 @@ urlpatterns = patterns('',
     url(r'managment/show_poll/(?P<poll_id>[1-9][0-9]*)/$', 'fereol.grade.poll.views.show_poll', name='grade-poll-show_poll'),
     url(r'managment/delete_polls$', 'fereol.grade.poll.views.delete_poll', name='grade-poll-delete_poll'),
            
-    url(r'poll_manage$', 'fereol.grade.poll.views.poll_manage', name='grade-poll-poll-manage'),
     url(r'autocomplete$', 'fereol.grade.poll.views.autocomplete', name='grade-poll-autocomplete'),
     
     url(r'get_section/(?P<section_id>[1-9][0-9]*)/$', 'fereol.grade.poll.views.get_section', name='grade-poll-get-section'),
