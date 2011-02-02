@@ -19,7 +19,7 @@
 #larrow{width: 5%; padding: 0% 2%;}
  
 
- 
+
  .schedule-table-container
  {
     text-align: center;
@@ -38,8 +38,8 @@
     }
 
     A:link {text-decoration: none} 
-	A:visited {text-decoration: none}  
-	
+    A:visited {text-decoration: none}  
+    
   .subject-inner {
     width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
    
@@ -80,18 +80,18 @@ form{padding: 2% 0%}
 
 
 body{
-	margin: 0em 0em 2em 0em;
+    margin: 0em 0em 2em 0em;
 }
 
-div{	    
-	font-family: 'sans-serif', serif;
+div{        
+    font-family: 'sans-serif', serif;
 }
 
 #main-container
 {
     background: white;
     border: 0.1em solid #cccccc;
-	width: 65%;
+    width: 65%;
 
 }
 
@@ -108,8 +108,6 @@ A:hover {text-decoration: none; color: #7D0000;}
    
     /*font-size: 16px;*/
 }
-
-
 
 /*** NAGŁÓWEK ***/
 
@@ -131,8 +129,8 @@ A:hover {text-decoration: none; color: #7D0000;}
 
 #main-content
 {
-	text-align:left;
-	padding:2%; width:96%;
+    text-align:left;
+    padding:2%; width:96%;
 }
 
 
@@ -140,9 +138,9 @@ A:hover {text-decoration: none; color: #7D0000;}
 
 #main-footer
 {
-	padding: 1%;
-	width:98%;
-	border-top: 0.1em solid #cccccc;
+    padding: 1%;
+    width:98%;
+    border-top: 0.1em solid #cccccc;
 }
 
 #main-footer a
@@ -156,13 +154,13 @@ A:hover {text-decoration: none; color: #7D0000;}
 
 .main-message
 {
-	text-align:center;
+    text-align:center;
     border: 0.1em solid red;
     background: #FFF5B3;
-	padding: 0.3em 0em;
-	color:red;
-	width:100%;
-	border-radius: 0.4em;
+    padding: 0.3em 0em;
+    color:red;
+    width:100%;
+    border-radius: 0.4em;
 }
 
 .version-info
@@ -178,12 +176,12 @@ A:hover {text-decoration: none; color: #7D0000;}
 }
 
 input[type=submit] {
-	margin: 5%;
-	width: 90%;
-	padding:3% 0%;
-	font-family: 'sans-serif', serif;
+    margin: 5%;
+    width: 90%;
+    padding:3% 0%;
+    font-family: 'sans-serif', serif;
 }
-		
+        
 input[type=text], input[type=password], textarea
 {
     border: 0.1em solid #cccccc;
@@ -230,7 +228,7 @@ border-bottom: none;
 
 .sschedule .break{
   border-bottom:1px solid black; 
- 
+  height: 10px;
 }
 
 .sschedule .row{
@@ -247,7 +245,6 @@ border-bottom: none;
 .align{
   clear: both;
 }
-
 
 .square{
 margin:5%;
