@@ -15,154 +15,161 @@
 
 				<div class="subject-outer">
 				{% for message in messages %}
-                                    <p class="main-message">{{ message }}</p>
-                                {% endfor %}
-					<div  style="text-align:left"> 
-					<h3> {{subject.name}}</h3>
-							<li> Wykład </li><br/>
-                                                        {% for lecture in lectures %}
-							<div style="padding: 1% 0% 0%  10%">
-								{% for term in  lecture.get_all_terms%}
-                                                                {{ term }}
-                                                                <br/>
-
-								{% endfor %}
-								{{ lecture.get_teacher_full_name }}<br/>
-                                                                {% if not lecture.signed %}
-                                                                <form action='/group/{{lecture.id}}/assign/' name='enrol_unenrol' method="post">
-									<input type='submit' class="clear" style="width:45%; " value="Zapisz" name='enrol' />
-                                                                 </form>
-                                                                {% else %}
-                                                                <form action='/group/{{lecture.id}}/resign/' name='enrol_unenrol' method="post">
-									<input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
-                                                                 </form>
-								{% endif %}
-							</div>
+                	<p class="main-message">{{ message }}</p>
+                {% endfor %}
+				<div  style="text-align:left"> 
+				<h3> {{subject.name}}</h3>
+				
+				{% if lectures %}
+					<li> Wykład </li>
+					<br/>
+					{% for lecture in lectures %}
+						<div style="padding: 1% 0% 0%  10%">
+							{% for term in  lecture.get_all_terms%}
+                            	{{ term }}<br/>
 							{% endfor %}
-							<br/>
-							{% if exercises %}
-							<li>  Ćwiczenia </li>
-							<br/>
-							<div style="padding: 1% 0% 0%  10%">
-								{% for ex in exercises %}
-                                                                {% for term in ex.get_all_terms%}
-                                                                {{ term }}
-                                                                {% endfor %}
-                                                        <br/>
-								{{ ex.get_teacher_full_name }}<br/>
+							{{ lecture.get_teacher_full_name }}<br/>
+							({{ lecture.number_of_students }}/{{ lecture.limit }})
+                            {% if not lecture.signed %}
+                            	<form action='/group/{{lecture.id}}/assign/' name='enrol_unenrol' method="post">
+									<input type='submit' class="clear" style="width:45%; " value="Zapisz" name='enrol' />
+                                </form>
+                            {% else %}
+                                <form action='/group/{{lecture.id}}/resign/' name='enrol_unenrol' method="post">
+									<input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
+                                </form>
+							{% endif %}
+						</div>
+					{% endfor %}
+						<br/>
+				{% endif %}
+					
+					
+				{% if exercises %}
+					<li>  Ćwiczenia </li>
+					<br/>
+					<div style="padding: 1% 0% 0%  10%">
+						{% for ex in exercises %}
+                        	{% for term in ex.get_all_terms%}
+                            	{{ term }}<br/>
+                            {% endfor %}
+							{{ ex.get_teacher_full_name }}<br/>
+							({{ ex.number_of_students }}/{{ ex.limit }})
 
-                                                                {% if subject.user_enrolled_to_exercise == ex.id %}
-                                                                        <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
-                                                                            <input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
-                                                                        </form>
-                                                                    {% else %}
-                                                                        {% if subject.user_enrolled_to_exercise %}
-                                                                            <form action='/group/{{subject.user_enrolled_to_exercise}}/{{ex.id}}/reassign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
-                                                                            </form>
-                                                                        {% else %}
-                                                                            <form action='/group/{{ex.id}}/assign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
-                                                                            </form>
-                                                                        {% endif %}
-								    {% endif %}
+                            {% if subject.user_enrolled_to_exercise == ex.id %}
+                            	<form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
+                                	<input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
+                            	</form>
+                            {% else %}
+                                {% if subject.user_enrolled_to_exercise %}
+                                	<form action='/group/{{subject.user_enrolled_to_exercise}}/{{ex.id}}/reassign/' name='enrol_unenrol' method="post">
+                                    	<input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
+                                    </form>
+                                {% else %}
+                                   	<form action='/group/{{ex.id}}/assign/' name='enrol_unenrol' method="post">
+                                    	<input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
+                                    </form>
+                                {% endif %}
+						    {% endif %}
 
-                                                                {% endfor %}
-							</div>
-                                                        {% endif %}
-                                                        {% if exer_labs %}
-                                                        <li>  Ćwiczenia + pracownie </li>
-							<br/>
-							<div style="padding: 1% 0% 0%  10%">
-								{% for ex in exer_labs %}
-                                                                {% for term in ex.get_all_terms%}
-                                                                {{ term }}
-                                                                {% endfor %}
-                                                        <br/>
-								{{ ex.get_teacher_full_name }}<br/>
-                                                            
-								
-                                                                    {% if subject.user_enrolled_to_exlaboratory == ex.id %}
-                                                                        <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
-                                                                            <input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
-                                                                        </form>
-                                                                    {% else %}
-                                                                        {% if subject.user_enrolled_to_exlaboratory %}
-                                                                            <form action='/group/{{ex.id}}/{{subject.user_enrolled_to_exlaboratory}}/reassign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
-                                                                            </form>
-                                                                        {% else %}
-                                                                            <form action='/group/{{ex.id}}/assign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
-                                                                            </form>
-                                                                        {% endif %}
-								    {% endif %}
-								
-                                                                {% endfor %}
-							</div>
-                                                        {% endif %}
+						{% endfor %}
+					</div>
+				{% endif %}
+					
+					
+                {% if exer_labs %}
+                	<li>  Ćwiczenia + pracownie </li>
+					<br/>
+					<div style="padding: 1% 0% 0%  10%">
+						{% for ex in exer_labs %}
+                        	{% for term in ex.get_all_terms%}
+                        		{{ term }}<br/>
+                            {% endfor %}
+							{{ ex.get_teacher_full_name }}<br/>
+                            ({{ ex.number_of_students }}/{{ ex.limit }})
+							
+                            {% if subject.user_enrolled_to_exlaboratory == ex.id %}
+                            	<form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
+                                	<input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
+                            	</form>
+                            {% else %}
+                            	{% if subject.user_enrolled_to_exlaboratory %}
+                                	<form action='/group/{{ex.id}}/{{subject.user_enrolled_to_exlaboratory}}/reassign/' name='enrol_unenrol' method="post">
+                                    	<input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
+                                	</form>
+                                {% else %}
+                                    <form action='/group/{{ex.id}}/assign/' name='enrol_unenrol' method="post">
+                                        <input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
+                                    </form>
+                               	{% endif %}
+							{% endif %}
+							
+						{% endfor %}
+					</div>
+				{% endif %}
+					
 
-                                                        {% if laboratories %}
-							<li>  Pracownie </li>
-							<br/>
-							<div style="padding: 1% 0% 0%  10%">
-								{% for lab in laboratories %}
-                                                                {% for term in lab.get_all_terms%}
-                                                                {{ term }}
-                                                                {% endfor %}
-                                                        <br/>
-								{{ lab.get_teacher_full_name }}<br/>
+                {% if laboratories %}
+					<li>  Pracownie </li>
+					<br/>
+					<div style="padding: 1% 0% 0%  10%">
+						{% for lab in laboratories %}
+                        	{% for term in lab.get_all_terms%}
+                            	{{ term }}<br/>
+                            {% endfor %}
+							{{ lab.get_teacher_full_name }}<br/>
+							({{ lab.number_of_students }}/{{ lab.limit }})
 
-                                                                {% if subject.user_enrolled_to_laboratory == lab.id %}
-                                                                        <form action='/group/{{lab.id}}/resign/' name='enrol_unenrol' method="post">
-                                                                            <input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
-                                                                        </form>
-                                                                    {% else %}
-                                                                        {% if subject.user_enrolled_to_laboratory %}
-                                                                            <form action='/group/{{subject.user_enrolled_to_laboratory}}/{{lab.id}}/reassign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
-                                                                            </form>
-                                                                        {% else %}
-                                                                            <form action='/group/{{lab.id}}/assign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
-                                                                            </form>
-                                                                        {% endif %}
-								    {% endif %}
+  							{% if subject.user_enrolled_to_laboratory == lab.id %}
+                            	<form action='/group/{{lab.id}}/resign/' name='enrol_unenrol' method="post">
+                                	<input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
+                                </form>
+                            {% else %}
+                            	{% if subject.user_enrolled_to_laboratory %}
+                                	<form action='/group/{{subject.user_enrolled_to_laboratory}}/{{lab.id}}/reassign/' name='enrol_unenrol' method="post">
+                                    	<input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
+                                    </form>
+                                {% else %}
+                                	<form action='/group/{{lab.id}}/assign/' name='enrol_unenrol' method="post">
+                                    	<input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
+                                    </form>
+                                {% endif %}
+							{% endif %}
 
-                                                                {% endfor %}
-							</div>
-                                                        {% endif %}
+						{% endfor %}
+					</div>
+				{% endif %}
 
-                                                        {% if exercises_adv %}
-							<li>  Ćwiczenia zaawansowane </li>
-							<br/>
-							<div style="padding: 1% 0% 0%  10%">
-								{% for ex in exercises_adv %}
-                                                                {% for term in ex.get_all_terms%}
-                                                                {{ term }}
-                                                                {% endfor %}
-                                                        <br/>
-								{{ ex.get_teacher_full_name }}<br/>
+                {% if exercises_adv %}
+					<li>  Ćwiczenia zaawansowane </li>
+					<br/>
+					<div style="padding: 1% 0% 0%  10%">
+						{% for ex in exercises_adv %}
+                        	{% for term in ex.get_all_terms%}
+                            	{{ term }}<br/>
+                            {% endfor %}
+							{{ ex.get_teacher_full_name }}<br/>
+							({{ ex.number_of_students }}/{{ ex.limit }})
 
-                                                                {% if subject.user_enrolled_to_exercise == ex.id %}
-                                                                        <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
-                                                                            <input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
-                                                                        </form>
-                                                                    {% else %}
-                                                                        {% if subject.user_enrolled_to_eaoratory %}
-                                                                            <form action='/group/{{subject.user_enrolled_to_eaoratory}}/{{ex.id}}/reassign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
-                                                                            </form>
-                                                                        {% else %}
-                                                                            <form action='/group/{{ex.id}}/assign/' name='enrol_unenrol' method="post">
-                                                                                <input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
-                                                                            </form>
-                                                                        {% endif %}
-								    {% endif %}
+                            {% if subject.user_enrolled_to_exercise == ex.id %}
+                            	<form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
+                                	<input type='submit' class="clear" style="width:45%;" value="Wypisz" name='unenrol' />
+                                </form>
+                            {% else %}
+                            	{% if subject.user_enrolled_to_eaoratory %}
+                                	<form action='/group/{{subject.user_enrolled_to_eaoratory}}/{{ex.id}}/reassign/' name='enrol_unenrol' method="post">
+                                    	<input type='submit' class="clear" style="width:45%;" value="Przepisz" name='reenrol' />
+                                    </form>
+                                {% else %}
+                                	<form action='/group/{{ex.id}}/assign/' name='enrol_unenrol' method="post">
+                                    	<input type='submit' class="clear" style="width:45%;" value="Zapisz" name='enrol' />
+                                    </form>
+                                {% endif %}
+							{% endif %}
 
-                                                                {% endfor %}
-							</div>
-                                                        {% endif %}
+						{% endfor %}
+					</div>
+				{% endif %}
 
                                                         {% if seminar %}
 							<li>  Seminarium </li>
@@ -174,6 +181,7 @@
                                                                 {% endfor %}
                                                         <br/>
 								{{ ex.get_teacher_full_name }}<br/>
+								({{ ex.number_of_students }}/{{ ex.limit }})
 
                                                                 {% if subject.user_enrolled_to_seminar == ex.id %}
                                                                         <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
@@ -205,6 +213,7 @@
                                                                 {% endfor %}
                                                         <br/>
 								{{ ex.get_teacher_full_name }}<br/>
+								({{ ex.number_of_students }}/{{ ex.limit }})
 
                                                                 {% if subject.user_enrolled_to_exercise == ex.id %}
                                                                         <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
@@ -235,6 +244,7 @@
                                                                 {% endfor %}
                                                         <br/>
 								{{ ex.get_teacher_full_name }}<br/>
+								({{ ex.number_of_students }}/{{ ex.limit }})
 
                                                                 {% if subject.user_enrolled_to_exercise == ex.id %}
                                                                         <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">

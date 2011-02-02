@@ -47,13 +47,21 @@ def subjectTerms(request,slug):
                 pass
 
             lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
+            #lectures = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in lectures]
             exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
+            #exercises = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exercises]
             laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
+            #laboratories = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in laboratories]
             exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
+            #exercises_adv = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exercises_adv]
             exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
+            #exer_labs = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exer_labs]
             seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
+            #seminar = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in seminar]
             language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
+            #language = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in language]
             sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
+            #sport = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in sport]
 
             data = {
                 'subject' : subject,
