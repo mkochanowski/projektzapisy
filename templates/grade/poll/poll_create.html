@@ -1,4 +1,4 @@
-﻿{% extends "grade/base.html" %}
+﻿{% extends "grade/poll/managment/base.html" %}
 
 {% block scripts %}
 
@@ -13,7 +13,7 @@
 {% endblock %}
 
 
-{% block content %}
+{% block poll-managment %}
 	{% if message == "Utworzono ankiety!" %}
 		<div class="main-message">
 			{% if polls_len == 0 %}
