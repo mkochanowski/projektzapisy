@@ -36,6 +36,13 @@ Poll.answer.init = function()
     var all      = parseInt($('#all-polls').text())
     var percent  = parseInt(finished/all * 100)
     $("#progressbar").progressbar({ value: percent });
+	$("form").keypress(function(e)
+	{
+  		if (e.which == 13)
+  		{
+    		return false;
+  		}
+	});
 }
 
 Poll.answer.hideOther = function()
