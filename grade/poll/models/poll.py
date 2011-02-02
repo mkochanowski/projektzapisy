@@ -20,7 +20,7 @@ class Poll( models.Model ):
     group             = models.ForeignKey( Group, verbose_name = 'grupa', blank = True, null = True )
     studies_type      = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
     sharing_employees = models.ManyToManyField( Employee, verbose_name = 'udostępniający pracownicy', blank = True, null = True )
-    
+    deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
     class Meta:
         verbose_name        = 'ankieta' 
         verbose_name_plural = 'ankiety'
@@ -95,12 +95,12 @@ class Poll( models.Model ):
     def get_polls_for_semester( semester = None):
         if not semester:
             semester = Semester.get_current_semester()
-        return Poll.objects.filter( semester = semester )
+        return Poll.objects.filter( semester = semester, deleted = False )
     
     @staticmethod
     def get_groups_without_poll():
         semester = Semester.get_current_semester()
-        polls    = Poll.objects.filter( semester = semester, group__isnull=False ).order_by('pk') 
+        polls    = Poll.objects.filter( semester = semester, group__isnull=False, deleted = False ).order_by('pk') 
         polls    = map( lambda p: p.group_id, polls)
         groups   = Group.objects.filter(subject__semester = semester).order_by('pk')
         return filter( lambda g: g.pk not in polls, groups)
@@ -108,13 +108,13 @@ class Poll( models.Model ):
     @staticmethod
     def get_current_polls():
         pks = map( lambda (x,): x, PublicKey.objects.all().values_list( 'poll' ))
-        return Poll.objects.filter( pk__in = pks )
+        return Poll.objects.filter( pk__in = pks, deleted=False )
         
     @staticmethod
     def get_current_semester_polls_without_keys():
         semester = Semester.get_current_semester()
         polls_with_keys = PublicKey.objects.all().values_list( 'poll' )
-        return Poll.objects.filter( semester = semester ).exclude( pk__in = polls_with_keys)        
+        return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys)        
 
     @staticmethod
     def get_all_polls_for_student( student ):
@@ -124,7 +124,7 @@ class Poll( models.Model ):
     @staticmethod
     def get_all_polls_for_group( group ):
         semester = Semester.get_current_semester()
-        return Poll.objects.filter( semester = semester, group = group )
+        return Poll.objects.filter( semester = semester, group = group, deleted=False )
     
     def get_section_by_id(self, section_id):
         return self.section_set.get(section__pk = section_id)

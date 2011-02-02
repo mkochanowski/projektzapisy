@@ -330,7 +330,7 @@ def delete_section( request ):
 @employee_required
 def polls_list( request ):
     data = {}
-    data['polls'] = Poll.objects.all().order_by('pk')
+    data['polls'] = Poll.objects.filter(delete=False).order_by('pk')
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 
@@ -347,7 +347,18 @@ def show_poll( request, poll_id):
 
 @employee_required
 def delete_poll( request ):
-    pass
+    counter = 0
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'delete_selected':
+            pks = request.POST.getlist('_selected_action')
+            for pk in pks:
+                poll = Poll.objects.get(pk=pk)
+                poll.deleted = True
+                poll.save()
+                counter = counter + 1
+    request.session['message'] = u'Usunięto ' + unicode(counter) + u'ankiet'
+    return HttpResponseRedirect(reverse('grade-poll-polls-list'))
 
 @employee_required
 def groups_without_poll( request ):
