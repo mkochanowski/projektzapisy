@@ -323,9 +323,9 @@ def questionset_create(request):
 
         section = Section()
         section.title       = post.get("poll[title]")
-        section.descritpion = post.get("poll[description]")
+        section.description = post.get("poll[description]")
         section.save()
-
+        
         questions = post.getlist('poll[question][order][]')
 
         position = 1
