@@ -27,6 +27,13 @@ Poll.create.init = function()
 	})
 
     $(Poll.create.chosenSection).sortable({handle : 'p'});
+	$("form").keypress(function(e)
+	{
+  		if (e.which == 13)
+  		{
+    		return false;
+  		}
+	});
 }
 
 $(Poll.create.init);
