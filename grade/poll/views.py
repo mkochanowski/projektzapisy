@@ -335,11 +335,18 @@ def polls_list( request ):
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 
 @employee_required
-def show_section( request, poll_id):
-    pass
+def show_poll( request, poll_id):
+    poll = Poll.objects.get(pk=poll_id)
+    form = PollForm()
+    form.setFields( poll, None, poll_id )
+    data = {}
+    data['form']    = form
+    data['grade']   = Semester.get_current_semester().is_grade_active
+    data['message'] = request.session.get('message', None)
+    return render_to_response( 'grade/poll/managment/show_poll.html', data, context_instance = RequestContext( request ))
 
 @employee_required
-def delete_section( request ):
+def delete_poll( request ):
     pass
 
 @employee_required
