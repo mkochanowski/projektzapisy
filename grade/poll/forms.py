@@ -97,6 +97,7 @@ class PollForm( forms.Form ):
                     field.hide_on    = map(lambda x: x.pk, questionOrdering.hide_on.all())
                     field.title      = title
                     field.description = questions[ 0 ].description
+                    if not field.description: field.description = ""
                     field.is_scale    = questions[ 0 ].is_scale
                     field.type       = u'single'
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
@@ -134,6 +135,7 @@ class PollForm( forms.Form ):
                                                initial  = answer )
                     field.type = 'single'
                     field.description      = question.description
+                    if not field.description: field.description = ""
                     if question.is_scale: field.is_scale  = True
                     if self.finished: field.widget.attrs[ 'disabled' ] = True
                     field.title        = title
@@ -178,6 +180,7 @@ class PollForm( forms.Form ):
                     field.choice_limit     = question.choice_limit 
                     field.has_other        = question.has_other
                     field.description      = question.description
+                    if not field.description: field.description = ""
                     field.type             = 'multi'
                     field.title = title 
                     if self.finished: field.disabled = True
@@ -208,6 +211,7 @@ class PollForm( forms.Form ):
                     field.type    =  'open'
                     field.title = title
                     field.description      = question.description
+                    if not field.description: field.description = ""
                     if self.finished: field.disabled = True
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field

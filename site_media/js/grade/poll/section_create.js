@@ -16,7 +16,7 @@ Poll.section.init = function()
     $("textarea").focus(function(){
         this.select();
     });
-    $(Poll.section.questionContainer).sortable({handle : 'div'});
+    $(Poll.section.questionContainer).sortable({handle : 'div', zIndex: 5, tolerance: 'pointer' });
     $('#questionset-submit').click(function()
     {
         if( Poll.section.submitted )
@@ -39,6 +39,7 @@ Poll.section.editParser = function()
      	}
 		);
 	});
+    $('.answerset').sortable({handle : 'div'});
 	$('.typeSelect').change(function()
 	{
 		var div = $(this).parents('.section-edit');
@@ -78,6 +79,11 @@ Poll.section.editParser = function()
     	var type  = $(div).find('.typeSelect')
     	Poll.section.createAnswer(ul, id, value, type)
     });
+    $('.delete-answer').click(function(){
+
+    	var li = $(this).parent().parent();
+	    Poll.section.removeQuestion( li );
+    })
 }
 
 Poll.section.addQuestion = function()
@@ -119,7 +125,7 @@ Poll.section.addQuestion = function()
     $(optionset).append(hasOther)
     $(optionset).addClass('optionset')
 
-    $(answerset).sortable({handle : 'input'});
+    $(answerset).sortable({handle : 'div'});
 
     $(isScale).hide();
     $(choiceLimit).hide();
@@ -304,7 +310,7 @@ Poll.section.makeStandardView = function(parent, element, question_type)
     else
     {
     	
-        var option = $(element).children('.answerset').children('li');
+        var option = $(element).children('.answerset').find('div');
         var ul     = document.createElement('ul');
         $(ul).addClass('poll-section-answer-list');
         
@@ -468,6 +474,7 @@ Poll.section.createAddOptionButton = function(elem, set, id, type)
 Poll.section.createAnswer = function(ul, id, value, type)
 {
 	var li     = document.createElement('li');
+	var div    = document.createElement('div');
     var check  = document.createElement('input');
 	var answer = document.createElement('input');
     var label  = document.createElement('label');
@@ -515,10 +522,11 @@ Poll.section.createAnswer = function(ul, id, value, type)
     {
         Poll.section.removeQuestion( li );
     });
-	$(li).append( answer );
-    $(li).append( check );
-    $(li).append( label );
-    $(li).append( sectionRemoveButton )
+	$(div).append( answer );
+    $(div).append( check );
+    $(div).append( label );
+    $(div).append( sectionRemoveButton )
+    $(li).append( div )
 	$(ul).append( li );
 }
 

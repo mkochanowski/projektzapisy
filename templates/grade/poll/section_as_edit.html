@@ -21,12 +21,12 @@
                                 <option value="leading"{% if field.type = 'single' and field.is_leading %} selected{% endif %}>Pytanie wiodące</option>
                             </select></td></tr>
                     </tbody></table>
-                    <ul class="answerset ui-sortable">
+                    <ul class="answerset">
                     {% if field.type != 'open' %}
                         {% for key, answer in field.widget.choices %}
-                        <li class="poll-question-answer">
+                        <li class="poll-question-answer"><div>
                             <input class="autocomplete" name="poll[question][{{forloop.parentloop.counter}}][answers][]" type="text" value="{{answer}}"><input{% if not field.is_leading %} style="display: none;"{% endif %} class="hideOnCheckbox" value="{{forloop.counter}}" id="poll[question][{{forloop.parentloop.counter}}][hideOn][]" name="poll[question][{{forloop.parentloop.counter}}][hideOn][]" type="checkbox"><label{% if not field.is_leading %} style="display: none;"{% endif %} for="poll[question][{{forloop.parentloop.counter}}][hideOn][]">Ukryj sekcję</label>
-                            <img src="/site_media/images/remove-ico.png" class="remove" alt="usuń">
+                            <img class = "delete-answer" src="/site_media/images/remove-ico.png" class="remove" alt="usuń"></div>
                         </li>
                         {% endfor %}
                     {% endif %}
