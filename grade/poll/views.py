@@ -292,6 +292,14 @@ def poll_create(request):
 #
 
 @employee_required
+def sections_list( request ):
+    pass
+
+@employee_required
+def polls_list( request ):
+    pass
+
+@employee_required
 def groups_without_poll( request ):
     data = {}
     data['groups'] = Poll.get_groups_without_poll()

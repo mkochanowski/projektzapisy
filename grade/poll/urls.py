@@ -1,8 +1,7 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
-    url(r'poll_create$', 'fereol.grade.poll.views.poll_create', name='grade-poll-poll-create'),
-    url(r'questionset_create$', 'fereol.grade.poll.views.questionset_create', name='grade-poll-questionset-create'),
+
     url(r'questionset_assign$', 'fereol.grade.poll.views.questionset_assign', name='grade-poll-questionset-assign'),
     url(r'ajax_get_subjects$',  'fereol.grade.poll.views.ajax_get_subjects',  name='grade-poll-get-subjects'),
     url(r'ajax_get_groups$',    'fereol.grade.poll.views.ajax_get_groups',    name='grade-poll-get-groups'),
@@ -17,7 +16,12 @@ urlpatterns = patterns('',
     #- url(r'poll_save$', 'fereol.grade.poll.views.poll_save', name='grade-poll-poll-save'),
     
     url(r'poll_results$', 'fereol.grade.poll.views.poll_results', name='grade-poll-poll-results'),
+    url(r'managment/polls_list$', 'fereol.grade.poll.views.polls_list', name='grade-poll-list'),
+    url(r'managment/sections-list$', 'fereol.grade.poll.views.sections_list', name='grade-poll-sections-list'),
     url(r'managment/groups_without_polls$', 'fereol.grade.poll.views.groups_without_poll', name='grade-poll-groups_without_polls'),
+    url(r'managment/poll_create$', 'fereol.grade.poll.views.poll_create', name='grade-poll-poll-create'),
+    url(r'managment/questionset_create$', 'fereol.grade.poll.views.questionset_create', name='grade-poll-questionset-create'),  
+       
     url(r'poll_manage$', 'fereol.grade.poll.views.poll_manage', name='grade-poll-poll-manage'),
     url(r'autocomplete$', 'fereol.grade.poll.views.autocomplete', name='grade-poll-autocomplete'),
     

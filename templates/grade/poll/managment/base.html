@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block main-subsystemname %}
+    Ocena zajęć
+{% endblock %} 
+
+{% load news_extras %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+{% endblock %}
+
+{% block main-navigation %}
+    <li><a href="/">Strona Główna</a></li>
+    <li><a href="/grade">Ocena zajęć</li>
+    <li>Zarzadzanie ankietami</li>
+{% endblock %}
+
+{% block main-menu %}
+
+    <!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
+    <!-- <li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li> -->
+    {%if user.student and grade %}
+        <li><a href="{% url grade-ticket-connections-choice %}">Pobierz bilety</a></li>
+    {% endif %}
+    {% if grade and user.student or grade and user.is_anonymous %}
+        <li><a href="{% url grade-poll-tickets-enter%}">Oceń zajęcia</a></li>    
+    {% endif %}
+    {% if not grade and user.employee or not grade and user.is_superuser %}        
+        <li><a href="{% url grade-poll-poll-manage %}">Zarządzaj ankietami</a></li>
+    {% endif %}
+    {% if user.is_superuser and not grade %}        
+        <li><a href="{% url grade-ticket-keys-generate %}">Generuj klucze</a></li>
+    {% endif %}
+    {% if user.is_superuser and grade %}        
+        <li><a href="{% url grade-disable-grade %}">Zamknij ocenę</a></li> 
+    {% endif %}
+    {% if user.is_superuser and not grade %}        
+        <li><a href="{% url grade-enable-grade %}">Otwórz ocenę</a></li>     
+    {% endif %}
+    {% if not user.is_anonymous %}        
+        <li><a href="{% url grade-poll-poll-results %}">Wyniki oceny</a></li>
+    {% endif %}
+    
+{% endblock %}
+
+{% block content %}
+
+    <div id="grade-main">
+        <div id="poll-managment-menu">
+            <menu>
+                <li><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
+                <li><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
+                <li><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
+                <li><a href="{% url grade-poll-questionset-create %}">Tworzenie sekcji</a></li>
+                <li><a href="{% url grade-poll-poll-create %}">Tworzenie ankiet</a></li>
+                <li><a href="{% url grade-ticket-keys-generate %}">Generuj klucze</a></li>
+            </menu>
+        </div>
+        {% block poll-managment %}
+            
+        {% endblock %}
+    </div>
+{% endblock %}

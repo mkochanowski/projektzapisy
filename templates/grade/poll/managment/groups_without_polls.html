@@ -1,14 +1,14 @@
-﻿{% extends "grade/base.html" %}
+﻿{% extends "grade/poll/managment/base.html" %}
 
 {% block scripts %}
-    {% endblock %}
+{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="/site_media/css/grade/managment.css" type="text/css" />
 {% endblock %}
 
 
-{% block content %}
+{% block poll-managment %}
   
     {% if message %}<div class="main-message">{{ message }}</div>{% endif %}
     {% if groups %}

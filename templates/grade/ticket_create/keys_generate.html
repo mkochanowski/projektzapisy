@@ -1,4 +1,5 @@
-{% extends "grade/base.html" %}
+﻿{% extends "grade/poll/managment/base.html" %}
+
 
 {% block styles %}
     <link rel="stylesheet" href="/site_media/css/grade/connections_choice.css" type="text/css" />
@@ -9,17 +10,10 @@
 <script src="/site_media/js/grade/ticket_create/BigInt.js" type="application/javascript"></script>
 <script src="/site_media/js/grade/ticket_create/keys_generate.js" type="application/javascript"></script>
 <script type="application/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>
-
-
 {% endblock %}
 
-{% block main-navigation %}
-    <li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
-    <li>Pobieranie Biletów</li>
-{% endblock %}
 
-{% block content %}
+{% block poll-managment %}
 
     {% if keys != 0 %}
     <div id="progressbar"></div>
