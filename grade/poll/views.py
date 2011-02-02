@@ -329,6 +329,17 @@ def delete_section( request ):
 
 @employee_required
 def polls_list( request ):
+    data = {}
+    data['polls'] = Poll.objects.all().order_by('pk')
+    data['grade']  = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
+
+@employee_required
+def show_section( request, poll_id):
+    pass
+
+@employee_required
+def delete_section( request ):
     pass
 
 @employee_required
