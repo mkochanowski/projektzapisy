@@ -1,5 +1,9 @@
 ﻿{% extends "grade/poll/managment/base.html" %}
 
+{% block scripts %}
+<script src="/site_media/js/grade/managment/list.js" type="application/javascript"></script>
+{% endblock %}
+
 {% block poll-managment %}
 <form method="POST" action="{% url grade-poll-delete_poll %}">
 <div class="actions">
@@ -8,7 +12,7 @@
 <option value="delete_selected">Usuń wybrane ankiety</option>
 </select></label>
     <button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
-        <span class="action-counter" style="display: inline;">0 z {{polls.count}} wybranych</span>
+        <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{polls.count}} wybranych</span>
 </div>
         <table>
 <thead>
@@ -23,7 +27,7 @@
     {% for poll in polls %}
         <tr>
             <td>
-                <input type="checkbox" name="_selected_action" value="{{poll.pk}}" class="action-select">
+                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{poll.pk}}" class="action-select">
             </td>
             <th>
                 <a href="{% url grade-poll-show_poll poll.id %}">{{poll}}</a>
