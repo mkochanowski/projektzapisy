@@ -1,11 +1,11 @@
 {% for section in sections %}
-<form method="Post" id="questionset" action="/grade/poll/questionset_create"><div style="display: none;"><input type="hidden" value="f7fe449096bfaf9c195c1ec8f0669456" name="csrfmiddlewaretoken" id="csrfmiddlewaretoken"></div>
+<form method="Post" id="questionset" action="/grade/poll/questionset_create">
             <input type="text" value="{{section.title}}" name="poll[title]" id="section-title">
-            <textarea name="poll[description]" id="section-desc">Wstaw tutaj opis sekcji</textarea>
+            <textarea name="poll[description]" id="section-desc">{{section.description}}</textarea>
             <ol id="poll-form" class="ui-sortable">
 {% for field in section.questions %}
             <li class="poll-question">
-                <input value="{{forloop.counter}}" name="poll[question][order][]" type="hidden">
+                <input value="{{forloop.counter}}" class="poll-question-id" name="poll[question][order][]" type="hidden">
                 <div class="section-edit section-mouseover">
                     <table><tbody><tr><td>Podaj treść pytania: </td>
                                       <td><input class="section-option" name="poll[question][{{forloop.counter}}][title]" id="poll[question][{{forloop.counter}}][title]" type="text" value="{{field.label}}"></td>
@@ -21,28 +21,26 @@
                                 <option value="leading"{% if field.type = 'single' and field.is_leading %} selected{% endif %}>Pytanie wiodące</option>
                             </select></td></tr>
                     </tbody></table>
-                    <ul style="" class="answerset ui-sortable">
+                    <ul class="answerset ui-sortable">
                     {% if field.type != 'open' %}
                         {% for key, answer in field.widget.choices %}
-                        <li>
-                            <input class="autocomplete" name="poll[question][{{forloop.parentloop.counter}}][answers][]" type="text" value="{{answer}}">
-                            <input{% if not field.is_leading %} style="display: none;"{% endif %} class="hideOnCheckbox" value="{{forloop.counter}}" id="poll[question][{{forloop.parentloop.counter}}][hideOn][]" name="poll[question][{{forloop.parentloop.counter}}][hideOn][]" type="checkbox">
-                            <label{% if not field.is_leading %} style="display: none;"{% endif %} for="poll[question][{{forloop.parentloop.counter}}][hideOn][]">Ukryj sekcję</label>
+                        <li class="poll-question-answer">
+                            <input class="autocomplete" name="poll[question][{{forloop.parentloop.counter}}][answers][]" type="text" value="{{answer}}"><input{% if not field.is_leading %} style="display: none;"{% endif %} class="hideOnCheckbox" value="{{forloop.counter}}" id="poll[question][{{forloop.parentloop.counter}}][hideOn][]" name="poll[question][{{forloop.parentloop.counter}}][hideOn][]" type="checkbox"><label{% if not field.is_leading %} style="display: none;"{% endif %} for="poll[question][{{forloop.parentloop.counter}}][hideOn][]">Ukryj sekcję</label>
                             <img src="/site_media/images/remove-ico.png" class="remove" alt="usuń">
                         </li>
                         {% endfor %}
                     {% endif %}
                     </ul>
-                    {% if field.type != 'open' %}<input type="button" name="addQuestion" value="Dodaj odpowiedź">{% endif %}
+                    {% if field.type != 'open' %}<input type="button" class="poll-add-answer" name="addQuestion" value="Dodaj odpowiedź">{% endif %}
                     <ul class="optionset">
-                        <li{% if field.type != 'single'%} style="display: none;"{% endif %}><input name="poll[question][1][isScale]" id="poll[question][1][isScale]" type="checkbox">
+                        <li{% if field.type != 'single'%} style="display: none;"{% endif %} class="isScale"><input name="poll[question][1][isScale]" id="poll[question][1][isScale]" type="checkbox">
                         <label for="poll[question][1][isScale]">Odpowiedź w formie skali</label></li>
-                        <li{% if field.type != 'multi' %} style="display: none;"{% endif %}><input name="poll[question][1][choiceLimit]" id="poll[question][1][choiceLimit]" type="text">
+                        <li{% if field.type != 'multi' %} style="display: none;"{% endif %} class="choiceLimit"><input name="poll[question][1][choiceLimit]" id="poll[question][1][choiceLimit]" type="text">
                         <label for="poll[question][1][choiceLimit]">Limit odpowiedzi</label></li>
-                        <li{% if field.type != 'multi' %}  style="display: none;"{% endif %}><input name="poll[question][1][hasOther]" id="poll[question][1][hasOther]" type="checkbox">
+                        <li{% if field.type != 'multi' %}  style="display: none;"{% endif %} class="hasOther"><input name="poll[question][1][hasOther]" id="poll[question][1][hasOther]" type="checkbox">
                         <label for="poll[question][1][hasOther]">Odpowiedź inne</label></li>
                     </ul>
-                    <input value="Gotowe" type="button"><input value="Usuń" type="button"></div>
+                    <input class="ready" value="Gotowe" type="button"><input class="delete" value="Usuń" type="button"></div>
             </li>
             {% endfor %}
             </ol>

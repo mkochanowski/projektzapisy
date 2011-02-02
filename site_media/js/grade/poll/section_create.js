@@ -11,7 +11,6 @@ Poll.section.init = function()
 
 	$("#add-question").click(Poll.section.addQuestion)
     $("input[type=text]").focus(function(){
-        // Select field contents
         this.select();
     });
     $("textarea").focus(function(){
@@ -26,7 +25,59 @@ Poll.section.init = function()
         }
         Poll.section.submitted = true;
     })
+	Poll.section.editParser();
+}
+
+Poll.section.editParser = function()
+{
+	$('.autocomplete').each(function()
+	{
+		$(this).autocomplete(
+    	{
+    	 source:'http://localhost:8000/grade/poll/autocomplete',
+         delay:10
+     	}
+		);
+	});
+	$('.typeSelect').change(function()
+	{
+		var div = $(this).parents('.section-edit');
+		var type = this;
+		var answerset   = $(div).children('.answerset');
+		var isScale     = $(div).find('.isScale')
+		var choiceLimit = $(div).find('.choiceLimit')
+		var hasOther    = $(div).find('.hasOther')
+		Poll.section.changeType(div, type, answerset, isScale, choiceLimit, hasOther)
+	});
+	Poll.section.questions = $('.poll-question').size()
 	
+    $('.ready').click(function()
+    { 
+    	var div  = $(this).parents('.section-edit');
+    	var type = $(div).find('.typeSelect')
+    	var li   = $(this).parents('.poll-question');
+        $(div).removeClass('section-edit');
+        $(div).addClass('section-show');
+        Poll.section.makeStandardView(li, div, type);
+        
+    });
+    $('.ready').click();
+    $('.delete').click(function()
+    {
+    	var li  = $(this).parents('.poll-question');
+        Poll.section.remove(li);
+    });	
+
+    $('.poll-add-answer').click(function()
+    {
+    	var li  = $(this).parents('.poll-question');
+    	var div = $(this).parents('.section-edit');
+    	var ul  = $(div).find('.answerset')
+    	var id  = $(li).find('.poll-question-id')
+    	var value = "Odpowiedz"
+    	var type  = $(div).find('.typeSelect')
+    	Poll.section.createAnswer(ul, id, value, type)
+    });
 }
 
 Poll.section.addQuestion = function()
@@ -132,7 +183,7 @@ Poll.section.createSectionOption = function(name, type, text)
         type: type
     }
     );
-
+	$(li).addClass(name);
     $(label).attr(
     {
         for: id
@@ -224,8 +275,8 @@ Poll.section.makeStandardView = function(parent, element, question_type)
     $(div).addClass('section-show').addClass('poll-section-field')
 
     var id          = $(parent).children('input[name="poll[question][order][]"]').val();
-    var title       = $(element).children('table') .children('tbody') .children('tr') .children('td').children( 'input[name$="[title]"]').val();
-    var description = $(element).children('table') .children('tbody') .children('tr') .children('td').children('input[name$="[description]"]').val();
+    var title       = $(element).find( 'input[name$="[title]"]').val();
+    var description = $(element).find('input[name$="[description]"]').val();
     var choice_limit = parseInt( $(element).find('input[name$="[choiceLimit]"]').val() )
     var type        = $(question_type).val();
 
