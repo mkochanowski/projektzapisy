@@ -7,7 +7,7 @@ from enrollment.records.exceptions import *
 from datetime import date
 
 DAYS_OF_WEEK = ['poniedziałek','wtorek','środa','czwartek','piątek','sobota','niedziela']
-DAYS_SIMPLE= ['poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek', 'sobota', 'niedziela']
+DAYS_SIMPLE= ['poniedzialek','wtorek','sroda','czwartek','piatek','sobota','niedziela']
 @login_required
 def studentSchedule(request, schedule_owner=None, delta=None):
     """
@@ -16,17 +16,17 @@ def studentSchedule(request, schedule_owner=None, delta=None):
     try:
         #choosing correct weekday
         if delta == None:
-            delta = 0
-        delta = int(delta)%7
-        left  = (delta+6)%7
-        right = (delta+1)%7
-        weekday = (date.today().weekday()+delta+7) % 7
+            weekday = date.today().weekday()
+        else :
+            weekday = int(delta) % 7
+        left  = (weekday+6)%7
+        right = (weekday+1)%7
         #choosing user
         if schedule_owner == None :
             owner = request.user
         else :
             owner = User.objects.get(username=schedule_owner)
-        
+            
         #receiving subjects for given weekday
         groups = Record.get_student_all_detailed_enrollings(owner.id)
         schedule = []
