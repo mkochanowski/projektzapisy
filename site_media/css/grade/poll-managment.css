@@ -62,3 +62,60 @@
 	padding:10px;
 }
 
+/*** TABELA Z ANKIETAMI/SEKCJAMI ***/
+
+#poll-managment-table {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border-collapse: collapse;
+	width: 100%;
+	border: 1px solid #cccccc;
+}
+
+#poll-managment-table a 
+{
+	text-decoration: none;
+	color: #000000;
+	font-weight: normal;
+	display: block;
+}
+
+#poll-managment-table tr
+{
+	background-color: #F8F8F8;
+	border-top: 1px solid #cccccc;
+}
+
+#poll-managment-table tr:nth-child(even)
+{
+	background-color: #cccccc;
+}
+
+#poll-managment-table td, #poll-managment-table th 
+{
+	padding: 5px;
+}
+
+#poll-managment-table thead th
+{
+	background-color: #FFF5B3;
+	padding: 5px;
+}
+
+#poll-managment-table .action-checkbox-column
+{
+	width: 30px;
+	text-align: center;
+}
+
+/*** RESZTA WIDOKU ANKIET/SEKCJI ***/
+
+.actions
+{
+	padding: 5px;
+}
+
+#grade-managment-main p
+{
+	text-align: center;
+}

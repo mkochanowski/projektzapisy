@@ -14,27 +14,25 @@
     <button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
         <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{sections.count}} wybranych</span>
 </div>
-        <table>
-<thead>
-<tr>
-<th class="action-checkbox-column">
-
-<input type="checkbox" id="action-toggle" style="display: inline;">
-</th><th>Sekcja</th>
-</tr>
-</thead>
-<tbody>
-    {% for section in sections %}
+<table id="poll-managment-table">
+	<thead>
+		<tr>
+		<th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;"></th>
+		<th>Sekcja</th>
+		</tr>
+	</thead>
+	<tbody>
+    	{% for section in sections %}
         <tr>
-            <td>
-                <input type="checkbox" name="_selected_action" value="{{section.pk}}" class="action-select">
+            <td class="action-checkbox-column">
+                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{section.pk}}" class="action-select">
             </td>
             <th>
                 <a href="{% url grade-poll-show_section section.id %}">{{section}}</a>
             </th>
         </tr>
-    {% endfor %}
-</tbody>
+    	{% endfor %}
+	</tbody>
 </table>
 </form>
 <p>{{sections.count}} sekcje</p>
