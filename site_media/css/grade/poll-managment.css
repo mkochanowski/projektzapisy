@@ -29,7 +29,7 @@
 	margin-right: 5px;
 }
 
-#poll-managment-menu ul a:link, ul a:visited
+#poll-managment-menu ul a:link, #poll-managment-menu ul a:visited
 {
 	text-decoration: none;
 	background-color: #F8F8F8;
