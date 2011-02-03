@@ -119,3 +119,42 @@
 {
 	text-align: center;
 }
+
+.poll-managment-message
+{
+	text-align: center;
+	font-size: 20px;
+	padding: 20px;
+	border: 1px solid #cccccc;
+        background: #FFF5B3;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        border-radius: 4px;
+
+}
+
+#poll-managment-list
+{
+	margin-top: 10px;
+	padding: 0;
+	border: 1px solid #cccccc;
+	border-bottom: 0;
+	list-style: none;
+
+}
+
+#poll-managment-list li
+{
+	display: block;
+	padding: 5px;
+	margin: 0;
+	border-bottom: 1px solid #cccccc;
+	background-color: #F8F8F8;
+}
+
+#poll-managment-list li:nth-child(even)
+{
+	background-color: #cccccc;
+}
+
+

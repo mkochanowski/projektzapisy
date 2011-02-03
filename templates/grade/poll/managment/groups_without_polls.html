@@ -13,13 +13,13 @@
     {% if message %}<div class="main-message">{{ message }}</div>{% endif %}
     {% if groups %}
         <h3>Następujące grupy nie posiadają przypisanych ankiet:</h3>
-        <ul>
+        <ul id="poll-managment-list">
         {% for group in groups%}
             <li>{{group}}</li>
         {% endfor %}
         </ul>
     {% else %}
-        <h3>Wszystkie grupy mają przypisaną ankietę</h3>
+        <div class="poll-managment-message">Wszystkie grupy mają przypisaną ankietę</div>
     {% endif %}
 {% endblock %}
 
