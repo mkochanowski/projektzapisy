@@ -10,11 +10,12 @@
     <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
 {% endblock %}
 
 {% block main-navigation %}
     <li><a href="/">Strona Główna</a></li>
-    <li><a href="/grade">Ocena zajęć</li>
+    <li><a href="/grade">Ocena zajęć</a></li>
     <li>Zarzadzanie ankietami</li>
 {% endblock %}
 
@@ -52,17 +53,17 @@
                 {{ message }}
         </div>
         {% endif %}
-    <div id="grade-main">
-        <div id="poll-managment-menu">
-            <menu>
-                <li><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
-                <li><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
-                <li><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
-                <li><a href="{% url grade-poll-questionset-create %}">Tworzenie sekcji</a></li>
-                <li><a href="{% url grade-poll-poll-create %}">Tworzenie ankiet</a></li>
-                <li><a href="{% url grade-ticket-keys-generate %}">Generuj klucze</a></li>
-            </menu>
-        </div>
+    <div id='poll-managment-menu'>
+	<ul>
+	   <li><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
+           <li><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
+           <li><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
+           <li><a href="{% url grade-poll-questionset-create %}">Tworzenie sekcji</a></li>
+           <li><a href="{% url grade-poll-poll-create %}">Tworzenie ankiet</a></li>
+           <li><a href="{% url grade-ticket-keys-generate %}">Generuj klucze</a></li>
+	</ul>
+    </div>
+    <div id="grade-managment-main">
         {% block poll-managment %}
             
         {% endblock %}
