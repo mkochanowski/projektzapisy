@@ -292,7 +292,23 @@ def poll_create(request):
 @employee_required
 def sections_list( request ):
     data = {}
-    data['sections'] = Section.objects.filter(deleted=False).order_by('pk')
+    sections   = Section.objects.filter(deleted=False).order_by('pk')
+    paginator = Paginator(sections, 25)
+
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    # If page request (9999) is out of range, deliver last page of results.
+    try:
+        sections = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        sections = paginator.page(paginator.num_pages)
+    
+    
+    data['sections'] = sections
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
