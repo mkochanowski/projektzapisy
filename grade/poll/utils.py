@@ -94,21 +94,45 @@ def prepare_data( request, slug ):
         del request.session[ 'errors' ]
     except KeyError:
         pass
+
+    polls = request.session.get( "polls", default = [] )
+    dict  = {}
+    if polls:
+        polls_id = reduce(lambda x, y: x + y, map( lambda ((x, s), l): 
+                                map( lambda (id, t, st):
+                                        id, 
+                                    l), polls))    
+        for poll in Poll.objects.filter(pk__in=polls_id).select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user'):
+            dict[poll.pk] = poll
     
-    data[ 'polls' ]    = map( lambda ((x, s), l): 
+        data[ 'polls' ]    = map( lambda ((x, s), l): 
                                 ((x, s),
                                 slug==s,
                                 map( lambda (id, t, st):
-                                        (id, t, st, Poll.objects.get( pk = id ).to_url_title( True )), 
+                                        (id, t, st, dict[id].to_url_title( True )), 
                                     l)),
-                            request.session.get( "polls", default = [] ))
-    data[ 'finished' ] = map( lambda ((x, s), l): 
+                            polls)
+    else:
+        data[ 'polls' ] = []
+    finished    = request.session.get( "finished", default = [] )
+    if finished:
+        finished_id = reduce(lambda x, y: x + y, map( lambda ((x, s), l): 
+                                map( lambda (id, t, st):
+                                        id, 
+                                    l), finished))
+        for poll in Poll.objects.filter(pk__in=finished_id).select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user'):
+            dict[poll.pk] = poll
+        
+        data[ 'finished' ] = map( lambda ((x, s), l): 
                                 ((x, s),
                                 slug==s,
                                 map( lambda (id, t, st):
-                                        (id, t, st, Poll.objects.get( pk = id ).to_url_title( True )), 
+                                        (id, t, st, dict[id].to_url_title( True )), 
                                     l)), 
-                            request.session.get( "finished", default = [] ))
+                            finished)
+    else:
+        data[ 'finished' ] = []
+    
     data[ 'finished_polls' ] = len(request.session.get( "finished", default = [] ))
     data[ 'all_polls']  = reduce(lambda x, y: x + y,
                                    map( lambda (p, l): len(l),
