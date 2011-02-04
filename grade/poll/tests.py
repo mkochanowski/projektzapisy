@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.test              import TestCase
-from fereol.users.models      import Student
-from fereol.grade.poll.models import Section, \
-                                     SingleChoiceQuestion, \
-                                     SingleChoiceQuestionOrdering, \
-                                     MultipleChoiceQuestion, \
-                                     OpenQuestion, \
-                                     Poll
+from django.test                import TestCase
+from django.contrib.auth.models import AnonymousUser, \
+                                       User
+from fereol.users.models        import Student, \
+                                       Employee
+from fereol.grade.poll.models   import Section, \
+                                       SingleChoiceQuestion, \
+                                       SingleChoiceQuestionOrdering, \
+                                       MultipleChoiceQuestion, \
+                                       OpenQuestion, \
+                                       Poll
 
 class SectionTest( TestCase ):
     fixtures = [ 'section_test.json' ]
@@ -40,14 +43,26 @@ class PollTest( TestCase ):
     fixtures = [ 'poll_test.json' ]
     
     def setUp( self ):
-        self.poll_group_only       = Poll.objects.get( pk = 1 )
-        self.poll_group_and_s_type = Poll.objects.get( pk = 2 )
-        self.poll_global_s_type    = Poll.objects.get( pk = 3 )
-        self.poll_global           = Poll.objects.get( pk = 4 )
-        self.valid_student         = Student.objects.get( pk = 1 )
-        self.waiting_student       = Student.objects.get( pk = 4 )
-        self.not_recorded_student  = Student.objects.get( pk = 2 )
-        self.invalid_s_type_stud   = Student.objects.get( pk = 3 )
+        self.poll_group_only            = Poll.objects.get( pk = 1 )
+        self.poll_group_and_s_type      = Poll.objects.get( pk = 2 )
+        self.poll_global_s_type         = Poll.objects.get( pk = 3 )
+        
+        self.poll_global                = Poll.objects.get( pk = 4 )
+        self.poll_lecture               = Poll.objects.get( pk = 1 )
+        self.poll_exercisces_not_shared = Poll.objects.get( pk = 6 )
+        self.poll_exercisces_shared     = Poll.objects.get( pk = 5 )
+        
+        self.valid_student              = Student.objects.get( pk = 1 )
+        self.waiting_student            = Student.objects.get( pk = 4 )
+        self.not_recorded_student       = Student.objects.get( pk = 2 )
+        self.invalid_s_type_stud        = Student.objects.get( pk = 3 )
+        
+        self.anonymous                  = AnonymousUser()
+        self.admin                      = User.objects.get( pk = 1 )
+        self.student                    = Student.objects.get( pk = 1)
+        self.lecturer                   = Employee.objects.get( pk = 1 )
+        self.sharer                     = Employee.objects.get( pk = 2 )
+        self.private                    = Employee.objects.get( pk = 3 )
         
     def test_student_recorded_to_group_is_entitled( self ):
         self.assertEqual( self.poll_group_only.is_student_entitled_to_poll( self.valid_student ), True )
@@ -75,6 +90,43 @@ class PollTest( TestCase ):
         self.assertEqual( self.poll_global.is_student_entitled_to_poll( self.waiting_student ), True )
         self.assertEqual( self.poll_global.is_student_entitled_to_poll( self.not_recorded_student ), True )
         self.assertEqual( self.poll_global.is_student_entitled_to_poll( self.invalid_s_type_stud ), True )
+    
+    def test_admin_can_see_each_poll_result( self ):
+        self.assertEqual( self.poll_global.is_user_entitled_to_view_result( self.admin ), True )
+        self.assertEqual( self.poll_lecture.is_user_entitled_to_view_result( self.admin ), True )
+        self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.admin ), True )
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.admin ), True )
+
+    def test_employee_can_see_each_global_poll_result( self ):
+        self.assertEqual( self.poll_global.is_user_entitled_to_view_result( self.lecturer.user ), True )
+        self.assertEqual( self.poll_global.is_user_entitled_to_view_result( self.sharer.user ), True )
+        self.assertEqual( self.poll_global.is_user_entitled_to_view_result( self.private.user ), True )
+    
+    def test_employee_can_see_his_result( self ):
+        self.assertEqual( self.poll_lecture.is_user_entitled_to_view_result( self.lecturer.user ), True )
+        self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.private.user ), True )
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.sharer.user ), True )
+    
+    def test_lecturer_can_see_all_results_from_his_subject( self ):
+        self.assertEqual( self.poll_lecture.is_user_entitled_to_view_result( self.lecturer.user ), True )
+        self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.lecturer.user ), True )
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.lecturer.user ), True )
+    
+    def test_everyone_can_see_shared_result( self ):
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.lecturer.user ), True )
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.sharer.user ), True )
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.private.user ), True )
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.student.user ), True )
+        
+    def test_no_one_can_see_private_result( self ):
+        self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.sharer.user ), False )
+        self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.student.user ), False )
+        
+    def test_non_authenticated_user_cannot_see_results( self ):
+        self.assertEqual( self.poll_global.is_user_entitled_to_view_result( self.anonymous ), False )
+        self.assertEqual( self.poll_lecture.is_user_entitled_to_view_result( self.anonymous ), False )
+        self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.anonymous ), False )
+        self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.anonymous ), False )
     
     # Nie ma testów pozostałych metod, bo byłyby to testy djangowych filtrów,
     # a tym ufamy, że działają

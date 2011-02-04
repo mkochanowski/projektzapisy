@@ -3,10 +3,12 @@ from django.db                         import models
 from django.utils.safestring           import SafeUnicode
 
 from fereol.users.models               import Employee, \
+                                              Student, \
                                               Type
 from fereol.enrollment.subjects.models import Group, \
                                               Subject, \
-                                              Semester
+                                              Semester, \
+                                              GROUP_TYPE_CHOICES
 from fereol.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
 from fereol.grade.ticket_create.models import PublicKey                                              
@@ -19,7 +21,7 @@ class Poll( models.Model ):
     semester          = models.ForeignKey( Semester, verbose_name = 'semestr' )
     group             = models.ForeignKey( Group, verbose_name = 'grupa', blank = True, null = True )
     studies_type      = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
-    sharing_employees = models.ManyToManyField( Employee, verbose_name = 'udostępniający pracownicy', blank = True, null = True )
+    share_result      = models.BooleanField( verbose_name = 'udostępnij wyniki', default = False, blank = True )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
     class Meta:
         verbose_name        = 'ankieta' 
@@ -66,6 +68,31 @@ class Poll( models.Model ):
                 return False
         
         return True 
+    
+    def is_user_entitled_to_view_result( self, user ):
+        if not user.is_authenticated(): return False
+        if user.is_superuser: return True
+        if self.share_result: return True
+        
+        try:
+            viewer  = user.employee
+            
+            if self.group:
+                if viewer == self.group.teacher: return True
+                
+                lecture = filter( lambda (x,y): y == 'wykład', GROUP_TYPE_CHOICES )[ 0 ][ 0 ]
+                groups  = Group.objects.filter( subject = self.group.subject, 
+                                                teacher = viewer,
+                                                type    = lecture )
+                if groups: return True
+            else:
+                # Zakładam, że wszyscy pracownicy powinni widzieć wyniki ankiet
+                # ogólnych
+                return True
+        except Employee.DoesNotExist: 
+            pass
+        
+        return False
                
     def all_sections( self ):
         return self.section_set.all()
