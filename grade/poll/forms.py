@@ -52,7 +52,7 @@ class PollForm( forms.Form ):
         
         if section_id:
             sections_set = []
-            sections_set.append( Section.objects.get(pk = section_id) )
+            sections_set.append( Section.objects.get(pk = section_id).select_related() )
         elif poll:
             sections_set = poll.all_sections()
         else:
@@ -68,14 +68,14 @@ class PollForm( forms.Form ):
             poll_section.questions   = []
             if str( type( questions[ 0 ])) == \
                 "<class 'fereol.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
-                questionOrdering  = SingleChoiceQuestionOrdering.objects.get( 
+                questionOrdering  = SingleChoiceQuestionOrdering.objects.select_related().get( 
                         sections = section,
                         question = questions[ 0 ])
                
                 if questionOrdering.is_leading:
                     title   += '_question-%d-leading' % questions[ 0 ].pk
                     try:
-                        answer = SingleChoiceQuestionAnswer.objects.get( 
+                        answer = SingleChoiceQuestionAnswer.objects.select_related().get( 
                                     saved_ticket = st,
                                     section      = section,
                                     question     = questions[ 0 ] ).option.pk
