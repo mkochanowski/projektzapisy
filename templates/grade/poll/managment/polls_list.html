@@ -14,7 +14,7 @@
 		</select>
 	</label>
    	<button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
-        <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{polls.count}} wybranych</span>
+        <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{polls.object_list.count}} wybranych</span>
 </div>
 <table id="poll-managment-table">
 	<thead>
@@ -24,7 +24,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	{% for poll in polls %}
+	{% for poll in polls.object_list %}
         <tr>
             <td class="action-checkbox-column">
                 <input type="checkbox" class="_selected_action" name="_selected_action" value="{{poll.pk}}" class="action-select">
@@ -37,5 +37,22 @@
 	</tbody>
 </table>
 </form>
-<p>{{polls.count}} ankiety</p>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if polls.has_previous %}
+            <a href="?page={{ polls.previous_page_number }}">poprzednia</a>
+        {% endif %}
+
+        <span class="current">
+            Strona {{ polls.number }} z {{ polls.paginator.num_pages }}
+        </span>
+
+        {% if polls.has_next %}
+            <a href="?page={{ polls.next_page_number }}">nastepna</a>
+        {% endif %}
+    </span>
+</div>
+
+<p>{{polls.object_list.count}} ankiety</p>
 {% endblock %}

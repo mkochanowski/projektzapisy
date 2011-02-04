@@ -40,6 +40,7 @@ from fereol.grade.poll.utils           import check_signature, \
                                               check_enable_grade
 
 from fereol.users.models                 import Employee
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
 def default(request):
     grade = Semester.get_current_semester().is_grade_active
@@ -330,7 +331,23 @@ def delete_section( request ):
 @employee_required
 def polls_list( request ):
     data = {}
-    data['polls'] = Poll.objects.filter(deleted=False).order_by('pk')
+    polls     = Poll.objects.filter(deleted=False).order_by('pk')
+    paginator = Paginator(polls, 25)
+
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    # If page request (9999) is out of range, deliver last page of results.
+    try:
+        polls = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        polls = paginator.page(paginator.num_pages)
+    
+    
+    data['polls']  = polls
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 
