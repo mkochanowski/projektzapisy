@@ -103,8 +103,8 @@ def send_package(idUser, passwordUser, i, e, n, m ):
     values = {
         'idUser'        : idUser,
         'passwordUser'  : passwordUser,
-        'groupNumber'    : i,
-        'groupKey'       : t
+        'groupNumber'   : i,
+        'groupKey'      : t
     }
 
     headers = { 'User-Agent' : 'firefox' }
@@ -116,9 +116,7 @@ def send_package(idUser, passwordUser, i, e, n, m ):
 
     # wysyłania zapytania na serwer
     req = urllib2.Request(url, data, headers)
-    
-
-
+  
     # odbieranie i analiza odpowiedzi serwera
     try:
         response = urllib2.urlopen(req)
@@ -345,7 +343,7 @@ def to_list(st):
     """
 
     # sprowadzamy odpowiedz serwera do listy
-    # kożystamy z tego ze elementy listy są oddzielone separatorami: ??? &&& ***
+    # korzystamy z tego ze elementy listy są oddzielone separatorami: ??? &&& ***
     
     result =[]
     st_l = st.split("???")
@@ -382,7 +380,6 @@ def client():
     idUser,passwordUser = get_user()
     # przesyłamy dane użytkownika i otrzymujemy listę ankiet
     pollSt = get_poll_list(idUser, passwordUser)
-
 
     # sprawdzenie czy w trakcie pobierania kluczy do ankiet nie powstał błąd
     if len(pollSt.split('???'))<2:
