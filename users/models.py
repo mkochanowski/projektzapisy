@@ -3,8 +3,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from users.exceptions import NonEmployeeException, NonStudentException
-from enrollment.subjects.models import Group
+from fereol.users.exceptions import NonEmployeeException, NonStudentException
+from fereol.enrollment.subjects.models import Group
 
 import logging
 logger = logging.getLogger()

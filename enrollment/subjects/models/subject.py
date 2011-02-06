@@ -3,7 +3,7 @@
 from django.db import models
 
 from student_options import StudentOptions
-from enrollment.subjects.exceptions import NonStudentOptionsException
+from fereol.enrollment.subjects.exceptions import NonStudentOptionsException
 
 from datetime import timedelta, datetime
 
