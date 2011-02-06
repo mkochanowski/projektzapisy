@@ -3,6 +3,7 @@
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import login
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
@@ -10,7 +11,9 @@ from django.core.urlresolvers import reverse
 
 from django.http import QueryDict, HttpResponse 
 from django.utils import simplejson
-from django.db.models import Q 
+from django.db.models import Q
+
+
 
 from users.exceptions import NonUserException, NonEmployeeException, NonStudentException
 from users.models import Employee, Student
@@ -116,3 +119,11 @@ def logout(request):
     logger.info('User %s <id: %s> is logged out ' % (request.user.username, request.user.id))    
     auth.logout(request)
     return HttpResponseRedirect('/')
+
+def login_plus_remember_me(request, *args, **kwargs):
+    ''' funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika'''
+    if request.method == 'POST':
+        if not request.POST.get('remember_me', None):
+            request.session.set_expiry(0)
+    return login(request, *args, **kwargs)
+    

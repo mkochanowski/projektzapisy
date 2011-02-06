@@ -138,8 +138,6 @@ FIXTURE_DIRS = (
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
 SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
 
 HAYSTACK_SITECONF = 'search_sites'
