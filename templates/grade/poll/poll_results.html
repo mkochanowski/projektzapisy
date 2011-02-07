@@ -13,6 +13,8 @@
 {% endblock %}
 
 {% block content %}
+	<table>
+		<td>
 	<form method="post">
 	Semestr:
 	<br/>
@@ -57,8 +59,55 @@
 	<br/>
 	<ul>
 		{% for l in list %}
-			<li> <p class="link"><a href="#">{{ l.subject.name }}</a></p></li>
+			<li> <p class="link"><a href="#">
+				[ {{ l.title }} ]
+				{% if l.group %}
+				{{ l.group.subject.name }}
+				{% endif %}
+			</a></p></li>
 		{% endfor %}
 	</ul>
+	
+		</td>
+	<td>
+		Tytuł ankiety:
+		{{ selected.title }} 
+		{% if selected %}
+			{{ selected.group.subject.name }}
+		{% endif %}
+		<br/>
+		Nazwisko autora:
+		{{ selected.author }}
+		<br/>
+		Semestr:
+		{{ selected.semester }}
+		<br/>
+		<table border=1>
+			{% for a in answers %}
+				<tr>
+				<td>tresc pytania</td>
+				<td>
+					13(20%) <br/>
+					<p class="link"><a href="#">nie fajnie</a></p>
+				</td>
+				<td>
+					????
+				</td>
+				<td>
+					????
+				</td>
+				</tr>
+			{% endfor %}
+			
+			<tr>
+				<td> treść pytania </td>
+				<td> odpowiedzi </td>
+			</tr>
+		</table>
+		
+		
+	</td>
+	</table>
+
 
 {% endblock %}
