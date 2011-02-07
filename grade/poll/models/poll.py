@@ -100,7 +100,7 @@ class Poll( models.Model ):
     def all_answers( self ):
         result = []
         for section in self.all_sections():
-            result += section.all_answers( self )
+            result.append( section.all_answers( self ))
         return result
     
     def as_row( self ):
