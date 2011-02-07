@@ -792,12 +792,22 @@ def poll_end_grading( request ):
 #### Poll results ####
 
 @login_required
-def poll_results(request):
+def poll_results( request ):
     grade = Semester.get_current_semester().is_grade_active
-    group = Employee.get_all_groups( request.user.id )
+    #group = Employee.get_all_groups( request.user.id )
+
+    polls = Poll.objects.all()
+
+    user_polls = []
+    for poll in polls:
+        if poll.is_user_entitled_to_view_result( request.user ):
+            user_polls.append(poll)
     
+    if user_polls!=[]:
+        answers = user_polls[0].all_answers()
+
     form = FilterMenu( request.POST )
-    data = { 'form' : form, 'list' : group, 'grade' : grade }
+    data = { 'form' : form, 'list' : user_polls, 'answers' : answers, 'selected' : user_polls[0] , 'grade' : grade }
     return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))
 
 
