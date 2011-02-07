@@ -3,6 +3,7 @@ from django.db     import models
 
 from base_question import BaseQuestion
 from option        import Option
+from saved_ticket  import SavedTicket
     
 class SingleChoiceQuestion( BaseQuestion ):
     sections = models.ManyToManyField( 'Section',    
@@ -18,6 +19,13 @@ class SingleChoiceQuestion( BaseQuestion ):
         verbose_name        = 'pytanie jednokrotnego wyboru'
         app_label           = 'poll'
         abstract            = False
+        
+    def get_all_answers_from_poll( self, poll, section ):
+        sts = SavedTicket.objects.filter( poll = poll, finished = True )
+        result = []
+        for st in sts:
+            result += st.singlechoicequestionanswer_set.filter( section = section )
+        return result
 
 class SingleChoiceQuestionOrdering( models.Model ):
     question   = models.ForeignKey( SingleChoiceQuestion, 

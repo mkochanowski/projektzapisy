@@ -97,6 +97,12 @@ class Poll( models.Model ):
     def all_sections( self ):
         return self.section_set.all()
     
+    def all_answers( self ):
+        result = []
+        for section in self.all_sections():
+            result += section.all_answers( self )
+        return result
+    
     def as_row( self ):
         res  = u"<tr><td>"
         res += unicode( self.pk ) + u'</td><td>'
