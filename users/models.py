@@ -3,7 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from fereol.users.exceptions import NonEmployeeException, NonStudentException
+from exceptions import NonEmployeeException, NonStudentException
 from fereol.enrollment.subjects.models import Group
 
 import logging

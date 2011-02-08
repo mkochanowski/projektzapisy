@@ -26,7 +26,7 @@ class EmployeeGroupsTest(TestCase):
     
     def testWithNotEmployeeUser(self):
         self.user.employee.delete()
-        self.assertRaises(NonEmployeeException, Employee.get_all_groups, self.user.id)
+        self.assertRaises(NonEmployeeException, Employee.get_all_groups, 4)
         
     def testEmployeeGroups(self):
         groups = Employee.get_all_groups(self.user.id)
