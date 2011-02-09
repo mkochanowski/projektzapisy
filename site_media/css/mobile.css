@@ -41,8 +41,9 @@
     A:visited {text-decoration: none}  
     
   .subject-inner {
-    width:100%; padding: 4% 1%; border: 1px solid black; /*background: #0073b5;
-   color: white;*/
+    width:100%; padding: 4% 1%; border: 1px solid black; 
+    background: #0073b5;
+    color: white;
     /*font-size: 16px;*/
   
   }
@@ -70,12 +71,9 @@
  }
  
 
-
-
 li{float:left;}
 
 form{padding: 2% 0%}
-
 
 
 body{
@@ -114,7 +112,7 @@ A:hover {text-decoration: none; color: #7D0000;}
 {
     width:100%;
     border-bottom: 0.1em solid #cccccc;
-    background: /*#fff5b3*/ #004872 url('/site_media/images/top-bg.png') repeat-x;
+    background:  #004872 url('/site_media/images/top-bg.png') repeat-x;
 }
 
 #main-header a
@@ -192,12 +190,9 @@ input[type=text], input[type=password], textarea
     width:99%;
 }
 
-
 .clear{ 
-
     background: white;
     border: 1px solid #cccccc;
-
 } 
 
 /*** Student Schedule ***/
@@ -208,49 +203,30 @@ text-align: center;
 width: 80%; 
 margin: 10% 0% 10% 10%; 
 }
-.sschedule .right
-{
-  float: right;
-  width: 75%;
-}
 
-.sschedule .left{
-  float: left; 
-  width: 24%;
-  border-right: 1px solid black;
+.sschedule table{
+  border-collapse:collapse;
+  width:100%;
+}
+.sschedule td, th, table{
+  border:1px solid black;
 }
 
 .sschedule .break{
-  border-bottom:1px solid black; 
   height: 10px;
-}
-
-.sschedule .row{
- border-bottom: 1px solid black;
-}
-.sschedule .row .nav {
-  float: left; 
-  width: 25%;
-}
-.sschedule .row .center{
-  float: left; 
-  width: 50%;
-}
-.align{
-  clear: both;
 }
 
 .square{
 margin:5%;
 width:21%;
 float: left;
-/*color: white;
-background: #0073b5;*/
+color: white;
+background: #0073b5;
 padding: 5% 0% 5% 0%;
 border: 1px solid black;
 }
 
-.fillsquare{
+.emptysquare{
   border: 0px;
   background: white;
 }

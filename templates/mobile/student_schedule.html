@@ -2,26 +2,21 @@
 
 {% block content %}
 
-<style type="text/css">
-table{border-collapse:collapse;width:100%;}
-table,td,th{border:1px solid black;}
-</style>
-
 <div class="sschedule">
 <table>
-    <tr ><td colspan="3" style="border: 1px solid black;">
-        <h2 style="text-align: center">Plan zajęć {% if owner != user %}: {{ owner.first_name }} {{ owner.last_name }} {% endif %}</h2>
-        </td>
+    <tr><th colspan="3">
+        <h2>Plan zajęć {% if owner != user %}: {{ owner.first_name }} {{ owner.last_name }} {% endif %}</h2>
+        </th>
     </tr>
     <tr>
-        <td width="25%"><a href="{% url student-schedule-delta owner.username left%}">
+        <td style="width:25%"><a href="{% url student-schedule-delta owner.username left%}">
             <h3>wstecz</h3>
         </a>
         </td>
-        <td width="50%">
+        <td style="width:50%">
             <h2>{{ weekday_name }}</h2>
             </td>
-        <td width="25%"><a href="{% url student-schedule-delta owner.username right %}">
+        <td style="width:25%"><a href="{% url student-schedule-delta owner.username right %}">
             <h3>dalej</h3>
         </a></td>
     </tr>
@@ -33,12 +28,13 @@ table,td,th{border:1px solid black;}
         {% if event.term == 0 %}
             <tr class="break"> </tr>
         {% else %}
-          <a href= "/subject/{{ event.group.subject.slug }}/" >
-            <tr>
-                <td> <p> {{event.term.period_string}}  </br> s. {{event.term.classroom}}</p> </td>
-                <td colspan="3"> <p> {{event.group.subject.name}} ({{event.group.get_type_display}})</p> </td>
-            </tr> 
-          </a>
+            <tr> 
+            <td> <a href= "/subject/{{ event.group.subject.slug }}/" >
+            <p> {{event.term.period_string}}  </br> s. {{event.term.classroom}}</p></a></td>
+            <td colspan="3"> <a href= "/subject/{{ event.group.subject.slug }}/">
+            <p> {{event.group.subject.name}} ({{event.group.get_type_display}})</p></a></td>
+            </tr>
+            </div> 
     {% endif %}
   {% endfor %}
   </table>

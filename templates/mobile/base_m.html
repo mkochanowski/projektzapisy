@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="Description" content="Opis dokumentu" />
+    <meta name="Description" content="Fereol mobile - System zapisów Instytutu Informatyki Uniwersytetu Wrocławskiego"/>
     <meta name="Author" content="Autor" />
     <link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/m_portrait.css" type="text/css" /> 
     <!--WIDOK POZIOMY, milestone1, rekomendacja: nie włączać przed spopularyzowaniem CSS3
         <link rel="stylesheet" media="all and (orientation: landscape)" href="/site_media/css/m_landscape.css" />     
     -->
-    
     <title>
         Zapisy II UWr - wersja mobilna
     </title>
@@ -20,13 +18,11 @@
     <div id="main-container">
     
         <div id="main-header" >
-            <a href="/"><img src="/site_media/images/logo_mobile.gif" id="logo" alt="Fereol mobile - Strona Główna" /></a>
+            <a href="/"><img src="/site_media/images/logo_mobile.gif" id="logo" title="Fereol mobile - strona główna" alt="System Zapisów II UWr" /></a>
              <a href = {% url user-mobile-logout %}>
                 {% if user.is_authenticated %}
                      <div class="subject-inner-clear">
-
                            Wyloguj {{ user.username }}
-
                     </div>
                 {% endif %}
             </a>
@@ -38,8 +34,8 @@
                 {% endblock %}
    
         </div>
-
-        <div style="clear:both"></div>
+    
+    <div style="clear:both"></div>
         
         <div id="main-footer">
                 <a href="{% url no-mobile %}"> przejdź do pełnej wersji</a>
@@ -48,6 +44,5 @@
         </div>
     </div>
     
-
 </body>
 </html>
