@@ -76,7 +76,7 @@ body{
 }
 
 div{        
-    font-family: 'sans-serif', serif;
+    font-family: sans-serif;
 }
 
 #main-container
@@ -105,13 +105,11 @@ div{
 /*** TREŚĆ ***/
 
 
-
 #main-content
 {
     text-align:left;
     padding:2%; width:96%;
 }
-
 
 /*** STOPKA ***/
 
@@ -157,7 +155,7 @@ input[type=submit] {
     margin: 5%;
     width: 90%;
     padding:3% 0%;
-    font-family: 'sans-serif', serif;
+    font-family: sans-serif;
 }
         
 input[type=text], input[type=password], textarea
