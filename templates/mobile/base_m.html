@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/m_portrait.css" type="text/css" /> 
     <!--WIDOK POZIOMY, milestone1, rekomendacja: nie włączać przed spopularyzowaniem CSS3
-		<link rel="stylesheet" media="all and (orientation: landscape)" href="/site_media/css/m_landscape.css" />     
-	-->
+        <link rel="stylesheet" media="all and (orientation: landscape)" href="/site_media/css/m_landscape.css" />     
+    -->
     
     <title>
         Zapisy II UWr - wersja mobilna
@@ -20,16 +20,16 @@
     <div id="main-container">
     
         <div id="main-header" >
-            <a href="/"><img src="/site_media/images/logo.jpg" id="logo" alt="Instytut Informatyki" /></a>
+            <a href="/"><img src="/site_media/images/logo_mobile.gif" id="logo" alt="Fereol mobile - Strona Główna" /></a>
              <a href = {% url user-mobile-logout %}>
-			 	{% if user.is_authenticated %}
-					 <div class="subject-inner-clear">
+                {% if user.is_authenticated %}
+                     <div class="subject-inner-clear">
 
-						   Wyloguj {{ user.username }}
+                           Wyloguj {{ user.username }}
 
-					</div>
-				{% endif %}
-			</a>
+                    </div>
+                {% endif %}
+            </a>
         </div>
         
         <div id="main-content" >

@@ -8,7 +8,6 @@
  }
  
 
- 
  #day-switch {
 
     text-align: center;
@@ -18,7 +17,6 @@
  
 #larrow{width: 5%; padding: 0% 2%;}
  
-
 
  .schedule-table-container
  {
@@ -35,14 +33,16 @@
 
    .subject-inner-clear{
         width:100%; padding: 1% 1%;  border: 0px solid black;
+        color: white;
+      
     }
 
     A:link {text-decoration: none} 
     A:visited {text-decoration: none}  
     
   .subject-inner {
-    width:100%; padding: 4% 1%; border: 1px solid black; /*background: #3399cc;*/
-   
+    width:100%; padding: 4% 1%; border: 1px solid black; /*background: #0073b5;
+   color: white;*/
     /*font-size: 16px;*/
   
   }
@@ -51,7 +51,6 @@
     width:70%; padding: 1% 15%; text-align: center; border: 0px solid black;
  } 
  
-
 
  #center-container
  {
@@ -115,7 +114,7 @@ A:hover {text-decoration: none; color: #7D0000;}
 {
     width:100%;
     border-bottom: 0.1em solid #cccccc;
-    background: #fff5b3 url('/site_media/images/top-bg.png') repeat-x;
+    background: /*#fff5b3*/ #004872 url('/site_media/images/top-bg.png') repeat-x;
 }
 
 #main-header a
@@ -208,16 +207,11 @@ input[type=text], input[type=password], textarea
 text-align: center; 
 width: 80%; 
 margin: 10% 0% 10% 10%; 
-border: 1px solid black; 
-border-bottom: none;
 }
 .sschedule .right
 {
   float: right;
-
   width: 75%;
-
-
 }
 
 .sschedule .left{
@@ -250,7 +244,13 @@ border-bottom: none;
 margin:5%;
 width:21%;
 float: left;
-
+/*color: white;
+background: #0073b5;*/
 padding: 5% 0% 5% 0%;
 border: 1px solid black;
+}
+
+.fillsquare{
+  border: 0px;
+  background: white;
 }

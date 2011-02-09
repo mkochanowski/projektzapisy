@@ -1,53 +1,46 @@
 {% extends "mobile/base_m.html" %}
 
 {% block content %}
+
+<style type="text/css">
+table{border-collapse:collapse;width:100%;}
+table,td,th{border:1px solid black;}
+</style>
+
 <div class="sschedule">
-    <div class="row">
-        <h2 style="">Plan zajęć {% if owner != user %}: {{ owner.first_name }} {{ owner.last_name }} {% endif %}</h2>
-    </div>
-    <div class="row">
-        <a href="{% url student-schedule-delta owner.username left%}">
-        <div class="nav">
+<table>
+    <tr ><td colspan="3" style="border: 1px solid black;">
+        <h2 style="text-align: center">Plan zajęć {% if owner != user %}: {{ owner.first_name }} {{ owner.last_name }} {% endif %}</h2>
+        </td>
+    </tr>
+    <tr>
+        <td width="25%"><a href="{% url student-schedule-delta owner.username left%}">
             <h3>wstecz</h3>
-        </div>
         </a>
-        <div class="center">
+        </td>
+        <td width="50%">
             <h2>{{ weekday_name }}</h2>
-        </div>
-        <a href="{% url student-schedule-delta owner.username right %}">
-        <div class="nav">
+            </td>
+        <td width="25%"><a href="{% url student-schedule-delta owner.username right %}">
             <h3>dalej</h3>
-        </div>
-        </a>
-        <div class="align"></div>
-    </div>
-    <div>
-        <div style="border-bottom:1px solid black;">
-        <div class="left">
-        <h3> termin </h3>
-        </div>
-        <div class="right">
-            <h3> przedmiot </h3>
-        </div>
-        <div class="align"></div>
-        </div>
+        </a></td>
+    </tr>
+<tr>
+    <td>  <h3> termin </h3> </td>
+    <td colspan="2"> <h3>przedmiot </h3> </td>
+</tr>
         {% for event in schedule %}
         {% if event.term == 0 %}
-            <div class="break"></div>
+            <tr class="break"> </tr>
         {% else %}
           <a href= "/subject/{{ event.group.subject.slug }}/" >
-            <div style="border-bottom:1px solid black;">
-                <div class="left">
-                    <p> {{event.term.period_string}}</br> s. {{event.term.classroom}}</p>
-                </div>
-                <div class="right">
-                    <p style = ""> {{event.group.subject.name}} ({{event.group.get_type_display}})</p>
-                </div>
-                <div class="align"></div>
-            </div>
+            <tr>
+                <td> <p> {{event.term.period_string}}  </br> s. {{event.term.classroom}}</p> </td>
+                <td colspan="3"> <p> {{event.group.subject.name}} ({{event.group.get_type_display}})</p> </td>
+            </tr> 
           </a>
     {% endif %}
   {% endfor %}
-  </div>
+  </table>
 </div>
 {% endblock %}
