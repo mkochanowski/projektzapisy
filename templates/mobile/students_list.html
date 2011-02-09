@@ -24,10 +24,10 @@
 
     <div class="subject-outer">
         <div class="subject-inner">
-            Lista studentów:
+            <b>Lista studentów</b>
             <hr>
             {% for s in students %}
-                <div style="margin: 1% 4%;" >
+                <div class="listpos" >
                     <a href="{% url student-schedule-owner s.user.username %}" style="float:left">{{s.get_full_name}}</a><br/>
                     <hr>
                 </div>
