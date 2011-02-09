@@ -3,6 +3,8 @@
 from datetime import datetime
 from django.db import models
 from subject import Subject
+from django.core.exceptions import MultipleObjectsReturned
+from fereol.enrollment.subjects.exceptions import *
 
 from datetime import datetime
 
@@ -35,8 +37,32 @@ class Semester( models.Model ):
     
     @staticmethod
     def get_current_semester():
-        """ returns current semester """ 
-        return Semester.objects.get(semester_beginning__lt =datetime.now().date(), semester_ending__gt= datetime.now().date())
+        """ if exist, it returns current semester. otherwise return None """ 
+        try:
+            return Semester.objects.get(semester_beginning__lte =datetime.now().date(), semester_ending__gte= datetime.now().date())
+        except Semester.DoesNotExist:
+            return None
+        except MultipleObjectsReturned:
+            raise MoreThanOneCurrentSemesterException()  
+
+    @staticmethod
+    def get_default_semester():
+        """Jeżeli istnieje semestr na który zapisy są otwarte, zwracany jest ten semestr, jeżeli taki nie istnieje zwracany jest semestr, który obecnie trwa. W przypadku gdy nie trwa żaden semestr, zwracany jest najbliższy semestr na który będzie można się zapisać lub None w przypadku braku takiego semestru """ 
+        try:
+            return Semester.objects.get(records_opening__lte =datetime.now(), records_closing__gte= datetime.now())
+        except Semester.DoesNotExist:
+            current_semester = Semester.get_current_semester()
+            if current_semester:
+                return current_semester
+            else:
+                next_semester = Semester.objects.filter(records_opening__gte =datetime.now()).order_by('records_opening')
+                if next_semester.exists():
+                    return next_semester[0]
+                else:
+                    return None
+                        
+        except MultipleObjectsReturned:
+            raise MoreThanOneSemesterWithOpenRecordsException()  
 
     @staticmethod
     def is_visible(id):
