@@ -126,7 +126,7 @@ class Type( models.Model ):
     """
         Model przechowuje informacje o typie studiow
     """
-    name = models.CharField(max_length=30, unique=True, verbose_name="Typ")
+    name = models.CharField(max_length=45, unique=True, verbose_name="Typ")
 
     class Meta:
         """
