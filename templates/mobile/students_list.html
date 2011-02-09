@@ -2,38 +2,38 @@
 
 {% block content %}
 <div id="center-container">
-	<a href="{% url employees-list %}">
-		<div class="subject-outer">
-			<div class="subject-inner" >
-				Zmień na: plany pracowników
-			</div>
-		</div>
-	</a>
+    <a href="{% url employees-list %}">
+        <div class="subject-outer">
+            <div class="subject-inner" >
+                <b>Zmień na: plany pracowników</b>
+            </div>
+        </div>
+    </a>
 </div>
 <br/>
 <div class="nav">
-		<a href="/students/">
-			<div class="subject-inner-clear">
-				<img src="/site_media/images/larrow.gif" width="5%" alt="left arrow"  />
-				Inne litery
-			</div>
-		</a>
+        <a href="/students/">
+            <div class="subject-inner-clear">
+                <img src="/site_media/images/larrow.gif" width="5%" alt="left arrow"  />
+                Inne litery
+            </div>
+        </a>
 </div>
 <br/>
 <div id="center-container">
 
-	<div class="subject-outer">
-		<div class="subject-inner">
-			Lista studentów:
-			<hr>
-			{% for s in students %}
-				<div style="margin: 1% 4%;" >
-					<a href="{% url student-schedule-owner s.user.username %}" style="float:left">{{s.get_full_name}}</a><br/>
-					<hr>
-				</div>
-			{% endfor %}
-		</div>
-	</div>
+    <div class="subject-outer">
+        <div class="subject-inner">
+            Lista studentów:
+            <hr>
+            {% for s in students %}
+                <div style="margin: 1% 4%;" >
+                    <a href="{% url student-schedule-owner s.user.username %}" style="float:left">{{s.get_full_name}}</a><br/>
+                    <hr>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
 </div>
 {% endblock %}

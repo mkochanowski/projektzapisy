@@ -1,35 +1,35 @@
 ﻿{% extends "mobile/base_m.html" %}
 
 {% block styles %}
-	<!--custom stylesheet-->
+    <!--custom stylesheet-->
 {% endblock %}
 
 {% block content %}
 
 <div class="middle">
 
-	<div class="subject-outer  ">
-		<a href="/records/schedule">
-			<div class="subject-inner middle">
-				Mój plan
-			</div>
-		</a>
-	</div>		
-	<div class="subject-outer  ">
-		<a href="{% url latest_news 'enrollment' %}">
-			<div class="subject-inner middle">
-				Zapisy	
-			</div>
-		</a>
-	</div>
-	
-	<div class="subject-outer  ">
-		<a href="{% url students-list %}">
-			<div class="subject-inner middle">
-				Terminarze innych
-			</div>
-		</a>
-	</div>
+    <div class="subject-outer">
+        <a href="/records/schedule">
+            <div class="subject-inner middle">
+                <b>Mój plan</b>
+            </div>
+        </a>
+    </div>      
+    <div class="subject-outer">
+        <a href="{% url latest_news 'enrollment' %}">
+            <div class="subject-inner middle">
+                <b>Zapisy</b>  
+            </div>
+        </a>
+    </div>
+    
+    <div class="subject-outer ">
+        <a href="{% url students-list %}">
+            <div class="subject-inner middle">
+                <b>Terminarze innych</b>
+            </div>
+        </a>
+    </div>
 </div>
 
 {% endblock %}
