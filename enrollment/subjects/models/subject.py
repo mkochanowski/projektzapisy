@@ -39,7 +39,7 @@ class Subject( models.Model ):
     """subject in offer"""
     entity = models.ForeignKey(SubjectEntity)
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
-    slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik')
+    slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
     ects = models.IntegerField(verbose_name="punkty ECTS", null=True)
