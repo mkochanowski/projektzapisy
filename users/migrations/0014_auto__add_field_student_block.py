@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding field 'Student.block'
-        db.add_column('users_student', 'block', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True), keep_default=False)
+        db.add_column('users_student', 'block', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True), keep_default=False)
     
     
     def backwards(self, orm):
@@ -65,7 +65,7 @@ class Migration(SchemaMigration):
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
-            'block': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),

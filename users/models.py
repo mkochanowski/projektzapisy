@@ -85,7 +85,7 @@ class Student(BaseUser):
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_delay_minutes = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (minuty)")
     type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
-    block = models.BooleanField(verbose_name="blokada planu", default = 'false')
+    block = models.BooleanField(verbose_name="blokada planu", default = False)
     
     @staticmethod
     def get_all_groups(user_id):
