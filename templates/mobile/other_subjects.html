@@ -3,24 +3,22 @@
 {% block content %}
 
 <div id="center-container">
-	
-	<div class="nav">
-		<a href = {% url student-enrollment %}>
-			<div class="subject-inner-clear">
-				<img src="/site_media/images/larrow.gif" width="5%" alt="left arrow"  />
-				Powrót
-			</div>
-		</a>
-	</div>
-	
-	<div>
-		<h3>Wszystkie przedmioty: </h3>
-		{% for s in subjects %}
-			<div class="subject-outer">
-				<a href= "/subject/{{ s.slug }}/" ><div class="subject-inner">{{ s.name }}</div></a>
-			</div>
-		{% endfor %}
-	</div>
+    
+        <a href = {% url student-enrollment %}>
+            <div class="subject-outer">
+                <div class="subject-inner round" >
+                <b>Powrót</b>
+                </div>
+            </div>
+        </a>    
+    <div>
+        <h3>Wszystkie przedmioty: </h3>
+        {% for s in subjects %}
+            <div class="subject-outer">
+                <a href= "/subject/{{ s.slug }}/" ><div class="subject-inner">{{ s.name }}</div></a>
+            </div>
+        {% endfor %}
+    </div>
 
 </div>
 {% endblock %}

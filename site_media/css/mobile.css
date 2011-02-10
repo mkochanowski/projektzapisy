@@ -200,6 +200,7 @@ margin: 10% 0% 10% 10%;
 }
 .sschedule .break{
   height: 10px;
+  background: white;
 }
 
 .listpos{
@@ -221,4 +222,10 @@ border: 1px solid black;
 .emptysquare{
   border: 0px;
   background: white;
+}
+
+.round {
+  -moz-border-radius:    10px;
+  -webkit-border-radius: 10px;
+  border-radius:         10px;
 }

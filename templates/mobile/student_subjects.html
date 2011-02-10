@@ -4,54 +4,54 @@
 
 <div id="center-container">
 
-	<div>
-	<h3>Przedmioty, na które jesteś zapisany:</h3>
-	
-		{% for e in enrolled %}
-			<div class="subject-outer">
-			<a href= "/subject/{{ e.subject.slug }}/" >
-			<div class="subject-inner">{{ e.subject.name }} <!--{{ e.allGroups }}--></div></a></div>
-		{% empty %}
-			<div style="font-style:italic;">
-				Brak przedmiotów w tej kategorii.
-			</div>
-		{% endfor %}
-	</div>
-	
-	<div>
-	<h3>Przedmioty przypięte:</h3>
+    <div>
+    <h3>Przedmioty, na które jesteś zapisany:</h3>
+    
+        {% for e in enrolled %}
+            <div class="subject-outer">
+            <a href= "/subject/{{ e.subject.slug }}/" >
+            <div class="subject-inner">{{ e.subject.name }} <!--{{ e.allGroups }}--></div></a></div>
+        {% empty %}
+            <div style="font-style:italic;">
+                Brak przedmiotów w tej kategorii.
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div>
+    <h3>Przedmioty przypięte:</h3>
 
-		{% for p in pinned %}
-			<div class="subject-outer">
-			<a href= "/subject/{{ p.slug }}/" >
-			<div class="subject-inner">{{ p.name }} </div></a></div>
-		{% empty %}
-			<div style="font-style:italic;">
-				Brak przedmiotów w tej kategorii.
-			</div>
-		{% endfor %}
-	</div>
+        {% for p in pinned %}
+            <div class="subject-outer">
+            <a href= "/subject/{{ p.slug }}/" >
+            <div class="subject-inner">{{ p.name }} </div></a></div>
+        {% empty %}
+            <div style="font-style:italic;">
+                Brak przedmiotów w tej kategorii.
+            </div>
+        {% endfor %}
+    </div>
 
-	<div>
-	<h3>Przedmioty, na które głosowałeś:</h3>
+    <div>
+    <h3>Przedmioty, na które głosowałeś:</h3>
 
-		{% for v in voted %}
-			<div class="subject-outer">
-			<a href= "/subject/{{ v.slug }}/" >
-			<div class="subject-inner">{{ v.name }} </div></a></div>
-		{% empty %}
-			<div style="font-style:italic;">
-				Brak przedmiotów w tej kategorii.
-			</div>
-		{% endfor %}
-	</div>
+        {% for v in voted %}
+            <div class="subject-outer">
+            <a href= "/subject/{{ v.slug }}/" >
+            <div class="subject-inner">{{ v.name }} </div></a></div>
+        {% empty %}
+            <div style="font-style:italic;">
+                Brak przedmiotów w tej kategorii.
+            </div>
+        {% endfor %}
+    </div>
 
-	<h3>Wszystkie przedmioty:</h3>
-	<div class="subject-outer">
-		<a href= "{% url enrollment-other %}" >
-			<div class="subject-inner">Przejdź do listy ... </div>
-		</a>
-	</div>
+    <h3>Wszystkie przedmioty:</h3>
+    <div class="subject-outer">
+        <a href= "{% url enrollment-other %}" >
+            <div class="subject-inner round">Przejdź do listy ... </div>
+        </a>
+    </div>
 
 </div>
 

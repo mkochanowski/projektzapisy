@@ -4,27 +4,27 @@
 <div id="center-container">
     <a href="{% url employees-list %}">
         <div class="subject-outer">
-            <div class="subject-inner" >
+            <div class="subject-inner round" >
                 <b>Zmień na: plany pracowników</b>
             </div>
         </div>
     </a>
 </div>
 <br/>
-<div class="nav">
+<div id="center-container">
         <a href="/students/">
-            <div class="subject-inner-clear">
-                <img src="/site_media/images/larrow.gif" width="5%" alt="left arrow"  />
-                Inne litery
+            <div class="subject-outer">
+                <div class="subject-inner round" >
+                <b>Powrót</b>
+                </div>
             </div>
         </a>
 </div>
 <br/>
 <div id="center-container">
-
     <div class="subject-outer">
         <div class="subject-inner">
-            <b>Lista studentów</b>
+            <b>Lista studentów {% if keyname != '' %} ({{keyname}}) {%endif %} </b>
             <hr>
             {% for s in students %}
                 <div class="listpos" >
@@ -34,7 +34,6 @@
             {% endfor %}
         </div>
     </div>
-
 </div>
 {% endblock %}
 

@@ -20,7 +20,8 @@ from fereol.users.forms import EmailChangeForm
 import logging
 logger = logging.getLogger()
 
-		
+KEYNAMES = ['','','ABC','DEF','GHI','JKL','MNO','PQRS','TUV','WXYZ']
+        
 def employee_profile(request, user_id):
     """student profile"""
     try:
@@ -46,10 +47,10 @@ def employee_profile(request, user_id):
 @login_required
 def employeesList(request,key=None):
     employees = Employee.objects.select_related().order_by('user__last_name', 'user__first_name')
-	
+    
     if key==None:
         return render_to_response('mobile/keyboard_employees.html', None, context_instance=RequestContext(request))
-	
+    
     employees = {
     '2' : employees.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C') | Q(user__last_name__startswith='Ć')),
     '3' : employees.filter(Q(user__last_name__startswith='D') | Q(user__last_name__startswith='E') | Q(user__last_name__startswith='F')),
@@ -61,12 +62,15 @@ def employeesList(request,key=None):
     '9' : employees.filter(Q(user__last_name__startswith='W') | Q(user__last_name__startswith='X') | Q(user__last_name__startswith='Y') | Q(user__last_name__startswith='Z') | Q(user__last_name__startswith='Ź') | Q(user__last_name__startswith='Ż')),
     }.get(key, None )
     
+    
+        
     data = {
             "employees" : employees,
+            "keyname" : KEYNAMES[int(key)],
             }  
     
     return render_to_response('mobile/employees_list.html', data, context_instance=RequestContext(request))
-	
+    
 
 @login_required
 def studentsList(request, key=None):
@@ -74,7 +78,7 @@ def studentsList(request, key=None):
 
     if key==None:
         return render_to_response('mobile/keyboard_students.html', None, context_instance=RequestContext(request))
-		
+        
     students = {
     '2' : students.filter(Q(user__last_name__startswith='A') | Q(user__last_name__startswith='B') | Q(user__last_name__startswith='C') | Q(user__last_name__startswith='Ć')),
     '3' : students.filter(Q(user__last_name__startswith='D') | Q(user__last_name__startswith='E') | Q(user__last_name__startswith='F')),
@@ -84,13 +88,14 @@ def studentsList(request, key=None):
     '7' : students.filter(Q(user__last_name__startswith='P') | Q(user__last_name__startswith='Q') | Q(user__last_name__startswith='R')| Q(user__last_name__startswith='S') | Q(user__last_name__startswith='Ś')),
     '8' : students.filter(Q(user__last_name__startswith='T') | Q(user__last_name__startswith='U') | Q(user__last_name__startswith='V')),
     '9' : students.filter(Q(user__last_name__startswith='W') | Q(user__last_name__startswith='X') | Q(user__last_name__startswith='Y') | Q(user__last_name__startswith='Z') | Q(user__last_name__startswith='Ź') | Q(user__last_name__startswith='Ż')),
-    }.get(key, None )		
-	
-	
+    }.get(key, None )       
+    
+    
     data = {
             "students" : students,
-            }  			
-			
+            "keyname" : KEYNAMES[int(key)],
+            }           
+            
     return render_to_response('mobile/students_list.html', data, context_instance=RequestContext(request))
 
 
