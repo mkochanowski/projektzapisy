@@ -496,7 +496,6 @@
         "pk": 1, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 101, 
             "student": 101, 
@@ -507,7 +506,6 @@
         "pk": 2, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 103, 
             "student": 100, 
@@ -518,7 +516,6 @@
         "pk": 3, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 103, 
             "student": 101, 
@@ -529,7 +526,6 @@
         "pk": 4, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 103, 
             "student": 102, 
@@ -540,7 +536,6 @@
         "pk": 5, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 104, 
             "student": 104, 
@@ -551,7 +546,6 @@
         "pk": 6, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 104, 
             "student": 105, 

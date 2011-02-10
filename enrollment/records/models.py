@@ -26,8 +26,6 @@ STATUS_PINNED = '2'
 STATUS_QUEUED = '1'
 RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'oczekujący')]
 
-QUEUE_STATUS = [(STATUS_QUEUED, u'zakolejkowany'), (STATUS_PINNED, u'oczekujący')]
-
 import logging
 logger = logging.getLogger()
 
@@ -313,7 +311,7 @@ class Record(models.Model):
 class QueueManager(models.Manager):
     def get_query_set(self):
         """ Returns only queued students. """
-        return super(QueueManager, self).get_query_set().filter(status=STATUS_QUEUED)
+        return super(QueueManager, self).get_query_set()
 
 def queue_priority(value):
     if value <= 0 or value > 10:
@@ -322,7 +320,6 @@ def queue_priority(value):
 class Queue(models.Model):
     group = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
-    status = models.CharField(max_length=1, choices=QUEUE_STATUS, verbose_name='status')
     time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
     priority = models.PositiveSmallIntegerField(default=1, validators=[queue_priority], verbose_name='priorytet')
     objects = models.Manager()
@@ -380,7 +377,7 @@ class Queue(models.Model):
             if Queue.queued.filter(group=group, student=student).count() > 0 :
                 logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
                 raise AlreadyQueuedException()
-            record, is_created = Queue.objects.get_or_create(group=group, student=student, status=STATUS_QUEUED, time=datetime.now(), priority=priority)
+            record, is_created = Queue.objects.get_or_create(group=group, student=student, time=datetime.now(), priority=priority)
             if is_created == False: # Nie wiem czy ten warunek ma sens z tym powyżej
                 logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
                 raise AlreadyQueuedException()
@@ -401,7 +398,7 @@ class Queue(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
-            record = Queue.objects.get(group=group, student=student, status=STATUS_QUEUED)
+            record = Queue.objects.get(group=group, student=student)
             record.priority = new_priority
             record.save()
             logger.info('User %s <id: %s> changed queue priority of group "%s" <id: %s> to %s' % (user.username, user.id, group, group.id, new_priority))
