@@ -85,6 +85,7 @@ class Student(BaseUser):
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
     type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
+    program = models.ForeignKey('Program', verbose_name='Program Studiów', null=True, default=None)
 
     
     @staticmethod
@@ -129,16 +130,10 @@ class Type( models.Model ):
     name = models.CharField(max_length=45, unique=True, verbose_name="Typ")
 
     class Meta:
-        """
-            Klasa django
-        """
         verbose_name = 'Typ studiów'
         verbose_name_plural = 'Typy studiów'
 
     def __unicode__(self):
-        """
-            metoda django
-        """
         return self.name
 
     @staticmethod
@@ -147,3 +142,16 @@ class Type( models.Model ):
             Typy studiow
         """
         return Type.objects.all()
+
+class Program( models.Model ):
+    """
+        Model przechowuje informacje o programie studiow
+    """
+    name = models.CharField(max_length=50, unique=True, verbose_name="Program")
+
+    class Meta:
+        verbose_name = 'Program studiów'
+        verbose_name_plural = 'Programy studiów'
+
+    def __unicode__(self):
+        return self.name
