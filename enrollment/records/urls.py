@@ -16,5 +16,8 @@ urlpatterns = patterns( 'fereol.enrollment.records.views',
     url('^schedule/prototype/resign$', 'ajaxResign', name='schedule-prototype-resign' ),
     url('^schedule/prototype/$', 'schedulePrototype', name='schedule-prototype' ),
     url('^schedule/$', 'own', name='schedule-own' ),
+    url('^schedule/prototype/block$', 'blockPlan', name='schedule-prototype-block' ),
+    url('^schedule/prototype/unblock$', 'unblockPlan', name='schedule-prototype-unblock' )
+
 )
 

@@ -85,7 +85,7 @@ class Student(BaseUser):
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_delay_minutes = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (minuty)")
     type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
-
+    block = models.BooleanField(verbose_name="blokada planu", default = 'false')
     
     @staticmethod
     def get_all_groups(user_id):
@@ -113,7 +113,35 @@ class Student(BaseUser):
              logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
          
-
+    @staticmethod
+    def records_block(user_id):
+        user = User.objects.get(id=user_id)
+        try :
+            student = user.student
+            if student.block == False:
+                student.block = True
+                student.save()
+                return student
+            else :
+                return False
+        except Student.DoesNotExist:
+             logger.error('Function Student.records_block(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             raise NonStudentException()
+    @staticmethod
+    def records_unblock(user_id):
+        user = User.objects.get(id=user_id)
+        try :
+            student = user.student
+            if student.block == True:
+                student.block = False
+                student.save()
+                return student
+            else :
+                return False
+        except Student.DoesNotExist:
+             logger.error('Function Student.records_unblock(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             raise NonStudentException()
+         
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'
