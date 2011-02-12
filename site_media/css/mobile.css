@@ -2,108 +2,26 @@
  * Style odpowiadające za wygląd głównego szablonu (logo, menu, stopka itp)
  */
 
- .subject-alert{
-    float: right;
-    padding: 0% 3% 0% 0%;
- }
- 
- #day-switch {
-
-    text-align: center;
-    padding: 2% 0%
- 
- }
- 
-#larrow{width: 5%; padding: 0% 2%;}
- 
-
- .schedule-table-container
- {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 4%;
-    margin-bottom: 4%;
- }
- 
-
-.middle{margin:10% 0%}
- 
-.subject-inner-clear{
-    width:100%; padding: 1% 1%;  border: 0px solid black;
-    color: white;
-}
-
-A:link {text-decoration: none; color: #0073B5} 
-A:visited {text-decoration: none; color: #0073B5} 
-A:hover {text-decoration: none; color: #7D0000;} 
-
-    
-.subject-inner {
-    width:100%; padding: 4% 1%; border: 1px solid black; 
-    background: #0073b5;
-    color: white;
-}
-  
-.subject-outer {
-    width:70%; padding: 1% 15%; text-align: center; border: 0px solid black;
- } 
- 
- #center-container
- {
+#center-container
+{
     text-align: center;
     width: 100%;
     margin-left: auto;
     margin-right: auto;
- }
- 
-
- .inne-button {
-    margin: 5%;
-    width: 50%;
-    padding:3% 0%;
-    
- }
- 
-
-li{float:left;}
-
-form{padding: 2% 0%}
-
-
-body{
-    margin: 0em 0em 2em 0em;
 }
-
-div{        
-    font-family: sans-serif;
-}
-
-#main-container
-{
-    background: white;
-    border: 0.1em solid #cccccc;
-    width: 65%;
-
-}
-
 
 /*** NAGŁÓWEK ***/
 
 #main-header
 {
-    width:100%;
-    border-bottom: 0.1em solid #cccccc;
-    background:  #004872;
+  background: #004872;
+  width:100%;
+  border-bottom: 0.1em solid #cccccc;
 }
-
-#main-header a
-{   
-    color: #0073B5;
+.navbar{
+    padding: 1% 1%;
 }
-
 /*** TREŚĆ ***/
-
 
 #main-content
 {
@@ -124,8 +42,53 @@ div{
 {   
     color: #999999;
 }
+#main-container
+{
+    background: white;
+    border: 0.1em solid #cccccc;
+    width: 65%;
+
+}
+
+A:link {text-decoration: none; color: white} 
+A:visited {text-decoration: none; color: white} 
+A:hover {text-decoration: none; color: #3f5f72} 
+
+li{float:left}
+
+form{padding: 2% 0%}
+
+body{margin: 0em 0em 2em 0em}
+
+div{font-family: sans-serif}
 
 
+.middle{margin:10% 0%}
+
+    
+.subject-inner {
+    text-align: center;
+    width:100%; padding: 4% 1%; border: 1px solid black; 
+    background: #0073b5;
+    color: white;
+}
+  
+.subject-outer {
+    width:70%; padding: 1% 15%;
+} 
+
+ .subject-alert{
+    float: right;
+    padding: 0% 3% 0% 0%;
+}
+ 
+ .inne-button {
+    margin: 5%;
+    width: 50%;
+    padding:3% 0%;
+    
+}
+ 
 /*** KOMUNIKAT ***/
 
 .main-message
@@ -151,6 +114,10 @@ div{
  
 }
 
+
+.sschedule input[type=submit]{
+  width: 60%;
+}
 input[type=submit] {
     margin: 5%;
     width: 90%;
@@ -162,16 +129,26 @@ input[type=text], input[type=password], textarea
 {
     border: 0.1em solid #cccccc;
     background: white;
-    padding:0em;
+    padding: 0em;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     height:1.7em;
     width:99%;
 }
 
+.subject-block{
+ border: 1px solid black;
+ background: #0073b5;
+ color: white;
+}
+.signbutton{
+  background: white;
+  border: 1px solid #cccccc;
+}
+
 .clear{ 
-    background: white;
-    border: 1px solid #cccccc;
+  background: white;
+  border: 1px solid #cccccc;
 } 
 
 /*** Student Schedule ***/
@@ -191,12 +168,6 @@ margin: 10% 0% 10% 10%;
   border:1px solid black;
   background: #0073b5;
   color: white;
-}
-.sschedule a{
-  color: white;
-}
-.sschedule A:hover{
-  color: #3f5f72;
 }
 .sschedule .break{
   height: 10px;
@@ -224,7 +195,10 @@ border: 1px solid black;
   background: white;
 }
 
-.round {
+.slist p{
+  margin: 1em 0em 0em;
+}
+.round{
   -moz-border-radius:    10px;
   -webkit-border-radius: 10px;
   border-radius:         10px;

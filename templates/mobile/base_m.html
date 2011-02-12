@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="Description" content="Fereol mobile - System zapisów Instytutu Informatyki Uniwersytetu Wrocławskiego"/>
     <meta name="Author" content="Autor" />
-	<meta name="viewport" content="width=device-width; height=device-height; maximum-scale=1.4; initial-scale=1.0; user-scalable=yes"/>
+    <meta name="viewport" content="width=device-width; height=device-height; maximum-scale=1.4; initial-scale=1.0; user-scalable=yes"/>
     <link rel="stylesheet" href="/site_media/css/mobile.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/m_portrait.css" type="text/css" /> 
     <!--WIDOK POZIOMY, milestone1, rekomendacja: nie włączać przed spopularyzowaniem CSS3
@@ -22,7 +22,7 @@
             <a href="/"><img src="/site_media/images/logo_mobile.gif" id="logo" title="Fereol mobile - strona główna" alt="System Zapisów II UWr" /></a>
              <a href = {% url user-mobile-logout %}>
                 {% if user.is_authenticated %}
-                     <div class="subject-inner-clear">
+                     <div class="navbar">
                            Wyloguj {{ user.username }}
                     </div>
                 {% endif %}
