@@ -52,7 +52,7 @@ class PollForm( forms.Form ):
         
         if section_id:
             sections_set = []
-            sections_set.append( Section.objects.get(pk = section_id).select_related() )
+            sections_set.append( Section.objects.get(pk = section_id)) #.select_related() )
         elif poll:
             sections_set = poll.all_sections()
         else:

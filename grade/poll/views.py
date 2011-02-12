@@ -321,7 +321,10 @@ def show_section( request, section_id):
     data['form']    = form
     data['grade']   = Semester.get_current_semester().is_grade_active
     data['message'] = request.session.get('message', None)
-    del request.session['message'] 
+    try:
+        del request.session['message'] 
+    except:
+        pass
     return render_to_response( 'grade/poll/managment/show_section.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -372,7 +375,7 @@ def polls_list( request ):
 def show_poll( request, poll_id):
     poll = Poll.objects.get(pk=poll_id)
     form = PollForm()
-    form.setFields( poll, None, poll_id )
+    form.setFields( poll, None, None )
     data = {}
     data['form']    = form
     data['grade']   = Semester.get_current_semester().is_grade_active
