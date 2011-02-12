@@ -30,7 +30,7 @@ Feature: Creating keys for polls in the grading protocol
 		And I am on grade main page        
 		And there are keys generated for polls
 		When I follow "Generuj klucze"
-		Then I wait for a while to see "Brak nowych ankiet"
+		Then I wait for a while to see "Brak kluczy do wygenerowania!"
         And I should not see "Wygenerowano klucze RSA"
 		And I should be on poll management page
 		
