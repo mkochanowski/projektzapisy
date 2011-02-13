@@ -18,7 +18,12 @@
   width:100%;
   border-bottom: 0.1em solid #cccccc;
 }
-.navbar{
+
+#logo{
+    width:100%;
+    border-bottom: 0.10em solid #cccccc;
+}
+#navbar{
     padding: 1% 1%;
 }
 /*** TREŚĆ ***/
@@ -47,7 +52,6 @@
     background: white;
     border: 0.1em solid #cccccc;
     width: 65%;
-
 }
 
 A:link {text-decoration: none; color: white} 
@@ -62,33 +66,27 @@ body{margin: 0em 0em 2em 0em}
 
 div{font-family: sans-serif}
 
-
-.middle{margin:10% 0%}
-
-    
 .subject-inner {
     text-align: center;
     width:100%; padding: 4% 1%; border: 1px solid black; 
     background: #0073b5;
     color: white;
 }
-  
 .subject-outer {
     width:70%; padding: 1% 15%;
-} 
+}
 
- .subject-alert{
-    float: right;
-    padding: 0% 3% 0% 0%;
+.box{
+  margin: 5% 15% 10% 15%;
+  padding: 3% 0% 3% 0%;
+  width:70%;
+  text-align: center;
+  border: 1px solid black; 
+  background: #0073b5;
+  color: white;
+  font-weight: bolder;
 }
- 
- .inne-button {
-    margin: 5%;
-    width: 50%;
-    padding:3% 0%;
-    
-}
- 
+
 /*** KOMUNIKAT ***/
 
 .main-message
@@ -108,15 +106,10 @@ div{font-family: sans-serif}
 }
 /*** KOMPONENTY ***/
 
-#logo{
-    width:100%;
-    border-bottom: 0.10em solid #cccccc;
- 
-}
-
 
 .sschedule input[type=submit]{
   width: 60%;
+  border: 2px solid #3F5F72;
 }
 input[type=submit] {
     margin: 5%;
@@ -145,12 +138,10 @@ input[type=text], input[type=password], textarea
   background: white;
   border: 1px solid #cccccc;
 }
-
 .clear{ 
   background: white;
   border: 1px solid #cccccc;
 } 
-
 /*** Student Schedule ***/
 
 .sschedule
@@ -173,7 +164,6 @@ margin: 10% 0% 10% 10%;
   height: 10px;
   background: white;
 }
-
 .listpos{
   margin: 1% 4%;
 }
@@ -181,23 +171,22 @@ margin: 10% 0% 10% 10%;
   color: white;
 }
 .square{
-margin:5%;
-width:21%;
-float: left;
-color: white;
-background: #0073b5;
-padding: 5% 0% 5% 0%;
-border: 1px solid black;
+  margin:5%;
+  width:21%;
+  float: left;
+  color: white;
+  background: #0073b5;
+  padding: 5% 0% 5% 0%;
+  border: 1px solid black;
 }
-
 .emptysquare{
   border: 0px;
   background: white;
 }
-
 .slist p{
   margin: 1em 0em 0em;
 }
+
 .round{
   -moz-border-radius:    10px;
   -webkit-border-radius: 10px;

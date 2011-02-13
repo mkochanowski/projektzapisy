@@ -2,7 +2,7 @@
 
 
 {% block styles %}
-	/*custom stylesheet*/
+    /*custom stylesheet*/
 {% endblock %}
 
 {% block content %}
@@ -12,22 +12,19 @@
     {% endif %}
 
     <form class="high-res-cent" method="post" action="{% url django.contrib.auth.views.login %}" >
-		<div>
-			{{ form.username.label_tag }}:<br/>
+        <div>
+            {{ form.username.label_tag }}:<br/>
              {{ form.username }}
-		</div>
+        </div>
       <div>{{ form.password.label_tag }}:<br/>
           {{ form.password }}
        </div>
         
-
         <div>
-		<input type="checkbox"  class="clear" value="1" checked="yes " style="float: left"/> Zapamiętaj mnie<br/>
-			<input type="submit"  value="Zaloguj"  />
+        <input type="checkbox"  class="clear" value="1" checked="yes " style="float: left"/> Zapamiętaj mnie<br/>
+            <input type="submit"  value="Zaloguj"  />
             <input type="hidden" name="next" value="{{ next }}" />
         </div>
     </form>
 
-
-    
 {% endblock %}

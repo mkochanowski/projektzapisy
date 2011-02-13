@@ -3,10 +3,7 @@
 {% block content %}
 
 <div id="center-container">
-
-    <div>
     <h3>Przedmioty, na które jesteś zapisany:</h3>
-    
         {% for e in enrolled %}
             <div class="subject-outer">
             <a href= "/subject/{{ e.subject.slug }}/" >
@@ -16,11 +13,7 @@
                 Brak przedmiotów w tej kategorii.
             </div>
         {% endfor %}
-    </div>
-    
-    <div>
     <h3>Przedmioty przypięte:</h3>
-
         {% for p in pinned %}
             <div class="subject-outer">
             <a href= "/subject/{{ p.slug }}/" >
@@ -30,11 +23,7 @@
                 Brak przedmiotów w tej kategorii.
             </div>
         {% endfor %}
-    </div>
-
-    <div>
     <h3>Przedmioty, na które głosowałeś:</h3>
-
         {% for v in voted %}
             <div class="subject-outer">
             <a href= "/subject/{{ v.slug }}/" >
@@ -44,14 +33,9 @@
                 Brak przedmiotów w tej kategorii.
             </div>
         {% endfor %}
-    </div>
-<br/>
-    <div class="subject-outer">
-        <a href= "{% url enrollment-other %}" >
-            <div class="subject-inner round"><b>Wszystkie przedmioty</b></div>
-        </a>
-    </div>
-
+    <a href= "{% url enrollment-other %}">
+        <div class="box round">Wszystkie przedmioty</div>
+    </a>
 </div>
 
 {% endblock %}

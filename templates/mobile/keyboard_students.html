@@ -1,17 +1,13 @@
 {% extends "mobile/base_m.html" %}
 
 {% block content %}
+<a href="{% url employees-list %}">
+    <div class="box round">Zmień na: plany pracowników</div>
+</a>
 
 <div id="center-container">
-    <a href="{% url employees-list %}">
-        <div class="subject-outer">
-            <div class="subject-inner round" >
-                <b>Zmień na: plany pracowników</b>
-            </div>
-        </div>
-    </a>
+    
 <div class="square emptysquare"></div>
-
 <a href="{% url students-list %}2"> <div class="square round"> ABC </div> </a>
 <a href="{% url students-list %}3"> <div class="square round"> DEF </div> </a>
 <a href="{% url students-list %}4"> <div class="square round"> GHI </div> </a>

@@ -1,29 +1,14 @@
 {% extends "mobile/base_m.html" %}
 
 {% block content %}
+<a href="{% url students-list %}">
+    <div class="box round">Zmień na: plany studentów</div>
+</a>
 
-<div id="center-container">
-    <a href="{% url students-list %}">
-        <div class="subject-outer">
-            <div class="subject-inner round" >
-                <b>Zmień na: plany studentów</b>
-            </div>
-        </div>
-    </a>
-</div>
-<br/>
+<a href="/students/">
+    <div class="box round">Powrót</div>
+</a>
 
-<div id="center-container">
-        <a href="/students/">
-            <div class="subject-outer">
-                <div class="subject-inner round" >
-                <b>Powrót</b>
-                </div>
-            </div>
-        </a>
-</div>
-
-<br/>
 <div id="center-container">
     <div class="subject-outer">
         <div class="subject-inner">
@@ -37,6 +22,5 @@
             {% endfor %}
         </div>
     </div>
-
 </div>
 {% endblock %}
