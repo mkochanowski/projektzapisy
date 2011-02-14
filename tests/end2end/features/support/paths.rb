@@ -20,6 +20,9 @@ module NavigationHelpers
     when /schedule page/
       '/records/schedule/'
     
+    when /schedule prototype page/
+       '/records/schedule/prototype/'
+    
     else
           begin
             page_name =~ /the (.*) page/

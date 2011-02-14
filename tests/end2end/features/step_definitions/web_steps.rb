@@ -85,3 +85,11 @@ end
 Then /^show me the page$/ do
   save_and_open_page
 end
+
+When /^I pin the group "([^"]*)"$/ do |gid|
+   page.find(:xpath, "//div[@id=\"schedule-term-#{gid}-#{gid}\"]/div/div/div/div[@title=\"Przypnij\"]").click
+end
+
+When /^I enroll in a pinned group "([^"]*)"$/ do |gid|
+   page.find(:xpath, "//div[@id=\"schedule-term-#{gid}-#{gid}\"]/div/div/div/div[@title=\"Zapisz\"]").click
+end
