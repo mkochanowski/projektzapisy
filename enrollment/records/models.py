@@ -314,6 +314,7 @@ class QueueManager(models.Manager):
         return super(QueueManager, self).get_query_set()
 
 def queue_priority(value):
+    """ Controls range of priority"""
     if value <= 0 or value > 10:
         raise ValidationError(u'%s is not a priority' % value)
 
@@ -338,10 +339,12 @@ class Queue(models.Model):
 
     @staticmethod
     def get_priority(user_id, group_id):
+        """ Returns priority of student in group queue"""
         user = User.objects.get(id=user_id)
         try:
             student = user.student
             group = Group.objects.get(id = group_id)
+            """Pobranie recordu z zapisem studenta do kolejki grupy"""
             queue = Queue.queued.filter(student=student, group=group)
             if queue:
                 return queue[0].priority
@@ -357,6 +360,7 @@ class Queue(models.Model):
 
     @staticmethod
     def get_students_in_queue(group_id):
+        """ Returns state of queue for group ordered by time (FIFO)."""
         try:
             group = Group.objects.get(id=group_id)
             return map(lambda x: x.student, Queue.queued.filter(group=group).order_by('time'))
@@ -366,17 +370,20 @@ class Queue(models.Model):
 
     @staticmethod
     def add_student_to_queue(user_id, group_id,priority=1):
-        """ assignes student to queue."""
+        """ Assign student to queue"""
         user = User.objects.get(id=user_id)
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
+            """ Czy student jest już zapisany na przedmiot"""
             if Record.enrolled.filter(group=group, student=student).count() > 0 :
                 logger.warning('Queue.add_student_to_queue() throws AlreadyAssignedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
                 raise AlreadyAssignedException()
+            """ Czy student nie jest już w danej kolejce"""
             if Queue.queued.filter(group=group, student=student).count() > 0 :
                 logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
                 raise AlreadyQueuedException()
+            """ Próba utworzenia wpisu do kolejki"""
             record, is_created = Queue.objects.get_or_create(group=group, student=student, time=datetime.now(), priority=priority)
             if is_created == False: # Nie wiem czy ten warunek ma sens z tym powyżej
                 logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
@@ -393,12 +400,13 @@ class Queue(models.Model):
 
     @staticmethod
     def change_student_priority(user_id, group_id, new_priority) :
-        """change student priority in group queue"""
+        """change student's priority in group queue"""
         user = User.objects.get(id=user_id)
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
             record = Queue.objects.get(group=group, student=student)
+            """ Podstawienie nowej wartości"""
             record.priority = new_priority
             record.save()
             logger.info('User %s <id: %s> changed queue priority of group "%s" <id: %s> to %s' % (user.username, user.id, group, group.id, new_priority))
@@ -441,14 +449,17 @@ class Queue(models.Model):
       try:
             point_limit_duration = 14 # number of days from records openning when 40 ECTS point limit is in force
             group = Group.objects.get(id=group_id)
+            """ Sprawdzenie, czy obowiązuje jeszcze limit ECTS"""
             if group.subject.semester.records_opening + timedelta(days=point_limit_duration) < datetime.now():
 		return False
+            """ Obliczenie sumy punktów ECTS"""
             groups = Record.get_groups_for_student(user_id)
             subjects = set([g.subject for g in groups])
             ects = sum([s.ects for s in subjects])
             if group.subject not in subjects:
 	        ects += group.subject.ects
-	    if ects <= 40:
+	    """ Porównanie sumy z obowiązującym limitem"""
+            if ects <= 40:
 	        return False
 	    else:
 	        return True 
@@ -464,11 +475,14 @@ class Queue(models.Model):
         try:
             group = Group.objects.get(id=group_id)
             queue = Queue.queued.filter(group=group).order_by('time')
+            """ Przeszukiwanie kolejki"""
             for q in queue:
                 student_id = q.student.user.id
+                """ Sprawdzenie mozliwosci zapisania studenta na zajęcia"""
                 if Queue.is_ECTS_points_limit_exceeded(student_id, group_id):
-					logger.info('User %s <id: %s> is now removed as first from queue of group "%s" <id %s> but he exceeded ECTS limit' % (q.student.user.username, q.student.user.id, group, group_id))
-					Queue.remove_student_from_queue(student_id, group_id)
+                    """ Wyrzucenie studenta z kolejki. Jego limit ECTS nie pozwala zapisać go do grupy, na którą oczekuje"""
+                    logger.info('User %s <id: %s> is now removed as first from queue of group "%s" <id %s> but he exceeded ECTS limit' % (q.student.user.username, q.student.user.id, group, group_id))
+                    Queue.remove_student_from_queue(student_id, group_id)
                 else:
                     logger.info('User %s <id: %s> is now removed as first from queue of group "%s" <id %s>' % (q.student.user.username, q.student.user.id, group, group_id))
                     return Queue.remove_student_from_queue(student_id, group_id)
@@ -485,6 +499,7 @@ class Queue(models.Model):
             
     @staticmethod
     def get_groups_for_student(user_id):
+        """ Return all groups that student is trying to sign to."""
         user = User.objects.get(id=user_id)
         try:
             student = user.student
@@ -501,7 +516,9 @@ class Queue(models.Model):
             student = user.student
             group = Group.objects.get(id = group_id)
             subject = Subject.objects.get(slug = group.subject_slug())
+            """ Pobranie listy grup z tego samego przedmiotu i tego samego typu, na które próbuje się zapisać student"""
             queued_group = [g for g in Queue.get_groups_for_student(user_id) if g.subject == subject and g.type == group.type]
+            """ Usunięcie wszystkich wpisów z kolejki, które są na liście queued_group i posiadają niższy priorytet od zadanego"""
             for q_g in queued_group :
                 record = Queue.queued.get(student = student,group = q_g)
                 if (record.priority <= priority) :
@@ -525,12 +542,14 @@ class Queue(models.Model):
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.subject, self.group.get_type_display(), self.group.get_teacher_full_name())
 
-#adding people from queue to group, after limits' change
 def add_people_from_queue(sender, instance, **kwargs):
+    """adding people from queue to group, after limits' change"""
     try:
+        """ Pobranie liczby zapisanych studentów"""
         num_of_people = Record.objects.filter(group=instance).count()
         queued = True
         while queued and (num_of_people < instance.limit) :
+            """ Opróżnianie kolejki do momentu osiągnięcia nowego limitu lub jej opróżnienia"""
             queued = Queue.remove_first_student_from_queue(instance.id)
             if queued:
                 logger.info('User %s <id: %s> is now added to group "%s" <id: %s> because of limits\' change (parameters instance = %s)' % (queued.student.user.username, queued.student.user.id, queued.group, queued.group.id, instance.id)) #prosze o sprawdzenie, czy sie nie pomylilem                
