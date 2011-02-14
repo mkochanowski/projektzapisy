@@ -11,13 +11,13 @@ World(WithinHelpers)
 
 def load_fixture(fixture)
     path = "../../"
-    system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/#{fixture}.json"
+    system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/#{fixture}.json -v 0"
 end
 
 Given /I start new scenario/ do
     path = "../../"
-    system "#{path}manage.py flush --noinput"
-    system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/core_dump.json"
+    system "#{path}manage.py flush --noinput -v 0"
+    system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/core_dump.json -v 0"
 end
 
 Given /I am logged in with "([^"]*)" privileges/ do |privileges|
@@ -73,6 +73,10 @@ When /^(?:|I )press "([^"]*)"$/ do |button|
 	click_button(button)
 end
 
+When /^(?:|I )press visible "([^"]*)"$/ do |button|
+    page.find(:xpath, "//*[input[(@value='#{button}')]]", :visible => true ).click_button(button)
+end
+
 When /^(?:|I )follow "([^"]*)"$/ do |link|
 	click_link(link)
 end
@@ -84,6 +88,23 @@ end
 When /^(?:|I )fill in "([^"]*)" with "([^"]*)"$/ do |field, value|
 	value.gsub!(/\n/, '<br/>')
 	fill_in(field, :with => value)
+end
+
+When /^(?:|I )fill in "([^"]*)" with value "([^"]*)" with "([^"]*)"$/ do |field, value_no, value|
+    value.gsub!(/\n/, '<br/>')
+    page.find( :xpath, "//*[input[(@name='#{field}') and (@id='#{value_no}')]]" ).fill_in(field, :with => value)
+end
+
+When /^(?:|I )select "([^"]*)" as "([^"]*)"$/ do |field, value|
+    select(value, :from=> field )
+end
+
+When /^(?:|I )check "([^"]*)"$/ do |field|
+    check(field)
+end
+
+When /^(?:|I )check "([^"]*)" with value "([^"]*)"$/ do |field, value|
+    page.find( :xpath, "//*[input[(@name='#{field}') and (@value='#{value}')]]" ).check(field)
 end
 
 Then /^I should be on (.+)$/ do |page_name|  

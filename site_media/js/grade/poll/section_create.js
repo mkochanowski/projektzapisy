@@ -490,6 +490,7 @@ Poll.section.createAnswer = function(ul, id, value, type)
     li.className = 'poll-question-answer';
     answer.name =  'poll[question][' + id + '][answers][]';
     answer.type = 'text'
+    answer.id = $(ul).children().size() + 1
 
     check.type = 'checkbox'
     check.name =   'poll[question][' + id + '][hideOn][]';
@@ -513,7 +514,6 @@ Poll.section.createAnswer = function(ul, id, value, type)
         $(check).hide();  
     }
 
-    $(answer).val(value);
     $(answer).addClass('autocomplete')
     $(answer).autocomplete(
     	{
