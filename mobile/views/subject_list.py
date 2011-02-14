@@ -13,7 +13,9 @@ logger = logging.getLogger()
 
 @login_required
 def studentSubjectList(request):
-	
+	"""
+		A function returning lists of subjects the authenticated user has enrolled to, has voted for or has pinned to their schedule.
+	"""
 	(subjects_enrolled, subjects_pinned, subjects_voted) = subjectsEnrolled(request)
 	logger.info('User %s looked at his subject list' % (unicode(request.user.username)))
 	return render_to_response("mobile/student_subjects.html", {'enrolled': subjects_enrolled, 'pinned': subjects_pinned, 'voted': subjects_voted}, context_instance = RequestContext(request))
@@ -21,6 +23,12 @@ def studentSubjectList(request):
 
 @login_required
 def otherSubjects(request):
+	"""
+		A function returning the list of all subjects from the current semester.
+		After adding the
+			and s not in subj
+		fragment of code, it returns the list of current semester subjects not returned by studentSubjectList.
+	"""
 	(subjects_enrolled, subjects_pinned, subjects_voted) = subjectsEnrolled(request)
 	subjects_enrolled = [s['subject'] for s in subjects_enrolled]
 	subj = subjects_enrolled + subjects_pinned + subjects_voted

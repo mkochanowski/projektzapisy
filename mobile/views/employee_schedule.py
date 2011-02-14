@@ -12,7 +12,7 @@ DAYS_SIMPLE= ['poniedzialek', 'wtorek', 'sroda', 'czwartek', 'piatek', 'sobota',
 @login_required
 def employeeSchedule(request, schedule_owner=None, delta=None):
     """
-        Main page
+        A function returning the schedule of a chosen employee.
     """
     try:
         #choosing correct weekday
@@ -30,6 +30,7 @@ def employeeSchedule(request, schedule_owner=None, delta=None):
         
         #receiving subjects for given weekday
         groups = owner.get_schedule(owner.user.id)
+        print groups
         schedule = []
         for group in groups:
             for term in group.terms_:

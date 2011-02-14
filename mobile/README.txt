@@ -9,7 +9,7 @@
             - listę przedmiotów, na które jest się zapisanym,
             - listę przedmiotów, na które się głosowało,
             - listę przedmiotów przypiętych,
-            - listę pozostałych przedmiotów.
+            - listę wszystkich przedmiotów.
     - Aplikacja korzysta z bazy danych głównego systemu.
     - Aplikacja automatycznie wykrywa wejście z urządzenia mobilnego i dokonuje przekierowania na wersję mobliną systemu.
 
@@ -25,9 +25,8 @@
 
     - Po dodaniu ww. wpisu pojawia się problem z ustawianiem ciasteczek dla domeny bez kropki (localhost). 
       Aby odpalić projekt lokalnie, można więc w '/etc/hosts' przypisać do 127.0.0.1 
-      np. localhost.localhost i m.localhost.localhost (oraz SESSION_COOKIE_DOMAIN = ".localhost.localhost").
+      np. localhost.localhost i m.localhost.localhost (oraz w settings.py: SESSION_COOKIE_DOMAIN = ".localhost.localhost").
 
 
 3. Moduły.
-
-
+	Opisy modułów umieszczone są w poszczególnych plikach projektu.

@@ -11,7 +11,7 @@ DAYS_SIMPLE= ['poniedzialek','wtorek','sroda','czwartek','piatek','sobota','nied
 @login_required
 def studentSchedule(request, schedule_owner=None, delta=None):
     """
-        Main page
+        A function returning the schedule of either the authenticated student or another chosen student.
     """
     try:
         #choosing correct weekday
