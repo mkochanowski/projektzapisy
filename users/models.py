@@ -59,7 +59,7 @@ class Employee(BaseUser):
         user = User.objects.get(id=user_id)
         try:
             employee = user.employee
-            groups = [g for g in Employee.get_all_groups(user_id) if g.subject.semester.is_current_semester()] 
+            groups = [g for g in Employee.get_all_groups(user_id) ]
             subjects = set([group.subject for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
