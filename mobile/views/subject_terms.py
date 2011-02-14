@@ -29,6 +29,9 @@ logger = logging.getLogger()
 
 @login_required
 def subjectTerms(request,slug):
+    """
+        A function returning all groups connected to the chosen subject.
+    """
         try:
             #subject = Subject.objects.get(id = slug)
             #sprint subject.slug
