@@ -17,8 +17,12 @@ from django.db.models import Q
 
 from users.exceptions import NonUserException, NonEmployeeException, NonStudentException
 from users.models import Employee, Student
+from enrollment.subjects.models import Semester
 
 from users.forms import EmailChangeForm
+
+from datetime import timedelta
+import datetime
 
 import logging
 logger = logging.getLogger()
@@ -29,11 +33,12 @@ def student_profile(request, user_id):
         user = User.objects.get(id=user_id)
         student = user.student
         groups = Student.get_schedule(user.id)
-        
+
         data = {
-            'groups' : groups,
-            'student' : student,
-        }
+	            'groups' : groups,
+	            'student' : student,
+	        }
+
         return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except NonStudentException:
@@ -93,7 +98,27 @@ def password_change_done(request):
 def my_profile(request):
     '''profile site'''
     logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
-    return render_to_response('users/my_profile.html', context_instance = RequestContext( request ))
+    current_semester = Semester.get_default_semester()
+    if current_semester:
+        point_limit_duration = 14 #TODO
+        t0 = current_semester.records_opening - request.user.student.get_t0_interval()       
+        terms = [
+        {"name":"T0", "term":t0},
+        {"name":"T0 + 24h", "term":t0 + timedelta(days=1)},
+        {"name":"T0 + 48h", "term":t0 + timedelta(days=2)},
+        {"name":"T0 + 72h", "term":t0 + timedelta(days=3)},
+        {"name":"T1", "term":current_semester.records_opening},
+        {"name":"T2", "term":current_semester.records_opening + timedelta(days=point_limit_duration)},
+        {"name":"T2", "term":current_semester.records_closing},
+        ]
+    else:
+        terms = []
+    
+    data = {
+        'terms' : terms,
+    }
+
+    return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
 
 @login_required
 def employees_list(request):

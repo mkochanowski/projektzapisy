@@ -18,7 +18,7 @@ class Semester( models.Model ):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.PositiveIntegerField(default=lambda: datetime.now().year, verbose_name='rok akademicki')
     # implies academic year: year/(year+1)
-    records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów')
+    records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów') # T0
     records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
     semester_beginning = models.DateField(null = False, verbose_name='Data rozpoczęcia semestru')
     semester_ending = models.DateField(null = False, verbose_name='Data zakończenia semestru')

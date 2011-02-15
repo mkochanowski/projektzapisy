@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from users.exceptions import NonEmployeeException, NonStudentException
 from enrollment.subjects.models import Group
 
+import datetime
+
 import logging
 logger = logging.getLogger()
 
@@ -86,6 +88,9 @@ class Student(BaseUser):
     records_opening_delay_minutes = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (minuty)")
     type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
     block = models.BooleanField(verbose_name="blokada planu", default = False)
+
+    def get_t0_interval(self):
+        return datetime.timedelta(minutes=self.records_opening_delay_minutes)
     
     @staticmethod
     def get_all_groups(user_id):

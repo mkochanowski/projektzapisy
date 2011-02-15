@@ -447,7 +447,7 @@ class Queue(models.Model):
     def is_ECTS_points_limit_exceeded(user_id, group_id):
       """check if the sum of ECTS points for every subject student is enrolled on, exceeds limit"""
       try:
-            point_limit_duration = 14 # number of days from records openning when 40 ECTS point limit is in force
+            point_limit_duration = 14 # number of days from records openning when 40 ECTS point limit is in force TODO
             group = Group.objects.get(id=group_id)
             """ Sprawdzenie, czy obowiązuje jeszcze limit ECTS"""
             if group.subject.semester.records_opening + timedelta(days=point_limit_duration) < datetime.now():
