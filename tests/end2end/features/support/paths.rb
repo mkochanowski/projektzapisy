@@ -13,6 +13,9 @@ module NavigationHelpers
       
     when /my profile page/
       '/users/'
+
+    when /the mobile home page/
+      'http://m.localhost.localhost:8000/'
       
     when /subjects page/
       '/subjects/'

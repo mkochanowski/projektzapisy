@@ -11,9 +11,8 @@ World(WithinHelpers)
 
 
 Given /I am logged in/ do
-  Given %{I am on the home page}
-    And %{I follow "System zapisów"}
-    And %{I follow "Zaloguj"}
+  Given %{I am on the home page} 
+    And %{I follow "zaloguj"}
     And %{I fill in "Nazwa użytkownika" with "student-test"}
     And %{I fill in "Hasło" with "aaa"}
     And %{I press "Zaloguj"}
@@ -58,6 +57,10 @@ end
 
 Then /^(?:|I )should see "([^"]*)"$/ do |text|  
   page.should have_content(text)
+end
+
+Then /^(?:|I )should see link "([^"]*)"$/ do |text|
+  find_link(text).visible?
 end
 
 Then /^(?:|I )should not see "([^"]*)"$/ do |text|  
