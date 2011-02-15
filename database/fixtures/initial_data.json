@@ -1208,22 +1208,40 @@
         }
     },
     {
-        "pk": 100, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "1000000", 
-            "first_name": "Jan", 
-            "last_name": "Kowalski0", 
-            "is_active": true, 
-            "is_superuser": false, 
-            "is_staff": false, 
-            "last_login": "2010-11-04 14:43:11", 
-            "groups": [], 
-            "user_permissions": [], 
-            "password": "sha1$9915f$38f8781f7fbaed11078a9f38295b7bea1f871cb7", 
-            "email": "aaa@aa.pl", 
-            "date_joined": "2010-11-04 14:42:09"
-        }
+       "pk": 99, 
+       "model": "auth.user", 
+       "fields": {
+          "username": "student-test", 
+          "first_name": "Student", 
+          "last_name": "Tester", 
+          "is_active": true, 
+          "is_superuser": false, 
+          "is_staff": false, 
+          "last_login": "2010-11-04 14:43:11", 
+          "groups": [], 
+          "user_permissions": [], 
+          "password": "sha1$9915f$38f8781f7fbaed11078a9f38295b7bea1f871cb7", 
+          "email": "aaa@aa.pl", 
+          "date_joined": "2010-11-04 14:42:09"
+       }
+    }, 
+    {
+       "pk": 100, 
+       "model": "auth.user", 
+       "fields": {
+          "username": "1000000", 
+          "first_name": "Jan", 
+          "last_name": "Kowalski0", 
+          "is_active": true, 
+          "is_superuser": false, 
+          "is_staff": false, 
+          "last_login": "2010-11-04 14:43:11", 
+          "groups": [], 
+          "user_permissions": [], 
+          "password": "sha1$9915f$38f8781f7fbaed11078a9f38295b7bea1f871cb7", 
+          "email": "aaa@aa.pl", 
+          "date_joined": "2010-11-04 14:42:09"
+       }
     }, 
     {
         "pk": 101, 
@@ -5868,8 +5886,8 @@
             "records_opening": "2010-02-01 00:00:00", 
             "visible": true, 
             "type": "l", 
-            "records_closing": "2010-02-15 00:00:00", 
-            "year": 2009
+            "records_closing": "2066-02-15 00:00:00", 
+            "year": 2010
         }
     }, 
     {
@@ -7420,17 +7438,30 @@
         }
     }, 
     {
-        "pk": 100, 
-        "model": "users.student", 
-        "fields": {
-            "ects": 134, 
-            "records_opening_delay_hours": 0, 
-            "receive_mass_mail_offer": true, 
-            "user": 100, 
-            "matricula": "1000000", 
-            "type": 1, 
-            "receive_mass_mail_enrollment": true
-        }
+       "pk": 100, 
+       "model": "users.student", 
+       "fields": {
+          "ects": 134, 
+          "records_opening_delay_hours": 0, 
+          "receive_mass_mail_offer": true, 
+          "user": 100, 
+          "matricula": "1000000", 
+          "type": 1, 
+          "receive_mass_mail_enrollment": true
+       }
+    }, 
+    {
+       "pk": 99, 
+       "model": "users.student", 
+       "fields": {
+          "ects": 134, 
+          "records_opening_delay_hours": 0, 
+          "receive_mass_mail_offer": true, 
+          "user": 99, 
+          "matricula": "1000000", 
+          "type": 1, 
+          "receive_mass_mail_enrollment": true
+       }
     }, 
     {
         "pk": 101, 
