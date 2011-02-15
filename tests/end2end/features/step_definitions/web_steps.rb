@@ -21,6 +21,7 @@ end
 Given /^I enroll in "([^"]*)" in group with id "([^"]*)"$/ do |coursename, id|
    Given %{I am on subjects page}
      And %{I click on "#{coursename}"}
+     And %{I sleep for 10 seconds} 
      And %{I click on link which points to "/records/#{id}/assign"}
 end
 
@@ -78,7 +79,7 @@ When /^I sleep for ([0-9]+) seconds$/ do |secs|
 end
 
 When /^I click on link which points to "([^"]*)"$/ do |path|
-  page.find(:xpath, "//a[@link=\"#{path}\"]").click
+  page.find(:xpath, "//a[@href=\"#{path}\"]").click
 end
 
 Then /^I should see link which points to "([^"]*)"$/ do |path|
