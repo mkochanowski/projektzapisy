@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# tests marked by comment "TIME DEPENDENCY" should be free from this dependency
+
 from datetime import datetime, timedelta, date
 
 from django.test import TestCase
@@ -34,7 +36,8 @@ class EmployeeScheduleTest(TestCase):
     def testWithNotEmployeeUser(self):
         self.user.employee.delete()
         self.assertRaises(NonEmployeeException, Employee.get_schedule, self.user.id)
-        
+ 
+#TIME DEPENDENCY       
     def testEmployeeSchedule(self):
         subject_1 = Subject.objects.get(id=1)
         subject_1.semester.year = datetime.now().year
@@ -64,16 +67,33 @@ class StudentScheduleTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__subjects']
     
     def setUp(self):
+    	"""
+    	EXERCISE_GROUP:
+	    	"fields": {
+	            "limit": 120, 
+	            "type": "2", 
+	            "teacher": 3, 
+	            "subject": 1
+	        }
+	    LECTURE_GROUP:
+		    "fields": {
+	            "limit": 120, 
+	            "type": "1", 
+	            "teacher": 3, 
+	            "subject": 1
+	        }
+    	"""
         self.user = User.objects.get(id=5)
-        self.group_1 = Group.objects.get(id=1)
-        self.group_2 = Group.objects.get(id=3)
-        self.record_1 = Record.add_student_to_group(self.user.id, self.group_1.id)
-       # self.record_2 = Record.add_student_to_group(self.user.id, self.group_2.id)
+        self.exercise_group = Group.objects.get(id=1)
+        self.lecture_group = Group.objects.get(id=3)
+        #Automaticaly add student to lecture group
+        self.record = Record.add_student_to_group(self.user.id, self.exercise_group.id)
         
     def testWithNotStudentUser(self):
         self.user.student.delete()
         self.assertRaises(NonStudentException, Student.get_schedule, self.user.id)
-        
+
+#TIME DEPENDENCY        
     def testStudentSchedule(self):
         subject_1 = Subject.objects.get(id=1)
         subject_1.semester.date = datetime.now().year
@@ -93,7 +113,7 @@ class StudentScheduleTest(TestCase):
         groups_term_id = map(lambda x: x.id, groups_term_id)
         
         for g in groups_id:
-        	self.assert_(g in [self.group_1.id, self.group_2.id])
+        	self.assert_(g in [self.exercise_group.id, self.lecture_group.id])
         for s in groups_subject:
         	self.assert_(s in [subject_1, subject_1])
         for t in groups_term_id:
