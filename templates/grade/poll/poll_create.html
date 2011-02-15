@@ -44,13 +44,13 @@
                     {% endfor %}
                 </select>
                 <label for="studies-type">Typ studiów: </label>
-                <select name="studies-type">
+                <select name="studies-type" id="studies-type">
                     <option value="-1">Dowolny</option>
                     {% for study_type in studies_types %}
                     <option value="{{study_type.pk}}"{% if study_type.pk == studies_type %} selected{% endif %}>{{study_type}}</option>
                     {% endfor %}
                 </select><br>
-                <label for="subject">Przedmiot: </label>
+                <label for="subjects">Przedmiot: </label>
                 <select name="subject" id="subjects">
                     <option value="-1">Nie przypisane do przedmiotu</option>
                     <option value="0"{% if subject_id == 0 %} selected{% endif %}>Wszystkie przedmioty</option>
@@ -74,7 +74,7 @@
             </fieldset>
             <label for="title">Tytuł:</label>
 
-            <input type="text" name="title"><br>
+            <input type="text" name="title" id="title"><br>
             <label for="description">Opis</label>
             <textarea name="description"></textarea>
             
@@ -84,7 +84,7 @@
                 <ul>
                 </ul><small>(Przeciągnij aby zmienić kolejność)</small>
             </div><br/>
-            <label for="section">Wybierz sekcję:</label>
+            <label for="sections">Wybierz sekcję:</label>
             <select name="section" id="sections">
                 {% for section in sections%}
                 <option value="{{section.pk}}">{{section}}</option>

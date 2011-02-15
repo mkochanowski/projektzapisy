@@ -96,7 +96,7 @@ When /^(?:|I )fill in "([^"]*)" with value "([^"]*)" with "([^"]*)"$/ do |field,
 end
 
 When /^(?:|I )select "([^"]*)" as "([^"]*)"$/ do |field, value|
-    select(value, :from=> field )
+    select(value, :from => field )
 end
 
 When /^(?:|I )check "([^"]*)"$/ do |field|
@@ -139,6 +139,21 @@ Given /^I am signed for groups with polls$/ do
 	load_fixture "records"
     load_fixture "keys_for_polls"
 end
+
+Given /^there are some subjects with groups for current semester$/ do
+	load_fixture "groups"
+	load_fixture "records"
+end
+
+Given /^there are some sections created already$/ do
+	load_fixture "groups"
+	load_fixture "sections"
+end
+
+Given /^there is a poll for some exercises$/ do
+    load_fixture "exercises_przedmiot_4"
+end
+
 
 When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 	if arg == "all" then
