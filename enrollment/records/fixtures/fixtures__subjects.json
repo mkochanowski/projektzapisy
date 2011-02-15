@@ -195,7 +195,7 @@
             "visible": true, 
             "type": "l", 
             "year": 2010,
-			"records_opening" : "2010-01-01 00:00:00"
+			"records_opening" : "2011-03-01 00:00:00"
         }
     }, 
     {
@@ -205,7 +205,7 @@
             "visible": true, 
             "type": "z", 
             "year": 2010,
-			"records_opening" : "2010-01-01 00:00:00"
+			"records_opening" : "2010-10-01 00:00:00"
         }
     }
 ]

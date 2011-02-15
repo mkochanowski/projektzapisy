@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
 
-from datetime import datetime
 from django.db import models
 from subject import Subject
 
@@ -31,7 +30,7 @@ class Semester( models.Model ):
 
     def is_current_semester(self):
         """ Answers to question: is semester current semester""" 
-        if self.semester_begining==None or self.semester_ending==None:
+        if self.semester_begining == None or self.semester_ending == None:
             return False
         return (self.semester_begining <= datetime.now().date() and self.semester_ending >= datetime.now().date())
     
