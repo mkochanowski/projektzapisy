@@ -11,7 +11,7 @@ Feature: Student wants to create tickets for polls
 		When I follow "Pobierz bilety"
 		And I uncheck "no" checkboxes in tickets grouping options
 		And I press "Pobierz bilety"
-		Then I should see "Pomyślnie wygenerowano bilety"
+		Then I wait for a while to see "Pomyślnie wygenerowano bilety"
 	
 	Scenario: Student successfully creates tickets for all his polls (without grouping)	
 		Given the grading protocol is "on"
@@ -21,7 +21,7 @@ Feature: Student wants to create tickets for polls
 		When I follow "Pobierz bilety"
 		And I uncheck "all" checkboxes in tickets grouping options
 		And I press "Pobierz bilety"
-		Then I should see "Pomyślnie wygenerowano bilety"
+		Then I wait for a while to see "Pomyślnie wygenerowano bilety"
 		
 	Scenario: Student successfully creates tickets for all his polls (with partial grouping)
 		Given the grading protocol is "on"
@@ -31,7 +31,7 @@ Feature: Student wants to create tickets for polls
 		When I follow "Pobierz bilety"
 		And I uncheck "some" checkboxes in tickets grouping options
 		And I press "Pobierz bilety"		
-		Then I should see "Pomyślnie wygenerowano bilety"
+		Then I wait for a while to see "Pomyślnie wygenerowano bilety"
 			
 	Scenario: Student fails to create tickets for all his polls - tickets already created
 		Given the grading protocol is "on"	
@@ -40,6 +40,7 @@ Feature: Student wants to create tickets for polls
         And I am on grade main page
 		When I follow "Pobierz bilety"
 		And I press "Pobierz bilety"
+        Then I wait for a while to see "Pomyślnie wygenerowano bilety"
 		And I follow "Pobierz bilety"
 		And I press "Pobierz bilety"
 		Then I should see "Nie udało się pobrać następujących biletów:"

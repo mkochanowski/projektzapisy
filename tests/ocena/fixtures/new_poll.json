@@ -1,1 +1,16 @@
-[{"pk": 1, "model": "poll.poll", "fields": {"studies_type": null, "group": null, "description": "teste", "title": "test", "author": 1000, "semester": 100}}, {"pk": 2, "model": "poll.poll", "fields": {"studies_type": null, "group": null, "description": "test", "title": "drugi test", "author": 1003, "semester": 100}}]
+[
+    {
+        "pk": 14, 
+        "model": "poll.poll", 
+        "fields": {
+            "studies_type": null, 
+            "share_result": false, 
+            "group": null, 
+            "description": "", 
+            "title": "Pusta ankieta", 
+            "deleted": false, 
+            "author": 2, 
+            "semester": 1
+        }
+    }
+]

@@ -65,7 +65,7 @@ Feature: User with privileges wants to create a poll.
         When I follow "Zarządzaj ankietami"    
         And I follow "Tworzenie ankiet"
         And I fill in "Tytuł:" as "Ogół zajęć w instytucie"
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję:" as "Ogół zajęć"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
         Then I should see "Utworzono ankiety"

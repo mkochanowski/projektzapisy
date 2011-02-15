@@ -162,38 +162,11 @@
         }
     }, 
     {
-        "pk": 31, 
+        "pk": 28, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_dontsendentry", 
             "name": "Can add blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 32, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_dontsendentry", 
-            "name": "Can change blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 33, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_dontsendentry", 
-            "name": "Can delete blokada", 
-            "content_type": 11
-        }
-    }, 
-    {
-        "pk": 28, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_message", 
-            "name": "Can add wiadomo\u015b\u0107", 
             "content_type": 10
         }
     }, 
@@ -201,8 +174,8 @@
         "pk": 29, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_message", 
-            "name": "Can change wiadomo\u015b\u0107", 
+            "codename": "change_dontsendentry", 
+            "name": "Can change blokada", 
             "content_type": 10
         }
     }, 
@@ -210,36 +183,63 @@
         "pk": 30, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_message", 
-            "name": "Can delete wiadomo\u015b\u0107", 
+            "codename": "delete_dontsendentry", 
+            "name": "Can delete blokada", 
             "content_type": 10
         }
     }, 
     {
-        "pk": 34, 
+        "pk": 25, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_message", 
+            "name": "Can add wiadomo\u015b\u0107", 
+            "content_type": 9
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_message", 
+            "name": "Can change wiadomo\u015b\u0107", 
+            "content_type": 9
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_message", 
+            "name": "Can delete wiadomo\u015b\u0107", 
+            "content_type": 9
+        }
+    }, 
+    {
+        "pk": 31, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_messagelog", 
             "name": "Can add log", 
-            "content_type": 12
+            "content_type": 11
         }
     }, 
     {
-        "pk": 35, 
+        "pk": 32, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_messagelog", 
             "name": "Can change log", 
-            "content_type": 12
+            "content_type": 11
         }
     }, 
     {
-        "pk": 36, 
+        "pk": 33, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_messagelog", 
             "name": "Can delete log", 
-            "content_type": 12
+            "content_type": 11
         }
     }, 
     {
@@ -270,30 +270,30 @@
         }
     }, 
     {
-        "pk": 126, 
+        "pk": 129, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_multiplechoicequestion", 
             "name": "Can add pytanie wielokrotnego wyboru", 
-            "content_type": 42
+            "content_type": 43
         }
     }, 
     {
-        "pk": 127, 
+        "pk": 130, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_multiplechoicequestion", 
             "name": "Can change pytanie wielokrotnego wyboru", 
-            "content_type": 42
+            "content_type": 43
         }
     }, 
     {
-        "pk": 128, 
+        "pk": 131, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_multiplechoicequestion", 
             "name": "Can delete pytanie wielokrotnego wyboru", 
-            "content_type": 42
+            "content_type": 43
         }
     }, 
     {
@@ -324,30 +324,30 @@
         }
     }, 
     {
-        "pk": 129, 
+        "pk": 132, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_multiplechoicequestionordering", 
             "name": "Can add pozycja pyta\u0144 wielokrotnego wyboru", 
-            "content_type": 43
+            "content_type": 44
         }
     }, 
     {
-        "pk": 130, 
+        "pk": 133, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_multiplechoicequestionordering", 
             "name": "Can change pozycja pyta\u0144 wielokrotnego wyboru", 
-            "content_type": 43
+            "content_type": 44
         }
     }, 
     {
-        "pk": 131, 
+        "pk": 134, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_multiplechoicequestionordering", 
             "name": "Can delete pozycja pyta\u0144 wielokrotnego wyboru", 
-            "content_type": 43
+            "content_type": 44
         }
     }, 
     {
@@ -405,30 +405,30 @@
         }
     }, 
     {
-        "pk": 138, 
+        "pk": 144, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_openquestionordering", 
             "name": "Can add pozycja pyta\u0144 otwartych", 
-            "content_type": 46
+            "content_type": 48
         }
     }, 
     {
-        "pk": 139, 
+        "pk": 145, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_openquestionordering", 
             "name": "Can change pozycja pyta\u0144 otwartych", 
-            "content_type": 46
+            "content_type": 48
         }
     }, 
     {
-        "pk": 140, 
+        "pk": 146, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_openquestionordering", 
             "name": "Can delete pozycja pyta\u0144 otwartych", 
-            "content_type": 46
+            "content_type": 48
         }
     }, 
     {
@@ -459,38 +459,11 @@
         }
     }, 
     {
-        "pk": 150, 
+        "pk": 153, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_poll", 
             "name": "Can add ankieta", 
-            "content_type": 50
-        }
-    }, 
-    {
-        "pk": 151, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_poll", 
-            "name": "Can change ankieta", 
-            "content_type": 50
-        }
-    }, 
-    {
-        "pk": 152, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_poll", 
-            "name": "Can delete ankieta", 
-            "content_type": 50
-        }
-    }, 
-    {
-        "pk": 153, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_savedticket", 
-            "name": "Can add zapisany bilet", 
             "content_type": 51
         }
     }, 
@@ -498,8 +471,8 @@
         "pk": 154, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_savedticket", 
-            "name": "Can change zapisany bilet", 
+            "codename": "change_poll", 
+            "name": "Can change ankieta", 
             "content_type": 51
         }
     }, 
@@ -507,44 +480,44 @@
         "pk": 155, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_savedticket", 
-            "name": "Can delete zapisany bilet", 
+            "codename": "delete_poll", 
+            "name": "Can delete ankieta", 
             "content_type": 51
         }
     }, 
     {
-        "pk": 144, 
+        "pk": 126, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_section", 
-            "name": "Can add sekcja", 
-            "content_type": 48
+            "codename": "add_savedticket", 
+            "name": "Can add zapisany bilet", 
+            "content_type": 42
         }
     }, 
     {
-        "pk": 145, 
+        "pk": 127, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_section", 
-            "name": "Can change sekcja", 
-            "content_type": 48
+            "codename": "change_savedticket", 
+            "name": "Can change zapisany bilet", 
+            "content_type": 42
         }
     }, 
     {
-        "pk": 146, 
+        "pk": 128, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_section", 
-            "name": "Can delete sekcja", 
-            "content_type": 48
+            "codename": "delete_savedticket", 
+            "name": "Can delete zapisany bilet", 
+            "content_type": 42
         }
     }, 
     {
         "pk": 147, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_sectionordering", 
-            "name": "Can add pozycja sekcji", 
+            "codename": "add_section", 
+            "name": "Can add sekcja", 
             "content_type": 49
         }
     }, 
@@ -552,8 +525,8 @@
         "pk": 148, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_sectionordering", 
-            "name": "Can change pozycja sekcji", 
+            "codename": "change_section", 
+            "name": "Can change sekcja", 
             "content_type": 49
         }
     }, 
@@ -561,36 +534,63 @@
         "pk": 149, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_sectionordering", 
-            "name": "Can delete pozycja sekcji", 
+            "codename": "delete_section", 
+            "name": "Can delete sekcja", 
             "content_type": 49
         }
     }, 
     {
-        "pk": 132, 
+        "pk": 150, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_sectionordering", 
+            "name": "Can add pozycja sekcji", 
+            "content_type": 50
+        }
+    }, 
+    {
+        "pk": 151, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_sectionordering", 
+            "name": "Can change pozycja sekcji", 
+            "content_type": 50
+        }
+    }, 
+    {
+        "pk": 152, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_sectionordering", 
+            "name": "Can delete pozycja sekcji", 
+            "content_type": 50
+        }
+    }, 
+    {
+        "pk": 135, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_singlechoicequestion", 
             "name": "Can add pytanie jednokrotnego wyboru", 
-            "content_type": 44
+            "content_type": 45
         }
     }, 
     {
-        "pk": 133, 
+        "pk": 136, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_singlechoicequestion", 
             "name": "Can change pytanie jednokrotnego wyboru", 
-            "content_type": 44
+            "content_type": 45
         }
     }, 
     {
-        "pk": 134, 
+        "pk": 137, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_singlechoicequestion", 
             "name": "Can delete pytanie jednokrotnego wyboru", 
-            "content_type": 44
+            "content_type": 45
         }
     }, 
     {
@@ -621,30 +621,57 @@
         }
     }, 
     {
-        "pk": 135, 
+        "pk": 138, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_singlechoicequestionordering", 
             "name": "Can add pozycja pyta\u0144 jednokrotnego wyboru", 
-            "content_type": 45
+            "content_type": 46
         }
     }, 
     {
-        "pk": 136, 
+        "pk": 139, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_singlechoicequestionordering", 
             "name": "Can change pozycja pyta\u0144 jednokrotnego wyboru", 
-            "content_type": 45
+            "content_type": 46
         }
     }, 
     {
-        "pk": 137, 
+        "pk": 140, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_singlechoicequestionordering", 
             "name": "Can delete pozycja pyta\u0144 jednokrotnego wyboru", 
-            "content_type": 45
+            "content_type": 46
+        }
+    }, 
+    {
+        "pk": 165, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_template", 
+            "name": "Can add szablon", 
+            "content_type": 55
+        }
+    }, 
+    {
+        "pk": 166, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_template", 
+            "name": "Can change szablon", 
+            "content_type": 55
+        }
+    }, 
+    {
+        "pk": 167, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_template", 
+            "name": "Can delete szablon", 
+            "content_type": 55
         }
     }, 
     {
@@ -990,30 +1017,30 @@
         }
     }, 
     {
-        "pk": 25, 
+        "pk": 34, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_migrationhistory", 
             "name": "Can add migration history", 
-            "content_type": 9
+            "content_type": 12
         }
     }, 
     {
-        "pk": 26, 
+        "pk": 35, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_migrationhistory", 
             "name": "Can change migration history", 
-            "content_type": 9
+            "content_type": 12
         }
     }, 
     {
-        "pk": 27, 
+        "pk": 36, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_migrationhistory", 
             "name": "Can delete migration history", 
-            "content_type": 9
+            "content_type": 12
         }
     }, 
     {
@@ -1479,18 +1506,18 @@
         "pk": 1, 
         "model": "auth.user", 
         "fields": {
-            "username": "ayertienna", 
-            "first_name": "", 
-            "last_name": "", 
+            "username": "administrator-test", 
+            "first_name": "Administrator", 
+            "last_name": "Testowy", 
             "is_active": true, 
             "is_superuser": true, 
             "is_staff": true, 
-            "last_login": "2011-01-21 00:31:38", 
+            "last_login": "2011-02-15 20:12:25", 
             "groups": [], 
             "user_permissions": [], 
-            "password": "sha1$d400b$ae4efb25aef25f684b4ee2a465ad97e0351b7002", 
-            "email": "a@a.pl", 
-            "date_joined": "2011-01-21 00:30:40"
+            "password": "sha1$3c6b3$e9f83129cdffcb4976252e8349b2a223ad91cd62", 
+            "email": "ayertienna@gmail.com", 
+            "date_joined": "2011-02-15 20:12:00"
         }
     }, 
     {
@@ -1498,17 +1525,17 @@
         "model": "auth.user", 
         "fields": {
             "username": "student-test", 
-            "first_name": "", 
-            "last_name": "", 
+            "first_name": "Student", 
+            "last_name": "Testowy", 
             "is_active": true, 
             "is_superuser": false, 
             "is_staff": false, 
-            "last_login": "2011-01-21 00:31:56", 
+            "last_login": "2011-02-15 20:12:40", 
             "groups": [], 
             "user_permissions": [], 
-            "password": "sha1$48532$f8bd736a5b509ef1a70bd55c503be85d8d6dac95", 
+            "password": "sha1$7173e$d0184cff1e04b0eb942418b7d991d449aacd6fd1", 
             "email": "", 
-            "date_joined": "2011-01-21 00:31:56"
+            "date_joined": "2011-02-15 20:12:40"
         }
     }, 
     {
@@ -1516,35 +1543,71 @@
         "model": "auth.user", 
         "fields": {
             "username": "employee-test", 
-            "first_name": "", 
-            "last_name": "", 
+            "first_name": "Pracownik", 
+            "last_name": "Testowy", 
             "is_active": true, 
             "is_superuser": false, 
             "is_staff": false, 
-            "last_login": "2011-01-21 00:33:07", 
+            "last_login": "2011-02-15 20:12:52", 
             "groups": [], 
             "user_permissions": [], 
-            "password": "sha1$a0988$8d2b4d1e164156107864a0874050672a041100f3", 
+            "password": "sha1$c8a35$5839c16283f7d44cc630326885ddcd37ffee253f", 
             "email": "", 
-            "date_joined": "2011-01-21 00:33:07"
+            "date_joined": "2011-02-15 20:12:52"
         }
     }, 
     {
         "pk": 4, 
         "model": "auth.user", 
         "fields": {
-            "username": "administrator-test", 
-            "first_name": "", 
+            "username": "employee1", 
+            "first_name": "Pracownik 1", 
             "last_name": "", 
             "is_active": true, 
-            "is_superuser": true, 
-            "is_staff": true, 
-            "last_login": "2011-01-21 00:33:28", 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2011-02-15 20:13:06", 
             "groups": [], 
             "user_permissions": [], 
-            "password": "sha1$25340$e44eab7ed175c02d6abc7b4fe5c7238ba3f0a3aa", 
+            "password": "sha1$63fe1$e3dbc910ec9739bb266cceb2bea9983b575a2c6d", 
             "email": "", 
-            "date_joined": "2011-01-21 00:33:28"
+            "date_joined": "2011-02-15 20:13:06"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "employee2", 
+            "first_name": "Pracownik 2", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2011-02-15 20:13:14", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$71e2e$f84b78c87901c64e038f18f55c406e4a009b2097", 
+            "email": "", 
+            "date_joined": "2011-02-15 20:13:14"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "auth.user", 
+        "fields": {
+            "username": "employee3", 
+            "first_name": "Pracownik 3", 
+            "last_name": "", 
+            "is_active": true, 
+            "is_superuser": false, 
+            "is_staff": false, 
+            "last_login": "2011-02-15 20:13:21", 
+            "groups": [], 
+            "user_permissions": [], 
+            "password": "sha1$98094$3811333e40f02085968bbfc91f864c2cbdef2e6b", 
+            "email": "", 
+            "date_joined": "2011-02-15 20:13:21"
         }
     }, 
     {
@@ -1563,7 +1626,37 @@
         "fields": {
             "consultations": "brak", 
             "receive_mass_mail_offer": true, 
+            "user": 1, 
+            "receive_mass_mail_enrollment": true
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "users.employee", 
+        "fields": {
+            "consultations": "brak", 
+            "receive_mass_mail_offer": true, 
             "user": 4, 
+            "receive_mass_mail_enrollment": true
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "users.employee", 
+        "fields": {
+            "consultations": "brak", 
+            "receive_mass_mail_offer": true, 
+            "user": 5, 
+            "receive_mass_mail_enrollment": true
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "users.employee", 
+        "fields": {
+            "consultations": "brak", 
+            "receive_mass_mail_offer": true, 
+            "user": 6, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -1575,8 +1668,8 @@
             "records_opening_delay_hours": 0, 
             "receive_mass_mail_offer": true, 
             "user": 2, 
-            "matricula": "6655", 
-            "type": 1, 
+            "matricula": "112233", 
+            "type": 2, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -1585,6 +1678,27 @@
         "model": "users.type", 
         "fields": {
             "name": "licencjackie"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "users.type", 
+        "fields": {
+            "name": "magisterskie"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "users.type", 
+        "fields": {
+            "name": "in\u017cynierskie"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "users.type", 
+        "fields": {
+            "name": "doktoranckie"
         }
     }
 ]

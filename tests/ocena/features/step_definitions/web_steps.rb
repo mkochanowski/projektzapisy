@@ -143,11 +143,11 @@ end
 When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 	if arg == "all" then
 		# odznaczenie obu checkboxów
-		uncheck("join_common")
-		uncheck("join_1")		
+		uncheck("join_1")
+		uncheck("join_2")		
 	elsif arg == "some" then
 		# odznaczenie pierwszego checkboxa (w teście są dwa)	
-		uncheck("join_common")
+		uncheck("join_1")
 	elsif arg == "no" then
 		# we do not touch anything then
 	end
@@ -158,5 +158,6 @@ Given /^I have previously saved some data in polls using "([^"]*)"$/ do |ticket|
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
-    wait_until(15) { page.should have_content(text) }
+    sleep 2
+    wait_until(5) { page.should have_content(text) }
 end
