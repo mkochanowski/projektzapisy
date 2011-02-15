@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'end_grading/$', 'fereol.grade.poll.views.poll_end_grading', name='poll-end-grading'),
     #- url(r'poll_save$', 'fereol.grade.poll.views.poll_save', name='grade-poll-poll-save'),
     
-    url(r'poll_results$', 'fereol.grade.poll.views.poll_results', name='grade-poll-poll-results'),
+    url(r'poll_results/(?P<poll_id>[1-9][0-9]*)?/$', 'fereol.grade.poll.views.poll_results', name='grade-poll-poll-results'),
     url(r'managment/polls_list$', 'fereol.grade.poll.views.polls_list', name='grade-poll-list'),
     url(r'managment/sections_list$', 'fereol.grade.poll.views.sections_list', name='grade-poll-sections-list'),
     url(r'managment/groups_without_polls$', 'fereol.grade.poll.views.groups_without_poll', name='grade-poll-groups_without_polls'),

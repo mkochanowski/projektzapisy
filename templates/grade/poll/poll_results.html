@@ -59,7 +59,7 @@
 	<br/>
 	<ul>
 		{% for l in list %}
-			<li> <p class="link"><a href="#">
+			<li> <p class="link"><a href="{% url grade-poll-poll-results l.id %}">
 				[ {{ l.title }} ]
 				{% if l.group %}
 				{{ l.group.subject.name }}
@@ -83,20 +83,21 @@
 		{{ selected.semester }}
 		<br/>
 		<table border=1>
-			{% for a in answers %}
-				<tr>
-				<td>tresc pytania</td>
-				<td>
-					13(20%) <br/>
-					<p class="link"><a href="#">nie fajnie</a></p>
-				</td>
-				<td>
-					????
-				</td>
-				<td>
-					????
-				</td>
-				</tr>
+			{% for grupa in answers %}
+				{% for a in grupa %}
+					<tr>
+					<td>{{ a.question }}</td>
+					<td>
+						{{ a.content }} 
+						{{ a.option }}
+						{% for o in a.options %}
+							{{ o }}
+							<br/>
+						{% endfor %}
+						{{ a.other }}
+					</td>
+					</tr>
+				{% endfor %}
 			{% endfor %}
 			
 			<tr>
