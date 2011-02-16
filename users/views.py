@@ -13,7 +13,7 @@ from django.http import QueryDict, HttpResponse
 from django.utils import simplejson
 from django.db.models import Q
 
-
+from django.conf import settings
 
 from users.exceptions import NonUserException, NonEmployeeException, NonStudentException
 from users.models import Employee, Student
@@ -100,7 +100,7 @@ def my_profile(request):
     logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
     current_semester = Semester.get_default_semester()
     if current_semester:
-        point_limit_duration = 14 #TODO
+        point_limit_duration = settings.POINT_LIMIT_DURATION 
         t0 = current_semester.records_opening - request.user.student.get_t0_interval()       
         terms = [
         {"name":"T0", "term":t0},
@@ -109,7 +109,7 @@ def my_profile(request):
         {"name":"T0 + 72h", "term":t0 + timedelta(days=3)},
         {"name":"T1", "term":current_semester.records_opening},
         {"name":"T2", "term":current_semester.records_opening + timedelta(days=point_limit_duration)},
-        {"name":"T2", "term":current_semester.records_closing},
+        {"name":"T3", "term":current_semester.records_closing},
         ]
     else:
         terms = []

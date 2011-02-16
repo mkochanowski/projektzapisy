@@ -145,6 +145,10 @@ HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
+#settings for enrollment
+POINT_LIMIT_DURATION = 14 # abs(t1-t2), in days
+ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
+
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.nowe-zapisy.ii.uni.wroc.pl' # without port number!
 #DEBUG = False

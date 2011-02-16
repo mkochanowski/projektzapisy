@@ -8,6 +8,8 @@ from enrollment.subjects.models import Group
 
 import datetime
 
+from fereol import settings
+
 import logging
 logger = logging.getLogger()
 
@@ -90,7 +92,7 @@ class Student(BaseUser):
     block = models.BooleanField(verbose_name="blokada planu", default = False)
 
     def get_t0_interval(self):
-        return datetime.timedelta(minutes=self.records_opening_delay_minutes)
+        return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS))
     
     @staticmethod
     def get_all_groups(user_id):
