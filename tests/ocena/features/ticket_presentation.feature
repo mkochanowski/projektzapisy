@@ -20,7 +20,18 @@ Feature: Anonymous user wants to present tickets for polls in order to anonymous
         
     
     Scenario Outline: Entry of the tickets in order to edit the polls
-        Given I have previously saved some data in polls using <ticket>
+        Given the grading protocol is "on"
+        And I am on grade main page
+        And I follow "Oceń zajęcia"
+        And I fill in "Podaj wygenerowane bilety:" with <ticket>
+        And I press "Wyślij" 
+        And I sleep for 2 seconds
+        When I follow "Ankiety ogólne"
+        And I follow "Ankieta ogólna"
+        And I fill in "poll-13_section-4_question-5-open" with "Matematycznych"
+        And I fill in "poll-13_section-4_question-6-open" with "Praktycznych"
+        And I press "Zapisz ankietę"
+        And I am on grade main page
         When I follow "Oceń zajęcia"
         And I fill in "Podaj wygenerowane bilety:" with <ticket>
         And I press "Wyślij"

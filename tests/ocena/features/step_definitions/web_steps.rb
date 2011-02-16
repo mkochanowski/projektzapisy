@@ -99,6 +99,10 @@ When /^(?:|I )select "([^"]*)" as "([^"]*)"$/ do |field, value|
     select(value, :from => field )
 end
 
+When /^(?:|I )choose "([^"]*)" as "([^"]*)"$/ do |field, value|
+    choose(value)
+end
+
 When /^(?:|I )check "([^"]*)"$/ do |field|
     check(field)
 end
@@ -166,10 +170,6 @@ When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 	elsif arg == "no" then
 		# we do not touch anything then
 	end
-end
-
-Given /^I have previously saved some data in polls using "([^"]*)"$/ do |ticket|
-  #  provide fixture or use this ticket to fill a fake poll in polls filling test ;)
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
