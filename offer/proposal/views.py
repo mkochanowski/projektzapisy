@@ -14,7 +14,7 @@ from django.template                import RequestContext
 from django.shortcuts               import redirect
 from copy                           import deepcopy
 
-from fereol.users.models            import Type
+from fereol.users.models            import Program
 
 from offer.proposal.models          import Proposal, Book, ProposalDescription, Types, DescriptionTypes
 from offer.proposal.exceptions      import NonStudentException, NonEmployeeException, NotOwnerException

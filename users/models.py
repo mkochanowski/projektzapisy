@@ -42,6 +42,8 @@ class Employee(BaseUser):
     Employee.
     '''
     consultations = models.TextField(verbose_name="konsultacje")
+    homepage = models.SlugField(max_length=255, verbose_name='strona domowa', default="")
+    room = models.PositiveIntegerField(verbose_name="pokój", null=True)
     
     @staticmethod
     def get_all_groups(user_id):
@@ -84,9 +86,13 @@ class Student(BaseUser):
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
-    type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
     program = models.ForeignKey('Program', verbose_name='Program Studiów', null=True, default=None)
+    semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
 
+    def get_type_of_studies(self):
+        """ returns type of studies """
+        semestr = {1:'pierwszy',2:'drugi',3:'trzeci',4:'czwarty',5:'piąty',6:'szósty',7:'siódmy',8:'ósmy',9:'dziewiąty',10:'dziesiąty',0:'niezdefiniowany'}[self.semestr]
+        return '%s, %s semestr' % (self.program , semestr)
     
     @staticmethod
     def get_all_groups(user_id):
@@ -123,25 +129,6 @@ class Student(BaseUser):
     def __unicode__(self):
         return str(self.user)
 
-class Type( models.Model ):
-    """
-        Model przechowuje informacje o typie studiow
-    """
-    name = models.CharField(max_length=45, unique=True, verbose_name="Typ")
-
-    class Meta:
-        verbose_name = 'Typ studiów'
-        verbose_name_plural = 'Typy studiów'
-
-    def __unicode__(self):
-        return self.name
-
-    @staticmethod
-    def get_types():
-        """
-            Typy studiow
-        """
-        return Type.objects.all()
 
 class Program( models.Model ):
     """
