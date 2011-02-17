@@ -60,6 +60,7 @@ def subject(request, slug):
         try:
             student = request.user.student
             subject.is_recording_open = subject.is_recording_open_for_student(student)
+            subject.can_enroll_from = subject.get_enrollment_opening_time(student)
             
             student_queues = queues.filter(student=student)
             student_queues_groups = map(lambda x: x.group, student_queues)

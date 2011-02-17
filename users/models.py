@@ -92,7 +92,7 @@ class Student(BaseUser):
     block = models.BooleanField(verbose_name="blokada planu", default = False)
 
     def get_t0_interval(self):
-        return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS))
+        return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
     
     @staticmethod
     def get_all_groups(user_id):

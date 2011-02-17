@@ -57,14 +57,20 @@ class Subject( models.Model ):
     visible = VisibleManager()
     
     def is_recording_open_for_student(self, student):
-        """ gives the answer to question: is student enrolling open for this subject at the very moment? """
+        """ gives the answer to question: is subject opened for enrollment for student at the very moment? """
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
+
+        try:
+            stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
+            interval = stud_opt.get_opening_bonus_timedelta()
+        except NonStudentOptionsException:
+            interval = timedelta(minutes=0)
 
         if records_opening == None:
             return False
         else:
-            if records_opening < datetime.now():
+            if records_opening - interval < datetime.now():
                 if records_closing == None:
                     return True
                 else:
@@ -72,23 +78,23 @@ class Subject( models.Model ):
             else:
                 return False
 
-#       try:
-#           stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
-#           records_opening = self.semester.records_opening 
-#           records_closing = self.semester.records_closing
-#           if records_opening == None:
-#               return False
-#           else:
-#               student_records_opening = records_opening + stud_opt.get_opening_delay_timedelta()
-#               if student_records_opening < datetime.now():
-#                   if records_closing == None:
-#                       return True
-#                   else:
-#                       return datetime.now() < records_closing
-#       except NonStudentOptionsException:
-#           logger.info('Subject.is_recording_open_for_student(student = %s) throws NonStudentOptionsException exception.' % str(student) )
-#           return False
-                
+    def get_enrollment_opening_time(self, student):
+        """ returns enrollment opening time as datetime object or None if enrollment is opened / was opened """
+        records_opening = self.semester.records_opening
+
+        try:
+            stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
+            interval = stud_opt.get_opening_bonus_timedelta()
+        except NonStudentOptionsException:
+            interval = timedelta(minutes=0)
+
+        if records_opening == None:
+            return False
+        else:
+            if records_opening - interval < datetime.now():
+                return None
+            else:
+                return records_opening - interval
     
     def get_semester_name(self):
         """ returns name of semester subject is linked to """

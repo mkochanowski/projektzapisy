@@ -39,9 +39,9 @@
 				{% if subject.lectures or subject.exercises or subject.laboratories %}
 					<li>
 						<span>Liczba godzin:</span>
-						{% if subject.lectures %}{{subject.lectures}} (wyk) {%if subject.lectures or subject.laboratories %}+{% endif %}{% endif %}
-						{% if subject.exercises %}{{subject.exercises}} (ćw) {%if subject.laboratories %}+{% endif %}{% endif %}
-						{% if subject.laboratories %}{{subject.laboratories}} (prac){% endif %}
+						{% if subject.lectures %}{{subject.lectures}} (wyk) {% endif %}
+						{% if subject.exercises %} + {{subject.exercises}} (ćw) % {% endif %}
+						{% if subject.laboratories %} + {{subject.laboratories}} (prac){% endif %}
 					</li>
 				{% endif %}
 				<li>
@@ -67,6 +67,12 @@
 		{% for message in messages %}
 			<p class="main-message">{{ message }}</p>
 		{% endfor %}
+
+        {% if subject.can_enroll_from %}
+            <br/>
+            <div class="tutorial"> Możesz zapisać się od: <b>{{subject.can_enroll_from}}</b></div>
+            <br/>
+        {% endif %}
 
 		{% for tutorial in tutorials %}{% if tutorial.groups %}
 			<div class="tutorial">
