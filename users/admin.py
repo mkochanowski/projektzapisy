@@ -5,7 +5,7 @@ from django.contrib import admin
 from fereol.users.models import Employee, Student, Type, Program
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('matricula','ects','program')
+    list_display = ('matricula','get_full_name','ects','program')
     search_fields = ('user__first_name', 'user__last_name', 'matricula')
     list_filter = ('program',)
 

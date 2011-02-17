@@ -45,10 +45,11 @@ class Subject( models.Model ):
     ects = models.IntegerField(verbose_name="punkty ECTS", null=True)
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     description = models.TextField(verbose_name='opis') 
-    lectures = models.IntegerField(verbose_name='ilość godzin wykładów')
-    exercises = models.IntegerField(verbose_name='ilość godzin ćwiczeń')
-    laboratories = models.IntegerField(verbose_name='ilość godzin pracowni')
+    lectures = models.IntegerField(verbose_name='Wykład')
+    exercises = models.IntegerField(verbose_name='Ćwiczenia')
+    laboratories = models.IntegerField(verbose_name='Pracownia')
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
+    repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method

@@ -6,6 +6,9 @@ from fereol.enrollment.subjects.models import *
 
 class SubjectAdmin(admin.ModelAdmin):  
     prepopulated_fields = {'slug' : ('name',)}
+    list_display = ('name', 'semester', 'lectures', 'exercises', 'laboratories','repetitions')
+    list_filter = ('semester',)
+    search_fields = ('name',)
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('number', 'capacity', 'building')
