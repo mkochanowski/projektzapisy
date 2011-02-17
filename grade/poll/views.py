@@ -807,17 +807,70 @@ def poll_results( request, poll_id ):
         if poll.is_user_entitled_to_view_result( request.user ):
             user_polls.append(poll)
 
+    selected = None
+    answers = None
+
     if user_polls!=[]:
         selected = user_polls[0]
-        answers = user_polls[0].all_answers()
+        if  user_polls[0].all_answers()!= []:
+            answers = user_polls[0].all_answers()[0]
 
     if poll_id:
         for p in user_polls:
             if int(poll_id) == int(p.id):
                 selected = p
-                answers = selected.all_answers()
+                if selected.all_answers() != []:
+                    answers = selected.all_answers()[0]
+					
+
+	# wersja tymczasowa zliczania wyników
+    grouped_answers = []
+    for a in answers:
+        if (a!=[]) and isinstance(a[0],OpenQuestionAnswer):
+            block = { 'open_question' : a[0].question, 'answer' : None }
+            l = []
+            for o in a:
+                l.append(o.content)
+            block['answer'] = l
+            grouped_answers.append(block)
+        elif (a!=[]) and isinstance(a[0],SingleChoiceQuestionAnswer):
+            block = { 'single_choice_question' : a[0].question, 'answer' : None }
+            l2=[]
+            for o in a:
+                l2.append(o.option)
+            l = []
+            while l2!=[]:
+                c = 0
+                t = l2[0]
+                for o in l2:
+                    if o==t:
+                        c+=1
+                        l2.remove(o)
+                l.append({ 'text' : t, 'count': c })
+            block['answer'] = l
+            grouped_answers.append(block)
+        elif (a!=[]) and isinstance(a[0],MultipleChoiceQuestionAnswer):
+            block = { 'multiple_choice_question' : a[0].question, 'answer' : None }
+            l2=[]
+            for o in a:
+                l2.append(o.option)
+            l = []
+            while l2!=[]:
+                c = 0
+                t = l2[0]
+                for o in l2:
+                    if t in o:
+                        c+=1
+                        o.remove(t)
+                        if o==[]:
+                            l2.remove(o)
+                l.append({ 'text' : t, 'count': c })
+            block['answer'] = l
+            grouped_answers.append(block)
+
+    print grouped_answers
 				
 				
     form = FilterMenu( request.POST )
-    data = { 'form' : form, 'list' : user_polls, 'answers' : answers[0], 'selected' : selected  , 'grade' : grade }
+    data = { 'form' : form, 'list' : user_polls, 'answers' : grouped_answers, 'selected' : selected  , 'grade' : grade }
     return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))

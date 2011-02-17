@@ -83,27 +83,54 @@
 		{{ selected.semester }}
 		<br/>
 		<table border=1>
-			{% for grupa in answers %}
-				{% for a in grupa %}
+			{% for a in answers %}
+				{% if a.open_question %} 
 					<tr>
-					<td>{{ a.question }}</td>
-					<td>
-						{{ a.content }} 
-						{{ a.option }}
-						{% for o in a.options %}
-							{{ o }}
-							<br/>
-						{% endfor %}
-						{{ a.other }}
-					</td>
+						<td>{{ a.open_question }}</td>
 					</tr>
-				{% endfor %}
+					<tr>
+						<td>
+							{% for o in a.answer %}
+								{{ o }}
+								<br/>
+							{% endfor %}
+						</td>
+					</tr>
+				{% endif %}
+					{% if a.single_choice_question %}
+						<tr>
+							<td>{{ a.single_choice_question }}</td>
+						</tr>
+						
+						<tr>
+							{% for o in a.answer %}
+								<td> 
+									{{ o.text }} 
+									<br/>
+									{{ o.count }}
+								</td>
+							{% endfor %}
+						</tr>
+						
+					{% endif %}
+					
+					
+					{% if a.multiple_choice_question %}
+						<tr>
+							<td>{{ a.single_choice_question }}</td>
+						</tr>
+						
+						<tr>
+							{% for o in a.answer %}
+								<td> 
+									{{ o.text }} 
+									<br/>
+									{{ o.count }}
+								</td>
+							{% endfor %}
+						</tr>
+					{% endif %}
 			{% endfor %}
-			
-			<tr>
-				<td> treść pytania </td>
-				<td> odpowiedzi </td>
-			</tr>
 		</table>
 		
 		
