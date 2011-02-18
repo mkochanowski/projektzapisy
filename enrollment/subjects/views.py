@@ -22,9 +22,15 @@ def make_it_json_friendly(element):
     return element
 
 ''' generates template data for filtering and list of subjects '''
-def prepare_subjects_list_to_render():
+def prepare_subjects_list_to_render(request):
     semesters = Semester.objects.filter(visible=True)
     subjects = Subject.visible.all()
+
+    try:
+        student = request.user.student
+        records_history = student.get_records_history()
+    except Student.DoesNotExist:
+        records_history = []
 
     semester_subjects = []
     for semester in semesters:
@@ -35,6 +41,9 @@ def prepare_subjects_list_to_render():
             'subjects': subjects.filter(semester__id__exact=semester.pk).
                 order_by('name').values('id', 'name', 'type', 'slug')
         })
+    for semester in semester_subjects:
+        for subject in semester['subjects']:
+            subject.update( { 'was_enrolled' : subject['id'] in records_history } )
 
     render_data = {
         'semester_subjects': semester_subjects,
@@ -46,7 +55,7 @@ def prepare_subjects_list_to_render():
 @login_required
 def subjects(request):
     return render_to_response('enrollment/subjects/subjects_list.html',
-        prepare_subjects_list_to_render(), context_instance=RequestContext(request))
+        prepare_subjects_list_to_render(request), context_instance=RequestContext(request))
 
    
 @login_required
@@ -182,7 +191,7 @@ def subject(request, slug):
             ]
         
 
-        data = prepare_subjects_list_to_render()
+        data = prepare_subjects_list_to_render(request)
         data.update({
             'subject' : subject,
             'tutorials' : tutorials,

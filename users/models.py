@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from users.exceptions import NonEmployeeException, NonStudentException
-from enrollment.subjects.models import Group
+from enrollment.subjects.models import Group, Semester
 
 import datetime
 
@@ -93,6 +93,15 @@ class Student(BaseUser):
 
     def get_t0_interval(self):
         return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
+
+    def get_records_history(self):
+        '''
+        Returns list of ids of subject s that student was enrolled for.
+        '''
+        default_semester = Semester.get_default_semester()
+        records = self.records.exclude(group__subject__semester = default_semester)
+        records_list = map(lambda x: x.group.subject.entity.id, records)
+        return list(frozenset(records_list))
     
     @staticmethod
     def get_all_groups(user_id):

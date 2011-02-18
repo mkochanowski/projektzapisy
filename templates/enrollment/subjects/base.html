@@ -75,6 +75,7 @@
 					<ul class="subjects-list">
 						{% for subject in semester.subjects %}
 							<li>
+                                {% if subject.was_enrolled %} ! {% endif %}
 								<a href="{% url subject-page subject.slug %}" id="subject-{{ subject.id }}">{{ subject.name }}</a>
 								<input type="hidden" name="type" value="{{ subject.type }}" />
 							</li>
