@@ -18,8 +18,8 @@ class Type(models.Model):
         self.name
 
     class Meta:
-        verbose_name = 'rodzaj'
-        verbose_name_plural = 'rodzaje'
+        verbose_name = 'rodzaj przedmiotu'
+        verbose_name_plural = 'rodzaje przedmiotów'
         app_label = 'subjects'
 
     def __unicode__(self):

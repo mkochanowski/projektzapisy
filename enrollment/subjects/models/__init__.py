@@ -6,3 +6,4 @@ from classroom import *
 from term import *
 from book import *
 from semester import *
+from points import *

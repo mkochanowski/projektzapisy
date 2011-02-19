@@ -28,4 +28,5 @@ admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Term)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(Type)
-
+admin.site.register(PointTypes)
+admin.site.register(PointsOfSubjects)
