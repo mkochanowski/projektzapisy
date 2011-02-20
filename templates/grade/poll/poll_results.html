@@ -84,9 +84,11 @@
 		<br/>
 		<table border=1>
 			{% for a in answers %}
-				{% if a.open_question %} 
+				{% if a.open_question %}
 					<tr>
-						<td>{{ a.open_question }}</td>
+						<td>
+							{{ a.open_question }}
+						</td>
 					</tr>
 					<tr>
 						<td>
@@ -97,39 +99,44 @@
 						</td>
 					</tr>
 				{% endif %}
-					{% if a.single_choice_question %}
-						<tr>
-							<td>{{ a.single_choice_question }}</td>
-						</tr>
-						
-						<tr>
-							{% for o in a.answer %}
-								<td> 
-									{{ o.text }} 
-									<br/>
-									{{ o.count }}
-								</td>
-							{% endfor %}
-						</tr>
-						
-					{% endif %}
 					
+				{% if a.single_choice_question %}
+					<tr>
+						<td>
+							{{ a.single_choice_question }}
+						</td>
+					</tr>
 					
-					{% if a.multiple_choice_question %}
-						<tr>
-							<td>{{ a.single_choice_question }}</td>
-						</tr>
+					<tr>
+						{% for o in a.answer %}
+							<td> 
+								{{ o.text }} 
+								<br/>
+								{{ o.count }}
+							</td>
+						{% endfor %}
+					</tr>
 						
-						<tr>
-							{% for o in a.answer %}
-								<td> 
-									{{ o.text }} 
-									<br/>
-									{{ o.count }}
-								</td>
-							{% endfor %}
-						</tr>
-					{% endif %}
+				{% endif %}
+				
+				{% if a.multiple_choice_question %}
+					<tr>
+						<td>
+							{{ a.multiple_choice_question }}
+						</td>
+					</tr>
+					
+					<tr>
+						{% for o in a.answer %}
+							<td> 
+								{{ o.text }} 
+								<br/>
+								{{ o.count }}
+							</td>
+						{% endfor %}
+					</tr>
+						
+				{% endif %}
 			{% endfor %}
 		</table>
 		

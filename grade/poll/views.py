@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 from django.contrib                    import auth
 from django.contrib.auth.decorators    import login_required
 from django.core.exceptions            import ObjectDoesNotExist
@@ -853,11 +853,12 @@ def poll_results( request, poll_id ):
             block = { 'multiple_choice_question' : a[0].question, 'answer' : None }
             l2=[]
             for o in a:
-                l2.append(o.option)
+                l2.append(list(o.options.all()))
             l = []
             while l2!=[]:
+                print l2
                 c = 0
-                t = l2[0]
+                t = l2[0][0]
                 for o in l2:
                     if t in o:
                         c+=1
@@ -865,10 +866,9 @@ def poll_results( request, poll_id ):
                         if o==[]:
                             l2.remove(o)
                 l.append({ 'text' : t, 'count': c })
+                    
             block['answer'] = l
             grouped_answers.append(block)
-
-    print grouped_answers
 				
 				
     form = FilterMenu( request.POST )
