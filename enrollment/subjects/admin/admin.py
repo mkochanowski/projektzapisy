@@ -20,6 +20,9 @@ class SubjectEntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'shortName')
     search_fields = ('name', 'shortName')
         
+class PointsOfSubjectsAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'program', 'value')
+
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(SubjectEntity, SubjectEntityAdmin)
 admin.site.register(StudentOptions)
@@ -29,4 +32,4 @@ admin.site.register(Term)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(Type)
 admin.site.register(PointTypes)
-admin.site.register(PointsOfSubjects)
+admin.site.register(PointsOfSubjects, PointsOfSubjectsAdmin)

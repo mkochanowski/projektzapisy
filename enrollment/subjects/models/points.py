@@ -11,6 +11,9 @@ class PointTypes(models.Model):
         verbose_name_plural = 'rodzaje punktów'
         app_label = 'subjects'
 
+    def __unicode__(self):
+        return '%s' % (self.name, )
+
 class PointsOfSubjects(models.Model):
     subject = models.ForeignKey('Subject', verbose_name='przedmiot')
     type_of_point = models.ForeignKey('PointTypes', verbose_name='rodzaj punktów')
@@ -21,3 +24,4 @@ class PointsOfSubjects(models.Model):
         verbose_name = 'zależność przedmiot-punkty'
         verbose_name_plural = 'zależności przedmiot-punkty'
         app_label = 'subjects'
+
