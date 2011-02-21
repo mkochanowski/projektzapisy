@@ -49,7 +49,7 @@
 				<select id="enr-subjectFilter-semester">
 					<option value="0">dowolny</option>
 					{% for semester in semester_subjects %}
-						<option value="{{ semester.id }}" {% if semester.is_current %} selected="selected" {% endif %}>{{ semester.name }}{% if semester.is_current %} (bieżący){% endif %}</option>
+						<option value="{{ semester.id }}" {% if semester.id == default_semester.id %} selected="selected" {% endif %}>{{ semester.name }}{% if semester.is_current %} (bieżący){% endif %}</option>
 					{% endfor %}
 				</select>
 			</span>
