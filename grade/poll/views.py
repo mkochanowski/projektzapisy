@@ -68,7 +68,6 @@ def disable_grade( request ):
     semester = Semester.get_current_semester()
     semester.is_grade_active = False
     semester.save()
-    grade = False
     
     PublicKey.objects.all().delete()
     PrivateKey.objects.all().delete()
@@ -77,7 +76,9 @@ def disable_grade( request ):
         st.finished = True
         st.save()
     
-    return render_to_response ('grade/base.html', {'grade' : grade, 'message' : "Zamknięto ocenę zajęć" }, context_instance = RequestContext ( request ))
+    messages.success( request, "Zamknięto ocenę zajęć" )
+    
+    return HttpResponseRedirect( '/grade' )
 
 #### Poll creation ####
 
