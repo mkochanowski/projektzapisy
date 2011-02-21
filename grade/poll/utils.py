@@ -5,14 +5,6 @@ from fereol.grade.poll.models         import Poll
 from fereol.grade.ticket_create.utils import poll_cmp, \
                                              flatten
 
-def check_enable_grade():
-    if Poll.get_polls_for_semester():
-        if Poll.get_current_semester_polls_without_keys():
-            return False
-        return True
-    else:
-        return False
-
 def check_signature( ticket, signed_ticket, public_key ):
     pk = RSA.importKey( public_key.public_key )
     return pk.verify( ticket, (signed_ticket,) )

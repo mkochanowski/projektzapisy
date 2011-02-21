@@ -36,9 +36,8 @@ from fereol.grade.poll.utils           import check_signature, \
                                               create_slug, \
                                               get_next, \
                                               get_prev, \
-                                              get_ticket_and_signed_ticket_from_session, \
-                                              check_enable_grade
-
+                                              get_ticket_and_signed_ticket_from_session
+                                              
 from fereol.users.models                 import Employee
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
@@ -48,14 +47,21 @@ def default(request):
 
 @employee_required
 def enable_grade( request ):
-    if check_enable_grade():
-        semester = Semester.get_current_semester()
+    semester = Semester.get_current_semester()
+    
+    if Poll.get_current_polls().count() == 0:
+        data = {'grade' : False, 
+                'error' : "Nie można otworzyć oceny; brak ankiet" }
+    elif Poll.get_current_semester_polls_without_keys().count() != 0:
+        data = {'grade' : False, 
+                'error' : "Nie można otworzyć oceny; brak kluczy dla ankiet" }
+    else:
         semester.is_grade_active = True
         semester.save()   
-        grade = True
-        return render_to_response ('grade/base.html', {'grade' : grade, 'success' : "Ocena zajęć otwarta" }, context_instance = RequestContext ( request ))
-    else:
-        return render_to_response ('grade/base.html', {'grade' : False, 'error' : "Oceny nie można otworzyć: brak wygenerowanych kluczy lub ankiet" }, context_instance = RequestContext ( request ))
+        data = {'grade'   : True, 
+                'success' : "Ocena zajęć otwarta" }
+    
+    return render_to_response ('grade/base.html', data, context_instance = RequestContext ( request ))
 
 @employee_required
 def disable_grade( request ):

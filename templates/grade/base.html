@@ -54,6 +54,24 @@ PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
     OSTYLOWAĆ TĄ WIADOMOŚĆ!
 -->
 
+    {% if message %}
+        <div class="main-message">
+            <h4>{{ message }}</h4>
+        </div>
+    {% endif %}
+    
+    {% if error %}
+        <div class="grade-error-message">
+            <h4>{{ error }}</h4>
+        </div>
+    {% endif %}
+    
+    {% if success %}
+        <div class="main-message">
+            <h4>{{ success }}</h4>
+        </div>
+    {% endif %}
+
     <div id="grade-main">
 	    <h2>Zasady Oceny Zajęć</h2>
         <div id="grade-main-rules">
