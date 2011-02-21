@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
-from django.contrib                    import auth
+from django.contrib                    import auth, messages
+
 from django.contrib.auth.decorators    import login_required
 from django.core.exceptions            import ObjectDoesNotExist
 from django.core.urlresolvers          import reverse
@@ -49,19 +50,18 @@ def default(request):
 def enable_grade( request ):
     semester = Semester.get_current_semester()
     
-    if Poll.get_current_polls().count() == 0:
-        data = {'grade' : False, 
-                'error' : "Nie można otworzyć oceny; brak ankiet" }
+    if semester.is_grade_active:
+        messages.error( request, "Nie można otworzyć oceny; ocena jest już otwarta")
+    elif Poll.get_polls_for_semester().count() == 0:
+        messages.error( request, "Nie można otworzyć oceny; brak ankiet")
     elif Poll.get_current_semester_polls_without_keys().count() != 0:
-        data = {'grade' : False, 
-                'error' : "Nie można otworzyć oceny; brak kluczy dla ankiet" }
+        messages.error( request, "Nie można otworzyć oceny; brak kluczy dla ankiet")
     else:
         semester.is_grade_active = True
         semester.save()   
-        data = {'grade'   : True, 
-                'success' : "Ocena zajęć otwarta" }
+        messages.success(request, "Ocena zajęć otwarta" )
     
-    return render_to_response ('grade/base.html', data, context_instance = RequestContext ( request ))
+    return HttpResponseRedirect('/grade')
 
 @employee_required
 def disable_grade( request ):

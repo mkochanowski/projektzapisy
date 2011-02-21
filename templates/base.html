@@ -73,7 +73,9 @@
 			{% block sidebar %}
 			{% endblock %}
 			<div id="main-content" class="{% block content-class %}normal{% endblock %}">
-				{% block content %}
+				{% block messages %}
+                {% endblock %}
+                {% block content %}
 				{% endblock %}
 				<div style="clear: right"></div>
 			</div>
