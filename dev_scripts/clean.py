@@ -47,7 +47,11 @@ if (dbname == '') or (dbuser == ''):
 	print 'Nie podano kompletnych danych do bazy postgresql'
 	exit()
 
-conn = psycopg2.connect('dbname=' + dbname + ' user=' + dbuser + ' password=' + dbpassword)
+try:
+	conn = psycopg2.connect('dbname=' + dbname + ' user=' + dbuser + ' password=' + dbpassword)
+except psycopg2.OperationalError:
+	print 'Nie udało się połączyć z bazą postgresql.'
+	exit()
 cursor = conn.cursor()
 
 cursor.execute("SELECT table_name FROM information_schema.tables WHERE " +

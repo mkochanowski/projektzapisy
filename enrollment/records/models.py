@@ -326,8 +326,8 @@ class Queue(models.Model):
     objects = models.Manager()
     queued = QueueManager()
 
-    def change_priority(self, value):
-        self.priority += value
+    def set_priority(self, value):
+        self.priority = value
         self.save()
         return self
 

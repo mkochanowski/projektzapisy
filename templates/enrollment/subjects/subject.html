@@ -39,9 +39,9 @@
 				{% if subject.lectures or subject.exercises or subject.laboratories %}
 					<li>
 						<span>Liczba godzin:</span>
-						{% if subject.lectures %}{{subject.lectures}} (wyk) {% endif %}
-						{% if subject.exercises %} + {{subject.exercises}} (ćw) % {% endif %}
-						{% if subject.laboratories %} + {{subject.laboratories}} (prac){% endif %}
+						{% if subject.lectures %}{{subject.lectures}} (wyk) {%if subject.lectures or subject.laboratories %}+{% endif %}{% endif %}
+						{% if subject.exercises %}{{subject.exercises}} (ćw) {%if subject.laboratories %}+{% endif %}{% endif %}
+						{% if subject.laboratories %}{{subject.laboratories}} (prac){% endif %}
 					</li>
 				{% endif %}
 				<li>
@@ -102,6 +102,7 @@
 							<td class="number">{{ t.enrolled }}</td>
 							<td class="number">{{ t.queued }}</td>
 							<td class="controls">
+								<input type="hidden" name="group-id" value="{{ t.id }}" />
 								{% if subject.is_recording_open %}
 									{% if t.signed %}
 										<a href="{% url record-resign t.id %}">wypisz</a>
@@ -126,7 +127,7 @@
 							<td class="priority">
 								{% if t.priority %}
 									<a href="{% url dec-priority t.id %}">-</a>
-									{{ t.priority }}
+									<span>{{ t.priority }}</span>
 									<a href="{% url inc-priority t.id %}">+</a>
 								{% endif %}
 							</td>
