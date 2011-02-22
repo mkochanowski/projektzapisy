@@ -16,9 +16,8 @@
                     <tr><td>Typ pytania: </td>
                         <td><select class="typeSelect options" name="poll[question][{{forloop.counter}}][type]">
                                 <option value="open"{% if field.type = 'open'%} selected{% endif %}>Otwarte</option>
-                                <option value="single"{% if field.type = 'single' and not field.is_leading %} selected{% endif %}>Jednokrotnego wyboru</option>
+                                <option value="single"{% if field.type = 'single' %} selected{% endif %}>Jednokrotnego wyboru</option>
                                 <option value="multi"{% if field.type = 'multi' %} selected{% endif %}>Wielokrotnego wyboru</option>
-                                <option value="leading"{% if field.type = 'single' and field.is_leading %} selected{% endif %}>Pytanie wiodące</option>
                             </select></td></tr>
                     </tbody></table>
                     <ul class="answerset">
@@ -31,14 +30,18 @@
                         {% endfor %}
                     {% endif %}
                     </ul>
-                    {% if field.type != 'open' %}<input type="button" class="poll-add-answer" name="addQuestion" value="Dodaj odpowiedź">{% endif %}
+                    {% if field.type != 'open' %}<input type="button" class="addQuestion" name="addQuestion" value="Dodaj odpowiedź">{% endif %}
                     <ul class="optionset">
-                        <li{% if field.type != 'single'%} style="display: none;"{% endif %} class="isScale"><input name="poll[question][1][isScale]" id="poll[question][1][isScale]" type="checkbox">
-                        <label for="poll[question][1][isScale]">Odpowiedź w formie skali</label></li>
-                        <li{% if field.type != 'multi' %} style="display: none;"{% endif %} class="choiceLimit"><input name="poll[question][1][choiceLimit]" id="poll[question][1][choiceLimit]" type="text">
-                        <label for="poll[question][1][choiceLimit]">Limit odpowiedzi</label></li>
-                        <li{% if field.type != 'multi' %}  style="display: none;"{% endif %} class="hasOther"><input name="poll[question][1][hasOther]" id="poll[question][1][hasOther]" type="checkbox">
-                        <label for="poll[question][1][hasOther]">Odpowiedź inne</label></li>
+                        <li{% if field.type != 'single'%} style="display: none;"{% endif %} class="isScale"><input name="poll[question][{{forloop.counter}}][isScale]" id="poll[question][{{forloop.counter}}][isScale]" type="checkbox">
+                        <label for="poll[question][{{forloop.counter}}][isScale]">Odpowiedź w formie skali</label></li>
+                        <li{% if field.type != 'multi' %} style="display: none;"{% endif %} class="choiceLimit"><input name="poll[question][{{forloop.counter}}][choiceLimit]" id="poll[question][{{forloop.counter}}][choiceLimit]" type="text">
+                        <label for="poll[question][{{forloop.counter}}][choiceLimit]">Limit odpowiedzi</label></li>
+                        <li{% if field.type != 'multi' %}  style="display: none;"{% endif %} class="hasOther"><input name="poll[question][{{forloop.counter}}][hasOther]" id="poll[question][{{forloop.counter}}][hasOther]" type="checkbox">
+                        <label for="poll[question][{{forloop.counter}}][hasOther]">Odpowiedź inne</label></li>
+        <li{% if field.type != 'single' %} style="display: none;"{% endif %} class="leading">
+            <input type="checkbox" id="poll[question][{{forloop.counter}}][leading]" name="poll[question][{{forloop.counter}}][leading]"{% if field.is_leading%} checked{% endif %}>
+            <label for="poll[question][{{forloop.counter}}][leading]">Pytanie wiodące</label>
+        </li> 
                     </ul>
                     <input class="ready" value="Gotowe" type="button"><input class="delete" value="Usuń" type="button"></div>
             </li>

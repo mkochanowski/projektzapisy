@@ -442,7 +442,7 @@ def questionset_create(request):
             if type == 'open':
                 question = OpenQuestion()
 
-            elif type == 'single' or type == 'leading':
+            elif type == 'single':
                 question = SingleChoiceQuestion()
                 question.is_scale = choicebox_is_on(post.get(question_name + "[isScale]"))
 
@@ -459,6 +459,7 @@ def questionset_create(request):
             question.save()
 
             options = post.getlist(question_name + "[answers][]")
+            print post.getlist(question_name + "[hideOn][]")
             hideOn  = map( lambda (x):( int(x)), post.getlist(question_name + "[hideOn][]"))
             hidenAnswers = []
             i = 1
@@ -480,12 +481,12 @@ def questionset_create(request):
                 container.position   = position
                 container.save()
 
-            elif type == 'single' or type == 'leading':
+            elif type == 'single':
                 container = SingleChoiceQuestionOrdering()
                 container.question    = question
                 container.sections    = section
                 container.position   = position
-                container.is_leading  = (type == 'leading')
+                container.is_leading  = choicebox_is_on(post.get(question_name + "[leading]"))
                 container.save()
                 for opt in hidenAnswers:
                     container.hide_on.add(opt)
@@ -679,8 +680,7 @@ def poll_answer( request, slug, pid ):
                         
                         section = Section.objects.get( pk = section_id )
                         
-                        if   ( question_type == 'leading' or \
-                               question_type == 'single' ):
+                        if   (question_type == 'single' ):
                             question = SingleChoiceQuestion.objects.get( 
                                             pk = question_id )
                             try:

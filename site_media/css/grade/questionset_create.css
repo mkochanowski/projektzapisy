@@ -50,6 +50,7 @@ padding:15px 20px 10px 10px;
 
 .section-show
 {
+    width:700px;
 }
 
 .section-mouseover
@@ -69,6 +70,14 @@ margin:15px;
 
 .poll-question-answers
 {
+}
+
+.edit-mode
+{
+    display:block;
+    position:absolute;
+    top: 0px;
+    right:0px;
 }
 
 /*** TWORZENIE ANKIETY - koniec ***/

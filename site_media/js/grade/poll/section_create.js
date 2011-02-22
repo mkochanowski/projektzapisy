@@ -6,10 +6,10 @@ Poll.section = Object();
 Poll.section.init = function()
 {
     Poll.section.submitted         = false;
-	Poll.section.questions         = 0;
+    Poll.section.questions         = 0;
     Poll.section.questionContainer = $("#poll-form");
-
-	$("#add-question").click(Poll.section.addQuestion)
+    Poll.section.havelastLi        = false;
+    $("#add-question").click(Poll.section.createQuestion)
     $("input[type=text]").focus(function(){
         this.select();
     });
@@ -25,529 +25,282 @@ Poll.section.init = function()
         }
         Poll.section.submitted = true;
     })
-	Poll.section.editParser();
-	
-	$("form").keypress(function(e)
-	{
-  		if (e.which == 13)
-  		{
-    		return false;
-  		}
-	});
+    Poll.section.editParser();
+    
+    $("form").keypress(function(e)
+    {
+          if (e.which == 13)
+          {
+            return false;
+          }
+    });
 }
 
 Poll.section.editParser = function()
 {
-	$('.autocomplete').each(function()
-	{
-		$(this).autocomplete(
-    	{
-    	 source:'http://localhost:8000/grade/poll/autocomplete',
+    $('.autocomplete').each(function()
+    {
+        $(this).autocomplete(
+        {
+         source:'http://localhost:8000/grade/poll/autocomplete',
          delay:10
-     	}
-		);
-	});
+         }
+        );
+    });
     $('.answerset').sortable({handle : 'div'});
-	$('.typeSelect').change(function()
-	{
-		var div = $(this).parents('.section-edit');
-		var type = this;
-		var answerset   = $(div).children('.answerset');
-		var isScale     = $(div).find('.isScale')
-		var choiceLimit = $(div).find('.choiceLimit')
-		var hasOther    = $(div).find('.hasOther')
-		Poll.section.changeType(div, type, answerset, isScale, choiceLimit, hasOther)
-	});
-	Poll.section.questions = $('.poll-question').size()
-	
+    $('.typeSelect').change(function()
+    {
+        var li = $(this).parents('.poll-question');
+        Poll.section.changeType( li )
+    });
+    Poll.section.questions = $('.poll-question').size()
+    
     $('.ready').click(function()
     { 
-    	var div  = $(this).parents('.section-edit');
-    	var type = $(div).find('.typeSelect')
-    	var li   = $(this).parents('.poll-question');
-        $(div).removeClass('section-edit');
-        $(div).addClass('section-show');
-        Poll.section.makeStandardView(li, div, type);
+        var li   = $(this).parents('.poll-question');
+        Poll.section.createView( li );
         
     });
     $('.ready').click();
     $('.delete').click(function()
     {
-    	var li  = $(this).parents('.poll-question');
-        Poll.section.remove(li);
-    });	
+        var li = $(this).parents('.poll-question');
+        Poll.section.remove( li );
+    });    
 
-    $('.poll-add-answer').click(function()
+    $('.addQuestion').click(function()
     {
-    	var li  = $(this).parents('.poll-question');
-    	var div = $(this).parents('.section-edit');
-    	var ul  = $(div).find('.answerset')
-    	var id  = $(li).find('.poll-question-id')
-    	var value = "Odpowiedz"
-    	var type  = $(div).find('.typeSelect')
-    	Poll.section.createAnswer(ul, id, value, type)
+        var li = $(this).parents('.poll-question');
+        Poll.section.addQuestion( li );
     });
     $('.delete-answer').click(function(){
 
-    	var li = $(this).parent().parent();
-	    Poll.section.removeQuestion( li );
+         $(this).parents('.poll-question-answer').remove();
     })
 }
 
-Poll.section.addQuestion = function()
+Poll.section.createQuestion = function( )
 {
-	Poll.section.questions++;
+    Poll.section.questions++;
+    var data = {
+        id: Poll.section.questions
+    }
+    $.tmpl( "question_edit", data).appendTo( Poll.section.questionContainer );
+     if ( Poll.section.havelastLi )
+     {
+        Poll.section.createView(Poll.section.lastLi)
+     }
+     Poll.section.lastLi = $(Poll.section.questionContainer).find('.poll-question').last();
+     Poll.section.havelastLi = true;
+    $('.ready').click(function(){
+                    var li = $(this).parents('.poll-question');
+                    Poll.section.createView( li );
+                })
+    $('.delete').click(function(){
+                    var li = $(this).parents('.poll-question');
+                    Poll.section.remove( li );
+                });
+    $('select[name$="[type]"]').change(function()
+                {
+                    var li = $(this).parents('.poll-question');
+                    Poll.section.changeType( li )
+                })
     
-    var type            = 'open'
-	var div             = document.createElement('div');
-    var li              = document.createElement('li');
-    var answerset       = document.createElement('ul');
-    var optionset       = document.createElement('ul');
-    $(answerset).addClass('answerset');
+}
 
+Poll.section.createView = function( li )
+{
 
-	li.className = "poll-question";
+    Poll.section.havelastLi = false;
+    var data = {
+        type:  $(li).find('select[name$="[type]"]').val(),
+        title: $(li).find('input[name$="[title]"]').val(),
+        desc:  $(li).find('input[name$="[description]"]').val(),
+        questionset: Poll.section.questionset( li ),
+        optionset: Poll.section.optionset( li )
+    }
+    $.tmpl( "question_view", data ).appendTo( li );
+    $(li).children('.section-edit').hide();
+    $(li).find('.section-show').dblclick(function(){Poll.section.createEdit(li)})
+    $(li).find('.edit-mode').click(function()
+        {
+            Poll.section.createEdit( li );
+        });
+    $(li).children('.section-show').mouseover(function(){
+        $(this).addClass('section-mouseover');
+        $(this).find('.edit-mode').show()
+        });
+    $(li).children('.section-show').mouseout(function(){
+        $(this).removeClass('section-mouseover');
+        $(this).find('.edit-mode').hide()        
+        });
+}
 
-    Poll.section.createQuestionPosition(li);
+Poll.section.createEdit = function( li )
+{
+     if ( Poll.section.havelastLi )
+     {
+        Poll.section.createView(Poll.section.lastLi)
+     }
+     Poll.section.havelastLi = true;
+     Poll.section.lastLi     = li;
+    $(li).find('.section-show').remove();
+    $(li).children('.section-edit').show();
+}
 
-    var table = document.createElement('table');
-    var tbody = document.createElement('tbody');
-
-    var title = Poll.section.createInput     ('title', 'Podaj treść pytania');
-    var desc  = Poll.section.createInput     ('description', '');
-    var type  = Poll.section.createTypeSelect();
-
-    Poll.section.createTr(tbody, title, 'Podaj treść pytania: ')
-    Poll.section.createTr(tbody, desc,  'Opis pytania: ')
-    Poll.section.createTr(tbody, type,  'Typ pytania: ')
+Poll.section.questionset = function( li )
+{
+    var questions = new Array();
+    $(li).find('.poll-question-answer').children('div').each(function()
+                {
+                 questions.push({
+                                   title:  $(this).find('input[name$="[answers][]"]').val(),
+                                   isHiden: $(this).find('input[name$="[hideOn][]"]').val()
+                                   })
+                });
+    return questions;
     
-    $(table).append(tbody);
-    var isScale     = Poll.section.createSectionOption('isScale', 'checkbox', 'Odpowiedź w formie skali')
-    var choiceLimit = Poll.section.createSectionOption('choiceLimit', 'text', 'Limit odpowiedzi')
-    var hasOther    = Poll.section.createSectionOption('hasOther', 'checkbox', 'Odpowiedź inne')
+}
 
+Poll.section.optionset = function( li )
+{
+    return {
+        isScale: $(li).find('input[name$="[isScale]"]').val(),
+        choiceLimit: $(li).find('input[name$="[choiceLimit]"]').val(),
+        hasOther: $(li).find('input[name$="[hasOther]"]').val()
+    }
+}
 
-
-    $(optionset).append(isScale)
-    $(optionset).append(choiceLimit)
-    $(optionset).append(hasOther)
-    $(optionset).addClass('optionset')
-
-    $(answerset).sortable({handle : 'div'});
-
-    $(isScale).hide();
-    $(choiceLimit).hide();
-    $(hasOther).hide();
-
-    $(div).append(table);
-    $(div).append(answerset);
-    $(div).append(optionset);
-    $(li).append(div);
-    $(Poll.section.questionContainer).append(li);
-
-    var ready = Poll.section.createButton('Gotowe', 'section-question-ready');
-    var del   = Poll.section.createButton('Usuń',   'section-question-delete');
-
-    $(div).append(ready);
-    $(div).append(del);
-
-    $(ready).click(function()
-    { 
-        $(div).removeClass('section-edit');
-        $(div).addClass('section-show');
-        Poll.section.makeStandardView(li, div, type);
-    });
-    $(del).click(function()
-    {
-        Poll.section.remove(li);
-    });
-    $(li).mouseover(function(){ $(div).addClass('section-mouseover'); });
-    $(type).change(function(){Poll.section.changeType(div, type, answerset, isScale, choiceLimit, hasOther)});
+Poll.section.changeType = function( li )
+{
+    var type      = $(li).find('select[name$="[type]"]').val();
+    var div       = $(li).children('.section-edit');
+    var answerset = $(li).find('.answerset');
+    Poll.section.hideOptions( li, type );
     
-
-    $(div).addClass('section-edit');
-    return li; 
-}
-
-Poll.section.createTr = function(parent, element, label)
-{
-    var tr       = document.createElement('tr')
-    var td_label = document.createElement('td')
-    var td_value = document.createElement('td')
-
-    $(td_label).text(label)
-    $(td_value).append(element)
-    $(tr).append(td_label);
-    $(tr).append(td_value);
-    $(parent).append(tr);
-   
-}
-
-Poll.section.createSectionOption = function(name, type, text)
-{
-    var li    = document.createElement('li');
-    var label = document.createElement('label');
-    var input = document.createElement('input');
-    var id = 'poll[question][' + Poll.section.questions + '][' + name +']'
-
-    $(input).attr(
-    {
-        id: id,
-        name: id,
-        type: type
-    }
-    );
-	$(li).addClass(name);
-    $(label).attr(
-    {
-        for: id
-    });
-    $(label).text(text);
-
-    $(li).append(input);
-    $(li).append(label);
-    return li;
-}
-
-Poll.section.changeType = function(parent, type, answerset, isScale, choiceLimit, hasOther)
-{
-    var id = $(parent).parent().children('input[name="poll[question][order][]"]').val();
-    if ($(type).val() == 'single')
-    {
-        $(answerset).children('li').children('.hideOnCheckbox, label').hide();
-        $(isScale).show();
-        $(choiceLimit).hide();
-        $(hasOther).hide();
-        if ( $(answerset).children().size() == 0 )
-        {
-            Poll.section.createAnswer(answerset, id, 'odpowiedź', type);
-            Poll.section.createAddOptionButton(parent, answerset, id, type);
-        }
-
-    }
-    else if ($(type).val() == 'multi')
-    {
-        //$(isLeading).parent().children('label').hide();
-        $(answerset).children('li').children('.hideOnCheckbox, label').hide();
-        $(isScale).hide();
-        $(choiceLimit).show();
-        $(hasOther).show();
-        if ( $(answerset).children().size() == 0 )
-        {
-            Poll.section.createAnswer(answerset, id, 'odpowiedź', type);
-            Poll.section.createAddOptionButton(parent, answerset, id, type);
-        }
-    }
-    else if ($(type).val() == 'leading')
-    {
-
-        $(isScale).show();
-        $(choiceLimit).hide();
-        $(hasOther).hide();
-        if ( $(answerset).children().size() == 0 )
-        {
-            Poll.section.createAnswer(answerset, id, 'odpowiedź', type );
-            Poll.section.createAddOptionButton(parent, answerset, id, type );
-        }
-        $(answerset).children('li').children().show();
-    }
-    else
-    {
-        $(answerset).children('li').children('.hideOnCheckbox, label').hide();
-        $(isScale).hide();
-        $(choiceLimit).hide();
-        $(hasOther).hide();
-        $(parent).children('input[name$="addQuestion"]').remove();        
-        $(answerset).children().remove();
-    }
-}
-
-Poll.section.removeElement = function(element, name)
-{
-    var el  =  $(element).children('input[name$="['+ name +']"]');
-    $(element).children('label[for="'+ $(el).attr('id') +'"]').remove()
-    $(el).remove()
-}
-
-
-Poll.section.createTypeSelect = function()
-{
-    var select = document.createElement('select')
-    $(select).attr('name', 'poll[question][' + Poll.section.questions + '][type]');
-    Poll.section.createOption(select, 'open', 'Otwarte')
-    Poll.section.createOption(select, 'single', 'Jednokrotnego wyboru')
-    Poll.section.createOption(select, 'multi', 'Wielokrotnego wyboru')
-    Poll.section.createOption(select, 'leading', 'Pytanie wiodące')
-    $(select).addClass('typeSelect');
-    $(select).addClass('options');
-    return select;
-}
-
-Poll.section.makeStandardView = function(parent, element, question_type)
-{
-    var div = document.createElement('div')
-    $(div).addClass('section-show').addClass('poll-section-field')
-
-    var id          = $(parent).children('input[name="poll[question][order][]"]').val();
-    var title       = $(element).find( 'input[name$="[title]"]').val();
-    var description = $(element).find('input[name$="[description]"]').val();
-    var choice_limit = parseInt( $(element).find('input[name$="[choiceLimit]"]').val() )
-    var type        = $(question_type).val();
-
-    Poll.section.createElement(div, 'h2', title);
-    Poll.section.createElement(div, 'small', description);
-    $(div).append( document.createElement('br') )
-	if( type == 'multi')
-    {
-    	if( choice_limit > 0)
-    	{
-    		var html = $(div).html()
-    		$(div).html( html + '<span class="poll-section-description">Możesz podać maksymalnie '+ choice_limit +' odpowiedzi</span>')
-    	}
-    		
-    }
     if (type == 'open')
     {
-        var textarea = document.createElement('textarea');
-        $(textarea).attr({
-        	'cols': 40,
-        	'rows': 5
-        });
-        $(div).append(textarea);
+        $(answerset).empty();
+        $(li).find('input[name="addQuestion"]').remove();
+        
     }
     else
     {
-    	
-        var option = $(element).children('.answerset').find('div');
-        var ul     = document.createElement('ul');
-        $(ul).addClass('poll-section-answer-list');
-        
-        $.each(option, function(index, v)
+
+        if( $(answerset).children().size() == 0 )
         {
-            var li    = document.createElement('li');
-            $(li).addClass('poll-section-answer-item');
+            var data = {
+                id: $(li).find('input[name="poll[question][order][]"]').val(),
+                size: 0
+            } 
+            Poll.section.addQuestion( li );
             
-            var label = document.createElement('label');
-            var txt   = $(v).children().val();
-            $(label).text( txt );
-            $(label).attr('for', 'poll[question][' + id + ']');
-            var input = document.createElement('input');
-            if( type == 'single' )
+            $.tmpl( "question_add", data ).insertAfter( answerset );
+            $('.addQuestion').click(function()
             {
-                input.type = 'radio'
-                $(input).addClass('poll-section-radio');
-            }
-            else
+                var li = $(this).parents('.poll-question');
+                Poll.section.addQuestion( li );
+            });
+            $(li).find('input[name$="[leading]"]').click( function()
             {
-                input.type = 'checkbox'
-                $(input).addClass('poll-section-choice');
-            }
-            input.name = 'poll[question][' + id + ']';
-            $(input).attr({'id': input.name })
-            $(li).append(input);
-            $(li).append(label);
-
-            $(ul).append(li)
-        });
-        if( type == 'multi')
-        {
-        	var other = $(element).children('.optionset').find('input[name$="[hasOther]"]')
-        	if ($(other).attr('checked'))
-        	{
-        		var input = document.createElement('input');
-            	var li    = document.createElement('li');
-            	var label = document.createElement('label');
-            	
-            	$(label).text('Inne')
-				input.type = 'checkbox'
-				$(input).addClass('poll-section-choice');
-	            $(li).append(input);
-	            $(li).append(label);
-
-	            $(ul).append(li)        		 
-        	}
+                if (jQuery(this).is(':checked'))
+                {
+                    $(li).find('input[name$="[hideOn][]"]').show();
+                    $(li).find('label[for$="[hideOn][]"]').show();                    
+                }
+                else
+                {
+                    $(li).find('input[name$="[hideOn][]"]').hide();
+                    $(li).find('label[for$="[hideOn][]"]').hide();
+                }
+            } );
+            $('.autocomplete').autocomplete(
+            {
+                source:'/grade/poll/autocomplete',
+                delay:10
+            });
         }
-        $(div).append(ul);
+            if(($(li).find('input[name$="[leading]"]:checked').val() !== undefined))
+            {
+                if(type !='single')
+                {
+                 $(answerset).find('input[name$="[hideOn][]"]').hide();
+                 $(answerset).find('label[for$="[hideOn][]"]').hide();
+                } else
+                {
+                  $(answerset).find('input[name$="[hideOn][]"]').show();
+                 $(answerset).find('label[for$="[hideOn][]"]').show();
+                
+                }
+            } 
         
     }
-
-    
-    var button   = Poll.section.createButton('Edytuj', 'section-button-edit');
-    $(button).hide();
-    $(button).click(function(){ $(element).show(); $(div).remove(); });
-    $(div).append(button);
-    $(div).mouseenter(function(){ $(button).show() });
-    $(div).mouseleave(function(){ $(button).hide() });
-    $(parent).append(div);
-    $(element).hide();
 }
 
-Poll.section.createButton = function(value, class)
+Poll.section.addQuestion = function( li )
 {
-    var button   = document.createElement('input');
-    button.value = value;
-    button.type  = 'button';
-    button.class = ''
-    return button;
-}
-
-Poll.section.createElement = function(parent, type, text)
-{
-    var element = document.createElement(type)
-    $(element).html(text)
-    $(parent).append(element)
-}
-
-
-Poll.section.createQuestionPosition = function(elem)
-{
-    var hidden   = document.createElement('input')
-    hidden.type  = 'hidden'
-    hidden.name  = 'poll[question][order][]'
-    hidden.value = Poll.section.questions;
-    $(elem).append(hidden)
-}
-
-Poll.section.createOption = function(select, value, text)
-{
-    var option = document.createElement('option')
-    option.value = value
-    $(option).text(text)
-    $(select).append(option)
-    return option
-}
-
-Poll.section.createInput = function(varname, text)
-{
-    var input = Poll.section.createBaseElement('text', Poll.section.questions, varname, text)
-    $(input).addClass('section-option');
-    return input;
-}
-
-Poll.section.createIdInput = function(id, varname, text)
-{
-    return Poll.section.createBaseElement('text', id, varname, text)
-}
-
-Poll.section.createIdRadiobox = function(id,  varname, text)
-{
-    return Poll.section.createBaseElement('radio', id, varname, text)
-}
-
-Poll.section.createIdCheckbox = function(id,  varname, text)
-{
-    return Poll.section.createBaseElement('checkbox', id, varname, text)
-}
-
-Poll.section.createCheckbox = function(varname, text)
-{
-    return Poll.section.createBaseElement('checkbox', Poll.section.questions, varname, text)
-}
-
-Poll.section.createBaseElement = function(type, id, varname, text)
-{
-    var checkbox  = document.createElement('input')
-    checkbox.type = type
-    checkbox.id   = 'poll[question][' + id + '][' + varname +']'
-    checkbox.name = 'poll[question][' + id + '][' + varname +']'
-
-    return checkbox
-}
-
-Poll.section.createOptionSet = function(question)
-{
-    var ul = document.createElement('ul');
-	ul.id = 'Question' + Poll.section.questions;
-	ul.className = 'poll-question-answers';
-
-    $(question).append(ul);
-    
-    Poll.section.createOption(ul);
-    Poll.section.createAddOptionButton(question, ul)
-}
-
-Poll.section.createAddOptionButton = function(elem, set, id, type)
-{
-    var button = document.createElement('input')
-    button.type = 'button';
-    button.name = 'addQuestion';
-    $(button).val('Dodaj odpowiedź');
-    $(button).click(function()
-    {
-        Poll.section.createAnswer(set, id, 'odpowiedź', type);
-    });
-    $(set).after(button);
-}
-
-Poll.section.createAnswer = function(ul, id, value, type)
-{
-	var li     = document.createElement('li');
-	var div    = document.createElement('div');
-    var check  = document.createElement('input');
-	var answer = document.createElement('input');
-    var label  = document.createElement('label');
-
-    li.className = 'poll-question-answer';
-    answer.name =  'poll[question][' + id + '][answers][]';
-    answer.type = 'text'
-    answer.id = $(ul).children().size() + 1
-
-    check.type = 'checkbox'
-    check.name =   'poll[question][' + id + '][hideOn][]';
-
-    $(check).attr('id', check.name);
-    $(check).val( $(ul).children().size() + 1 )
-    $(check).addClass('hideOnCheckbox');
-    $(check).css('display', 'inline');
-
-    $(label).attr(
-    {
-        for: check.name,
-    });    
-
-    $(label).text('Ukryj sekcję');
-    $(label).css('display', 'inline');
-
-    if( $(type).val() != 'leading')
-    {
-        $(label).hide();
-        $(check).hide();  
-    }
-
-    $(answer).addClass('autocomplete')
-    $(answer).autocomplete(
-    	{
-    	 source:'http://localhost:8000/grade/poll/autocomplete',
-         delay:10
+     var type      = $(li).find('select[name$="[type]"]').val();
+     var answerset = $(li).find('.answerset');
+     var data = {
+        id: $(li).find('input[name="poll[question][order][]"]').val(),
+                size: $(answerset).children().size() + 1
      }
-	);
-    var sectionRemoveButton = document.createElement('img');
-    sectionRemoveButton.alt = 'usuń';
-    sectionRemoveButton.className = 'remove';
-    sectionRemoveButton.src = '/site_media/images/remove-ico.png';
+     $.tmpl( "question", data ).appendTo( answerset );
+     $('.remove').click(function()
+     {
+        $(this).parents('.poll-question-answer').remove();
+     });
+     
+     if( (type == 'single') && ($(li).find('input[name$="[leading]"]:checked').val() !== undefined))
+     {
+         $(answerset).find('input[name$="[hideOn][]"]').show();
+         $(answerset).find('label[for$="[hideOn][]"]').show();
+     }
+     else
+     {
+         $(answerset).find('input[name$="[hideOn][]"]').hide();
+         $(answerset).find('label[for$="[hideOn][]"]').hide();
+     }
+}
 
-    $(sectionRemoveButton).click(function()
+Poll.section.hideOptions = function( li, type )
+{
+
+    var isScale     = $(li).find('.isScale');
+    var hasOther    = $(li).find('.hasOther');
+    var choiceLimit = $(li).find('.choiceLimit');
+    var leading     = $(li).find('.leading');
+    
+    if (type == 'single')
     {
-        Poll.section.removeQuestion( li );
-    });
-	$(div).append( answer );
-    $(div).append( check );
-    $(div).append( label );
-    $(div).append( sectionRemoveButton )
-    $(li).append( div )
-	$(ul).append( li );
+        $(isScale).show();
+        $(leading).show();
+        $(choiceLimit).hide();
+        $(hasOther).hide()
+    }
+    else if (type == 'multi')
+    {
+        $(isScale).hide();
+        $(leading).hide();
+        $(choiceLimit).show();
+        $(hasOther).show();
+    }
+    else if (type == 'open')
+    {
+        $(isScale).hide();
+        $(leading).hide();
+        $(choiceLimit).hide();
+        $(hasOther).hide();
+    }
+    else
+    {
+        $(isScale).show();
+        $(choiceLimit).hide();
+        $(hasOther).hide();
+        $(leading).hide();
+    }
 }
 
-
-Poll.section.removeQuestion = function( element )
-{
-    $(element).remove();
-}
-
-Poll.section.remove = function ( element )
-{
-    $(element).remove();
-}
 
 $(Poll.section.init);
 
