@@ -5,51 +5,23 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    depends_on = (
-        ('subjects', '0001_initial'),
-    )
     
     def forwards(self, orm):
         
-        # Adding model 'Record'
-        db.create_table('records_record', (
-            ('status', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('student', self.gf('django.db.models.fields.related.ForeignKey')(related_name='records', to=orm['users.Student'])),
-        ))
-        db.send_create_signal('records', ['Record'])
+        # Deleting field 'StudentOptions.records_opening_delay_hours'
+        db.delete_column('subjects_studentoptions', 'records_opening_delay_hours')
 
-        # Adding unique constraint on 'Record', fields ['student', 'group']
-        db.create_unique('records_record', ['student_id', 'group_id'])
-
-        # Adding model 'Queue'
-        db.create_table('records_queue', (
-            ('priority', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=1)),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('student', self.gf('django.db.models.fields.related.ForeignKey')(related_name='queues', to=orm['users.Student'])),
-            ('time', self.gf('django.db.models.fields.DateTimeField')()),
-        ))
-        db.send_create_signal('records', ['Queue'])
-
-        # Adding unique constraint on 'Queue', fields ['student', 'group']
-        db.create_unique('records_queue', ['student_id', 'group_id'])
+        # Adding field 'StudentOptions.records_opening_delay_minutes'
+        db.add_column('subjects_studentoptions', 'records_opening_delay_minutes', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Record'
-        db.delete_table('records_record')
+        # Adding field 'StudentOptions.records_opening_delay_hours'
+        db.add_column('subjects_studentoptions', 'records_opening_delay_hours', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
 
-        # Removing unique constraint on 'Record', fields ['student', 'group']
-        db.delete_unique('records_record', ['student_id', 'group_id'])
-
-        # Deleting model 'Queue'
-        db.delete_table('records_queue')
-
-        # Removing unique constraint on 'Queue', fields ['student', 'group']
-        db.delete_unique('records_queue', ['student_id', 'group_id'])
+        # Deleting field 'StudentOptions.records_opening_delay_minutes'
+        db.delete_column('subjects_studentoptions', 'records_opening_delay_minutes')
     
     
     models = {
@@ -89,20 +61,16 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'records.queue': {
-            'Meta': {'unique_together': "(('student', 'group'),)", 'object_name': 'Queue'},
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']"}),
+        'subjects.book': {
+            'Meta': {'object_name': 'Book'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'priority': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '1'}),
-            'student': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'queues'", 'to': "orm['users.Student']"}),
-            'time': ('django.db.models.fields.DateTimeField', [], {})
+            'name': ('django.db.models.fields.TextField', [], {}),
+            'subject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'books'", 'to': "orm['subjects.Subject']"})
         },
-        'records.record': {
-            'Meta': {'unique_together': "(('student', 'group'),)", 'object_name': 'Record'},
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']"}),
+        'subjects.classroom': {
+            'Meta': {'object_name': 'Classroom'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'status': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'student': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'records'", 'to': "orm['users.Student']"})
+            'number': ('django.db.models.fields.CharField', [], {'max_length': '4'})
         },
         'subjects.group': {
             'Meta': {'object_name': 'Group'},
@@ -115,10 +83,10 @@ class Migration(SchemaMigration):
         'subjects.semester': {
             'Meta': {'unique_together': "(('type', 'year'),)", 'object_name': 'Semester'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'records_closing': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'records_opening': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'semester_beginning': ('django.db.models.fields.DateField', [], {}),
-            'semester_ending': ('django.db.models.fields.DateField', [], {}),
+            'records_closing': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'records_opening': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'semester_begining': ('django.db.models.fields.DateField', [], {'blank': 'True'}),
+            'semester_ending': ('django.db.models.fields.DateField', [], {'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'visible': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'year': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2011'})
@@ -152,6 +120,15 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'})
         },
+        'subjects.term': {
+            'Meta': {'object_name': 'Term'},
+            'classroom': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Classroom']"}),
+            'dayOfWeek': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
+            'end_time': ('django.db.models.fields.TimeField', [], {}),
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'term'", 'to': "orm['subjects.Group']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'start_time': ('django.db.models.fields.TimeField', [], {})
+        },
         'subjects.type': {
             'Meta': {'object_name': 'Type'},
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Type']", 'null': 'True', 'blank': 'True'}),
@@ -169,7 +146,6 @@ class Migration(SchemaMigration):
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
-            'block': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
@@ -186,4 +162,4 @@ class Migration(SchemaMigration):
         }
     }
     
-    complete_apps = ['records']
+    complete_apps = ['subjects']

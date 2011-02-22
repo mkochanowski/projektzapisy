@@ -76,6 +76,8 @@ MEDIA_ROOT = 'site_media'
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = ''
 
+USE_ETAGS = True
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -143,10 +145,15 @@ HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
-TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
-TEST_OUTPUT_VERBOSE = True
-TEST_OUTPUT_DESCRIPTIONS = True
-TEST_OUTPUT_DIR = 'xmlrunner'
+#TODO: udokumentowac zaleznosci!
+#TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
+#TEST_OUTPUT_VERBOSE = True
+#TEST_OUTPUT_DESCRIPTIONS = True
+#TEST_OUTPUT_DIR = 'xmlrunner'
+
+#settings for enrollment
+POINT_LIMIT_DURATION = 14 # abs(t1-t2), in days
+ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
 
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.nowe-zapisy.ii.uni.wroc.pl' # without port number!

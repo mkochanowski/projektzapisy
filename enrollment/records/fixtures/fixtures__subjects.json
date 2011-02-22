@@ -109,7 +109,7 @@
 		"pk": 1,
 		"model": "subjects.studentoptions",
 		"fields": {
-			"records_opening_delay_hours": 0,
+			"records_opening_delay_minutes": 0,
 			"student": 1,
 			"subject": 1
 		}
@@ -118,7 +118,7 @@
 		"pk": 2,
 		"model": "subjects.studentoptions",
 		"fields": {
-			"records_opening_delay_hours": 0,
+			"records_opening_delay_minutes": 0,
 			"student": 1,
 			"subject": 2
 		}
@@ -189,23 +189,29 @@
         }
     }, 
     {
-        "pk": 1, 
-        "model": "subjects.semester", 
+        "pk": 1,
+        "model": "subjects.semester",
         "fields": {
             "visible": true, 
             "type": "l", 
             "year": 2010,
-			"records_opening" : "2011-03-01 00:00:00"
+            "records_opening" : "2011-03-01 00:00:00",
+            "records_closing": "2020-12-31 23:59:59",
+            "semester_beginning": "2011-02-26",
+            "semester_ending": "2011-06-21"
         }
-    }, 
+    },
     {
-        "pk": 2, 
-        "model": "subjects.semester", 
+        "pk": 2,
+        "model": "subjects.semester",
         "fields": {
             "visible": true, 
             "type": "z", 
             "year": 2010,
-			"records_opening" : "2010-10-01 00:00:00"
+            "records_opening" : "2010-10-01 00:00:00",
+            "records_closing": "2020-12-31 23:59:59",
+            "semester_beginning": "2010-10-01",
+            "semester_ending": "2011-02-02"
         }
     }
 ]

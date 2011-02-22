@@ -2,6 +2,8 @@
 
 from django.db import models
 from subject import Subject
+from django.core.exceptions import MultipleObjectsReturned
+from fereol.enrollment.subjects.exceptions import *
 
 from datetime import datetime
 
@@ -15,10 +17,10 @@ class Semester( models.Model ):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.PositiveIntegerField(default=lambda: datetime.now().year, verbose_name='rok akademicki')
     # implies academic year: year/(year+1)
-    records_opening = models.DateTimeField(blank = True, null = True, verbose_name='Czas otwarcia zapisów')
-    records_closing = models.DateTimeField(blank = True, null = True, verbose_name='Czas zamkniecia zapisów')
-    semester_begining = models.DateField(blank = True, null = False, verbose_name='Data rozpoczęcia semestru')
-    semester_ending = models.DateField(blank = True, null = False, verbose_name='Data zakończenia semestru')
+    records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów') # T0
+    records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
+    semester_beginning = models.DateField(null = False, verbose_name='Data rozpoczęcia semestru')
+    semester_ending = models.DateField(null = False, verbose_name='Data zakończenia semestru')
 
     def get_subjects(self):
         """ gets all subjects linked to semester """
@@ -30,14 +32,38 @@ class Semester( models.Model ):
 
     def is_current_semester(self):
         """ Answers to question: is semester current semester""" 
-        if self.semester_begining == None or self.semester_ending == None:
+        if self.semester_beginning == None or self.semester_ending == None:
             return False
-        return (self.semester_begining <= datetime.now().date() and self.semester_ending >= datetime.now().date())
+        return (self.semester_beginning <= datetime.now().date() and self.semester_ending >= datetime.now().date())
     
     @staticmethod
     def get_current_semester():
-        """ returns current semester """ 
-        return Semester.objects.get(semester_begining__lt =datetime.now().date(), semester_ending__gt= datetime.now().date())
+        """ if exist, it returns current semester. otherwise return None """ 
+        try:
+            return Semester.objects.get(semester_beginning__lte =datetime.now().date(), semester_ending__gte= datetime.now().date())
+        except Semester.DoesNotExist:
+            return None
+        except MultipleObjectsReturned:
+            raise MoreThanOneCurrentSemesterException()  
+
+    @staticmethod
+    def get_default_semester():
+        """Jeżeli istnieje semestr na który zapisy są otwarte, zwracany jest ten semestr, jeżeli taki nie istnieje zwracany jest semestr, który obecnie trwa. W przypadku gdy nie trwa żaden semestr, zwracany jest najbliższy semestr na który będzie można się zapisać lub None w przypadku braku takiego semestru """ 
+        try:
+            return Semester.objects.get(records_opening__lte =datetime.now(), records_closing__gte= datetime.now())
+        except Semester.DoesNotExist:
+            current_semester = Semester.get_current_semester()
+            if current_semester:
+                return current_semester
+            else:
+                next_semester = Semester.objects.filter(records_opening__gte =datetime.now()).order_by('records_opening')
+                if next_semester.exists():
+                    return next_semester[0]
+                else:
+                    return None
+                        
+        except MultipleObjectsReturned:
+            raise MoreThanOneSemesterWithOpenRecordsException()  
 
     @staticmethod
     def is_visible(id):

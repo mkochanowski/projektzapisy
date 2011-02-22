@@ -53,7 +53,7 @@ class AddStudentToGroupTest(TestCase):
 
 #TIME DEPENDENCY
     def testSubjectWithRecordsNotOpenForStudent(self):
-        self.user.student.records_opening_delay_hours = 0
+        self.user.student.records_opening_delay_minutes = 0
         self.user.student.save()
         self.exercise_group.subject.semester.records_opening = datetime.now()
         self.exercise_group.subject.semester.records_closing = datetime.now()
@@ -340,7 +340,7 @@ class AddStudentToQueue(TestCase):
         self.group.subject.semester.records_closing = datetime.now()
         self.group.subject.semester.save()
         student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
-        student_options.records_opening_delay_hours = 10
+        student_options.records_opening_delay_minutes = 10
         student_options.save()
         self.assertRaises(RecordsNotOpenException, Queue.add_student_to_queue, self.user.id, self.group.id)'''
 

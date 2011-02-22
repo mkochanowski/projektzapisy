@@ -10,19 +10,14 @@ import logging
 logger = logging.getLogger()
 
 class StudentOptions( models.Model ):
-    """ Used for defining relation between Student and Subject """
+    """ Used for defining time bonus in records - for Student, Subject. Student gets bonuses if voted for subject. """
     subject = models.ForeignKey('Subject', verbose_name = 'przedmiot')
     student = models.ForeignKey('users.Student', verbose_name = 'student')
-    records_opening_delay_hours = models.IntegerField(verbose_name='opóźnienie w otwarciu zapisu (godziny)')
+    records_opening_delay_minutes = models.IntegerField(verbose_name='Przyspieszenie otwarcia zapisów na ten przedmiot (minuty)')
 
-    def get_opening_delay_timedelta(self):
-        """ returns records opening delay as timedelta """
-        return timedelta(hours=self.get_opening_delay_hours())
-    
-    def get_opening_delay_hours(self):
-        """ returns records opening delay as imteger standing for hours """
-        student_records_opening_delay_hours = self.student.records_opening_delay_hours
-        return student_records_opening_delay_hours + self.records_opening_delay_hours
+    def get_opening_bonus_timedelta(self):
+        """ returns records opening bonus as timedelta """
+        return timedelta(minutes=self.records_opening_delay_minutes)
     
     @staticmethod
     def get_student_options_for_subject(student_id, subject_id):
@@ -32,11 +27,6 @@ class StudentOptions( models.Model ):
         except StudentOptions.DoesNotExist:
             logger.error('StudentOptions.get_student_options_for_subject(student_id = %d, subject_id = %d) throws StudentOptions.DoesNotExist exception.' % (int(student_id), int(subject_id)) )
             raise NonStudentOptionsException()
-
-
-    def get_name(self):
-        """ gets printable name of StudentOptions """
-        return u'Przedmiot: %s, Student: %s ' % (self.subject, self.student)
     
     class Meta:
         verbose_name = 'zależność przedmiot-student'
@@ -45,4 +35,5 @@ class StudentOptions( models.Model ):
         app_label = 'subjects'
 
     def __unicode__(self):
-        return self.get_name()
+        """ returns printable name of StudentOptions """
+        return u'Przedmiot: %s, Student: %s ' % (self.subject, self.student)

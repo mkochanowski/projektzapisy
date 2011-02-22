@@ -83,6 +83,8 @@
     </div>
     <div class="schedule-buttons-wrapper">
         <input id="btnAssignToAll" type="button" value="Zapisz mnie na przypięte przedmioty">
+        <input id="blockUrl" type="button" value="Zablokuj plan" onClick="location.href='{% url schedule-prototype-block %}'">
+        <input id="unblockUrl" type="button" value="Oblokuj plan" onClick="location.href='{% url schedule-prototype-unblock %}'">
     </div>
 {% endblock %}
  

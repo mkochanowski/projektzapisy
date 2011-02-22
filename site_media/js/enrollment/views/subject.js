@@ -20,9 +20,53 @@ SubjectView.init = function()
 
 	SubjectView._initDetailsToggleSwitch();
 	SubjectView._initExpandableDescription();
+	SubjectView._initPriorityControls();
 };
 
 $(SubjectView.init);
+var xxx = 0;
+/**
+ * Inicjuje kontrolki wybierania priorytetu w grupie.
+ */
+SubjectView._initPriorityControls = function()
+{
+	$('div.tutorial tbody td.priority').each(function(idx, elem)
+	{
+		elem = $(elem);
+		if (elem.children('a').length == 0)
+			return;
+		var id = elem.parent().find('input[name=group-id]').assertOne().
+			attr('value').castToInt();
+		var currentPriority = elem.children('span').assertOne().text().
+			castToInt();
+
+		elem.empty();
+
+		var prioritySelector = $.create('select').appendTo(elem);
+		for (var i = 1; i <= 10; i++)
+		{
+			var priorityOption = $.create('option', {value: i}).text(i);
+			if (i == currentPriority)
+				priorityOption.attr('selected', 'selected');
+			prioritySelector.append(priorityOption);
+		}
+
+		prioritySelector.change(function()
+		{
+			prioritySelector.attr('disabled', true);
+			var newPriority = prioritySelector.attr('value').castToInt();
+
+			//TODO: generowanie URL, a nie na sztywno
+			$.get('/records/' + id + '/queue_set_priority/' + newPriority,
+				function(data)
+			{
+				if (data.Success.Message == 'OK')
+					prioritySelector.attr('disabled', false);
+				//TODO: ewentualny komunikat błędu
+			}, 'json');
+		});
+	});
+};
 
 /**
  * Inicjuje zwijanie długich opisów przedmiotów.
