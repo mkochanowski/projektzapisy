@@ -90,6 +90,14 @@ Then /^show me the page$/ do
   save_and_open_page
 end
 
+Then /^I enroll to group with id "([^"]*)" on mobile$/ do |gid|
+  page.find(:xpath, "//form[@action=\"\/group\/#{gid}\/assign\/\"]/input").click
+end
+
+Then /^I unenroll to group with id "([^"]*)" on mobile$/ do |gid|
+  page.find(:xpath, "//form[@action=\"\/group\/#{gid}\/resign\/\"]/input").click
+end
+
 When /^I pin the group "([^"]*)"$/ do |gid|
    page.find(:xpath, "//div[@id=\"schedule-term-#{gid}-#{gid}\"]/div/div/div/div[@title=\"Przypnij\"]").click
 end
@@ -97,3 +105,4 @@ end
 When /^I enroll in a pinned group "([^"]*)"$/ do |gid|
    page.find(:xpath, "//div[@id=\"schedule-term-#{gid}-#{gid}\"]/div/div/div/div[@title=\"Zapisz\"]").click
 end
+
