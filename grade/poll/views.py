@@ -25,7 +25,7 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SavedTicket, \
                                               SingleChoiceQuestionAnswer, \
                                               MultipleChoiceQuestionAnswer, \
-                                              OpenQuestionAnswer, Option
+                                              OpenQuestionAnswer, Option, Template
 from fereol.users.models               import Type
 from fereol.grade.poll.forms           import TicketsForm, \
                                               PollForm, \
@@ -37,7 +37,7 @@ from fereol.grade.poll.utils           import check_signature, \
                                               get_next, \
                                               get_prev, \
                                               get_ticket_and_signed_ticket_from_session, \
-                                              check_enable_grade
+                                              check_enable_grade, getGroups
 
 from fereol.users.models                 import Employee
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -139,25 +139,6 @@ def poll_create(request):
     type         = None
     studies_type = None
     subject      = None
-    # TODO: przeniesc do modeli - porozmawiaz z grupa
-    def getGroups(semester, group = None, type = None, subject = None):
-        if subject == -1:
-            return {}
-        if group:
-            return group
-        if type:
-            if subject:
-                groups = Group.objects.filter(type=type, subject=subject)
-            else:
-                groups = Group.objects.filter(type=type)
-        else:
-            if subject:
-                groups = Group.objects.filter(subject=subject)
-            else:
-                groups = Group.objects.filter(subject__semester = semester)
-                
-        
-        return groups
 
     message = ""
     polls   = []
@@ -290,6 +271,19 @@ def poll_create(request):
 # Poll managment
 #
 
+@employee_required
+def templates( request ):
+    data = {}
+    templates = Template.objects.filter(deleted=False).order_by('pk')
+    data['templates'] = templates
+    data['grade']  = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
+
+@employee_required
+def use_templates( request ):
+    pass
+    
+    
 @employee_required
 def sections_list( request ):
     data = {}
