@@ -3,43 +3,39 @@
 {% block content %}
 
 <div id="center-container">
-
-	<div>
-	<h3>Przedmioty, na które jesteś zapisany:</h3>
-	
-		{% for e in enrolled %}
-			<div class="subject-outer">
-			<a href= "/subject/{{ e.subject.slug }}/" >
-			<div class="subject-inner">{{ e.subject.name }} <!--{{ e.allGroups }}--></div></a></div>
-		{% endfor %}
-	</div>
-	
-	<div>
-	<h3>Przedmioty przypięte:</h3>
-
-		{% for p in pinned %}
-			<div class="subject-outer">
-			<a href= "/subject/{{ p.slug }}/" >
-			<div class="subject-inner">{{ p.name }} </div></a></div>
-		{% endfor %}
-	</div>
-
-	<div>
-	<h3>Przedmioty, na które głosowałeś:</h3>
-
-		{% for v in voted %}
-			<div class="subject-outer">
-			<a href= "/subject/{{ v.slug }}/" >
-			<div class="subject-inner">{{ v.name }} </div></a></div>
-		{% endfor %}
-	</div>
-
-	<div class="subject-outer">
-		<a href= "{% url enrollment-other %}" >
-			<div class="subject-inner">Inne przedmioty</div>
-		</a>
-	</div>
-
+    <h3>Przedmioty, na które jesteś zapisany:</h3>
+        {% for e in enrolled %}
+            <div class="subject-outer">
+            <a href= "/subject/{{ e.subject.slug }}/" >
+            <div class="subject-inner">{{ e.subject.name }} <!--{{ e.allGroups }}--></div></a></div>
+        {% empty %}
+            <div style="font-style:italic;">
+                Brak przedmiotów w tej kategorii.
+            </div>
+        {% endfor %}
+    <h3>Przedmioty przypięte:</h3>
+        {% for p in pinned %}
+            <div class="subject-outer">
+            <a href= "/subject/{{ p.slug }}/" >
+            <div class="subject-inner">{{ p.name }} </div></a></div>
+        {% empty %}
+            <div style="font-style:italic;">
+                Brak przedmiotów w tej kategorii.
+            </div>
+        {% endfor %}
+    <h3>Przedmioty, na które głosowałeś:</h3>
+        {% for v in voted %}
+            <div class="subject-outer">
+            <a href= "/subject/{{ v.slug }}/" >
+            <div class="subject-inner">{{ v.name }} </div></a></div>
+        {% empty %}
+            <div style="font-style:italic;">
+                Brak przedmiotów w tej kategorii.
+            </div>
+        {% endfor %}
+    <a href= "{% url enrollment-other %}">
+        <div class="box round">Wszystkie przedmioty</div>
+    </a>
 </div>
 
 {% endblock %}

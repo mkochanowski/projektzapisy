@@ -5,28 +5,28 @@
 <div class="sschedule">
 <table>
     <tr><th colspan="3">
-        <h2>Plan zajęć {% if owner != user %} <br/> {{ owner.first_name }} {{ owner.last_name }} {% endif %}</h2>
+        <h2>Plan zajęć {% if owner != user %}<br/> {{ owner.first_name }} {{ owner.last_name }} {% endif %}</h2>
         </th>
     </tr>
     <tr>
-        <td style="width:25%"><a href="{% url student-schedule-delta owner.username left%}">
+        <td style="width:25%"><a href="{% url employee-schedule-delta owner.username left %}">
             <h3>wstecz</h3>
         </a>
         </td>
         <td style="width:50%">
             <h2>{{ weekday_name }}</h2>
             </td>
-        <td style="width:25%"><a href="{% url student-schedule-delta owner.username right %}">
+        <td style="width:25%"><a href="{% url employee-schedule-delta owner.username right %}">
             <h3>dalej</h3>
         </a></td>
     </tr>
 <tr>
-    <td>  <h3> termin </h3> </td>
-    <td colspan="2"> <h3>przedmiot </h3> </td>
+    <th>  <h3> termin </h3> </th>
+    <th colspan="2"> <h3>przedmiot </h3> </th>
 </tr>
         {% for event in schedule %}
         {% if event.term == 0 %}
-            <tr><td class="break" colspan="3"></td> </tr>
+                 <tr><td class="break" colspan="3"></td></tr>
         {% else %}
             <tr> 
             <td> <a href= "/subject/{{ event.group.subject.slug }}/" >

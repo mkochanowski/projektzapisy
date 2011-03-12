@@ -19,6 +19,16 @@ urlpatterns = patterns('',
     url(r'records/schedule/(?P<schedule_owner>\w+)/$', 'fereol.mobile.views.studentSchedule', name = 'student-schedule-owner'),
     url(r'records/schedule/(?P<schedule_owner>\w+)/(?P<delta>\-?\d+)/$', 'fereol.mobile.views.studentSchedule', name = 'student-schedule-delta'),
     
+    url(r'employees/$', 'fereol.mobile.views.employeesList', name = 'employees-list'),
+    url(r'employees/(?P<key>\d)$', 'fereol.mobile.views.employeesList', name = 'employees-list'),
+    
+    url(r'employees/schedule/(?P<schedule_owner>\w+)/$', 'fereol.mobile.views.employeeSchedule', name = 'employee-schedule-owner'),
+    url(r'employees/schedule/(?P<schedule_owner>\w+)/(?P<delta>\-?\d+)/$', 'fereol.mobile.views.employeeSchedule', name = 'employee-schedule-delta'),
+    
+    url(r'students/$', 'fereol.mobile.views.studentsList', name = 'students-list'),
+    url(r'students/(?P<key>\d)$', 'fereol.mobile.views.studentsList', name = 'students-list'),
+    
+    
     url(r'^(?P<cat>[\w\-_]+)/$', 'news.views.latest_news', name='latest_news'),
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
     url(r'^subject/(?P<slug>[\w\-_]+)', 'fereol.mobile.views.subjectTerms', name='subject-terms'),

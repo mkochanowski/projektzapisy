@@ -3,20 +3,17 @@
 {% block content %}
 
 <div id="center-container">
-
-	<div class="menu-outer">
-		<a href= {% url enrollment-other %} >
-			<div class="menu-inner">Lista przedmiotów</div>
-		</a>
-	</div>
-	<div>
-		<h3>Wszystkie przedmioty: </h3>
-		{% for s in subjects %}
-			<div class="subject-outer">
-				<a href= "/subject/{{ s.slug }}/" ><div class="subject-inner">{{ s.name }}</div></a>
-			</div>
-		{% endfor %}
-	</div>
+    <a href = {% url student-enrollment %}>
+        <div class="box round">Powrót</div>
+    </a>    
+    <div>
+        <h3>Wszystkie przedmioty: </h3>
+        {% for s in subjects %}
+            <div class="subject-outer">
+                <a href= "/subject/{{ s.slug }}/" ><div class="subject-inner">{{ s.name }}</div></a>
+            </div>
+        {% endfor %}
+    </div>
 
 </div>
 {% endblock %}
