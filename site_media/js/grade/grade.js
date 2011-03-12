@@ -1,4 +1,4 @@
-
+﻿
 
 FormGenerator = Object();
 
@@ -63,6 +63,7 @@ FormGenerator.addQuestion = function()
 FormGenerator.addOption = function( question )
 {
 	var li = document.createElement('li');
+        li.className = 'poll-question-answer';
 	var answer = document.createElement('input');
 	    answer.name =  'poll[' + question + '][answers][]';
 	    answer.value = 'odpowiedź';

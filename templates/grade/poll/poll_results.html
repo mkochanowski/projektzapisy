@@ -1,0 +1,148 @@
+﻿{% extends "grade/base.html" %}
+
+{% load news_extras %}
+
+{% block content-class %}wide{% endblock %}
+
+
+
+{% block main-navigation %}
+    <li><a href="/">Strona Główna</a></li>
+    <li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+    <li>Wyniki oceny</li>
+{% endblock %}
+
+{% block content %}
+	<table>
+		<td>
+	<form method="post">
+	Semestr:
+	<br/>
+	{{ form.semestr_date_begin.label }}
+	{{ form.semestr_date_begin }}
+	{{ form.semestr_date_end.label }}
+	{{ form.semestr_date_end }}
+	<br/>
+	{{ form.semestr_winter }}
+	{{ form.semestr_winter.label }}
+	
+	<br/>
+	{{ form.semestr_summer }}
+	{{ form.semestr_summer.label }}
+	<br/>
+	Zasoby:
+	<br/>
+	{{ form.own_resource }}
+	{{ form.own_resource.label }}
+	<br/>
+	{{ form.available_resource }}
+	{{ form.available_resource.label }}
+	<br/>
+	Filtrowanie:
+	<br/>
+	{{ form.lecture }}
+	{{ form.lecture.label }}
+	<br/>
+	{{ form.tutorial }}
+	{{ form.tutorial.label }}
+	<br/>
+	{{ form.lab }}
+	{{ form.lab.label }}
+	<br/>
+	Sortowanie:
+	<br/>
+	{{ form.order }}
+	<br/>
+	</form>
+	
+	<p class="link"><a href="#">Przedmioty:</a></p>
+	<br/>
+	<ul>
+		{% for l in list %}
+			<li> <p class="link"><a href="{% url grade-poll-poll-results l.id %}">
+				[ {{ l.title }} ]
+				{% if l.group %}
+				{{ l.group.subject.name }}
+				{% endif %}
+			</a></p></li>
+		{% endfor %}
+	</ul>
+	
+		</td>
+	<td>
+		Tytuł ankiety:
+		{{ selected.title }} 
+		{% if selected %}
+			{{ selected.group.subject.name }}
+		{% endif %}
+		<br/>
+		Nazwisko autora:
+		{{ selected.author }}
+		<br/>
+		Semestr:
+		{{ selected.semester }}
+		<br/>
+		<table border=1>
+			{% for a in answers %}
+				{% if a.open_question %}
+					<tr>
+						<td>
+							{{ a.open_question }}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							{% for o in a.answer %}
+								{{ o }}
+								<br/>
+							{% endfor %}
+						</td>
+					</tr>
+				{% endif %}
+					
+				{% if a.single_choice_question %}
+					<tr>
+						<td>
+							{{ a.single_choice_question }}
+						</td>
+					</tr>
+					
+					<tr>
+						{% for o in a.answer %}
+							<td> 
+								{{ o.text }} 
+								<br/>
+								{{ o.count }}
+							</td>
+						{% endfor %}
+					</tr>
+						
+				{% endif %}
+				
+				{% if a.multiple_choice_question %}
+					<tr>
+						<td>
+							{{ a.multiple_choice_question }}
+						</td>
+					</tr>
+					
+					<tr>
+						{% for o in a.answer %}
+							<td> 
+								{{ o.text }} 
+								<br/>
+								{{ o.count }}
+							</td>
+						{% endfor %}
+					</tr>
+						
+				{% endif %}
+			{% endfor %}
+		</table>
+		
+		
+	</td>
+	</table>
+
+
+{% endblock %}

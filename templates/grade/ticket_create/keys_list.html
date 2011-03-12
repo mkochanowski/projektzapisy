@@ -1,0 +1,17 @@
+{% extends "grade/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+    <li>Lista kluczy publicznych</li>
+{% endblock %}
+
+{% block content %}
+
+<table border="1">
+{% for l in list %}
+{{ l.poll.as_row }}
+{% endfor %}
+</table>
+{% endblock %}
+

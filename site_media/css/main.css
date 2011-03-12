@@ -538,7 +538,7 @@ a.main-sidebar-toggle-button:hover
 
 /*** KOMUNIKAT ***/
 
-.main-message, .main-side-message
+.main-message, .main-side-message, .main-error
 {
 	border: 1px solid #cccccc;
 	background: #FFF5B3;
@@ -549,7 +549,7 @@ a.main-sidebar-toggle-button:hover
 	border-radius: 4px;
 }
 
-.main-message
+.main-message, .main-error
 {
 	margin: 10px;
 	margin-bottom: 35px;

@@ -1,0 +1,45 @@
+{% extends "grade/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/connections_choice.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script src="/site_media/js/grade/ticket_create/BigInt.js" type="text/javascript"></script>
+<script src="/site_media/js/grade/ticket_create/ticket_create.js" type="text/javascript"></script>
+<script type="application/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>
+{% endblock %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+	<li>Pobieranie Biletów</li>
+{% endblock %}
+
+{% block content %}
+    {% if success %}
+    <div class="main-message">{{ success }}</div>
+    {% endif %}
+    {% if message %} 
+    <div class="main-message">{{ message }}</div>
+    {% endif %}
+    {% if error %} 
+    <div class="main-error">{{ error }}</div>
+    {% endif %}
+    {% if grade %}
+    <div id="progressbar"></div>
+	<div id="grade-connection-choice">
+	<form method="post" id="connection_choice">
+	<h3>Pobieranie biletów na następujące ankiety:</h3>
+	<table id = "grade-connection-choice-form">
+            {{ form.as_table }}
+	</table>
+        <input id="connection_choice_button" type="submit" value="Pobierz bilety">
+    	</form>
+	</div>
+
+    <div>{{ p }}</div>
+    {% endif %}
+{% endblock %}
+

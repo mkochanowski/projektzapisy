@@ -8,3 +8,5 @@ search_index/*
 *.log
 *~
 settings_local.py
+/apache
+

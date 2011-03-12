@@ -1,0 +1,31 @@
+﻿{% extends "grade/poll/managment/base.html" %}
+
+{% block scripts %}
+
+<script src="/site_media/js/grade/poll/section_create.js" type="text/javascript"></script>
+<script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
+	
+{% endblock %}
+
+{% block styles %}
+	<link rel="stylesheet" href="/site_media/css/grade/questionset_create.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
+{% endblock %}
+
+
+{% block poll-managment %}
+  
+	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
+		<form url="" id="questionset" method="Post">
+			<input type="text" id="section-title" name="poll[title]" value="Tytuł sekcji">
+            <textarea id="section-desc" name="poll[description]">Wstaw tutaj opis sekcji</textarea>
+			<ol id="poll-form">
+			</ol>
+		<input type="button" value="Dodaj pytanie" id="add-question">
+    <br/><br/>
+		<input id="questionset-submit" type="submit" value="Zapisz">
+	</form>
+{% endblock %}
+

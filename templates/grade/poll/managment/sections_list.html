@@ -1,0 +1,56 @@
+﻿{% extends "grade/poll/managment/base.html" %}
+
+{% block scripts %}
+<script src="/site_media/js/grade/managment/list.js" type="application/javascript"></script>
+{% endblock %}
+
+{% block poll-managment %}
+<form method="POST" action="{% url grade-poll-delete_section %}">
+<div class="actions">
+    <label>Akcja: <select name="action">
+<option selected="selected" value="">---------</option>
+<option value="delete_selected">Usuń wybrane sekcje</option>
+</select></label>
+    <button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
+        <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{sections.object_list.count}} wybranych</span>
+</div>
+<table id="poll-managment-table">
+	<thead>
+		<tr>
+		<th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;"></th>
+		<th>Sekcja</th>
+		</tr>
+	</thead>
+	<tbody>
+    	{% for section in sections.object_list %}
+        <tr>
+            <td class="action-checkbox-column">
+                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{section.pk}}" class="action-select">
+            </td>
+            <th>
+                <a href="{% url grade-poll-show_section section.id %}">{{section}}</a>
+            </th>
+        </tr>
+    	{% endfor %}
+	</tbody>
+</table>
+</form>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if polls.has_previous %}
+            <a href="?page={{ sections.previous_page_number }}">poprzednia</a>
+        {% endif %}
+
+        <span class="current">
+            Strona {{ sections.number }} z {{ sections.paginator.num_pages }}
+        </span>
+
+        {% if polls.has_next %}
+            <a href="?page={{ sections.next_page_number }}">nastepna</a>
+        {% endif %}
+    </span>
+</div>
+
+<p>{{sections.object_list.count}} sekcje</p>
+{% endblock %}

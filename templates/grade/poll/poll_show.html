@@ -1,0 +1,37 @@
+{% for section in sections %}
+	<div class="poll-section">
+	        <h2 class="poll-section-title">{{section.title}}</h2>
+	        <span class="poll-section-description">{{section.description}}</span>
+	    {% for field in section.questions %}
+	    <div class="poll-section-field{% if field.is_leading %} poll-section-leading{% endif %}">
+            <h4>{{field.label}}</h4>
+            {% if field.description %}<span class="poll-section-description">{{field.description}}</span>{% endif %}
+	        {% if field.type == 'single' %}
+                <ul class="poll-section-answer-list">
+                {% for key, radio in field.widget.choices %}
+                    <li  class="poll-section-answer-item">
+                        <input type="radio" id="{{field.title}}-{{key}}" class="poll-section-radio{% if key in  field.hide_on %} poll-section-radio-hideon{% else %} poll-section-radio-all{% endif %}" name="{{field.title}}" value="{{key}}"{% if field.initial == key%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>
+                        <label for="{{field.title}}-{{key}}">{{radio}}</label>
+                    </li>
+                {% endfor %}
+                </ul>
+	        {% else %}{% if field.type == 'multi' %}
+                {% if field.choice_limit %}{% if field.choice_limit > 0 %}<span class="poll-section-description">Możesz podać maksymalnie {{field.choice_limit}} odpowiedzi</span>{% endif %}{% endif %}
+                <input type="hidden" value="{{field.choice_limit}}" class="poll-section-answer-limit">{% endif %}
+                <ul class="poll-section-answer-list{% if field.choice_limit %} poll-section-choicelimit{% endif %}">
+                {% if field.choice_limit %}
+                {% for key, radio in field.widget.choices %}
+                    <li  class="poll-section-answer-item"><input type="checkbox" class="poll-section-choice {% if field.choice_limit %}poll-section-choicelimit-choice{% endif %}" id="{{field.title}}-{{key}}" name="{{field.title}}" value="{{key}}"{% if  key in field.initial%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>
+                    <label for="{{field.title}}-{{key}}">{{radio}}</label>
+                    {% if key == -1 %}<input type="text" {% if field.disabled %} disabled="disabled"{% endif %} class="poll-section-other{% if field.choice_limit %} poll-section-choicelimit-choice{% endif %}">{% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+	       	{% else %}{% if field.type == 'open'  %}
+	       		<textarea cols="40" rows="5" name="{{field.title}}"{% if field.disabled %} disabled="disabled"{% endif %}>{{field.initial}}</textarea>
+	       	{% endif %}{% endif %}{% endif %}
+	    </div>
+	    {% endfor %}
+    <hr>
+	</div>
+{% endfor %}

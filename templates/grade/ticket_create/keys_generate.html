@@ -1,0 +1,26 @@
+﻿{% extends "grade/poll/managment/base.html" %}
+
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/connections_choice.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+{% endblock %}
+
+{% block scripts %}
+<script src="/site_media/js/grade/ticket_create/BigInt.js" type="application/javascript"></script>
+<script src="/site_media/js/grade/ticket_create/keys_generate.js" type="application/javascript"></script>
+<script type="application/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>
+{% endblock %}
+
+
+{% block poll-managment %}
+
+    {% if keys != 0 %}
+        <div id="progressbar"></div>
+        <span id="generated-keys">0</span> / <span id="all-keys">{{keys}}</span> (<span id="keys-percent">0</span>%)
+    {% else %}
+        Brak kluczy do wygenerowania!
+    {% endif %}
+{% endblock %}
+
