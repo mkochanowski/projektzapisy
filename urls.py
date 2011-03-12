@@ -23,6 +23,8 @@ urlpatterns = patterns('',
     (r'^proposal/', include('fereol.offer.proposal.urls')),
     (r'^news/', include('fereol.news.urls')),
     (r'^vote/', include('fereol.offer.vote.urls')),
+    # OCENA ZAJĘĆ
+    (r'^grade/', include('fereol.grade.urls')),
     #
     (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
     (r'^users/', include('fereol.users.urls')),

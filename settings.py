@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'fereol.offer.vote',
     'fereol.users',
     'fereol.debug_toolbar',
+    'fereol.grade.poll',
     'fereol.mobile',
 )
 FIXTURE_DIRS = (
