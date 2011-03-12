@@ -37,7 +37,7 @@ from django.core.cache import cache
 @employee_required
 def ajax_keys_generate( request ):
     generate_keys_for_polls()
-    return HttpResponse("ok")
+    return HttpResponse("OK")
     
 @employee_required
 def ajax_keys_progress( request ):

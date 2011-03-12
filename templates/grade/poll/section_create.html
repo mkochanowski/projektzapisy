@@ -17,12 +17,15 @@
 
 {% block poll-managment %}
   
-	{% if message %}<div class="main-message">{{ message }}</div>{% endif %}
 		<form url="" id="questionset" method="Post">
-			<input type="text" id="section-title" name="poll[title]" value="Tytuł sekcji">
-            <textarea id="section-desc" name="poll[description]">Wstaw tutaj opis sekcji</textarea>
-			<ol id="poll-form">
-			</ol>
+			<label for="section-title">Tytuł:</label>
+            <input type="text" id="section-title" name="poll[title]">
+            <label for="section-desc">Opis:</label>
+            <textarea id="section-desc" name="poll[description]"></textarea>
+            <label for="leading">Pytanie wiodące</label>
+            <input type="checkbox">
+			<ul id="poll-form">
+			</ul>
 		<input type="button" value="Dodaj pytanie" id="add-question">
     <br/><br/>
 		<input id="questionset-submit" type="submit" value="Zapisz">

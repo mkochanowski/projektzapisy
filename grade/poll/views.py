@@ -141,11 +141,15 @@ def edit_section(request, section_id):
 @employee_required
 def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect( '/grade' )
     semester     = None
     group        = None
     type         = None
     studies_type = None
     subject      = None
+    
     # TODO: przeniesc do modeli - porozmawiaz z grupa
     def getGroups(semester, group = None, type = None, subject = None):
         if subject == -1:
@@ -161,9 +165,7 @@ def poll_create(request):
             if subject:
                 groups = Group.objects.filter(subject=subject)
             else:
-                groups = Group.objects.filter(subject__semester = semester)
-                
-        
+                groups = Group.objects.filter(subject__semester = semester)                    
         return groups
 
     message = ""
@@ -207,7 +209,15 @@ def poll_create(request):
             studies_type = Type.objects.get(pk=studies_type)
         else:
             studies_type = None
+    
+        if (request.POST.get('title', '') == ''):
+            messages.error(request, "Nie można utworzyć ankiety; brak tytułu")
+            return HttpResponseRedirect( '/grade' )
 
+        if (request.POST.getlist('sections[]') == []):
+            messages.error(request, "Nie można utworzyć ankiety; ankieta jest pusta")
+            return HttpResponseRedirect( '/grade' )
+        
         groups = getGroups(semester, group, type, subject)
         for group in groups:
             if groups_without == 'on' and Poll.get_all_polls_for_group(group):
@@ -428,6 +438,9 @@ def declaration( request ):
 @employee_required    
 def questionset_create(request):
     grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect( '/grade' )
     def parse_form(post):
         def choicebox_is_on(value):
             if value == 'on':
@@ -435,8 +448,14 @@ def questionset_create(request):
             return False
 
         section = Section()
-        section.title       = post.get("poll[title]")
+        section.title       = post.get("poll[title]")        
+        if (section.title == ""):
+            #messages.error(request, "Nie można utworzyć sekcji; niepoprawny tytuł sekcji")
+            return False
+            
         section.description = post.get("poll[description]")
+        if (section.description == u"Wstaw tutaj opis sekcji"):
+            section.description = u""
         section.save()
         
         questions = post.getlist('poll[question][order][]')
@@ -508,11 +527,13 @@ def questionset_create(request):
             position   = position + 1
     data = {}
     if request.method == "POST":
-        parse_form(request.POST)
-        request.session['message'] = 'Sekcja dodana'
-
-        #TODO: check 'is OK?'
-        return HttpResponseRedirect(reverse('grade-poll-questionset-create'))
+        if parse_form(request.POST):
+            request.session['message'] = 'Sekcja dodana'
+            return HttpResponseRedirect(reverse('grade-poll-questionset-create'))
+        else:
+            # messages.error(request, "Błąd dodania sekcji")
+            HttpResponseRedirect( '/grade' )
+            
     if request.session.get('message', None):
         data['message'] = request.session.get('message', None)
         del request.session['message']
@@ -630,9 +651,14 @@ def poll_answer( request, slug, pid ):
             form.setFields( poll, st )
             
             if form.is_valid():
-                for key, value in form.cleaned_data.items():
+                items = form.cleaned_data.items()
+                if ((u'finish', True) in items):
+                    messages.success(request, u"Ankieta: " + poll.title + u" zakończona")
+                else:
+                    messages.success(request, u"Ankieta: " + poll.title + u" zapisana")
                     
-                    if key == 'finish':
+                for key, value in items:                    
+                    if key == 'finish':                    
                         if value:
                             finit = request.session.get( 'finished', default = [])
                             polls = request.session.get( 'polls',    default = [])
@@ -675,6 +701,7 @@ def poll_answer( request, slug, pid ):
                             
                             st.finished = True
                             st.save()
+                                                    
                             
                     else:
                         [ poll_data, section_data, question_data ] = key.split( '_' )

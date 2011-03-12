@@ -133,14 +133,14 @@ def generate_rsa_key():
     """    
     
     #wersja bezpieczniejsza
-    key_length = 1024
-    RSAkey     = RSA.generate(key_length)    
+    #key_length = 1024
+    #RSAkey     = RSA.generate(key_length)    
     
     #wersja szybsza
     #do poprawki: tworzenie i usuwanie pliku test_rsa...
-    #getstatusoutput('ssh-keygen -b 1024 -t "rsa" -f test_rsa -N "" -q')
-    #RSAkey = RSA.importKey( open('test_rsa').read() )
-    #getstatusoutput('rm test_rsa*')
+    getstatusoutput('ssh-keygen -b 1024 -t "rsa" -f test_rsa -N "" -q')
+    RSAkey = RSA.importKey( open('test_rsa').read() )
+    getstatusoutput('rm test_rsa*')
         
     privateKey = RSAkey.exportKey()        
     publicKey  = RSAkey.publickey().exportKey()
@@ -165,7 +165,7 @@ def generate_keys_for_polls():
     cache.set('generated-keys', '0')
     i = 1
     for el in poll_list:
-        cache.set('generated-keys', i)
+        cache.set('generated-keys', str(i))
         (pub, priv) = generate_rsa_key()
         pub_list.append(pub)
         priv_list.append(priv)

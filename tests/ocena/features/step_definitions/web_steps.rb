@@ -58,7 +58,17 @@ Then /^(?:|I )should not see link "([^"]*)"$/ do |link|
 end
 
 Then /^(?:|I )should not see "([^"]*)"$/ do |text|  
-  page.should have_no_content(text)
+    page.should have_no_content(text)
+end
+
+Then /^"([^\"]+)" should be invisible$/ do |text|
+  paths = [
+    "//*[@class='hidden']/*[contains(.,'#{text}')]",
+    "//*[@class='invisible']/*[contains(.,'#{text}')]",
+    "//*[@style='display: none;']/*[contains(.,'#{text}')]"
+  ]
+  xpath = paths.join '|'
+  page.should have_xpath(xpath)
 end
 
 Given /^(?:|I )am on (.+)$/ do |page|
@@ -173,6 +183,6 @@ When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
-    sleep 2
+    sleep 3
     wait_until(5) { page.should have_content(text) }
 end
