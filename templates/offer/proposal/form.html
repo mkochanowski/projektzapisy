@@ -1,5 +1,7 @@
 {% extends "offer/proposal/base.html" %}
 
+{% block main-subtitle %}Edycja propozycji{% if proposal.name %}:{% endif %} {{proposal.name}}{% endblock %}
+
 {% block proposal-scripts %}
 	<script type="text/javascript" src="/site_media/js/offer/proposal/form.js"></script>
 {% endblock %}

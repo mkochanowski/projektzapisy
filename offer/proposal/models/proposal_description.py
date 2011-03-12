@@ -25,7 +25,7 @@ class ProposalDescription(models.Model):
     proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
     description  = models.TextField( verbose_name = 'opis' )
     requirements = models.TextField( verbose_name = 'wymagania' )
-    comments     = models.TextField( verbose_name = 'uwagi' )
+    comments     = models.TextField( verbose_name = 'uwagi', blank = True )
     
     date         = models.DateTimeField(verbose_name = 'data dodania')
     tags         = models.ManyToManyField(ProposalDescriptionTag, blank = True)
@@ -33,18 +33,18 @@ class ProposalDescription(models.Model):
     
     ects         = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
     
-    lectures     = models.IntegerField(verbose_name = 'ilość godzin wykładów', 
+    lectures     = models.IntegerField(verbose_name = 'liczba godzin wykładów',
                                             choices = PROPOSAL_HOURS)
-    repetitories = models.IntegerField(verbose_name = 'ilość godzin repetytoriów', 
+    repetitories = models.IntegerField(verbose_name = 'liczba godzin repetytoriów',
                                             choices = PROPOSAL_HOURS)
-    exercises    = models.IntegerField(verbose_name = 'ilość godzin ćwiczeń', 
+    exercises    = models.IntegerField(verbose_name = 'liczba godzin ćwiczeń',
                                             choices = PROPOSAL_HOURS)
-    laboratories = models.IntegerField(verbose_name =' ilość godzin pracowni', 
+    laboratories = models.IntegerField(verbose_name =' liczba godzin pracowni',
                                             choices = PROPOSAL_HOURS)
     deleted = models.BooleanField(verbose_name='usunięty', default=False)
-    web_page = models.CharField( verbose_name = 'Strona WWW', 
-                                max_length   = 200,
-                                blank        = True,
+    web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+                                verify_exists= True,
+								blank        = True,
                                 null         = True )
                                 
     

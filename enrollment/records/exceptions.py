@@ -42,3 +42,6 @@ class AdminActionException(Exception):
 class AlreadyQueuedException(Exception):
     """is thrown when user tries to queue for the same group twice """
     pass
+class ECTS_Limit_Exception(Exception):
+    """is thrown when user tries to queue for the same group twice """
+    pass

@@ -1,6 +1,8 @@
 {% extends "offer/proposal/base.html" %}
 
-{% load news_extras %} {# WTF?! po co tu newsy? #}
+{% load fereol_common %}
+
+{% block main-subtitle %}Propozycje: {{proposal.name}}{% endblock %}
 
 {% block proposal-scripts %}
 	<script type="text/javascript" src="/site_media/js/offer/proposal/view.js"></script>
@@ -42,7 +44,7 @@
 			<li>Egzamin: {% if proposal.is_exam %}Tak{% else %}Nie{% endif %}</li>
 			<li>Możliwe zajęcia w języku angielskim: {% if proposal.in_english %}Tak{% else %}Nie{% endif %}</li>
 			<li>
-				{% if proposal.description.web_page %}<a href="{{ proposal.description.web_page }}">Strona przedmiotu</a>{% endif %}
+				{% if proposal.description.web_page %}<a href="{{ proposal.description.web_page|validate_url }}">Strona przedmiotu</a>{% endif %}
 			</li>
 		</ul>
 

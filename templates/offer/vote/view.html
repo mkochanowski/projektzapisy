@@ -1,9 +1,11 @@
 {% extends "offer/base.html" %}
 
+{% block main-subtitle %}Pokaż mój głos{% endblock %}
+
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
 	<li><a href="{% url vote-main %}">Głosowanie</a></li>
-	<li>Pokaż głos</li>
+	<li>Pokaż mój głos</li>
 {% endblock %}
 
 {% block styles %}

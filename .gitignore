@@ -7,4 +7,6 @@ search_index/*
 *.tmp*
 *.log
 *~
+settings_local.py
 /apache
+

@@ -9,10 +9,14 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Changing field 'Term.hourFrom'
-        db.alter_column('subjects_term', 'hourFrom', self.gf('django.db.models.fields.TimeField')())
+        #db.alter_column('subjects_term', 'hourFrom', self.gf('django.db.models.fields.TimeField')())
+        db.delete_column('subjects_term', 'hourFrom')
+        db.add_column('subjects_term', 'hourFrom', self.gf('django.db.models.fields.TimeField')(default=datetime.time(0, 0)))
 
         # Changing field 'Term.hourTo'
-        db.alter_column('subjects_term', 'hourTo', self.gf('django.db.models.fields.TimeField')())
+        #db.alter_column('subjects_term', 'hourTo', self.gf('django.db.models.fields.TimeField')())
+        db.delete_column('subjects_term', 'hourTo')
+        db.add_column('subjects_term', 'hourTo', self.gf('django.db.models.fields.TimeField')(default=datetime.time(0, 0)))
     
     
     def backwards(self, orm):

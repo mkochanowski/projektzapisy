@@ -5,13 +5,14 @@ from django.db import models
      
 class Type(models.Model):
     """types of subjects"""
-    name = models.CharField(max_length=30, verbose_name='rodzaj zajec', default="", unique=True)
+    name = models.CharField(max_length=30, verbose_name='rodzaj zajec', default="", unique=False)
     group     = models.ForeignKey("self", null=True, blank=True, verbose_name='grupa')
     meta_type = models.BooleanField(default = False, verbose_name ='Grupa typow')
+	#TODO: dodać unique na parę (meta_type, name)
     
     @staticmethod
-    def get_all_types_of_subjects():
-        Type.objects.all()
+    def get_all_types():
+        return Type.objects.select_related('group').all()
     
     def get_name(self):
         self.name

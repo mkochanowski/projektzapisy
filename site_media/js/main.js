@@ -43,11 +43,11 @@ Fereol.Subsystems = {
  */
 Fereol.initSubsystemTypeSelector = function()
 {
-	var systemTypeBar = $('#main-systemTypeBar').assertOne();
 	var currentSubsystem = Fereol.getCurrentSubsystem();
 	if (!currentSubsystem)
 		return;
 
+	var systemTypeBar = $('#main-systemTypeBar').assertOne();
 	systemTypeBar.empty();
 	var subsystemSelectorButton = $.create('span').
 		text(currentSubsystem.name).
@@ -98,7 +98,11 @@ Fereol.getCurrentSubsystem = function()
 	if (typeof Fereol.currentSubsystem != 'undefined')
 		return Fereol.currentSubsystem;
 
-	var currentSystemName = $('#main-systemTypeBar').assertOne().text().trim();
+	var systemTypeBar = $('#main-systemTypeBar');
+	if (systemTypeBar.length == 0)
+		return Fereol.currentSubsystem = null;
+
+	var currentSystemName = systemTypeBar.assertOne().text().trim();
 	var currentSystem = null;
 
 	for (var id in Fereol.Subsystems)

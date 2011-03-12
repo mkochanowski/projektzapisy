@@ -42,6 +42,9 @@ class Term( models.Model ):
     def _convert_string_to_time(self, str):
         hour, minute = map(lambda x: int(x), str.split('.'))
         return time(hour=hour, minute=minute)
-
+    
+    def period_string(self):
+        return "%s – %s" % (self.start_time.strftime("%H"), self.end_time.strftime("%H"))
+        
     def __unicode__(self):
         return "%s (%s-%s) s.%s" % (self.get_dayOfWeek_display(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom)

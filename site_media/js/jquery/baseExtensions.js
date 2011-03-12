@@ -63,6 +63,14 @@ Array.prototype.remove = function(index, count)
 	return this.push.apply(this, tail);
 };
 
+Array.prototype.removeElement = function(element)
+{
+	var index = this.indexOf(element);
+	if (index < 0)
+		throw new Error('Element not found');
+	return this.remove(index, 1);
+};
+
 jQuery.log = function(message)
 {
 	if(window.console)
