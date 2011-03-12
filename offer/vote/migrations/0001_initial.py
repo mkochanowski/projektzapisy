@@ -11,10 +11,10 @@ class Migration(SchemaMigration):
         # Adding model 'SystemState'
         db.create_table('vote_systemstate', (
             ('max_vote', self.gf('django.db.models.fields.IntegerField')(default=30)),
-            ('vote_end', self.gf('django.db.models.fields.DateField')(default=datetime.date(2010, 12, 31))),
-            ('vote_beg', self.gf('django.db.models.fields.DateField')(default=datetime.date(2010, 1, 1))),
+            ('vote_end', self.gf('django.db.models.fields.DateField')(default=datetime.date(2011, 12, 31))),
+            ('vote_beg', self.gf('django.db.models.fields.DateField')(default=datetime.date(2011, 1, 1))),
             ('max_points', self.gf('django.db.models.fields.IntegerField')(default=3)),
-            ('year', self.gf('django.db.models.fields.IntegerField')(default=2010, unique=True)),
+            ('year', self.gf('django.db.models.fields.IntegerField')(default=2011, unique=True)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
         db.send_create_signal('vote', ['SystemState'])
@@ -103,16 +103,26 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Employee'},
             'consultations': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
+            'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'records_opening_delay_hours': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
+            'records_opening_delay_minutes': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
+            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+        },
+        'users.type': {
+            'Meta': {'object_name': 'Type'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
         'vote.singlevote': {
             'Meta': {'unique_together': "(('subject', 'state', 'student'),)", 'object_name': 'SingleVote'},
@@ -127,9 +137,9 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'max_points': ('django.db.models.fields.IntegerField', [], {'default': '3'}),
             'max_vote': ('django.db.models.fields.IntegerField', [], {'default': '30'}),
-            'vote_beg': ('django.db.models.fields.DateField', [], {'default': 'datetime.date(2010, 1, 1)'}),
-            'vote_end': ('django.db.models.fields.DateField', [], {'default': 'datetime.date(2010, 12, 31)'}),
-            'year': ('django.db.models.fields.IntegerField', [], {'default': '2010', 'unique': 'True'})
+            'vote_beg': ('django.db.models.fields.DateField', [], {'default': 'datetime.date(2011, 1, 1)'}),
+            'vote_end': ('django.db.models.fields.DateField', [], {'default': 'datetime.date(2011, 12, 31)'}),
+            'year': ('django.db.models.fields.IntegerField', [], {'default': '2011', 'unique': 'True'})
         }
     }
     

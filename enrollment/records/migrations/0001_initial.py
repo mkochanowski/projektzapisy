@@ -5,9 +5,6 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    depends_on = (
-        ('subjects', '0001_initial'),
-    )
     
     def forwards(self, orm):
         
@@ -169,7 +166,7 @@ class Migration(SchemaMigration):
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
-            'block': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
