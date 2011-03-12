@@ -65,11 +65,10 @@ class Migration(SchemaMigration):
 
         # Adding model 'Poll'
         db.create_table('poll_poll', (
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
             ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'])),
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=250)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
         ))
         db.send_create_signal('poll', ['Poll'])
 
@@ -199,8 +198,7 @@ class Migration(SchemaMigration):
             'multiple_choice_question': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.MultipleChoiceQuestion']", 'symmetrical': 'False'}),
             'open_questions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.OpenQuestion']", 'symmetrical': 'False'}),
             'single_choice_questions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.SingleChoiceQuestion']", 'symmetrical': 'False'}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '250'})
+            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"})
         },
         'poll.singlechoicequestion': {
             'Meta': {'object_name': 'SingleChoiceQuestion'},
@@ -223,18 +221,16 @@ class Migration(SchemaMigration):
         'subjects.semester': {
             'Meta': {'unique_together': "(('type', 'year'),)", 'object_name': 'Semester'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'records_closing': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'records_opening': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'semester_beginning': ('django.db.models.fields.DateField', [], {}),
-            'semester_ending': ('django.db.models.fields.DateField', [], {}),
+            'records_closing': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'records_opening': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'visible': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'year': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2011'})
+            'year': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2010'})
         },
         'subjects.studentoptions': {
             'Meta': {'unique_together': "(('subject', 'student'),)", 'object_name': 'StudentOptions'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'records_opening_delay_minutes': ('django.db.models.fields.IntegerField', [], {}),
+            'records_opening_delay_hours': ('django.db.models.fields.IntegerField', [], {}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Student']"}),
             'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"})
         },
@@ -257,15 +253,12 @@ class Migration(SchemaMigration):
         'subjects.subjectentity': {
             'Meta': {'object_name': 'SubjectEntity'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'subjects.type': {
             'Meta': {'object_name': 'Type'},
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Type']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'meta_type': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '30'})
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '30'})
         },
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
@@ -277,13 +270,12 @@ class Migration(SchemaMigration):
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
-            'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'records_opening_delay_minutes': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
+            'records_opening_delay_hours': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },

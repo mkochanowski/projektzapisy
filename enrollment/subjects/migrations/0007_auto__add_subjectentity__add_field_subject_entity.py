@@ -5,115 +5,34 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    depends_on = (
-        ('users', '0001_initial'),
-    )
     
     def forwards(self, orm):
         
-        # Adding model 'Subject'
-        db.create_table('subjects_subject', (
-            ('lectures', self.gf('django.db.models.fields.IntegerField')()),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+        # Adding model 'SubjectEntity'
+        db.create_table('subjects_subjectentity', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('exercises', self.gf('django.db.models.fields.IntegerField')()),
-            ('laboratories', self.gf('django.db.models.fields.IntegerField')()),
-            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255, db_index=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
-        db.send_create_signal('subjects', ['Subject'])
+        db.send_create_signal('subjects', ['SubjectEntity'])
 
-        # Adding model 'SubjectDescription'
-        db.create_table('subjects_subjectdescription', (
-            ('date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(related_name='descriptions', to=orm['subjects.Subject'])),
-        ))
-        db.send_create_signal('subjects', ['SubjectDescription'])
-
-        # Adding model 'Classroom'
-        db.create_table('subjects_classroom', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('number', self.gf('django.db.models.fields.CharField')(max_length=4)),
-        ))
-        db.send_create_signal('subjects', ['Classroom'])
-
-        # Adding model 'Term'
-        db.create_table('subjects_term', (
-            ('dayOfWeek', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('hourFrom', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('hourTo', self.gf('django.db.models.fields.CharField')(max_length=2)),
-        ))
-        db.send_create_signal('subjects', ['Term'])
-
-        # Adding model 'Group'
-        db.create_table('subjects_group', (
-            ('limit', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0)),
-            ('teacher', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'])),
-        ))
-        db.send_create_signal('subjects', ['Group'])
-
-        # Adding M2M table for field classroom on 'Group'
-        db.create_table('subjects_group_classroom', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('group', models.ForeignKey(orm['subjects.group'], null=False)),
-            ('classroom', models.ForeignKey(orm['subjects.classroom'], null=False))
-        ))
-        db.create_unique('subjects_group_classroom', ['group_id', 'classroom_id'])
-
-        # Adding M2M table for field term on 'Group'
-        db.create_table('subjects_group_term', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('group', models.ForeignKey(orm['subjects.group'], null=False)),
-            ('term', models.ForeignKey(orm['subjects.term'], null=False))
-        ))
-        db.create_unique('subjects_group_term', ['group_id', 'term_id'])
-
-        # Adding model 'Books'
-        db.create_table('subjects_books', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.TextField')()),
-            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'])),
-        ))
-        db.send_create_signal('subjects', ['Books'])
+        # Adding field 'Subject.entity'
+        db.add_column('subjects_subject', 'entity', self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['subjects.SubjectEntity']), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Subject'
-        db.delete_table('subjects_subject')
+        # Deleting model 'SubjectEntity'
+        db.delete_table('subjects_subjectentity')
 
-        # Deleting model 'SubjectDescription'
-        db.delete_table('subjects_subjectdescription')
-
-        # Deleting model 'Classroom'
-        db.delete_table('subjects_classroom')
-
-        # Deleting model 'Term'
-        db.delete_table('subjects_term')
-
-        # Deleting model 'Group'
-        db.delete_table('subjects_group')
-
-        # Removing M2M table for field classroom on 'Group'
-        db.delete_table('subjects_group_classroom')
-
-        # Removing M2M table for field term on 'Group'
-        db.delete_table('subjects_group_term')
-
-        # Deleting model 'Books'
-        db.delete_table('subjects_books')
+        # Deleting field 'Subject.entity'
+        db.delete_column('subjects_subject', 'entity_id')
     
     
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '80', 'unique': 'True'}),
             'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'})
         },
         'auth.permission': {
@@ -137,7 +56,7 @@ class Migration(SchemaMigration):
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
+            'username': ('django.db.models.fields.CharField', [], {'max_length': '30', 'unique': 'True'})
         },
         'contenttypes.contenttype': {
             'Meta': {'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
@@ -146,11 +65,11 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'subjects.books': {
-            'Meta': {'object_name': 'Books'},
+        'subjects.book': {
+            'Meta': {'object_name': 'Book'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.TextField', [], {}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"})
+            'subject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'books'", 'to': "orm['subjects.Subject']"})
         },
         'subjects.classroom': {
             'Meta': {'object_name': 'Classroom'},
@@ -167,21 +86,31 @@ class Migration(SchemaMigration):
             'term': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'grupy'", 'to': "orm['subjects.Term']"}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
         },
+        'subjects.semester': {
+            'Meta': {'unique_together': "(('type', 'year'),)", 'object_name': 'Semester'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
+            'visible': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'year': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2010'})
+        },
         'subjects.subject': {
             'Meta': {'object_name': 'Subject'},
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'entity': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.SubjectEntity']"}),
             'exercises': ('django.db.models.fields.IntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'laboratories': ('django.db.models.fields.IntegerField', [], {}),
             'lectures': ('django.db.models.fields.IntegerField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'})
+            'semester': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Semester']", 'null': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'unique': 'True', 'db_index': 'True'}),
+            'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Employee']"}),
+            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Type']", 'null': 'True'})
         },
-        'subjects.subjectdescription': {
-            'Meta': {'object_name': 'SubjectDescription'},
-            'date': ('django.db.models.fields.DateTimeField', [], {}),
-            'description': ('django.db.models.fields.TextField', [], {}),
+        'subjects.subjectentity': {
+            'Meta': {'object_name': 'SubjectEntity'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptions'", 'to': "orm['subjects.Subject']"})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'subjects.term': {
             'Meta': {'object_name': 'Term'},
@@ -189,6 +118,11 @@ class Migration(SchemaMigration):
             'hourFrom': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
             'hourTo': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
+        'subjects.type': {
+            'Meta': {'object_name': 'Type'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '30', 'unique': 'True'})
         },
         'users.employee': {
             'Meta': {'object_name': 'Employee'},

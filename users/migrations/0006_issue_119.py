@@ -8,28 +8,32 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'Employee'
-        db.create_table('users_employee', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Employee'])
+        # Deleting field 'Employee.first_name'
+        db.delete_column('users_employee', 'first_name')
 
-        # Adding model 'Student'
-        db.create_table('users_student', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Student'])
+        # Deleting field 'Employee.last_name'
+        db.delete_column('users_employee', 'last_name')
+
+        # Deleting field 'Student.first_name'
+        db.delete_column('users_student', 'first_name')
+
+        # Deleting field 'Student.last_name'
+        db.delete_column('users_student', 'last_name')
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Employee'
-        db.delete_table('users_employee')
+        # Adding field 'Employee.first_name'
+        db.add_column('users_employee', 'first_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
 
-        # Deleting model 'Student'
-        db.delete_table('users_student')
+        # Adding field 'Employee.last_name'
+        db.add_column('users_employee', 'last_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
+
+        # Adding field 'Student.first_name'
+        db.add_column('users_student', 'first_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
+
+        # Adding field 'Student.last_name'
+        db.add_column('users_student', 'last_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
     
     
     models = {
@@ -72,11 +76,14 @@ class Migration(SchemaMigration):
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'records_opening_hour': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }

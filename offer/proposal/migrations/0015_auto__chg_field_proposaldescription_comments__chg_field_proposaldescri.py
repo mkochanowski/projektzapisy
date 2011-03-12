@@ -8,41 +8,20 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'SystemState'
-        db.create_table('vote_systemstate', (
-            ('max_vote', self.gf('django.db.models.fields.IntegerField')(default=30)),
-            ('vote_end', self.gf('django.db.models.fields.DateField')(default=datetime.date(2010, 12, 31))),
-            ('vote_beg', self.gf('django.db.models.fields.DateField')(default=datetime.date(2010, 1, 1))),
-            ('max_points', self.gf('django.db.models.fields.IntegerField')(default=3)),
-            ('year', self.gf('django.db.models.fields.IntegerField')(default=2010, unique=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('vote', ['SystemState'])
+        # Changing field 'ProposalDescription.comments'
+        db.alter_column('proposal_proposaldescription', 'comments', self.gf('django.db.models.fields.TextField')(blank=True))
 
-        # Adding model 'SingleVote'
-        db.create_table('vote_singlevote', (
-            ('value', self.gf('django.db.models.fields.IntegerField')()),
-            ('state', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['vote.SystemState'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Student'])),
-            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal'])),
-        ))
-        db.send_create_signal('vote', ['SingleVote'])
-
-        # Adding unique constraint on 'SingleVote', fields ['subject', 'state', 'student']
-        db.create_unique('vote_singlevote', ['subject_id', 'state_id', 'student_id'])
+        # Changing field 'ProposalDescription.web_page'
+        db.alter_column('proposal_proposaldescription', 'web_page', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True))
     
     
     def backwards(self, orm):
         
-        # Deleting model 'SystemState'
-        db.delete_table('vote_systemstate')
+        # Changing field 'ProposalDescription.comments'
+        db.alter_column('proposal_proposaldescription', 'comments', self.gf('django.db.models.fields.TextField')())
 
-        # Deleting model 'SingleVote'
-        db.delete_table('vote_singlevote')
-
-        # Removing unique constraint on 'SingleVote', fields ['subject', 'state', 'student']
-        db.delete_unique('vote_singlevote', ['subject_id', 'state_id', 'student_id'])
+        # Changing field 'ProposalDescription.web_page'
+        db.alter_column('proposal_proposaldescription', 'web_page', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True))
     
     
     models = {
@@ -82,6 +61,19 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'proposal.book': {
+            'Meta': {'object_name': 'Book'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.TextField', [], {}),
+            'order': ('django.db.models.fields.IntegerField', [], {}),
+            'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'books'", 'to': "orm['proposal.Proposal']"})
+        },
+        'proposal.descriptiontypes': {
+            'Meta': {'object_name': 'DescriptionTypes'},
+            'description': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptiontypes'", 'to': "orm['proposal.ProposalDescription']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'lecture_type': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptionstypes'", 'to': "orm['proposal.Types']"})
+        },
         'proposal.proposal': {
             'Meta': {'object_name': 'Proposal'},
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -94,43 +86,65 @@ class Migration(SchemaMigration):
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalTag']", 'symmetrical': 'False', 'blank': 'True'}),
             'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'proposal_teachers_related'", 'blank': 'True', 'to': "orm['users.Employee']"})
         },
+        'proposal.proposaldescription': {
+            'Meta': {'object_name': 'ProposalDescription'},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'autor'", 'to': "orm['auth.User']"}),
+            'comments': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'date': ('django.db.models.fields.DateTimeField', [], {}),
+            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'ects': ('django.db.models.fields.IntegerField', [], {}),
+            'exercises': ('django.db.models.fields.IntegerField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'laboratories': ('django.db.models.fields.IntegerField', [], {}),
+            'lectures': ('django.db.models.fields.IntegerField', [], {}),
+            'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptions'", 'to': "orm['proposal.Proposal']"}),
+            'repetitories': ('django.db.models.fields.IntegerField', [], {}),
+            'requirements': ('django.db.models.fields.TextField', [], {}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalDescriptionTag']", 'symmetrical': 'False', 'blank': 'True'}),
+            'web_page': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
+        },
+        'proposal.proposaldescriptiontag': {
+            'Meta': {'object_name': 'ProposalDescriptionTag'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
+        },
         'proposal.proposaltag': {
             'Meta': {'object_name': 'ProposalTag'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
         },
+        'proposal.types': {
+            'Meta': {'object_name': 'Types'},
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['proposal.Types']", 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'meta_type': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'name': ('django.db.models.fields.TextField', [], {})
+        },
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
             'consultations': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
+            'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'records_opening_delay_hours': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
+            'records_opening_delay_minutes': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
+            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
-        'vote.singlevote': {
-            'Meta': {'unique_together': "(('subject', 'state', 'student'),)", 'object_name': 'SingleVote'},
+        'users.type': {
+            'Meta': {'object_name': 'Type'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'state': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['vote.SystemState']"}),
-            'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Student']"}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['proposal.Proposal']"}),
-            'value': ('django.db.models.fields.IntegerField', [], {})
-        },
-        'vote.systemstate': {
-            'Meta': {'object_name': 'SystemState'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'max_points': ('django.db.models.fields.IntegerField', [], {'default': '3'}),
-            'max_vote': ('django.db.models.fields.IntegerField', [], {'default': '30'}),
-            'vote_beg': ('django.db.models.fields.DateField', [], {'default': 'datetime.date(2010, 1, 1)'}),
-            'vote_end': ('django.db.models.fields.DateField', [], {'default': 'datetime.date(2010, 12, 31)'}),
-            'year': ('django.db.models.fields.IntegerField', [], {'default': '2010', 'unique': 'True'})
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         }
     }
     
-    complete_apps = ['vote']
+    complete_apps = ['proposal']

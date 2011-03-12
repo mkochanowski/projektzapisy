@@ -5,30 +5,16 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    depends_on = (
-        ('offer.proposal', '0001_initial'),
-    )
-            
     
     def forwards(self, orm):
         
-        # Adding model 'Preference'
-        db.create_table('preferences_preference', (
-            ('review_lecture', self.gf('django.db.models.fields.IntegerField')()),
-            ('lab', self.gf('django.db.models.fields.IntegerField')()),
-            ('employee', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
-            ('lecture', self.gf('django.db.models.fields.IntegerField')()),
-            ('proposal', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('tutorial', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal('preferences', ['Preference'])
-    
+        # Adding field 'ProposalDescription.author'
+       db.add_column('proposal_proposaldescription', 'author', self.gf('django.db.models.fields.related.ForeignKey')(default='1', related_name='autor', to=orm['auth.User']), keep_default=False)
     
     def backwards(self, orm):
         
-        # Deleting model 'Preference'
-        db.delete_table('preferences_preference')
+        # Deleting field 'ProposalDescription.author'
+        db.delete_column('proposal_proposaldescription', 'author_id')
     
     
     models = {
@@ -68,21 +54,18 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'preferences.preference': {
-            'Meta': {'object_name': 'Preference'},
-            'employee': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Employee']"}),
+        'proposal.book': {
+            'Meta': {'object_name': 'Book'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'lab': ('django.db.models.fields.IntegerField', [], {}),
-            'lecture': ('django.db.models.fields.IntegerField', [], {}),
-            'proposal': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['proposal.Proposal']"}),
-            'review_lecture': ('django.db.models.fields.IntegerField', [], {}),
-            'tutorial': ('django.db.models.fields.IntegerField', [], {})
+            'name': ('django.db.models.fields.TextField', [], {}),
+            'order': ('django.db.models.fields.IntegerField', [], {}),
+            'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'books'", 'to': "orm['proposal.Proposal']"})
         },
         'proposal.proposal': {
             'Meta': {'object_name': 'Proposal'},
             'ects': ('django.db.models.fields.IntegerField', [], {}),
             'exercises': ('django.db.models.fields.IntegerField', [], {}),
-            'fans': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Student']"}),
+            'fans': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Student']", 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'laboratories': ('django.db.models.fields.IntegerField', [], {}),
             'lectures': ('django.db.models.fields.IntegerField', [], {}),
@@ -90,8 +73,24 @@ class Migration(SchemaMigration):
             'repetitories': ('django.db.models.fields.IntegerField', [], {}),
             'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalTag']", 'blank': 'True'}),
-            'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Employee']"}),
+            'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Employee']", 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+        },
+        'proposal.proposaldescription': {
+            'Meta': {'object_name': 'ProposalDescription'},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'autor'", 'to': "orm['auth.User']"}),
+            'comments': ('django.db.models.fields.TextField', [], {}),
+            'date': ('django.db.models.fields.DateTimeField', [], {}),
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'proposal': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'descriptions'", 'to': "orm['proposal.Proposal']"}),
+            'requirements': ('django.db.models.fields.TextField', [], {}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalDescriptionTag']", 'blank': 'True'})
+        },
+        'proposal.proposaldescriptiontag': {
+            'Meta': {'object_name': 'ProposalDescriptionTag'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
         },
         'proposal.proposaltag': {
             'Meta': {'object_name': 'ProposalTag'},
@@ -100,20 +99,17 @@ class Migration(SchemaMigration):
         },
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
-            'first_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
-            'first_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'records_opening_delay_hours': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
     
-    complete_apps = ['preferences']
+    complete_apps = ['proposal']

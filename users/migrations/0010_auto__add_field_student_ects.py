@@ -8,28 +8,14 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'Employee'
-        db.create_table('users_employee', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Employee'])
-
-        # Adding model 'Student'
-        db.create_table('users_student', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Student'])
+        # Adding field 'Student.ects'
+        db.add_column('users_student', 'ects', self.gf('django.db.models.fields.PositiveIntegerField')(default=0), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Employee'
-        db.delete_table('users_employee')
-
-        # Deleting model 'Student'
-        db.delete_table('users_student')
+        # Deleting field 'Student.ects'
+        db.delete_column('users_student', 'ects')
     
     
     models = {
@@ -71,12 +57,18 @@ class Migration(SchemaMigration):
         },
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
+            'consultations': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
+            'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'records_opening_delay_hours': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }

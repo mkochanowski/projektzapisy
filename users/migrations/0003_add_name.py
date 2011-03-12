@@ -8,28 +8,32 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'Employee'
-        db.create_table('users_employee', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Employee'])
+        # Adding field 'Employee.first_name'
+        db.add_column('users_employee', 'first_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
 
-        # Adding model 'Student'
-        db.create_table('users_student', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Student'])
+        # Adding field 'Employee.last_name'
+        db.add_column('users_employee', 'last_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
+
+        # Adding field 'Student.first_name'
+        db.add_column('users_student', 'first_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
+
+        # Adding field 'Student.last_name'
+        db.add_column('users_student', 'last_name', self.gf('django.db.models.fields.CharField')(default='', max_length=50), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Employee'
-        db.delete_table('users_employee')
+        # Deleting field 'Employee.first_name'
+        db.delete_column('users_employee', 'first_name')
 
-        # Deleting model 'Student'
-        db.delete_table('users_student')
+        # Deleting field 'Employee.last_name'
+        db.delete_column('users_employee', 'last_name')
+
+        # Deleting field 'Student.first_name'
+        db.delete_column('users_student', 'first_name')
+
+        # Deleting field 'Student.last_name'
+        db.delete_column('users_student', 'last_name')
     
     
     models = {
@@ -71,12 +75,17 @@ class Migration(SchemaMigration):
         },
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
+            'first_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
+            'first_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
+            'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }

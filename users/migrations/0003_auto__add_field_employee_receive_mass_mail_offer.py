@@ -8,28 +8,14 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'Employee'
-        db.create_table('users_employee', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Employee'])
-
-        # Adding model 'Student'
-        db.create_table('users_student', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-        ))
-        db.send_create_signal('users', ['Student'])
+        # Adding field 'Employee.receive_mass_mail_offer'
+        db.add_column('users_employee', 'receive_mass_mail_offer', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Employee'
-        db.delete_table('users_employee')
-
-        # Deleting model 'Student'
-        db.delete_table('users_student')
+        # Deleting field 'Employee.receive_mass_mail_offer'
+        db.delete_column('users_employee', 'receive_mass_mail_offer')
     
     
     models = {
@@ -72,11 +58,13 @@ class Migration(SchemaMigration):
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
