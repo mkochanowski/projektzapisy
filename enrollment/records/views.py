@@ -403,7 +403,7 @@ def records(request, group_id):
         students_in_group = Record.get_students_in_group(group_id)
         students_in_queue = Queue.get_students_in_queue(group_id)
         all_students = Student.objects.all()
-        data = prepare_subjects_list_to_render(request)
+        data = prepare_subjects_list_to_render()
         data.update({
             'all_students' : all_students,
             'students_in_group' : students_in_group,
