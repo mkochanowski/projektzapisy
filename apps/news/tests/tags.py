@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from utils import generate_random_news
 
-from news.templatetags.news_extras import *
+from apps.news.templatetags.news_extras import *
 
 class NewsTagsTest(TestCase):
     def test_newscount(self):
