@@ -37,8 +37,8 @@ from fereol.grade.poll.utils           import check_signature, \
                                               create_slug, \
                                               get_next, \
                                               get_prev, \
-                                              get_ticket_and_signed_ticket_from_session
-                                              check_enable_grade, getGroups
+                                              get_ticket_and_signed_ticket_from_session,\
+                                              getGroups
                                               
 from fereol.users.models                 import Employee
 from django.core.paginator import Paginator, InvalidPage, EmptyPage

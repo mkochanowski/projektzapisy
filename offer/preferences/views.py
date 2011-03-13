@@ -42,9 +42,9 @@ def view(request):
         types = types.split(',')
     prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query).order_by('proposal__name')
     data = {
-		'prefs': prefs,
-		'proposalTypes': Types.objects.all(),
-	}
+        'prefs': prefs,
+        'proposalTypes': Types.objects.all(),
+    }
     def process_pref(pref):
         """
             Processes preference
