@@ -5,7 +5,7 @@ import logging
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -100,9 +100,9 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
-    'fereol.middleware.mobile_detector.MobileDetectionMiddleware',
-    'fereol.middleware.mobileMiddleware.SubdomainMiddleware',
-    'fereol.middleware.error_handling.ErrorHandlerMiddleware'
+    'middleware.mobile_detector.mobileDetectionMiddleware',
+    'middleware.mobileMiddleware.SubdomainMiddleware',
+    'middleware.error_handling.ErrorHandlerMiddleware'
 )
 
 ROOT_URLCONF = 'fereol.urls'
@@ -118,18 +118,18 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'haystack',
-    'fereol.mailer',
-    'fereol.south',
-    'fereol.enrollment.subjects',
-    'fereol.enrollment.records',
-    'fereol.news',
-    'fereol.offer.preferences',
-    'fereol.offer.proposal',
-    'fereol.offer.vote',
-    'fereol.users',
-    'fereol.debug_toolbar',
-    'fereol.grade.poll',
-    'fereol.mobile',
+    'mailer',
+    'south',
+    'apps.enrollment.subjects',
+    'apps.enrollment.records',
+    'apps.news',
+    'apps.offer.preferences',
+    'apps.offer.proposal',
+    'apps.offer.vote',
+    'apps.users',
+    'debug_toolbar',
+    'apps.grade.poll',
+    'apps.mobile',
 )
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),

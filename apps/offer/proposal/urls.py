@@ -1,0 +1,21 @@
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns( 'apps.offer.proposal.views',
+    ( '^add/$', 'proposal_form' ),
+    url('^delete/(?P<slug>[\w\-_]+)$',               'delete_proposal',             name='proposal-delete'),
+    url('^deleteDescription/(?P<pid>[0-9]+)$',       'delete_description',          name='proposal-description-delete'),
+    url('^offer/create/$',                           'offer_create',                name='proposal-offer-create'),
+    url('^offer/select/$',                           'offer_select',                name='proposal-offer-select'),
+    url( '^become/(?P<slug>[\w\-_]+)/fans/$',        'become', {'group':'fans'},    name='proposal-beFan' ),
+    url( '^become/(?P<slug>[\w\-_]+)/teachers/$',    'become', {'group':'teachers'},name='proposal-beTeacher' ),
+    url( '^become/(?P<slug>[\w\-_]+)/helpers/$',     'become', {'group':'helpers'}, name='proposal-beHelper' ),
+    url( '^stopBe/(?P<slug>[\w\-_]+)/fans/$',        'stop_be',{'group':'fans'},    name='proposal-StopFan' ),
+    url( '^stopBe/(?P<slug>[\w\-_]+)/teachers/$',    'stop_be',{'group':'teachers'},name='proposal-StopTeacher' ),
+    url( '^stopBe/(?P<slug>[\w\-_]+)/helpers/$',     'stop_be',{'group':'helpers'}, name='proposal-StopHelper' ),
+    url( '^edit/(?P<sid>[0-9]+)/$',                  'proposal_form',               name='proposal-edit' ),
+    url( '^history/(?P<sid>[0-9]+)/$',               'proposal_history',            name='proposal-history' ),
+    url( '^restore/(?P<descid>[0-9]+)/$',            'proposal_restore',            name='proposal-restore' ),
+    url('^(?P<slug>[\w\-_]+)/(?P<descid>[0-9]+)/?$', 'proposal',                    name='proposal-page-archival'),
+    url('^(?P<slug>[\w\-_]+)',                       'proposal',                    name='proposal-page'),
+    url('^$',                                        'proposals',                   name='proposal-list' ),    
+)

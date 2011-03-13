@@ -22,9 +22,9 @@ if __name__ == '__main__':
 import psycopg2 as pg
 import psycopg2.extensions
 
-from fereol.enrollment.records.models import Record, STATUS_ENROLLED
-from fereol.enrollment.subjects.models import Subject, Semester, SubjectEntity, Type, Group, Term, Classroom
-from fereol.users.models import Student, Employee
+from apps.enrollment.records.models import Record, STATUS_ENROLLED
+from apps.enrollment.subjects.models import Subject, Semester, SubjectEntity, Type, Group, Term, Classroom
+from apps.users.models import Student, Employee
 
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
