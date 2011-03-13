@@ -49,11 +49,17 @@ PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
     
 {% endblock %}
 
-{% block content %}
-<!--
-    OSTYLOWAĆ TĄ WIADOMOŚĆ!
--->
+{% block messages %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class={% if message.tags == error %}"grade-error-message"{% else %}"main-message"{% endif %}>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
 
+{% block content %}
     <div id="grade-main">
 	    <h2>Zasady Oceny Zajęć</h2>
         <div id="grade-main-rules">

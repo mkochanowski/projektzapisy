@@ -52,7 +52,8 @@ def import_semester_schedule(xmlfile):
         name = el_subject.find('name').text
         entity = SubjectEntity.objects.get_or_create(name=name)[0]
         slug = slugify(semester.year + '_' + name)
-        sub_type = Type.objects.get_or_create(name=el_subject.find('type').text)[0]
+        # TODO: nie testowane:
+        sub_type = Type.objects.get_or_create(name=el_subject.find('type').text, meta_type=False)[0]
         desc = el_subject.find('desc').text
         lectures = el_subject.find('lectures').text
         exercises = el_subject.find('exercises').text

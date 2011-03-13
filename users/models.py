@@ -3,8 +3,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+from exceptions import NonEmployeeException, NonStudentException
+from fereol.enrollment.subjects.models import Group
 from users.exceptions import NonEmployeeException, NonStudentException
-from enrollment.subjects.models import Group
+from enrollment.subjects.models import Group, Semester
+
+import datetime
+
+from fereol import settings
 
 import logging
 logger = logging.getLogger()
@@ -59,7 +65,7 @@ class Employee(BaseUser):
         user = User.objects.get(id=user_id)
         try:
             employee = user.employee
-            groups = [g for g in Employee.get_all_groups(user_id) if g.subject.semester.is_current_semester()] 
+            groups = [g for g in Employee.get_all_groups(user_id) ]
             subjects = set([group.subject for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
@@ -83,9 +89,21 @@ class Student(BaseUser):
     '''
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
-    records_opening_delay_hours = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (godziny)")
+    records_opening_delay_minutes = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (minuty)")
     type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
+    block = models.BooleanField(verbose_name="blokada planu", default = False)
 
+    def get_t0_interval(self):
+        return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
+
+    def get_records_history(self):
+        '''
+        Returns list of ids of subject s that student was enrolled for.
+        '''
+        default_semester = Semester.get_default_semester()
+        records = self.records.exclude(group__subject__semester = default_semester)
+        records_list = map(lambda x: x.group.subject.entity.id, records)
+        return list(frozenset(records_list))
     
     @staticmethod
     def get_all_groups(user_id):
@@ -113,7 +131,35 @@ class Student(BaseUser):
              logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
          
-
+    @staticmethod
+    def records_block(user_id):
+        user = User.objects.get(id=user_id)
+        try :
+            student = user.student
+            if student.block == False:
+                student.block = True
+                student.save()
+                return student
+            else :
+                return False
+        except Student.DoesNotExist:
+             logger.error('Function Student.records_block(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             raise NonStudentException()
+    @staticmethod
+    def records_unblock(user_id):
+        user = User.objects.get(id=user_id)
+        try :
+            student = user.student
+            if student.block == True:
+                student.block = False
+                student.save()
+                return student
+            else :
+                return False
+        except Student.DoesNotExist:
+             logger.error('Function Student.records_unblock(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             raise NonStudentException()
+         
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'

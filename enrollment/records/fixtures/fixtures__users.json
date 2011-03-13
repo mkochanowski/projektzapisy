@@ -123,7 +123,7 @@
         "model": "users.student", 
         "fields": {
             "receive_mass_mail_offer": true, 
-	    "records_opening_delay_hours": 0,
+	    "records_opening_delay_minutes": 0,
             "matricula": "221135", 
             "user": 5
         }

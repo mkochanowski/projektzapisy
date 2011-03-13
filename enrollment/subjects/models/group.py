@@ -28,6 +28,11 @@ class Group(models.Model):
     def get_group_limit(self):
         """return maximal amount of participants"""
         return self.limit
+    
+    def number_of_students(self):
+        """Returns number of students enrolled to particular group"""
+        from fereol.enrollment.records.models import Record
+        return Record.enrolled.filter(group=self).count()
 
     def subject_slug(self):
         return self.subject.slug
@@ -38,4 +43,6 @@ class Group(models.Model):
         app_label = 'subjects'
 
     def __unicode__(self):
-        return "%s: %s - %s" % (unicode(self.subject.name), unicode(self.get_type_display()), unicode(self.get_teacher_full_name()))
+        return "%s: %s - %s" % (unicode(self.subject.entity.get_short_name()), 
+                                unicode(self.get_type_display()), 
+                                unicode(self.get_teacher_full_name()))

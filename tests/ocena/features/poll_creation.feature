@@ -186,7 +186,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Brak tytułu ankiety"
+        Then I should see "Nie można utworzyć ankiety; brak tytułu"
             
     Scenario: Administrator fails to create a poll when there are no sections
 		Given the grading protocol is "off"
@@ -196,12 +196,12 @@ Feature: User with privileges wants to create a poll.
         And I follow "Tworzenie ankiet"
         And I fill in "Tytuł:" with "Ankieta bez treści"
         And I press "Stwórz ankietę"
-        Then I should see "Brak tytułu ankiety"            
+        Then I should see "Nie można utworzyć ankiety; ankieta jest pusta"            
             
     Scenario: Administrator fails to create a poll when the grading protocol is on
    		Given the grading protocol is "on"
         And I am logged in with "administrator" privileges
         And I am on grade main page 
         When I go to /grade/poll/managment/poll_create
-        Then I should see "Ocena zajęć jest aktywna, nie można dodawać ankiet"
+        Then I should see "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" 
         

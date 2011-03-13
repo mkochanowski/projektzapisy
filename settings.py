@@ -21,6 +21,8 @@ DATABASE_PASSWORD = ''                   # Not used with sqlite3.
 DATABASE_HOST = ''                       # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''                       # Set to empty string for default. Not used with sqlite3.
 
+
+
 # mass-mail account
 # You can test sending with:
 # $ python -m smtpd -n -c DebuggingServer localhost:1025
@@ -38,6 +40,8 @@ EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
 def custom_show_toolbar(request):
+    if ('HTTP_HOST' in request.META) and (request.META['HTTP_HOST'][0:2] == 'm.'):
+        return False
     return DEBUG
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -72,6 +76,8 @@ MEDIA_ROOT = 'site_media'
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = ''
 
+USE_ETAGS = True
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -87,13 +93,22 @@ TEMPLATE_LOADERS = (
 #    'django.template.loaders.eggs.load_template_source',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.messages.context_processors.messages',
+    'django.contrib.auth.context_processors.auth',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
+    'fereol.middleware.mobile_detector.MobileDetectionMiddleware',
+    'fereol.middleware.mobileMiddleware.SubdomainMiddleware',
+    'fereol.middleware.error_handling.ErrorHandlerMiddleware'
 )
 
 ROOT_URLCONF = 'fereol.urls'
@@ -108,6 +123,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.messages',
     'haystack',
     'fereol.mailer',
     'fereol.south',
@@ -119,9 +135,11 @@ INSTALLED_APPS = (
     'fereol.offer.vote',
     'fereol.users',
     'fereol.debug_toolbar',
+    'fereol.mobile',
     'fereol.grade.poll',
     'fereol.grade.ticket_create',
 )
+
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
 )
@@ -136,4 +154,24 @@ HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
+#TODO: udokumentowac zaleznosci!
+#TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
+#TEST_OUTPUT_VERBOSE = True
+#TEST_OUTPUT_DESCRIPTIONS = True
+#TEST_OUTPUT_DIR = 'xmlrunner'
+
+#settings for enrollment
+POINT_LIMIT_DURATION = 14 # abs(t1-t2), in days
+ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
+
+# that's only the example of settings_local.py file contents:
+#SESSION_COOKIE_DOMAIN = '.nowe-zapisy.ii.uni.wroc.pl' # without port number!
+#DEBUG = False
+#TEMPLATE_DEBUG = DEBUG
+
+local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
+if os.path.isfile(local_settings_file):
+    execfile(local_settings_file)
+
 SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
+

@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
-from django.http                         import HttpResponse
+from django.contrib                      import messages
+from django.http                         import HttpResponse, HttpResponseRedirect
 from django.shortcuts                    import render_to_response
 from django.template                     import RequestContext
 from django.utils                        import simplejson
@@ -36,7 +37,7 @@ from django.core.cache import cache
 @employee_required
 def ajax_keys_generate( request ):
     generate_keys_for_polls()
-    return HttpResponse("ok")
+    return HttpResponse("OK")
     
 @employee_required
 def ajax_keys_progress( request ):
@@ -46,6 +47,9 @@ def ajax_keys_progress( request ):
 @employee_required
 def keys_generate( request ):   
     grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect( '/grade' )
     count = Poll.get_current_semester_polls_without_keys().all().count()
     return render_to_response( 'grade/ticket_create/keys_generate.html', { 'grade' : grade, 'keys': count }, context_instance = RequestContext( request ))
 

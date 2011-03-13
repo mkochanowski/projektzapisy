@@ -6,7 +6,7 @@
 
 from django.contrib.auth.decorators import permission_required
 # from django.core.urlresolvers import reverse
-from django.http import HttpResponse # , Http404
+from django.http import HttpResponse, HttpResponseRedirect # , Http404
 from django.shortcuts import get_object_or_404, render_to_response, \
      redirect
 from django.template import RequestContext
@@ -17,13 +17,14 @@ from news.forms import NewsForm
 from news.models import News
 from news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
      get_search_results_data, mail_news_enrollment, \
-     mail_news_offer, render_with_category_template
+     mail_news_offer, render_with_category_template, render_with_device_detection
 
 def main_page( request ):
     """
         Main page
     """
-    return render_to_response( 'common/index.html', context_instance = RequestContext( request ) )
+    return render_to_response('common/index.html', context_instance = RequestContext(request))
+
 
 def search_page(request, cat):
     """

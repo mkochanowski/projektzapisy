@@ -62,7 +62,7 @@ Feature: Anonymous user, who has just entered his tickets, wants to fill some po
         And I press "Zapisz ankietę"
         Then I should see "Ankieta: Ankieta wykładu zapisana"
         And I should see "Czy chodziłeś na wykład regularnie?"
-        And I should not see "Czy wykład był prowadzony w sposób jasny i zrozumiały?" 
+        And "Czy wykład był prowadzony w sposób jasny i zrozumiały?" should be invisible
     
     Scenario: User changes value of the opening question several times
         Given the grading protocol is "on"

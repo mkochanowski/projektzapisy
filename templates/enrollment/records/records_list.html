@@ -1,29 +1,71 @@
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li class="main-message">{{ message }}</li>
-        {% endfor %}
-    </ul>
-   {% endif %}
-   
-<div>
+{% extends "enrollment/subjects/base.html" %}
 
-<h2><a class="subject-details-link" link="{% url subject-page group.subject_slug %}">{{group.subject}}</a> {{group.type_and_teacher}} <br /> <br /> Lista zapisanych osób </h2>
-<br />
-{% for student in students_in_group %}
-<li>
-    <a class="subject-details-link" link="{% url student-profile student.user.id %}">{{student.user.get_full_name}}</a>
-</li>
-{% empty %}Brak zapisanych osób.
-{% endfor %}
-<br />
-<h2> Kolejka </h2>
-<br />
-{% for student in students_in_queue %}
-<li>
-    <a class="subject-details-link" link="{% url student-profile student.user.id %}">{{student.user.get_full_name}}</a>
-</li>
-{% empty %}Brak osób zapisanych do kolejki.
-{% endfor %}
-</ul>
-</div>
+{% block main-subtitle %}
+	{{group.subject.name}}
+	({{group.get_type_display}}: {{group.get_teacher_full_name}})
+{% endblock %}
+
+{% block main-navigation %}
+	<li><a href="{% url main-page %}">Strona główna</a></li>
+	<li><a href="{% url latest_news 'enrollment' %}">Zapisy</a></li>
+	<li><a href="{% url subject-list %}">Przedmioty</a></li>
+	<li>
+		<a href="{% url subject-page group.subject.slug %}"
+			>{{group.subject.name}}</a>
+	</li>
+	<li>{{group.get_type_display}}: {{group.get_teacher_full_name}}</li>
+{% endblock %}
+
+{% block content %}
+	<div id="enr-group-view">
+		{% for message in messages %}
+			<p class="main-message">{{ message }}</p>
+		{% endfor %}
+
+		<h1>{{group.subject.name}}</h1>
+		<h2>{{group.get_type_display}}:
+			{{group.get_teacher_full_name}} </h2>
+
+		<p>
+			<a href="{% url subject-page group.subject_slug %}">powrót do przedmiotu</a>
+		</p>
+
+		<br/>
+		<h3>Lista osób zapisanych na przedmiot:</h3>
+		<p>Liczba zapisanych osób: {{students_in_group|length}} / {{group.get_group_limit}}</p>
+		<br/>
+		
+		<table>
+			<tbody>
+				{% for student in students_in_group %}
+					<tr>
+						<td><a href="{% url student-profile student.user.id %}">
+						    {{student.user.get_full_name}}</a></td>
+						<td>{{student.matricula}}</td>
+					</tr>
+			
+				{% empty %}
+					Brak zapisanych osób.
+				{% endfor %}
+			</tbody>
+		</table>
+     
+		<br/>
+		{%if students_in_queue %}
+			<h3>Lista osób oczekujących na zapis:</h3>
+			<p> Liczba osób oczekujących na zapis: {{students_in_queue|length}} </p>
+			<br/>
+			<table>
+				<tbody>
+					{% for student in students_in_queue %}
+						<tr>
+							<td><a href="{% url student-profile student.user.id %}">
+							    {{student.user.get_full_name}}</a></td>
+							<td>{{student.matricula}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+	</div>
+{% endblock %}

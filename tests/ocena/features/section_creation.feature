@@ -112,7 +112,7 @@ Feature: User with privileges wants to create a section.
         And I am logged in with "administrator" privileges
         And I am on grade main page    
         When I go to /grade/poll/managment/section_create
-        Then I should see "Ocena zajęć jest aktywna, nie można dodawać sekcji"
+        Then I should see "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona"
     
     Scenario: Administrator tries to create section with no questions
 		Given the grading protocol is "off"
@@ -122,7 +122,7 @@ Feature: User with privileges wants to create a section.
         And I follow "Tworzenie sekcji"  
         And I fill in "section-title" with "Sekcja administratora"
         And I press "Zapisz"         
-        Then I should see "Sekcja nie zawiera pytań"
+        Then I should see "Nie można utworzyć sekcji; sekcja nie zawiera pytań"
             
     Scenario: Administrator tries to create section without a title
 		Given the grading protocol is "off"
@@ -130,22 +130,10 @@ Feature: User with privileges wants to create a section.
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Tworzenie sekcji"      
-        And I fill in "section-title" with ""
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobała Ci się moja praca?"
         And I press "Zapisz" 
-        Then I should see "Brak tytułu sekcji"
-    
-    Scenario: Administrator tries to create section with a default title
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
-        And I am on grade main page
-        When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"      
-        And I press "Dodaj pytanie" 
-        And I fill in "poll[question][1][title]" with "Jak podobała Ci się moja praca?"
-        And I press "Zapisz"        
-        Then I should see "Błąd: podaj poprawny tytuł sekcji"
+        Then I should see "Nie można utworzyć sekcji; niepoprawny tytuł sekcji"
     
     Scenario Outline: Administrator tries to add a question without a question text
 		Given the grading protocol is "off"
@@ -157,7 +145,7 @@ Feature: User with privileges wants to create a section.
         And I press "Dodaj pytanie" 
         And I select "poll[question][1][type]" as <typ_pytania>
         And I press "Zapisz" 
-        Then I should see "Brak tekstu w pytaniu"
+        Then I should see "Nie można zapisać sekcji; brak tekstu w jednym z pytań"
         
     Examples:
         | typ_pytania |
@@ -177,65 +165,10 @@ Feature: User with privileges wants to create a section.
         And I select "poll[question][1][type]" as <typ_pytania>
         And I fill in "poll[question][1][title]" with "Treść pytania"
         And I press "Zapisz" 
-        Then I should see "Brak opcji w pytaniu"
+        Then I should see "Nie można zapisać sekcji; brak opcji w jednym z pytań"
 
     Examples:
         | typ_pytania |
         | "Jednokrotnego wyboru" |
         | "Wielokrotnego wyboru" |
         | "Pytanie wiodące" |
-        
-    Scenario: Administrator tries to create a section with two leading questions
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
-        And I am on grade main page
-        When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"
-        And I fill in "section-title" with "Sekcja administratora - pytania otwierające, oba"
-        And I press "Dodaj pytanie" 
-        And I fill in "poll[question][1][title]" with "Czy podobała Ci oferta w tym semestrze?"
-        And I select "poll[question][1][type]" as "Pytanie wiodące"
-        And I fill in "poll[question][1][answers][]" with value "1" with "tak"
-        And I press visible "Dodaj odpowiedź" 
-        And I fill in "poll[question][1][answers][]" with value "2" with "trudno powiedzieć"
-        And I press visible "Dodaj odpowiedź" 
-        And I fill in "poll[question][1][answers][]" with value "3" with "nie"
-        And I check "poll[question][1][hideOn][]" with value "3"
-        And I press visible "Gotowe"        
-        And I press "Dodaj pytanie"     
-        And I fill in "poll[question][2][title]" with "Czy podobała Ci oferta w tym semestrze?"
-        And I select "poll[question][2][type]" as "Pytanie wiodące"
-        And I fill in "poll[question][2][answers][]" with value "1" with "tak"
-        And I press visible "Dodaj odpowiedź" 
-        And I fill in "poll[question][2][answers][]" with value "2" with "trudno powiedzieć"
-        And I press visible "Dodaj odpowiedź" 
-        And I fill in "poll[question][2][answers][]" with value "3" with "nie"
-        And I check "poll[question][2][hideOn][]" with value "3"    
-        And I press visible "Gotowe"
-        And I press "Zapisz"
-        Then I should see "Zbyt wiele pytań wiodących"
-        
-    
-    Scenario: Administrator tries to create a section with leading question not being the first one
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
-        And I am on grade main page
-        When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"
-        And I fill in "section-title" with "Sekcja administratora - drugie pytanie otwierające"
-        And I press "Dodaj pytanie" 
-        And I fill in "poll[question][1][title]" with "Jak podobała Ci oferta w tym semestrze?"
-        And I select "poll[question][1][type]" as "Otwarte"
-        And I press visible "Gotowe"        
-        And I press "Dodaj pytanie" 
-        And I fill in "poll[question][2][title]" with "Czy podobała Ci oferta w tym semestrze?"
-        And I select "poll[question][2][type]" as "Pytanie wiodące"
-        And I fill in "poll[question][2][answers][]" with value "1" with "tak"
-        And I press visible "Dodaj odpowiedź" 
-        And I fill in "poll[question][2][answers][]" with value "2" with "trudno powiedzieć"
-        And I press visible "Dodaj odpowiedź" 
-        And I fill in "poll[question][2][answers][]" with value "3" with "nie"
-        And I check "poll[question][2][hideOn][]" with value "3"    
-        And I press visible "Gotowe"
-        And I press "Zapisz"
-        Then I should see "Pytanie wiodące powinno być pierwsze"

@@ -1,5 +1,7 @@
 {% extends "enrollment/base.html" %}
- 
+
+{% block main-subtitle %}Prototyp planu zajęć{% endblock %}
+
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="/site_media/css/jquery/jquery.ui.schedule.css" />
     <link rel="stylesheet" type="text/css" href="/site_media/css/enrollment/records/schedule-prototype.css" />
@@ -81,6 +83,8 @@
     </div>
     <div class="schedule-buttons-wrapper">
         <input id="btnAssignToAll" type="button" value="Zapisz mnie na przypięte przedmioty">
+        <input id="blockUrl" type="button" value="Zablokuj plan" onClick="location.href='{% url schedule-prototype-block %}'">
+        <input id="unblockUrl" type="button" value="Oblokuj plan" onClick="location.href='{% url schedule-prototype-unblock %}'">
     </div>
 {% endblock %}
  

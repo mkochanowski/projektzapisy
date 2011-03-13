@@ -285,7 +285,9 @@
             "records_opening": "2010-02-01 00:00:00", 
             "visible": true, 
             "type": "l", 
-            "records_closing": "2010-02-15 00:00:00", 
+            "records_closing": "2010-02-15 00:00:00",
+            "semester_beginning": "2011-02-26",
+            "semester_ending": "2011-06-21",
             "year": 2009
         }
     }, 
@@ -296,7 +298,9 @@
             "records_opening": "2010-09-25 00:00:00", 
             "visible": true, 
             "type": "z", 
-            "records_closing": "2010-10-15 00:00:00", 
+            "records_closing": "2010-10-15 00:00:00",
+            "semester_beginning": "2010-10-01",
+            "semester_ending": "2011-02-02",
             "year": 2010
         }
     }, 
@@ -315,7 +319,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 100, 
             "matricula": "1000000", 
@@ -328,7 +332,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 101, 
             "matricula": "1000001", 
@@ -341,7 +345,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 102, 
             "matricula": "1000002", 
@@ -354,7 +358,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 103, 
             "matricula": "1000003", 
@@ -367,7 +371,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 104, 
             "matricula": "1000004", 
@@ -380,7 +384,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 105, 
             "matricula": "1000005", 
@@ -465,7 +469,6 @@
         "pk": 1, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 5, 
             "group": 100, 
             "student": 101, 
@@ -476,7 +479,6 @@
         "pk": 2, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 5, 
             "group": 100, 
             "student": 102, 
@@ -487,7 +489,6 @@
         "pk": 3, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 102, 
             "student": 101, 
@@ -498,7 +499,6 @@
         "pk": 4, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 0, 
             "group": 101, 
             "student": 101, 
@@ -509,7 +509,6 @@
         "pk": 5, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 6, 
             "group": 103, 
             "student": 101, 
@@ -520,7 +519,6 @@
         "pk": 6, 
         "model": "records.queue", 
         "fields": {
-            "status": "1", 
             "priority": 5, 
             "group": 104, 
             "student": 101, 
