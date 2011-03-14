@@ -5,10 +5,6 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    depends_on = (
-        ('offer.proposal', '0001_initial'),
-    )
-            
     
     def forwards(self, orm):
         
@@ -16,10 +12,11 @@ class Migration(SchemaMigration):
         db.create_table('preferences_preference', (
             ('review_lecture', self.gf('django.db.models.fields.IntegerField')()),
             ('lab', self.gf('django.db.models.fields.IntegerField')()),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('employee', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
             ('lecture', self.gf('django.db.models.fields.IntegerField')()),
             ('proposal', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal'])),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('hidden', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
             ('tutorial', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('preferences', ['Preference'])
@@ -36,7 +33,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Group'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'})
+            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
         },
         'auth.permission': {
             'Meta': {'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
@@ -50,7 +47,7 @@ class Migration(SchemaMigration):
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'blank': 'True'}),
+            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -58,7 +55,7 @@ class Migration(SchemaMigration):
             'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'blank': 'True'}),
+            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
         'contenttypes.contenttype': {
@@ -71,6 +68,7 @@ class Migration(SchemaMigration):
         'preferences.preference': {
             'Meta': {'object_name': 'Preference'},
             'employee': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Employee']"}),
+            'hidden': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'lab': ('django.db.models.fields.IntegerField', [], {}),
             'lecture': ('django.db.models.fields.IntegerField', [], {}),
@@ -80,18 +78,15 @@ class Migration(SchemaMigration):
         },
         'proposal.proposal': {
             'Meta': {'object_name': 'Proposal'},
-            'ects': ('django.db.models.fields.IntegerField', [], {}),
-            'exercises': ('django.db.models.fields.IntegerField', [], {}),
-            'fans': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Student']"}),
+            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'fans': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Student']", 'symmetrical': 'False', 'blank': 'True'}),
+            'helpers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'proposal_helpers_related'", 'blank': 'True', 'to': "orm['users.Employee']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'laboratories': ('django.db.models.fields.IntegerField', [], {}),
-            'lectures': ('django.db.models.fields.IntegerField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'repetitories': ('django.db.models.fields.IntegerField', [], {}),
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'wlasciciel'", 'null': 'True', 'to': "orm['auth.User']"}),
             'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
-            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalTag']", 'blank': 'True'}),
-            'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Employee']"}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '30'})
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['proposal.ProposalTag']", 'symmetrical': 'False', 'blank': 'True'}),
+            'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'proposal_teachers_related'", 'blank': 'True', 'to': "orm['users.Employee']"})
         },
         'proposal.proposaltag': {
             'Meta': {'object_name': 'ProposalTag'},
@@ -100,19 +95,28 @@ class Migration(SchemaMigration):
         },
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
-            'first_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
+            'consultations': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
-            'first_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
+            'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'records_opening_delay_minutes': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
+            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+        },
+        'users.type': {
+            'Meta': {'object_name': 'Type'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         }
     }
     
