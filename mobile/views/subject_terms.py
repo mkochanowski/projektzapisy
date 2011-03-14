@@ -32,56 +32,56 @@ def subjectTerms(request,slug):
     """
         A function returning all groups connected to the chosen subject.
     """
+    try:
+        #subject = Subject.objects.get(id = slug)
+        #sprint subject.slug
+        subject = Subject.visible.get(slug=slug)
         try:
-            #subject = Subject.objects.get(id = slug)
-            #sprint subject.slug
-            subject = Subject.visible.get(slug=slug)
-            try:
-                student = request.user.student
-                subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
-                subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
-                subject.user_enrolled_to_eaoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '4')
-                subject.user_enrolled_to_exlaboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '5')
-                subject.user_enrolled_to_seminar = Record.is_student_in_subject_group_type(request.user.id, slug, '6')
-                subject.user_enrolled_to_langoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '7')
-                subject.user_enrolled_to_ssoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '8')
-                subject.is_recording_open = subject.is_recording_open_for_student(student)
-            except Student.DoesNotExist:
-                pass
+            student = request.user.student
+            subject.user_enrolled_to_exercise = Record.is_student_in_subject_group_type(request.user.id, slug, '2')
+            subject.user_enrolled_to_laboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '3')
+            subject.user_enrolled_to_eaoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '4')
+            subject.user_enrolled_to_exlaboratory = Record.is_student_in_subject_group_type(request.user.id, slug, '5')
+            subject.user_enrolled_to_seminar = Record.is_student_in_subject_group_type(request.user.id, slug, '6')
+            subject.user_enrolled_to_langoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '7')
+            subject.user_enrolled_to_ssoratory = Record.is_student_in_subject_group_type(request.user.id, slug, '8')
+            subject.is_recording_open = subject.is_recording_open_for_student(student)
+        except Student.DoesNotExist:
+            pass
 
-            lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
-            #lectures = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in lectures]
-            exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
-            #exercises = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exercises]
-            laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
-            #laboratories = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in laboratories]
-            exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
-            #exercises_adv = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exercises_adv]
-            exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
-            #exer_labs = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exer_labs]
-            seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
-            #seminar = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in seminar]
-            language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
-            #language = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in language]
-            sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
-            #sport = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in sport]
+        lectures = Record.get_groups_with_records_for_subject(slug, request.user.id, '1')
+        #lectures = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in lectures]
+        exercises = Record.get_groups_with_records_for_subject(slug, request.user.id, '2')
+        #exercises = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exercises]
+        laboratories = Record.get_groups_with_records_for_subject(slug, request.user.id, '3')
+        #laboratories = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in laboratories]
+        exercises_adv = Record.get_groups_with_records_for_subject(slug, request.user.id, '4')
+        #exercises_adv = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exercises_adv]
+        exer_labs = Record.get_groups_with_records_for_subject(slug, request.user.id, '5')
+        #exer_labs = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in exer_labs]
+        seminar = Record.get_groups_with_records_for_subject(slug, request.user.id, '6')
+        #seminar = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in seminar]
+        language = Record.get_groups_with_records_for_subject(slug, request.user.id, '7')
+        #language = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in language]
+        sport = Record.get_groups_with_records_for_subject(slug, request.user.id, '8')
+        #sport = [{'group': x, 'limit':x.limit, 'enrolled':Record.number_of_students(x)} for x in sport]
 
-            data = {
-                'subject' : subject,
-                'lectures' : lectures,
-                'exercises' : exercises,
-                'exercises_adv' : exercises_adv,
-                'laboratories' : laboratories,
-                'seminar' : seminar,
-                'exer_labs' : exer_labs,
-                'language' : language,
-                'sport' : sport
-            }
-            return render_to_response( 'mobile/subject_terms.html', data, context_instance = RequestContext( request ) )
-        except Subject.DoesNotExist, NonSubjectException:
-            logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % unicode(slug) )
-            request.user.message_set.create(message="Przedmiot nie istnieje.")
-            return render_to_response('mobile/subject_terms.html', context_instance=RequestContext(request))
+        data = {
+            'subject' : subject,
+            'lectures' : lectures,
+            'exercises' : exercises,
+            'exercises_adv' : exercises_adv,
+            'laboratories' : laboratories,
+            'seminar' : seminar,
+            'exer_labs' : exer_labs,
+            'language' : language,
+            'sport' : sport
+        }
+        return render_to_response( 'mobile/subject_terms.html', data, context_instance = RequestContext( request ) )
+    except Subject.DoesNotExist, NonSubjectException:
+        logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % unicode(slug) )
+        request.user.message_set.create(message="Przedmiot nie istnieje.")
+        return render_to_response('mobile/subject_terms.html', context_instance=RequestContext(request))
 
 
 @login_required
