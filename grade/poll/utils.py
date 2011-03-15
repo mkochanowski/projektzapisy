@@ -4,6 +4,26 @@ from Crypto.PublicKey                 import RSA
 from fereol.grade.poll.models         import Poll
 from fereol.grade.ticket_create.utils import poll_cmp, \
                                              flatten
+from enrollment.records.models        import Group
+
+def getGroups(semester, group = None, type = None, subject = None):
+    if subject == -1:
+        return {}
+    if group:
+        return group
+    if type:
+        if subject:
+            groups = Group.objects.filter(type=type, subject=subject)
+        else:
+            groups = Group.objects.filter(type=type)
+    else:
+        if subject:
+            groups = Group.objects.filter(subject=subject)
+        else:
+            groups = Group.objects.filter(subject__semester = semester)
+
+
+    return groups
 
 def check_signature( ticket, signed_ticket, public_key ):
     pk = RSA.importKey( public_key.public_key )
