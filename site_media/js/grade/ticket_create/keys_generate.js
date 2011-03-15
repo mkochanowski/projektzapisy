@@ -33,6 +33,8 @@ Ticket.keys_generate.finish = function(result)
 {
 	clearInterval(Ticket.keys_generate.interval)
 	$( "#progressbar" ).progressbar( "option", "value", 100 );
+	$( "#keys-percent" ).text('100');
+	$( "#generated-keys" ).text(Ticket.keys_generate.keys);
 }
 
 Ticket.keys_generate.update = function(result)
