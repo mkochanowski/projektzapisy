@@ -187,7 +187,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Wdra\u017canie system\u00f3w klasy ERP", 
-            "ects": 6, 
             "entity": 100, 
             "semester": 100, 
             "teachers": [
@@ -319,7 +318,7 @@
             "receive_mass_mail_offer": true, 
             "user": 100, 
             "matricula": "1000000", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -332,7 +331,7 @@
             "receive_mass_mail_offer": true, 
             "user": 101, 
             "matricula": "1000001", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -345,7 +344,7 @@
             "receive_mass_mail_offer": true, 
             "user": 102, 
             "matricula": "1000002", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     },
@@ -358,7 +357,7 @@
             "receive_mass_mail_offer": true, 
             "user": 103, 
             "matricula": "1000003", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     },
@@ -371,7 +370,7 @@
             "receive_mass_mail_offer": true, 
             "user": 104, 
             "matricula": "1000004", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     },
@@ -384,34 +383,34 @@
             "receive_mass_mail_offer": true, 
             "user": 105, 
             "matricula": "1000005", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     },
     {
         "pk": 0, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "in\u017cynierskie"
         }
     }, 
     {
         "pk": 1, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "magisterskie"
         }
     }, 
     {
         "pk": 2, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "licencjackie"
         }
     }, 
     {
         "pk": 3, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "doktoranckie"
         }
