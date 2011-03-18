@@ -27,10 +27,10 @@
             <input type="text" id="section-title" name="poll[title]">
             <label for="section-desc">Opis:</label>
             <textarea id="section-desc" name="poll[description]"></textarea>
-            <label for="leading">Pytanie wiodące</label>
-            <input type="checkbox">
-			<ul id="poll-form">
-			</ul>
+            <input class="leading" type="checkbox" id="section-leading" name="poll[leading]">
+            <label class="leading" for="section-leading">Posiada pytanie wiodące</label>
+			<ol id="poll-form">
+			</ol>
 		<input type="button" value="Dodaj pytanie" id="add-question">
     <br/><br/>
 		<input id="questionset-submit" type="submit" value="Zapisz">

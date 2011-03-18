@@ -445,7 +445,9 @@ def questionset_create(request):
             return False
 
         section = Section()
-        section.title       = post.get("poll[title]")        
+        section.title       = post.get("poll[title]")
+        is_leading          = choicebox_is_on(post.get("poll[leading]"))
+
         if (section.title == ""):
             #messages.error(request, "Nie można utworzyć sekcji; niepoprawny tytuł sekcji")
             return False
@@ -482,7 +484,6 @@ def questionset_create(request):
             question.save()
 
             options = post.getlist(question_name + "[answers][]")
-            print post.getlist(question_name + "[hideOn][]")
             hideOn  = map( lambda (x):( int(x)), post.getlist(question_name + "[hideOn][]"))
             hidenAnswers = []
             i = 1
@@ -509,7 +510,7 @@ def questionset_create(request):
                 container.question    = question
                 container.sections    = section
                 container.position   = position
-                container.is_leading  = choicebox_is_on(post.get(question_name + "[leading]"))
+                container.is_leading  = (position == 1) and is_leading
                 container.save()
                 for opt in hidenAnswers:
                     container.hide_on.add(opt)
