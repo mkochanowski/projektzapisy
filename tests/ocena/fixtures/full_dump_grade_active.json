@@ -1710,7 +1710,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 0, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0, 
             "receive_mass_mail_offer": true, 
             "user": 2, 
             "matricula": "112233", 
@@ -2176,7 +2176,7 @@
             "visible": true, 
             "year": 2010, 
             "type": "z", 
-            "semester_begining": "2010-01-15", 
+            "semester_beginning": "2010-01-15", 
             "is_grade_active": true
         }
     }, 
