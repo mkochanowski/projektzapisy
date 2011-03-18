@@ -459,7 +459,7 @@ class Queue(models.Model):
             program = User.objects.get(id=user_id).student.program
             ects = sum([Queue.get_point(program,subject) for subject in subjects])
             if group.subject not in subjects:
-	        ects += group.subject.ects
+	        ects += Queue.get_point(program,group.subject)
 	    if ects <= 40:
 	        return False
 	    else:
