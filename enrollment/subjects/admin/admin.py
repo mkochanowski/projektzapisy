@@ -22,6 +22,8 @@ class SubjectEntityAdmin(admin.ModelAdmin):
         
 class PointsOfSubjectsAdmin(admin.ModelAdmin):
     list_display = ('subject', 'program', 'value')
+    search_fields = ('subject__name', )
+    list_filter = ('program',)
 
 admin.site.register(Subject, SubjectAdmin)
 admin.site.register(SubjectEntity, SubjectEntityAdmin)
