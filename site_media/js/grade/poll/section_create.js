@@ -5,7 +5,7 @@ Poll.section = Object();
 
 
 ///////////////////////////////////////////////////////////
-//// Metody wykonywane po zaladowaniu strony
+//// Functions  run after page load
 ///////////////////////////////////////////////////////////
 
 Poll.section.init = function()
@@ -55,10 +55,8 @@ Poll.section.init = function()
 }
 
 /*
-* Metoda stosowana przy widoku edycji sekcji
-* parsuje istniejace juz pytania ustawia
-* zmienne oraz zdarzenia tak, aby skrypt dzialal
-* rowniez tam.
+* Function using during section edit.
+* It parse html and set events and variables
 *
 * @author mjablonski
 *
@@ -112,8 +110,7 @@ Poll.section.editParser = function()
 
 
 /*
-* Co zaskakujace, metoda ta sluzy do tworzenia nowego pytania
-* zarowno od strony htmla jak i przypisania zdarzen
+* Create new question in section.
 *
 * @author mjablonski
 *
@@ -154,10 +151,10 @@ Poll.section.createQuestion = function( )
 }
 
 /*
-* Metoda dodaje przycisk dodajacy odpowiedzi do pytania
+* Add button to new answer to question.
 *
 * @author mjablonski
-* @param dom-node li - element listy pytań
+* @param dom-node li - questionset element
  */
 Poll.section.addOptionButton = function( li )
 {
