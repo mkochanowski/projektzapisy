@@ -2399,7 +2399,7 @@
         "pk": 100, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 23, 
+            "records_opening_delay_minutes": 23,
             "student": 123, 
             "subject": 111
         }
@@ -2408,7 +2408,7 @@
         "pk": 101, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 7, 
+            "records_opening_delay_minutes": 7,
             "student": 126, 
             "subject": 113
         }
@@ -2417,7 +2417,7 @@
         "pk": 102, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 44, 
+            "records_opening_delay_minutes": 44,
             "student": 121, 
             "subject": 124
         }
@@ -2426,7 +2426,7 @@
         "pk": 103, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 11, 
+            "records_opening_delay_minutes": 11,
             "student": 103, 
             "subject": 114
         }
@@ -2435,7 +2435,7 @@
         "pk": 104, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 83, 
+            "records_opening_delay_minutes": 83,
             "student": 138, 
             "subject": 105
         }
@@ -2444,7 +2444,7 @@
         "pk": 105, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 8, 
+            "records_opening_delay_minutes": 8,
             "student": 116, 
             "subject": 122
         }
@@ -2453,7 +2453,7 @@
         "pk": 106, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 67, 
+            "records_opening_delay_minutes": 67,
             "student": 103, 
             "subject": 121
         }
@@ -2462,7 +2462,7 @@
         "pk": 107, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 80, 
+            "records_opening_delay_minutes": 80,
             "student": 100, 
             "subject": 127
         }
@@ -2471,7 +2471,7 @@
         "pk": 108, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 75, 
+            "records_opening_delay_minutes": 75,
             "student": 103, 
             "subject": 128
         }
@@ -2480,7 +2480,7 @@
         "pk": 109, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 51, 
+            "records_opening_delay_minutes": 51,
             "student": 111, 
             "subject": 109
         }
@@ -2489,7 +2489,7 @@
         "pk": 110, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 5, 
+            "records_opening_delay_minutes": 5,
             "student": 134, 
             "subject": 123
         }
@@ -2498,7 +2498,7 @@
         "pk": 111, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 49, 
+            "records_opening_delay_minutes": 49,
             "student": 134, 
             "subject": 101
         }
@@ -2507,7 +2507,7 @@
         "pk": 112, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 92, 
+            "records_opening_delay_minutes": 92,
             "student": 118, 
             "subject": 122
         }
@@ -2516,7 +2516,7 @@
         "pk": 113, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 28, 
+            "records_opening_delay_minutes": 28,
             "student": 101, 
             "subject": 127
         }
@@ -2525,7 +2525,7 @@
         "pk": 114, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 34, 
+            "records_opening_delay_minutes": 34,
             "student": 117, 
             "subject": 105
         }
@@ -2534,7 +2534,7 @@
         "pk": 115, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 80, 
+            "records_opening_delay_minutes": 80,
             "student": 125, 
             "subject": 111
         }
@@ -2543,7 +2543,7 @@
         "pk": 116, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 42, 
+            "records_opening_delay_minutes": 42,
             "student": 113, 
             "subject": 106
         }
@@ -2552,7 +2552,7 @@
         "pk": 117, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 75, 
+            "records_opening_delay_minutes": 75,
             "student": 113, 
             "subject": 127
         }
@@ -2561,7 +2561,7 @@
         "pk": 118, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 55, 
+            "records_opening_delay_minutes": 55,
             "student": 120, 
             "subject": 122
         }
@@ -2570,7 +2570,7 @@
         "pk": 119, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 13, 
+            "records_opening_delay_minutes": 13,
             "student": 111, 
             "subject": 106
         }
@@ -2579,7 +2579,7 @@
         "pk": 120, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 12, 
+            "records_opening_delay_minutes": 12,
             "student": 109, 
             "subject": 100
         }
@@ -2588,7 +2588,7 @@
         "pk": 121, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 7, 
+            "records_opening_delay_minutes": 7,
             "student": 138, 
             "subject": 116
         }
@@ -2597,7 +2597,7 @@
         "pk": 122, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 9, 
+            "records_opening_delay_minutes": 9,
             "student": 130, 
             "subject": 106
         }
@@ -2606,7 +2606,7 @@
         "pk": 123, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 83, 
+            "records_opening_delay_minutes": 83,
             "student": 130, 
             "subject": 120
         }
@@ -2615,7 +2615,7 @@
         "pk": 124, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 61, 
+            "records_opening_delay_minutes": 61,
             "student": 105, 
             "subject": 117
         }
@@ -2624,7 +2624,7 @@
         "pk": 125, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 68, 
+            "records_opening_delay_minutes": 68,
             "student": 125, 
             "subject": 122
         }
@@ -2633,7 +2633,7 @@
         "pk": 126, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 32, 
+            "records_opening_delay_minutes": 32,
             "student": 139, 
             "subject": 115
         }
@@ -2642,7 +2642,7 @@
         "pk": 127, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 78, 
+            "records_opening_delay_minutes": 78,
             "student": 135, 
             "subject": 121
         }
@@ -2651,7 +2651,7 @@
         "pk": 128, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 37, 
+            "records_opening_delay_minutes": 37,
             "student": 102, 
             "subject": 111
         }
@@ -2660,7 +2660,7 @@
         "pk": 129, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 80, 
+            "records_opening_delay_minutes": 80,
             "student": 135, 
             "subject": 123
         }
@@ -2669,7 +2669,7 @@
         "pk": 130, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 46, 
+            "records_opening_delay_minutes": 46,
             "student": 119, 
             "subject": 122
         }
@@ -2678,7 +2678,7 @@
         "pk": 131, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 58, 
+            "records_opening_delay_minutes": 58,
             "student": 127, 
             "subject": 112
         }
@@ -2687,7 +2687,7 @@
         "pk": 132, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 25, 
+            "records_opening_delay_minutes": 25,
             "student": 128, 
             "subject": 122
         }
@@ -2696,7 +2696,7 @@
         "pk": 133, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 41, 
+            "records_opening_delay_minutes": 41,
             "student": 103, 
             "subject": 114
         }
@@ -2705,7 +2705,7 @@
         "pk": 134, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 71, 
+            "records_opening_delay_minutes": 71,
             "student": 104, 
             "subject": 119
         }
@@ -2714,7 +2714,7 @@
         "pk": 135, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 50, 
+            "records_opening_delay_minutes": 50,
             "student": 105, 
             "subject": 104
         }
@@ -2723,7 +2723,7 @@
         "pk": 136, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 83, 
+            "records_opening_delay_minutes": 83,
             "student": 137, 
             "subject": 106
         }
@@ -2732,7 +2732,7 @@
         "pk": 137, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 40, 
+            "records_opening_delay_minutes": 40,
             "student": 107, 
             "subject": 101
         }
@@ -2741,7 +2741,7 @@
         "pk": 138, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 51, 
+            "records_opening_delay_minutes": 51,
             "student": 105, 
             "subject": 123
         }
@@ -2750,7 +2750,7 @@
         "pk": 139, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 43, 
+            "records_opening_delay_minutes": 43,
             "student": 117, 
             "subject": 110
         }
@@ -2759,7 +2759,7 @@
         "pk": 140, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 18, 
+            "records_opening_delay_minutes": 18,
             "student": 115, 
             "subject": 109
         }
@@ -2768,7 +2768,7 @@
         "pk": 141, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 30, 
+            "records_opening_delay_minutes": 30,
             "student": 133, 
             "subject": 128
         }
@@ -2777,7 +2777,7 @@
         "pk": 142, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 32, 
+            "records_opening_delay_minutes": 32,
             "student": 110, 
             "subject": 108
         }
@@ -2786,7 +2786,7 @@
         "pk": 143, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 16, 
+            "records_opening_delay_minutes": 16,
             "student": 104, 
             "subject": 102
         }
@@ -2795,7 +2795,7 @@
         "pk": 144, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 10, 
+            "records_opening_delay_minutes": 10,
             "student": 107, 
             "subject": 128
         }
@@ -2804,7 +2804,7 @@
         "pk": 145, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 2, 
+            "records_opening_delay_minutes": 2,
             "student": 138, 
             "subject": 125
         }
@@ -2813,7 +2813,7 @@
         "pk": 146, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 18, 
+            "records_opening_delay_minutes": 18,
             "student": 101, 
             "subject": 104
         }
@@ -2822,7 +2822,7 @@
         "pk": 147, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 54, 
+            "records_opening_delay_minutes": 54,
             "student": 113, 
             "subject": 102
         }
@@ -2831,7 +2831,7 @@
         "pk": 148, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 37, 
+            "records_opening_delay_minutes": 37,
             "student": 125, 
             "subject": 129
         }
@@ -2840,7 +2840,7 @@
         "pk": 149, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 70, 
+            "records_opening_delay_minutes": 70,
             "student": 100, 
             "subject": 126
         }
@@ -2849,7 +2849,7 @@
         "pk": 150, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 22, 
+            "records_opening_delay_minutes": 22,
             "student": 138, 
             "subject": 121
         }
@@ -2858,7 +2858,7 @@
         "pk": 151, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 54, 
+            "records_opening_delay_minutes": 54,
             "student": 128, 
             "subject": 106
         }
@@ -2867,7 +2867,7 @@
         "pk": 152, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 24, 
+            "records_opening_delay_minutes": 24,
             "student": 132, 
             "subject": 107
         }
@@ -2876,7 +2876,7 @@
         "pk": 153, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 95, 
+            "records_opening_delay_minutes": 95,
             "student": 100, 
             "subject": 113
         }
@@ -2885,7 +2885,7 @@
         "pk": 154, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 97, 
+            "records_opening_delay_minutes": 97,
             "student": 102, 
             "subject": 100
         }
@@ -2894,7 +2894,7 @@
         "pk": 155, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 47, 
+            "records_opening_delay_minutes": 47,
             "student": 104, 
             "subject": 108
         }
@@ -2903,7 +2903,7 @@
         "pk": 156, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 63, 
+            "records_opening_delay_minutes": 63,
             "student": 123, 
             "subject": 121
         }
@@ -2912,7 +2912,7 @@
         "pk": 157, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 27, 
+            "records_opening_delay_minutes": 27,
             "student": 117, 
             "subject": 125
         }
@@ -2921,7 +2921,7 @@
         "pk": 158, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 71, 
+            "records_opening_delay_minutes": 71,
             "student": 115, 
             "subject": 102
         }
@@ -2930,7 +2930,7 @@
         "pk": 159, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 80, 
+            "records_opening_delay_minutes": 80,
             "student": 117, 
             "subject": 102
         }
@@ -2939,7 +2939,7 @@
         "pk": 160, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 38, 
+            "records_opening_delay_minutes": 38,
             "student": 112, 
             "subject": 110
         }
@@ -2948,7 +2948,7 @@
         "pk": 161, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 91, 
+            "records_opening_delay_minutes": 91,
             "student": 126, 
             "subject": 110
         }
@@ -2957,7 +2957,7 @@
         "pk": 162, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 98, 
+            "records_opening_delay_minutes": 98,
             "student": 122, 
             "subject": 114
         }
@@ -2966,7 +2966,7 @@
         "pk": 163, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 87, 
+            "records_opening_delay_minutes": 87,
             "student": 137, 
             "subject": 114
         }
@@ -2975,7 +2975,7 @@
         "pk": 164, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "student": 134, 
             "subject": 116
         }
@@ -2984,7 +2984,7 @@
         "pk": 165, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 60, 
+            "records_opening_delay_minutes": 60,
             "student": 134, 
             "subject": 103
         }
@@ -2993,7 +2993,7 @@
         "pk": 166, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 71, 
+            "records_opening_delay_minutes": 71,
             "student": 117, 
             "subject": 116
         }
@@ -3002,7 +3002,7 @@
         "pk": 167, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 62, 
+            "records_opening_delay_minutes": 62,
             "student": 136, 
             "subject": 115
         }
@@ -3011,7 +3011,7 @@
         "pk": 168, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 79, 
+            "records_opening_delay_minutes": 79,
             "student": 128, 
             "subject": 110
         }
@@ -3020,7 +3020,7 @@
         "pk": 169, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 73, 
+            "records_opening_delay_minutes": 73,
             "student": 128, 
             "subject": 100
         }
@@ -3029,7 +3029,7 @@
         "pk": 170, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 35, 
+            "records_opening_delay_minutes": 35,
             "student": 107, 
             "subject": 102
         }
@@ -3038,7 +3038,7 @@
         "pk": 171, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 87, 
+            "records_opening_delay_minutes": 87,
             "student": 110, 
             "subject": 110
         }
@@ -3047,7 +3047,7 @@
         "pk": 172, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 7, 
+            "records_opening_delay_minutes": 7,
             "student": 108, 
             "subject": 122
         }
@@ -3056,7 +3056,7 @@
         "pk": 173, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 83, 
+            "records_opening_delay_minutes": 83,
             "student": 135, 
             "subject": 110
         }
@@ -3065,7 +3065,7 @@
         "pk": 174, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 27, 
+            "records_opening_delay_minutes": 27,
             "student": 107, 
             "subject": 126
         }
@@ -3074,7 +3074,7 @@
         "pk": 175, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 6, 
+            "records_opening_delay_minutes": 6,
             "student": 128, 
             "subject": 110
         }
@@ -3083,7 +3083,7 @@
         "pk": 176, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 21, 
+            "records_opening_delay_minutes": 21,
             "student": 131, 
             "subject": 117
         }
@@ -3092,7 +3092,7 @@
         "pk": 177, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 87, 
+            "records_opening_delay_minutes": 87,
             "student": 125, 
             "subject": 114
         }
@@ -3101,7 +3101,7 @@
         "pk": 178, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 14, 
+            "records_opening_delay_minutes": 14,
             "student": 125, 
             "subject": 124
         }
@@ -3110,7 +3110,7 @@
         "pk": 179, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 37, 
+            "records_opening_delay_minutes": 37,
             "student": 130, 
             "subject": 102
         }
@@ -3119,7 +3119,7 @@
         "pk": 180, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 77, 
+            "records_opening_delay_minutes": 77,
             "student": 126, 
             "subject": 111
         }
@@ -3128,7 +3128,7 @@
         "pk": 181, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 61, 
+            "records_opening_delay_minutes": 61,
             "student": 133, 
             "subject": 112
         }
@@ -3137,7 +3137,7 @@
         "pk": 182, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 91, 
+            "records_opening_delay_minutes": 91,
             "student": 133, 
             "subject": 102
         }
@@ -3146,7 +3146,7 @@
         "pk": 183, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 43, 
+            "records_opening_delay_minutes": 43,
             "student": 116, 
             "subject": 120
         }
@@ -3155,7 +3155,7 @@
         "pk": 184, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 13, 
+            "records_opening_delay_minutes": 13,
             "student": 116, 
             "subject": 117
         }
@@ -3164,7 +3164,7 @@
         "pk": 185, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 2, 
+            "records_opening_delay_minutes": 2,
             "student": 134, 
             "subject": 117
         }
@@ -3173,7 +3173,7 @@
         "pk": 186, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 52, 
+            "records_opening_delay_minutes": 52,
             "student": 135, 
             "subject": 128
         }
@@ -3182,7 +3182,7 @@
         "pk": 187, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 32, 
+            "records_opening_delay_minutes": 32,
             "student": 134, 
             "subject": 104
         }
@@ -3191,7 +3191,7 @@
         "pk": 188, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 68, 
+            "records_opening_delay_minutes": 68,
             "student": 100, 
             "subject": 121
         }
@@ -3200,7 +3200,7 @@
         "pk": 189, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 32, 
+            "records_opening_delay_minutes": 32,
             "student": 137, 
             "subject": 121
         }
@@ -3209,7 +3209,7 @@
         "pk": 190, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 56, 
+            "records_opening_delay_minutes": 56,
             "student": 134, 
             "subject": 129
         }
@@ -3218,7 +3218,7 @@
         "pk": 191, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 80, 
+            "records_opening_delay_minutes": 80,
             "student": 127, 
             "subject": 125
         }
@@ -3227,7 +3227,7 @@
         "pk": 192, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 94, 
+            "records_opening_delay_minutes": 94,
             "student": 118, 
             "subject": 110
         }
@@ -3236,7 +3236,7 @@
         "pk": 193, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 96, 
+            "records_opening_delay_minutes": 96,
             "student": 114, 
             "subject": 128
         }
@@ -3245,7 +3245,7 @@
         "pk": 194, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 26, 
+            "records_opening_delay_minutes": 26,
             "student": 127, 
             "subject": 104
         }
@@ -3254,7 +3254,7 @@
         "pk": 195, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 36, 
+            "records_opening_delay_minutes": 36,
             "student": 129, 
             "subject": 120
         }
@@ -3263,7 +3263,7 @@
         "pk": 196, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 33, 
+            "records_opening_delay_minutes": 33,
             "student": 114, 
             "subject": 127
         }
@@ -3272,7 +3272,7 @@
         "pk": 197, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 42, 
+            "records_opening_delay_minutes": 42,
             "student": 106, 
             "subject": 103
         }
@@ -3281,7 +3281,7 @@
         "pk": 198, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 28, 
+            "records_opening_delay_minutes": 28,
             "student": 134, 
             "subject": 124
         }
@@ -3290,7 +3290,7 @@
         "pk": 199, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 71, 
+            "records_opening_delay_minutes": 71,
             "student": 138, 
             "subject": 101
         }
@@ -3299,7 +3299,7 @@
         "pk": 200, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 92, 
+            "records_opening_delay_minutes": 92,
             "student": 114, 
             "subject": 118
         }
@@ -3308,7 +3308,7 @@
         "pk": 201, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 84, 
+            "records_opening_delay_minutes": 84,
             "student": 134, 
             "subject": 115
         }
@@ -3317,7 +3317,7 @@
         "pk": 202, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 29, 
+            "records_opening_delay_minutes": 29,
             "student": 128, 
             "subject": 126
         }
@@ -3326,7 +3326,7 @@
         "pk": 203, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 91, 
+            "records_opening_delay_minutes": 91,
             "student": 137, 
             "subject": 120
         }
@@ -3335,7 +3335,7 @@
         "pk": 204, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 49, 
+            "records_opening_delay_minutes": 49,
             "student": 123, 
             "subject": 107
         }
@@ -3344,7 +3344,7 @@
         "pk": 205, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 36, 
+            "records_opening_delay_minutes": 36,
             "student": 111, 
             "subject": 129
         }
@@ -3353,7 +3353,7 @@
         "pk": 206, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 56, 
+            "records_opening_delay_minutes": 56,
             "student": 105, 
             "subject": 105
         }
@@ -3362,7 +3362,7 @@
         "pk": 207, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 36, 
+            "records_opening_delay_minutes": 36,
             "student": 119, 
             "subject": 121
         }
@@ -3371,7 +3371,7 @@
         "pk": 208, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 9, 
+            "records_opening_delay_minutes": 9,
             "student": 139, 
             "subject": 107
         }
@@ -3380,7 +3380,7 @@
         "pk": 209, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 95, 
+            "records_opening_delay_minutes": 95,
             "student": 110, 
             "subject": 125
         }
@@ -3389,7 +3389,7 @@
         "pk": 210, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 79, 
+            "records_opening_delay_minutes": 79,
             "student": 134, 
             "subject": 101
         }
@@ -3398,7 +3398,7 @@
         "pk": 211, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 37, 
+            "records_opening_delay_minutes": 37,
             "student": 110, 
             "subject": 108
         }
@@ -3407,7 +3407,7 @@
         "pk": 212, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 34, 
+            "records_opening_delay_minutes": 34,
             "student": 119, 
             "subject": 126
         }
@@ -3416,7 +3416,7 @@
         "pk": 213, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 10, 
+            "records_opening_delay_minutes": 10,
             "student": 122, 
             "subject": 113
         }
@@ -3425,7 +3425,7 @@
         "pk": 214, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 60, 
+            "records_opening_delay_minutes": 60,
             "student": 112, 
             "subject": 119
         }
@@ -3434,7 +3434,7 @@
         "pk": 215, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 50, 
+            "records_opening_delay_minutes": 50,
             "student": 128, 
             "subject": 122
         }
@@ -3443,7 +3443,7 @@
         "pk": 216, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 81, 
+            "records_opening_delay_minutes": 81,
             "student": 116, 
             "subject": 127
         }
@@ -3452,7 +3452,7 @@
         "pk": 217, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 6, 
+            "records_opening_delay_minutes": 6,
             "student": 104, 
             "subject": 108
         }
@@ -3461,7 +3461,7 @@
         "pk": 218, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 57, 
+            "records_opening_delay_minutes": 57,
             "student": 126, 
             "subject": 129
         }
@@ -3470,7 +3470,7 @@
         "pk": 219, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 6, 
+            "records_opening_delay_minutes": 6,
             "student": 101, 
             "subject": 129
         }
@@ -3479,7 +3479,7 @@
         "pk": 220, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 33, 
+            "records_opening_delay_minutes": 33,
             "student": 100, 
             "subject": 106
         }
@@ -3488,7 +3488,7 @@
         "pk": 221, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 94, 
+            "records_opening_delay_minutes": 94,
             "student": 109, 
             "subject": 126
         }
@@ -3497,7 +3497,7 @@
         "pk": 222, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 74, 
+            "records_opening_delay_minutes": 74,
             "student": 124, 
             "subject": 118
         }
@@ -3506,7 +3506,7 @@
         "pk": 223, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 11, 
+            "records_opening_delay_minutes": 11,
             "student": 114, 
             "subject": 120
         }
@@ -3515,7 +3515,7 @@
         "pk": 224, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 56, 
+            "records_opening_delay_minutes": 56,
             "student": 135, 
             "subject": 102
         }
@@ -3524,7 +3524,7 @@
         "pk": 225, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 37, 
+            "records_opening_delay_minutes": 37,
             "student": 117, 
             "subject": 112
         }
@@ -3533,7 +3533,7 @@
         "pk": 226, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 90, 
+            "records_opening_delay_minutes": 90,
             "student": 138, 
             "subject": 111
         }
@@ -3542,7 +3542,7 @@
         "pk": 227, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 99, 
+            "records_opening_delay_minutes": 99,
             "student": 124, 
             "subject": 117
         }
@@ -3551,7 +3551,7 @@
         "pk": 228, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 60, 
+            "records_opening_delay_minutes": 60,
             "student": 113, 
             "subject": 113
         }
@@ -3560,7 +3560,7 @@
         "pk": 229, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 99, 
+            "records_opening_delay_minutes": 99,
             "student": 139, 
             "subject": 107
         }
@@ -3569,7 +3569,7 @@
         "pk": 230, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 41, 
+            "records_opening_delay_minutes": 41,
             "student": 104, 
             "subject": 107
         }
@@ -3578,7 +3578,7 @@
         "pk": 231, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 77, 
+            "records_opening_delay_minutes": 77,
             "student": 110, 
             "subject": 109
         }
@@ -3587,7 +3587,7 @@
         "pk": 232, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 43, 
+            "records_opening_delay_minutes": 43,
             "student": 105, 
             "subject": 113
         }
@@ -3596,7 +3596,7 @@
         "pk": 233, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 21, 
+            "records_opening_delay_minutes": 21,
             "student": 108, 
             "subject": 129
         }
@@ -3605,7 +3605,7 @@
         "pk": 234, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 2, 
+            "records_opening_delay_minutes": 2,
             "student": 124, 
             "subject": 126
         }
@@ -3614,7 +3614,7 @@
         "pk": 235, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 86, 
+            "records_opening_delay_minutes": 86,
             "student": 114, 
             "subject": 103
         }
@@ -3623,7 +3623,7 @@
         "pk": 236, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 11, 
+            "records_opening_delay_minutes": 11,
             "student": 136, 
             "subject": 111
         }
@@ -3632,7 +3632,7 @@
         "pk": 237, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 84, 
+            "records_opening_delay_minutes": 84,
             "student": 107, 
             "subject": 125
         }
@@ -3641,7 +3641,7 @@
         "pk": 238, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 41, 
+            "records_opening_delay_minutes": 41,
             "student": 127, 
             "subject": 120
         }
@@ -3650,7 +3650,7 @@
         "pk": 239, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 45, 
+            "records_opening_delay_minutes": 45,
             "student": 139, 
             "subject": 119
         }
@@ -3659,7 +3659,7 @@
         "pk": 240, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 94, 
+            "records_opening_delay_minutes": 94,
             "student": 120, 
             "subject": 115
         }
@@ -3668,7 +3668,7 @@
         "pk": 241, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 11, 
+            "records_opening_delay_minutes": 11,
             "student": 137, 
             "subject": 126
         }
@@ -3677,7 +3677,7 @@
         "pk": 242, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 42, 
+            "records_opening_delay_minutes": 42,
             "student": 120, 
             "subject": 121
         }
@@ -3686,7 +3686,7 @@
         "pk": 243, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 65, 
+            "records_opening_delay_minutes": 65,
             "student": 114, 
             "subject": 119
         }
@@ -3695,7 +3695,7 @@
         "pk": 244, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 47, 
+            "records_opening_delay_minutes": 47,
             "student": 116, 
             "subject": 125
         }
@@ -3704,7 +3704,7 @@
         "pk": 245, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 43, 
+            "records_opening_delay_minutes": 43,
             "student": 114, 
             "subject": 121
         }
@@ -3713,7 +3713,7 @@
         "pk": 246, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 57, 
+            "records_opening_delay_minutes": 57,
             "student": 105, 
             "subject": 107
         }
@@ -3722,7 +3722,7 @@
         "pk": 247, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 20, 
+            "records_opening_delay_minutes": 20,
             "student": 129, 
             "subject": 117
         }
@@ -3731,7 +3731,7 @@
         "pk": 248, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 88, 
+            "records_opening_delay_minutes": 88,
             "student": 103, 
             "subject": 106
         }
@@ -3740,7 +3740,7 @@
         "pk": 249, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 68, 
+            "records_opening_delay_minutes": 68,
             "student": 100, 
             "subject": 105
         }
@@ -3749,7 +3749,7 @@
         "pk": 250, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 20, 
+            "records_opening_delay_minutes": 20,
             "student": 114, 
             "subject": 105
         }
@@ -3758,7 +3758,7 @@
         "pk": 251, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 75, 
+            "records_opening_delay_minutes": 75,
             "student": 137, 
             "subject": 104
         }
@@ -3767,7 +3767,7 @@
         "pk": 252, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 81, 
+            "records_opening_delay_minutes": 81,
             "student": 100, 
             "subject": 107
         }
@@ -3776,7 +3776,7 @@
         "pk": 253, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 64, 
+            "records_opening_delay_minutes": 64,
             "student": 137, 
             "subject": 101
         }
@@ -3785,7 +3785,7 @@
         "pk": 254, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 83, 
+            "records_opening_delay_minutes": 83,
             "student": 104, 
             "subject": 129
         }
@@ -3794,7 +3794,7 @@
         "pk": 255, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 51, 
+            "records_opening_delay_minutes": 51,
             "student": 100, 
             "subject": 103
         }
@@ -3803,7 +3803,7 @@
         "pk": 256, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 52, 
+            "records_opening_delay_minutes": 52,
             "student": 109, 
             "subject": 111
         }
@@ -3812,7 +3812,7 @@
         "pk": 257, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 82, 
+            "records_opening_delay_minutes": 82,
             "student": 129, 
             "subject": 102
         }
@@ -3821,7 +3821,7 @@
         "pk": 258, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 39, 
+            "records_opening_delay_minutes": 39,
             "student": 137, 
             "subject": 125
         }
@@ -3830,7 +3830,7 @@
         "pk": 259, 
         "model": "subjects.studentoptions", 
         "fields": {
-            "records_opening_delay_hours": 35, 
+            "records_opening_delay_minutes": 35,
             "student": 138, 
             "subject": 125
         }
@@ -5924,10 +5924,12 @@
         "pk": 100, 
         "model": "subjects.semester", 
         "fields": {
-            "records_opening": "2010-02-01 00:00:00", 
+            "records_opening": "2011-02-20 00:00:00",
             "visible": true, 
             "type": "l", 
-            "records_closing": "2010-02-15 00:00:00", 
+            "records_closing": "2011-03-10 00:00:00",
+            "semester_beginning": "2011-02-26",
+            "semester_ending": "2011-06-21",
             "year": 2009
         }
     }, 
@@ -5938,7 +5940,9 @@
             "records_opening": "2010-09-25 00:00:00", 
             "visible": true, 
             "type": "z", 
-            "records_closing": "2010-10-15 00:00:00", 
+            "records_closing": "2010-10-15 00:00:00",
+            "semester_beginning": "2010-10-01",
+            "semester_ending": "2011-02-02",
             "year": 2010
         }
     }, 
@@ -7483,7 +7487,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 100, 
             "matricula": "1000000", 
@@ -7496,7 +7500,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 122, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 101, 
             "matricula": "1000001", 
@@ -7509,7 +7513,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 92, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 102, 
             "matricula": "1000002", 
@@ -7522,7 +7526,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 144, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 103, 
             "matricula": "1000003", 
@@ -7535,7 +7539,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 117, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 104, 
             "matricula": "1000004", 
@@ -7548,7 +7552,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 23, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 105, 
             "matricula": "1000005", 
@@ -7561,7 +7565,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 96, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 106, 
             "matricula": "1000006", 
@@ -7574,7 +7578,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 27, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 107, 
             "matricula": "1000007", 
@@ -7587,7 +7591,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 24, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 108, 
             "matricula": "1000008", 
@@ -7600,7 +7604,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 159, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 109, 
             "matricula": "1000009", 
@@ -7613,7 +7617,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 151, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 110, 
             "matricula": "1000010", 
@@ -7626,7 +7630,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 138, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 111, 
             "matricula": "1000011", 
@@ -7639,7 +7643,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 77, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 112, 
             "matricula": "1000012", 
@@ -7652,7 +7656,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 33, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 113, 
             "matricula": "1000013", 
@@ -7665,7 +7669,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 96, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 114, 
             "matricula": "1000014", 
@@ -7678,7 +7682,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 8, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 115, 
             "matricula": "1000015", 
@@ -7691,7 +7695,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 77, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 116, 
             "matricula": "1000016", 
@@ -7704,7 +7708,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 160, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 117, 
             "matricula": "1000017", 
@@ -7717,7 +7721,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 165, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 118, 
             "matricula": "1000018", 
@@ -7730,7 +7734,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 70, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 119, 
             "matricula": "1000019", 
@@ -7743,7 +7747,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 37, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 120, 
             "matricula": "1000020", 
@@ -7756,7 +7760,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 141, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 121, 
             "matricula": "1000021", 
@@ -7769,7 +7773,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 165, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 122, 
             "matricula": "1000022", 
@@ -7782,7 +7786,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 179, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 123, 
             "matricula": "1000023", 
@@ -7795,7 +7799,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 2, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 124, 
             "matricula": "1000024", 
@@ -7808,7 +7812,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 15, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 125, 
             "matricula": "1000025", 
@@ -7821,7 +7825,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 158, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 126, 
             "matricula": "1000026", 
@@ -7834,7 +7838,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 6, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 127, 
             "matricula": "1000027", 
@@ -7847,7 +7851,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 22, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 128, 
             "matricula": "1000028", 
@@ -7860,7 +7864,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 59, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 129, 
             "matricula": "1000029", 
@@ -7873,7 +7877,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 71, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 130, 
             "matricula": "1000030", 
@@ -7886,7 +7890,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 28, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 131, 
             "matricula": "1000031", 
@@ -7899,7 +7903,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 53, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 132, 
             "matricula": "1000032", 
@@ -7912,7 +7916,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 35, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 133, 
             "matricula": "1000033", 
@@ -7925,7 +7929,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 44, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 134, 
             "matricula": "1000034", 
@@ -7938,7 +7942,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 42, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 135, 
             "matricula": "1000035", 
@@ -7951,7 +7955,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 59, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 136, 
             "matricula": "1000036", 
@@ -7964,7 +7968,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 141, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 137, 
             "matricula": "1000037", 
@@ -7977,7 +7981,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 70, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 138, 
             "matricula": "1000038", 
@@ -7990,7 +7994,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 83, 
-            "records_opening_delay_hours": 0, 
+            "records_opening_delay_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 139, 
             "matricula": "1000039", 

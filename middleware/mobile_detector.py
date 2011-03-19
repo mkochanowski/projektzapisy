@@ -2,7 +2,7 @@ import re
 
 
 
-class MobileDetectionMiddleware(object):
+class mobileDetectionMiddleware(object):
     """
     Useful middleware to detect if the user is
     on a mobile device.
@@ -59,4 +59,4 @@ class MobileDetectionMiddleware(object):
                     is_mobile = True
 
         request.is_mobile = is_mobile
-	#print "FROM MOBILE DETECTION " + str(request.is_mobile)
+	#print "FROM mobile DETECTION " + str(request.is_mobile)

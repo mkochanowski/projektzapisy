@@ -34,6 +34,7 @@ http://github.com/robhudson/django-debug-toolbar
 
 == Uruchomienie (dla developerów) ==
 
+
 Przed pierwszym uruchomieniem należy przygotować bazę danych
 i załadować dane:
 $ python manage.py syncdb

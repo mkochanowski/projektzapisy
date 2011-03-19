@@ -20,6 +20,15 @@ Moje dane:
 	<li>login: {{user.username}}</li>
 	<li>email: {{user.email}}</li>
 </ul>
+<br/>
+<table>
+    {% for t in terms %}
+        <tr>
+        <td><b>{{t.name}}</b> : {{t.term}}</td>
+        </tr>
+    {% endfor %}
+</table>
+<br/>
 <a href="{% url password-change %}">zmień hasło</a>
 <a href="{% url email-change %}">zmień adres email</a>
 

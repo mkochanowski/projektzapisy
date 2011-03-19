@@ -9,7 +9,7 @@
 
 {% block main-menu %}
 	<!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
-	<!-- <li><a href="{% url news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li> -->
+	<!-- <li><a href="{% url apps.news.views.latest_news 'offer' %}">Aktualności</a> ({% newscount "offer" %})</li> -->
 	
 	{% if user.employee %}        
 	<li><a href="{% url grade-poll-add %}">Dodaj ankietę</a></li>

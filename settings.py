@@ -76,6 +76,8 @@ MEDIA_ROOT = 'site_media'
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = ''
 
+USE_ETAGS = True
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -98,9 +100,9 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
-    'fereol.middleware.mobile_detector.MobileDetectionMiddleware',
-    'fereol.middleware.mobileMiddleware.SubdomainMiddleware',
-    'fereol.middleware.error_handling.ErrorHandlerMiddleware'
+    'middleware.mobile_detector.mobileDetectionMiddleware',
+    'middleware.mobileMiddleware.SubdomainMiddleware',
+    'middleware.error_handling.ErrorHandlerMiddleware'
 )
 
 ROOT_URLCONF = 'fereol.urls'
@@ -116,18 +118,18 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'haystack',
-    'fereol.mailer',
-    'fereol.south',
-    'fereol.enrollment.subjects',
-    'fereol.enrollment.records',
-    'fereol.news',
-    'fereol.offer.preferences',
-    'fereol.offer.proposal',
-    'fereol.offer.vote',
-    'fereol.users',
-    'fereol.debug_toolbar',
-    'fereol.grade.poll',
-    'fereol.mobile',
+    'mailer',
+    'south',
+    'apps.enrollment.subjects',
+    'apps.enrollment.records',
+    'apps.news',
+    'apps.offer.preferences',
+    'apps.offer.proposal',
+    'apps.offer.vote',
+    'apps.users',
+    'debug_toolbar',
+    'apps.grade.poll',
+    'apps.mobile',
 )
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
@@ -142,6 +144,16 @@ HAYSTACK_SITECONF = 'search_sites'
 HAYSTACK_SEARCH_ENGINE = 'whoosh'
 HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
+
+#TODO: udokumentowac zaleznosci!
+#TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
+#TEST_OUTPUT_VERBOSE = True
+#TEST_OUTPUT_DESCRIPTIONS = True
+#TEST_OUTPUT_DIR = 'xmlrunner'
+
+#settings for enrollment
+POINT_LIMIT_DURATION = 14 # abs(t1-t2), in days
+ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
 
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.nowe-zapisy.ii.uni.wroc.pl' # without port number!

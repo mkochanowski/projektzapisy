@@ -2,7 +2,7 @@ import re
 
 
 
-class MobileDetectionMiddleware(object):
+class mobileDetectionMiddleware(object):
     """
     Useful middleware to detect if the user is
     on a mobile device.
