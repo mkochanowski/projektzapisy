@@ -331,7 +331,6 @@ def sections_list( request ):
     
     data['sections'] = sections
     data['grade']  = Semester.get_current_semester().is_grade_active
-    data['privileged_user'] = request.user.is_staff
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
 @employee_required
