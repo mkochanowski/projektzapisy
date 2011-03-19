@@ -4,9 +4,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from exceptions import NonEmployeeException, NonStudentException
-from fereol.enrollment.subjects.models import Group
 from users.exceptions import NonEmployeeException, NonStudentException
-from enrollment.subjects.models import Group, Semester
+from enrollment.subjects.models import Group, Semester, Subject
 
 import datetime
 
@@ -48,7 +47,19 @@ class Employee(BaseUser):
     Employee.
     '''
     consultations = models.TextField(verbose_name="konsultacje")
-    
+        
+    """
+    Method used to verify whether user is allowed to create a poll for certain group 
+        (== he is an admin, a teacher for this subject or a teacher for this group)
+    """
+    def has_privileges_for_group(self, group_id):
+        try:
+            group = Group.objects.get(pk=group_id)
+            return ( group.teacher == self or self in group.subject.teachers.all() or self.user.is_staff )
+        except:
+            logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
+        return False
+            
     @staticmethod
     def get_all_groups(user_id):
         user = User.objects.get(id=user_id)
@@ -56,7 +67,7 @@ class Employee(BaseUser):
             employee = user.employee
             groups = Group.objects.filter(teacher=employee)
         except Employee.DoesNotExist:
-             logger.error('Function Employee.get_all_groups(user_id = %d) wthrows Employee.DoesNotExist exception.' % user_id )
+             logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
         return groups
     

@@ -175,7 +175,7 @@ def poll_create(request):
         else:
             semester = Semester.get_current_semester()
         if group > 0:
-            group    = Group.objects.get(pk = group)
+            group    = Group.objects.filter(pk = group)
         else:
             group    = None
 
@@ -201,10 +201,11 @@ def poll_create(request):
         if (request.POST.getlist('sections[]') == []):
             messages.error(request, "Nie można utworzyć ankiety; ankieta jest pusta")
             return HttpResponseRedirect( '/grade' )
-        
         groups = getGroups(semester, group, type, subject)
         for group in groups:
             if groups_without == 'on' and Poll.get_all_polls_for_group(group):
+                continue
+            if not request.user.employee.has_privileges_for_group(group.pk):
                 continue
             poll = Poll()
             poll.author       = request.user.employee

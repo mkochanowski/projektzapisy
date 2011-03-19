@@ -15,10 +15,7 @@ module NavigationHelpers
       '/grade/'
     
     when /poll management page/
-		'/grade/poll_manage'
-        
-    when /grade keys generator/
-        '/grade/ticket/keys_generate'
+		'/grade/poll_manage'        
     
     when /polls filling page/
         '/grade/poll/polls/all'

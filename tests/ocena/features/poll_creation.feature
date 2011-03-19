@@ -133,7 +133,7 @@ Feature: User with privileges wants to create a poll.
         And I fill in "Tytuł:" with "Ankieta do ćwiczeń"
         And I select "Przedmiot:" as "Wszystkie przedmioty"
         And I select "Typ zajęć:" as "ćwiczenia"      
-        And I check "Utwórz dla grup bez ankiet"  
+        And I check "Utwórz tylko dla grup bez ankiet"  
         And I select "Wybierz sekcję:" as "Ćwiczenia"
         And I press "Dodaj sekcję"        
         And I select "Wybierz sekcję:" as "Uwagi"
@@ -160,7 +160,7 @@ Feature: User with privileges wants to create a poll.
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 4" 
     
-    Scenario: Employee fails to create a poll for somebody elses group when he is not a lecturer
+    Scenario: Employee can not create a poll for somebody elses group when he is not a lecturer - but he can for his own
 		Given the grading protocol is "off"
         And I am logged in with "employee" privileges
         And I am on grade main page
@@ -174,7 +174,6 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Nie masz uprawnień do stworzenia ankiety dla grupy: employee2"
         And I should see "Liczba utworzonych ankiet: 1"
 
     Scenario: Administrator fails to create a poll when there is no title
