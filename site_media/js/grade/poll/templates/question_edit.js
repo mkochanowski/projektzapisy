@@ -28,11 +28,11 @@ var question_edit = "<li class='poll-question'>                         " +
 "			<input type='checkbox' id='poll[question][${id}][isScale]' name='poll[question][${id}][isScale]'>" +
 "			<label for='poll[question][${id}][isScale]'>Odpowiedź w formie skali</label>" +
 "		</li>" +
-"		<li class='multi not-open choiceLimit' style='display: none;'>" +
+"		<li class='multi not-single not-open choiceLimit' style='display: none;'>" +
 "			<input type='text' id='poll[question][${id}][choiceLimit]' name='poll[question][${id}][choiceLimit]'>" +
 "			<label for='poll[question][${id}][choiceLimit]'>Limit odpowiedzi</label>" +
 "		</li>" +
-"		<li class='single not-open hasOther' style='display: none;'>" +
+"		<li class='multi not-single not-open hasOther' style='display: none;'>" +
 "			<input type='checkbox' id='poll[question][${id}][hasOther]' name='poll[question][${id}][hasOther]'>" +
 "			<label for='poll[question][${id}][hasOther]'>Odpowiedź inne</label>" +
 "		</li>" +
