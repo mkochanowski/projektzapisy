@@ -4,7 +4,7 @@
 .pydevproject
 .settings/
 search_index/*
-*.tmp*
+*.tmp
 *.log
 *~
 settings_local.py

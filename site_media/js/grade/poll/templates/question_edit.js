@@ -11,7 +11,7 @@ var question_edit = "<li class='poll-question'>                         " +
 "				<td>Opis pytania: </td>" +
 "				<td><input type='text' id='poll[question][${id}][description]' name='poll[question][${id}][description]' class='section-option'></td>" +
 "			</tr>" +
-"			<tr>" +
+"			<tr  class='typeSelect'>" +
 "				<td>Typ pytania: </td>" +
 "				<td><select name='poll[question][${id}][type]' class='typeSelect options'>" +
 "				    	<option value='open'>Otwarte</option>" +

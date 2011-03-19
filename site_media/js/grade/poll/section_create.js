@@ -16,24 +16,19 @@ Poll.section.init = function()
     Poll.section.questionContainer = $("#poll-form");
     Poll.section.havelastLi        = false; // to change active question
 
-    /* bahaviors */
-    Poll.section.toggleLeading();
 
     $(Poll.section.questionContainer).sortable({
             handle : 'div',
             zIndex: 5,
             tolerance: 'pointer',
-            deactivate: function(event, ui)
-                        {
-                            Poll.section.toggleLeading();
-                        }
+            items: '> li:not(.firstQuestion)'
 
     });
     /* set events */
     $("#add-question").click(Poll.section.createQuestion)
     $("input[type=text]").focus(function(){ this.select(); });
     $("textarea").focus(function(){ this.select(); });
-    $(".leading").change(Poll.section.toggleHideOn);
+    $(".leading").change(Poll.section.changeLeading);
     
     // send form
     $('#questionset-submit').click(function()
@@ -110,7 +105,7 @@ Poll.section.editParser = function()
 
 
 /*
-* Create new question in section.
+* Create new question in section and put at end of questionContainer
 *
 * @author mjablonski
 *
@@ -122,7 +117,31 @@ Poll.section.createQuestion = function( )
     var data = {
         id: Poll.section.questions
     }
-    $.tmpl( "question_edit", data).appendTo( Poll.section.questionContainer );
+    Poll.section.questionCreator('last', data);
+
+
+}
+
+/*
+* Create question.
+*
+* @author mjablonski
+*
+* @param string position  - position of question in place: top or last
+* @param json data - with id of question
+*
+ */
+
+Poll.section.questionCreator = function( position, data )
+{
+    if ( position == 'top')
+    {
+        $.tmpl( "question_edit", data).prependTo( Poll.section.questionContainer );
+    }
+    else if ( position == 'last')
+    {
+        $.tmpl( "question_edit", data).appendTo( Poll.section.questionContainer );
+    }
 
     if ( Poll.section.havelastLi )
     {
@@ -290,7 +309,6 @@ Poll.section.changeType = function( li )
         
     }
     $(answerset).find('.hideOnCheckbox').hide();
-    Poll.section.toggleLeading();
     Poll.section.toggleHideOn();
 }
 
@@ -354,31 +372,51 @@ Poll.section.makeQuestionset = function( li )
 }
 
 /*
- * Wywolanie tej metody powoduje wyswietlenie/ukrycie
- * pytania o uzycie 'pytania wiodacego'.
- * Pytanie jest pokazywane, jezeli pierwsza pozycja
- * jest typu 'single'
+ * Function show leading question
  *
  * @author mjablonski
- * */
+ */
 
-Poll.section.toggleLeading = function( )
+Poll.section.changeLeading = function()
 {
-    var type = $(Poll.section.questionContainer)
-                .find('select[name$="[type]"]')
-                .first()
-                .val();
-
-    if ( type == 'single' )
+    if ( $(this).is(':checked') )
     {
-        $(".leading").show();
+        //
+        var data = {
+            id: 0
+        }
+        Poll.section.questionCreator('top', data);
+        var leadingQuestion = $(Poll.section.questionContainer)
+                .children()
+                .first();
+        // change and hide type
+
+        $(leadingQuestion)
+                .find('.typeSelect')
+                .val("single")
+                .hide()
+                .change()
+
+        // hide delete button
+        $(leadingQuestion)
+                .find('.delete')
+                .hide();
+        
+        // don't sort first in questionset
+        $(leadingQuestion)
+                .addClass('firstQuestion');
 
     }
     else
     {
-        $(".leading").hide();
+        // delete first
+        $(Poll.section.questionContainer)
+                .children()
+                .first()
+                .remove();
     }
 }
+
 
 /*
 * Kolejna metoda obslugujaca pytania wiodace
