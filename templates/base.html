@@ -38,6 +38,9 @@
 			<p id="main-systemTypeBar">{{ subsystemname }}</p>
 		{% endif %}
 		<p id="main-signinBar">
+                        {% if user.is_staff %}
+                                <a href="/admin/">Panel administracyjny</a> |
+                        {% endif %}
 			{% if user.is_authenticated %}
 				Jesteś zalogowany jako
 				<a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
