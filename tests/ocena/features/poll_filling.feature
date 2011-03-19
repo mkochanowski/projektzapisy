@@ -111,4 +111,4 @@ Feature: Anonymous user, who has just entered his tickets, wants to fill some po
         Given the grading protocol is "off"
         And I am on grade main page
         And I go to grade/poll/poll_answer/przedmiot-2/8/
-        Then I should see "Ocena zajęć jest zamknięta"
+        Then I should see "Nie znaleziono strony"

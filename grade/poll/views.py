@@ -304,9 +304,14 @@ def templates( request ):
 def use_templates( request ):
     pass
     
-    
+
 @employee_required
 def sections_list( request ):
+    """
+        Preparation of sections list; if user is member of the staff he will also
+        be able to edit and delete sections; employees without special privileges
+        aren't allowed to any such action.
+    """
     data = {}
     sections   = Section.objects.filter(deleted=False).order_by('pk')
     paginator = Paginator(sections, 25)
@@ -326,6 +331,7 @@ def sections_list( request ):
     
     data['sections'] = sections
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['privileged_user'] = request.user.is_staff
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -409,7 +415,7 @@ def delete_poll( request ):
                 poll.deleted = True
                 poll.save()
                 counter = counter + 1
-    request.session['message'] = u'Usunięto ' + unicode(counter) + u'ankiet'
+    request.session['message'] = u'Usunięto ' + unicode(counter) + u' ankiet'
     return HttpResponseRedirect(reverse('grade-poll-polls-list'))
 
 @employee_required

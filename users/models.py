@@ -48,11 +48,11 @@ class Employee(BaseUser):
     '''
     consultations = models.TextField(verbose_name="konsultacje")
         
-    """
-    Method used to verify whether user is allowed to create a poll for certain group 
-        (== he is an admin, a teacher for this subject or a teacher for this group)
-    """
     def has_privileges_for_group(self, group_id):
+        """
+        Method used to verify whether user is allowed to create a poll for certain group 
+        (== he is an admin, a teacher for this subject or a teacher for this group)
+        """
         try:
             group = Group.objects.get(pk=group_id)
             return ( group.teacher == self or self in group.subject.teachers.all() or self.user.is_staff )
