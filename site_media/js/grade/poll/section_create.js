@@ -100,7 +100,7 @@ Poll.section.editParser = function()
 }
 
 //////////////////////////////////////////////////////////////
-//// Metody poswiecone tworzeniu nowych pytan
+//// Question creation
 /////////////////////////////////////////////////////////////
 
 
@@ -134,6 +134,9 @@ Poll.section.createQuestion = function( )
 
 Poll.section.questionCreator = function( position, data )
 {
+
+    // create object in position:
+
     if ( position == 'top')
     {
         $.tmpl( "question_edit", data)
@@ -145,6 +148,7 @@ Poll.section.questionCreator = function( position, data )
                 .appendTo( Poll.section.questionContainer );
     }
 
+    //
     if ( Poll.section.havelastLi )
     {
         Poll.section.createView(Poll.section.lastLi)
@@ -154,6 +158,8 @@ Poll.section.questionCreator = function( position, data )
                         .last();
 
     Poll.section.havelastLi = true;
+
+    // buttons events
 
     $('.ready').click(function(){
                     var li = $(this).parents('.poll-question');
@@ -179,7 +185,7 @@ Poll.section.questionCreator = function( position, data )
  */
 Poll.section.addOptionButton = function( li )
 {
-     // Przygotowanie danych do szablonu
+     // Prepare data
      var type      = $(li).find('select[name$="[type]"]').val();
      var answerset = $(li).find('.answerset');
 
@@ -191,7 +197,8 @@ Poll.section.addOptionButton = function( li )
         size: $(answerset).children().size() + 1,
         leading: leading
      }
-    // zastosowanie szablonu:
+
+    // create object
      $.tmpl( "question", data ).appendTo( answerset );
      $('.remove').click(function()
      {
@@ -223,14 +230,14 @@ Poll.section.isLeadingQuestion = function( li)
 }
 
 ///////////////////////////////////////////////////////////////
-///// Obsługa trybów: edycji i widoku zwykłego
+///// Edit and View mode
 ///////////////////////////////////////////////////////////////
 
 /*
-* Metoda przelacza tryb pytania z edycji do widoku zwyklego
+* Change to view-mode
 *
 * @author mjablonski
-* @param dom-node li - element listy pytań
+* @param dom-node li - element of questionset
  */
 
 Poll.section.createView = function( li )
@@ -265,10 +272,10 @@ Poll.section.createView = function( li )
 }
 
 /*
-* Metoda zmienia tryb pytania na 'edycja'
+* Change mode to edit
 *
 * @author mjablonski
-* @param dom-node li - element listy pytan
+* @param dom-node li - element of questionset
  */
 
 Poll.section.createEdit = function( li )
@@ -284,11 +291,10 @@ Poll.section.createEdit = function( li )
 }
 
 /*
-* Metoda wykonywana jest po zmianie typu pytania
-* dostosowuje pytanie do wybranego typu
+* Change type event
 *
 * @author mjablonski
-* @param dom-node li - element listy pytan
+* @param dom-node li - element od questionset
  */
 
 Poll.section.changeType = function( li )
@@ -334,13 +340,16 @@ $(Poll.section.init);
 
 
 /////////////////////////////////////////////////////////////
-//// Różne medoty pomocnicze
+//// Help functions
 /////////////////////////////////////////////////////////////
 
 /*
-* Po zmianie typu pytania przelacza opcje dodatkowe
+* Hide and show options for question type
 *
 * @author: mjablonski
+*
+* @param dom-node li - questionset element
+* @param strung type - new type of question
  */
 Poll.section.hideOptions = function( li, type )
 {
@@ -350,11 +359,11 @@ Poll.section.hideOptions = function( li, type )
 }
 
 /*
-* Przygotowuje informacje o ustawieniach pytania do przeslania do szablonu
-* Wykorzystywane przy zmianie widoku
+* Prepare json with state of optionset
 *
 * @author mjablonski
-* @param dom-node li - element listy pytań
+* @param dom-node li - questionset element
+* @return json  - optionset state
  */
 Poll.section.makeOptionset = function( li )
 {
@@ -366,11 +375,11 @@ Poll.section.makeOptionset = function( li )
 }
 
 /*
-* Przygotowuje liste odpowiedzi
-* wykorzystywane przy zmianie widoku pytania
+* Prepare json with answer state
 *
 * @author mjablonski
-* @param dom-node li - element listy pytań
+* @param dom-node li - element of questionset
+* @return json - answers for question
 * */
 Poll.section.makeQuestionset = function( li )
 {
