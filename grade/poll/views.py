@@ -39,9 +39,13 @@ from fereol.grade.poll.utils           import check_signature, \
                                               get_prev, \
                                               get_ticket_and_signed_ticket_from_session,\
                                               getGroups
-                                              
-from fereol.users.models                 import Employee
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from fereol.users.models               import Employee
+from django.core.paginator             import Paginator, InvalidPage, EmptyPage
+
+from form_utils                        import get_section_form_data, \
+                                              validate_section_form, \
+                                              section_save
+from django.utils.safestring           import SafeUnicode
 
 def default(request):
     grade = Semester.get_current_semester().is_grade_active
@@ -435,111 +439,48 @@ def declaration( request ):
 
 @employee_required    
 def questionset_create(request):
-    grade = Semester.get_current_semester().is_grade_active
+    data          = {}
+    grade         = Semester.get_current_semester().is_grade_active
+    data['grade'] = grade
+    
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( '/grade' )
-    def parse_form(post):
-        def choicebox_is_on(value):
-            if value == 'on':
-                return True
-            return False
-
-        section = Section()
-        section.title       = post.get("poll[title]")
-        is_leading          = choicebox_is_on(post.get("poll[leading]"))
-
-        if (section.title == ""):
-            #messages.error(request, "Nie można utworzyć sekcji; niepoprawny tytuł sekcji")
-            return False
-            
-        section.description = post.get("poll[description]")
-        if (section.description == u"Wstaw tutaj opis sekcji"):
-            section.description = u""
-        section.save()
-        
-        questions = post.getlist('poll[question][order][]')
-
-        position = 1
-        for question_id in questions:
-            question_name        = "poll[question][" + str(question_id) +"]"
-            type                 = post.get(question_name + "[type]")
-
-            if type == 'open':
-                question = OpenQuestion()
-
-            elif type == 'single':
-                question = SingleChoiceQuestion()
-                question.is_scale = choicebox_is_on(post.get(question_name + "[isScale]"))
-
-            elif type == 'multi':
-                question = MultipleChoiceQuestion()
-                question.choice_limit = choicebox_is_on(post.get(question_name + "[choiceLimit]"))
-                question.has_other    = choicebox_is_on(post.get(question_name + "[hasOther]"))
-
-            else:
-                raise WrongType(type)
-
-            question.content     = post.get(question_name + "[title]")
-            question.description =  post.get(question_name + "[description]")
-            question.save()
-
-            options = post.getlist(question_name + "[answers][]")
-            hideOn  = map( lambda (x):( int(x)), post.getlist(question_name + "[hideOn][]"))
-            hidenAnswers = []
-            i = 1
-            for option_name in options:
-                option          = Option()
-                option.content  = option_name
-                option.save()
-                question.options.add(option)
-                if i in hideOn:
-                    hidenAnswers.append(option)
-                i = i + 1
-
-            question.save()
-            
-            if type == 'open':
-                container = OpenQuestionOrdering()
-                container.question   = question
-                container.sections   = section
-                container.position   = position
-                container.save()
-
-            elif type == 'single':
-                container = SingleChoiceQuestionOrdering()
-                container.question    = question
-                container.sections    = section
-                container.position   = position
-                container.is_leading  = (position == 1) and is_leading
-                container.save()
-                for opt in hidenAnswers:
-                    container.hide_on.add(opt)
-                container.save()
-
-            elif type == 'multi':
-                container = MultipleChoiceQuestionOrdering()
-                container.question   = question
-                container.sections    = section
-                container.position   = position
-                container.save()
-
-            position   = position + 1
-    data = {}
+    
+    
     if request.method == "POST":
-        if parse_form(request.POST):
-            request.session['message'] = 'Sekcja dodana'
-            return HttpResponseRedirect(reverse('grade-poll-questionset-create'))
-        else:
-            # messages.error(request, "Błąd dodania sekcji")
-            HttpResponseRedirect( '/grade' )
+        # TODO:
+        # Dodać tutaj wypełnienie forma danymi
+        
+        form_data = get_section_form_data( request.POST )
+        errors    = validate_section_form( form_data )
+        
+        if errors:
+            error_msg = u"Nie można utworzyć sekcji:\n<ul>"
+            if errors.has_key( 'title' ):
+                error_msg += u"<li>" + errors[ 'title' ] + u"</li>"
+            if errors.has_key( 'content' ):
+                error_msg += u"<li>" + errors[ 'content' ] + u"</li>"
+            if errors.has_key( 'questions' ):
+                question_errors = errors[ 'questions' ].keys()
+                question_errors.sort()
+                for position in question_errors:
+                    error_msg += u"<li>Pytanie " + unicode(position) + ":\n<ul>"
+                    for error in errors[ 'questions' ][ position ]:
+                        error_msg += u"<li>" + error + u"</li>"
+                    error_msg += u"</ul></li>"
+            error_msg += u"</ul>"
             
-    if request.session.get('message', None):
-        data['message'] = request.session.get('message', None)
-        del request.session['message']
-          
-    data['grade'] = grade
+            messages.error( request, SafeUnicode( error_msg ))
+        else:
+            if section_save( form_data ):
+                messages.success( request, "Sekcja dodana" )
+                return HttpResponseRedirect( '/grade/poll/managment/sections_list' )
+            else:
+                messages.error( request, "Zapis sekcji nie powiódł się" )
+            
     return render_to_response ('grade/poll/section_create.html', data, context_instance = RequestContext( request ))
+
 
 def questionset_assign(request):
     pass

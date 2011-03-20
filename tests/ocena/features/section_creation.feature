@@ -122,7 +122,8 @@ Feature: User with privileges wants to create a section.
         And I follow "Tworzenie sekcji"  
         And I fill in "section-title" with "Sekcja administratora"
         And I press "Zapisz"         
-        Then I should see "Nie można utworzyć sekcji; sekcja nie zawiera pytań"
+        Then I should see "Nie można utworzyć sekcji:"
+	And I should see "Sekcja nie zawiera pytań"
             
     Scenario: Administrator tries to create section without a title
 		Given the grading protocol is "off"
@@ -133,7 +134,8 @@ Feature: User with privileges wants to create a section.
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobała Ci się moja praca?"
         And I press "Zapisz" 
-        Then I should see "Nie można utworzyć sekcji; niepoprawny tytuł sekcji"
+        Then I should see "Nie można utworzyć sekcji:"
+	And I should see "Niepoprawny tytuł sekcji"
     
     Scenario Outline: Administrator tries to add a question without a question text
 		Given the grading protocol is "off"
@@ -145,14 +147,15 @@ Feature: User with privileges wants to create a section.
         And I press "Dodaj pytanie" 
         And I select "poll[question][1][type]" as <typ_pytania>
         And I press "Zapisz" 
-        Then I should see "Nie można zapisać sekcji; brak tekstu w jednym z pytań"
+        Then I should see "Nie można utworzyć sekcji:"
+	And I should see "Pytanie 1:" 
+	And I should see "brak tekstu"
         
     Examples:
         | typ_pytania |
         | "Otwarte" |
         | "Jednokrotnego wyboru" |
         | "Wielokrotnego wyboru" |
-        | "Pytanie wiodące" |
     
     Scenario Outline: Administrator tries to add a choice question with no choices
 		Given the grading protocol is "off"
@@ -165,10 +168,11 @@ Feature: User with privileges wants to create a section.
         And I select "poll[question][1][type]" as <typ_pytania>
         And I fill in "poll[question][1][title]" with "Treść pytania"
         And I press "Zapisz" 
-        Then I should see "Nie można zapisać sekcji; brak opcji w jednym z pytań"
+        Then I should see "Nie można utworzyć sekcji:"
+	And I should see "Pytanie 1:"
+	And I should see "brak opcji"
 
     Examples:
         | typ_pytania |
         | "Jednokrotnego wyboru" |
         | "Wielokrotnego wyboru" |
-        | "Pytanie wiodące" |
