@@ -74,9 +74,9 @@ Poll.section.editParser = function()
         Poll.section.changeType( li )
     });
     Poll.section.questions = $('.poll-question').size()
-    
+
     $('.ready').click(function()
-    { 
+    {
         var li   = $(this).parents('.poll-question');
         Poll.section.createView( li );
         
@@ -136,11 +136,13 @@ Poll.section.questionCreator = function( position, data )
 {
     if ( position == 'top')
     {
-        $.tmpl( "question_edit", data).prependTo( Poll.section.questionContainer );
+        $.tmpl( "question_edit", data)
+                .prependTo( Poll.section.questionContainer );
     }
     else if ( position == 'last')
     {
-        $.tmpl( "question_edit", data).appendTo( Poll.section.questionContainer );
+        $.tmpl( "question_edit", data)
+                .appendTo( Poll.section.questionContainer );
     }
 
     if ( Poll.section.havelastLi )
@@ -180,9 +182,14 @@ Poll.section.addOptionButton = function( li )
      // Przygotowanie danych do szablonu
      var type      = $(li).find('select[name$="[type]"]').val();
      var answerset = $(li).find('.answerset');
+
+     var leading = Poll.section.isLeadingQuestion( li );
+
+
      var data = {
         id: $(li).find('input[name="poll[question][order][]"]').val(),
-                size: $(answerset).children().size() + 1
+        size: $(answerset).children().size() + 1,
+        leading: leading
      }
     // zastosowanie szablonu:
      $.tmpl( "question", data ).appendTo( answerset );
@@ -192,6 +199,28 @@ Poll.section.addOptionButton = function( li )
      });
 }
 
+
+/*
+* Function to check leading
+*
+* @author mjablonski
+*
+* @param dom-node li - element of questionset
+* @return bool - true if li is leading question, false if not
+ */
+
+Poll.section.isLeadingQuestion = function( li)
+{
+    if ( ! $(".leading").is(':checked') )
+    {
+        return false;
+    }
+    if ($(li).find('input[name="poll[question][order][]"]').val() == 0)
+    {
+        return true;
+    }
+    return false;
+}
 
 ///////////////////////////////////////////////////////////////
 ///// Obsługa trybów: edycji i widoku zwykłego
@@ -207,6 +236,9 @@ Poll.section.addOptionButton = function( li )
 Poll.section.createView = function( li )
 {
 
+    // clean old view
+    $(li).children('.section-show')
+        .remove();
     Poll.section.havelastLi = false;
     var data = {
         type:  $(li).find('select[name$="[type]"]').val(),
@@ -287,19 +319,6 @@ Poll.section.changeType = function( li )
                 var li = $(this).parents('.poll-question');
                 Poll.section.addOptionButton( li );
             });
-            $(li).find('input[name$="[leading]"]').click( function()
-            {
-                if (jQuery(this).is(':checked'))
-                {
-                    $(li).find('input[name$="[hideOn][]"]').show();
-                    $(li).find('label[for$="[hideOn][]"]').show();                    
-                }
-                else
-                {
-                    $(li).find('input[name$="[hideOn][]"]').hide();
-                    $(li).find('label[for$="[hideOn][]"]').hide();
-                }
-            } );
             $('.autocomplete').autocomplete(
             {
                 source:'/grade/poll/autocomplete',
@@ -308,8 +327,6 @@ Poll.section.changeType = function( li )
         }
         
     }
-    $(answerset).find('.hideOnCheckbox').hide();
-    Poll.section.toggleHideOn();
 }
 
 
@@ -386,11 +403,13 @@ Poll.section.changeLeading = function()
             id: 0
         }
         Poll.section.questionCreator('top', data);
+
         var leadingQuestion = $(Poll.section.questionContainer)
                 .children()
                 .first();
         // change and hide type
 
+        Poll.section.lastLi = leadingQuestion;
         $(leadingQuestion)
                 .find('.typeSelect')
                 .val("single")
@@ -418,26 +437,3 @@ Poll.section.changeLeading = function()
 }
 
 
-/*
-* Kolejna metoda obslugujaca pytania wiodace
-* ukrywa / pokazuje przyciski obslugi wiodacych
-*
-* @author mjablonski
-*
- */
-
-Poll.section.toggleHideOn = function()
-{
-
-    var answerset = $(Poll.section.questionContainer)
-                    .find('.answerset')
-                    .first();
-    if ( $('input[name$="[leading]"]:checked').val() !== undefined )
-    {
-        $(answerset).find('.hideOnCheckbox').show()
-    }
-    else
-    {
-        $(answerset).find('.hideOnCheckbox').hide();
-    }
-}
