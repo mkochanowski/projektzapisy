@@ -15,8 +15,6 @@ def getGroups(semester, group = None, type = None, subject = None):
             groups = Group.objects.filter(subject=subject)
         else:
             groups = Group.objects.filter(subject__semester = semester)
-            
-    
     return groups
 
 def ordering_cmp( ord_1, ord_2 ):

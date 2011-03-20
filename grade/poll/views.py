@@ -299,7 +299,7 @@ def poll_create(request):
 @employee_required
 def templates( request ):
     data = {}
-    templates = Template.objects.filter(deleted=False).order_by('pk')
+    templates = Template.objects.filter(deleted=False)
     data['templates'] = templates
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
@@ -308,11 +308,16 @@ def templates( request ):
 def use_templates( request ):
     pass
     
-    
+
 @employee_required
 def sections_list( request ):
+    """
+        Preparation of sections list; if user is member of the staff he will also
+        be able to edit and delete sections; employees without special privileges
+        aren't allowed to any such action.
+    """
     data = {}
-    sections   = Section.objects.filter(deleted=False).order_by('pk')
+    sections   = Section.objects.filter(deleted=False)
     paginator = Paginator(sections, 25)
 
     # Make sure page request is an int. If not, deliver first page.
@@ -370,7 +375,7 @@ def delete_section( request ):
 @employee_required
 def polls_list( request ):
     data = {}
-    polls     = Poll.objects.filter(deleted=False).order_by('pk')
+    polls     = Poll.objects.filter(deleted=False)
     paginator = Paginator(polls, 25)
 
     # Make sure page request is an int. If not, deliver first page.
@@ -413,7 +418,7 @@ def delete_poll( request ):
                 poll.deleted = True
                 poll.save()
                 counter = counter + 1
-    request.session['message'] = u'Usunięto ' + unicode(counter) + u'ankiet'
+    request.session['message'] = u'Usunięto ' + unicode(counter) + u' ankiet'
     return HttpResponseRedirect(reverse('grade-poll-polls-list'))
 
 @employee_required

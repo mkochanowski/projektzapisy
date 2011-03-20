@@ -14,22 +14,23 @@
     <button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
         <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{sections.object_list.count}} wybranych</span>
 </div>
+
 <table id="poll-managment-table">
 	<thead>
 		<tr>
-		<th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;"></th>
-		<th>Sekcja</th>
+        <th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;" {% if not privileged_user %} disabled {% endif %}></th>
+		<th>Sekcje</th>
 		</tr>
 	</thead>
 	<tbody>
     	{% for section in sections.object_list %}
-        <tr>
+        <tr>            
             <td class="action-checkbox-column">
-                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{section.pk}}" class="action-select">
+                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{section.pk}}" class="action-select" {% if not user.is_staff %} disabled {% endif %}>
+            </td>            
+            <td>
+                <a href="{% url grade-poll-show_section section.id %}" target="_blank">{{section}}</a>
             </td>
-            <th>
-                <a href="{% url grade-poll-show_section section.id %}">{{section}}</a>
-            </th>
         </tr>
     	{% endfor %}
 	</tbody>

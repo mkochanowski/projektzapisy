@@ -27,11 +27,11 @@
 	{% for poll in polls.object_list %}
         <tr>
             <td class="action-checkbox-column">
-                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{poll.pk}}" class="action-select">
+                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{poll.pk}}" class="action-select" {% if not user.is_staff and not poll.author.user == user %} disabled {% endif %}>
             </td>
-            <th>
-                <a href="{% url grade-poll-show_poll poll.id %}">{{poll}}</a>
-            </th>
+            <td>
+                <a href="{% url grade-poll-show_poll poll.id %}" target="_blank">{{poll}}</a>
+            </td>
         </tr>
     	{% endfor %}
 	</tbody>

@@ -27,6 +27,7 @@ class Template( models.Model ):
         verbose_name        = 'szablon' 
         verbose_name_plural = 'szablony'
         app_label           = 'poll'
+        ordering            =['title']
         
     def __unicode__( self ):
         res = unicode( self.title )
