@@ -449,7 +449,7 @@ class Queue(models.Model):
       if not pos:
          return 0  # tu powinien szukać defaultowej wartości
       else:
-         return pos[0].value
+         return pos[0]["value"]
 
     @staticmethod
     def is_ECTS_points_limit_exceeded(user_id, group_id):

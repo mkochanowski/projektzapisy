@@ -455,6 +455,93 @@
         }
     },
     {
+        "pk": 1,
+        "model": "subjects.pointtypes",
+        "fields": {
+            "name": "ECTS"
+        }
+    },
+    {
+       "pk": 1,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 100,
+            "type_of_point": 1, 
+            "program": 1,
+            "value": 6
+       }
+    },
+    {
+       "pk": 2,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 100,
+            "type_of_point": 1, 
+            "program": 2,
+            "value": 6
+       }
+    },
+    {
+       "pk": 3,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 100,
+            "type_of_point": 1, 
+            "program": 3,
+            "value": 6
+       }
+    },
+    {
+       "pk": 4,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 100,
+            "type_of_point": 1, 
+            "program": 0,
+            "value": 6
+       }
+    },
+    {
+       "pk": 5,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 102,
+            "type_of_point": 1, 
+            "program": 1,
+            "value": 40
+       }
+    },
+    {
+       "pk": 6,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 102,
+            "type_of_point": 1, 
+            "program": 2,
+            "value": 40
+       }
+    },
+    {
+       "pk": 7,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 102,
+            "type_of_point": 1, 
+            "program": 3,
+            "value": 40
+       }
+    },
+    {
+       "pk": 8,
+       "model": "subjects.pointsofsubjects",
+       "fields": {
+            "subject": 102,
+            "type_of_point": 1, 
+            "program": 0,
+            "value": 40
+       }
+    },
+    {
         "pk": 1, 
         "model": "records.record", 
         "fields": {
