@@ -18,6 +18,7 @@ class Section( models.Model ):
         verbose_name        = 'sekcja'
         verbose_name_plural = 'sekcje'
         app_label           = 'poll'
+        ordering            = ['title']
         
     def __unicode__( self ):
         return unicode( self.title )

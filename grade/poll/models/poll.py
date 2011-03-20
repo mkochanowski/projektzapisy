@@ -23,10 +23,12 @@ class Poll( models.Model ):
     studies_type      = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
     share_result      = models.BooleanField( verbose_name = 'udostępnij wyniki', default = False, blank = True )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
+    
     class Meta:
         verbose_name        = 'ankieta' 
         verbose_name_plural = 'ankiety'
         app_label           = 'poll'
+        ordering            = ['group__subject__name']
         
     def __unicode__( self ):
         res = unicode( self.title )

@@ -295,7 +295,7 @@ def poll_create(request):
 @employee_required
 def templates( request ):
     data = {}
-    templates = Template.objects.filter(deleted=False).order_by('pk')
+    templates = Template.objects.filter(deleted=False)
     data['templates'] = templates
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
@@ -313,7 +313,7 @@ def sections_list( request ):
         aren't allowed to any such action.
     """
     data = {}
-    sections   = Section.objects.filter(deleted=False).order_by('pk')
+    sections   = Section.objects.filter(deleted=False)
     paginator = Paginator(sections, 25)
 
     # Make sure page request is an int. If not, deliver first page.
@@ -371,7 +371,7 @@ def delete_section( request ):
 @employee_required
 def polls_list( request ):
     data = {}
-    polls     = Poll.objects.filter(deleted=False).order_by('pk')
+    polls     = Poll.objects.filter(deleted=False)
     paginator = Paginator(polls, 25)
 
     # Make sure page request is an int. If not, deliver first page.

@@ -214,5 +214,5 @@ def client_connection( request ):
             
 @csrf_exempt
 def keys_list( request ):
-    l = PublicKey.objects.all()
+    l = PublicKey.objects.all()#.order_by('poll__group__subject__name')
     return render_to_response('grade/ticket_create/keys_list.html', {'list': l,},context_instance = RequestContext( request ))
