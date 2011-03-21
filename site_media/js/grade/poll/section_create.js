@@ -182,7 +182,7 @@ Poll.section.questionCreator = function( position, data )
                     var li = $(this).parents('.poll-question');
                     $(li).remove()
                 });
-    $('select[name$="[faketype]"]').change(function()
+    $('select[name$="[formtype]"]').change(function()
                 {
                     var li = $(this).parents('.poll-question');
                     Poll.section.changeType( li )
@@ -191,7 +191,7 @@ Poll.section.questionCreator = function( position, data )
 }
 
 /*
-* Add button to new answer to question.
+* Add answer to question.
 *
 * @author mjablonski
 * @param dom-node li - questionset element
@@ -208,6 +208,9 @@ Poll.section.addAnswer = function( li, data )
     data.id      = $(li).find('input[name="poll[question][order][]"]').val()
     data.size    = $(answerset).children().size() + 1
     data.leading = leading
+    if (typeof data.name == 'undefined'){
+        data.name = '';﻿
+    }
 
     // create object
     $.tmpl( "question", data ).appendTo( answerset );
@@ -317,35 +320,35 @@ Poll.section.createEdit = function( li )
 
 Poll.section.changeType = function( li )
 {
-    var faketype  = $(li).find('select[name$="[faketype]"]').val();
-    var type      = poll_types[faketype].realtype;
+    var formtype  = $(li).find('select[name$="[formtype]"]').val();
+    var type      = poll_types[formtype].realtype;
     $(li).find('input[name$="[type]"]').val( type );
     
     var div       = $(li).children('.section-edit');
     var answerset = $(li).find('.answerset');
 
 
-    $(li).find('.optionss').hide();
-    $(poll_types[faketype].options).each(function(index, value)
+    $(li).find('.option').hide();
+    $(poll_types[formtype].options).each(function(index, value)
     {
         $(li).find('.' + value).show();
     })
-    $(poll_types[faketype].optionOn).each(function(index, value)
+    $(poll_types[formtype].optionOn).each(function(index, value)
     {
         $(li).find('.' + value).attr('checked', true)
     })
 
     $(li).find('input[name="addQuestion"]').remove();
-    if( !poll_types[faketype].haveAnswers)
+    if( !poll_types[formtype].haveAnswers)
     {
         $(answerset).empty();
     }
     else
     {
-        if( $(poll_types[faketype].answers).size() > 0)
+        if( $(poll_types[formtype].answers).size() > 0)
         {
             $(answerset).empty();
-            $(poll_types[faketype].answers).each(function(index, value)
+            $(poll_types[formtype].answers).each(function(index, value)
             {
                 var data = {
                     name: value
