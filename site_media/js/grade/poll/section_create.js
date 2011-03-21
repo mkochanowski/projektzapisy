@@ -79,7 +79,6 @@ Poll.section.editParser = function()
     {
         var li   = $(this).parents('.poll-question');
         Poll.section.createView( li );
-        
     });
     $('.ready').click();
     $('.delete').click(function()
@@ -91,7 +90,7 @@ Poll.section.editParser = function()
     $('.addQuestion').click(function()
     {
         var li = $(this).parents('.poll-question');
-        Poll.section.addOptionButton( li );
+        Poll.section.addAnswer( li, new Object );
     });
     $('.delete-answer').click(function(){
 
@@ -136,18 +135,32 @@ Poll.section.questionCreator = function( position, data )
 {
 
     // create object in position:
+    var li;
 
     if ( position == 'top')
     {
         $.tmpl( "question_edit", data)
                 .prependTo( Poll.section.questionContainer );
+        li = $(Poll.section.questionContainer)
+                .children()
+                .first()
     }
     else if ( position == 'last')
     {
         $.tmpl( "question_edit", data)
                 .appendTo( Poll.section.questionContainer );
+        li = $(Poll.section.questionContainer)
+                .children()
+                .last()
     }
 
+
+    for( var t in poll_types)
+    {
+        $.tmpl( "type_option", poll_types[t])
+                .appendTo( $(li).find('.options') )
+    }
+    
     //
     if ( Poll.section.havelastLi )
     {
@@ -167,9 +180,9 @@ Poll.section.questionCreator = function( position, data )
                 })
     $('.delete').click(function(){
                     var li = $(this).parents('.poll-question');
-                    Poll.section.remove( li );
+                    $(li).remove()
                 });
-    $('select[name$="[type]"]').change(function()
+    $('select[name$="[formtype]"]').change(function()
                 {
                     var li = $(this).parents('.poll-question');
                     Poll.section.changeType( li )
@@ -178,32 +191,33 @@ Poll.section.questionCreator = function( position, data )
 }
 
 /*
-* Add button to new answer to question.
+* Add answer to question.
 *
 * @author mjablonski
 * @param dom-node li - questionset element
  */
-Poll.section.addOptionButton = function( li )
+Poll.section.addAnswer = function( li, data )
 {
      // Prepare data
-     var type      = $(li).find('select[name$="[type]"]').val();
-     var answerset = $(li).find('.answerset');
+    var type      = $(li).find('input[name$="[type]"]').val();
+    var answerset = $(li).find('.answerset');
 
-     var leading = Poll.section.isLeadingQuestion( li );
+    var leading = Poll.section.isLeadingQuestion( li );
 
 
-     var data = {
-        id: $(li).find('input[name="poll[question][order][]"]').val(),
-        size: $(answerset).children().size() + 1,
-        leading: leading
-     }
+    data.id      = $(li).find('input[name="poll[question][order][]"]').val()
+    data.size    = $(answerset).children().size() + 1
+    data.leading = leading
+    if (typeof data.name == 'undefined'){
+        data.name = '';﻿
+    }
 
     // create object
-     $.tmpl( "question", data ).appendTo( answerset );
-     $('.remove').click(function()
-     {
-        $(this).parents('.poll-question-answer').remove();
-     });
+    $.tmpl( "question", data ).appendTo( answerset );
+    $('.remove').click(function()
+    {
+    $(this).parents('.poll-question-answer').remove();
+    });
 }
 
 
@@ -248,7 +262,7 @@ Poll.section.createView = function( li )
         .remove();
     Poll.section.havelastLi = false;
     var data = {
-        type:  $(li).find('select[name$="[type]"]').val(),
+        type:  $(li).find('input[name$="[type]"]').val(),
         title: $(li).find('input[name$="[title]"]').val(),
         desc:  $(li).find('input[name$="[description]"]').val(),
         questionset: Poll.section.makeQuestionset( li ),
@@ -256,11 +270,18 @@ Poll.section.createView = function( li )
     }
     $.tmpl( "question_view", data ).appendTo( li );
     $(li).children('.section-edit').hide();
-    $(li).find('.section-show').dblclick(function(){Poll.section.createEdit(li)})
-    $(li).find('.edit-mode').click(function()
-        {
-            Poll.section.createEdit( li );
-        });
+
+    $(li).find('.section-show')
+            .dblclick(function()
+                {
+                    Poll.section.createEdit(li)
+                })
+    $(li).find('.edit-mode')
+         .click(function()
+            {
+                Poll.section.createEdit( li );
+            });
+
     $(li).children('.section-show').mouseover(function(){
         $(this).addClass('section-mouseover');
         $(this).find('.edit-mode').show()
@@ -299,40 +320,64 @@ Poll.section.createEdit = function( li )
 
 Poll.section.changeType = function( li )
 {
-    var type      = $(li).find('select[name$="[type]"]').val();
+    var formtype  = $(li).find('select[name$="[formtype]"]').val();
+    var type      = poll_types[formtype].realtype;
+    $(li).find('input[name$="[type]"]').val( type );
+    
     var div       = $(li).children('.section-edit');
     var answerset = $(li).find('.answerset');
-    Poll.section.hideOptions( li, type );
-    
-    if (type == 'open')
+
+
+    $(li).find('.option').hide();
+    $(poll_types[formtype].options).each(function(index, value)
+    {
+        $(li).find('.' + value).show();
+    })
+    $(poll_types[formtype].optionOn).each(function(index, value)
+    {
+        $(li).find('.' + value).attr('checked', true)
+    })
+
+    $(li).find('input[name="addQuestion"]').remove();
+    if( !poll_types[formtype].haveAnswers)
     {
         $(answerset).empty();
-        $(li).find('input[name="addQuestion"]').remove();
     }
     else
     {
-        if( $(answerset).children().size() == 0 )
+        if( $(poll_types[formtype].answers).size() > 0)
         {
-            var data = {
-                id: $(li).find('input[name="poll[question][order][]"]').val(),
-                size: 0
-            } 
-            Poll.section.addOptionButton( li );
-            
-            $.tmpl( "question_add", data ).insertAfter( answerset );
-            $('.addQuestion').click(function()
+            $(answerset).empty();
+            $(poll_types[formtype].answers).each(function(index, value)
+            {
+                var data = {
+                    name: value
+                }
+                Poll.section.addAnswer( li, data );
+            })
+        }
+        else if ($(answerset).children().size() == 0)
+        {
+
+            Poll.section.addAnswer( li, new Object() );
+        }
+        var data = {
+            id: $(li).find('input[name="poll[question][order][]"]').val(),
+            size: $(answerset).children().size()
+        }
+        $.tmpl( "question_add", data ).insertAfter( answerset );
+        $('.addQuestion').click(function()
             {
                 var li = $(this).parents('.poll-question');
-                Poll.section.addOptionButton( li );
+                Poll.section.addAnswer( li, new Object );
             });
-            $('.autocomplete').autocomplete(
-            {
-                source:'/grade/poll/autocomplete',
-                delay:10
-            });
-        }
-        
     }
+
+    $('.autocomplete').autocomplete(
+    {
+        source:'/grade/poll/autocomplete',
+        delay:10
+    });
 }
 
 
@@ -343,20 +388,6 @@ $(Poll.section.init);
 //// Help functions
 /////////////////////////////////////////////////////////////
 
-/*
-* Hide and show options for question type
-*
-* @author: mjablonski
-*
-* @param dom-node li - questionset element
-* @param strung type - new type of question
- */
-Poll.section.hideOptions = function( li, type )
-{
-
-    $(li).find('.' + type).show();
-    $(li).find('.not-' + type).hide();
-}
 
 /*
 * Prepare json with state of optionset
