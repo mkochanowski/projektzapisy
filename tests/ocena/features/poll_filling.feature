@@ -105,10 +105,4 @@ Feature: Anonymous user, who has just entered his tickets, wants to fill some po
         Then I should see "Ankieta: Ankieta ogólna zakończona"
         And I should see "Zakończono 1 spośród 6"
         And I should see "Matematycznych"
-        And I should see "Praktycznych"         
-      
-    Scenario: User fails to fill a poll when grading protocol is off
-        Given the grading protocol is "off"
-        And I am on grade main page
-        And I go to grade/poll/poll_answer/przedmiot-2/8/
-        Then I should see "Nie znaleziono strony"
+        And I should see "Praktycznych"
