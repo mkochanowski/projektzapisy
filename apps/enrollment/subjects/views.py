@@ -47,7 +47,7 @@ def prepare_subjects_list_to_render(request):
 
     render_data = {
         'semester_subjects': semester_subjects,
-        'types_list' : Type.get_all_types(),
+        'types_list' : Type.objects.select_related('group').order_by('name').all(),
         'default_semester': Semester.get_default_semester()
     }
     return render_data
