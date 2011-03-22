@@ -201,3 +201,12 @@ def mail_news_offer(news):
     users += list(Employee.objects.filter(receive_mass_mail_offer=True).select_related())
     send_mass_mail(render_email_from_news(news), users)
     
+def mail_news_grade(news):
+    """
+    Queue news in form of a mail message to all users
+    that haven't opted out.
+    """
+    users  = list(Student.objects.filter(receive_mass_mail_grade=True).select_related())
+    users += list(Employee.objects.filter(receive_mass_mail_grade=True).select_related())
+    send_mass_mail(render_email_from_news(news), users)
+    

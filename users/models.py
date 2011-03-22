@@ -26,7 +26,10 @@ class BaseUser(models.Model):
     receive_mass_mail_offer = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia OD")
-    
+    receive_mass_mail_grade = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
+        
     def get_full_name(self):
         return self.user.get_full_name()
     

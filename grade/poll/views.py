@@ -46,6 +46,7 @@ from form_utils                        import get_section_form_data, \
                                               validate_section_form, \
                                               section_save
 from django.utils.safestring           import SafeUnicode
+from fereol.news.models                import News
 
 def rules(request):
     grade = Semester.get_current_semester().is_grade_active
@@ -63,7 +64,14 @@ def enable_grade( request ):
         messages.error( request, "Nie można otworzyć oceny; brak kluczy dla ankiet")
     else:
         semester.is_grade_active = True
-        semester.save()   
+        news = News()
+        news.author   = request.user
+        news.title    = u"Otwarto ocenę zajęć"
+        news.body     = u"Ocena zajęć została otwarta. Zapraszamy do wypełniania ankiet."
+        news.category = 'grade'
+        news.save()
+        semester.save()
+         
         messages.success(request, "Ocena zajęć otwarta" )
     
     return HttpResponseRedirect('/news/grade')

@@ -16,7 +16,7 @@ from django.views.generic.create_update import delete_object
 from news.forms import NewsForm
 from news.models import News
 from news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
-     get_search_results_data, mail_news_enrollment, \
+     get_search_results_data, mail_news_enrollment, mail_news_grade, \
      mail_news_offer, render_with_category_template, render_with_device_detection
 from enrollment.subjects.models import Semester
 
@@ -109,6 +109,8 @@ def add(request, cat):
                 mail_news_offer(news)
             elif cat == 'enrollment':
                 mail_news_enrollment(news)
+            elif cat == 'grade':
+                mail_news_grade(news)
             return redirect(latest_news, cat)
     else:
         form = NewsForm()
