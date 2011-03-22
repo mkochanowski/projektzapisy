@@ -49,7 +49,7 @@ def keys_generate( request ):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect( '/grade' )
+        return HttpResponseRedirect( '/news/grade' )
     count = Poll.get_current_semester_polls_without_keys().all().count()
     return render_to_response( 'grade/ticket_create/keys_generate.html', { 'grade' : grade, 'keys': count }, context_instance = RequestContext( request ))
 

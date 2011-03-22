@@ -35,7 +35,7 @@ Fereol.Subsystem = function(name, baseHref)
 Fereol.Subsystems = {
 	ENROLLMENT: new Fereol.Subsystem('System zapisów', '/news/enrollment/'),
 	OFFER: new Fereol.Subsystem('Kształtowanie oferty dydaktycznej', '/news/offer/'),
-	GRADE: new Fereol.Subsystem('Ocena zajęć', '/grade/')
+	GRADE: new Fereol.Subsystem('Ocena zajęć', '/news/grade/')
 };
 
 /**

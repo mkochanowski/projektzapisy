@@ -10,8 +10,12 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona główna</a></li>
-	<li><a href="{% url latest_news category %}">
-	{% ifequal category "enrollment" %}Zapisy{% else %}Oferta{% endifequal %}</a></li>
+    <li><a href="{% url latest_news category %}">
+		{% ifequal category "enrollment" %}Zapisy{% endifequal %}
+        {% ifequal category "offer" %}Oferta{% endifequal %}
+        {% ifequal category "grade" %}Ocena zajęć{% endifequal %}
+        </a>
+	</li>
 	{% if adding %}
 		<li>Dodaj ogłoszenie</li>
 	{% else %}

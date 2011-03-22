@@ -47,9 +47,9 @@ from form_utils                        import get_section_form_data, \
                                               section_save
 from django.utils.safestring           import SafeUnicode
 
-def default(request):
+def rules(request):
     grade = Semester.get_current_semester().is_grade_active
-    return render_to_response ('grade/base.html', {'grade' : grade }, context_instance = RequestContext ( request ))
+    return render_to_response ('grade/rules.html', {'grade' : grade }, context_instance = RequestContext ( request ))
 
 @employee_required
 def enable_grade( request ):
@@ -66,7 +66,7 @@ def enable_grade( request ):
         semester.save()   
         messages.success(request, "Ocena zajęć otwarta" )
     
-    return HttpResponseRedirect('/grade')
+    return HttpResponseRedirect('/news/grade')
 
 @employee_required
 def disable_grade( request ):
@@ -83,7 +83,7 @@ def disable_grade( request ):
     
     messages.success( request, "Zamknięto ocenę zajęć" )
     
-    return HttpResponseRedirect( '/grade' )
+    return HttpResponseRedirect('/news/grade')
 
 #### Poll creation ####
 
@@ -148,7 +148,7 @@ def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect( '/grade' )
+        return HttpResponseRedirect('/news/grade')
     semester     = None
     group        = None
     type         = None
@@ -200,11 +200,11 @@ def poll_create(request):
     
         if (request.POST.get('title', '') == ''):
             messages.error(request, "Nie można utworzyć ankiety; brak tytułu")
-            return HttpResponseRedirect( '/grade' )
+            return HttpResponseRedirect('/news/grade')
 
         if (request.POST.getlist('sections[]') == []):
             messages.error(request, "Nie można utworzyć ankiety; ankieta jest pusta")
-            return HttpResponseRedirect( '/grade' )
+            return HttpResponseRedirect('/news/grade')
         groups = getGroups(semester, group, type, subject)
         for group in groups:
             if groups_without == 'on' and Poll.get_all_polls_for_group(group):
@@ -450,7 +450,7 @@ def questionset_create(request):
     
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect( '/grade' )
+        return HttpResponseRedirect('/news/grade')
     
     
     if request.method == "POST":

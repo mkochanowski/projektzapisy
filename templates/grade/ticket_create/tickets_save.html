@@ -6,7 +6,7 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
-	<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+	<li><a href="{% url news.views.latest_news 'grade' %}">Ocena Zajęć</a></li>
 	<li>Pobieranie Biletów</li>
 {% endblock %}
 

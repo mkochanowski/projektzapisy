@@ -6,7 +6,7 @@ from django.conf.urls.defaults import *
 # by default, they return a fully rendered page
 
 urlpatterns = patterns('',
-    url(r'^$',              'fereol.grade.poll.views.default',                name='grade-default'),
+    url(r'^rules$',         'fereol.grade.poll.views.rules',                name='grade-rules'),
     
     url(r'^enable_grade$',  'fereol.grade.poll.views.enable_grade',           name='grade-enable-grade'),
     url(r'^disable_grade$', 'fereol.grade.poll.views.disable_grade',          name='grade-disable-grade'),

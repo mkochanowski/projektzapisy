@@ -62,7 +62,7 @@
 					{% block main-menu %}
 						<li><a href="{% url latest_news 'enrollment' %}">System zapisów</a></li>
 						<li><a href="{% url latest_news 'offer' %}">Kształtowanie oferty dydaktycznej</a></li>
-						<li><a href="{% url grade-default %}">Ocena Zajęć</a></li>
+						<li><a href="{% url latest_news 'grade' %}">Ocena Zajęć</a></li>
 					{% endblock %}
 				</ul>
 			</div>
@@ -82,6 +82,13 @@
 			{% endblock %}
 			<div id="main-content" class="{% block content-class %}normal{% endblock %}">
 				{% block messages %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class={% if message.tags == error %}"error-message"{% else %}"main-message"{% endif %}>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 {% endblock %}
                 {% block content %}
 				{% endblock %}

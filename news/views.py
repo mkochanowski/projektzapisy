@@ -18,12 +18,14 @@ from news.models import News
 from news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
      get_search_results_data, mail_news_enrollment, \
      mail_news_offer, render_with_category_template, render_with_device_detection
+from enrollment.subjects.models import Semester
 
 def main_page( request ):
     """
         Main page
     """
-    return render_to_response('common/index.html', context_instance = RequestContext(request))
+    grade = Semester.get_current_semester().is_grade_active
+    return render_to_response('common/index.html', {'grade':grade}, context_instance = RequestContext(request))
 
 
 def search_page(request, cat):
@@ -84,6 +86,8 @@ def display_news_list(request, data={}):
     """
         NEws list
     """
+    grade = Semester.get_current_semester().is_grade_active
+    data['grade'] = grade
     return render_with_category_template(
         'news/list.html',
         RequestContext(request,data))
@@ -113,6 +117,7 @@ def add(request, cat):
         'category': cat,
         'form': form,
         'adding': True,
+        'grade' : Semester.get_current_semester().is_grade_active
         }))
 
 @permission_required('news.change_news')
@@ -143,6 +148,7 @@ def edit(request, cat, nid):
         RequestContext(request, {
         'category': cat,
         'form': form,
+        'grade' : Semester.get_current_semester().is_grade_active
         }))
 
 @permission_required('news.delete_news')
@@ -158,4 +164,5 @@ def delete(request, nid):
         RequestContext(request, {
             'category': category,
             'news': news,
+            'grade' : Semester.get_current_semester().is_grade_active
         }))

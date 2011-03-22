@@ -39,6 +39,10 @@ def render_with_category_template(temp, context):
     temp = get_template(temp)
     if context.get('category', '') == 'enrollment':
         temp.nodelist[0].parent_name = 'enrollment/base.html'
+    elif context.get('category', '') == 'grade':
+        temp.nodelist[0].parent_name = 'grade/base.html'
+    elif context.get('category', '') == 'offer':
+        temp.nodelist[0].parent_name = 'offer/base.html'
     return HttpResponse(temp.render(context))
     
 def render_items(request, items):
