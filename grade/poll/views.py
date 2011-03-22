@@ -79,17 +79,28 @@ def enable_grade( request ):
 @employee_required
 def disable_grade( request ):
     semester = Semester.get_current_semester()
-    semester.is_grade_active = False
-    semester.save()
     
-    PublicKey.objects.all().delete()
-    PrivateKey.objects.all().delete()
+    if semester.is_grade_active:
+        news = News()
+        news.author   = request.user
+        news.title    = u"Zamknięto ocenę zajęć"
+        news.body     = u"Ocena zajęć zakończyła się. Można już oglądać wyniki ankiet."
+        news.category = 'grade'
+        news.save()
     
-    for st in SavedTicket.objects.all():
-        st.finished = True
-        st.save()
-    
-    messages.success( request, "Zamknięto ocenę zajęć" )
+        semester.is_grade_active = False
+        semester.save()
+        
+        PublicKey.objects.all().delete()
+        PrivateKey.objects.all().delete()
+        
+        for st in SavedTicket.objects.all():
+            st.finished = True
+            st.save()
+        
+        messages.success( request, "Zamknięto ocenę zajęć" )
+    else:
+        messages.error( request, "Nie można zamknąć oceny; system nie był uruchomiony" )
     
     return HttpResponseRedirect('/news/grade')
 
