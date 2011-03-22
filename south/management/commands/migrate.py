@@ -81,6 +81,24 @@ class Command(BaseCommand):
                 return
         else:
             apps = list(migration.all_migrations())
+            
+            ###
+            # ADDED FOR FEREOL PROJECT #
+                                     ###
+            # Ordering apps as in settings.py 
+            from settings import INSTALLED_APPS
+            def cmp_app_labels( al1, al2 ):
+                for app in INSTALLED_APPS:
+                    name = app.split( '.' )[-1]
+                    if name == al1:
+                        return -1
+                    elif name == al2:
+                        return 1
+                return -1
+            apps.sort( lambda x, y: cmp_app_labels( x[0].app_label(), y[0].app_label()))
+                                        ###
+            # END FEREOL PROJECT ADDITION #
+            ####
         
         # Do we need to show the list of migrations?
         if show_list and apps:
