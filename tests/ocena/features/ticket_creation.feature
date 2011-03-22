@@ -43,7 +43,7 @@ Feature: Student wants to create tickets for polls
         Then I wait for a while to see "Pomyślnie wygenerowano bilety"
 		And I follow "Pobierz bilety"
 		And I press "Pobierz bilety"
-		Then I should see "Nie udało się pobrać następujących biletów:"
+		Then I wait for a while to see "Nie udało się pobrać następujących biletów:"
 		And I should see "Bilet już pobrano"
 		
 	Scenario: Student tries to create tickets for polls when the protocol is off

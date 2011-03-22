@@ -36,11 +36,11 @@ Feature: User with privileges wants to create a section.
         And I fill in "section-title" with "Sekcja administratora - złożona"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobała Ci oferta w tym semestrze?"
-        And I select "poll[question][1][type]" as "Otwarte"
+        And I select "poll[question][1][formtype]" as "Pytanie otwarte"
         And I press visible "Gotowe"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][2][title]" with "Czy była dość bogata?"
-        And I select "poll[question][2][type]" as "Jednokrotnego wyboru"
+        And I select "poll[question][2][formtype]" as "Pytanie jednokrotnego wyboru"
         And I fill in "poll[question][2][answers][1]" with "tak"
         And I press visible "Dodaj odpowiedź" 
         And I fill in "poll[question][2][answers][2]" with "trudno powiedzieć"
@@ -49,7 +49,7 @@ Feature: User with privileges wants to create a section.
         And I press visible "Gotowe"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][3][title]" with "Czego było za mało?"
-        And I select "poll[question][3][type]" as "Wielokrotnego wyboru"
+        And I select "poll[question][3][formtype]" as "Pytanie wielokrotnego wyboru"
         And I fill in "poll[question][3][answers][1]" with "Algorytmów"
         And I press visible "Dodaj odpowiedź"
         And I fill in "poll[question][3][answers][2]" with "Sieci"
@@ -58,7 +58,7 @@ Feature: User with privileges wants to create a section.
         And I press visible "Gotowe"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][4][title]" with "Czego było za dużo?"
-        And I select "poll[question][4][type]" as "Wielokrotnego wyboru"
+        And I select "poll[question][4][formtype]" as "Pytanie wielokrotnego wyboru"
         And I fill in "poll[question][4][answers][1]" with "Algorytmów"
         And I press visible "Dodaj odpowiedź" 
         And I fill in "poll[question][4][answers][2]" with "Sieci"
@@ -87,7 +87,7 @@ Feature: User with privileges wants to create a section.
         And I press visible "Gotowe"        
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Czy była dość bogata?"
-        And I select "poll[question][1][type]" as "Jednokrotnego wyboru"
+        And I select "poll[question][1][formtype]" as "Pytanie jednokrotnego wyboru"
         And I fill in "poll[question][1][answers][1]" with "tak"   
         And I press visible "Dodaj odpowiedź" 
         And I fill in "poll[question][1][answers][2]" with "trudno powiedzieć"
@@ -143,7 +143,7 @@ Feature: User with privileges wants to create a section.
         And I follow "Tworzenie sekcji"    
         And I fill in "section-title" with "Sekcja administratora"         
         And I press "Dodaj pytanie" 
-        And I select "poll[question][1][type]" as <typ_pytania>
+        And I select "poll[question][1][formtype]" as <typ_pytania>
         And I press "Zapisz" 
         Then I should see "Nie można utworzyć sekcji:"
 	And I should see "Pytanie 1:" 
@@ -151,9 +151,9 @@ Feature: User with privileges wants to create a section.
         
     Examples:
         | typ_pytania |
-        | "Otwarte" |
-        | "Jednokrotnego wyboru" |
-        | "Wielokrotnego wyboru" |
+        | "Pytanie otwarte" |
+        | "Pytanie jednokrotnego wyboru" |
+        | "Pytanie wielokrotnego wyboru" |
     
     Scenario Outline: Administrator tries to add a choice question with no choices
 		Given the grading protocol is "off"
@@ -163,7 +163,7 @@ Feature: User with privileges wants to create a section.
         And I follow "Tworzenie sekcji"      
         And I fill in "section-title" with "Sekcja administratora"
         And I press "Dodaj pytanie" 
-        And I select "poll[question][1][type]" as <typ_pytania>
+        And I select "poll[question][1][formtype]" as <typ_pytania>
         And I fill in "poll[question][1][title]" with "Treść pytania"
         And I press "Zapisz" 
         Then I should see "Nie można utworzyć sekcji:"
@@ -172,5 +172,5 @@ Feature: User with privileges wants to create a section.
 
     Examples:
         | typ_pytania |
-        | "Jednokrotnego wyboru" |
-        | "Wielokrotnego wyboru" |
+        | "Pytanie jednokrotnego wyboru" |
+        | "Pytanie wielokrotnego wyboru" |
