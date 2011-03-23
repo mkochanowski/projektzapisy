@@ -2,7 +2,7 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
-	<li><a href="{% url news.views.latest_news 'grade' %}">Ocena Zajęć</a></li>
+	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena Zajęć</a></li>
 	<li>Weryfikacja biletów</li>
 {% endblock %}
 {% block content %}

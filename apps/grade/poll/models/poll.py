@@ -2,16 +2,16 @@
 from django.db                         import models
 from django.utils.safestring           import SafeUnicode
 
-from fereol.users.models               import Employee, \
+from apps.users.models               import Employee, \
                                               Student, \
                                               Type
-from fereol.enrollment.subjects.models import Group, \
+from apps.enrollment.subjects.models import Group, \
                                               Subject, \
                                               Semester, \
                                               GROUP_TYPE_CHOICES
-from fereol.enrollment.records.models  import Record, \
+from apps.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
-from fereol.grade.ticket_create.models import PublicKey                                              
+from apps.grade.ticket_create.models import PublicKey                                              
 from section                           import SectionOrdering
 
 class Poll( models.Model ):

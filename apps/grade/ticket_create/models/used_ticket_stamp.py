@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from django.db                import models
-from fereol.grade.poll.models import Poll
-from fereol.users.models      import Student
+from apps.grade.poll.models import Poll
+from apps.users.models      import Student
 
 class UsedTicketStamp( models.Model ):
     student = models.ForeignKey( Student,

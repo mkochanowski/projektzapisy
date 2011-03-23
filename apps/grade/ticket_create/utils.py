@@ -8,14 +8,14 @@ from string                                import whitespace
 from django.db.models                      import Q
 from django.utils.safestring               import SafeUnicode
 
-from fereol.enrollment.subjects.models     import Subject, \
+from apps.enrollment.subjects.models     import Subject, \
                                                   Group                                              
-from fereol.enrollment.records.models      import Record 
-from fereol.grade.poll.models              import Poll
-from fereol.grade.ticket_create.models     import PublicKey, \
+from apps.enrollment.records.models      import Record 
+from apps.grade.poll.models              import Poll
+from apps.grade.ticket_create.models     import PublicKey, \
                                                   PrivateKey, \
                                                   UsedTicketStamp 
-from fereol.grade.ticket_create.exceptions import *
+from apps.grade.ticket_create.exceptions import *
 from time import sleep
 from django.core.cache import cache
 

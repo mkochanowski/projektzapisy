@@ -9,15 +9,15 @@ from django.http                       import HttpResponse, \
 from django.shortcuts                  import render_to_response
 from django.template                   import RequestContext
 from django.utils                      import simplejson
-from fereol.users.decorators           import student_required, employee_required
+from apps.users.decorators           import student_required, employee_required
 from django.contrib.auth.decorators    import login_required
 
-from fereol.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
+from apps.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
                                               
-from fereol.grade.ticket_create.utils  import from_plaintext
-from fereol.grade.ticket_create.models import PublicKey, \
+from apps.grade.ticket_create.utils  import from_plaintext
+from apps.grade.ticket_create.models import PublicKey, \
                                               PrivateKey
-from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
+from apps.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               OpenQuestion, SingleChoiceQuestion, \
                                               OpenQuestionOrdering, Option, \
                                               SingleChoiceQuestionOrdering, \
@@ -27,11 +27,11 @@ from fereol.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SingleChoiceQuestionAnswer, \
                                               MultipleChoiceQuestionAnswer, \
                                               OpenQuestionAnswer, Option, Template
-from fereol.users.models               import Type
-from fereol.grade.poll.forms           import TicketsForm, \
+from apps.users.models               import Type
+from apps.grade.poll.forms           import TicketsForm, \
                                               PollForm, \
                                               FilterMenu
-from fereol.grade.poll.utils           import check_signature, \
+from apps.grade.poll.utils           import check_signature, \
                                               prepare_data, \
                                               group_polls_and_tickets_by_subject, \
                                               create_slug, \
@@ -39,14 +39,14 @@ from fereol.grade.poll.utils           import check_signature, \
                                               get_prev, \
                                               get_ticket_and_signed_ticket_from_session,\
                                               getGroups
-from fereol.users.models               import Employee
+from apps.users.models               import Employee
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
 
 from form_utils                        import get_section_form_data, \
                                               validate_section_form, \
                                               section_save
 from django.utils.safestring           import SafeUnicode
-from fereol.news.models                import News
+from apps.news.models                import News
 
 def rules(request):
     grade = Semester.get_current_semester().is_grade_active

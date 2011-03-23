@@ -2,9 +2,9 @@
 from django.test                import TestCase
 from django.contrib.auth.models import AnonymousUser, \
                                        User
-from fereol.users.models        import Student, \
+from apps.users.models        import Student, \
                                        Employee
-from fereol.grade.poll.models   import Section, \
+from apps.grade.poll.models   import Section, \
                                        SingleChoiceQuestion, \
                                        SingleChoiceQuestionOrdering, \
                                        MultipleChoiceQuestion, \

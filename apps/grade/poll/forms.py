@@ -8,13 +8,13 @@ from django.core.exceptions   import ValidationError, \
                                      ObjectDoesNotExist
 from django.core.validators   import MaxLengthValidator                                     
 
-from fereol.grade.poll.models import SingleChoiceQuestionOrdering, \
+from apps.grade.poll.models import SingleChoiceQuestionOrdering, \
                                      Section, OpenQuestionAnswer, \
                                      SingleChoiceQuestionAnswer, \
                                      MultipleChoiceQuestionAnswer
 
 
-from fereol.enrollment.subjects.models      import Semester
+from apps.enrollment.subjects.models      import Semester
 
 class TicketsForm( forms.Form ):
     ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 
@@ -66,7 +66,7 @@ class PollForm( forms.Form ):
             poll_section.description = section.description
             poll_section.questions   = []
             if str( type( questions[ 0 ])) == \
-                "<class 'fereol.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
+                "<class 'apps.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
                 questionOrdering  = SingleChoiceQuestionOrdering.objects.select_related().get( 
                         sections = section,
                         question = questions[ 0 ])
@@ -109,7 +109,7 @@ class PollForm( forms.Form ):
             for question in questions:
                 title = 'poll-%d_section-%d_question-%d' % ( ppk, section.pk, question.pk )
                 if str( type( question )) == \
-                    "<class 'fereol.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
+                    "<class 'apps.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
                     title += '-single'
                     
                     if question.is_scale:
@@ -142,7 +142,7 @@ class PollForm( forms.Form ):
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
                 elif str( type( question )) == \
-                    "<class 'fereol.grade.poll.models.multiple_choice_question.MultipleChoiceQuestion'>":
+                    "<class 'apps.grade.poll.models.multiple_choice_question.MultipleChoiceQuestion'>":
                     title += '-multi'
                     
                     try:
@@ -188,7 +188,7 @@ class PollForm( forms.Form ):
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
                 elif str( type( question )) == \
-                    "<class 'fereol.grade.poll.models.open_question.OpenQuestion'>":
+                    "<class 'apps.grade.poll.models.open_question.OpenQuestion'>":
                     title += '-open'
                     
                     try:

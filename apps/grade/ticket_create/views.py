@@ -4,15 +4,15 @@ from django.http                         import HttpResponse, HttpResponseRedire
 from django.shortcuts                    import render_to_response
 from django.template                     import RequestContext
 from django.utils                        import simplejson
-from fereol.users.decorators             import student_required, employee_required
+from apps.users.decorators             import student_required, employee_required
 from django.contrib.auth.decorators      import login_required
 
-from fereol.enrollment.subjects.models   import Semester, \
+from apps.enrollment.subjects.models   import Semester, \
                                                 Group,\
                                                 Subject
-from fereol.enrollment.records.models    import Record
-from fereol.grade.poll.models            import Poll
-from fereol.grade.ticket_create.utils    import generate_keys_for_polls, \
+from apps.enrollment.records.models    import Record
+from apps.grade.poll.models            import Poll
+from apps.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 generate_keys,          \
                                                 group_polls_by_subject, \
                                                 secure_signer, \
@@ -22,11 +22,11 @@ from fereol.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 connect_groups, \
                                                 secure_signer_without_save, \
                                                 secure_mark
-from fereol.grade.ticket_create.forms      import PollCombineForm
-from fereol.grade.ticket_create.exceptions import *
-from fereol.grade.ticket_create.models     import PublicKey
+from apps.grade.ticket_create.forms      import PollCombineForm
+from apps.grade.ticket_create.exceptions import *
+from apps.grade.ticket_create.models     import PublicKey
 from django.contrib.auth                   import authenticate, login, logout
-from fereol.grade.ticket_create.forms      import *
+from apps.grade.ticket_create.forms      import *
 from django.views.decorators.csrf          import csrf_exempt
 from Crypto.PublicKey import RSA
 from django.core.cache import cache

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*- 
 import re
 from Crypto.PublicKey                 import RSA
-from fereol.grade.poll.models         import Poll
-from fereol.grade.ticket_create.utils import poll_cmp, \
+from apps.grade.poll.models         import Poll
+from apps.grade.ticket_create.utils import poll_cmp, \
                                              flatten
-from enrollment.records.models        import Group
+from apps.enrollment.records.models        import Group
 
 def check_signature( ticket, signed_ticket, public_key ):
     pk = RSA.importKey( public_key.public_key )

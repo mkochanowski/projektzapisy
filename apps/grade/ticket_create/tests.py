@@ -4,10 +4,10 @@ from utils                             import generate_keys_for_polls, \
                                               group_polls_by_subject
 from models                            import PublicKey, \
                                               PrivateKey
-from fereol.grade.poll.models          import Poll
-from fereol.users.models               import Employee, \
+from apps.grade.poll.models          import Poll
+from apps.users.models               import Employee, \
                                               Student
-from fereol.enrollment.subjects.models import Semester
+from apps.enrollment.subjects.models import Semester
                         
 class UtilsTest( TestCase ):
     

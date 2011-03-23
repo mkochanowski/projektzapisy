@@ -4,7 +4,7 @@
 """
 
 from django.contrib           import admin
-from fereol.grade.poll.models import Option, \
+from apps.grade.poll.models import Option, \
                                      OpenQuestionOrdering, \
                                      SingleChoiceQuestionOrdering, \
                                      MultipleChoiceQuestionOrdering, \

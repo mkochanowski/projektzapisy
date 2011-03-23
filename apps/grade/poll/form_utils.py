@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from grade.poll.models import Section, \
-                              OpenQuestion, \
-                              OpenQuestionOrdering, \
-                              SingleChoiceQuestion, \
-                              SingleChoiceQuestionOrdering, \
-                              MultipleChoiceQuestion, \
-                              MultipleChoiceQuestionOrdering, \
-                              Option
+from apps.grade.poll.models import Section, \
+                                   OpenQuestion, \
+                                   OpenQuestionOrdering, \
+                                   SingleChoiceQuestion, \
+                                   SingleChoiceQuestionOrdering, \
+                                   MultipleChoiceQuestion, \
+                                   MultipleChoiceQuestionOrdering, \
+                                   Option
 
 def choicebox_is_on( value ):
     return value == 'on'

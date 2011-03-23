@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     (r'^news/', include('apps.news.urls')),
     (r'^vote/', include('apps.offer.vote.urls')),
     # OCENA ZAJĘĆ
-    #- (r'^grade/', include('apps.grade.urls')),
+    (r'^grade/', include('apps.grade.urls')),
     #
     (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
     (r'^users/', include('apps.users.urls')),
@@ -37,6 +37,6 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    #- (r'admin/subjects/import_semester', 'apps.enrollment.subjects.admin.views.import_semester'),
-    #- (r'^admin/', include(admin.site.urls)),
+    (r'admin/subjects/import_semester', 'apps.enrollment.subjects.admin.views.import_semester'),
+    (r'^admin/', include(admin.site.urls)),
 )
