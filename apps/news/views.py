@@ -24,7 +24,10 @@ def main_page( request ):
     """
         Main page
     """
-    grade = Semester.get_current_semester().is_grade_active
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
     return render_to_response('common/index.html', {'grade':grade}, context_instance = RequestContext(request))
 
 
@@ -86,7 +89,10 @@ def display_news_list(request, data={}):
     """
         NEws list
     """
-    grade = Semester.get_current_semester().is_grade_active
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
     data['grade'] = grade
     return render_with_category_template(
         'news/list.html',
@@ -114,12 +120,16 @@ def add(request, cat):
             return redirect(latest_news, cat)
     else:
         form = NewsForm()
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
     return render_with_category_template('news/form.html',
         RequestContext(request, {
         'category': cat,
         'form': form,
         'adding': True,
-        'grade' : Semester.get_current_semester().is_grade_active
+        'grade' : grade
         }))
 
 @permission_required('news.change_news')
@@ -142,6 +152,8 @@ def edit(request, cat, nid):
                 mail_news_offer(news)
             elif cat == 'enrollment':
                 mail_news_enrollment(news)
+            elif cat == 'grade':
+                mail_news_grade(news)
             return redirect(latest_news, news.category)
     else:
         news_instance = get_object_or_404(News, pk=nid)
@@ -162,9 +174,13 @@ def delete(request, nid):
         news.delete()
         request.user.message_set.create(message="Usunięto ogłoszenie.")
         return redirect(latest_news, category)
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
     return render_with_category_template('news/confirm_delete.html',
         RequestContext(request, {
             'category': category,
             'news': news,
-            'grade' : Semester.get_current_semester().is_grade_active
+            'grade' : grade
         }))

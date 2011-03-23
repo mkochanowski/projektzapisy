@@ -19,7 +19,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 3"
             
     Scenario: Employee creates a poll for his subject, just for lecture
@@ -36,7 +36,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 1"        
                 
     Scenario: Employee creates a poll for his group, when he is not the lecturer
@@ -54,7 +54,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 1"
             
             
@@ -68,7 +68,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Ogół zajęć"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 1"    
     
     Scenario: Administrator creates a poll for every lecture there is
@@ -85,7 +85,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 4"
             
     Scenario: Administrator creates a poll for exercises for a specific lecture
@@ -102,7 +102,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 2"    
             
     Scenario: Administrator creates a poll for all the exercises when there is already a poll for some exercises
@@ -120,7 +120,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 8"
             
     Scenario: Administrator creates a poll for all the exercises without polls
@@ -139,7 +139,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 6"   
             
     Scenario: Administrator creates a poll for all the lectures, available only to students on 'studia licencjackie'
@@ -157,7 +157,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Utworzono ankiety"
+        Then I wait for a while to see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 4" 
     
     Scenario: Employee can not create a poll for somebody elses group when he is not a lecturer - but he can for his own
@@ -185,7 +185,7 @@ Feature: User with privileges wants to create a poll.
         And I select "Wybierz sekcję:" as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Nie można utworzyć ankiety; brak tytułu"
+        Then I wait for a while to see "Nie można utworzyć ankiety; brak tytułu"
             
     Scenario: Administrator fails to create a poll when there are no sections
 		Given the grading protocol is "off"
@@ -195,12 +195,12 @@ Feature: User with privileges wants to create a poll.
         And I follow "Tworzenie ankiet"
         And I fill in "Tytuł:" with "Ankieta bez treści"
         And I press "Stwórz ankietę"
-        Then I should see "Nie można utworzyć ankiety; ankieta jest pusta"            
+        Then I wait for a while to see "Nie można utworzyć ankiety; ankieta jest pusta"            
             
     Scenario: Administrator fails to create a poll when the grading protocol is on
    		Given the grading protocol is "on"
         And I am logged in with "administrator" privileges
         And I am on grade main page 
         When I go to /grade/poll/managment/poll_create
-        Then I should see "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" 
+        Then I wait for a while to see "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" 
         

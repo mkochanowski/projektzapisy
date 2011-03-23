@@ -268,7 +268,13 @@ def poll_create(request):
                 pollSection.save()
                 i = i + 1
 
-        message = "Utworzono ankiety!"
+        message  = "Utworzono ankiety!"
+        message += ("<br>Liczba utworzonych ankiet: %d" % (len( polls )))
+        message += "<ul>"
+        for poll in polls:
+            message += ("<li>%s</li>" % poll )
+        message += "</ul>"
+        message  = SafeUnicode( message )
         request.session['message'] = message
         request.session['polls_len']   = len(polls)
         request.session['polls']       = polls
@@ -297,7 +303,8 @@ def poll_create(request):
     data['studies_types'] = Type.objects.all()
     data['semesters']    = Semester.objects.all()
     data['subjects']     = sem
-    data['message']      = message
+    #- data['message']      = message
+    messages.info( request, message )
     data['polls_len']    = polls_len
     data['polls']        = polls
     data['sections']     = Section.objects.filter(deleted=False)
