@@ -14,29 +14,29 @@ feeds = {
 
 urlpatterns = patterns('',
     #MAIN PAGE
-    url('^$', 'fereol.news.views.main_page', name='main-page'),
+    url('^$', 'apps.news.views.main_page', name='main-page'),
     #Z
-    (r'^subjects/', include('fereol.enrollment.subjects.urls')),
-    (r'^records/', include('fereol.enrollment.records.urls')),
+    (r'^subjects/', include('apps.enrollment.subjects.urls')),
+    (r'^records/', include('apps.enrollment.records.urls')),
     # OD
-    (r'^prefs/', include('fereol.offer.preferences.urls')),
-    (r'^proposal/', include('fereol.offer.proposal.urls')),
-    (r'^news/', include('fereol.news.urls')),
-    (r'^vote/', include('fereol.offer.vote.urls')),
+    (r'^prefs/', include('apps.offer.preferences.urls')),
+    (r'^proposal/', include('apps.offer.proposal.urls')),
+    (r'^news/', include('apps.news.urls')),
+    (r'^vote/', include('apps.offer.vote.urls')),
     # OCENA ZAJĘĆ
-    (r'^grade/', include('fereol.grade.urls')),
+    #- (r'^grade/', include('apps.grade.urls')),
     #
     (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
-    (r'^users/', include('fereol.users.urls')),
+    (r'^users/', include('apps.users.urls')),
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
 
     (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
-    #CHANGE TO MOBILE
-    url(r'^mobile/$', 'fereol.mobile.views.onMobile', name = 'on-mobile'),
+    #CHANGE TO apps.mobile
+    url(r'^mobile/$', 'apps.mobile.views.onMobile', name = 'on-mobile'),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    (r'admin/subjects/import_semester', 'fereol.enrollment.subjects.admin.views.import_semester'),
-    (r'^admin/', include(admin.site.urls)),
+    #- (r'admin/subjects/import_semester', 'apps.enrollment.subjects.admin.views.import_semester'),
+    #- (r'^admin/', include(admin.site.urls)),
 )

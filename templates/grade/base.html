@@ -22,8 +22,6 @@ PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
 {% endblock %}
 
 {% block main-menu %}
-
-    <!-- TRZEBA ZROBIĆ NEWSY DLA OCENY I TO POPRAWIĆ -->
      <li><a href="{% url news.views.latest_news 'grade' %}">Aktualności</a> ({% newscount "grade" %})</li> 
      <li><a href="{% url grade-rules %}">Zasady Oceny Zajęć</a></li>
     {%if user.student and grade %}

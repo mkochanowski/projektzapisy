@@ -7,6 +7,7 @@ search_index/*
 *.tmp
 *.log
 *~
+.idea/
 settings_local.py
 /apache
 .idea/
