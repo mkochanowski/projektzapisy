@@ -1,7 +1,3 @@
-
-<!--
-PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
--->
 {% extends "base.html" %}
 
 {% block main-subsystemname %}
@@ -17,13 +13,13 @@ PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
 {% endblock %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
-	<li>Ocena Zajęć</li>
+	<li><a href="/">Strona główna</a></li>
+	<li>Ocena zajęć</li>
 {% endblock %}
 
 {% block main-menu %}
      <li><a href="{% url apps.news.views.latest_news 'grade' %}">Aktualności</a> ({% newscount "grade" %})</li> 
-     <li><a href="{% url grade-rules %}">Zasady Oceny Zajęć</a></li>
+     <li><a href="{% url grade-rules %}">Zasady oceny zajęć</a></li>
     {%if user.student and grade %}
         <li><a href="{% url grade-ticket-connections-choice %}">Pobierz bilety</a></li>
     {% endif %}
@@ -32,9 +28,6 @@ PRZEMYŚLEĆ UKŁAD I DO POPRAWKI
     {% endif %}
     {% if not grade and user.employee or not grade and user.is_superuser %}        
         <li><a href="{% url grade-poll-list %}">Zarządzaj ankietami</a></li>
-    {% endif %}
-    {% if user.is_superuser and not grade %}        
-        <li><a href="{% url grade-ticket-keys-generate %}">Generuj klucze</a></li>
     {% endif %}
     {% if user.is_superuser and grade %}        
         <li><a href="{% url grade-disable-grade %}">Zamknij ocenę</a></li> 

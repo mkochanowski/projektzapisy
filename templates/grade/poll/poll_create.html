@@ -79,15 +79,14 @@
             <textarea name="description"></textarea>
             
             <div id="sections-list">
-                
                 Wybrane sekcje: <!-- TODO: brak, gdy puste -->
                 <ul>
-                </ul><small>(Przeciągnij aby zmienić kolejność)</small>
+                </ul><small>(Przeciągnij, aby zmienić kolejność)</small>
             </div><br/>
             <label for="sections">Wybierz sekcję:</label>
             <select name="section" id="sections">
-                {% for section in sections%}
-                <option value="{{section.pk}}">{{section}}</option>
+                {% for section in sections %}
+                    <option value="{{section.pk}}">{{section}}</option>
                 {% endfor %}
             </select>
             <input id="section-add" type="button" value="Dodaj sekcję"><br/>
