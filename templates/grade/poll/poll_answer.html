@@ -1,6 +1,5 @@
 {% extends "grade/poll/polls_for_user.html" %}
-
-
+{% load poll_answers_extra %}
 
 {% block scripts %}
 <script type="application/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>
@@ -20,7 +19,11 @@
     	<input type="hidden" id="poll-form-id" value="{{pid}}">
         <h1>{{ title }}</h1>
         <span>{{ desc }}</span>
-            {{ form.as_divs }}
+            {% if form_errors %}
+                {{ form|as_divs_with_errors:form_errors }}
+            {% else %}
+                {{ form.as_divs }}
+            {% endif %}
         {% if form.finish %}
         <div class="fieldWrapper">
             {{ form.finish.errors }}

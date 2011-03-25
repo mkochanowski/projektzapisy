@@ -16,6 +16,8 @@ from apps.grade.poll.models import SingleChoiceQuestionOrdering, \
 
 from apps.enrollment.subjects.models      import Semester
 
+import copy
+
 class TicketsForm( forms.Form ):
     ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 
                                                     attrs = {'cols' : 80, 
@@ -32,11 +34,11 @@ class PollForm( forms.Form ):
         from django.template import loader
         return loader.render_to_string('grade/poll/section_as_edit.html', {"sections": self.sections})
             
-    def as_divs(self):
+    def as_divs(self, errors = None):
         from django.template import loader
-        return loader.render_to_string('grade/poll/poll_show.html', {"sections": self.sections})
+        return loader.render_to_string('grade/poll/poll_show.html', {"errors": errors, "sections": self.sections})
     
-    def setFields( self, poll = None, st = None, section_id = None ):
+    def setFields( self, poll = None, st = None, section_id = None, post_data = None ):
     	if st:
         	self.finished = st.finished
         else:
@@ -51,7 +53,7 @@ class PollForm( forms.Form ):
         
         if section_id:
             sections_set = []
-            sections_set.append( Section.objects.get(pk = section_id)) #.select_related() )
+            sections_set.append( Section.objects.get(pk = section_id))
         elif poll:
             sections_set = poll.all_sections()
         else:
@@ -73,14 +75,17 @@ class PollForm( forms.Form ):
                
                 if questionOrdering.is_leading:
                     title   += '_question-%d-leading' % questions[ 0 ].pk
-                    try:
-                        answer = SingleChoiceQuestionAnswer.objects.select_related().get( 
-                                    saved_ticket = st,
-                                    section      = section,
-                                    question     = questions[ 0 ] ).option.pk
-                    except ObjectDoesNotExist:
-                        answer = None
-                    
+                    if post_data:
+                        answer = post_data.get( title, None )
+                    else:
+                        try:
+                            answer = SingleChoiceQuestionAnswer.objects.select_related().get( 
+                                        saved_ticket = st,
+                                        section      = section,
+                                        question     = questions[ 0 ] ).option.pk
+                        except ObjectDoesNotExist:
+                            answer = None
+                    print answer
                     choices = []
                     for option in questions[ 0 ].options.all().order_by('pk'):
                         choices.append(( option.pk, unicode( option.content )))
@@ -115,13 +120,16 @@ class PollForm( forms.Form ):
                     if question.is_scale:
                         title += '-scale'
 
-                    try:
-                        answer = SingleChoiceQuestionAnswer.objects.get( 
-                                    saved_ticket = st,
-                                    section      = section,
-                                    question     = question ).option.pk
-                    except ObjectDoesNotExist:
-                        answer = None
+                    if post_data:
+                        answer = post_data.get( title, None )
+                    else:
+                        try:
+                            answer = SingleChoiceQuestionAnswer.objects.get( 
+                                        saved_ticket = st,
+                                        section      = section,
+                                        question     = question ).option.pk
+                        except ObjectDoesNotExist:
+                            answer = None
                         
                     choices = []
                     for option in question.options.all().order_by('pk'):
@@ -145,37 +153,49 @@ class PollForm( forms.Form ):
                     "<class 'apps.grade.poll.models.multiple_choice_question.MultipleChoiceQuestion'>":
                     title += '-multi'
                     
-                    try:
-                        answer   = MultipleChoiceQuestionAnswer.objects.get(
-                                      saved_ticket = st,
-                                      section      = section,
-                                      question     = question)
-                        other_ans = answer.other
-                        answer    =  map( lambda x: x.pk, answer.options.all())
-                    except ObjectDoesNotExist:
-                        answer    = None
-                        other_ans = None
-                    
+                    if post_data:
+                        answer    = map( int, post_data.getlist( title ))
+                        if -1 in answer:
+                            other_ans = post_data.get( title + '-other', None )
+                        else:
+                            other_ans = None
+                    else:
+                        try:
+                            answer   = MultipleChoiceQuestionAnswer.objects.get(
+                                          saved_ticket = st,
+                                          section      = section,
+                                          question     = question)
+                            other_ans = answer.other
+                            answer    =  map( lambda x: x.pk, answer.options.all())
+                        except ObjectDoesNotExist:
+                            answer    = None
+                            other_ans = None
                     choices = []
                     for option in question.options.all().order_by('pk'):
                         choices.append(( option.pk, unicode( option.content )))
-                    
+                    other_field = None
                     if question.has_other:
                         choices.append(( -1, unicode( 'Inne' )))
                         other_field = forms.CharField( 
                                         label    = u'', 
                                         initial  = other_ans,
                                         required = False )
+                        other_field.title = title + '-other'
+                        other_field.type  = 'other'
                         if self.finished: other_field.widget.attrs[ 'disabled' ] = True
-                        if other_ans: answer.append( -1 )
-                    
+                        if other_ans and -1 not in answer: answer.append( -1 )
+                    if answer:
+                        choosed = len( answer )
+                    else:
+                        choosed = 0
                     field = forms.MultipleChoiceField( 
-                                choices    = choices,
-                                label      = unicode( question.content ),
-                                required   = False,
-                                widget     = forms.widgets.CheckboxSelectMultiple(),
-                                initial    = answer,
-                                validators = [ MaxLengthValidator( question.choice_limit )])
+                                choices        = choices,
+                                label          = unicode( question.content ),
+                                required       = False,
+                                widget         = forms.widgets.CheckboxSelectMultiple(),
+                                initial        = answer,
+                                validators     = [ MaxLengthValidator( question.choice_limit )],
+                                error_messages = { "max_length": "Można wybrać maksymalnie %d odpowiedzi (wybrano %d)" % (question.choice_limit, choosed ) })
                     field.choice_limit     = question.choice_limit 
                     field.has_other        = question.has_other
                     field.description      = question.description
@@ -183,21 +203,25 @@ class PollForm( forms.Form ):
                     field.type             = 'multi'
                     field.title = title 
                     if self.finished: field.disabled = True
-                    if question.has_other:
-                        field.other = other_field
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
+                    if question.has_other:
+                        field.other = other_field
+                        self.fields[ unicode(other_field.title) ] = other_field
                 elif str( type( question )) == \
                     "<class 'apps.grade.poll.models.open_question.OpenQuestion'>":
                     title += '-open'
                     
-                    try:
-                        answer = OpenQuestionAnswer.objects.get( 
-                                    saved_ticket = st,
-                                    section      = section,
-                                    question     = question ).content
-                    except ObjectDoesNotExist:
-                        answer = ""
+                    if post_data:
+                        answer = post_data.get( title, None )
+                    else:
+                        try:
+                            answer = OpenQuestionAnswer.objects.get( 
+                                        saved_ticket = st,
+                                        section      = section,
+                                        question     = question ).content
+                        except ObjectDoesNotExist:
+                            answer = ""
     
                     field = forms.CharField( 
                                 widget = forms.widgets.Textarea(
@@ -221,6 +245,7 @@ class PollForm( forms.Form ):
                             required  = False,
                             initial   = False,
                             help_text = u'Jeśli zaznaczysz to pole, utracisz mozliwość edycji ankiety po zapisaniu.' )
+            field.type  = 'finish'
             self.finish = field
             self.fields[ u'finish' ] = field
 
