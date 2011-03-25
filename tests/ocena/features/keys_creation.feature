@@ -7,8 +7,9 @@ Feature: Creating keys for polls in the grading protocol
 		Given the grading protocol is "off"
 		And there are polls generated
 		And I am logged in with "administrator" privileges
-		And I am on grade main page        
-		When I follow "Generuj klucze"		
+		And I am on grade main page 
+        When I follow "Zarządzaj ankietami"
+		And I follow "Generuj klucze"		
         Then I wait for a while to see "100%"
 	
 	Scenario: Successfully creating additional keys for added polls
@@ -18,7 +19,8 @@ Feature: Creating keys for polls in the grading protocol
 		And I am on grade main page        
 		And there are keys generated for polls
 		When I add new poll
-		And I follow "Generuj klucze"        
+        When I follow "Zarządzaj ankietami"
+		And I follow "Generuj klucze"		
 		Then I wait for a while to see "100%"
 	
 	Scenario: Failing to create keys - all the polls already have them
@@ -27,7 +29,8 @@ Feature: Creating keys for polls in the grading protocol
 		And I am logged in with "administrator" privileges
 		And I am on grade main page        
 		And there are keys generated for polls
-		When I follow "Generuj klucze"
+        When I follow "Zarządzaj ankietami"
+		And I follow "Generuj klucze"		
 		Then I wait for a while to see "Brak kluczy do wygenerowania!"
         And I should not see "100%"
 		

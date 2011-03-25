@@ -12,14 +12,14 @@
 {% endblock %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona Główna</a></li>
-	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena Zajęć</a></li>
-	<li>Pobieranie Biletów</li>
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+	<li>Pobieranie biletów</li>
 {% endblock %}
 
 {% block content %}
     {% if success %}
-    <div class="main-message">{{ success }}</div>
+    <div class="main-success">{{ success }}</div>
     {% endif %}
     {% if message %} 
     <div class="main-message">{{ message }}</div>

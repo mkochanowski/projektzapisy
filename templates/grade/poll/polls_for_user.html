@@ -6,14 +6,15 @@
 {% endblock %}
 
 {% block main-navigation %}
-    <li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena Zajęć</a></li>
+    <li><a href="/">Strona główna</a></li>
+    <li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
     <li>Twoje ankiety</li>
 {% endblock %}
 
+<!--
 {% block content %}
 {% if errors %}
-    <div class="grade-error-message">
+    <div class="main-message">
         Błąd nastepujących ankiet.
         <ul>
         {% for error in errors %}
@@ -22,6 +23,7 @@
         </ul>
     </div>
 {% endif %}
+-->
 
 <div id="grade-progressbar-div"><div id="progressbar"></div>
 Zakończono <span id="finished-polls">{{finished_polls}}</span> spośród <span id="all-polls">{{all_polls}}</span></div>

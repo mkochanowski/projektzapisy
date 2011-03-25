@@ -6,14 +6,13 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona Główna</a></li>
-	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena Zajęć</a></li>
-	<li>Pobieranie Biletów</li>
+	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+	<li>Pobieranie biletów</li>
 {% endblock %}
 
 {% block content %}
-<!-- OSTYLOWAĆ -->
     {% if errors %}
-        <div class='grade-error-message'>
+        <div class='main-error'>
             <h3> Nie udało się pobrać następujących biletów:</h3>
             <ul>
                 {% for err in errors %}
@@ -35,10 +34,8 @@
             </form>
         </div>
     {% else %}
-        <div class='grade-error-message'>
+        <div class='main-error'>
             <h4>Niestety nie możesz pobrać żadnych biletów.</h4>
         </div>
     {% endif %}
-    
-    
 {% endblock %}
