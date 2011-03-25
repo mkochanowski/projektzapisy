@@ -200,8 +200,12 @@ def assign(request, group_id):
         if request.user.student.block :
             request.user.message_set.create(message="Twój plan jest zablokowany.")
             return render_to_response('common/error.html', context_instance=RequestContext(request))
+        group = Group.objects.get(id=group_id)
+        is_student_already_in_subject_group_type = Record.is_student_in_subject_group_type(user_id=request.user.id, slug=group.subject_slug(), group_type=group.type)
         records_list = Record.add_student_to_group(request.user.id, group_id)
-        if len(records_list) == 1:
+        if is_student_already_in_subject_group_type:
+        	request.user.message_set.create(message="Zostałeś przeniesiony do grupy.")
+        elif len(records_list) == 1:
             request.user.message_set.create(message="Zostałeś zapisany do grupy.")
         else:
             request.user.message_set.create(message="Zostałeś zapisany do wybranej grupy i grupy wykładowej.")
