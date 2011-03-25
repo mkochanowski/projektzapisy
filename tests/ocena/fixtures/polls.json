@@ -186,7 +186,7 @@
         "model": "poll.multiplechoicequestion", 
         "fields": {
             "content": "Jak oceniasz przygotowanie materia\u0142\u00f3w pomocniczych do wyk\u0142adu? ", 
-            "choice_limit": 0, 
+            "choice_limit": 4, 
             "description": "(chodzi o wszelkie notatki, ksera ksi\u0105\u017cek, bibliografi\u0119, linki na stronie przedmiotu)", 
             "has_other": true, 
             "options": [
@@ -202,7 +202,7 @@
         "model": "poll.multiplechoicequestion", 
         "fields": {
             "content": "Jak oceniasz zaanga\u017cowanie prowadz\u0105cego w \u0107wiczenia?", 
-            "choice_limit": 0, 
+            "choice_limit": 4, 
             "description": "", 
             "has_other": true, 
             "options": [

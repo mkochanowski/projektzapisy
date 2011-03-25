@@ -117,6 +117,10 @@ When /^(?:|I )check "([^"]*)"$/ do |field|
     check(field)
 end
 
+When /^(?:|I )uncheck "([^"]*)"$/ do |field|
+    uncheck(field)
+end
+
 When /^(?:|I )check "([^"]*)" with value "([^"]*)"$/ do |field, value|
     page.find( :xpath, "//*[input[(@name='#{field}') and (@value='#{value}')]]" ).check(field)
 end
@@ -185,4 +189,20 @@ end
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
     sleep 3
     wait_until(5) { page.should have_content(text) }
+end
+
+Then /^"([^"]*)" should be filled with "([^"]*)"$/ do |field, value|
+    find_field(field).value.should == value
+end
+
+Then /^"([^"]*)" should be hidden$/ do |field|
+    page.should have_xpath("//*[input[(@name='#{field}') and (@style='display: none;')]]")
+end
+
+Then /^"([^"]*)" should be checked$/ do |field|
+    page.should have_checked_field( field )
+end
+
+Then /^"([^"]*)" should be unchecked$/ do |field|
+     page.should have_unchecked_field( field )
 end
