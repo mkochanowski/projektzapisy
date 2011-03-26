@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block content %}
+<!--
     {% if errors %}
         <div class='main-error'>
             <h3> Nie udało się pobrać następujących biletów:</h3>
@@ -24,14 +25,20 @@
             </ul>
         </div>
     {% endif %} 
+-->
     
     {% if tickets %}
         <div id='grade-tickets-save-form'>
             <h3> Pomyślnie wygenerowano bilety.<br>Zapisz je w bezpiecznym miejscu.</h3>
             <form action="">
-    	        <textarea name="keys" cols="80" rows="20" readonly="readonly">{{ tickets }}
+    	        <textarea id="keys" name="keys" cols="80" rows="20" readonly="readonly">{{ tickets }}
                 </textarea>
             </form>
+            <input id="download-keys" 
+                   class="download-keys-button" 
+                   type="button" 
+                   value="Zapisz bilety do pliku"
+                   onclick='window.open("data:application/octet-stream," + encodeURIComponent($("#keys").text()))'>
         </div>
     {% else %}
         <div class='main-error'>

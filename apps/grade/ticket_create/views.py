@@ -116,8 +116,16 @@ def connections_choice( request ):
                     secure_mark(request.user, g, t )
     
                 errors, tickets_to_serve = get_valid_tickets( prepared_tickets )
-                data = { 'errors'  : errors,
-                         'tickets' : to_plaintext( tickets_to_serve ),
+                if errors:
+                    message = u'Nie udało się pobrać następujących biletów:\n<ul>'
+                    for poll, reason in errors:
+                        message += u"<li>Ankieta: " + unicode( poll )
+                        message += u"<br>Powód: "
+                        message += unicode( reason )
+                        message += u"</li>"
+                    message += u"</ul>"
+                    messages.error( request, SafeUnicode( message ))
+                data = { 'tickets' : to_plaintext( tickets_to_serve ),
                          'grade' : grade }
                 return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
                 
@@ -127,7 +135,8 @@ def connections_choice( request ):
         data = { 'form' : form, 'grade' : grade}
         return render_to_response ('grade/ticket_create/connection_choice.html', data, context_instance = RequestContext ( request ))
     else:
-        return render_to_response ('grade/ticket_create/connection_choice.html', {'grade': grade, 'error': "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów"}, context_instance = RequestContext ( request ))
+        messages.error( request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów" )
+        return render_to_response ('grade/ticket_create/connection_choice.html', {'grade': grade }, context_instance = RequestContext ( request ))
     
 
 @csrf_exempt
