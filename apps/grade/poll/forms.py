@@ -86,7 +86,7 @@ class PollForm( forms.Form ):
                                         question     = questions[ 0 ] ).option.pk
                         except ObjectDoesNotExist:
                             answer = None
-                    print answer
+                    
                     choices = []
                     for option in questions[ 0 ].options.all().order_by('pk'):
                         choices.append(( option.pk, unicode( option.content )))

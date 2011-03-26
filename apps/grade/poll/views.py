@@ -579,13 +579,17 @@ def tickets_enter(request):
                         errors.append(( id, u"Nie udało się zweryfikować podpisu pod biletem." ))
                 except:
                     errors.append(( id, u"Podana ankieta nie istnieje" ))
-                
-            for id, error in errors:
-                try:
-                    poll = unicode( Poll.objects.get( pk = id ).title )
-                except:
-                    poll = unicode( id )
-                messages.error( request, poll + u' - ' + error )
+
+            if errors:
+                msg = u"Wystąpił problem z biletami na następujące ankiety: <ul>"    
+                for id, error in errors:
+                    try:
+                        poll = unicode( Poll.objects.get( pk = id ).title )
+                    except:
+                        poll = unicode( id )
+                    msg += u'<li>' + poll + u'</li>'
+                msg += u'</ul>'
+                messages.error( request, SafeUnicode( msg ))
             request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_subject( polls ))
             request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_subject( finished ))
             
@@ -858,7 +862,7 @@ def poll_answer( request, slug, pid ):
 def poll_end_grading( request ):
     request.session.clear()
     
-    return HttpResponseRedirect( '/grade/' )
+    return HttpResponseRedirect( '/news/grade/' )
 #### Poll results ####
 
 @login_required

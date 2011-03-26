@@ -187,7 +187,7 @@ When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
-    sleep 3
+    sleep 4
     wait_until(5) { page.should have_content(text) }
 end
 
