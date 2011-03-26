@@ -16,7 +16,7 @@
 		Aby ankieta pozostała anonimowa należy się <a href="{% url grade-logout %}">wylogować</a></div>
 	{% else %}
 		<div id='grade-tickets-enter'>
-		<form action="" method="post">
+		<form action="" method="post" enctype="multipart/form-data">
 		<table id='grade-tickets-enter-form'>
 			{{ form.as_table }}
 		</table>

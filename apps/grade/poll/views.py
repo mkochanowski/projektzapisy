@@ -46,7 +46,7 @@ from django.core.paginator             import Paginator, InvalidPage, EmptyPage
 from form_utils                        import get_section_form_data, \
                                               validate_section_form, \
                                               section_save
-from django.utils.safestring           import SafeUnicode
+from django.utils.safestring           import SafeUnicode, mark_safe
 from apps.news.models                import News
 
 def rules(request):
@@ -527,18 +527,32 @@ def tickets_enter(request):
     data = {}
     
     if request.method == "POST":
-        form = TicketsForm( request.POST )
+        form = TicketsForm( request.POST, request.FILES )
         
         if form.is_valid():
-            tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
+            if request.FILES:
+                keysfile = request.FILES[ 'ticketsfile' ]
+                if keysfile.size > 1048576:
+                    from django.template.defaultfilters import filesizeformat
+                    messages.error( request, 
+                        u'Proszę przesłać plik o maksymalnym rozmiarze: \
+                        %s. Obecny rozmiar to: %s' % 
+                        (filesizeformat(1048576), filesizeformat(keysfile.size)))
+                    data[ 'form' ]  = form 
+                    data[ 'grade' ] = grade
+                    return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
+                else:
+                    tickets_plaintext = keysfile.read()
+            else:
+                tickets_plaintext = form.cleaned_data[ 'ticketsfield' ]
             try:
                 ids_and_tickets   = from_plaintext( tickets_plaintext )
             except:
                 ids_and_tickets   = []
             
             if not ids_and_tickets:
-                data[ 'error' ] = "Podano niepoprawne bilety."
-                data[ 'form' ]  = form
+                messages.error( request, "Podano niepoprawne bilety." )
+                data[ 'form' ]  = form 
                 data[ 'grade' ] = grade
                 return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
                 
@@ -562,11 +576,16 @@ def tickets_enter(request):
                             st.save()
                             polls.append(( poll, ticket, signed_ticket ))
                     else:
-                        errors.append(( id, "Nie udało się zweryfikować podpisu pod biletem." ))
+                        errors.append(( id, u"Nie udało się zweryfikować podpisu pod biletem." ))
                 except:
-                    errors.append(( id, "Podana ankieta nie istnieje" ))
-                    
-            request.session[ "errors" ]            = errors
+                    errors.append(( id, u"Podana ankieta nie istnieje" ))
+                
+            for id, error in errors:
+                try:
+                    poll = unicode( Poll.objects.get( pk = id ).title )
+                except:
+                    poll = unicode( id )
+                messages.error( request, poll + u' - ' + error )
             request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_subject( polls ))
             request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_subject( finished ))
             

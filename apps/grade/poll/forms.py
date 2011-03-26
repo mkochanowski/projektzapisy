@@ -16,14 +16,15 @@ from apps.grade.poll.models import SingleChoiceQuestionOrdering, \
 
 from apps.enrollment.subjects.models      import Semester
 
-import copy
-
 class TicketsForm( forms.Form ):
     ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 
                                                     attrs = {'cols' : 80, 
                                                              'rows' : 20 }), 
                                  label     = "Podaj wygenerowane bilety",
-                                 help_text = "Wklej tutaj pobrane wcześniej bilety." )
+                                 help_text = "Wklej tutaj pobrane wcześniej bilety.",
+                                 required  = False )
+    ticketsfile = forms.FileField( label    = "Lub wybierz plik z biletami:",
+                                   required = False )
 
 class PollForm( forms.Form ):
     class myObject:
