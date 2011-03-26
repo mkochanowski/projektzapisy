@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from fereol.users.models import Employee, Student, Program
+from apps.users.models import Employee, Student, Program
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('matricula','get_full_name','ects','get_type_of_studies')
