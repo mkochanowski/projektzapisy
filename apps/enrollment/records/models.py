@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 from apps.enrollment.records.exceptions import NonGroupException
-from apps.enrollment.records.exceptions import ECTS_Limit_Exception
+from apps.enrollment.records.exceptions import ECTS_Limit_Exception 
+from apps.enrollment.records.exceptions import NotCurrentSemesterException
 
 from apps.enrollment.subjects.models.subject import Subject
 from django.contrib.auth.models import User
@@ -276,6 +277,8 @@ class Record(models.Model):
             student = user.student
             group = Group.objects.get(id=group_id)
             record = Record.enrolled.get(group=group, student=student)
+            if not group.subject.semester.is_current_semester():
+            	raise NotCurrentSemesterException
             queued = Queue.remove_first_student_from_queue(group_id)
             record.delete()
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id)) 

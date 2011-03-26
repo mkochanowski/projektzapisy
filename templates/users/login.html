@@ -24,12 +24,14 @@
                 <th>{{ form.password.label_tag }}:</th>
                 <td>{{ form.password }}</td>
             </tr>
-	    <tr>
-		<th>Zapamiętaj mnie:</th>
-		<td><input type="checkbox" name="remember_me" value="true"/></td>
-	    </tr>
+		    <tr>
+				<th>Zapamiętaj mnie:</th>
+				<td><input type="checkbox" name="remember_me" value="true"/></td>
+		    </tr>
         </table>
-
+		<p>
+			<a href="{% url password-reset %}">Zapomniałeś hasła?</a>
+		</p>
         <p>
             <input type="submit" value="Zaloguj" />
             <input type="hidden" name="next" value="{{ next }}" />

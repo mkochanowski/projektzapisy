@@ -75,7 +75,7 @@
                     minutes="{{ term.length_in_minutes }}" 
                     day="{{ term.day_in_zero_base }}"
                     status="{{ record.schedule_widget_status_ }}">
-                    <span>{{record.group_}}<br/>
+                    <span><a href="{% url subject-page record.group.subject.slug %}">{{record.group.subject.entity.get_short_name}}</a>: {{record.group.get_type_display}} - {{record.group.get_teacher_full_name}}<br/>
                     (s.{{term.classroom}})</span>
                 </div>
             {% endfor %}

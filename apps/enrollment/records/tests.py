@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 from apps.enrollment.subjects.models import Subject, Group, StudentOptions, Semester
 from apps.enrollment.records.models import Record, Queue
-from apps.enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException
+from apps.enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException, NotCurrentSemesterException
 from apps.enrollment.subjects.exceptions import NonSubjectException
 from apps.users.models import Employee, Student
 
@@ -80,6 +80,9 @@ class RemoveStudentFromGroupTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=3)
+        self.group.subject.semester.semester_beginning = datetime.now().date() - timedelta(days=1)
+        self.group.subject.semester.semester_ending = datetime.now().date() + timedelta(days=1)
+        self.group.subject.semester.save()
         self.records = Record.add_student_to_group(self.user.id, self.group.id)
 
     def testWithNonStudentUser(self):
@@ -96,7 +99,14 @@ class RemoveStudentFromGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
         self.assertRaises(AlreadyNotAssignedException, Record.remove_student_from_group, self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 0)
-    
+	
+    def testWithGroupInDifferentSemesterThanCurrent(self):
+    	semester = self.group.subject.semester
+    	semester.semester_ending = datetime.now().date() - timedelta(days=1)
+    	semester.save()
+    	self.assertFalse(semester.is_current_semester())    
+    	self.assertRaises(NotCurrentSemesterException, Record.remove_student_from_group, self.user.id, self.group.id)
+    	
     def testRemoveStudentFromGroup(self):
     	self.assertEqual(Record.objects.count(), 1)
         Record.remove_student_from_group(self.user.id, self.group.id)
@@ -183,9 +193,14 @@ class AssignmentToGroupsWithSameTypes(TestCase):
         self.group2 = Group.objects.get(id=2)
         self.lecture1 = Group.objects.get(id=3)
         self.lecture2 = Group.objects.get(id=4)
-
+			
+        semester = self.group1.subject.semester
+        semester.semester_beginning = datetime.now().date() - timedelta(days=1)
+        semester.semester_ending = datetime.now().date() + timedelta(days=1)
+        semester.save()
+        
         self.record = Record.objects.create(student=self.user.student, group=self.lecture1)
-
+        
     def testAssignToAnotherLecture(self):
         Record.add_student_to_group(self.user.id, self.lecture2.id) 
         self.assertEqual(Record.objects.count(), 2)
