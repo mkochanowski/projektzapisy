@@ -24,8 +24,8 @@ class SingleChoiceQuestion( BaseQuestion ):
         sts = SavedTicket.objects.filter( poll = poll, finished = True )
         result = []
         for st in sts:
-            result += st.singlechoicequestionanswer_set.filter( section = section )
-        return result
+            result += st.singlechoicequestionanswer_set.filter( question = self, section = section )
+        return self, result
 
 class SingleChoiceQuestionOrdering( models.Model ):
     question   = models.ForeignKey( SingleChoiceQuestion, 

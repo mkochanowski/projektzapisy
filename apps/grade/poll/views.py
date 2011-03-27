@@ -98,6 +98,7 @@ def disable_grade( request ):
         PrivateKey.objects.all().delete()
         
         for st in SavedTicket.objects.all():
+            # TODO: oznaczyć je jako archiwalne!
             st.finished = True
             st.save()
         
@@ -889,78 +890,87 @@ def poll_results( request, mode='S', poll_id = None ):
 
         
     if poll_id:
-        answers = Poll.objects.get( id = poll_id ).all_answers()
-        data['results'] = answers
-        data['pid']     = poll_id
-    #~ user_polls = []
-    #~ for poll in polls:
-        #~ if poll.is_user_entitled_to_view_result( request.user ):
-            #~ user_polls.append(poll)
-#~ 
-    #~ selected = None
-    #~ answers = None
+        data['pid']       = poll_id
+        poll              = Poll.objects.get( id = poll_id )
+        data['link_mode'] = mode
+        if poll.is_user_entitled_to_view_result( request.user ):
+            poll_answers = poll.all_answers()
+            sts_fin      = SavedTicket.objects.filter( poll = poll, finished = True  ).count()
+            sts_not_fin  = SavedTicket.objects.filter( poll = poll, finished = False ).count()
+            sts_all      = sts_fin + sts_not_fin
 
-    #~ if user_polls:
-        #~ selected = user_polls[0]
-        #~ if  user_polls[0].all_answers():
-            #~ answers = user_polls[0].all_answers()[0]
-#~ 
-    #~ if poll_id:
-        #~ for p in user_polls:
-            #~ if int(poll_id) == int(p.id):
-                #~ selected = p
-                #~ if selected.all_answers() != []:
-                    #~ answers = selected.all_answers()[0]
-					#~ 
-#~ 
-	#~ # wersja tymczasowa zliczania wyników
-    #~ grouped_answers = []
-    #~ for a in answers:
-        #~ if (a!=[]) and isinstance(a[0],OpenQuestionAnswer):
-            #~ block = { 'open_question' : a[0].question, 'answer' : None }
-            #~ l = []
-            #~ for o in a:
-                #~ l.append(o.content)
-            #~ block['answer'] = l
-            #~ grouped_answers.append(block)
-        #~ elif (a!=[]) and isinstance(a[0],SingleChoiceQuestionAnswer):
-            #~ block = { 'single_choice_question' : a[0].question, 'answer' : None }
-            #~ l2=[]
-            #~ for o in a:
-                #~ l2.append(o.option)
-            #~ l = []
-            #~ while l2!=[]:
-                #~ c = 0
-                #~ t = l2[0]
-                #~ for o in l2:
-                    #~ if o==t:
-                        #~ c+=1
-                        #~ l2.remove(o)
-                #~ l.append({ 'text' : t, 'count': c })
-            #~ block['answer'] = l
-            #~ grouped_answers.append(block)
-        #~ elif (a!=[]) and isinstance(a[0],MultipleChoiceQuestionAnswer):
-            #~ block = { 'multiple_choice_question' : a[0].question, 'answer' : None }
-            #~ l2=[]
-            #~ for o in a:
-                #~ l2.append(list(o.options.all()))
-            #~ l = []
-            #~ while l2!=[]:
-                #~ print l2
-                #~ c = 0
-                #~ t = l2[0][0]
-                #~ for o in l2:
-                    #~ if t in o:
-                        #~ c+=1
-                        #~ o.remove(t)
-                        #~ if o==[]:
-                            #~ l2.remove(o)
-                #~ l.append({ 'text' : t, 'count': c })
-                    #~ 
-            #~ block['answer'] = l
-            #~ grouped_answers.append(block)
-				#~ 
-				#~ 
-    #~ form = FilterMenu( request.POST )
-    #~ data = { 'form' : form, 'list' : user_polls, 'answers' : grouped_answers, 'selected' : selected  , 'grade' : grade }
+            answers = []
+            for section, section_answers in poll_answers:
+                s_ans = []
+                for question, question_answers in section_answers:
+                    if isinstance( question, SingleChoiceQuestion ):
+                        mode     = u'single'
+                        q_data   = map( lambda x: x.option, question_answers )
+                        options  = question.options.all()
+                        ans_data = []
+                        for option in options:
+                            ans_data.append(( option.content, q_data.count( option ), int(100 * (float(q_data.count( option )) / float(sts_fin)))))
+                        ans_data.append((u"Brak odpowiedzi", sts_fin - len( q_data), int(100 * (float(sts_fin - len( q_data))/ float(sts_fin)))))
+                        s_ans.append(( mode, question.content, ans_data, ( 100 / len( ans_data ))-1))
+                        
+                    elif isinstance( question, MultipleChoiceQuestion ):
+                        mode               = u'multi'
+                        q_data             = map( lambda x: (list( x.options.all()) , x.other), question_answers )
+                        if q_data:
+                            q_data, other_data = zip( *q_data )
+                            q_data             = sum( q_data, [] )
+                            other_data         = list( filter( lambda x: x, other_data ))
+                        else:
+                            other_data     = []
+                        options            = question.options.all()
+                        ans_data           = []
+                        for option in options:
+                            ans_data.append(( option.content, q_data.count( option ), int(100 * (float(q_data.count( option )) / float(sts_fin)))))
+                        if question.has_other:
+                            ans_data.append(( u"Inne", len( other_data ), int(100 * (float(len( other_data)) / float(sts_fin))), other_data))
+                        ans_data.append((u"Brak odpowiedzi", sts_fin - len( question_answers), int(100 * (float(sts_fin - len(question_answers))/ float(sts_fin)))))
+                        s_ans.append(( mode, question.content, ans_data, ( 100 / len( ans_data ))-1))
+                        
+                    elif isinstance( question, OpenQuestion ):
+                        mode   = u'open'
+                        q_data = map( lambda x: x.content, question_answers )
+                        s_ans.append(( mode, question.content, q_data, len( q_data) ))
+                        
+                answers.append(( section.title, s_ans ))
+
+            data['completness'] = SafeUnicode( u"Liczba studentów, którzy zakończyli wypełniać ankietę: %d<br/>Liczba studentów którzy nie zakończyli wypełniać ankiety: %d" % ( sts_fin, sts_not_fin ))
+            data['poll_title']  = poll.title
+            try:
+                data[ 'poll_subject' ] = poll.group.subject.name
+                data[ 'poll_group' ]   = poll.group.get_type_display()
+                data[ 'poll_teacher' ] = poll.group.get_teacher_full_name()
+            except:
+                data[ 'poll_subject' ] = "Ankieta ogólna"
+                
+            try:
+                user = poll.group.teacher
+            except:
+                user = None
+                
+            if user:
+                if user == request.user:
+                    data['show_share_toggle'] = True
+            else:
+                data['show_share_toggle'] = request.user.is_superuser
+            
+            data['share_state'] = poll.share_result
+            data['results']     = answers
+        else:
+            messages.error( request, "Nie masz uprawnień do oglądania wyników tej ankiety." )
+ 
     return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))
+
+def share_results_toggle( request, mode, poll_id ):
+    poll = Poll.objects.get( pk = poll_id )
+    poll.share_result = not poll.share_result
+    poll.save()
+    if poll.share_result:
+        messages.info( request, u"Udostępniono wyniki ankiety." )
+    else:
+        messages.info( request, u"Przestano udostepniać wyniki ankiety." )
+    return HttpResponseRedirect(reverse( 'grade-poll-poll-results', args=[mode, poll_id] ))

@@ -36,7 +36,7 @@ class Section( models.Model ):
         result = []
         for question in self.all_questions():
             result.append( question.get_all_answers_from_poll( poll, self ))
-        return result
+        return self, result
         
 class SectionOrdering( models.Model ):
     poll     = models.ForeignKey( 'Poll',      verbose_name = 'ankieta' )

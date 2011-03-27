@@ -16,4 +16,11 @@ class MultipleChoiceQuestionAnswer( BaseAnswer ):
         app_label           = 'poll'
         
     def __unicode__( self ):
-        return unicode( list( self.options.all())) + unicode( self.other )
+        ans = u""
+        for option in self.options.all():
+            ans += unicode( option ) + u'; '
+        if self.other:
+            ans += unicode( other )
+        else:
+            ans = ans[ :-2 ]
+        return ans
