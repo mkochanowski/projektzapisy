@@ -8,7 +8,7 @@
 
     <input class="leading" type="checkbox" id="section-leading" name="poll[leading]"{% if section.leading %} checked{% endif %}>
     <label class="leading" for="section-leading">Posiada pytanie wiodące</label>
-{{ section.leading }}
+
     <ol id="poll-form" class="ui-sortable">
         {% for field in section.questions %}
             <li class="poll-question{% if field.is_leading %} firstQuestion{% endif %}">
