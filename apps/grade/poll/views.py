@@ -397,7 +397,7 @@ def delete_section( request ):
                 section.save()
                 counter = counter + 1
     request.session['message'] = u'Usunięto ' + unicode(counter) + u'sekcji'
-    return HttpResponseRedirect(reverse('grade-poll-sections-list'))
+    return HttpResponseRedirect(reverse('apps.grade.poll.views.sections_list'))
 
 @employee_required
 def polls_list( request ):
@@ -446,7 +446,7 @@ def delete_poll( request ):
                 poll.save()
                 counter = counter + 1
     request.session['message'] = u'Usunięto ' + unicode(counter) + u' ankiet'
-    return HttpResponseRedirect(reverse('grade-poll-polls-list'))
+    return HttpResponseRedirect(reverse('apps.grade.poll.views.polls_list'))
 
 @employee_required
 def groups_without_poll( request ):
