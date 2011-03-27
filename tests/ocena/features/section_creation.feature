@@ -103,7 +103,6 @@ Feature: User with privileges wants to create a section.
         And I am on grade main page    
         When I go to /grade/poll/managment/section_create
         Then I should see "Zaloguj"
-
     
     Scenario: While grading protocol is active, the administrator tries to create a section
 		Given the grading protocol is "on"

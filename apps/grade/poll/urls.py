@@ -24,11 +24,11 @@ urlpatterns = patterns('',
     url(r'managment/delete_polls$', 'apps.grade.poll.views.delete_poll', name='grade-poll-delete_poll'),
     url(r'managment/templates$', 'apps.grade.poll.views.templates', name='grade-poll-templates'),
     url(r'managment/templates/use$', 'apps.grade.poll.views.use_templates', name='grade-poll-use-template'),
+    url(r'managment/edit_section/(?P<section_id>[1-9][0-9]*)/$', 'apps.grade.poll.views.edit_section', name='grade-poll-edit-section'),
     
     
            
     url(r'autocomplete$', 'apps.grade.poll.views.autocomplete', name='grade-poll-autocomplete'),
     
     url(r'get_section/(?P<section_id>[1-9][0-9]*)/$', 'apps.grade.poll.views.get_section', name='grade-poll-get-section'),
-    url(r'edit_section/(?P<section_id>[1-9][0-9]*)/$', 'apps.grade.poll.views.edit_section', name='grade-poll-edit-section'),
 )

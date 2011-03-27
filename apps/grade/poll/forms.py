@@ -68,6 +68,7 @@ class PollForm( forms.Form ):
             poll_section.title       = section.title
             poll_section.description = section.description
             poll_section.questions   = []
+            poll_section.leading     = False
             if str( type( questions[ 0 ])) == \
                 "<class 'apps.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
                 questionOrdering  = SingleChoiceQuestionOrdering.objects.select_related().get( 
@@ -98,7 +99,9 @@ class PollForm( forms.Form ):
                                 widget   = forms.widgets.RadioSelect(),
                                 initial  = answer )
                     
-                    field.is_leading = True
+                    field.is_leading     = True
+                    poll_section.leading = True
+                    section
                     field.hide_on    = map(lambda x: x.pk, questionOrdering.hide_on.all())
                     field.title      = title
                     field.description = questions[ 0 ].description
