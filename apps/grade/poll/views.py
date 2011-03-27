@@ -39,7 +39,9 @@ from apps.grade.poll.utils           import check_signature, \
                                               get_next, \
                                               get_prev, \
                                               get_ticket_and_signed_ticket_from_session,\
-                                              getGroups
+                                              getGroups, \
+                                              group_polls_by_subject, \
+                                              group_polls_by_teacher
 from apps.users.models               import Employee
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
 
@@ -120,7 +122,6 @@ def autocomplete(request):
     json = simplejson.dumps(results)
     return HttpResponse(json, mimetype='application/javascript')
 
-
 @employee_required
 def ajax_get_groups(request):
     message = "No XHR"
@@ -160,7 +161,6 @@ def edit_section(request, section_id):
     form = PollForm()
     form.setFields( None, None, section_id )
     return render_to_response( 'grade/poll/section_edit.html', {"form": form}, context_instance = RequestContext( request ))
-
 
 @employee_required
 def poll_create(request):
@@ -334,7 +334,6 @@ def templates( request ):
 def use_templates( request ):
     pass
     
-
 @employee_required
 def sections_list( request ):
     """
@@ -395,7 +394,7 @@ def delete_section( request ):
                 section.deleted = True
                 section.save()
                 counter = counter + 1
-    request.session['message'] = u'Usunięto ' + unicode(counter) + u'sekcji'
+    messages.success( request, u'Usunięto ' + unicode(counter) + u'sekcji' )
     return HttpResponseRedirect(reverse('grade-poll-sections-list'))
 
 @employee_required
@@ -461,13 +460,6 @@ def poll_manage(request):
     data['semesters']  = Semester.objects.all() 
     return render_to_response ('grade/poll/manage.html', {'grade' : grade}, context_instance = RequestContext( request ))
 
-@login_required
-def declaration( request ):
-    # TODO:
-    #       Wyświetlanie wyników oceny
-    grade = Semester.get_current_semester().is_grade_active
-    return render_to_response ('grade/poll/show.html', {'grade' : grade}, context_instance = RequestContext( request ))
-
 @employee_required    
 def questionset_create(request):
     data          = {}
@@ -512,10 +504,6 @@ def questionset_create(request):
             
     return render_to_response ('grade/poll/section_create.html', data, context_instance = RequestContext( request ))
 
-
-def questionset_assign(request):
-    pass
-    
 #### Poll answering ####
 @login_required
 def grade_logout(request):
@@ -601,7 +589,6 @@ def tickets_enter(request):
     data[ 'form' ]  = form
     data[ 'grade' ] = grade
     return render_to_response( 'grade/poll/tickets_enter.html', data, context_instance = RequestContext( request ))
-
 
 def polls_for_user( request, slug ):
     if not 'polls' in request.session.keys():
@@ -866,81 +853,114 @@ def poll_end_grading( request ):
 #### Poll results ####
 
 @login_required
-def poll_results( request, poll_id ):
-    grade = Semester.get_current_semester().is_grade_active
-    #group = Employee.get_all_groups( request.user.id )
+def poll_results( request, mode='S', poll_id = None ):
+    ###
+    # TODO:
+    #   Filtry!!!
+    
+    data = {}
+    data['grade'] = Semester.get_current_semester().is_grade_active
+    
+    if mode == 'S':
+        data['mode']  = 'subject'
+    elif mode == 'T':
+        data['mode']  = 'teacher'
+    
+    semester      = Semester.get_current_semester()
+    if semester.is_grade_active:
+        messages.info( request, "Ocena zajęć jest otwarta; wyniki nie są kompletne." )
+    
+    if not poll_id:
+        polls = filter( lambda x: x.is_user_entitled_to_view_result( request.user ), 
+                                Poll.get_polls_for_semester())
+        request.session['polls_by_subject'] = group_polls_by_subject( polls )
+        request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
+    
+    try:
+        data['polls_by_subject'] = request.session['polls_by_subject']
+        data['polls_by_teacher'] = request.session['polls_by_teacher']
+    except:
+        polls = filter( lambda x: x.is_user_entitled_to_view_result( request.user ), 
+                                Poll.get_polls_for_semester())
+        request.session['polls_by_subject'] = group_polls_by_subject( polls )
+        request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
+        data['polls_by_subject']            = request.session['polls_by_subject']
+        data['polls_by_teacher']            = request.session['polls_by_teacher']
 
-    polls = Poll.objects.all()
-
-    user_polls = []
-    for poll in polls:
-        if poll.is_user_entitled_to_view_result( request.user ):
-            user_polls.append(poll)
-
-    selected = None
-    answers = None
-
-    if user_polls!=[]:
-        selected = user_polls[0]
-        if  user_polls[0].all_answers()!= []:
-            answers = user_polls[0].all_answers()[0]
-
+        
     if poll_id:
-        for p in user_polls:
-            if int(poll_id) == int(p.id):
-                selected = p
-                if selected.all_answers() != []:
-                    answers = selected.all_answers()[0]
-					
+        answers = Poll.objects.get( id = poll_id ).all_answers()
+        data['results'] = answers
+        data['pid']     = poll_id
+    #~ user_polls = []
+    #~ for poll in polls:
+        #~ if poll.is_user_entitled_to_view_result( request.user ):
+            #~ user_polls.append(poll)
+#~ 
+    #~ selected = None
+    #~ answers = None
 
-	# wersja tymczasowa zliczania wyników
-    grouped_answers = []
-    for a in answers:
-        if (a!=[]) and isinstance(a[0],OpenQuestionAnswer):
-            block = { 'open_question' : a[0].question, 'answer' : None }
-            l = []
-            for o in a:
-                l.append(o.content)
-            block['answer'] = l
-            grouped_answers.append(block)
-        elif (a!=[]) and isinstance(a[0],SingleChoiceQuestionAnswer):
-            block = { 'single_choice_question' : a[0].question, 'answer' : None }
-            l2=[]
-            for o in a:
-                l2.append(o.option)
-            l = []
-            while l2!=[]:
-                c = 0
-                t = l2[0]
-                for o in l2:
-                    if o==t:
-                        c+=1
-                        l2.remove(o)
-                l.append({ 'text' : t, 'count': c })
-            block['answer'] = l
-            grouped_answers.append(block)
-        elif (a!=[]) and isinstance(a[0],MultipleChoiceQuestionAnswer):
-            block = { 'multiple_choice_question' : a[0].question, 'answer' : None }
-            l2=[]
-            for o in a:
-                l2.append(list(o.options.all()))
-            l = []
-            while l2!=[]:
-                print l2
-                c = 0
-                t = l2[0][0]
-                for o in l2:
-                    if t in o:
-                        c+=1
-                        o.remove(t)
-                        if o==[]:
-                            l2.remove(o)
-                l.append({ 'text' : t, 'count': c })
-                    
-            block['answer'] = l
-            grouped_answers.append(block)
-				
-				
-    form = FilterMenu( request.POST )
-    data = { 'form' : form, 'list' : user_polls, 'answers' : grouped_answers, 'selected' : selected  , 'grade' : grade }
+    #~ if user_polls:
+        #~ selected = user_polls[0]
+        #~ if  user_polls[0].all_answers():
+            #~ answers = user_polls[0].all_answers()[0]
+#~ 
+    #~ if poll_id:
+        #~ for p in user_polls:
+            #~ if int(poll_id) == int(p.id):
+                #~ selected = p
+                #~ if selected.all_answers() != []:
+                    #~ answers = selected.all_answers()[0]
+					#~ 
+#~ 
+	#~ # wersja tymczasowa zliczania wyników
+    #~ grouped_answers = []
+    #~ for a in answers:
+        #~ if (a!=[]) and isinstance(a[0],OpenQuestionAnswer):
+            #~ block = { 'open_question' : a[0].question, 'answer' : None }
+            #~ l = []
+            #~ for o in a:
+                #~ l.append(o.content)
+            #~ block['answer'] = l
+            #~ grouped_answers.append(block)
+        #~ elif (a!=[]) and isinstance(a[0],SingleChoiceQuestionAnswer):
+            #~ block = { 'single_choice_question' : a[0].question, 'answer' : None }
+            #~ l2=[]
+            #~ for o in a:
+                #~ l2.append(o.option)
+            #~ l = []
+            #~ while l2!=[]:
+                #~ c = 0
+                #~ t = l2[0]
+                #~ for o in l2:
+                    #~ if o==t:
+                        #~ c+=1
+                        #~ l2.remove(o)
+                #~ l.append({ 'text' : t, 'count': c })
+            #~ block['answer'] = l
+            #~ grouped_answers.append(block)
+        #~ elif (a!=[]) and isinstance(a[0],MultipleChoiceQuestionAnswer):
+            #~ block = { 'multiple_choice_question' : a[0].question, 'answer' : None }
+            #~ l2=[]
+            #~ for o in a:
+                #~ l2.append(list(o.options.all()))
+            #~ l = []
+            #~ while l2!=[]:
+                #~ print l2
+                #~ c = 0
+                #~ t = l2[0][0]
+                #~ for o in l2:
+                    #~ if t in o:
+                        #~ c+=1
+                        #~ o.remove(t)
+                        #~ if o==[]:
+                            #~ l2.remove(o)
+                #~ l.append({ 'text' : t, 'count': c })
+                    #~ 
+            #~ block['answer'] = l
+            #~ grouped_answers.append(block)
+				#~ 
+				#~ 
+    #~ form = FilterMenu( request.POST )
+    #~ data = { 'form' : form, 'list' : user_polls, 'answers' : grouped_answers, 'selected' : selected  , 'grade' : grade }
     return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))

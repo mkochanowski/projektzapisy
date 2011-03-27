@@ -35,7 +35,7 @@ Zakończono <span id="finished-polls">{{finished_polls}}</span> spośród <span 
     <h4>Ankiety dostępne</h4>
     <ul id="grade-fillable-poll-list">
     {% for poll_sub in polls %}
-        <li><a class="grade-fillable-poll-link" href="{% url grade-poll-polls-for-user poll_sub.0.1 %}"-->{{ poll_sub.0.0 }}</a>
+        <li><a class="grade-fillable-poll-link" href="{% url grade-poll-polls-for-user poll_sub.0.1 %}">{{ poll_sub.0.0 }}</a>
             <ul class="grade-fillable-poll-sublist">
             {% for poll in poll_sub.2 %}
                 <li><a id="grade-fillable-poll-link-{{poll.0}}" href="{% url grade-poll-poll-answer poll_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>

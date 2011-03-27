@@ -145,7 +145,6 @@ def get_next( poll_list, finished_list, poll_id ):
         
     return None
     
-    
 def get_prev( poll_list, finished_list, poll_id ):
     poll_list.reverse()
     finished_list.reverse()
@@ -189,3 +188,76 @@ def getGroups(semester, group = None, type = None, subject = None):
             groups = Group.objects.filter(subject__semester = semester)
 
     return groups
+
+def poll_cmp_subjects( p1, p2 ):
+    if p1.group:
+        if p2.group:
+            return cmp( p1.group.subject.name, p2.group.subject.name )
+        else:
+            return 1
+    else:
+        return -1
+
+def poll_cmp_teachers( p1, p2 ):
+    if p1.group:
+        if p2.group:
+            return cmp( p1.group.get_teacher_full_name(), p2.group.get_teacher_full_name() )
+        else:
+            return 1
+    else:
+        return -1
+        
+def group_polls_by_subject( polls ):
+    polls.sort( poll_cmp_subjects )
+    
+    groupped = []
+    if polls:
+        try:
+            act_sub = polls[ 0 ].group.subject.name
+        except:
+            act_sub = u"Ankiety ogólne"
+        act = [ polls[ 0 ]]
+        polls = polls[ 1: ]
+        
+        for poll in polls:
+            try:
+                sub = poll.group.subject.name
+            except:
+                sub = u"Ankiety ogólne"
+            
+            if sub == act_sub:
+                act.append( poll )
+            else:
+                groupped.append(( act_sub, act ))
+                act     = [ poll ]
+                act_sub = sub
+        if act: groupped.append(( act_sub, act ))
+    return groupped
+            
+    
+def group_polls_by_teacher( polls ):
+    polls.sort( poll_cmp_teachers )
+
+    groupped = []
+    if polls:
+        try:
+            act_sub = polls[ 0 ].group.get_teacher_full_name()
+        except:
+            act_sub = u"Ankiety ogólne"
+        act = [ polls[ 0 ]]
+        polls = polls[ 1: ]
+        
+        for poll in polls:
+            try:
+                sub = poll.group.get_teacher_full_name()
+            except:
+                sub = u"Ankiety ogólne"
+            
+            if sub == act_sub:
+                act.append( poll )
+            else:
+                groupped.append(( act_sub, act ))
+                act     = [ poll ]
+                act_sub = sub
+        if act: groupped.append(( act_sub, act ))
+    return groupped
