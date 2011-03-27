@@ -50,6 +50,8 @@ SubjectsList.initSubjectLists = function()
 			subject.type = subjectContainer.children('input[name=type]').
 				assertOne().attr('value').castToInt();
 			subject.container = subjectContainer;
+			subject.wasEnrolled = subjectContainer.children('input[name=wasEnrolled]').
+				assertOne().attr('value').castToBool();
 			semester.addSubject(subject);
 			SubjectsList.subjects[subject.id] = subject;
 		});
@@ -109,6 +111,14 @@ SubjectsList.initFilter = function()
 		return (subject.semester.id == option);
 	}));
 
+	SubjectsList.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'hideSigned', '#enr-hidesigned', function(element, value)
+	{
+		if (!value)
+			return true;
+		var subject = element.data;
+		return !subject.wasEnrolled;
+	}));
 
 	SubjectsList.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
 		function(element, subjectType)
@@ -194,6 +204,7 @@ SubjectsList.Subject = function()
 	this.semester = null;
 	this.container = null;
 	this.visible = true;
+	this.wasEnrolled = null; // czy aktualny student był zapisany
 };
 
 /**

@@ -24,6 +24,16 @@ String.prototype.castToInt = function(acceptNull)
 	return val;
 };
 
+String.prototype.castToBool = function()
+{
+	var val = this.trim();
+	if (val == 'True')
+		return true;
+	if (val == 'False')
+		return false;
+	throw new Error('Nieprawidłowa wartość');
+};
+
 String.prototype.removePrefix = function(prefix)
 {
 	if (this.indexOf(prefix) != 0)

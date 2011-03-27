@@ -53,7 +53,7 @@
 					{% endfor %}
 				</select>
 			</span>
-			<span class="checkbox"><input type="checkbox" disabled="disabled" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -75,9 +75,9 @@
 					<ul class="subjects-list">
 						{% for subject in semester.subjects %}
 							<li>
-                                {% if subject.was_enrolled %} ! {% endif %}
 								<a href="{% url subject-page subject.slug %}" id="subject-{{ subject.id }}">{{ subject.name }}</a>
 								<input type="hidden" name="type" value="{{ subject.type }}" />
+								<input type="hidden" name="wasEnrolled" value="{{ subject.was_enrolled }}" />
 							</li>
 						{% endfor %}
 					</ul>
