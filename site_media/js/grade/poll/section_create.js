@@ -47,6 +47,7 @@ Poll.section.init = function()
             return false;
           }
     });
+    $(Poll.section.editParser);
 }
 
 /*
@@ -58,6 +59,9 @@ Poll.section.init = function()
  */
 Poll.section.editParser = function()
 {
+    $('.poll-question').each(function(i, d){Poll.section.parse($(this))});
+
+    Poll.section.questions = $('.poll-question').size()
     $('.autocomplete').each(function()
     {
         $(this).autocomplete(
@@ -67,13 +71,11 @@ Poll.section.editParser = function()
          }
         );
     });
-    $('.answerset').sortable({handle : 'div'});
     $('.typeSelect').change(function()
     {
-        var li = $(this).parents('.poll-question');
         Poll.section.changeType( li )
     });
-    Poll.section.questions = $('.poll-question').size()
+
 
     $('.ready').click(function()
     {
@@ -81,21 +83,40 @@ Poll.section.editParser = function()
         Poll.section.createView( li );
     });
     $('.ready').click();
+    $('.edit-mode').hide()
     $('.delete').click(function()
     {
         var li = $(this).parents('.poll-question');
         Poll.section.remove( li );
-    });    
-
-    $('.addQuestion').click(function()
-    {
-        var li = $(this).parents('.poll-question');
-        Poll.section.addAnswer( li, new Object );
     });
+
     $('.delete-answer').click(function(){
 
          $(this).parents('.poll-question-answer').remove();
     })
+}
+
+Poll.section.parse = function(li)
+{
+
+    var type = $(li).find('input[name$="[type]"]').val();
+
+    /* type selectbox configuration */
+    for( var t in poll_types)
+    {
+        $.tmpl( "type_option", poll_types[t])
+            .appendTo( $(li).find('.options') )
+    }
+
+    $(li).find('.options').val(type);
+    Poll.section.changeType( li );
+    $(li).find('.edit-mode')
+         .click(function()
+            {
+                Poll.section.createEdit( li );
+            });
+    
+
 }
 
 //////////////////////////////////////////////////////////////

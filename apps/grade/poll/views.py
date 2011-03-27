@@ -371,6 +371,7 @@ def show_section( request, section_id):
     data['form']    = form
     data['grade']   = Semester.get_current_semester().is_grade_active
     data['message'] = request.session.get('message', None)
+    data['section'] = Section.objects.get(pk=section_id)
     try:
         del request.session['message'] 
     except:

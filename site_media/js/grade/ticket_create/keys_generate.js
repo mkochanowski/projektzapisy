@@ -31,7 +31,7 @@ Ticket.keys_generate.progress = function()
 	$.ajax({
         type: "POST",
         url: url_progress,
-        success: Ticket.keys_generate.update,
+        success: Ticket.keys_generate.update
     });
 }
 
