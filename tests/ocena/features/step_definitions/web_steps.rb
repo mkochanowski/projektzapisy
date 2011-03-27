@@ -129,6 +129,9 @@ Then /^I cannot check "([^"]*)"$/ do |field|
     page.find(:xpath, "//*[input[(@id='#{field}' or @name='#{field}') and @disabled]]")
 end
 
+Then /^"([^"]*)" should be disabled$/ do |field|
+    page.find(:xpath, "//*[input[(@id='#{field}' or @name='#{field}' or @value='#{field}') and @disabled]]")
+end
 
 Then /^I should be on (.+)$/ do |page_name|  
 	current_path = URI.parse(current_url).path
@@ -177,7 +180,6 @@ Given /^there is a poll for some exercises$/ do
     load_fixture "exercises_przedmiot_4"
 end
 
-
 When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 	if arg == "all" then
 		# odznaczenie obu checkboxów
@@ -213,6 +215,6 @@ Then /^"([^"]*)" should be unchecked$/ do |field|
 end
 
 When /^I click "([^"]*)"$/ do |value|
-    selector = "//*[contains(text(),'#{value}')]"
+    selector = "//*[contains(text(),'#{value}') or @alt='#{value}']"
     page.find(:xpath, selector).click
 end

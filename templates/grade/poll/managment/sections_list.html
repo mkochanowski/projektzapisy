@@ -29,7 +29,7 @@
                 <input type="checkbox" class="_selected_action" name="_selected_action" value="{{section.pk}}" class="action-select" {% if not user.is_staff %} disabled {% endif %}>
             </td>            
             <td>
-                <a href="{% url grade-poll-show_section section.id %}" target="_blank">{{section}}</a>
+                <a href="{% url grade-poll-show_section section.id %}">{{section}}</a>
             </td>
         </tr>
     	{% endfor %}
