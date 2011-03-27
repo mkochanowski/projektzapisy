@@ -40,7 +40,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               get_prev, \
                                               get_ticket_and_signed_ticket_from_session,\
                                               group_polls_by_subject, \
-                                              group_polls_by_teacher
+                                              group_polls_by_teacher, \
                                               getGroups,\
                                               declination_poll,\
                                               declination_section
