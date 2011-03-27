@@ -18,7 +18,7 @@
 <table id="poll-managment-table">
 	<thead>
 		<tr>
-        <th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;" {% if not privileged_user %} disabled {% endif %}></th>
+        <th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;" {% if not user.is_staff %} disabled {% endif %}></th>
 		<th>Sekcje</th>
 		</tr>
 	</thead>

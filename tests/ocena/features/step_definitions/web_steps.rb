@@ -122,8 +122,13 @@ When /^(?:|I )uncheck "([^"]*)"$/ do |field|
 end
 
 When /^(?:|I )check "([^"]*)" with value "([^"]*)"$/ do |field, value|
-    page.find( :xpath, "//*[input[(@name='#{field}') and (@value='#{value}')]]" ).check(field)
+    page.find(:xpath, "//*[input[(@name='#{field}') and (@value='#{value}')]]" ).check(field)
 end
+
+Then /^I cannot check "([^"]*)"$/ do |field|
+    page.find(:xpath, "//*[input[(@id='#{field}' or @name='#{field}') and @disabled]]")
+end
+
 
 Then /^I should be on (.+)$/ do |page_name|  
 	current_path = URI.parse(current_url).path
@@ -205,4 +210,9 @@ end
 
 Then /^"([^"]*)" should be unchecked$/ do |field|
      page.should have_unchecked_field( field )
+end
+
+When /^I click "([^"]*)"$/ do |value|
+    selector = "//*[contains(text(),'#{value}')]"
+    page.find(:xpath, selector).click
 end

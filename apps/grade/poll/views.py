@@ -39,7 +39,9 @@ from apps.grade.poll.utils           import check_signature, \
                                               get_next, \
                                               get_prev, \
                                               get_ticket_and_signed_ticket_from_session,\
-                                              getGroups
+                                              getGroups,\
+                                              declination_poll,\
+                                              declination_section
 from apps.users.models               import Employee
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
 
@@ -396,7 +398,8 @@ def delete_section( request ):
                 section.deleted = True
                 section.save()
                 counter = counter + 1
-    request.session['message'] = u'Usunięto ' + unicode(counter) + u'sekcji'
+    message = u'Usunięto ' + unicode(counter) + u' ' + declination_section(counter)
+    messages.info(request, SafeUnicode(message))
     return HttpResponseRedirect(reverse('grade-poll-sections-list'))
 
 @employee_required
@@ -445,8 +448,9 @@ def delete_poll( request ):
                 poll.deleted = True
                 poll.save()
                 counter = counter + 1
-    request.session['message'] = u'Usunięto ' + unicode(counter) + u' ankiet'
-    return HttpResponseRedirect(reverse('grade-poll-polls-list'))
+    message =  u'Usunięto ' + unicode(counter) + u' ' + declination_poll(counter)
+    messages.info(request, SafeUnicode(message))    
+    return HttpResponseRedirect(reverse('grade-poll-list'))
 
 @employee_required
 def groups_without_poll( request ):
