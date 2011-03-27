@@ -448,9 +448,14 @@ def delete_poll( request ):
                 poll.deleted = True
                 poll.save()
                 counter = counter + 1
+<<<<<<< HEAD
     message =  u'Usunięto ' + unicode(counter) + u' ' + declination_poll(counter)
     messages.info(request, SafeUnicode(message))    
     return HttpResponseRedirect(reverse('grade-poll-list'))
+=======
+    request.session['message'] = u'Usunięto ' + unicode(counter) + u' ankiet'
+    return HttpResponseRedirect(reverse('apps.grade.poll.views.polls_list'))
+>>>>>>> e9205478069b8aaa12cb83335e2dbdbb7b408921
 
 @employee_required
 def groups_without_poll( request ):
