@@ -32,6 +32,28 @@ margin:15px;
 {
 }
 
+#box
+{
+    width: 350px;
+    height: 150px;
+    background: #FFF;
+    text-align: center;
+    position: fixed;
+    margin-left: -175px;
+    margin-top: -75px;
+    left: 50%;
+    top: 50%;
+    z-index: 20;
+    display: none;
+}
+ 
+#screen
+{
+position:fixed;
+    left: 0;
+    top: 0;
+    background: #000;
+}
 
 
 /*** TWORZENIE ANKIETY - koniec ***/

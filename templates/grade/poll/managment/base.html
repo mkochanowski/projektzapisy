@@ -16,6 +16,7 @@
 {{ fdata }}
 
 {% block content %}
+
     <div id='poll-managment-menu'>
 	<ul>
            <li><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
@@ -24,7 +25,6 @@
            <li><a href="{% url grade-poll-questionset-create %}">Tworzenie sekcji</a></li>
            <li><a href="{% url grade-poll-poll-create %}">Tworzenie ankiet</a></li>
            <li><a href="{% url grade-poll-templates %}">Szablony</a></li>
-           <li><a href="{% url grade-ticket-keys-generate %}">Generuj klucze</a></li>
 	</ul>
     </div>
     <div id="grade-managment-main">

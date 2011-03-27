@@ -44,15 +44,6 @@ def ajax_keys_progress( request ):
     count = cache.get('generated-keys', 0)
     return HttpResponse(str(count))
 
-@employee_required
-def keys_generate( request ):   
-    grade = Semester.get_current_semester().is_grade_active
-    if grade:
-        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect( '/news/grade' )
-    count = Poll.get_current_semester_polls_without_keys().all().count()
-    return render_to_response( 'grade/ticket_create/keys_generate.html', { 'grade' : grade, 'keys': count }, context_instance = RequestContext( request ))
-
 @student_required
 def ajax_get_rsa_keys_step1( request ):
     message = "No XHR"

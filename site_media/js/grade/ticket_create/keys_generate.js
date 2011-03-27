@@ -5,16 +5,22 @@ Ticket.keys_generate = new Object()
 
 Ticket.keys_generate.init = function()
 {
-	$("#progressbar").progressbar({ value: 0 });
-	Ticket.keys_generate.keys   = $('#all-keys').text();
-    Ticket.keys_generate.start();
+
+    if( $(".main-message:contains('Liczba utworzonych ankiet:')").size() > 0)
+    {
+        $('#screen').css({  "display": "block", opacity: 0.7, "width":$(document).width(),"height":$(document).height()});
+        $('#box').css({"display": "block"}).click(function(){$(this).css("display", "none");$('#screen').css("display", "none")});
+    	$("#progressbar").progressbar({ value: 0 });
+	    Ticket.keys_generate.keys   = $('#all-keys').text();
+        Ticket.keys_generate.start();
+    }
 }
 
 Ticket.keys_generate.start = function()
 {
 	$.ajax({
         type: "POST",
-        url: "grade/ticket/ajax_keys_generate",
+        url: url_generate,
         success: Ticket.keys_generate.finish
     });
     Ticket.keys_generate.interval = setInterval( "Ticket.keys_generate.progress()", 2000 );
@@ -24,7 +30,7 @@ Ticket.keys_generate.progress = function()
 {
 	$.ajax({
         type: "POST",
-        url: "grade/ticket/ajax_keys_progress",
+        url: url_progress,
         success: Ticket.keys_generate.update,
     });
 }

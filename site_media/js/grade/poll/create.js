@@ -1,3 +1,5 @@
+
+
 if (typeof Poll == 'undefined')
     Poll = new Object();
 
@@ -105,7 +107,7 @@ Poll.create.changeSemester = function()
 Poll.create.loadSubjects = function(subjects)
 {
     $("#subjects").children().remove();
-    var item1 = Poll.create.createOption('-1', 'Nie przypisane do przedmiotu')
+    var item1 =  Poll.create.createOption('-1', 'Nie przypisane do przedmiotu')
     var item2 = Poll.create.createOption('0', 'Wszystkie grupy')
     $("#subjects").append(item1);
     $("#subjects").append(item2);
@@ -118,10 +120,7 @@ Poll.create.loadSubjects = function(subjects)
 
 Poll.create.createOption = function(value, text)
 {
-    var item = document.createElement('option');
-    item.value = value
-    $(item).text(text)
-    return item
+    return $('<option></option>').val(value).html(text);
 }
 
 Poll.create.addSection = function()
@@ -179,4 +178,13 @@ Poll.create.removeSection = function(sectionElement)
     $(sectionElement).remove();
 }
 
+/*
+* If we created polls, we must create keys.
+*
+* @author mjablonski
+ */
 
+Poll.create.generateKeys = function()
+{
+
+}

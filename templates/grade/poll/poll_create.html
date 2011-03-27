@@ -2,8 +2,13 @@
 
 {% block scripts %}
 
-<script src="/site_media/js/grade/poll/create.js" type="text/javascript"></script> 
+<script src="/site_media/js/grade/poll/create.js" type="text/javascript"></script>
+<script src="/site_media/js/grade/ticket_create/keys_generate.js" type="application/javascript"></script>
 <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
+<script type="text/javascript">
+    var url_generate = '{% url grade-ticket-keys-generator %}'
+    var url_progress = '{% url grade-ticket-keys-progress %}'
+</script>
 	
 {% endblock %}
 
@@ -11,10 +16,12 @@
 	<link rel="stylesheet" href="/site_media/css/grade/create.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
 {% endblock %}
 
 
 {% block poll-managment %}
+
 	{% if message == "Utworzono ankiety!" %}
 		<div class="main-message">
 			{% if polls_len == 0 %}
@@ -92,5 +99,17 @@
             <input id="section-add" type="button" value="Dodaj sekcję"><br/>
             <input id="poll-create-submit" type="submit" value="Stwórz ankietę">
         </form>
+
+    {% comment %} Grey screen {% endcomment %}
+    <div id='box'>
+        <h2>Trwa generowanie kluczy</h2>
+        <div id="progressbar"></div>
+        <span id="generated-keys">0</span> / <span id="all-keys">{{polls_len}}</span> (<span id="keys-percent">0</span>%)
+        <br>
+        (Kliknięcie ukrywa ten komunikat. Nie przerywa jednak procesu.)
+    </div>
+
+    <div id='screen'>
+    </div>
 {% endblock %}
 
