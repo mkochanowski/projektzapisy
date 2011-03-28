@@ -2,20 +2,17 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
 
-    url(r'questionset_assign$', 'apps.grade.poll.views.questionset_assign', name='grade-poll-questionset-assign'),
     url(r'ajax_get_subjects$',  'apps.grade.poll.views.ajax_get_subjects',  name='grade-poll-get-subjects'),
     url(r'ajax_get_groups$',    'apps.grade.poll.views.ajax_get_groups',    name='grade-poll-get-groups'),
 
     url(r'tickets_enter$', 'apps.grade.poll.views.tickets_enter', name='grade-poll-tickets-enter'),
-    
-    #- url(r'polls/$',         'apps.grade.poll.views.polls_for_user', name='grade-poll-polls-for-user'),
     url(r'polls/(?P<slug>[\w\-_]+)$',         'apps.grade.poll.views.polls_for_user', name='grade-poll-polls-for-user'),
     
     url(r'poll_answer/(?P<slug>[\w\-_]+)/(?P<pid>[0-9]+)/$', 'apps.grade.poll.views.poll_answer', name='grade-poll-poll-answer'),
     url(r'end_grading/$', 'apps.grade.poll.views.poll_end_grading', name='poll-end-grading'),
-    #- url(r'poll_save$', 'apps.grade.poll.views.poll_save', name='grade-poll-poll-save'),
     
-    url(r'poll_results/(?P<poll_id>[1-9][0-9]*)?/$', 'apps.grade.poll.views.poll_results', name='grade-poll-poll-results'),
+    url(r'poll_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.poll_results', name='grade-poll-poll-results'),
+    url(r'share_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.share_results_toggle', name='grade-poll-share-results'),
     url(r'managment/polls_list$', 'apps.grade.poll.views.polls_list', name='grade-poll-list'),
     url(r'managment/sections_list$', 'apps.grade.poll.views.sections_list', name='grade-poll-sections-list'),
     url(r'managment/groups_without_polls$', 'apps.grade.poll.views.groups_without_poll', name='grade-poll-groups_without_polls'),

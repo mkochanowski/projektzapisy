@@ -18,8 +18,8 @@ class OpenQuestion( BaseQuestion ):
         sts = SavedTicket.objects.filter( poll = poll, finished = True )
         result = []
         for st in sts:
-            result += st.openquestionanswer_set.filter( section = section )
-        return result
+            result += st.openquestionanswer_set.filter( question = self, section = section )
+        return self, result
 
 class OpenQuestionOrdering( models.Model ):
     question = models.ForeignKey( OpenQuestion, verbose_name = 'pytanie' )

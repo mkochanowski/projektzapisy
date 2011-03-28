@@ -122,7 +122,15 @@ When /^(?:|I )uncheck "([^"]*)"$/ do |field|
 end
 
 When /^(?:|I )check "([^"]*)" with value "([^"]*)"$/ do |field, value|
-    page.find( :xpath, "//*[input[(@name='#{field}') and (@value='#{value}')]]" ).check(field)
+    page.find(:xpath, "//*[input[(@name='#{field}') and (@value='#{value}')]]" ).check(field)
+end
+
+Then /^I cannot check "([^"]*)"$/ do |field|
+    page.find(:xpath, "//*[input[(@id='#{field}' or @name='#{field}') and @disabled]]")
+end
+
+Then /^"([^"]*)" should be disabled$/ do |field|
+    page.find(:xpath, "//*[input[(@id='#{field}' or @name='#{field}' or @value='#{field}') and @disabled]]")
 end
 
 Then /^I should be on (.+)$/ do |page_name|  
@@ -172,7 +180,6 @@ Given /^there is a poll for some exercises$/ do
     load_fixture "exercises_przedmiot_4"
 end
 
-
 When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 	if arg == "all" then
 		# odznaczenie obu checkboxów
@@ -205,4 +212,9 @@ end
 
 Then /^"([^"]*)" should be unchecked$/ do |field|
      page.should have_unchecked_field( field )
+end
+
+When /^I click "([^"]*)"$/ do |value|
+    selector = "//*[contains(text(),'#{value}') or @alt='#{value}']"
+    page.find(:xpath, selector).click
 end

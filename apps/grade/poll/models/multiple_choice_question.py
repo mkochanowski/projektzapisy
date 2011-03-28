@@ -24,8 +24,8 @@ class MultipleChoiceQuestion( BaseQuestion ):
         sts = SavedTicket.objects.filter( poll = poll, finished = True )
         result = []
         for st in sts:
-            result += st.multiplechoicequestionanswer_set.filter( section = section )
-        return result
+            result += st.multiplechoicequestionanswer_set.filter( question = self, section = section )
+        return self, result
 
 
 class MultipleChoiceQuestionOrdering( models.Model ):
