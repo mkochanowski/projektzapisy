@@ -363,6 +363,7 @@ def sections_list( request ):
     """
     data = {}
     sections   = Section.objects.filter(deleted=False)
+    sections_count = Section.objects.filter(deleted=False).count()
     paginator = Paginator(sections, 25)
 
     # Make sure page request is an int. If not, deliver first page.
@@ -379,6 +380,8 @@ def sections_list( request ):
     
     
     data['sections'] = sections
+    data['sections_count'] = sections_count
+    data['sections_word'] = declination_section(sections_count, True)    
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
@@ -424,6 +427,7 @@ def delete_section( request ):
 def polls_list( request ):
     data = {}
     polls     = Poll.objects.filter(deleted=False)
+    polls_count = Poll.objects.filter(deleted=False).count()
     paginator = Paginator(polls, 25)
 
     # Make sure page request is an int. If not, deliver first page.
@@ -440,6 +444,8 @@ def polls_list( request ):
     
     
     data['polls']  = polls
+    data['polls_count'] = polls_count
+    data['polls_word'] = declination_poll(polls_count, True)
     data['grade']  = Semester.get_current_semester().is_grade_active
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 

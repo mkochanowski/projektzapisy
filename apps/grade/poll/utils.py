@@ -262,17 +262,23 @@ def group_polls_by_teacher( polls ):
         if act: groupped.append(( act_sub, act ))
     return groupped
 
-def declination_poll(num):
+def declination_poll(num, nominative = False):
     if num == 1:
-        return u'ankietę'
+        if nominative:
+            return u'ankieta'
+        else:        
+            return u'ankietę'
     if ((num % 10) in [2,3,4] and (num < 10 or num > 20)):
         return u'ankiety'
     return u'ankiet'
     
 
-def declination_section(num):
+def declination_section(num, nominative = False):
     if num == 1:
-        return u'sekcję'
+        if nominative:
+            return u'sekcja'
+        else:
+            return u'sekcję'
     if ((num % 10) in [2,3,4] and (num < 10 or num > 20)):
         return u'sekcje'
     return u'sekcji'
