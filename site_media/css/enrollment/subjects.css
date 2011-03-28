@@ -136,9 +136,20 @@
  * Widok przedmiotu - listy terminów
  ******************************************************************************/
 
-#enr-subject-view .tutorial
+#enr-subject-view .tutorial form,
+#enr-subject-view .tutorial form div
+{
+	display: inline;
+}
+
+#enr-subject-view
 {
 	padding-bottom: 20px;
+}
+
+#enr-subject-view .tutorial
+{
+	padding-bottom: 10px;
 }
 
 #enr-subject-view .tutorial h2
@@ -200,6 +211,11 @@
 #enr-subject-view .tutorial table td.priority
 {
 	text-align: center;
+}
+
+#enr-subject-view .tutorial table td.priority
+{
+	white-space: nowrap;
 }
 
 /*******************************************************************************

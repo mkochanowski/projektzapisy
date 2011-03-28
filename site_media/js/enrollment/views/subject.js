@@ -33,7 +33,7 @@ SubjectView._initPriorityControls = function()
 	$('div.tutorial tbody td.priority').each(function(idx, elem)
 	{
 		elem = $(elem);
-		if (elem.children('a').length == 0)
+		if (elem.children('form').length == 0)
 			return;
 		var id = elem.parent().find('input[name=group-id]').assertOne().
 			attr('value').castToInt();
@@ -57,8 +57,9 @@ SubjectView._initPriorityControls = function()
 			var newPriority = prioritySelector.attr('value').castToInt();
 
 			//TODO: generowanie URL, a nie na sztywno
-			$.get('/records/' + id + '/queue_set_priority/' + newPriority,
-				function(data)
+			$.post('/records/' + id + '/queue_set_priority/' + newPriority, {
+					csrfmiddlewaretoken: $.cookie('csrftoken') // TODO: nowe jquery tego podobno nie wymaga
+				}, function(data)
 			{
 				if (data.Success.Message == 'OK')
 					prioritySelector.attr('disabled', false);

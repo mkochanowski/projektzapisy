@@ -105,19 +105,19 @@
 								<input type="hidden" name="group-id" value="{{ t.id }}" />
 								{% if subject.is_recording_open %}
 									{% if t.signed %}
-										<a href="{% url record-resign t.id %}">wypisz</a>
+										<form action="{% url record-resign t.id %}" method="post"><div><input type="submit" value="wypisz" /></div></form>
 									{% else %}
 										{% if t.is_in_diff %}
-											<a href="{% url record-assign t.id %}">przenieś</a>
+											<form action="{% url record-assign t.id %}" method="post"><div><input type="submit" value="przenieś" /></div></form>
 										{% else %}
 											{% if t.is_full %}
 												{% if t.priority %}
-													<a href="{% url queue-resign t.id %}">wypisz z kolejki</a>
+													<form action="{% url queue-resign t.id %}" method="post"><div><input type="submit" value="wypisz z kolejki" /></div></form>
 												{% else %}
-													<a href="{% url queue-assign t.id %}">zapisz do kolejki</a>
+													<form action="{% url queue-assign t.id %}" method="post"><div><input type="submit" value="zapisz do kolejki" /></div></form>
 												{% endif %}
 											{% else %}
-												<a href="{% url record-assign t.id %}">zapisz</a>
+												<form action="{% url record-assign t.id %}" method="post"><div><input type="submit" value="zapisz" /></div></form>
 											{% endif %}
 										{% endif %}
 									{% endif %}
@@ -126,9 +126,9 @@
 							</td>
 							<td class="priority">
 								{% if t.priority %}
-									<a href="{% url dec-priority t.id %}">-</a>
+									<form action="{% url dec-priority t.id %}" method="post"><div><input type="submit" value="-" /></div></form>
 									<span>{{ t.priority }}</span>
-									<a href="{% url inc-priority t.id %}">+</a>
+									<form action="{% url inc-priority t.id %}" method="post"><div><input type="submit" value="+" /></div></form>
 								{% endif %}
 							</td>
 						</tr>

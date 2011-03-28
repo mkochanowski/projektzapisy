@@ -34,7 +34,7 @@ function getSearchedSubjects(url_, successCallback) {
 	      url: url_,
 	      type: "POST",
 		  dataType: "json",
-	      data: "semester=" + sem_id + "&keyword=" + $('input:text[name:keyword]').val() + SubjTypes,
+	      data: "csrfmiddlewaretoken=" + $.cookie('csrftoken') + "&semester=" + sem_id + "&keyword=" + $('input:text[name:keyword]').val() + SubjTypes, // jakby co, to ja tego nie pisałem
 	      success: successCallback,
 		  error: function (XMLHttpRequest, textStatus, errorThrown) {
 	        alert("XMLHttpRequest="+XMLHttpRequest.responseText+"\ntextStatus="+textStatus+"\nerrorThrown="+errorThrown);
