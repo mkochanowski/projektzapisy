@@ -11,11 +11,13 @@ Poll.create.init = function()
     Poll.create.sections      = $('#sections');
     Poll.create.chosenSection = $('#sections-list').children('ul')[0];
 
-    $('.type-visibility').hide();
-    $('.group-visibility').hide();
-    
-    
-    $(Poll.create.changeSubjects)
+    if( $("#group").children().size() < 2)
+    {
+        $('.type-visibility').hide();
+        $('.group-visibility').hide();
+        $(Poll.create.changeSubjects)
+    }
+
     $('#section-add').click(Poll.create.addSection);
     $('#semester').change(Poll.create.changeSemester);
     $('#subjects').change(Poll.create.changeSubjects);

@@ -14,7 +14,7 @@
         <h3>Następujące grupy nie posiadają przypisanych ankiet:</h3>
         <ul id="poll-managment-list">
         {% for group in groups%}
-            <li>{{group}}</li>
+            <li><a href="{% url grade-poll-poll-create-group group_id=group.pk %}">{{group}}</a></li>
         {% endfor %}
         </ul>
     {% else %}

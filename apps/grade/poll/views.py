@@ -162,8 +162,11 @@ def edit_section(request, section_id):
     return render_to_response( 'grade/poll/section_edit.html', {"form": form}, context_instance = RequestContext( request ))
 
 
+
+
+
 @employee_required
-def poll_create(request):
+def poll_create(request, group_id = 0):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
@@ -177,6 +180,7 @@ def poll_create(request):
 
     message = ""
     polls   = []
+
     if request.method == "POST":
         semester = int(request.POST.get('semester', 0))
         group    = int(request.POST.get('group', 0))
@@ -294,11 +298,11 @@ def poll_create(request):
     
     if message_sesion:
         message   = message_sesion
-        polls     = request.session['polls']
-        polls_len = request.session['polls_len']
-        del request.session['message']
-        del request.session['polls']
-        del request.session['polls_len']
+        polls     = request.session.get('polls')
+        polls_len = request.session.get('polls_len')
+        request.session['message']   = None
+        request.session['polls']     = None
+        request.session['polls_len'] = None
 
     data['studies_types'] = Type.objects.all()
     data['semesters']    = Semester.objects.all()
@@ -309,13 +313,25 @@ def poll_create(request):
     data['polls']        = polls
     data['sections']     = Section.objects.filter(deleted=False)
     data['types']        = GROUP_TYPE_CHOICES
-    data['group']        = request.session.get('group', None)
-    data['type']         = unicode(request.session.get('type', None))
+
+    if group_id > 0:
+        group = Group.objects.get(pk=group_id)
+        data['group']        = int(group_id)
+        data['type']         = group.type
+        data['subject_id']   = group.subject.pk
+        data['semester']     = group.subject.semester.pk
+        data['groups']       = Group.objects.filter(type=group.type, subject=group.subject).order_by('teacher')
+        
+    else:
+        data['group']        = request.session.get('group', None)
+        data['type']         = unicode(request.session.get('type', None))
+        data['subject_id']   = request.session.get('subject', None)
+        data['semester']     = request.session.get('semester', None)
+        
     data['studies_type'] = request.session.get('studies_type', None)
-    data['subject_id']   = request.session.get('subject', None)
-    data['semester']     = request.session.get('semester', None)
     data['poll_without'] = request.session.get('poll_without', None)
     data['grade'] =  grade
+    
     return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
 
 #
