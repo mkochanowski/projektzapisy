@@ -31,14 +31,16 @@ Ticket.create.init   = function()
     }
     else
     {
-    $('#grade-connection-choice-form').find('th').each(function()
-    {
+        $('#grade-connection-choice-form').find('label').each(function()
+        {
 
-         var html = $(this).html()
-	     html = html.slice(0, -1)
-    	 $(this).html(html)
-    });    	
-}
+             var html = $(this).html()
+             html = html.slice(0, -1)
+             $(this).html(html)
+        });
+    }
+    $('.tooltip').tooltip();
+
 }
 
 
