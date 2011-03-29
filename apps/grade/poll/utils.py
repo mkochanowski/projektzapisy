@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*- 
 import re
+import StringIO
+import csv
 from Crypto.PublicKey                 import RSA
 from apps.grade.poll.models         import Poll
 from apps.grade.ticket_create.utils import poll_cmp, \
                                              flatten
 from apps.enrollment.records.models        import Group
+
 
 def check_signature( ticket, signed_ticket, public_key ):
     pk = RSA.importKey( public_key.public_key )
@@ -282,3 +285,67 @@ def declination_section(num, nominative = False):
     if ((num % 10) in [2,3,4] and (num < 10 or num > 20)):
         return u'sekcje'
     return u'sekcji'
+    
+####  HELPER FOR UNICODE + CSV -- Python's CSV does not support unicode 
+
+class UnicodeWriter(object):
+
+    def __init__(self, f, dialect=csv.excel_tab, encoding="utf-16", **kwds):
+        # Redirect output to a queue
+        self.queue = StringIO.StringIO()
+        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
+        self.stream = f
+        self.encoding = encoding
+    
+    def writerow(self, row):
+        # Modified from original: now using unicode(s) to deal with e.g. ints
+        self.writer.writerow([unicode(s).encode("utf-8") for s in row])
+        # Fetch UTF-8 output from the queue ...
+        data = self.queue.getvalue()
+        data = data.decode("utf-8")
+        # ... and reencode it into the target encoding
+        data = data.encode(self.encoding)
+        # write to the target stream
+        self.stream.write(data)
+        # empty queue
+        self.queue.truncate(0)
+    
+    def writerows(self, rows):
+        for row in rows:
+            self.writerow(row)
+            
+#### CSV file preparation
+
+def generate_csv_title(poll):
+    res = poll.title
+    try:        
+        res += u' ' + poll.group.subject.name
+        res += u' ' + poll.group.get_type_display()
+        res += u' ' + poll.group.get_teacher_full_name()
+    except:
+        res += u' ' + u'Ankieta ogólna'
+    res += u'.csv'
+    return unicode(res)
+    
+def csv_prepare_header(sections):
+    """
+    csv_prepare_header prepares header for a specific poll - that is, it provides 
+    questions for the specific poll, prepared as reqired by the csv.writer
+    """
+    row = []
+    for sec_questions in sections:        
+        row += sec_questions
+    return row
+    
+def csv_prepare(handle, poll_sections, poll_data):
+    """
+    csv_prepare prepares the entire csv file - typically this is a file for
+    a specific poll
+    """
+    #handle = StringIO.StringIO() #open(csv_title, 'wb')
+    writer = UnicodeWriter(handle, delimiter=';', quotechar='"', quoting = csv.QUOTE_ALL)    
+    writer.writerow( csv_prepare_header(poll_sections) )    
+    for poll in poll_data:
+        writer.writerow(poll)    
+    return handle
+    

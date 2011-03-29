@@ -336,7 +336,7 @@ Poll.section.createEdit = function( li )
 * Change type event
 *
 * @author mjablonski
-* @param dom-node li - element od questionset
+* @param dom-node li - element of questionset
  */
 
 Poll.section.changeType = function( li )

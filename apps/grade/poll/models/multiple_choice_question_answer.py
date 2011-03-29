@@ -20,7 +20,7 @@ class MultipleChoiceQuestionAnswer( BaseAnswer ):
         for option in self.options.all():
             ans += unicode( option ) + u'; '
         if self.other:
-            ans += unicode( other )
+            ans += unicode( self.other )
         else:
             ans = ans[ :-2 ]
         return ans

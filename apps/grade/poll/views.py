@@ -12,6 +12,7 @@ from django.template                   import RequestContext
 from django.utils                      import simplejson
 from apps.users.decorators             import student_required, employee_required
 from django.contrib.auth.decorators    import login_required
+from django.core.servers.basehttp import FileWrapper
 
 from apps.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
                                               
@@ -43,7 +44,9 @@ from apps.grade.poll.utils           import check_signature, \
                                               group_polls_by_teacher, \
                                               getGroups,\
                                               declination_poll,\
-                                              declination_section
+                                              declination_section,\
+                                              csv_prepare,\
+                                              generate_csv_title
 
 from apps.users.models               import Employee
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
@@ -53,6 +56,10 @@ from form_utils                        import get_section_form_data, \
                                               section_save
 from django.utils.safestring           import SafeUnicode, mark_safe
 from apps.news.models                import News
+from settings import PROJECT_PATH, MEDIA_ROOT
+from os import sep
+from django.utils.encoding import smart_str, smart_unicode
+
 
 def rules(request):
     grade = Semester.get_current_semester().is_grade_active
@@ -880,6 +887,7 @@ def poll_end_grading( request ):
     request.session.clear()
     
     return HttpResponseRedirect( '/news/grade/' )
+
 #### Poll results ####
 
 @login_required
@@ -993,6 +1001,37 @@ def poll_results( request, mode='S', poll_id = None ):
             messages.error( request, "Nie masz uprawnień do oglądania wyników tej ankiety." )
  
     return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))
+
+def save_csv(request, mode, poll_id):    
+    poll = Poll.objects.get( pk = poll_id )
+    csv_title = generate_csv_title(poll)
+    full_path = PROJECT_PATH + sep + MEDIA_ROOT + sep + csv_title
+
+    # For each section: section title and contents of all questions
+    poll_answers = poll.all_answers()    
+    sections = []    
+    for section, section_answers in poll_answers:            
+        sections.append( map (lambda q: u'[' + unicode(section.title) + u']' + unicode(q.content), section.all_questions()) )         
+                        
+    # For each ticket (that is, response to the poll): answers to all questions
+    poll_answers = poll.all_answers_by_tickets()
+    answers = []
+    for ticket, sections_list in poll_answers:
+        answer = []  
+        for section, section_answers in sections_list:        
+            # Actual answers to these questions                       
+            for question, question_answer in section_answers:
+                if question_answer == []:
+                    answer.append(u'')
+                else:                    
+                    answer.append( unicode(question_answer[0]) )
+        answers.append( answer )       
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename='+ smart_str(csv_title)        
+    csv_content = csv_prepare(response, sections, answers)
+    return response
+    #return HttpResponseRedirect(reverse( 'grade-poll-poll-results', args=[mode, poll_id] ))
+    
 
 def share_results_toggle( request, mode, poll_id ):
     poll = Poll.objects.get( pk = poll_id )

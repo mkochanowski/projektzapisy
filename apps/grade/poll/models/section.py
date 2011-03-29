@@ -38,6 +38,12 @@ class Section( models.Model ):
             result.append( question.get_all_answers_from_poll( poll, self ))
         return self, result
         
+    def all_answers_for_ticket( self, poll, ticket ):
+        result = []
+        for question in self.all_questions():
+            result.append( question.get_all_answers_from_poll_for_ticket( poll, self, ticket ))
+        return self, result        
+        
 class SectionOrdering( models.Model ):
     poll     = models.ForeignKey( 'Poll',      verbose_name = 'ankieta' )
     section  = models.ForeignKey( Section, verbose_name = 'sekcja' )

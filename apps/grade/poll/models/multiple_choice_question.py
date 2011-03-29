@@ -26,6 +26,11 @@ class MultipleChoiceQuestion( BaseQuestion ):
         for st in sts:
             result += st.multiplechoicequestionanswer_set.filter( question = self, section = section )
         return self, result
+        
+    def get_all_answers_from_poll_for_ticket(self, poll, section, ticket):
+        result = []
+        result += ticket.multiplechoicequestionanswer_set.filter( question = self, section = section )
+        return self, result  
 
 
 class MultipleChoiceQuestionOrdering( models.Model ):
