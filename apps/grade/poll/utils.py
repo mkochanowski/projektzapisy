@@ -324,6 +324,7 @@ def generate_csv_title(poll):
         res += u' ' + poll.group.get_teacher_full_name()
     except:
         res += u' ' + u'Ankieta ogólna'
+    res += u' ' + unicode(poll.pk)
     res += u'.csv'
     return unicode(res)
     

@@ -56,8 +56,6 @@ from form_utils                        import get_section_form_data, \
                                               section_save
 from django.utils.safestring           import SafeUnicode, mark_safe
 from apps.news.models                import News
-from settings import PROJECT_PATH, MEDIA_ROOT
-from os import sep
 from django.utils.encoding import smart_str, smart_unicode
 
 
@@ -1005,7 +1003,6 @@ def poll_results( request, mode='S', poll_id = None ):
 def save_csv(request, mode, poll_id):    
     poll = Poll.objects.get( pk = poll_id )
     csv_title = generate_csv_title(poll)
-    full_path = PROJECT_PATH + sep + MEDIA_ROOT + sep + csv_title
 
     # For each section: section title and contents of all questions
     poll_answers = poll.all_answers()    
