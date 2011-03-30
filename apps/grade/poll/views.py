@@ -944,8 +944,16 @@ def poll_results( request, mode='S', poll_id = None ):
                         options  = question.options.all()
                         ans_data = []
                         for option in options:
-                            ans_data.append(( option.content, q_data.count( option ), int(100 * (float(q_data.count( option )) / float(sts_fin)))))
-                        ans_data.append((u"Brak odpowiedzi", sts_fin - len( q_data), int(100 * (float(sts_fin - len( q_data))/ float(sts_fin)))))
+                            if sts_fin:
+                                perc = int(100 * (float(q_data.count( option )) / float(sts_fin)))
+                            else:
+                                perc = 0
+                            ans_data.append(( option.content, q_data.count( option ), perc))
+                        if sts_fin:
+                            perc = int(100 * (float(sts_fin - len( q_data))/ float(sts_fin)))
+                        else:
+                            perc = 0
+                        ans_data.append((u"Brak odpowiedzi", sts_fin - len( q_data), perc))
                         s_ans.append(( mode, question.content, ans_data, ( 100 / len( ans_data ))-1))
                         
                     elif isinstance( question, MultipleChoiceQuestion ):
@@ -960,10 +968,22 @@ def poll_results( request, mode='S', poll_id = None ):
                         options            = question.options.all()
                         ans_data           = []
                         for option in options:
-                            ans_data.append(( option.content, q_data.count( option ), int(100 * (float(q_data.count( option )) / float(sts_fin)))))
+                            if sts_fin:
+                                perc = int(100 * (float(q_data.count( option )) / float(sts_fin)))
+                            else:
+                                perc = 0
+                            ans_data.append(( option.content, q_data.count( option ), perc))
                         if question.has_other:
-                            ans_data.append(( u"Inne", len( other_data ), int(100 * (float(len( other_data)) / float(sts_fin))), other_data))
-                        ans_data.append((u"Brak odpowiedzi", sts_fin - len( question_answers), int(100 * (float(sts_fin - len(question_answers))/ float(sts_fin)))))
+                            if sts_fin:
+                                perc = int(100 * (float(len( other_data)) / float(sts_fin)))
+                            else:
+                                perc = 0
+                            ans_data.append(( u"Inne", len( other_data ), perc, other_data))
+                        if sts_fin:
+                            perc = int(100 * (float(sts_fin - len(question_answers))/ float(sts_fin)))
+                        else:
+                            perc = 0
+                        ans_data.append((u"Brak odpowiedzi", sts_fin - len( question_answers), perc))
                         s_ans.append(( mode, question.content, ans_data, ( 100 / len( ans_data ))-1))
                         
                     elif isinstance( question, OpenQuestion ):
@@ -973,7 +993,11 @@ def poll_results( request, mode='S', poll_id = None ):
                         
                 answers.append(( section.title, s_ans ))
 
-            data['completness'] = SafeUnicode( u"Liczba studentów, którzy zakończyli wypełniać ankietę: %d<br/>Liczba studentów którzy nie zakończyli wypełniać ankiety: %d" % ( sts_fin, sts_not_fin ))
+            
+            if semester.is_grade_active: 
+                data['completness'] = SafeUnicode( u"Liczba studentów, którzy zakończyli wypełniać ankietę: %d<br/>Liczba studentów którzy nie zakończyli wypełniać ankiety: %d" % ( sts_fin, sts_not_fin ))
+            else:
+                data['completness'] = SafeUnicode( u"Liczba studentów, którzy wypełnili ankietę: %d" % ( sts_fin ))
             data['poll_title']  = poll.title
             try:
                 data[ 'poll_subject' ] = poll.group.subject.name
@@ -998,7 +1022,7 @@ def poll_results( request, mode='S', poll_id = None ):
         else:
             messages.error( request, "Nie masz uprawnień do oglądania wyników tej ankiety." )
  
-    return render_to_response ('grade/poll/poll_results.html', data, context_instance = RequestContext ( request ))
+    return render_to_response ('grade/poll/poll_total_results.html', data, context_instance = RequestContext ( request ))
 
 def save_csv(request, mode, poll_id):    
     poll = Poll.objects.get( pk = poll_id )

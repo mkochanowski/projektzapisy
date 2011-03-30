@@ -128,8 +128,8 @@ tr:nth-child(odd) {
     text-align: center;
 }
 
-.section-link, .show-ans-link{
-    width: 100;
+.section-link, .show-ans-link, .show-other-ans-link{
+    width: 100%;
     text-decoration: none;
     color: black; }
 

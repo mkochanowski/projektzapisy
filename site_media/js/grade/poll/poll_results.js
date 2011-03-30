@@ -43,6 +43,11 @@ Poll.results.init = function()
         return false;
     })
     
+    $('.show-other-ans-link').click(function(){
+        $(this).parent().siblings('.hidden-answers').slideToggle(250);
+        return false;
+    })
+    
     $('.section-link').click(function(){
         $(this).parent().siblings('table').slideToggle(250);
         return false;
