@@ -887,7 +887,6 @@ def poll_end_grading( request ):
     return HttpResponseRedirect( '/news/grade/' )
 
 #### Poll results ####
-
 @login_required
 def poll_results( request, mode='S', poll_id = None ):
     ###
@@ -922,12 +921,16 @@ def poll_results( request, mode='S', poll_id = None ):
         request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
         data['polls_by_subject']            = request.session['polls_by_subject']
         data['polls_by_teacher']            = request.session['polls_by_teacher']
-
         
     if poll_id:
         data['pid']       = poll_id
-        poll              = Poll.objects.get( id = poll_id )
         data['link_mode'] = mode
+        try:
+            poll              = Poll.objects.get( id = poll_id )
+        except:
+            messages.error(request, u"Podana ankieta nie istnieje." )
+            return render_to_response ('grade/poll/poll_total_results.html', data, context_instance = RequestContext ( request ))
+    
         if poll.is_user_entitled_to_view_result( request.user ):
             poll_answers = poll.all_answers()
             sts_fin      = SavedTicket.objects.filter( poll = poll, finished = True  ).count()
@@ -1024,6 +1027,95 @@ def poll_results( request, mode='S', poll_id = None ):
  
     return render_to_response ('grade/poll/poll_total_results.html', data, context_instance = RequestContext ( request ))
 
+@login_required
+def poll_results_detailed( request, mode, poll_id, st_id = None ):
+    data = {}
+    data['grade'] = Semester.get_current_semester().is_grade_active
+    
+    if mode == 'S':
+        data['mode']  = 'subject'
+    elif mode == 'T':
+        data['mode']  = 'teacher'
+    
+    semester      = Semester.get_current_semester()
+    if semester.is_grade_active:
+        messages.info( request, "Ocena zajęć jest otwarta; wyniki nie są kompletne." )
+       
+    try:
+        data['polls_by_subject'] = request.session['polls_by_subject']
+        data['polls_by_teacher'] = request.session['polls_by_teacher']
+    except:
+        polls = filter( lambda x: x.is_user_entitled_to_view_result( request.user ), 
+                                Poll.get_polls_for_semester())
+        request.session['polls_by_subject'] = group_polls_by_subject( polls )
+        request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
+        data['polls_by_subject']            = request.session['polls_by_subject']
+        data['polls_by_teacher']            = request.session['polls_by_teacher']
+        
+    data['pid']       = poll_id
+    data['link_mode'] = mode
+    try:
+        poll              = Poll.objects.get( id = poll_id )
+    except:
+        messages.error(request, u"Podana ankieta nie istnieje." )
+        return render_to_response ('grade/poll/poll_total_results.html', data, context_instance = RequestContext ( request ))
+
+    if poll.is_user_entitled_to_view_result( request.user ):
+        
+        if not st_id:
+            sts = SavedTicket.objects.filter( poll = poll, finished = True )
+            data['page'] = 1
+            data['sts']  = sts
+            request.session[ 'sts' ] = data[ 'sts' ]
+        else:
+            try:
+                data['sts'] = request.session['sts']
+            except:
+                sts = SavedTicket.objects.filter( poll = poll, finished = True )
+                data['sts']  = sts
+                request.session[ 'sts' ] = data[ 'sts' ]
+                
+            sts  = data['sts']
+            data['page'] = 1
+            err = True
+            for i, st in enumerate( sts ):
+                if unicode(st.id) == unicode(st_id):
+                    data['page'] = i+1
+                    err = False
+                    break
+            if err: messages.error( request, u"Nie istnieje taka odpowiedź na ankietę" )
+
+        sts = list( sts )
+        if sts:
+            st   = sts[ data['page'] - 1 ]
+            
+            form = PollForm()
+            form.setFields( poll, st )
+            data[ 'form' ] = form
+            
+            data['first'] = sts[ 0 ].id
+            data['last']  = sts[ -1 ].id
+            data[ 'connected' ] = []
+            for cst in SavedTicket.objects.filter( ticket = st.ticket, finished = True ).exclude( poll = poll ):
+                cform = PollForm()
+                cform.setFields( cst.poll, cst )
+                data['connected'].append( cform )
+            
+            pages = []
+            for i, t in enumerate( data['sts']): pages.append(( i+1, t.id ))
+            beg = data[ 'page' ] - 10
+            if beg < 1: beg = 1
+            end = beg + 50
+            data['pages'] = pages[beg-1:end-1]
+        else:
+            messages.error( request, "Brak odpowiedzi na tą ankietę." )
+        
+    else:
+        messages.error( request, "Nie masz uprawnień do oglądania wyników tej ankiety." )
+            
+    return render_to_response ('grade/poll/poll_detailed_results.html', data, context_instance = RequestContext ( request ))
+
+@login_required
 def save_csv(request, mode, poll_id):    
     poll = Poll.objects.get( pk = poll_id )
     csv_title = generate_csv_title(poll)
@@ -1052,8 +1144,8 @@ def save_csv(request, mode, poll_id):
     csv_content = csv_prepare(response, sections, answers)
     return response
     #return HttpResponseRedirect(reverse( 'grade-poll-poll-results', args=[mode, poll_id] ))
-    
-
+ 
+@login_required
 def share_results_toggle( request, mode, poll_id ):
     poll = Poll.objects.get( pk = poll_id )
     poll.share_result = not poll.share_result

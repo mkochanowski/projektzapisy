@@ -1,0 +1,34 @@
+{% extends "grade/poll/poll_results.html" %}
+
+{% block results %}
+    {% if form %}
+        <div id="ans-title"><h1>Odpowiedź {{ page }}</h1></div>
+        <br/><br/>
+        {{ form.as_divs }}
+        
+        {% if connected %}
+        <a class="connected-link">Powiązane odpowiedzi</a>
+        <hr/>
+        <div class="connected-polls">
+            <br/><br/>
+            {% for cform in connected %}
+                {{ cform.as_divs }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="pages">
+            <span class="beglink">
+                <a href="{% url grade-poll-poll-results-detailed link_mode pid first %}">Pierwsza odpowiedź</a>
+            </span>
+            {% for pg in pages %}
+                <span class="page-link {% if pg.0 == page %}active{%endif%}">
+                    <a href="{% url grade-poll-poll-results-detailed link_mode pid pg.1 %}">{{ pg.0 }}</a>
+                </span>
+            {% endfor %}
+            <span class="endlink">
+                <a href="{% url grade-poll-poll-results-detailed link_mode pid last %}">Ostatnia odpowiedź</a>
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}

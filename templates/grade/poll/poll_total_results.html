@@ -79,6 +79,9 @@
                 </table>
             </div>
         {% endfor %}
+        <span class="result-details">
+            <a href="{% url grade-poll-poll-results-detailed link_mode pid %}">Szczegółowe wyniki</a>
+        </span>
         {% if show_share_toggle %}
             <span class="share-results-toggle">
                 <a href="{% url grade-poll-share-results link_mode pid %}">
