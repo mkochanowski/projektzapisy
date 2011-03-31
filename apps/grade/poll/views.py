@@ -6,7 +6,8 @@ from django.core.exceptions            import ObjectDoesNotExist, \
                                               ValidationError
 from django.core.urlresolvers          import reverse
 from django.http                       import HttpResponse, \
-                                              HttpResponseRedirect
+                                              HttpResponseRedirect,\
+                                              Http404
 from django.shortcuts                  import render_to_response
 from django.template                   import RequestContext
 from django.utils                      import simplejson
@@ -27,7 +28,8 @@ from apps.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SavedTicket, \
                                               SingleChoiceQuestionAnswer, \
                                               MultipleChoiceQuestionAnswer, \
-                                              OpenQuestionAnswer, Option, Template
+                                              OpenQuestionAnswer, Option, Template, \
+                                              TemplateSections
 from apps.users.models               import Type
 from apps.grade.poll.forms           import TicketsForm, \
                                               PollForm, \
@@ -53,6 +55,131 @@ from form_utils                        import get_section_form_data, \
                                               section_save
 from django.utils.safestring           import SafeUnicode, mark_safe
 from apps.news.models                import News
+
+
+@employee_required
+def templates( request ):
+    """
+        Preparation of template list;
+    """
+    data = {}
+    templates = Template.objects.filter(deleted=False)
+    paginator = Paginator(templates, 25)
+
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    # If page request (9999) is out of range, deliver last page of results.
+    try:
+        templates = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        templates = paginator.page(paginator.num_pages)
+
+    data['templates'] = templates
+    data['grade']  = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
+
+@employee_required
+def use_templates( request ):
+    pass
+
+@employee_required
+def template_actions( request ):
+    data = {}
+    data['grade']  = Semester.get_current_semester().is_grade_active
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'delete_selected':
+            data['templates'] = get_objects( request, Template)
+            return render_to_response( 'grade/poll/managment/templates_confirm.html',
+                                       data, context_instance = RequestContext( request ))
+
+        elif action == 'use_selected':
+            pass
+
+    return HttpResponseRedirect(reverse('grade-poll-templates'))
+
+def get_objects( request, object ):
+    pks = request.POST.getlist('_selected_action')
+    return object.objects.filter( pk__in=pks)
+
+@employee_required
+def delete_templates( request ):
+    if request.method == 'POST':
+        counter = delete_objects(request, Template, 'templates[]')
+        message = u'Usunięto ' + unicode(counter) + u' ' + declination_section(counter)
+        messages.info(request, SafeUnicode(message))
+            
+    return HttpResponseRedirect(reverse('grade-poll-templates'))
+
+def delete_objects( request, object, object_list ):
+    pks = request.POST.getlist(object_list)
+    counter = 0
+    for pk in pks:
+        element = object.objects.get(pk=pk)
+        element.deleted = True
+        element.save()
+        counter = counter + 1
+
+    return counter
+
+@employee_required
+def show_template( request, template_id ):
+    pass
+
+# save poll as template
+# @author mjablonski
+@employee_required
+def create_template(request):
+    if request.method <> "POST":
+        raise Http404
+
+    type         = int(request.POST.get('type', 0))
+    studies_type = int(request.POST.get('studies-type', -1))
+    subject      = int(request.POST.get('subject', 0))
+
+    if studies_type > -1:
+        studies_type = Type.objects.get(pk=studies_type)
+    else:
+        studies_type = None
+
+    if subject > 0:
+        subject = Subject.objects.get(pk=subject)
+    elif subject == 0:
+        subject = None
+    else:
+        subject = -1
+
+    if type == 0:
+        type = None
+
+    tmpl = Template()
+    tmpl.title        = request.POST.get('title', '')
+    tmpl.description  = request.POST.get('description', '')
+    tmpl.studies_type = studies_type
+    if subject == -1:
+        tmpl.no_subject = True
+        tmpl.subject    = None
+    else:
+        tmpl.no_subject = False
+        tmpl.subject    = subject
+
+    tmpl.group_type   = type
+
+    tmpl.save()
+    for section in request.POST.getlist('sections[]'):
+        sections = TemplateSections()
+        sections.template = tmpl
+        sections.section  = Section.objects.get(pk=section)
+        sections.save()
+
+    return HttpResponseRedirect( reverse('grade-poll-templates') )
+
 
 def rules(request):
     grade = Semester.get_current_semester().is_grade_active
@@ -186,12 +313,11 @@ def poll_create(request, group_id = 0):
     polls   = []
 
     if request.method == "POST":
-        semester = int(request.POST.get('semester', 0))
-        group    = int(request.POST.get('group', 0))
-        type     = int(request.POST.get('type', 0))
+        semester     = int(request.POST.get('semester', 0))
+        group        = int(request.POST.get('group', 0))
+        type         = int(request.POST.get('type', 0))
         studies_type = int(request.POST.get('studies-type', -1))
-        subject  = int(request.POST.get('subject', 0))
-        
+        subject      = int(request.POST.get('subject', 0))
         groups_without = request.POST.get('poll-only-without', None)
         
         request.session['studies_type'] = studies_type
@@ -341,18 +467,6 @@ def poll_create(request, group_id = 0):
 #
 # Poll managment
 #
-
-@employee_required
-def templates( request ):
-    data = {}
-    templates = Template.objects.filter(deleted=False)
-    data['templates'] = templates
-    data['grade']  = Semester.get_current_semester().is_grade_active
-    return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
-
-@employee_required
-def use_templates( request ):
-    pass
     
 @employee_required
 def sections_list( request ):

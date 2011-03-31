@@ -6,8 +6,11 @@
 <script src="/site_media/js/grade/ticket_create/keys_generate.js" type="application/javascript"></script>
 <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
 <script type="text/javascript">
+
     var url_generate = '{% url grade-ticket-keys-generator %}'
     var url_progress = '{% url grade-ticket-keys-progress %}'
+    var url_template = '{% url grade-poll-create-template %}'
+
 </script>
 	
 {% endblock %}
@@ -127,7 +130,7 @@
             <textarea name="description"></textarea>
             <hr>
             <div id="sections-list">
-                Wybrane sekcje: <!-- TODO: brak, gdy puste -->
+                Wybrane sekcje:
                 <ul>
                 </ul><small>(Przeciągnij, aby zmienić kolejność)</small>
             </div><br/>
@@ -139,6 +142,7 @@
             </select>
             <input id="section-add" type="button" value="Dodaj sekcję"><br/>
             <input id="poll-create-submit" type="submit" value="Stwórz ankietę">
+            <input id="poll-create-template" type="submit" value="Utwórz szablon">
         </form>
 
     {% comment %} Grey screen {% endcomment %}

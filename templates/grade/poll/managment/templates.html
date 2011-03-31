@@ -1,0 +1,60 @@
+{% extends "grade/poll/managment/base.html" %}
+
+{% block scripts %}
+<script src="/site_media/js/grade/managment/list.js" type="application/javascript"></script>
+{% endblock %}
+
+{% block poll-managment %}
+<form method="POST" action="{% url grade-poll-template-action %}">
+<div class="actions">
+	<label>Akcja:
+		<select name="action">
+		<option selected="selected" value="">---------</option>
+		<option value="delete_selected">Usuń wybrane szablony</option>
+		<option value="use_selected">Zastosuje wybrane szablony</option>
+		</select>
+	</label>
+   	<button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
+        <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{templates.object_list.count}} wybranych</span>
+</div>
+<table id="poll-managment-table">
+	<thead>
+	<tr>
+		<th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;"></th>
+		<th>Szablony</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for template in templates.object_list %}
+        <tr>
+            <td class="action-checkbox-column">
+                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{template.pk}}" class="action-select" {% if not user.is_staff %} disabled {% endif %}>
+            </td>
+            <td>
+                <a href="{% url grade-poll-show_template template.id %}">{{template}}</a>
+            </td>
+        </tr>
+    	{% endfor %}
+	</tbody>
+</table>
+</form>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if templates.has_previous %}
+            <a href="?page={{ templates.previous_page_number }}">poprzednia</a>
+        {% endif %}
+
+        <span class="current">
+            Strona {{ templates.number }} z {{ templates.paginator.num_pages }}
+        </span>
+
+        {% if templates.has_next %}
+            <a href="?page={{ templates.next_page_number }}">nastepna</a>
+        {% endif %}
+    </span>
+</div>
+
+<!-- to jest liczenie nie tego co trzeba, a do tego jest bez odmiany :( -->
+<p>{{templates.paginator.count}} Szablony</p>
+{% endblock %}

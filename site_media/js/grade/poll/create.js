@@ -1,5 +1,3 @@
-
-
 if (typeof Poll == 'undefined')
     Poll = new Object();
 
@@ -38,6 +36,11 @@ Poll.create.init = function()
     		return false;
   		}
 	});
+
+    $('#poll-create-template').click(function()
+    {
+        $('#poll-create').attr("action", url_template);
+    })
 }
 
 $(Poll.create.init);
@@ -178,15 +181,4 @@ Poll.create.getSection = function( section_id, li )
 Poll.create.removeSection = function(sectionElement)
 {
     $(sectionElement).remove();
-}
-
-/*
-* If we created polls, we must create keys.
-*
-* @author mjablonski
- */
-
-Poll.create.generateKeys = function()
-{
-
 }

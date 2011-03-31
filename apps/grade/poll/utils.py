@@ -178,14 +178,14 @@ def getGroups(semester, group = None, type = None, subject = None):
         return group
     if type:
         if subject:
-            groups = Group.objects.filter(type=type, subject=subject)
+            groups = Group.objects.filter( type=type, subject=subject )
         else:
-            groups = Group.objects.filter(type=type)
+            groups = Group.objects.filter( type=type )
     else:
         if subject:
-            groups = Group.objects.filter(subject=subject)
+            groups = Group.objects.filter( subject=subject )
         else:
-            groups = Group.objects.filter(subject__semester = semester)
+            groups = Group.objects.filter( subject__semester = semester )
 
     return groups
 

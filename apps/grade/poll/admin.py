@@ -17,7 +17,8 @@ from apps.grade.poll.models import Option, \
                                      SavedTicket, \
                                      OpenQuestionAnswer, \
                                      SingleChoiceQuestionAnswer, \
-                                     MultipleChoiceQuestionAnswer
+                                     MultipleChoiceQuestionAnswer, Template, \
+                                     TemplateSections
 
 admin.site.register( Option )
 admin.site.register( OpenQuestionOrdering )
@@ -33,3 +34,5 @@ admin.site.register( SavedTicket )
 admin.site.register( OpenQuestionAnswer )
 admin.site.register( SingleChoiceQuestionAnswer )
 admin.site.register( MultipleChoiceQuestionAnswer )
+admin.site.register( Template )
+admin.site.register( TemplateSections )
