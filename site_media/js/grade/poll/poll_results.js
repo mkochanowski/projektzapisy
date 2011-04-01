@@ -8,6 +8,7 @@ Poll.results.init = function()
     var pid  = $('#poll-id').val();
     var mode = $('#display-mode').val();
     
+    $('.connected-polls').hide();
     $('.hidden-answers').hide();
     $('.result-groupped-list').hide();
 	$('#results-by-subject-list').hide();
@@ -43,9 +44,18 @@ Poll.results.init = function()
         return false;
     })
     
+    $('.show-other-ans-link').click(function(){
+        $(this).parent().siblings('.hidden-answers').slideToggle(250);
+        return false;
+    })
+    
     $('.section-link').click(function(){
         $(this).parent().siblings('table').slideToggle(250);
         return false;
+    })
+    
+    $('.connected-link').click(function(){
+        $(this).siblings('.connected-polls').slideToggle(250);
     })
 }
 
