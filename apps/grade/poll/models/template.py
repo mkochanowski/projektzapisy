@@ -48,5 +48,7 @@ class TemplateSections( models.Model ):
         verbose_name_plural = 'pozycje sekcji'
         verbose_name        = 'pozycja sekcji'
         app_label           = 'poll'
+        ordering = ['id']
+
 
 

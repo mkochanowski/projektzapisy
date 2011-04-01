@@ -27,6 +27,11 @@ class SingleChoiceQuestion( BaseQuestion ):
             result += st.singlechoicequestionanswer_set.filter( question = self, section = section )
         return self, result
 
+    def get_all_answers_from_poll_for_ticket(self, poll, section, ticket):
+        result = []
+        result += ticket.singlechoicequestionanswer_set.filter( question = self, section = section )
+        return self, result         
+
 class SingleChoiceQuestionOrdering( models.Model ):
     question   = models.ForeignKey( SingleChoiceQuestion, 
                                     verbose_name = 'pytanie' )

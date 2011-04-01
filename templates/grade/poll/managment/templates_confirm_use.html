@@ -1,0 +1,16 @@
+{% extends "grade/poll/managment/base.html" %}
+
+{% block poll-managment %}
+    Czy na pewno chcesz zastosować poniższe szablony?
+    <form action="{% url grade-poll-use-template %}" method="POST">
+        <ul>
+            {% for template in templates %}
+                <li>
+                    <input type="hidden" name="templates[]" value="{{ template.pk }}">
+                    <a href="{% url grade-poll-show_template template.pk %}">{{template}}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="submit" value="Zastosuj">
+    </form>
+{% endblock %}

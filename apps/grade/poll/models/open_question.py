@@ -20,6 +20,11 @@ class OpenQuestion( BaseQuestion ):
         for st in sts:
             result += st.openquestionanswer_set.filter( question = self, section = section )
         return self, result
+        
+    def get_all_answers_from_poll_for_ticket(self, poll, section, ticket):        
+        result = []
+        result += ticket.openquestionanswer_set.filter( question = self, section = section )
+        return self, result        
 
 class OpenQuestionOrdering( models.Model ):
     question = models.ForeignKey( OpenQuestion, verbose_name = 'pytanie' )

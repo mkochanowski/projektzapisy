@@ -160,6 +160,9 @@
                     </a>
                 </span>
             {% endif %}
+            <span class="save-csv">
+                <a href="{% url grade-poll-save-csv link_mode pid %}">Pobierz ankietę jako plik csv</a>
+            </span>
         {% else %}
             Wybierz ankietę z menu po prawej
         {% endif %}

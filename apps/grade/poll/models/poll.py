@@ -13,6 +13,7 @@ from apps.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
 from apps.grade.ticket_create.models import PublicKey                                              
 from section                           import SectionOrdering
+from saved_ticket                       import SavedTicket
 
 class Poll( models.Model ):
     author            = models.ForeignKey( Employee, verbose_name = 'autor', related_name = 'author' )
@@ -163,3 +164,17 @@ class Poll( models.Model ):
     
     def get_section_by_id(self, section_id):
         return self.section_set.get(section__pk = section_id)
+            
+    def all_answers_by_tickets( self ):
+        results = []
+        tickets = SavedTicket.objects.filter( poll = self, finished = True)
+        sections = self.all_sections()
+        for ticket in tickets:
+            sections_answers = []
+            # for each section, we want to get all the answers for this section's questions - and in the right order!
+            for section in sections:
+                answers_in_section = section.all_answers_for_ticket(self, ticket)
+                sections_answers.append( answers_in_section )                
+            #print sections_answers
+            results.append( (ticket, sections_answers) ) 
+        return results

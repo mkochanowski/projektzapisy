@@ -1,5 +1,4 @@
 ﻿{% extends "grade/poll/managment/base.html" %}
-
 {% block scripts %}
 
 <script src="/site_media/js/grade/poll/create.js" type="text/javascript"></script>
@@ -24,27 +23,6 @@
 
 
 {% block poll-managment %}
-
-	{% if message == "Utworzono ankiety!" %}
-		<div class="main-message">
-			{% if polls_len == 0 %}
-				Nie utworzono żadnej ankiety.
-			{% else %}
-				Liczba utworzonych ankiet: {{polls_len}}
-				<ul>
-					{% for poll in polls %}
-						<li>{{poll}}</li>
-					{% endfor %}
-				</ul>
-			{% endif %}
-		</div>
-	{% else %}
-		{% if message %}
-		<div class="main-message">
-				{{ message }}
-		</div>
-		{% endif %}
-	{% endif %}
         <form method="POST" id="poll-create">
             <table>
                 <tr>
@@ -67,7 +45,7 @@
                         <select name="studies-type" id="studies-type">
                             <option value="-1">Dowolny</option>
                             {% for study_type in studies_types %}
-                                <option value="{{study_type.pk}}"{% if study_type.pk == studies_type %} selected{% endif %}>{{study_type}}</option>
+                                <option value="{{study_type.pk}}"{% if study_type.pk == studies_type.pk %} selected{% endif %}>{{study_type}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -80,8 +58,8 @@
                         <select name="subject" id="subjects">
                             <option value="-1">Nie przypisane do przedmiotu</option>
                             <option value="0"{% if subject_id == 0 %} selected{% endif %}>Wszystkie przedmioty</option>
-                            {% for subject in subjects %}
-                                <option value="{{subject.pk}}"{% if subject_id == subject.pk %} selected{% endif %}>{{subject.name}}</option>
+                            {% for sub in subjects %}
+                                <option value="{{sub.pk}}"{% if sub.pk == subject.pk %} selected{% endif %}>{{sub.name}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -93,8 +71,8 @@
                     <td>
                         <select name="type" id="type" class="type-visibility">
                             <option value="0">Wszystkie typy</option>
-                            {% for k, v in types %}{{k}}
-                                <option value="{{k}}"{% if type == k %} selected{% endif %}>{{v}}</option>
+                            {% for k, v in types %}
+                                <option value="{{k}}"{% if k == type %} selected{% endif %}>{{v}}</option>
                             {% endfor %}
                         </select>
                     </td>
@@ -108,7 +86,7 @@
                             <option value="0">Wszystkie grupy</option>
                             {% if group > 0 %}
                                 {% for gr in groups %}
-                                    <option value="{{ gr.pk }}"{% if gr.pk == group %} selected{% endif %}>{{ gr }}</option>
+                                    <option value="{{ gr.pk }}"{% if gr.pk == group.pk %} selected{% endif %}>{{ gr }}</option>
                                 {% endfor %}
                             {% endif %}
                         </select>
@@ -119,7 +97,7 @@
                         <label for="poll-only-without">Utwórz tylko dla grup bez ankiet</label>
                     </td>
                     <td>
-                        <input type="checkbox" name="poll-only-without" id="poll-only-without"{% if poll_without %} checked{% endif %}>
+                        <input type="checkbox" name="poll-only-without" id="poll-only-without"{% if groups_without == "on" %} checked{% endif %}>
                     </td>
                 </tr>
             </table><hr>
