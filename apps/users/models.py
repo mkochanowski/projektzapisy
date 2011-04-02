@@ -20,7 +20,7 @@ class BaseUser(models.Model):
     User abstract class. For every app user there is entry in django.auth.
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, verbose_name="Użytkownik")
     receive_mass_mail_enrollment = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia Zapisów")
@@ -30,6 +30,7 @@ class BaseUser(models.Model):
     
     def get_full_name(self):
         return self.user.get_full_name()
+    get_full_name.short_description = 'Użytkownik'
     
     @staticmethod
     def get(user_id):
@@ -39,9 +40,14 @@ class BaseUser(models.Model):
             logger.error('Getter(user_id = %d) in BaseUser throws User.DoesNotExist exception.' % user_id )
             raise NonUserException
         return user
+
+    def __unicode__(self):
+        return self.get_full_name
     
     class Meta:
         abstract = True
+
+
 
 class Employee(BaseUser):
     '''
@@ -83,7 +89,7 @@ class Employee(BaseUser):
         app_label = 'users'
       
     def __unicode__(self):
-        return str(self.user)
+        return str(self.user.get_full_name())
 
 class Student(BaseUser):
     ''' 
@@ -99,7 +105,8 @@ class Student(BaseUser):
     def get_type_of_studies(self):
         """ returns type of studies """
         semestr = {1:'pierwszy',2:'drugi',3:'trzeci',4:'czwarty',5:'piąty',6:'szósty',7:'siódmy',8:'ósmy',9:'dziewiąty',10:'dziesiąty',0:'niezdefiniowany'}[self.semestr]
-        return '%s, %s semestr' % (self.program , semestr)
+        return '%s, semestr %s' % (self.program , semestr)
+    get_type_of_studies.short_description = 'Studia'
 
     def get_t0_interval(self):
         return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
@@ -175,7 +182,7 @@ class Student(BaseUser):
         app_label = 'users'
     
     def __unicode__(self):
-        return str(self.user)
+        return str(self.user.get_full_name())
 
 
 class Program( models.Model ):
