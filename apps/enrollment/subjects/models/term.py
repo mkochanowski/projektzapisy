@@ -47,4 +47,4 @@ class Term( models.Model ):
         return "%s – %s" % (self.start_time.strftime("%H"), self.end_time.strftime("%H"))
         
     def __unicode__(self):
-        return "%s (%s-%s) s.%s" % (self.get_dayOfWeek_display(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom)
+        return "%s (%s-%s) s.%s" % (self.get_dayOfWeek_display(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom.number)

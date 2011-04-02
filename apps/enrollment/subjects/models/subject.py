@@ -37,7 +37,7 @@ class VisibleManager(models.Manager):
 
 class Subject( models.Model ):
     """subject in offer"""
-    entity = models.ForeignKey(SubjectEntity)
+    entity = models.ForeignKey(SubjectEntity, verbose_name='podstawa przedmiotu')
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
