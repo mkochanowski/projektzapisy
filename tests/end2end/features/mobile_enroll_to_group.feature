@@ -8,13 +8,11 @@ Background:
      And I press "Zaloguj"
 
 Scenario: Successful adding to group
-     When I follow "Inne przedmioty"
-     And I follow "Bazy danych"
-     And I enroll to group with id "188" on mobile
-     #And I am in the home page
-     Then I should see "Zostałeś zapisany do grupy."
-     And I follow "przejdź do pełnej wersji"
-     And I follow "System zapisów"
-     And I follow "Przedmioty"
-     And I follow "Bazy danych"
-     Then I should see link "/records/188/resign"
+    When I follow "Bazy danych"
+    And I enroll to group with id "241" on mobile
+    Then I should see "Zostałeś zapisany do grupy."
+    When I follow "przejdź do pełnej wersji"
+    And I follow "System zapisów"
+    And I follow "Przedmioty"
+    And I follow "Bazy danych"
+    Then I should see button "wypisz" next to "group-id" with value "241"
