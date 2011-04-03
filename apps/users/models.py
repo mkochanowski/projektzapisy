@@ -54,7 +54,7 @@ class Employee(BaseUser):
     Employee.
     '''
     consultations = models.TextField(verbose_name="konsultacje")
-    homepage = models.SlugField(max_length=255, verbose_name='strona domowa', default="")
+    homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="")
     room = models.PositiveIntegerField(verbose_name="pokój", null=True)
     
     @staticmethod
