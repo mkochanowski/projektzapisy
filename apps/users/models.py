@@ -197,3 +197,19 @@ class Program( models.Model ):
 
     def __unicode__(self):
         return self.name
+
+class StudiaZamawiane(models.Model):
+    """
+        Model przechowuje dodatkowe informacje o studentach zamawianych
+    """
+    student = models.OneToOneField(Student, verbose_name='Student')
+    points =  models.FloatField(verbose_name='Punkty')
+    comments = models.TextField(verbose_name='Uwagi', blank=True)
+    bank_account = models.CharField(max_length=40, blank=True, verbose_name="Numer konta bankowego")
+
+    class Meta:
+        verbose_name = 'Studia zamawiane'
+        verbose_name_plural = 'Studia zamawiane'
+
+    def __unicode__(self):
+        return 'Student zamawiany: '+str(self.student)

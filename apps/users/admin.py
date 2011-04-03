@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from apps.users.models import Employee, Student, Program
+from apps.users.models import Employee, Student, Program, StudiaZamawiane
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('matricula','get_full_name','ects','get_type_of_studies')
@@ -28,6 +28,12 @@ class EmployeeAdmin(admin.ModelAdmin):
     ordering = ['user__last_name','user__first_name']
     list_display_links = ('get_full_name',)
 
+class StudiaZamawianeAdmin(admin.ModelAdmin):
+    list_display = ('__unicode__','points','comments')
+    search_fields = ('student__user__first_name', 'student__user__last_name', 'student__user__matricula')
+    ordering = ['student__user__last_name','student__user__first_name']
+
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Program)
+admin.site.register(StudiaZamawiane, StudiaZamawianeAdmin)
