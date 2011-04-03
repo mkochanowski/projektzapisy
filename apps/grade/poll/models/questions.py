@@ -18,7 +18,10 @@ class Answer( models.Model ):
         app_label           = "poll"
         
     def __unicode__( self ):
-        return self.contents
+        if len(self.contents) > 50:
+            return self.contents[:50] + "..."
+        else:
+            return self.contents
 
 class Question( models.Model ):
     """
