@@ -14,4 +14,4 @@ class Classroom( models.Model ):
         app_label = 'subjects'
     
     def __unicode__(self):
-        return self.number
+        return self.number + ' ('+str(self.capacity)+')'

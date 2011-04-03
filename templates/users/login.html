@@ -9,39 +9,42 @@
 {% endblock %}
 
 {% block content %}
+    {% if user.is_authenticated %}
+        <p class="main-message">Jesteś już zalogowany. Możesz się <a href="{% url user-logout %}">wylogować</a>.</p>
+    {% else %}
+        {% if form.errors %}
+            <p class="main-message">Podany identyfikator i hasło się nie zgadzają. Spróbuj ponownie.</p>
+        {% endif %}
 
-    {% if form.errors %}
-        <p class="main-message">Podany identyfikator i hasło się nie zgadzają. Spróbuj ponownie.</p>
+        <form method="post" action="{% url apps.users.views.login_plus_remember_me %}" id="common-login-form">
+            <table>
+                <tr>
+                    <th>{{ form.username.label_tag }}:</th>
+                    <td>{{ form.username }}</td>
+                </tr>
+                <tr>
+                    <th>{{ form.password.label_tag }}:</th>
+                    <td>{{ form.password }}</td>
+                </tr>
+		        <tr>
+				    <th>Zapamiętaj mnie:</th>
+				    <td><input type="checkbox" name="remember_me" value="true"/></td>
+		        </tr>
+            </table>
+		    <p>
+			    <a href="{% url password-reset %}">Zapomniałeś hasła?</a>
+		    </p>
+            <p>
+                <input type="submit" value="Zaloguj" />
+                <input type="hidden" name="next" value="{{ next }}" />
+            </p>
+        </form>
+
+        <script type="text/javascript">
+            /* <![CDATA[ */
+                $('#id_username').focus();
+            /* ]]> */
+        </script>
     {% endif %}
-
-    <form method="post" action="{% url apps.users.views.login_plus_remember_me %}" id="common-login-form">
-        <table>
-            <tr>
-                <th>{{ form.username.label_tag }}:</th>
-                <td>{{ form.username }}</td>
-            </tr>
-            <tr>
-                <th>{{ form.password.label_tag }}:</th>
-                <td>{{ form.password }}</td>
-            </tr>
-		    <tr>
-				<th>Zapamiętaj mnie:</th>
-				<td><input type="checkbox" name="remember_me" value="true"/></td>
-		    </tr>
-        </table>
-		<p>
-			<a href="{% url password-reset %}">Zapomniałeś hasła?</a>
-		</p>
-        <p>
-            <input type="submit" value="Zaloguj" />
-            <input type="hidden" name="next" value="{{ next }}" />
-        </p>
-    </form>
-
-    <script type="text/javascript">
-        /* <![CDATA[ */
-            $('#id_username').focus();
-        /* ]]> */
-    </script>
     
 {% endblock %}
