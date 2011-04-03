@@ -1669,34 +1669,34 @@
             "receive_mass_mail_offer": true, 
             "user": 2, 
             "matricula": "112233", 
-            "type": 2, 
+            "program": 2, 
             "receive_mass_mail_enrollment": true
         }
     }, 
     {
         "pk": 1, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "licencjackie"
         }
     }, 
     {
         "pk": 2, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "magisterskie"
         }
     }, 
     {
         "pk": 3, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "in\u017cynierskie"
         }
     }, 
     {
         "pk": 4, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "doktoranckie"
         }

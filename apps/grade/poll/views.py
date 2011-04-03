@@ -31,7 +31,6 @@ from apps.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               MultipleChoiceQuestionAnswer, \
                                               OpenQuestionAnswer, Option, Template, \
                                               TemplateSections
-from apps.users.models               import Type
 from apps.grade.poll.forms           import TicketsForm, \
                                               PollForm, \
                                               FilterMenu

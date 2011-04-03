@@ -447,6 +447,14 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
+    def get_point(program,subject):
+      pos = PointsOfSubjects.objects.filter(subject=subject, program=program).values()
+      if not pos:
+         return 0  # tu powinien szukać defaultowej wartości
+      else:
+         return pos[0]["value"]
+
+    @staticmethod
     def is_ECTS_points_limit_exceeded(user_id, group_id):
       """check if the sum of ECTS points for every subject student is enrolled on, exceeds limit"""
       try:
@@ -458,9 +466,10 @@ class Queue(models.Model):
             """ Obliczenie sumy punktów ECTS"""
             groups = Record.get_groups_for_student(user_id)
             subjects = set([g.subject for g in groups])
-            ects = sum([s.ects for s in subjects])
+            program = User.objects.get(id=user_id).student.program
+            ects = sum([Queue.get_point(program,subject) for subject in subjects])
             if group.subject not in subjects:
-	        ects += group.subject.ects
+	        ects += Queue.get_point(program,group.subject)
 	    """ Porównanie sumy z obowiązującym limitem"""
             if ects <= 40:
 	        return False

@@ -9,6 +9,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import simplejson
+from django.views.decorators.http import require_POST
 
 from apps.enrollment.subjects.models import *
 from apps.users.models import *
@@ -18,6 +19,7 @@ from apps.enrollment.subjects.views import prepare_subjects_list_to_render
 
 from datetime import time
 
+@require_POST
 @login_required
 def ajaxPin(request):
     data = {}
@@ -40,6 +42,7 @@ def ajaxPin(request):
         data['Exception']['Message'] = "Nie możesz się przypiąć, bo już jesteś przypięty."
     return HttpResponse(simplejson.dumps(data))
 
+@require_POST
 @login_required
 def ajaxUnpin(request):
     data = {}
@@ -62,6 +65,7 @@ def ajaxUnpin(request):
         data['Exception']['Message'] = "Nie możesz zostać wypięty, bo nie jesteś przypięty."
     return HttpResponse(simplejson.dumps(data))
 
+@require_POST
 @login_required
 def ajaxAssign(request):
     data = {}
@@ -107,6 +111,7 @@ def ajaxAssign(request):
         data['Exception']['Message'] = "Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte."
     return HttpResponse(simplejson.dumps(data))
 
+@require_POST
 @login_required
 def ajaxResign(request):
     data = {}
@@ -135,6 +140,7 @@ def ajaxResign(request):
         data['Exception']['Message'] = "Nie możesz się wypisać, bo nie jesteś zapisany."
     return HttpResponse(simplejson.dumps(data))
 
+@require_POST
 def deleteStudentFromGroup(request, user_id, group_id):
     try:
         
@@ -167,6 +173,7 @@ def deleteStudentFromGroup(request, user_id, group_id):
     else:    
         return render_to_response('enrollment/records/records_list.html', data, context_instance=RequestContext(request))
 
+@require_POST
 @login_required
 def blockPlan(request) :
     data = {}
@@ -180,6 +187,8 @@ def blockPlan(request) :
         data['Exception']['Code'] = "NonStudent"
         data['Exception']['Message'] = "Nie możesz zablokować planu, bo nie jesteś studentem."
     return HttpResponse(simplejson.dumps(data))
+
+@require_POST
 @login_required
 def unblockPlan(request) :
     data = {}
@@ -194,14 +203,19 @@ def unblockPlan(request) :
         data['Exception']['Message'] = "Nie możesz zablokować planu, bo nie jesteś studentem."
     return HttpResponse(simplejson.dumps(data))
 
+@require_POST
 @login_required
 def assign(request, group_id):
     try:
         if request.user.student.block :
             request.user.message_set.create(message="Twój plan jest zablokowany.")
             return render_to_response('common/error.html', context_instance=RequestContext(request))
+        group = Group.objects.get(id=group_id)
+        is_student_already_in_subject_group_type = Record.is_student_in_subject_group_type(user_id=request.user.id, slug=group.subject_slug(), group_type=group.type)
         records_list = Record.add_student_to_group(request.user.id, group_id)
-        if len(records_list) == 1:
+        if is_student_already_in_subject_group_type:
+        	request.user.message_set.create(message="Zostałeś przeniesiony do grupy.")
+        elif len(records_list) == 1:
             request.user.message_set.create(message="Zostałeś zapisany do grupy.")
         else:
             request.user.message_set.create(message="Zostałeś zapisany do wybranej grupy i grupy wykładowej.")
@@ -225,6 +239,7 @@ def assign(request, group_id):
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+@require_POST
 @login_required
 def queue_assign(request, group_id):
     try:
@@ -252,8 +267,7 @@ def queue_assign(request, group_id):
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
-
-
+@require_POST
 @login_required
 def queue_inc_priority(request, group_id):
     try:
@@ -280,6 +294,7 @@ def queue_inc_priority(request, group_id):
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+@require_POST
 @login_required
 def queue_dec_priority(request, group_id):
     try:
@@ -306,6 +321,7 @@ def queue_dec_priority(request, group_id):
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+@require_POST
 @login_required
 def queue_set_priority(request, group_id, priority):
     try:
@@ -334,9 +350,7 @@ def queue_set_priority(request, group_id, priority):
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
-
-
-
+@require_POST
 @login_required
 def change(request, old_id, new_id):
     try:
@@ -362,6 +376,7 @@ def change(request, old_id, new_id):
         request.user.message_set.create(message="Nie możesz się przenieść, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+@require_POST
 @login_required
 def resign(request, group_id):
     try:
@@ -381,6 +396,7 @@ def resign(request, group_id):
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
+@require_POST
 @login_required
 def queue_resign(request, group_id):
     try:
@@ -415,7 +431,7 @@ def records(request, group_id):
     except NonGroupException:
         request.user.message_set.create(message="Podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
-        
+
 @login_required
 def own(request):
     try:

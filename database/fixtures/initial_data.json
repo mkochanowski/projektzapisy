@@ -5487,7 +5487,7 @@
             "receive_mass_mail_offer": true, 
             "user": 100, 
             "matricula": "1000000", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5500,7 +5500,7 @@
             "receive_mass_mail_offer": true, 
             "user": 101, 
             "matricula": "1000001", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5513,7 +5513,7 @@
             "receive_mass_mail_offer": true, 
             "user": 102, 
             "matricula": "1000002", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5526,7 +5526,7 @@
             "receive_mass_mail_offer": true, 
             "user": 103, 
             "matricula": "1000003", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5539,7 +5539,7 @@
             "receive_mass_mail_offer": true, 
             "user": 104, 
             "matricula": "1000004", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5552,7 +5552,7 @@
             "receive_mass_mail_offer": true, 
             "user": 105, 
             "matricula": "1000005", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5565,7 +5565,7 @@
             "receive_mass_mail_offer": true, 
             "user": 106, 
             "matricula": "1000006", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5578,7 +5578,7 @@
             "receive_mass_mail_offer": true, 
             "user": 107, 
             "matricula": "1000007", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5591,7 +5591,7 @@
             "receive_mass_mail_offer": true, 
             "user": 108, 
             "matricula": "1000008", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5604,7 +5604,7 @@
             "receive_mass_mail_offer": true, 
             "user": 109, 
             "matricula": "1000009", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5617,7 +5617,7 @@
             "receive_mass_mail_offer": true, 
             "user": 110, 
             "matricula": "1000010", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5630,7 +5630,7 @@
             "receive_mass_mail_offer": true, 
             "user": 111, 
             "matricula": "1000011", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5643,7 +5643,7 @@
             "receive_mass_mail_offer": true, 
             "user": 112, 
             "matricula": "1000012", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5656,7 +5656,7 @@
             "receive_mass_mail_offer": true, 
             "user": 113, 
             "matricula": "1000013", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5669,7 +5669,7 @@
             "receive_mass_mail_offer": true, 
             "user": 114, 
             "matricula": "1000014", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5682,7 +5682,7 @@
             "receive_mass_mail_offer": true, 
             "user": 115, 
             "matricula": "1000015", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5695,7 +5695,7 @@
             "receive_mass_mail_offer": true, 
             "user": 116, 
             "matricula": "1000016", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5708,7 +5708,7 @@
             "receive_mass_mail_offer": true, 
             "user": 117, 
             "matricula": "1000017", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5721,7 +5721,7 @@
             "receive_mass_mail_offer": true, 
             "user": 118, 
             "matricula": "1000018", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5734,7 +5734,7 @@
             "receive_mass_mail_offer": true, 
             "user": 119, 
             "matricula": "1000019", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5747,7 +5747,7 @@
             "receive_mass_mail_offer": true, 
             "user": 120, 
             "matricula": "1000020", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5760,7 +5760,7 @@
             "receive_mass_mail_offer": true, 
             "user": 121, 
             "matricula": "1000021", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5773,7 +5773,7 @@
             "receive_mass_mail_offer": true, 
             "user": 122, 
             "matricula": "1000022", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5786,7 +5786,7 @@
             "receive_mass_mail_offer": true, 
             "user": 123, 
             "matricula": "1000023", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5799,7 +5799,7 @@
             "receive_mass_mail_offer": true, 
             "user": 124, 
             "matricula": "1000024", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5812,7 +5812,7 @@
             "receive_mass_mail_offer": true, 
             "user": 125, 
             "matricula": "1000025", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5825,7 +5825,7 @@
             "receive_mass_mail_offer": true, 
             "user": 126, 
             "matricula": "1000026", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5838,7 +5838,7 @@
             "receive_mass_mail_offer": true, 
             "user": 127, 
             "matricula": "1000027", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5851,7 +5851,7 @@
             "receive_mass_mail_offer": true, 
             "user": 128, 
             "matricula": "1000028", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5864,7 +5864,7 @@
             "receive_mass_mail_offer": true, 
             "user": 129, 
             "matricula": "1000029", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5877,7 +5877,7 @@
             "receive_mass_mail_offer": true, 
             "user": 130, 
             "matricula": "1000030", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5890,7 +5890,7 @@
             "receive_mass_mail_offer": true, 
             "user": 131, 
             "matricula": "1000031", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5903,7 +5903,7 @@
             "receive_mass_mail_offer": true, 
             "user": 132, 
             "matricula": "1000032", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5916,7 +5916,7 @@
             "receive_mass_mail_offer": true, 
             "user": 133, 
             "matricula": "1000033", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5929,7 +5929,7 @@
             "receive_mass_mail_offer": true, 
             "user": 134, 
             "matricula": "1000034", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5942,7 +5942,7 @@
             "receive_mass_mail_offer": true, 
             "user": 135, 
             "matricula": "1000035", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5955,7 +5955,7 @@
             "receive_mass_mail_offer": true, 
             "user": 136, 
             "matricula": "1000036", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5968,7 +5968,7 @@
             "receive_mass_mail_offer": true, 
             "user": 137, 
             "matricula": "1000037", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5981,7 +5981,7 @@
             "receive_mass_mail_offer": true, 
             "user": 138, 
             "matricula": "1000038", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -5994,7 +5994,7 @@
             "receive_mass_mail_offer": true, 
             "user": 139, 
             "matricula": "1000039", 
-            "type": 1, 
+            "program": 1, 
             "receive_mass_mail_enrollment": true
         }
     }, 
@@ -6007,34 +6007,34 @@
             "receive_mass_mail_offer": true, 
             "user": 1020, 
             "matricula": "665544", 
-            "type": 2, 
+            "program": 2, 
             "receive_mass_mail_enrollment": true
         }
     }, 
     {
         "pk": 0, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "in\u017cynierskie"
         }
     }, 
     {
         "pk": 1, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "magisterskie"
         }
     }, 
     {
         "pk": 2, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "licencjackie"
         }
     }, 
     {
         "pk": 3, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "doktoranckie"
         }
@@ -7794,7 +7794,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Wdra\u017canie system\u00f3w klasy ERP", 
-            "ects": 6, 
             "entity": 100, 
             "semester": 100, 
             "teachers": [
@@ -7812,8 +7811,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Text mining", 
-            "ects": 6, 
+            "name": "Text mining",  
             "entity": 101, 
             "semester": 101, 
             "teachers": [
@@ -7832,7 +7830,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Algorytmy tekstowe", 
-            "ects": 6, 
             "entity": 102, 
             "semester": 101, 
             "teachers": [
@@ -7851,7 +7848,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Zastosowania wielomian\u00f3w Czebyszewa", 
-            "ects": 6, 
             "entity": 103, 
             "semester": 100, 
             "teachers": [
@@ -7869,8 +7865,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Wprowadzenie do logiki formalnej", 
-            "ects": 6, 
+            "name": "Wprowadzenie do logiki formalnej",  
             "entity": 104, 
             "semester": 100, 
             "teachers": [
@@ -7889,7 +7884,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Teoretyczne podstawy j\u0119zyk\u00f3w programowania", 
-            "ects": 6, 
             "entity": 105, 
             "semester": 100, 
             "teachers": [
@@ -7908,7 +7902,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Seminarium: Protoko\u0142y Rynku Elektronicznego", 
-            "ects": 3, 
             "entity": 106, 
             "semester": 100, 
             "teachers": [
@@ -7927,7 +7920,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Procesory graficzne w obliczeniach r\u00f3wnoleg\u0142ych (CUDA)", 
-            "ects": 5, 
             "entity": 107, 
             "semester": 101, 
             "teachers": [
@@ -7946,7 +7938,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Kurs j\u0119zyka Lua", 
-            "ects": 5, 
             "entity": 108, 
             "semester": 101, 
             "teachers": [
@@ -7964,8 +7955,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Seminarium: Krzywe i powierzchnie w grafice komputerowej", 
-            "ects": 3, 
+            "name": "Seminarium: Krzywe i powierzchnie w grafice komputerowej",  
             "entity": 109, 
             "semester": 100, 
             "teachers": [
@@ -7984,7 +7974,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Seminarium: Algorytmika: nowe osi\u0105gni\u0119cia i trendy", 
-            "ects": 3, 
             "entity": 110, 
             "semester": 100, 
             "teachers": [
@@ -8003,7 +7992,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Kurs j\u0119zyka ANSI C z elementami C++", 
-            "ects": 5, 
             "entity": 111, 
             "semester": 101, 
             "teachers": [
@@ -8021,8 +8009,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Rachunek lambda", 
-            "ects": 6, 
+            "name": "Rachunek lambda",  
             "entity": 112, 
             "semester": 100, 
             "teachers": [
@@ -8041,7 +8028,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Logika dla informatyk\u00f3w", 
-            "ects": 7, 
             "entity": 113, 
             "semester": 101, 
             "teachers": [
@@ -8060,7 +8046,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Programowanie funkcyjne", 
-            "ects": 6, 
             "entity": 114, 
             "semester": 100, 
             "teachers": [
@@ -8079,7 +8064,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Bazy danych 2", 
-            "ects": 6, 
             "entity": 115, 
             "semester": 101, 
             "teachers": [
@@ -8098,7 +8082,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Analiza numeryczna (M)", 
-            "ects": 12, 
             "entity": 116, 
             "semester": 101, 
             "teachers": [
@@ -8116,8 +8099,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Programowanie", 
-            "ects": 9, 
+            "name": "Programowanie",  
             "entity": 117, 
             "semester": 100, 
             "teachers": [
@@ -8135,8 +8117,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Modelowanie zjawisk przyrodniczych", 
-            "ects": 6, 
+            "name": "Modelowanie zjawisk przyrodniczych",  
             "entity": 118, 
             "semester": 100, 
             "teachers": [
@@ -8154,8 +8135,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 0, 
-            "name": "Licencjacki projekt programistyczny", 
-            "ects": 4, 
+            "name": "Licencjacki projekt programistyczny",
             "entity": 119, 
             "semester": 100, 
             "teachers": [
@@ -8174,7 +8154,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Analiza matematyczna", 
-            "ects": 6, 
             "entity": 120, 
             "semester": 101, 
             "teachers": [
@@ -8193,7 +8172,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Sieci neuronowe", 
-            "ects": 6, 
             "entity": 121, 
             "semester": 101, 
             "teachers": [
@@ -8212,7 +8190,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Kurs: UNIX - \u015brodowisko i narz\u0119dzia programowania", 
-            "ects": 5, 
             "entity": 122, 
             "semester": 100, 
             "teachers": [
@@ -8231,7 +8208,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Seminarium: Zastosowania algorytm\u00f3w ewolucyjnych", 
-            "ects": 3, 
             "entity": 123, 
             "semester": 101, 
             "teachers": [
@@ -8250,7 +8226,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Kurs programowania pod Windows w technologii .NET", 
-            "ects": 5, 
             "entity": 124, 
             "semester": 100, 
             "teachers": [
@@ -8269,7 +8244,6 @@
         "fields": {
             "lectures": 30, 
             "name": "J\u0119zyki formalne i z\u0142o\u017cono\u015b\u0107 obliczeniowa", 
-            "ects": 9, 
             "entity": 125, 
             "semester": 100, 
             "teachers": [
@@ -8288,7 +8262,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Bazy danych", 
-            "ects": 6, 
             "entity": 126, 
             "semester": 100, 
             "teachers": [
@@ -8306,8 +8279,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Seminarium: Bezpiecze\u0144stwo i ochrona informacji", 
-            "ects": 3, 
+            "name": "Seminarium: Bezpiecze\u0144stwo i ochrona informacji",  
             "entity": 127, 
             "semester": 101, 
             "teachers": [
@@ -8326,7 +8298,6 @@
         "fields": {
             "lectures": 45, 
             "name": "Algebra", 
-            "ects": 6, 
             "entity": 128, 
             "semester": 100, 
             "teachers": [
@@ -8345,7 +8316,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Zastosowanie teorii kategorii do konstruowania program\u00f3w", 
-            "ects": 6, 
             "entity": 129, 
             "semester": 101, 
             "teachers": [

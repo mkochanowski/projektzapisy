@@ -4,7 +4,7 @@ from django.utils.safestring           import SafeUnicode
 
 from apps.users.models               import Employee, \
                                               Student, \
-                                              Type
+                                              Program
 from apps.enrollment.subjects.models import Group, \
                                               Subject, \
                                               Semester, \
@@ -17,7 +17,7 @@ from section                         import SectionOrdering, Section
 class Template( models.Model ):
     title             = models.CharField( max_length = 40, verbose_name = 'tytuł' )
     description       = models.TextField( blank = True, verbose_name = 'opis' )
-    studies_type      = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
+    studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
     subject           = models.ForeignKey( Subject, verbose_name = 'przedmiot', blank = True, null = True)
     no_subject        = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'nie przypisany' )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięty' )

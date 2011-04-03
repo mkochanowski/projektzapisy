@@ -28,7 +28,6 @@
             "description": "Opis", 
             "entity": 1, 
             "semester": 2,
-            "ects" : 13, 
             "teachers": [
                 3
             ], 
@@ -47,7 +46,6 @@
             "description": "Wiadomo co ;-)", 
             "entity": 2, 
             "semester": 2,
-            "ects" : 9, 
             "teachers": [
                 1
             ], 

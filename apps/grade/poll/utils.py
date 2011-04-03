@@ -21,7 +21,7 @@ from apps.grade.poll.exceptions             import NoTitleException, NoPollExcep
                                                     NoSectionException
 
 from apps.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
-from apps.users.models               import Type
+from apps.users.models               import Program
 
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
 from django.utils.safestring           import SafeUnicode, mark_safe
@@ -475,7 +475,7 @@ def make_template_variables( request ):
 
     studies_type = int(request.POST.get('studies-type', -1))
     if studies_type > -1:
-        studies_type = Type.objects.get(pk=studies_type)
+        studies_type = Program.objects.get(pk=studies_type)
     else:
         studies_type = None
 

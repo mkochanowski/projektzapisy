@@ -12,6 +12,7 @@ from random import randint
 from string import join
 
 SOURCE_DIR = 'fereol'
+REPO_URL = 'git@fereol.pl:fereol.git'
 
 def bool_input(prompt):
 	while True:
@@ -232,7 +233,7 @@ with open('init-data/settings_local.py', 'w') as local:
 SOURCE_DIR = config.get('source', 'dir')
 
 if not os.path.exists(SOURCE_DIR):
-	os.system('git clone git@iiuwr.indefero.net:iiuwr/fereol.git ' + SOURCE_DIR)
+	os.system('git clone ' + REPO_URL + ' ' + SOURCE_DIR)
 	os.chdir('fereol')
 	os.system('git checkout ' + config.get('source', 'branch'))
 	os.chdir('..')

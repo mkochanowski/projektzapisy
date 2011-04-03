@@ -19,7 +19,7 @@ class BaseUser(models.Model):
     User abstract class. For every app user there is entry in django.auth.
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, verbose_name="Użytkownik")
     receive_mass_mail_enrollment = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia Zapisów")
@@ -32,6 +32,7 @@ class BaseUser(models.Model):
         
     def get_full_name(self):
         return self.user.get_full_name()
+    get_full_name.short_description = 'Użytkownik'
     
     @staticmethod
     def get(user_id):
@@ -41,15 +42,22 @@ class BaseUser(models.Model):
             logger.error('Getter(user_id = %d) in BaseUser throws User.DoesNotExist exception.' % user_id )
             raise NonUserException
         return user
+
+    def __unicode__(self):
+        return self.get_full_name
     
     class Meta:
         abstract = True
+
+
 
 class Employee(BaseUser):
     '''
     Employee.
     '''
     consultations = models.TextField(verbose_name="konsultacje")
+    homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="")
+    room = models.PositiveIntegerField(verbose_name="pokój", null=True)
         
     def has_privileges_for_group(self, group_id):
         """
@@ -95,7 +103,7 @@ class Employee(BaseUser):
         app_label = 'users'
       
     def __unicode__(self):
-        return str(self.user)
+        return str(self.user.get_full_name())
 
 class Student(BaseUser):
     ''' 
@@ -104,8 +112,15 @@ class Student(BaseUser):
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_delay_minutes = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (minuty)")
-    type = models.ForeignKey('Type', null=True, blank=True, verbose_name='Typ Studiów')
+    program = models.ForeignKey('Program', verbose_name='Program Studiów', null=True, default=None)
     block = models.BooleanField(verbose_name="blokada planu", default = False)
+    semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
+
+    def get_type_of_studies(self):
+        """ returns type of studies """
+        semestr = {1:'pierwszy',2:'drugi',3:'trzeci',4:'czwarty',5:'piąty',6:'szósty',7:'siódmy',8:'ósmy',9:'dziewiąty',10:'dziesiąty',0:'niezdefiniowany'}[self.semestr]
+        return '%s, semestr %s' % (self.program , semestr)
+    get_type_of_studies.short_description = 'Studia'
 
     def get_t0_interval(self):
         return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
@@ -118,7 +133,8 @@ class Student(BaseUser):
         records = self.records.exclude(group__subject__semester = default_semester)
         records_list = map(lambda x: x.group.subject.entity.id, records)
         return list(frozenset(records_list))
-    
+
+   
     @staticmethod
     def get_all_groups(user_id):
         user = User.objects.get(id=user_id)
@@ -180,30 +196,34 @@ class Student(BaseUser):
         app_label = 'users'
     
     def __unicode__(self):
-        return str(self.user)
+        return str(self.user.get_full_name())
 
-class Type( models.Model ):
+
+class Program( models.Model ):
     """
-        Model przechowuje informacje o typie studiow
+        Model przechowuje informacje o programie studiow
     """
-    name = models.CharField(max_length=30, unique=True, verbose_name="Typ")
+    name = models.CharField(max_length=50, unique=True, verbose_name="Program")
 
     class Meta:
-        """
-            Klasa django
-        """
-        verbose_name = 'Typ studiów'
-        verbose_name_plural = 'Typy studiów'
+        verbose_name = 'Program studiów'
+        verbose_name_plural = 'Programy studiów'
 
     def __unicode__(self):
-        """
-            metoda django
-        """
         return self.name
 
-    @staticmethod
-    def get_types():
-        """
-            Typy studiow
-        """
-        return Type.objects.all()
+class StudiaZamawiane(models.Model):
+    """
+        Model przechowuje dodatkowe informacje o studentach zamawianych
+    """
+    student = models.OneToOneField(Student, verbose_name='Student')
+    points =  models.FloatField(verbose_name='Punkty')
+    comments = models.TextField(verbose_name='Uwagi', blank=True)
+    bank_account = models.CharField(max_length=40, blank=True, verbose_name="Numer konta bankowego")
+
+    class Meta:
+        verbose_name = 'Studia zamawiane'
+        verbose_name_plural = 'Studia zamawiane'
+
+    def __unicode__(self):
+        return 'Student zamawiany: '+str(self.student)

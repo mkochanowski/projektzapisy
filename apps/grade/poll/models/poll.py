@@ -4,7 +4,7 @@ from django.utils.safestring           import SafeUnicode
 
 from apps.users.models               import Employee, \
                                               Student, \
-                                              Type
+                                              Program
 from apps.enrollment.subjects.models import Group, \
                                               Subject, \
                                               Semester, \
@@ -21,7 +21,7 @@ class Poll( models.Model ):
     description       = models.TextField( blank = True, verbose_name = 'opis' )
     semester          = models.ForeignKey( Semester, verbose_name = 'semestr' )
     group             = models.ForeignKey( Group, verbose_name = 'grupa', blank = True, null = True )
-    studies_type      = models.ForeignKey( Type, verbose_name = 'typ studiów', blank = True, null = True )
+    studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
     share_result      = models.BooleanField( verbose_name = 'udostępnij wyniki', default = False, blank = True )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
     
@@ -67,7 +67,7 @@ class Poll( models.Model ):
                 return False
                 
         if self.studies_type:
-            if self.studies_type != student.type:
+            if self.studies_type != student.program:
                 return False
         
         return True 

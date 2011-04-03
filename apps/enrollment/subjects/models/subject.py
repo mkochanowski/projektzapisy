@@ -37,18 +37,18 @@ class VisibleManager(models.Manager):
 
 class Subject( models.Model ):
     """subject in offer"""
-    entity = models.ForeignKey(SubjectEntity)
+    entity = models.ForeignKey(SubjectEntity, verbose_name='podstawa przedmiotu')
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
-    slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik')
+    slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
-    ects = models.IntegerField(verbose_name="punkty ECTS", null=True)
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     description = models.TextField(verbose_name='opis') 
-    lectures = models.IntegerField(verbose_name='liczba godzin wykładów')
-    exercises = models.IntegerField(verbose_name='liczba godzin ćwiczeń')
-    laboratories = models.IntegerField(verbose_name='liczba godzin pracowni')
+    lectures = models.IntegerField(verbose_name='wykład')
+    exercises = models.IntegerField(verbose_name='ćwiczenia')
+    laboratories = models.IntegerField(verbose_name='pracownia')
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
+    repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method

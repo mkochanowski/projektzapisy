@@ -15,8 +15,7 @@ class Semester( models.Model ):
 
     visible = models.BooleanField(verbose_name='widoczny')
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
-    year = models.PositiveIntegerField(default=lambda: datetime.now().year, verbose_name='rok akademicki')
-    # implies academic year: year/(year+1)
+    year = models.CharField(max_length=7, default='0', verbose_name='rok akademicki')
     records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów') # T0
     records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
     semester_beginning = models.DateField(null = False, verbose_name='Data rozpoczęcia semestru')
@@ -30,7 +29,7 @@ class Semester( models.Model ):
 		
     def get_name(self):
         """ returns name of semester """
-        return '%s %i/%i' % (self.get_type_display() , self.year, self.year + 1)
+        return '%s %s' % (self.get_type_display() , self.year)
 
     def is_current_semester(self):
         """ Answers to question: is semester current semester""" 

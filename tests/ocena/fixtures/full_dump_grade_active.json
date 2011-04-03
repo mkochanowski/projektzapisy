@@ -1714,34 +1714,34 @@
             "receive_mass_mail_offer": true, 
             "user": 2, 
             "matricula": "112233", 
-            "type": 2, 
+            "program": 2, 
             "receive_mass_mail_enrollment": true
         }
     }, 
     {
         "pk": 1, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "licencjackie"
         }
     }, 
     {
         "pk": 2, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "magisterskie"
         }
     }, 
     {
         "pk": 3, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "in\u017cynierskie"
         }
     }, 
     {
         "pk": 4, 
-        "model": "users.type", 
+        "model": "users.program", 
         "fields": {
             "name": "doktoranckie"
         }
@@ -1976,7 +1976,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 1", 
-            "ects": 6, 
             "entity": 1, 
             "semester": 1, 
             "teachers": [
@@ -1995,7 +1994,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 2", 
-            "ects": 6, 
             "entity": 1, 
             "semester": 1, 
             "teachers": [
@@ -2013,8 +2011,7 @@
         "model": "subjects.subject", 
         "fields": {
             "lectures": 30, 
-            "name": "Przedmiot 3", 
-            "ects": 6, 
+            "name": "Przedmiot 3",  
             "entity": 1, 
             "semester": 1, 
             "teachers": [
@@ -2033,7 +2030,6 @@
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 4", 
-            "ects": 6, 
             "entity": 1, 
             "semester": 1, 
             "teachers": [

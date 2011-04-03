@@ -5,8 +5,9 @@
 """
 
 from django.db                            import models
-from apps.users.models                         import Type
+from apps.users.models                         import Program
 from apps.offer.proposal.models.types          import Types
+
 
 class DescriptionTypes( models.Model ):
     """
