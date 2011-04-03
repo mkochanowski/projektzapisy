@@ -7,18 +7,6 @@ from django.db import models
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        
-        # Deleting field 'StudentOptions.records_opening_delay_hours'
-        db.delete_column('subjects_studentoptions', 'records_opening_delay_hours')
-
-        # Adding field 'StudentOptions.records_opening_delay_minutes'
-        db.add_column('subjects_studentoptions', 'records_opening_delay_minutes', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-
-        # Deleting field 'Semester.semester_begining'
-        db.delete_column('subjects_semester', 'semester_begining')
-
-        # Adding field 'Semester.semester_beginning'
-        db.add_column('subjects_semester', 'semester_beginning', self.gf('django.db.models.fields.DateField')(default=datetime.date(2011, 4, 3)), keep_default=False)
 
         # Changing field 'Semester.records_opening'
         db.alter_column('subjects_semester', 'records_opening', self.gf('django.db.models.fields.DateTimeField')(null=True))
