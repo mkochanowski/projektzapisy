@@ -5,7 +5,7 @@ from django.contrib import admin
 from apps.enrollment.subjects.models import *
 
 class SubjectAdmin(admin.ModelAdmin):  
-    prepopulated_fields = {'slug' : ('name',)}
+    prepopulated_fields = {'slug' : ('name', 'semester')}
     list_display = ('name', 'semester', 'lectures', 'exercises', 'laboratories','repetitions')
     list_filter = ('semester',)
     search_fields = ('name',)
