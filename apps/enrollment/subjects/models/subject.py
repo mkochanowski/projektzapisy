@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 from django.db import models
+from django.template.defaultfilters import slugify
 
 from student_options import StudentOptions
 from apps.enrollment.subjects.exceptions import NonStudentOptionsException
@@ -39,8 +40,8 @@ class Subject( models.Model ):
     """subject in offer"""
     entity = models.ForeignKey(SubjectEntity, verbose_name='podstawa przedmiotu')
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
-    slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
+    slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     description = models.TextField(verbose_name='opis') 
@@ -56,6 +57,11 @@ class Subject( models.Model ):
     objects = models.Manager()
     visible = VisibleManager()
     
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.slug = slugify('%s %s' % (self.name, self.semester))
+        super(Subject, self).save(*args, **kwargs)
+        
     def is_recording_open_for_student(self, student):
         """ gives the answer to question: is subject opened for apps.enrollment for student at the very moment? """
         records_opening = self.semester.records_opening
@@ -108,6 +114,7 @@ class Subject( models.Model ):
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
         app_label = 'subjects'
+        unique_together = (('name', 'semester'),)
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.get_semester_name())
