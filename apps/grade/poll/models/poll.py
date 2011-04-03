@@ -26,12 +26,15 @@ class Poll( models.Model ):
     
     single_choice_questions = models.ManyToManyField( 
                           SingleChoiceQuestion,
+                          blank=True,
                           verbose_name = "pytania jednokrotnego wyboru")
     multiple_choice_question = models.ManyToManyField(
                           MultipleChoiceQuestion,
+                          blank=True,
                           verbose_name = "pytania wielokrotnego wyboru")
     open_questions           = models.ManyToManyField(
                           OpenQuestion,
+                          blank=True,
                           verbose_name = "pytania otwarte")
                           
     class Meta:
