@@ -530,14 +530,15 @@ def tickets_enter(request):
 
             if errors:
                 msg = u"Wystąpił problem z biletami na następujące ankiety: <ul>"    
-                for id, error in errors:
+                for pid, error in errors:
                     try:
-                        poll = unicode( Poll.objects.get( pk = id ).title )
+                        poll = unicode( Poll.objects.get( pk = pid ))
                     except:
-                        poll = unicode( id )
-                    msg += u'<li>' + poll + u'</li>'
+                        poll = unicode( pid )
+                    msg += u'<li>' + poll + u" - " + error + u'</li>'
                 msg += u'</ul>'
-                messages.error( request, SafeUnicode( msg ))
+                msg  = mark_safe( unicode( msg ))
+                messages.error( request, msg)
             request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_subject( polls ))
             request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_subject( finished ))
             

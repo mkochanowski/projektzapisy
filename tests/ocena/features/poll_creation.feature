@@ -92,7 +92,7 @@ Feature: User with privileges wants to create a poll.
         And I follow "Tworzenie ankiet"
         And I select "Przedmiot:" as "Przedmiot 2"
         And I select "Typ zajęć:" as "ćwiczenia"
-        And I select "Grupa:" as "employee-test"
+        And I select "Grupa:" as "Pracownik Testowy"
         And I fill in "Tytuł:" with "Ankieta dla ćwiczeń z przedmiotu 1"
         And I select "Wybierz sekcję:" as "Ćwiczenia"
         And I press "Dodaj sekcję"

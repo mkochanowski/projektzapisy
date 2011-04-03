@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import template
+from django.utils.safestring  import mark_safe
 from libs import postmarkup
 import logging
 
@@ -79,3 +80,7 @@ class CaptureasNode(template.Node):
         output = self.nodelist.render(context)
         context[self.varname] = output
         return ''
+
+@register.filter
+def safestring( str ):
+    return mark_safe( str )

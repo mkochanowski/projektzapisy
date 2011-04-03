@@ -33,7 +33,7 @@ class Poll( models.Model ):
         
     def __unicode__( self ):
         res = unicode( self.title )
-        if self.group: res += u', grupa: ' + unicode( self.group )
+        if self.group: res += u', ' + unicode( self.group )
         if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
         return res
         

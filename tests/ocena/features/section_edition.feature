@@ -26,7 +26,7 @@ Feature: User with privileges wants to edit some sections.
         And I fill in "poll[question][5][answers][3]" with "Kryptografii"
         And I press visible "Gotowe"        
         And I press "Zapisz"
-        Then I should see "Zapisano sekcję"
+        Then I should see "Sekcja dodana"
                 
     Scenario: Employee fails to edit a section
         Given I am logged in with "employee" privileges
