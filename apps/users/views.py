@@ -99,6 +99,9 @@ def my_profile(request):
     '''profile site'''
     logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
     current_semester = Semester.get_default_semester()
+    zamawiany = Student.get_zamawiany(request.user.id)
+    comments = zamawiany and zamawiany.comments or ''
+    points = zamawiany and zamawiany.points or 0
     if current_semester:
         try:
             point_limit_duration = settings.POINT_LIMIT_DURATION 
@@ -119,6 +122,9 @@ def my_profile(request):
     
     data = {
         'terms' : terms,
+        'zamawiany' : zamawiany,
+        'comments' : comments,
+        'points' : points,
     }
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))

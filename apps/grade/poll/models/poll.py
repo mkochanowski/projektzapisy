@@ -16,6 +16,7 @@ from section                           import SectionOrdering
 from saved_ticket                       import SavedTicket
 
 class Poll( models.Model ):
+
     author            = models.ForeignKey( Employee, verbose_name = 'autor', related_name = 'author' )
     title             = models.CharField( max_length = 40, verbose_name = 'tytuł' )
     description       = models.TextField( blank = True, verbose_name = 'opis' )
@@ -24,7 +25,7 @@ class Poll( models.Model ):
     studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
     share_result      = models.BooleanField( verbose_name = 'udostępnij wyniki', default = False, blank = True )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
-    
+
     class Meta:
         verbose_name        = 'ankieta' 
         verbose_name_plural = 'ankiety'

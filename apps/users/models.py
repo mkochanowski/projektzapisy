@@ -189,7 +189,18 @@ class Student(BaseUser):
         except Student.DoesNotExist:
              logger.error('Function Student.records_unblock(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
-         
+ 
+
+    @staticmethod
+    def get_zamawiany(user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            student = Student.objects.get(user=user)
+            zamawiany = StudiaZamawiane.objects.get(student=student)
+            return zamawiany
+        except (User.DoesNotExist, Student.DoesNotExist, StudiaZamawiane.DoesNotExist):
+             return None
+        
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'
@@ -201,7 +212,7 @@ class Student(BaseUser):
 
 class Program( models.Model ):
     """
-        Model przechowuje informacje o programie studiow
+        Program of student studies
     """
     name = models.CharField(max_length=50, unique=True, verbose_name="Program")
 

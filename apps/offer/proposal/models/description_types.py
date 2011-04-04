@@ -20,3 +20,6 @@ class DescriptionTypes( models.Model ):
         verbose_name = 'Typ propozycji'
 	verbose_name_plural ='Typy propozycji'
         app_label = 'proposal'
+        
+    def __unicode__(self):
+        return self.lecture_type.__unicode__() + " | " + self.description.__unicode__()

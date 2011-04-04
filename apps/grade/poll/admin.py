@@ -3,7 +3,7 @@
     Django admin panel for polls
 """
 
-from django.contrib           import admin
+from django.contrib         import admin
 from apps.grade.poll.models import Option, \
                                      OpenQuestionOrdering, \
                                      SingleChoiceQuestionOrdering, \
@@ -35,4 +35,4 @@ admin.site.register( OpenQuestionAnswer )
 admin.site.register( SingleChoiceQuestionAnswer )
 admin.site.register( MultipleChoiceQuestionAnswer )
 admin.site.register( Template )
-admin.site.register( TemplateSections )
+
