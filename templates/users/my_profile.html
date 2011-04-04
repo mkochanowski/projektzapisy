@@ -20,6 +20,13 @@ Moje dane:
 	<li>login: {{user.username}}</li>
 	<li>email: {{user.email}}</li>
 </ul>
+
+{% if zamawiany %}
+<br/>
+{{ comments|safe }}
+<br/>
+{% endif %}
+
 <br/>
 <table>
     {% for t in terms %}

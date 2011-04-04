@@ -162,7 +162,7 @@ POINT_LIMIT_DURATION = 14 # abs(t1-t2), in days
 ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
 
 # that's only the example of settings_local.py file contents:
-#SESSION_COOKIE_DOMAIN = '.nowe-zapisy.ii.uni.wroc.pl' # without port number!
+#SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
 
