@@ -129,6 +129,7 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned)
 
 		subject.id = elem.children('input[name=id]').attr('value').castToInt();
 		subject.name = elem.children('label').disableDragging().text().trim();
+		subject.shortName = elem.children('input[name=short]').attr('value').trim();
 		subject.type = elem.children('input[name=type]').attr('value').castToInt();
 		subject.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
 
@@ -140,6 +141,7 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned)
 			sterm.isPinned = (pinned.indexOf(sterm.groupID) >= 0);
 			sterm.isEnrolled = (enrolled.indexOf(sterm.groupID) >= 0);
 			sterm.isPrototyped = false;
+			sterm.subject = subject;
 
 			sterm.assignSchedule(SchedulePrototype.schedule);
 
@@ -166,6 +168,7 @@ SchedulePrototype.PrototypeSubject = function()
 {
 	this.id = null;
 	this.name = null;
+	this.shortName = null;
 	this.type = null;
 	this.wasEnrolled = null;
 	this.terms = [];
@@ -187,7 +190,9 @@ SchedulePrototype.PrototypeSubject.prototype.setPrototyped = function(prototyped
 
 SchedulePrototype.PrototypeSubject.prototype.toString = function()
 {
-	if (this.name)
+	if (this.shortName)
+		return this.shortName;
+	else if (this.name)
 		return this.name;
 	else
 		return 'SchedulePrototype.PrototypeSubject';

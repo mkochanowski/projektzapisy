@@ -90,6 +90,7 @@
 				<label for="enr-schedulePrototype-subject-{{ subject.subject.id }}">{{ subject.subject.name }}</label>
 				<input type="hidden" name="id" value="{{ subject.subject.id }}" />
 				<input type="hidden" name="type" value="{{ subject.subject.type }}" />
+				<input type="hidden" name="short" value="{{ subject.subject.short }}" />
 				<input type="hidden" name="wasEnrolled" value="{{ subject.subject.was_enrolled }}" />
 				{% for term in subject.terms %}
 					<input type="hidden" name="term" value="{{ term }}" />

@@ -302,7 +302,8 @@ Schedule.prototype._arrangeTerms = function()
 				height: termPositionHeight + 'px',
 				top: (termPositionTop - o.bordersSize) + 'px',
 				left: (termPositionLeft - o.bordersSize) + 'px'
-			});//.children().text(term.toString());
+			});
+			term.onResize(maxGroupWidth == 1);
 		}
 	}
 };
@@ -354,8 +355,9 @@ Schedule.Term = function(day, timeFrom, timeTo, container)
 	this.schedule = null;
 	this._invalidated = true;
 	this._collisions = [];
+	this.onResize = function(isFullSize) {};
 
-	this.container = container.assertOne().attr('className', 'term');
+	this.container = container.assertOne().addClass('term');
 };
 
 Schedule.Term.prototype.collides = function(term)

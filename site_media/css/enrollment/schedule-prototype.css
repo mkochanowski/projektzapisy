@@ -27,3 +27,69 @@
 	padding-left: 30px;
 	padding-top: 2px;
 }
+
+/******************************************************************************/
+
+#enr-schedulePrototype-scheduleContainer .enrolled
+{
+	background: wheat;
+}
+
+#enr-schedulePrototype-scheduleContainer .term .name
+{
+	display: block;
+	padding: 2px;
+	padding-bottom: 0;
+
+	font-size: 14px;
+}
+
+#enr-schedulePrototype-scheduleContainer .term .teacher
+{
+	padding: 2px;
+	padding-top: 0;
+	
+	font-size: 10px;
+}
+
+
+#enr-schedulePrototype-scheduleContainer .term .classroom
+{
+	position: absolute;
+	display: block;
+	padding: 2px;
+	padding-top: 0;
+
+	font-size: 10px;
+	text-align: right;
+	white-space: nowrap;
+	z-index: 2;
+
+	background: #F8F8F8;
+	border-radius: 3px;
+}
+
+#enr-schedulePrototype-scheduleContainer .enrolled .classroom
+{
+	background: wheat;
+}
+
+#enr-schedulePrototype-scheduleContainer .term .type
+{
+	position: absolute;
+	display: block;
+	padding: 2px;
+	padding-top: 0;
+
+	font-size: 10px;
+	color: #666666;
+	z-index: 1;
+	background: #F8F8F8;
+
+	border-radius: 3px;
+}
+
+#enr-schedulePrototype-scheduleContainer .enrolled .type
+{
+	background: wheat;
+}

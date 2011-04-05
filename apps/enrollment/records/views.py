@@ -466,6 +466,7 @@ def schedule_prototype(request):
                     'subject': {
                         'id' : subject.pk,
                         'name': subject.name,
+                        'short': subject.entity.get_short_name(),
                         'type': subject.type.pk,
                         'was_enrolled': 'False', #TODO: kod w prepare_subjects_list_to_render moim zdaniem nie zadziała
                     },
@@ -476,9 +477,12 @@ def schedule_prototype(request):
             subjects_in_semester_tmp[subject.pk]['terms'].append({
                 'id': term.pk,
                 'group': term.group.pk, #TODO: podejrzane - id są takie same jak group
+                'group_type': int(term.group.type),
+                'teacher': str(term.group.teacher.user.get_full_name()),
+                'classroom': int(term.classroom.number),
                 'day': int(term.dayOfWeek),
                 'start_time': [term.start_time.hour, term.start_time.minute],
-				'end_time': [term.end_time.hour, term.end_time.minute],
+                'end_time': [term.end_time.hour, term.end_time.minute],
             })
   
         data = {

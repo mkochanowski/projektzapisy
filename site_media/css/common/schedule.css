@@ -62,4 +62,5 @@
 	border: 1px solid #666666;
 	background: #F8F8F8;
 	border-radius: 4px;
+	overflow: hidden;
 }
