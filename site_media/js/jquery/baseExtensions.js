@@ -24,6 +24,13 @@ String.prototype.castToInt = function(acceptNull)
 	return val;
 };
 
+Number.prototype.castToInt = function()
+{
+	if (this % 1 != 0)
+		throw new Error('Nieprawidłowa wartość (liczba zmiennoprzecinkowa)');
+	return parseInt(this);
+};
+
 String.prototype.castToBool = function()
 {
 	var val = this.trim();
@@ -39,6 +46,19 @@ String.prototype.removePrefix = function(prefix)
 	if (this.indexOf(prefix) != 0)
 		throw new Error('Prefiks nie pasuje do ciągu');
 	return this.substr(prefix.length);
+};
+
+String.prototype.lpad = function(padStr, length)
+{
+	var add = length - this.length;
+
+	if (add <= 0)
+		return String(this);
+
+	padStr = (new Array(Math.ceil(add / padStr.length) + 1)).join(padStr).
+		substr(0, add);
+
+    return (padStr + this);
 };
 
 if (!Array.prototype.indexOf)
@@ -203,4 +223,9 @@ jQuery.fn.maximizeWidth = function()
 jQuery.fn.appendSpace = function()
 {
 	return this.append($.createText(' '));
+};
+
+jQuery.parseDjangoJSON = function(djjson)
+{
+	return jQuery.parseJSON(djjson.replace(new RegExp("'", 'g'), '"'));
 };

@@ -434,6 +434,7 @@ def records(request, group_id):
 
 @login_required
 def own(request):
+    ''' own schedule view '''
     try:
         groups = Record.get_student_all_detailed_enrollings(request.user.id)
         data = {
@@ -446,35 +447,47 @@ def own(request):
         return render_to_response('common/error.html', context_instance=RequestContext(request))
  
 @login_required       
-def schedulePrototype(request):
+def schedule_prototype(request):
+    ''' schedule prototype view '''
     try:
-        student_records = Record.get_student_all_detailed_records(request.user.id)
-        #subjects = Subject.visible.select_related().all()
-        #for sub in subjects:
-        #    sub.lecturers = ''
-        #    for teacher in sub.teachers.all():
-        #        sub.lecturers =  teacher.user.get_full_name() + ',' + sub.lecturers
-        all_terms = Term.objects.select_related().all()
-        for term in all_terms:
-            term.description = term.group
-        
-        #group_with_subjects = Group.objects.select_related(depth = 2).all()
-        #subjects = set([g.subject for g in group_with_subjects])
-        #for subject in subjects:
-        #    for group in subject.groups_:
-        #        group.terms_ = all_terms.filter(group = group)
-        semesters = Semester.objects.filter(visible=True)
-        semesters_list = [(sem.pk, sem.get_name()) for sem in semesters]
-        types_list = [(type.pk, type.name) for type in Type.get_all_types()]
+        default_semester = Semester.get_default_semester()
+        if not default_semester:
+            raise RuntimeError('TODO: trzeba to jakoś obsługiwać')
+
+        student_records = Record.get_student_records_ids(request.user, default_semester)
+
+        terms_in_semester = Term.get_all_in_semester(default_semester)
+        subjects_in_semester = []
+        subjects_in_semester_tmp = {}
+        for term in terms_in_semester:
+            subject = term.group.subject
+            if not subject.pk in subjects_in_semester_tmp:
+                subject_collection = {
+                    'subject': {
+                        'id' : subject.pk,
+                        'name': subject.name,
+                        'type': subject.type.pk,
+                        'was_enrolled': 'False', #TODO: kod w prepare_subjects_list_to_render moim zdaniem nie zadziała
+                    },
+                    'terms': []
+                }
+                subjects_in_semester_tmp.update({subject.pk: subject_collection})
+                subjects_in_semester.append(subject_collection)
+            subjects_in_semester_tmp[subject.pk]['terms'].append({
+                'id': term.pk,
+                'group': term.group.pk, #TODO: podejrzane - id są takie same jak group
+                'day': int(term.dayOfWeek),
+                'start_time': [term.start_time.hour, term.start_time.minute],
+				'end_time': [term.end_time.hour, term.end_time.minute],
+            })
   
         data = {
             'student_records': student_records,
-            #'subjects': subjects,
-            'semesters_list' : semesters_list, 
-            'types_list' : types_list,
-            'terms' : all_terms
+            'subjects' : subjects_in_semester,
+            'semester' : default_semester,
+            'types_list' : Type.get_all_for_jsfilter()
         }
         return render_to_response('enrollment/records/schedule_prototype.html', data, context_instance = RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message="Nie masz planu, bo nie jesteś studentem.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))   
+        return render_to_response('common/error.html', context_instance=RequestContext(request))

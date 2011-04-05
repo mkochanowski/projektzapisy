@@ -50,23 +50,22 @@ class Record(models.Model):
         return Record.enrolled.filter(group=group_).count()
 
     @staticmethod
-    def get_student_all_detailed_records(user_id):
-        user = User.objects.get(id=user_id)
+    def get_student_records_ids(user, semester):
         try:
-            student = user.student
-            records = Record.objects.filter(student=student).\
-                select_related('group', 'group__subject').order_by('group__subject__name')
+            records = Record.objects.\
+                filter(student=user.student, group__subject__semester=semester).\
+                values_list('group__pk', 'status');
+            pinned = []
+            enrolled = []
             for record in records:
-                record.group_ = record.group
-                record.group_.terms_ = record.group.get_all_terms()
-                record.group_.subject_ = record.group.subject
-                if record.status == STATUS_ENROLLED:
-                    record.schedule_widget_status_ = 'fixed'
-                elif record.status == STATUS_PINNED:
-                    record.schedule_widget_status_ = 'pinned'
+                if int(record[1]) == 1:
+                    enrolled.append(record[0])
                 else:
-                    record.schedule_widget_status_ = ''
-            return records
+                    pinned.append(record[0])
+            return {
+                'enrolled': enrolled,
+                'pinned': pinned
+            }
         except Student.DoesNotExist:
             logger.error('Record.get_student_all_detailed_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
