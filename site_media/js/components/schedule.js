@@ -12,10 +12,10 @@ Schedule = function(container, options)
 		dayRowHeight: 25,
 		bordersSize: 1,
 
-		dayList: ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek'],
+		dayList: [0, 1, 2, 3, 4],
 
 		startTime: new Schedule.Time(8, 00),
-		endTime: new Schedule.Time(24, 00),
+		endTime: new Schedule.Time(23, 00),
 
 		hourLabelHeight: 12
 	};
@@ -82,7 +82,7 @@ Schedule = function(container, options)
 		if (i > 0)
 			rulePosition += (i - 1) * o.bordersSize;
 
-		$.create('div', {className: 'dayLabel'}).text(o.dayList[i]).
+		$.create('div', {className: 'dayLabel'}).text(Schedule.dayNames[o.dayList[i]]).
 			appendTo(this.dayLabelsContainer).css(
 		{
 			left: rulePosition + 'px'
@@ -151,6 +151,8 @@ Schedule = function(container, options)
 		}
 	}
 };
+
+Schedule.dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
 Schedule.prototype._timeToPosition = function(time, countLastBorder)
 {
@@ -420,12 +422,7 @@ Schedule.Term.prototype.getCoherentCollisions = function()
 
 Schedule.Term.prototype.toString = function()
 {
-	var s = '';
-	if (this.schedule)
-		s += this.schedule.options.dayList[this.day] + ' ';
-	else
-		s += 'Dzień_' + this.day + ' ';
-	s += this.timeFrom.toString() + '-' +
+	return Schedule.dayNames[this.day] + ' ' +
+		this.timeFrom.toString() + '-' +
 		this.timeTo.toString();
-	return s;
 };

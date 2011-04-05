@@ -59,3 +59,14 @@ Fereol.Enrollment.SubjectTerm.prototype._updateVisibility = function()
 	else
 		SchedulePrototype.schedule.removeTerm(this.scheduleTerm);
 };
+
+Fereol.Enrollment.SubjectTerm.prototype.setPrototyped = function(prototyped)
+{
+	this.isPrototyped = prototyped;
+	this._updateVisibility();
+};
+
+Fereol.Enrollment.SubjectTerm.prototype.toString = function()
+{
+	return this.scheduleTerm.toString();
+};

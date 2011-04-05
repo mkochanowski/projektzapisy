@@ -1,0 +1,29 @@
+/**
+ * Style używane w prototypie planu.
+ */
+
+#enr-schedulePrototype-subject-list
+{
+	list-style: none;
+	padding-left: 5px !important;
+}
+
+#enr-schedulePrototype-subject-list li
+{
+	clear: left;
+	padding-bottom: 8px;
+}
+
+#enr-schedulePrototype-subject-list li span.checkbox
+{
+	float: left;
+	width: 25px;
+	text-align: center;
+}
+
+#enr-schedulePrototype-subject-list li label
+{
+	display: block;
+	padding-left: 30px;
+	padding-top: 2px;
+}

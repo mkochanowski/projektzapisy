@@ -30,18 +30,8 @@ SchedulePrototype.init = function()
 		new Schedule.Time(18, 20), new Schedule.Time(19, 10), $.create('div').text('e')));
 	*/
 
-	$('#enr-schedulePrototype-subject-list').
-		children('li').children('input[name=term]').
-		each(function(idx, elem)
-	{
-		var sterm = Fereol.Enrollment.SubjectTerm.fromJSON(elem.value);
-		sterm.isPinned = (pinnedGroupIDs.indexOf(sterm.groupID) >= 0);
-		sterm.isEnrolled = (enrolledGroupIDs.indexOf(sterm.groupID) >= 0);
-		sterm.isPrototyped = false;
-		
-		sterm.assignSchedule(SchedulePrototype.schedule);
-	});
-
+	
+	SchedulePrototype.initSubjectList(enrolledGroupIDs, pinnedGroupIDs);
 	//SchedulePrototype.initFilter();
 };
 
@@ -121,4 +111,84 @@ SchedulePrototype.initFilter = function()
 	};
 */
 	SchedulePrototype.subjectFilter.runThread();
+};
+
+SchedulePrototype.subjectList = [];
+
+SchedulePrototype.initSubjectList = function(enrolled, pinned)
+{
+	$('#enr-schedulePrototype-subject-list').
+		children('li').each(function(idx, elem)
+	{
+		elem = $(elem);
+
+		var prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
+
+		var subject = new SchedulePrototype.PrototypeSubject();
+		SchedulePrototype.subjectList.push(subject);
+
+		subject.id = elem.children('input[name=id]').attr('value').castToInt();
+		subject.name = elem.children('label').disableDragging().text().trim();
+		subject.type = elem.children('input[name=type]').attr('value').castToInt();
+		subject.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
+
+		elem.children('input[name=term]').each(function(idx, elem)
+		{
+			elem = $(elem);
+
+			var sterm = Fereol.Enrollment.SubjectTerm.fromJSON(elem.attr('value'));
+			sterm.isPinned = (pinned.indexOf(sterm.groupID) >= 0);
+			sterm.isEnrolled = (enrolled.indexOf(sterm.groupID) >= 0);
+			sterm.isPrototyped = false;
+
+			sterm.assignSchedule(SchedulePrototype.schedule);
+
+			subject.terms.push(sterm);
+		});
+
+		(function()
+		{
+			prototypedCheckbox.click(function()
+			{
+				subject.setPrototyped(prototypedCheckbox.attr('checked'));
+			});
+		})();
+		subject.setPrototyped(prototypedCheckbox.attr('checked'));
+	});
+};
+
+/*******************************************************************************
+ * Klasa przedmiotu używanego w prototypie planu, tzn posiadającego kolekcję
+ * terminów.
+ ******************************************************************************/
+
+SchedulePrototype.PrototypeSubject = function()
+{
+	this.id = null;
+	this.name = null;
+	this.type = null;
+	this.wasEnrolled = null;
+	this.terms = [];
+	this.isPrototyped = false;
+};
+
+SchedulePrototype.PrototypeSubject.prototype.setPrototyped = function(prototyped)
+{
+	prototyped = !!prototyped;
+	if (this.isPrototyped == prototyped)
+		return;
+	this.isPrototyped = prototyped;
+
+	this.terms.forEach(function(term)
+	{
+		term.setPrototyped(prototyped);
+	});
+};
+
+SchedulePrototype.PrototypeSubject.prototype.toString = function()
+{
+	if (this.name)
+		return this.name;
+	else
+		return 'SchedulePrototype.PrototypeSubject';
 };
