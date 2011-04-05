@@ -5,6 +5,16 @@
 http://www.python.org/
 - fedora, debian/ubuntu: python
 
+* pyCrypto = 2.3 z poprawionym bugiem dotyczącym ładowania kluczy
+http://fereol.wasilczyk.pl/wiki/_media/downloads/pycrypto.tar.gz
+- należy zainstalować ze źródeł:
+   1. $ tar -zxf pycrypto.tar.gz
+   2. $ cd pycrypto
+   3. $ python setup.py build
+   4. # python setup.py install
+  potrzebny do tego będzie pakiet python-devel, albo python-dev - 
+  w zależności od dystrybucji.
+  
 * django = 1.2.x
 http://www.djangoproject.com/
 - fedora: Django
