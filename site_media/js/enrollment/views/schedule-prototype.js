@@ -10,10 +10,15 @@ SchedulePrototype = new Object();
 SchedulePrototype.init = function()
 {
 	var scheduleContainer = $('#enr-schedulePrototype-scheduleContainer').assertOne();
-	var pinnedGroupIDs = $.parseDjangoJSON(scheduleContainer.
+	var pinnedGroupIDs = $.parseJSON(scheduleContainer.
 		children('input[name=pinned]').assertOne().attr('value'));
-	var enrolledGroupIDs = $.parseDjangoJSON(scheduleContainer.
+	var enrolledGroupIDs = $.parseJSON(scheduleContainer.
 		children('input[name=enrolled]').assertOne().attr('value'));
+
+	SchedulePrototype.urls['set-pinned'] = scheduleContainer.
+		children('input[name=setPinnedUrl]').assertOne().attr('value').trim();
+	SchedulePrototype.urls['set-enrolled'] = scheduleContainer.
+		children('input[name=setEnrolledUrl]').assertOne().attr('value').trim();
 
 	SchedulePrototype.schedule = new Schedule(scheduleContainer);
 
@@ -34,6 +39,8 @@ SchedulePrototype.init = function()
 	SchedulePrototype.initSubjectList(enrolledGroupIDs, pinnedGroupIDs);
 	//SchedulePrototype.initFilter();
 };
+
+SchedulePrototype.urls = {};
 
 $(SchedulePrototype.init);
 

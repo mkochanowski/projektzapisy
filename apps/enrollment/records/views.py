@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from django.core.urlresolvers import reverse
-from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import simplejson
 from django.views.decorators.http import require_POST
+from django.utils.datastructures import MultiValueDictKeyError
 
 from apps.enrollment.subjects.models import *
 from apps.users.models import *
@@ -17,128 +15,124 @@ from apps.enrollment.records.models import *
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.subjects.views import prepare_subjects_list_to_render
 
-from datetime import time
+from libs.ajax_messages import *
 
 @require_POST
-@login_required
-def ajaxPin(request):
-    data = {}
+def prototype_set_pinned(request):
+    '''
+        Response for AJAX query for pinning or un-pinning group from student's
+        schedule.
+    '''
+    if not request.user.is_authenticated():
+        return AjaxFailureMessage('NotAuthenticated', 'Nie jesteś zalogowany.')
+
     try:
-        group_id = int(request.POST["GroupId"])
-        record = Record.pin_student_to_group(request.user.id, group_id)
-        data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś przypięty do grupy."
-    except NonStudentException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonStudent"
-        data['Exception']['Message'] = "Nie możesz się przypiąć, bo nie jesteś studentem."
-    except NonGroupException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonGroup"
-        data['Exception']['Message'] = "Nie możesz się przypiąć, bo podana grupa nie istnieje."
-    except AlreadyPinnedException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "AlreadyNotPinned"
-        data['Exception']['Message'] = "Nie możesz się przypiąć, bo już jesteś przypięty."
-    return HttpResponse(simplejson.dumps(data))
+        group_id = int(request.POST['group'])
+        set_pinned = request.POST['pin'] == 'true'
+    except MultiValueDictKeyError:
+        return AjaxFailureMessage('InvalidRequest', 'Nieprawidłowe zapytanie.')
 
-@require_POST
-@login_required
-def ajaxUnpin(request):
-    data = {}
     try:
-        group_id = int(request.POST["GroupId"])
-        record = Record.unpin_student_from_group(request.user.id, group_id)
-        data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś wypięty z grupy."
-    except NonStudentException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonStudent"
-        data['Exception']['Message'] = "Nie możesz zostać wypięty, bo nie jesteś studentem."
-    except NonGroupException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonGroup"
-        data['Exception']['Message'] = "Nie możesz zostać wypięty, bo podana grupa nie istnieje."
-    except AlreadyUnPinnedException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "AlreadyNotUnPinned"
-        data['Exception']['Message'] = "Nie możesz zostać wypięty, bo nie jesteś przypięty."
-    return HttpResponse(simplejson.dumps(data))
-
-@require_POST
-@login_required
-def ajaxAssign(request):
-    data = {}
-    try:
-        if request.user.student.block :
-            data['Exception'] = {}
-            data['Exception']['Code'] = "BlockPlan"
-            data['Exception']['Message'] = "Twój plan jest zablokowany"
-            return HttpResponse(simplejson.dumps(data))
-
-        group_id = int(request.POST["GroupId"])
-        logger.info('User %s  <id: %s> uses AJAX to enroll himself to group with id: <%s>' % (request.user.username, request.user.id, group_id))
-
-        records_list = Record.add_student_to_group(request.user.id, group_id)
-        data['Success'] = {}
-        if len(records_list) == 1:
-            data['Success']['Message'] = "Zostałeś zapisany do grupy."
+        if set_pinned:
+            Record.pin_student_to_group(request.user.id, group_id)
+            return AjaxSuccessMessage('Grupa została przypięta do Twojego planu.')
         else:
-            data['Success']['Message'] = "Zostałeś zapisany do wybranej grupy i grupy wykładowej."
+            Record.unpin_student_from_group(request.user.id, group_id)
+            return AjaxSuccessMessage('Grupa została odpięta od Twojego planu.')
     except NonStudentException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonStudent"
-        data['Exception']['Message'] = "Nie możesz się zapisać, bo nie jesteś studentem."
+        return AjaxFailureMessage('NonStudent', \
+            'Nie możesz przypinać grup do planu, bo nie jesteś studentem.');
     except NonGroupException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonGroup"
-        data['Exception']['Message'] = "Nie możesz się zapisać, bo podana grupa nie istnieje."
-    except AssignedInThisTypeGroupException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "AssignedInThisTypeGroup"
-        data['Exception']['Message'] = "Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu."
-    except AlreadyAssignedException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "AlreadyAssigned"
-        data['Exception']['Message'] = "Nie możesz się zapisać, bo już jesteś zapisany."
-    except OutOfLimitException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "OutOfLimit"
-        data['Exception']['Message'] = "Nie możesz się zapisać, bo grupa jest już zapełniona."
-    except RecordsNotOpenException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "RecordsNotOpen"
-        data['Exception']['Message'] = "Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte."
-    return HttpResponse(simplejson.dumps(data))
+        return AjaxFailureMessage('NonGroup', \
+            'Nie możesz przypiąć tej grupy, bo już nie istnieje.');
+    except AlreadyPinnedException:
+        return AjaxSuccessMessage( \
+            'Grupa jest już przypięta do Twojego planu.');
+    except AlreadyNotPinnedException:
+        return AjaxSuccessMessage( \
+            'Grupa jest już odpięta od Twojego planu.');
 
 @require_POST
-@login_required
-def ajaxResign(request):
-    data = {}
+def set_enrolled(request, method):
+    '''
+        Set student assigned (or not) to group.
+    '''
+    if not request.user.is_authenticated():
+        return AjaxFailureMessage('NotAuthenticated', 'Nie jesteś zalogowany.')
+
+    is_ajax = (method == '.json')
+    message_context = None if is_ajax else request
     try:
-        if request.user.student.block :
-            data['Exception'] = {}
-            data['Exception']['Code'] = "BlockPlan"
-            data['Exception']['Message'] = "Twój plan jest zablokowany"
-            return HttpResponse(simplejson.dumps(data))
-        group_id = int(request.POST["GroupId"])
-        logger.info('User %s  <id: %s> uses AJAX to resign from group with id: <%s>' % (request.user.username, request.user.id, group_id))
-        record = Record.remove_student_from_group(request.user.id, group_id)
-        data['Success'] = {}
-        data['Success']['Message'] = "Zostałeś wypisany z grupy."
+        group_id = int(request.POST['group'])
+        set_enrolled = request.POST['enroll'] == 'true'
+    except MultiValueDictKeyError:
+        return AjaxFailureMessage.auto_render('InvalidRequest', \
+            'Nieprawidłowe zapytanie.', message_context)
+
+    if request.user.student.block:
+        return AjaxFailureMessage.auto_render('ScheduleLocked', \
+            'Twój plan jest zablokowany.', message_context);
+
+    logger.info('User %s <id: %s> set himself %s to group with id: %s' % \
+        (request.user.username, request.user.id, \
+        ('enrolled' if set_enrolled else 'not enrolled'), group_id))
+
+    try:
+        if set_enrolled:
+            connected_records = Record.add_student_to_group(request.user.id, group_id)
+            record = connected_records[0]
+            if len(connected_records) == 1:
+                message = 'Zostałeś zapisany do wybranej grupy.'
+            else:
+                message = 'Zostałeś zapisany do wybranej grupy oraz grup ' + \
+                'powiązanych.'
+        else:
+            connected_records = None
+            record = Record.remove_student_from_group(request.user.id, group_id)
+            message = 'Zostałeś wypisany z wybranej grupy.'
+
+        connected_group_ids = None
+        if connected_records:
+            connected_group_ids = []
+            for record in connected_records:
+                connected_group_ids.append(record.group.pk)
+
+        if is_ajax:
+            return AjaxSuccessMessage(message, connected_group_ids)
+        else:
+            request.user.message_set.create(message=message)
+            return redirect('subject-page', slug=record.group_slug())
     except NonStudentException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonStudent"
-        data['Exception']['Message'] = "Nie możesz się wypisać, bo nie jesteś studentem."
+        return AjaxFailureMessage.auto_render('NonStudent',
+            'Nie możesz zapisać lub wypisać się z grupy, ponieważ nie jesteś studentem.', \
+            message_context)
     except NonGroupException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonGroup"
-        data['Exception']['Message'] = "Nie możesz się wypisać, bo podana grupa nie istnieje."
+        return AjaxFailureMessage.auto_render('NonGroup',
+            'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona już nie istnieje.', \
+            message_context)
+    #except AssignedInThisTypeGroupException:
+    except AlreadyAssignedException:
+        message = 'Jesteś już zapisany do tej grupy.'
+        if is_ajax:
+            return AjaxSuccessMessage(message)
+        else:
+            request.user.message_set.create(message=message)
+            return redirect('subject-page', slug=Group.objects.get(id=group_id).group_slug())
     except AlreadyNotAssignedException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "AlreadyNotAssigned"
-        data['Exception']['Message'] = "Nie możesz się wypisać, bo nie jesteś zapisany."
-    return HttpResponse(simplejson.dumps(data))
+        message = 'Jesteś już wypisany z tej grupy.'
+        if is_ajax:
+            return AjaxSuccessMessage(message)
+        else:
+            request.user.message_set.create(message=message)
+            return redirect('subject-page', slug=Group.objects.get(id=group_id).group_slug())
+    except OutOfLimitException:
+        return AjaxFailureMessage.auto_render('OutOfLimit', # TODO: dopisywanie do kolejki
+            'Nie możesz zapisać się do grupy, bo podana jest już pełna.', \
+            message_context)
+    except RecordsNotOpenException:
+        return AjaxFailureMessage.auto_render('RecordsNotOpen',
+            'Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ' + \
+            'Ciebie otwarte.', message_context)
 
 @require_POST
 def deleteStudentFromGroup(request, user_id, group_id):
@@ -474,16 +468,18 @@ def schedule_prototype(request):
                 }
                 subjects_in_semester_tmp.update({subject.pk: subject_collection})
                 subjects_in_semester.append(subject_collection)
-            subjects_in_semester_tmp[subject.pk]['terms'].append({
+            term_data = {
                 'id': term.pk,
-                'group': term.group.pk, #TODO: podejrzane - id są takie same jak group
+                'group': term.group.pk,
                 'group_type': int(term.group.type),
-                'teacher': str(term.group.teacher.user.get_full_name()),
+                'teacher': term.group.teacher.user.get_full_name(),
                 'classroom': int(term.classroom.number),
                 'day': int(term.dayOfWeek),
                 'start_time': [term.start_time.hour, term.start_time.minute],
                 'end_time': [term.end_time.hour, term.end_time.minute],
-            })
+            }
+            subjects_in_semester_tmp[subject.pk]['terms'].\
+                append(simplejson.dumps(term_data))
   
         data = {
             'student_records': student_records,

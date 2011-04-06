@@ -225,7 +225,46 @@ jQuery.fn.appendSpace = function()
 	return this.append($.createText(' '));
 };
 
-jQuery.parseDjangoJSON = function(djjson)
+AjaxMessage = function()
 {
-	return jQuery.parseJSON(djjson.replace(new RegExp("'", 'g'), '"'));
+	this.type = null;
+	this.code = null;
+	this.message = null;
+	this.data = null;
+};
+
+AjaxMessage.fromJSON = function(raw)
+{
+	var message = new AjaxMessage();
+	message.type = raw.type.trim();
+	message.code = raw.code.trim();
+	message.message = raw.message.trim();
+	message.data = raw.data;
+
+	return message;
+};
+
+AjaxMessage.prototype.isSuccess = function()
+{
+	return (this.type == 'success');
+};
+
+AjaxMessage.prototype.isFailure = function()
+{
+	return (this.type == 'failure');
+};
+
+AjaxMessage.prototype.displayMessageBox = function()
+{
+	MessageBox.display(this.message);
+};
+
+AjaxMessage.prototype.toString = function()
+{
+	if (this.isSuccess())
+		return 'AjaxSuccessMessage';
+	else if (this.isFailure())
+		return 'AjaxFailureMessage';
+	else
+		return 'AjaxMessage';
 };

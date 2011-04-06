@@ -14,6 +14,7 @@
 	<script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
 	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
 	<script src="/site_media/js/components/schedule.js" type="text/javascript"></script>
+	<script src="/site_media/js/components/messageBox.js" type="text/javascript"></script>
 
 	<script src="/site_media/js/common/listFilter.js" type="text/javascript"></script>
 	<script src="/site_media/js/common/listFilter-subjectType.js" type="text/javascript"></script>
@@ -55,13 +56,6 @@
 {% endblock %}
 
 {% block comment %}
-    <div id="schedule-wrapper"
-        pinUrl="{% url schedule-prototype-pin %}"
-        unpinUrl="{% url schedule-prototype-unpin %}"
-        assignUrl="{% url schedule-prototype-assign %}"
-        resignUrl="{% url schedule-prototype-resign %}">
-    </div>
-
     <div>
         <input id="btnAssignToAll" type="button" value="Zapisz mnie na przypięte przedmioty">
         <input id="blockUrl" type="button" value="Zablokuj plan" onClick="location.href='{% url schedule-prototype-block %}'">
@@ -75,6 +69,9 @@
 			planu nie może bez niej działać.</p>
 		<input type="hidden" name="pinned" value="{{ student_records.pinned }}" />
 		<input type="hidden" name="enrolled" value="{{ student_records.enrolled }}" />
+
+		<input type="hidden" name="setPinnedUrl" value="{% url schedule-prototype-set-pinned %}" />
+		<input type="hidden" name="setEnrolledUrl" value="{% url schedule-set-enrolled '.json' %}" />
 	</div>
 {% endblock %}
  
