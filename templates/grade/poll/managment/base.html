@@ -15,16 +15,6 @@
 
 {{ fdata }}
 
-{% block messages %}
-    {% if messages %}
-        {% for message in messages %}
-            <div class={% if message.tags == error %}"error-message"{% else %}"main-message"{% endif %}>
-                {{ message|safe }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endblock %}
-
 {% block content %}
 
     <div id='poll-managment-menu'>

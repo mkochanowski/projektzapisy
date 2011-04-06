@@ -39,9 +39,9 @@
 			<p id="main-systemTypeBar">{{ subsystemname }}</p>
 		{% endif %}
 		<p id="main-signinBar">
-                        {% if user.is_staff %}
-                                <a href="/admin/">Panel administracyjny</a> |
-                        {% endif %}
+			{% if user.is_staff %}
+					<a href="/admin/">Panel administracyjny</a> |
+			{% endif %}
 			{% if user.is_authenticated %}
 				Jesteś zalogowany jako
 				<a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
@@ -85,15 +85,9 @@
 			{% endblock %}
 			<div id="main-content" class="{% block content-class %}normal{% endblock %}">
 				{% block messages %}
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class={% if message.tags == error %}"error-message"{% else %}"main-message"{% endif %}>
-                                {{ message|safestring }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endblock %}
-                {% block content %}
+					{% include 'common/messages.html' %}
+				{% endblock %}
+				{% block content %}
 				{% endblock %}
 				<div style="clear: right"></div>
 			</div>

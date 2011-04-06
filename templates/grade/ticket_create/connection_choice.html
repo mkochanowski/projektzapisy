@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if success %}
+    {% if success %} <!-- TODO: przerobić na request.user.message_set.create(message='wiadomość') -->
     <div class="main-success">{{ success }}</div>
     {% endif %}
     {% if message %} 

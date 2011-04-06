@@ -136,6 +136,7 @@ def set_enrolled(request, method):
 
 @require_POST
 def deleteStudentFromGroup(request, user_id, group_id):
+    #TODO: wywalić, albo przepisać
     try:
         
         logged_as_staff = request.user.is_staff

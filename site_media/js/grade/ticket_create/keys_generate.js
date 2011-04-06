@@ -6,7 +6,7 @@ Ticket.keys_generate = new Object()
 Ticket.keys_generate.init = function()
 {
 
-    if( $(".main-message:contains('Liczba utworzonych ankiet:')").size() > 0)
+    if( $(".main-message:contains('Liczba utworzonych ankiet:')").size() > 0) // TODO: ej, tego się tak nie robi
     {
         $('#screen').css({  "display": "block", opacity: 0.7, "width":$(document).width(),"height":$(document).height()});
         $('#box').css({"display": "block"}).click(function(){$(this).css("display", "none");$('#screen').css("display", "none")});

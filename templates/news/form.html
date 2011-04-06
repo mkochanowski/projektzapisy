@@ -25,9 +25,6 @@
 
 {% block content-class %}narrow{% endblock %}
 {% block content %}
-	{% for message in messages %}
-		<div class="main-message">{{ message }}</div>
-	{% endfor %}
 	<form action="" method="post" id="od-news-form">
 		{{ form.as_p }}
 		<p class="submit">

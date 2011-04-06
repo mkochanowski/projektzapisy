@@ -104,9 +104,10 @@ def vote( request ):
 #                return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
                 return vote_view( request )
             else:
-                data['message'] = u'Przekroczono limit głosowania.\
-                                  Limit wynosi ' + str(SystemState.get_max_vote()) +\
-                                  u', a oddano głos o watości: ' + str(vote_sum) + '.'
+                request.user.message_set.create(message=\
+                    'Przekroczono limit głosowania. Limit wynosi ' + \
+                    str(SystemState.get_max_vote()) + \
+                    ', a oddano głos o watości: ' + str(vote_sum) + '.')
                 return render_to_response('offer/vote/form.html', data, context_instance = RequestContext( request ))
     else:
         data['form'] = VoteForm( winter  = winter_subs,

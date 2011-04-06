@@ -64,9 +64,7 @@
 			<div class="footer"></div>
 		</div>
 
-		{% for message in messages %}
-			<p class="main-message">{{ message }}</p>
-		{% endfor %}
+		{% block messages %}{% endblock %}{% include 'common/messages.html' %}
 
         {% if subject.can_enroll_from %}
             <br/>
