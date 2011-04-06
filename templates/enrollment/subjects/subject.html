@@ -1,5 +1,7 @@
 {% extends "enrollment/subjects/base.html" %}
 
+{% load fereol_common %}
+
 {% block main-subtitle %}{{subject.name}}{% endblock %}
 
 {% block main-navigation %}
@@ -50,10 +52,13 @@
 					Matematyka w zakresie szkoły średniej,
 					<a onclick="alert('to tylko przykład')">AiSD</a>
 				</li>
-				<li>
-					<span>Możesz zapisać się od:</span>
-					2010-13-37 (za 3 dni)
-				</li>
+				{% if subject.can_enroll_from %}
+					<li>
+						<span>Możesz zapisać się od:</span>
+						{{ subject.can_enroll_from|date:'Y-m-d H:i' }}
+						({{ subject.can_enroll_interval|timedelta }})
+					</li>
+				{% endif %}
 			</ul>
 
 			<div class="description">
@@ -65,12 +70,6 @@
 		</div>
 
 		{% block messages %}{% endblock %}{% include 'common/messages.html' %}
-
-        {% if subject.can_enroll_from %}
-            <br/>
-            <div class="tutorial"> Możesz zapisać się od: <b>{{subject.can_enroll_from}}</b></div>
-            <br/>
-        {% endif %}
 
 		{% for tutorial in tutorials %}{% if tutorial.groups %}
 			<div class="tutorial">

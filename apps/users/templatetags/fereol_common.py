@@ -1,3 +1,4 @@
+import math
 # -*- coding: utf-8 -*-
 
 from django import template
@@ -84,3 +85,30 @@ class CaptureasNode(template.Node):
 @register.filter
 def safestring( str ):
     return mark_safe( str )
+
+@register.filter
+def timedelta(delta):
+	if delta.days < 0:
+		raise RuntimeError('Nie obsługiwany parametr')
+	if delta.days > 1:
+		return 'za ' + str(delta.days) + ' dni'
+	seconds = delta.days * 24 * 3600 + delta.seconds
+	if seconds > 3600:
+		hours = int(math.floor(seconds / 3600.0 + 0.5))
+		if hours == 1:
+			return 'za godzinę'
+		if hours >= 10 and hours <= 20:
+			return 'za ' + str(hours) + ' godzin'
+		if hours % 10 >= 2 and hours % 10 <= 4:
+			return 'za ' + str(hours) + ' godziny'
+		return 'za ' + str(hours) + ' godzin'
+	if seconds > 60:
+		minutes = int(math.floor(seconds / 60.0 + 0.5))
+		if minutes == 1:
+			return 'za minutę'
+		if minutes >= 10 and minutes <= 20:
+			return 'za ' + str(minutes) + ' minut'
+		if minutes % 10 >= 2 and minutes % 10 <= 4:
+			return 'za ' + str(minutes) + ' minuty'
+		return 'za ' + str(minutes) + ' minut'
+	return 'za mniej niż minutę'
