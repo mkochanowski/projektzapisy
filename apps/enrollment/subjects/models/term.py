@@ -20,7 +20,15 @@ class Term( models.Model ):
         verbose_name = 'termin'
         verbose_name_plural = 'terminy'
         app_label = 'subjects'
-        
+    
+    @staticmethod
+    def get_all_in_semester(semester):
+        return Term.objects.filter(group__subject__semester=semester).\
+            select_related('classroom', 'group', 'group__subject', \
+            'group__subject__semester', 'group__subject__entity',
+            'group__subject__type', \
+            'group__teacher', 'group__teacher__user').order_by('group__subject__name').all()
+    
     def day_in_zero_base(self):
         return int(self.dayOfWeek)-1
     
