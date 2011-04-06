@@ -4,22 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 
-from django.http import QueryDict, HttpResponse 
-from django.utils import simplejson
-from django.db.models import Q 
-
 from apps.enrollment.subjects.models         import *
 from apps.enrollment.records.models          import *
 
-from apps.enrollment.subjects.exceptions import NonSubjectException, NonStudentOptionsException
+from apps.enrollment.subjects.exceptions import NonSubjectException
 
 import logging
 logger = logging.getLogger()
-
-def make_it_json_friendly(element):
-    element['entity__name'] = unicode(element['entity__name'])
-    element['slug'] = unicode(element['slug'])
-    return element
 
 ''' generates template data for filtering and list of subjects '''
 def prepare_subjects_list_to_render(request):
@@ -66,7 +57,6 @@ def subject(request, slug):
         records = Record.enrolled.filter(group__subject=subject)
         queues = Queue.queued.filter(group__subject=subject)
         groups = list(Group.objects.filter(subject=subject))
-        const= 0
         try:
             student = request.user.student
             subject.is_recording_open = subject.is_recording_open_for_student(student)
@@ -200,46 +190,7 @@ def subject(request, slug):
 
         return render_to_response( 'enrollment/subjects/subject.html', data, context_instance = RequestContext( request ) )
 
-    except Subject.DoesNotExist, NonSubjectException:
+    except (Subject.DoesNotExist, NonSubjectException):
         logger.error('Function subject(slug = %s) throws Subject.DoesNotExist exception.' % unicode(slug) )
         request.user.message_set.create(message="Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
-    
-@login_required
-def list_of_subjects(request):
-    # TODO: zbędne?
-    semester_name, list_of_types = "", []
-    keyword, semester = "", None
-    response = Subject.visible.all()      
-
-    try:
-        if request.POST.has_key('keyword'):
-            keyword = request.POST['keyword']
-            response = response.filter(Q(entity__name__icontains=keyword) | Q(teachers__user__last_name__icontains=keyword))
-
-        if request.POST.has_key('semester'):
-            semester = request.POST['semester']
-            semester_name = Semester.objects.get(id=semester).get_name()
-            response = response.filter(semester__id__exact=semester)
-        else:
-            logger.warning('Function list_of_subjects(request) was called with empty parameter: semester')
-       
-        if request.POST.has_key('type'):
-            list_of_types = request.POST.getlist('type')
-            if list_of_types:
-               response = response.filter(type__id__in=list_of_types)
-        else:
-            logger.warning('Function list_of_subjects(request) was called with empty parameter: type')
-    
-   
-    except Semester.DoesNotExist: 
-        logger.warning('Function list_of_subjects(request = {%s}) throws Semester.DoesNotExist exception.' % unicode(request.POST) )
-        return HttpResponse(simplejson.dumps({'semester_name' : 'nieznany', 'subjects' : {} }), mimetype="application/javascript")
-    else:
-        response = response.order_by('name').values('id', 'entity__name', 'slug')
-    
-        response = map(make_it_json_friendly, response)
-        result = {'semester_name' : semester_name, 'subjects' : response }
-
-        return HttpResponse(simplejson.dumps(result), mimetype="application/javascript")
- 
