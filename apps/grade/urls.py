@@ -16,5 +16,5 @@ urlpatterns = patterns('',
     (r'^poll/',   include('apps.grade.poll.urls')),
     (r'^ticket/', include('apps.grade.ticket_create.urls')),
 
-    url(r'declaration$',  'declaration', name='grade-poll-show'),
+    url(r'^declaration$',  'declaration', name='grade-poll-show'),
 )
