@@ -15,8 +15,6 @@ from apps.enrollment.subjects.exceptions import NonSubjectException, NonStudentO
 
 from itertools import cycle
 
-from django.db import transaction
-
 from django.db.models import signals
 #from django.dispatch import receiver
 from apps.enrollment.subjects.models.group import Group
@@ -217,7 +215,6 @@ class Record(models.Model):
           
 
     @staticmethod
-    @transaction.commit_on_success
     def add_student_to_group(user_id, group_id):
         """ assignes student to group if his records for subject are open. If student is pinned to group, pinned becomes enrolled """
         user = User.objects.get(id=user_id)
@@ -268,7 +265,6 @@ class Record(models.Model):
             return new_records
 
     @staticmethod
-    @transaction.commit_on_success
     def remove_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)
         try:
@@ -424,7 +420,6 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
-    @transaction.commit_on_success
     def remove_student_from_queue(user_id, group_id):
         """remove student from queue"""
         user = User.objects.get(id=user_id)

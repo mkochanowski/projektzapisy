@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.utils import simplejson
 from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
+from django.db import transaction
 
 from apps.enrollment.subjects.models import *
 from apps.users.models import *
@@ -200,6 +201,7 @@ def unblockPlan(request) :
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def assign(request, group_id):
     try:
         if request.user.student.block :
@@ -216,26 +218,33 @@ def assign(request, group_id):
             request.user.message_set.create(message="Zostałeś zapisany do wybranej grupy i grupy wykładowej.")
         return redirect("subject-page", slug=records_list[0].group_slug())
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AssignedInThisTypeGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać bo jesteś już zapisany do innej grupy tego typu.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except OutOfLimitException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa jest pełna.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def queue_assign(request, group_id):
     try:
         if request.user.student.block :
@@ -244,26 +253,31 @@ def queue_assign(request, group_id):
         if Group.objects.get(id=group_id).subject.is_recording_open_for_student(request.user.student):
             queue = Queue.add_student_to_queue(request.user.id, group_id)
             request.user.message_set.create(message="Zostałeś zapisany do kolejki.")
-            slug=queue.group_slug()
+            slug = queue.group_slug()
         else:
             request.user.message_set.create(message="Nie możesz zapisać się do kolejki, bo nie masz otwartych zapisów.")
-            slug=Group.objects.get(id=group_id).subject_slug()
+            slug = Group.objects.get(id=group_id).subject_slug()
         return redirect("subject-page", slug=slug)
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def queue_inc_priority(request, group_id):
     try:
         if request.user.student.block :
@@ -277,20 +291,25 @@ def queue_inc_priority(request, group_id):
             request.user.message_set.create(message="Nie można zwiększyć priorytetu.")
         return redirect("subject-page", slug=queue.group_slug())
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def queue_dec_priority(request, group_id):
     try:
         if request.user.student.block :
@@ -304,20 +323,25 @@ def queue_dec_priority(request, group_id):
             request.user.message_set.create(message="Nie można zmniejszyć priorytetu.")
         return redirect("subject-page", slug=queue.group_slug())
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def queue_set_priority(request, group_id, priority):
     try:
         if request.user.student.block :
@@ -333,20 +357,25 @@ def queue_set_priority(request, group_id, priority):
             queue.set_priority(priority)
         return HttpResponse(simplejson.dumps({'Success': {'Message': 'OK'}}))
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyAssignedException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo już jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def change(request, old_id, new_id):
     try:
         if request.user.student.block :
@@ -356,23 +385,29 @@ def change(request, old_id, new_id):
         request.user.message_set.create(message="Zostałeś przepisany do innej grupy.")
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyNotAssignedException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz zmienić grupy, bo nie jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except OutOfLimitException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się przenieść, bo podana grupa jest pełna.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except RecordsNotOpenException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się przenieść, bo zapisy na ten przedmiot nie są dla ciebie otwarte.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def resign(request, group_id):
     try:
         if request.user.student.block :
@@ -382,17 +417,21 @@ def resign(request, group_id):
         request.user.message_set.create(message="Zostałeś wypisany z grupy.")
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except AlreadyNotAssignedException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś zapisany.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 @require_POST
 @login_required
+@transaction.commit_on_success
 def queue_resign(request, group_id):
     try:
         if request.user.student.block :
@@ -402,9 +441,11 @@ def queue_resign(request, group_id):
         request.user.message_set.create(message="Zostałeś wypisany z kolejki.")
         return redirect("subject-page", slug=record.group_slug())
     except NonStudentException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się wypisać, bo nie jesteś studentem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except NonGroupException:
+    	transaction.rollback()
         request.user.message_set.create(message="Nie możesz się wypisać, bo podana grupa nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
