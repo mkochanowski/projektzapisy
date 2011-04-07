@@ -18,7 +18,8 @@ from apps.users.decorators import employee_required
 
 from apps.offer.preferences.models import PREFERENCE_CHOICES
 
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers     import reverse
+from django.views.decorators.http import require_POST
 
 import logging
 logger = logging.getLogger()
@@ -97,6 +98,7 @@ def description(request, proposal_id):
         'offer/preferences/description.html',
         data)
 
+@require_POST
 @employee_required
 def hide(request, pref_id):
     """
@@ -114,6 +116,7 @@ def hide(request, pref_id):
         data = {'Failure': 'Preference does not exist'}
     return HttpResponse(simplejson.dumps(data))
 
+@require_POST
 @employee_required
 def unhide(request, pref_id):
     """
@@ -160,6 +163,7 @@ def save_all_prefs(request):
     return redirect('prefs-default-view')
 
 @employee_required
+@require_POST
 def init_pref(request, prop_id):
     """
         Initialize preference

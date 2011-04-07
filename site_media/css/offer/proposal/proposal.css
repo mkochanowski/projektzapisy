@@ -2,6 +2,16 @@
  * Kształtowanie oferty dydaktycznej - propozycje przedmiotów
  */
 
+a.with-js
+{
+    display:none;
+}
+
+form.force-js
+{
+    display:inline;
+}
+
 #od-proposal-contents
 {
 	border: 1px solid #cccccc;

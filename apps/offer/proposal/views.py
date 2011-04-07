@@ -12,6 +12,7 @@ from django.http                    import HttpResponse
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
+from django.views.decorators.http   import require_POST
 from copy                           import deepcopy
 
 from apps.users.models            import Program
@@ -23,6 +24,7 @@ from apps.offer.proposal.exceptions      import NonStudentException, NonEmployee
 import logging
 logger = logging.getLogger("")
 
+@require_POST
 @login_required
 def become(request, slug, group):
     """
@@ -40,7 +42,8 @@ def become(request, slug, group):
         logger.error("Dodawanie uzytkownika do grupy przy propozycji. NonEmployeeException. Id = %d" % proposal_.id)
         request.user.message_set.create(message="Nie jesteś pracownkiem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
-        
+
+@require_POST
 @login_required
 def stop_be(request, slug, group):
     """
@@ -339,6 +342,7 @@ def proposal_history( request, sid ):
     return render_to_response ('offer/proposal/history.html', data, context_instance = RequestContext(request)) 
     
 @login_required
+@require_POST
 def proposal_restore ( request, descid ):
     """
         Description restore
@@ -363,6 +367,7 @@ def proposal_restore ( request, descid ):
 
     return redirect("proposal-page", olddesc.proposal.slug )
 
+@require_POST
 @permission_required('proposal.can_delete_proposal')
 def delete_proposal( request, slug ):
     """
@@ -375,6 +380,7 @@ def delete_proposal( request, slug ):
     
     return redirect("proposal-list")
 
+@require_POST
 @permission_required('proposal.can_delete_proposal')
 def delete_description( request, pid ):
     """
@@ -405,7 +411,7 @@ def offer_create( request ):
     
     return render_to_response('offer/proposal/create_offer.html', data, context_instance = RequestContext( request ))
     
-
+@require_POST
 @permission_required('proposal.can_create_offer')
 def offer_select(request):
     """
