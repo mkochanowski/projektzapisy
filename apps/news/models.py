@@ -44,6 +44,7 @@ CATEGORIES = (
     ('-', 'Hidden'),
     ('offer', 'Oferta'),
     ('enrollment', 'Zapisy'),
+    ('grade', 'Ocena zajęć'),
 )
 
 class News(models.Model):

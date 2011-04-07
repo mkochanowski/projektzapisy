@@ -99,23 +99,32 @@ def my_profile(request):
     '''profile site'''
     logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
     current_semester = Semester.get_default_semester()
+    zamawiany = Student.get_zamawiany(request.user.id)
+    comments = zamawiany and zamawiany.comments or ''
+    points = zamawiany and zamawiany.points or 0
     if current_semester:
-        point_limit_duration = settings.POINT_LIMIT_DURATION 
-        t0 = current_semester.records_opening - request.user.student.get_t0_interval()       
-        terms = [
-        {"name":"T0", "term":t0},
-        {"name":"T0 + 24h", "term":t0 + timedelta(days=1)},
-        {"name":"T0 + 48h", "term":t0 + timedelta(days=2)},
-        {"name":"T0 + 72h", "term":t0 + timedelta(days=3)},
-        {"name":"T1", "term":current_semester.records_opening},
-        {"name":"T2", "term":current_semester.records_opening + timedelta(days=point_limit_duration)},
-        {"name":"T3", "term":current_semester.records_closing},
-        ]
+        try:
+            point_limit_duration = settings.POINT_LIMIT_DURATION 
+            t0 = current_semester.records_opening - request.user.student.get_t0_interval()       
+            terms = [
+            {"name":"T0", "term":t0},
+            {"name":"T0 + 24h", "term":t0 + timedelta(days=1)},
+            {"name":"T0 + 48h", "term":t0 + timedelta(days=2)},
+            {"name":"T0 + 72h", "term":t0 + timedelta(days=3)},
+            {"name":"T1", "term":current_semester.records_opening},
+            {"name":"T2", "term":current_semester.records_opening + timedelta(days=point_limit_duration)},
+            {"name":"T3", "term":current_semester.records_closing},
+            ]
+        except:
+            terms = []
     else:
         terms = []
     
     data = {
         'terms' : terms,
+        'zamawiany' : zamawiany,
+        'comments' : comments,
+        'points' : points,
     }
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))

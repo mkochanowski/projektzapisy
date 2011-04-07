@@ -13,6 +13,10 @@ class Type(models.Model):
     @staticmethod
     def get_all_types():
         return Type.objects.select_related('group').all()
+
+    @staticmethod
+    def get_all_for_jsfilter():
+        return Type.objects.select_related('group').order_by('name').all()
     
     def get_name(self):
         self.name

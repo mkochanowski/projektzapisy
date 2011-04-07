@@ -22,7 +22,7 @@ Given /^I enroll in "([^"]*)" in group with id "([^"]*)"$/ do |coursename, id|
    Given %{I am on subjects page}
      And %{I click on "#{coursename}"}
      And %{I sleep for 10 seconds} 
-     And %{I click on link which points to "/records/#{id}/assign"}
+     And %{I press "zapisz" next to "group-id" with value "#{id}"}
 end
 
 Given /^(?:|I )am on (.+)$/ do |page|
@@ -36,6 +36,10 @@ end
 
 When /^(?:|I )press "([^"]*)"$/ do |button|
   click_button(button)
+end
+
+When /^(?:|I )press "([^"]*)" next to "([^"]*)" with value "([^"]*)"$/ do |button, name, value|
+    page.find(:xpath, "//*[@name=\"#{name}\" and @value=\"#{value}\"]/following-sibling::*").click_button(button)
 end
 
 When /^(?:|I )follow "([^"]*)"$/ do |link|
@@ -54,6 +58,10 @@ Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")$/ do |text, selector|
   with_scope(selector) do
     page.should have_content(text)    
   end
+end
+
+Then /^(?:|I )should see button "([^"]*)" next to "([^"]*)" with value "([^"]*)"$/ do |button, name, value|
+    page.find(:xpath, "//*[@name=\"#{name}\" and @value=\"#{value}\"]/following-sibling::*").should have_button(button)
 end
 
 Then /^(?:|I )should see "([^"]*)"$/ do |text|  

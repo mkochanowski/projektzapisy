@@ -18,10 +18,6 @@
 
 {% block content %}
 	<div id="enr-group-view">
-		{% for message in messages %}
-			<p class="main-message">{{ message }}</p>
-		{% endfor %}
-
 		<h1>{{group.subject.name}}</h1>
 		<h2>{{group.get_type_display}}:
 			{{group.get_teacher_full_name}} </h2>

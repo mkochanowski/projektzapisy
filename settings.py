@@ -99,9 +99,16 @@ TEMPLATE_LOADERS = (
 #    'django.template.loaders.eggs.load_template_source',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.messages.context_processors.messages',
+    'django.contrib.auth.context_processors.auth',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
@@ -123,6 +130,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.messages',
     'haystack',
     'mailer',
     'south',
@@ -135,8 +143,10 @@ INSTALLED_APPS = (
     'apps.users',
     'debug_toolbar',
     'apps.grade.poll',
+    'apps.grade.ticket_create',
     'apps.mobile',
 )
+
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
 )
@@ -162,10 +172,13 @@ POINT_LIMIT_DURATION = 14 # abs(t1-t2), in days
 ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
 
 # that's only the example of settings_local.py file contents:
-#SESSION_COOKIE_DOMAIN = '.nowe-zapisy.ii.uni.wroc.pl' # without port number!
+#SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
 
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
+

@@ -10,8 +10,12 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona główna</a></li>
-	<li><a href="{% url latest_news category %}">
-	{% ifequal category "enrollment" %}Zapisy{% else %}Oferta{% endifequal %}</a></li>
+    <li><a href="{% url latest_news category %}">
+		{% ifequal category "enrollment" %}Zapisy{% endifequal %}
+        {% ifequal category "offer" %}Oferta{% endifequal %}
+        {% ifequal category "grade" %}Ocena zajęć{% endifequal %}
+        </a>
+	</li>
 	{% if adding %}
 		<li>Dodaj ogłoszenie</li>
 	{% else %}
@@ -21,9 +25,6 @@
 
 {% block content-class %}narrow{% endblock %}
 {% block content %}
-	{% for message in messages %}
-		<div class="main-message">{{ message }}</div>
-	{% endfor %}
 	<form action="" method="post" id="od-news-form">
 		{{ form.as_p }}
 		<p class="submit">

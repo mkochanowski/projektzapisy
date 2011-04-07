@@ -4,8 +4,11 @@
 .pydevproject
 .settings/
 search_index/*
-*.tmp*
+*.tmp
 *.log
 *~
 .idea/
 settings_local.py
+/apache
+.idea/
+

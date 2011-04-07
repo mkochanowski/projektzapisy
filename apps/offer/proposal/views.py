@@ -116,7 +116,6 @@ def proposal_form(request, sid = None):
     """
     
     edit_mode = True if sid else False    
-    message = None
     books_to_form = []
     success = False
     proposal_description = ""
@@ -192,7 +191,7 @@ def proposal_form(request, sid = None):
         proposal_.slug = proposal_.create_slug(proposal_.name)             
         
         if Proposal.objects.filter(slug = proposal_.slug).exclude(id = proposal_.id).count() > 0:                
-            message = 'Istnieje już przedmiot o takiej nazwie'
+            request.user.message_set.create(message='Istnieje już przedmiot o takiej nazwie.')
             correct_form = False                                                 
 
         number_of_types = 0
@@ -205,7 +204,8 @@ def proposal_form(request, sid = None):
             or proposal_requirements == "" or proposal_lectures == -1
             or proposal_repetitories == -1 or proposal_exercises == -1
             or proposal_laboratories == -1):
-                message = ('Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' +
+                request.user.message_set.create(message=\
+                    'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' + \
                     'punktów ECTS oraz liczbę godzin zajęć.')
                 correct_form = False
         
@@ -266,9 +266,11 @@ def proposal_form(request, sid = None):
             success = True                                     
                                                
             if edit_mode:
-                message = 'Zmiany zostały wprowadzone.'
+                request.user.message_set.create(message=\
+                    'Zmiany zostały wprowadzone.')
             else:
-                message = 'Przedmiot został dodany.'
+                request.user.message_set.create(message=\
+                    'Przedmiot został dodany.')
     
     if proposal_ and proposal_.id:
         books_to_form = list(proposal_.books.all())
@@ -298,7 +300,6 @@ def proposal_form(request, sid = None):
     data = {
         'editForm'              : True,
         'editMode'              : edit_mode,
-        'message'               : message,
         'proposal'              : proposal_,
         'books'                 : books_to_form,
         'proposalDescription'   : proposal_description,

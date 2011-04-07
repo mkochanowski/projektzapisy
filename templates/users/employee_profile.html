@@ -10,8 +10,13 @@
 <h3>Dane:</h3>
 <ul>
 	<li>{{employee.get_full_name}}</li>
-	<li>email: {{employee.user.email}}</li>
+	<li>email: <a href="mailto:{{employee.user.email}}">{{employee.user.email}}</a></li>
+	<li>strona: <a href="{{employee.homepage}}">{{employee.homepage}}</a></li>
 </ul>
+<br \>
+<h3>Konsultacje:</h3>
+<p>{{employee.consultations}}</p>
+<br \>
 <div id="schedule-wrapper">
 	{% for group in groups %}
 		{% for term in group.terms_ %}
@@ -30,8 +35,7 @@
 	{% endfor %}
 </div>
 <br/>
-<h3>Konsultacje:</h3>
-<p>{{employee.consultations}}</p>
+
 
 
 

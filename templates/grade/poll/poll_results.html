@@ -1,0 +1,83 @@
+﻿{% extends "grade/base.html" %}
+
+{% block scripts %}
+<script type="application/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>
+<script src="/site_media/js/grade/poll/poll_results.js" type="text/javascript"></script>
+{% endblock %}
+
+{% load news_extras %}
+
+{% block content-class %}wide{% endblock %}
+
+{% block main-navigation %}
+    <li><a href="/">Strona Główna</a></li>
+    <li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+    <li>Wyniki oceny</li>
+{% endblock %}
+
+{% block content %}
+<!-- NA GÓRĘ MA IŚĆ PASEK FILTRÓW! -->
+
+<input type="hidden" id="poll-id" value="{% if pid %}{{pid}}{% else %}-1{% endif %}">
+<input type="hidden" id="display-mode" value="{{mode}}">
+
+{% if polls_by_subject and polls_by_teacher %}
+    <div id="results-poll-menu">
+        <ul id="results-groupping-list">
+            <li>
+                <h3><a id="subjects-list-link" href="">
+                    Przedmioty
+                </a></h3>
+                <ul id="results-by-subject-list">
+                    {% for poll_list in polls_by_subject %}
+                    <li><h4><a class="list-link" href="">{{ poll_list.0 }}</a></h4>
+                    <ul class="result-groupped-list">
+                        {% for poll in poll_list.1 %}
+                        <li><a id="results-by-subject-{{ poll.id }}" 
+                               class="result-poll-link" 
+                               href="{% url grade-poll-poll-results 'S' poll.id %}">{{ poll.title }}
+                        {% if poll.group %}
+                            - {{ poll.group.get_type_display }}
+                            - {{ poll.group.get_teacher_full_name }}
+                        {% endif %}
+                        </a></li>
+                        {% endfor %}
+                    </ul></li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <h3><a id="teachers-list-link" href="">
+                    Prowadzący
+                </a></h3>
+                <ul id="results-by-teacher-list">
+                    {% for poll_list in polls_by_teacher %}
+                    <li><h4><a class="list-link" href="">{{ poll_list.0 }}</a></h4>
+                    <ul class="result-groupped-list">
+                        {% for poll in poll_list.1 %}
+                        <li><a id="results-by-teacher-{{ poll.id }}" 
+                               class="result-poll-link" 
+                               href="{% url grade-poll-poll-results 'T' poll.id %}">{{ poll.title }}
+                        {% if poll.group %}
+                            - {{ poll.group.subject.name }}
+                            - {{ poll.group.get_type_display }}
+                        {% endif %}
+                        </a></li>
+                        {% endfor %}
+                    </ul></li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div id="results-content">
+    {% block results %}
+    {% endblock %}
+    </div>
+{% else %}
+    <div class="main-message">
+        Nie posiadasz uprawnień do oglądania żadnych wyników.
+    </div>
+{% endif %}
+{% endblock %}

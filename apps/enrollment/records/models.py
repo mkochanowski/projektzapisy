@@ -15,8 +15,6 @@ from apps.enrollment.subjects.exceptions import NonSubjectException, NonStudentO
 
 from itertools import cycle
 
-from django.db import transaction
-
 from django.db.models import signals
 #from django.dispatch import receiver
 from apps.enrollment.subjects.models.group import Group
@@ -50,23 +48,22 @@ class Record(models.Model):
         return Record.enrolled.filter(group=group_).count()
 
     @staticmethod
-    def get_student_all_detailed_records(user_id):
-        user = User.objects.get(id=user_id)
+    def get_student_records_ids(user, semester):
         try:
-            student = user.student
-            records = Record.objects.filter(student=student).\
-                select_related('group', 'group__subject').order_by('group__subject__name')
+            records = Record.objects.\
+                filter(student=user.student, group__subject__semester=semester).\
+                values_list('group__pk', 'status');
+            pinned = []
+            enrolled = []
             for record in records:
-                record.group_ = record.group
-                record.group_.terms_ = record.group.get_all_terms()
-                record.group_.subject_ = record.group.subject
-                if record.status == STATUS_ENROLLED:
-                    record.schedule_widget_status_ = 'fixed'
-                elif record.status == STATUS_PINNED:
-                    record.schedule_widget_status_ = 'pinned'
+                if int(record[1]) == 1:
+                    enrolled.append(record[0])
                 else:
-                    record.schedule_widget_status_ = ''
-            return records
+                    pinned.append(record[0])
+            return {
+                'enrolled': enrolled,
+                'pinned': pinned
+            }
         except Student.DoesNotExist:
             logger.error('Record.get_student_all_detailed_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
             raise NonStudentException()
@@ -180,13 +177,13 @@ class Record(models.Model):
             logger.info('User %s <id: %s> is no longer pinned to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             return record
         except Record.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Record.DoesNotExist exception' % (int(user_id), int(group_id)))
             raise AlreadyNotPinnedException()
         except Student.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Student.DoesNotExist exception' % (int(user_id), int(group_id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
+            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Group.DoesNotExist exception' % (int(user_id), int(group_id)))
             raise NonGroupException()
 
     @staticmethod
@@ -218,7 +215,6 @@ class Record(models.Model):
           
 
     @staticmethod
-    @transaction.commit_on_success
     def add_student_to_group(user_id, group_id):
         """ assignes student to group if his records for subject are open. If student is pinned to group, pinned becomes enrolled """
         user = User.objects.get(id=user_id)
@@ -269,7 +265,6 @@ class Record(models.Model):
             return new_records
 
     @staticmethod
-    @transaction.commit_on_success
     def remove_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)
         try:
@@ -425,7 +420,6 @@ class Queue(models.Model):
             raise NonGroupException()
 
     @staticmethod
-    @transaction.commit_on_success
     def remove_student_from_queue(user_id, group_id):
         """remove student from queue"""
         user = User.objects.get(id=user_id)

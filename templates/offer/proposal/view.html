@@ -10,12 +10,6 @@
 
 {% block proposal-content %}
 	<div id="od-proposal-view">
-		{% if messages %}
-			{% for message in messages %}
-				<p class="main-message">{{ message }}</p>
-			{% endfor %}
-		{% endif %}
-
 		{% ifnotequal descid newest.id %}
 			<p class="main-message">
 				Wersja archiwalna!

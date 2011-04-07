@@ -1,0 +1,24 @@
+﻿{% extends "grade/poll/managment/base.html" %}
+
+{% block scripts %}
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
+{% endblock %}
+
+
+{% block poll-managment %}
+  
+    {% if groups %}
+        <h3>Następujące grupy nie posiadają przypisanych ankiet:</h3>
+        <ul id="poll-managment-list">
+        {% for group in groups%}
+            <li><a href="{% url grade-poll-poll-create-group group_id=group.pk %}">{{group}}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <div class="main-message">Wszystkie grupy mają przypisane ankiety</div>
+    {% endif %}
+{% endblock %}
+

@@ -1,0 +1,70 @@
+{% extends "grade/base.html" %}
+
+{% block scripts %}
+<script type="application/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>
+<script src="/site_media/js/grade/poll/poll_answer.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block main-navigation %}
+    <li><a href="/">Strona główna</a></li>
+    <li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+    <li>Twoje ankiety</li>
+{% endblock %}
+
+{% block content %}
+<!--
+{% if errors %}
+    <div class="main-message">
+        Błąd nastepujących ankiet.
+        <ul>
+        {% for error in errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+-->
+
+<div id="grade-progressbar-div"><div id="progressbar"></div>
+Zakończono <span id="finished-polls">{{finished_polls}}</span> spośród <span id="all-polls">{{all_polls}}</span></div>
+<div id="grade-poll-choose-menu">
+{% if polls or finished %}
+    <h3>Twoje ankiety</h3>
+{% endif %}
+{% if polls %}
+    <h4>Ankiety dostępne</h4>
+    <ul id="grade-fillable-poll-list">
+    {% for poll_sub in polls %}
+        <li><a class="grade-fillable-poll-link" href="{% url grade-poll-polls-for-user poll_sub.0.1 %}">{{ poll_sub.0.0 }}</a>
+            <ul class="grade-fillable-poll-sublist">
+            {% for poll in poll_sub.2 %}
+                <li><a id="grade-fillable-poll-link-{{poll.0}}" href="{% url grade-poll-poll-answer poll_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
+            {% endfor %}
+            </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if finished %}
+    <h4>Ankiety zakończone</h4>
+    <ul id="grade-not-fillable-poll-list">
+    {% for fin_sub in finished %}
+        <li><a class="grade-fillable-poll-link"  href="{% url grade-poll-polls-for-user fin_sub.0.1 %}">{{ fin_sub.0.0 }}</a>
+        <ul class="grade-not-fillable-poll-sublist">
+            {% for poll in fin_sub.2 %}
+                <li><a id="grade-fillable-poll-link-{{poll.0}}" href="{% url grade-poll-poll-answer fin_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
+            {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+</div>
+<div id="grade-poll-content">
+{% block poll-content %}
+{% endblock %}
+</div>
+
+<div id="grade-end-grading"><a href="{% url poll-end-grading %}">Zakończ oceniać</a></div>
+{% endblock %}

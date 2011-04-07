@@ -16,14 +16,19 @@ from django.views.generic.create_update import delete_object
 from apps.news.forms import NewsForm
 from apps.news.models import News
 from apps.news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
-     get_search_results_data, mail_news_enrollment, \
+     get_search_results_data, mail_news_enrollment,  mail_news_grade, \
      mail_news_offer, render_with_category_template, render_with_device_detection
+from apps.enrollment.subjects.models import Semester
 
 def main_page( request ):
     """
         Main page
     """
-    return render_to_response('common/index.html', context_instance = RequestContext(request))
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    return render_to_response('common/index.html', {'grade':grade}, context_instance = RequestContext(request))
 
 
 def search_page(request, cat):
@@ -84,6 +89,11 @@ def display_news_list(request, data={}):
     """
         NEws list
     """
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    data['grade'] = grade
     return render_with_category_template(
         'news/list.html',
         RequestContext(request,data))
@@ -105,14 +115,21 @@ def add(request, cat):
                 mail_news_offer(news)
             elif cat == 'enrollment':
                 mail_news_enrollment(news)
+            elif cat == 'grade':
+                mail_news_grade(news)
             return redirect(latest_news, cat)
     else:
         form = NewsForm()
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
     return render_with_category_template('news/form.html',
         RequestContext(request, {
         'category': cat,
         'form': form,
         'adding': True,
+        'grade' : grade
         }))
 
 @permission_required('news.change_news')
@@ -135,6 +152,8 @@ def edit(request, cat, nid):
                 mail_news_offer(news)
             elif cat == 'enrollment':
                 mail_news_enrollment(news)
+            elif cat == 'grade':
+                mail_news_grade(news)
             return redirect(latest_news, news.category)
     else:
         news_instance = get_object_or_404(News, pk=nid)
@@ -143,6 +162,7 @@ def edit(request, cat, nid):
         RequestContext(request, {
         'category': cat,
         'form': form,
+        'grade' : Semester.get_current_semester().is_grade_active
         }))
 
 @permission_required('news.delete_news')
@@ -154,8 +174,13 @@ def delete(request, nid):
         news.delete()
         request.user.message_set.create(message="Usunięto ogłoszenie.")
         return redirect(latest_news, category)
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
     return render_with_category_template('news/confirm_delete.html',
         RequestContext(request, {
             'category': category,
             'news': news,
+            'grade' : grade
         }))

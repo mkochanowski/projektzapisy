@@ -1,0 +1,48 @@
+{% extends "grade/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/tickets_save.css" type="text/css" />
+{% endblock %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona Główna</a></li>
+	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+	<li>Pobieranie biletów</li>
+{% endblock %}
+
+{% block content %}
+<!--
+    {% if errors %}
+        <div class='main-error'>
+            <h3> Nie udało się pobrać następujących biletów:</h3>
+            <ul>
+                {% for err in errors %}
+                    <li>
+                        Ankieta: <b>{{ err.0 }}</b> <br>
+                        Powód: {{ err.1 }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %} 
+-->
+    
+    {% if tickets %}
+        <div id='grade-tickets-save-form'>
+            <h3> Pomyślnie wygenerowano bilety.<br>Zapisz je w bezpiecznym miejscu.</h3>
+            <form action="">
+    	        <textarea id="keys" name="keys" cols="80" rows="20" readonly="readonly">{{ tickets }}
+                </textarea>
+            </form>
+            <input id="download-keys" 
+                   class="download-keys-button" 
+                   type="button" 
+                   value="Zapisz bilety do pliku"
+                   onclick='window.open("data:application/octet-stream," + encodeURIComponent($("#keys").text()))'>
+        </div>
+    {% else %}
+        <div class='main-error'>
+            <h4>Niestety nie możesz pobrać żadnych biletów.</h4>
+        </div>
+    {% endif %}
+{% endblock %}

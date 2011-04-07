@@ -1,0 +1,58 @@
+﻿{% extends "grade/poll/managment/base.html" %}
+
+{% block scripts %}
+<script src="/site_media/js/grade/managment/list.js" type="application/javascript"></script>
+{% endblock %}
+
+{% block poll-managment %}
+<form method="POST" action="{% url grade-poll-delete_poll %}">
+<div class="actions">
+	<label>Akcja: 
+		<select name="action">
+		<option selected="selected" value="">---------</option>
+		<option value="delete_selected">Usuń wybrane ankiety</option>
+		</select>
+	</label>
+   	<button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
+        <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{polls.object_list.count}} wybranych</span>
+</div>
+<table id="poll-managment-table">
+	<thead>
+	<tr>
+		<th class="action-checkbox-column"><input type="checkbox" id="action-toggle" style="display: inline;"></th>
+		<th>Ankiety</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for poll in polls.object_list %}
+        <tr>
+            <td class="action-checkbox-column">
+                <input type="checkbox" class="_selected_action" name="_selected_action" value="{{poll.pk}}" class="action-select" {% if not user.is_staff and not poll.author.user == user %} disabled {% endif %}>
+            </td>
+            <td>
+                <a href="{% url grade-poll-show_poll poll.id %}">{{poll}}</a>
+            </td>
+        </tr>
+    	{% endfor %}
+	</tbody>
+</table>
+</form>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if polls.has_previous %}
+            <a href="?page={{ polls.previous_page_number }}">poprzednia</a>
+        {% endif %}
+
+        <span class="current">
+            Strona {{ polls.number }} z {{ polls.paginator.num_pages }}
+        </span>
+
+        {% if polls.has_next %}
+            <a href="?page={{ polls.next_page_number }}">nastepna</a>
+        {% endif %}
+    </span>
+</div>
+
+<p>{{polls.paginator.count}} {{polls_word}}</p>
+{% endblock %}

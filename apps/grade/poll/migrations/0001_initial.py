@@ -8,127 +8,273 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding model 'Answer'
-        db.create_table('poll_answer', (
+        # Adding model 'Option'
+        db.create_table('poll_option', (
+            ('content', self.gf('django.db.models.fields.CharField')(max_length=250)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
         ))
-        db.send_create_signal('poll', ['Answer'])
+        db.send_create_signal('poll', ['Option'])
 
-        # Adding model 'OpenQuestion'
-        db.create_table('poll_openquestion', (
-            ('reason', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+        # Adding model 'SavedTicket'
+        db.create_table('poll_savedticket', (
+            ('ticket', self.gf('django.db.models.fields.TextField')()),
+            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Poll'])),
+            ('finished', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
         ))
-        db.send_create_signal('poll', ['OpenQuestion'])
+        db.send_create_signal('poll', ['SavedTicket'])
 
-        # Adding model 'SingleChoiceQuestion'
-        db.create_table('poll_singlechoicequestion', (
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('has_other', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('reason', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
-        ))
-        db.send_create_signal('poll', ['SingleChoiceQuestion'])
-
-        # Adding M2M table for field answers on 'SingleChoiceQuestion'
-        db.create_table('poll_singlechoicequestion_answers', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('singlechoicequestion', models.ForeignKey(orm['poll.singlechoicequestion'], null=False)),
-            ('answer', models.ForeignKey(orm['poll.answer'], null=False))
-        ))
-        db.create_unique('poll_singlechoicequestion_answers', ['singlechoicequestion_id', 'answer_id'])
+        # Adding unique constraint on 'SavedTicket', fields ['ticket', 'poll']
+        db.create_unique('poll_savedticket', ['ticket', 'poll_id'])
 
         # Adding model 'MultipleChoiceQuestion'
         db.create_table('poll_multiplechoicequestion', (
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('has_other', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('reason', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('content', self.gf('django.db.models.fields.CharField')(max_length=250)),
+            ('choice_limit', self.gf('django.db.models.fields.IntegerField')()),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('contents', self.gf('django.db.models.fields.TextField')()),
+            ('has_other', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
         ))
         db.send_create_signal('poll', ['MultipleChoiceQuestion'])
 
-        # Adding M2M table for field answers on 'MultipleChoiceQuestion'
-        db.create_table('poll_multiplechoicequestion_answers', (
+        # Adding M2M table for field options on 'MultipleChoiceQuestion'
+        db.create_table('poll_multiplechoicequestion_options', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
             ('multiplechoicequestion', models.ForeignKey(orm['poll.multiplechoicequestion'], null=False)),
-            ('answer', models.ForeignKey(orm['poll.answer'], null=False))
+            ('option', models.ForeignKey(orm['poll.option'], null=False))
         ))
-        db.create_unique('poll_multiplechoicequestion_answers', ['multiplechoicequestion_id', 'answer_id'])
+        db.create_unique('poll_multiplechoicequestion_options', ['multiplechoicequestion_id', 'option_id'])
+
+        # Adding model 'MultipleChoiceQuestionOrdering'
+        db.create_table('poll_multiplechoicequestionordering', (
+            ('sections', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.MultipleChoiceQuestion'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('position', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal('poll', ['MultipleChoiceQuestionOrdering'])
+
+        # Adding unique constraint on 'MultipleChoiceQuestionOrdering', fields ['sections', 'position']
+        db.create_unique('poll_multiplechoicequestionordering', ['sections_id', 'position'])
+
+        # Adding model 'SingleChoiceQuestion'
+        db.create_table('poll_singlechoicequestion', (
+            ('content', self.gf('django.db.models.fields.CharField')(max_length=250)),
+            ('is_scale', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('poll', ['SingleChoiceQuestion'])
+
+        # Adding M2M table for field options on 'SingleChoiceQuestion'
+        db.create_table('poll_singlechoicequestion_options', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('singlechoicequestion', models.ForeignKey(orm['poll.singlechoicequestion'], null=False)),
+            ('option', models.ForeignKey(orm['poll.option'], null=False))
+        ))
+        db.create_unique('poll_singlechoicequestion_options', ['singlechoicequestion_id', 'option_id'])
+
+        # Adding model 'SingleChoiceQuestionOrdering'
+        db.create_table('poll_singlechoicequestionordering', (
+            ('is_leading', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('sections', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.SingleChoiceQuestion'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('position', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal('poll', ['SingleChoiceQuestionOrdering'])
+
+        # Adding unique constraint on 'SingleChoiceQuestionOrdering', fields ['sections', 'is_leading', 'position']
+        db.create_unique('poll_singlechoicequestionordering', ['sections_id', 'is_leading', 'position'])
+
+        # Adding M2M table for field hide_on on 'SingleChoiceQuestionOrdering'
+        db.create_table('poll_singlechoicequestionordering_hide_on', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('singlechoicequestionordering', models.ForeignKey(orm['poll.singlechoicequestionordering'], null=False)),
+            ('option', models.ForeignKey(orm['poll.option'], null=False))
+        ))
+        db.create_unique('poll_singlechoicequestionordering_hide_on', ['singlechoicequestionordering_id', 'option_id'])
+
+        # Adding model 'OpenQuestion'
+        db.create_table('poll_openquestion', (
+            ('content', self.gf('django.db.models.fields.CharField')(max_length=250)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('poll', ['OpenQuestion'])
+
+        # Adding model 'OpenQuestionOrdering'
+        db.create_table('poll_openquestionordering', (
+            ('sections', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.OpenQuestion'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('position', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal('poll', ['OpenQuestionOrdering'])
+
+        # Adding unique constraint on 'OpenQuestionOrdering', fields ['sections', 'position']
+        db.create_unique('poll_openquestionordering', ['sections_id', 'position'])
+
+        # Adding model 'Section'
+        db.create_table('poll_section', (
+            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=50)),
+        ))
+        db.send_create_signal('poll', ['Section'])
+
+        # Adding model 'SectionOrdering'
+        db.create_table('poll_sectionordering', (
+            ('position', self.gf('django.db.models.fields.IntegerField')()),
+            ('section', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('poll', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Poll'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+        ))
+        db.send_create_signal('poll', ['SectionOrdering'])
+
+        # Adding unique constraint on 'SectionOrdering', fields ['poll', 'position']
+        db.create_unique('poll_sectionordering', ['poll_id', 'position'])
 
         # Adding model 'Poll'
         db.create_table('poll_poll', (
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'])),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
-            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'])),
+            ('studies_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Type'], null=True, blank=True)),
+            ('share_result', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'], null=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name='author', to=orm['users.Employee'])),
+            ('semester', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Semester'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=250)),
         ))
         db.send_create_signal('poll', ['Poll'])
 
-        # Adding M2M table for field open_questions on 'Poll'
-        db.create_table('poll_poll_open_questions', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('poll', models.ForeignKey(orm['poll.poll'], null=False)),
-            ('openquestion', models.ForeignKey(orm['poll.openquestion'], null=False))
+        # Adding model 'OpenQuestionAnswer'
+        db.create_table('poll_openquestionanswer', (
+            ('content', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.OpenQuestion'])),
+            ('section', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('saved_ticket', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.SavedTicket'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
-        db.create_unique('poll_poll_open_questions', ['poll_id', 'openquestion_id'])
+        db.send_create_signal('poll', ['OpenQuestionAnswer'])
 
-        # Adding M2M table for field multiple_choice_question on 'Poll'
-        db.create_table('poll_poll_multiple_choice_question', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('poll', models.ForeignKey(orm['poll.poll'], null=False)),
-            ('multiplechoicequestion', models.ForeignKey(orm['poll.multiplechoicequestion'], null=False))
+        # Adding model 'SingleChoiceQuestionAnswer'
+        db.create_table('poll_singlechoicequestionanswer', (
+            ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.SingleChoiceQuestion'])),
+            ('section', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('saved_ticket', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.SavedTicket'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('option', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Option'], null=True, blank=True)),
         ))
-        db.create_unique('poll_poll_multiple_choice_question', ['poll_id', 'multiplechoicequestion_id'])
+        db.send_create_signal('poll', ['SingleChoiceQuestionAnswer'])
 
-        # Adding M2M table for field single_choice_questions on 'Poll'
-        db.create_table('poll_poll_single_choice_questions', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('poll', models.ForeignKey(orm['poll.poll'], null=False)),
-            ('singlechoicequestion', models.ForeignKey(orm['poll.singlechoicequestion'], null=False))
+        # Adding model 'MultipleChoiceQuestionAnswer'
+        db.create_table('poll_multiplechoicequestionanswer', (
+            ('question', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.MultipleChoiceQuestion'])),
+            ('section', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('other', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('saved_ticket', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.SavedTicket'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
         ))
-        db.create_unique('poll_poll_single_choice_questions', ['poll_id', 'singlechoicequestion_id'])
+        db.send_create_signal('poll', ['MultipleChoiceQuestionAnswer'])
+
+        # Adding M2M table for field options on 'MultipleChoiceQuestionAnswer'
+        db.create_table('poll_multiplechoicequestionanswer_options', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('multiplechoicequestionanswer', models.ForeignKey(orm['poll.multiplechoicequestionanswer'], null=False)),
+            ('option', models.ForeignKey(orm['poll.option'], null=False))
+        ))
+        db.create_unique('poll_multiplechoicequestionanswer_options', ['multiplechoicequestionanswer_id', 'option_id'])
+
+        # Adding model 'Template'
+        db.create_table('poll_template', (
+            ('studies_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Type'], null=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('share_result', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('group_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
+            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'], null=True, blank=True)),
+        ))
+        db.send_create_signal('poll', ['Template'])
     
     
     def backwards(self, orm):
         
-        # Deleting model 'Answer'
-        db.delete_table('poll_answer')
+        # Deleting model 'Option'
+        db.delete_table('poll_option')
 
-        # Deleting model 'OpenQuestion'
-        db.delete_table('poll_openquestion')
+        # Deleting model 'SavedTicket'
+        db.delete_table('poll_savedticket')
 
-        # Deleting model 'SingleChoiceQuestion'
-        db.delete_table('poll_singlechoicequestion')
-
-        # Removing M2M table for field answers on 'SingleChoiceQuestion'
-        db.delete_table('poll_singlechoicequestion_answers')
+        # Removing unique constraint on 'SavedTicket', fields ['ticket', 'poll']
+        db.delete_unique('poll_savedticket', ['ticket', 'poll_id'])
 
         # Deleting model 'MultipleChoiceQuestion'
         db.delete_table('poll_multiplechoicequestion')
 
-        # Removing M2M table for field answers on 'MultipleChoiceQuestion'
-        db.delete_table('poll_multiplechoicequestion_answers')
+        # Removing M2M table for field options on 'MultipleChoiceQuestion'
+        db.delete_table('poll_multiplechoicequestion_options')
+
+        # Deleting model 'MultipleChoiceQuestionOrdering'
+        db.delete_table('poll_multiplechoicequestionordering')
+
+        # Removing unique constraint on 'MultipleChoiceQuestionOrdering', fields ['sections', 'position']
+        db.delete_unique('poll_multiplechoicequestionordering', ['sections_id', 'position'])
+
+        # Deleting model 'SingleChoiceQuestion'
+        db.delete_table('poll_singlechoicequestion')
+
+        # Removing M2M table for field options on 'SingleChoiceQuestion'
+        db.delete_table('poll_singlechoicequestion_options')
+
+        # Deleting model 'SingleChoiceQuestionOrdering'
+        db.delete_table('poll_singlechoicequestionordering')
+
+        # Removing unique constraint on 'SingleChoiceQuestionOrdering', fields ['sections', 'is_leading', 'position']
+        db.delete_unique('poll_singlechoicequestionordering', ['sections_id', 'is_leading', 'position'])
+
+        # Removing M2M table for field hide_on on 'SingleChoiceQuestionOrdering'
+        db.delete_table('poll_singlechoicequestionordering_hide_on')
+
+        # Deleting model 'OpenQuestion'
+        db.delete_table('poll_openquestion')
+
+        # Deleting model 'OpenQuestionOrdering'
+        db.delete_table('poll_openquestionordering')
+
+        # Removing unique constraint on 'OpenQuestionOrdering', fields ['sections', 'position']
+        db.delete_unique('poll_openquestionordering', ['sections_id', 'position'])
+
+        # Deleting model 'Section'
+        db.delete_table('poll_section')
+
+        # Deleting model 'SectionOrdering'
+        db.delete_table('poll_sectionordering')
+
+        # Removing unique constraint on 'SectionOrdering', fields ['poll', 'position']
+        db.delete_unique('poll_sectionordering', ['poll_id', 'position'])
 
         # Deleting model 'Poll'
         db.delete_table('poll_poll')
 
-        # Removing M2M table for field open_questions on 'Poll'
-        db.delete_table('poll_poll_open_questions')
+        # Deleting model 'OpenQuestionAnswer'
+        db.delete_table('poll_openquestionanswer')
 
-        # Removing M2M table for field multiple_choice_question on 'Poll'
-        db.delete_table('poll_poll_multiple_choice_question')
+        # Deleting model 'SingleChoiceQuestionAnswer'
+        db.delete_table('poll_singlechoicequestionanswer')
 
-        # Removing M2M table for field single_choice_questions on 'Poll'
-        db.delete_table('poll_poll_single_choice_questions')
+        # Deleting model 'MultipleChoiceQuestionAnswer'
+        db.delete_table('poll_multiplechoicequestionanswer')
+
+        # Removing M2M table for field options on 'MultipleChoiceQuestionAnswer'
+        db.delete_table('poll_multiplechoicequestionanswer_options')
+
+        # Deleting model 'Template'
+        db.delete_table('poll_template')
     
     
     models = {
@@ -168,49 +314,129 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'poll.answer': {
-            'Meta': {'object_name': 'Answer'},
-            'contents': ('django.db.models.fields.TextField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
         'poll.multiplechoicequestion': {
             'Meta': {'object_name': 'MultipleChoiceQuestion'},
-            'answers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Answer']", 'symmetrical': 'False'}),
-            'contents': ('django.db.models.fields.TextField', [], {}),
-            'description': ('django.db.models.fields.TextField', [], {}),
+            'choice_limit': ('django.db.models.fields.IntegerField', [], {}),
+            'content': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'has_other': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'reason': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'required': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'})
+            'options': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Option']", 'symmetrical': 'False'}),
+            'sections': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Section']", 'through': "orm['poll.MultipleChoiceQuestionOrdering']", 'symmetrical': 'False'})
+        },
+        'poll.multiplechoicequestionanswer': {
+            'Meta': {'object_name': 'MultipleChoiceQuestionAnswer'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'options': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['poll.Option']", 'null': 'True', 'blank': 'True'}),
+            'other': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.MultipleChoiceQuestion']"}),
+            'saved_ticket': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.SavedTicket']"}),
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"})
+        },
+        'poll.multiplechoicequestionordering': {
+            'Meta': {'unique_together': "(['sections', 'position'],)", 'object_name': 'MultipleChoiceQuestionOrdering'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'position': ('django.db.models.fields.IntegerField', [], {}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.MultipleChoiceQuestion']"}),
+            'sections': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"})
         },
         'poll.openquestion': {
             'Meta': {'object_name': 'OpenQuestion'},
-            'contents': ('django.db.models.fields.TextField', [], {}),
-            'description': ('django.db.models.fields.TextField', [], {}),
+            'content': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'reason': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'required': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'})
+            'sections': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Section']", 'through': "orm['poll.OpenQuestionOrdering']", 'symmetrical': 'False'})
+        },
+        'poll.openquestionanswer': {
+            'Meta': {'object_name': 'OpenQuestionAnswer'},
+            'content': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.OpenQuestion']"}),
+            'saved_ticket': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.SavedTicket']"}),
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"})
+        },
+        'poll.openquestionordering': {
+            'Meta': {'unique_together': "(['sections', 'position'],)", 'object_name': 'OpenQuestionOrdering'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'position': ('django.db.models.fields.IntegerField', [], {}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.OpenQuestion']"}),
+            'sections': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"})
+        },
+        'poll.option': {
+            'Meta': {'object_name': 'Option'},
+            'content': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'poll.poll': {
             'Meta': {'object_name': 'Poll'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Employee']"}),
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'author'", 'to': "orm['users.Employee']"}),
+            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Group']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'multiple_choice_question': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.MultipleChoiceQuestion']", 'symmetrical': 'False'}),
-            'open_questions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.OpenQuestion']", 'symmetrical': 'False'}),
-            'single_choice_questions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.SingleChoiceQuestion']", 'symmetrical': 'False'}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '250'})
+            'semester': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Semester']"}),
+            'share_result': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'studies_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+        },
+        'poll.savedticket': {
+            'Meta': {'unique_together': "(['ticket', 'poll'],)", 'object_name': 'SavedTicket'},
+            'finished': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'poll': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Poll']"}),
+            'ticket': ('django.db.models.fields.TextField', [], {})
+        },
+        'poll.section': {
+            'Meta': {'object_name': 'Section'},
+            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'poll': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Poll']", 'through': "orm['poll.SectionOrdering']", 'symmetrical': 'False'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+        },
+        'poll.sectionordering': {
+            'Meta': {'unique_together': "(['poll', 'position'],)", 'object_name': 'SectionOrdering'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'poll': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Poll']"}),
+            'position': ('django.db.models.fields.IntegerField', [], {}),
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"})
         },
         'poll.singlechoicequestion': {
             'Meta': {'object_name': 'SingleChoiceQuestion'},
-            'answers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Answer']", 'symmetrical': 'False'}),
-            'contents': ('django.db.models.fields.TextField', [], {}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'has_other': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'content': ('django.db.models.fields.CharField', [], {'max_length': '250'}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'reason': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'required': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'})
+            'is_scale': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'options': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Option']", 'symmetrical': 'False'}),
+            'sections': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Section']", 'through': "orm['poll.SingleChoiceQuestionOrdering']", 'symmetrical': 'False'})
+        },
+        'poll.singlechoicequestionanswer': {
+            'Meta': {'object_name': 'SingleChoiceQuestionAnswer'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'option': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Option']", 'null': 'True', 'blank': 'True'}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.SingleChoiceQuestion']"}),
+            'saved_ticket': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.SavedTicket']"}),
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"})
+        },
+        'poll.singlechoicequestionordering': {
+            'Meta': {'unique_together': "(['sections', 'is_leading', 'position'],)", 'object_name': 'SingleChoiceQuestionOrdering'},
+            'hide_on': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Option']", 'symmetrical': 'False', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_leading': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'position': ('django.db.models.fields.IntegerField', [], {}),
+            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.SingleChoiceQuestion']"}),
+            'sections': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"})
+        },
+        'poll.template': {
+            'Meta': {'object_name': 'Template'},
+            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'group_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'share_result': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'studies_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
+            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']", 'null': 'True', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '40'})
         },
         'subjects.group': {
             'Meta': {'object_name': 'Group'},
@@ -223,6 +449,7 @@ class Migration(SchemaMigration):
         'subjects.semester': {
             'Meta': {'unique_together': "(('type', 'year'),)", 'object_name': 'Semester'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_grade_active': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'records_closing': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'records_opening': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'semester_beginning': ('django.db.models.fields.DateField', [], {}),

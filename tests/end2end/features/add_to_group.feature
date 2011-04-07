@@ -11,12 +11,11 @@ Feature: Student wants to add himself to group in order to learn something
   Scenario: Subject page is accessible
     When I am on subjects page
     And I click on "Algebra"
-    Then I should see "Algebra" within "#subject-details"
+    Then I should see "Algebra" within "#enr-subject-view"
     
   Scenario: Successful adding to group
     When I am on subjects page
     And I click on "Algebra"
-    And I click on link which points to "/records/196/assign"
+    And I press "zapisz" next to "group-id" with value "251"
     And I sleep for 2 seconds
-    Then I should see "wypisz"
-    And I should see link which points to "/records/196/resign"
+    Then I should see button "wypisz" next to "group-id" with value "251"

@@ -1,0 +1,58 @@
+{% extends "grade/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li> 
+    <li>Zasady oceny zajęć</li>
+{% endblock %}
+
+{% block content %}
+    <div id="grade-main">
+	    <h2>Informacje ogólne</h2>
+        <div id="grade-main-rules">
+            Ocena zajęć jest systemem umożliwiającym anonimowe wyrażanie opinii na temat zajęć prowadzonych w Instytucie Informatyki Uniwerystetu Wrocławskiego.<br>
+            Informacje na temat oceny zajęć są dostępne na <a href="https://www.ii.uni.wroc.pl/node/142">stronie Instytutu</a>
+        </div>
+        <h2>Dla studenta</h2>
+        <div id="grade-main-rules">
+            <p>
+            Podstawowe założenia systemu są następujące:
+            <ul>
+                <li>Student ma prawo ocenić przedmiot, na który był zapisany, o ile została dla niego stworzona ankieta
+                <li>Student ma prawo wypełnić każdą ankietę ogólną, która go dotyczy
+                <li>Ankieta winna pozostać anonimowa, to jest, o ile z udzielonych odpowiedzi nie wynika jasno tożsamość ankietowanego, tożsamość ta nie powinna być możliwa do ustalenia
+                <li>Informacja o tym, że student pobrał bilety, służące do oceniania zajęć, jest zapisywana w systemie i może skutkować otrzymaniem bonusu do zapisów
+                <li>Student nie może wypełnić danej ankiety więcej, niż raz, może jednak - jeśli taka jest jego wola - wracać do rozpoczętej ankiety, zmieniając odpowiedzi (aż do zakończenia oceny przez Dyrektora ds. Dydaktycznych)
+                <li>Ocena wykładu i zajęć pomocniczych z dowolnego przedmiotu będą niepowiązane, chyba, że student zdecyduje się je powiązać
+                <li>Student ma wgląd w te części wyników oceny, które zostaną udostępnione przez prowadzących, ma także wgląd w podsumowania zbiorcze, jeśli zostaną one przygotowane
+            </ul>
+            </p>
+            <p>Więcej szczegółów na temat elementów systemu:
+            <ul>
+                <li><a href="">Ocena zajęć krok po kroku</a>
+                <li><a href="">Anonimowość oceny zajęć - protokół ślepych podpisów</a>
+                <li><a href="">Bonus za ocenianie zajęć</a>
+                <li><a href="">Powiązanie opinii na temat wykładu i zajęć pomocniczych</a>
+            </ul>
+            </p>
+        </div>
+        <h2>Dla prowadzącego</h2>
+        <div id="grade-main-rules">
+            <p>
+            System oceny umożliwia zarówno łatwe tworzenie ankiet dla uczestników zajęć, jak i analizę ich wyników.
+            <ul>
+                <li>Udostępnione zostało dodawanie ankiet specyficznych dla przedmiotu, grupy bądź rodzaju studiów. Umożliwiono tworzenie ankiet nie tylko Dyrektorowi ds. Dydaktycznych, ale także prowadzącym zajęcia - z pewnymi zastrzeżeniami dotyczącymi uprawnień do tworzenia ankiet.
+                <li>Wyniki oceny zajęć udostępniają podstawowe widoki przeglądania ocen studentów, udostępniania wyników ocen, a także eksport wyników do pliku .csv, celem dalszej ich obróbki i bardziej szczegółowej analizy.
+            </ul></p>
+            <p>Więcej szczegółów na temat elementów systemu:
+            <ul>
+                <li><a href="">Tworzenie ankiet - kto może utworzyć ankietę?</a>
+                <li><a href="">Tworzenie ankiet - podstawy</a>
+                <li><a href="">Tworzenie ankiet - bardziej zaawansowane możliwości</a>
+                <li><a href="">Wyniki oceny - domyślna widoczność wyników</a>
+                <li><a href="">Wyniki oceny - udostępnianie wyników, filtry, eksport</a>
+            </ul>
+            </p>        
+        </div>
+	</div>
+{% endblock %}

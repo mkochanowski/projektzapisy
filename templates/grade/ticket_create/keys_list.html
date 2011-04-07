@@ -1,0 +1,16 @@
+{% extends "grade/base.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+    <li>Lista kluczy publicznych</li>
+{% endblock %}
+
+{% block content %}
+    <table border="1">
+    {% for l in list %}
+        {{ l.poll.as_row }}
+    {% endfor %}
+    </table>
+{% endblock %}
+

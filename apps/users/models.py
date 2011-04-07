@@ -4,7 +4,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from exceptions import NonEmployeeException, NonStudentException
-from apps.enrollment.subjects.models import Group
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from apps.enrollment.subjects.models import Group, Semester
 
@@ -27,7 +26,10 @@ class BaseUser(models.Model):
     receive_mass_mail_offer = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia OD")
-    
+    receive_mass_mail_grade = models.BooleanField(
+        default = True, 
+        verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
+        
     def get_full_name(self):
         return self.user.get_full_name()
     get_full_name.short_description = 'Użytkownik'
@@ -54,9 +56,21 @@ class Employee(BaseUser):
     Employee.
     '''
     consultations = models.TextField(verbose_name="konsultacje")
-    homepage = models.SlugField(max_length=255, verbose_name='strona domowa', default="")
+    homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="")
     room = models.PositiveIntegerField(verbose_name="pokój", null=True)
-    
+        
+    def has_privileges_for_group(self, group_id):
+        """
+        Method used to verify whether user is allowed to create a poll for certain group 
+        (== he is an admin, a teacher for this subject or a teacher for this group)
+        """
+        try:
+            group = Group.objects.get(pk=group_id)
+            return ( group.teacher == self or self in group.subject.teachers.all() or self.user.is_staff )
+        except:
+            logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
+        return False
+            
     @staticmethod
     def get_all_groups(user_id):
         user = User.objects.get(id=user_id)
@@ -64,7 +78,7 @@ class Employee(BaseUser):
             employee = user.employee
             groups = Group.objects.filter(teacher=employee)
         except Employee.DoesNotExist:
-             logger.error('Function Employee.get_all_groups(user_id = %d) wthrows Employee.DoesNotExist exception.' % user_id )
+             logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
         return groups
     
@@ -175,7 +189,18 @@ class Student(BaseUser):
         except Student.DoesNotExist:
              logger.error('Function Student.records_unblock(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
-         
+ 
+
+    @staticmethod
+    def get_zamawiany(user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            student = Student.objects.get(user=user)
+            zamawiany = StudiaZamawiane.objects.get(student=student)
+            return zamawiany
+        except (User.DoesNotExist, Student.DoesNotExist, StudiaZamawiane.DoesNotExist):
+             return None
+        
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'
@@ -187,7 +212,7 @@ class Student(BaseUser):
 
 class Program( models.Model ):
     """
-        Model przechowuje informacje o programie studiow
+        Program of student studies
     """
     name = models.CharField(max_length=50, unique=True, verbose_name="Program")
 

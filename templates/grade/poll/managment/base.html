@@ -1,0 +1,35 @@
+{% extends "grade/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
+{% endblock %}
+
+{% block main-navigation %}
+    <li><a href="/">Strona główna</a></li>
+    <li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+    <li>Zarzadzanie ankietami</li>
+{% endblock %}
+
+{{ fdata }}
+
+{% block content %}
+
+    <div id='poll-managment-menu'>
+	<ul>
+           <li><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
+           <li><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
+           <li><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
+           <li><a href="{% url grade-poll-questionset-create %}">Tworzenie sekcji</a></li>
+           <li><a href="{% url grade-poll-poll-create %}">Tworzenie ankiet</a></li>
+           <li><a href="{% url grade-poll-templates %}">Szablony</a></li>
+	</ul>
+    </div>
+    <div id="grade-managment-main">
+        {% block poll-managment %}
+            
+        {% endblock %}
+    </div>
+{% endblock %}

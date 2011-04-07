@@ -1,0 +1,16 @@
+{% extends "grade/poll/polls_for_user.html" %}
+
+{% block main-navigation %}
+	<li><a href="/">Strona główna</a></li>
+	<li><a href="{% url apps.news.views.latest_news 'grade' %}">Ocena zajęć</a></li>
+	<li>Edycja sekcji</li>
+{% endblock %}
+
+
+{% block poll-content %}
+        <table>
+            <tr><th>{{ title }}</th></tr>
+            <tr><td>{{ desc }}</td></tr>
+            {{ form.as_table }}
+        </table>
+{% endblock %}

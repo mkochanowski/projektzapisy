@@ -1,0 +1,60 @@
+﻿/**
+ * Style odpowiadające za tworzenie ankiety
+ */
+
+
+/*** TWORZENIE ANKIETY ***/
+
+#tytul_ankiety
+{
+margin:10px;
+}
+
+#create_main
+{
+width:300px;
+background:#F8F8F8;
+border: 1px solid #CCC;
+padding:10px;
+}
+
+.poll-question-answer
+{
+margin:10px;
+}
+
+.poll-question
+{
+margin:15px;
+}
+
+.poll-question-answers
+{
+}
+
+#box
+{
+    width: 350px;
+    height: 150px;
+    background: #FFF;
+    text-align: center;
+    position: fixed;
+    margin-left: -175px;
+    margin-top: -75px;
+    left: 50%;
+    top: 50%;
+    z-index: 20;
+    display: none;
+}
+ 
+#screen
+{
+position:fixed;
+    left: 0;
+    top: 0;
+    background: #000;
+}
+
+
+/*** TWORZENIE ANKIETY - koniec ***/
+

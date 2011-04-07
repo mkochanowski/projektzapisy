@@ -3,9 +3,9 @@
 from django.db import models
 
 from subject import *
-
 from apps.enrollment.records.models import *
 
+# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.SubjectTerm.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'), ('4', 'ćwiczenia (grupa zaawansowana)'), ('5', 'ćwiczenio-pracownia'), ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF')]
 
 class Group(models.Model):
@@ -37,11 +37,13 @@ class Group(models.Model):
 
     def subject_slug(self):
         return self.subject.slug
-    
+        
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
         app_label = 'subjects'
 
     def __unicode__(self):
-        return "%s: %s - %s" % (self.subject.entity.get_short_name(), self.get_type_display(), self.get_teacher_full_name())
+        return "%s: %s - %s" % (unicode(self.subject.entity.get_short_name()), 
+                                unicode(self.get_type_display()), 
+                                unicode(self.get_teacher_full_name()))

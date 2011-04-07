@@ -5,8 +5,16 @@ from django.conf.urls.defaults import *
 # format=html - returns data rendered with template, not using the base template
 # by default, they return a fully rendered page
 
-urlpatterns = patterns('apps.grade.poll.views',
-    url(r'^$',            'default',    name='grade-default'),
-    url(r'create$',       'create',     name='grade-poll-add'),
-    url(r'^check_keys$',  'check_keys', name='grade-poll-verify-keys'),
+urlpatterns = patterns('',
+    url(r'^rules$',         'apps.grade.poll.views.rules',                name='grade-rules'),
+    
+    url(r'^enable_grade$',  'apps.grade.poll.views.enable_grade',           name='grade-enable-grade'),
+    url(r'^disable_grade$', 'apps.grade.poll.views.disable_grade',          name='grade-disable-grade'),
+    
+    url(r'^grade_logout$',  'apps.grade.poll.views.grade_logout',           name='grade-logout'),
+    
+    (r'^poll/',   include('apps.grade.poll.urls')),
+    (r'^ticket/', include('apps.grade.ticket_create.urls')),
+
+    url(r'declaration$',  'declaration', name='grade-poll-show'),
 )
