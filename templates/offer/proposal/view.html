@@ -74,9 +74,15 @@
 			<li>
 				{% if user.student %}
 					{% if isFan %}
-						<a href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
+                        <form action="{% url proposal-StopFan slug=proposal.slug %}" method="POST" class="force-js">
+                            <input type="submit" class="without-js" value="Nie pójdę na to">
+						    <a class="with-js" href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
+                        </form>
 					{% else %}
-						<a href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
+                        <form action="{% url proposal-beFan slug=proposal.slug %}" method="POST" class="force-js">
+                            <input type="submit" class="without-js" value="Pójdę na to">
+						    <a class="with-js" href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
+                        </form>
 					{% endif %}
 					(chętnych: {{fans}})
 				{% else %}
@@ -86,9 +92,15 @@
 			<li>
 				{% if user.employee %}
 					{% if isTeacher %}
-						<a href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
+                        <form action="{% url proposal-StopTeacher slug=proposal.slug %}" method="POST" class="force-js">
+                            <input type="submit" class="without-js" value="Nie mogę poprowadzi">
+						    <a class="with-js" href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
+                        </form>
 					{% else %}
-						<a href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
+                        <form action="{% url proposal-beTeacher slug=proposal.slug %}" method="POST" class="force-js">
+                            <input type="submit" class="without-js" value="Mogę prowadzić wykład">
+						    <a class="with-js" href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
+                        </form>
 					{% endif %}
 					(chętnych: {{teachers}})
 				{% else %}
@@ -98,9 +110,15 @@
 			<li>
 				{% if user.employee %}
 					{% if isHelper %}
-						<a href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
+                        <form action="{% url proposal-StopHelper slug=proposal.slug %}" method="POST" class="force-js">
+                            <input type="submit" class="without-js" value="Nie pomogę poprowadzić">
+						    <a class="with-js" href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
+                        </form>
 					{% else %}
-						<a href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
+                        <form action="{% url proposal-beHelper slug=proposal.slug %}" method="POST" class="force-js">
+                            <input type="submit" class="without-js" value="Pomogę poprowadzić">
+						    <a class="with-js" href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
+                        </form>
 					{% endif %}
 					(chętnych: {{helpers}})
 				{% else %}
@@ -130,10 +148,14 @@
 			</p>
 			{% if perms.can_delete_proposal %}
 			<p>
-				<a class="proposal-delete" href="{% url proposal-delete slug=proposal.slug %}">Usuń tę propozycję</a>
+                <form action="{% url proposal-delete slug=proposal.slug %}" method="POST" class="force-js">
+                    <input type="submit" class="without-js" value="Usuń tę propozycję">
+				    <a class="with-js proposal-delete" href="{% url proposal-delete slug=proposal.slug %}">Usuń tę propozycję</a>
 			</p>
 			<p>
-				<a class="proposal-delete" href="{% url proposal-description-delete pid=proposal.description.id %}">Usuń tę wersję</a>
+                <form action="{% url proposal-description-delete pid=proposal.description.id %}" method="POST" class="force-js">
+                    <input type="submit" class="without-js" value="Usuń tę wersję">
+                    <a class="with-js proposal-delete" href="{% url proposal-description-delete pid=proposal.description.id %}">Usuń tę wersję</a>
 			</p>
 			{% endif %}
 		</div>

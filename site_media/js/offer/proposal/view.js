@@ -17,4 +17,16 @@ Proposal.view.initDeleteButtons = function()
 	});
 };
 
+Proposal.view.forcePOST = function()
+{
+    $('.without-js').hide();
+    $('a.with-js').show();
+    $('a.with-js').click(function()
+    {
+        $(this).parent().submit();
+        return false;
+    });
+}
+
+$(Proposal.view.forcePOST);
 $(Proposal.view.initDeleteButtons);

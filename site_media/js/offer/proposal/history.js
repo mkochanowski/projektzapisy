@@ -17,4 +17,17 @@ Proposal.history.initRestoreButtons = function()
 	});
 };
 
+Proposal.history.forcePOST = function()
+{
+    $('.without-js').hide();
+    $('a.with-js').show();
+    $('a.with-js').click(function()
+    {
+        $(this).parent().submit();
+        return false;
+    });
+}
+
+$(Proposal.history.forcePOST);
+
 $(Proposal.history.initRestoreButtons);
