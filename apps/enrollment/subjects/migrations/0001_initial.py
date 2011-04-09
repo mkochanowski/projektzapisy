@@ -5,9 +5,6 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    depends_on = (
-        ('users',    '0001_initial'),
-    )
     
     def forwards(self, orm):
         
@@ -45,16 +42,19 @@ class Migration(SchemaMigration):
             ('lectures', self.gf('django.db.models.fields.IntegerField')()),
             ('laboratories', self.gf('django.db.models.fields.IntegerField')()),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('ects', self.gf('django.db.models.fields.IntegerField')(null=True)),
+            ('repetitions', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('semester', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Semester'], null=True)),
             ('exercises', self.gf('django.db.models.fields.IntegerField')()),
             ('entity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.SubjectEntity'])),
             ('type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Type'], null=True)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=255, db_index=True)),
+            ('slug', self.gf('django.db.models.fields.SlugField')(max_length=255, unique=True, null=True, db_index=True)),
             ('description', self.gf('django.db.models.fields.TextField')()),
         ))
         db.send_create_signal('subjects', ['Subject'])
+
+        # Adding unique constraint on 'Subject', fields ['name', 'semester']
+        db.create_unique('subjects_subject', ['name', 'semester_id'])
 
         # Adding M2M table for field teachers on 'Subject'
         db.create_table('subjects_subject_teachers', (
@@ -76,6 +76,8 @@ class Migration(SchemaMigration):
 
         # Adding model 'Classroom'
         db.create_table('subjects_classroom', (
+            ('building', self.gf('django.db.models.fields.CharField')(default='', max_length=75, blank=True)),
+            ('capacity', self.gf('django.db.models.fields.PositiveSmallIntegerField')(default=0)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('number', self.gf('django.db.models.fields.CharField')(max_length=4)),
         ))
@@ -107,14 +109,41 @@ class Migration(SchemaMigration):
             ('semester_ending', self.gf('django.db.models.fields.DateField')()),
             ('records_closing', self.gf('django.db.models.fields.DateTimeField')(null=True)),
             ('visible', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('year', self.gf('django.db.models.fields.PositiveIntegerField')(default=2011)),
+            ('year', self.gf('django.db.models.fields.CharField')(default='0', max_length=7)),
             ('type', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('is_grade_active', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
         ))
         db.send_create_signal('subjects', ['Semester'])
 
         # Adding unique constraint on 'Semester', fields ['type', 'year']
         db.create_unique('subjects_semester', ['type', 'year'])
+
+        # Adding model 'PointTypes'
+        db.create_table('subjects_pointtypes', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(default='', max_length=30)),
+        ))
+        db.send_create_signal('subjects', ['PointTypes'])
+
+        # Adding model 'PointsOfSubjectEntities'
+        db.create_table('subjects_pointsofsubjectentities', (
+            ('value', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('type_of_point', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.PointTypes'])),
+            ('entity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.SubjectEntity'])),
+        ))
+        db.send_create_signal('subjects', ['PointsOfSubjectEntities'])
+
+        # Adding model 'PointsOfSubjects'
+        db.create_table('subjects_pointsofsubjects', (
+            ('value', self.gf('django.db.models.fields.PositiveSmallIntegerField')()),
+            ('program', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['users.Program'], null=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('type_of_point', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.PointTypes'])),
+            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'])),
+        ))
+        db.send_create_signal('subjects', ['PointsOfSubjects'])
     
     
     def backwards(self, orm):
@@ -133,6 +162,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Subject'
         db.delete_table('subjects_subject')
+
+        # Removing unique constraint on 'Subject', fields ['name', 'semester']
+        db.delete_unique('subjects_subject', ['name', 'semester_id'])
 
         # Removing M2M table for field teachers on 'Subject'
         db.delete_table('subjects_subject_teachers')
@@ -154,6 +186,15 @@ class Migration(SchemaMigration):
 
         # Removing unique constraint on 'Semester', fields ['type', 'year']
         db.delete_unique('subjects_semester', ['type', 'year'])
+
+        # Deleting model 'PointTypes'
+        db.delete_table('subjects_pointtypes')
+
+        # Deleting model 'PointsOfSubjectEntities'
+        db.delete_table('subjects_pointsofsubjectentities')
+
+        # Deleting model 'PointsOfSubjects'
+        db.delete_table('subjects_pointsofsubjects')
     
     
     models = {
@@ -201,6 +242,8 @@ class Migration(SchemaMigration):
         },
         'subjects.classroom': {
             'Meta': {'object_name': 'Classroom'},
+            'building': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '75', 'blank': 'True'}),
+            'capacity': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'number': ('django.db.models.fields.CharField', [], {'max_length': '4'})
         },
@@ -212,16 +255,37 @@ class Migration(SchemaMigration):
             'teacher': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Employee']", 'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
         },
+        'subjects.pointsofsubjectentities': {
+            'Meta': {'object_name': 'PointsOfSubjectEntities'},
+            'entity': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.SubjectEntity']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'type_of_point': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.PointTypes']"}),
+            'value': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
+        },
+        'subjects.pointsofsubjects': {
+            'Meta': {'object_name': 'PointsOfSubjects'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
+            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"}),
+            'type_of_point': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.PointTypes']"}),
+            'value': ('django.db.models.fields.PositiveSmallIntegerField', [], {})
+        },
+        'subjects.pointtypes': {
+            'Meta': {'object_name': 'PointTypes'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '30'})
+        },
         'subjects.semester': {
             'Meta': {'unique_together': "(('type', 'year'),)", 'object_name': 'Semester'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_grade_active': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'records_closing': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'records_opening': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'semester_beginning': ('django.db.models.fields.DateField', [], {}),
             'semester_ending': ('django.db.models.fields.DateField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'visible': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'year': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2011'})
+            'year': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '7'})
         },
         'subjects.studentoptions': {
             'Meta': {'unique_together': "(('subject', 'student'),)", 'object_name': 'StudentOptions'},
@@ -231,17 +295,17 @@ class Migration(SchemaMigration):
             'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"})
         },
         'subjects.subject': {
-            'Meta': {'object_name': 'Subject'},
+            'Meta': {'unique_together': "(('name', 'semester'),)", 'object_name': 'Subject'},
             'description': ('django.db.models.fields.TextField', [], {}),
-            'ects': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'entity': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.SubjectEntity']"}),
             'exercises': ('django.db.models.fields.IntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'laboratories': ('django.db.models.fields.IntegerField', [], {}),
             'lectures': ('django.db.models.fields.IntegerField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'repetitions': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'semester': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Semester']", 'null': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'unique': 'True', 'null': 'True', 'db_index': 'True'}),
             'students_options': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Student']", 'through': "orm['subjects.StudentOptions']", 'symmetrical': 'False'}),
             'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Employee']", 'symmetrical': 'False'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Type']", 'null': 'True'})
@@ -271,10 +335,18 @@ class Migration(SchemaMigration):
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
             'consultations': ('django.db.models.fields.TextField', [], {}),
+            'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'room': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+        },
+        'users.program': {
+            'Meta': {'object_name': 'Program'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
@@ -282,16 +354,13 @@ class Migration(SchemaMigration):
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'records_opening_delay_minutes': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
+            'semestr': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
-        },
-        'users.type': {
-            'Meta': {'object_name': 'Type'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         }
     }
     
