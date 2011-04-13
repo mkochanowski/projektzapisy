@@ -14,6 +14,13 @@ def load_fixture(fixture)
     system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/#{fixture}.json -v 0"
 end
 
+def run_client(input_file)
+    path = "../../site_media/Downloads/"
+    system "rm -rf tickets.txt"
+    system "python #{path}client.py < client_input/#{input_file} > out"
+    system "rm -rf out"
+end
+
 Given /I start new scenario/ do
     path = "../../"
     system "#{path}manage.py flush --noinput -v 0"
@@ -194,7 +201,7 @@ When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
-    sleep 4
+    sleep 10
     wait_until(5) { page.should have_content(text) }
 end
 
@@ -217,4 +224,8 @@ end
 When /^I click "([^"]*)"$/ do |value|
     selector = "//*[contains(text(),'#{value}') or @alt='#{value}']"
     page.find(:xpath, selector).click
+end
+
+When /^I run client with "([^"]*)"$/ do |file|
+    run_client( file )
 end
