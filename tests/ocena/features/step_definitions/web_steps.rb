@@ -24,6 +24,7 @@ end
 Given /I start new scenario/ do
     path = "../../"
     system "#{path}manage.py flush --noinput -v 0"
+    system "#{path}manage.py migrate --fake -v 0"
     system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/core_dump.json -v 0"
 end
 
