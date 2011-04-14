@@ -230,3 +230,29 @@ end
 When /^I run client with "([^"]*)"$/ do |file|
     run_client( file )
 end
+
+Then /^tickets should not be connected$/ do
+    ticket_client = ""
+    file   = File.new("tickets.txt", "r")
+    for i in 1..4:
+        ticket_client = file.gets
+    end
+    file.close
+    ticket_fereol = page.find(:xpath, "//*[textarea[(@id='keys')]]").text.split( "id: 5" )[1].split( " " )[ 0 ]
+    ticket_client.should_not be_eql( ticket_fereol )
+end
+
+Then /^tickets file should not exist$/ do
+    file_list = Dir.glob("*.txt")
+    file_list.should_not be_include( "tickets.txt" )
+end
+
+When /^I enter generated ticket$/ do
+    ticket_client = ""
+    file   = File.new("tickets.txt", "r")
+    while( line = file.gets )
+        ticket_client += line
+    end
+    file.close
+    fill_in("Podaj wygenerowane bilety:", :with => ticket_client)
+end

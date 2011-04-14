@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+########################################################################
+#                   Fereol poll keys download client                   #
+#                     downloaded from www.fereol.pl                    #
+########################################################################
+#   written in python 2.7  
+# If you would like to redirect your output to file please set
+# PYTHONIOENCODING environment variable to utf-8
 
 # moduł do kodowania 
 from Crypto.PublicKey                  import RSA
@@ -7,7 +14,6 @@ from Crypto.Random.random              import getrandbits, \
 # moduły do komunikacji sieciowej
 import urllib
 import urllib2
-
 
 # moduły pomocnicze
 import sys
