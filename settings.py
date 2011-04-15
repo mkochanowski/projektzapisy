@@ -173,6 +173,7 @@ ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
 
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
+SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
 

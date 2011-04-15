@@ -9,6 +9,17 @@ module WithinHelpers
 end
 World(WithinHelpers)
 
+def load_fixture(fixture)
+    path = "../../"
+    system "#{path}manage.py loaddata #{path}tests/end2end/fixtures/#{fixture}.json -v 0"
+end
+
+Given /I start new scenario/ do
+    path = "../../"
+    system "#{path}manage.py flush --noinput -v 0"
+    system "#{path}manage.py migrate --fake -v 0"
+    system "#{path}manage.py loaddata #{path}tests/end2end/fixtures/core_dump.json -v 0"
+end
 
 Given /I am logged in/ do
   Given %{I am on the home page} 

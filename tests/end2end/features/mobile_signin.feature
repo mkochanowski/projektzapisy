@@ -1,7 +1,8 @@
 Feature: User wants to sign in in order to use functions which aren't publicly available on mobile-fereol
 
   Background:
-    Given I am on the mobile home page
+    Given I start new scenario
+    And I am on the mobile home page
     
   Scenario: Successful signing in with student credentials 
     When I follow "Zapisy"
