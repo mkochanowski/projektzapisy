@@ -14,9 +14,17 @@ def load_fixture(fixture)
     system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/#{fixture}.json -v 0"
 end
 
+def run_client(input_file)
+    path = "../../site_media/Downloads/"
+    system "rm -rf tickets.txt"
+    system "python #{path}client.py < client_input/#{input_file} > out"
+    system "rm -rf out"
+end
+
 Given /I start new scenario/ do
     path = "../../"
     system "#{path}manage.py flush --noinput -v 0"
+    system "#{path}manage.py migrate --fake -v 0"
     system "#{path}manage.py loaddata #{path}tests/ocena/fixtures/core_dump.json -v 0"
 end
 
@@ -194,7 +202,7 @@ When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
-    sleep 4
+    sleep 10
     wait_until(5) { page.should have_content(text) }
 end
 
@@ -217,4 +225,34 @@ end
 When /^I click "([^"]*)"$/ do |value|
     selector = "//*[contains(text(),'#{value}') or @alt='#{value}']"
     page.find(:xpath, selector).click
+end
+
+When /^I run client with "([^"]*)"$/ do |file|
+    run_client( file )
+end
+
+Then /^tickets should not be connected$/ do
+    ticket_client = ""
+    file   = File.new("tickets.txt", "r")
+    for i in 1..4:
+        ticket_client = file.gets
+    end
+    file.close
+    ticket_fereol = page.find(:xpath, "//*[textarea[(@id='keys')]]").text.split( "id: 5" )[1].split( " " )[ 0 ]
+    ticket_client.should_not be_eql( ticket_fereol )
+end
+
+Then /^tickets file should not exist$/ do
+    file_list = Dir.glob("*.txt")
+    file_list.should_not be_include( "tickets.txt" )
+end
+
+When /^I enter generated ticket$/ do
+    ticket_client = ""
+    file   = File.new("tickets.txt", "r")
+    while( line = file.gets )
+        ticket_client += line
+    end
+    file.close
+    fill_in("Podaj wygenerowane bilety:", :with => ticket_client)
 end

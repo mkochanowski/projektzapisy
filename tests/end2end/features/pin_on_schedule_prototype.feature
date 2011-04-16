@@ -1,10 +1,12 @@
 Feature: student wants to pin a group to his schedule prototype
 
   Background:
-    Given I am logged in
+    Given I start new scenario
+    And I am logged in
     And I am on schedule prototype page
     
     # All below is redundant - question is, which one should remain - this, or add_to_pinned_group?
+    # Also, prototype is not yet fullt functional, so we'll just comment this one for a while
   
   Scenario: Schedule prototype shows the groups of clicked course
     #When I click on "Wprowadzenie do logiki formalnej"

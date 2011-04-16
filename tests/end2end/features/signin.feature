@@ -1,7 +1,8 @@
 Feature: User wants to sign in in order to use functions which aren't publicly available
 
   Background:
-    Given I am on the home page
+    Given I start new scenario
+    And I am on the home page
     
   Scenario: Successful signing in with student credentials 
     When I follow "zaloguj"

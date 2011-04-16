@@ -14,6 +14,16 @@ class PointTypes(models.Model):
     def __unicode__(self):
         return '%s' % (self.name, )
 
+class PointsOfSubjectEntities(models.Model):
+    entity = models.ForeignKey('SubjectEntity', verbose_name='podstawa przedmiotu')
+    type_of_point = models.ForeignKey('PointTypes', verbose_name='rodzaj punktów')
+    value = models.PositiveSmallIntegerField(verbose_name='liczba punktów')
+
+    class Meta:
+        verbose_name = 'zależność podstawa przedmiotu-punkty'
+        verbose_name_plural = 'zależności podstawy przedmiotu-punkty'
+        app_label = 'subjects'
+
 class PointsOfSubjects(models.Model):
     subject = models.ForeignKey('Subject', verbose_name='przedmiot')
     type_of_point = models.ForeignKey('PointTypes', verbose_name='rodzaj punktów')

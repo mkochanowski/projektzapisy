@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
+########################################################################
+#                   Fereol poll keys download client                   #
+#                     downloaded from www.fereol.pl                    #
+########################################################################
+#   written in python 2.7  
+# If you would like to redirect your output to file please set
+# PYTHONIOENCODING environment variable to utf-8
 
-# moduł do kodawania 
+# moduł do kodowania 
 from Crypto.PublicKey                  import RSA
 from Crypto.Random.random              import getrandbits, \
                                               randint
 # moduły do komunikacji sieciowej
 import urllib
 import urllib2
-
 
 # moduły pomocnicze
 import sys
@@ -63,7 +69,7 @@ def revMod( a, m ):
     if x < 0: x += m
     return x
 
-def generate_sygnature( n , e , m ):
+def generate_signature( n , e , m ):
     k   = randint( 2, int(n) )
     while gcd( n, k ) != 1:
         k = randint( 1, int(n) )
@@ -82,6 +88,8 @@ def get_url():
     """
 
     # pobieranie adresu serwera. Jeżeli plik z adresem nie istnieje podawana jest wartość domyślna
+    # TODO:
+    #   przerobić tak, żeby domyślnie tu był adres fereola i nie dawać możliwości zmiany
     try:
         file_with_url = open("url.txt","r")
     except IOError, err:
@@ -97,7 +105,7 @@ def send_package(idUser, passwordUser, i, e, n, m ):
     """
     
     # zakodowywanie kluczy do ankiet za pomocą m
-    t,k = generate_sygnature(n,e,m)
+    t,k = generate_signature(n,e,m)
 
     # dane do przesłania na serwer
     values = {
@@ -131,10 +139,10 @@ def send_package(idUser, passwordUser, i, e, n, m ):
         st_response = response.read()
         save_result(k, n, m, st_response)
     except ValueError, err:
-        print u"nie udało się pobrać klucza."
+        print u"nie udało się pobrać biletu"
         print st_response.decode('utf-8')
     except IndexError, err:
-        print u"nie udało się pobrać klucza,"
+        print u"nie udało się pobrać biletu"
         print st_response.decode('utf-8')
 
 def get_user():
@@ -143,17 +151,18 @@ def get_user():
     Enter id and password from keyboard.
         
     """
-    
-    userId=""
-    userPassword=""
-
-
     # pobieranie danych o użytkowniku z klawiatury
-    userId=raw_input(u"id:")
-    userPassword = getpass.getpass()
-    
-    return userId,userPassword
+    user = raw_input("Nazwa użytkownika [%s]: " % getpass.getuser())
+    if not user:
+        user = getpass.getuser()
 
+    if sys.stdin.isatty():
+        password = getpass.getpass('Hasło: ')
+    else:
+        password = sys.stdin.readline().rstrip()
+
+    return user, password
+    
 def save_result(k, n, m, st_response):
     """
 
@@ -383,7 +392,7 @@ def client():
 
     # sprawdzenie czy w trakcie pobierania kluczy do ankiet nie powstał błąd
     if len(pollSt.split('???'))<2:
-        print u"nie udało się pobrać klucza"
+        print u"nie udało się pobrać biletu"
         print pollSt.decode("utf-8")
         return
 

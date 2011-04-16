@@ -103,7 +103,7 @@ class Employee(BaseUser):
         app_label = 'users'
       
     def __unicode__(self):
-        return str(self.user.get_full_name())
+        return unicode(self.user.get_full_name())
 
 class Student(BaseUser):
     ''' 
@@ -207,7 +207,7 @@ class Student(BaseUser):
         app_label = 'users'
     
     def __unicode__(self):
-        return str(self.user.get_full_name())
+        return unicode(self.user.get_full_name())
 
 
 class Program( models.Model ):

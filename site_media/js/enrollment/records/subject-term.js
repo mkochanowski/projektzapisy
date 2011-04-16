@@ -269,7 +269,6 @@ Fereol.Enrollment.SubjectTerm.prototype.setEnrolled = function(enrolled)
 					if (e.groupID == self.groupID || e.type != self.type)
 						return;
 					e.isEnrolled = false;
-					e.isPinned = false;
 					e._updateVisibility();
 				});
 
