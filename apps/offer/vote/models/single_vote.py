@@ -77,5 +77,5 @@ class SingleVote ( models.Model ):
         
         users = []
         for vote in votes:
-            apps.users.append(vote.student.user)
+            users.append(vote.student.user)
         return users
