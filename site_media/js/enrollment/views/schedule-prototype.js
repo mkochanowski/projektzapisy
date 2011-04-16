@@ -14,6 +14,8 @@ SchedulePrototype.init = function()
 		children('input[name=pinned]').assertOne().attr('value'));
 	var enrolledGroupIDs = $.parseJSON(scheduleContainer.
 		children('input[name=enrolled]').assertOne().attr('value'));
+	var queuedGroupIDs = $.parseJSON(scheduleContainer.
+		children('input[name=queued]').assertOne().attr('value'));
 
 	SchedulePrototype.urls['set-pinned'] = scheduleContainer.
 		children('input[name=setPinnedUrl]').assertOne().attr('value').trim();
@@ -36,7 +38,7 @@ SchedulePrototype.init = function()
 	*/
 
 	
-	SchedulePrototype.initSubjectList(enrolledGroupIDs, pinnedGroupIDs);
+	SchedulePrototype.initSubjectList(enrolledGroupIDs, pinnedGroupIDs, queuedGroupIDs);
 	//SchedulePrototype.initFilter();
 };
 
@@ -122,7 +124,7 @@ SchedulePrototype.initFilter = function()
 
 SchedulePrototype.subjectList = [];
 
-SchedulePrototype.initSubjectList = function(enrolled, pinned)
+SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 {
 	$('#enr-schedulePrototype-subject-list').
 		children('li').each(function(idx, elem)
@@ -147,6 +149,7 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned)
 			var sterm = Fereol.Enrollment.SubjectTerm.fromJSON(elem.attr('value'));
 			sterm.isPinned = (pinned.indexOf(sterm.groupID) >= 0);
 			sterm.isEnrolled = (enrolled.indexOf(sterm.groupID) >= 0);
+			sterm.isQueued = (queued.indexOf(sterm.groupID) >= 0);
 			sterm.isPrototyped = false;
 			sterm.subject = subject;
 

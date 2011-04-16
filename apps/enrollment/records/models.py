@@ -62,7 +62,10 @@ class Record(models.Model):
                     pinned.append(record[0])
             return {
                 'enrolled': enrolled,
-                'pinned': pinned
+                'pinned': pinned,
+                'queued': Queue.queued.filter(student=user.student,\
+                          group__subject__semester=semester).\
+                          values_list('group__pk', flat=True)
             }
         except Student.DoesNotExist:
             logger.error('Record.get_student_all_detailed_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
@@ -372,6 +375,9 @@ class Queue(models.Model):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
+            if not Group.objects.get(id=group_id).subject.\
+                is_recording_open_for_student(student):
+                raise RecordsNotOpenException()
             group = Group.objects.get(id=group_id)
             """ Czy student jest już zapisany na przedmiot"""
             if Record.enrolled.filter(group=group, student=student).count() > 0 :

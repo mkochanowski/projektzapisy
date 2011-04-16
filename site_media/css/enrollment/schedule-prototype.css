@@ -30,9 +30,18 @@
 
 /******************************************************************************/
 
-#enr-schedulePrototype-scheduleContainer .enrolled
+#enr-schedulePrototype-scheduleContainer .enrolled,
+#enr-schedulePrototype-scheduleContainer .enrolled .classroom,
+#enr-schedulePrototype-scheduleContainer .enrolled .type
 {
-	background: wheat;
+	background: #f5d393 !important; /* wheat */
+}
+
+#enr-schedulePrototype-scheduleContainer .queued,
+#enr-schedulePrototype-scheduleContainer .queued .classroom,
+#enr-schedulePrototype-scheduleContainer .queued .type
+{
+	background: #f5e9d0 !important;
 }
 
 #enr-schedulePrototype-scheduleContainer .term .name
@@ -69,11 +78,6 @@
 	border-radius: 3px;
 }
 
-#enr-schedulePrototype-scheduleContainer .enrolled .classroom
-{
-	background: wheat;
-}
-
 #enr-schedulePrototype-scheduleContainer .term .type
 {
 	position: absolute;
@@ -87,11 +91,6 @@
 	background: #F8F8F8;
 
 	border-radius: 3px;
-}
-
-#enr-schedulePrototype-scheduleContainer .enrolled .type
-{
-	background: wheat;
 }
 
 #enr-schedulePrototype-scheduleContainer .term .controls

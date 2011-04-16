@@ -120,16 +120,30 @@ def set_enrolled(request, method):
             request.user.message_set.create(message=message)
             return redirect('subject-page', slug=Group.objects.get(id=group_id).group_slug())
     except AlreadyNotAssignedException:
-        message = 'Jesteś już wypisany z tej grupy.'
+        try:
+            Queue.remove_student_from_queue(request.user.id, group_id)
+            message = 'Zostałeś wypisany z kolejki wybranej grupy.'
+        except AlreadyNotAssignedException:
+            message = 'Jesteś już wypisany z tej grupy.'
         if is_ajax:
             return AjaxSuccessMessage(message)
         else:
             request.user.message_set.create(message=message)
             return redirect('subject-page', slug=Group.objects.get(id=group_id).group_slug())
     except OutOfLimitException:
-        return AjaxFailureMessage.auto_render('OutOfLimit', # TODO: dopisywanie do kolejki
-            'Nie możesz zapisać się do grupy, bo podana jest już pełna.', \
-            message_context)
+        try:
+            Queue.add_student_to_queue(request.user.id, group_id)
+            try:
+                Record.unpin_student_from_group(request.user.id, group_id)
+            except AlreadyNotPinnedException:
+                pass
+            return AjaxFailureMessage.auto_render('Queued',
+                'Grupa jest pełna. Zostałeś zapisany do kolejki.', \
+                message_context)
+        except AlreadyQueuedException:
+            return AjaxFailureMessage.auto_render('AlreadyQueued',
+                'Jesteś już zapisany do kolejki.', \
+                message_context)
     except RecordsNotOpenException:
         return AjaxFailureMessage.auto_render('RecordsNotOpen',
             'Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ' + \

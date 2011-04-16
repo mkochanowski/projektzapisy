@@ -69,6 +69,7 @@
 			planu nie może bez niej działać.</p>
 		<input type="hidden" name="pinned" value="{{ student_records.pinned }}" />
 		<input type="hidden" name="enrolled" value="{{ student_records.enrolled }}" />
+		<input type="hidden" name="queued" value="{{ student_records.queued }}" />
 
 		<input type="hidden" name="setPinnedUrl" value="{% url schedule-prototype-set-pinned %}" />
 		<input type="hidden" name="setEnrolledUrl" value="{% url schedule-set-enrolled '.json' %}" />

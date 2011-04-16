@@ -22,6 +22,7 @@ Fereol.Enrollment.SubjectTerm = function()
 	this.isPinned = false; // czy jest "przypięty"
 	this.isEnrolled = false; // czy student jest zapisany
 	this.isPrototyped = false; // czy jest tymczasowo wyświetlony w prototypie
+	this.isQueued = false; // czy jest "w kolejce"
 
 	this._isLoading = false; // czy w tej chwili trwa komunikacja z serwerem
 	this._isVisible = false;
@@ -47,6 +48,11 @@ Fereol.Enrollment.SubjectTerm.groupTypes =
 };
 
 Fereol.Enrollment.SubjectTerm.byGroups = {};
+
+Fereol.Enrollment.SubjectTerm.prototype.isEnrolledOrQueued = function()
+{
+	return this.isEnrolled || this.isQueued;
+}
 
 Fereol.Enrollment.SubjectTerm.fromJSON = function(json)
 {
@@ -126,15 +132,23 @@ Fereol.Enrollment.SubjectTerm.prototype._updateVisibility = function()
 		this.container.addClass('enrolled');
 	else
 		this.container.removeClass('enrolled');
+	if (this.isQueued)
+		this.container.addClass('queued');
+	else
+		this.container.removeClass('queued');
 
-	var shouldBeVisible = (this.isPinned || this.isEnrolled || this.isPrototyped);
+	var shouldBeVisible = (this.isPinned || this.isEnrolled ||
+		this.isPrototyped || this.isQueued);
 	if (shouldBeVisible == this._isVisible)
 		return;
 	this._isVisible = shouldBeVisible;
 	if (shouldBeVisible)
 		SchedulePrototype.schedule.addTerm(this.scheduleTerm);
 	else
+	{
 		SchedulePrototype.schedule.removeTerm(this.scheduleTerm);
+		this._controlsBox.css('display', 'none');
+	}
 };
 
 Fereol.Enrollment.SubjectTerm.prototype._updateControls = function()
@@ -148,7 +162,7 @@ Fereol.Enrollment.SubjectTerm.prototype._updateControls = function()
 		this._signInOutButton.click(function()
 		{
 			MessageBox.clear();
-			self.setEnrolled(!self.isEnrolled);
+			self.setEnrolled(!self.isEnrolledOrQueued());
 		});
 
 		this._pinUnpinButton.click(function()
@@ -168,12 +182,13 @@ Fereol.Enrollment.SubjectTerm.prototype._updateControls = function()
 
 	this._pinUnpinButton.css({
 		backgroundPosition: this.isPinned ? '-12px -12px' : '0 -12px',
-		display: this.isEnrolled ? 'none' : ''
+		display: this.isEnrolledOrQueued() ? 'none' : ''
 	}).attr('title', this.isPinned ? 'odepnij od planu' : 'przypnij do planu');
 	this._signInOutButton.css({
-		backgroundPosition: this.isEnrolled ? '-12px 0' : '0 0',
+		backgroundPosition: this.isEnrolledOrQueued() ? '-12px 0' : '0 0',
 		display: ''
-	}).attr('title', this.isEnrolled ? 'wypisz się' : 'zapisz się');
+	}).attr('title', this.isEnrolledOrQueued() ? 'wypisz się' +
+		(this.isQueued ? ' z kolejki' : '') : 'zapisz się');
 };
 
 Fereol.Enrollment.SubjectTerm.prototype._onResize = function(isFullSize)
@@ -246,7 +261,7 @@ Fereol.Enrollment.SubjectTerm.prototype.setEnrolled = function(enrolled)
 	this._updateControls();
 
 	enrolled = !!enrolled;
-	if (this.isEnrolled == enrolled)
+	if (this.isEnrolledOrQueued() == enrolled)
 		return;
 
 	$.post(SchedulePrototype.urls['set-enrolled'], {
@@ -261,6 +276,7 @@ Fereol.Enrollment.SubjectTerm.prototype.setEnrolled = function(enrolled)
 		{
 			self.isEnrolled = enrolled;
 			self.isPinned = false;
+			self.isQueued = false;
 			if (enrolled)
 			{
 				// zaznaczanie innych grup tego samego typu jako "nie zapisane"
@@ -285,6 +301,12 @@ Fereol.Enrollment.SubjectTerm.prototype.setEnrolled = function(enrolled)
 					});
 				})
 			}
+		}
+		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')
+		{
+			self.isQueued = true;
+			self.isPinned = false;
+			result.displayMessageBox();
 		}
 		else
 			result.displayMessageBox();
