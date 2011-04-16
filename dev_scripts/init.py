@@ -13,6 +13,9 @@ from string import join
 
 SOURCE_DIR = 'fereol'
 REPO_URL = 'git@fereol.pl:fereol.git'
+CURRENT_SEMESTER_ID = 4
+
+OS_CWD = os.getcwd()
 
 def bool_input(prompt):
 	while True:
@@ -190,7 +193,7 @@ with open('init-data/init.sql', 'w') as datasql:
 		', semester_beginning = \'' + semester_beginning + '\'' +
 		', semester_ending = \'' + semester_ending + '\'' +
 		# TODO: jak będą uzupełnione grupy w semestrze zimowym, dać wybieranie 100/101, aktualizację obu semestrów
-		' WHERE id = 100;\n')
+		' WHERE id = ' + str(CURRENT_SEMESTER_ID) + ';\n')
 	
 	domain = config.get('local-settings', 'domain')
 	if domain:
@@ -236,7 +239,16 @@ if not os.path.exists(SOURCE_DIR):
 	os.system('git clone ' + REPO_URL + ' ' + SOURCE_DIR)
 	os.chdir('fereol')
 	os.system('git checkout ' + config.get('source', 'branch'))
-	os.chdir('..')
+	os.chdir(OS_CWD)
+
+################################################################################
+# Generowanie przykładowej bazy danych.
+################################################################################
+
+os.chdir(SOURCE_DIR)
+os.chdir('dev_scripts/initial_data')
+os.system('python generate_initial_data.py small > ' + OS_CWD + '/init-data/initial-db.json')
+os.chdir(OS_CWD)
 
 ################################################################################
 # Instalacja.
@@ -250,11 +262,11 @@ if not config_dbsqlite:
 	print '\033[91m' + 'Podaj hasło do bazy postgresql' + '\033[0m'
 os.system('python manage.py dbshell < ../init-data/early-init.sql')
 os.system('python manage.py loaddata ../init-data/init.json')
-os.system('python manage.py loaddata database/fixtures/initial_data.json')
+os.system('python manage.py loaddata ../init-data/initial-db.json')
 if not config_dbsqlite:
 	print '\033[91m' + 'Podaj hasło do bazy postgresql' + '\033[0m'
 os.system('python manage.py dbshell < ../init-data/init.sql')
-os.chdir('..')
+os.chdir(OS_CWD)
 
 ################################################################################
 # Czyszczenie.
@@ -266,6 +278,7 @@ if True:
 	os.remove('init.json');
 	os.remove('early-init.sql');
 	os.remove('init.sql');
+	os.remove('initial-db.json');
 	os.remove('settings_local.py');
-	os.chdir('..')
+	os.chdir(OS_CWD)
 	os.rmdir('init-data')
