@@ -12,6 +12,8 @@
 {% endblock %}
 
 {% block enrollment-subjects-scripts %}
+	<script src="/site_media/js/components/messageBox.js" type="text/javascript"></script>
+
 	<script src="/site_media/js/enrollment/views/subject.js" type="text/javascript"></script>
 {% endblock %}
 
@@ -101,31 +103,36 @@
 							<td class="controls">
 								<input type="hidden" name="group-id" value="{{ t.id }}" />
 								{% if subject.is_recording_open %}
-									{% if t.signed %}
-										<form action="{% url record-resign t.id %}" method="post"><div><input type="submit" value="wypisz" /></div></form>
-									{% else %}
-										{% if t.is_in_diff %}
-											<form action="{% url record-assign t.id %}" method="post"><div><input type="submit" value="przenieś" /></div></form>
+									<form action="{% url schedule-set-enrolled %}" method="post"><div>
+										<input type="hidden" name="group" value="{{ t.id }}" />
+										{% if t.signed %}
+											<input type="hidden" name="enroll" value="false" />
+											<input type="submit" value="wypisz" />
+										{% else %}{% if not t.is_full %}
+											<input type="hidden" name="enroll" value="true" />
+											<input type="submit" value="{% if t.is_in_diff %}przenieś{% else %}zapisz{% endif %}" />
+										{% else %}{% if t.priority %}
+											<input type="hidden" name="enroll" value="false" />
+											<input type="submit" value="wypisz z kolejki" />
 										{% else %}
-											{% if t.is_full %}
-												{% if t.priority %}
-													<form action="{% url queue-resign t.id %}" method="post"><div><input type="submit" value="wypisz z kolejki" /></div></form>
-												{% else %}
-													<form action="{% url queue-assign t.id %}" method="post"><div><input type="submit" value="zapisz do kolejki" /></div></form>
-												{% endif %}
-											{% else %}
-												<form action="{% url record-assign t.id %}" method="post"><div><input type="submit" value="zapisz" /></div></form>
-											{% endif %}
-										{% endif %}
-									{% endif %}
+											<input type="hidden" name="enroll" value="true" />
+											<input type="submit" value="zapisz do kolejki" />
+										{% endif %}{% endif %}{% endif %}
+									</div></form>
 								{% endif %}
 								<a href="{% url group-records t.id %}">lista</a>
 							</td>
 							<td class="priority">
 								{% if t.priority %}
-									<form action="{% url dec-priority t.id %}" method="post"><div><input type="submit" value="-" /></div></form>
+									<form action="{% url set-priority t.id %}" method="post"><div>
+										<input type="hidden" name="priority" value="{{ t.priority|add:-1}}" />
+										<input type="submit" value="-" {% if t.priority <= 1 %} disabled="disabled" {% endif %} />
+									</div></form>
 									<span>{{ t.priority }}</span>
-									<form action="{% url inc-priority t.id %}" method="post"><div><input type="submit" value="+" /></div></form>
+									<form action="{% url set-priority t.id %}" method="post"><div>
+										<input type="hidden" name="priority" value="{{ t.priority|add:1}}" />
+										<input type="submit" value="+" {% if t.priority >= 10 %} disabled="disabled" {% endif %} />
+									</div></form>
 								{% endif %}
 							</td>
 						</tr>

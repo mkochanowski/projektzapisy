@@ -17,7 +17,7 @@ class AjaxMessage(HttpResponse):
 		HttpResponse.__init__(self, simplejson.dumps(ajax_message_as_json))
 
 class AjaxSuccessMessage(AjaxMessage):
-	def __init__(self, message, data = None):
+	def __init__(self, message = 'OK', data = None):
 		AjaxMessage.__init__(self, 'success', 'ok', message, data = data)
 
 class AjaxFailureMessage(AjaxMessage):
