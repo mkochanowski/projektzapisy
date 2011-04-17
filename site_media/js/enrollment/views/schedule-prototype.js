@@ -80,6 +80,7 @@ SchedulePrototype.initFilter = function()
 			return;
 		SchedulePrototype.emptyFilterWarningVisible = visible;
 		SchedulePrototype.emptyFilterWarning.css('display', visible?'':'none');
+		SchedulePrototype.uncheckAllButton.css('display', visible?'none':'');
 	};
 
 	SchedulePrototype.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
@@ -192,8 +193,9 @@ SchedulePrototype.subjectList = [];
 
 SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 {
-	$('#enr-schedulePrototype-subject-list').
-		children('li').each(function(idx, elem)
+	var subjectList = $('#enr-schedulePrototype-subject-list');
+
+	subjectList.children('li').each(function(idx, elem)
 	{
 		elem = $(elem);
 
@@ -205,6 +207,7 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 		subject.shortName = elem.children('input[name=short]').attr('value').trim();
 		subject.type = elem.children('input[name=type]').attr('value').castToInt();
 		subject.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
+		subject.isRecordingOpen = elem.children('input[name=isRecordingOpen]').attr('value').castToBool();
 		subject._listElementContainer = elem;
 		subject._prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
 
@@ -233,6 +236,16 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 		})();
 		subject.setPrototyped(subject._prototypedCheckbox.attr('checked'));
 	});
+
+	SchedulePrototype.uncheckAllButton = $.create('a').attr('id',
+		'enr-schedulePrototype-uncheckAll').insertAfter(subjectList).
+		text('odznacz wszystkie').disableDragging().click(function()
+	{
+		SchedulePrototype.subjectList.forEach(function(subject)
+		{
+			subject.setPrototyped(false);
+		});
+	});
 };
 
 /*******************************************************************************
@@ -247,6 +260,7 @@ SchedulePrototype.PrototypeSubject = function()
 	this.shortName = null;
 	this.type = null;
 	this.wasEnrolled = null;
+	this.isRecordingOpen = null;
 	this.terms = [];
 	this.isPrototyped = false;
 	this._listElementContainer = null;

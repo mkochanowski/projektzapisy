@@ -11,7 +11,7 @@ from apps.users.models import Student
 
 from apps.enrollment.subjects.models import *
 from apps.enrollment.records.exceptions import *
-from apps.enrollment.subjects.exceptions import NonSubjectException, NonStudentOptionsException
+from apps.enrollment.subjects.exceptions import NonSubjectException
 
 from itertools import cycle
 
@@ -243,9 +243,6 @@ class Record(models.Model):
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
-        except NonStudentOptionsException:
-            logger.error('Record.add_student_to_group()  throws NonStudentOptionsException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
-            raise RecordsNotOpenException()
         except Student.DoesNotExist:
             logger.error('Record.add_student_to_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonStudentException()
@@ -261,9 +258,10 @@ class Record(models.Model):
     def remove_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)
         try:
-
             student = user.student
             group = Group.objects.get(id=group_id)
+            if not group.subject.is_recording_open_for_student(student):
+                raise RecordsNotOpenException()
             record = Record.enrolled.get(group=group, student=student)
             if not group.subject.semester.is_current_semester():
             	raise NotCurrentSemesterException

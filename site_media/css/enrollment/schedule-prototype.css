@@ -59,6 +59,14 @@ a#enr-schedulePrototype-setLocked.unlocked
 	background-image: url('/site_media/images/padlock-unlocked.png');
 }
 
+#enr-schedulePrototype-uncheckAll
+{
+	font-size: 10px;
+	position: relative;
+	top: 10px;
+	left: 5px;
+}
+
 /******************************************************************************/
 
 #enr-schedulePrototype-scheduleContainer .enrolled,

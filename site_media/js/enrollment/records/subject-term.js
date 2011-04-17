@@ -122,7 +122,8 @@ Fereol.Enrollment.SubjectTerm.prototype._updateVisibility = function()
 
 		this.container.mouseenter(function()
 		{
-			self._controlsBox.css('display', 'block');
+			if (!self._controlsEmpty)
+				self._controlsBox.css('display', 'block');
 		}).mouseleave(function()
 		{
 			self._controlsBox.css('display', 'none');
@@ -173,6 +174,7 @@ Fereol.Enrollment.SubjectTerm.prototype._updateControls = function()
 			self.setPinned(!self.isPinned);
 		});
 	}
+	this._controlsEmpty = false;
 
 	if (this._isLoading)
 	{
@@ -188,9 +190,11 @@ Fereol.Enrollment.SubjectTerm.prototype._updateControls = function()
 	}).attr('title', this.isPinned ? 'odepnij od planu' : 'przypnij do planu');
 	this._signInOutButton.css({
 		backgroundPosition: this.isEnrolledOrQueued() ? '-12px 0' : '0 0',
-		display: ''
+		display: this.subject.isRecordingOpen ? '' : 'none'
 	}).attr('title', this.isEnrolledOrQueued() ? 'wypisz się' +
 		(this.isQueued ? ' z kolejki' : '') : 'zapisz się');
+	this._controlsEmpty = this.isEnrolledOrQueued() &&
+		!this.subject.isRecordingOpen;
 };
 
 Fereol.Enrollment.SubjectTerm.prototype._onResize = function(isFullSize)
@@ -261,6 +265,9 @@ Fereol.Enrollment.SubjectTerm.prototype.setEnrolled = function(enrolled)
 
 	var self = this;
 	this._updateControls();
+
+	if (!this.subject.isRecordingOpen)
+		throw new Error('Zapisy na ten przedmiot są zamknięte');
 
 	enrolled = !!enrolled;
 	if (this.isEnrolledOrQueued() == enrolled)

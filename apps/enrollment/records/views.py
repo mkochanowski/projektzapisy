@@ -169,9 +169,13 @@ def set_enrolled(request, method):
                 message_context)
     except RecordsNotOpenException:
         transaction.rollback()
-        return AjaxFailureMessage.auto_render('RecordsNotOpen',
-            'Nie możesz się zapisać, bo zapisy na ten przedmiot nie są dla ' + \
-            'Ciebie otwarte.', message_context)
+        if set_enrolled:
+            message = 'Nie możesz się zapisać, ponieważ zapisy na ten ' + \
+                'przedmiot nie są dla Ciebie otwarte.'
+        else:
+            message = 'Nie możesz się wypisać, ponieważ zapisy są już zamknięte.'
+        return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
+            message_context)
 
 @require_POST
 def records_set_locked(request, method):
@@ -292,6 +296,7 @@ def schedule_prototype(request):
 
         student_records = Record.get_student_records_ids(request.user,\
             default_semester)
+        StudentOptions.preload_cache(request.user.student, default_semester)
 
         terms_in_semester = Term.get_all_in_semester(default_semester)
         subjects_in_semester = []
@@ -305,6 +310,8 @@ def schedule_prototype(request):
                         'name': subject.name,
                         'short': subject.entity.get_short_name(),
                         'type': subject.type.pk,
+                        'is_recording_open': subject.\
+                            is_recording_open_for_student(request.user.student),
                         #TODO: kod w prepare_subjects_list_to_render moim
                         #      zdaniem nie zadziała
                         'was_enrolled': 'False',

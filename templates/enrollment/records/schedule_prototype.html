@@ -95,6 +95,7 @@
 				<input type="hidden" name="type" value="{{ subject.subject.type }}" />
 				<input type="hidden" name="short" value="{{ subject.subject.short }}" />
 				<input type="hidden" name="wasEnrolled" value="{{ subject.subject.was_enrolled }}" />
+				<input type="hidden" name="isRecordingOpen" value="{{ subject.subject.is_recording_open }}" />
 				{% for term in subject.terms %}
 					<input type="hidden" name="term" value="{{ term }}" />
 				{% endfor %}
