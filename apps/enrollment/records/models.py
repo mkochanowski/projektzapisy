@@ -49,44 +49,34 @@ class Record(models.Model):
 
     @staticmethod
     def get_student_records_ids(user, semester):
-        try:
-            records = Record.objects.\
-                filter(student=user.student, group__subject__semester=semester).\
-                values_list('group__pk', 'status');
-            pinned = []
-            enrolled = []
-            for record in records:
-                if int(record[1]) == 1:
-                    enrolled.append(record[0])
-                else:
-                    pinned.append(record[0])
-            return {
-                'enrolled': enrolled,
-                'pinned': pinned,
-                'queued': Queue.queued.filter(student=user.student,\
-                          group__subject__semester=semester).\
-                          values_list('group__pk', flat=True)
-            }
-        except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detailed_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
-            raise NonStudentException()
+        records = Record.objects.\
+            filter(student=user.student, group__subject__semester=semester).\
+            values_list('group__pk', 'status');
+        pinned = []
+        enrolled = []
+        for record in records:
+            if int(record[1]) == 1:
+                enrolled.append(record[0])
+            else:
+                pinned.append(record[0])
+        return {
+            'enrolled': enrolled,
+            'pinned': pinned,
+            'queued': Queue.queued.filter(student=user.student,\
+                      group__subject__semester=semester).\
+                      values_list('group__pk', flat=True)
+        }
 
     @staticmethod
-    def get_student_all_detailed_enrollings(user_id):
-        user = User.objects.get(id=user_id)
-        try:
-            student = user.student
-            records = Record.enrolled.filter(student=student).\
-                select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user').order_by('group__subject__name')
-            groups = [record.group for record in records]
-            subjects = set([group.subject for group in groups])
-            for group in groups:
-                group.terms_ = group.get_all_terms() # TODO: generuje osobne zapytanie dla każdej grupy, powinno być pobierane w jednym
-                group.subject_ = group.subject
-            return groups
-        except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detailed_enrollings(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
-            raise NonStudentException()
+    def get_student_records(student):
+        records = Record.enrolled.filter(student=student).\
+            select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user').order_by('group__subject__name')
+        groups = [record.group for record in records]
+        subjects = set([group.subject for group in groups])
+        for group in groups:
+            group.terms_ = group.get_all_terms() # TODO: generuje osobne zapytanie dla każdej grupy, powinno być pobierane w jednym
+            group.subject_ = group.subject
+        return groups
 
     @staticmethod
     def get_groups_with_records_for_subject(slug, user_id, group_type):

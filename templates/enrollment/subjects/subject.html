@@ -103,7 +103,7 @@
 							<td class="controls">
 								<input type="hidden" name="group-id" value="{{ t.id }}" />
 								{% if subject.is_recording_open %}
-									<form action="{% url schedule-set-enrolled %}" method="post"><div>
+									<form action="{% url records-set-enrolled %}" method="post"><div>
 										<input type="hidden" name="group" value="{{ t.id }}" />
 										{% if t.signed %}
 											<input type="hidden" name="enroll" value="false" />
@@ -120,16 +120,16 @@
 										{% endif %}{% endif %}{% endif %}
 									</div></form>
 								{% endif %}
-								<a href="{% url group-records t.id %}">lista</a>
+								<a href="{% url records-group t.id %}">lista</a>
 							</td>
 							<td class="priority">
 								{% if t.priority %}
-									<form action="{% url set-priority t.id %}" method="post"><div>
+									<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
 										<input type="hidden" name="priority" value="{{ t.priority|add:-1}}" />
 										<input type="submit" value="-" {% if t.priority <= 1 %} disabled="disabled" {% endif %} />
 									</div></form>
 									<span>{{ t.priority }}</span>
-									<form action="{% url set-priority t.id %}" method="post"><div>
+									<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
 										<input type="hidden" name="priority" value="{{ t.priority|add:1}}" />
 										<input type="submit" value="+" {% if t.priority >= 10 %} disabled="disabled" {% endif %} />
 									</div></form>

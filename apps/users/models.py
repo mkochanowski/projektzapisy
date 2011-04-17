@@ -160,36 +160,10 @@ class Student(BaseUser):
         except Student.DoesNotExist:
              logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
              raise NonStudentException()
-         
-    @staticmethod
-    def records_block(user_id):
-        user = User.objects.get(id=user_id)
-        try :
-            student = user.student
-            if student.block == False:
-                student.block = True
-                student.save()
-                return student
-            else :
-                return False
-        except Student.DoesNotExist:
-             logger.error('Function Student.records_block(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
-             raise NonStudentException()
-    @staticmethod
-    def records_unblock(user_id):
-        user = User.objects.get(id=user_id)
-        try :
-            student = user.student
-            if student.block == True:
-                student.block = False
-                student.save()
-                return student
-            else :
-                return False
-        except Student.DoesNotExist:
-             logger.error('Function Student.records_unblock(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
-             raise NonStudentException()
- 
+    
+    def records_set_locked(self, locked):
+        self.block = locked
+        self.save()
 
     @staticmethod
     def get_zamawiany(user_id):

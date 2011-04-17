@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.shortcuts import redirect
@@ -65,11 +64,13 @@ def set_enrolled(request, method):
     '''
         Set student assigned (or not) to group.
     '''
-    if not request.user.is_authenticated():
-        return AjaxFailureMessage('NotAuthenticated', 'Nie jesteś zalogowany.')
-
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
+
+    if not request.user.is_authenticated():
+        return AjaxFailureMessage('NotAuthenticated', 'Nie jesteś zalogowany.',\
+            message_context)
+
     try:
         group_id = int(request.POST['group'])
         set_enrolled = request.POST['enroll'] == 'true'
@@ -173,41 +174,47 @@ def set_enrolled(request, method):
             'Ciebie otwarte.', message_context)
 
 @require_POST
-@login_required
-def blockPlan(request) :
-    #TODO: przepisać
-    data = {}
-    try:
-        logger.info('User %s  <id: %s> uses AJAX to block his/her plan' % (request.user.username, request.user.id))
-        if Student.records_block(request.user.id) :
-            data['Success'] = {}
-            data['Success']['Message'] = "Twój plan został zablokowany"
-    except NonStudentException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonStudent"
-        data['Exception']['Message'] = "Nie możesz zablokować planu, bo nie jesteś studentem."
-    return HttpResponse(simplejson.dumps(data))
+def records_set_locked(request, method):
+    '''
+        Locks or unlocks records for student to prevent mistakes.
+    '''
+    is_ajax = (method == '.json')
+    message_context = None if is_ajax else request
 
-@require_POST
-@login_required
-def unblockPlan(request) :
-    #TODO: przepisać
-    data = {}
+    if not request.user.is_authenticated():
+        return AjaxFailureMessage.auto_render('NotAuthenticated',\
+            'Nie jesteś zalogowany.', message_context)
+
     try:
-        logger.info('User %s  <id: %s> uses AJAX to block his/her plan' % (request.user.username, request.user.id))
-        if Student.records_unblock(request.user.id) :
-            data['Success'] = {}
-            data['Success']['Message'] = "Twój plan został odblokowany"
-    except NonStudentException:
-        data['Exception'] = {}
-        data['Exception']['Code'] = "NonStudent"
-        data['Exception']['Message'] = "Nie możesz zablokować planu, bo nie jesteś studentem."
-    return HttpResponse(simplejson.dumps(data))
+        lock = request.POST['lock'] == 'true'
+    except MultiValueDictKeyError:
+        return AjaxFailureMessage.auto_render('InvalidRequest',\
+            'Nieprawidłowe zapytanie.', message_context)
+
+    try:
+        logger.info('User %s  <id: %d> %s his/her records' %\
+            (request.user.username, request.user.id,\
+            ('locks' if lock else 'unlocks')))
+        request.user.student.records_set_locked(lock)
+
+        message = 'Plan został ' + ('zablokowany.' if lock else ' odblokowany.')
+        if is_ajax:
+            return AjaxSuccessMessage(message)
+        else:
+            request.user.message_set.create(message=message)
+            return redirect('schedule-prototype')
+    except Student.DoesNotExist:
+        transaction.rollback()
+        return AjaxFailureMessage.auto_render('NonStudent',\
+            'Nie jesteś studentem.', message_context)
 
 @require_POST
 @login_required
 @transaction.commit_on_success
 def queue_set_priority(request, group_id, method):
+    '''
+        Sets new priority for queue of some group
+    '''
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
 
@@ -268,7 +275,7 @@ def own(request):
         logger.info('User %s <id: %s> looked at his schedule' %\
             (request.user.username, request.user.id))
         return render_to_response('enrollment/records/schedule.html', {
-            'groups': Record.get_student_all_detailed_enrollings(request.user.id)
+            'groups': Record.get_student_records(request.user.student)
         }, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message='Nie jesteś studentem.')
@@ -329,7 +336,7 @@ def schedule_prototype(request):
         }
         return render_to_response('enrollment/records/schedule_prototype.html',\
             data, context_instance = RequestContext(request))
-    except NonStudentException:
+    except Student.DoesNotExist:
         request.user.message_set.create(message='Nie jesteś studentem.')
         return render_to_response('common/error.html', \
             context_instance=RequestContext(request))

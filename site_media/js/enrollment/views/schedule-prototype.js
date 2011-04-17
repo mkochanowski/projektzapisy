@@ -40,6 +40,7 @@ SchedulePrototype.init = function()
 	
 	SchedulePrototype.initSubjectList(enrolledGroupIDs, pinnedGroupIDs, queuedGroupIDs);
 	SchedulePrototype.initFilter();
+	SchedulePrototype.initRecordsLocking();
 };
 
 SchedulePrototype.urls = {};
@@ -115,6 +116,76 @@ SchedulePrototype.initFilter = function()
 
 	SchedulePrototype.subjectFilter.runThread();
 	$('#enr-schedulePrototype-top-bar').find('label').disableDragging();
+};
+
+/**
+ * Inicjuje przycisk blokowania planu.
+ */
+SchedulePrototype.initRecordsLocking = function()
+{
+	var lockForm = $('#enr-schedulePrototype-setLocked').assertOne();
+	var lockURL = lockForm.find('input[name=ajax-url]').assertOne().
+		attr('value').trim();
+	var isLocked = (lockForm.find('input[name=lock]').assertOne().
+		attr('value') != 'true');
+	var isLocking = false;
+
+	var lockButton = $.create('a').insertAfter(lockForm);
+	lockForm.remove();
+	lockButton.attr('id', 'enr-schedulePrototype-setLocked');
+
+	var updateLockButton = function()
+	{
+		var label = (isLocked ? 'Odblokuj' : 'Zablokuj') + ' plan';
+		lockButton.text(label).attr('title', label).
+			toggleClass('locked', isLocked).
+			toggleClass('unlocked', !isLocked);
+	};
+	updateLockButton();
+
+	lockButton.click(function()
+	{
+		if (isLocking)
+			return;
+		isLocking = true;
+		lockButton.css('opacity', '0.5');
+
+		isLocked = !isLocked;
+		updateLockButton();
+		
+		$.post(lockURL, {
+			csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
+			lock: isLocked
+		}, function(data)
+		{
+			var result = AjaxMessage.fromJSON(data);
+			self._isLoading = false;
+			if (result.isSuccess())
+			{
+				isLocking = false;
+				lockButton.css('opacity', '1');
+			}
+			else
+				result.displayMessageBox();
+			self._updateVisibility();
+		}, 'json');
+	});
+
+	lockButton.hover(function()
+	{
+		if (isLocking)
+			return;
+		lockButton.
+			toggleClass('locked', !isLocked).
+			toggleClass('unlocked', isLocked);
+	}, function()
+	{
+		if (isLocking)
+			return;
+		lockButton.
+			toggleClass('locked', isLocked).
+			toggleClass('unlocked', !isLocked);
+	})
 };
 
 SchedulePrototype.subjectList = [];

@@ -55,14 +55,20 @@
 	</div>
 {% endblock %}
 
-{% block comment %}
-    <div>
-        <input id="blockUrl" type="button" value="Zablokuj plan" onClick="location.href='{% url schedule-prototype-block %}'">
-        <input id="unblockUrl" type="button" value="Oblokuj plan" onClick="location.href='{% url schedule-prototype-unblock %}'">
-    </div>
-{% endblock %}
-
 {% block content %}
+	<form action="{% url records-set-locked %}" method="post" id="enr-schedulePrototype-setLocked"><div>
+		<input type="hidden" name="ajax-url" value="{% url records-set-locked '.json' %}" />
+		{% if user.student.block %}
+			<input type="hidden" name="lock" value="false" />
+			<input type="submit" value="Odblokuj plan" />
+		{% else %}
+			<input type="hidden" name="lock" value="true" />
+			<input type="submit" value="Zablokuj plan" />
+		{% endif %}
+	</div></form>
+
+	{% block messages %}{% endblock %}{% include 'common/messages.html' %}
+
 	<div id="enr-schedulePrototype-scheduleContainer">
 		<p>Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu
 			planu nie może bez niej działać.</p>
@@ -71,7 +77,7 @@
 		<input type="hidden" name="queued" value="{{ student_records.queued }}" />
 
 		<input type="hidden" name="setPinnedUrl" value="{% url schedule-prototype-set-pinned %}" />
-		<input type="hidden" name="setEnrolledUrl" value="{% url schedule-set-enrolled '.json' %}" />
+		<input type="hidden" name="setEnrolledUrl" value="{% url records-set-enrolled '.json' %}" />
 	</div>
 {% endblock %}
  
