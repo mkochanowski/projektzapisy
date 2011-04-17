@@ -4,7 +4,6 @@ from django.db import models
 from django.template.defaultfilters import slugify
 
 from student_options import StudentOptions
-from apps.enrollment.subjects.exceptions import NonStudentOptionsException
 
 from datetime import timedelta, datetime
 
@@ -66,11 +65,10 @@ class Subject( models.Model ):
         """ gives the answer to question: is subject opened for apps.enrollment for student at the very moment? """
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
-
         try:
-            stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
+            stud_opt = StudentOptions.get_cached(student, self)
             interval = stud_opt.get_opening_bonus_timedelta()
-        except NonStudentOptionsException:
+        except StudentOptions.DoesNotExist:
             interval = timedelta(minutes=0)
 
         if records_opening == None:
@@ -89,9 +87,9 @@ class Subject( models.Model ):
         records_opening = self.semester.records_opening
 
         try:
-            stud_opt = StudentOptions.get_student_options_for_subject(student.id, self.id)
+            stud_opt = StudentOptions.get_cached(student, self)
             interval = stud_opt.get_opening_bonus_timedelta()
-        except NonStudentOptionsException:
+        except StudentOptions.DoesNotExist:
             interval = timedelta(minutes=0)
 
         if records_opening == None:

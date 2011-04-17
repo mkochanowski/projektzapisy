@@ -28,11 +28,59 @@
 	padding-top: 2px;
 }
 
+form#enr-schedulePrototype-setLocked
+{
+	text-align: right;
+}
+
+a#enr-schedulePrototype-setLocked
+{
+	position: absolute;
+	top: 5px;
+	left: 730px;
+
+	display: block;
+	width: 16px;
+	height: 16px;
+
+	overflow: hidden;
+	text-indent: 10000px;
+
+	background: no-repeat;
+}
+
+a#enr-schedulePrototype-setLocked.locked
+{
+	background-image: url('/site_media/images/padlock-locked.png');
+}
+
+a#enr-schedulePrototype-setLocked.unlocked
+{
+	background-image: url('/site_media/images/padlock-unlocked.png');
+}
+
+#enr-schedulePrototype-uncheckAll
+{
+	font-size: 10px;
+	position: relative;
+	top: 10px;
+	left: 5px;
+}
+
 /******************************************************************************/
 
-#enr-schedulePrototype-scheduleContainer .enrolled
+#enr-schedulePrototype-scheduleContainer .enrolled,
+#enr-schedulePrototype-scheduleContainer .enrolled .classroom,
+#enr-schedulePrototype-scheduleContainer .enrolled .type
 {
-	background: wheat;
+	background: #f5ca7b !important; /* wheat */
+}
+
+#enr-schedulePrototype-scheduleContainer .queued,
+#enr-schedulePrototype-scheduleContainer .queued .classroom,
+#enr-schedulePrototype-scheduleContainer .queued .type
+{
+	background: #f5e5c4 !important;
 }
 
 #enr-schedulePrototype-scheduleContainer .term .name
@@ -69,11 +117,6 @@
 	border-radius: 3px;
 }
 
-#enr-schedulePrototype-scheduleContainer .enrolled .classroom
-{
-	background: wheat;
-}
-
 #enr-schedulePrototype-scheduleContainer .term .type
 {
 	position: absolute;
@@ -87,11 +130,6 @@
 	background: #F8F8F8;
 
 	border-radius: 3px;
-}
-
-#enr-schedulePrototype-scheduleContainer .enrolled .type
-{
-	background: wheat;
 }
 
 #enr-schedulePrototype-scheduleContainer .term .controls

@@ -24,7 +24,7 @@ SubjectView.init = function()
 };
 
 $(SubjectView.init);
-var xxx = 0;
+
 /**
  * Inicjuje kontrolki wybierania priorytetu w grupie.
  */
@@ -35,10 +35,9 @@ SubjectView._initPriorityControls = function()
 		elem = $(elem);
 		if (elem.children('form').length == 0)
 			return;
-		var id = elem.parent().find('input[name=group-id]').assertOne().
-			attr('value').castToInt();
 		var currentPriority = elem.children('span').assertOne().text().
 			castToInt();
+		var priorityChangeURL = elem.children('form').first().attr('action');
 
 		elem.empty();
 
@@ -51,21 +50,26 @@ SubjectView._initPriorityControls = function()
 			prioritySelector.append(priorityOption);
 		}
 
-		prioritySelector.change(function()
-		{
-			prioritySelector.attr('disabled', true);
-			var newPriority = prioritySelector.attr('value').castToInt();
-
-			//TODO: generowanie URL, a nie na sztywno
-			$.post('/records/' + id + '/queue_set_priority/' + newPriority, {
-					csrfmiddlewaretoken: $.cookie('csrftoken') // TODO: nowe jquery tego podobno nie wymaga
-				}, function(data)
+		(function () {
+			prioritySelector.change(function()
 			{
-				if (data.Success.Message == 'OK')
-					prioritySelector.attr('disabled', false);
-				//TODO: ewentualny komunikat błędu
-			}, 'json');
-		});
+				prioritySelector.attr('disabled', true);
+				var newPriority = prioritySelector.attr('value').castToInt();
+
+				//TODO: generowanie URL, a nie na sztywno (dopisek .json)
+				$.post(priorityChangeURL + '.json', {
+						csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
+						priority: newPriority
+					}, function(data)
+				{
+					var result = AjaxMessage.fromJSON(data);
+					if (result.isSuccess())
+						prioritySelector.attr('disabled', false);
+					else
+						result.displayMessageBox();
+				}, 'json');
+			});
+		})();
 	});
 };
 

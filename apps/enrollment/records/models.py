@@ -11,7 +11,7 @@ from apps.users.models import Student
 
 from apps.enrollment.subjects.models import *
 from apps.enrollment.records.exceptions import *
-from apps.enrollment.subjects.exceptions import NonSubjectException, NonStudentOptionsException
+from apps.enrollment.subjects.exceptions import NonSubjectException
 
 from itertools import cycle
 
@@ -49,41 +49,34 @@ class Record(models.Model):
 
     @staticmethod
     def get_student_records_ids(user, semester):
-        try:
-            records = Record.objects.\
-                filter(student=user.student, group__subject__semester=semester).\
-                values_list('group__pk', 'status');
-            pinned = []
-            enrolled = []
-            for record in records:
-                if int(record[1]) == 1:
-                    enrolled.append(record[0])
-                else:
-                    pinned.append(record[0])
-            return {
-                'enrolled': enrolled,
-                'pinned': pinned
-            }
-        except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detailed_records(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
-            raise NonStudentException()
+        records = Record.objects.\
+            filter(student=user.student, group__subject__semester=semester).\
+            values_list('group__pk', 'status');
+        pinned = []
+        enrolled = []
+        for record in records:
+            if int(record[1]) == 1:
+                enrolled.append(record[0])
+            else:
+                pinned.append(record[0])
+        return {
+            'enrolled': enrolled,
+            'pinned': pinned,
+            'queued': Queue.queued.filter(student=user.student,\
+                      group__subject__semester=semester).\
+                      values_list('group__pk', flat=True)
+        }
 
     @staticmethod
-    def get_student_all_detailed_enrollings(user_id):
-        user = User.objects.get(id=user_id)
-        try:
-            student = user.student
-            records = Record.enrolled.filter(student=student).\
-                select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user').order_by('group__subject__name')
-            groups = [record.group for record in records]
-            subjects = set([group.subject for group in groups])
-            for group in groups:
-                group.terms_ = group.get_all_terms() # TODO: generuje osobne zapytanie dla każdej grupy, powinno być pobierane w jednym
-                group.subject_ = group.subject
-            return groups
-        except Student.DoesNotExist:
-            logger.error('Record.get_student_all_detailed_enrollings(user_id = %d) throws Student.DoesNotExist exception.' % int(user_id))
-            raise NonStudentException()
+    def get_student_records(student):
+        records = Record.enrolled.filter(student=student).\
+            select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user').order_by('group__subject__name')
+        groups = [record.group for record in records]
+        subjects = set([group.subject for group in groups])
+        for group in groups:
+            group.terms_ = group.get_all_terms() # TODO: generuje osobne zapytanie dla każdej grupy, powinno być pobierane w jednym
+            group.subject_ = group.subject
+        return groups
 
     @staticmethod
     def get_groups_with_records_for_subject(slug, user_id, group_type):
@@ -250,9 +243,6 @@ class Record(models.Model):
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
                 raise OutOfLimitException()
-        except NonStudentOptionsException:
-            logger.error('Record.add_student_to_group()  throws NonStudentOptionsException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
-            raise RecordsNotOpenException()
         except Student.DoesNotExist:
             logger.error('Record.add_student_to_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonStudentException()
@@ -268,9 +258,10 @@ class Record(models.Model):
     def remove_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)
         try:
-
             student = user.student
             group = Group.objects.get(id=group_id)
+            if not group.subject.is_recording_open_for_student(student):
+                raise RecordsNotOpenException()
             record = Record.enrolled.get(group=group, student=student)
             if not group.subject.semester.is_current_semester():
             	raise NotCurrentSemesterException
@@ -372,6 +363,9 @@ class Queue(models.Model):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
+            if not Group.objects.get(id=group_id).subject.\
+                is_recording_open_for_student(student):
+                raise RecordsNotOpenException()
             group = Group.objects.get(id=group_id)
             """ Czy student jest już zapisany na przedmiot"""
             if Record.enrolled.filter(group=group, student=student).count() > 0 :

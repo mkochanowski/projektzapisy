@@ -347,8 +347,7 @@ class AddStudentToQueue(TestCase):
         self.assertRaises(AlreadyQueuedException, Queue.add_student_to_queue, self.student.id, self.group.id)
         self.assertEqual(Queue.objects.filter(group=self.group.id).count(), 1)
           
-# method Queue.add_student_to_queue isn't check if records are open - BUG?       
-    '''def testWithRecordsNotOpenForStudent(self):
+    def testWithRecordsNotOpenForStudent(self):
         self.user.student.records_opening_delay_hours = 0
         self.user.student.save()
         self.group.subject.semester.records_opening = datetime.now()
@@ -357,7 +356,7 @@ class AddStudentToQueue(TestCase):
         student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
         student_options.records_opening_delay_minutes = 10
         student_options.save()
-        self.assertRaises(RecordsNotOpenException, Queue.add_student_to_queue, self.user.id, self.group.id)'''
+        self.assertRaises(RecordsNotOpenException, Queue.add_student_to_queue, self.user.id, self.group.id)
 
 class RemoveStudentFromQueue(TestCase):
     fixtures =  ['fixtures__queue']

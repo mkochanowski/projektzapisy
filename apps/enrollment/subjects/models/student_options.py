@@ -2,9 +2,7 @@
 
 from django.db import models
 
-from apps.enrollment.subjects.exceptions import NonStudentOptionsException
-
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 import logging
 logger = logging.getLogger()
@@ -15,19 +13,42 @@ class StudentOptions( models.Model ):
     student = models.ForeignKey('users.Student', verbose_name = 'student')
     records_opening_delay_minutes = models.IntegerField(verbose_name='Przyspieszenie otwarcia zapisów na ten przedmiot (minuty)')
 
+    options_cache = {}
+
+    @staticmethod
+    def preload_cache(student, semester):
+        '''
+            Preloads cache with subjects for certain student and semester.
+        '''
+        if not student.id in StudentOptions.options_cache:
+            StudentOptions.options_cache[student.id] = {}
+        if not semester.id in StudentOptions.options_cache[student.id]:
+            StudentOptions.options_cache[student.id][semester.id] = {}
+        for option in StudentOptions.objects.filter(subject__semester=semester,\
+            student=student).all():
+            StudentOptions.options_cache[student.id][semester.id]\
+                [option.subject.id] = option
+
+    @staticmethod
+    def get_cached(student, subject):
+        '''
+            Returns StudentOption instance for student and subject id.
+            Doesn't make new query, if record is already cached.
+        '''
+        cache = StudentOptions.options_cache
+        if not student.id in cache:
+            cache[student.id] = {}
+        if not subject.semester.id in cache[student.id]: # miss
+            return StudentOptions.objects.get(subject=subject, student=student)
+        if subject.id in cache[student.id][subject.semester.id]: # get
+            return cache[student.id][subject.semester.id][subject.id]
+        else: # not miss, but doesn't exists
+            raise StudentOptions.DoesNotExist()
+
     def get_opening_bonus_timedelta(self):
         """ returns records opening bonus as timedelta """
         return timedelta(minutes=self.records_opening_delay_minutes)
-    
-    @staticmethod
-    def get_student_options_for_subject(student_id, subject_id):
-        """ returns StudentOption instance for student and subject id, throws NonStudentOptionsException if such record do not exist""" 
-        try:    
-            return StudentOptions.objects.get(subject__id=subject_id, student__id=student_id)
-        except StudentOptions.DoesNotExist:
-            logger.error('StudentOptions.get_student_options_for_subject(student_id = %d, subject_id = %d) throws StudentOptions.DoesNotExist exception.' % (int(student_id), int(subject_id)) )
-            raise NonStudentOptionsException()
-    
+
     class Meta:
         verbose_name = 'zależność przedmiot-student'
         verbose_name_plural = 'zależności przedmiot-student'
