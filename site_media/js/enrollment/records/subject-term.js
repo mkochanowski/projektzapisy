@@ -102,7 +102,9 @@ Fereol.Enrollment.SubjectTerm.prototype._updateVisibility = function()
 		this._teacherLabel = $.create('span', {className: 'teacher'}).text(this.teacher).
 			appendTo(this.container);
 		this._typeLabel = $.create('span', {className: 'type'}).
-			appendTo(this.container);
+			appendTo(this.container).attr('title',
+			Fereol.Enrollment.SubjectTerm.groupTypes[this.type][0]);
+
 		this._classroomLabel = $.create('span', {className: 'classroom'}).
 			appendTo(this.container);
 		if (this.classroom)

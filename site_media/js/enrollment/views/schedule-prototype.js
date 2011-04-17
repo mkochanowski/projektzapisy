@@ -39,7 +39,7 @@ SchedulePrototype.init = function()
 
 	
 	SchedulePrototype.initSubjectList(enrolledGroupIDs, pinnedGroupIDs, queuedGroupIDs);
-	//SchedulePrototype.initFilter();
+	SchedulePrototype.initFilter();
 };
 
 SchedulePrototype.urls = {};
@@ -84,17 +84,13 @@ SchedulePrototype.initFilter = function()
 	SchedulePrototype.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
 		'phrase', '.filter-phrase', function(element, value)
 	{
-		return true;
 		var subject = element.data;
-		if (!subject.name)
-			$.log(subject);
 		return (subject.name.toLowerCase().indexOf(value) >= 0);
 	}));
 
 	SchedulePrototype.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
 		'hideSigned', '#enr-hidesigned', function(element, value)
 	{
-		return true;
 		if (!value)
 			return true;
 		var subject = element.data;
@@ -104,22 +100,21 @@ SchedulePrototype.initFilter = function()
 	SchedulePrototype.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
 		function(element, subjectType)
 	{
-		return true;
 		var subject = element.data;
 		return (subject.type == subjectType);
 	}));
-/*
-	for (var subject in SchedulePrototype.subjects)
+
+	SchedulePrototype.subjectList.forEach(function(subject)
 	{
-		subject = SchedulePrototype.subjects[subject];
 		SchedulePrototype.subjectFilter.addElement(new ListFilter.Element(subject, function(visible)
 		{
 			var subject = this.data;
 			subject.setVisible(visible);
 		}));
-	};
-*/
+	});
+
 	SchedulePrototype.subjectFilter.runThread();
+	$('#enr-schedulePrototype-top-bar').find('label').disableDragging();
 };
 
 SchedulePrototype.subjectList = [];
@@ -131,8 +126,6 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 	{
 		elem = $(elem);
 
-		var prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
-
 		var subject = new SchedulePrototype.PrototypeSubject();
 		SchedulePrototype.subjectList.push(subject);
 
@@ -141,6 +134,8 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 		subject.shortName = elem.children('input[name=short]').attr('value').trim();
 		subject.type = elem.children('input[name=type]').attr('value').castToInt();
 		subject.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
+		subject._listElementContainer = elem;
+		subject._prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
 
 		elem.children('input[name=term]').each(function(idx, elem)
 		{
@@ -160,12 +155,12 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 
 		(function()
 		{
-			prototypedCheckbox.click(function()
+			subject._prototypedCheckbox.click(function()
 			{
-				subject.setPrototyped(prototypedCheckbox.attr('checked'));
+				subject.setPrototyped(subject._prototypedCheckbox.attr('checked'));
 			});
 		})();
-		subject.setPrototyped(prototypedCheckbox.attr('checked'));
+		subject.setPrototyped(subject._prototypedCheckbox.attr('checked'));
 	});
 };
 
@@ -183,6 +178,8 @@ SchedulePrototype.PrototypeSubject = function()
 	this.wasEnrolled = null;
 	this.terms = [];
 	this.isPrototyped = false;
+	this._listElementContainer = null;
+	this._prototypedCheckbox = null;
 };
 
 SchedulePrototype.PrototypeSubject.prototype.setPrototyped = function(prototyped)
@@ -191,11 +188,19 @@ SchedulePrototype.PrototypeSubject.prototype.setPrototyped = function(prototyped
 	if (this.isPrototyped == prototyped)
 		return;
 	this.isPrototyped = prototyped;
+	this._prototypedCheckbox.attr('checked', prototyped);
 
 	this.terms.forEach(function(term)
 	{
 		term.setPrototyped(prototyped);
 	});
+};
+
+SchedulePrototype.PrototypeSubject.prototype.setVisible = function(visible)
+{
+	this._listElementContainer.css('display', (visible ? '' : 'none'));
+	if (!visible)
+		this.setPrototyped(false);
 };
 
 SchedulePrototype.PrototypeSubject.prototype.toString = function()

@@ -34,14 +34,14 @@
 #enr-schedulePrototype-scheduleContainer .enrolled .classroom,
 #enr-schedulePrototype-scheduleContainer .enrolled .type
 {
-	background: #f5d393 !important; /* wheat */
+	background: #f5ca7b !important; /* wheat */
 }
 
 #enr-schedulePrototype-scheduleContainer .queued,
 #enr-schedulePrototype-scheduleContainer .queued .classroom,
 #enr-schedulePrototype-scheduleContainer .queued .type
 {
-	background: #f5e9d0 !important;
+	background: #f5e5c4 !important;
 }
 
 #enr-schedulePrototype-scheduleContainer .term .name

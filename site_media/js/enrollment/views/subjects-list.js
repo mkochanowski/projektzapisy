@@ -11,8 +11,6 @@ SubjectsList.init = function()
 {
 	SubjectsList.initSubjectLists();
 	SubjectsList.initFilter();
-
-	$('#enr-subjectsList-top-bar').find('label').disableDragging();
 };
 
 $(SubjectsList.init);
@@ -138,6 +136,7 @@ SubjectsList.initFilter = function()
 	};
 
 	SubjectsList.subjectFilter.runThread();
+	$('#enr-subjectsList-top-bar').find('label').disableDragging();
 };
 
 
