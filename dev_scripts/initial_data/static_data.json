@@ -1635,5 +1635,1180 @@
         "fields": {
             "name": "doktoranckie"
         }
-    }
+    },
+    {
+        "pk": 1, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "algorytmika"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "kryptografia i bezpiecze\u0144stwo"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "sieci i administracja systemami"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "grafika komputerowa"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "in\u017cynieria oprogramowania"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "1"
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "2"
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "3"
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "4"
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "5"
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "1"
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "2"
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "3"
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "4"
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "5"
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "1"
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "2"
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "3"
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "4"
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "5"
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "poni\u017cej 1h"
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "mi\u0119dzy 2 a 5 h"
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "powy\u017cej 5h"
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 41, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 42, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 43, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 44, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 45, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 46, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 47, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 48, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 49, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 50, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 51, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 52, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "tak"
+        }
+    }, 
+    {
+        "pk": 53, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie"
+        }
+    }, 
+    {
+        "pk": 54, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "niedba\u0142e"
+        }
+    }, 
+    {
+        "pk": 55, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "trudne do znalezienia"
+        }
+    }, 
+    {
+        "pk": 56, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "nie na temat"
+        }
+    }, 
+    {
+        "pk": 57, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "solidnie przygotowane"
+        }
+    }, 
+    {
+        "pk": 58, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "czytelne"
+        }
+    }, 
+    {
+        "pk": 59, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "pojawiaj\u0105ce si\u0119 z du\u017cym op\u00f3\u017anieniem"
+        }
+    }, 
+    {
+        "pk": 60, 
+        "model": "poll.option", 
+        "fields": {
+            "content": "pojawiaj\u0105ce si\u0119 tu\u017c przed/po zaj\u0119ciach"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "poll.multiplechoicequestion", 
+        "fields": {
+            "content": "Z jakich dziedzin jest za ma\u0142o zaj\u0119\u0107?", 
+            "choice_limit": 6, 
+            "description": "", 
+            "has_other": true, 
+            "options": [
+                1, 
+                2, 
+                3, 
+                4, 
+                5
+            ]
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.multiplechoicequestion", 
+        "fields": {
+            "content": "Jak oceniasz materia\u0142y przygotowane przez prowadz\u0105cego?", 
+            "choice_limit": 4, 
+            "description": "Chodzi zar\u00f3wno o notatki w\u0142asne prowadz\u0105cego, jak i linki/bibliografi\u0119", 
+            "has_other": true, 
+            "options": [
+                54, 
+                55, 
+                56, 
+                57, 
+                58, 
+                59, 
+                60
+            ]
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.multiplechoicequestionordering", 
+        "fields": {
+            "sections": 7, 
+            "question": 2, 
+            "position": 4
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "poll.multiplechoicequestionordering", 
+        "fields": {
+            "sections": 1, 
+            "question": 1, 
+            "position": 3
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy jeste\u015b zadowolony z poziomu studi\u00f3w w instytucie?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                6, 
+                7
+            ]
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy poleci\u0142by\u015b te studia swoim znajomym?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                8, 
+                9
+            ]
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy ucz\u0119szczasz w ramach studi\u00f3w na zaj\u0119cia prowadzone przez inne, ni\u017c Instytut Informatyki, jednostki?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                10, 
+                11
+            ]
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Jak oceniasz przygotowanie zaj\u0119\u0107 WF", 
+            "is_scale": true, 
+            "description": "", 
+            "options": [
+                12, 
+                13, 
+                14, 
+                15, 
+                16
+            ]
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Jak oceniasz przygotowanie zaj\u0119\u0107 w SPNJO", 
+            "is_scale": true, 
+            "description": "", 
+            "options": [
+                17, 
+                18, 
+                19, 
+                20, 
+                21
+            ]
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Jak oceniasz przygotowanie zaj\u0119\u0107 w Instytucie Matematycznym?", 
+            "is_scale": true, 
+            "description": "", 
+            "options": [
+                22, 
+                23, 
+                24, 
+                25, 
+                26
+            ]
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy przedmiot by\u0142 ciekawy?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                27, 
+                28
+            ]
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy uwa\u017casz przedmiot za przydatny?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                29, 
+                30
+            ]
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy polecane zadania pomaga\u0142y w zrozumieniu przedmiotu?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                31, 
+                32
+            ]
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy zadania mia\u0142y odpowiedni poziom trudno\u015bci?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                33, 
+                34
+            ]
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Ile czasu (tygodniowo) po\u015bwi\u0119ca\u0142e\u015b na przygotowywanie si\u0119 do zaj\u0119\u0107?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                35, 
+                36, 
+                37
+            ]
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy prowadz\u0105cy pomaga\u0142 rozwi\u0105za\u0107 zadania, dawa\u0142 wskaz\u00f3wki, by\u0142 dost\u0119pny na konsultacjach?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                38, 
+                39
+            ]
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy zaj\u0119cia by\u0142y prowadzone w odpowiednim tempie?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                40, 
+                41
+            ]
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy wi\u0119kszo\u015b\u0107 obecnych (Twoim zdaniem) rozumia\u0142a, co si\u0119 dzieje na zaj\u0119ciach?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                42, 
+                43
+            ]
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy przedmiot by\u0142 ciekawy?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                44, 
+                45
+            ]
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy uwa\u017casz przedmiot za przydatny?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                46, 
+                47
+            ]
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy do zaj\u0119\u0107 prowadz\u0105cy przygotowywa\u0142 materia\u0142y dodatkowe?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                48, 
+                49
+            ]
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy by\u0142y one \u0142atwo dost\u0119pne?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                50, 
+                51
+            ]
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "poll.singlechoicequestion", 
+        "fields": {
+            "content": "Czy prowadz\u0105cy podawa\u0142 list\u0119 literatury, stron www lub innych podobnych, poszerzaj\u0105cych wiedz\u0119 na dany temat?", 
+            "is_scale": false, 
+            "description": "", 
+            "options": [
+                52, 
+                53
+            ]
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 7, 
+            "hide_on": [], 
+            "question": 17, 
+            "is_leading": false, 
+            "position": 0
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 7, 
+            "hide_on": [], 
+            "question": 18, 
+            "is_leading": false, 
+            "position": 2
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 7, 
+            "hide_on": [], 
+            "question": 19, 
+            "is_leading": false, 
+            "position": 3
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 4, 
+            "hide_on": [], 
+            "question": 7, 
+            "is_leading": false, 
+            "position": 1
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 4, 
+            "hide_on": [], 
+            "question": 8, 
+            "is_leading": false, 
+            "position": 4
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 5, 
+            "hide_on": [], 
+            "question": 9, 
+            "is_leading": false, 
+            "position": 1
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 5, 
+            "hide_on": [], 
+            "question": 10, 
+            "is_leading": false, 
+            "position": 2
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 5, 
+            "hide_on": [], 
+            "question": 11, 
+            "is_leading": false, 
+            "position": 3
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 5, 
+            "hide_on": [], 
+            "question": 12, 
+            "is_leading": false, 
+            "position": 4
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 2, 
+            "hide_on": [], 
+            "question": 1, 
+            "is_leading": false, 
+            "position": 1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 2, 
+            "hide_on": [], 
+            "question": 2, 
+            "is_leading": false, 
+            "position": 2
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 3, 
+            "hide_on": [], 
+            "question": 4, 
+            "is_leading": true, 
+            "position": 1
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 3, 
+            "hide_on": [], 
+            "question": 3, 
+            "is_leading": false, 
+            "position": 0
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 3, 
+            "hide_on": [], 
+            "question": 5, 
+            "is_leading": false, 
+            "position": 2
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 3, 
+            "hide_on": [], 
+            "question": 6, 
+            "is_leading": false, 
+            "position": 3
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 6, 
+            "hide_on": [], 
+            "question": 13, 
+            "is_leading": false, 
+            "position": 1
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "poll.singlechoicequestionordering", 
+        "fields": {
+            "sections": 6, 
+            "hide_on": [], 
+            "question": 14, 
+            "is_leading": false, 
+            "position": 2
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Jakie przedmioty powinny zosta\u0107 dodane w przysz\u0142ym roku do oferty dydaktycznej?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Jakie przedmioty powinny by\u0107 usuni\u0119te z oferty dydaktycznej?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Czy uwa\u017casz, \u017ce jakie\u015b przedmioty powinny by\u0107 prowadzone inaczej? Je\u015bli tak - to jak?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Czy jest co\u015b, co nie podoba Ci si\u0119 w sposobie funkcjonowania instytutu?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Czy masz jakie\u015b uwagi dotycz\u0105ce zaj\u0119\u0107 prowadzonych poza Instytutem Informatyki?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Co Ci si\u0119 najbardziej podoba\u0142o?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Co Ci si\u0119 najbardziej nie podoba\u0142o?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Co by\u015b zmieni\u0142?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Jakie s\u0105 Twoje odczucia zwi\u0105zane ze sposobem prowadzenia zaj\u0119\u0107?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Co Ci si\u0119 najbardziej podoba\u0142o?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Co Ci si\u0119 najbardziej nie podoba\u0142o?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Co by\u015b zmieni\u0142?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "poll.openquestion", 
+        "fields": {
+            "content": "Czy materia\u0142y okaza\u0142y si\u0119 by\u0107 przydatne?", 
+            "description": null
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 7, 
+            "question": 13, 
+            "position": 1
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 4, 
+            "question": 6, 
+            "position": 2
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 4, 
+            "question": 7, 
+            "position": 3
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 4, 
+            "question": 8, 
+            "position": 5
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 2, 
+            "question": 4, 
+            "position": 3
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 3, 
+            "question": 5, 
+            "position": 4
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 1, 
+            "question": 1, 
+            "position": 1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 1, 
+            "question": 2, 
+            "position": 2
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 1, 
+            "question": 3, 
+            "position": 4
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "poll.openquestionordering", 
+        "fields": {
+            "sections": 6, 
+            "question": 9, 
+            "position": 3
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "poll.section", 
+        "fields": {
+            "deleted": false, 
+            "description": "", 
+            "title": "Materia\u0142y dodatkowe"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "poll.section", 
+        "fields": {
+            "deleted": false, 
+            "description": "", 
+            "title": "O przedmiocie"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "poll.section", 
+        "fields": {
+            "deleted": false, 
+            "description": "", 
+            "title": "O zadaniach"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "poll.section", 
+        "fields": {
+            "deleted": false, 
+            "description": "", 
+            "title": "Pytania o instytut"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "poll.section", 
+        "fields": {
+            "deleted": false, 
+            "description": "", 
+            "title": "Pytania o zaj\u0119cia dodatkowe"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "poll.section", 
+        "fields": {
+            "deleted": false, 
+            "description": "", 
+            "title": "Pytania og\u00f3lne"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "poll.section", 
+        "fields": {
+            "deleted": false, 
+            "description": "", 
+            "title": "Tempo prowadzenia"
+        }
+    } 
 ]

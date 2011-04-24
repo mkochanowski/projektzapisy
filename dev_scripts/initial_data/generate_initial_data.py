@@ -3,7 +3,7 @@
 # Author: Pawel Kacprzak
 
 from random import randint as rand
-from random import choice, seed
+from random import choice, seed, sample
 import json
 import sys
 
@@ -13,6 +13,10 @@ opt_bigdb = True
 for arg in sys.argv[1:]:
 	if arg == 'small':
 		opt_bigdb = False
+
+#########################################################################
+#                        Setup & options                                #
+#########################################################################
 
 SUBJECTS = json.loads(open('subjects_data.json', 'r').read())
 
@@ -54,6 +58,13 @@ FEMALE_FIRST_NAMES = NAMES['FEMALE_FIRST_NAMES']
 MALE_LAST_NAMES = NAMES['MALE_LAST_NAMES']
 FEMALE_LAST_NAMES = NAMES['FEMALE_LAST_NAMES']
 
+#polls & sections
+ADMIN_ID = 1 # id of admin user
+
+#########################################################################
+#                           Static data                                 #
+#########################################################################
+
 # BEGIN SCRIPT
 
 spaces = ' ' * INDENT
@@ -64,6 +75,11 @@ f_input = open(file_input, 'r')
 input_data = f_input.read()
 input_data = input_data[:-2] + ',\n'
 s += input_data
+
+#########################################################################
+#               Generate users - students and employees                 #
+#########################################################################
+
 # Generate users
 id_start = 2
 
@@ -85,6 +101,16 @@ for user_id in range(id_start, id_start + NUM_OF_STUDENTS):
 last_user_for_student_id = user_id
 s += ''.join(users_raw)
 
+# Generate students
+students_raw = []
+for student_id in range(first_user_for_student_id, last_user_for_student_id + 1):
+	ects = rand(ECTS_LOW, ECTS_HIGH)
+	delay = rand(DELAY_MINUTES_FOR_STUDENT_LOW, DELAY_MINUTES_FOR_STUDENT_HIGH)
+	program = choice(STUDIES_PROGRAMS)
+	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.student",\n@!@@!@"fields": {\n@!@@!@@!@"ects": %s,\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"matricula": "%s",\n@!@@!@@!@"program": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (student_id, ects, delay, student_id, student_id, program)
+	students_raw.append(record)
+s += ''.join(students_raw)
+
 # Generate users for employees
 first_user_for_employee_id = id_start + NUM_OF_STUDENTS
 employees_raw = []
@@ -101,6 +127,18 @@ for user_id in range(id_start + NUM_OF_STUDENTS, id_start + NUM_OF_STUDENTS + NU
 last_user_for_employee_id = user_id
 s += ''.join(employees_raw)
 
+# Generate employees
+employees_raw = []
+list_employees = [1] + range(first_user_for_employee_id, last_user_for_employee_id + 1)
+for employee_id in list_employees:
+	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.employee",\n@!@@!@"fields": {\n@!@@!@@!@"consultations": "pn 10:00 - 12:00",\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (employee_id, employee_id)
+	employees_raw.append(record)
+s += ''.join(employees_raw)
+
+#########################################################################
+#                      Generate clasrooms                               #
+#########################################################################
+
 # Generate classrooms
 classroom_id_start = 1
 classrooms = []
@@ -112,74 +150,73 @@ for classroom_id in range(classroom_id_start, classroom_id_start + NUM_OF_CLASSR
 	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.classroom",\n@!@@!@"fields": {\n@!@@!@@!@"number": "%s"\n@!@@!@}\n@!@},\n' % (classroom_id, number)
 	classrooms_raw.append(record)
 classroom_id_end = classroom_id
-# Generate students
 s += ''.join(classrooms_raw)
 
-students_raw = []
-for student_id in range(first_user_for_student_id, last_user_for_student_id + 1):
-	ects = rand(ECTS_LOW, ECTS_HIGH)
-	delay = rand(DELAY_MINUTES_FOR_STUDENT_LOW, DELAY_MINUTES_FOR_STUDENT_HIGH)
-	program = choice(STUDIES_PROGRAMS)
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.student",\n@!@@!@"fields": {\n@!@@!@@!@"ects": %s,\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"matricula": "%s",\n@!@@!@@!@"program": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (student_id, ects, delay, student_id, student_id, program)
-	students_raw.append(record)
-s += ''.join(students_raw)
-	
-# Generate employees
 
-employees_raw = []
-for employee_id in range(first_user_for_employee_id, last_user_for_employee_id + 1):
-	ects = rand(ECTS_LOW, ECTS_HIGH)
-	delay = rand(DELAY_MINUTES_FOR_STUDENT_LOW, DELAY_MINUTES_FOR_STUDENT_HIGH)
-	program = choice(STUDIES_PROGRAMS)
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.employee",\n@!@@!@"fields": {\n@!@@!@@!@"consultations": "pn 10:00 - 12:00",\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (employee_id, employee_id)
-	employees_raw.append(record)
-s += ''.join(employees_raw)
+#########################################################################
+#                      Generate subjects                                #
+#########################################################################
 
 # Generate subjects
-
 subject_id_start = 1
 subject_id = subject_id_start
 subjects_raw = []
+semesters = [1,2,3,4]
+subjects = {}
+
 # Generate subjects in year 2009
 for sub in SUBJECTS:
-	if sub['semester'] == 1:
-		slug = '%s-zimowy-2009' % (sub['slug'])
-	else:
-		slug = '%s-letni-2009' % (sub['slug'])
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.subject",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (subject_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'], sub['exercises'], sub['laboratories'], sub['type'], slug)
-	subjects_raw.append(record)
-	subject_id += 1
+    if sub['semester'] == 1:
+        slug = '%s-zimowy-2009' % (sub['slug'])
+        subjects[subject_id] = 1        
+    else:
+        slug = '%s-letni-2009' % (sub['slug'])
+        subjects[subject_id] = 2
+    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.subject",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (subject_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'], sub['exercises'], sub['laboratories'], sub['type'], slug)
+    subjects_raw.append(record)
+    subject_id += 1
 	
 # Generate subjects in year 2010
 for sub in SUBJECTS[:-2]:
-	if sub['semester'] == 1:
-		slug = '%s-zimowy-2010' % (sub['slug'])
-	else:
-		slug = '%s-letni-2010' % (sub['slug'])
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.subject",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (subject_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'] + 2, sub['exercises'], sub['laboratories'], sub['type'], slug)
-	subjects_raw.append(record)
-	subject_id += 1
+    if sub['semester'] == 1:
+        slug = '%s-zimowy-2010' % (sub['slug'])
+        subjects[subject_id] = 3
+    else:
+        slug = '%s-letni-2010' % (sub['slug'])
+        subjects[subject_id] = 4
+    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.subject",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (subject_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'] + 2, sub['exercises'], sub['laboratories'], sub['type'], slug)
+    subjects_raw.append(record)
+    subject_id += 1
 	
 subject_id_end = subject_id
 s += ''.join(subjects_raw)
+
+#########################################################################
+#                      Generate groups                                  #
+#########################################################################
 
 # Generate groups 
 group_id_start = 1
 group_id = group_id_start
 groups_raw = []
+groups_sem = {1: [], 2:[], 3: [], 4: []}
+
 for subject_id in range(subject_id_start, subject_id_end):
-	teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
-	limit = choice(LECTURES_LIMITS)
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "1",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
-	groups_raw.append(record)
-	group_id += 1
-	groups = rand(MIN_NON_LECTURE_GROUPS_FOR_SUBJECT, MAX_NON_LECTURE_GROUPS_FOR_SUBJECT)	
-	for i in range(1, groups + 1):
-		teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
-		limit = choice(NON_LECTURE_LIMITS)
-		record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "2",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
-		groups_raw.append(record)
-		group_id += 1
+
+    teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
+    limit = choice(LECTURES_LIMITS)
+    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "1",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
+    groups_sem[ subjects[subject_id] ].append(group_id)
+    groups_raw.append(record)
+    group_id += 1
+    groups = rand(MIN_NON_LECTURE_GROUPS_FOR_SUBJECT, MAX_NON_LECTURE_GROUPS_FOR_SUBJECT)	
+    for i in range(1, groups + 1):
+        teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
+        limit = choice(NON_LECTURE_LIMITS)
+        record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "2",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
+        groups_sem[ subjects[subject_id] ].append(group_id)
+        groups_raw.append(record)
+        group_id += 1
 		
 group_id_end = group_id
 s += ''.join(groups_raw)
@@ -187,7 +224,6 @@ s += ''.join(groups_raw)
 # Generate terms
 
 triples = []
-
 terms_raw = []
 for term_id in range(group_id_start, group_id_end):
 	day = rand(1, 5)
@@ -217,6 +253,10 @@ for student in range(first_user_for_student_id, last_user_for_student_id):
 		student_options_id += 1
 s += ''.join(student_options_raw)
 
+#########################################################################
+#                      Generate records                                 #
+#########################################################################
+
 #generate_records
 
 pairs = []
@@ -232,15 +272,53 @@ for record_id in range(1, NUM_OF_RECORDS + 1):
 		student = rand(first_user_for_student_id, last_user_for_student_id - 1)
 		pair = (group, student)
 		counter += 1
-#		print counter
-#		print "losuje: g=%s, s=%s" % (group, student)
 	counter = 0
 	pairs.append(pair)
 	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "records.record",\n@!@@!@"fields": {\n@!@@!@@!@"status": "1",\n@!@@!@@!@"group": %s,\n@!@@!@@!@"student": %s\n@!@@!@}\n@!@},\n' % (record_id, group, student)
 	records_raw.append(record)
 s += ''.join(records_raw)
 	
+#########################################################################
+#                      Generate polls                                   #
+#########################################################################
+
+def generate_poll(poll_id, sec_total, sem, group, polls_raw):
+    """
+    Generate one poll for a specified group (or null)
+    """
+    if (group == "null"):
+        n_sec = rand(1,3)
+        sections = sample(range(1,4), n_sec)
+    else:
+        n_sec = rand(1,4)
+        sections = sample(range(4,8), n_sec)
+    poll = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "poll.poll",\n@!@@!@"fields": {\n@!@@!@@!@"studies_type": null,\n@!@@!@@!@"group": %s,\n@!@@!@@!@"description": "",\n@!@@!@@!@"title": "Ankieta",\n@!@@!@@!@"author": %s,\n@!@@!@@!@"semester": %s\n@!@@!@}\n@!@},\n' % (poll_id, group, ADMIN_ID, sem)
+    polls_raw += poll
+    sec_num = 1
+    for sec_id in sections:
+        section = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "poll.sectionordering",\n@!@@!@"fields": {\n@!@@!@@!@"position": %s,\n@!@@!@@!@"section": %s,\n@!@@!@@!@"poll": "%s"\n@!@@!@}\n@!@},\n' % (sec_total, sec_num, sec_id, poll_id)
+        sec_total += 1
+        polls_raw += section   
+        sec_num += 1
+    return (polls_raw, sec_total)
+            
+def generate_polls(semesters, groups):
+    """
+    Generates polls for all the groups created + one poll without group assigned per semester
+    """
+    polls_raw = []
+    sec_total = 1
+    poll_id = 1
+    for sem in semesters:
+        (polls_raw,sec_total) = generate_poll(poll_id, sec_total, sem, "null", polls_raw)
+        poll_id += 1
+        for group in groups[sem]:   
+            (polls_raw,sec_total) = generate_poll(poll_id, sec_total, sem, group, polls_raw)
+            poll_id += 1
+    return polls_raw    
+    
+s += ''.join( generate_polls(semesters, groups_sem) )
+    
 # Convert to readable format using indents and add close bracket
 s = s.replace('@!@', spaces)[:-2] + '\n]'
-
 print s.encode('utf-8')
