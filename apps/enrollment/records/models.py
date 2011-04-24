@@ -9,7 +9,7 @@ from django.db import models
 
 from apps.users.models import Student
 
-from apps.enrollment.subjects.models import *
+from apps.enrollment.subjects.models import Group
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.subjects.exceptions import NonSubjectException
 
@@ -17,7 +17,6 @@ from itertools import cycle
 
 from django.db.models import signals
 #from django.dispatch import receiver
-from apps.enrollment.subjects.models.group import Group
 
 
 STATUS_ENROLLED = '1'

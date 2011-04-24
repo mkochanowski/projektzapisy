@@ -101,7 +101,7 @@ class StudentScheduleTest(TestCase):
         subject_1.semester.semester_ending = date.today() + timedelta(days = 5 * 30)
         subject_1.semester.save()
         
-        groups = Student.get_schedule(self.user.id)
+        groups = Student.get_schedule(user.student)
         
         term_1 = Term.objects.get(id=1).id
         term_2 = Term.objects.get(id=3).id
