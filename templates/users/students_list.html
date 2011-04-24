@@ -37,7 +37,7 @@
 				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
 			</div>
 		</fieldset>
-		<fieldset id="enr-subjectsList-other">
+		<fieldset id="enr-studentsList-other">
 			<legend><span>Opcje</span></legend>
 			<span class="checkbox"><input type="checkbox" id="enr-hidenotrecorded" checked="yes" /><label for="enr-hidenotrecorded">Ukryj osoby niezapisane na żaden przedmiot</label></span>
 		</fieldset>
@@ -53,8 +53,8 @@ Wybierz studenta z menu po prawej.
 {% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
 {% block sidebar %}
 <div id="main-sidebar">
-        <div id="student-alpha-list">
-            <ul id="student-list-menu">
+        <div id="user-alpha-list">
+            <ul id="user-list-menu">
                 <li{% if char = 'A' %} class="active"{%  endif %}><a href="{% url students-char-list "A" "B" %}" class="ajax">A-B</a></li>
                 <li{% if char = 'C' %} class="active"{%  endif %}><a href="{% url students-char-list 'C' 'D' %}" class="ajax">C-D</a></li>
                 <li{% if char = 'E' %} class="active"{%  endif %}><a href="{% url students-char-list 'E' 'F' %}" class="ajax">E-F</a></li>

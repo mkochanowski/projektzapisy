@@ -11,7 +11,11 @@
 	background: white url(../../../images/loading-black.gif) no-repeat scroll right top;
 }
 
-#student-alpha-list {
+.employee-loading {
+	background: white url(../../../images/loading-black.gif) no-repeat scroll right top;
+}
+
+#user-alpha-list {
     position:absolute;
     left:240px;
     border-right: 1px solid #CCCCCC;
@@ -21,32 +25,24 @@
     list-style: none outside none;
     margin: 10px;
 }
-#student-alpha-list ul {
+#user-alpha-list ul {
     list-style: none outside none;
     padding-left:0px;
     margin: 10px;
 }
 
-#student-alpha-list li {
+#user-alpha-list li {
     margin: 5px 0;
     text-align:center;
 }
 
-#students-list {
-    z-index:2;
-}
 
-#student-list-menu
-{
-
-}
-
-#student-list-menu > li
+#user-list-menu > li
 {
     border-bottom: 1px solid #CCCCCC;
 }
 
-#student-list-menu a
+#user-list-menu a
 {
     text-decoration:none;
 }

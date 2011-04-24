@@ -70,7 +70,24 @@ class Employee(BaseUser):
         except:
             logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
         return False
-            
+
+    @staticmethod
+    def get_list(begin, end):
+        return Employee.objects.filter(user__last_name__range=(begin, unicode(end) + u'źźźźź')).\
+                    select_related().order_by('user__last_name', 'user__first_name')
+
+    @staticmethod
+    def get_all_groups_in_semester(user_id):
+        user = User.objects.get(id=user_id)
+        semester = Semester.get_current_semester()
+        try:
+            employee = user.employee
+            groups = Group.objects.filter(teacher=employee, subject__semester=semester)
+        except Employee.DoesNotExist:
+             logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
+             raise NonEmployeeException()
+        return groups
+
     @staticmethod
     def get_all_groups(user_id):
         user = User.objects.get(id=user_id)
@@ -87,7 +104,7 @@ class Employee(BaseUser):
         user = User.objects.get(id=user_id)
         try:
             employee = user.employee
-            groups = [g for g in Employee.get_all_groups(user_id) ]
+            groups = [g for g in Employee.get_all_groups_in_semester(user_id) ]
             subjects = set([group.subject for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()

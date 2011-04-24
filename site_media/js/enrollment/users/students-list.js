@@ -5,7 +5,7 @@
 StudentsList = new Object();
 
 /**
- * Inicjuje widok listy przedmiotów.
+ * Inicjuje widok listy studentów.
  */
 StudentsList.init = function()
 {
@@ -160,19 +160,6 @@ StudentsList.initFilter = function()
 	}));
 
 
-	StudentsList.studentFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
-		'phrase', '.filter-phrase', function(element, value)
-	{
-		var student = element.data;
-		if (!student.name)
-			$.log(student);
-		var name  = (student.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-        var album = (student.album.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-        var email = (student.email.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-
-        return name || album || email;
-	}));
-
     StudentsList.runStudents( StudentsList.studentFilter );
 
 	StudentsList.studentFilter.runThread();
@@ -235,6 +222,7 @@ StudentsList.student = function()
 	this.name = null;
 	this.email = null;
     this.album = null; // index
+    this.recorded = false;
 	this.container = null;
 	this.visible = true;
 };

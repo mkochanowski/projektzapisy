@@ -12,8 +12,8 @@ class Group(models.Model):
     """group for subject"""
     subject = models.ForeignKey('Subject', verbose_name='przedmiot', related_name='groups')
     teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
-    type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
-    limit = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
+    type    = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
+    limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
@@ -37,7 +37,16 @@ class Group(models.Model):
 
     def subject_slug(self):
         return self.subject.slug
-        
+
+    @staticmethod
+    def teacher_in_present(employees, semester):
+        teachers = Group.objects.filter(subject__semester = semester).distinct().values_list('teacher__pk', flat=True)
+
+        for employee in employees:
+            employee.teacher = employee.pk in teachers
+
+        return employees
+    
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'

@@ -17,10 +17,11 @@ from django.conf import settings
 
 from apps.users.exceptions import NonUserException, NonEmployeeException,\
                                  NonStudentException
-from apps.users.utils import prepare_ajax_students_list
+from apps.users.utils import prepare_ajax_students_list,\
+                             prepare_ajax_employee_list
 
 from apps.users.models import Employee, Student
-from apps.enrollment.subjects.models import Semester
+from apps.enrollment.subjects.models import Semester, Group
 from apps.enrollment.records.models import Record
 
 from apps.users.forms import EmailChangeForm
@@ -76,7 +77,25 @@ def employee_profile(request, user_id):
             'groups' : groups,
             'employee' : employee,
         }
-        return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
+        if request.is_ajax():
+            return render_to_response('users/ajax_employee_profile.html', data, context_instance=RequestContext(request))
+        else:
+            begin = 'A'
+            end   = 'B'
+            char  = 'A'
+            employees = Employee.get_list(begin, end)
+            semester = Semester.get_current_semester()
+            employees = Group.teacher_in_present(employees, semester)
+
+            for e in employees:
+                e.short_new = e.user.first_name[:1] + e.user.last_name[:2]
+                e.short_old = e.user.first_name[:2] + e.user.last_name[:2]
+
+            data['employees'] = employees
+            data['char'] = char
+              
+            return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
+
 
     except NonEmployeeException:
         logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % user_id )
@@ -145,14 +164,33 @@ def my_profile(request):
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
 
 @login_required
-def employees_list(request):
-    employees = Employee.objects.select_related().order_by('user__last_name', 'user__first_name')
-    
-    data = {
+def employees_list(request, begin = 'A', end='B'):
+    if end == 'X':
+        end = u'Ż'
+        
+    employees = Employee.get_list(begin, end)
+    semester = Semester.get_current_semester()
+    employees = Group.teacher_in_present(employees, semester)
+
+    for e in employees:
+        e.short_new = e.user.first_name[:1] + e.user.last_name[:2]
+        e.short_old = e.user.first_name[:2] + e.user.last_name[:2]
+
+    if request.is_ajax():
+        employees = prepare_ajax_employee_list(employees)
+        return AjaxSuccessMessage(message="ok", data=employees)
+    else:
+        if begin == 'A' and end == 'X':
+            char = X
+        else:
+            char = begin
+
+        data = {
             "employees" : employees,
+            "char": char
             }  
     
-    return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
+        return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
 
 @login_required
 def students_list(request, begin = 'A', end='B'):

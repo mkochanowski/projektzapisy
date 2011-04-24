@@ -19,4 +19,5 @@ urlpatterns = patterns('apps.users.views',
     url('^employees/$', 'employees_list', name='employees-list'),
     url('^students/$', 'students_list', name='students-list'),
     url('^students/(?P<begin>[A-Z])/(?P<end>[A-Z])/$', 'students_list', name='students-char-list'),
+    url('^employees/(?P<begin>[A-Z])/(?P<end>[A-Z])/$', 'employees_list', name='employees-char-list'),
 )
