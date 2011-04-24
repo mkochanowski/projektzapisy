@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 from django.contrib.auth.views import login, password_change, password_change_done, password_reset, password_reset_confirm, password_reset_complete, password_reset_done
 from django.views.generic.simple import direct_to_template
@@ -17,4 +18,5 @@ urlpatterns = patterns('apps.users.views',
     url('^logout/$', 'logout', name='user-logout'),
     url('^employees/$', 'employees_list', name='employees-list'),
     url('^students/$', 'students_list', name='students-list'),
+    url('^students/(?P<begin>[A-Z])/(?P<end>[A-Z])/$', 'students_list', name='students-char-list'),
 )

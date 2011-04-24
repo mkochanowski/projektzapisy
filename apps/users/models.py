@@ -116,6 +116,7 @@ class Student(BaseUser):
     block = models.BooleanField(verbose_name="blokada planu", default = False)
     semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
 
+
     def get_type_of_studies(self):
         """ returns type of studies """
         semestr = {1:'pierwszy',2:'drugi',3:'trzeci',4:'czwarty',5:'piąty',6:'szósty',7:'siódmy',8:'ósmy',9:'dziewiąty',10:'dziesiąty',0:'niezdefiniowany'}[self.semestr]
@@ -134,7 +135,12 @@ class Student(BaseUser):
         records_list = map(lambda x: x.group.subject.entity.id, records)
         return list(frozenset(records_list))
 
-   
+
+    @staticmethod
+    def get_list(begin = 'A', end='Ż'):
+        return Student.objects.filter(user__last_name__range=(begin, unicode(end) + u'źźźźź')).\
+                select_related().order_by('user__last_name', 'user__first_name')
+
     @staticmethod
     def get_all_groups(user_id):
         user = User.objects.get(id=user_id)

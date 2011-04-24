@@ -34,9 +34,9 @@ Number.prototype.castToInt = function()
 String.prototype.castToBool = function()
 {
 	var val = this.trim();
-	if (val == 'True')
+	if (val.toLowerCase() == 'true')
 		return true;
-	if (val == 'False')
+	if (val.toLowerCase() == 'false')
 		return false;
 	throw new Error('Nieprawidłowa wartość');
 };

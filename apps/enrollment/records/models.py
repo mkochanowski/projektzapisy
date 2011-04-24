@@ -42,6 +42,20 @@ class Record(models.Model):
     enrolled = EnrolledManager()
 
     @staticmethod
+    def recorded_students(students):
+        """ Returns students with information about his/her records """
+
+        recorded = Record.enrolled.distinct().\
+                   values_list('student__user__id', flat=True).\
+                   order_by('student__user__id')
+
+        for student in students: # O(n^2) - da sie liniowo, jezeli posortujemy po id a nie nazwiskach
+            student.recorded = student.id in recorded
+
+        return students
+
+
+    @staticmethod
     def number_of_students(group):
         """Returns number of students enrolled to particular group"""
         group_ = group
@@ -308,7 +322,7 @@ def queue_priority(value):
         raise ValidationError(u'%s is not a priority' % value)
 
 class Queue(models.Model):
-    group = models.ForeignKey(Group, verbose_name='grupa')
+    group   = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
     time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
     priority = models.PositiveSmallIntegerField(default=1, validators=[queue_priority], verbose_name='priorytet')

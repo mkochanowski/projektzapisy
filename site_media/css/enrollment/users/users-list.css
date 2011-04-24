@@ -6,3 +6,52 @@
 	position: absolute; top:0; left:0; width:100%; height:100%; min-height:32px; 
 	background: white url(../../../images/loading-black.gif) no-repeat scroll right top; 
 	opacity: 0.5; filter: alpha(opacity = 50); zoom: 1; }
+
+.student-loading {
+	background: white url(../../../images/loading-black.gif) no-repeat scroll right top;
+}
+
+#student-alpha-list {
+    position:absolute;
+    left:240px;
+    border-right: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+    background-color: #FFFFFF;
+    list-style: none outside none;
+    margin: 10px;
+}
+#student-alpha-list ul {
+    list-style: none outside none;
+    padding-left:0px;
+    margin: 10px;
+}
+
+#student-alpha-list li {
+    margin: 5px 0;
+    text-align:center;
+}
+
+#students-list {
+    z-index:2;
+}
+
+#student-list-menu
+{
+
+}
+
+#student-list-menu > li
+{
+    border-bottom: 1px solid #CCCCCC;
+}
+
+#student-list-menu a
+{
+    text-decoration:none;
+}
+
+.active {
+    font-weight:bolder;
+    background-color: #CCCCCC;
+}

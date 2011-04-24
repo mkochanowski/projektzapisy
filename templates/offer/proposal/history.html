@@ -20,7 +20,7 @@
 						<a>{{desc.author.get_full_name}}</a> {% comment %} {% url profile desc.author.id %} {% endcomment %}
 					</span>
 					{% if can_edit %}
-                         <form action="{% url proposal-restore descid=desc.id %}" method="POST" class="force-js">
+                         <form action="{% url proposal-restore descid=desc.id %}" method="POST" class="force-js">{% csrf_token %}
                              <input type="submit" class="without-js" value="przywróc">
 						     <a class="with-js subjectrestore" href="{% url proposal-restore descid=desc.id %}">przywróć</a>
                         </form>

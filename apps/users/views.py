@@ -15,17 +15,23 @@ from django.db.models import Q
 
 from django.conf import settings
 
-from apps.users.exceptions import NonUserException, NonEmployeeException, NonStudentException
+from apps.users.exceptions import NonUserException, NonEmployeeException,\
+                                 NonStudentException
+from apps.users.utils import prepare_ajax_students_list
+
 from apps.users.models import Employee, Student
 from apps.enrollment.subjects.models import Semester
+from apps.enrollment.records.models import Record
 
 from apps.users.forms import EmailChangeForm
 
 from datetime import timedelta
+from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
 import datetime
 
 import logging
 logger = logging.getLogger()
+
 
 def student_profile(request, user_id):
     """student profile"""
@@ -39,14 +45,24 @@ def student_profile(request, user_id):
 	            'student' : student,
 	        }
 
-        return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
+        if request.is_ajax():
+            return render_to_response('users/ajax_student_profile.html', data, context_instance=RequestContext(request))
+        else:
+            begin = 'A'
+            end   = 'B'
+            char  = 'A'
+            students = Student.get_list(begin, end)
+            students = Record.recorded_students(students)
+            data['students'] = students
+            data['char']     = char
+            return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except NonStudentException:
-        logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % user_id )
+        logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % int(user_id) )
         request.user.message_set.create(message="Nie ma takiego studenta.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
-        logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % user_id )
+        logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
         request.user.message_set.create(message="Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
         
@@ -140,12 +156,24 @@ def employees_list(request):
     return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
 
 @login_required
-def students_list(request):
-    students = Student.objects.select_related().order_by('user__last_name', 'user__first_name')
-    data = {
-            "students" : students,
-            }  
-    return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
+def students_list(request, begin = 'A', end='B'):
+    if end == 'X':
+        end = u'Ż'
+
+    students = Student.get_list(begin, end)
+    students = Record.recorded_students(students)
+
+    if request.is_ajax():
+        students = prepare_ajax_students_list(students)
+        return AjaxSuccessMessage(message="ok", data=students)
+    else:
+        if begin == 'A' and end == 'X':
+            char = X
+        else:
+            char = begin
+            
+        data = { "students" : students, "char": char }
+        return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
 @login_required
 def logout(request):
