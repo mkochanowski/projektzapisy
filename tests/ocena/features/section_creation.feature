@@ -118,8 +118,7 @@ Feature: User with privileges wants to create a section.
         When I follow "Zarządzaj ankietami"
         And I follow "Tworzenie sekcji"  
         And I fill in "section-title" with "Sekcja administratora"
-        And I press "Zapisz"         
-        Then I should see "Nie można utworzyć sekcji:"
+        And I press "Zapisz"
 	And I should see "Sekcja nie zawiera pytań"
             
     Scenario: Administrator tries to create section without a title
@@ -130,9 +129,8 @@ Feature: User with privileges wants to create a section.
         And I follow "Tworzenie sekcji"      
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobała Ci się moja praca?"
-        And I press "Zapisz" 
-        Then I should see "Nie można utworzyć sekcji:"
-	And I should see "Niepoprawny tytuł sekcji"
+        And I press "Zapisz"
+	And I should see "To pole jest wymagane."
     
     Scenario Outline: Administrator tries to add a question without a question text
 		Given the grading protocol is "off"
@@ -143,10 +141,8 @@ Feature: User with privileges wants to create a section.
         And I fill in "section-title" with "Sekcja administratora"         
         And I press "Dodaj pytanie" 
         And I select "poll[question][1][formtype]" as <typ_pytania>
-        And I press "Zapisz" 
-        Then I should see "Nie można utworzyć sekcji:"
-	And I should see "Pytanie 1:" 
-	And I should see "brak tekstu"
+        And I press "Zapisz"
+	And I should see "To pole jest wymagane."
         
     Examples:
         | typ_pytania |
@@ -164,10 +160,8 @@ Feature: User with privileges wants to create a section.
         And I press "Dodaj pytanie" 
         And I select "poll[question][1][formtype]" as <typ_pytania>
         And I fill in "poll[question][1][title]" with "Treść pytania"
-        And I press "Zapisz" 
-        Then I should see "Nie można utworzyć sekcji:"
-	And I should see "Pytanie 1:"
-	And I should see "brak opcji"
+        And I press "Zapisz"
+	And I should see "To pole jest wymagane."
 
     Examples:
         | typ_pytania |

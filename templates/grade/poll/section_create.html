@@ -1,10 +1,10 @@
 ﻿{% extends "grade/poll/managment/base.html" %}
 
 {% block scripts %}
-
-<script src="/site_media/js/grade/poll/section_create.js" type="text/javascript"></script>
 <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
 <script type="text/javascript" src="/site_media/js/jquery/jquery-tmpl/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="/site_media/js/jquery/jquery-validation-1.8.0/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/site_media/js/jquery/jquery-validation-1.8.0/localization/messages_pl.js"></script>
 
 <script src="/site_media/js/grade/poll/templates/question_view.js" type="text/javascript"></script>
 <script src="/site_media/js/grade/poll/templates/question_edit.js" type="text/javascript"></script>
@@ -12,6 +12,8 @@
 <script src="/site_media/js/grade/poll/templates/question_add.js" type="text/javascript"></script>
 <script src="/site_media/js/grade/poll/templates/type_option.js" type="text/javascript"></script>
 <script src="/site_media/js/grade/poll/poll_types.js" type="text/javascript"></script>
+
+<script src="/site_media/js/grade/poll/section_create.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block styles %}
@@ -24,14 +26,15 @@
 
 {% block poll-managment %}
   
-		<form url="" id="questionset" method="Post">
+	<form url="" id="questionset" method="Post" class="">
 			<label for="section-title">Tytuł:</label>
-            <input type="text" id="section-title" name="poll[title]">
+            <input type="text" id="section-title" name="poll[title]" class="required">
             <label for="section-desc">Opis:</label>
             <textarea id="section-desc" name="poll[description]"></textarea>
             <input class="leading" type="checkbox" id="section-leading" name="poll[leading]">
             <label class="leading" for="section-leading">Posiada pytanie wiodące</label>
-			<ul id="poll-form">
+            <input type="hidden" name="fake" class="anyquestion" value="">
+			<ul id="poll-form" class="questionset">
 			</ul>
 		<input type="button" value="Dodaj pytanie" id="add-question">
     <br/><br/>

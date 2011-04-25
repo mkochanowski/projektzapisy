@@ -86,3 +86,12 @@ margin:15px;
 
 /*** TWORZENIE ANKIETY - koniec ***/
 
+
+label.error {
+    color: red;
+    display:block;
+}
+
+.poll-question-answer label.error {
+    display: inline;
+}
