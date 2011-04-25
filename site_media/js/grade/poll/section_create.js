@@ -336,6 +336,7 @@ Poll.section.createView = function( li )
             .dblclick(function()
                 {
                     Poll.section.createEdit(li)
+                    $('.edit-mode').hide();
                 })
     $(li).find('.edit-mode')
          .click(function()
@@ -362,7 +363,7 @@ Poll.section.createView = function( li )
 
 Poll.section.createEdit = function( li )
 {
-    if( !Poll.section.validate(Poll.section.lastLi))
+    if( Poll.section.havelastLi && !Poll.section.validate(Poll.section.lastLi))
     {
         return false;
     }

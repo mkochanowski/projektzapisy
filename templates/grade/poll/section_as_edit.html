@@ -10,7 +10,7 @@
     <label class="leading" for="section-leading">Posiada pytanie wiodące</label>
 
     <input type="hidden" name="fake" class="anyquestion" value="">
-    <ol id="poll-form" class="ui-sortable">
+    <ol id="poll-form" class="ui-sortable questionset">
         {% for field in section.questions %}
             <li class="poll-question{% if field.is_leading %} firstQuestion{% endif %}">
                 <input value="{{forloop.counter}}" class="poll-question-id" name="poll[question][order][]" type="hidden">
