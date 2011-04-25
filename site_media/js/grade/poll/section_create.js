@@ -38,13 +38,6 @@ Poll.section.init = function()
     Poll.section.havelastLi        = false; // to change active question
 
     $(".leading").attr('checked', false)
-    $(Poll.section.questionContainer).sortable({
-            handle : 'div',
-            zIndex: 5,
-            tolerance: 'pointer',
-            items: '> li:not(.firstQuestion)'
-
-    });
     /* set events */
     $("#add-question").click(Poll.section.createQuestion)
     $("input[type=text]").focus(function(){ this.select(); });
@@ -70,6 +63,12 @@ Poll.section.init = function()
           }
     });
     $(Poll.section.editParser);
+    $(Poll.section.questionContainer).sortable({
+            handle : '.section-edit',
+            tolerance: 'pointer',
+            items: '> li:not(.firstQuestion)'
+
+    });
 }
 
 /*
