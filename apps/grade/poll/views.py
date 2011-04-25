@@ -243,7 +243,7 @@ def autocomplete(request):
             value = request.GET[u'term']
             # Ignore queries shorter than length 3
             #if len(value) > 2:
-            model_results = Option.objects.filter(content__icontains=value).\
+            model_results = Option.objects.filter(content__istartswith=value).\
                 distinct().values_list('content', flat=True)
             results = [ x for x in model_results ]
     json = simplejson.dumps(results)
