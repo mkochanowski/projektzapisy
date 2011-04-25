@@ -279,6 +279,15 @@ Poll.section.addAnswer = function( li, data )
     {
     $(this).parents('.poll-question-answer').remove();
     });
+
+    $(li).find('.autocomplete').each(function(i, d){
+
+        $(this).autocomplete(
+        {
+            source:'/grade/poll/autocomplete',
+            delay:10
+        });
+    });
 }
 
 
@@ -440,10 +449,13 @@ Poll.section.changeType = function( li )
             });
     }
 
-    $('.autocomplete').autocomplete(
-    {
-        source:'/grade/poll/autocomplete',
-        delay:10
+    $(li).find('.autocomplete').each(function(i, d){
+
+        $(this).autocomplete(
+        {
+            source:'/grade/poll/autocomplete',
+            delay:10
+        });
     });
 }
 
