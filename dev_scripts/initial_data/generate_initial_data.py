@@ -21,6 +21,7 @@ db_config_big = {
 	'DELAY_MINUTES_FOR_STUDENT_LOW': 0,
 	'DELAY_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
 	'STUDIES_PROGRAMS': [1, 2],
+	'SEMESTERS_FOR_STUDIES_PROGRAMS': {1: [1, 2, 3, 4, 5, 6], 2: [1, 2, 3, 4]},
 # employees
 	'NUM_OF_EMPLOYEES': 50,
 # classrooms
@@ -43,6 +44,7 @@ db_config_small = {
 	'DELAY_MINUTES_FOR_STUDENT_LOW': 0,
 	'DELAY_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
 	'STUDIES_PROGRAMS': [1, 2],
+	'SEMESTERS_FOR_STUDIES_PROGRAMS': {1: [1, 2, 3, 4, 5, 6], 2: [1, 2, 3, 4]},
 # employees
 	'NUM_OF_EMPLOYEES': 10,
 # classrooms
@@ -129,7 +131,8 @@ for student_id in range(first_user_for_student_id, last_user_for_student_id + 1)
 	ects = rand(config['ECTS_LOW'], config['ECTS_HIGH'])
 	delay = rand(config['DELAY_MINUTES_FOR_STUDENT_LOW'], config['DELAY_MINUTES_FOR_STUDENT_HIGH'])
 	program = choice(config['STUDIES_PROGRAMS'])
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.student",\n@!@@!@"fields": {\n@!@@!@@!@"ects": %s,\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"matricula": "%s",\n@!@@!@@!@"program": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (student_id, ects, delay, student_id, student_id, program)
+	semestr = choice(config['SEMESTERS_FOR_STUDIES_PROGRAMS'][program])
+	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.student",\n@!@@!@"fields": {\n@!@@!@@!@"ects": %s,\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"matricula": "%s",\n@!@@!@@!@"program": %s,\n@!@@!@@!@"semestr": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (student_id, ects, delay, student_id, student_id, program, semestr)
 	students_raw.append(record)
 s += ''.join(students_raw)
 
