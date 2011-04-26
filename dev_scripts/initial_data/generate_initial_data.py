@@ -9,47 +9,69 @@ import sys
 
 seed(0)
 
-opt_bigdb = True
-for arg in sys.argv[1:]:
-	if arg == 'small':
-		opt_bigdb = False
-
 #########################################################################
 #                        Setup & options                                #
 #########################################################################
 
+db_config_big = {
+# students
+	'NUM_OF_STUDENTS': 500,
+	'ECTS_LOW': 0,
+	'ECTS_HIGH': 300,
+	'DELAY_MINUTES_FOR_STUDENT_LOW': 0,
+	'DELAY_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
+	'STUDIES_PROGRAMS': [1, 2],
+# employees
+	'NUM_OF_EMPLOYEES': 50,
+# classrooms
+	'NUM_OF_CLASSROOMS': 30,
+	'CLASSROOMS_NUMBERS': [i for i in range(1, 150)],
+	'MIN_NON_LECTURE_GROUPS_FOR_SUBJECT': 1,
+	'MAX_NON_LECTURE_GROUPS_FOR_SUBJECT': 5,
+	'LECTURES_LIMITS': [20, 30, 40, 50, 60, 100, 200],
+	'NON_LECTURE_LIMITS': [20, 30],
+	'DELAY_MINUTES_FOR_SUBJECT_LOW': 0,
+	'DELAY_MINUTES_FOR_SUBJECT_HIGH': 3 * 24 * 60,
+	'NUM_OF_RECORDS': 3000,
+	}
+
+db_config_small = {
+# students
+	'NUM_OF_STUDENTS': 25,
+	'ECTS_LOW': 0,
+	'ECTS_HIGH': 300,
+	'DELAY_MINUTES_FOR_STUDENT_LOW': 0,
+	'DELAY_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
+	'STUDIES_PROGRAMS': [1, 2],
+# employees
+	'NUM_OF_EMPLOYEES': 10,
+# classrooms
+	'NUM_OF_CLASSROOMS': 10,
+	'CLASSROOMS_NUMBERS': [i for i in range(1, 150)],
+# groups
+	'MIN_NON_LECTURE_GROUPS_FOR_SUBJECT': 1,
+	'MAX_NON_LECTURE_GROUPS_FOR_SUBJECT': 5,
+	'LECTURES_LIMITS': [20, 30, 40, 50, 60, 100, 200],
+	'NON_LECTURE_LIMITS': [20, 30],
+# students_options 
+	'DELAY_MINUTES_FOR_SUBJECT_LOW': 0,
+	'DELAY_MINUTES_FOR_SUBJECT_HIGH': 3 * 24 * 60,
+# records
+	'NUM_OF_RECORDS': 100,
+	}
+	
+
+# SET BIG DATABASE CONFIG AS DEFAULT CONFIG
+config = db_config_big
+
+for arg in sys.argv[1:]:
+	if arg == 'small':
+		config = db_config_small
+	
 SUBJECTS = json.loads(open('subjects_data.json', 'r').read())
 
 # SETUP
 file_input = 'static_data.json'
-
-# students
-NUM_OF_STUDENTS = 500 if opt_bigdb else 25
-ECTS_LOW = 0
-ECTS_HIGH = 300
-DELAY_MINUTES_FOR_STUDENT_LOW = 0
-DELAY_MINUTES_FOR_STUDENT_HIGH = 3 * 24 * 60
-STUDIES_PROGRAMS = [1, 2] 
-
-# employees
-NUM_OF_EMPLOYEES = 50 if opt_bigdb else 10
-
-#classrooms
-NUM_OF_CLASSROOMS = 30 if opt_bigdb else 10
-CLASSROOMS_NUMBERS = [i for i in range(1, 150)]
-
-#groups
-MIN_NON_LECTURE_GROUPS_FOR_SUBJECT = 1
-MAX_NON_LECTURE_GROUPS_FOR_SUBJECT = 5
-LECTURES_LIMITS = [20, 30, 40, 50, 60, 100, 200]
-NON_LECTURE_LIMITS = [20, 30]
-
-#students_options 
-DELAY_MINUTES_FOR_SUBJECT_LOW = 0
-DELAY_MINUTES_FOR_SUBJECT_HIGH = 3 * 24 * 60
-#records
-NUM_OF_RECORDS = 3000 if opt_bigdb else 100
-
 INDENT = 4
 
 NAMES = json.loads(open('names_data.json', 'r').read())
@@ -87,7 +109,7 @@ id_start = 2
 username = 2
 first_user_for_student_id = id_start
 users_raw = []
-for user_id in range(id_start, id_start + NUM_OF_STUDENTS):
+for user_id in range(id_start, id_start + config['NUM_OF_STUDENTS']):
 	if user_id % 2:
 		first_name = choice(MALE_FIRST_NAMES)
 		last_name = choice(MALE_LAST_NAMES)
@@ -104,17 +126,17 @@ s += ''.join(users_raw)
 # Generate students
 students_raw = []
 for student_id in range(first_user_for_student_id, last_user_for_student_id + 1):
-	ects = rand(ECTS_LOW, ECTS_HIGH)
-	delay = rand(DELAY_MINUTES_FOR_STUDENT_LOW, DELAY_MINUTES_FOR_STUDENT_HIGH)
-	program = choice(STUDIES_PROGRAMS)
+	ects = rand(config['ECTS_LOW'], config['ECTS_HIGH'])
+	delay = rand(config['DELAY_MINUTES_FOR_STUDENT_LOW'], config['DELAY_MINUTES_FOR_STUDENT_HIGH'])
+	program = choice(config['STUDIES_PROGRAMS'])
 	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.student",\n@!@@!@"fields": {\n@!@@!@@!@"ects": %s,\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"matricula": "%s",\n@!@@!@@!@"program": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (student_id, ects, delay, student_id, student_id, program)
 	students_raw.append(record)
 s += ''.join(students_raw)
 
 # Generate users for employees
-first_user_for_employee_id = id_start + NUM_OF_STUDENTS
+first_user_for_employee_id = id_start + config['NUM_OF_STUDENTS']
 employees_raw = []
-for user_id in range(id_start + NUM_OF_STUDENTS, id_start + NUM_OF_STUDENTS + NUM_OF_EMPLOYEES):
+for user_id in range(id_start + config['NUM_OF_STUDENTS'], id_start + config['NUM_OF_STUDENTS'] + config['NUM_OF_EMPLOYEES']):
 	if user_id % 2:
 		first_name = choice(MALE_FIRST_NAMES)
 		last_name = choice(MALE_LAST_NAMES)
@@ -143,10 +165,10 @@ s += ''.join(employees_raw)
 classroom_id_start = 1
 classrooms = []
 classrooms_raw = []
-for classroom_id in range(classroom_id_start, classroom_id_start + NUM_OF_CLASSROOMS):
-	number = choice(CLASSROOMS_NUMBERS)
+for classroom_id in range(classroom_id_start, classroom_id_start + config['NUM_OF_CLASSROOMS']):
+	number = choice(config['CLASSROOMS_NUMBERS'])
 	while number in classrooms:
-		number = choice(CLASSROOMS_NUMBERS)
+		number = choice(config['CLASSROOMS_NUMBERS'])
 	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.classroom",\n@!@@!@"fields": {\n@!@@!@@!@"number": "%s"\n@!@@!@}\n@!@},\n' % (classroom_id, number)
 	classrooms_raw.append(record)
 classroom_id_end = classroom_id
@@ -204,15 +226,15 @@ groups_sem = {1: [], 2:[], 3: [], 4: []}
 for subject_id in range(subject_id_start, subject_id_end):
 
     teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
-    limit = choice(LECTURES_LIMITS)
+    limit = choice(config['LECTURES_LIMITS'])
     record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "1",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
     groups_sem[ subjects[subject_id] ].append(group_id)
     groups_raw.append(record)
     group_id += 1
-    groups = rand(MIN_NON_LECTURE_GROUPS_FOR_SUBJECT, MAX_NON_LECTURE_GROUPS_FOR_SUBJECT)	
+    groups = rand(config['MIN_NON_LECTURE_GROUPS_FOR_SUBJECT'], config['MAX_NON_LECTURE_GROUPS_FOR_SUBJECT'])	
     for i in range(1, groups + 1):
         teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
-        limit = choice(NON_LECTURE_LIMITS)
+        limit = choice(config['NON_LECTURE_LIMITS'])
         record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "2",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
         groups_sem[ subjects[subject_id] ].append(group_id)
         groups_raw.append(record)
@@ -247,7 +269,7 @@ student_options_id = 1
 student_options_raw = []
 for student in range(first_user_for_student_id, last_user_for_student_id):
 	for subject in range(subject_id_start, subject_id_end):
-		delay = rand(DELAY_MINUTES_FOR_SUBJECT_LOW, DELAY_MINUTES_FOR_SUBJECT_HIGH)
+		delay = rand(config['DELAY_MINUTES_FOR_SUBJECT_LOW'], config['DELAY_MINUTES_FOR_SUBJECT_HIGH'])
 		record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.studentoptions",\n@!@@!@"fields": {\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"student": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (student_options_id, delay, student, subject)
 		student_options_raw.append(record)
 		student_options_id += 1
@@ -263,7 +285,7 @@ pairs = []
 
 counter = 0
 records_raw = []
-for record_id in range(1, NUM_OF_RECORDS + 1):
+for record_id in range(1, config['NUM_OF_RECORDS'] + 1):
 	group = rand(group_id_start, group_id_end - 1)
 	student = rand(first_user_for_student_id, last_user_for_student_id - 1)
 	pair = (group, student)
