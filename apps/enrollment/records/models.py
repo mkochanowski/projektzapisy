@@ -10,6 +10,7 @@ from django.db import models
 from apps.users.models import Student
 
 from apps.enrollment.subjects.models import Group
+from apps.enrollment.subjects.models import PointsOfSubjects
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.subjects.exceptions import NonSubjectException
 
