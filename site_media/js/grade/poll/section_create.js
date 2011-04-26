@@ -141,7 +141,6 @@ Poll.section.parse = function(li)
             {
                 Poll.section.createEdit( li );
             });
-    
 
 }
 

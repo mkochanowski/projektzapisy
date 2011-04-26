@@ -1,0 +1,16 @@
+{% extends "grade/poll/managment/base.html" %}
+
+{% block poll-managment %}
+    Czy na pewno chcesz usunąć poniższe ankiety?
+    <form action="{% url grade-poll-delete_poll %}" method="POST">
+        <ul>
+            {% for poll in polls %}
+                <li>
+                    <input type="hidden" name="polls[]" value="{{ poll.pk }}">
+                    <a href="{% url grade-poll-show_poll poll.pk %}">{{poll}}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="submit" value="Usuń">
+    </form>
+{% endblock %}

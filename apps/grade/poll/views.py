@@ -355,20 +355,24 @@ def get_section(request, section_id):
     return render_to_response( 'grade/poll/poll_section.html', {"form": form}, context_instance = RequestContext( request ))
 
 @employee_required
-def delete_section( request ):
-    counter = 0
+def section_actions( request ):
+    data = {}
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'delete_selected':
-            pks = request.POST.getlist('_selected_action')
-            for pk in pks:
-                section = Section.objects.get(pk=pk)
-                section.deleted = True
-                section.save()
-                counter = counter + 1
+            data['sections'] = get_objects( request, Section )
+            return render_to_response( 'grade/poll/managment/section_confirm_delete.html',
+                                       data, context_instance = RequestContext( request ))
 
-    message = u'Usunięto ' + unicode(counter) + u' ' + declination_section(counter)
-    messages.info(request, SafeUnicode(message))
+    return HttpResponseRedirect(reverse('grade-poll-sections-list'))
+
+@employee_required
+def delete_sections( request ):
+    if request.method == 'POST':
+        counter = delete_objects(request, Section, 'sections[]')
+        message = u'Usunięto ' + unicode(counter) + u' ' + declination_section(counter)
+        messages.info(request, SafeUnicode(message))
+
     return HttpResponseRedirect(reverse('grade-poll-sections-list'))
 
 @employee_required
@@ -392,21 +396,27 @@ def show_poll( request, poll_id):
     return render_to_response( 'grade/poll/managment/show_poll.html', data, context_instance = RequestContext( request ))
 
 @employee_required
-def delete_poll( request ):
-    counter = 0
+def poll_actions( request ):
+    data = {}
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'delete_selected':
-            pks = request.POST.getlist('_selected_action')
-            for pk in pks:
-                poll = Poll.objects.get(pk=pk)
-                poll.deleted = True
-                poll.save()
-                counter = counter + 1
-    message =  u'Usunięto ' + unicode(counter) + u' ' + declination_poll(counter)
-    messages.info(request, SafeUnicode(message))    
+            data['polls'] = get_objects( request, Poll )
+            return render_to_response( 'grade/poll/managment/poll_confirm_delete.html',
+                                       data, context_instance = RequestContext( request ))
     return HttpResponseRedirect(reverse('grade-poll-list'))
-    
+
+
+@employee_required
+def delete_polls( request ):
+    if request.method == 'POST':
+        counter = delete_objects(request, Poll, 'polls[]')
+        message = u'Usunięto ' + unicode(counter) + u' ' + declination_poll(counter)
+        messages.info(request, SafeUnicode(message))
+
+    return HttpResponseRedirect(reverse('grade-poll-list'))
+
+
 @employee_required
 def groups_without_poll( request ):
     data = {}
@@ -433,8 +443,6 @@ def questionset_create(request):
     
     
     if request.method == "POST":
-        # TODO:
-        # Dodać tutaj wypełnienie forma danymi
         
         form_data = get_section_form_data( request.POST )
         errors    = validate_section_form( form_data )
