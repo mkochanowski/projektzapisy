@@ -277,9 +277,9 @@ class Record(models.Model):
             group = Group.objects.get(id=group_id)
             if not group.subject.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
-            record = Record.enrolled.get(group=group, student=student)
             if not group.subject.semester.is_current_semester():
             	raise NotCurrentSemesterException
+            record = Record.enrolled.get(group=group, student=student)
             queued = Queue.remove_first_student_from_queue(group_id)
             record.delete()
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id)) 
@@ -435,6 +435,10 @@ class Queue(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
+            if not group.subject.is_recording_open_for_student(student):
+                raise RecordsNotOpenException()
+            if not group.subject.semester.is_current_semester():
+            	raise NotCurrentSemesterException
             record = Queue.queued.get(group=group, student=student)
             record.delete()
             logger.info('User %s <id: %s> is now removed from queue of group "%s" <id: %s>' % (user.username, user.id, group, group.id)) 
