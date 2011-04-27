@@ -2,6 +2,7 @@
 
 {% block scripts %}
 <script src="/site_media/js/grade/managment/list.js" type="application/javascript"></script>
+<script src="/site_media/js/grade/managment/poll_list.js" type="application/javascript"></script>
 {% endblock %}
 
 {% block poll-managment %}
@@ -30,7 +31,7 @@
                 <input type="checkbox" class="_selected_action" name="_selected_action" value="{{poll.pk}}" class="action-select" {% if not user.is_staff and not poll.author.user == user %} disabled {% endif %}>
             </td>
             <td>
-                <a href="{% url grade-poll-show_poll poll.id %}">{{poll}}</a>
+                <a href="{% url grade-poll-show_poll poll.id %}" class='poll_list_a'>{{poll}}</a>
             </td>
         </tr>
     	{% endfor %}
@@ -53,6 +54,13 @@
         {% endif %}
     </span>
 </div>
-
 <p>{{polls.paginator.count}} {{polls_word}}</p>
+
+{% comment %} Grey screen {% endcomment %}
+<div id='box'>
+
+</div>
+
+<div id='screen'>
+</div>
 {% endblock %}

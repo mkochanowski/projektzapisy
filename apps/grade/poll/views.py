@@ -396,8 +396,10 @@ def show_poll( request, poll_id):
     data = {}
     data['form']    = form
     data['grade']   = Semester.get_current_semester().is_grade_active
-    data['message'] = request.session.get('message', None)
-    return render_to_response( 'grade/poll/managment/show_poll.html', data, context_instance = RequestContext( request ))
+    if request.is_ajax():
+        return render_to_response( 'grade/poll/managment/ajax_show_poll.html', data, context_instance = RequestContext( request ))
+    else:
+        return render_to_response( 'grade/poll/managment/show_poll.html', data, context_instance = RequestContext( request ))
 
 @employee_required
 def poll_actions( request ):
