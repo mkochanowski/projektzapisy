@@ -84,6 +84,7 @@ def templates( request ):
     data = {}
     data['templates'] = make_paginator( request, Template )
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['tab']    = "template_list"
     return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -331,6 +332,7 @@ def sections_list( request ):
     data['sections'] = make_paginator( request, Section )
     data['sections_word'] = declination_section(data['sections'].paginator.count, True)
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['tab']    = "section_list"
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -381,6 +383,7 @@ def polls_list( request ):
     data['polls']      = make_paginator(request, Poll)
     data['polls_word'] = declination_poll(data['polls'].paginator.count, True)
     data['grade']      = Semester.get_current_semester().is_grade_active
+    data['tab']    = "poll_list"
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 
@@ -422,6 +425,7 @@ def groups_without_poll( request ):
     data = {}
     data['groups'] = Poll.get_groups_without_poll()
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['tab']    = "group_without"
     return render_to_response( 'grade/poll/managment/groups_without_polls.html', data, context_instance = RequestContext( request ))
 
 @employee_required
