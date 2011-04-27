@@ -696,11 +696,12 @@ def prepare_data_for_create_poll( request, group_id ):
         data['subjects'] = Subject.objects.filter(semester = data['semester']).order_by('name')
     else:
         semester_id      = Semester.get_current_semester()
+        data['semester'] = semester_id
         data['subjects'] = Subject.objects.filter(semester = semester_id).order_by('name')
 
-    data['studies_types'] = Program.objects.all()
-    data['semesters']    = Semester.objects.all()
-    data['sections']     = Section.objects.filter(deleted=False)
-    data['types']        = GROUP_TYPE_CHOICES
+    data['studies_types']    = Program.objects.all()
+    data['semesters']        = Semester.objects.all()
+    data['sections']         = Section.objects.filter(deleted=False)
+    data['types']            = GROUP_TYPE_CHOICES
 
     return data

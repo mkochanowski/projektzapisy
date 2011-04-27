@@ -32,7 +32,7 @@
                     <td>
                         <select name="semester" id="semester">
                             {% for sem in semesters %}
-                                <option value="{{sem.pk}}"{% if semester.pl == sem.pl %} selected{% endif %}>{{sem}}</option>
+                                <option value="{{sem.pk}}"{% if semester.pk == sem.pk %} selected{% endif %}>{{sem}}</option>
                             {% endfor %}
                         </select>
                     </td>
