@@ -55,7 +55,8 @@ from apps.grade.poll.utils           import check_signature, \
                                               prepare_data_for_create_poll, make_polls_for_groups, \
                                               make_message_from_polls, save_template_in_session, \
                                               make_polls_for_all, get_templates,\
-                                              make_template_from_db
+                                              make_template_from_db,\
+                                              get_groups_for_user
 
 from apps.users.models               import Employee
 
@@ -257,7 +258,7 @@ def ajax_get_groups(request):
         if request.method == 'POST':
             type    = int( request.POST.get('type', '0') )
             subject = int( request.POST.get('subject', '0') )
-            groups  = groups_list( Group.objects.filter(type=type, subject=subject).order_by('teacher'))
+            groups  = groups_list( get_groups_for_user(request, type, subject))
             message = simplejson.dumps( groups )
     return HttpResponse(message)
 

@@ -693,11 +693,11 @@ def prepare_data_for_create_poll( request, group_id ):
         data['groups']       = Group.objects.filter(type=group.type, subject=group.subject).order_by('teacher')
 
     if data['semester']:
-        data['subjects'] = Subject.objects.filter(semester = data['semester']).order_by('name')
+        data['subjects'] = get_subjects_for_user(request, data['semester'])
     else:
         semester_id      = Semester.get_current_semester()
         data['semester'] = semester_id
-        data['subjects'] = Subject.objects.filter(semester = semester_id).order_by('name')
+        data['subjects'] = get_subjects_for_user(request, semester_id)
 
     data['studies_types']    = Program.objects.all()
     data['semesters']        = Semester.objects.all()
@@ -705,3 +705,17 @@ def prepare_data_for_create_poll( request, group_id ):
     data['types']            = GROUP_TYPE_CHOICES
 
     return data
+
+def get_subjects_for_user(request, semester):
+    if request.user.is_staff:
+        return Subject.objects.filter(semester = semester).order_by('name')
+    else:
+        #TODO: or employee prowadzi grupę
+        subjects = Group.objects.filter(subject__semester=semester, teacher=request.user.employee).values_list('subject__pk', flat=True)
+        return Subject.objects.filter(semester = semester, teacher__contain=request.user.employee, pk__in=subjects).order_by('name')
+
+def get_groups_for_user(request, type, subject):
+    if request.user_is_staf:
+        return Group.objects.filter(type=type, subject=subject).order_by('teacher')
+    else:
+        return Group.objects.filter(type=type, subject=subject, teacher=request.user.employee).order_by('teacher')
