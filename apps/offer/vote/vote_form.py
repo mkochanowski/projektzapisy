@@ -10,7 +10,15 @@ from django.utils.safestring  import SafeUnicode
 
 from apps.offer.vote.models import SystemState
 from apps.offer.vote.models import SingleVote
+from django.core.urlresolvers import reverse
 
+class VoteField(forms.ChoiceField):
+    def __init__(self, choices=(), required=True, widget=None, label=None,
+                 initial=None, help_text=None, url='', *args, **kwargs):
+        super(VoteField, self).__init__(required=required, widget=widget, label=label,
+                                        choices=choices,
+                                        initial=initial, help_text=help_text, *args, **kwargs)
+        self.url = url
 
 class VoteForm( forms.Form ):
     """
@@ -39,8 +47,9 @@ class VoteForm( forms.Form ):
             except ObjectDoesNotExist:
                 choosed = 0
             
-            self.fields['winter_%s' % sub.pk] = forms.ChoiceField(
+            self.fields['winter_%s' % sub.pk] = VoteField(
                                             label     = sub.name,
+                                            url       = reverse('proposal-page', args=[sub.slug]),
                                             choices   = self.choices,
                                             help_text = u'Semestr Zimowy',
                                             initial   = choosed)
@@ -56,8 +65,9 @@ class VoteForm( forms.Form ):
             except ObjectDoesNotExist:
                 choosed = 0
             
-            self.fields['summer_%s' % sub.pk] = forms.ChoiceField(
+            self.fields['summer_%s' % sub.pk] = VoteField(
                                             label     = sub.name,
+                                            url       = reverse('proposal-page', args=[sub.slug]),
                                             choices   = self.choices,
                                             help_text = u'Semestr Letni',
                                             initial   = choosed)
@@ -73,8 +83,9 @@ class VoteForm( forms.Form ):
             except ObjectDoesNotExist:
                 choosed = 0
             
-            self.fields['unknown_%s' % sub.pk] = forms.ChoiceField(
+            self.fields['unknown_%s' % sub.pk] = VoteField(
                                             label     = sub.name,
+                                            url       = reverse('proposal-page', args=[sub.slug]),
                                             choices   = self.choices,
                                             help_text = u'Semestr Nieokreślony',
                                             initial   = choosed)
@@ -109,6 +120,8 @@ class VoteForm( forms.Form ):
         
         for key in self.fields.iterkeys():
             field = self.fields[key]
+
+            print field.initial
             subject_class = u''
             for type in self.subject_types[key]:
                 subject_class += u' subject-type-' + str(type.lecture_type.id)
@@ -116,7 +129,7 @@ class VoteForm( forms.Form ):
                 subject_class += " isFan"
             field_str = \
                 u'<li class="od-vote-subject ' + subject_class + '">\
-                    <label for="id_' + key + '">' + field.label + '</label>\
+                    <label for="id_' + key + '"><a href="'+ field.url +'">' + field.label + '</a></label>\
                     <select name="' + key + '" id="id_' + key + '">'
             for (i, s) in field.choices:
                 field_str += '<option value="'
