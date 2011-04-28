@@ -436,9 +436,9 @@ def make_paginator( request, object):
 
     # If page request (9999) is out of range, deliver last page of results.
     try:
-        return paginator.page(page)
+        return (paginator.page(page), paginator)
     except (EmptyPage, InvalidPage):
-        return paginator.page(paginator.num_pages)
+        return (paginator.page(paginator.num_pages), paginator)
 
 def subject_list( subjects ):
     subject_list = []
@@ -734,3 +734,13 @@ def get_groups_for_user(request, type, subject):
         return Group.objects.filter(type=type, subject=subject).order_by('teacher')
     else:
         return Group.objects.filter(type=type, subject=subject, teacher=request.user.employee).order_by('teacher')
+
+def make_pages( pages ):
+    if pages < 12:
+        return range(1, pages)
+
+    list = range(1, 5)
+    list += None
+    list.extend( range(pages-5, pages))
+
+    return list

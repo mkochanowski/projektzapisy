@@ -56,7 +56,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               make_message_from_polls, save_template_in_session, \
                                               make_polls_for_all, get_templates,\
                                               make_template_from_db,\
-                                              get_groups_for_user
+                                              get_groups_for_user, make_pages
 
 from apps.users.models               import Employee
 
@@ -83,8 +83,10 @@ def templates( request ):
         @author mjablonski
     """
     data = {}
-    data['templates'] = make_paginator( request, Template )
+    data['templates'], paginator = make_paginator( request, Template )
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "template_list"
     return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
 
@@ -330,9 +332,11 @@ def sections_list( request ):
         aren't allowed to any such action.
     """
     data = {}
-    data['sections'] = make_paginator( request, Section )
+    data['sections'], paginator = make_paginator( request, Section )
     data['sections_word'] = declination_section(data['sections'].paginator.count, True)
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "section_list"
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
@@ -381,9 +385,11 @@ def delete_sections( request ):
 @employee_required
 def polls_list( request ):
     data = {}
-    data['polls']      = make_paginator(request, Poll)
+    data['polls'], paginator  = make_paginator(request, Poll)
     data['polls_word'] = declination_poll(data['polls'].paginator.count, True)
     data['grade']      = Semester.get_current_semester().is_grade_active
+    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "poll_list"
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))

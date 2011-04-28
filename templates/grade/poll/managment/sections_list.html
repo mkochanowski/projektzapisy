@@ -38,20 +38,35 @@
 </form>
 
 <div class="pagination">
-    <span class="step-links">
-        {% if polls.has_previous %}
-            <a href="?page={{ sections.previous_page_number }}">poprzednia</a>
+    Strony: {% if sections.has_previous %}
+        <a href="?page={{ sections.previous_page_number }}" class="prev">&lsaquo;&lsaquo; poprzednia</a>
+    {% endif %}
+    {% for page in pages %}
+        {% if page %}
+            {% ifequal page sections.number %}
+                <span class="current page">{{ page }}</span>
+            {% else %}
+                <a href="?page={{ page }}" class="page">{{ page }}</a>
+            {% endifequal %}
+        {% else %}
+            ...
         {% endif %}
+    {% endfor %}
+    {% if sections.has_next %}
+        <a href="?page={{ sections.next_page_number }}" class="next">następna &rsaquo;&rsaquo;</a>
+    {% endif %}
 
-        <span class="current">
-            Strona {{ sections.number }} z {{ sections.paginator.num_pages }}
-        </span>
+    {% if sections.paginator.num_pages > 1 %}
+    <form action="" method="GET" style="float:right;">
+        Przejdź do: <select name="page" onchange="submit()">
+            {% for p in pages_range %}
+                <option value="{{ p }}"{% if p == sections.number %} selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select> strony.
+    </form>
+    {% endif %}
+</div>    
 
-        {% if polls.has_next %}
-            <a href="?page={{ sections.next_page_number }}">nastepna</a>
-        {% endif %}
-    </span>
-</div>
 
 <p>{{sections.paginator.count}} {{sections_word}}</p>
 {% endblock %}
