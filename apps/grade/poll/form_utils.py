@@ -39,6 +39,7 @@ def get_section_form_data( post ):
     data = {}
     
     data[ 'title' ]       = post.get( "poll[title]" )
+    data[ 'old_id' ]      = post.get( "old_id", None)
     data[ 'description' ] = post.get( "poll[description]" )
     
     data[ 'has_leading_question' ] = choicebox_is_on(post.get("poll[leading]"))
@@ -247,6 +248,11 @@ def section_save( data ):
             for p in positions: p.delete()
             section.delete()
             return False
-            
+
+    if data[ 'old_id' ]:
+        section = Section.objects.get(pk = data[ 'old_id' ] )
+        section.deleted = True
+        section.save()
+        
     return True
             

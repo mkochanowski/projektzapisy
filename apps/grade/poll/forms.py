@@ -242,6 +242,10 @@ class PollForm( forms.Form ):
                     if self.finished: field.disabled = True
                     poll_section.questions.append( field )
                     self.fields[ unicode( title ) ] = field
+
+            if section.pk:
+                poll_section.pk = section.pk
+                
             self.sections.append(poll_section)
         if not self.finished:
             field = forms.BooleanField(

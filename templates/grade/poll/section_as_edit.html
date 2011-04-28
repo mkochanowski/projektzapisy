@@ -1,6 +1,7 @@
 {% for section in sections %}
 <form method="Post" id="questionset" action="{% url grade-poll-questionset-create %}">
 
+    <input type="hidden" name="old_id" value="{{ section.pk }}">
     <input type="text"   value="{{section.title}}" name="poll[title]" id="section-title" class="required">
 
     <textarea name="poll[description]" id="section-desc">{{section.description}}</textarea>
