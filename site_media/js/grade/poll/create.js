@@ -71,7 +71,7 @@ Poll.create.changeTypes = function()
         dataString = 'type=' + type + '&subject=' + subject
         $.ajax({
             type: "POST",
-            url: "grade/poll/ajax_get_groups",
+            url: "/grade/poll/ajax_get_groups",
             async: false,
             dataType: 'json',
             data: dataString,

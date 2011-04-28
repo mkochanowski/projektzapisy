@@ -149,7 +149,7 @@ def create_poll_from_template(request, templates):
     polls_list = []
     for tmpl in templates:
         template = make_template_from_db( request, tmpl)
-        groups    = getGroups(template)
+        groups    = getGroups(request, template)
         if groups:
             polls     = make_polls_for_groups(request, groups, template)
         else:
@@ -292,7 +292,7 @@ def poll_create(request, group_id = 0):
     if request.method == "POST":
         try:
             template  = make_template_variables( request )
-            groups    = getGroups(template)
+            groups    = getGroups(request, template)
             if groups:
                 polls     = make_polls_for_groups(request, groups, template)
             else:

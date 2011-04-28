@@ -25,6 +25,7 @@ from apps.users.models               import Program
 
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
 from django.utils.safestring           import SafeUnicode, mark_safe
+from django.db.models import Q
 
 def check_signature( ticket, signed_ticket, public_key ):
     pk = RSA.importKey( public_key.public_key )
@@ -191,21 +192,35 @@ def get_ticket_and_signed_ticket_from_session( session, slug, poll_id ):
     except IndexError:
         return None, None
 
-def getGroups(template):
+def getGroups(request, template):
     if template['subject'] == -1:
         return {}
     if template['group']:
         return template['group']
     if template['type']:
         if template['subject']:
-            groups = Group.objects.filter( type=template['type'], subject=template['subject'] )
+            sub = request.user.employee in template['subject'].teachers.all()
+            if request.user.is_staff or sub:
+                groups = Group.objects.filter( type=template['type'], subject=template['subject'] )
+            else:
+                groups = Group.objects.filter( type=template['type'], subject=template['subject'], teacher=request.user.employee )
         else:
-            groups = Group.objects.filter( type=template['type'] )
+            if request.user.is_staff:
+                groups = Group.objects.filter( type=template['type'] )
+            else:
+                groups = Group.objects.filter( type=template['type'], teacher=request.user.employee )
     else:
         if template['subject']:
-            groups = Group.objects.filter( subject=template['subject'] )
+            sub = request.user.employee in template['subject'].teachers.all()
+            if request.user.is_staff or sub:
+                groups = Group.objects.filter( subject=template['subject'] )
+            else:
+                groups = Group.objects.filter( subject=template['subject'], teacher=request.user.employee )
         else:
-            groups = Group.objects.filter( subject__semester = template['semester'] )
+            if request.user.is_staff:
+                groups = Group.objects.filter( subject__semester = template['semester'] )
+            else:
+                groups = Group.objects.filter( subject__semester = template['semester'], teacher=request.user.employee   )
 
     return groups
 
@@ -710,12 +725,12 @@ def get_subjects_for_user(request, semester):
     if request.user.is_staff:
         return Subject.objects.filter(semester = semester).order_by('name')
     else:
-        #TODO: or employee prowadzi grupę
         subjects = Group.objects.filter(subject__semester=semester, teacher=request.user.employee).values_list('subject__pk', flat=True)
-        return Subject.objects.filter(semester = semester, teacher__contain=request.user.employee, pk__in=subjects).order_by('name')
+        return Subject.objects.filter(Q(semester = semester), Q(teachers=request.user.employee) | Q(pk__in=subjects)).order_by('name')
 
 def get_groups_for_user(request, type, subject):
-    if request.user_is_staf:
+    sub = Subject.objects.filter(pk=subject, teachers=request.user.employee)
+    if request.user.is_staff or sub:
         return Group.objects.filter(type=type, subject=subject).order_by('teacher')
     else:
         return Group.objects.filter(type=type, subject=subject, teacher=request.user.employee).order_by('teacher')
