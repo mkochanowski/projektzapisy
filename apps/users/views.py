@@ -33,7 +33,7 @@ import datetime
 import logging
 logger = logging.getLogger()
 
-
+@login_required
 def student_profile(request, user_id):
     """student profile"""
     try:
@@ -65,7 +65,8 @@ def student_profile(request, user_id):
         logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
         request.user.message_set.create(message="Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
-        
+
+@login_required
 def employee_profile(request, user_id):
     """student profile"""
     try:
