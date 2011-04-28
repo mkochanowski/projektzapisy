@@ -16,7 +16,20 @@ Ticket.create.init   = function()
     Ticket.create.unblindt_array = new Array();
     Ticket.create.k_array        = new Array();
     Ticket.create.RAND_BITS      = 512;
-    $("#connection_choice_button").click(Ticket.create.step1);
+    Ticket.create.used           = false;
+    
+    $("#connection_choice_button").click(function()
+    {
+        if( Ticket.create.used )
+        {
+            return false;
+        }
+        Ticket.create.used = true;
+
+        Ticket.create.step1();
+
+        return false;
+    })
 
     // for Chrome:
     if ($.browser.webkit)
