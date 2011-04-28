@@ -579,7 +579,15 @@ def polls_for_user( request, slug ):
     
     data = prepare_data( request, slug )
     data[ 'grade' ] = Semester.get_current_semester().is_grade_active
-    
+    if data['polls']:
+        (_, s), _, list = data['polls'][0]
+        id, _, _, _ = list[0]
+        return HttpResponseRedirect( reverse('grade-poll-poll-answer', args=[s, id ]))
+    elif data['finished']:
+        (_, s), _, list = data['finished'][0]
+        id, _, _, _ = list[0]
+        return HttpResponseRedirect( reverse('grade-poll-poll-answer', args=[s, id ]))
+
     return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
     
 def poll_answer( request, slug, pid ):
