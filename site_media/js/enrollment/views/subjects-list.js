@@ -97,7 +97,7 @@ SubjectsList.initFilter = function()
 		var subject = element.data;
 		if (!subject.name)
 			$.log(subject);
-		return (subject.name.toLowerCase().indexOf(value) >= 0);
+		return (subject.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
 	}));
 
 	SubjectsList.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
