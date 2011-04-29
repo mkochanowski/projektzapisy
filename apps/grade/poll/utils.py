@@ -317,7 +317,14 @@ def declination_section(num, nominative = False):
     if ((num % 10) in [2,3,4] and (num < 10 or num > 20)):
         return u'sekcje'
     return u'sekcji'
-    
+
+def declination_template(num):
+	if (num == 1):
+		return u'szablon'
+	if (num in [2,3,4]):
+		return u'szablony'
+	return 'szablonów'
+   
 ####  HELPER FOR UNICODE + CSV -- Python's CSV does not support unicode 
 
 class UnicodeWriter(object):
@@ -740,7 +747,7 @@ def make_pages( pages ):
         return range(1, pages)
 
     list = range(1, 5)
-    list += None
+	# CO KURWA?! list += None
     list.extend( range(pages-5, pages))
 
     return list

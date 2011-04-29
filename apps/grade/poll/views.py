@@ -46,6 +46,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               getGroups,\
                                               declination_poll,\
                                               declination_section,\
+                                              declination_template,\
                                               csv_prepare,\
                                               generate_csv_title, get_objects, \
                                               delete_objects, \
@@ -76,6 +77,7 @@ from apps.grade.poll.exceptions import NoTitleException, NoSectionException, \
 
 
 #### TEMPLATES
+#not really nice to change naming convention, is it? --AM
 @employee_required
 def templates( request ):
     """
@@ -85,6 +87,7 @@ def templates( request ):
     data = {}
     data['templates'], paginator = make_paginator( request, Template )
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['template_word'] = declination_template(data['templates'].paginator.count)
     data['pages']  = make_pages( paginator.num_pages+1 )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "template_list"
@@ -121,7 +124,7 @@ def template_actions( request ):
 def delete_templates( request ):
     if request.method == 'POST':
         counter = delete_objects(request, Template, 'templates[]')
-        message = u'Usunięto ' + unicode(counter) + u' ' + declination_section(counter)
+        message = u'Usunięto ' + unicode(counter) + u' ' + declination_template(counter)
         messages.info(request, SafeUnicode(message))
             
     return HttpResponseRedirect(reverse('grade-poll-templates'))
