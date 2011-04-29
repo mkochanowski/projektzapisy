@@ -40,19 +40,33 @@
 </form>
 
 <div class="pagination">
-    <span class="step-links">
-        {% if templates.has_previous %}
-            <a href="?page={{ templates.previous_page_number }}">poprzednia</a>
+    Strony: {% if templates.has_previous %}
+        <a href="?page={{ templates.previous_page_number }}" class="prev">&lsaquo;&lsaquo; poprzednia</a>
+    {% endif %}
+    {% for page in pages %}
+        {% if page %}
+            {% ifequal page templates.number %}
+                <span class="current page">{{ page }}</span>
+            {% else %}
+                <a href="?page={{ page }}" class="page">{{ page }}</a>
+            {% endifequal %}
+        {% else %}
+            ...
         {% endif %}
+    {% endfor %}
+    {% if templates.has_next %}
+        <a href="?page={{ templates.next_page_number }}" class="next">następna &rsaquo;&rsaquo;</a>
+    {% endif %}
 
-        <span class="current">
-            Strona {{ templates.number }} z {{ templates.paginator.num_pages }}
-        </span>
-
-        {% if templates.has_next %}
-            <a href="?page={{ templates.next_page_number }}">nastepna</a>
-        {% endif %}
-    </span>
+    {% if templates.paginator.num_pages > 1 %}
+    <form action="" method="GET" style="float:right;">
+        Przejdź do: <select name="page" onchange="submit()">
+            {% for p in pages_range %}
+                <option value="{{ p }}"{% if p == templates.number %} selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select> strony.
+    </form>
+    {% endif %}
 </div>
 
 <!-- to jest liczenie nie tego co trzeba, a do tego jest bez odmiany :( -->

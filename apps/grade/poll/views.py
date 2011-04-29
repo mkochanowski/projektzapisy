@@ -55,7 +55,8 @@ from apps.grade.poll.utils           import check_signature, \
                                               prepare_data_for_create_poll, make_polls_for_groups, \
                                               make_message_from_polls, save_template_in_session, \
                                               make_polls_for_all, get_templates,\
-                                              make_template_from_db
+                                              make_template_from_db,\
+                                              get_groups_for_user, make_pages
 
 from apps.users.models               import Employee
 
@@ -82,8 +83,11 @@ def templates( request ):
         @author mjablonski
     """
     data = {}
-    data['templates'] = make_paginator( request, Template )
+    data['templates'], paginator = make_paginator( request, Template )
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['pages_range']  = range( 1, paginator.num_pages+1 )
+    data['tab']    = "template_list"
     return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -147,7 +151,7 @@ def create_poll_from_template(request, templates):
     polls_list = []
     for tmpl in templates:
         template = make_template_from_db( request, tmpl)
-        groups    = getGroups(template)
+        groups    = getGroups(request, template)
         if groups:
             polls     = make_polls_for_groups(request, groups, template)
         else:
@@ -243,8 +247,9 @@ def autocomplete(request):
             value = request.GET[u'term']
             # Ignore queries shorter than length 3
             #if len(value) > 2:
-            model_results = Option.objects.filter(content__icontains=value)
-            results = [ x.content for x in model_results ]
+            model_results = Option.objects.filter(content__istartswith=value).\
+                distinct().values_list('content', flat=True)
+            results = [ x for x in model_results ]
     json = simplejson.dumps(results)
     return HttpResponse(json, mimetype='application/javascript')
 
@@ -255,7 +260,7 @@ def ajax_get_groups(request):
         if request.method == 'POST':
             type    = int( request.POST.get('type', '0') )
             subject = int( request.POST.get('subject', '0') )
-            groups  = groups_list( Group.objects.filter(type=type, subject=subject).order_by('teacher'))
+            groups  = groups_list( get_groups_for_user(request, type, subject))
             message = simplejson.dumps( groups )
     return HttpResponse(message)
 
@@ -289,7 +294,7 @@ def poll_create(request, group_id = 0):
     if request.method == "POST":
         try:
             template  = make_template_variables( request )
-            groups    = getGroups(template)
+            groups    = getGroups(request, template)
             if groups:
                 polls     = make_polls_for_groups(request, groups, template)
             else:
@@ -327,9 +332,12 @@ def sections_list( request ):
         aren't allowed to any such action.
     """
     data = {}
-    data['sections'] = make_paginator( request, Section )
+    data['sections'], paginator = make_paginator( request, Section )
     data['sections_word'] = declination_section(data['sections'].paginator.count, True)
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['pages_range']  = range( 1, paginator.num_pages+1 )
+    data['tab']    = "section_list"
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -354,28 +362,35 @@ def get_section(request, section_id):
     return render_to_response( 'grade/poll/poll_section.html', {"form": form}, context_instance = RequestContext( request ))
 
 @employee_required
-def delete_section( request ):
-    counter = 0
+def section_actions( request ):
+    data = {}
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'delete_selected':
-            pks = request.POST.getlist('_selected_action')
-            for pk in pks:
-                section = Section.objects.get(pk=pk)
-                section.deleted = True
-                section.save()
-                counter = counter + 1
+            data['sections'] = get_objects( request, Section )
+            return render_to_response( 'grade/poll/managment/section_confirm_delete.html',
+                                       data, context_instance = RequestContext( request ))
 
-    message = u'Usunięto ' + unicode(counter) + u' ' + declination_section(counter)
-    messages.info(request, SafeUnicode(message))
+    return HttpResponseRedirect(reverse('grade-poll-sections-list'))
+
+@employee_required
+def delete_sections( request ):
+    if request.method == 'POST':
+        counter = delete_objects(request, Section, 'sections[]')
+        message = u'Usunięto ' + unicode(counter) + u' ' + declination_section(counter)
+        messages.info(request, SafeUnicode(message))
+
     return HttpResponseRedirect(reverse('grade-poll-sections-list'))
 
 @employee_required
 def polls_list( request ):
     data = {}
-    data['polls']      = make_paginator(request, Poll)
+    data['polls'], paginator  = make_paginator(request, Poll)
     data['polls_word'] = declination_poll(data['polls'].paginator.count, True)
     data['grade']      = Semester.get_current_semester().is_grade_active
+    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['pages_range']  = range( 1, paginator.num_pages+1 )
+    data['tab']    = "poll_list"
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 
@@ -387,30 +402,39 @@ def show_poll( request, poll_id):
     data = {}
     data['form']    = form
     data['grade']   = Semester.get_current_semester().is_grade_active
-    data['message'] = request.session.get('message', None)
-    return render_to_response( 'grade/poll/managment/show_poll.html', data, context_instance = RequestContext( request ))
+    if request.is_ajax():
+        return render_to_response( 'grade/poll/managment/ajax_show_poll.html', data, context_instance = RequestContext( request ))
+    else:
+        return render_to_response( 'grade/poll/managment/show_poll.html', data, context_instance = RequestContext( request ))
 
 @employee_required
-def delete_poll( request ):
-    counter = 0
+def poll_actions( request ):
+    data = {}
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'delete_selected':
-            pks = request.POST.getlist('_selected_action')
-            for pk in pks:
-                poll = Poll.objects.get(pk=pk)
-                poll.deleted = True
-                poll.save()
-                counter = counter + 1
-    message =  u'Usunięto ' + unicode(counter) + u' ' + declination_poll(counter)
-    messages.info(request, SafeUnicode(message))    
+            data['polls'] = get_objects( request, Poll )
+            return render_to_response( 'grade/poll/managment/poll_confirm_delete.html',
+                                       data, context_instance = RequestContext( request ))
     return HttpResponseRedirect(reverse('grade-poll-list'))
-    
+
+
+@employee_required
+def delete_polls( request ):
+    if request.method == 'POST':
+        counter = delete_objects(request, Poll, 'polls[]')
+        message = u'Usunięto ' + unicode(counter) + u' ' + declination_poll(counter)
+        messages.info(request, SafeUnicode(message))
+
+    return HttpResponseRedirect(reverse('grade-poll-list'))
+
+
 @employee_required
 def groups_without_poll( request ):
     data = {}
     data['groups'] = Poll.get_groups_without_poll()
     data['grade']  = Semester.get_current_semester().is_grade_active
+    data['tab']    = "group_without"
     return render_to_response( 'grade/poll/managment/groups_without_polls.html', data, context_instance = RequestContext( request ))
 
 @employee_required
@@ -432,8 +456,6 @@ def questionset_create(request):
     
     
     if request.method == "POST":
-        # TODO:
-        # Dodać tutaj wypełnienie forma danymi
         
         form_data = get_section_form_data( request.POST )
         errors    = validate_section_form( form_data )
@@ -557,7 +579,15 @@ def polls_for_user( request, slug ):
     
     data = prepare_data( request, slug )
     data[ 'grade' ] = Semester.get_current_semester().is_grade_active
-    
+    if data['polls']:
+        (_, s), _, list = data['polls'][0]
+        id, _, _, _ = list[0]
+        return HttpResponseRedirect( reverse('grade-poll-poll-answer', args=[s, id ]))
+    elif data['finished']:
+        (_, s), _, list = data['finished'][0]
+        id, _, _, _ = list[0]
+        return HttpResponseRedirect( reverse('grade-poll-poll-answer', args=[s, id ]))
+
     return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
     
 def poll_answer( request, slug, pid ):

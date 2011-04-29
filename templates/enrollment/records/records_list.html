@@ -55,9 +55,9 @@
 				<tbody>
 					{% for student in students_in_queue %}
 						<tr>
-							<td><a href="{% url student-profile student.user.id %}">
+							<td><a href="{% url student-profile student.user.id %}"{% if student.pk == user.student.pk %} class="bold"{% endif %}>
 							    {{student.user.get_full_name}}</a></td>
-							<td>{{student.matricula}}</td>
+							<td {% if student.pk == user.student.pk %} class="bold"{% endif %}>{{student.matricula}}</td>
 						</tr>
 					{% endfor %}
 				</tbody>

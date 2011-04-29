@@ -6,7 +6,7 @@ var question_view = "<div class='section-show poll-section-field' style='positio
 "		<span class='poll-section-description'>Możesz podać maksymalnie ${optionset.choiceLimit} odpowiedzi</span>	" +
 "	{{/if}} " +
 "	{{if type === 'open'}}" +
-"   	<textarea cols='40' rows='5'></textarea>	" +
+"   	<textarea cols='40' rows='5' disabled='disabled'></textarea>	" +
 "	{{else}}	" +
 "	<ul class='poll-section-answer-list'>	" +
 "	{{each(i, question) questionset}}	" +

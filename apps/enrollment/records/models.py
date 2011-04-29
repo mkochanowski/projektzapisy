@@ -9,15 +9,16 @@ from django.db import models
 
 from apps.users.models import Student
 
-from apps.enrollment.subjects.models import *
+from apps.enrollment.subjects.models import Group
+from apps.enrollment.subjects.models import PointsOfSubjects
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.subjects.exceptions import NonSubjectException
 
+from datetime import datetime, timedelta, date
 from itertools import cycle
 
 from django.db.models import signals
 #from django.dispatch import receiver
-from apps.enrollment.subjects.models.group import Group
 
 
 STATUS_ENROLLED = '1'
@@ -40,6 +41,20 @@ class Record(models.Model):
 
     objects = models.Manager()
     enrolled = EnrolledManager()
+
+    @staticmethod
+    def recorded_students(students):
+        """ Returns students with information about his/her records """
+
+        recorded = Record.enrolled.distinct().\
+                   values_list('student__user__id', flat=True).\
+                   order_by('student__user__id')
+
+        for student in students: # O(n^2) - da sie liniowo, jezeli posortujemy po id a nie nazwiskach
+            student.recorded = student.id in recorded
+
+        return students
+
 
     @staticmethod
     def number_of_students(group):
@@ -262,9 +277,9 @@ class Record(models.Model):
             group = Group.objects.get(id=group_id)
             if not group.subject.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
-            record = Record.enrolled.get(group=group, student=student)
             if not group.subject.semester.is_current_semester():
             	raise NotCurrentSemesterException
+            record = Record.enrolled.get(group=group, student=student)
             queued = Queue.remove_first_student_from_queue(group_id)
             record.delete()
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id)) 
@@ -308,7 +323,7 @@ def queue_priority(value):
         raise ValidationError(u'%s is not a priority' % value)
 
 class Queue(models.Model):
-    group = models.ForeignKey(Group, verbose_name='grupa')
+    group   = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
     time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
     priority = models.PositiveSmallIntegerField(default=1, validators=[queue_priority], verbose_name='priorytet')
@@ -420,6 +435,10 @@ class Queue(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
+            if not group.subject.is_recording_open_for_student(student):
+                raise RecordsNotOpenException()
+            if not group.subject.semester.is_current_semester():
+            	raise NotCurrentSemesterException
             record = Queue.queued.get(group=group, student=student)
             record.delete()
             logger.info('User %s <id: %s> is now removed from queue of group "%s" <id: %s>' % (user.username, user.id, group, group.id)) 

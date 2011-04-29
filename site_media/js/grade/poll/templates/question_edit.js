@@ -5,7 +5,7 @@ var question_edit = "<li class='poll-question'>                         " +
 "		<tbody>     " +
 "			<tr>    " +
 "				<td>Podaj treść pytania: </td>" +
-"				<td><input type='text' id='poll[question][${id}][title]' name='poll[question][${id}][title]' class='section-option'></td>" +
+"				<td><input type='text' id='poll[question][${id}][title]' name='poll[question][${id}][title]' class='section-option required'></td>" +
 "			</tr>" +
 "			<tr> " +
 "				<td>Opis pytania: </td>" +
@@ -21,6 +21,7 @@ var question_edit = "<li class='poll-question'>                         " +
 "			</tr>" +
 "		</tbody>" +
 "	</table>" +
+"   <input type='hidden' name='fake' class='fake-answerser anyanswer'> " +
 "	<ul class='answerset ui-sortable' style=''></ul>" +
 "	<ul class='optionset'>" +
 "		<li class='isScale option' style='display: none;'>" +

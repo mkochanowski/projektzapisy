@@ -158,3 +158,28 @@
 }
 
 
+#poll-managment-menu ul li.active_tab a
+{
+	background: #eeeeee;
+}
+
+#box
+{
+    width: 500px;
+    background: #FFF;
+    position: fixed;
+    margin-left: -250px;
+    margin-top: -75px;
+    left: 50%;
+    top: 25%;
+    z-index: 20;
+    display: none;
+}
+
+#screen
+{
+position:fixed;
+    left: 0;
+    top: 0;
+    background: #000;
+}

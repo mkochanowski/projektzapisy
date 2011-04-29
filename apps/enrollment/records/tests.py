@@ -107,6 +107,14 @@ class RemoveStudentFromGroupTest(TestCase):
     	self.assertFalse(semester.is_current_semester())    
     	self.assertRaises(NotCurrentSemesterException, Record.remove_student_from_group, self.user.id, self.group.id)
     	
+    def testAfterRecordsClosing(self):
+    	semester = self.group.subject.semester
+    	semester.semester_ending = datetime.now().date() + timedelta(days=1)
+    	semester.records_closing = datetime.now().date() - timedelta(days=1)
+    	semester.save()
+    	self.assert_(semester.is_current_semester())    
+    	self.assertRaises(RecordsNotOpenException, Record.remove_student_from_group, self.user.id, self.group.id)
+    	
     def testRemoveStudentFromGroup(self):
     	self.assertEqual(Record.objects.count(), 1)
         Record.remove_student_from_group(self.user.id, self.group.id)
@@ -385,6 +393,21 @@ class RemoveStudentFromQueue(TestCase):
     def testStudentNotAssignedToQueue(self):
         self.assertRaises(AlreadyNotAssignedException, Queue.remove_student_from_queue, self.student1.id, self.group.id)
     
+    def testWithGroupInDifferentSemesterThanCurrent(self):
+    	semester = self.group.subject.semester
+    	semester.semester_ending = datetime.now().date() - timedelta(days=1)
+    	semester.save()
+    	self.assertFalse(semester.is_current_semester())    
+    	self.assertRaises(NotCurrentSemesterException, Queue.remove_student_from_queue, self.user.id, self.group.id)
+    	
+    def testAfterRecordsClosing(self):
+    	semester = self.group.subject.semester
+    	semester.semester_ending = datetime.now().date() + timedelta(days=1)
+    	semester.records_closing = datetime.now().date() - timedelta(days=1)
+    	semester.save()
+    	self.assert_(semester.is_current_semester())    
+    	self.assertRaises(RecordsNotOpenException, Queue.remove_student_from_queue, self.user.id, self.group.id)
+    	
     def testRemoveStudentFromQueue(self):
         self.assertEqual(Queue.objects.filter(group=self.group.id).count(), 1)
         Queue.remove_student_from_queue(self.student2.id, self.group.id)

@@ -4,6 +4,27 @@ if (typeof Poll == 'undefined'){
 Poll.section = Object();
 
 
+jQuery.validator.addMethod("have_questions", function(value, element) {
+  return $('.questionset').children().size() > 0;
+}, "Sekcja nie zawiera pytań.");
+
+jQuery.validator.addMethod("have_answers", function(value, element){
+    if ( $(element).parents('.poll-question').find('input[name$="[type]"]').val() == 'open' )
+    {
+        return true;
+    }
+    return $(element).siblings('.answerset').children().size()>0;
+}, "To pytanie musi mieć odpowiedzi.")
+
+
+jQuery.validator.addClassRules("anyquestion", {
+  have_questions: true
+});
+
+jQuery.validator.addClassRules("anyanswer", {
+  have_answers: true
+});
+
 ///////////////////////////////////////////////////////////
 //// Functions  run after page load
 ///////////////////////////////////////////////////////////
@@ -16,14 +37,7 @@ Poll.section.init = function()
     Poll.section.questionContainer = $("#poll-form");
     Poll.section.havelastLi        = false; // to change active question
 
-
-    $(Poll.section.questionContainer).sortable({
-            handle : 'div',
-            zIndex: 5,
-            tolerance: 'pointer',
-            items: '> li:not(.firstQuestion)'
-
-    });
+    $(".leading").attr('checked', false)
     /* set events */
     $("#add-question").click(Poll.section.createQuestion)
     $("input[type=text]").focus(function(){ this.select(); });
@@ -31,14 +45,15 @@ Poll.section.init = function()
     $(".leading").change(Poll.section.changeLeading);
     
     // send form
-    $('#questionset-submit').click(function()
+    $("#questionset").validate();
+   /* $('#questionset-submit').click(function()
     {
         if( Poll.section.submitted )
         {
             return false;
         }
         Poll.section.submitted = true;
-    });
+    });*/
     /* enter don't sending */
     $("form").keypress(function(e)
     {
@@ -48,6 +63,12 @@ Poll.section.init = function()
           }
     });
     $(Poll.section.editParser);
+    $(Poll.section.questionContainer).sortable({
+            handle : '.section-edit',
+            tolerance: 'pointer',
+            items: '> li:not(.firstQuestion)'
+
+    });
 }
 
 /*
@@ -80,7 +101,11 @@ Poll.section.editParser = function()
     $('.ready').click(function()
     {
         var li   = $(this).parents('.poll-question');
-        Poll.section.createView( li );
+        if ( Poll.section.validate(li) )
+        {
+            Poll.section.createView( li );
+            $('.edit-mode').hide();
+        }
     });
     $('.ready').click();
     $('.edit-mode').hide()
@@ -88,6 +113,7 @@ Poll.section.editParser = function()
     {
         var li = $(this).parents('.poll-question');
         Poll.section.remove( li );
+        Poll.section.validate( li );
     });
 
     $('.delete-answer').click(function(){
@@ -115,7 +141,6 @@ Poll.section.parse = function(li)
             {
                 Poll.section.createEdit( li );
             });
-    
 
 }
 
@@ -133,13 +158,20 @@ Poll.section.parse = function(li)
 
 Poll.section.createQuestion = function( )
 {
+    if( Poll.section.havelastLi)
+    {
+        if( !Poll.section.validate( Poll.section.lastLi))
+        {
+            return false;
+        }
+    }
+
     Poll.section.questions++;
     var data = {
         id: Poll.section.questions
     }
     Poll.section.questionCreator('last', data);
-
-
+    $('.edit-mode').hide()
 }
 
 /*
@@ -154,6 +186,7 @@ Poll.section.createQuestion = function( )
 
 Poll.section.questionCreator = function( position, data )
 {
+
 
     // create object in position:
     var li;
@@ -196,9 +229,14 @@ Poll.section.questionCreator = function( position, data )
     // buttons events
 
     $('.ready').click(function(){
-                    var li = $(this).parents('.poll-question');
-                    Poll.section.createView( li );
-                })
+        var li = $(this).parents('.poll-question');
+        if( Poll.section.validate(li) )
+        {
+            Poll.section.createView( li );
+            $('.edit-mode').hide()
+        }
+
+    })
     $('.delete').click(function(){
                     var li = $(this).parents('.poll-question');
                     $(li).remove()
@@ -239,6 +277,15 @@ Poll.section.addAnswer = function( li, data )
     {
     $(this).parents('.poll-question-answer').remove();
     });
+
+    $(li).find('.autocomplete').each(function(i, d){
+
+        $(this).autocomplete(
+        {
+            source:'/grade/poll/autocomplete',
+            delay:10
+        });
+    });
 }
 
 
@@ -277,7 +324,7 @@ Poll.section.isLeadingQuestion = function( li)
 
 Poll.section.createView = function( li )
 {
-
+    $('.edit-mode').hide()
     // clean old view
     $(li).children('.section-show')
         .remove();
@@ -296,6 +343,7 @@ Poll.section.createView = function( li )
             .dblclick(function()
                 {
                     Poll.section.createEdit(li)
+                    $('.edit-mode').hide();
                 })
     $(li).find('.edit-mode')
          .click(function()
@@ -322,6 +370,10 @@ Poll.section.createView = function( li )
 
 Poll.section.createEdit = function( li )
 {
+    if( Poll.section.havelastLi && !Poll.section.validate(Poll.section.lastLi))
+    {
+        return false;
+    }
      if ( Poll.section.havelastLi )
      {
         Poll.section.createView(Poll.section.lastLi)
@@ -330,6 +382,7 @@ Poll.section.createEdit = function( li )
      Poll.section.lastLi     = li;
     $(li).find('.section-show').remove();
     $(li).children('.section-edit').show();
+    $("#questionset").validate().element('.anyquestion');
 }
 
 /*
@@ -394,10 +447,13 @@ Poll.section.changeType = function( li )
             });
     }
 
-    $('.autocomplete').autocomplete(
-    {
-        source:'/grade/poll/autocomplete',
-        delay:10
+    $(li).find('.autocomplete').each(function(i, d){
+
+        $(this).autocomplete(
+        {
+            source:'/grade/poll/autocomplete',
+            delay:10
+        });
     });
 }
 
@@ -457,6 +513,11 @@ Poll.section.makeQuestionset = function( li )
 
 Poll.section.changeLeading = function()
 {
+    if( ! Poll.section.validate( Poll.section.lastLi ) )
+    {
+        $(".leading").attr('checked', false)
+        return false;
+    }
     if ( $(this).is(':checked') )
     {
         //
@@ -494,7 +555,25 @@ Poll.section.changeLeading = function()
                 .children()
                 .first()
                 .remove();
+        $("#questionset").validate().element('.anyquestion');
+        $("#questionset").valid();
     }
 }
 
 
+Poll.section.validate = function(li)
+{
+    var element_tilte   = $(li).find('input[name$="[title]"]');
+    var element_answers = $(li).find('.anyanswer');
+    var a = $("#questionset").validate().element(element_tilte);
+    var b = $("#questionset").validate().element(element_answers);
+
+    var c = true;
+
+    $(li).find('.question-answer').each(function(i, elem)
+    {
+        c = c && $("#questionset").validate().element(elem);
+    })
+
+    return a && b && c;
+}

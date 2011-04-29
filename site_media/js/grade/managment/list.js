@@ -17,6 +17,7 @@ List.checkbox.changeAll = function()
 	if( $(this).attr('checked') )
 	{
 		$('._selected_action').attr('checked', true)
+        $('._selected_action:disabled').attr('checked', false)
 	}
 	else
 	{

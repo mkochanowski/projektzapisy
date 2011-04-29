@@ -1,11 +1,15 @@
-{% block styles %}
+{% extends "users/students_list.html" %}
+{% block profile_styles %}
 	<link rel="stylesheet" href="/site_media/css/jquery/jquery.ui.schedule.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/enrollment/records/schedule.css" type="text/css" />
 {% endblock %}
-{% block scripts %}
+{% block profile_scripts %}
 	<script src="/site_media/js/jquery/jquery.ui.schedule.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/records/schedule.js" type="text/javascript"></script>
 {% endblock %}
+
+{% block content %}
+<div id="student-profile">
 
 <h3>Dane:</h3>
 <ul>
@@ -16,12 +20,12 @@
 <div id="schedule-wrapper">
 	{% for group in groups %}
 		{% for term in group.terms_ %}
-			<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}" 
+			<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}"
 				subjectID="{{group.subject_.pk}}"
 				groupID="{{group.pk}}"
 				termID="{{term.pk}}"
-				from="{{ term.time_from_in_minutes }}" 
-				minutes="{{ term.length_in_minutes }}" 
+				from="{{ term.time_from_in_minutes }}"
+				minutes="{{ term.length_in_minutes }}"
 				day="{{ term.day_in_zero_base }}"
 				status="fixed">
 				{{group}}<br/>
@@ -30,5 +34,7 @@
 		{% endfor %}
 	{% endfor %}
 </div>
+</div>
+{% endblock %}
 
 

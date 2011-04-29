@@ -70,7 +70,24 @@ class Employee(BaseUser):
         except:
             logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
         return False
-            
+
+    @staticmethod
+    def get_list(begin, end):
+        return Employee.objects.filter(user__last_name__range=(begin, unicode(end) + u'źźźźź')).\
+                    select_related().order_by('user__last_name', 'user__first_name')
+
+    @staticmethod
+    def get_all_groups_in_semester(user_id):
+        user = User.objects.get(id=user_id)
+        semester = Semester.get_current_semester()
+        try:
+            employee = user.employee
+            groups = Group.objects.filter(teacher=employee, subject__semester=semester)
+        except Employee.DoesNotExist:
+             logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
+             raise NonEmployeeException()
+        return groups
+
     @staticmethod
     def get_all_groups(user_id):
         user = User.objects.get(id=user_id)
@@ -87,7 +104,7 @@ class Employee(BaseUser):
         user = User.objects.get(id=user_id)
         try:
             employee = user.employee
-            groups = [g for g in Employee.get_all_groups(user_id) ]
+            groups = [g for g in Employee.get_all_groups_in_semester(user_id) ]
             subjects = set([group.subject for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
@@ -116,6 +133,7 @@ class Student(BaseUser):
     block = models.BooleanField(verbose_name="blokada planu", default = False)
     semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
 
+
     def get_type_of_studies(self):
         """ returns type of studies """
         semestr = {1:'pierwszy',2:'drugi',3:'trzeci',4:'czwarty',5:'piąty',6:'szósty',7:'siódmy',8:'ósmy',9:'dziewiąty',10:'dziesiąty',0:'niezdefiniowany'}[self.semestr]
@@ -134,31 +152,36 @@ class Student(BaseUser):
         records_list = map(lambda x: x.group.subject.entity.id, records)
         return list(frozenset(records_list))
 
-   
+
     @staticmethod
-    def get_all_groups(user_id):
-        user = User.objects.get(id=user_id)
+    def get_list(begin = 'A', end='Ż'):
+        return Student.objects.filter(user__last_name__range=(begin, unicode(end) + u'źźźźź')).\
+                select_related().order_by('user__last_name', 'user__first_name')
+
+    @staticmethod
+    def get_all_groups(student):
         try:
-            student = user.student
-            groups = map(lambda x: x.group, student.records.filter(status="1"))
+            groups = map(lambda x: x.group, student.records.filter(status="1").\
+                        select_related('group', 'group__teacher',
+                                      'group__subject__semester',
+                                      'group__subject__term'))
         except Student.DoesNotExist:
-             logger.error('Function Student.get_all_groups(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             logger.error('Function Student.get_all_groups(student = %d)' + \
+             'throws Student.DoesNotExist exception.' % student.pk )
              raise NonStudentException()
         return groups
     
     @staticmethod
-    def get_schedule(user_id):
-        user = User.objects.get(id=user_id)
+    def get_schedule(student):
         try:
-            student = user.student
-            groups = [g for g in Student.get_all_groups(user_id) if g.subject.semester.is_current_semester()]
+            groups = [g for g in Student.get_all_groups(student) if g.subject.semester.is_current_semester()]
             subjects = set([group.subject for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
                 group.subject_ = group.subject
             return groups
         except Student.DoesNotExist:
-             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user_id )
+             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user.id )
              raise NonStudentException()
     
     def records_set_locked(self, locked):
