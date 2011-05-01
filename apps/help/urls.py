@@ -2,6 +2,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('apps.help.views',
     url(r'^$', 'main_page', name='help'),
+    url(r'^terms/$', 'terms', name='help-terms'),
     url(r'^rules/$', 'rules', name='help-rules'),
     url(r'^enrollment/$', 'enrollment', name='help-enrollment'),
     url(r'^grade/$', 'grade', name='help-grade'),

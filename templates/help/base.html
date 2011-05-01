@@ -10,11 +10,17 @@
 <div id="main-sidebar">
 <h2>Menu</h2>
 <ul>
-    <li><a href="{% url help-rules %}">Zasady i terminy</a></li>
-    <li><a href="{% url help-enrollment %}">Zapisy</a></li>
-    <li><a href="{% url help-grade %}">Ocena</a></li>
+    <li><a href="{% url help-terms %}">Terminy</a></li>
+    <li><a href="{% url help-rules %}">Zasady</a></li>
+    <li><a href="{% url help-enrollment %}">System zapisów</a></li>
+    <li><a href="{% url help-grade %}">Ocena zajęć</a></li>
     <li><a href="{% url help-mobile %}">Wersja mobilna</a></li>
     <li><a href="{% url help-export %}">Export planu zajęć</a></li>
 </ul>
 </div>
 {% endblock %}
+
+{% block content %} 
+To jakiś rysuneczek podobny do tego o cyklu życia oferty dydaktycznej(http://fereol.wasilczyk.pl/wiki/cykl-zycia-oferty-dydaktycznej)
+i w dwóch słowach, do czego służy aplikacja i wyjaśnienie podstawowych pojęć.
+{% endblock %} 

@@ -11,6 +11,9 @@ from django.shortcuts import render_to_response
 def main_page( request ):
     return render_to_response('help/base.html', {}, context_instance = RequestContext(request))
 
+def terms( request ):
+    return render_to_response('help/terms.html', {}, context_instance = RequestContext(request))
+
 def rules( request ):
     return render_to_response('help/rules.html', {}, context_instance = RequestContext(request))
 
