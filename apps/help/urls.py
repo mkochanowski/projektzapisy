@@ -1,0 +1,11 @@
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('apps.help.views',
+    url(r'^$', 'main_page', name='help'),
+    url(r'^rules/$', 'rules', name='help-rules'),
+    url(r'^enrollment/$', 'enrollment', name='help-enrollment'),
+    url(r'^grade/$', 'grade', name='help-grade'),
+    url(r'^mobile/$', 'mobile', name='help-mobile'),
+    url(r'^export/$', 'export', name='help-export'),
+    url(r'^admin/$', 'admin', name='adminasdf'),
+)

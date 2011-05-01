@@ -15,6 +15,8 @@ feeds = {
 urlpatterns = patterns('',
     #MAIN PAGE
     url('^$', 'apps.news.views.main_page', name='main-page'),
+    #HELP
+    (r'^help/', include('apps.help.urls')),
     #Z
     (r'^subjects/', include('apps.enrollment.subjects.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),

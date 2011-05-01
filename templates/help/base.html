@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load news_extras %}
+
+{% block main-subsystemname %}System zapisów{% endblock %}
+
+{% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
+
+{% block sidebar %}
+<div id="main-sidebar">
+<h2>Menu</h2>
+<ul>
+    <li><a href="{% url help-rules %}">Zasady i terminy</a></li>
+    <li><a href="{% url help-enrollment %}">Zapisy</a></li>
+    <li><a href="{% url help-grade %}">Ocena</a></li>
+    <li><a href="{% url help-mobile %}">Wersja mobilna</a></li>
+    <li><a href="{% url help-export %}">Export planu zajęć</a></li>
+</ul>
+</div>
+{% endblock %}
