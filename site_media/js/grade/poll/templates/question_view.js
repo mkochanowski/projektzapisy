@@ -2,8 +2,10 @@ var question_view = "<div class='section-show poll-section-field' style='positio
 "	<input class='edit-mode' type='button' value='Edytuj'>" + 
 "	<h2>${title}</h2>" +
 "	<small>${desc}</small><br>" +
-"	{{if type === 'multi' }}" + 
+"	{{if type === 'multi' }}" +
+"       {{if optionset.choiceLimit>0 }}" +
 "		<span class='poll-section-description'>Możesz podać maksymalnie ${optionset.choiceLimit} odpowiedzi</span>	" +
+"       {{/if}}"+
 "	{{/if}} " +
 "	{{if type === 'open'}}" +
 "   	<textarea cols='40' rows='5' disabled='disabled'></textarea>	" +

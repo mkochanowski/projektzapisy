@@ -1,5 +1,5 @@
 if (typeof Poll == 'undefined'){
-    Poll = new Object();﻿
+    Poll = new Object();
 }
 Poll.section = Object();
 
@@ -46,14 +46,7 @@ Poll.section.init = function()
     
     // send form
     $("#questionset").validate();
-   /* $('#questionset-submit').click(function()
-    {
-        if( Poll.section.submitted )
-        {
-            return false;
-        }
-        Poll.section.submitted = true;
-    });*/
+
     /* enter don't sending */
     $("form").keypress(function(e)
     {
@@ -119,6 +112,8 @@ Poll.section.editParser = function()
     $('.delete-answer').click(function(){
 
          $(this).parents('.poll-question-answer').remove();
+        $(li).find('select[name$="[choiceLimit]"]').children().remove()
+
     })
 }
 
@@ -268,15 +263,26 @@ Poll.section.addAnswer = function( li, data )
     data.size    = $(answerset).children().size() + 1
     data.leading = leading
     if (typeof data.name == 'undefined'){
-        data.name = '';﻿
+        data.name = '';
     }
 
     // create object
     $.tmpl( "question", data ).appendTo( answerset );
     $('.remove').click(function()
     {
-    $(this).parents('.poll-question-answer').remove();
+        $(this).parents('.poll-question-answer').remove();
+        $(li).find('select[name$="[choiceLimit]"]').children().last().remove()
     });
+
+
+    var limit_select = $(li).find('select[name$="[choiceLimit]"]')
+
+    var options = $(limit_select).
+            children().last().val().castToInt();
+
+    $(limit_select).append(
+        $('<option></option>').val(options + 1).html(options + 1)
+    );
 
     $(li).find('.autocomplete').each(function(i, d){
 
@@ -416,12 +422,17 @@ Poll.section.changeType = function( li )
     if( !poll_types[formtype].haveAnswers)
     {
         $(answerset).empty();
+
+        
+        $(li).find('select[name$="[choiceLimit]"]').children(':gt(0)').remove()
+
     }
     else
     {
         if( $(poll_types[formtype].answers).size() > 0)
         {
             $(answerset).empty();
+            $(li).find('select[name$="[choiceLimit]"]').children(':gt(0)').remove()
             $(poll_types[formtype].answers).each(function(index, value)
             {
                 var data = {
@@ -478,7 +489,7 @@ Poll.section.makeOptionset = function( li )
     return {
         isScale:     $(li).find('input[name$="[isScale]"]').val(),
         hasOther:    $(li).find('input[name$="[hasOther]"]').val(),
-        choiceLimit: $(li).find('input[name$="[choiceLimit]"]').val()
+        choiceLimit: parseInt( $(li).find('select[name$="[choiceLimit]"]').val() )
     }
 }
 
