@@ -29,7 +29,9 @@ var question_edit = "<li class='poll-question'>                         " +
 "			<label for='poll[question][${id}][isScale]'>Odpowiedź w formie skali</label>" +
 "		</li>" +
 "		<li class='choiceLimit option' style='display: none;'>" +
-"			<input type='text' id='poll[question][${id}][choiceLimit]' name='poll[question][${id}][choiceLimit]'>" +
+"           <select id='poll[question][${id}][choiceLimit]' name='poll[question][${id}][choiceLimit]'>"+
+"                <option value='0'>Brak limitu</option>"+
+"            </select>"+
 "			<label for='poll[question][${id}][choiceLimit]'>Limit odpowiedzi</label>" +
 "		</li>" +
 "		<li class='hasOther option' style='display: none;'>" +

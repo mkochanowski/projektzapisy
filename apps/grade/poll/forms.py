@@ -6,7 +6,7 @@ from django                   import forms
 from django.utils.safestring  import SafeUnicode
 from django.core.exceptions   import ValidationError, \
                                      ObjectDoesNotExist
-from django.core.validators   import MaxLengthValidator                                     
+from django.core.validators   import MaxLengthValidator
 
 from apps.grade.poll.models import SingleChoiceQuestionOrdering, \
                                      Section, OpenQuestionAnswer, \
@@ -25,6 +25,11 @@ class TicketsForm( forms.Form ):
                                  required  = False )
     ticketsfile = forms.FileField( label    = "Lub wybierz plik z biletami:",
                                    required = False )
+
+
+class MaxAnswersValidator(MaxLengthValidator):
+    compare = lambda self, a, b: (b<>0) and (a > b)
+
 
 class PollForm( forms.Form ):
     class myObject:
@@ -198,7 +203,7 @@ class PollForm( forms.Form ):
                                 required       = False,
                                 widget         = forms.widgets.CheckboxSelectMultiple(),
                                 initial        = answer,
-                                validators     = [ MaxLengthValidator( question.choice_limit )],
+                                validators     = [ MaxAnswersValidator( question.choice_limit )],
                                 error_messages = { "max_length": "Można wybrać maksymalnie %d odpowiedzi (wybrano %d)" % (question.choice_limit, choosed ) })
                     field.choice_limit     = question.choice_limit 
                     field.has_other        = question.has_other
