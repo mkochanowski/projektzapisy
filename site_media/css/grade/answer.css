@@ -42,3 +42,20 @@
 .only-show {
     display:none;
 }
+
+ul[class*="scale"] > li{
+	float: left;
+}
+
+label[for*="scale"]{
+	margin-right: 1em;
+	float: left;
+}
+
+input[class*="scale"]{
+	float: left;
+}
+
+hr, .poll-section-field {
+	clear: both;
+}
