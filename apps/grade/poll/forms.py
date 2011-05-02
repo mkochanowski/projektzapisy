@@ -150,6 +150,7 @@ class PollForm( forms.Form ):
                                                widget   = forms.widgets.RadioSelect(),
                                                initial  = answer )
                     field.type = 'single'
+                    if title.endswith( 'scale' ): field.scale = True
                     field.description      = question.description
                     if not field.description: field.description = ""
                     if question.is_scale: field.is_scale  = True
