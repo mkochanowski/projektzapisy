@@ -29,6 +29,7 @@ jQuery.validator.addClassRules("anyanswer", {
 //// Functions  run after page load
 ///////////////////////////////////////////////////////////
 
+
 Poll.section.init = function()
 {
     /* set vars */
@@ -43,7 +44,7 @@ Poll.section.init = function()
     $("input[type=text]").focus(function(){ this.select(); });
     $("textarea").focus(function(){ this.select(); });
     $(".leading").change(Poll.section.changeLeading);
-    
+
     // send form
     $("#questionset").validate();
 
@@ -62,6 +63,33 @@ Poll.section.init = function()
             items: '> li:not(.firstQuestion)'
 
     });
+
+    $('.only-edit').show();
+    $('.only-show').hide();
+}
+
+Poll.section.showEdit = function()
+{
+    $('.ready').click(function()
+    {
+        var li   = $(this).parents('.poll-question');
+        $(li).children('.section-show')
+            .remove();
+        Poll.section.havelastLi = false;
+        var data = {
+            type:  $(li).find('input[name$="[type]"]').val(),
+            title: $(li).find('input[name$="[title]"]').val(),
+            desc:  $(li).find('input[name$="[description]"]').val(),
+            questionset: Poll.section.makeQuestionset( li ),
+            optionset: Poll.section.makeOptionset( li )
+        }
+        $.tmpl( "question_view", data ).appendTo( li );
+
+        $('.edit-mode').hide();
+        $('.section-edit').hide();
+        $('.only-edit').hide();
+        $('.only-show').show();
+    }).click();
 }
 
 /*
@@ -104,9 +132,7 @@ Poll.section.editParser = function()
     $('.edit-mode').hide()
     $('.delete').click(function()
     {
-        var li = $(this).parents('.poll-question');
-        Poll.section.remove( li );
-        Poll.section.validate( li );
+        $(this).parents('.poll-question').remove();
     });
 
     $('.delete-answer').click(function(){
@@ -469,8 +495,6 @@ Poll.section.changeType = function( li )
 }
 
 
-$(Poll.section.init);
-
 
 /////////////////////////////////////////////////////////////
 //// Help functions
@@ -524,7 +548,7 @@ Poll.section.makeQuestionset = function( li )
 
 Poll.section.changeLeading = function()
 {
-    if( ! Poll.section.validate( Poll.section.lastLi ) )
+    if( $(".leading").attr('checked') && Poll.section.havelastLi && ! Poll.section.validate( Poll.section.lastLi ) )
     {
         $(".leading").attr('checked', false)
         return false;

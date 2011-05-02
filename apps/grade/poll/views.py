@@ -350,13 +350,12 @@ def show_section( request, section_id):
     data = {}
     data['form']    = form
     data['grade']   = Semester.get_current_semester().is_grade_active
-    data['message'] = request.session.get('message', None)
     data['section'] = Section.objects.get(pk=section_id)
-    try:
-        del request.session['message'] 
-    except:
-        pass
-    return render_to_response( 'grade/poll/managment/show_section.html', data, context_instance = RequestContext( request ))
+
+    if request.is_ajax():
+        return render_to_response( 'grade/poll/managment/ajax_show_section.html', data, context_instance = RequestContext( request ))
+    else:
+        return render_to_response( 'grade/poll/managment/show_section.html', data, context_instance = RequestContext( request ))
 
 @employee_required
 def get_section(request, section_id):
@@ -447,6 +446,15 @@ def poll_manage(request):
     data['semesters']  = Semester.objects.all() 
     return render_to_response ('grade/poll/manage.html', {'grade' : grade}, context_instance = RequestContext( request ))
 
+@employee_required()
+def get_section_form(request):
+    data          = {}
+    grade         = Semester.get_current_semester().is_grade_active
+    data['grade'] = grade
+    
+    return render_to_response ('grade/poll/ajax_section_create.html', data, context_instance = RequestContext( request ))
+
+
 @employee_required    
 def questionset_create(request):
     data          = {}
@@ -456,10 +464,8 @@ def questionset_create(request):
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect('/news/grade')
-    
-    
+
     if request.method == "POST":
-        
         form_data = get_section_form_data( request.POST )
         errors    = validate_section_form( form_data )
         
@@ -483,11 +489,12 @@ def questionset_create(request):
         else:
             if section_save( form_data ):
                 messages.success( request, "Sekcja dodana" )
-                return HttpResponseRedirect( '/grade/poll/managment/sections_list' )
             else:
                 messages.error( request, "Zapis sekcji nie powiódł się" )
+                
+        return HttpResponseRedirect( '/grade/poll/managment/sections_list' )
             
-    return render_to_response ('grade/poll/section_create.html', data, context_instance = RequestContext( request ))
+    return HttpResponseRedirect( '/grade/poll/managment/sections_list' )
 
 #### Poll answering ####
 @login_required

@@ -38,3 +38,7 @@
     border--radius: 4px;
     padding: 5px 0px 0px 5px;
 }
+
+.only-show {
+    display:none;
+}
