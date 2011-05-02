@@ -42,6 +42,15 @@ Poll.list.init = function()
         Poll.section.init();
         return false;
     })
+
+    $('#new-poll').click(function()
+    {
+        var html = Poll.list.getCreatePoll();
+        Fereol.dialog.setHTML( html )
+        Fereol.dialog.show();
+        Poll.create.init();
+        return false;
+    })
 }
 
 $(Poll.list.init);
@@ -49,6 +58,11 @@ $(Poll.list.init);
 Poll.list.getCreateSection = function( )
 {
     return Poll.list.getHTML('/grade/poll/managment/section/form/');
+}
+
+Poll.list.getCreatePoll = function( )
+{
+    return Poll.list.getHTML('/grade/poll/managment/poll/form/');
 }
 
 Poll.list.getHTML = function( link )

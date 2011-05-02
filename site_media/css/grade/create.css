@@ -37,28 +37,12 @@ margin:15px;
 {
 }
 
-#box
+#poll-create-submit
 {
-    width: 350px;
-    height: 150px;
-    background: #FFF;
-    text-align: center;
-    position: fixed;
-    margin-left: -175px;
-    margin-top: -75px;
-    left: 50%;
-    top: 50%;
-    z-index:9999;;
-    display: none;
+    margin-BOTTOM: 5px;
+    margin-top: 15px;
 }
- 
-#screen
-{
-position:fixed;
-    left: 0;
-    top: 0;
-    background: #000;
-}
+
 
 
 /*** TWORZENIE ANKIETY - koniec ***/

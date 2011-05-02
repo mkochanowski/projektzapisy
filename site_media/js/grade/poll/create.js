@@ -36,14 +36,9 @@ Poll.create.init = function()
     		return false;
   		}
 	});
-
-    $('#poll-create-template').click(function()
-    {
-        $('#poll-create').attr("action", url_template);
-    })
 }
 
-$(Poll.create.init);
+
 
 Poll.create.changeSubjects = function()
 {
@@ -167,7 +162,7 @@ Poll.create.getSection = function( section_id, li )
 	var result;
 	$.ajax({
         type: "POST",
-        url: "grade/poll/get_section/" + section_id + "/",
+        url: "/grade/poll/get_section/" + section_id + "/",
         async: false,
         success: function(data)
         {

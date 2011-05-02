@@ -287,7 +287,13 @@ def edit_section(request, section_id):
     return render_to_response( 'grade/poll/section_edit.html', {"form": form}, context_instance = RequestContext( request ))
 
 @employee_required
-#TODO: @grade_required
+def poll_form(request, group_id = 0):
+    grade = Semester.get_current_semester().is_grade_active
+    data = prepare_data_for_create_poll( request, group_id )
+    data['grade'] =  grade
+    return render_to_response( 'grade/poll/ajax_poll_create.html', data, context_instance = RequestContext( request ))
+
+@employee_required
 def poll_create(request, group_id = 0):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
@@ -311,17 +317,15 @@ def poll_create(request, group_id = 0):
 
         except NoTitleException:
             messages.error(request, "Nie można utworzyć ankiety; brak tytułu")
-            return HttpResponseRedirect(reverse('grade-poll-poll-create'))
+            return HttpResponseRedirect(reverse('grade-poll-list'))
         except NoSectionException:
             messages.error(request, "Nie można utworzyć ankiety; ankieta jest pusta")
-            return HttpResponseRedirect(reverse('grade-poll-poll-create'))
+            return HttpResponseRedirect(reverse('grade-poll-list'))
         except NoPollException:
             messages.info(request, "Nie utworzono żadnej ankiety")
-            return HttpResponseRedirect(reverse('grade-poll-poll-create'))
+            return HttpResponseRedirect(reverse('grade-poll-list'))
 
-    data = prepare_data_for_create_poll( request, group_id )
-    data['grade'] =  grade
-    return render_to_response( 'grade/poll/poll_create.html', data, context_instance = RequestContext( request ))
+    return HttpResponseRedirect(reverse('grade-poll-list'))
 
 #
 # Poll managment
