@@ -544,7 +544,7 @@ def prepare_template( request ):
     tmpl.title        = variables['title']
     tmpl.description  = variables['description']
     tmpl.studies_type = variables['studies_type']
-    templ.author      = request.
+    tmpl.author       = request.user.employee
 
     if variables['subject'] == -1:
         tmpl.no_subject = True
