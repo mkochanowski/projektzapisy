@@ -132,6 +132,7 @@ Poll.section.editParser = function()
     $('.edit-mode').hide()
     $('.delete').click(function()
     {
+        Poll.section.havelastLi = false;
         $(this).parents('.poll-question').remove();
     });
 
@@ -259,8 +260,8 @@ Poll.section.questionCreator = function( position, data )
 
     })
     $('.delete').click(function(){
-                    var li = $(this).parents('.poll-question');
-                    $(li).remove()
+                    Poll.section.havelastLi = false;
+                    $(this).parents('.poll-question').remove();
                 });
     $('select[name$="[formtype]"]').change(function()
                 {
@@ -590,6 +591,7 @@ Poll.section.changeLeading = function()
                 .children()
                 .first()
                 .remove();
+        Poll.section.havelastLi = false;
         $("#questionset").validate().element('.anyquestion');
         $("#questionset").valid();
     }
