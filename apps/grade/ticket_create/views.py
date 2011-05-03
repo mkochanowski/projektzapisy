@@ -88,7 +88,7 @@ def connections_choice( request ):
     grade = Semester.get_current_semester().is_grade_active
     students_polls = Poll.get_all_polls_for_student( request.user.student )
     groupped_polls = group_polls_by_subject( students_polls )
-    
+    connected = any(len(x) > 1 for x in groupped_polls)
     if grade:
         if request.method == "POST":
             form = PollCombineForm( request.POST, 
@@ -123,7 +123,7 @@ def connections_choice( request ):
         else:
             form = PollCombineForm( polls = groupped_polls )
             
-        data = { 'form' : form, 'grade' : grade}
+        data = { 'form' : form, 'grade' : grade, 'connected': connected}
         return render_to_response ('grade/ticket_create/connection_choice.html', data, context_instance = RequestContext ( request ))
     else:
         messages.error( request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów" )

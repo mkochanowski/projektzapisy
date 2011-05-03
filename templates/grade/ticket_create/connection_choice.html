@@ -32,7 +32,12 @@
     <div id="progressbar"></div>
 	<div id="grade-connection-choice">
 	<form method="post" id="connection_choice">
-	<h3>Pobieranie biletów na następujące ankiety:</h3>
+	<h3>
+		Pobieranie biletów na następujące ankiety:
+		{% if connected %}
+			<a href="link do strony pomocy o powiązaniu ankiet"><img class="tooltip" src="/site_media/images/documentinfo.png"></a>
+		{% endif %}
+	</h3> 
 	<table id = "grade-connection-choice-form">
             {{ form.as_table }}
 	</table>
@@ -42,7 +47,8 @@
 
     <div>{{ p }}</div>
     <div class="data_tooltip"  style="display:none;">
-        To jest upragniony przez wszystkich tooltip
+        Powiązanie oceny oznacza wygenerowanie tego samego biletu dla kilku ankiet; <br>
+        umożliwia to połączenie wyników ankiet jednego wypełniającego.
     </div>
     {% endif %}
 {% endblock %}
