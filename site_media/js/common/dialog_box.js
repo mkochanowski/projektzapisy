@@ -27,7 +27,7 @@ Fereol.dialog.show = function()
     $('#screen').css({  "display": "block"});
     $('#box').css({"display": "block"});
     $('#backscreen').css('display', 'block');
-     $('#box-exit').click( Fereol.dialog.hide )
+    $('#box-exit').click( Fereol.dialog.hide );
 }
 
 Fereol.dialog.init();

@@ -78,6 +78,14 @@ from apps.grade.poll.exceptions import NoTitleException, NoSectionException, \
 
 #### TEMPLATES
 #not really nice to change naming convention, is it? --AM
+
+@employee_required
+def template_form(request, group_id = 0):
+    grade = Semester.get_current_semester().is_grade_active
+    data = prepare_data_for_create_poll( request, group_id )
+    data['grade'] =  grade
+    return render_to_response( 'grade/poll/ajax_template_create.html', data, context_instance = RequestContext( request ))
+
 @employee_required
 def templates( request ):
     """
@@ -85,10 +93,11 @@ def templates( request ):
         @author mjablonski
     """
     data = {}
-    data['templates'], paginator = make_paginator( request, Template )
+    page, paginator = make_paginator( request, Template )
+    data['templates'] = page
     data['grade']  = Semester.get_current_semester().is_grade_active
-    data['template_word'] = declination_template(data['templates'].paginator.count)
-    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['template_word'] = declination_template(paginator.count)
+    data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "template_list"
     return render_to_response( 'grade/poll/managment/templates.html', data, context_instance = RequestContext( request ))
@@ -168,7 +177,17 @@ def create_poll_from_template(request, templates):
 
 @employee_required
 def show_template( request, template_id ):
-    pass
+    template = Template.objects.get(pk=template_id)
+    form = PollForm()
+    form.setFields( template, None, None )
+    data = {}
+    data['form']     = form
+    data['template'] = template
+    data['grade']    = Semester.get_current_semester().is_grade_active
+    if request.is_ajax():
+        return render_to_response( 'grade/poll/managment/ajax_show_template.html', data, context_instance = RequestContext( request ))
+    else:
+        return render_to_response( 'grade/poll/managment/show_poll.html', data, context_instance = RequestContext( request ))
 
 # save poll as template
 # @author mjablonski
@@ -339,10 +358,11 @@ def sections_list( request ):
         aren't allowed to any such action.
     """
     data = {}
-    data['sections'], paginator = make_paginator( request, Section )
-    data['sections_word'] = declination_section(data['sections'].paginator.count, True)
+    page, paginator = make_paginator( request, Section )
+    data['sections'] = page
+    data['sections_word'] = declination_section(paginator.count, True)
     data['grade']  = Semester.get_current_semester().is_grade_active
-    data['pages']  = make_pages( paginator.num_pages+1 )
+    data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "section_list"
     return render_to_response( 'grade/poll/managment/sections_list.html', data, context_instance = RequestContext( request ))
@@ -391,11 +411,12 @@ def delete_sections( request ):
 @employee_required
 def polls_list( request ):
     data = {}
-    data['polls'], paginator  = make_paginator(request, Poll)
-    data['polls_word'] = declination_poll(data['polls'].paginator.count, True)
+    page, paginator  = make_paginator(request, Poll)
+    data['polls'] = page
+    data['polls_word'] = declination_poll(paginator.count, True)
     data['grade']      = Semester.get_current_semester().is_grade_active
-    data['pages']  = make_pages( paginator.num_pages+1 )
-    data['pages_range']  = range( 1, paginator.num_pages+1 )
+    data['pages']  = make_pages( paginator.num_pages+1, page.number )
+    data['pages_range']  = paginator._get_page_range()
     data['tab']    = "poll_list"
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
