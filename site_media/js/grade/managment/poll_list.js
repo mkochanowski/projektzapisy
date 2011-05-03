@@ -10,6 +10,7 @@ Poll.list.init = function()
     {
         var html = Poll.list.getHTML( $(this).attr('href') )
         Fereol.dialog.setHTML(html);
+        Fereol.dialog.setTile("Podgląd ankiety");
         Fereol.dialog.show();
         return false;
     })
@@ -17,17 +18,20 @@ Poll.list.init = function()
     {
         var html = Poll.list.getHTML( $(this).attr('href') )
         Fereol.dialog.setHTML(html);
+        Fereol.dialog.setTitle("Podgląd sekcji")
         Fereol.dialog.show();
         $('#box-belt-edit').remove();
         if(! $(this).parent().parent().find('._selected_action').attr('disabled') )
         {
-            $('#box-belt').append($("<input type='button' value='Edytuj' id='box-belt-edit'>"));
+            var button = "<input type='button' value='Edytuj' id='box-belt-edit'>"
+            Fereol.dialog.addButton(button);
         }
         Poll.section.showEdit();
 
 
         $('#box-belt-edit').click(function()
         {
+            Fereol.dialog.setTitle("Edycja sekcji")
             Poll.section.init();
             $(this).hide();
         });
@@ -38,6 +42,7 @@ Poll.list.init = function()
     {
         var html = Poll.list.getCreateSection();
         Fereol.dialog.setHTML(html);
+        Fereol.dialog.setTitle("Nowa sekcja");
         Fereol.dialog.show();
         Poll.section.init();
         return false;
@@ -47,6 +52,7 @@ Poll.list.init = function()
     {
         var html = Poll.list.getCreatePoll();
         Fereol.dialog.setHTML( html )
+        Fereol.dialog.setTitle("Nowa ankieta")
         Fereol.dialog.show();
         Poll.create.init();
         return false;
@@ -56,6 +62,7 @@ Poll.list.init = function()
     {
         var html = Poll.list.getCreateTemplate();
         Fereol.dialog.setHTML( html )
+        Fereol.dialog.setTitle( "Nowy szablon")
         Fereol.dialog.show();
         Poll.create.init();
         return false;
@@ -65,6 +72,7 @@ Poll.list.init = function()
     {
         var html = Poll.list.getHTML( $(this).attr('href') )
         Fereol.dialog.setHTML(html);
+        Fereol.dialog.setTitle("Podgląd szablonu")
         Fereol.dialog.show();
         return false;
     });

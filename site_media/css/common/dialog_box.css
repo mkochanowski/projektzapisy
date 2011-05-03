@@ -68,9 +68,17 @@
     min-height:23px;
 }
 
-#box-exit
+#box-button
 {
-    display: inline-block;
-    right:5px;
+    display:inline;
     position:absolute;
+    right:5px
+}
+
+#box-title-container
+{
+    display:inline;
+    position:absolute;
+    left:5px;
+    float:left;
 }

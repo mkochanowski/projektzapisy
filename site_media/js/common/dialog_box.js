@@ -32,6 +32,16 @@ Fereol.dialog.show = function()
 
 Fereol.dialog.init();
 
+Fereol.dialog.setTitle = function(html)
+{
+    $('#box-title').html(html);
+}
+
+Fereol.dialog.addButton = function( button )
+{
+    $('#box-button').html( button + $('#box-button').html() )
+}
+
 Fereol.dialog.setHTML = function(html)
 {
     $('#box-content').html( html );
