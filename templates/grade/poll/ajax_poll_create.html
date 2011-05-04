@@ -85,17 +85,21 @@
     <hr>
     <div id="sections-list">
         Wybrane sekcje:
-        <ul>
-        </ul><small>(Przeciągnij, aby zmienić kolejność)</small>
-    </div><br/>
-    <label for="sections">Wybierz sekcję:</label>
-    <select name="section" id="sections">
-        {% for section in sections %}
-            <option value="{{section.pk}}">{{section}}</option>
-        {% endfor %}
-    </select>
-    <input id="section-add" type="button" value="Dodaj sekcję"><br/><br/>
-    <input id="poll-create-submit" type="submit" value="Stwórz ankietę"><br/>
+        <ul class="chosen-sections">
+        </ul>
+    </div>
+    <div class='section-add'>
+        <small>(Przeciągnij, aby zmienić kolejność)</small>
+        <br/>
+        <label for="sections">Wybierz sekcję:</label>
+        <select name="section" id="sections">
+            {% for section in sections %}
+                <option value="{{section.pk}}">{{section}}</option>
+            {% endfor %}
+        </select>
+        <input id="section-add" type="button" value="Dodaj sekcję"><br/><br/>
+        <input id="poll-create-submit" type="submit" value="Stwórz ankietę"><br/>
+    </div>
 </form>
 
 
