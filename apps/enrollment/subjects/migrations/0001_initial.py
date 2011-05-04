@@ -5,6 +5,9 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
+    depends_on = (
+        ('users',    '0001_initial'),
+    )
     
     def forwards(self, orm):
         
@@ -31,7 +34,13 @@ class Migration(SchemaMigration):
 
         # Adding model 'SubjectEntity'
         db.create_table('subjects_subjectentity', (
+            ('lectures', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('description', self.gf('django.db.models.fields.TextField')(default='')),
+            ('repetitions', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('exercises', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('shortName', self.gf('django.db.models.fields.CharField')(max_length=30, null=True)),
+            ('laboratories', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Type'], null=True)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
@@ -312,9 +321,15 @@ class Migration(SchemaMigration):
         },
         'subjects.subjectentity': {
             'Meta': {'object_name': 'SubjectEntity'},
+            'description': ('django.db.models.fields.TextField', [], {'default': "''"}),
+            'exercises': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'laboratories': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'lectures': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'})
+            'repetitions': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Type']", 'null': 'True'})
         },
         'subjects.term': {
             'Meta': {'object_name': 'Term'},
