@@ -51,9 +51,31 @@ Poll.list.init = function()
         Poll.create.init();
         return false;
     })
+
+    $('#new-template').click(function()
+    {
+        var html = Poll.list.getCreateTemplate();
+        Fereol.dialog.setHTML( html )
+        Fereol.dialog.show();
+        Poll.create.init();
+        return false;
+    })
+
+    $('.show_template').click(function()
+    {
+        var html = Poll.list.getHTML( $(this).attr('href') )
+        Fereol.dialog.setHTML(html);
+        Fereol.dialog.show();
+        return false;
+    });
 }
 
 $(Poll.list.init);
+
+Poll.list.getCreateTemplate = function( )
+{
+    return Poll.list.getHTML('/grade/poll/managment/templates/form/');
+}
 
 Poll.list.getCreateSection = function( )
 {

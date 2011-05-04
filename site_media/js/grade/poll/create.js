@@ -96,7 +96,7 @@ Poll.create.changeSemester = function()
     dataString = 'semester=' + semester
     $.ajax({
         type: "POST",
-        url: "grade/poll/ajax_get_subjects",
+        url: "/grade/poll/ajax_get_subjects",
         async: false,
         dataType: 'json',
         data: dataString,

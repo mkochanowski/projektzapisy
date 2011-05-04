@@ -62,7 +62,7 @@
         <a href="?page={{ sections.previous_page_number }}" class="prev">&lsaquo;&lsaquo; poprzednia</a>
     {% endif %}
     {% for page in pages %}
-        {% if page %}
+        {% if page > 0 %}
             {% ifequal page sections.number %}
                 <span class="current page">{{ page }}</span>
             {% else %}

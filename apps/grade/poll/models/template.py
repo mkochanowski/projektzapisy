@@ -24,7 +24,8 @@ class Template( models.Model ):
     group_type        = models.CharField( max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     sections          = models.ManyToManyField( Section, verbose_name = 'sekcje',
                                                 through = 'TemplateSections')
-
+    author            = models.ForeignKey( Employee, verbose_name = 'autor' )
+    
     class Meta:
         verbose_name        = 'szablon' 
         verbose_name_plural = 'szablony'
@@ -35,14 +36,19 @@ class Template( models.Model ):
         res = unicode( self.title )
         if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
         if self.subject:      res += u', przedmiot: ' + unicode( self.subject )
-        if self.group_type:   res += u', typ grupy: ' + unicode( self.group_type )
+        if self.group_type:   res += u', typ grupy: ' + unicode( self.get_group_type_display() )
         return res
+
+    def all_sections( self ):
+        sections =  self.templatesections_set.all().values_list('pk', flat=True)
+        return Section.objects.filter(pk__in=sections)
+
         
 
 class TemplateSections( models.Model ):
-    id = models.AutoField(primary_key=True)
+    id           = models.AutoField(primary_key=True)
     template     = models.ForeignKey( Template,      verbose_name = 'ankieta' )
-    section  = models.ForeignKey( Section, verbose_name = 'sekcja' )
+    section      = models.ForeignKey( Section, verbose_name = 'sekcja' )
 
     class Meta:
         verbose_name_plural = 'pozycje sekcji'
@@ -50,5 +56,6 @@ class TemplateSections( models.Model ):
         app_label           = 'poll'
         ordering = ['id']
 
-
+    def all_questions(self):
+        return self.section.all_questions()
 

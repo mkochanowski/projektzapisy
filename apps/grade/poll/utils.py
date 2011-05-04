@@ -544,6 +544,7 @@ def prepare_template( request ):
     tmpl.title        = variables['title']
     tmpl.description  = variables['description']
     tmpl.studies_type = variables['studies_type']
+    tmpl.author       = request.user.employee
 
     if variables['subject'] == -1:
         tmpl.no_subject = True
@@ -742,12 +743,24 @@ def get_groups_for_user(request, type, subject):
     else:
         return Group.objects.filter(type=type, subject=subject, teacher=request.user.employee).order_by('teacher')
 
-def make_pages( pages ):
+def make_pages( pages, page_number ):
     if pages < 12:
         return range(1, pages)
 
-    list = range(1, 5)
-	# CO KURWA?! list += None
-    list.extend( range(pages-5, pages))
+    list = range(1, 6)
+    if page_number > 8:
+	    list.extend( [-1])
+
+    first = max(page_number-2, 6)
+    last = min(page_number+3, pages)
+
+    list.extend( range(first, last))
+
+    if page_number < pages - 8:
+        list.extend( [-1])
+
+    last = min(page_number+3, pages)
+    start = max(last, pages-5)
+    list.extend( range(start, pages))
 
     return list

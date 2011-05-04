@@ -2,6 +2,17 @@
 
 {% block scripts %}
 <script src="/site_media/js/grade/managment/list.js" type="application/javascript"></script>
+<script src="/site_media/js/grade/managment/poll_list.js" type="application/javascript"></script>
+<script src="/site_media/js/grade/poll/create.js" type="text/javascript"></script>
+<script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
+
+{% endblock %}
+
+{% block extra-styles %}
+	<link rel="stylesheet" href="/site_media/css/grade/create.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
 {% endblock %}
 
 {% block poll-managment %}
@@ -16,6 +27,7 @@
 	</label>
    	<button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
         <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{templates.object_list.count}} wybranych</span>
+    <button id="new-template" value="0" name="create" title="Utwórz nowy" class="button" type="submit" style="position:absolute;right:80px">Utwórz nowy</button>
 </div>
 <table id="poll-managment-table">
 	<thead>
@@ -31,7 +43,7 @@
                 <input type="checkbox" class="_selected_action" name="_selected_action" value="{{template.pk}}" class="action-select" {% if not user.is_staff %} disabled {% endif %}>
             </td>
             <td>
-                <a href="{% url grade-poll-show_template template.id %}">{{template}}</a>
+                <a class="show_template" href="{% url grade-poll-show_template template.id %}">{{template}}</a>
             </td>
         </tr>
     	{% endfor %}
@@ -44,7 +56,7 @@
         <a href="?page={{ templates.previous_page_number }}" class="prev">&lsaquo;&lsaquo; poprzednia</a>
     {% endif %}
     {% for page in pages %}
-        {% if page %}
+        {% if page > 0 %}
             {% ifequal page templates.number %}
                 <span class="current page">{{ page }}</span>
             {% else %}
