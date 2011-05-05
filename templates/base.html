@@ -21,7 +21,7 @@
 
 	<link rel="shortcut icon" href="/site_media/favicon.ico" />
 	
-	<script src="/site_media/js/jquery/jquery-1.5.2.min.js" type="text/javascript"></script>
+	<script src="/site_media/js/jquery/jquery-1.5.2.js" type="text/javascript"></script>
 	<script src="/site_media/js/jquery/baseExtensions.js" type="text/javascript"></script>
 	<script src="/site_media/js/main.js" type="text/javascript"></script>
 	<script src="/site_media/js/django_ajax_token.js" type="text/javascript"></script>
@@ -42,6 +42,7 @@
 			{% if user.is_staff %}
 					<a href="/admin/">Panel administracyjny</a> |
 			{% endif %}
+                        <a href="{% url help %}">Pomoc</a> |
 			{% if user.is_authenticated %}
 				Jesteś zalogowany jako
 				<a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>

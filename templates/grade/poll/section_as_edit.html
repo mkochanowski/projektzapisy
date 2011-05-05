@@ -2,13 +2,14 @@
 <form method="Post" id="questionset" action="{% url grade-poll-questionset-create %}">
 
     <input type="hidden" name="old_id" value="{{ section.pk }}">
-    <input type="text"   value="{{section.title}}" name="poll[title]" id="section-title" class="required">
+    <input type="text"   value="{{section.title}}" name="poll[title]" id="section-title" class="required only-edit">
 
-    <textarea name="poll[description]" id="section-desc">{{section.description}}</textarea>
+    <textarea name="poll[description]" id="section-desc" class="only-edit">{{section.description}}</textarea>
+    <h2 class="poll-section-title only-show">{{section.title}}</h2>
+    <span class="poll-section-description only-show">{{section.description}}</span>
 
-
-    <input class="leading" type="checkbox" id="section-leading" name="poll[leading]"{% if section.leading %} checked{% endif %}>
-    <label class="leading" for="section-leading">Posiada pytanie wiodące</label>
+    <input class="leading  only-edit" type="checkbox" id="section-leading" name="poll[leading]"{% if section.leading %} checked{% endif %}>
+    <label class="leading  only-edit" for="section-leading">Posiada pytanie wiodące</label>
 
     <input type="hidden" name="fake" class="anyquestion" value="">
     <ol id="poll-form" class="ui-sortable questionset">
@@ -76,8 +77,8 @@
             </li>
         {% endfor %}
     </ol>
-        <input type="button" id="add-question" value="Dodaj pytanie">
+        <input type="button" id="add-question" value="Dodaj pytanie" class="only-edit">
     <br><br>
-        <input type="submit" value="Zapisz" id="questionset-submit">
+        <input type="submit" value="Zapisz" id="questionset-submit" class="only-edit">
     </form>
 {% endfor %}

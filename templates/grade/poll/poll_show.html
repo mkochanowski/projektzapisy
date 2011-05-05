@@ -18,7 +18,7 @@
                         </ul></div>
                 {% endif %}
                 {% if field.type == 'single' %}
-                    <ul class="poll-section-answer-list">
+                    <ul class="poll-section-answer-list{% if field.scale %} scale{% endif %}">
                     {% for key, radio in field.widget.choices %}
                         <li  class="poll-section-answer-item">
                             <input type="radio" id="{{field.title}}-{{key}}" class="poll-section-radio{% if key in  field.hide_on %} poll-section-radio-hideon{% else %} poll-section-radio-all{% endif %}" name="{{field.title}}" value="{{key}}"{% if field.initial == key%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>

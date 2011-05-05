@@ -1,5 +1,5 @@
 if (typeof Poll == 'undefined'){
-    Poll = new Object();﻿
+    Poll = new Object();
 }
 Poll.section = Object();
 
@@ -29,6 +29,7 @@ jQuery.validator.addClassRules("anyanswer", {
 //// Functions  run after page load
 ///////////////////////////////////////////////////////////
 
+
 Poll.section.init = function()
 {
     /* set vars */
@@ -43,17 +44,10 @@ Poll.section.init = function()
     $("input[type=text]").focus(function(){ this.select(); });
     $("textarea").focus(function(){ this.select(); });
     $(".leading").change(Poll.section.changeLeading);
-    
+
     // send form
     $("#questionset").validate();
-   /* $('#questionset-submit').click(function()
-    {
-        if( Poll.section.submitted )
-        {
-            return false;
-        }
-        Poll.section.submitted = true;
-    });*/
+
     /* enter don't sending */
     $("form").keypress(function(e)
     {
@@ -69,6 +63,33 @@ Poll.section.init = function()
             items: '> li:not(.firstQuestion)'
 
     });
+
+    $('.only-edit').show();
+    $('.only-show').hide();
+}
+
+Poll.section.showEdit = function()
+{
+    $('.ready').click(function()
+    {
+        var li   = $(this).parents('.poll-question');
+        $(li).children('.section-show')
+            .remove();
+        Poll.section.havelastLi = false;
+        var data = {
+            type:  $(li).find('input[name$="[type]"]').val(),
+            title: $(li).find('input[name$="[title]"]').val(),
+            desc:  $(li).find('input[name$="[description]"]').val(),
+            questionset: Poll.section.makeQuestionset( li ),
+            optionset: Poll.section.makeOptionset( li )
+        }
+        $.tmpl( "question_view", data ).appendTo( li );
+
+        $('.edit-mode').hide();
+        $('.section-edit').hide();
+        $('.only-edit').hide();
+        $('.only-show').show();
+    }).click();
 }
 
 /*
@@ -111,14 +132,14 @@ Poll.section.editParser = function()
     $('.edit-mode').hide()
     $('.delete').click(function()
     {
-        var li = $(this).parents('.poll-question');
-        Poll.section.remove( li );
-        Poll.section.validate( li );
+        $(this).parents('.poll-question').remove();
     });
 
     $('.delete-answer').click(function(){
 
          $(this).parents('.poll-question-answer').remove();
+        $(li).find('select[name$="[choiceLimit]"]').children().remove()
+
     })
 }
 
@@ -268,15 +289,26 @@ Poll.section.addAnswer = function( li, data )
     data.size    = $(answerset).children().size() + 1
     data.leading = leading
     if (typeof data.name == 'undefined'){
-        data.name = '';﻿
+        data.name = '';
     }
 
     // create object
     $.tmpl( "question", data ).appendTo( answerset );
     $('.remove').click(function()
     {
-    $(this).parents('.poll-question-answer').remove();
+        $(this).parents('.poll-question-answer').remove();
+        $(li).find('select[name$="[choiceLimit]"]').children().last().remove()
     });
+
+
+    var limit_select = $(li).find('select[name$="[choiceLimit]"]')
+
+    var options = $(limit_select).
+            children().last().val().castToInt();
+
+    $(limit_select).append(
+        $('<option></option>').val(options + 1).html(options + 1)
+    );
 
     $(li).find('.autocomplete').each(function(i, d){
 
@@ -416,12 +448,17 @@ Poll.section.changeType = function( li )
     if( !poll_types[formtype].haveAnswers)
     {
         $(answerset).empty();
+
+        
+        $(li).find('select[name$="[choiceLimit]"]').children(':gt(0)').remove()
+
     }
     else
     {
         if( $(poll_types[formtype].answers).size() > 0)
         {
             $(answerset).empty();
+            $(li).find('select[name$="[choiceLimit]"]').children(':gt(0)').remove()
             $(poll_types[formtype].answers).each(function(index, value)
             {
                 var data = {
@@ -458,8 +495,6 @@ Poll.section.changeType = function( li )
 }
 
 
-$(Poll.section.init);
-
 
 /////////////////////////////////////////////////////////////
 //// Help functions
@@ -478,7 +513,7 @@ Poll.section.makeOptionset = function( li )
     return {
         isScale:     $(li).find('input[name$="[isScale]"]').val(),
         hasOther:    $(li).find('input[name$="[hasOther]"]').val(),
-        choiceLimit: $(li).find('input[name$="[choiceLimit]"]').val()
+        choiceLimit: parseInt( $(li).find('select[name$="[choiceLimit]"]').val() )
     }
 }
 
@@ -513,7 +548,7 @@ Poll.section.makeQuestionset = function( li )
 
 Poll.section.changeLeading = function()
 {
-    if( ! Poll.section.validate( Poll.section.lastLi ) )
+    if( $(".leading").attr('checked') && Poll.section.havelastLi && ! Poll.section.validate( Poll.section.lastLi ) )
     {
         $(".leading").attr('checked', false)
         return false;

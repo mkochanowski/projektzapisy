@@ -5,6 +5,15 @@
     <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/common/dialog_box.css" type="text/css" />
+    {% block extra-styles %}
+    {% endblock %}
+{% endblock %}
+
+{% block mainscripts %}
+    <script src="/site_media/js/common/dialog_box.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery-tmpl/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
 {% endblock %}
 
 {% block main-navigation %}
@@ -19,12 +28,10 @@
 
     <div id='poll-managment-menu'>
 	<ul>
+           <li{% if tab == "template_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-templates %}">Lista szablonów</a></li>
            <li{% if tab == "poll_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
            <li{% if tab == "section_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
            <li{% if tab == "group_without" %} class="active_tab"{% endif %}><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
-           <li><a href="{% url grade-poll-questionset-create %}">Tworzenie sekcji</a></li>
-           <li><a href="{% url grade-poll-poll-create %}">Tworzenie ankiet</a></li>
-           <li{% if tab == "template_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-templates %}">Szablony</a></li>
 	</ul>
     </div>
     <div id="grade-managment-main">
@@ -32,4 +39,6 @@
             
         {% endblock %}
     </div>
+{% include 'common/dialog_box.html' %}
+
 {% endblock %}

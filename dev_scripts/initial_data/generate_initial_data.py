@@ -307,6 +307,8 @@ s += ''.join(records_raw)
 #                      Generate polls                                   #
 #########################################################################
 
+poll_sections = {}
+
 def generate_poll(poll_id, sec_total, sem, group, polls_raw):
     """
     Generate one poll for a specified group (or null)
@@ -317,6 +319,7 @@ def generate_poll(poll_id, sec_total, sem, group, polls_raw):
     else:
         n_sec = rand(1,4)
         sections = sample(range(4,8), n_sec)
+    poll_sections[poll_id] = sections
     poll = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "poll.poll",\n@!@@!@"fields": {\n@!@@!@@!@"studies_type": null,\n@!@@!@@!@"group": %s,\n@!@@!@@!@"description": "",\n@!@@!@@!@"title": "Ankieta",\n@!@@!@@!@"author": %s,\n@!@@!@@!@"semester": %s\n@!@@!@}\n@!@},\n' % (poll_id, group, ADMIN_ID, sem)
     polls_raw += poll
     sec_num = 1
@@ -343,7 +346,46 @@ def generate_polls(semesters, groups):
     return polls_raw    
     
 s += ''.join( generate_polls(semesters, groups_sem) )
+
+#########################################################################
+#                      Generate answers for polls                       #
+#########################################################################
+ANSWERS = json.loads(open('answers_data.json', 'r').read())
+
+def generate_answers(poll_id, amount, ans_id, ticket_id):
+    answers_poll = ''
+    for i in xrange(amount):
+        ticket = '@!@{\n@!@@!@"pk": %s, "model": "poll.savedticket", "fields": {\n@!@@!@@!@"ticket": "0", "poll": %s, "finished": true\n@!@@!@}\n@!@},\n' % (ticket_id, poll_id)
+        answers_poll += ticket
+        for sec in poll_sections[poll_id]:
+            ans_sec =  ANSWERS["SECTION"+str(sec)]
+            for ans in ans_sec:
+                if rand(1,10) > 3: # not all the questions will have answers 
+                    if ans["model"] == "poll.singlechoicequestionanswer":
+                        answer = choice(ans["answers"])
+                        fields = '@!@@!@"question": %s, "section": %s, "saved_ticket": %s, "option": %s' % (ans["question"], sec, ticket_id, answer) 
+                    elif ans["model"] == "poll.multiplechoicequestionanswer":
+                        answer = sample(ans["answers"], rand(1,ans["limit"]))                        
+                        fields = '@!@@!@"question": %s, "section": %s, "other": null, "saved_ticket": %s, "options": %s' % (ans["question"], sec, ticket_id, answer) 
+                    elif ans["model"] == "poll.openquestionanswer":
+                        answer = choice(ans["answers"])
+                        fields = '@!@@!@"content": "%s", "question": %s, "section": %s, "saved_ticket": %s' % (answer, ans["question"], sec, ticket_id)                    
+                    answers_poll += '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "%s",\n@!@@!@"fields": {\n@!@%s\n@!@@!@}\n@!@},\n' % (ans_id, ans["model"], fields)                    
+                    ans_id += 1
+        ticket_id += 1
+    return (ans_id, ticket_id, answers_poll)
+          
+def generate_answers_full():
+    answers_raw = []
+    ans_id = 1
+    ticket_id = 1
+    for poll_id in iter(poll_sections):                
+        (ans_id, ticket_id, answer) = generate_answers(poll_id, rand(5,15), ans_id, ticket_id)
+        answers_raw += answer
+    return answers_raw
     
+s += ''.join( generate_answers_full() )
+
 # Convert to readable format using indents and add close bracket
 s = s.replace('@!@', spaces)[:-2] + '\n]'
 print s.encode('utf-8')

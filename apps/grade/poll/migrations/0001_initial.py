@@ -138,7 +138,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'Poll'
         db.create_table('poll_poll', (
-            ('studies_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Type'], null=True, blank=True)),
+            ('studies_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Program'], null=True, blank=True)),
             ('share_result', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
             ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Group'], null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -190,16 +190,25 @@ class Migration(SchemaMigration):
 
         # Adding model 'Template'
         db.create_table('poll_template', (
-            ('studies_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Type'], null=True, blank=True)),
+            ('studies_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Program'], null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=40)),
             ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('share_result', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Employee'])),
+            ('no_subject', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('group_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
             ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subjects.Subject'], null=True, blank=True)),
         ))
         db.send_create_signal('poll', ['Template'])
+
+        # Adding model 'TemplateSections'
+        db.create_table('poll_templatesections', (
+            ('section', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Section'])),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('template', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['poll.Template'])),
+        ))
+        db.send_create_signal('poll', ['TemplateSections'])
     
     
     def backwards(self, orm):
@@ -275,6 +284,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Template'
         db.delete_table('poll_template')
+
+        # Deleting model 'TemplateSections'
+        db.delete_table('poll_templatesections')
     
     
     models = {
@@ -376,7 +388,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'semester': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Semester']"}),
             'share_result': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'studies_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
+            'studies_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Program']", 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '40'})
         },
         'poll.savedticket': {
@@ -429,14 +441,22 @@ class Migration(SchemaMigration):
         },
         'poll.template': {
             'Meta': {'object_name': 'Template'},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Employee']"}),
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'group_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'share_result': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'studies_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
+            'no_subject': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'sections': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['poll.Section']", 'through': "orm['poll.TemplateSections']", 'symmetrical': 'False'}),
+            'studies_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Program']", 'null': 'True', 'blank': 'True'}),
             'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']", 'null': 'True', 'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '40'})
+        },
+        'poll.templatesections': {
+            'Meta': {'object_name': 'TemplateSections'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'section': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Section']"}),
+            'template': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['poll.Template']"})
         },
         'subjects.group': {
             'Meta': {'object_name': 'Group'},
@@ -456,7 +476,7 @@ class Migration(SchemaMigration):
             'semester_ending': ('django.db.models.fields.DateField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'visible': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'year': ('django.db.models.fields.PositiveIntegerField', [], {'default': '2011'})
+            'year': ('django.db.models.fields.CharField', [], {'default': "'0'", 'max_length': '7'})
         },
         'subjects.studentoptions': {
             'Meta': {'unique_together': "(('subject', 'student'),)", 'object_name': 'StudentOptions'},
@@ -466,26 +486,32 @@ class Migration(SchemaMigration):
             'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Subject']"})
         },
         'subjects.subject': {
-            'Meta': {'object_name': 'Subject'},
+            'Meta': {'unique_together': "(('name', 'semester'),)", 'object_name': 'Subject'},
             'description': ('django.db.models.fields.TextField', [], {}),
-            'ects': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             'entity': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.SubjectEntity']"}),
             'exercises': ('django.db.models.fields.IntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'laboratories': ('django.db.models.fields.IntegerField', [], {}),
             'lectures': ('django.db.models.fields.IntegerField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'repetitions': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'semester': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Semester']", 'null': 'True'}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'unique': 'True', 'null': 'True', 'db_index': 'True'}),
             'students_options': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Student']", 'through': "orm['subjects.StudentOptions']", 'symmetrical': 'False'}),
             'teachers': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Employee']", 'symmetrical': 'False'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Type']", 'null': 'True'})
         },
         'subjects.subjectentity': {
             'Meta': {'object_name': 'SubjectEntity'},
+            'description': ('django.db.models.fields.TextField', [], {'default': "''"}),
+            'exercises': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'laboratories': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'lectures': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'})
+            'repetitions': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subjects.Type']", 'null': 'True'})
         },
         'subjects.type': {
             'Meta': {'object_name': 'Type'},
@@ -497,10 +523,18 @@ class Migration(SchemaMigration):
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
             'consultations': ('django.db.models.fields.TextField', [], {}),
+            'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'room': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+        },
+        'users.program': {
+            'Meta': {'object_name': 'Program'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
@@ -508,16 +542,13 @@ class Migration(SchemaMigration):
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'records_opening_delay_minutes': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
+            'semestr': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
-        },
-        'users.type': {
-            'Meta': {'object_name': 'Type'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         }
     }
     

@@ -41,7 +41,7 @@ class PollCombineForm( forms.Form ):
                 field = forms.BooleanField( label     = SafeUnicode( title ),
                                             required  = False,
                                             initial   = True,
-                                            help_text = u'Powiąż ocenę <img class="tooltip" src="/site_media/images/documentinfo.png">'
+                                            help_text = u'Powiąż ocenę'
 					  ) # this is NOT escaped
                 
                 self.fields[ label ] = field

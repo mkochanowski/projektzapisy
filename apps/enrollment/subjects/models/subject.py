@@ -14,6 +14,12 @@ class SubjectEntity(models.Model):
     """entity of particular subject title"""
     name = models.CharField(max_length=100, verbose_name='nazwa')
     shortName = models.CharField(max_length=30, null=True, verbose_name='skrócona nazwa')
+    type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
+    description = models.TextField(verbose_name='opis', default='') 
+    lectures = models.IntegerField(verbose_name='wykład', default=0)
+    exercises = models.IntegerField(verbose_name='ćwiczenia', default=0)
+    laboratories = models.IntegerField(verbose_name='pracownia', default=0)
+    repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
 
     class Meta:
         verbose_name = 'Podstawa przedmiotu'
