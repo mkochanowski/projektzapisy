@@ -11,10 +11,13 @@ class Migration(SchemaMigration):
         # Adding model 'Employee'
         db.create_table('users_employee', (
             ('consultations', self.gf('django.db.models.fields.TextField')()),
-            ('receive_mass_mail_enrollment', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
+            ('room', self.gf('django.db.models.fields.PositiveIntegerField')(null=True)),
             ('receive_mass_mail_offer', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+            ('receive_mass_mail_enrollment', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
+            ('homepage', self.gf('django.db.models.fields.URLField')(default='', max_length=200)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('receive_mass_mail_grade', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
         ))
         db.send_create_signal('users', ['Employee'])
 
@@ -22,22 +25,34 @@ class Migration(SchemaMigration):
         db.create_table('users_student', (
             ('ects', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
             ('records_opening_delay_minutes', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
+            ('semestr', self.gf('django.db.models.fields.PositiveIntegerField')(default=0)),
+            ('program', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['users.Program'], null=True)),
             ('receive_mass_mail_offer', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
             ('matricula', self.gf('django.db.models.fields.CharField')(default='', unique=True, max_length=20)),
-            ('type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Type'], null=True, blank=True)),
+            ('receive_mass_mail_enrollment', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('block', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
-            ('receive_mass_mail_enrollment', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
+            ('receive_mass_mail_grade', self.gf('django.db.models.fields.BooleanField')(default=True, blank=True)),
         ))
         db.send_create_signal('users', ['Student'])
 
-        # Adding model 'Type'
-        db.create_table('users_type', (
+        # Adding model 'Program'
+        db.create_table('users_program', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=30)),
+            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=50)),
         ))
-        db.send_create_signal('users', ['Type'])
+        db.send_create_signal('users', ['Program'])
+
+        # Adding model 'StudiaZamawiane'
+        db.create_table('users_studiazamawiane', (
+            ('points', self.gf('django.db.models.fields.FloatField')()),
+            ('bank_account', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('student', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['users.Student'], unique=True)),
+            ('comments', self.gf('django.db.models.fields.TextField')(blank=True)),
+        ))
+        db.send_create_signal('users', ['StudiaZamawiane'])
     
     
     def backwards(self, orm):
@@ -48,8 +63,11 @@ class Migration(SchemaMigration):
         # Deleting model 'Student'
         db.delete_table('users_student')
 
-        # Deleting model 'Type'
-        db.delete_table('users_type')
+        # Deleting model 'Program'
+        db.delete_table('users_program')
+
+        # Deleting model 'StudiaZamawiane'
+        db.delete_table('users_studiazamawiane')
     
     
     models = {
@@ -92,10 +110,18 @@ class Migration(SchemaMigration):
         'users.employee': {
             'Meta': {'object_name': 'Employee'},
             'consultations': ('django.db.models.fields.TextField', [], {}),
+            'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'room': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+        },
+        'users.program': {
+            'Meta': {'object_name': 'Program'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '50'})
         },
         'users.student': {
             'Meta': {'object_name': 'Student'},
@@ -103,16 +129,21 @@ class Migration(SchemaMigration):
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
+            'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'records_opening_delay_minutes': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Type']", 'null': 'True', 'blank': 'True'}),
+            'semestr': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
-        'users.type': {
-            'Meta': {'object_name': 'Type'},
+        'users.studiazamawiane': {
+            'Meta': {'object_name': 'StudiaZamawiane'},
+            'bank_account': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
+            'comments': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
+            'points': ('django.db.models.fields.FloatField', [], {}),
+            'student': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['users.Student']", 'unique': 'True'})
         }
     }
     

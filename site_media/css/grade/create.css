@@ -43,7 +43,33 @@ margin:15px;
     margin-top: 15px;
 }
 
+.section-title{
+    float: left;
+    }
 
+.fold-unfold-button{
+    float: left;
+    margin-right: 4em;
+    }
+    
+.remove{
+    float: right;
+    }
 
+.section{
+    clear: both;
+    }
+
+.section-add{
+    clear: both;
+    }
+
+.chosen-sections > li{
+    clear: left;
+}
+
+.chosen-sections {
+    list-style: none;
+    }
 /*** TWORZENIE ANKIETY - koniec ***/
 

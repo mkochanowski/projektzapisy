@@ -385,7 +385,7 @@ def show_section( request, section_id):
 def get_section(request, section_id):
     form = PollForm()
     form.setFields( None, None, section_id )
-    return render_to_response( 'grade/poll/poll_section.html', {"form": form}, context_instance = RequestContext( request ))
+    return render_to_response( 'grade/poll/poll_section.html', {"form": form, "section_id": section_id}, context_instance = RequestContext( request ))
 
 @employee_required
 def section_actions( request ):

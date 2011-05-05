@@ -133,28 +133,48 @@ Poll.create.addSection = function()
 
     newSection.appendChild(sectionId);
     
-    var section = Poll.create.getSection( sectionId.value, newSection )
+    var section = Poll.create.getSection( sectionId.value, newSection );
     
     var sectionLabel = document.createElement('p');
+    
+    var sectionFoldUnfoldButton = document.createElement( 'button' );
+    $(sectionFoldUnfoldButton).text( '+' );
+    sectionFoldUnfoldButton.className = 'fold-unfold-button';
+    $(sectionFoldUnfoldButton).click( function(){
+        if ($(this).text() == '+'){
+            $(this).text('-');
+        } else {
+            if ($(this).text() == '-'){
+                $(this).text('+');
+            }
+        }
+        $('#section-' + sectionId.value ).slideToggle(250);
+        return false;
+    });
+    sectionLabel.appendChild(sectionFoldUnfoldButton);
+    
+    var sectionTitle = document.createElement('span');
     label = $('#sections option:selected').text();
-    $(sectionLabel).text(label);
+    $(sectionTitle).text(label);
+    sectionTitle.className = 'section-title';
+    sectionLabel.appendChild(sectionTitle);
 
     var sectionRemoveButton = document.createElement('img');
     sectionRemoveButton.alt = 'usuń';
     sectionRemoveButton.className = 'remove';
     sectionRemoveButton.src = '/site_media/images/remove-ico.png';
     sectionLabel.appendChild(sectionRemoveButton);
-
+    
     var Lilabel = $(sectionLabel).html();
     $(newSection).append( $(sectionLabel) )
     $(newSection).append( $(section) )
 	$(Poll.create.chosenSection).append(newSection)
-	
+    $('#section-' + sectionId.value ).hide();
+    
     $(newSection).find('.remove').click(function()
     {
         Poll.create.removeSection(newSection);
     });    
-    
 }
 
 Poll.create.getSection = function( section_id, li )
