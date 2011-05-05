@@ -1,9 +1,10 @@
 {% load poll_answers_extra %}
-
-{% for section in sections %}
-	<div class="poll-section">
-	        <h2 class="poll-section-title">{{section.title}}</h2>
-	        <span class="poll-section-description">{{section.description}}</span>
+{% for section in sections %}	
+    <div class="poll-section">
+        <button class='grade-section-toggle-button' id='section-toggle-{{section.pk}}'>-</button>
+        <h2 class="poll-section-title">{{section.title}}</h2>
+        <span class="poll-section-description">{{section.description}}</span>
+        <div class='section-content' id='section-{{section.pk}}'>
 	    {% for field in section.questions %}
         {% if field.type %}
             <div class="fieldWrapper poll-section-field{% if field.is_leading %} poll-section-leading{% endif %}">                   
@@ -45,6 +46,22 @@
             </div>
         {% endif %}
         {% endfor %}
+        </div>
     <hr>
 	</div>
 {% endfor %}
+<SCRIPT language="javascript" type="text/javascript">
+    $( '.grade-section-toggle-button' ).click( function(){
+        var toToggleId  = $(this).attr( 'id' ).split( '-' )[2];
+        var toToggleObj = $('#section-' + toToggleId );
+        toToggleObj.slideToggle( 250 );
+        if ( $(this).text() == '+' ){
+            $(this).text( '-' );
+        } else {
+            if ( $(this).text() == '-' ) {
+                $(this).text( '+' );
+            }
+        }
+        return false;
+    });
+</SCRIPT>

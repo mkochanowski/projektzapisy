@@ -57,5 +57,5 @@ input[class*="scale"]{
 }
 
 hr, .poll-section-field {
-	clear: both;
+	clear: left;
 }
