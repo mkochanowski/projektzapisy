@@ -14,6 +14,7 @@
 
 	<link rel="stylesheet" href="/site_media/css/general.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/main.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
 	{% block mainstyles %}
 	{% endblock %}
 	{% block styles %}
@@ -22,9 +23,19 @@
 	<link rel="shortcut icon" href="/site_media/favicon.ico" />
 	
 	<script src="/site_media/js/jquery/jquery-1.5.2.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js"></script>"
 	<script src="/site_media/js/jquery/baseExtensions.js" type="text/javascript"></script>
 	<script src="/site_media/js/main.js" type="text/javascript"></script>
 	<script src="/site_media/js/django_ajax_token.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/site_media/js/common/dialog_box.js"></script>
+    {% if user.is_superuser and keys_to_create %}
+    <script type="text/javascript"  src="/site_media/js/grade/ticket_create/keys_generate.js"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
+    <script type="text/javascript">
+        var url_generate = '{% url grade-ticket-keys-generator %}';
+        var url_progress = '{% url grade-ticket-keys-progress  %}';
+    </script>
+    {% endif %}
 	{% block mainscripts %}
 	{% endblock %}
 	{% block scripts %}
@@ -90,6 +101,8 @@
 				{% endblock %}
 				{% block content %}
 				{% endblock %}
+                {% block special %}
+                {% endblock %}
 				<div style="clear: right"></div>
 			</div>
 		</div>

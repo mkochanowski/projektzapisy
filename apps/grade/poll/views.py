@@ -71,6 +71,7 @@ from django.utils.encoding import smart_str, smart_unicode
 from apps.grade.poll.exceptions import NoTitleException, NoSectionException, \
                                     NoPollException
 
+from apps.news.views import display_news_list
 ########################################
 #### POLL MANAGMENT
 ########################################
@@ -213,13 +214,16 @@ def rules(request):
 @employee_required
 def enable_grade( request ):
     semester = Semester.get_current_semester()
-    
     if semester.is_grade_active:
         messages.error( request, "Nie można otworzyć oceny; ocena jest już otwarta")
     elif Poll.get_polls_for_semester().count() == 0:
         messages.error( request, "Nie można otworzyć oceny; brak ankiet")
     elif Poll.get_current_semester_polls_without_keys().count() != 0:
         messages.error( request, "Nie można otworzyć oceny; brak kluczy dla ankiet")
+        data = {}
+        data['category'] = 'grade'
+        data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
+        return display_news_list(request, data)
     else:
         semester.is_grade_active = True
         news = News()
@@ -732,10 +736,8 @@ def poll_answer( request, slug, pid ):
                         ansx = request.POST.get( section_answers[ 0 ], None)
                         if ansx:
                             option = Option.objects.get( pk = ansx)
-                            print option
                             ans.option = option
                             ans.save()
-                            print ans
                             if option in question.singlechoicequestionordering_set.filter( sections = section )[ 0 ].hide_on.all():
                                 delete = True
                         else:
@@ -873,7 +875,6 @@ def poll_answer( request, slug, pid ):
         data[ 'form' ]   = form
         
         if request.method == "POST" and (not data['form_errors'] or st.finished):
-            print request.POST.get( 'Save', default=None )
             if request.POST.get( 'Next', default=None ):
                 return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]))
             if request.POST.get( 'Prev', default=None ):
