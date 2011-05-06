@@ -92,10 +92,14 @@ def templates( request ):
         List of templates
         @author mjablonski
     """
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     data = {}
     page, paginator = make_paginator( request, Template )
     data['templates'] = page
-    data['grade']  = Semester.get_current_semester().is_grade_active
+    data['grade']  = grade
     data['template_word'] = declination_template(paginator.count)
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
@@ -358,10 +362,14 @@ def sections_list( request ):
         aren't allowed to any such action.
     """
     data = {}
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     page, paginator = make_paginator( request, Section )
     data['sections'] = page
     data['sections_word'] = declination_section(paginator.count, True)
-    data['grade']  = Semester.get_current_semester().is_grade_active
+    data['grade']  = grade
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "section_list"
@@ -369,11 +377,15 @@ def sections_list( request ):
 
 @employee_required
 def show_section( request, section_id):
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     form = PollForm()
     form.setFields( None, None, section_id )
     data = {}
     data['form']    = form
-    data['grade']   = Semester.get_current_semester().is_grade_active
+    data['grade']   = grade
     data['section'] = Section.objects.get(pk=section_id)
 
     if request.is_ajax():
@@ -411,10 +423,14 @@ def delete_sections( request ):
 @employee_required
 def polls_list( request ):
     data = {}
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     page, paginator  = make_paginator(request, Poll)
     data['polls'] = page
     data['polls_word'] = declination_poll(paginator.count, True)
-    data['grade']      = Semester.get_current_semester().is_grade_active
+    data['grade']      = grade
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = paginator._get_page_range()
     data['tab']    = "poll_list"

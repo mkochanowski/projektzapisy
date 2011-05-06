@@ -13,6 +13,7 @@
     margin-top: -75px;
     margin-bottom: 100px;
     z-index:100;
+    outline:none;
 }
 
 #box-content

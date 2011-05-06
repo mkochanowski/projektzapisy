@@ -26,10 +26,9 @@
                         </li>
                     {% endfor %}
                     </ul>
-                {% else %}{% if field.type == 'multi' %}
-                    <input type="hidden" value="{{field.choice_limit}}" class="poll-section-answer-limit">{% endif %}
+                {% endif %}{% if field.type == 'multi' %}
+                    {% if field.choice_limit %}<input type="hidden" value="{{field.choice_limit}}" class="poll-section-answer-limit">{% endif %}
                     <ul class="poll-section-answer-list{% if field.choice_limit %} poll-section-choicelimit{% endif %}">
-                    {% if field.choice_limit %}
                     {% for key, radio in field.widget.choices %}
                         <li  class="poll-section-answer-item"><input type="checkbox" class="poll-section-choice {% if field.choice_limit %}poll-section-choicelimit-choice{% endif %}" id="{{field.title}}-{{key}}" name="{{field.title}}" value="{{key}}"{% if  key in field.initial%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>
                         <label for="{{field.title}}-{{key}}">{{radio}}</label>
@@ -39,9 +38,9 @@
                         </li>
                     {% endfor %}
                     </ul>
-                {% else %}{% if field.type == 'open'  %}
+                {% endif %}{% if field.type == 'open'  %}
                     <textarea cols="40" rows="5" name="{{field.title}}"{% if field.disabled %} disabled="disabled"{% endif %}>{{field.initial}}</textarea>
-                {% endif %}{% endif %}{% endif %}
+                {% endif %}
             </div>
         {% endif %}
         {% endfor %}

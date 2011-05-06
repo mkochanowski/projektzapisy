@@ -24,7 +24,7 @@ padding:15px 20px 10px 10px;
 
 #section-title
 {
-    width: 440px;
+    width: 590px;
     font-size:14px;
     font-weight:bold;
     color: #666666;
@@ -72,13 +72,6 @@ margin:15px;
 {
 }
 
-.edit-mode
-{
-    display:block;
-    position:absolute;
-    top: 0px;
-    right:0px;
-}
 
 #poll-form {
     list-style-type: none;

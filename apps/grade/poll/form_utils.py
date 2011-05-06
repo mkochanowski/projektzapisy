@@ -144,7 +144,7 @@ def single_choice_question_save( section, leading, question ):
         q.delete()
         return None
         
-    if p.position == 1 and leading:
+    if p.position == 0 and leading:
         p.is_leading = True
         p.hide_on    = hide_on
         try:
