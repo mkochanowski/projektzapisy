@@ -134,7 +134,7 @@ def generate_rsa_key():
     
     #wersja bezpieczniejsza
     #key_length = 1024
-    #RSAkey     = RSA.generate(key_length)    
+    #RSAkey     = RSA.generate(key_length)
     
     #wersja szybsza
     #do poprawki: tworzenie i usuwanie pliku test_rsa...
@@ -165,10 +165,10 @@ def generate_keys_for_polls():
     cache.set('generated-keys', '0')
     i = 1
     for el in poll_list:
-        cache.set('generated-keys', str(i))
         (pub, priv) = generate_rsa_key()
         pub_list.append(pub)
         priv_list.append(priv)
+        cache.set('generated-keys', str(i))
         i = i + 1
     save_public_keys(zip(poll_list, pub_list))
     save_private_keys(zip(poll_list, priv_list))

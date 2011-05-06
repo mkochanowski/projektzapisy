@@ -432,8 +432,9 @@ def polls_list( request ):
     data['polls_word'] = declination_poll(paginator.count, True)
     data['grade']      = grade
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
-    data['pages_range']  = paginator._get_page_range()
-    data['tab']    = "poll_list"
+    data['pages_range']    = paginator._get_page_range()
+    data['tab']            = "poll_list"
+    data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 
