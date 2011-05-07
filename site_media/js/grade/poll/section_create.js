@@ -574,10 +574,13 @@ Poll.section.changeType = function( li )
  */
 Poll.section.makeOptionset = function( li )
 {
+    var a  = ($(li).parent().children('li').index(li) === 0)
+    var b  = $('#section-leading').attr('checked');
     return {
         isScale:     $(li).find('input[name$="[isScale]"]').is(':checked'),
         hasOther:    $(li).find('input[name$="[hasOther]"]').val(),
-        choiceLimit: parseInt( $(li).find('select[name$="[choiceLimit]"]').val() )
+        choiceLimit: parseInt( $(li).find('select[name$="[choiceLimit]"]').val() ),
+        is_leading:  a && b
     }
 }
 

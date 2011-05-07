@@ -125,7 +125,7 @@ Poll.create.createOption = function(value, text)
 Poll.create.addSection = function()
 {
     var value = $(Poll.create.sections).val();
-    if ( value === -1 )
+    if ( value === "-1" )
     {
         return false;
     }
