@@ -76,12 +76,12 @@
 					{% if isFan %}
                         <form action="{% url proposal-StopFan slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Nie pójdę na to">
-						    <a class="with-js" href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
+						    <a class="with-js befan" href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
                         </form>
 					{% else %}
                         <form action="{% url proposal-beFan slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Pójdę na to">
-						    <a class="with-js" href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
+						    <a class="with-js befan" href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
                         </form>
 					{% endif %}
 					(chętnych: {{fans}})
@@ -94,12 +94,12 @@
 					{% if isTeacher %}
                         <form action="{% url proposal-StopTeacher slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Nie mogę poprowadzi">
-						    <a class="with-js" href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
+						    <a class="with-js befan" href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
                         </form>
 					{% else %}
                         <form action="{% url proposal-beTeacher slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Mogę prowadzić wykład">
-						    <a class="with-js" href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
+						    <a class="with-js befan" href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
                         </form>
 					{% endif %}
 					(chętnych: {{teachers}})
@@ -112,12 +112,12 @@
 					{% if isHelper %}
                         <form action="{% url proposal-StopHelper slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Nie pomogę poprowadzić">
-						    <a class="with-js" href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
+						    <a class="with-js befan" href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
                         </form>
 					{% else %}
                         <form action="{% url proposal-beHelper slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Pomogę poprowadzić">
-						    <a class="with-js" href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
+						    <a class="with-js befan" href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
                         </form>
 					{% endif %}
 					(chętnych: {{helpers}})
