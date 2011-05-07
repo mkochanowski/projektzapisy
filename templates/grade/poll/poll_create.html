@@ -15,7 +15,7 @@
 {% endblock %}
 
 
-{% block poll-managment %}
+{% block poll-managment %} aaa
         <form method="POST" id="poll-create">
             <table>
                 <tr>
@@ -95,15 +95,16 @@
                 </tr>
             </table><hr>
             <label for="title">Tytuł:</label>
-            <input type="text" name="title" id="title"><br>
+            <input type="text" name="title" id="title" class="required"><br>
             
             <label for="description">Opis:</label>
             <textarea name="description" id="description" rows="4"></textarea>
-            
+
             <hr>
             <div id="sections-list">
+                <input type="hidden" class="anysection">
                 Wybrane sekcje:
-                <ul>
+                <ul id="sections-list-ul">
                 </ul><small>(Przeciągnij, aby zmienić kolejność)</small>
             </div><br/>
             <label for="sections">Wybierz sekcję:</label>

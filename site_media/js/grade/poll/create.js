@@ -1,10 +1,21 @@
 if (typeof Poll == 'undefined')
     Poll = new Object();
 
+
+jQuery.validator.addMethod("have_sections", function(value, element) {
+  return $('#sections-list-ul').children().size() > 0;
+}, "Ankieta musi mieć pytania");
+
+jQuery.validator.addClassRules("anysection", {
+  have_sections: true
+});
+
 Poll.create = new Object();
 
 Poll.create.init = function()
 {
+
+
 	Poll.create.submitted     = false;
     Poll.create.sections      = $('#sections');
     Poll.create.chosenSection = $('#sections-list').children('ul')[0];
@@ -21,13 +32,7 @@ Poll.create.init = function()
     $('#semester').change(Poll.create.changeSemester);
     $('#subjects').change(Poll.create.changeSubjects);
     $('#type').change(Poll.create.changeTypes);
-	$('#poll-create-submit').click(function()
-	{
-		if( Poll.create.submitted )
-			return false;
-		
-		Poll.create.submitted = true;
-	})
+
 
     $(Poll.create.chosenSection).sortable({handle : 'p'});
 	$("form").keypress(function(e)
@@ -37,6 +42,7 @@ Poll.create.init = function()
     		return false;
   		}
 	});
+    $("#poll-create").validate();
 }
 
 Poll.create.changeSubjects = function()

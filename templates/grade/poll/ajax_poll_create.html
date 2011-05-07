@@ -77,13 +77,15 @@
         </tr>
     </table><hr>
     <label for="title">Tytuł:</label>
-    <input type="text" name="title" id="title"><br>
-
+    <input type="text" name="title" id="title" class="required"><br>
+<div class="clear"></div>
     <label for="description">Opis:</label>
     <textarea name="description" id="description" rows="4"></textarea>
-
+<div class="clear"></div>
     <hr>
     <div id="sections-list">
+
+        <input type="hidden" class="anysection">
         Wybrane sekcje:
         <ul class="chosen-sections">
         </ul>
