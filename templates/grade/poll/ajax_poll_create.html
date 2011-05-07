@@ -93,6 +93,7 @@
         <br/>
         <label for="sections">Wybierz sekcję:</label>
         <select name="section" id="sections">
+               <option value="-1">Wybierz...</option>
             {% for section in sections %}
                 <option value="{{section.pk}}">{{section}}</option>
             {% endfor %}

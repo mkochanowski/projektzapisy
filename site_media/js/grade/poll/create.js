@@ -8,6 +8,7 @@ Poll.create.init = function()
 	Poll.create.submitted     = false;
     Poll.create.sections      = $('#sections');
     Poll.create.chosenSection = $('#sections-list').children('ul')[0];
+    Poll.create.firstChosen   = $(Poll.create.sections).children()[0]
 
     if( $("#group").children().size() < 2)
     {
@@ -37,8 +38,6 @@ Poll.create.init = function()
   		}
 	});
 }
-
-
 
 Poll.create.changeSubjects = function()
 {
@@ -125,15 +124,20 @@ Poll.create.createOption = function(value, text)
 
 Poll.create.addSection = function()
 {
-    var newSection  = document.createElement('li');
-    var sectionId   = document.createElement('input');
-    sectionId.type  = 'hidden';
-    sectionId.value = $(Poll.create.sections).val()
-    sectionId.name  = 'sections[]'
+    var value = $(Poll.create.sections).val();
+    if ( value === -1 )
+    {
+        return false;
+    }
 
-    newSection.appendChild(sectionId);
-    
-    var section = Poll.create.getSection( sectionId.value, newSection );
+
+
+    var newSection  = $('<li>');
+    var sectionId   = $('<input type="hidden" name="sections[]"' +
+            ' value="'+ value +'">');
+
+    $(newSection).append(sectionId);
+    var section = Poll.create.getSection( value );
     $(newSection).append( $(section) )
 	$(Poll.create.chosenSection).append(newSection)
       
@@ -152,20 +156,22 @@ Poll.create.addSection = function()
             }
         }
         return false;
-    }); 
-    
-    var sectionRemoveButton = document.createElement('img');
-    sectionRemoveButton.alt = 'usuń';
-    sectionRemoveButton.className = 'remove';
-    sectionRemoveButton.src = '/site_media/images/remove-ico.png';
-    $('#poll-section-title-' + sectionId.value).after(sectionRemoveButton);   
-    $(newSection).find('.remove').click(function()
-    {
-        Poll.create.removeSection(newSection);
+
     });
+    var sectionRemove =  $('<img src="/site_media/images/remove-ico.png"'+
+                           'class="remove" alt="usuń">');
+
+    $('#poll-section-title-' + value).after(sectionRemove);
+    $(sectionRemove).click(function()
+    {
+        $(newSection).remove();
+        $(Poll.create.sections).children('option[value="'+ value +'"]').show();
+    });
+    $(Poll.create.sections).children('option[value="'+ value +'"]').hide();
+    $(Poll.create.firstChosen).attr('selected', true);
 }
 
-Poll.create.getSection = function( section_id, li )
+Poll.create.getSection = function( section_id )
 {
 	var result;
 	$.ajax({
@@ -180,8 +186,3 @@ Poll.create.getSection = function( section_id, li )
     return result
 }
 
-
-Poll.create.removeSection = function(sectionElement)
-{
-    $(sectionElement).remove();
-}
