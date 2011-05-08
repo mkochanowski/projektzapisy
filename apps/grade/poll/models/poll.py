@@ -14,6 +14,7 @@ from apps.enrollment.records.models  import Record, \
 from apps.grade.ticket_create.models import PublicKey                                              
 from section                           import SectionOrdering
 from saved_ticket                       import SavedTicket
+from origin                          import Origin
 
 class Poll( models.Model ):
 
@@ -25,6 +26,7 @@ class Poll( models.Model ):
     studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
     share_result      = models.BooleanField( verbose_name = 'udostępnij wyniki', default = False, blank = True )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
+    origin            = models.ForeignKey( Origin, verbose_name='zbiór', default=None, blank = True, null= True)
 
     class Meta:
         verbose_name        = 'ankieta' 

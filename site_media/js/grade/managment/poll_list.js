@@ -12,6 +12,21 @@ Poll.list.init = function()
         Fereol.dialog.setHTML(html);
         Fereol.dialog.setTitle("Podgląd ankiety");
         Fereol.dialog.show();
+        $('#box-belt-edit').remove();
+        if(! $(this).parent().parent().find('._selected_action').attr('disabled') )
+        {
+            var button = "<input type='button' value='Edytuj' id='box-belt-edit'>"
+            Fereol.dialog.addButton(button);
+        }
+        $('#box-belt-edit').click(function()
+        {
+            var html = Poll.list.getHTML( $("#edit_url").val() );
+            Fereol.dialog.setHTML(html);
+            Fereol.dialog.setTitle("Edycja ankiety");
+            Poll.create.init();
+            $(this).hide();
+            return false;
+        });
         return false;
     })
     $('.section_list_a').click(function()

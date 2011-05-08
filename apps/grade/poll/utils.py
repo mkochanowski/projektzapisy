@@ -13,7 +13,7 @@ from apps.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SingleChoiceQuestionAnswer, \
                                               MultipleChoiceQuestionAnswer, \
                                               OpenQuestionAnswer, Option, Template, \
-                                              TemplateSections
+                                              TemplateSections, Origin
 from apps.grade.ticket_create.utils import poll_cmp, \
                                              flatten
 from apps.enrollment.records.models        import Group
@@ -467,7 +467,6 @@ def make_template_from_db( request, template):
     var = {}
     var['type']           = template.group_type
     var['sections']       = template.sections.all()
-    print var['sections']
     var['studies_type']   = template.studies_type
     var['title']          = template.title
     var['description']    = template.description
@@ -590,7 +589,7 @@ def get_templates( request ):
     return Template.objects.filter(pk__in=pks)
 
 
-def make_section_for_poll(request, poll, template):
+def make_section_for_poll(request, poll, template={}):
     if 'sections' in template:
         sections = template['sections']
         if sections == []:
@@ -608,11 +607,15 @@ def make_section_for_poll(request, poll, template):
             raise NoSectionException
 
         for (i, section) in enumerate(sections):
+            print section
             pollSection = SectionOrdering()
             pollSection.poll = poll
             pollSection.position = i
-            pollSection.section = Section.objects.get(pk = section)
+            print type(int(section))
+            pollSection.section = Section.objects.get(pk=int(section))
             pollSection.save()
+            print 'aaa'
+        print "end"
 
 def make_poll_from_template( request, template):
     poll = Poll()
@@ -626,22 +629,26 @@ def make_poll_from_template( request, template):
 
     return poll
 
-def make_poll(request, template, group=None):
+def make_poll(request, template, group=None, orgin=None):
     template['iterate_group'] = group
     poll = make_poll_from_template(request, template)
+    poll.origin = origin
+    poll.save()
     make_section_for_poll(request, poll, template)
     return poll
 
 def make_polls_for_groups( request, groups, template ):
     polls = []
 
+    origin = Origin()
+    origin.save()
     for group in groups:
         if template['groups_without'] == 'on' and Poll.get_all_polls_for_group(group):
             continue
         if not request.user.employee.has_privileges_for_group(group.pk):
             continue
 
-        poll = make_poll(request, template, group)
+        poll = make_poll(request, template, group, origin)
         polls.append(unicode(poll))
 
     if (len(polls)==0):
@@ -649,8 +656,10 @@ def make_polls_for_groups( request, groups, template ):
     return polls
 
 def make_polls_for_all( request, template ):
+    origin = Origin()
+    origin.save()
     polls = []
-    poll = make_poll(request, template)
+    poll = make_poll(request, template, None, origin)
 
     polls.append(unicode(poll))
 
@@ -704,7 +713,7 @@ def make_message_from_polls( polls ):
 
     return message
 
-def prepare_data_for_create_poll( request, group_id ):
+def prepare_data_for_create_poll( request, group_id = 0 ):
     data = pop_template_from_session( request )
 
     if group_id > 0:
@@ -764,3 +773,14 @@ def make_pages( pages, page_number ):
     list.extend( range(start, pages))
 
     return list
+
+def edit_poll(poll, request, origin):
+    poll.title = request.POST.get('title', '')
+    poll.description = request.POST.get('description', '')
+    poll.origin = origin
+    poll.save()
+
+    for section in SectionOrdering.objects.filter(poll=poll):
+        section.delete()
+
+    make_section_for_poll(request, poll)

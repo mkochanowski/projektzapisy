@@ -13,3 +13,4 @@ from open_question_answer            import OpenQuestionAnswer
 from single_choice_question_answer   import SingleChoiceQuestionAnswer
 from multiple_choice_question_answer import MultipleChoiceQuestionAnswer
 from template                        import Template, TemplateSections
+from origin                          import Origin

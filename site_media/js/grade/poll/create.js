@@ -15,11 +15,27 @@ Poll.create = new Object();
 Poll.create.init = function()
 {
 
-
 	Poll.create.submitted     = false;
     Poll.create.sections      = $('#sections');
     Poll.create.chosenSection = $('#sections-list').children('ul')[0];
     Poll.create.firstChosen   = $(Poll.create.sections).children()[0]
+
+    $('.sectionid').each(function(i, elem){
+        var value = $(elem).val();
+        $(Poll.create.sections).children('option[value="'+ value +'"]').hide();
+    })
+    $('.poll-section-title').each(function(i, elem){
+        var sectionRemove =  $('<img src="/site_media/images/remove-ico.png"'+
+                           'class="remove" alt="usuń">');
+        $(elem).after(sectionRemove);
+        $(sectionRemove).click(function()
+        {
+            var li    = $(sectionRemove).closest('li');
+            var value = $(li).find('.sectionid').val()
+            $(li).remove();
+            $(Poll.create.sections).children('option[value="'+ value +'"]').show();
+        });
+    });
 
     if( $("#group").children().size() < 2)
     {
@@ -139,7 +155,7 @@ Poll.create.addSection = function()
 
 
     var newSection  = $('<li>');
-    var sectionId   = $('<input type="hidden" name="sections[]"' +
+    var sectionId   = $('<input type="hidden" class="sectionid" name="sections[]"' +
             ' value="'+ value +'">');
 
     $(newSection).append(sectionId);

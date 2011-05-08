@@ -30,7 +30,7 @@ from apps.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SingleChoiceQuestionAnswer, \
                                               MultipleChoiceQuestionAnswer, \
                                               OpenQuestionAnswer, Option, Template, \
-                                              TemplateSections
+                                              TemplateSections, Origin
 from apps.grade.poll.forms           import TicketsForm, \
                                               PollForm, \
                                               FilterMenu
@@ -57,7 +57,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               make_message_from_polls, save_template_in_session, \
                                               make_polls_for_all, get_templates,\
                                               make_template_from_db,\
-                                              get_groups_for_user, make_pages
+                                              get_groups_for_user, make_pages, edit_poll
 
 from apps.users.models               import Employee
 
@@ -321,6 +321,50 @@ def poll_form(request, group_id = 0):
     return render_to_response( 'grade/poll/ajax_poll_create.html', data, context_instance = RequestContext( request ))
 
 @employee_required
+def poll_edit_form(request, poll_id):
+    grade = Semester.get_current_semester().is_grade_active
+    poll = Poll.objects.get( pk=poll_id )
+    data = prepare_data_for_create_poll( request )
+
+    poll.forms = []
+
+    for section in poll.all_sections():
+        form = PollForm()
+        form.setFields( None, None, section.pk )
+        form.sid = section.pk
+        poll.forms.append(form)
+
+    print poll.forms
+    data['grade'] =  grade
+    data['poll']  = poll
+    return render_to_response( 'grade/poll/ajax_poll_edit.html', data, context_instance = RequestContext( request ))
+
+@employee_required
+def poll_edit(request):
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
+
+    if request.method == "POST":
+        for_all = ( request.POST.get('for_all') == 'on' )
+        poll_id = int(request.POST['poll_id'])
+        poll    = Poll.objects.get(pk=poll_id)
+        if for_all and poll.origin:
+            origin = poll.origin
+            polls = Poll.objects.filter(origin=origin)
+            for edited_poll in polls:
+                edit_poll(edited_poll, request, origin)
+            messages.success( request, "Ankiety zostały zmienione" )
+        else:
+            origin = Origin()
+            origin.save()
+            edit_poll(poll, request, origin)
+            messages.success( request, "Ankieta została zmieniona" )
+
+    return HttpResponseRedirect(reverse('grade-poll-list'))
+
+@employee_required
 def poll_create(request, group_id = 0):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
@@ -449,6 +493,7 @@ def show_poll( request, poll_id):
     form.setFields( poll, None, None )
     data = {}
     data['form']    = form
+    data['poll_id'] = poll_id
     data['grade']   = Semester.get_current_semester().is_grade_active
     if request.is_ajax():
         return render_to_response( 'grade/poll/managment/ajax_show_poll.html', data, context_instance = RequestContext( request ))
