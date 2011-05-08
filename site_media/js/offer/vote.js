@@ -173,7 +173,7 @@ Vote.initFilter = function()
 		'phrase', '.filter-phrase', function(element, value)
 	{
 		var subject = $(element.data);
-		return (subject.children('label').text().toLowerCase().indexOf(value) >= 0);
+		return (subject.children('label').text().toLowerCase().indexOf(value.toLowerCase()) >= 0);
 	}));
 
 	Vote.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
