@@ -39,6 +39,6 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    (r'admin/subjects/import_semester', 'apps.enrollment.subjects.admin.views.import_semester'),
-    (r'^admin/', include(admin.site.urls)),
+    (r'admin337365/subjects/import_semester', 'apps.enrollment.subjects.admin.views.import_semester'),
+    (r'^admin337365/', include(admin.site.urls)),
 )
