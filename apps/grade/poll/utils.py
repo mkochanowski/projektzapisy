@@ -607,15 +607,11 @@ def make_section_for_poll(request, poll, template={}):
             raise NoSectionException
 
         for (i, section) in enumerate(sections):
-            print section
             pollSection = SectionOrdering()
             pollSection.poll = poll
             pollSection.position = i
-            print type(int(section))
             pollSection.section = Section.objects.get(pk=int(section))
             pollSection.save()
-            print 'aaa'
-        print "end"
 
 def make_poll_from_template( request, template):
     poll = Poll()

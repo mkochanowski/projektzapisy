@@ -334,7 +334,6 @@ def poll_edit_form(request, poll_id):
         form.sid = section.pk
         poll.forms.append(form)
 
-    print poll.forms
     data['grade'] =  grade
     data['poll']  = poll
     return render_to_response( 'grade/poll/ajax_poll_edit.html', data, context_instance = RequestContext( request ))
