@@ -65,7 +65,7 @@
 			{% else %}
 				Nie jesteś zalogowany
 				&ndash;
-				<a href="{% url user-login %}">zaloguj</a>
+				<a href="{% url user-login %}?next={{request.path}}">zaloguj</a>
 			{% endif %}
 		</p>
 	</div>
