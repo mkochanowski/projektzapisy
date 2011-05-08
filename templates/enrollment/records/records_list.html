@@ -32,12 +32,20 @@
 		<br/>
 		
 		<table>
+			<thead>
+				<td>Imię i nazwisko</td>
+				<td>Nr indeksu</td>
+				<td>Rodzaj studiów</td>
+				<td>Semestr</td>
+			</thead>
 			<tbody>
 				{% for student in students_in_group %}
 					<tr>
 						<td><a href="{% url student-profile student.user.id %}">
 						    {{student.user.get_full_name}}</a></td>
 						<td>{{student.matricula}}</td>
+						<td>{{student.program}}</td>
+						<td>{{student.semestr}}</td>
 					</tr>
 			
 				{% empty %}
