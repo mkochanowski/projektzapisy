@@ -1,13 +1,41 @@
 if (typeof Poll == 'undefined')
     Poll = new Object();
 
+
+jQuery.validator.addMethod("have_sections", function(value, element) {
+  return $('#sections-list-ul').children().size() > 0;
+}, "Ankieta musi mieć pytania");
+
+jQuery.validator.addClassRules("anysection", {
+  have_sections: true
+});
+
 Poll.create = new Object();
 
 Poll.create.init = function()
 {
+
 	Poll.create.submitted     = false;
     Poll.create.sections      = $('#sections');
     Poll.create.chosenSection = $('#sections-list').children('ul')[0];
+    Poll.create.firstChosen   = $(Poll.create.sections).children()[0]
+
+    $('.sectionid').each(function(i, elem){
+        var value = $(elem).val();
+        $(Poll.create.sections).children('option[value="'+ value +'"]').hide();
+    })
+    $('.poll-section-title').each(function(i, elem){
+        var sectionRemove =  $('<img src="/site_media/images/remove-ico.png"'+
+                           'class="remove" alt="usuń">');
+        $(elem).after(sectionRemove);
+        $(sectionRemove).click(function()
+        {
+            var li    = $(sectionRemove).closest('li');
+            var value = $(li).find('.sectionid').val()
+            $(li).remove();
+            $(Poll.create.sections).children('option[value="'+ value +'"]').show();
+        });
+    });
 
     if( $("#group").children().size() < 2)
     {
@@ -20,13 +48,7 @@ Poll.create.init = function()
     $('#semester').change(Poll.create.changeSemester);
     $('#subjects').change(Poll.create.changeSubjects);
     $('#type').change(Poll.create.changeTypes);
-	$('#poll-create-submit').click(function()
-	{
-		if( Poll.create.submitted )
-			return false;
-		
-		Poll.create.submitted = true;
-	})
+
 
     $(Poll.create.chosenSection).sortable({handle : 'p'});
 	$("form").keypress(function(e)
@@ -36,9 +58,8 @@ Poll.create.init = function()
     		return false;
   		}
 	});
+    $("#poll-create").validate();
 }
-
-
 
 Poll.create.changeSubjects = function()
 {
@@ -125,59 +146,54 @@ Poll.create.createOption = function(value, text)
 
 Poll.create.addSection = function()
 {
-    var newSection  = document.createElement('li');
-    var sectionId   = document.createElement('input');
-    sectionId.type  = 'hidden';
-    sectionId.value = $(Poll.create.sections).val()
-    sectionId.name  = 'sections[]'
-
-    newSection.appendChild(sectionId);
-    
-    var section = Poll.create.getSection( sectionId.value, newSection );
-    
-    var sectionLabel = document.createElement('p');
-    
-    var sectionFoldUnfoldButton = document.createElement( 'button' );
-    $(sectionFoldUnfoldButton).text( '+' );
-    sectionFoldUnfoldButton.className = 'fold-unfold-button';
-    $(sectionFoldUnfoldButton).click( function(){
-        if ($(this).text() == '+'){
-            $(this).text('-');
-        } else {
-            if ($(this).text() == '-'){
-                $(this).text('+');
-            }
-        }
-        $('#section-' + sectionId.value ).slideToggle(250);
+    var value = $(Poll.create.sections).val();
+    if ( value === "-1" )
+    {
         return false;
-    });
-    sectionLabel.appendChild(sectionFoldUnfoldButton);
-    
-    var sectionTitle = document.createElement('span');
-    label = $('#sections option:selected').text();
-    $(sectionTitle).text(label);
-    sectionTitle.className = 'section-title';
-    sectionLabel.appendChild(sectionTitle);
+    }
 
-    var sectionRemoveButton = document.createElement('img');
-    sectionRemoveButton.alt = 'usuń';
-    sectionRemoveButton.className = 'remove';
-    sectionRemoveButton.src = '/site_media/images/remove-ico.png';
-    sectionLabel.appendChild(sectionRemoveButton);
-    
-    var Lilabel = $(sectionLabel).html();
-    $(newSection).append( $(sectionLabel) )
+
+
+    var newSection  = $('<li>');
+    var sectionId   = $('<input type="hidden" class="sectionid" name="sections[]"' +
+            ' value="'+ value +'">');
+
+    $(newSection).append(sectionId);
+    var section = Poll.create.getSection( value );
     $(newSection).append( $(section) )
 	$(Poll.create.chosenSection).append(newSection)
-    $('#section-' + sectionId.value ).hide();
-    
-    $(newSection).find('.remove').click(function()
+      
+    $( '#section-content-' + sectionId.value ).hide();
+    $( '#section-toggle-' + sectionId.value ).text( '+' );
+    $( '.grade-section-toggle-button' ).unbind( 'click' );
+    $( '.grade-section-toggle-button' ).click( function(){
+        var toToggleId  = $(this).attr( 'id' ).split( '-' )[2];
+        var toToggleObj = $('#section-content-' + toToggleId );
+        toToggleObj.slideToggle( 250 );
+        if ( $(this).text() == '+' ){
+            $(this).text( '-' );
+        } else {
+            if ( $(this).text() == '-' ) {
+                $(this).text( '+' );
+            }
+        }
+        return false;
+
+    });
+    var sectionRemove =  $('<img src="/site_media/images/remove-ico.png"'+
+                           'class="remove" alt="usuń">');
+
+    $('#poll-section-title-' + value).after(sectionRemove);
+    $(sectionRemove).click(function()
     {
-        Poll.create.removeSection(newSection);
-    });    
+        $(newSection).remove();
+        $(Poll.create.sections).children('option[value="'+ value +'"]').show();
+    });
+    $(Poll.create.sections).children('option[value="'+ value +'"]').hide();
+    $(Poll.create.firstChosen).attr('selected', true);
 }
 
-Poll.create.getSection = function( section_id, li )
+Poll.create.getSection = function( section_id )
 {
 	var result;
 	$.ajax({
@@ -192,8 +208,3 @@ Poll.create.getSection = function( section_id, li )
     return result
 }
 
-
-Poll.create.removeSection = function(sectionElement)
-{
-    $(sectionElement).remove();
-}

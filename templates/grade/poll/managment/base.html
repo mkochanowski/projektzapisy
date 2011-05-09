@@ -6,14 +6,17 @@
     <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/common/dialog_box.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/grade/questionset_create.css" type="text/css" />
     {% block extra-styles %}
     {% endblock %}
 {% endblock %}
 
 {% block mainscripts %}
     <script src="/site_media/js/common/dialog_box.js" type="text/javascript"></script>
-    <script type="text/javascript" src="/site_media/js/jquery/jquery-tmpl/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery-tmpl/jquery.tmpl.js"></script>
     <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery-validation-1.8.0/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery-validation-1.8.0/localization/messages_pl.js"></script>
 {% endblock %}
 
 {% block main-navigation %}
@@ -39,6 +42,4 @@
             
         {% endblock %}
     </div>
-{% include 'common/dialog_box.html' %}
-
 {% endblock %}

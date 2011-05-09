@@ -73,18 +73,21 @@ class Proposal( models.Model ):
             teachers
             helpers
         """
-        if group == 'fans':
-            field = self.fans
-        elif group == 'teachers':
-            field = self.teachers
-        elif group == 'helpers':
-            field = self.helpers
 
         try:
-            if field.get(user = user):
-                return True
-            else:
+            if group == 'fans':
+                if self.fans.get(id=user.id):
+                    return True
                 return False
+            elif group == 'teachers':
+                if self.teachers.get(id = user.id):
+                    return True
+                return False
+            elif group == 'helpers':
+                if self.helpers.get(id = user.id):
+                    return True
+                return False
+
         except Student.DoesNotExist:
             return False
         except Employee.DoesNotExist:

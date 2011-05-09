@@ -13,12 +13,14 @@
     margin-top: -75px;
     margin-bottom: 100px;
     z-index:100;
+    outline:none;
 }
 
 #box-content
 {
     padding-left: 15px;
     padding-right: 15px;
+    padding-top:  15px;
     border-left: 1px solid #000000;
     border-right: 1px solid #000000;
     border-bottom: 1px solid #000000;
@@ -68,9 +70,17 @@
     min-height:23px;
 }
 
-#box-exit
+#box-button
 {
-    display: inline-block;
-    right:5px;
+    display:inline;
     position:absolute;
+    right:5px
+}
+
+#box-title-container
+{
+    display:inline;
+    position:absolute;
+    left:5px;
+    float:left;
 }

@@ -43,13 +43,8 @@ margin:15px;
     margin-top: 15px;
 }
 
-.section-title{
+.poll-section-title{
     float: left;
-    }
-
-.fold-unfold-button{
-    float: left;
-    margin-right: 4em;
     }
     
 .remove{
@@ -70,6 +65,10 @@ margin:15px;
 
 .chosen-sections {
     list-style: none;
+    }
+    
+.section-content {
+    clear: both;
     }
 /*** TWORZENIE ANKIETY - koniec ***/
 

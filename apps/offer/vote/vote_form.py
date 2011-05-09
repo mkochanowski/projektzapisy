@@ -121,7 +121,6 @@ class VoteForm( forms.Form ):
         for key in self.fields.iterkeys():
             field = self.fields[key]
 
-            print field.initial
             subject_class = u''
             for type in self.subject_types[key]:
                 subject_class += u' subject-type-' + str(type.lecture_type.id)

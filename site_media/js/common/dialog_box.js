@@ -28,9 +28,21 @@ Fereol.dialog.show = function()
     $('#box').css({"display": "block"});
     $('#backscreen').css('display', 'block');
     $('#box-exit').click( Fereol.dialog.hide );
+    $('#box').focus();
 }
 
 Fereol.dialog.init();
+
+Fereol.dialog.setTitle = function(html)
+{
+    $('#box-title').html(html);
+}
+
+Fereol.dialog.addButton = function( button )
+{
+    $('#box-button').html( button + $('#box-button').html() )
+    $('#box-exit').click( Fereol.dialog.hide )
+}
 
 Fereol.dialog.setHTML = function(html)
 {

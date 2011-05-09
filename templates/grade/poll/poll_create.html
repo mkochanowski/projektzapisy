@@ -2,15 +2,8 @@
 {% block scripts %}
 
 <script src="/site_media/js/grade/poll/create.js" type="text/javascript"></script>
-<script src="/site_media/js/grade/ticket_create/keys_generate.js" type="application/javascript"></script>
 <script type="text/javascript" src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js"></script>
-<script type="text/javascript">
 
-    var url_generate = '{% url grade-ticket-keys-generator %}'
-    var url_progress = '{% url grade-ticket-keys-progress %}'
-    var url_template = '{% url grade-poll-create-template %}'
-
-</script>
 	
 {% endblock %}
 
@@ -22,7 +15,7 @@
 {% endblock %}
 
 
-{% block poll-managment %}
+{% block poll-managment %} aaa
         <form method="POST" id="poll-create">
             <table>
                 <tr>
@@ -102,19 +95,21 @@
                 </tr>
             </table><hr>
             <label for="title">Tytuł:</label>
-            <input type="text" name="title" id="title"><br>
+            <input type="text" name="title" id="title" class="required"><br>
             
             <label for="description">Opis:</label>
             <textarea name="description" id="description" rows="4"></textarea>
-            
+
             <hr>
             <div id="sections-list">
+                <input type="hidden" class="anysection">
                 Wybrane sekcje:
-                <ul>
+                <ul id="sections-list-ul">
                 </ul><small>(Przeciągnij, aby zmienić kolejność)</small>
             </div><br/>
             <label for="sections">Wybierz sekcję:</label>
             <select name="section" id="sections">
+                    <option value="-1">Wybierz sekcję</option>
                 {% for section in sections %}
                     <option value="{{section.pk}}">{{section}}</option>
                 {% endfor %}

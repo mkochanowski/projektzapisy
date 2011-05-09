@@ -56,13 +56,26 @@ Poll.section.init = function()
             return false;
           }
     });
-    $(Poll.section.editParser);
+    //Poll.section.editParser();
     $(Poll.section.questionContainer).sortable({
             handle : '.section-edit',
             tolerance: 'pointer',
             items: '> li:not(.firstQuestion)'
 
     });
+
+    $('.ready').click(function()
+    {
+        $(this).parents('.poll-question').children('.section-show').mouseover(function(){
+            $(this).addClass('section-mouseover');
+            $(this).find('.edit-mode').show()
+            });
+
+        $(this).parents('.poll-question').children('.section-show').mouseout(function(){
+            $(this).removeClass('section-mouseover');
+            $(this).find('.edit-mode').hide()
+            });
+    })
 
     $('.only-edit').show();
     $('.only-show').hide();
@@ -79,6 +92,7 @@ Poll.section.showEdit = function()
         var data = {
             type:  $(li).find('input[name$="[type]"]').val(),
             title: $(li).find('input[name$="[title]"]').val(),
+            isdesc: $(li).find('input[name$="[description]"]').val().length,
             desc:  $(li).find('input[name$="[description]"]').val(),
             questionset: Poll.section.makeQuestionset( li ),
             optionset: Poll.section.makeOptionset( li )
@@ -89,19 +103,9 @@ Poll.section.showEdit = function()
         $('.section-edit').hide();
         $('.only-edit').hide();
         $('.only-show').show();
-    }).click();
-}
 
-/*
-* Function using during section edit.
-* It parse html and set events and variables
-*
-* @author mjablonski
-*
- */
-Poll.section.editParser = function()
-{
-    $('.poll-question').each(function(i, d){Poll.section.parse($(this))});
+
+    }).click();
 
     Poll.section.questions = $('.poll-question').size()
     $('.autocomplete').each(function()
@@ -115,10 +119,44 @@ Poll.section.editParser = function()
     });
     $('.typeSelect').change(function()
     {
+        var li   = $(this).parents('.poll-question');
         Poll.section.changeType( li )
     });
 
+}
 
+/*
+* Function using during section edit.
+* It parse html and set events and variables
+*
+* @author mjablonski
+*
+ */
+Poll.section.editParser = function()
+{
+    Poll.section.havelastLi= false;
+    $('.poll-question').each(function(i, d){Poll.section.parse($(this))});
+    Poll.section.questions = $('.poll-question').size()
+    Poll.section.questionContainer = $("#poll-form");
+    $('.autocomplete').each(function()
+    {
+        $(this).autocomplete(
+        {
+         source:'grade/poll/autocomplete',
+         delay:10
+         }
+        );
+    });
+
+
+    $('.typeSelect').unbind('change')
+    $('.typeSelect').change(function()
+    {
+        var li   = $(this).parents('.poll-question');
+        Poll.section.changeType( li )
+    });
+
+    $('.ready').unbind('click');
     $('.ready').click(function()
     {
         var li   = $(this).parents('.poll-question');
@@ -132,15 +170,27 @@ Poll.section.editParser = function()
     $('.edit-mode').hide()
     $('.delete').click(function()
     {
+        Poll.section.havelastLi = false;
         $(this).parents('.poll-question').remove();
     });
 
     $('.delete-answer').click(function(){
-
-         $(this).parents('.poll-question-answer').remove();
-        $(li).find('select[name$="[choiceLimit]"]').children().remove()
+        var li   = $(this).parents('.poll-question');
+        $(this).parents('.poll-question-answer').remove();
+        $(li).find('select[name$="[choiceLimit]"]').children().last().remove()
 
     })
+    $(".leading").change(Poll.section.changeLeading);
+
+    $("#add-question").click(Poll.section.createQuestion);
+
+
+    $(Poll.section.questionContainer).sortable({
+            handle : '.section-edit',
+            tolerance: 'pointer',
+            items: '> li:not(.firstQuestion)'
+
+    });
 }
 
 Poll.section.parse = function(li)
@@ -236,7 +286,7 @@ Poll.section.questionCreator = function( position, data )
                 .appendTo( $(li).find('.options') )
     }
     
-    //
+
     if ( Poll.section.havelastLi )
     {
         Poll.section.createView(Poll.section.lastLi)
@@ -250,6 +300,7 @@ Poll.section.questionCreator = function( position, data )
     // buttons events
 
     $('.ready').click(function(){
+
         var li = $(this).parents('.poll-question');
         if( Poll.section.validate(li) )
         {
@@ -259,15 +310,14 @@ Poll.section.questionCreator = function( position, data )
 
     })
     $('.delete').click(function(){
-                    var li = $(this).parents('.poll-question');
-                    $(li).remove()
+                    Poll.section.havelastLi = false;
+                    $(this).parents('.poll-question').remove();
                 });
     $('select[name$="[formtype]"]').change(function()
                 {
                     var li = $(this).parents('.poll-question');
                     Poll.section.changeType( li )
                 })
-
 }
 
 /*
@@ -361,10 +411,24 @@ Poll.section.createView = function( li )
     $(li).children('.section-show')
         .remove();
     Poll.section.havelastLi = false;
+
+    var elem = $(li).find('.section-edit')
+    var desc = $(elem).find('input[name$="[description]"]').val()
+
+    if ( desc )
+    {
+        isdesc = desc.length
+    }
+    else
+    {
+        isdesc = ''
+    }
+
     var data = {
-        type:  $(li).find('input[name$="[type]"]').val(),
-        title: $(li).find('input[name$="[title]"]').val(),
-        desc:  $(li).find('input[name$="[description]"]').val(),
+        type:  $(elem).find('input[name$="[type]"]').val(),
+        title: $(elem).find('input[name$="[title]"]').val(),
+        desc:  desc,
+        isdesc: isdesc,
         questionset: Poll.section.makeQuestionset( li ),
         optionset: Poll.section.makeOptionset( li )
     }
@@ -383,11 +447,11 @@ Poll.section.createView = function( li )
                 Poll.section.createEdit( li );
             });
 
-    $(li).children('.section-show').mouseover(function(){
+    $(li).find('.section-show').mouseover(function(){
         $(this).addClass('section-mouseover');
         $(this).find('.edit-mode').show()
         });
-    $(li).children('.section-show').mouseout(function(){
+    $(li).find('.section-show').mouseout(function(){
         $(this).removeClass('section-mouseover');
         $(this).find('.edit-mode').hide()        
         });
@@ -510,10 +574,13 @@ Poll.section.changeType = function( li )
  */
 Poll.section.makeOptionset = function( li )
 {
+    var a  = ($(li).parent().children('li').index(li) === 0)
+    var b  = $('#section-leading').attr('checked');
     return {
-        isScale:     $(li).find('input[name$="[isScale]"]').val(),
+        isScale:     $(li).find('input[name$="[isScale]"]').is(':checked'),
         hasOther:    $(li).find('input[name$="[hasOther]"]').val(),
-        choiceLimit: parseInt( $(li).find('select[name$="[choiceLimit]"]').val() )
+        choiceLimit: parseInt( $(li).find('select[name$="[choiceLimit]"]').val() ),
+        is_leading:  a && b
     }
 }
 
@@ -533,6 +600,7 @@ Poll.section.makeQuestionset = function( li )
                {
                  questions.push(
                     {
+                        id:      'blablabla',
                         title:   $(this).find('input[name$="[answers][]"]').val(),
                         isHiden: $(this).find('input[name$="[hideOn][]"]').val()
                    })
@@ -555,12 +623,10 @@ Poll.section.changeLeading = function()
     }
     if ( $(this).is(':checked') )
     {
-        //
         var data = {
             id: 0
         }
         Poll.section.questionCreator('top', data);
-
         var leadingQuestion = $(Poll.section.questionContainer)
                 .children()
                 .first();
@@ -581,7 +647,6 @@ Poll.section.changeLeading = function()
         // don't sort first in questionset
         $(leadingQuestion)
                 .addClass('firstQuestion');
-
     }
     else
     {
@@ -590,6 +655,13 @@ Poll.section.changeLeading = function()
                 .children()
                 .first()
                 .remove();
+        if (Poll.section.havelastLi)
+        {
+            if( $(Poll.section.lastLi).parent().index(Poll.section.lastLi) === 0)
+            {
+                Poll.section.havelastLi = false;
+            }
+        }
         $("#questionset").validate().element('.anyquestion');
         $("#questionset").valid();
     }

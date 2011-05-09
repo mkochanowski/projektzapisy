@@ -30,7 +30,7 @@ from apps.grade.poll.models          import Poll, Section, SectionOrdering, \
                                               SingleChoiceQuestionAnswer, \
                                               MultipleChoiceQuestionAnswer, \
                                               OpenQuestionAnswer, Option, Template, \
-                                              TemplateSections
+                                              TemplateSections, Origin
 from apps.grade.poll.forms           import TicketsForm, \
                                               PollForm, \
                                               FilterMenu
@@ -57,7 +57,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               make_message_from_polls, save_template_in_session, \
                                               make_polls_for_all, get_templates,\
                                               make_template_from_db,\
-                                              get_groups_for_user, make_pages
+                                              get_groups_for_user, make_pages, edit_poll
 
 from apps.users.models               import Employee
 
@@ -71,6 +71,7 @@ from django.utils.encoding import smart_str, smart_unicode
 from apps.grade.poll.exceptions import NoTitleException, NoSectionException, \
                                     NoPollException
 
+from apps.news.views import display_news_list
 ########################################
 #### POLL MANAGMENT
 ########################################
@@ -92,10 +93,14 @@ def templates( request ):
         List of templates
         @author mjablonski
     """
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     data = {}
     page, paginator = make_paginator( request, Template )
     data['templates'] = page
-    data['grade']  = Semester.get_current_semester().is_grade_active
+    data['grade']  = grade
     data['template_word'] = declination_template(paginator.count)
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
@@ -209,13 +214,16 @@ def rules(request):
 @employee_required
 def enable_grade( request ):
     semester = Semester.get_current_semester()
-    
     if semester.is_grade_active:
         messages.error( request, "Nie można otworzyć oceny; ocena jest już otwarta")
     elif Poll.get_polls_for_semester().count() == 0:
         messages.error( request, "Nie można otworzyć oceny; brak ankiet")
     elif Poll.get_current_semester_polls_without_keys().count() != 0:
         messages.error( request, "Nie można otworzyć oceny; brak kluczy dla ankiet")
+        data = {}
+        data['category'] = 'grade'
+        data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
+        return display_news_list(request, data)
     else:
         semester.is_grade_active = True
         news = News()
@@ -313,6 +321,49 @@ def poll_form(request, group_id = 0):
     return render_to_response( 'grade/poll/ajax_poll_create.html', data, context_instance = RequestContext( request ))
 
 @employee_required
+def poll_edit_form(request, poll_id):
+    grade = Semester.get_current_semester().is_grade_active
+    poll = Poll.objects.get( pk=poll_id )
+    data = prepare_data_for_create_poll( request )
+
+    poll.forms = []
+
+    for section in poll.all_sections():
+        form = PollForm()
+        form.setFields( None, None, section.pk )
+        form.sid = section.pk
+        poll.forms.append(form)
+
+    data['grade'] =  grade
+    data['poll']  = poll
+    return render_to_response( 'grade/poll/ajax_poll_edit.html', data, context_instance = RequestContext( request ))
+
+@employee_required
+def poll_edit(request):
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
+
+    if request.method == "POST":
+        for_all = ( request.POST.get('for_all') == 'on' )
+        poll_id = int(request.POST['poll_id'])
+        poll    = Poll.objects.get(pk=poll_id)
+        if for_all and poll.origin:
+            origin = poll.origin
+            polls = Poll.objects.filter(origin=origin)
+            for edited_poll in polls:
+                edit_poll(edited_poll, request, origin)
+            messages.success( request, "Ankiety zostały zmienione" )
+        else:
+            origin = Origin()
+            origin.save()
+            edit_poll(poll, request, origin)
+            messages.success( request, "Ankieta została zmieniona" )
+
+    return HttpResponseRedirect(reverse('grade-poll-list'))
+
+@employee_required
 def poll_create(request, group_id = 0):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
@@ -358,10 +409,14 @@ def sections_list( request ):
         aren't allowed to any such action.
     """
     data = {}
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     page, paginator = make_paginator( request, Section )
     data['sections'] = page
     data['sections_word'] = declination_section(paginator.count, True)
-    data['grade']  = Semester.get_current_semester().is_grade_active
+    data['grade']  = grade
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
     data['tab']    = "section_list"
@@ -369,11 +424,15 @@ def sections_list( request ):
 
 @employee_required
 def show_section( request, section_id):
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     form = PollForm()
     form.setFields( None, None, section_id )
     data = {}
     data['form']    = form
-    data['grade']   = Semester.get_current_semester().is_grade_active
+    data['grade']   = grade
     data['section'] = Section.objects.get(pk=section_id)
 
     if request.is_ajax():
@@ -411,13 +470,18 @@ def delete_sections( request ):
 @employee_required
 def polls_list( request ):
     data = {}
+    grade = Semester.get_current_semester().is_grade_active
+    if grade:
+        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
+        return HttpResponseRedirect('/news/grade')
     page, paginator  = make_paginator(request, Poll)
     data['polls'] = page
     data['polls_word'] = declination_poll(paginator.count, True)
-    data['grade']      = Semester.get_current_semester().is_grade_active
+    data['grade']      = grade
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
-    data['pages_range']  = paginator._get_page_range()
-    data['tab']    = "poll_list"
+    data['pages_range']    = paginator._get_page_range()
+    data['tab']            = "poll_list"
+    data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 
@@ -428,6 +492,7 @@ def show_poll( request, poll_id):
     form.setFields( poll, None, None )
     data = {}
     data['form']    = form
+    data['poll_id'] = poll_id
     data['grade']   = Semester.get_current_semester().is_grade_active
     if request.is_ajax():
         return render_to_response( 'grade/poll/managment/ajax_show_poll.html', data, context_instance = RequestContext( request ))
@@ -715,10 +780,8 @@ def poll_answer( request, slug, pid ):
                         ansx = request.POST.get( section_answers[ 0 ], None)
                         if ansx:
                             option = Option.objects.get( pk = ansx)
-                            print option
                             ans.option = option
                             ans.save()
-                            print ans
                             if option in question.singlechoicequestionordering_set.filter( sections = section )[ 0 ].hide_on.all():
                                 delete = True
                         else:
@@ -856,7 +919,6 @@ def poll_answer( request, slug, pid ):
         data[ 'form' ]   = form
         
         if request.method == "POST" and (not data['form_errors'] or st.finished):
-            print request.POST.get( 'Save', default=None )
             if request.POST.get( 'Next', default=None ):
                 return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]))
             if request.POST.get( 'Prev', default=None ):

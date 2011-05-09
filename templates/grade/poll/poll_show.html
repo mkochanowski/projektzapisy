@@ -1,9 +1,10 @@
 {% load poll_answers_extra %}
-
-{% for section in sections %}
-	<div class="poll-section">
-	        <h2 class="poll-section-title">{{section.title}}</h2>
-	        <span class="poll-section-description">{{section.description}}</span>
+{% for section in sections %}	
+    <div class="poll-section">
+        <button class='grade-section-toggle-button' id='section-toggle-{{section.pk}}'>-</button>
+        <h2 class="poll-section-title" id="poll-section-title-{{section.pk}}">{{section.title}}</h2>
+        <span class="poll-section-description">{{section.description}}</span>
+        <div class='section-content' id='section-content-{{section.pk}}'>
 	    {% for field in section.questions %}
         {% if field.type %}
             <div class="fieldWrapper poll-section-field{% if field.is_leading %} poll-section-leading{% endif %}">                   
@@ -26,10 +27,9 @@
                         </li>
                     {% endfor %}
                     </ul>
-                {% else %}{% if field.type == 'multi' %}
-                    <input type="hidden" value="{{field.choice_limit}}" class="poll-section-answer-limit">{% endif %}
+                {% endif %}{% if field.type == 'multi' %}
+                    {% if field.choice_limit %}<input type="hidden" value="{{field.choice_limit}}" class="poll-section-answer-limit">{% endif %}
                     <ul class="poll-section-answer-list{% if field.choice_limit %} poll-section-choicelimit{% endif %}">
-                    {% if field.choice_limit %}
                     {% for key, radio in field.widget.choices %}
                         <li  class="poll-section-answer-item"><input type="checkbox" class="poll-section-choice {% if field.choice_limit %}poll-section-choicelimit-choice{% endif %}" id="{{field.title}}-{{key}}" name="{{field.title}}" value="{{key}}"{% if  key in field.initial%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>
                         <label for="{{field.title}}-{{key}}">{{radio}}</label>
@@ -39,12 +39,28 @@
                         </li>
                     {% endfor %}
                     </ul>
-                {% else %}{% if field.type == 'open'  %}
+                {% endif %}{% if field.type == 'open'  %}
                     <textarea cols="40" rows="5" name="{{field.title}}"{% if field.disabled %} disabled="disabled"{% endif %}>{{field.initial}}</textarea>
-                {% endif %}{% endif %}{% endif %}
+                {% endif %}
             </div>
         {% endif %}
         {% endfor %}
+        </div>
     <hr>
 	</div>
 {% endfor %}
+<SCRIPT language="javascript" type="text/javascript">
+    $( '.grade-section-toggle-button' ).click( function(){
+        var toToggleId  = $(this).attr( 'id' ).split( '-' )[2];
+        var toToggleObj = $('#section-content-' + toToggleId );
+        toToggleObj.slideToggle( 250 );
+        if ( $(this).text() == '+' ){
+            $(this).text( '-' );
+        } else {
+            if ( $(this).text() == '-' ) {
+                $(this).text( '+' );
+            }
+        }
+        return false;
+    });
+</SCRIPT>

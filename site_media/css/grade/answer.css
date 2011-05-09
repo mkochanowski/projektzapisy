@@ -57,5 +57,11 @@ input[class*="scale"]{
 }
 
 hr, .poll-section-field {
-	clear: both;
+	clear: left;
+}
+
+.edit-mode
+{
+    position:absolute;
+    right: 55px;
 }

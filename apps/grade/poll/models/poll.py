@@ -14,6 +14,7 @@ from apps.enrollment.records.models  import Record, \
 from apps.grade.ticket_create.models import PublicKey                                              
 from section                           import SectionOrdering
 from saved_ticket                       import SavedTicket
+from origin                          import Origin
 
 class Poll( models.Model ):
 
@@ -25,6 +26,7 @@ class Poll( models.Model ):
     studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
     share_result      = models.BooleanField( verbose_name = 'udostępnij wyniki', default = False, blank = True )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
+    origin            = models.ForeignKey( Origin, verbose_name='zbiór', default=None, blank = True, null= True)
 
     class Meta:
         verbose_name        = 'ankieta' 
@@ -144,14 +146,20 @@ class Poll( models.Model ):
     
     @staticmethod
     def get_current_polls():
-        pks = map( lambda (x,): x, PublicKey.objects.all().values_list( 'poll' ))
+        pks = PublicKey.objects.all().values_list( 'poll', flat=True )
         return Poll.objects.filter( pk__in = pks, deleted=False )
         
     @staticmethod
     def get_current_semester_polls_without_keys():
         semester = Semester.get_current_semester()
         polls_with_keys = PublicKey.objects.all().values_list( 'poll' )
-        return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys)        
+        return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys)
+
+    @staticmethod
+    def count_current_semester_polls_without_keys():
+        semester = Semester.get_current_semester()
+        polls_with_keys = PublicKey.objects.all().values( 'poll' )
+        return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys).count()
 
     @staticmethod
     def get_all_polls_for_student( student ):

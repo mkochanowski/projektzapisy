@@ -6,12 +6,14 @@ Ticket.keys_generate = new Object()
 Ticket.keys_generate.init = function()
 {
 
-    if( $(".main-message:contains('Liczba utworzonych ankiet:')").size() > 0)
+    if( $('#keys_to_create').text().castToInt() > 0)
     {
-        $('#screen').css({  "display": "block", opacity: 0.7, "width":$(document).width(),"height":$(document).height()});
-        $('#box').css({"display": "block"}).click(function(){$(this).css("display", "none");$('#screen').css("display", "none")});
+        var html = "<div><span>Trwa generowanie kluczy</span>( <span id='keys-percent'>0</span> % )<div id='progressbar'></div></div>"
+        Fereol.dialog.setHTML(html);
+        Fereol.dialog.setTitle("Generowanie kluczy");
+        Fereol.dialog.show();
     	$("#progressbar").progressbar({ value: 0 });
-	    Ticket.keys_generate.keys   = $('#all-keys').text();
+	    Ticket.keys_generate.keys   = $('#keys_to_create').text().castToInt()
         Ticket.keys_generate.start();
     }
 }
@@ -40,7 +42,6 @@ Ticket.keys_generate.finish = function(result)
 	clearInterval(Ticket.keys_generate.interval)
 	$( "#progressbar" ).progressbar( "option", "value", 100 );
 	$( "#keys-percent" ).text('100');
-	$( "#generated-keys" ).text(Ticket.keys_generate.keys);
 }
 
 Ticket.keys_generate.update = function(result)
@@ -48,7 +49,6 @@ Ticket.keys_generate.update = function(result)
 	var done    = parseInt(result);
 	var all     = Ticket.keys_generate.keys
 	var percent = parseInt ((done/all) * 100)
-	$( "#generated-keys" ).text(done);
 	$( "#keys-percent" ).text(percent);
 	$( "#progressbar" ).progressbar( "option", "value", percent );
 	

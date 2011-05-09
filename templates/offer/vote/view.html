@@ -15,7 +15,7 @@
 {% block content-class %}narrow{% endblock %}
 {% block content %}
 	<div id="od-vote-view">
-		<h2>Podsumowanie głosowania</h2>
+		<h2>Podsumowanie głosowania (<a href="{% url vote %}">głosuj</a>)</h2>
 		{% if winter_votes or summer_votes or unknown_votes %}
 			<ul>
 				{% if winter_votes %}
