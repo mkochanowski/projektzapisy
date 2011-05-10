@@ -124,6 +124,8 @@ def subject(request, slug):
         seminar = []
         language = []
         sport = []
+        repertory = []
+        project = []
 
 
         for g in groups:
@@ -151,6 +153,10 @@ def subject(request, slug):
                 language.append(g);
             elif g.type == '8':
                 sport.append(g);
+            elif g.type == '9':
+                repertory.append(g);
+            elif g.type == '10':
+                project.append(g);
             else:
                 break;
 
@@ -174,6 +180,7 @@ def subject(request, slug):
 
         tutorials = [
             { 'name' : 'Wykłady', 'groups' : lectures},
+            { 'name' : 'Repetytorium', 'groups' : repertory},
             { 'name' : 'Ćwiczenia', 'groups' : exercises},
             { 'name' : 'Pracownia', 'groups' : exercises_adv},
             { 'name' : 'Ćwiczenia (poziom zaaansowany)', 'groups' : laboratories},
@@ -181,6 +188,7 @@ def subject(request, slug):
             { 'name' : 'Seminarium', 'groups' : exer_labs},
             { 'name' : 'Lektorat', 'groups' : language},
             { 'name' : 'Zajęcia', 'groups' : sport},
+            { 'name' : 'Project', 'groups' : project},
             ]
         
 
