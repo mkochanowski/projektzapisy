@@ -6,7 +6,10 @@ from subject import *
 from apps.enrollment.records.models import *
 
 # w przypadku edycji, poprawić też javascript: Fereol.Enrollment.SubjectTerm.groupTypes
-GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'), ('4', 'ćwiczenia (grupa zaawansowana)'), ('5', 'ćwiczenio-pracownia'), ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF')]
+GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
+        ('4', 'ćwiczenia (grupa zaawansowana)'), ('5', 'ćwiczenio-pracownia'),
+        ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
+        ('9', 'repetytorium'), ('10', 'projekt')]
 
 class Group(models.Model):
     """group for subject"""

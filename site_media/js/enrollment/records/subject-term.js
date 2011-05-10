@@ -44,7 +44,9 @@ Fereol.Enrollment.SubjectTerm.groupTypes =
 	5: ['ćwiczenia + prac.', 'ćw+prac'],
 	6: ['seminarium', 'sem'],
 	7: ['lektorat', 'lek'],
-	8: ['wf', 'wf']
+	8: ['wf', 'wf'],
+    9: ['repetytorium', 'rep'],
+   10: ['projekt', 'proj']
 };
 
 Fereol.Enrollment.SubjectTerm.byGroups = {};
