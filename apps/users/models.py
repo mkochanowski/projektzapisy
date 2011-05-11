@@ -72,9 +72,22 @@ class Employee(BaseUser):
         return False
 
     @staticmethod
-    def get_list(begin, end):
-        return Employee.objects.filter(user__last_name__range=(begin, unicode(end) + u'źźźźź')).\
+    def get_list(begin):
+        def next_char(begin):
+            return chr(ord(begin) + 1)
+        if begin == 'Z':
+            return Employee.objects.filter(user__last_name__gte=begin).\
                     select_related().order_by('user__last_name', 'user__first_name')
+        elif begin == 'All':
+            return Employee.objects.all().\
+                    select_related().order_by('user__last_name', 'user__first_name')
+        else:
+            end = next_char(begin)
+            return Employee.objects.filter(user__last_name__range=(begin, end)).\
+                    select_related().order_by('user__last_name', 'user__first_name')
+
+
+
 
     @staticmethod
     def get_all_groups_in_semester(user_id):
@@ -154,9 +167,19 @@ class Student(BaseUser):
 
 
     @staticmethod
-    def get_list(begin = 'A', end='Ż'):
-        return Student.objects.filter(user__last_name__range=(begin, unicode(end) + u'źźźźź')).\
-                select_related().order_by('user__last_name', 'user__first_name')
+    def get_list(begin = 'A'):
+        def next_char(begin):
+            return chr(ord(begin) + 1)
+        if begin == 'Z':
+            return Student.objects.filter(user__last_name__gte=begin).\
+                    select_related().order_by('user__last_name', 'user__first_name')
+        elif begin == 'All':
+            return Student.objects.all().\
+                    select_related().order_by('user__last_name', 'user__first_name')
+        else:
+            end = next_char(begin)
+            return Student.objects.filter(user__last_name__range=(begin, end)).\
+                    select_related().order_by('user__last_name', 'user__first_name')
 
     @staticmethod
     def get_all_groups(student):

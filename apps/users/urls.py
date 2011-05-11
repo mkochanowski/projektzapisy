@@ -18,6 +18,6 @@ urlpatterns = patterns('apps.users.views',
     url('^logout/$', 'logout', name='user-logout'),
     url('^employees/$', 'employees_list', name='employees-list'),
     url('^students/$', 'students_list', name='students-list'),
-    url('^students/(?P<begin>[A-Z])/(?P<end>[A-Z])/$', 'students_list', name='students-char-list'),
-    url('^employees/(?P<begin>[A-Z])/(?P<end>[A-Z])/$', 'employees_list', name='employees-char-list'),
+    url('^students/(?P<begin>[A-Z]|(All))/$', 'students_list', name='students-char-list'),
+    url('^employees/(?P<begin>[A-Z]|(All))/$', 'employees_list', name='employees-char-list'),
 )

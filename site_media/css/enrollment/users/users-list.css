@@ -15,31 +15,17 @@
 	background: white url(../../../images/loading-black.gif) no-repeat scroll right top;
 }
 
-#user-alpha-list {
-    position:absolute;
-    left:240px;
-    border-right: 1px solid #CCCCCC;
-    border-bottom: 1px solid #CCCCCC;
-    border-top: 1px solid #CCCCCC;
-    background-color: #FFFFFF;
-    list-style: none outside none;
-    margin: 10px;
-}
 #user-alpha-list ul {
+    float: right;
     list-style: none outside none;
-    padding-left:0px;
     margin: 10px;
-}
-
-#user-alpha-list li {
-    margin: 5px 0;
-    text-align:center;
 }
 
 
 #user-list-menu > li
 {
-    border-bottom: 1px solid #CCCCCC;
+    float:left;
+    margin-left: 10px
 }
 
 #user-list-menu a
@@ -48,6 +34,5 @@
 }
 
 .active {
-    font-weight:bolder;
-    background-color: #CCCCCC;
+    color:#000000;
 }

@@ -81,16 +81,21 @@ StudentsList.ajax.parseList = function(data)
     var student_list = $('#students-list').assertOne().children('ul.students');
     $(student_list).children().remove();
     StudentsList.studentFilter.clearElements();
-    $.each(data.data, function(i, student)
+    if ( data.data )
     {
-        $.tmpl( "student", student).appendTo(student_list);
-    })
+        $.each(data.data, function(i, student)
+        {
+            $.tmpl( "student", student).appendTo(student_list);
+        })
+    }
     StudentsList.parseStudent();
     StudentsList.runStudents( StudentsList.studentFilter );
 	$('.student-profile-link').click(function(){
         loadStudentProfile($(this).attr('href'));
          return false;
     })
+    StudentsList.emptyFilterWarningVisible = false;
+    StudentsList.studentFilter.doFilter()
 }
 
 
@@ -207,6 +212,7 @@ StudentsList.runStudents = function( filter )
             student.setVisible(visible);
         }));
     };
+
 }
 
 /*******************************************************************************

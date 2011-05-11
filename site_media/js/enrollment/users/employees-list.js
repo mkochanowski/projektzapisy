@@ -12,6 +12,7 @@ EmployeesList.init = function()
 	EmployeesList.initEmployeeLists();
 	EmployeesList.initFilter();
 	$('.employee-profile-link').click(function(){
+
 	      loadEmployeeProfile($(this).attr('href'));
          return false;
     })
@@ -46,12 +47,15 @@ EmployeesList.ajax = new Object();
 EmployeesList.ajax.init = function()
 {
 
-    EmployeesList.ajax.activeA = $('.active').assertOne();
+    EmployeesList.ajax.activeA = $('.active');
     $('.ajax').click(function(){
-	    $('#employees-list').addClass('profile-loading');
+	    $('#employees-list').addClass('profile-loading');Z
         EmployeesList.ajax.getList($(this).attr('href'));
-        $(EmployeesList.ajax.activeA).removeClass('active')
-        EmployeesList.ajax.activeA = $(this)
+
+        if ($('.active').size() > 0)
+        {
+            $('.active').removeClass('active')
+        }
         $(this).addClass('active');
 
         return false;
@@ -77,10 +81,13 @@ EmployeesList.ajax.parseList = function(data)
     var employee_list = $('#employees-list').assertOne().children('ul.employees');
     $(employee_list).children().remove();
     EmployeesList.employeeFilter.clearElements();
-    $.each(data.data, function(i, employee)
+    if ( data.data )
     {
-        $.tmpl( "employee", employee).appendTo(employee_list);
-    })
+        $.each(data.data, function(i, employee)
+        {
+            $.tmpl( "employee", employee).appendTo(employee_list);
+        })
+    }
     EmployeesList.parseEmployee();
     EmployeesList.runEmployees( EmployeesList.employeeFilter );
 	$('.employee-profile-link').click(function(){
