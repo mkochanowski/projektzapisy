@@ -18,6 +18,8 @@ SubjectView.init = function()
 	// czy panel szczegółów jest wyświetlony
 	SubjectView.detailsVisible = null;
 
+	SubjectView.isEnrollmentOpen = ($('.setEnrolledButton').size() > 0);
+
 	SubjectView._initDetailsToggleSwitch();
 	SubjectView._initExpandableDescription();
 	SubjectView._initTermsList();
@@ -31,6 +33,8 @@ $(SubjectView.init);
  */
 SubjectView._initTermsList = function()
 {
+	if (!SubjectView.isEnrollmentOpen)
+		return;
 	SubjectView._termsList = new Array();
 	SubjectView._termsMap = new Object();
 	$('#enr-subject-view > .tutorial tbody tr').each(function(idx, elem)

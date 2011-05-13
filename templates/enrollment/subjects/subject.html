@@ -91,7 +91,9 @@
 							<th title="Liczba aktualnie zapisanych osób" class="number termEnrolledHeader">Zapis.</th>
 							<th title="Liczba osób oczekujących na zapis" class="number termQueuedHeader">Kolejka</th>
 							<td class="controls"></td>
-							<th class="priority">Priorytet</th>
+							{% if subject.is_recording_open %}
+								<th class="priority">Priorytet</th>
+							{% endif %}
 						</tr>
 					</thead>
 					<tbody>
@@ -137,20 +139,22 @@
 								{% endif %}
 								<a href="{% url records-group t.id %}">lista</a>
 							</td>
-							<td class="priority">
-								{% if t.priority %}
-									<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
-										<input type="hidden" name="priority" value="{{ t.priority|add:-1}}" />
-										<input type="submit" value="-" {% if t.priority <= 1 %} disabled="disabled" {% endif %} />
-									</div></form>
-									<span>{{ t.priority }}</span>
-									<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
-										<input type="hidden" name="priority" value="{{ t.priority|add:1}}" />
-										<input type="submit" value="+" {% if t.priority >= 10 %} disabled="disabled" {% endif %} />
-									</div></form>
-								{% endif %}
-								<input type="hidden" name="ajax-priority-url" value="{% url records-queue-set-priority t.id '.json' %}" />
-							</td>
+							{% if subject.is_recording_open %}
+								<td class="priority">
+									{% if t.priority %}
+										<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
+											<input type="hidden" name="priority" value="{{ t.priority|add:-1}}" />
+											<input type="submit" value="-" {% if t.priority <= 1 %} disabled="disabled" {% endif %} />
+										</div></form>
+										<span>{{ t.priority }}</span>
+										<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
+											<input type="hidden" name="priority" value="{{ t.priority|add:1}}" />
+											<input type="submit" value="+" {% if t.priority >= 10 %} disabled="disabled" {% endif %} />
+										</div></form>
+									{% endif %}
+									<input type="hidden" name="ajax-priority-url" value="{% url records-queue-set-priority t.id '.json' %}" />
+								</td>
+							{% endif %}
 						</tr>
 					{% endfor %}
 					</tbody>
