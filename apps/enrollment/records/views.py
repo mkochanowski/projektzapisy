@@ -173,12 +173,14 @@ def set_enrolled(request, method):
             message = 'Nie możesz się zapisać, ponieważ zapisy na ten ' + \
                 'przedmiot nie są dla Ciebie otwarte.'
         else:
-            message = 'Nie możesz się wypisać, ponieważ zapisy są już zamknięte.'
+            message = 'Nie możesz się wypisać, ponieważ zapisy są już ' + \
+                'zamknięte.'
         return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
             message_context)
     except NotCurrentSemesterException:
         transaction.rollback()
-        message = 'Nie możesz się wypisać z tej grupy, ponieważ znajduje się ona w semestrze innym niż aktualny.'
+        message = 'Nie możesz się wypisać z tej grupy, ponieważ znajduje ' + \
+            'się ona w semestrze innym niż aktualny.'
         return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
             message_context)
 

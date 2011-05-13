@@ -14,6 +14,7 @@
 {% block enrollment-subjects-scripts %}
 	<script src="/site_media/js/components/messageBox.js" type="text/javascript"></script>
 
+	<script src="/site_media/js/enrollment/records/subject-term.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/views/subject.js" type="text/javascript"></script>
 {% endblock %}
 
@@ -28,12 +29,14 @@
 					<span>Rodzaj:</span>
 					{{subject.type}}
 				</li>
-				<li>
-					<span>Prowadzący:</span>
-					{% for teacher in subject.teachers.all %}
-						<a href="{% url employee-profile teacher.user.id %}">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
-					{% endfor %}
-				</li>
+				{% if subject.teachers.all %}
+					<li>
+						<span>Prowadzący:</span>
+						{% for teacher in subject.teachers.all %}
+							<a href="{% url employee-profile teacher.user.id %}">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
+						{% endfor %}
+					</li>
+				{% endif %}
 				{% if subject.ects %}
 					<li>
 						<span>Punkty ECTS:</span>
@@ -73,17 +76,20 @@
 
 		{% block messages %}{% endblock %}{% include 'common/messages.html' %}
 
+		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
+
 		{% for tutorial in tutorials %}{% if tutorial.groups %}
 			<div class="tutorial">
 				<h2>{{tutorial.name}}</h2>
+				<input type="hidden" name="tutorial-type" value="{{ tutorial.type }}" />
 				<table>
 					<thead>
 						<tr>
 							<th>Prowadzący</th>
 							<th class="term">Termin zajęć</th>
 							<th title="Maksymalna liczba osób, które mogą zapisać się na przedmiot" class="number">Limit</th>
-							<th title="Liczba aktualnie zapisanych osób" class="number">Zapisanych</th>
-							<th title="Liczba osób oczekujących na zapis" class="number">W kolejce</th>
+							<th title="Liczba aktualnie zapisanych osób" class="number termEnrolledHeader">Zapis.</th>
+							<th title="Liczba osób oczekujących na zapis" class="number termQueuedHeader">Kolejka</th>
 							<td class="controls"></td>
 							<th class="priority">Priorytet</th>
 						</tr>
@@ -91,32 +97,41 @@
 					<tbody>
 					{% for t in tutorial.groups %}
 						<tr {% if t.signed %} class="signed" {% endif %} >
-							<td>{{ t.get_teacher_full_name }}</td>
+							<td>
+								{% if t.teacher %}
+									<a href="{% url employee-profile t.teacher.user.id %}">
+										{{ t.teacher.user.get_full_name }}
+									</a>
+								{% else %}
+									(nieznany prowadzący)
+								{% endif %}
+							</td>
 							<td class="term">
 								{% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
 									<span>{{d}}</span>
 								{% endfor %}
 							</td>
-							<td class="number">{{ t.get_group_limit }}</td>
-							<td class="number">{{ t.enrolled }}</td>
-							<td class="number">{{ t.queued }}</td>
+							<td class="number termLimit">{{ t.get_group_limit }}</td>
+							<td class="number termEnrolledCount">{{ t.enrolled }}</td>
+							<td class="number termQueuedCount">{{ t.queued }}</td>
 							<td class="controls">
 								<input type="hidden" name="group-id" value="{{ t.id }}" />
+								<input type="hidden" name="is-signed-in" value="{% if t.signed %}true{% else %}false{% endif %}" />
 								{% if subject.is_recording_open %}
-									<form action="{% url records-set-enrolled %}" method="post"><div>
+									<form action="{% url records-set-enrolled %}" method="post" class="setEnrolled"><div>
 										<input type="hidden" name="group" value="{{ t.id }}" />
 										{% if t.signed %}
 											<input type="hidden" name="enroll" value="false" />
-											<input type="submit" value="wypisz" />
+											<input type="submit" value="wypisz" class="setEnrolledButton" />
 										{% else %}{% if not t.is_full %}
 											<input type="hidden" name="enroll" value="true" />
-											<input type="submit" value="{% if t.is_in_diff %}przenieś{% else %}zapisz{% endif %}" />
+											<input type="submit" value="{% if t.is_in_diff %}przenieś{% else %}zapisz{% endif %}" class="setEnrolledButton" />
 										{% else %}{% if t.priority %}
 											<input type="hidden" name="enroll" value="false" />
-											<input type="submit" value="wypisz z kolejki" />
+											<input type="submit" value="wypisz z kolejki" class="setEnrolledButton" />
 										{% else %}
 											<input type="hidden" name="enroll" value="true" />
-											<input type="submit" value="zapisz do kolejki" />
+											<input type="submit" value="zapisz do kolejki" class="setEnrolledButton" />
 										{% endif %}{% endif %}{% endif %}
 									</div></form>
 								{% endif %}
@@ -134,6 +149,7 @@
 										<input type="submit" value="+" {% if t.priority >= 10 %} disabled="disabled" {% endif %} />
 									</div></form>
 								{% endif %}
+								<input type="hidden" name="ajax-priority-url" value="{% url records-queue-set-priority t.id '.json' %}" />
 							</td>
 						</tr>
 					{% endfor %}

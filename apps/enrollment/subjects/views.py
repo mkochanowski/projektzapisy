@@ -179,16 +179,16 @@ def subject(request, slug):
         sport.name = "Zajęcia"'''
 
         tutorials = [
-            { 'name' : 'Wykłady', 'groups' : lectures},
-            { 'name' : 'Repetytorium', 'groups' : repertory},
-            { 'name' : 'Ćwiczenia', 'groups' : exercises},
-            { 'name' : 'Pracownia', 'groups' : exercises_adv},
-            { 'name' : 'Ćwiczenia (poziom zaaansowany)', 'groups' : laboratories},
-            { 'name' : 'Ćwiczenio-pracownie', 'groups' : seminar},
-            { 'name' : 'Seminarium', 'groups' : exer_labs},
-            { 'name' : 'Lektorat', 'groups' : language},
-            { 'name' : 'Zajęcia', 'groups' : sport},
-            { 'name' : 'Project', 'groups' : project},
+            { 'name' : 'Wykłady', 'groups' : lectures, 'type' : 1},
+            { 'name' : 'Repetytorium', 'groups' : repertory, 'type' : 9},
+            { 'name' : 'Ćwiczenia', 'groups' : exercises, 'type' : 2},
+            { 'name' : 'Pracownia', 'groups' : exercises_adv, 'type' : 4},
+            { 'name' : 'Ćwiczenia (poziom zaaansowany)', 'groups' : laboratories, 'type' : 3},
+            { 'name' : 'Ćwiczenio-pracownie', 'groups' : seminar, 'type' : 6},
+            { 'name' : 'Seminarium', 'groups' : exer_labs, 'type' : 5},
+            { 'name' : 'Lektorat', 'groups' : language, 'type' : 7},
+            { 'name' : 'Zajęcia', 'groups' : sport, 'type' : 8},
+            { 'name' : 'Project', 'groups' : project, 'type' : 10},
             ]
         
 

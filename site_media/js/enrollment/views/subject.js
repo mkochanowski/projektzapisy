@@ -20,57 +20,40 @@ SubjectView.init = function()
 
 	SubjectView._initDetailsToggleSwitch();
 	SubjectView._initExpandableDescription();
-	SubjectView._initPriorityControls();
+	SubjectView._initTermsList();
+	SubjectView._initTermsTablesStyles();
 };
 
 $(SubjectView.init);
 
 /**
- * Inicjuje kontrolki wybierania priorytetu w grupie.
+ * Inicjuje listy terminów.
  */
-SubjectView._initPriorityControls = function()
+SubjectView._initTermsList = function()
 {
-	$('div.tutorial tbody td.priority').each(function(idx, elem)
+	SubjectView._termsList = new Array();
+	SubjectView._termsMap = new Object();
+	$('#enr-subject-view > .tutorial tbody tr').each(function(idx, elem)
 	{
-		elem = $(elem);
-		if (elem.children('form').length == 0)
-			return;
-		var currentPriority = elem.children('span').assertOne().text().
-			castToInt();
-		var priorityChangeURL = elem.children('form').first().attr('action');
-
-		elem.empty();
-
-		var prioritySelector = $.create('select').appendTo(elem);
-		for (var i = 1; i <= 10; i++)
-		{
-			var priorityOption = $.create('option', {value: i}).text(i);
-			if (i == currentPriority)
-				priorityOption.attr('selected', 'selected');
-			prioritySelector.append(priorityOption);
-		}
-
-		(function () {
-			prioritySelector.change(function()
-			{
-				prioritySelector.attr('disabled', true);
-				var newPriority = prioritySelector.attr('value').castToInt();
-
-				//TODO: generowanie URL, a nie na sztywno (dopisek .json)
-				$.post(priorityChangeURL + '.json', {
-						csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
-						priority: newPriority
-					}, function(data)
-				{
-					var result = AjaxMessage.fromJSON(data);
-					if (result.isSuccess())
-						prioritySelector.attr('disabled', false);
-					else
-						result.displayMessageBox();
-				}, 'json');
-			});
-		})();
+		var term = Fereol.Enrollment.SubjectTerm.fromHTML($(elem));
+		SubjectView._termsList.push(term);
+		SubjectView._termsMap[term.id] = term;
+		term.convertControlsToAJAX();
 	});
+};
+
+/**
+ * Inicjuje dynamicznie zmienane style tabel z terminami.
+ */
+SubjectView._initTermsTablesStyles = function()
+{
+	Sidebar.addObserver({ update: function()
+	{
+		$('#enr-subject-view .termEnrolledHeader').text(
+			Sidebar.visible ? 'Zapis.' : 'Zapisanych');
+		$('#enr-subject-view .termQueuedHeader').text(
+			Sidebar.visible ? 'Kolejka' : 'W kolejce');
+	}});
 };
 
 /**

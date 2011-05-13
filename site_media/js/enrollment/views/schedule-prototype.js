@@ -215,7 +215,7 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
 		{
 			elem = $(elem);
 
-			var sterm = Fereol.Enrollment.SubjectTerm.fromJSON(elem.attr('value'));
+			var sterm = Fereol.Enrollment.ScheduleSubjectTerm.fromJSON(elem.attr('value'));
 			sterm.isPinned = (pinned.indexOf(sterm.groupID) >= 0);
 			sterm.isEnrolled = (enrolled.indexOf(sterm.groupID) >= 0);
 			sterm.isQueued = (queued.indexOf(sterm.groupID) >= 0);

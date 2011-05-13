@@ -1,9 +1,5 @@
 /**
- * Model terminu przedmiotu, tzn zakresu godzinowego dla określonej grupy
- * z określonego przedmiotu, do wyświetlenia w terminarzu.
- *
- * TODO: przetestować dla niespójnych id grup i terminów (w danych przykładowych
- * wszystkie id terminów pokrywają się z id grup).
+ * Model terminu przedmiotu, do wyświetlenia w widoku przedmiotu.
  */
 
 if (!Fereol.Enrollment)
@@ -12,320 +8,302 @@ if (!Fereol.Enrollment)
 Fereol.Enrollment.SubjectTerm = function()
 {
 	this.id = null;
-	this.groupID = null;
-	this.scheduleTerm = null; // Schedule.Term
-	this.container = $.create('div');
 
-	this._containerReady = false;
-	this._controlsReady = false;
-
-	this.isPinned = false; // czy jest "przypięty"
 	this.isEnrolled = false; // czy student jest zapisany
-	this.isPrototyped = false; // czy jest tymczasowo wyświetlony w prototypie
 	this.isQueued = false; // czy jest "w kolejce"
+	this.queuePriority = null; // jeżeli jest w kolejce, to jaki ma priorytet
 
-	this._isLoading = false; // czy w tej chwili trwa komunikacja z serwerem
-	this._isVisible = false;
+	this.groupLimit = null;
+	this.enrolledCount = null;
+	this.queuedCount = null;
 
-	this.schedule = null;
-	this.subject = null; // SchedulePrototype.PrototypeSubject
-
-	this.classroom = null;
-	this.teacher = null;
-	this.type = null;
+	this._queuePrioritySetURL = null;
 };
 
-Fereol.Enrollment.SubjectTerm.groupTypes =
+Fereol.Enrollment.SubjectTerm.fromHTML = function(container)
 {
-	1: ['wykład', 'wyk'],
-	2: ['ćwiczenia', 'ćw'],
-	3: ['pracownia', 'prac'],
-	4: ['ćwiczenia (zaaw)', 'ćw-z'],
-	5: ['ćwiczenia + prac.', 'ćw+prac'],
-	6: ['seminarium', 'sem'],
-	7: ['lektorat', 'lek'],
-	8: ['wf', 'wf'],
-    9: ['repetytorium', 'rep'],
-   10: ['projekt', 'proj']
-};
+	container.assertOne();
 
-Fereol.Enrollment.SubjectTerm.byGroups = {};
-
-Fereol.Enrollment.SubjectTerm.prototype.isEnrolledOrQueued = function()
-{
-	return this.isEnrolled || this.isQueued;
-}
-
-Fereol.Enrollment.SubjectTerm.fromJSON = function(json)
-{
 	var sterm = new Fereol.Enrollment.SubjectTerm();
-	var raw = $.parseJSON(json)
+	sterm._container = container;
 
-	sterm.id = raw.id.castToInt();
-	sterm.groupID = raw.group.castToInt();
-	sterm.scheduleTerm = new Schedule.Term(
-		raw.day.castToInt() - 1,
-		new Schedule.Time(raw.start_time[0].castToInt(), raw.start_time[1].castToInt()),
-		new Schedule.Time(raw.end_time[0].castToInt(), raw.end_time[1].castToInt()),
-		sterm.container
-	);
-	sterm.scheduleTerm.onResize = function(isFullSize)
+	sterm.id = container.find('input[name=group-id]').assertOne().attr('value').
+		castToInt();
+	sterm.type = container.parent().parent().parent().
+		children('input[name=tutorial-type]').assertOne().attr('value').castToInt();
+
+	sterm._groupLimitCell = container.find('td.termLimit').assertOne();
+	sterm._enrolledCountCell = container.find('td.termEnrolledCount').
+		assertOne();
+	sterm._queuedCountCell = container.find('td.termQueuedCount').assertOne();
+
+	sterm.groupLimit = sterm._groupLimitCell.text().castToInt();
+	sterm.enrolledCount = sterm._enrolledCountCell.text().castToInt();
+	sterm.queuedCount = sterm._queuedCountCell.text().castToInt();
+	sterm.isEnrolled = container.find('input[name=is-signed-in]').assertOne().
+		attr('value').castToBool();
+
+	if (!Fereol.Enrollment.SubjectTerm._setEnrolledURL)
+		Fereol.Enrollment.SubjectTerm._setEnrolledURL =
+			$('input[name=ajax-set-enrolled-url]').assertOne().attr('value');
+
+	var priorityCell = container.find('td.priority').assertOne();
+	sterm._queuePrioritySetURL = priorityCell.
+		children('input[name=ajax-priority-url]').assertOne().attr('value');
+	if (priorityCell.children('form').length > 0)
 	{
-		sterm._onResize(isFullSize);
-	};
-
-	sterm.classroom = raw.classroom.castToInt();
-	sterm.teacher = raw.teacher;
-	sterm.type = raw.group_type.castToInt();
-
-	if (!Fereol.Enrollment.SubjectTerm.byGroups[sterm.groupID])
-		Fereol.Enrollment.SubjectTerm.byGroups[sterm.groupID] = [];
-	Fereol.Enrollment.SubjectTerm.byGroups[sterm.groupID].push(sterm);
+		sterm.isQueued = true;
+		sterm.queuePriority = priorityCell.children('span').assertOne().text().
+			castToInt();
+	}
 
 	return sterm;
 };
 
-Fereol.Enrollment.SubjectTerm.prototype.assignSchedule = function(schedule)
-{
-	this.schedule = schedule;
-	this._updateVisibility();
-};
-
-Fereol.Enrollment.SubjectTerm.prototype._updateVisibility = function()
+/**
+ * Zamienia zwykłe kontrolki (np. przyciski zapisywania) w ajax-owe.
+ */
+Fereol.Enrollment.SubjectTerm.prototype.convertControlsToAJAX = function()
 {
 	var self = this;
 
-	if (!this._containerReady)
+	var setEnrolledForm = this._container.find('.setEnrolled').assertOne();
+
+	// Opera nie potrafi łamać wierszy w input[type=button]
+	if ($.browser.opera)
 	{
-		this._containerReady = true;
-
-		$.create('span', {className: 'name'}).text(this.subject.shortName).
-			attr('title', this.subject.name).appendTo(this.container);
-		this._teacherLabel = $.create('span', {className: 'teacher'}).text(this.teacher).
-			appendTo(this.container);
-		this._typeLabel = $.create('span', {className: 'type'}).
-			appendTo(this.container).attr('title',
-			Fereol.Enrollment.SubjectTerm.groupTypes[this.type][0]);
-
-		this._classroomLabel = $.create('span', {className: 'classroom'}).
-			appendTo(this.container);
-		if (this.classroom)
-			this._classroomLabel.text('s. ' + this.classroom);
-
-		this._controlsBox = $.create('div', {className: 'controls'}).
-			appendTo(this.container).css('display', 'none');
-
-		this._pinUnpinButton = $.create('span', { className: 'pinUnpin'}).
-			appendTo(this._controlsBox);
-		this._signInOutButton = $.create('span', { className: 'signInOut'}).
-			appendTo(this._controlsBox);
-		this._loadingIndicator = $.create('div', { className: 'loadingIndicator'}).
-			appendTo(this._controlsBox).css('display', 'none');
-
-		this.container.mouseenter(function()
-		{
-			if (!self._controlsEmpty)
-				self._controlsBox.css('display', 'block');
-		}).mouseleave(function()
-		{
-			self._controlsBox.css('display', 'none');
-		});
+		this._setEnrolledButton = $.create('button', {
+			className: 'setEnrolledButton'
+		}).insertAfter(setEnrolledForm);
+		this._setEnrolledButtonAlternative = true;
 	}
-	this._updateControls();
+	else
+	{
+		this._setEnrolledButton = $.create('input', {
+			type: 'button',
+			className: 'setEnrolledButton'
+		}).insertAfter(setEnrolledForm);
+		this._setEnrolledButtonAlternative = false;
+	}
 
+	setEnrolledForm.remove();
+	this._setEnrolledButton.click(function()
+	{
+		MessageBox.clear();
+		self.setEnrolled(self._setEnrolledAction);
+	});
+
+	var priorityCell = this._container.find('td.priority').assertOne();
+	priorityCell.empty();
+	this._prioritySelector = $.create('select').appendTo(priorityCell);
+	for (var i = 1; i <= 10; i++)
+	{
+		var priorityOption = $.create('option', {value: i}).text(i);
+		if (i === this.queuePriority)
+			priorityOption.attr('selected', 'selected');
+		this._prioritySelector.append(priorityOption);
+	}
+	this._prioritySelector.change(function()
+	{
+		MessageBox.clear();
+		self.changePriority(self._prioritySelector.attr('value').
+			castToInt());
+	});
+
+	this.refreshView();
+};
+
+/**
+ * Odświeża wiersz terminu na podstawie danych z modelu javascriptowego.
+ */
+Fereol.Enrollment.SubjectTerm.prototype.refreshView = function()
+{
+	this._prioritySelector.toggle(this.isQueued);
+	this._container.toggleClass('signed', this.isEnrolled);
+
+	this._setEnrolledAction = null;
+	var newEnrolledButtonLabel = null;
 	if (this.isEnrolled)
-		this.container.addClass('enrolled');
-	else
-		this.container.removeClass('enrolled');
-	if (this.isQueued)
-		this.container.addClass('queued');
-	else
-		this.container.removeClass('queued');
-
-	var shouldBeVisible = (this.isPinned || this.isEnrolled ||
-		this.isPrototyped || this.isQueued);
-	if (shouldBeVisible == this._isVisible)
-		return;
-	this._isVisible = shouldBeVisible;
-	if (shouldBeVisible)
-		SchedulePrototype.schedule.addTerm(this.scheduleTerm);
+	{
+		this._setEnrolledAction = false;
+		newEnrolledButtonLabel = 'wypisz';
+	}
+	else if (!this.isFull())
+	{
+		this._setEnrolledAction = true;
+		newEnrolledButtonLabel = 'zapisz'; //TODO: przenieś
+	}
+	else if (this.isQueued)
+	{
+		this._setEnrolledAction = false;
+		newEnrolledButtonLabel = 'wypisz z kolejki';
+	}
 	else
 	{
-		SchedulePrototype.schedule.removeTerm(this.scheduleTerm);
-		this._controlsBox.css('display', 'none');
+		this._setEnrolledAction = true;
+		newEnrolledButtonLabel = 'zapisz do kolejki';
 	}
+
+	if (this._setEnrolledButtonAlternative)
+		this._setEnrolledButton.text(newEnrolledButtonLabel);
+	else
+		this._setEnrolledButton.attr('value', newEnrolledButtonLabel);
+
+	this._enrolledCountCell.text(this.enrolledCount);
+	this._queuedCountCell.text(this.queuedCount);
 };
 
-Fereol.Enrollment.SubjectTerm.prototype._updateControls = function()
+/**
+ * @return true, jeżeli grupa jest pełna
+ */
+Fereol.Enrollment.SubjectTerm.prototype.isFull = function()
+{
+	if (this.groupLimit === null ||
+		this.enrolledCount === null)
+		throw new Error('NullPointerException');
+	return this.groupLimit <= this.enrolledCount;
+};
+
+/**
+ * Zmienia priorytet grupy.
+ *
+ * @param newPriority nowy priorytet (1-10)
+ */
+Fereol.Enrollment.SubjectTerm.prototype.changePriority = function(newPriority)
 {
 	var self = this;
+	this._prioritySelector.attr('disabled', true);
+	if (newPriority < 1 || newPriority > 10)
+		throw new Error('Nieprawidłowy priorytet do ustawienia');
 	
-	if (!this._controlsReady)
-	{
-		this._controlsReady = true;
-
-		this._signInOutButton.click(function()
-		{
-			MessageBox.clear();
-			self.setEnrolled(!self.isEnrolledOrQueued());
-		});
-
-		this._pinUnpinButton.click(function()
-		{
-			MessageBox.clear();
-			self.setPinned(!self.isPinned);
-		});
-	}
-	this._controlsEmpty = false;
-
-	if (this._isLoading)
-	{
-		self._loadingIndicator.css('display', 'block');
-		self._controlsBox.children('span').css('display', 'none');
-		return;
-	}
-	self._loadingIndicator.css('display', 'none');
-
-	this._pinUnpinButton.css({
-		backgroundPosition: this.isPinned ? '-12px -12px' : '0 -12px',
-		display: this.isEnrolledOrQueued() ? 'none' : ''
-	}).attr('title', this.isPinned ? 'odepnij od planu' : 'przypnij do planu');
-	this._signInOutButton.css({
-		backgroundPosition: this.isEnrolledOrQueued() ? '-12px 0' : '0 0',
-		display: this.subject.isRecordingOpen ? '' : 'none'
-	}).attr('title', this.isEnrolledOrQueued() ? 'wypisz się' +
-		(this.isQueued ? ' z kolejki' : '') : 'zapisz się');
-	this._controlsEmpty = this.isEnrolledOrQueued() &&
-		!this.subject.isRecordingOpen;
-};
-
-Fereol.Enrollment.SubjectTerm.prototype._onResize = function(isFullSize)
-{
-	var CLASSROOM_PADDING = 2;
-
-	this._classroomLabel.css({
-		left: (this._classroomLabel.parent().innerWidth() -
-			CLASSROOM_PADDING * 2 -
-			this._classroomLabel.width()) + 'px',
-		top: (this._classroomLabel.parent().innerHeight() -
-			this._classroomLabel.height() -
-			CLASSROOM_PADDING) + 'px'
-	});
-
-	this._typeLabel.text(Fereol.Enrollment.SubjectTerm.
-		groupTypes[this.type][isFullSize?0:1]).css({
-		top: (this._typeLabel.parent().innerHeight() -
-			this._typeLabel.height() -
-			CLASSROOM_PADDING) + 'px'
-	});
-
-	this._teacherLabel.css({
-		display: isFullSize ? 'block' : 'none'
-	});
-};
-
-Fereol.Enrollment.SubjectTerm.prototype.setPrototyped = function(prototyped)
-{
-	this.isPrototyped = prototyped;
-	this._updateVisibility();
-};
-
-Fereol.Enrollment.SubjectTerm.prototype.setPinned = function(pinned)
-{
-	if (this._isLoading)
-		return;
-	this._isLoading = true;
-
-	var self = this;
-	this._updateControls();
-
-	pinned = !!pinned;
-	if (this.isPinned == pinned)
-		return;
-
-	$.post(SchedulePrototype.urls['set-pinned'], {
-		csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
-		group: this.groupID,
-		pin: pinned
-	}, function(data)
+	$.post(this._queuePrioritySetURL, {
+			csrfmiddlewaretoken: $.cookie('csrftoken'),
+			priority: newPriority
+		}, function(data)
 	{
 		var result = AjaxMessage.fromJSON(data);
-		self._isLoading = false;
 		if (result.isSuccess())
-			self.isPinned = pinned;
+			self._prioritySelector.attr('disabled', false);
 		else
 			result.displayMessageBox();
-		self._updateVisibility();
 	}, 'json');
 };
 
-Fereol.Enrollment.SubjectTerm.prototype.setEnrolled = function(enrolled)
+/**
+ * Zapisuje lub wypisuje użytkownika do/z grupy lub kolejki (w zależności od
+ * wolnych miejsc.
+ *
+ * Założenie: zmiany limitów grup odbywają się rzadko. Zmiana taka może
+ * spowodować operowanie na nieświeżych danych, np. użytkownik może obserwować
+ * nieprawidłowe liczniki grup. Na przykład, jeżeli przy próbie zapisania się
+ * do grupy (w której było 10 zajętych miejsc na 20 w sumie) zostaną
+ * zmniejszone w niej limity (do równo 10), użytkownik zamiast stanu 10/10
+ * ujrzy 20/20 (i siebie w kolejce). Po odświeżeniu zobaczy prawidłowy stan.
+ *
+ * Zawsze jedak akcja "zapisania" zapisze go do grupy lub kolejki, akcja
+ * "wypisania" analogicznie wypisze. Akcja "zapisania", jeżeli zapisze go do
+ * kolejki, NIE wypisze z grupy, niezależnie od etykiety przycisku (która może
+ * brzmieć "przepisz do innej grupy").
+ *
+ * @param enroll true, jeżeli zapisać; false aby wypisać
+ */
+Fereol.Enrollment.SubjectTerm.prototype.setEnrolled = function(enroll)
 {
-	if (this._isLoading)
+	if (!Fereol.Enrollment.SubjectTerm._setLoading(true))
 		return;
-	this._isLoading = true;
 
 	var self = this;
-	this._updateControls();
+	enroll = !!enroll;
 
-	if (!this.subject.isRecordingOpen)
-		throw new Error('Zapisy na ten przedmiot są zamknięte');
-
-	enrolled = !!enrolled;
-	if (this.isEnrolledOrQueued() == enrolled)
-		return;
-
-	$.post(SchedulePrototype.urls['set-enrolled'], {
-		csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
-		group: this.groupID,
-		enroll: enrolled
+	$.post(Fereol.Enrollment.SubjectTerm._setEnrolledURL, {
+		csrfmiddlewaretoken: $.cookie('csrftoken'),
+		group: this.id,
+		enroll: enroll
 	}, function(data)
 	{
 		var result = AjaxMessage.fromJSON(data);
 		self._isLoading = false;
+		if (self.isEnrolled)
+		{
+			self.isEnrolled = false;
+			self.enrolledCount--;
+		}
+		if (self.isQueued)
+		{
+			self.isQueued = false;
+			self.queuedCount--;
+		}
 		if (result.isSuccess())
 		{
-			self.isEnrolled = enrolled;
-			self.isPinned = false;
+			if (self.isEnrolled != enroll)
+			{
+				self.isEnrolled = enroll;
+				self.enrolledCount += (enroll ? 1 : -1);
+			}
 			self.isQueued = false;
-			if (enrolled)
+			if (enroll)
 			{
 				// zaznaczanie innych grup tego samego typu jako "nie zapisane"
-				self.subject.terms.forEach(function(e)
+				SubjectView._termsList.forEach(function(e)
 				{
-					if (e.groupID == self.groupID || e.type != self.type)
+					if (e.id == self.id || e.type != self.type)
 						return;
-					e.isEnrolled = false;
-					e._updateVisibility();
+					if (e.isEnrolled)
+					{
+						e.isEnrolled = false;
+						e.enrolledCount--;
+					}
+					e.refreshView();
 				});
 
 				// zaznaczanie powiązanych jako "zapisane"
-				result.data.forEach(function(e)
+				result.data.forEach(function(alsoEnrolledID)
 				{
-					if (e == self.groupID)
+					if (alsoEnrolledID == self.id)
 						return;
-					Fereol.Enrollment.SubjectTerm.byGroups[e].forEach(function(alsoEnrolledTo)
+					var alsoEnrolled = SubjectView._termsMap[alsoEnrolledID];
+					if (!alsoEnrolled.isEnrolled)
 					{
-						alsoEnrolledTo.isEnrolled = true;
-						alsoEnrolledTo.isPinned = false;
-						alsoEnrolledTo._updateVisibility();
-					});
+						alsoEnrolled.isEnrolled = true;
+						alsoEnrolled.enrolledCount++;
+					}
+					alsoEnrolled.refreshView();
 				})
 			}
 		}
 		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')
 		{
 			self.isQueued = true;
-			self.isPinned = false;
+			self.queuedCount++;
+			if (self.enrolledCount < self.groupLimit)
+				self.enrolledCount = self.groupLimit;
 			result.displayMessageBox();
 		}
 		else
 			result.displayMessageBox();
-		self._updateVisibility();
+		self.refreshView();
+		Fereol.Enrollment.SubjectTerm._setLoading(false);
 	}, 'json');
+};
+
+/**
+ * Włącza lub wyłącza tryb komunikacji z serwerem. W tym trybie może być tylko
+ * jeden "wątek".
+ *
+ * @param loading true, jeżeli włączyć
+ * @return true, jeżeli zakończono powodzeniem
+ */
+Fereol.Enrollment.SubjectTerm._setLoading = function(loading)
+{
+	loading = !!loading;
+	if (loading && Fereol.Enrollment.SubjectTerm._isLoading)
+		return false;
+	Fereol.Enrollment.SubjectTerm._isLoading = loading;
+	$('input.setEnrolledButton').attr('disabled', loading);
+	return true;
 };
 
 Fereol.Enrollment.SubjectTerm.prototype.toString = function()
 {
-	return this.scheduleTerm.toString();
-};
+	return 'SubjectTerm';
+}
