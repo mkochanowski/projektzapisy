@@ -16,6 +16,9 @@ Fereol.Enrollment.ScheduleSubjectTerm = function()
 	this.scheduleTerm = null; // Schedule.Term
 	this.container = $.create('div');
 
+	this.limit = null; // limit osób w grupie
+	this.enrolledCount = null; // ilość osób zapisanych do grupy
+
 	this._containerReady = false;
 	this._controlsReady = false;
 
@@ -54,7 +57,12 @@ Fereol.Enrollment.ScheduleSubjectTerm.byGroups = {};
 Fereol.Enrollment.ScheduleSubjectTerm.prototype.isEnrolledOrQueued = function()
 {
 	return this.isEnrolled || this.isQueued;
-}
+};
+
+Fereol.Enrollment.ScheduleSubjectTerm.prototype.isFull = function()
+{
+	return this.limit <= this.enrolledCount;
+};
 
 Fereol.Enrollment.ScheduleSubjectTerm.fromJSON = function(json)
 {
@@ -73,6 +81,9 @@ Fereol.Enrollment.ScheduleSubjectTerm.fromJSON = function(json)
 	{
 		sterm._onResize(isFullSize);
 	};
+
+	sterm.limit = raw.limit.castToInt();
+	sterm.enrolledCount = raw.enrolled_count.castToInt();
 
 	sterm.classroom = raw.classroom.castToInt();
 	sterm.teacher = raw.teacher;
@@ -133,14 +144,9 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype._updateVisibility = function()
 	}
 	this._updateControls();
 
-	if (this.isEnrolled)
-		this.container.addClass('enrolled');
-	else
-		this.container.removeClass('enrolled');
-	if (this.isQueued)
-		this.container.addClass('queued');
-	else
-		this.container.removeClass('queued');
+	this.container.toggleClass('enrolled', this.isEnrolled);
+	this.container.toggleClass('queued', this.isQueued);
+	this.container.toggleClass('full', this.isFull() && !this.isEnrolled && !this.isQueued);
 
 	var shouldBeVisible = (this.isPinned || this.isEnrolled ||
 		this.isPrototyped || this.isQueued);

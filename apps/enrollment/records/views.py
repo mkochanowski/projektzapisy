@@ -305,6 +305,7 @@ def schedule_prototype(request):
             default_semester)
         StudentOptions.preload_cache(request.user.student, default_semester)
 
+        numbers_of_students = Group.numbers_of_students(default_semester)
         terms_in_semester = Term.get_all_in_semester(default_semester)
         subjects_in_semester = []
         subjects_in_semester_tmp = {}
@@ -338,6 +339,9 @@ def schedule_prototype(request):
                 'day': int(term.dayOfWeek),
                 'start_time': [term.start_time.hour, term.start_time.minute],
                 'end_time': [term.end_time.hour, term.end_time.minute],
+                'limit': int(term.group.get_group_limit()),
+                'enrolled_count': int(numbers_of_students[term.group.pk]) \
+                    if numbers_of_students.has_key(term.group.pk) else 0,
             }
             subjects_in_semester_tmp[subject.pk]['terms'].\
                 append(simplejson.dumps(term_data))

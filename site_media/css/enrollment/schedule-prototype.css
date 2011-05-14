@@ -83,6 +83,13 @@ a#enr-schedulePrototype-setLocked.unlocked
 	background: #f5e5c4 !important;
 }
 
+#enr-schedulePrototype-scheduleContainer .full
+{
+	background-image: url('/site_media/images/schedule-warning.png');
+	background-repeat: no-repeat;
+	background-position: right top;
+}
+
 #enr-schedulePrototype-scheduleContainer .term .name
 {
 	display: block;
