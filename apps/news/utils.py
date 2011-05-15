@@ -169,7 +169,7 @@ def render_email_from_news(news):
     tem = get_template('news/email_html.html')
     html_body = tem.render(con)
     from_email = MASS_MAIL_FROM
-    course = settings.EMAIL_Course_PREFIX + news.title
+    course = settings.EMAIL_COURSE_PREFIX + news.title
     return (course, plaintext_body, html_body)
 
 def send_mass_mail(msg_parts, users):
