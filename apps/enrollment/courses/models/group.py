@@ -40,13 +40,14 @@ class Group(models.Model):
         return Record.enrolled.filter(group=self).count()
 
     @staticmethod
-    def numbers_of_students(semester):
+    def numbers_of_students(semester, enrolled):
         '''
             Returns numbers of students enrolled to all groups in particular
             semester
         '''
-        from apps.enrollment.records.models import Record
-        raw_counts = Record.enrolled.filter(group__course__semester=semester).\
+        from apps.enrollment.records.models import Record, Queue
+        manager = Record.enrolled if enrolled else Queue.queued
+        raw_counts = manager.filter(group__course__semester=semester).\
             values('group__pk').order_by().annotate(Count('group__pk'))
         count_map = {}
         for r in raw_counts:

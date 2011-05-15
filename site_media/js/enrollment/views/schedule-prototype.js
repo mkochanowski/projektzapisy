@@ -205,6 +205,7 @@ SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
 		course.id = elem.children('input[name=id]').attr('value').castToInt();
 		course.name = elem.children('label').disableDragging().text().trim();
 		course.shortName = elem.children('input[name=short]').attr('value').trim();
+		course.url = elem.children('input[name=url]').attr('value').trim();
 		course.type = elem.children('input[name=type]').attr('value').castToInt();
 		course.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
 		course.isRecordingOpen = elem.children('input[name=isRecordingOpen]').attr('value').castToBool();
@@ -258,6 +259,7 @@ SchedulePrototype.PrototypeCourse = function()
 	this.id = null;
 	this.name = null;
 	this.shortName = null;
+	this.url = null;
 	this.type = null;
 	this.wasEnrolled = null;
 	this.isRecordingOpen = null;

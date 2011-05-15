@@ -34,4 +34,4 @@ class Type(models.Model):
         """
             Zwraca wszystkie typy przedmiotów z wyjątkiem abstrakcyjnych
         """
-        return Types.objects.filter(meta_type=False)
+        return Type.objects.filter(meta_type=False)

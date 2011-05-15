@@ -41,6 +41,9 @@ http://github.com/jtauber/django-mailer/
 * debug-toolbar >= 0.8.3 (dołączone w repozytorium projektu)
 http://github.com/robhudson/django-debug-toolbar
 
+* django-paranoid-sessions
+http://pypi.python.org/pypi/django-paranoid-sessions/
+https://github.com/rfk/django-paranoid-sessions
 
 == Uruchomienie (dla developerów) ==
 

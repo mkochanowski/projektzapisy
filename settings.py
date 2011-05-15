@@ -14,10 +14,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 	
-#~ DATABASE_ENGINE   = 'postgresql_psycopg2'  # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-#~ DATABASE_NAME     = 'fereol_db'            # Or path to database file if using sqlite3.
-#~ DATABASE_USER     = 'fereol'               # Not used with sqlite3.
-#~ DATABASE_PASSWORD = 'fereol'               # Not used with sqlite3.
+#DATABASE_ENGINE   = 'postgresql_psycopg2'  # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+#DATABASE_NAME     = 'fereol'            # Or path to database file if using sqlite3.
+#DATABASE_USER     = 'fereol'               # Not used with sqlite3.
+#DATABASE_PASSWORD = 'fereol'               # Not used with sqlite3.
  
 DATABASE_ENGINE = 'sqlite3'              # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = os.path.join(PROJECT_PATH, 'database/db.sqlite3') # Or path to database file if using sqlite3.
@@ -108,6 +108,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'paranoidsessions.ParanoidSessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
