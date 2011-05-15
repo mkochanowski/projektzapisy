@@ -36,15 +36,17 @@
 						{% endfor %}
 					</li>
 				{% endif %}
+				{% if course.ects %}
 					<li>
 						<span>Punkty ECTS:</span>
 						{{course.ects}}
 					</li>
 				{% endif %}
-				{% if course.lectures or course.exercises or course.laboratories %}
+				{% if course.lectures or course.exercises or course.laboratories or course.repetitions%}
 					<li>
 						<span>Liczba godzin:</span>
-						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.lectures or course.laboratories %}+{% endif %}{% endif %}
+						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.lectures or course.laboratories or course.repetitions %}+{% endif %}{% endif %}
+						{% if course.repetitions %}{{course.repetitions}} (rep) {%if course.lectures or course.laboratories %}+{% endif %}{% endif %}
 						{% if course.exercises %}{{course.exercises}} (ćw) {%if course.laboratories %}+{% endif %}{% endif %}
 						{% if course.laboratories %}{{course.laboratories}} (prac){% endif %}
 					</li>
@@ -117,6 +119,7 @@
 							<td class="controls">
 								<input type="hidden" name="group-id" value="{{ t.id }}" />
 								<input type="hidden" name="is-signed-in" value="{% if t.signed %}true{% else %}false{% endif %}" />
+								{% if course.is_recording_open %}
 									<form action="{% url records-set-enrolled %}" method="post" class="setEnrolled"><div>
 										<input type="hidden" name="group" value="{{ t.id }}" />
 										{% if t.signed %}
