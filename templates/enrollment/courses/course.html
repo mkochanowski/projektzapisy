@@ -42,7 +42,7 @@
 						{{course.ects}}
 					</li>
 				{% endif %}
-				{% if course.lectures or course.exercises or course.laboratories or course.repetitions%}
+				{% if course.lectures or course.exercises or course.laboratories or course.repetitions %}
 					<li>
 						<span>Liczba godzin:</span>
 						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.lectures or course.laboratories or course.repetitions %}+{% endif %}{% endif %}

@@ -22,13 +22,20 @@ class Term( models.Model ):
         app_label = 'courses'
     
     @staticmethod
-    def get_all_in_semester(semester):
-        return Term.objects.filter(group__course__semester=semester).\
-            select_related('classroom', 'group', 'group__course', \
+    def get_all_in_semester(semester, student=None):
+        filtered = Term.objects.filter(group__course__semester=semester)
+        
+        if student:
+            from apps.enrollment.records.models import Record
+            filtered = filtered.filter(group__id__in=\
+                Record.get_student_enrolled_ids(student, semester))
+            
+        return filtered.select_related('classroom', 'group', 'group__course', \
             'group__course__semester', 'group__course__entity',
             'group__course__type', \
-            'group__teacher', 'group__teacher__user').order_by('group__course__name').all()
-    
+            'group__teacher', 'group__teacher__user').\
+            order_by('dayOfWeek', 'start_time').all()
+
     def day_in_zero_base(self):
         return int(self.dayOfWeek)-1
     

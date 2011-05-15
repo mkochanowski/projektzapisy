@@ -9,7 +9,6 @@
 {% block scripts %}
 	<script src="/site_media/js/jquery/jquery-ui-1.8.1.custom.min.js" type="text/javascript"></script>
 	<script src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js" type="text/javascript"></script>
-	<script src="/site_media/js/jquery/jquery.ui.schedule.js" type="text/javascript"></script>
 
 	<script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
 	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
@@ -89,16 +88,16 @@
 		<ul id="enr-schedulePrototype-course-list">
 			{% for course in courses %}
 			<li>
-				<span class="checkbox"><input type="checkbox" id="enr-schedulePrototype-course-{{ course.course.id }}" /></span>
-				<label for="enr-schedulePrototype-course-{{ course.course.id }}">{{ course.course.name }}</label>
-				<input type="hidden" name="id" value="{{ course.course.id }}" />
-				<input type="hidden" name="type" value="{{ course.course.type }}" />
-				<input type="hidden" name="short" value="{{ course.course.short }}" />
-				<input type="hidden" name="wasEnrolled" value="{{ course.course.was_enrolled }}" />
-				<input type="hidden" name="isRecordingOpen" value="{{ course.course.is_recording_open }}" />
-				<input type="hidden" name="url" value="{% url course-page course.course.slug %}" />
+				<span class="checkbox"><input type="checkbox" id="enr-schedulePrototype-course-{{ course.info.id }}" /></span>
+				<label for="enr-schedulePrototype-course-{{ course.info.id }}">{{ course.info.name }}</label>
+				<input type="hidden" name="id" value="{{ course.info.id }}" />
+				<input type="hidden" name="type" value="{{ course.info.type }}" />
+				<input type="hidden" name="short" value="{{ course.info.short }}" />
+				<input type="hidden" name="wasEnrolled" value="{{ course.info.was_enrolled }}" />
+				<input type="hidden" name="isRecordingOpen" value="{{ course.info.is_recording_open }}" />
+				<input type="hidden" name="url" value="{% url course-page course.info.slug %}" />
 				{% for term in course.terms %}
-					<input type="hidden" name="term" value="{{ term }}" />
+					<input type="hidden" name="term" value="{{ term.json }}" />
 				{% endfor %}
 			</li>
 			{% endfor %}
