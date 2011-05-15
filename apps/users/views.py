@@ -20,7 +20,7 @@ from apps.users.exceptions import NonUserException, NonEmployeeException,\
 from apps.users.utils import prepare_ajax_students_list,\
                              prepare_ajax_employee_list
 
-from apps.users.models import Employee, Student
+from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 
@@ -198,7 +198,9 @@ def employees_list(request, begin = 'A'):
     else:
         data = {
             "employees" : employees,
-            "char": begin
+            "char": begin,
+            "is_student" : BaseUser.is_student(request.user),
+            "is_employee" : BaseUser.is_employee(request.user),
             }  
     
         return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
@@ -212,7 +214,11 @@ def students_list(request, begin = 'A'):
         students = prepare_ajax_students_list(students)
         return AjaxSuccessMessage(message="ok", data=students)
     else:
-        data = { "students" : students, "char": begin }
+        data = { 
+            "students" : students, 
+            "char": begin,
+            "is_student" : BaseUser.is_student(request.user),
+            "is_employee" : BaseUser.is_employee(request.user), }
         return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
 @login_required
