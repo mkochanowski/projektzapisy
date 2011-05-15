@@ -185,6 +185,7 @@ def proposal_form(request, sid = None):
 
         proposal_lectures = int(request.POST.get('lectures', -1))
         proposal_repetitories = int(request.POST.get('repetitories', -1))
+        proposal_seminars = int(request.POST.get('seminars', -1))
         proposal_exercises = int(request.POST.get('exercises', -1))
         proposal_laboratories = int(request.POST.get('laboratories', -1))        
         
@@ -210,8 +211,8 @@ def proposal_form(request, sid = None):
 
         if  ( proposal_name == "" or proposal_ects == "" or proposal_description == ""
             or proposal_requirements == "" or proposal_lectures == -1
-            or proposal_repetitories == -1 or proposal_exercises == -1
-            or proposal_laboratories == -1):
+            or proposal_repetitories == -1 or proposal_seminars == -1
+            or proposal_exercises == -1 or proposal_laboratories == -1):
                 request.user.message_set.create(message=\
                     'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' + \
                     'punktów ECTS oraz liczbę godzin zajęć.')
@@ -238,6 +239,7 @@ def proposal_form(request, sid = None):
             description.ects = proposal_ects
             description.lectures = proposal_lectures
             description.repetitories = proposal_repetitories
+            description.seminars = proposal_seminars
             description.exercises = proposal_exercises
             description.laboratories = proposal_laboratories
             description.web_page = proposal_www   

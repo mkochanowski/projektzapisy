@@ -90,6 +90,7 @@
       "lectures": 15,  
       "ects": 6, 
       "repetitories": 15,
+      "seminars" : 15,
       "exercises": 15, 
       "laboratories": 15, 
       "author": 1
@@ -107,7 +108,8 @@
       "proposal": 2,
       "lectures": 15, 
       "ects": 6, 
-      "repetitories": 15, 
+      "repetitories": 15,
+      "seminars": 15, 
       "exercises": 15, 
       "laboratories": 15, 
       "author": 1
@@ -126,7 +128,8 @@
       "proposal": 3,
       "lectures": 15, 
       "ects": 3, 
-      "repetitories": 0, 
+      "repetitories": 0,
+      "seminars": 15, 
       "exercises": 0, 
       "laboratories": 0, 
       "author": 1

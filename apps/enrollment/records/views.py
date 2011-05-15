@@ -280,94 +280,137 @@ def records(request, group_id):
         return render_to_response('common/error.html',\
             context_instance=RequestContext(request))
 
+def prepare_courses_with_terms(terms):
+    courses_list = []
+    courses_map = {}
+    for term in terms:
+        course = term.group.course
+        if not course.pk in courses_map:
+            course_info = {
+                'object': course,
+                'info': {
+                    'id' : course.pk,
+                    'name': course.name,
+                    'short': course.entity.get_short_name(),
+                    'type': course.type.pk,
+                    'slug': course.slug,
+                },
+                'terms': []
+            }
+            courses_map[course.pk] = course_info
+            courses_list.append(course_info)
+        term_info = {
+            'id': term.pk,
+            'group': term.group.pk,
+            'group_url': reverse('records-group', args=[term.group.pk]),
+            'group_type': int(term.group.type),
+            'teacher': term.group.teacher.user.get_full_name(),
+            'teacher_url': reverse('employee-profile', \
+                args=[term.group.teacher.user.id]),
+            'classroom': int(term.classroom.number),
+            'day': int(term.dayOfWeek),
+            'start_time': [term.start_time.hour, term.start_time.minute],
+            'end_time': [term.end_time.hour, term.end_time.minute],
+            'limit': int(term.group.get_group_limit()),
+        }
+        courses_map[course.pk]['terms'].append({
+            'id': term.pk,
+            'object': term,
+            'info': term_info
+        })
+    return courses_list
+
 @login_required
 def own(request):
     ''' own schedule view '''
-    try:
-        logger.info('User %s <id: %s> looked at his schedule' %\
-            (request.user.username, request.user.id))
-        return render_to_response('enrollment/records/schedule.html', {
-            'groups': Record.get_student_records(request.user.student),
-            "is_student" : BaseUser.is_student(request.user),
-            "is_employee" : BaseUser.is_employee(request.user),
-        }, context_instance=RequestContext(request))
-    except NonStudentException:
-        request.user.message_set.create(message='Nie jesteś studentem.')
-        return render_to_response('common/error.html',\
-            context_instance=RequestContext(request))
- 
-@login_required       
-def schedule_prototype(request):
-    ''' schedule prototype view '''
-    try:
-        default_semester = Semester.get_default_semester()
-        if not default_semester:
-            raise RuntimeError('TODO: trzeba to jakoś obsługiwać')
 
-        student_records = Record.get_student_records_ids(request.user,\
-            default_semester)
-        StudentOptions.preload_cache(request.user.student, default_semester)
+    default_semester = Semester.get_default_semester()
+    if not default_semester:
+        raise RuntimeError('Nie ma aktywnego semestru')
 
-        enrolled_students_counts =\
-            Group.numbers_of_students(default_semester, True)
-        queued_students_counts =\
-            Group.numbers_of_students(default_semester, False)
-        terms_in_semester = Term.get_all_in_semester(default_semester)
-        courses_in_semester = []
-        courses_in_semester_tmp = {}
-        for term in terms_in_semester:
-            course = term.group.course
-            if not course.pk in courses_in_semester_tmp:
-                course_collection = {
-                    'course': {
-                        'id' : course.pk,
-                        'name': course.name,
-                        'short': course.entity.get_short_name(),
-                        'type': course.type.pk,
-                        'is_recording_open': course.\
-                            is_recording_open_for_student(request.user.student),
-                        #TODO: kod w prepare_courses_list_to_render moim
-                        #      zdaniem nie zadziała
-                        'was_enrolled': 'False',
-                        'slug': course.slug,
-                    },
-                    'terms': []
-                }
-                courses_in_semester_tmp.update({
-                    course.pk: course_collection
-                })
-                courses_in_semester.append(course_collection)
-            term_data = {
-                'id': term.pk,
-                'group': term.group.pk,
-                'group_url': reverse('records-group', args=[term.group.pk]),
-                'group_type': int(term.group.type),
-                'teacher': term.group.teacher.user.get_full_name(),
-                'teacher_url': reverse('employee-profile', args=[term.group.teacher.user.id]),
-                'classroom': int(term.classroom.number),
-                'day': int(term.dayOfWeek),
-                'start_time': [term.start_time.hour, term.start_time.minute],
-                'end_time': [term.end_time.hour, term.end_time.minute],
-                'limit': int(term.group.get_group_limit()),
-                'enrolled_count': int(enrolled_students_counts[term.group.pk]) \
-                    if enrolled_students_counts.has_key(term.group.pk) else 0,
-                'queued_count': int(queued_students_counts[term.group.pk]) \
-                    if queued_students_counts.has_key(term.group.pk) else 0,
-            }
-            courses_in_semester_tmp[course.pk]['terms'].\
-                append(simplejson.dumps(term_data))
-  
-        data = {
-            "is_student" : BaseUser.is_student(request.user),
-            "is_employee" : BaseUser.is_employee(request.user),
-            'student_records': student_records,
-            'courses' : courses_in_semester,
-            'semester' : default_semester,
-            'types_list' : Type.get_all_for_jsfilter()
-        }
-        return render_to_response('enrollment/records/schedule_prototype.html',\
-            data, context_instance = RequestContext(request))
+    try:
+        student = request.user.student
     except Student.DoesNotExist:
         request.user.message_set.create(message='Nie jesteś studentem.')
         return render_to_response('common/error.html', \
             context_instance=RequestContext(request))
+
+    courses = prepare_courses_with_terms(\
+        Term.get_all_in_semester(default_semester, student))
+
+    terms_by_days = [None for i in range(8)] # dni numerowane od 1
+    for course in courses:
+        for term in course['terms']:
+            day = int(term['object'].dayOfWeek)
+            if not terms_by_days[day]:
+                terms_by_days[day] = {
+                    'day_id': day,
+                    'day_name': term['object'].get_dayOfWeek_display(),
+                    'terms': []
+                }
+            terms_by_days[day]['terms'].append(term)
+            term.update({ # TODO: do szablonu
+                'json': simplejson.dumps(term['info'])
+            })
+    terms_by_days = filter(lambda term: term, terms_by_days)
+
+    data = {
+        'is_student': BaseUser.is_student(request.user),
+        'is_employee': BaseUser.is_employee(request.user),
+        'terms_by_days': terms_by_days,
+        'courses': courses
+    }
+
+    return render_to_response('enrollment/records/schedule.html',\
+        data, context_instance = RequestContext(request))
+
+@login_required       
+def schedule_prototype(request):
+    ''' schedule prototype view '''
+    try:
+        student = request.user.student
+    except Student.DoesNotExist:
+        request.user.message_set.create(message='Nie jesteś studentem.')
+        return render_to_response('common/error.html', \
+            context_instance=RequestContext(request))
+
+    default_semester = Semester.get_default_semester()
+    if not default_semester:
+        raise RuntimeError('Nie ma aktywnego semestru')
+
+    StudentOptions.preload_cache(student, default_semester)
+
+    enrolled_students_counts = Group.numbers_of_students(default_semester, True)
+    queued_students_counts = Group.numbers_of_students(default_semester, False)
+    courses = prepare_courses_with_terms(\
+        Term.get_all_in_semester(default_semester))
+    for course in courses:
+        course['info'].update({
+            'is_recording_open': course['object'].\
+                is_recording_open_for_student(student),
+            #TODO: kod w prepare_courses_list_to_render moim zdaniem nie
+            #      zadziała
+            'was_enrolled': 'False',
+        })
+        for term in course['terms']:
+            term['info'].update({
+                'enrolled_count': int(enrolled_students_counts[term['id']]) \
+                    if enrolled_students_counts.has_key(term['id']) else 0,
+                'queued_count': int(queued_students_counts[term['id']]) \
+                    if queued_students_counts.has_key(term['id']) else 0,
+            })
+            term.update({ # TODO: do szablonu
+                'json': simplejson.dumps(term['info'])
+            })
+    
+    data = {
+        'is_student': BaseUser.is_student(request.user),
+        'is_employee': BaseUser.is_employee(request.user),
+        'student_records': Record.get_student_records_ids(student, \
+            default_semester),
+        'courses' : courses,
+        'semester' : default_semester,
+        'types_list' : Type.get_all_for_jsfilter()
+    }
+    return render_to_response('enrollment/records/schedule_prototype.html',\
+        data, context_instance = RequestContext(request))

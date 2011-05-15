@@ -1,3 +1,4 @@
+//TODO: DEPRECATED
 
 $(function(){
 	$('.schedule-table-simple tr:even').addClass('even');
