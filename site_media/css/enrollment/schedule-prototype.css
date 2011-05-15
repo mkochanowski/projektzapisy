@@ -146,6 +146,7 @@ a#enr-schedulePrototype-setLocked.unlocked
 	top: 0;
 	left: 0;
 	width: 18px;
+	cursor: default;
 
 	border: 1px solid #666666;
 	border-top: 0;
@@ -186,4 +187,32 @@ a#enr-schedulePrototype-setLocked.unlocked
 	margin: 1px;
 	
 	background: no-repeat url('/site_media/images/loading-small.gif');
+}
+
+/*******************************************************************************
+ * Popup.
+ ******************************************************************************/
+
+#enr-schedulePrototype-scheduleContainer .termPopupContents
+{
+	width: 300px;
+	padding: 10px;
+}
+
+#enr-schedulePrototype-scheduleContainer .termPopupContents .name
+{
+	font-weight: normal;
+	font-size: 18px;
+	margin-bottom: 10px;
+}
+
+#enr-schedulePrototype-scheduleContainer .termPopupContents .enrolledCount img
+{
+	vertical-align: middle;
+}
+
+#enr-schedulePrototype-scheduleContainer .termPopupContents .enrolledInfo
+{
+	margin-top: 10px;
+	font-weight: bold;
 }

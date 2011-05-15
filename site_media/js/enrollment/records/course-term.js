@@ -236,14 +236,11 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 		}
 		if (result.isSuccess())
 		{
-			if (self.isEnrolled != enroll)
-			{
-				self.isEnrolled = enroll;
-				self.enrolledCount += (enroll ? 1 : -1);
-			}
-			self.isQueued = false;
 			if (enroll)
 			{
+				self.isEnrolled = true;
+				self.enrolledCount++;
+
 				// zaznaczanie innych grup tego samego typu jako "nie zapisane"
 				CourseView._termsList.forEach(function(e)
 				{
