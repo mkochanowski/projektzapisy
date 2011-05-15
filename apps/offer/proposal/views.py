@@ -197,6 +197,10 @@ def proposal_form(request, sid = None):
             request.user.message_set.create(message='Istnieje już przedmiot o takiej nazwie.')
             correct_form = False                                                 
 
+        if proposal_.slug == '':
+            request.user.message_set.create(message='Nazwa przedmiotu jest niepoprawna.')
+            correct_form = False
+
         number_of_types = 0
         for one_type in types:
             if one_type != "":
