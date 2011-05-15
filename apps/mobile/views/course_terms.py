@@ -134,7 +134,7 @@ def resign(request, group_id):
 @login_required
 def reassign(request,group_from,group_to):
     try:
-        record = Record.change_student_group(request.user.id, group_from, group_to)
+        record = Record.add_student_to_group(request.user.id, group_id)
         request.user.message_set.create(message="Zostałeś przepisany do innej grupy.")
         logger.info('User %s reassign from group with id: %d to group with id: %d (mobile fereol)' % (request.user,int(group_from),int(group_to)))
         return redirect("course-terms", slug=record.group_slug())
