@@ -1182,7 +1182,7 @@
         "pk": 105, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_subject", 
+            "codename": "add_course",
             "name": "Can add przedmiot", 
             "content_type": 35
         }
@@ -1191,7 +1191,7 @@
         "pk": 106, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_subject", 
+            "codename": "change_course",
             "name": "Can change przedmiot", 
             "content_type": 35
         }
@@ -1200,7 +1200,7 @@
         "pk": 107, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_subject", 
+            "codename": "delete_course",
             "name": "Can delete przedmiot", 
             "content_type": 35
         }
@@ -1209,7 +1209,7 @@
         "pk": 102, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_subjectentity", 
+            "codename": "add_courseentity",
             "name": "Can add Podstawa przedmiotu", 
             "content_type": 34
         }
@@ -1218,7 +1218,7 @@
         "pk": 103, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_subjectentity", 
+            "codename": "change_courseentity",
             "name": "Can change Podstawa przedmiotu", 
             "content_type": 34
         }
@@ -1227,7 +1227,7 @@
         "pk": 104, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_subjectentity", 
+            "codename": "delete_courseentity",
             "name": "Can delete Podstawa przedmiotu", 
             "content_type": 34
         }

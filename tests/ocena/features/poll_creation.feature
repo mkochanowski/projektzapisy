@@ -2,10 +2,10 @@ Feature: User with privileges wants to create a poll.
 
     Background:
         Given I start new scenario
-        And there are some subjects with groups for current semester
+        And there are some courses with groups for current semester
         And there are some sections created already
         
-    Scenario: Administrator can see all the subjects
+    Scenario: Administrator can see all the courses
 		# Given the grading protocol is "off"
         # And I am logged in with "administrator" privileges
         # And I am on grade main page
@@ -13,7 +13,7 @@ Feature: User with privileges wants to create a poll.
         # And I follow "Tworzenie ankiet"
         # Then I can select from "4" options in "Przedmiot:"
                     
-    Scenario: Employee can see only his subjects
+    Scenario: Employee can see only his courses
 		# Given the grading protocol is "off"
         # And I am logged in with "employee" privileges
         # And I am on grade main page
@@ -44,7 +44,7 @@ Feature: User with privileges wants to create a poll.
         # And I press "Dodaj sekcję"
         # Then I can't select "Ogół zajęć" from "Wybierz sekcję:"
             
-    Scenario: Employee creates a poll for his subject for all exercises groups
+    Scenario: Employee creates a poll for his course for all exercises groups
 		Given the grading protocol is "off"
         And I am logged in with "employee" privileges
         And I am on grade main page
@@ -64,7 +64,7 @@ Feature: User with privileges wants to create a poll.
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 3"
             
-    Scenario: Employee creates a poll for his subject, just for lecture
+    Scenario: Employee creates a poll for his course, just for lecture
 		Given the grading protocol is "off"
         And I am logged in with "employee" privileges
         And I am on grade main page
@@ -105,7 +105,7 @@ Feature: User with privileges wants to create a poll.
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 1"            
             
-    Scenario: Administrator creates a poll with no subject or group assigned
+    Scenario: Administrator creates a poll with no course or group assigned
 		Given the grading protocol is "off"
         And I am logged in with "administrator" privileges
         And I am on grade main page

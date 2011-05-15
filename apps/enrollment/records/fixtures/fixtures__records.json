@@ -552,7 +552,7 @@
         "pk": 70, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_subject", 
+            "codename": "add_course", 
             "name": "Can add przedmiot", 
             "content_type": 24
         }
@@ -561,7 +561,7 @@
         "pk": 67, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_subjectentity", 
+            "codename": "add_courseentity", 
             "name": "Can add encja przedmiotu", 
             "content_type": 23
         }
@@ -624,7 +624,7 @@
         "pk": 71, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_subject", 
+            "codename": "change_course", 
             "name": "Can change przedmiot", 
             "content_type": 24
         }
@@ -633,7 +633,7 @@
         "pk": 68, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_subjectentity", 
+            "codename": "change_courseentity", 
             "name": "Can change encja przedmiotu", 
             "content_type": 23
         }
@@ -696,7 +696,7 @@
         "pk": 72, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_subject", 
+            "codename": "delete_course", 
             "name": "Can delete przedmiot", 
             "content_type": 24
         }
@@ -705,7 +705,7 @@
         "pk": 69, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_subjectentity", 
+            "codename": "delete_courseentity", 
             "name": "Can delete encja przedmiotu", 
             "content_type": 23
         }
@@ -966,9 +966,9 @@
         "pk": 23, 
         "model": "contenttypes.contenttype", 
         "fields": {
-            "model": "subjectentity", 
+            "model": "courseentity", 
             "name": "encja przedmiotu", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1004,7 +1004,7 @@
         "fields": {
             "model": "group", 
             "name": "grupa", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1022,7 +1022,7 @@
         "fields": {
             "model": "book", 
             "name": "ksi\u0105\u017cka", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1110,9 +1110,9 @@
         "pk": 24, 
         "model": "contenttypes.contenttype", 
         "fields": {
-            "model": "subject", 
+            "model": "course", 
             "name": "przedmiot", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1121,7 +1121,7 @@
         "fields": {
             "model": "type", 
             "name": "rodzaj", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1130,7 +1130,7 @@
         "fields": {
             "model": "classroom", 
             "name": "sala", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1139,7 +1139,7 @@
         "fields": {
             "model": "semester", 
             "name": "semestr", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1175,7 +1175,7 @@
         "fields": {
             "model": "term", 
             "name": "termin", 
-            "app_label": "subjects"
+            "app_label": "courses"
         }
     }, 
     {
@@ -1442,7 +1442,7 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:10", 
-            "app_name": "subjects", 
+            "app_name": "courses", 
             "migration": "0001_initial"
         }
     }, 
@@ -1451,8 +1451,8 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:11", 
-            "app_name": "subjects", 
-            "migration": "0002_auto__del_subjectdescription__del_books__add_book__add_field_subject_d"
+            "app_name": "courses", 
+            "migration": "0002_auto__del_coursedescription__del_books__add_book__add_field_course_d"
         }
     }, 
     {
@@ -1460,8 +1460,8 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:12", 
-            "app_name": "subjects", 
-            "migration": "0003_auto__add_semester__add_field_subject_semester"
+            "app_name": "courses", 
+            "migration": "0003_auto__add_semester__add_field_course_semester"
         }
     }, 
     {
@@ -1469,7 +1469,7 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:12", 
-            "app_name": "subjects", 
+            "app_name": "courses", 
             "migration": "0004_auto__add_field_semester_visible"
         }
     }, 
@@ -1478,7 +1478,7 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:12", 
-            "app_name": "subjects", 
+            "app_name": "courses", 
             "migration": "0005_auto__add_type"
         }
     }, 
@@ -1487,8 +1487,8 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:13", 
-            "app_name": "subjects", 
-            "migration": "0006_auto__add_unique_type_name__add_field_subject_type"
+            "app_name": "courses", 
+            "migration": "0006_auto__add_unique_type_name__add_field_course_type"
         }
     }, 
     {
@@ -1496,8 +1496,8 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:13", 
-            "app_name": "subjects", 
-            "migration": "0007_auto__add_subjectentity__add_field_subject_entity"
+            "app_name": "courses", 
+            "migration": "0007_auto__add_courseentity__add_field_course_entity"
         }
     }, 
     {
@@ -1505,8 +1505,8 @@
         "model": "south.migrationhistory", 
         "fields": {
             "applied": "2010-05-16 15:03:13", 
-            "app_name": "subjects", 
-            "migration": "0008_create_subject_entities"
+            "app_name": "courses", 
+            "migration": "0008_create_course_entities"
         }
     }, 
     {
@@ -1571,28 +1571,28 @@
     }, 
     {
         "pk": 1, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity", 
         "fields": {
             "name": "Algorytmy i struktury danych"
         }
     }, 
     {
         "pk": 2, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity", 
         "fields": {
             "name": "Programowanie"
         }
     }, 
     {
         "pk": 3, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity", 
         "fields": {
             "name": "Bazy danych"
         }
     }, 
     {
         "pk": 1, 
-        "model": "subjects.subject", 
+        "model": "courses.course", 
         "fields": {
             "lectures": 30, 
             "description": "Opis", 
@@ -1610,7 +1610,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "subjects.subject", 
+        "model": "courses.course", 
         "fields": {
             "lectures": 30, 
             "description": "Wiadomo co ;-)", 
@@ -1628,14 +1628,14 @@
     }, 
     {
         "pk": 1, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "Obowiazki.O1"
         }
     }, 
     {
         "pk": 1, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "term": [
                 1
@@ -1643,12 +1643,12 @@
             "limit": 120, 
             "type": "2", 
             "teacher": 3, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 2, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "term": [
                 2
@@ -1656,12 +1656,12 @@
             "limit": 25, 
             "type": "2", 
             "teacher": 2, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 3, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": { 
             "term": [
                 3
@@ -1669,12 +1669,12 @@
             "limit": 120, 
             "type": "1", 
             "teacher": 3, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 4, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "term": [
                 4
@@ -1682,33 +1682,33 @@
             "limit": 300, 
             "type": "1", 
             "teacher": 1, 
-            "subject": 2
+            "course": 2
         }
     }, 
     {
         "pk": 1, 
-        "model": "subjects.classroom", 
+        "model": "courses.classroom", 
         "fields": {
             "number": "25"
         }
     }, 
     {
         "pk": 2, 
-        "model": "subjects.classroom", 
+        "model": "courses.classroom", 
         "fields": {
             "number": "11"
         }
     }, 
     {
         "pk": 3, 
-        "model": "subjects.classroom", 
+        "model": "courses.classroom", 
         "fields": {
             "number": "112"
         }
     }, 
     {
         "pk": 1, 
-        "model": "subjects.term", 
+        "model": "courses.term", 
         "fields": {
             "dayOfWeek": "1", 
             "start_time": "08:00:00",
@@ -1718,7 +1718,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "subjects.term", 
+        "model": "courses.term", 
         "fields": {
             "dayOfWeek": "4", 
             "start_time": "10:00:00",
@@ -1728,7 +1728,7 @@
     }, 
     {
         "pk": 3, 
-        "model": "subjects.term", 
+        "model": "courses.term", 
         "fields": {
             "dayOfWeek": "3", 
             "start_time": "12:00:00",
@@ -1738,7 +1738,7 @@
     },
     {
         "pk": 4, 
-        "model": "subjects.term", 
+        "model": "courses.term", 
         "fields": {
             "dayOfWeek": "3", 
             "start_time": "16:00:00",
@@ -1748,7 +1748,7 @@
     },
 	{
         "pk": 1,
-        "model": "subjects.semester",
+        "model": "courses.semester",
         "fields": {
             "records_opening": "2010-02-01 00:00:00",
             "visible": true,
@@ -1761,7 +1761,7 @@
     },
     {
         "pk": 2,
-        "model": "subjects.semester",
+        "model": "courses.semester",
         "fields": {
             "records_opening": "2010-09-25 00:00:00",
             "visible": true,

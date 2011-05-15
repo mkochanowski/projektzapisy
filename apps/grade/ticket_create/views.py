@@ -7,14 +7,14 @@ from django.utils                        import simplejson
 from apps.users.decorators             import student_required, employee_required
 from django.contrib.auth.decorators      import login_required
 
-from apps.enrollment.subjects.models   import Semester, \
+from apps.enrollment.courses.models   import Semester, \
                                                 Group,\
-                                                Subject
+                                                Course
 from apps.enrollment.records.models    import Record
 from apps.grade.poll.models            import Poll
 from apps.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 generate_keys,          \
-                                                group_polls_by_subject, \
+                                                group_polls_by_course, \
                                                 secure_signer, \
                                                 unblind, \
                                                 get_valid_tickets, \
@@ -50,7 +50,7 @@ def ajax_get_rsa_keys_step1( request ):
     if request.is_ajax():
         if request.method == 'POST':
             students_polls = Poll.get_all_polls_for_student( request.user.student )
-            groupped_polls = group_polls_by_subject( students_polls )
+            groupped_polls = group_polls_by_course( students_polls )
             form = PollCombineForm( request.POST, 
                                     polls = groupped_polls )
             if form.is_valid():
@@ -66,7 +66,7 @@ def ajax_get_rsa_keys_step2( request ):
     if request.is_ajax():
         if request.method == 'POST':
             students_polls = Poll.get_all_polls_for_student( request.user.student )
-            groupped_polls = group_polls_by_subject( students_polls )
+            groupped_polls = group_polls_by_course( students_polls )
             form = PollCombineForm( request.POST, 
                                     polls = groupped_polls )
             if form.is_valid():
@@ -87,7 +87,7 @@ def ajax_get_rsa_keys_step2( request ):
 def connections_choice( request ):
     grade = Semester.get_current_semester().is_grade_active
     students_polls = Poll.get_all_polls_for_student( request.user.student )
-    groupped_polls = group_polls_by_subject( students_polls )
+    groupped_polls = group_polls_by_course( students_polls )
     connected = any(len(x) > 1 for x in groupped_polls)
     if grade:
         if request.method == "POST":
@@ -153,7 +153,7 @@ def client_connection( request ):
             if groupNumber == u"*":
                 st=u""
                 students_polls = Poll.get_all_polls_for_student( user.student )
-                groupped_polls = group_polls_by_subject( students_polls )
+                groupped_polls = group_polls_by_course( students_polls )
                 for polls in groupped_polls:
                     
                     if len( polls ) == 1:
@@ -162,7 +162,7 @@ def client_connection( request ):
                         st += u'[' + unicode( polls[0].title ) + u']%%%'
             
                         if polls[0].group:
-                            st += unicode( polls[0].group.subject.name ) + u'%%%'
+                            st += unicode( polls[0].group.course.name ) + u'%%%'
                             st += unicode( polls[0].group.get_type_display()) + u': %%%'
                             st += unicode( polls[0].group.get_teacher_full_name()) + u'%%%'
 
@@ -176,7 +176,7 @@ def client_connection( request ):
                             if not poll.group:
                                 st += u'Ankiety ogólne: %%%   [' + poll.title + '] '
                             else:
-                                st += u'Przedmiot: ' + polls[ 0 ].group.subject.name + u'%%%    [' + poll.title + u'] ' + \
+                                st += u'Przedmiot: ' + polls[ 0 ].group.course.name + u'%%%    [' + poll.title + u'] ' + \
                                          poll.group.get_type_display() + u': ' + \
                                          poll.group.get_teacher_full_name() + u'***'
                                 st += unicode( PublicKey.objects.get( poll = poll.pk ).public_key ) + '&&&'
@@ -214,5 +214,5 @@ def client_connection( request ):
             
 @csrf_exempt
 def keys_list( request ):
-    l = PublicKey.objects.all()#.order_by('poll__group__subject__name')
+    l = PublicKey.objects.all()#.order_by('poll__group__course__name')
     return render_to_response('grade/ticket_create/keys_list.html', {'list': l,},context_instance = RequestContext( request ))

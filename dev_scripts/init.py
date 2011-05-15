@@ -186,7 +186,7 @@ with open('init-data/init.sql', 'w') as datasql:
 		next_week = 'now() + interval \'1 week\''
 		prev_week = 'now() - interval \'1 week\''
 	
-	datasql.write('UPDATE subjects_semester SET ' +
+	datasql.write('UPDATE courses_semester SET ' +
 		'year = ' + str(school_year) +
 		', records_opening = ' + prev_week +
 		', records_closing = ' + next_week +

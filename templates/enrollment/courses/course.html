@@ -1,0 +1,145 @@
+{% extends "enrollment/courses/base.html" %}
+
+{% load fereol_common %}
+
+{% block main-subtitle %}{{course.name}}{% endblock %}
+
+{% block main-navigation %}
+	<li><a href="{% url main-page %}">Strona główna</a></li>
+	<li><a href="{% url latest_news 'enrollment' %}">Zapisy</a></li>
+	<li><a href="{% url course-list %}">Przedmioty</a></li>
+	<li>{{course.name}}</li>
+{% endblock %}
+
+{% block enrollment-courses-scripts %}
+	<script src="/site_media/js/components/messageBox.js" type="text/javascript"></script>
+
+	<script src="/site_media/js/enrollment/views/course.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+	<div id="enr-course-view">
+
+		<h1>{{course.name}}</h1>
+
+		<div class="details">
+			<ul class="properties">
+				<li>
+					<span>Rodzaj:</span>
+					{{course.type}}
+				</li>
+				<li>
+					<span>Prowadzący:</span>
+					{% for teacher in course.teachers.all %}
+						<a href="{% url employee-profile teacher.user.id %}">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
+					{% endfor %}
+				</li>
+				{% if course.ects %}
+					<li>
+						<span>Punkty ECTS:</span>
+						{{course.ects}}
+					</li>
+				{% endif %}
+				{% if course.lectures or course.exercises or course.laboratories %}
+					<li>
+						<span>Liczba godzin:</span>
+						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.lectures or course.laboratories %}+{% endif %}{% endif %}
+						{% if course.exercises %}{{course.exercises}} (ćw) {%if course.laboratories %}+{% endif %}{% endif %}
+						{% if course.laboratories %}{{course.laboratories}} (prac){% endif %}
+					</li>
+				{% endif %}
+				<li>
+					<span>Wymagane:</span>
+					<a onclick="alert('to tylko przykład')">JFiZO</a>,
+					Matematyka w zakresie szkoły średniej,
+					<a onclick="alert('to tylko przykład')">AiSD</a>
+				</li>
+				{% if course.can_enroll_from %}
+					<li>
+						<span>Możesz zapisać się od:</span>
+						{{ course.can_enroll_from|date:'Y-m-d H:i' }}
+						({{ course.can_enroll_interval|timedelta }})
+					</li>
+				{% endif %}
+			</ul>
+
+			<div class="description">
+				<h2>Opis przedmiotu:</h2>
+				<p>{{course.description}}</p>
+			</div>
+
+			<div class="footer"></div>
+		</div>
+
+		{% block messages %}{% endblock %}{% include 'common/messages.html' %}
+
+		{% for tutorial in tutorials %}{% if tutorial.groups %}
+			<div class="tutorial">
+				<h2>{{tutorial.name}}</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Prowadzący</th>
+							<th class="term">Termin zajęć</th>
+							<th title="Maksymalna liczba osób, które mogą zapisać się na przedmiot" class="number">Limit</th>
+							<th title="Liczba aktualnie zapisanych osób" class="number">Zapisanych</th>
+							<th title="Liczba osób oczekujących na zapis" class="number">W kolejce</th>
+							<td class="controls"></td>
+							<th class="priority">Priorytet</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for t in tutorial.groups %}
+						<tr {% if t.signed %} class="signed" {% endif %} >
+							<td>{{ t.get_teacher_full_name }}</td>
+							<td class="term">
+								{% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
+									<span>{{d}}</span>
+								{% endfor %}
+							</td>
+							<td class="number">{{ t.get_group_limit }}</td>
+							<td class="number">{{ t.enrolled }}</td>
+							<td class="number">{{ t.queued }}</td>
+							<td class="controls">
+								<input type="hidden" name="group-id" value="{{ t.id }}" />
+								{% if course.is_recording_open %}
+									<form action="{% url records-set-enrolled %}" method="post"><div>
+										<input type="hidden" name="group" value="{{ t.id }}" />
+										{% if t.signed %}
+											<input type="hidden" name="enroll" value="false" />
+											<input type="submit" value="wypisz" />
+										{% else %}{% if not t.is_full %}
+											<input type="hidden" name="enroll" value="true" />
+											<input type="submit" value="{% if t.is_in_diff %}przenieś{% else %}zapisz{% endif %}" />
+										{% else %}{% if t.priority %}
+											<input type="hidden" name="enroll" value="false" />
+											<input type="submit" value="wypisz z kolejki" />
+										{% else %}
+											<input type="hidden" name="enroll" value="true" />
+											<input type="submit" value="zapisz do kolejki" />
+										{% endif %}{% endif %}{% endif %}
+									</div></form>
+								{% endif %}
+								<a href="{% url records-group t.id %}">lista</a>
+							</td>
+							<td class="priority">
+								{% if t.priority %}
+									<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
+										<input type="hidden" name="priority" value="{{ t.priority|add:-1}}" />
+										<input type="submit" value="-" {% if t.priority <= 1 %} disabled="disabled" {% endif %} />
+									</div></form>
+									<span>{{ t.priority }}</span>
+									<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
+										<input type="hidden" name="priority" value="{{ t.priority|add:1}}" />
+										<input type="submit" value="+" {% if t.priority >= 10 %} disabled="disabled" {% endif %} />
+									</div></form>
+								{% endif %}
+							</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		{% endif %}{% endfor %}
+	</div>
+{% endblock %}

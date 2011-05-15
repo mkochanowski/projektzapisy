@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.test                       import TestCase
 from utils                             import generate_keys_for_polls, \
-                                              group_polls_by_subject
+                                              group_polls_by_course
 from models                            import PublicKey, \
                                               PrivateKey
 from apps.grade.poll.models          import Poll
 from apps.users.models               import Employee, \
                                               Student
-from apps.enrollment.subjects.models import Semester
+from apps.enrollment.courses.models import Semester
                         
 class UtilsTest( TestCase ):
     
@@ -72,19 +72,19 @@ class UtilsTest( TestCase ):
         
         self.assertEqual( pre_keys, post_keys )
         
-    def test_group_polls_by_subject_makes_valid_groups( self ):
+    def test_group_polls_by_course_makes_valid_groups( self ):
         generate_keys_for_polls()
         polls = Poll.get_all_polls_for_student( Student.objects.get( pk = 1 ))
-        groupped = group_polls_by_subject( polls )
+        groupped = group_polls_by_course( polls )
         
         for group in groupped:
             if group[0].group:
-                subject = group[0].group.subject
+                course = group[0].group.course
             else:
-                subject = None
+                course = None
             for poll in group:
-                if subject:
-                    self.assertEqual( subject, poll.group.subject )
+                if course:
+                    self.assertEqual( course, poll.group.course )
                 else:
-                    self.assertEqual( subject, poll.group )
+                    self.assertEqual( course, poll.group )
         

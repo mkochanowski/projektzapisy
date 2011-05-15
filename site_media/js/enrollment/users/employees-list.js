@@ -49,7 +49,7 @@ EmployeesList.ajax.init = function()
 
     EmployeesList.ajax.activeA = $('.active');
     $('.ajax').click(function(){
-	    $('#employees-list').addClass('profile-loading');Z
+	    $('#employees-list').addClass('profile-loading');
         EmployeesList.ajax.getList($(this).attr('href'));
 
         if ($('.active').size() > 0)

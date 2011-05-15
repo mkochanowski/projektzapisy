@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     #HELP
     (r'^help/', include('apps.help.urls')),
     #Z
-    (r'^subjects/', include('apps.enrollment.subjects.urls')),
+    (r'^courses/', include('apps.enrollment.courses.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),
     # OD
     (r'^prefs/', include('apps.offer.preferences.urls')),
@@ -39,6 +39,6 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    (r'^fereol_admin/subjects/import_semester', 'apps.enrollment.subjects.admin.views.import_semester'),
+    (r'^fereol_admin/courses/import_semester', 'apps.enrollment.courses.admin.views.import_semester'),
     (r'^fereol_admin/', include(admin.site.urls)),
 )

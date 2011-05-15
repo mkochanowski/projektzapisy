@@ -18,7 +18,7 @@ from apps.news.models import News
 from apps.news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
      get_search_results_data, mail_news_enrollment,  mail_news_grade, \
      mail_news_offer, render_with_category_template, render_with_device_detection
-from apps.enrollment.subjects.models import Semester
+from apps.enrollment.courses.models import Semester
 
 def main_page( request ):
     """

@@ -406,7 +406,7 @@ def offer_create( request ):
         Widok listy przedmiotów, które można wybrać w ramach oferty dydaktycznej
     """
     data = {
-        'subjects' : Proposal.objects.filter(deleted=False).order_by('name'),
+        'courses' : Proposal.objects.filter(deleted=False).order_by('name'),
     }    
     
     return render_to_response('offer/proposal/create_offer.html', data, context_instance = RequestContext( request ))

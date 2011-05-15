@@ -32,7 +32,7 @@ class OutOfLimitException(Exception):
     pass
 
 class RecordsNotOpenException(Exception):
-    """is thrown when someone tries to enroll to subject and he do not have open records at that time"""
+    """is thrown when someone tries to enroll to course and he do not have open records at that time"""
     pass
 
 class AdminActionException(Exception):

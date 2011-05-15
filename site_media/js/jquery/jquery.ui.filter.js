@@ -92,7 +92,7 @@ $.widget("ui.filter", {
 		
 	   	$(o.elemsToFilterSelector).each(function(){
 			var $elem = $(this);
-			//console.log($elem.attr('subjectname'));
+			//console.log($elem.attr('coursename'));
 			$elem.removeClass(o.hideClass);
 			jQuery.each(filtersArray, function(){
 				 var filter = this;

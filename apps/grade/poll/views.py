@@ -15,7 +15,7 @@ from apps.users.decorators             import student_required, employee_require
 from django.contrib.auth.decorators    import login_required
 from django.core.servers.basehttp import FileWrapper
 
-from apps.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models import Semester, Group, Course, GROUP_TYPE_CHOICES
                                               
 from apps.grade.ticket_create.utils  import from_plaintext
 from apps.grade.ticket_create.models import PublicKey, \
@@ -36,12 +36,12 @@ from apps.grade.poll.forms           import TicketsForm, \
                                               FilterMenu
 from apps.grade.poll.utils           import check_signature, \
                                               prepare_data, \
-                                              group_polls_and_tickets_by_subject, \
+                                              group_polls_and_tickets_by_course, \
                                               create_slug, \
                                               get_next, \
                                               get_prev, \
                                               get_ticket_and_signed_ticket_from_session,\
-                                              group_polls_by_subject, \
+                                              group_polls_by_course, \
                                               group_polls_by_teacher, \
                                               getGroups,\
                                               declination_poll,\
@@ -51,7 +51,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               generate_csv_title, get_objects, \
                                               delete_objects, \
                                               make_paginator, groups_list, \
-                                              subject_list, make_template_variables, \
+                                              course_list, make_template_variables, \
                                               prepare_template, prepare_sections_for_template, \
                                               prepare_data_for_create_poll, make_polls_for_groups, \
                                               make_message_from_polls, save_template_in_session, \
@@ -289,20 +289,20 @@ def ajax_get_groups(request):
     if request.is_ajax():
         if request.method == 'POST':
             type    = int( request.POST.get('type', '0') )
-            subject = int( request.POST.get('subject', '0') )
-            groups  = groups_list( get_groups_for_user(request, type, subject))
+            course = int( request.POST.get('course', '0') )
+            groups  = groups_list( get_groups_for_user(request, type, course))
             message = simplejson.dumps( groups )
     return HttpResponse(message)
 
 
 @employee_required
-def ajax_get_subjects(request):
+def ajax_get_courses(request):
     message = "No XHR"
     if request.is_ajax():
         if request.method == 'POST':
             semester = int( request.POST.get('semester', '0') )
-            subjects = subjects_list( Subject.objects.filter(semester=semester).order_by('name') )
-            message = simplejson.dumps( subjects )
+            courses = courses_list( Course.objects.filter(semester=semester).order_by('name') )
+            message = simplejson.dumps( courses )
     return HttpResponse(message)
 
 
@@ -666,8 +666,8 @@ def tickets_enter(request):
                 msg += u'</ul>'
                 msg  = mark_safe( unicode( msg ))
                 messages.error( request, msg)
-            request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_subject( polls ))
-            request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_subject( finished ))
+            request.session[ "polls" ]             = map( lambda (s, l): ((s, create_slug( s )), l), group_polls_and_tickets_by_course( polls ))
+            request.session[ "finished" ]          = map( lambda (s, l): ((s, create_slug( s )), l),group_polls_and_tickets_by_course( finished ))
             
 
             return HttpResponseRedirect( '/grade/poll/polls/all' )
@@ -955,7 +955,7 @@ def poll_results( request, mode='S', poll_id = None ):
     data['grade'] = Semester.get_current_semester().is_grade_active
     
     if mode == 'S':
-        data['mode']  = 'subject'
+        data['mode']  = 'course'
     elif mode == 'T':
         data['mode']  = 'teacher'
     
@@ -966,18 +966,18 @@ def poll_results( request, mode='S', poll_id = None ):
     if not poll_id:
         polls = filter( lambda x: x.is_user_entitled_to_view_result( request.user ), 
                                 Poll.get_polls_for_semester())
-        request.session['polls_by_subject'] = group_polls_by_subject( polls )
+        request.session['polls_by_course'] = group_polls_by_course( polls )
         request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
     
     try:
-        data['polls_by_subject'] = request.session['polls_by_subject']
+        data['polls_by_course'] = request.session['polls_by_course']
         data['polls_by_teacher'] = request.session['polls_by_teacher']
     except:
         polls = filter( lambda x: x.is_user_entitled_to_view_result( request.user ), 
                                 Poll.get_polls_for_semester())
-        request.session['polls_by_subject'] = group_polls_by_subject( polls )
+        request.session['polls_by_course'] = group_polls_by_course( polls )
         request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
-        data['polls_by_subject']            = request.session['polls_by_subject']
+        data['polls_by_course']            = request.session['polls_by_course']
         data['polls_by_teacher']            = request.session['polls_by_teacher']
         
     if poll_id:
@@ -1061,11 +1061,11 @@ def poll_results( request, mode='S', poll_id = None ):
                 data['completness'] = SafeUnicode( u"Liczba studentów, którzy wypełnili ankietę: %d" % ( sts_fin ))
             data['poll_title']  = poll.title
             try:
-                data[ 'poll_subject' ] = poll.group.subject.name
+                data[ 'poll_course' ] = poll.group.course.name
                 data[ 'poll_group' ]   = poll.group.get_type_display()
                 data[ 'poll_teacher' ] = poll.group.get_teacher_full_name()
             except:
-                data[ 'poll_subject' ] = "Ankieta ogólna"
+                data[ 'poll_course' ] = "Ankieta ogólna"
                 
             try:
                 user = poll.group.teacher
@@ -1091,7 +1091,7 @@ def poll_results_detailed( request, mode, poll_id, st_id = None ):
     data['grade'] = Semester.get_current_semester().is_grade_active
     
     if mode == 'S':
-        data['mode']  = 'subject'
+        data['mode']  = 'course'
     elif mode == 'T':
         data['mode']  = 'teacher'
     
@@ -1100,14 +1100,14 @@ def poll_results_detailed( request, mode, poll_id, st_id = None ):
         messages.info( request, "Ocena zajęć jest otwarta; wyniki nie są kompletne." )
        
     try:
-        data['polls_by_subject'] = request.session['polls_by_subject']
+        data['polls_by_course'] = request.session['polls_by_course']
         data['polls_by_teacher'] = request.session['polls_by_teacher']
     except:
         polls = filter( lambda x: x.is_user_entitled_to_view_result( request.user ), 
                                 Poll.get_polls_for_semester())
-        request.session['polls_by_subject'] = group_polls_by_subject( polls )
+        request.session['polls_by_course'] = group_polls_by_course( polls )
         request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
-        data['polls_by_subject']            = request.session['polls_by_subject']
+        data['polls_by_course']            = request.session['polls_by_course']
         data['polls_by_teacher']            = request.session['polls_by_teacher']
         
     data['pid']       = poll_id

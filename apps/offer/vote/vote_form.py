@@ -25,8 +25,8 @@ class VoteForm( forms.Form ):
         Voting form
     """
     choices = [(str(i), i) for i in range(SystemState.get_max_points()+1)]
-    subject_types = {}
-    subject_fan_flag = {}
+    course_types = {}
+    course_fan_flag = {}
     
     def __init__ (self, *args, **kwargs):
         winter  = kwargs.pop('winter')
@@ -42,7 +42,7 @@ class VoteForm( forms.Form ):
             try:
                 choosed = SingleVote.objects.get( 
                             student = voter, 
-                            subject = sub,
+                            course = sub,
                             state   = state ).value
             except ObjectDoesNotExist:
                 choosed = 0
@@ -53,14 +53,14 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Zimowy',
                                             initial   = choosed)
-            self.subject_types['winter_%s' % sub.pk] = sub.description().types()
-            self.subject_fan_flag['winter_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
+            self.course_types['winter_%s' % sub.pk] = sub.description().types()
+            self.course_fan_flag['winter_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
                                             
         for sub in summer:
             try:
                 choosed = SingleVote.objects.get( 
                             student = voter, 
-                            subject = sub,
+                            course = sub,
                             state   = state ).value
             except ObjectDoesNotExist:
                 choosed = 0
@@ -71,14 +71,14 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Letni',
                                             initial   = choosed)
-            self.subject_types['summer_%s' % sub.pk] = sub.description().types()
-            self.subject_fan_flag['summer_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
+            self.course_types['summer_%s' % sub.pk] = sub.description().types()
+            self.course_fan_flag['summer_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
         
         for sub in unknown:
             try:
                 choosed = SingleVote.objects.get( 
                             student = voter, 
-                            subject = sub,
+                            course = sub,
                             state   = state ).value
             except ObjectDoesNotExist:
                 choosed = 0
@@ -89,8 +89,8 @@ class VoteForm( forms.Form ):
                                             choices   = self.choices,
                                             help_text = u'Semestr Nieokreślony',
                                             initial   = choosed)
-            self.subject_types['unknown_%s' % sub.pk] = sub.description().types()
-            self.subject_fan_flag['unknown_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
+            self.course_types['unknown_%s' % sub.pk] = sub.description().types()
+            self.course_fan_flag['unknown_%s' % sub.pk] = sub.is_in_group(voter, 'fans')
     
     def vote_points( self ):
         """
@@ -121,13 +121,13 @@ class VoteForm( forms.Form ):
         for key in self.fields.iterkeys():
             field = self.fields[key]
 
-            subject_class = u''
-            for type in self.subject_types[key]:
-                subject_class += u' subject-type-' + str(type.lecture_type.id)
-            if self.subject_fan_flag[key]:
-                subject_class += " isFan"
+            course_class = u''
+            for type in self.course_types[key]:
+                course_class += u' course-type-' + str(type.lecture_type.id)
+            if self.course_fan_flag[key]:
+                course_class += " isFan"
             field_str = \
-                u'<li class="od-vote-subject ' + subject_class + '">\
+                u'<li class="od-vote-course ' + course_class + '">\
                     <label for="id_' + key + '"><a href="'+ field.url +'">' + field.label + '</a></label>\
                     <select name="' + key + '" id="id_' + key + '">'
             for (i, s) in field.choices:

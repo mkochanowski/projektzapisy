@@ -5,16 +5,16 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from apps.enrollment.subjects.models import Subject, Group, StudentOptions, Semester
+from apps.enrollment.courses.models import Course, Group, StudentOptions, Semester
 from apps.enrollment.records.models import Record, Queue
 from apps.enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException, NotCurrentSemesterException
-from apps.enrollment.subjects.exceptions import NonSubjectException
+from apps.enrollment.courses.exceptions import NonCourseException
 from apps.users.models import Employee, Student
 
 from datetime import datetime, timedelta
 
 class AddStudentToGroupTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
+    fixtures =  ['fixtures__users', 'fixtures__courses']
 
     def setUp(self):
     	"""
@@ -23,14 +23,14 @@ class AddStudentToGroupTest(TestCase):
 	            "limit": 120, 
 	            "type": "2", 
 	            "teacher": 3, 
-	            "subject": 1
+	            "course": 1
 	        }
 	    LECTURE_GROUP:
 		    "fields": {
 	            "limit": 120, 
 	            "type": "1", 
 	            "teacher": 3, 
-	            "subject": 1
+	            "course": 1
 	        }
     	"""
         self.user = User.objects.get(id=5)
@@ -52,13 +52,13 @@ class AddStudentToGroupTest(TestCase):
         self.assertRaises(OutOfLimitException, Record.add_student_to_group, self.user.id, self.exercise_group.id)
 
 #TIME DEPENDENCY
-    def testSubjectWithRecordsNotOpenForStudent(self):
+    def testCourseWithRecordsNotOpenForStudent(self):
         self.user.student.records_opening_delay_minutes = 0
         self.user.student.save()
-        self.exercise_group.subject.semester.records_opening = datetime.now()
-        self.exercise_group.subject.semester.records_closing = datetime.now()
-        self.exercise_group.subject.semester.save()
-        student_options = StudentOptions.objects.get(student=self.user.student, subject=self.exercise_group.subject)
+        self.exercise_group.course.semester.records_opening = datetime.now()
+        self.exercise_group.course.semester.records_closing = datetime.now()
+        self.exercise_group.course.semester.save()
+        student_options = StudentOptions.objects.get(student=self.user.student, course=self.exercise_group.course)
         student_options.records_opening_delay_hours = 10
         student_options.save()
         self.assertRaises(RecordsNotOpenException, Record.add_student_to_group, self.user.id, self.exercise_group.id)        
@@ -75,14 +75,14 @@ class AddStudentToGroupTest(TestCase):
         self.assertEqual(records[1].group, self.exercise_group)
 
 class RemoveStudentFromGroupTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
+    fixtures =  ['fixtures__users', 'fixtures__courses']
         
     def setUp(self):
         self.user = User.objects.get(id=5)
         self.group = Group.objects.get(id=3)
-        self.group.subject.semester.semester_beginning = datetime.now().date() - timedelta(days=1)
-        self.group.subject.semester.semester_ending = datetime.now().date() + timedelta(days=1)
-        self.group.subject.semester.save()
+        self.group.course.semester.semester_beginning = datetime.now().date() - timedelta(days=1)
+        self.group.course.semester.semester_ending = datetime.now().date() + timedelta(days=1)
+        self.group.course.semester.save()
         self.records = Record.add_student_to_group(self.user.id, self.group.id)
 
     def testWithNonStudentUser(self):
@@ -101,14 +101,14 @@ class RemoveStudentFromGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
 	
     def testWithGroupInDifferentSemesterThanCurrent(self):
-    	semester = self.group.subject.semester
+    	semester = self.group.course.semester
     	semester.semester_ending = datetime.now().date() - timedelta(days=1)
     	semester.save()
     	self.assertFalse(semester.is_current_semester())    
     	self.assertRaises(NotCurrentSemesterException, Record.remove_student_from_group, self.user.id, self.group.id)
     	
     def testAfterRecordsClosing(self):
-    	semester = self.group.subject.semester
+    	semester = self.group.course.semester
     	semester.semester_ending = datetime.now().date() + timedelta(days=1)
     	semester.records_closing = datetime.now().date() - timedelta(days=1)
     	semester.save()
@@ -120,37 +120,37 @@ class RemoveStudentFromGroupTest(TestCase):
         Record.remove_student_from_group(self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 0)
  
-class IsStudentInSubjectGroupTypeTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
+class IsStudentInCourseGroupTypeTest(TestCase):
+    fixtures =  ['fixtures__users', 'fixtures__courses']
 
     
     def setUp(self):
         self.user = User.objects.get(id=5)
         self.lecture_group = Group.objects.get(id=3)
         self.exercise_group = Group.objects.get(id=1)
-        self.subject = Subject.objects.get(id=1)
+        self.course = Course.objects.get(id=1)
         self.record = Record.add_student_to_group(self.user.id, self.lecture_group.id)
     
     def testWithNonStudentUser(self):
         self.user.student.delete()
-        self.assertRaises(NonStudentException, Record.is_student_in_subject_group_type, self.user.id, self.subject.slug, self.lecture_group.type)
+        self.assertRaises(NonStudentException, Record.is_student_in_course_group_type, self.user.id, self.course.slug, self.lecture_group.type)
         
-    def testWithNonSubject(self):    
-        subject_slug = self.subject.slug
-        self.subject.delete()
-        self.assertRaises(NonSubjectException, Record.is_student_in_subject_group_type, self.user.id, subject_slug, self.lecture_group.type)
+    def testWithNonCourse(self):
+        course_slug = self.course.slug
+        self.course.delete()
+        self.assertRaises(NonCourseException, Record.is_student_in_course_group_type, self.user.id, course_slug, self.lecture_group.type)
     
-    def testStudentInSubjectGroupType(self):
-        self.assert_(Record.is_student_in_subject_group_type(self.user.id, self.subject.slug, self.lecture_group.type))
-        self.assertFalse(Record.is_student_in_subject_group_type(self.user.id, self.subject.slug, self.exercise_group.type))
+    def testStudentInCourseGroupType(self):
+        self.assert_(Record.is_student_in_course_group_type(self.user.id, self.course.slug, self.lecture_group.type))
+        self.assertFalse(Record.is_student_in_course_group_type(self.user.id, self.course.slug, self.exercise_group.type))
                     
 class GetGroupsForStudentTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
+    fixtures =  ['fixtures__users', 'fixtures__courses']
 
     def setUp(self):
     	"""
-    	lecture_group_2 and exercise_group belong to same subject
-    	lecture_group_2 belongs to different subject
+    	lecture_group_2 and exercise_group belong to same course
+    	lecture_group_2 belongs to different course
     	"""
         self.user = User.objects.get(id=5)
         self.lecture_group_1 = Group.objects.get(id=3)
@@ -175,7 +175,7 @@ class GetGroupsForStudentTest(TestCase):
         self.assert_(self.lecture_group_2 in groups)
         
 class GetStudentsInGroupTest(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
+    fixtures =  ['fixtures__users', 'fixtures__courses']
     
     def setUp(self):
         self.user = User.objects.get(id=5)
@@ -192,7 +192,7 @@ class GetStudentsInGroupTest(TestCase):
         
         
 class AssignmentToGroupsWithSameTypes(TestCase):
-    fixtures =  ['fixtures__users', 'fixtures__subjects']
+    fixtures =  ['fixtures__users', 'fixtures__courses']
     
     def setUp(self):
         self.user = User.objects.get(id=5)
@@ -202,7 +202,7 @@ class AssignmentToGroupsWithSameTypes(TestCase):
         self.lecture1 = Group.objects.get(id=3)
         self.lecture2 = Group.objects.get(id=4)
 			
-        semester = self.group1.subject.semester
+        semester = self.group1.course.semester
         semester.semester_beginning = datetime.now().date() - timedelta(days=1)
         semester.semester_ending = datetime.now().date() + timedelta(days=1)
         semester.save()
@@ -358,10 +358,10 @@ class AddStudentToQueue(TestCase):
     def testWithRecordsNotOpenForStudent(self):
         self.user.student.records_opening_delay_hours = 0
         self.user.student.save()
-        self.group.subject.semester.records_opening = datetime.now()
-        self.group.subject.semester.records_closing = datetime.now()
-        self.group.subject.semester.save()
-        student_options = StudentOptions.objects.get(student=self.user.student, subject=self.group.subject)
+        self.group.course.semester.records_opening = datetime.now()
+        self.group.course.semester.records_closing = datetime.now()
+        self.group.course.semester.save()
+        student_options = StudentOptions.objects.get(student=self.user.student, course=self.group.course)
         student_options.records_opening_delay_minutes = 10
         student_options.save()
         self.assertRaises(RecordsNotOpenException, Queue.add_student_to_queue, self.user.id, self.group.id)
@@ -394,14 +394,14 @@ class RemoveStudentFromQueue(TestCase):
         self.assertRaises(AlreadyNotAssignedException, Queue.remove_student_from_queue, self.student1.id, self.group.id)
     
     def testWithGroupInDifferentSemesterThanCurrent(self):
-    	semester = self.group.subject.semester
+    	semester = self.group.course.semester
     	semester.semester_ending = datetime.now().date() - timedelta(days=1)
     	semester.save()
     	self.assertFalse(semester.is_current_semester())    
     	self.assertRaises(NotCurrentSemesterException, Queue.remove_student_from_queue, self.user.id, self.group.id)
     	
     def testAfterRecordsClosing(self):
-    	semester = self.group.subject.semester
+    	semester = self.group.course.semester
     	semester.semester_ending = datetime.now().date() + timedelta(days=1)
     	semester.records_closing = datetime.now().date() - timedelta(days=1)
     	semester.save()

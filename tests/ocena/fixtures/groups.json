@@ -1,7 +1,7 @@
 [
     {
         "pk": 1, 
-        "model": "subjects.type", 
+        "model": "courses.type",
         "fields": {
             "meta_type": false, 
             "group": null, 
@@ -10,14 +10,14 @@
     }, 
     {
         "pk": 1, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity",
         "fields": {
             "name": "informatyczny"
         }
     }, 
     {
         "pk": 1, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 1", 
@@ -35,7 +35,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 2",  
@@ -53,7 +53,7 @@
     }, 
     {
         "pk": 3, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 3", 
@@ -71,7 +71,7 @@
     }, 
     {
         "pk": 4, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 4", 
@@ -89,122 +89,122 @@
     }, 
     {
         "pk": 1, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 30, 
             "type": "1", 
             "teacher": 1, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 2, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 3, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 3, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 4, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 4, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 5, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 5, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 20, 
             "type": "1", 
             "teacher": 4, 
-            "subject": 2
+            "course": 2
         }
     }, 
     {
         "pk": 6, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 1, 
-            "subject": 2
+            "course": 2
         }
     }, 
     {
         "pk": 7, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 4, 
-            "subject": 2
+            "course": 2
         }
     }, 
     {
         "pk": 8, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 15, 
             "type": "1", 
             "teacher": 5, 
-            "subject": 3
+            "course": 3
         }
     }, 
     {
         "pk": 9, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 15, 
             "type": "2", 
             "teacher": 5, 
-            "subject": 3
+            "course": 3
         }
     }, 
     {
         "pk": 10, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 20, 
             "type": "1", 
             "teacher": 4, 
-            "subject": 4
+            "course": 4
         }
     }, 
     {
         "pk": 11, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 4, 
-            "subject": 4
+            "course": 4
         }
     }, 
     {
         "pk": 12, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 1, 
-            "subject": 4
+            "course": 4
         }
     }
 ]

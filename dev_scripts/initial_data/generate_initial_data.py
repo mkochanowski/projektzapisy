@@ -27,12 +27,12 @@ db_config_big = {
 # classrooms
 	'NUM_OF_CLASSROOMS': 30,
 	'CLASSROOMS_NUMBERS': [i for i in range(1, 150)],
-	'MIN_NON_LECTURE_GROUPS_FOR_SUBJECT': 1,
-	'MAX_NON_LECTURE_GROUPS_FOR_SUBJECT': 5,
+	'MIN_NON_LECTURE_GROUPS_FOR_COURSE': 1,
+	'MAX_NON_LECTURE_GROUPS_FOR_COURSE': 5,
 	'LECTURES_LIMITS': [20, 30, 40, 50, 60, 100, 200],
 	'NON_LECTURE_LIMITS': [20, 30],
-	'DELAY_MINUTES_FOR_SUBJECT_LOW': 0,
-	'DELAY_MINUTES_FOR_SUBJECT_HIGH': 3 * 24 * 60,
+	'DELAY_MINUTES_FOR_COURSE_LOW': 0,
+	'DELAY_MINUTES_FOR_COURSE_HIGH': 3 * 24 * 60,
 	'NUM_OF_RECORDS': 3000,
 	}
 
@@ -51,13 +51,13 @@ db_config_small = {
 	'NUM_OF_CLASSROOMS': 10,
 	'CLASSROOMS_NUMBERS': [i for i in range(1, 150)],
 # groups
-	'MIN_NON_LECTURE_GROUPS_FOR_SUBJECT': 1,
-	'MAX_NON_LECTURE_GROUPS_FOR_SUBJECT': 5,
+	'MIN_NON_LECTURE_GROUPS_FOR_COURSE': 1,
+	'MAX_NON_LECTURE_GROUPS_FOR_COURSE': 5,
 	'LECTURES_LIMITS': [20, 30, 40, 50, 60, 100, 200],
 	'NON_LECTURE_LIMITS': [20, 30],
 # students_options 
-	'DELAY_MINUTES_FOR_SUBJECT_LOW': 0,
-	'DELAY_MINUTES_FOR_SUBJECT_HIGH': 3 * 24 * 60,
+	'DELAY_MINUTES_FOR_COURSE_LOW': 0,
+	'DELAY_MINUTES_FOR_COURSE_HIGH': 3 * 24 * 60,
 # records
 	'NUM_OF_RECORDS': 100,
 	}
@@ -70,7 +70,7 @@ for arg in sys.argv[1:]:
 	if arg == 'small':
 		config = db_config_small
 	
-SUBJECTS = json.loads(open('subjects_data.json', 'r').read())
+COURSES = json.loads(open('courses_data.json', 'r').read())
 
 # SETUP
 file_input = 'static_data.json'
@@ -172,49 +172,49 @@ for classroom_id in range(classroom_id_start, classroom_id_start + config['NUM_O
 	number = choice(config['CLASSROOMS_NUMBERS'])
 	while number in classrooms:
 		number = choice(config['CLASSROOMS_NUMBERS'])
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.classroom",\n@!@@!@"fields": {\n@!@@!@@!@"number": "%s"\n@!@@!@}\n@!@},\n' % (classroom_id, number)
+	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.classroom",\n@!@@!@"fields": {\n@!@@!@@!@"number": "%s"\n@!@@!@}\n@!@},\n' % (classroom_id, number)
 	classrooms_raw.append(record)
 classroom_id_end = classroom_id
 s += ''.join(classrooms_raw)
 
 
 #########################################################################
-#                      Generate subjects                                #
+#                      Generate courses                                #
 #########################################################################
 
-# Generate subjects
-subject_id_start = 1
-subject_id = subject_id_start
-subjects_raw = []
+# Generate courses
+course_id_start = 1
+course_id = course_id_start
+courses_raw = []
 semesters = [1,2,3,4]
-subjects = {}
+courses = {}
 
-# Generate subjects in year 2009
-for sub in SUBJECTS:
+# Generate courses in year 2009
+for sub in COURSES:
     if sub['semester'] == 1:
         slug = '%s-zimowy-2009' % (sub['slug'])
-        subjects[subject_id] = 1        
+        courses[course_id] = 1        
     else:
         slug = '%s-letni-2009' % (sub['slug'])
-        subjects[subject_id] = 2
-    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.subject",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (subject_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'], sub['exercises'], sub['laboratories'], sub['type'], slug)
-    subjects_raw.append(record)
-    subject_id += 1
+        courses[course_id] = 2
+    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.course",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (course_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'], sub['exercises'], sub['laboratories'], sub['type'], slug)
+    courses_raw.append(record)
+    course_id += 1
 	
-# Generate subjects in year 2010
-for sub in SUBJECTS[:-2]:
+# Generate courses in year 2010
+for sub in COURSES[:-2]:
     if sub['semester'] == 1:
         slug = '%s-zimowy-2010' % (sub['slug'])
-        subjects[subject_id] = 3
+        courses[course_id] = 3
     else:
         slug = '%s-letni-2010' % (sub['slug'])
-        subjects[subject_id] = 4
-    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.subject",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (subject_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'] + 2, sub['exercises'], sub['laboratories'], sub['type'], slug)
-    subjects_raw.append(record)
-    subject_id += 1
+        courses[course_id] = 4
+    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.course",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (course_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'] + 2, sub['exercises'], sub['laboratories'], sub['type'], slug)
+    courses_raw.append(record)
+    course_id += 1
 	
-subject_id_end = subject_id
-s += ''.join(subjects_raw)
+course_id_end = course_id
+s += ''.join(courses_raw)
 
 #########################################################################
 #                      Generate groups                                  #
@@ -226,20 +226,20 @@ group_id = group_id_start
 groups_raw = []
 groups_sem = {1: [], 2:[], 3: [], 4: []}
 
-for subject_id in range(subject_id_start, subject_id_end):
+for course_id in range(course_id_start, course_id_end):
 
     teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
     limit = choice(config['LECTURES_LIMITS'])
-    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "1",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
-    groups_sem[ subjects[subject_id] ].append(group_id)
+    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "1",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"course": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, course_id)
+    groups_sem[ courses[course_id] ].append(group_id)
     groups_raw.append(record)
     group_id += 1
-    groups = rand(config['MIN_NON_LECTURE_GROUPS_FOR_SUBJECT'], config['MAX_NON_LECTURE_GROUPS_FOR_SUBJECT'])	
+    groups = rand(config['MIN_NON_LECTURE_GROUPS_FOR_COURSE'], config['MAX_NON_LECTURE_GROUPS_FOR_COURSE'])	
     for i in range(1, groups + 1):
         teacher = rand(first_user_for_employee_id, last_user_for_employee_id)
         limit = choice(config['NON_LECTURE_LIMITS'])
-        record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "2",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, subject_id)
-        groups_sem[ subjects[subject_id] ].append(group_id)
+        record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.group",\n@!@@!@"fields": {\n@!@@!@@!@"limit": %s,\n@!@@!@@!@"type": "2",\n@!@@!@@!@"teacher": %s,\n@!@@!@@!@"course": %s\n@!@@!@}\n@!@},\n' % (group_id, limit, teacher, course_id)
+        groups_sem[ courses[course_id] ].append(group_id)
         groups_raw.append(record)
         group_id += 1
 		
@@ -262,7 +262,7 @@ for term_id in range(group_id_start, group_id_end):
 		start_hour = 2 * rand(4, 9)
 		triple = (day, classroom, start_hour)
 	triples.append(triple)
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.term",\n@!@@!@"fields": {\n@!@@!@@!@"dayOfWeek": "%s",\n@!@@!@@!@"classroom": %s,\n@!@@!@@!@"start_time": "%s:00:00",\n@!@@!@@!@"group": %s,\n@!@@!@@!@"end_time": "%s:00:00"\n@!@@!@}\n@!@},\n' % (term_id, day, classroom, start_hour, term_id, start_hour + 2)
+	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.term",\n@!@@!@"fields": {\n@!@@!@@!@"dayOfWeek": "%s",\n@!@@!@@!@"classroom": %s,\n@!@@!@@!@"start_time": "%s:00:00",\n@!@@!@@!@"group": %s,\n@!@@!@@!@"end_time": "%s:00:00"\n@!@@!@}\n@!@},\n' % (term_id, day, classroom, start_hour, term_id, start_hour + 2)
 	terms_raw.append(record)
 s += ''.join(terms_raw)
 
@@ -271,9 +271,9 @@ s += ''.join(terms_raw)
 student_options_id = 1
 student_options_raw = []
 for student in range(first_user_for_student_id, last_user_for_student_id):
-	for subject in range(subject_id_start, subject_id_end):
-		delay = rand(config['DELAY_MINUTES_FOR_SUBJECT_LOW'], config['DELAY_MINUTES_FOR_SUBJECT_HIGH'])
-		record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "subjects.studentoptions",\n@!@@!@"fields": {\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"student": %s,\n@!@@!@@!@"subject": %s\n@!@@!@}\n@!@},\n' % (student_options_id, delay, student, subject)
+	for course in range(course_id_start, course_id_end):
+		delay = rand(config['DELAY_MINUTES_FOR_COURSE_LOW'], config['DELAY_MINUTES_FOR_COURSE_HIGH'])
+		record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.studentoptions",\n@!@@!@"fields": {\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"student": %s,\n@!@@!@@!@"course": %s\n@!@@!@}\n@!@},\n' % (student_options_id, delay, student, course)
 		student_options_raw.append(record)
 		student_options_id += 1
 s += ''.join(student_options_raw)

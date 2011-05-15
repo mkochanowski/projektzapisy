@@ -36,7 +36,7 @@ EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
-EMAIL_SUBJECT_PREFIX = '[Fereol] ' # please don't remove the trailing space
+EMAIL_COURSE_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
 #loggin settings:
 
@@ -135,7 +135,7 @@ INSTALLED_APPS = (
     'haystack',
     'mailer',
     'south',
-    'apps.enrollment.subjects',
+    'apps.enrollment.courses',
     'apps.enrollment.records',
     'apps.news',
     'apps.offer.preferences',

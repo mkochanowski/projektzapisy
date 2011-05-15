@@ -41,12 +41,12 @@ Poll.create.init = function()
     {
         $('.type-visibility').hide();
         $('.group-visibility').hide();
-        $(Poll.create.changeSubjects)
+        $(Poll.create.changeCourses)
     }
 
     $('#section-add').click(Poll.create.addSection);
     $('#semester').change(Poll.create.changeSemester);
-    $('#subjects').change(Poll.create.changeSubjects);
+    $('#courses').change(Poll.create.changeCourses);
     $('#type').change(Poll.create.changeTypes);
 
 
@@ -61,11 +61,11 @@ Poll.create.init = function()
     $("#poll-create").validate();
 }
 
-Poll.create.changeSubjects = function()
+Poll.create.changeCourses = function()
 {
-    var subject = $('#subjects').val();
+    var course = $('#courses').val();
     
-    if ( subject > -1 )
+    if ( course > -1 )
     {
         $('.type-visibility').show();
         Poll.create.changeTypes();
@@ -80,11 +80,11 @@ Poll.create.changeSubjects = function()
 Poll.create.changeTypes = function()
 {
     var type    = parseInt($('#type').val());
-    var subject = parseInt($('#subjects').val());
-    if ( type > 0 && subject > 0 )
+    var course = parseInt($('#courses').val());
+    if ( type > 0 && course > 0 )
     {
         $('.group-visibility').show();
-        dataString = 'type=' + type + '&subject=' + subject
+        dataString = 'type=' + type + '&course=' + course
         $.ajax({
             type: "POST",
             url: "/grade/poll/ajax_get_groups",
@@ -117,24 +117,24 @@ Poll.create.changeSemester = function()
     dataString = 'semester=' + semester
     $.ajax({
         type: "POST",
-        url: "/grade/poll/ajax_get_subjects",
+        url: "/grade/poll/ajax_get_courses",
         async: false,
         dataType: 'json',
         data: dataString,
-        success: Poll.create.loadSubjects
+        success: Poll.create.loadCourses
     });
 }
 
-Poll.create.loadSubjects = function(subjects)
+Poll.create.loadCourses = function(courses)
 {
-    $("#subjects").children().remove();
+    $("#courses").children().remove();
     var item1 =  Poll.create.createOption('-1', 'Nie przypisane do przedmiotu')
     var item2 = Poll.create.createOption('0', 'Wszystkie grupy')
-    $("#subjects").append(item1);
-    $("#subjects").append(item2);
-    $.each(subjects, function(key, value)
+    $("#courses").append(item1);
+    $("#courses").append(item2);
+    $.each(courses, function(key, value)
     {
-        $("#subjects").append( Poll.create.createOption( value[0], value[1] ) );
+        $("#courses").append( Poll.create.createOption( value[0], value[1] ) );
     });
 
 }

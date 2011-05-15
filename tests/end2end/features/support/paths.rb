@@ -17,8 +17,8 @@ module NavigationHelpers
     when /the mobile home page/
       'http://m.localhost.localhost:8000/'
       
-    when /subjects page/
-      '/subjects/'
+    when /courses page/
+      '/courses/'
       
     when /schedule page/
       '/records/schedule/'

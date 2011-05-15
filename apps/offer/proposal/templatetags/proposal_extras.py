@@ -10,9 +10,9 @@ register = Library()
 
 from apps.offer.proposal.models import Proposal
 
-class SubjectsInOfferNode(Node):
+class CoursesInOfferNode(Node):
     """
-        Adds a list of subjects to template context
+        Adds a list of courses to template context
     """
     def __init__(self, varname):
         self.varname = varname
@@ -22,10 +22,10 @@ class SubjectsInOfferNode(Node):
         return ''
 
 @register.tag
-def get_subjects_in_offer(parser, token):
+def get_courses_in_offer(parser, token):
     bits = token.contents.split()
     if len(bits) != 3:
-        raise TemplateSyntaxError, "get_subjects_in_offer tag takes exactly two arguments"
+        raise TemplateSyntaxError, "get_courses_in_offer tag takes exactly two arguments"
     if bits[1] != 'as':
-        raise TemplateSyntaxError, "first argument to the get_subjects_in_offer tag must be 'as'"
-    return SubjectsInOfferNode(bits[2])
+        raise TemplateSyntaxError, "first argument to the get_courses_in_offer tag must be 'as'"
+    return CoursesInOfferNode(bits[2])
