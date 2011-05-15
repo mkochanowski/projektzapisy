@@ -9,7 +9,7 @@
 if (!Fereol.Enrollment)
 	Fereol.Enrollment = new Object();
 
-Fereol.Enrollment.ScheduleSubjectTerm = function()
+Fereol.Enrollment.ScheduleCourseTerm = function()
 {
 	this.id = null;
 	this.groupID = null;
@@ -31,14 +31,14 @@ Fereol.Enrollment.ScheduleSubjectTerm = function()
 	this._isVisible = false;
 
 	this.schedule = null;
-	this.subject = null; // SchedulePrototype.PrototypeSubject
+	this.course = null; // SchedulePrototype.PrototypeCourse
 
 	this.classroom = null;
 	this.teacher = null;
 	this.type = null;
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.groupTypes =
+Fereol.Enrollment.ScheduleCourseTerm.groupTypes =
 {
 	1: ['wykład', 'wyk'],
 	2: ['ćwiczenia', 'ćw'],
@@ -52,21 +52,21 @@ Fereol.Enrollment.ScheduleSubjectTerm.groupTypes =
    10: ['projekt', 'proj']
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.byGroups = {};
+Fereol.Enrollment.ScheduleCourseTerm.byGroups = {};
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype.isEnrolledOrQueued = function()
+Fereol.Enrollment.ScheduleCourseTerm.prototype.isEnrolledOrQueued = function()
 {
 	return this.isEnrolled || this.isQueued;
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype.isFull = function()
+Fereol.Enrollment.ScheduleCourseTerm.prototype.isFull = function()
 {
 	return this.limit <= this.enrolledCount;
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.fromJSON = function(json)
+Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json)
 {
-	var sterm = new Fereol.Enrollment.ScheduleSubjectTerm();
+	var sterm = new Fereol.Enrollment.ScheduleCourseTerm();
 	var raw = $.parseJSON(json)
 
 	sterm.id = raw.id.castToInt();
@@ -89,20 +89,20 @@ Fereol.Enrollment.ScheduleSubjectTerm.fromJSON = function(json)
 	sterm.teacher = raw.teacher;
 	sterm.type = raw.group_type.castToInt();
 
-	if (!Fereol.Enrollment.ScheduleSubjectTerm.byGroups[sterm.groupID])
-		Fereol.Enrollment.ScheduleSubjectTerm.byGroups[sterm.groupID] = [];
-	Fereol.Enrollment.ScheduleSubjectTerm.byGroups[sterm.groupID].push(sterm);
+	if (!Fereol.Enrollment.ScheduleCourseTerm.byGroups[sterm.groupID])
+		Fereol.Enrollment.ScheduleCourseTerm.byGroups[sterm.groupID] = [];
+	Fereol.Enrollment.ScheduleCourseTerm.byGroups[sterm.groupID].push(sterm);
 
 	return sterm;
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype.assignSchedule = function(schedule)
+Fereol.Enrollment.ScheduleCourseTerm.prototype.assignSchedule = function(schedule)
 {
 	this.schedule = schedule;
 	this._updateVisibility();
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype._updateVisibility = function()
+Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 {
 	var self = this;
 
@@ -110,13 +110,13 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype._updateVisibility = function()
 	{
 		this._containerReady = true;
 
-		$.create('span', {className: 'name'}).text(this.subject.shortName).
-			attr('title', this.subject.name).appendTo(this.container);
+		$.create('span', {className: 'name'}).text(this.course.shortName).
+			attr('title', this.course.name).appendTo(this.container);
 		this._teacherLabel = $.create('span', {className: 'teacher'}).text(this.teacher).
 			appendTo(this.container);
 		this._typeLabel = $.create('span', {className: 'type'}).
 			appendTo(this.container).attr('title',
-			Fereol.Enrollment.ScheduleSubjectTerm.groupTypes[this.type][0]);
+			Fereol.Enrollment.ScheduleCourseTerm.groupTypes[this.type][0]);
 
 		this._classroomLabel = $.create('span', {className: 'classroom'}).
 			appendTo(this.container);
@@ -162,7 +162,7 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype._updateVisibility = function()
 	}
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype._updateControls = function()
+Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 {
 	var self = this;
 	
@@ -198,14 +198,14 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype._updateControls = function()
 	}).attr('title', this.isPinned ? 'odepnij od planu' : 'przypnij do planu');
 	this._signInOutButton.css({
 		backgroundPosition: this.isEnrolledOrQueued() ? '-12px 0' : '0 0',
-		display: this.subject.isRecordingOpen ? '' : 'none'
+		display: this.course.isRecordingOpen ? '' : 'none'
 	}).attr('title', this.isEnrolledOrQueued() ? 'wypisz się' +
 		(this.isQueued ? ' z kolejki' : '') : 'zapisz się');
 	this._controlsEmpty = this.isEnrolledOrQueued() &&
-		!this.subject.isRecordingOpen;
+		!this.course.isRecordingOpen;
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype._onResize = function(isFullSize)
+Fereol.Enrollment.ScheduleCourseTerm.prototype._onResize = function(isFullSize)
 {
 	var CLASSROOM_PADDING = 2;
 
@@ -218,7 +218,7 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype._onResize = function(isFullSize)
 			CLASSROOM_PADDING) + 'px'
 	});
 
-	this._typeLabel.text(Fereol.Enrollment.ScheduleSubjectTerm.
+	this._typeLabel.text(Fereol.Enrollment.ScheduleCourseTerm.
 		groupTypes[this.type][isFullSize?0:1]).css({
 		top: (this._typeLabel.parent().innerHeight() -
 			this._typeLabel.height() -
@@ -230,13 +230,13 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype._onResize = function(isFullSize)
 	});
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype.setPrototyped = function(prototyped)
+Fereol.Enrollment.ScheduleCourseTerm.prototype.setPrototyped = function(prototyped)
 {
 	this.isPrototyped = prototyped;
 	this._updateVisibility();
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype.setPinned = function(pinned)
+Fereol.Enrollment.ScheduleCourseTerm.prototype.setPinned = function(pinned)
 {
 	if (this._isLoading)
 		return;
@@ -265,7 +265,7 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype.setPinned = function(pinned)
 	}, 'json');
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype.setEnrolled = function(enrolled)
+Fereol.Enrollment.ScheduleCourseTerm.prototype.setEnrolled = function(enrolled)
 {
 	if (this._isLoading)
 		return;
@@ -274,7 +274,7 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype.setEnrolled = function(enrolled)
 	var self = this;
 	this._updateControls();
 
-	if (!this.subject.isRecordingOpen)
+	if (!this.course.isRecordingOpen)
 		throw new Error('Zapisy na ten przedmiot są zamknięte');
 
 	enrolled = !!enrolled;
@@ -297,7 +297,7 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype.setEnrolled = function(enrolled)
 			if (enrolled)
 			{
 				// zaznaczanie innych grup tego samego typu jako "nie zapisane"
-				self.subject.terms.forEach(function(e)
+				self.course.terms.forEach(function(e)
 				{
 					if (e.groupID == self.groupID || e.type != self.type)
 						return;
@@ -310,7 +310,7 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype.setEnrolled = function(enrolled)
 				{
 					if (e == self.groupID)
 						return;
-					Fereol.Enrollment.ScheduleSubjectTerm.byGroups[e].forEach(function(alsoEnrolledTo)
+					Fereol.Enrollment.ScheduleCourseTerm.byGroups[e].forEach(function(alsoEnrolledTo)
 					{
 						alsoEnrolledTo.isEnrolled = true;
 						alsoEnrolledTo.isPinned = false;
@@ -331,7 +331,7 @@ Fereol.Enrollment.ScheduleSubjectTerm.prototype.setEnrolled = function(enrolled)
 	}, 'json');
 };
 
-Fereol.Enrollment.ScheduleSubjectTerm.prototype.toString = function()
+Fereol.Enrollment.ScheduleCourseTerm.prototype.toString = function()
 {
 	return this.scheduleTerm.toString();
 };
