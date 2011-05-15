@@ -173,12 +173,14 @@ def set_enrolled(request, method):
             message = 'Nie możesz się zapisać, ponieważ zapisy na ten ' + \
                 'przedmiot nie są dla Ciebie otwarte.'
         else:
-            message = 'Nie możesz się wypisać, ponieważ zapisy są już zamknięte.'
+            message = 'Nie możesz się wypisać, ponieważ zapisy są już ' + \
+                'zamknięte.'
         return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
             message_context)
     except NotCurrentSemesterException:
         transaction.rollback()
-        message = 'Nie możesz się wypisać z tej grupy, ponieważ znajduje się ona w semestrze innym niż aktualny.'
+        message = 'Nie możesz się wypisać z tej grupy, ponieważ znajduje ' + \
+            'się ona w semestrze innym niż aktualny.'
         return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
             message_context)
 
@@ -303,6 +305,7 @@ def schedule_prototype(request):
             default_semester)
         StudentOptions.preload_cache(request.user.student, default_semester)
 
+        numbers_of_students = Group.numbers_of_students(default_semester)
         terms_in_semester = Term.get_all_in_semester(default_semester)
         courses_in_semester = []
         courses_in_semester_tmp = {}
@@ -336,6 +339,9 @@ def schedule_prototype(request):
                 'day': int(term.dayOfWeek),
                 'start_time': [term.start_time.hour, term.start_time.minute],
                 'end_time': [term.end_time.hour, term.end_time.minute],
+                'limit': int(term.group.get_group_limit()),
+                'enrolled_count': int(numbers_of_students[term.group.pk]) \
+                    if numbers_of_students.has_key(term.group.pk) else 0,
             }
             courses_in_semester_tmp[course.pk]['terms'].\
                 append(simplejson.dumps(term_data))

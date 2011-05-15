@@ -4,8 +4,9 @@ from django.db import models
 
 from course import *
 from apps.enrollment.records.models import *
+from django.db.models import Count
 
-# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.CourseTerm.groupTypes
+# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.ScheduleCourseTerm.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('4', 'ćwiczenia (grupa zaawansowana)'), ('5', 'ćwiczenio-pracownia'),
         ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
@@ -37,6 +38,20 @@ class Group(models.Model):
         """Returns number of students enrolled to particular group"""
         from apps.enrollment.records.models import Record
         return Record.enrolled.filter(group=self).count()
+
+    @staticmethod
+    def numbers_of_students(semester):
+        '''
+            Returns numbers of students enrolled to all groups in particular
+            semester
+        '''
+        from apps.enrollment.records.models import Record
+        raw_counts = Record.enrolled.filter(group__course__semester=semester).\
+            values('group__pk').order_by().annotate(Count('group__pk'))
+        count_map = {}
+        for r in raw_counts:
+            count_map[r['group__pk']] = r['group__pk__count']
+        return count_map
 
     def course_slug(self):
         return self.course.slug

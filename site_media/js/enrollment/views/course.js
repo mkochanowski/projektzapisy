@@ -18,59 +18,46 @@ CourseView.init = function()
 	// czy panel szczegółów jest wyświetlony
 	CourseView.detailsVisible = null;
 
+	CourseView.isEnrollmentOpen = ($('.setEnrolledButton').size() > 0);
+
 	CourseView._initDetailsToggleSwitch();
 	CourseView._initExpandableDescription();
-	CourseView._initPriorityControls();
+	CourseView._initTermsList();
+	CourseView._initTermsTablesStyles();
 };
 
 $(CourseView.init);
 
 /**
- * Inicjuje kontrolki wybierania priorytetu w grupie.
+ * Inicjuje listy terminów.
  */
-CourseView._initPriorityControls = function()
+CourseView._initTermsList = function()
 {
-	$('div.tutorial tbody td.priority').each(function(idx, elem)
+	if (!CourseView.isEnrollmentOpen)
+		return;
+	CourseView._termsList = new Array();
+	CourseView._termsMap = new Object();
+	$('#enr-course-view > .tutorial tbody tr').each(function(idx, elem)
 	{
-		elem = $(elem);
-		if (elem.children('form').length == 0)
-			return;
-		var currentPriority = elem.children('span').assertOne().text().
-			castToInt();
-		var priorityChangeURL = elem.children('form').first().attr('action');
-
-		elem.empty();
-
-		var prioritySelector = $.create('select').appendTo(elem);
-		for (var i = 1; i <= 10; i++)
-		{
-			var priorityOption = $.create('option', {value: i}).text(i);
-			if (i == currentPriority)
-				priorityOption.attr('selected', 'selected');
-			prioritySelector.append(priorityOption);
-		}
-
-		(function () {
-			prioritySelector.change(function()
-			{
-				prioritySelector.attr('disabled', true);
-				var newPriority = prioritySelector.attr('value').castToInt();
-
-				//TODO: generowanie URL, a nie na sztywno (dopisek .json)
-				$.post(priorityChangeURL + '.json', {
-						csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
-						priority: newPriority
-					}, function(data)
-				{
-					var result = AjaxMessage.fromJSON(data);
-					if (result.isSuccess())
-						prioritySelector.attr('disabled', false);
-					else
-						result.displayMessageBox();
-				}, 'json');
-			});
-		})();
+		var term = Fereol.Enrollment.CourseTerm.fromHTML($(elem));
+		CourseView._termsList.push(term);
+		CourseView._termsMap[term.id] = term;
+		term.convertControlsToAJAX();
 	});
+};
+
+/**
+ * Inicjuje dynamicznie zmienane style tabel z terminami.
+ */
+CourseView._initTermsTablesStyles = function()
+{
+	Sidebar.addObserver({ update: function()
+	{
+		$('#enr-course-view .termEnrolledHeader').text(
+			Sidebar.visible ? 'Zapis.' : 'Zapisanych');
+		$('#enr-course-view .termQueuedHeader').text(
+			Sidebar.visible ? 'Kolejka' : 'W kolejce');
+	}});
 };
 
 /**
