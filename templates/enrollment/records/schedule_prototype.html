@@ -96,6 +96,7 @@
 				<input type="hidden" name="short" value="{{ course.course.short }}" />
 				<input type="hidden" name="wasEnrolled" value="{{ course.course.was_enrolled }}" />
 				<input type="hidden" name="isRecordingOpen" value="{{ course.course.is_recording_open }}" />
+				<input type="hidden" name="url" value="{% url course-page course.course.slug %}" />
 				{% for term in course.terms %}
 					<input type="hidden" name="term" value="{{ term }}" />
 				{% endfor %}

@@ -185,6 +185,8 @@ Schedule.prototype.addTerm = function(term)
 {
 	this.terms.push(term);
 	this.termsSubcontainer.append(term.container);
+	if (term._popupContainer)
+		this.termsSubcontainer.append(term._popupContainer);
 	term.schedule = this;
 	term._invalidated = true;
 
@@ -204,6 +206,8 @@ Schedule.prototype.removeTerm = function(term)
 		throw new Error('Termin nie jest w terminarzu');
 	this.terms.remove(idx);
 	term.container.detach();
+	if (term._popupContainer)
+		term._popupContainer.detach();
 
 	this.terms.forEach(function(aTerm)
 	{
@@ -347,7 +351,7 @@ Schedule.Time.prototype.toString = function()
  * Klasa Schedule.Term.
  ******************************************************************************/
 
-Schedule.Term = function(day, timeFrom, timeTo, container)
+Schedule.Term = function(day, timeFrom, timeTo, container, popupContents)
 {
 	this.day = day;
 	this.timeFrom = timeFrom;
@@ -358,6 +362,18 @@ Schedule.Term = function(day, timeFrom, timeTo, container)
 	this.onResize = function(isFullSize) {};
 
 	this.container = container.assertOne().addClass('term');
+
+	this.popupVisible = false;
+	this.popupContents = null;
+	this._popupContainer = null;
+	if (popupContents)
+	{
+		this._popupContainer = $.create('div',
+			{className: 'termPopupContainer'}).toggle(false);
+		this.popupContents = popupContents.assertOne().
+			addClass('termPopupContents').appendTo(this._popupContainer);
+		this.container.addClass('termWithPopup');
+	}
 };
 
 Schedule.Term.prototype.collides = function(term)
@@ -420,6 +436,90 @@ Schedule.Term.prototype.getCoherentCollisions = function()
 	{
 		return a.timeFrom.timestamp - b.timeFrom.timestamp;
 	});
+};
+
+Schedule.Term.prototype.setPopupVisible = function(visible)
+{
+	var self = this;
+	this._popupContainer.stop();
+	this.popupContents.stop();
+	if (visible)
+	{
+		this._popupContainer.css('opacity', 0);
+		this._popupContainer.toggle(true);
+		var contentsWidth = this.popupContents.outerWidth();
+		var contentsHeight = this.popupContents.outerHeight();
+		var termWidth = this.container.width();
+		var termHeight = this.container.height();
+		var termPosition = this.container.position();
+		var dstPosLeft = Math.round(termPosition.left + termWidth / 2 -
+			contentsWidth / 2);
+		var dstPosTop = Math.round(termPosition.top + termHeight / 2 -
+			contentsHeight / 2);
+		var origContOffsetLeft = Math.round((termWidth - contentsWidth)/2);
+		var origContOffsetTop = Math.round((termHeight - contentsHeight)/2);
+		var scheduleWidth =  this.schedule.termsContainer.innerWidth();
+		var scheduleHeight =  this.schedule.termsContainer.innerHeight();
+		if (dstPosLeft + contentsWidth > scheduleWidth)
+		{
+			var newDstPosLeft = scheduleWidth - contentsWidth - 1;
+			origContOffsetLeft += newDstPosLeft - dstPosLeft;
+			dstPosLeft = newDstPosLeft;
+		}
+		if (dstPosLeft < 0)
+		{
+			dstPosLeft = -1;
+			origContOffsetLeft = dstPosLeft - termPosition.left;
+		}
+		if (dstPosTop + contentsHeight > scheduleHeight)
+		{
+			var newDstPosTop = scheduleHeight - contentsHeight - 1;
+			origContOffsetTop += newDstPosTop - dstPosTop;
+			dstPosTop = newDstPosTop;
+		}
+		if (dstPosTop < 0)
+		{
+			dstPosTop = -1;
+			origContOffsetTop = dstPosTop - termPosition.top;
+		}
+
+		this._popupContainer.css({
+			left: termPosition.left + 'px',
+			top: termPosition.top + 'px',
+			width: termWidth + 'px',
+			height: termHeight + 'px'
+		});
+		this.popupContents.css({
+			left: origContOffsetLeft + 'px',
+			top: origContOffsetTop + 'px'
+		});
+
+		this._popupContainer.animate({
+			top: dstPosTop + 'px',
+			left: dstPosLeft + 'px',
+			width: contentsWidth + 'px',
+			height: contentsHeight + 'px',
+			opacity: 1
+		}, {
+			duration: 400,
+			step: function(now, fx)
+			{
+				if (fx.prop == 'top')
+					self.popupContents.css('top', (dstPosTop - now) + 'px');
+				if (fx.prop == 'left')
+					self.popupContents.css('left', (dstPosLeft - now) + 'px');
+			}
+		});
+	}
+	else
+	{
+		this._popupContainer.animate({
+			opacity: 0
+		}, 300, function()
+		{
+			self._popupContainer.toggle(false);
+		});
+	}
 };
 
 Schedule.Term.prototype.toString = function()

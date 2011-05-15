@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.shortcuts import redirect
@@ -305,7 +306,10 @@ def schedule_prototype(request):
             default_semester)
         StudentOptions.preload_cache(request.user.student, default_semester)
 
-        numbers_of_students = Group.numbers_of_students(default_semester)
+        enrolled_students_counts =\
+            Group.numbers_of_students(default_semester, True)
+        queued_students_counts =\
+            Group.numbers_of_students(default_semester, False)
         terms_in_semester = Term.get_all_in_semester(default_semester)
         courses_in_semester = []
         courses_in_semester_tmp = {}
@@ -323,6 +327,7 @@ def schedule_prototype(request):
                         #TODO: kod w prepare_courses_list_to_render moim
                         #      zdaniem nie zadziała
                         'was_enrolled': 'False',
+                        'slug': course.slug,
                     },
                     'terms': []
                 }
@@ -333,15 +338,19 @@ def schedule_prototype(request):
             term_data = {
                 'id': term.pk,
                 'group': term.group.pk,
+                'group_url': reverse('records-group', args=[term.group.pk]),
                 'group_type': int(term.group.type),
                 'teacher': term.group.teacher.user.get_full_name(),
+                'teacher_url': reverse('employee-profile', args=[term.group.teacher.user.id]),
                 'classroom': int(term.classroom.number),
                 'day': int(term.dayOfWeek),
                 'start_time': [term.start_time.hour, term.start_time.minute],
                 'end_time': [term.end_time.hour, term.end_time.minute],
                 'limit': int(term.group.get_group_limit()),
-                'enrolled_count': int(numbers_of_students[term.group.pk]) \
-                    if numbers_of_students.has_key(term.group.pk) else 0,
+                'enrolled_count': int(enrolled_students_counts[term.group.pk]) \
+                    if enrolled_students_counts.has_key(term.group.pk) else 0,
+                'queued_count': int(queued_students_counts[term.group.pk]) \
+                    if queued_students_counts.has_key(term.group.pk) else 0,
             }
             courses_in_semester_tmp[course.pk]['terms'].\
                 append(simplejson.dumps(term_data))
