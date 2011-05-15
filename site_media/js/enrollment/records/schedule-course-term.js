@@ -206,7 +206,11 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 
 	var enrolled = $.create('p', {className: 'enrolledCount'}).
 		text('Zapisanych: ').appendTo(this.popupContents);
-	$.create('a').attr('href', this.groupURL).appendTo(enrolled).
+	$.create('a', {
+		href: this.groupURL,
+		title: 'zapisanych osób: ' + this.enrolledCount +
+			', limit miejsc w grupie: ' + this.limit
+	}).appendTo(enrolled).
 		text(this.enrolledCount + '/' + this.limit);
 	if (this.enrolledCount >= this.limit && !this.isEnrolled && !this.isQueued)
 		$.create('img', {

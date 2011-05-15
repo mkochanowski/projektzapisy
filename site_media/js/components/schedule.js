@@ -31,6 +31,8 @@ Schedule = function(container, options)
 	this.container.empty();
 	this.container.attr('className', 'schedule');
 
+	this.currentPopup = null;
+
 	var minutesCount = o.endTime.timestamp - o.startTime.timestamp;
 	var hoursCount = Math.ceil(minutesCount / 60);
 
@@ -445,6 +447,12 @@ Schedule.Term.prototype.setPopupVisible = function(visible)
 	this.popupContents.stop();
 	if (visible)
 	{
+		if (this.schedule.currentPopup !== this)
+		{
+			if (this.schedule.currentPopup)
+				this.schedule.currentPopup.setPopupVisible(false);
+			this.schedule.currentPopup = this;
+		}
 		this._popupContainer.css('opacity', 0);
 		this._popupContainer.toggle(true);
 		var contentsWidth = this.popupContents.outerWidth();
@@ -513,6 +521,8 @@ Schedule.Term.prototype.setPopupVisible = function(visible)
 	}
 	else
 	{
+		if (this.schedule.currentPopup === this)
+			this.schedule.currentPopup = null;
 		this._popupContainer.animate({
 			opacity: 0
 		}, 300, function()
