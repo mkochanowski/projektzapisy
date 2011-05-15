@@ -5,8 +5,8 @@ from django.utils.safestring           import SafeUnicode
 from apps.users.models               import Employee, \
                                               Student, \
                                               Program
-from apps.enrollment.subjects.models import Group, \
-                                              Subject, \
+from apps.enrollment.courses.models import Group, \
+                                              Course, \
                                               Semester, \
                                               GROUP_TYPE_CHOICES
 from apps.enrollment.records.models  import Record, \
@@ -18,8 +18,8 @@ class Template( models.Model ):
     title             = models.CharField( max_length = 40, verbose_name = 'tytuł' )
     description       = models.TextField( blank = True, verbose_name = 'opis' )
     studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
-    subject           = models.ForeignKey( Subject, verbose_name = 'przedmiot', blank = True, null = True)
-    no_subject        = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'nie przypisany' )
+    course           = models.ForeignKey( Course, verbose_name = 'przedmiot', blank = True, null = True)
+    no_course        = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'nie przypisany' )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięty' )
     group_type        = models.CharField( max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     sections          = models.ManyToManyField( Section, verbose_name = 'sekcje',
@@ -35,7 +35,7 @@ class Template( models.Model ):
     def __unicode__( self ):
         res = unicode( self.title )
         if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
-        if self.subject:      res += u', przedmiot: ' + unicode( self.subject )
+        if self.course:      res += u', przedmiot: ' + unicode( self.course )
         if self.group_type:   res += u', typ grupy: ' + unicode( self.get_group_type_display() )
         return res
 

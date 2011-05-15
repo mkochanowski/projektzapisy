@@ -607,7 +607,7 @@ input.bigButton
 	display: inline-block !important;
 }
 
-.filter-subject-type-metaSwitch
+.filter-course-type-metaSwitch
 {
 	float: right;
 	clear: left;
@@ -615,12 +615,12 @@ input.bigButton
 	margin-bottom: -6px;
 }
 
-.subject-type-filter
+.course-type-filter
 {
 	width: 300px;
 }
 
-.subject-type-filter > span
+.course-type-filter > span
 {
 	min-width: 150px;
 }

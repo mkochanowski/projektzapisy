@@ -22,7 +22,7 @@
 					<li><span>Semestr zimowy</span>
 						<ul>
 							{% for vote in winter_votes %}
-								<li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+								<li><span>{{ vote.course.name }}</span> {{ vote.value }}</li>
 							{% endfor %}
 						</ul>
 					</li>
@@ -32,7 +32,7 @@
 					<li><span>Semestr letni</span>
 						<ul>
 							{% for vote in summer_votes %}
-								<li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+								<li><span>{{ vote.course.name }}</span> {{ vote.value }}</li>
 							{% endfor %}
 						</ul>
 					</li>
@@ -42,7 +42,7 @@
 					<li><span>Semestr nieokreślony</span>
 						<ul>
 							{% for vote in unknown_votes %}
-								<li><span>{{ vote.subject.name }}</span> {{ vote.value }}</li>
+								<li><span>{{ vote.course.name }}</span> {{ vote.value }}</li>
 							{% endfor %}
 						</ul>
 					</li>

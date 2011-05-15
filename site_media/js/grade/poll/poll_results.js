@@ -11,9 +11,9 @@ Poll.results.init = function()
     $('.connected-polls').hide();
     $('.hidden-answers').hide();
     $('.result-groupped-list').hide();
-	$('#results-by-subject-list').hide();
-    $('#subjects-list-link').click( function(){
-        $('#results-by-subject-list').slideToggle(250);
+	$('#results-by-course-list').hide();
+    $('#courses-list-link').click( function(){
+        $('#results-by-course-list').slideToggle(250);
         return false;
     });
     $('#results-by-teacher-list').hide();
@@ -31,8 +31,8 @@ Poll.results.init = function()
     $('#results-by-'+mode+'-'+pid).parent().parent().show();
     
     if (pid != -1) {
-        if (mode == 'subject'){
-            $('#results-by-subject-list').show();
+        if (mode == 'course'){
+            $('#results-by-course-list').show();
         }
         else if (mode == 'teacher'){
             $('#results-by-teacher-list').show();

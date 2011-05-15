@@ -9,11 +9,11 @@ from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
 
-from apps.enrollment.subjects.models import *
+from apps.enrollment.courses.models import *
 from apps.users.models import *
 from apps.enrollment.records.models import *
 from apps.enrollment.records.exceptions import *
-from apps.enrollment.subjects.views import prepare_subjects_list_to_render
+from apps.enrollment.courses.views import prepare_courses_list_to_render
 
 from libs.ajax_messages import *
 
@@ -89,8 +89,8 @@ def set_enrolled(request, method):
     try:
         if set_enrolled:
             group = Group.objects.get(id=group_id)
-            moved = Record.is_student_in_subject_group_type(\
-                user_id=request.user.id, slug=group.subject_slug(),\
+            moved = Record.is_student_in_course_group_type(\
+                user_id=request.user.id, slug=group.course_slug(),\
                 group_type=group.type) #TODO: omg ale crap
             connected_records = Record.add_student_to_group(request.user.id,\
                 group_id)
@@ -117,7 +117,7 @@ def set_enrolled(request, method):
             return AjaxSuccessMessage(message, connected_group_ids)
         else:
             request.user.message_set.create(message=message)
-            return redirect('subject-page', slug=record.group_slug())
+            return redirect('course-page', slug=record.group_slug())
     except NonStudentException:
         transaction.rollback()
         return AjaxFailureMessage.auto_render('NonStudent',
@@ -134,8 +134,8 @@ def set_enrolled(request, method):
             return AjaxSuccessMessage(message)
         else:
             request.user.message_set.create(message=message)
-            return redirect('subject-page', slug=Group.objects.\
-                get(id=group_id).subject_slug())
+            return redirect('course-page', slug=Group.objects.\
+                get(id=group_id).course_slug())
     except AlreadyNotAssignedException:
         try:
             Queue.remove_student_from_queue(request.user.id, group_id)
@@ -146,8 +146,8 @@ def set_enrolled(request, method):
             return AjaxSuccessMessage(message)
         else:
             request.user.message_set.create(message=message)
-            return redirect('subject-page', slug=Group.objects.\
-                get(id=group_id).subject_slug())
+            return redirect('course-page', slug=Group.objects.\
+                get(id=group_id).course_slug())
     except OutOfLimitException:
         try:
             Queue.add_student_to_queue(request.user.id, group_id)
@@ -161,8 +161,8 @@ def set_enrolled(request, method):
                     message_context)
             else:
                 request.user.message_set.create(message=message)
-                return redirect('subject-page', slug=Group.objects.\
-                    get(id=group_id).subject_slug())
+                return redirect('course-page', slug=Group.objects.\
+                    get(id=group_id).course_slug())
         except AlreadyQueuedException:
             return AjaxFailureMessage.auto_render('AlreadyQueued',
                 'Jesteś już zapisany do kolejki.', \
@@ -250,7 +250,7 @@ def queue_set_priority(request, group_id, method):
         if is_ajax:
             return AjaxSuccessMessage()
         else:
-            return redirect("subject-page", slug=queue.group_slug())
+            return redirect("course-page", slug=queue.group_slug())
     except Queue.DoesNotExist:
     	transaction.rollback()
         return AjaxFailureMessage.auto_render('NotQueued',\
@@ -265,7 +265,7 @@ def records(request, group_id):
         students_in_group = Record.get_students_in_group(group_id)
         students_in_queue = Queue.get_students_in_queue(group_id)
         all_students = Student.objects.all()
-        data = prepare_subjects_list_to_render(request)
+        data = prepare_courses_list_to_render(request)
         data.update({
             'all_students' : all_students,
             'students_in_group' : students_in_group,
@@ -307,29 +307,29 @@ def schedule_prototype(request):
 
         numbers_of_students = Group.numbers_of_students(default_semester)
         terms_in_semester = Term.get_all_in_semester(default_semester)
-        subjects_in_semester = []
-        subjects_in_semester_tmp = {}
+        courses_in_semester = []
+        courses_in_semester_tmp = {}
         for term in terms_in_semester:
-            subject = term.group.subject
-            if not subject.pk in subjects_in_semester_tmp:
-                subject_collection = {
-                    'subject': {
-                        'id' : subject.pk,
-                        'name': subject.name,
-                        'short': subject.entity.get_short_name(),
-                        'type': subject.type.pk,
-                        'is_recording_open': subject.\
+            course = term.group.course
+            if not course.pk in courses_in_semester_tmp:
+                course_collection = {
+                    'course': {
+                        'id' : course.pk,
+                        'name': course.name,
+                        'short': course.entity.get_short_name(),
+                        'type': course.type.pk,
+                        'is_recording_open': course.\
                             is_recording_open_for_student(request.user.student),
-                        #TODO: kod w prepare_subjects_list_to_render moim
+                        #TODO: kod w prepare_courses_list_to_render moim
                         #      zdaniem nie zadziała
                         'was_enrolled': 'False',
                     },
                     'terms': []
                 }
-                subjects_in_semester_tmp.update({
-                    subject.pk: subject_collection
+                courses_in_semester_tmp.update({
+                    course.pk: course_collection
                 })
-                subjects_in_semester.append(subject_collection)
+                courses_in_semester.append(course_collection)
             term_data = {
                 'id': term.pk,
                 'group': term.group.pk,
@@ -343,12 +343,12 @@ def schedule_prototype(request):
                 'enrolled_count': int(numbers_of_students[term.group.pk]) \
                     if numbers_of_students.has_key(term.group.pk) else 0,
             }
-            subjects_in_semester_tmp[subject.pk]['terms'].\
+            courses_in_semester_tmp[course.pk]['terms'].\
                 append(simplejson.dumps(term_data))
   
         data = {
             'student_records': student_records,
-            'subjects' : subjects_in_semester,
+            'courses' : courses_in_semester,
             'semester' : default_semester,
             'types_list' : Type.get_all_for_jsfilter()
         }

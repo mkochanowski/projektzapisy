@@ -66,13 +66,13 @@ body{margin: 0em 0em 2em 0em}
 
 div{font-family: sans-serif}
 
-.subject-inner {
+.course-inner {
     text-align: center;
     width:100%; padding: 4% 1%; border: 1px solid black; 
     background: #0073b5;
     color: white;
 }
-.subject-outer {
+.course-outer {
     width:70%; padding: 1% 15%;
 }
 
@@ -129,7 +129,7 @@ input[type=text], input[type=password], textarea
     width:99%;
 }
 
-.subject-block{
+.course-block{
  border: 1px solid black;
  background: #0073b5;
  color: white;

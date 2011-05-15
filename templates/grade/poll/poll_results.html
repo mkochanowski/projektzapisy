@@ -21,19 +21,19 @@
 <input type="hidden" id="poll-id" value="{% if pid %}{{pid}}{% else %}-1{% endif %}">
 <input type="hidden" id="display-mode" value="{{mode}}">
 
-{% if polls_by_subject and polls_by_teacher %}
+{% if polls_by_course and polls_by_teacher %}
     <div id="results-poll-menu">
         <ul id="results-groupping-list">
             <li>
-                <h3><a id="subjects-list-link" href="">
+                <h3><a id="courses-list-link" href="">
                     Przedmioty
                 </a></h3>
-                <ul id="results-by-subject-list">
-                    {% for poll_list in polls_by_subject %}
+                <ul id="results-by-course-list">
+                    {% for poll_list in polls_by_course %}
                     <li><h4><a class="list-link" href="">{{ poll_list.0 }}</a></h4>
                     <ul class="result-groupped-list">
                         {% for poll in poll_list.1 %}
-                        <li><a id="results-by-subject-{{ poll.id }}" 
+                        <li><a id="results-by-course-{{ poll.id }}"
                                class="result-poll-link" 
                                href="{% url grade-poll-poll-results 'S' poll.id %}">{{ poll.title }}
                         {% if poll.group %}
@@ -59,7 +59,7 @@
                                class="result-poll-link" 
                                href="{% url grade-poll-poll-results 'T' poll.id %}">{{ poll.title }}
                         {% if poll.group %}
-                            - {{ poll.group.subject.name }}
+                            - {{ poll.group.course.name }}
                             - {{ poll.group.get_type_display }}
                         {% endif %}
                         </a></li>

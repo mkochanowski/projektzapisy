@@ -17,7 +17,7 @@
 	{% for group in groups %}
 		{% for term in group.terms_ %}
 			<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}" 
-				subjectID="{{group.subject_.pk}}"
+				courseID="{{group.course_.pk}}"
 				groupID="{{group.pk}}"
 				termID="{{term.pk}}"
 				from="{{ term.time_from_in_minutes }}" 

@@ -32,7 +32,7 @@ class SystemStateAdminForm( ModelForm ):
         
     def clean_max_points(self):
         """
-            Max points per subjects validation
+            Max points per courses validation
         """
         data = self.cleaned_data['max_points']
         

@@ -38,7 +38,7 @@ SchedulePrototype.init = function()
 	*/
 
 	
-	SchedulePrototype.initSubjectList(enrolledGroupIDs, pinnedGroupIDs, queuedGroupIDs);
+	SchedulePrototype.initCourseList(enrolledGroupIDs, pinnedGroupIDs, queuedGroupIDs);
 	SchedulePrototype.initFilter();
 	SchedulePrototype.initRecordsLocking();
 };
@@ -52,13 +52,13 @@ $(SchedulePrototype.init);
  */
 SchedulePrototype.initFilter = function()
 {
-	var subjectFilterForm = $('#enr-schedulePrototype-top-bar').assertOne();
+	var courseFilterForm = $('#enr-schedulePrototype-top-bar').assertOne();
 
-	subjectFilterForm.css('display', 'block');
+	courseFilterForm.css('display', 'block');
 
-	subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
+	courseFilterForm.find('.filter-phrase-reset').assertOne().click(function()
 	{
-		subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+		courseFilterForm.find('.filter-phrase').assertOne().attr('value', '');
 	});
 
 	// komunikat o pustym filtrze
@@ -66,14 +66,14 @@ SchedulePrototype.initFilter = function()
 		$.create('p', {className: 'main-side-message'}).
 		text('Do podanego filtra nie pasuje żaden przedmiot.').
 		css({marginTop: '50px', display: 'none'}).
-		insertAfter($('#enr-schedulePrototype-subject-list').assertOne());
+		insertAfter($('#enr-schedulePrototype-course-list').assertOne());
 	SchedulePrototype.emptyFilterWarningVisible = false;
 
 	// konfiguracja filtra
 
-	SchedulePrototype.subjectFilter = new ListFilter('SchedulePrototype-subjects', subjectFilterForm.getDOM());
+	SchedulePrototype.courseFilter = new ListFilter('SchedulePrototype-courses', courseFilterForm.getDOM());
 
-	SchedulePrototype.subjectFilter.afterFilter = function(matchedElementsCount)
+	SchedulePrototype.courseFilter.afterFilter = function(matchedElementsCount)
 	{
 		var visible = (matchedElementsCount == 0);
 		if (SchedulePrototype.emptyFilterWarningVisible == visible)
@@ -83,39 +83,39 @@ SchedulePrototype.initFilter = function()
 		SchedulePrototype.uncheckAllButton.css('display', visible?'none':'');
 	};
 
-	SchedulePrototype.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
+	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
 		'phrase', '.filter-phrase', function(element, value)
 	{
-		var subject = element.data;
-		return (subject.name.toLowerCase().indexOf(value) >= 0);
+		var course = element.data;
+		return (course.name.toLowerCase().indexOf(value) >= 0);
 	}));
 
-	SchedulePrototype.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
 		'hideSigned', '#enr-hidesigned', function(element, value)
 	{
 		if (!value)
 			return true;
-		var subject = element.data;
-		return !subject.wasEnrolled;
+		var course = element.data;
+		return !course.wasEnrolled;
 	}));
 
-	SchedulePrototype.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
-		function(element, subjectType)
+	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createCourseTypeFilter(
+		function(element, courseType)
 	{
-		var subject = element.data;
-		return (subject.type == subjectType);
+		var course = element.data;
+		return (course.type == courseType);
 	}));
 
-	SchedulePrototype.subjectList.forEach(function(subject)
+	SchedulePrototype.courseList.forEach(function(course)
 	{
-		SchedulePrototype.subjectFilter.addElement(new ListFilter.Element(subject, function(visible)
+		SchedulePrototype.courseFilter.addElement(new ListFilter.Element(course, function(visible)
 		{
-			var subject = this.data;
-			subject.setVisible(visible);
+			var course = this.data;
+			course.setVisible(visible);
 		}));
 	});
 
-	SchedulePrototype.subjectFilter.runThread();
+	SchedulePrototype.courseFilter.runThread();
 	$('#enr-schedulePrototype-top-bar').find('label').disableDragging();
 };
 
@@ -189,61 +189,61 @@ SchedulePrototype.initRecordsLocking = function()
 	})
 };
 
-SchedulePrototype.subjectList = [];
+SchedulePrototype.courseList = [];
 
-SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
+SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
 {
-	var subjectList = $('#enr-schedulePrototype-subject-list');
+	var courseList = $('#enr-schedulePrototype-course-list');
 
-	subjectList.children('li').each(function(idx, elem)
+	courseList.children('li').each(function(idx, elem)
 	{
 		elem = $(elem);
 
-		var subject = new SchedulePrototype.PrototypeSubject();
-		SchedulePrototype.subjectList.push(subject);
+		var course = new SchedulePrototype.PrototypeCourse();
+		SchedulePrototype.courseList.push(course);
 
-		subject.id = elem.children('input[name=id]').attr('value').castToInt();
-		subject.name = elem.children('label').disableDragging().text().trim();
-		subject.shortName = elem.children('input[name=short]').attr('value').trim();
-		subject.type = elem.children('input[name=type]').attr('value').castToInt();
-		subject.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
-		subject.isRecordingOpen = elem.children('input[name=isRecordingOpen]').attr('value').castToBool();
-		subject._listElementContainer = elem;
-		subject._prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
+		course.id = elem.children('input[name=id]').attr('value').castToInt();
+		course.name = elem.children('label').disableDragging().text().trim();
+		course.shortName = elem.children('input[name=short]').attr('value').trim();
+		course.type = elem.children('input[name=type]').attr('value').castToInt();
+		course.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
+		course.isRecordingOpen = elem.children('input[name=isRecordingOpen]').attr('value').castToBool();
+		course._listElementContainer = elem;
+		course._prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
 
 		elem.children('input[name=term]').each(function(idx, elem)
 		{
 			elem = $(elem);
 
-			var sterm = Fereol.Enrollment.ScheduleSubjectTerm.fromJSON(elem.attr('value'));
+			var sterm = Fereol.Enrollment.ScheduleCourseTerm.fromJSON(elem.attr('value'));
 			sterm.isPinned = (pinned.indexOf(sterm.groupID) >= 0);
 			sterm.isEnrolled = (enrolled.indexOf(sterm.groupID) >= 0);
 			sterm.isQueued = (queued.indexOf(sterm.groupID) >= 0);
 			sterm.isPrototyped = false;
-			sterm.subject = subject;
+			sterm.course = course;
 
 			sterm.assignSchedule(SchedulePrototype.schedule);
 
-			subject.terms.push(sterm);
+			course.terms.push(sterm);
 		});
 
 		(function()
 		{
-			subject._prototypedCheckbox.click(function()
+			course._prototypedCheckbox.click(function()
 			{
-				subject.setPrototyped(subject._prototypedCheckbox.attr('checked'));
+				course.setPrototyped(course._prototypedCheckbox.attr('checked'));
 			});
 		})();
-		subject.setPrototyped(subject._prototypedCheckbox.attr('checked'));
+		course.setPrototyped(course._prototypedCheckbox.attr('checked'));
 	});
 
 	SchedulePrototype.uncheckAllButton = $.create('a').attr('id',
-		'enr-schedulePrototype-uncheckAll').insertAfter(subjectList).
+		'enr-schedulePrototype-uncheckAll').insertAfter(courseList).
 		text('odznacz wszystkie').disableDragging().click(function()
 	{
-		SchedulePrototype.subjectList.forEach(function(subject)
+		SchedulePrototype.courseList.forEach(function(course)
 		{
-			subject.setPrototyped(false);
+			course.setPrototyped(false);
 		});
 	});
 };
@@ -253,7 +253,7 @@ SchedulePrototype.initSubjectList = function(enrolled, pinned, queued)
  * terminów.
  ******************************************************************************/
 
-SchedulePrototype.PrototypeSubject = function()
+SchedulePrototype.PrototypeCourse = function()
 {
 	this.id = null;
 	this.name = null;
@@ -267,7 +267,7 @@ SchedulePrototype.PrototypeSubject = function()
 	this._prototypedCheckbox = null;
 };
 
-SchedulePrototype.PrototypeSubject.prototype.setPrototyped = function(prototyped)
+SchedulePrototype.PrototypeCourse.prototype.setPrototyped = function(prototyped)
 {
 	prototyped = !!prototyped;
 	if (this.isPrototyped == prototyped)
@@ -281,19 +281,19 @@ SchedulePrototype.PrototypeSubject.prototype.setPrototyped = function(prototyped
 	});
 };
 
-SchedulePrototype.PrototypeSubject.prototype.setVisible = function(visible)
+SchedulePrototype.PrototypeCourse.prototype.setVisible = function(visible)
 {
 	this._listElementContainer.css('display', (visible ? '' : 'none'));
 	if (!visible)
 		this.setPrototyped(false);
 };
 
-SchedulePrototype.PrototypeSubject.prototype.toString = function()
+SchedulePrototype.PrototypeCourse.prototype.toString = function()
 {
 	if (this.shortName)
 		return this.shortName;
 	else if (this.name)
 		return this.name;
 	else
-		return 'SchedulePrototype.PrototypeSubject';
+		return 'SchedulePrototype.PrototypeCourse';
 };

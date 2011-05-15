@@ -14,7 +14,7 @@ if __name__ == '__main__':
     setup_environ(settings)
 
 from apps.enrollment.records.models import Record, STATUS_ENROLLED
-from apps.enrollment.subjects.models import Subject, Semester, SubjectEntity, Type, Group, Term, Classroom
+from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom
 from apps.users.models import Student, Employee
 
 from django.template.defaultfilters import slugify
@@ -71,7 +71,7 @@ def get_classroom(rooms):
     
 
 def import_schedule(file, semester):
-    subject = None
+    course = None
     while True:
         line = file.readline()
         if not line:
@@ -90,7 +90,7 @@ def import_schedule(file, semester):
                 group_type = GROUP_TYPES[g.group('type')]
                 teacher = find_teacher(g.group('teacher'))
 
-                group = Group.objects.create(subject=subject,
+                group = Group.objects.create(course=course,
                                              teacher=teacher,
                                              type=group_type)
                 term = Term.objects.create(dayOfWeek=dayOfWeek,
@@ -105,9 +105,9 @@ def import_schedule(file, semester):
         elif line.startswith(' '):
             name = lower_pl(line[1:-1])
             shortName = name[:29]
-            entity = SubjectEntity.objects.get_or_create(name=name,shortName=shortName)[0]
+            entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
 
-            subject_type = entity.type
+            course_type = entity.type
             description = entity.description
             lectures = entity.lectures
             exercises = entity.exercises
@@ -115,10 +115,10 @@ def import_schedule(file, semester):
             repetitions = entity.repetitions
             slug = str(semester.year) + semester.type + '_' + slugify(name)
             try:
-                subject = Subject.objects.create(name=name,
+                course = Course.objects.create(name=name,
                                                  entity=entity,
                                                  semester=semester,
-                                                 type=subject_type,
+                                                 type=course_type,
                                                  slug = slug,
                                                  description = description,
                                                  lectures = lectures,
@@ -128,7 +128,7 @@ def import_schedule(file, semester):
                                                  )
         
             except Exception, e:
-                print 'Error during creating subject:%s. \nError: %s ' % (name, e)
+                print 'Error during creating course:%s. \nError: %s ' % (name, e)
         else:
             continue
 

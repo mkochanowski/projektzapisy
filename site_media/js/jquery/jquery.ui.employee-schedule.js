@@ -20,7 +20,7 @@ $.widget("ui.schedule", {
 		var self = this,
 			o = this.options;
 		
-		self.subjectList = [];	
+		self.courseList = [];
 		
 		self.initialTerms = self.element.find('div');
 		
@@ -118,12 +118,12 @@ $.widget("ui.schedule", {
 		return '.schedule-group-term[groupid="' + groupID + '"]';
 	},
 	
-	_subjectSelector: function(subjectID) {
-		return '.schedule-group-term[subjectid="' + subjectID + '"]';
+	_courseSelector: function(courseID) {
+		return '.schedule-group-term[courseid="' + courseID + '"]';
 	},
 	
-	_subjectTermsToDeleteSelector: function(subjectID) {
-		return '.schedule-group-term[subjectid="' + subjectID + '"]:not(.schedule-fixed,.schedule-pinned)';
+	_courseTermsToDeleteSelector: function(courseID) {
+		return '.schedule-group-term[courseid="' + courseID + '"]:not(.schedule-fixed,.schedule-pinned)';
 	},
 	
 	_termEntityId: function(groupID, termID) {
@@ -152,7 +152,7 @@ $.widget("ui.schedule", {
 		return added;
 	},
 	
-	addTerm: function(content, day, from, minutes, subjectID, groupID, termID, status) {
+	addTerm: function(content, day, from, minutes, courseID, groupID, termID, status) {
 		var self = this;
 		
 		if(!self._termWithSameIdAlreadyAdded(groupID, termID)) {
@@ -161,7 +161,7 @@ $.widget("ui.schedule", {
 					minutes: minutes,
 					day: day,
 					from: from,
-					subjectID: subjectID,
+					courseID: courseID,
 					groupID: groupID,
 					termID: termID,
 					status: status})
@@ -184,9 +184,9 @@ $.widget("ui.schedule", {
 	},
 	
 	
-	deleteSubjectTerms: function(subjectID){
+	deleteCourseTerms: function(courseID){
 		var self = this;
-		self.element.find(self._subjectTermsToDeleteSelector(subjectID)).remove();
+		self.element.find(self._courseTermsToDeleteSelector(courseID)).remove();
 		for(var i=0; i<self.dayColumnList.length; i++){
 			self._orderColumnContent(self.dayColumnList[i]);
 		}
@@ -195,12 +195,12 @@ $.widget("ui.schedule", {
 	_addDivTerm: function(divTerm) {
 		var self = this;
 		
-		if(self.subjectList[divTerm.attr('subjectid')] == undefined) {
-			self.subjectList[divTerm.attr('subjectid')] = { boxClass : self._nextBoxClass() };
+		if(self.courseList[divTerm.attr('courseid')] == undefined) {
+			self.courseList[divTerm.attr('courseid')] = { boxClass : self._nextBoxClass() };
 		}
 		
 		$('<div></div>')
-			.addClass('box ' + self.subjectList[divTerm.attr('subjectid')].boxClass) 
+			.addClass('box ' + self.courseList[divTerm.attr('courseid')].boxClass)
 			.append($('<div></div>')
 				.addClass('middle')
 				.append(divTerm.html()))

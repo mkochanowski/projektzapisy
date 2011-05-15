@@ -29,10 +29,10 @@
                  <tr><td class="break" colspan="3"></td></tr>
         {% else %}
             <tr> 
-            <td> <a href= "/subject/{{ event.group.subject.slug }}/" >
+            <td> <a href= "/course/{{ event.group.course.slug }}/" >
             <p> {{event.term.period_string}}  </br> s. {{event.term.classroom}}</p></a></td>
-            <td colspan="3"> <a href= "/subject/{{ event.group.subject.slug }}/">
-            <p> {{event.group.subject.name}} ({{event.group.get_type_display}})</p></a></td>
+            <td colspan="3"> <a href= "/course/{{ event.group.course.slug }}/">
+            <p> {{event.group.course.name}} ({{event.group.get_type_display}})</p></a></td>
             </tr>
             </div> 
     {% endif %}

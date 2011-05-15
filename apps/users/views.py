@@ -21,7 +21,7 @@ from apps.users.utils import prepare_ajax_students_list,\
                              prepare_ajax_employee_list
 
 from apps.users.models import Employee, Student
-from apps.enrollment.subjects.models import Semester, Group
+from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 
 from apps.users.forms import EmailChangeForm, BankAccountChangeForm

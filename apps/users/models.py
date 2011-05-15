@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 from exceptions import NonEmployeeException, NonStudentException
 from apps.users.exceptions import NonEmployeeException, NonStudentException
-from apps.enrollment.subjects.models import Group, Semester
+from apps.enrollment.courses.models import Group, Semester
 
 import datetime
 
@@ -62,11 +62,11 @@ class Employee(BaseUser):
     def has_privileges_for_group(self, group_id):
         """
         Method used to verify whether user is allowed to create a poll for certain group 
-        (== he is an admin, a teacher for this subject or a teacher for this group)
+        (== he is an admin, a teacher for this course or a teacher for this group)
         """
         try:
             group = Group.objects.get(pk=group_id)
-            return ( group.teacher == self or self in group.subject.teachers.all() or self.user.is_staff )
+            return ( group.teacher == self or self in group.course.teachers.all() or self.user.is_staff )
         except:
             logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
         return False
@@ -95,7 +95,7 @@ class Employee(BaseUser):
         semester = Semester.get_current_semester()
         try:
             employee = user.employee
-            groups = Group.objects.filter(teacher=employee, subject__semester=semester)
+            groups = Group.objects.filter(teacher=employee, course__semester=semester)
         except Employee.DoesNotExist:
              logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
@@ -118,10 +118,10 @@ class Employee(BaseUser):
         try:
             employee = user.employee
             groups = [g for g in Employee.get_all_groups_in_semester(user_id) ]
-            subjects = set([group.subject for group in groups])
+            courses = set([group.course for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
-                group.subject_ = group.subject
+                group.course_ = group.course
             return groups
         except Employee.DoesNotExist:
              logger.error('Function Employee.get_schedule(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
@@ -158,11 +158,11 @@ class Student(BaseUser):
 
     def get_records_history(self):
         '''
-        Returns list of ids of subject s that student was enrolled for.
+        Returns list of ids of course s that student was enrolled for.
         '''
         default_semester = Semester.get_default_semester()
-        records = self.records.exclude(group__subject__semester = default_semester)
-        records_list = map(lambda x: x.group.subject.entity.id, records)
+        records = self.records.exclude(group__course__semester = default_semester)
+        records_list = map(lambda x: x.group.course.entity.id, records)
         return list(frozenset(records_list))
 
 
@@ -186,8 +186,8 @@ class Student(BaseUser):
         try:
             groups = map(lambda x: x.group, student.records.filter(status="1").\
                         select_related('group', 'group__teacher',
-                                      'group__subject__semester',
-                                      'group__subject__term'))
+                                      'group__course__semester',
+                                      'group__course__term'))
         except Student.DoesNotExist:
              logger.error('Function Student.get_all_groups(student = %d)' + \
              'throws Student.DoesNotExist exception.' % student.pk )
@@ -197,11 +197,11 @@ class Student(BaseUser):
     @staticmethod
     def get_schedule(student):
         try:
-            groups = [g for g in Student.get_all_groups(student) if g.subject.semester.is_current_semester()]
-            subjects = set([group.subject for group in groups])
+            groups = [g for g in Student.get_all_groups(student) if g.course.semester.is_current_semester()]
+            courses = set([group.course for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
-                group.subject_ = group.subject
+                group.course_ = group.course
             return groups
         except Student.DoesNotExist:
              logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user.id )

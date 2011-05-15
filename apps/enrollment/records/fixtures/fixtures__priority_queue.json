@@ -127,63 +127,63 @@
     }, 
    {
         "pk": 1, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "obowi\u0105zkowy.O1"
         }
     }, 
     {
         "pk": 2, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "obowi\u0105zkowy.O2"
         }
     }, 
     {
         "pk": 3, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "obowi\u0105zkowy.O3"
         }
     }, 
     {
         "pk": 4, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "informatyczny.I1"
         }
     }, 
     {
         "pk": 5, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "informatyczny.I2"
         }
     }, 
     {
         "pk": 6, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "kurs"
         }
     }, 
     {
         "pk": 7, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "seminarium"
         }
     }, 
     {
         "pk": 100, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity", 
         "fields": {
             "name": "Wdra\u017canie system\u00f3w klasy ERP"
         }
     }, 
     {
         "pk": 100, 
-        "model": "subjects.subject", 
+        "model": "courses.course", 
         "fields": {
             "lectures": 30, 
             "name": "Wdra\u017canie system\u00f3w klasy ERP", 
@@ -201,74 +201,74 @@
     }, 
     {
         "pk": 100, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "2", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     }, 
     {
         "pk": 101, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "2", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     },
     {
         "pk": 102, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "1", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     },
     {
         "pk": 103, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "2", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     },
     {
         "pk": 104, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "2", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     },
     {
         "pk": 105, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "3", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     },
     {
         "pk": 100, 
-        "model": "subjects.classroom", 
+        "model": "courses.classroom", 
         "fields": {
             "number": "62"
         }
     }, 
     {
         "pk": 100, 
-        "model": "subjects.term", 
+        "model": "courses.term", 
         "fields": {
             "dayOfWeek": "1", 
             "classroom": 100, 
@@ -279,7 +279,7 @@
     }, 
     {
         "pk": 100, 
-        "model": "subjects.semester", 
+        "model": "courses.semester", 
         "fields": {
             "records_opening": "2010-02-01 00:00:00", 
             "visible": true, 
@@ -292,7 +292,7 @@
     }, 
     {
         "pk": 101, 
-        "model": "subjects.semester", 
+        "model": "courses.semester", 
         "fields": {
             "records_opening": "2010-09-25 00:00:00", 
             "visible": true, 

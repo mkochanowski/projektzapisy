@@ -17,14 +17,14 @@ Prefs.init = function()
 	var prefsList = $('#od-prefs-list');
 	Prefs.prefsList = prefsList.getDOM();
 
-	Prefs.subjects = new Array();
-	var subjectElements = prefsList.children('li');
-	for (i = 0; i < subjectElements.length; i++)
+	Prefs.courses = new Array();
+	var courseElements = prefsList.children('li');
+	for (i = 0; i < courseElements.length; i++)
 	{
-		var sub = Prefs.Subject.fromElement(subjectElements[i]);
+		var sub = Prefs.Course.fromElement(courseElements[i]);
 		sub.attachControls();
 		sub.setCollapsed(true);
-		Prefs.subjects.push(sub);
+		Prefs.courses.push(sub);
 	}
 
 	// panel rozwiń / zwiń wszystko
@@ -43,8 +43,8 @@ Prefs.init = function()
 
 	var toggleCollapseAll = function(collapse)
 	{
-		for (i = 0; i < Prefs.subjects.length; i++)
-			Prefs.subjects[i].setCollapsed(collapse);
+		for (i = 0; i < Prefs.courses.length; i++)
+			Prefs.courses[i].setCollapsed(collapse);
 	};
 	$(collapseAll).click(function()
 	{
@@ -156,7 +156,7 @@ Prefs.Undecided.prototype.init = function()
 				return;
 			}
 
-			var sub = new Prefs.Subject();
+			var sub = new Prefs.Course();
 			sub.id = data.id;
 			sub.types = data.types;
 			sub.name = data.name;
@@ -215,7 +215,7 @@ Prefs.Undecided.prototype.init = function()
 			if (data.showlaboratories)
 				appendSelect('Pracownia:', 'lab');
 
-			Prefs.subjects.push(sub);
+			Prefs.courses.push(sub);
 			sub.attachControls();
 
 			if (Prefs.emptyMessage)
@@ -233,7 +233,7 @@ Prefs.Undecided.prototype.init = function()
  * Model preferencji przedmiotu
  ******************************************************************************/
 
-Prefs.Subject = function()
+Prefs.Course = function()
 {
 	this.id = null;
 	this.types = new Array();
@@ -247,11 +247,11 @@ Prefs.Subject = function()
 	this.isNew = false;
 };
 
-Prefs.Subject.fromElement = function(element)
+Prefs.Course.fromElement = function(element)
 {
 	var el = $(element);
 
-	var sub = new Prefs.Subject();
+	var sub = new Prefs.Course();
 	sub.id = Number(el.children('.pref-id').val());
 	sub.types = el.children('.pref-type').val().trim().split(new RegExp(' +'));
 	sub.name = el.children('.name').text().trim();
@@ -267,7 +267,7 @@ Prefs.Subject.fromElement = function(element)
 	return sub;
 };
 
-Prefs.Subject.prototype.attachControls = function()
+Prefs.Course.prototype.attachControls = function()
 {
 	var thisObj = this;
 	var label = $(this.container).children('.name');
@@ -311,14 +311,14 @@ Prefs.Subject.prototype.attachControls = function()
 					$(thisObj.container).removeClass('hidden');
 					thisObj.hideBtn.value = 'Ukryj';
 				}
-				Prefs.subjectFilter.doFilter();
+				Prefs.courseFilter.doFilter();
 			}
 		});
 
 	});
 };
 
-Prefs.Subject.prototype.setCollapsed = function(collapsed)
+Prefs.Course.prototype.setCollapsed = function(collapsed)
 {
 	collapsed = !!collapsed;
 	if (collapsed == this.collapsed)
@@ -357,13 +357,13 @@ Prefs.setEmptyFilterWarningVisible = function(visible)
  */
 Prefs.initFilter = function()
 {
-	var subjectFilterForm = $('#od-prefs-top-bar').assertOne();
+	var courseFilterForm = $('#od-prefs-top-bar').assertOne();
 
-	subjectFilterForm.css('display', 'block');
+	courseFilterForm.css('display', 'block');
 
-	subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
+	courseFilterForm.find('.filter-phrase-reset').assertOne().click(function()
 	{
-		subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+		courseFilterForm.find('.filter-phrase').assertOne().attr('value', '');
 	});
 
 	// komunikat o pustym filtrze
@@ -376,50 +376,50 @@ Prefs.initFilter = function()
 
 	// konfiguracja filtra
 
-	Prefs.subjectFilter = new ListFilter('prefs-subjects', subjectFilterForm.getDOM());
-	Prefs.subjectFilter.afterFilter = function(matchedElementsCount)
+	Prefs.courseFilter = new ListFilter('prefs-courses', courseFilterForm.getDOM());
+	Prefs.courseFilter.afterFilter = function(matchedElementsCount)
 	{
 		Prefs.setEmptyFilterWarningVisible(matchedElementsCount == 0);
 	};
 
-	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
+	Prefs.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
 		'phrase', '.filter-phrase', function(element, value)
 	{
-		var subject = element.data;
-		return (subject.name.toLowerCase().indexOf(value) >= 0);
+		var course = element.data;
+		return (course.name.toLowerCase().indexOf(value) >= 0);
 	}));
 
-	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+	Prefs.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
 		'showHidden', '#od-prefs-hidden', function(element, value)
 	{
 		if (value)
 			return true;
-		var subject = element.data;
-		return !subject.hidden;
+		var course = element.data;
+		return !course.hidden;
 	}));
 
-	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+	Prefs.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
 		'onlyNew', '#od-prefs-only-new', function(element, value)
 	{
 		if (!value)
 			return true;
-		var subject = element.data;
-		return subject.isNew;
+		var course = element.data;
+		return course.isNew;
 	}));
 
-	Prefs.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
-		function(element, subjectType)
+	Prefs.courseFilter.addFilter(ListFilter.CustomFilters.createCourseTypeFilter(
+		function(element, courseType)
 	{
-		var subject = element.data;
-		return (subject.types.indexOf(subjectType) >= 0);
+		var course = element.data;
+		return (course.types.indexOf(courseType) >= 0);
 	}));
 
-	for (var i = 0; i < Prefs.subjects.length; i++)
-		Prefs.subjectFilter.addElement(new ListFilter.Element(Prefs.subjects[i], function(visible)
+	for (var i = 0; i < Prefs.courses.length; i++)
+		Prefs.courseFilter.addElement(new ListFilter.Element(Prefs.courses[i], function(visible)
 		{
-			var subject = this.data;
-			$(subject.container).css('display', visible?'block':'none')
+			var course = this.data;
+			$(course.container).css('display', visible?'block':'none')
 		}));
 
-	Prefs.subjectFilter.runThread();
+	Prefs.courseFilter.runThread();
 };

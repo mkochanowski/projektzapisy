@@ -16,7 +16,7 @@ class PollCombineForm( forms.Form ):
                     title = u'[' + polls[ 0 ].title + u'] Ankieta ogólna'
                 else:
                     title = u'[' + polls[ 0 ].title + u'] Przedmiot: ' + \
-                            polls[ 0 ].group.subject.name + \
+                            polls[ 0 ].group.course.name + \
                             u' ' + polls[ 0 ].group.get_type_display() + u': ' + \
                             polls[ 0 ].group.get_teacher_full_name()
                 if polls[ 0 ].studies_type: u', studia ' + polls[ 0 ].studies_type
@@ -27,8 +27,8 @@ class PollCombineForm( forms.Form ):
                     title = u'Ankiety ogólne:<ul>'
                     label = u'join_common'
                 else:
-                    title = u'Przedmiot: ' + polls[ 0 ].group.subject.name + u'<ul>'
-                    label = u'join_' + unicode( polls[ 0 ].group.subject.pk )
+                    title = u'Przedmiot: ' + polls[ 0 ].group.course.name + u'<ul>'
+                    label = u'join_' + unicode( polls[ 0 ].group.course.pk )
                 for poll in polls:
                     if not poll.group:
                         title += u'<li>[' + poll.title + ']'

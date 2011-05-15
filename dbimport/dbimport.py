@@ -23,7 +23,7 @@ import psycopg2 as pg
 import psycopg2.extensions
 
 from apps.enrollment.records.models import Record, STATUS_ENROLLED
-from apps.enrollment.subjects.models import Subject, Semester, SubjectEntity, Type, Group, Term, Classroom
+from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom
 from apps.users.models import Student, Employee
 
 from django.template.defaultfilters import slugify
@@ -224,7 +224,7 @@ def import_groups(conn, sub_id, sub):
             print '[ERROR] Group type is not recognized:', gr_type_id
             continue
 
-        group = Group.objects.create(subject=sub,
+        group = Group.objects.create(course=sub,
                                      teacher=teacher,
                                      type=gr_type,
                                      limit=limit
@@ -244,7 +244,7 @@ def import_groups(conn, sub_id, sub):
         
         import_records(conn, gr_id, group)
 
-def import_subjects(conn, sem_id, sem):
+def import_courses(conn, sem_id, sem):
     cur = conn.cursor()
     cur.execute('select kod_przed_sem, nazwa, rodzaj_od_2007, opis, kod_uz, punkty_ects from przedmiot join przedmiot_semestr using(kod_przed) where semestr_id = %s',
                 (sem_id,)
@@ -263,7 +263,7 @@ def import_subjects(conn, sem_id, sem):
         teacher_id = rec[4]
         ects = rec[5]
             
-        entity = SubjectEntity.objects.get_or_create(name=name)[0]
+        entity = CourseEntity.objects.get_or_create(name=name)[0]
         slug = str(sem.year) + sem.type + '_' + slugify(name) # FIXME: slugify removes polish diacritical signs
 
         if sub_type_id == 1:
@@ -285,13 +285,13 @@ def import_subjects(conn, sem_id, sem):
         elif sub_type_id == 9:
             sub_type = Type.objects.get_or_create(name='Nieinformatyczny')[0]
         else:
-            print '[ERROR] Type of subject', name, 'not recognized:', sub_type_id
+            print '[ERROR] Type of course', name, 'not recognized:', sub_type_id
             continue
 
         sub = None
 
         try:
-            sub = Subject.objects.create(name=name,
+            sub = Course.objects.create(name=name,
                                          entity=entity,
                                          slug=slug,
                                          semester=sem,
@@ -346,7 +346,7 @@ def import_semesters(conn):
             transaction.rollback()
             continue
 
-        import_subjects(conn, rec[0], sem)
+        import_courses(conn, rec[0], sem)
 
     cur.close()
 

@@ -1182,7 +1182,7 @@
         "pk": 105, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_subject", 
+            "codename": "add_course",
             "name": "Can add przedmiot", 
             "content_type": 35
         }
@@ -1191,7 +1191,7 @@
         "pk": 106, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_subject", 
+            "codename": "change_course",
             "name": "Can change przedmiot", 
             "content_type": 35
         }
@@ -1200,7 +1200,7 @@
         "pk": 107, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_subject", 
+            "codename": "delete_course",
             "name": "Can delete przedmiot", 
             "content_type": 35
         }
@@ -1209,7 +1209,7 @@
         "pk": 102, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "add_subjectentity", 
+            "codename": "add_courseentity",
             "name": "Can add Podstawa przedmiotu", 
             "content_type": 34
         }
@@ -1218,7 +1218,7 @@
         "pk": 103, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "change_subjectentity", 
+            "codename": "change_courseentity",
             "name": "Can change Podstawa przedmiotu", 
             "content_type": 34
         }
@@ -1227,7 +1227,7 @@
         "pk": 104, 
         "model": "auth.permission", 
         "fields": {
-            "codename": "delete_subjectentity", 
+            "codename": "delete_courseentity",
             "name": "Can delete Podstawa przedmiotu", 
             "content_type": 34
         }
@@ -1956,7 +1956,7 @@
     }, 
     {
         "pk": 1, 
-        "model": "subjects.type", 
+        "model": "courses.type",
         "fields": {
             "meta_type": false, 
             "group": null, 
@@ -1965,14 +1965,14 @@
     }, 
     {
         "pk": 1, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity",
         "fields": {
             "name": "informatyczny"
         }
     }, 
     {
         "pk": 1, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 1", 
@@ -1990,7 +1990,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 2", 
@@ -2008,7 +2008,7 @@
     }, 
     {
         "pk": 3, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 3",  
@@ -2026,7 +2026,7 @@
     }, 
     {
         "pk": 4, 
-        "model": "subjects.subject", 
+        "model": "courses.course",
         "fields": {
             "lectures": 30, 
             "name": "Przedmiot 4", 
@@ -2044,127 +2044,127 @@
     }, 
     {
         "pk": 1, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 30, 
             "type": "1", 
             "teacher": 1, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 2, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 3, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 3, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 4, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 4, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 5, 
-            "subject": 1
+            "course": 1
         }
     }, 
     {
         "pk": 5, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 20, 
             "type": "1", 
             "teacher": 4, 
-            "subject": 2
+            "course": 2
         }
     }, 
     {
         "pk": 6, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 1, 
-            "subject": 2
+            "course": 2
         }
     }, 
     {
         "pk": 7, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 4, 
-            "subject": 2
+            "course": 2
         }
     }, 
     {
         "pk": 8, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 15, 
             "type": "1", 
             "teacher": 5, 
-            "subject": 3
+            "course": 3
         }
     }, 
     {
         "pk": 9, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 15, 
             "type": "2", 
             "teacher": 5, 
-            "subject": 3
+            "course": 3
         }
     }, 
     {
         "pk": 10, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 20, 
             "type": "1", 
             "teacher": 4, 
-            "subject": 4
+            "course": 4
         }
     }, 
     {
         "pk": 11, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 4, 
-            "subject": 4
+            "course": 4
         }
     }, 
     {
         "pk": 12, 
-        "model": "subjects.group", 
+        "model": "courses.group",
         "fields": {
             "limit": 10, 
             "type": "2", 
             "teacher": 1, 
-            "subject": 4
+            "course": 4
         }
     }, 
     {
         "pk": 1, 
-        "model": "subjects.semester", 
+        "model": "courses.semester",
         "fields": {
             "records_opening": "2010-01-15 20:23:02", 
             "semester_ending": "2020-02-15", 

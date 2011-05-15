@@ -30,16 +30,16 @@ def vote_view( request ):
     """
         View of once given vote
     """
-    votes = SingleVote.get_votes( request.user.student ).order_by('subject__name')
+    votes = SingleVote.get_votes( request.user.student ).order_by('course__name')
     summer_votes  = []
     winter_votes  = []
     unknown_votes = []
     vote_sum      = 0
     for vote_ in votes:
         vote_sum = vote_sum + vote_.value
-        if   vote_.subject.in_summer():
+        if   vote_.course.in_summer():
             summer_votes.append(vote_)
-        elif vote_.subject.in_winter():
+        elif vote_.course.in_winter():
             winter_votes.append(vote_)
         else:
             unknown_votes.append(vote_)
@@ -92,10 +92,10 @@ def vote( request ):
                 
                 for name, points in form.vote_points():
                     if int(points) > 0:
-                        subject = Proposal.objects.get(name=name)
+                        course = Proposal.objects.get(name=name)
                         single_vote = SingleVote()
                         single_vote.student = request.user.student
-                        single_vote.subject = subject
+                        single_vote.course = course
                         single_vote.state   = SystemState.get_state()
                         single_vote.value   = int(points)
                         single_vote.save()
@@ -145,13 +145,13 @@ def vote_summary( request ):
     
 def proposal_vote_summary( request, slug ):
     """
-        Summary for given subject
+        Summary for given course
     """
-    subject = Proposal.objects.get( slug=slug )
-    points, voters = SingleVote.get_points_and_voters( subject )
-    users = SingleVote.get_voters( subject )
+    course = Proposal.objects.get( slug=slug )
+    points, voters = SingleVote.get_points_and_voters( course )
+    users = SingleVote.get_voters( course )
     
-    data = { 'proposal' : subject,
+    data = { 'proposal' : course,
              'points'   : points,
              'votes'    : voters,
              'users'    : users}

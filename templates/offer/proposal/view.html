@@ -13,7 +13,7 @@
 		{% ifnotequal descid newest.id %}
 			<p class="main-message">
 				Wersja archiwalna!
-				{% if can_edit %}<a class="subjectrestore" href="{% url proposal-restore descid=descid %}">Przywróć</a> lub{% endif %}
+				{% if can_edit %}<a class="courserestore" href="{% url proposal-restore descid=descid %}">Przywróć</a> lub{% endif %}
 				<a href="{% url proposal-page slug=proposal.slug %}">przejdź do bieżącej</a>.
 			</p>
 		{% endifnotequal %}

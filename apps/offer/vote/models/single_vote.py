@@ -17,7 +17,7 @@ class SingleVote ( models.Model ):
     student = models.ForeignKey  ( 'users.Student',
                                     verbose_name = 'głosujący' )
                                     
-    subject = models.ForeignKey  ( Proposal, 
+    course = models.ForeignKey  ( Proposal,
                                    verbose_name = 'przedmiot')
 
     state   = models.ForeignKey  ( 'vote.SystemState',
@@ -29,13 +29,13 @@ class SingleVote ( models.Model ):
         verbose_name        = 'pojedynczy głos'
         verbose_name_plural = 'pojedyncze głosy'
         app_label           = 'vote'
-        ordering            = ('student', '-value', 'subject')
+        ordering            = ('student', '-value', 'course')
         
-        unique_together = ('subject', 'state', 'student')
+        unique_together = ('course', 'state', 'student')
         
     def __unicode__( self ):
         return  '[' + str(self.state.year) + u']Głos użytkownika: ' + \
-				self.student.user.username + '; ' + self.subject.name + \
+				self.student.user.username + '; ' + self.course.name + \
 				'; ' + str(self.value)
 
     @staticmethod
@@ -57,7 +57,7 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( subject = proposal, state=current_state )
+        votes = SingleVote.objects.filter( course = proposal, state=current_state )
         value = 0
         voters = votes.count()
         for vote in votes:
@@ -73,7 +73,7 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( subject = proposal, state=current_state )
+        votes = SingleVote.objects.filter( course = proposal, state=current_state )
         
         users = []
         for vote in votes:

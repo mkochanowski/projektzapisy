@@ -8,9 +8,9 @@
     </a>    
     <div>
         <h3>Wszystkie przedmioty: </h3>
-        {% for s in subjects %}
-            <div class="subject-outer">
-                <a href= "/subject/{{ s.slug }}/" ><div class="subject-inner">{{ s.name }}</div></a>
+        {% for s in courses %}
+            <div class="course-outer">
+                <a href= "/course/{{ s.slug }}/" ><div class="course-inner">{{ s.name }}</div></a>
             </div>
         {% endfor %}
     </div>

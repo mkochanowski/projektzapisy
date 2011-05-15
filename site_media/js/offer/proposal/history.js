@@ -11,7 +11,7 @@ Proposal.history.initRestoreButtons = function()
 		return;
 	Proposal.history.restoreButtonsAreReady = true;
 
-	$('.subjectrestore').click(function()
+	$('.courserestore').click(function()
 	{
 		return !!confirm("Jesteś pewien?");
 	});

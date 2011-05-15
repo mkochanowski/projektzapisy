@@ -74,7 +74,7 @@ def view(request):
 @employee_required
 def description(request, proposal_id):
     """
-        Renders subjects description.
+        Renders courses description.
 
         * when format=json is passed via GET:
           return ProposalDescription data as json

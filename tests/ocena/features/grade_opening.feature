@@ -14,15 +14,15 @@ Feature: Behaviour of the system when trying to open grading
     Scenario: Not all the polls are in the system - warning
         # Given there are polls generated
         # And there are keys generated for polls
-        # And there are subjects without a poll
+        # And there are courses without a poll
         # When I follow "Otwórz ocenę"
         # Then I should see a warning "Brak ankiet dla grup:"
-        # And I should see "tu wpisujemy nazwę grupy, która będzie dodana w kroku subjects without a poll"
+        # And I should see "tu wpisujemy nazwę grupy, która będzie dodana w kroku courses without a poll"
    
     Scenario: Not all the polls are in the system - success
         # Given there are polls generated
         # And there are keys generated for polls
-        # And there are subjects without a poll
+        # And there are courses without a poll
         # When I follow "Otwórz ocenę"
         # And I press "napis odpowiedni dla otwierania 'mimo wszystko'" in warning window
         # Then I should see "Ocena zajęć otwarta"
@@ -31,7 +31,7 @@ Feature: Behaviour of the system when trying to open grading
     Scenario: Not all the polls are in the system - failure        
         # Given there are polls generated
         # And there are keys generated for polls
-        # And there are subjects without a poll
+        # And there are courses without a poll
         # When I follow "Otwórz ocenę"
         # And I press "napis odpowiedni dla nie otwierania" in warning window
         # Then I should see "Anulowano otwarcie oceny zajęć"
