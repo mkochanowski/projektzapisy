@@ -13,7 +13,7 @@ from apps.offer.preferences.exceptions import *
 from apps.offer.preferences.models import Preference
 from apps.offer.preferences.utils import *
 from apps.offer.proposal.models import Proposal
-from apps.offer.proposal.models.types import Types
+from apps.enrollment.courses.models import Type
 from apps.users.decorators import employee_required
 
 from apps.offer.preferences.models import PREFERENCE_CHOICES
@@ -44,7 +44,7 @@ def view(request):
     prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query).order_by('proposal__name')
     data = {
         'prefs': prefs,
-        'proposalTypes': Types.objects.all(),
+        'proposalTypes': Type.objects.all(),
     }
     def process_pref(pref):
         """

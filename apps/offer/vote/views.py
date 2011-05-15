@@ -12,7 +12,7 @@ from django.shortcuts               import redirect
 
 from apps.offer.vote.models                   import SingleVote, SystemState
 from apps.offer.proposal.models               import Proposal
-from apps.offer.proposal.models.types import Types
+from apps.enrollment.courses.models import Type
 
 from apps.users.decorators      import student_required
 from apps.offer.vote.vote_form  import VoteForm
@@ -69,7 +69,7 @@ def vote( request ):
             unknown_subs.append(sub)
 
     data = {
-               'proposalTypes': Types.objects.all(),
+               'proposalTypes': Type.objects.all(),
        }
 
     if request.method == "POST":

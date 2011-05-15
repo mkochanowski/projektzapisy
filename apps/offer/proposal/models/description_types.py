@@ -6,7 +6,7 @@
 
 from django.db                            import models
 from apps.users.models                         import Program
-from apps.offer.proposal.models.types          import Types
+from apps.enrollment.courses.models          import Type
 
 
 class DescriptionTypes( models.Model ):
@@ -14,7 +14,7 @@ class DescriptionTypes( models.Model ):
         Types of description
     """
     description         = models.ForeignKey('ProposalDescription',   related_name = 'descriptiontypes')
-    lecture_type        = models.ForeignKey('Types',      related_name = 'descriptionstypes')
+    lecture_type        = models.ForeignKey('courses.Type',      related_name = 'descriptionstypes')
                 
     class Meta:
         verbose_name = 'Typ propozycji'

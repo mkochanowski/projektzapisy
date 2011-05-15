@@ -17,7 +17,8 @@ from copy                           import deepcopy
 
 from apps.users.models            import Program
 
-from apps.offer.proposal.models          import Proposal, Book, ProposalDescription, Types, DescriptionTypes
+from apps.offer.proposal.models          import Proposal, Book, ProposalDescription, DescriptionTypes
+from apps.enrollment.courses.models                 import Type
 from apps.offer.proposal.exceptions      import NonStudentException, NonEmployeeException, NotOwnerException
 
 
@@ -125,7 +126,7 @@ def proposal_form(request, sid = None):
     proposal_requirements = ""
     proposal_comments = ""
     proposal_www = ""
-    types_name = Types.get_types()
+    types_name = Type.get_types()
 
     types_table = {}
 
