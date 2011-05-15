@@ -216,7 +216,10 @@ SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
 		{
 			elem = $(elem);
 
-			var sterm = Fereol.Enrollment.ScheduleCourseTerm.fromJSON(elem.attr('value'));
+			var sterm = Fereol.Enrollment.ScheduleCourseTerm.fromJSON(
+				elem.attr('value'));
+			sterm.displayStyle =
+				Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.PROTOTYPE;
 			sterm.isPinned = (pinned.indexOf(sterm.groupID) >= 0);
 			sterm.isEnrolled = (enrolled.indexOf(sterm.groupID) >= 0);
 			sterm.isQueued = (queued.indexOf(sterm.groupID) >= 0);

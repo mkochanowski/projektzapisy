@@ -87,7 +87,8 @@ Schedule = function(container, options)
 		$.create('div', {className: 'dayLabel'}).text(Schedule.dayNames[o.dayList[i]]).
 			appendTo(this.dayLabelsContainer).css(
 		{
-			left: rulePosition + 'px'
+			left: rulePosition + 'px',
+			width: this.options.dayColumnWidth + 'px'
 		});
 
 		if (i == 0)

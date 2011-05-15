@@ -1,3 +1,7 @@
+/**
+ * Style dotyczące komponenty terminarza.
+ */
+
 .schedule
 {
 	position: relative;
@@ -51,7 +55,6 @@
 {
 	position: absolute;
 	height: 20px;
-	width: 125px;
 	padding-top: 5px;
 	text-align: center;
 }
