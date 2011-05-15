@@ -63,9 +63,9 @@ class Record(models.Model):
         return Record.enrolled.filter(group=group_).count()
 
     @staticmethod
-    def get_student_records_ids(user, semester):
+    def get_student_records_ids(student, semester):
         records = Record.objects.\
-            filter(student=user.student, group__course__semester=semester).\
+            filter(student=student, group__course__semester=semester).\
             values_list('group__pk', 'status');
         pinned = []
         enrolled = []
@@ -77,19 +77,29 @@ class Record(models.Model):
         return {
             'enrolled': enrolled,
             'pinned': pinned,
-            'queued': Queue.queued.filter(student=user.student,\
+            'queued': Queue.queued.filter(student=student,\
                       group__course__semester=semester).\
                       values_list('group__pk', flat=True)
         }
 
     @staticmethod
+    def get_student_enrolled_ids(student, semester):
+        return Record.enrolled.\
+            filter(student=student, group__course__semester=semester).\
+            values_list('group__pk', flat=True)
+
+    @staticmethod
     def get_student_records(student):
+        '''
+            TODO: DEPRECATED
+        '''
         records = Record.enrolled.filter(student=student).\
-            select_related('group', 'group__course', 'group__teacher', 'group__teacher__user').order_by('group__course__name')
+            select_related('group', 'group__course', 'group__teacher',
+                'group__teacher__user', 'group__term').\
+                order_by('group__course__name')
         groups = [record.group for record in records]
-        courses = set([group.course for group in groups])
         for group in groups:
-            group.terms_ = group.get_all_terms() # TODO: generuje osobne zapytanie dla każdej grupy, powinno być pobierane w jednym
+            group.terms_ = group.get_all_terms() # za dużo zapytań
             group.course_ = group.course
         return groups
 
