@@ -18,6 +18,9 @@ Fereol.Enrollment.ScheduleCourseTerm = function()
 	this.container = $.create('div');
 	this.popupContents = $.create('div');
 
+	this.displayStyle =
+		Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.SCHEDULE;
+
 	this.limit = null; // limit osób w grupie
 	this.enrolledCount = null; // ilość osób zapisanych do grupy
 	this.queuedCount = null; // ilość osób w kolejce
@@ -34,12 +37,17 @@ Fereol.Enrollment.ScheduleCourseTerm = function()
 	this._isVisible = false;
 
 	this.schedule = null;
-	this.course = null; // SchedulePrototype.PrototypeCourse
+	this.course = null; // SchedulePrototype.PrototypeCourse lub Schedule.PrototypeCourse
 
 	this.classroom = null;
 	this.teacher = null;
 	this.teacherURL = null;
 	this.type = null;
+};
+
+Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle = {
+	SCHEDULE: 1,
+	PROTOTYPE: 2
 };
 
 Fereol.Enrollment.ScheduleCourseTerm.groupTypes =
@@ -68,7 +76,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype.isFull = function()
 	return this.limit <= this.enrolledCount;
 };
 
-Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json)
+Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 {
 	var sterm = new Fereol.Enrollment.ScheduleCourseTerm();
 	var raw = $.parseJSON(json)
@@ -89,8 +97,10 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json)
 	};
 
 	sterm.limit = raw.limit.castToInt();
-	sterm.enrolledCount = raw.enrolled_count.castToInt();
-	sterm.queuedCount = raw.queued_count.castToInt();
+	sterm.enrolledCount = (raw.enrolled_count === undefined ? null :
+		raw.enrolled_count.castToInt());
+	sterm.queuedCount = (raw.queued_count === undefined ? null :
+		raw.queued_count.castToInt());
 
 	sterm.classroom = raw.classroom.castToInt();
 	sterm.teacher = raw.teacher;
@@ -131,24 +141,34 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 		if (this.classroom)
 			this._classroomLabel.text('s. ' + this.classroom);
 
-		this._controlsBox = $.create('div', {className: 'controls'}).
-			appendTo(this.container).css('display', 'none');
-
-		this._pinUnpinButton = $.create('span', { className: 'pinUnpin'}).
-			appendTo(this._controlsBox);
-		this._signInOutButton = $.create('span', { className: 'signInOut'}).
-			appendTo(this._controlsBox);
-		this._loadingIndicator = $.create('div', { className: 'loadingIndicator'}).
-			appendTo(this._controlsBox).css('display', 'none');
-
-		this.container.mouseenter(function()
+		this._controlsBox = null;
+		if (this.displayStyle ==
+			Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.PROTOTYPE)
 		{
-			if (!self._controlsEmpty)
-				self._controlsBox.css('display', 'block');
-		}).mouseleave(function()
-		{
-			self._controlsBox.css('display', 'none');
-		});
+			this._controlsBox = $.create('div', {className: 'controls'}).
+				appendTo(this.container).css('display', 'none');
+
+			this._pinUnpinButton = $.create('span', { className: 'pinUnpin'}).
+				appendTo(this._controlsBox);
+			this._signInOutButton = $.create('span', { className: 'signInOut'}).
+				appendTo(this._controlsBox);
+			this._loadingIndicator =
+				$.create('div', { className: 'loadingIndicator'}).
+				appendTo(this._controlsBox).css('display', 'none');
+
+			this.container.mouseenter(function()
+			{
+				if (!self._controlsEmpty)
+					self._controlsBox.css('display', 'block');
+			}).mouseleave(function()
+			{
+				self._controlsBox.css('display', 'none');
+			});
+			this._controlsBox.click(function(ev)
+			{
+				ev.stopPropagation();
+			});
+		}
 
 		this.container.click(function()
 		{
@@ -158,10 +178,6 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 		this.popupContents.mouseleave(function()
 		{
 			self.scheduleTerm.setPopupVisible(false);
-		});
-		self._controlsBox.click(function(ev)
-		{
-			ev.stopPropagation();
 		});
 	}
 	this._updateControls();
@@ -176,11 +192,12 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 		return;
 	this._isVisible = shouldBeVisible;
 	if (shouldBeVisible)
-		SchedulePrototype.schedule.addTerm(this.scheduleTerm);
+		this.schedule.addTerm(this.scheduleTerm);
 	else
 	{
-		SchedulePrototype.schedule.removeTerm(this.scheduleTerm);
-		this._controlsBox.css('display', 'none');
+		this.schedule.removeTerm(this.scheduleTerm);
+		if (this._controlsBox)
+			this._controlsBox.css('display', 'none');
 	}
 };
 
@@ -204,39 +221,54 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 		'Sala: ' + this.classroom
 	).appendTo(this.popupContents);
 
-	var enrolled = $.create('p', {className: 'enrolledCount'}).
-		text('Zapisanych: ').appendTo(this.popupContents);
-	$.create('a', {
-		href: this.groupURL,
-		title: 'zapisanych osób: ' + this.enrolledCount +
-			', limit miejsc w grupie: ' + this.limit
-	}).appendTo(enrolled).
-		text(this.enrolledCount + '/' + this.limit);
-	if (this.enrolledCount >= this.limit && !this.isEnrolled && !this.isQueued)
-		$.create('img', {
-			src: '/site_media/images/warning.png',
-			alt: '(brak wolnych miejsc)',
-			title: 'nie ma wolnych miejsc w tej grupie, możesz zapisać się ' +
-				'do kolejki'
-		}).appendTo(enrolled.appendSpace());
-	if (this.queuedCount > 0)
-		$.create('span').text('(w kolejce: ' + this.queuedCount + ')').
-			appendTo(enrolled.appendSpace());
-
-	if (this.isEnrolledOrQueued())
+	if (this.displayStyle ==
+		Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.PROTOTYPE)
 	{
-		var einfo = $.create('p', { className: 'enrolledInfo'}).
-			appendTo(this.popupContents);
-		if (this.isEnrolled)
-			einfo.text('Jesteś zapisany do tej grupy.');
-		if (this.isQueued)
-			einfo.text('Jesteś w kolejce do tej grupy.');
+		var enrolled = $.create('p', {className: 'enrolledCount'}).
+			text('Zapisanych: ').appendTo(this.popupContents);
+		$.create('a', {
+			href: this.groupURL,
+			title: 'zapisanych osób: ' + this.enrolledCount +
+				', limit miejsc w grupie: ' + this.limit
+		}).appendTo(enrolled).
+			text(this.enrolledCount + '/' + this.limit);
+		if (this.enrolledCount >= this.limit && !this.isEnrolled &&
+			!this.isQueued)
+			$.create('img', {
+				src: '/site_media/images/warning.png',
+				alt: '(brak wolnych miejsc)',
+				title: 'nie ma wolnych miejsc w tej grupie, możesz zapisać ' +
+					'się do kolejki'
+			}).appendTo(enrolled.appendSpace());
+		if (this.queuedCount > 0)
+			$.create('span').text('(w kolejce: ' + this.queuedCount + ')').
+				appendTo(enrolled.appendSpace());
+
+		if (this.isEnrolledOrQueued())
+		{
+			var einfo = $.create('p', { className: 'enrolledInfo'}).
+				appendTo(this.popupContents);
+			if (this.isEnrolled)
+				einfo.text('Jesteś zapisany do tej grupy.');
+			if (this.isQueued)
+				einfo.text('Jesteś w kolejce do tej grupy.');
+		}
+	}
+	else if (this.displayStyle ==
+		Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.SCHEDULE)
+	{
+		$.create('p', {className: 'groupListLink'}).appendTo(
+			this.popupContents).append($.create('a', {
+			href: this.groupURL
+		}).text('lista osób zapisanych do grupy'));
 	}
 };
 
 Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 {
 	var self = this;
+	if (!this._controlsBox)
+		return;
 	
 	if (!this._controlsReady)
 	{
@@ -259,7 +291,8 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 	if (this._isLoading)
 	{
 		self._loadingIndicator.css('display', 'block');
-		self._controlsBox.children('span').css('display', 'none');
+		if (self._controlsBox)
+			self._controlsBox.children('span').css('display', 'none');
 		return;
 	}
 	self._loadingIndicator.css('display', 'none');

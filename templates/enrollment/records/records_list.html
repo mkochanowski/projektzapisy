@@ -52,8 +52,8 @@
 					Brak zapisanych osób.
 				{% endfor %}
 			</tbody>
-		</table>
-     
+		</table><br />
+        <a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do grupy]</a>
 		<br/>
 		{%if students_in_queue %}
 			<h3>Lista osób oczekujących na zapis:</h3>
