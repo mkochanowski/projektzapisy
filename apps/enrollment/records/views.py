@@ -287,7 +287,9 @@ def own(request):
         logger.info('User %s <id: %s> looked at his schedule' %\
             (request.user.username, request.user.id))
         return render_to_response('enrollment/records/schedule.html', {
-            'groups': Record.get_student_records(request.user.student)
+            'groups': Record.get_student_records(request.user.student),
+            "is_student" : BaseUser.is_student(request.user),
+            "is_employee" : BaseUser.is_employee(request.user),
         }, context_instance=RequestContext(request))
     except NonStudentException:
         request.user.message_set.create(message='Nie jesteś studentem.')
@@ -356,6 +358,8 @@ def schedule_prototype(request):
                 append(simplejson.dumps(term_data))
   
         data = {
+            "is_student" : BaseUser.is_student(request.user),
+            "is_employee" : BaseUser.is_employee(request.user),
             'student_records': student_records,
             'courses' : courses_in_semester,
             'semester' : default_semester,

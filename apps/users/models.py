@@ -43,6 +43,22 @@ class BaseUser(models.Model):
             raise NonUserException
         return user
 
+    @staticmethod
+    def is_student(user):
+        try:
+            student = user.student
+            return True
+        except:
+            return False
+
+    @staticmethod
+    def is_employee(user):
+        try:
+            employee = request.user.employee
+            return True
+        except:
+            return False
+
     def __unicode__(self):
         return self.get_full_name
     
