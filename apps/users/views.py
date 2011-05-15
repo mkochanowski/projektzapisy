@@ -24,7 +24,7 @@ from apps.users.models import Employee, Student
 from apps.enrollment.subjects.models import Semester, Group
 from apps.enrollment.records.models import Record
 
-from apps.users.forms import EmailChangeForm
+from apps.users.forms import EmailChangeForm, BankAccountChangeForm
 
 from datetime import timedelta
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
@@ -122,13 +122,30 @@ def email_change(request):
         form = EmailChangeForm({'email' : request.user.email})
     return render_to_response('users/email_change_form.html', {'form':form}, context_instance=RequestContext(request))
 
+@login_required
+def bank_account_change(request):
+    '''function that enables bank account changing'''
+    if request.POST:
+        data = request.POST.copy()
+        zamawiany = Student.get_zamawiany(request.user.id)
+        form = BankAccountChangeForm(data, instance=zamawiany)
+        if form.is_valid():
+            form.save()
+            logger.info('User (%s) changed bank account' % request.user.get_full_name())
+            request.user.message_set.create(message="Twój numer konta bankowego został zmieniony.")
+            return HttpResponseRedirect(reverse('my-profile'))
+    else:
+        zamawiany = Student.get_zamawiany(request.user.id)
+        form = BankAccountChangeForm({'bank_account': zamawiany.bank_account})
+    return render_to_response('users/bank_account_change_form.html', {'form':form}, context_instance=RequestContext(request))
+
 @login_required  
 def password_change_done(request):
     '''informs if password were changed'''
     logger.info('User (%s) changed password' % request.user.get_full_name())
     request.user.message_set.create(message="Twóje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
- 
+
 @login_required  
 def my_profile(request):
     '''profile site'''
