@@ -1118,7 +1118,8 @@
         "fields": {
             "meta_type": false, 
             "group": 8, 
-            "name": "Obowi\u0105zkowy 1"
+            "name": "Obowi\u0105zkowy 1",
+            "short_name": "Obo1"
         }
     }, 
     {
@@ -1127,7 +1128,8 @@
         "fields": {
             "meta_type": false, 
             "group": 8, 
-            "name": "Obowi\u0105zkowy 2"
+            "name": "Obowi\u0105zkowy 2",
+            "short_name": "Obo2"
         }
     }, 
     {
@@ -1136,7 +1138,8 @@
         "fields": {
             "meta_type": false, 
             "group": 8, 
-            "name": "Obowi\u0105zkowy 3"
+            "name": "Obowi\u0105zkowy 3",
+            "short_name": "Obo3"
         }
     }, 
     {
@@ -1145,7 +1148,8 @@
         "fields": {
             "meta_type": false, 
             "group": 9, 
-            "name": "Informatyczny 1"
+            "name": "Informatyczny 1",
+            "short_name": "Inf1"
         }
     }, 
     {
@@ -1154,7 +1158,8 @@
         "fields": {
             "meta_type": false, 
             "group": 9, 
-            "name": "Informatyczny 2"
+            "name": "Informatyczny 2",
+            "short_name": "Inf2"
         }
     }, 
     {
@@ -1163,7 +1168,8 @@
         "fields": {
             "meta_type": false, 
             "group": 10, 
-            "name": "Kurs"
+            "name": "Kurs",
+            "short_name": "Kurs"
         }
     }, 
     {
@@ -1172,7 +1178,8 @@
         "fields": {
             "meta_type": false, 
             "group": null, 
-            "name": "Seminarium"
+            "name": "Seminarium",
+            "short_name": "Sem"
         }
     }, 
     {
@@ -1181,7 +1188,8 @@
         "fields": {
             "meta_type": true, 
             "group": null, 
-            "name": "Obowi\u0105zkowy"
+            "name": "Obowi\u0105zkowy",
+            "short_name": "Obo"
         }
     }, 
     {
@@ -1190,7 +1198,8 @@
         "fields": {
             "meta_type": true, 
             "group": null, 
-            "name": "Informatyczny"
+            "name": "Informatyczny",
+            "short_name": "Inf"
         }
     }, 
     {
@@ -1199,7 +1208,8 @@
         "fields": {
             "meta_type": true, 
             "group": null, 
-            "name": "Kurs"
+            "name": "Kurs",
+            "short_name": "Kurs"
         }
     }, 
     {
@@ -1208,7 +1218,8 @@
         "fields": {
             "meta_type": false, 
             "group": 10, 
-            "name": "Projekt"
+            "name": "Projekt",
+            "short_name": "Proj"
         }
     }, 
     {
@@ -1217,7 +1228,8 @@
         "fields": {
             "meta_type": false, 
             "group": null, 
-            "name": "Nieinformatyczny"
+            "name": "Nieinformatyczny",
+            "short_name": "Inny"
         }
     }, 
     {

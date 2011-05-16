@@ -14,11 +14,12 @@ from django.core.urlresolvers import reverse
 
 class VoteField(forms.ChoiceField):
     def __init__(self, choices=(), required=True, widget=None, label=None,
-                 initial=None, help_text=None, url='', *args, **kwargs):
+                 initial=None, help_text=None, url='', type='', *args, **kwargs):
         super(VoteField, self).__init__(required=required, widget=widget, label=label,
                                         choices=choices,
                                         initial=initial, help_text=help_text, *args, **kwargs)
         self.url = url
+        self.type = type
 
 class VoteForm( forms.Form ):
     """
@@ -51,6 +52,7 @@ class VoteForm( forms.Form ):
                                             label     = sub.name,
                                             url       = reverse('proposal-page', args=[sub.slug]),
                                             choices   = self.choices,
+                                            type      = sub.description().types()[0].lecture_type.short_name,
                                             help_text = u'Semestr Zimowy',
                                             initial   = choosed)
             self.course_types['winter_%s' % sub.pk] = sub.description().types()
@@ -69,6 +71,7 @@ class VoteForm( forms.Form ):
                                             label     = sub.name,
                                             url       = reverse('proposal-page', args=[sub.slug]),
                                             choices   = self.choices,
+                                            type      = sub.description().types()[0].lecture_type.short_name,
                                             help_text = u'Semestr Letni',
                                             initial   = choosed)
             self.course_types['summer_%s' % sub.pk] = sub.description().types()
@@ -87,6 +90,7 @@ class VoteForm( forms.Form ):
                                             label     = sub.name,
                                             url       = reverse('proposal-page', args=[sub.slug]),
                                             choices   = self.choices,
+                                            type      = sub.description().types()[0].lecture_type.short_name,
                                             help_text = u'Semestr Nieokreślony',
                                             initial   = choosed)
             self.course_types['unknown_%s' % sub.pk] = sub.description().types()
@@ -128,7 +132,7 @@ class VoteForm( forms.Form ):
                 course_class += " isFan"
             field_str = \
                 u'<li class="od-vote-course ' + course_class + '">\
-                    <label for="id_' + key + '"><a href="'+ field.url +'">' + field.label + '</a></label>\
+                    <label for="id_' + key + '"><a href="'+ field.url +'">' + field.label + '</a> ('+  field.type+')</label>\
                     <select name="' + key + '" id="id_' + key + '">'
             for (i, s) in field.choices:
                 field_str += '<option value="'
