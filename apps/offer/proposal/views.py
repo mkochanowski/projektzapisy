@@ -207,7 +207,6 @@ def proposal_form(request, sid = None):
         for one_type in types:
             if one_type != "":
                 number_of_types = number_of_types + 1
-        print number_of_types
 
         if  ( proposal_name == "" or proposal_ects == "" or proposal_description == ""
             or proposal_requirements == "" or proposal_lectures == -1

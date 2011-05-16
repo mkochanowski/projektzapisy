@@ -14,7 +14,7 @@
 			{% for desc in descriptions %}
 				<li>
 					<strong>
-						<a href="{% url proposal-page-archival slug=descriptions.0.proposal.slug descid=desc.id  %}">{{ desc.date|date:"Y F d G:i:s" }}</a>
+						<a href="{% url proposal-page-archival slug=descriptions.0.proposal.slug descid=desc.id  %}">{{ desc.date|date:"Y.m.d H:i" }}</a>
 					</strong>
 					<span class="author">
 						<a>{{desc.author.get_full_name}}</a> {% comment %} {% url profile desc.author.id %} {% endcomment %}

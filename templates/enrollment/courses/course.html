@@ -60,7 +60,7 @@
 				{% if course.can_enroll_from %}
 					<li>
 						<span>Możesz zapisać się od:</span>
-						{{ course.can_enroll_from|date:'Y-m-d H:i' }}
+						{{ course.can_enroll_from|date:'Y.m.d H:i' }}
 						({{ course.can_enroll_interval|timedelta }})
 					</li>
 				{% endif %}

@@ -32,7 +32,7 @@ Studia zamawiane:<br/>
 <table>
     {% for t in terms %}
         <tr>
-        <td><b>{{t.name}}</b> : {{t.term}}</td>
+        <td><b>{{t.name}}</b>:</td><td>{{t.term|date:"H:i, d.m.Y"}}</td>
         </tr>
     {% endfor %}
 </table>

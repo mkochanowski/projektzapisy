@@ -30,7 +30,6 @@ def employeeSchedule(request, schedule_owner=None, delta=None):
         
         #receiving courses for given weekday
         groups = owner.get_schedule(owner.user.id)
-        print groups
         schedule = []
         for group in groups:
             for term in group.terms_:
