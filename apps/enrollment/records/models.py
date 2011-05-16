@@ -10,7 +10,8 @@ from django.db import models
 from apps.users.models import Student
 
 from apps.enrollment.courses.models import Group
-from apps.enrollment.courses.models import PointsOfCourses
+from apps.enrollment.courses.models import PointsOfCourses,\
+                                        PointsOfCourseEntities
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.courses.exceptions import NonCourseException
 
@@ -467,7 +468,11 @@ class Queue(models.Model):
     def get_point(program,course):
       pos = PointsOfCourses.objects.filter(course=course, program=program).values()
       if not pos:
-         return 0  # tu powinien szukać defaultowej wartości
+         point = PointsOfCourseEntities.objects.filter(entity = course.entity).values()
+         if point:
+            return point[0]["value"]
+         else:
+            return 0
       else:
          return pos[0]["value"]
 
