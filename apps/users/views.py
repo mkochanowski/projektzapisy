@@ -48,13 +48,11 @@ def student_profile(request, user_id):
         if request.is_ajax():
             return render_to_response('users/ajax_student_profile.html', data, context_instance=RequestContext(request))
         else:
-            begin = 'A'
-            end   = 'B'
-            char  = 'A'
-            students = Student.get_list(begin, end)
+            begin = student.user.last_name[0]
+            students = Student.get_list(begin)
             students = Record.recorded_students(students)
             data['students'] = students
-            data['char']     = char
+            data['char']     = begin
             return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except NonStudentException:
@@ -81,10 +79,8 @@ def employee_profile(request, user_id):
         if request.is_ajax():
             return render_to_response('users/ajax_employee_profile.html', data, context_instance=RequestContext(request))
         else:
-            begin = 'A'
-            end   = 'B'
-            char  = 'A'
-            employees = Employee.get_list(begin, end)
+            begin = user.last_name[0]
+            employees = Employee.get_list(begin)
             semester = Semester.get_current_semester()
             employees = Group.teacher_in_present(employees, semester)
 
@@ -93,11 +89,10 @@ def employee_profile(request, user_id):
                 e.short_old = e.user.first_name[:2] + e.user.last_name[:2]
 
             data['employees'] = employees
-            data['char'] = char
+            data['char'] = begin
               
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
-
-
+        
     except NonEmployeeException:
         logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % user_id )
         request.user.message_set.create(message="Nie ma takiego pracownika.")
