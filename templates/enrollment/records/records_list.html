@@ -18,13 +18,36 @@
 
 {% block content %}
 	<div id="enr-group-view">
-		<h1>{{group.course.name}}</h1>
-		<h2>{{group.get_type_display}}:
-			{{group.get_teacher_full_name}} </h2>
 
-		<p>
-			<a href="{% url course-page group.course_slug %}">powrót do przedmiotu</a>
-		</p>
+
+        <h1>{{group.course.name}}</h1>
+<a href="{% url course-page group.course_slug %}">Powrót</a>
+        <div class="details">
+            <ul class="properties">
+                <li>
+                    <span>Typ:</span>
+                    {{group.get_type_display}}
+                </li>
+                <li>
+                    <span>Prowadzący:</span>
+                    {% if group.teacher %}
+                        <a href="{% url employee-profile group.teacher.user.id %}">{{group.get_teacher_full_name}}</a>
+                    {% else %}
+                        {{group.get_teacher_full_name}}
+                    {% endif %}
+                </li>
+                <li>
+                    <span>Termin:</span>
+                    {% for term in group.get_all_terms %}
+                        {{term}}{%if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </li>
+
+
+            </ul>
+        </div>
+
+        <hr>
 
 		<br/>
 		<h3>Lista osób zapisanych na przedmiot:</h3>

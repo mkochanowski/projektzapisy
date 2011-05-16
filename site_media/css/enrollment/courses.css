@@ -39,19 +39,20 @@
  * Widok przedmiotu - szczegóły
  ******************************************************************************/
 
-#enr-course-view
+#enr-course-view, #enr-group-view
 {
 	position: relative;
 }
 
-#enr-course-view .details
+#enr-course-view .details, #enr-group-view .details
 {
 	position: relative;
 	margin-bottom: 20px;
+    margin-top: 10px;
 	overflow: hidden;
 }
 
-#enr-course-view .details h2
+#enr-course-view .details h2,#enr-group-view .details h2
 {
 	font-size: 14px;
 	color: #999999;
@@ -60,7 +61,7 @@
 	margin-bottom: 10px;
 }
 
-#enr-course-view .details ul.properties
+#enr-course-view .details ul.properties, #enr-group-view .details ul.properties
 {
 	list-style: none;
 
@@ -79,7 +80,7 @@
 	border-radius: 4px;
 }
 
-#enr-course-view .details ul.properties li
+#enr-course-view .details ul.properties li, #enr-group-view .details ul.properties li
 {
 	border-bottom: 1px dotted #cccccc;
 	padding: 3px 5px;
@@ -90,23 +91,23 @@
 	position: relative;
 }
 
-#enr-course-view .details ul.properties li:last-child
+#enr-course-view .details ul.properties li:last-child, #enr-group-view .details ul.properties li:last-child
 {
 	border-bottom: 0;
 }
 
-#enr-course-view .details ul.properties li span
+#enr-course-view .details ul.properties li span, #enr-group-view .details ul.properties li span
 {
 	color: #666666;
 }
 
-#enr-course-view .details .description
+#enr-course-view .details .description, #enr-group-view .details .description
 {
 	position: relative;
 	margin-bottom: 12px;
 }
 
-#enr-course-view .details .description .more
+#enr-course-view .details .description .more, #enr-group-view .details .description .more
 {
 	position: absolute;
 	top: 0;
@@ -120,13 +121,13 @@
 	white-space: nowrap;
 }
 
-#enr-course-view .details .footer
+#enr-course-view .details .footer, #enr-group-view .details .footer
 {
 	clear: left;
 	margin-top: -12px;
 }
 
-#enr-course-view .details-toggle
+#enr-course-view .details-toggle, #enr-group-view .details-toggle
 {
 	font-size: 12px;
 	float: right;
