@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -184,6 +185,14 @@ def set_enrolled(request, method):
             'się ona w semestrze innym niż aktualny.'
         return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
             message_context)
+    except ECTS_Limit_Exception:
+        if is_ajax:
+            return AjaxFailureMessage.auto_render('ECTSLimit', 'Przekroczyłeś limit ECTS')
+        else:
+            messages.error(request, 'Przekroczony limit 40 ECTS')
+            return redirect('course-page', slug=Group.objects.\
+                    get(id=group_id).course_slug())
+
 
 @require_POST
 def records_set_locked(request, method):

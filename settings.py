@@ -13,12 +13,12 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-	
+
 #DATABASE_ENGINE   = 'postgresql_psycopg2'  # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 #DATABASE_NAME     = 'fereol'            # Or path to database file if using sqlite3.
 #DATABASE_USER     = 'fereol'               # Not used with sqlite3.
 #DATABASE_PASSWORD = 'fereol'               # Not used with sqlite3.
- 
+
 DATABASE_ENGINE = 'sqlite3'              # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = os.path.join(PROJECT_PATH, 'database/db.sqlite3') # Or path to database file if using sqlite3.
 DATABASE_USER = ''                       # Not used with sqlite3.
@@ -170,8 +170,9 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 #TEST_OUTPUT_DIR = 'xmlrunner'
 
 #settings for enrollment
-POINT_LIMIT_DURATION = 14 # abs(t1-t2), in days
+ECTS_LIMIT_DURATION = 14 # abs(t1-t2), in days
 ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
+ECTS_LIMIT = 40
 
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!

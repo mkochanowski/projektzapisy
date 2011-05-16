@@ -156,7 +156,7 @@ def my_profile(request):
     points = zamawiany and zamawiany.points or 0
     if current_semester:
         try:
-            point_limit_duration = settings.POINT_LIMIT_DURATION 
+            point_limit_duration = settings.ECTS_LIMIT_DURATION
             t0 = current_semester.records_opening - request.user.student.get_t0_interval()       
             terms = [
             {"name":"T0", "term":t0},
