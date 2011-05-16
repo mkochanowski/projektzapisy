@@ -45,14 +45,14 @@
                 </tr>
                 <tr>
                     <td>
-                        <label for="subjects">Przedmiot: </label>
+                        <label for="courses">Przedmiot: </label>
                     </td>
                     <td>
-                        <select name="subject" id="subjects">
+                        <select name="course" id="courses">
                             <option value="-1">Nie przypisane do przedmiotu</option>
-                            <option value="0"{% if subject_id == 0 %} selected{% endif %}>Wszystkie przedmioty</option>
-                            {% for sub in subjects %}
-                                <option value="{{sub.pk}}"{% if sub.pk == subject.pk %} selected{% endif %}>{{sub.name}}</option>
+                            <option value="0"{% if course_id == 0 %} selected{% endif %}>Wszystkie przedmioty</option>
+                            {% for sub in courses %}
+                                <option value="{{sub.pk}}"{% if sub.pk == course.pk %} selected{% endif %}>{{sub.name}}</option>
                             {% endfor %}
                         </select>
                     </td>

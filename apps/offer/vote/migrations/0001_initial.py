@@ -30,12 +30,12 @@ class Migration(SchemaMigration):
             ('state', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['vote.SystemState'])),
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('student', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['users.Student'])),
-            ('subject', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal'])),
+            ('course', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['proposal.Proposal'])),
         ))
         db.send_create_signal('vote', ['SingleVote'])
 
-        # Adding unique constraint on 'SingleVote', fields ['subject', 'state', 'student']
-        db.create_unique('vote_singlevote', ['subject_id', 'state_id', 'student_id'])
+        # Adding unique constraint on 'SingleVote', fields ['course', 'state', 'student']
+        db.create_unique('vote_singlevote', ['course_id', 'state_id', 'student_id'])
     
     
     def backwards(self, orm):
@@ -46,8 +46,8 @@ class Migration(SchemaMigration):
         # Deleting model 'SingleVote'
         db.delete_table('vote_singlevote')
 
-        # Removing unique constraint on 'SingleVote', fields ['subject', 'state', 'student']
-        db.delete_unique('vote_singlevote', ['subject_id', 'state_id', 'student_id'])
+        # Removing unique constraint on 'SingleVote', fields ['course', 'state', 'student']
+        db.delete_unique('vote_singlevote', ['course_id', 'state_id', 'student_id'])
     
     
     models = {
@@ -120,11 +120,11 @@ class Migration(SchemaMigration):
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },
         'vote.singlevote': {
-            'Meta': {'unique_together': "(('subject', 'state', 'student'),)", 'object_name': 'SingleVote'},
+            'Meta': {'unique_together': "(('course', 'state', 'student'),)", 'object_name': 'SingleVote'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'state': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['vote.SystemState']"}),
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Student']"}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['proposal.Proposal']"}),
+            'course': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['proposal.Proposal']"}),
             'value': ('django.db.models.fields.IntegerField', [], {})
         },
         'vote.systemstate': {

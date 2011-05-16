@@ -17,7 +17,7 @@
 	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
 
 	<script src="/site_media/js/common/listFilter.js" type="text/javascript"></script>
-	<script src="/site_media/js/common/listFilter-subjectType.js" type="text/javascript"></script>
+	<script src="/site_media/js/common/listFilter-courseType.js" type="text/javascript"></script>
 	<script src="/site_media/js/offer/prefs.js" type="text/javascript"></script>
 {% endblock %}
 
@@ -34,13 +34,13 @@
 				<input class="reset filter-phrase-reset" type="reset" value="X" style="display:none;" />
 			</div>
 		</fieldset>
-		<fieldset class="subject-type-filter">
+		<fieldset class="course-type-filter">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in proposalTypes %}
 				<span class="checkbox">
-					<input type="checkbox" checked="checked" id="filter-subject-type-{{ type.id }}" {% if type.meta_type %} class="filter-subject-type-meta" {% endif %} value="{{ type.id }}"/>
+					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
 					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
-					<label for="filter-subject-type-{{ type.id }}">{{ type.name }}</label>
+					<label for="filter-course-type-{{ type.id }}">{{ type.name }}</label>
 				</span>
 			{% endfor %}
 		</fieldset>

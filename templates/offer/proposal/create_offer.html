@@ -30,23 +30,23 @@
 				<th>Chętni do poprowadzenia</th>
 				<th>Chętni do pomocy</th>
 			</tr>
-			{% for subject in subjects %}
-			<tr {% if subject.in_offer %}class="selected"{% endif %}>
+			{% for course in courses %}
+			<tr {% if course.in_offer %}class="selected"{% endif %}>
 				<td>
-					<input type="checkbox" name="selectSubject" value="{{ subject.id }}" autocomplete="off" {% if subject.in_offer %}checked{% endif %} />
+					<input type="checkbox" name="selectCourse" value="{{ course.id }}" autocomplete="off" {% if course.in_offer %}checked{% endif %} />
 				</td>
-				<td>{{ subject.name }}</td>
-				<td class="cen">{{ subject.fans_count }}</td>
+				<td>{{ course.name }}</td>
+				<td class="cen">{{ course.fans_count }}</td>
 				<td class="cen">
-					{% ifequal subject.teachers_count 0 %}0
+					{% ifequal course.teachers_count 0 %}0
 					{% else %}
-						<a href="#" subject="{{ subject.id }}" class="teachersDetails">{{ subject.teachers_count }}</a>
+						<a href="#" course="{{ course.id }}" class="teachersDetails">{{ course.teachers_count }}</a>
 					{% endifequal %}
 				</td>
 				<td class="cen">
-					{% ifequal subject.helpers_count 0 %}0
+					{% ifequal course.helpers_count 0 %}0
 					{% else %}
-						<a href="#" subject="{{ subject.id }}" class="helpersDetails">{{ subject.helpers_count }}</a>
+						<a href="#" course="{{ course.id }}" class="helpersDetails">{{ course.helpers_count }}</a>
 					{% endifequal %}
 				</td>
 			</tr>
@@ -54,9 +54,9 @@
 		</table>
 
 		<div class="teachers">
-			{% for subject in subjects %}
-				<div class="teacher" id="teachers{{ subject.id }}">
-					{% for teacher in subject.teachers.all %}
+			{% for course in courses %}
+				<div class="teacher" id="teachers{{ course.id }}">
+					{% for teacher in course.teachers.all %}
 					<div>{{ teacher.first_name }} {{ teacher.last_name }}</div>
 					{% endfor %}
 				</div>
@@ -66,9 +66,9 @@
 		</div>
 
 		<div class="helpers">
-			{% for subject in subjects %}
-				<div class="helper" id="helpers{{ subject.id }}">
-					{% for helper in subject.helpers.all %}
+			{% for course in courses %}
+				<div class="helper" id="helpers{{ course.id }}">
+					{% for helper in course.helpers.all %}
 					<div>{{ helper.first_name }} {{ helper.last_name }}</div>
 					{% endfor %}
 				</div>

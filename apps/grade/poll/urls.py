@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
 
-    url(r'^ajax_get_subjects$',  'apps.grade.poll.views.ajax_get_subjects',  name='grade-poll-get-subjects'),
+    url(r'^ajax_get_courses$',  'apps.grade.poll.views.ajax_get_courses',  name='grade-poll-get-courses'),
     url(r'^ajax_get_groups$',    'apps.grade.poll.views.ajax_get_groups',    name='grade-poll-get-groups'),
 
     url(r'^tickets_enter$', 'apps.grade.poll.views.tickets_enter', name='grade-poll-tickets-enter'),

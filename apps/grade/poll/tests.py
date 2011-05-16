@@ -107,7 +107,7 @@ class PollTest( TestCase ):
         self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.private.user ), True )
         self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.sharer.user ), True )
     
-    def test_lecturer_can_see_all_results_from_his_subject( self ):
+    def test_lecturer_can_see_all_results_from_his_course( self ):
         self.assertEqual( self.poll_lecture.is_user_entitled_to_view_result( self.lecturer.user ), True )
         self.assertEqual( self.poll_exercisces_not_shared.is_user_entitled_to_view_result( self.lecturer.user ), True )
         self.assertEqual( self.poll_exercisces_shared.is_user_entitled_to_view_result( self.lecturer.user ), True )

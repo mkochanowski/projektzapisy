@@ -8,7 +8,7 @@ from string                                import whitespace
 from django.db.models                      import Q
 from django.utils.safestring               import SafeUnicode
 
-from apps.enrollment.subjects.models     import Subject, \
+from apps.enrollment.courses.models     import Course, \
                                                   Group                                              
 from apps.enrollment.records.models      import Record 
 from apps.grade.poll.models              import Poll
@@ -83,7 +83,7 @@ def revMod( a, m ):
 def poll_cmp( poll1, poll2 ):
     if poll1.group:
         if poll2.group:
-            c = cmp( poll1.group.subject.name, poll2.group.subject.name )
+            c = cmp( poll1.group.course.name, poll2.group.course.name )
             if c == 0:
                 c = cmp( poll1.group.type, poll2.group.type )
                 if c == 0:
@@ -174,7 +174,7 @@ def generate_keys_for_polls():
     save_private_keys(zip(poll_list, priv_list))
     return 
     
-def group_polls_by_subject( poll_list ):
+def group_polls_by_course( poll_list ):
     if poll_list == []: return []
     
     poll_list.sort( poll_cmp )
@@ -193,7 +193,7 @@ def group_polls_by_subject( poll_list ):
                 act_polls = [ poll ]
         else:
             if poll.group:
-                if act_group.subject == poll.group.subject:
+                if act_group.course == poll.group.course:
                     act_polls.append( poll )
                 else:
                     act_group = poll.group
@@ -214,7 +214,7 @@ def connect_groups( groupped_polls, form ):
         if not polls[ 0 ].group:
             label = 'join_common'
         else:
-            label = u'join_' + unicode( polls[ 0 ].group.subject.pk )
+            label = u'join_' + unicode( polls[ 0 ].group.course.pk )
         
         if len( polls ) == 1:
             connected_groups.append( polls )
@@ -323,7 +323,7 @@ def to_plaintext( vtl ):
         if not p.group:
             res += u'Ankieta ogólna &#10;'
         else:
-            res += unicode( p.group.subject.name ) + " &#10;"
+            res += unicode( p.group.course.name ) + " &#10;"
             res += unicode( p.group.get_type_display()) + ": "
             res += unicode( p.group.get_teacher_full_name()) + " &#10;"
         if p.studies_type:

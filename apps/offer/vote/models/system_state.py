@@ -83,7 +83,7 @@ class SystemState( models.Model ):
     @staticmethod
     def get_max_points(year = None):
         """
-            Get max points per subject
+            Get max points per course
         """
         state = SystemState.get_state(year)
         return state.max_points

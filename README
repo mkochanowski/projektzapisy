@@ -41,6 +41,9 @@ http://github.com/jtauber/django-mailer/
 * debug-toolbar >= 0.8.3 (dołączone w repozytorium projektu)
 http://github.com/robhudson/django-debug-toolbar
 
+* django-paranoid-sessions
+http://pypi.python.org/pypi/django-paranoid-sessions/
+https://github.com/rfk/django-paranoid-sessions
 
 == Uruchomienie (dla developerów) ==
 
@@ -59,6 +62,16 @@ Po uruchomieniu należy ustawić odpowiednią domenę w panelu django (sekcja
 Sites), lub bezpośrednio w tabeli django_site.
 
 Więcej na http://iiuwr.indefero.net/p/fereol/page/PrzykladoweDane/
+
+POSTGRESQL:
+
+tworzenie bazy:
+CREATE DATABASE fereol WITH ENCODING 'UTF8' LC_CTYPE='pl_PL.UTF-8' LC_COLLATE='pl_PL.UTF-8' TEMPLATE=template0;
+
+
+- pozbycie się problemu z migracjami:
+ALTER TABLE auth_permission ALTER "name" TYPE character varying(255);
+ALTER TABLE auth_permission ALTER "codename" TYPE character varying(255);
 
 == Konfiguracja ==
 

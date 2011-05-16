@@ -20,11 +20,11 @@ from apps.users.exceptions import NonUserException, NonEmployeeException,\
 from apps.users.utils import prepare_ajax_students_list,\
                              prepare_ajax_employee_list
 
-from apps.users.models import Employee, Student
-from apps.enrollment.subjects.models import Semester, Group
+from apps.users.models import Employee, Student, BaseUser
+from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 
-from apps.users.forms import EmailChangeForm
+from apps.users.forms import EmailChangeForm, BankAccountChangeForm
 
 from datetime import timedelta
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
@@ -122,13 +122,30 @@ def email_change(request):
         form = EmailChangeForm({'email' : request.user.email})
     return render_to_response('users/email_change_form.html', {'form':form}, context_instance=RequestContext(request))
 
+@login_required
+def bank_account_change(request):
+    '''function that enables bank account changing'''
+    if request.POST:
+        data = request.POST.copy()
+        zamawiany = Student.get_zamawiany(request.user.id)
+        form = BankAccountChangeForm(data, instance=zamawiany)
+        if form.is_valid():
+            form.save()
+            logger.info('User (%s) changed bank account' % request.user.get_full_name())
+            request.user.message_set.create(message="Twój numer konta bankowego został zmieniony.")
+            return HttpResponseRedirect(reverse('my-profile'))
+    else:
+        zamawiany = Student.get_zamawiany(request.user.id)
+        form = BankAccountChangeForm({'bank_account': zamawiany.bank_account})
+    return render_to_response('users/bank_account_change_form.html', {'form':form}, context_instance=RequestContext(request))
+
 @login_required  
 def password_change_done(request):
     '''informs if password were changed'''
     logger.info('User (%s) changed password' % request.user.get_full_name())
     request.user.message_set.create(message="Twóje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
- 
+
 @login_required  
 def my_profile(request):
     '''profile site'''
@@ -165,11 +182,9 @@ def my_profile(request):
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
 
 @login_required
-def employees_list(request, begin = 'A', end='B'):
-    if end == 'X':
-        end = u'Ż'
-        
-    employees = Employee.get_list(begin, end)
+def employees_list(request, begin = 'A'):
+
+    employees = Employee.get_list(begin)
     semester = Semester.get_current_semester()
     employees = Group.teacher_in_present(employees, semester)
 
@@ -181,36 +196,29 @@ def employees_list(request, begin = 'A', end='B'):
         employees = prepare_ajax_employee_list(employees)
         return AjaxSuccessMessage(message="ok", data=employees)
     else:
-        if begin == 'A' and end == 'X':
-            char = X
-        else:
-            char = begin
-
         data = {
             "employees" : employees,
-            "char": char
+            "char": begin,
+            "is_student" : BaseUser.is_student(request.user),
+            "is_employee" : BaseUser.is_employee(request.user),
             }  
     
         return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
 
 @login_required
-def students_list(request, begin = 'A', end='B'):
-    if end == 'X':
-        end = u'Ż'
-
-    students = Student.get_list(begin, end)
+def students_list(request, begin = 'A'):
+    students = Student.get_list(begin)
     students = Record.recorded_students(students)
 
     if request.is_ajax():
         students = prepare_ajax_students_list(students)
         return AjaxSuccessMessage(message="ok", data=students)
     else:
-        if begin == 'A' and end == 'X':
-            char = X
-        else:
-            char = begin
-            
-        data = { "students" : students, "char": char }
+        data = { 
+            "students" : students, 
+            "char": begin,
+            "is_student" : BaseUser.is_student(request.user),
+            "is_employee" : BaseUser.is_employee(request.user), }
         return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
 @login_required

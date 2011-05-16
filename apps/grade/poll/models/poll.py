@@ -5,8 +5,8 @@ from django.utils.safestring           import SafeUnicode
 from apps.users.models               import Employee, \
                                               Student, \
                                               Program
-from apps.enrollment.subjects.models import Group, \
-                                              Subject, \
+from apps.enrollment.courses.models import Group, \
+                                              Course, \
                                               Semester, \
                                               GROUP_TYPE_CHOICES
 from apps.enrollment.records.models  import Record, \
@@ -32,11 +32,11 @@ class Poll( models.Model ):
         verbose_name        = 'ankieta' 
         verbose_name_plural = 'ankiety'
         app_label           = 'poll'
-        ordering            = ['group__subject__name', 'group__teacher']
+        ordering            = ['group__course__name', 'group__teacher']
         
     def __unicode__( self ):
         res = unicode( self.title )
-        if self.group: res += u', ' + unicode( self.group.subject.name) + u": " + unicode(self.group.get_type_display()) + u" - " + unicode(self.group.get_teacher_full_name())
+        if self.group: res += u', ' + unicode( self.group.course.name) + u": " + unicode(self.group.get_type_display()) + u" - " + unicode(self.group.get_teacher_full_name())
         if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
         return res
         
@@ -48,7 +48,7 @@ class Poll( models.Model ):
             sep = u', '
             
         if self.group: 
-            res += sep + self.group.subject.name
+            res += sep + self.group.course.name
             res += sep + self.group.get_type_display()
             res += u': '   + self.group.get_teacher_full_name()
         else:
@@ -87,7 +87,7 @@ class Poll( models.Model ):
                 if viewer == self.group.teacher: return True
                 
                 lecture = filter( lambda (x,y): y == 'wykład', GROUP_TYPE_CHOICES )[ 0 ][ 0 ]
-                groups  = Group.objects.filter( subject = self.group.subject, 
+                groups  = Group.objects.filter( course = self.group.course,
                                                 teacher = viewer,
                                                 type    = lecture )
                 if groups: return True
@@ -115,7 +115,7 @@ class Poll( models.Model ):
         res += unicode( self.title ) + u'</td><td>'
         
         if self.group:
-            res += unicode( self.group.subject.name ) + u'</td><td>'
+            res += unicode( self.group.course.name ) + u'</td><td>'
             res += unicode( self.group.get_type_display()) + u'</td><td>'
             res += unicode( self.group.get_teacher_full_name()) + u'</td><td>'
         else:
@@ -141,7 +141,7 @@ class Poll( models.Model ):
         semester = Semester.get_current_semester()
         polls    = Poll.objects.filter( semester = semester, group__isnull=False, deleted = False ).order_by('pk') 
         polls    = map( lambda p: p.group_id, polls)
-        groups   = Group.objects.filter(subject__semester = semester).order_by('pk')
+        groups   = Group.objects.filter(course__semester = semester).order_by('pk')
         return filter( lambda g: g.pk not in polls, groups)
     
     @staticmethod

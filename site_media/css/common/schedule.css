@@ -1,3 +1,7 @@
+/**
+ * Style dotyczące komponenty terminarza.
+ */
+
 .schedule
 {
 	position: relative;
@@ -51,7 +55,6 @@
 {
 	position: absolute;
 	height: 20px;
-	width: 125px;
 	padding-top: 5px;
 	text-align: center;
 }
@@ -63,4 +66,25 @@
 	background: #F8F8F8;
 	border-radius: 4px;
 	overflow: hidden;
+}
+
+.schedule .termWithPopup
+{
+	cursor: pointer;
+}
+
+.schedule .termPopupContainer
+{
+	position: absolute;
+	z-index: 3;
+	border: 1px solid #666666;
+	border-radius: 4px;
+	background: #f8f8f8;
+	overflow: hidden;
+	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
+}
+
+.schedule .termPopupContents
+{
+	position: absolute;
 }

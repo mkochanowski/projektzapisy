@@ -66,10 +66,10 @@
 {% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
 {% block sidebar %}
 	<div id="main-sidebar">
-		{% get_subjects_in_offer as subjects_in_offer %}
+		{% get_courses_in_offer as courses_in_offer %}
 		<h2>Przedmioty w ofercie dydaktycznej</h2>
 		<ul>
-			{% for sub in subjects_in_offer %}
+			{% for sub in courses_in_offer %}
 				<li>{{ sub.name }}</li>
 			{% endfor %}
 		</ul>

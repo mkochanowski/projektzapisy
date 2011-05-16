@@ -14,7 +14,7 @@
 	float: left;
 }
 
-#results-groupping-list, #results-by-subject-list, #results-by-teacher-list
+#results-groupping-list, #results-by-course-list, #results-by-teacher-list
 {
 	list-style-type: none;
 	padding-left: 0;
@@ -31,13 +31,13 @@
 	margin-bottom: 5px;
 }
 
-#results-by-subject-list li, .result-groupped-list li, #results-by-teacher-list li
+#results-by-course-list li, .result-groupped-list li, #results-by-teacher-list li
 {
 	border-bottom: 1px solid #cccccc;
 	overflow: hidden;
 }
 
-#results-by-subject-list li:last-child, .results-groupped-list li:last-child, #results-by-teacher-list li:last-child
+#results-by-course-list li:last-child, .results-groupped-list li:last-child, #results-by-teacher-list li:last-child
 {
 	border-bottom: 0;
 }
@@ -50,7 +50,7 @@
 	border-top: 1px solid #cccccc;
 }
 
-#subjects-list-link, #teachers-list-link, #results-by-subject-list li a, #results-by-subject-list li span, .results-groupped-list li a, .results-groupped-list li span, #results-by-teacher-list li a, #results-by-teacher-list li span
+#courses-list-link, #teachers-list-link, #results-by-course-list li a, #results-by-course-list li span, .results-groupped-list li a, .results-groupped-list li span, #results-by-teacher-list li a, #results-by-teacher-list li span
 {
 	padding-top: 2px;
 	padding-bottom: 2px;
@@ -60,17 +60,17 @@
 	text-decoration: none;
 }
 
-#subjects-list-link, #teachers-list-link, #results-by-subject-list li a, #results-by-subject-list li span, #results-by-teacher-list li a, #results-by-teacher-list li span .results-groupped-list li a
+#courses-list-link, #teachers-list-link, #results-by-course-list li a, #results-by-course-list li span, #results-by-teacher-list li a, #results-by-teacher-list li span .results-groupped-list li a
 {
 	background: #F8F8F8;
 }
 
-#subjects-list-link, #teachers-list-link, .results-groupped-list li a, .results-groupped-list li span
+#courses-list-link, #teachers-list-link, .results-groupped-list li a, .results-groupped-list li span
 {
 	padding-left: 20px;
 }
 
-.other-link:hover, #subjects-list-link:hover, #teachers-list-link:hover, #results-by-subject-list li a:hover, #results-by-teacher-list li a:hover, .results-groupped-list li a:hover
+.other-link:hover, #courses-list-link:hover, #teachers-list-link:hover, #results-by-course-list li a:hover, #results-by-teacher-list li a:hover, .results-groupped-list li a:hover
 {
 	background: #eeeeee;
 }

@@ -19,10 +19,11 @@ Moje dane:
 <ul>
 	<li>login: {{user.username}}</li>
 	<li>email: {{user.email}}</li>
+        {%if zamawiany%}<li>numer konta bankowego: {{zamawiany.bank_account}}</li>{%endif%}
 </ul>
 
-{% if zamawiany %}
-<br/>
+{% if zamawiany %}<br/>
+Studia zamawiane:<br/>
 {{ comments|safe }}
 <br/>
 {% endif %}
@@ -38,5 +39,8 @@ Moje dane:
 <br/>
 <a class="change_profile" href="{% url password-change %}">zmień hasło</a>
 <a class="change_profile" href="{% url email-change %}">zmień adres email</a>
+{%if zamawiany%}
+<a class="change_bank_account" href="{% url bank-account-change %}">zmień numer konta bankowego</a>
+{%endif%}
 
 {% endblock %}

@@ -1,14 +1,14 @@
 $(document).ready(
 	function()
 	{
-		$('[name=selectSubject]').click(selectSubject);
+		$('[name=selectCourse]').click(selectCourse);
 		$('.teachersDetails').each(showTeachersDetails);
 		$('.helpersDetails').each(showHelpersDetails);
 		//$('.teachersDetails').click(showTeachersDetails);
 	}
 );
 
-function selectSubject()
+function selectCourse()
 {
 	var tr = $(this).parent().parent();
 	var action;
@@ -53,14 +53,14 @@ function selectSubject()
 
 function showTeachersDetails()
 {
-	var id = $(this).attr('subject');
+	var id = $(this).attr('course');
 
 	$(this).colorbox({ "inline" : true, "href" : "#teachers" + id, "title" : ""});
 }
 
 function showHelpersDetails()
 {
-	var id = $(this).attr('subject');
+	var id = $(this).attr('course');
 
 	$(this).colorbox({ "inline" : true, "href" : "#helpers" + id, "title" : ""});
 }

@@ -1,7 +1,6 @@
 {% extends "users/students_list.html" %}
 {% block profile_styles %}
 	<link rel="stylesheet" href="/site_media/css/jquery/jquery.ui.schedule.css" type="text/css" />
-	<link rel="stylesheet" href="/site_media/css/enrollment/records/schedule.css" type="text/css" />
 {% endblock %}
 {% block profile_scripts %}
 	<script src="/site_media/js/jquery/jquery.ui.schedule.js" type="text/javascript"></script>
@@ -21,7 +20,7 @@
 	{% for group in groups %}
 		{% for term in group.terms_ %}
 			<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}"
-				subjectID="{{group.subject_.pk}}"
+				courseID="{{group.course_.pk}}"
 				groupID="{{group.pk}}"
 				termID="{{term.pk}}"
 				from="{{ term.time_from_in_minutes }}"

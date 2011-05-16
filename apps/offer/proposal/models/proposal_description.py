@@ -37,6 +37,8 @@ class ProposalDescription(models.Model):
                                             choices = PROPOSAL_HOURS)
     repetitories = models.IntegerField(verbose_name = 'liczba godzin repetytoriów',
                                             choices = PROPOSAL_HOURS)
+    seminars     = models.IntegerField(verbose_name = 'liczba godzin seminariów',
+                                            choices = PROPOSAL_HOURS)
     exercises    = models.IntegerField(verbose_name = 'liczba godzin ćwiczeń',
                                             choices = PROPOSAL_HOURS)
     laboratories = models.IntegerField(verbose_name =' liczba godzin pracowni',

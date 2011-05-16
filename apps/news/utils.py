@@ -156,7 +156,7 @@ def render_email_from_news(news):
     """
     Creates multipart email message given a news instance.
 
-    Returns (subject, text_body, html_body) triple.
+    Returns (course, text_body, html_body) triple.
     """
     con = Context( {
         'news':  news,
@@ -169,18 +169,18 @@ def render_email_from_news(news):
     tem = get_template('news/email_html.html')
     html_body = tem.render(con)
     from_email = MASS_MAIL_FROM
-    subject = settings.EMAIL_SUBJECT_PREFIX + news.title
-    return (subject, plaintext_body, html_body)
+    course = settings.EMAIL_COURSE_PREFIX + news.title
+    return (course, plaintext_body, html_body)
 
 def send_mass_mail(msg_parts, users):
     """
     Queue mass mail to the specified apps.users.
     """
-    (subject, text_body, html_body) = msg_parts
+    (course, text_body, html_body) = msg_parts
     emails = set([user.user.email for user in users])
     for email in emails:
         if email:
-            send_html_mail(subject, text_body, html_body, 
+            send_html_mail(course, text_body, html_body,
                        MASS_MAIL_FROM, [email])
                        
 def mail_news_enrollment(news):

@@ -18,7 +18,8 @@ from apps.news.models import News
 from apps.news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
      get_search_results_data, mail_news_enrollment,  mail_news_grade, \
      mail_news_offer, render_with_category_template, render_with_device_detection
-from apps.enrollment.subjects.models import Semester
+from apps.enrollment.courses.models import Semester
+from apps.users.models import BaseUser
 
 def main_page( request ):
     """
@@ -94,6 +95,10 @@ def display_news_list(request, data={}):
     except:
         grade = False
     data['grade'] = grade
+
+    data['is_student'] = BaseUser.is_student(request.user)
+    data['is_employee'] = BaseUser.is_employee(request.user)
+
     return render_with_category_template(
         'news/list.html',
         RequestContext(request,data))
@@ -129,7 +134,9 @@ def add(request, cat):
         'category': cat,
         'form': form,
         'adding': True,
-        'grade' : grade
+        'grade' : grade,
+        "is_student" : BaseUser.is_student(request.user),
+        "is_employee" : BaseUser.is_employee(request.user),
         }))
 
 @permission_required('news.change_news')
@@ -162,7 +169,9 @@ def edit(request, cat, nid):
         RequestContext(request, {
         'category': cat,
         'form': form,
-        'grade' : Semester.get_current_semester().is_grade_active
+        'grade' : Semester.get_current_semester().is_grade_active,
+        "is_student" : BaseUser.is_student(request.user),
+        "is_employee" : BaseUser.is_employee(request.user),
         }))
 
 @permission_required('news.delete_news')
@@ -182,5 +191,7 @@ def delete(request, nid):
         RequestContext(request, {
             'category': category,
             'news': news,
-            'grade' : grade
+            'grade' : grade,
+            "is_student" : BaseUser.is_student(request.user),
+            "is_employee" : BaseUser.is_employee(request.user),
         }))

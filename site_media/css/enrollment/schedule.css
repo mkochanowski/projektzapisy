@@ -1,0 +1,109 @@
+#enr-schedule-scheduleContainer
+{
+	margin-bottom: 50px;
+}
+
+#enr-schedule-scheduleContainer .byWeekDays h2
+{
+	font-size: 20px;
+	font-weight: normal;
+	padding-bottom: 15px;
+	display: none; /* ma być w htmlu, ale nie potrzebujemy tego wyświetlać */
+}
+
+#enr-schedule-scheduleContainer .byWeekDays h3
+{
+	font-size: 18px;
+	font-weight: normal;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+#enr-schedule-scheduleContainer .byWeekDays ul
+{
+	list-style: none;
+	padding: 0;
+	padding-bottom: 10px;
+}
+
+#enr-schedule-scheduleContainer .byWeekDays li
+{
+	margin: 0;
+	padding-left: 15px;
+}
+
+#enr-schedule-scheduleContainer .byWeekDays li .time
+{
+	float: left;
+	width: 80px;
+	text-align: right;
+	padding-right: 10px;
+}
+
+#enr-schedule-scheduleContainer .byWeekDays li .classroom
+{
+	color: #999999;
+}
+
+/*******************************************************************************
+ * Tabelka z przedmiotami.
+ ******************************************************************************/
+
+#enr-schedule-listByCourse
+{
+	width: 600px;
+	margin: auto;
+	margin-top: 20px;
+
+	background: #F8F8F8;
+	border: 1px solid #CCCCCC;
+	border-radius: 4px;
+	border-spacing: 0;
+}
+
+#enr-schedule-listByCourse td,
+#enr-schedule-listByCourse th
+{
+	padding: 2px 5px;
+}
+
+#enr-schedule-listByCourse thead th
+{
+	border-bottom: 1px solid #CCCCCC;
+}
+
+#enr-schedule-listByCourse tfoot td
+{
+	border-top: 1px solid #CCCCCC;
+	text-align: right;
+}
+
+#enr-schedule-listByCourse tbody tr.courseHeader td
+{
+	border-top: 1px dotted #CCCCCC;
+}
+
+#enr-schedule-listByCourse tbody tr.courseHeader:first-child td
+{
+	border-top: 0;
+}
+
+#enr-schedule-listByCourse tbody tr.courseHeader .name
+{
+	font-size: 16px;
+}
+
+#enr-schedule-listByCourse tbody tr.courseDetails ul
+{
+	list-style: none;
+	padding-top: 7px;
+	padding-left: 15px;
+	padding-bottom: 5px;
+	color: #666666;
+}
+
+#enr-schedule-listByCourse .ects
+{
+	text-align: center;
+	border-left: 1px dotted #CCCCCC;
+}

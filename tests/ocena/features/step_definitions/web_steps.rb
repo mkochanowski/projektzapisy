@@ -174,7 +174,7 @@ Given /^I am signed for groups with polls$/ do
     load_fixture "keys_for_polls"
 end
 
-Given /^there are some subjects with groups for current semester$/ do
+Given /^there are some courses with groups for current semester$/ do
 	load_fixture "groups"
 	load_fixture "records"
 end

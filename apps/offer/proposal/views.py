@@ -17,7 +17,8 @@ from copy                           import deepcopy
 
 from apps.users.models            import Program
 
-from apps.offer.proposal.models          import Proposal, Book, ProposalDescription, Types, DescriptionTypes
+from apps.offer.proposal.models          import Proposal, Book, ProposalDescription, DescriptionTypes
+from apps.enrollment.courses.models                 import Type
 from apps.offer.proposal.exceptions      import NonStudentException, NonEmployeeException, NotOwnerException
 
 
@@ -125,7 +126,7 @@ def proposal_form(request, sid = None):
     proposal_requirements = ""
     proposal_comments = ""
     proposal_www = ""
-    types_name = Types.get_types()
+    types_name = Type.get_types()
 
     types_table = {}
 
@@ -184,6 +185,7 @@ def proposal_form(request, sid = None):
 
         proposal_lectures = int(request.POST.get('lectures', -1))
         proposal_repetitories = int(request.POST.get('repetitories', -1))
+        proposal_seminars = int(request.POST.get('seminars', -1))
         proposal_exercises = int(request.POST.get('exercises', -1))
         proposal_laboratories = int(request.POST.get('laboratories', -1))        
         
@@ -197,6 +199,10 @@ def proposal_form(request, sid = None):
             request.user.message_set.create(message='Istnieje już przedmiot o takiej nazwie.')
             correct_form = False                                                 
 
+        if proposal_.slug == '':
+            request.user.message_set.create(message='Nazwa przedmiotu jest niepoprawna.')
+            correct_form = False
+
         number_of_types = 0
         for one_type in types:
             if one_type != "":
@@ -205,8 +211,8 @@ def proposal_form(request, sid = None):
 
         if  ( proposal_name == "" or proposal_ects == "" or proposal_description == ""
             or proposal_requirements == "" or proposal_lectures == -1
-            or proposal_repetitories == -1 or proposal_exercises == -1
-            or proposal_laboratories == -1):
+            or proposal_repetitories == -1 or proposal_seminars == -1
+            or proposal_exercises == -1 or proposal_laboratories == -1):
                 request.user.message_set.create(message=\
                     'Podaj nazwę, opis, wymagania, typ przedmiotu, liczbę ' + \
                     'punktów ECTS oraz liczbę godzin zajęć.')
@@ -233,6 +239,7 @@ def proposal_form(request, sid = None):
             description.ects = proposal_ects
             description.lectures = proposal_lectures
             description.repetitories = proposal_repetitories
+            description.seminars = proposal_seminars
             description.exercises = proposal_exercises
             description.laboratories = proposal_laboratories
             description.web_page = proposal_www   
@@ -406,7 +413,7 @@ def offer_create( request ):
         Widok listy przedmiotów, które można wybrać w ramach oferty dydaktycznej
     """
     data = {
-        'subjects' : Proposal.objects.filter(deleted=False).order_by('name'),
+        'courses' : Proposal.objects.filter(deleted=False).order_by('name'),
     }    
     
     return render_to_response('offer/proposal/create_offer.html', data, context_instance = RequestContext( request ))

@@ -127,79 +127,79 @@
     }, 
     {
         "pk": 100, 
-        "model": "subjects.studentoptions", 
+        "model": "courses.studentoptions", 
         "fields": {
             "records_opening_delay_minutes": 8,
             "student": 100, 
-            "subject": 100
+            "course": 100
         }
     }, 
    {
         "pk": 1, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "obowi\u0105zkowy.O1"
         }
     }, 
     {
         "pk": 2, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "obowi\u0105zkowy.O2"
         }
     }, 
     {
         "pk": 3, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "obowi\u0105zkowy.O3"
         }
     }, 
     {
         "pk": 4, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "informatyczny.I1"
         }
     }, 
     {
         "pk": 5, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "informatyczny.I2"
         }
     }, 
     {
         "pk": 6, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "kurs"
         }
     }, 
     {
         "pk": 7, 
-        "model": "subjects.type", 
+        "model": "courses.type", 
         "fields": {
             "name": "seminarium"
         }
     }, 
     {
         "pk": 100, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity", 
         "fields": {
             "name": "Wdra\u017canie system\u00f3w klasy ERP"
         }
     }, 
     {
         "pk": 101, 
-        "model": "subjects.subjectentity", 
+        "model": "courses.courseentity", 
         "fields": {
             "name": "Logika dla informatyk\u00f3w"
         }
     }, 
     {
         "pk": 100, 
-        "model": "subjects.subject", 
+        "model": "courses.course", 
         "fields": {
             "lectures": 30, 
             "name": "Wdra\u017canie system\u00f3w klasy ERP", 
@@ -217,7 +217,7 @@
     }, 
     {
         "pk": 102, 
-        "model": "subjects.subject", 
+        "model": "courses.course", 
         "fields": {
             "lectures": 30, 
             "name": "Logika dla informatyk\u00f3w", 
@@ -235,64 +235,64 @@
     }, 
     {
         "pk": 100, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 20, 
             "type": "1", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     }, 
     {
         "pk": 101, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "2", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     }, 
     {
         "pk": 102, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 20, 
             "type": "2", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     }, 
     {
         "pk": 103, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 20, 
             "type": "2", 
             "teacher": 1000, 
-            "subject": 100
+            "course": 100
         }
     },
     {
         "pk": 104, 
-        "model": "subjects.group", 
+        "model": "courses.group", 
         "fields": {
             "limit": 1, 
             "type": "1", 
             "teacher": 1000, 
-            "subject": 102
+            "course": 102
         }
     },
     {
         "pk": 100, 
-        "model": "subjects.classroom", 
+        "model": "courses.classroom", 
         "fields": {
             "number": "62"
         }
     }, 
     {
         "pk": 100, 
-        "model": "subjects.term", 
+        "model": "courses.term", 
         "fields": {
             "dayOfWeek": "1", 
             "classroom": 100, 
@@ -303,7 +303,7 @@
     }, 
     {
         "pk": 101, 
-        "model": "subjects.term", 
+        "model": "courses.term", 
         "fields": {
             "dayOfWeek": "2", 
             "classroom": 100, 
@@ -314,7 +314,7 @@
     }, 
     {
         "pk": 100,
-        "model": "subjects.semester",
+        "model": "courses.semester",
         "fields": {
             "records_opening": "2010-02-01 00:00:00",
             "visible": true,
@@ -327,7 +327,7 @@
     },
     {
         "pk": 101,
-        "model": "subjects.semester",
+        "model": "courses.semester",
         "fields": {
             "records_opening": "2010-09-25 00:00:00",
             "visible": true,
@@ -456,16 +456,16 @@
     },
     {
         "pk": 1,
-        "model": "subjects.pointtypes",
+        "model": "courses.pointtypes",
         "fields": {
             "name": "ECTS"
         }
     },
     {
        "pk": 1,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 100,
+            "course": 100,
             "type_of_point": 1, 
             "program": 1,
             "value": 6
@@ -473,9 +473,9 @@
     },
     {
        "pk": 2,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 100,
+            "course": 100,
             "type_of_point": 1, 
             "program": 2,
             "value": 6
@@ -483,9 +483,9 @@
     },
     {
        "pk": 3,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 100,
+            "course": 100,
             "type_of_point": 1, 
             "program": 3,
             "value": 6
@@ -493,9 +493,9 @@
     },
     {
        "pk": 4,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 100,
+            "course": 100,
             "type_of_point": 1, 
             "program": 0,
             "value": 6
@@ -503,9 +503,9 @@
     },
     {
        "pk": 5,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 102,
+            "course": 102,
             "type_of_point": 1, 
             "program": 1,
             "value": 40
@@ -513,9 +513,9 @@
     },
     {
        "pk": 6,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 102,
+            "course": 102,
             "type_of_point": 1, 
             "program": 2,
             "value": 40
@@ -523,9 +523,9 @@
     },
     {
        "pk": 7,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 102,
+            "course": 102,
             "type_of_point": 1, 
             "program": 3,
             "value": 40
@@ -533,9 +533,9 @@
     },
     {
        "pk": 8,
-       "model": "subjects.pointsofsubjects",
+       "model": "courses.pointsofcourses",
        "fields": {
-            "subject": 102,
+            "course": 102,
             "type_of_point": 1, 
             "program": 0,
             "value": 40

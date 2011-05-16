@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-    Proposal of subject
+    Proposal of course
 """
 
 from datetime import datetime
@@ -18,7 +18,7 @@ from apps.users.models                       import Employee, Student
 
 class Proposal( models.Model ):
     """
-        Proposal of subject
+        Proposal of course
     """
     name = models.CharField(max_length = 255,
                             verbose_name = 'nazwa przedmiotu' )
@@ -224,21 +224,21 @@ class Proposal( models.Model ):
 
     def in_offer(self):
         """
-            Checks if subject is in offer
+            Checks if course is in offer
             (if it has tag offer)
         """
         return self.has_tag('offer')
     
     def in_summer( self ):
         """
-            Checks if subject is in summer semester
+            Checks if course is in summer semester
             (if it has tag summer)
         """
         return self.has_tag('summer')
         
     def in_winter( self ):
         """
-            Checks if subject is in winter semester
+            Checks if course is in winter semester
             (if it has tag winter)
         """
         return self.has_tag('winter')

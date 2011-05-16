@@ -61,6 +61,11 @@ String.prototype.lpad = function(padStr, length)
     return (padStr + this);
 };
 
+String.prototype.capitalize = function()
+{
+	return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
 if (!Array.prototype.indexOf)
 	Array.prototype.indexOf = function(value)
 	{

@@ -14,7 +14,7 @@ from apps.grade.poll.models import SingleChoiceQuestionOrdering, \
                                      MultipleChoiceQuestionAnswer
 
 
-from apps.enrollment.subjects.models      import Semester
+from apps.enrollment.courses.models      import Semester
 
 class TicketsForm( forms.Form ):
     ticketsfield = forms.CharField( widget = forms.widgets.Textarea( 

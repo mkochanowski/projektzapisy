@@ -79,12 +79,12 @@ Vote.initCounters = function()
 	maxPointsNode.appendChild(Vote.maxPointsNode);
 	maxPointsNode.appendChild(document.createTextNode('.'));
 
-	Vote.totalSubjectsCount = $('#od-vote-form').find('select').length;
-	Vote.wantedSubjectsCount = $('#od-vote-form').find('.isFan').length;
+	Vote.totalCoursesCount = $('#od-vote-form').find('select').length;
+	Vote.wantedCoursesCount = $('#od-vote-form').find('.isFan').length;
 
 	var onlyWantedLabel = $('#od-vote-onlywanted').parent().children('label').getDOM();
 	onlyWantedLabel.appendChild(document.createTextNode(' (' +
-		Vote.wantedSubjectsCount + ' z ' + Vote.totalSubjectsCount + ')'));
+		Vote.wantedCoursesCount + ' z ' + Vote.totalCoursesCount + ')'));
 
 	// włączenie liczników
 
@@ -121,13 +121,13 @@ Vote.refreshCounters = function()
  */
 Vote.initFilter = function()
 {
-	var subjectFilterForm = $('#od-vote-top-bar').assertOne();
+	var courseFilterForm = $('#od-vote-top-bar').assertOne();
 
-	subjectFilterForm.css('display', 'block');
+	courseFilterForm.css('display', 'block');
 
-	subjectFilterForm.find('.filter-phrase-reset').assertOne().click(function()
+	courseFilterForm.find('.filter-phrase-reset').assertOne().click(function()
 	{
-		subjectFilterForm.find('.filter-phrase').assertOne().attr('value', '');
+		courseFilterForm.find('.filter-phrase').assertOne().attr('value', '');
 	});
 
 	// dodawanie do semestrów komunikatów o pustym filtrze
@@ -146,8 +146,8 @@ Vote.initFilter = function()
 
 	// konfiguracja filtra
 
-	Vote.subjectFilter = new ListFilter('vote-subjects', subjectFilterForm.getDOM());
-	Vote.subjectFilter.afterFilter = function()
+	Vote.courseFilter = new ListFilter('vote-courses', courseFilterForm.getDOM());
+	Vote.courseFilter.afterFilter = function()
 	{
 		var lists = $('#od-vote-form').find('ul');
 		for (i = 0; i < lists.length; i++)
@@ -169,39 +169,39 @@ Vote.initFilter = function()
 		}
 	};
 
-	Vote.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
+	Vote.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
 		'phrase', '.filter-phrase', function(element, value)
 	{
-		var subject = $(element.data);
-		return (subject.children('label').text().toLowerCase().indexOf(value.toLowerCase()) >= 0);
+		var course = $(element.data);
+		return (course.children('label').text().toLowerCase().indexOf(value.toLowerCase()) >= 0);
 	}));
 
-	Vote.subjectFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+	Vote.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
 		'onlyWanted', '#od-vote-onlywanted', function(element, value)
 	{
 		if (!value)
 			return true;
-		var subject = $(element.data);
-		return subject.hasClass('isFan');
+		var course = $(element.data);
+		return course.hasClass('isFan');
 	}));
 
-	Vote.subjectFilter.addFilter(ListFilter.CustomFilters.createSubjectTypeFilter(
-		function(element, subjectType)
+	Vote.courseFilter.addFilter(ListFilter.CustomFilters.createCourseTypeFilter(
+		function(element, courseType)
 	{
-		var subject = $(element.data);
-		return subject.hasClass('subject-type-' + subjectType);
+		var course = $(element.data);
+		return course.hasClass('course-type-' + courseType);
 	}));
 
-	var subjects = $('#od-vote-form').find('li.od-vote-subject');
-	for (i = 0; i < subjects.length; i++)
-		Vote.subjectFilter.addElement(new ListFilter.Element(subjects[i], function(visible)
+	var courses = $('#od-vote-form').find('li.od-vote-course');
+	for (i = 0; i < courses.length; i++)
+		Vote.courseFilter.addElement(new ListFilter.Element(courses[i], function(visible)
 		{
-			var subject = $(this.data);
+			var course = $(this.data);
 			if (visible)
-				subject.addClass('visible').removeClass('hidden');
+				course.addClass('visible').removeClass('hidden');
 			else
-				subject.removeClass('visible').addClass('hidden');
+				course.removeClass('visible').addClass('hidden');
 		}));
 
-	Vote.subjectFilter.runThread();
+	Vote.courseFilter.runThread();
 };

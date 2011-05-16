@@ -30,7 +30,7 @@ Given /I am logged in/ do
 end
 
 Given /^I enroll in "([^"]*)" in group with id "([^"]*)"$/ do |coursename, id|
-   Given %{I am on subjects page}
+   Given %{I am on courses page}
      And %{I click on "#{coursename}"}
      And %{I sleep for 10 seconds} 
      And %{I press "zapisz" next to "group-id" with value "#{id}"}

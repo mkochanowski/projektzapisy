@@ -27,7 +27,7 @@ def studentSchedule(request, schedule_owner=None, delta=None):
         else :
             owner = User.objects.get(username=schedule_owner)
             
-        #receiving subjects for given weekday
+        #receiving courses for given weekday
         groups = Record.get_student_records(owner.id)
         schedule = []
         for group in groups:
@@ -42,15 +42,15 @@ def studentSchedule(request, schedule_owner=None, delta=None):
         jump = True
         last_time = None
         null = {'group' : 0, 'term': 0}
-        for subject in schedule:
+        for course in schedule:
             if jump == True :
                 jump = False
             else :
-                if subject['term'].start_time > last_time :
+                if course['term'].start_time > last_time :
                     schedule_form.append(null)
                     jump = False
-            last_time = subject['term'].end_time
-            schedule_form.append(subject)
+            last_time = course['term'].end_time
+            schedule_form.append(course)
 
         data = {
             'schedule': schedule_form,

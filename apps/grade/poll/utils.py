@@ -20,7 +20,7 @@ from apps.enrollment.records.models        import Group
 from apps.grade.poll.exceptions             import NoTitleException, NoPollException, \
                                                     NoSectionException
 
-from apps.enrollment.subjects.models import Semester, Group, Subject, GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models import Semester, Group, Course, GROUP_TYPE_CHOICES
 from apps.users.models               import Program
 
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
@@ -31,7 +31,7 @@ def check_signature( ticket, signed_ticket, public_key ):
     pk = RSA.importKey( public_key.public_key )
     return pk.verify( ticket, (signed_ticket,) )
 
-def group_polls_and_tickets_by_subject( poll_and_ticket_list ):
+def group_polls_and_tickets_by_course( poll_and_ticket_list ):
     if poll_and_ticket_list == []: return []
     
     poll_and_ticket_list.sort( lambda (p1, t1, st1), (p2, t2, st2): poll_cmp( p1, p2 ))
@@ -49,15 +49,15 @@ def group_polls_and_tickets_by_subject( poll_and_ticket_list ):
                 act_group = poll.group
                 act_polls = [( poll.pk, ticket, signed_ticket )]
         else:
-            if   poll.group.subject == act_group.subject:
+            if   poll.group.course == act_group.course:
                 act_polls.append(( poll.pk, ticket, signed_ticket ))
             else:
-                res.append(( unicode( act_group.subject.name ), act_polls ))
+                res.append(( unicode( act_group.course.name ), act_polls ))
                 act_group = poll.group
                 act_polls = [( poll.pk, ticket, signed_ticket )]
     
     if act_group:
-        res.append(( unicode( act_group.subject.name ), act_polls ))
+        res.append(( unicode( act_group.course.name ), act_polls ))
     else:
         res.append(( u'Ankiety ogólne', act_polls ))
         
@@ -86,7 +86,7 @@ def create_slug( name ):
     slug = re.sub("-$", "", slug)
     return slug
 
-def get_polls_for_subject((( sub, slug ), get), groupped_polls ):
+def get_polls_for_course((( sub, slug ), get), groupped_polls ):
     if get:
         return (( sub, slug ), u'jest')
     else:
@@ -116,7 +116,7 @@ def prepare_data( request, slug ):
                                 map( lambda (id, t, st):
                                         id, 
                                     l), polls))    
-        for poll in Poll.objects.filter(pk__in=polls_id).select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user'):
+        for poll in Poll.objects.filter(pk__in=polls_id).select_related('group', 'group__course', 'group__teacher', 'group__teacher__user'):
             dict[poll.pk] = poll
     
         data[ 'polls' ]    = map( lambda ((x, s), l): 
@@ -134,7 +134,7 @@ def prepare_data( request, slug ):
                                 map( lambda (id, t, st):
                                         id, 
                                     l), finished))
-        for poll in Poll.objects.filter(pk__in=finished_id).select_related('group', 'group__subject', 'group__teacher', 'group__teacher__user'):
+        for poll in Poll.objects.filter(pk__in=finished_id).select_related('group', 'group__course', 'group__teacher', 'group__teacher__user'):
             dict[poll.pk] = poll
         
         data[ 'finished' ] = map( lambda ((x, s), l): 
@@ -193,41 +193,41 @@ def get_ticket_and_signed_ticket_from_session( session, slug, poll_id ):
         return None, None
 
 def getGroups(request, template):
-    if template['subject'] == -1:
+    if template['course'] == -1:
         return {}
     if template['group']:
         return template['group']
     if template['type']:
-        if template['subject']:
-            sub = request.user.employee in template['subject'].teachers.all()
+        if template['course']:
+            sub = request.user.employee in template['course'].teachers.all()
             if request.user.is_staff or sub:
-                groups = Group.objects.filter( type=template['type'], subject=template['subject'] )
+                groups = Group.objects.filter( type=template['type'], course=template['course'] )
             else:
-                groups = Group.objects.filter( type=template['type'], subject=template['subject'], teacher=request.user.employee )
+                groups = Group.objects.filter( type=template['type'], course=template['course'], teacher=request.user.employee )
         else:
             if request.user.is_staff:
                 groups = Group.objects.filter( type=template['type'] )
             else:
                 groups = Group.objects.filter( type=template['type'], teacher=request.user.employee )
     else:
-        if template['subject']:
-            sub = request.user.employee in template['subject'].teachers.all()
+        if template['course']:
+            sub = request.user.employee in template['course'].teachers.all()
             if request.user.is_staff or sub:
-                groups = Group.objects.filter( subject=template['subject'] )
+                groups = Group.objects.filter( course=template['course'] )
             else:
-                groups = Group.objects.filter( subject=template['subject'], teacher=request.user.employee )
+                groups = Group.objects.filter( course=template['course'], teacher=request.user.employee )
         else:
             if request.user.is_staff:
-                groups = Group.objects.filter( subject__semester = template['semester'] )
+                groups = Group.objects.filter( course__semester = template['semester'] )
             else:
-                groups = Group.objects.filter( subject__semester = template['semester'], teacher=request.user.employee   )
+                groups = Group.objects.filter( course__semester = template['semester'], teacher=request.user.employee   )
 
     return groups
 
-def poll_cmp_subjects( p1, p2 ):
+def poll_cmp_courses( p1, p2 ):
     if p1.group:
         if p2.group:
-            return cmp( p1.group.subject.name, p2.group.subject.name )
+            return cmp( p1.group.course.name, p2.group.course.name )
         else:
             return 1
     else:
@@ -242,13 +242,13 @@ def poll_cmp_teachers( p1, p2 ):
     else:
         return -1
         
-def group_polls_by_subject( polls ):
-    polls.sort( poll_cmp_subjects )
+def group_polls_by_course( polls ):
+    polls.sort( poll_cmp_courses )
     
     groupped = []
     if polls:
         try:
-            act_sub = polls[ 0 ].group.subject.name
+            act_sub = polls[ 0 ].group.course.name
         except:
             act_sub = u"Ankiety ogólne"
         act = [ polls[ 0 ]]
@@ -256,7 +256,7 @@ def group_polls_by_subject( polls ):
         
         for poll in polls:
             try:
-                sub = poll.group.subject.name
+                sub = poll.group.course.name
             except:
                 sub = u"Ankiety ogólne"
             
@@ -358,7 +358,7 @@ class UnicodeWriter(object):
 def generate_csv_title(poll):
     res = poll.title
     try:        
-        res += u' ' + poll.group.subject.name
+        res += u' ' + poll.group.course.name
         res += u' ' + poll.group.get_type_display()
         res += u' ' + poll.group.get_teacher_full_name()
     except:
@@ -447,11 +447,11 @@ def make_paginator( request, object):
     except (EmptyPage, InvalidPage):
         return (paginator.page(paginator.num_pages), paginator)
 
-def subject_list( subjects ):
-    subject_list = []
-    for subject in subjects:
-        subject_list.append( (subject.pk , unicode(subject.name)) )
-    return subject_list
+def course_list( courses ):
+    course_list = []
+    for course in courses:
+        course_list.append( (course.pk , unicode(course.name)) )
+    return course_list
 
 def groups_list( groups ):
     group_list = []
@@ -470,7 +470,7 @@ def make_template_from_db( request, template):
     var['studies_type']   = template.studies_type
     var['title']          = template.title
     var['description']    = template.description
-    var['subject']        = template.subject
+    var['course']        = template.course
     var['semester']       = Semester.get_current_semester()
     var['groups_without'] = 'off'
     var['group']          = None
@@ -500,13 +500,13 @@ def make_template_variables( request ):
     else:
         studies_type = None
 
-    subject      = int(request.POST.get('subject', 0))
-    if subject > 0:
-        subject = Subject.objects.get(pk=subject)
-    elif subject == 0:
-        subject = None
+    course      = int(request.POST.get('course', 0))
+    if course > 0:
+        course = Course.objects.get(pk=course)
+    elif course == 0:
+        course = None
     else:
-        subject = -1
+        course = -1
 
     group        = int(request.POST.get('group', 0))
     if group > 0:
@@ -521,7 +521,7 @@ def make_template_variables( request ):
         semester = Semester.get_current_semester()
     var['type']           = type
     var['studies_type']   = studies_type
-    var['subject']        = subject
+    var['course']        = course
     var['title']          = request.POST.get('title', '')
     var['semester']       = semester
     var['description']    = request.POST.get('description', '')
@@ -545,12 +545,12 @@ def prepare_template( request ):
     tmpl.studies_type = variables['studies_type']
     tmpl.author       = request.user.employee
 
-    if variables['subject'] == -1:
-        tmpl.no_subject = True
-        tmpl.subject    = None
+    if variables['course'] == -1:
+        tmpl.no_course = True
+        tmpl.course    = None
     else:
-        tmpl.no_subject = False
-        tmpl.subject    = variables['subject']
+        tmpl.no_course = False
+        tmpl.course    = variables['course']
 
     tmpl.group_type   = variables['type']
 
@@ -669,7 +669,7 @@ def save_template_in_session( request, template ):
     request.session['semester']     =  template['semester']
     request.session['group']        =  template['group']
     request.session['type']         =  template['type']
-    request.session['subject']      =  template['subject']
+    request.session['course']      =  template['course']
     request.session['groups_without'] = template['groups_without']
     request.session['polls_len']    =  template['polls_len']
 
@@ -679,7 +679,7 @@ def pop_template_from_session( request ):
     template['semester']        = request.session.get('semester', None)
     template['group']           = request.session.get('group', None)
     template['type']            = unicode(request.session.get('type', 0))
-    template['subject']         = request.session.get('subject', None)
+    template['course']         = request.session.get('course', None)
     template['groups_without']  = request.session.get('groups_without', None)
     template['polls_len']       = request.session.get('polls_len', None)
     #clear session for future
@@ -691,8 +691,8 @@ def pop_template_from_session( request ):
         del request.session['group']
     if 'type' in request.session:
         del request.session['type']
-    if 'subject' in request.session:
-        del request.session['subject']
+    if 'course' in request.session:
+        del request.session['course']
     if 'groups_without' in request.session:
         del request.session['groups_without']
     if 'polls_len' in request.session:
@@ -716,16 +716,16 @@ def prepare_data_for_create_poll( request, group_id = 0 ):
         group                = Group.objects.get(pk=group_id)
         data['group']        = group.pk
         data['type']         = group.type
-        data['subject_id']   = group.subject.pk
-        data['semester']     = group.subject.semester.pk
-        data['groups']       = Group.objects.filter(type=group.type, subject=group.subject).order_by('teacher')
+        data['course_id']   = group.course.pk
+        data['semester']     = group.course.semester.pk
+        data['groups']       = Group.objects.filter(type=group.type, course=group.course).order_by('teacher')
 
     if data['semester']:
-        data['subjects'] = get_subjects_for_user(request, data['semester'])
+        data['courses'] = get_courses_for_user(request, data['semester'])
     else:
         semester_id      = Semester.get_current_semester()
         data['semester'] = semester_id
-        data['subjects'] = get_subjects_for_user(request, semester_id)
+        data['courses'] = get_courses_for_user(request, semester_id)
 
     data['studies_types']    = Program.objects.all()
     data['semesters']        = Semester.objects.all()
@@ -734,19 +734,19 @@ def prepare_data_for_create_poll( request, group_id = 0 ):
 
     return data
 
-def get_subjects_for_user(request, semester):
+def get_courses_for_user(request, semester):
     if request.user.is_staff:
-        return Subject.objects.filter(semester = semester).order_by('name')
+        return Course.objects.filter(semester = semester).order_by('name')
     else:
-        subjects = Group.objects.filter(subject__semester=semester, teacher=request.user.employee).values_list('subject__pk', flat=True)
-        return Subject.objects.filter(Q(semester = semester), Q(teachers=request.user.employee) | Q(pk__in=subjects)).order_by('name')
+        courses = Group.objects.filter(course__semester=semester, teacher=request.user.employee).values_list('course__pk', flat=True)
+        return Course.objects.filter(Q(semester = semester), Q(teachers=request.user.employee) | Q(pk__in=courses)).order_by('name')
 
-def get_groups_for_user(request, type, subject):
-    sub = Subject.objects.filter(pk=subject, teachers=request.user.employee)
+def get_groups_for_user(request, type, course):
+    sub = Course.objects.filter(pk=course, teachers=request.user.employee)
     if request.user.is_staff or sub:
-        return Group.objects.filter(type=type, subject=subject).order_by('teacher')
+        return Group.objects.filter(type=type, course=course).order_by('teacher')
     else:
-        return Group.objects.filter(type=type, subject=subject, teacher=request.user.employee).order_by('teacher')
+        return Group.objects.filter(type=type, course=course, teacher=request.user.employee).order_by('teacher')
 
 def make_pages( pages, page_number ):
     if pages < 12:

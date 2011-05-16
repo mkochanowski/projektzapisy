@@ -5,7 +5,7 @@ Background:
     And I am logged in
 
 Scenario: Student unenrolls from a group
-    When I am on subjects page
+    When I am on courses page
     And I click on "Bazy danych"
     And I press "zapisz" next to "group-id" with value "201"
     And I am on the mobile home page
