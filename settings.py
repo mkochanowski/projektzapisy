@@ -32,6 +32,14 @@ DATABASE_PORT = ''                       # Set to empty string for default. Not 
 # mass-mail account
 # You can test sending with:
 # $ python -m smtpd -n -c DebuggingServer localhost:1025
+
+# For gmail:
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_HOST_USER = 'youremail@gmail.com'
+#EMAIL_HOST_PASSWORD = 'password'
+#EMAIL_PORT = 587
+
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 EMAIL_HOST_USER = ''
