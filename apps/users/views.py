@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login
@@ -109,9 +109,17 @@ def email_change(request):
         data = request.POST.copy()
         form = EmailChangeForm(data, instance=request.user)
         if form.is_valid():
+            email = form.cleaned_data['email']
+
+            user = User.objects.filter(email=email)
+
+            if user and user <> request.user:
+                messages.error(request, "Podany adres jest już przypisany do innego użytkownika!")
+                return render_to_response('users/email_change_form.html', {'form':form}, context_instance=RequestContext(request))
+
             form.save()
             logger.info('User (%s) changed email' % request.user.get_full_name())
-            request.user.message_set.create(message="Twój adres e-mail został zmieniony.")
+            messages.success(request, message="Twój adres e-mail został zmieniony.")
             return HttpResponseRedirect(reverse('my-profile'))
     else:
         form = EmailChangeForm({'email' : request.user.email})
