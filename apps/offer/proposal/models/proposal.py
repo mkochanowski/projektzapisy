@@ -256,3 +256,11 @@ class Proposal( models.Model ):
             (if it has tag english)
         """
         return self.has_tag('english')
+
+    @staticmethod
+    def get_offer():
+        return Proposal.objects.filter(tags__name='offer').values_list('pk', flat=True)
+
+    @staticmethod
+    def get_vote():
+        return Proposal.objects.filter(tags__name='vote').values_list('pk', flat=True)

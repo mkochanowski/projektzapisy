@@ -23,9 +23,6 @@
     border-top: 1px solid #cccccc;
 }
 
-#offerCreate tr.selected td {
-    background: #E9F7EF;
-}
 .helpers div {
     display: none;
 }
@@ -47,4 +44,19 @@ padding: 3px 5px;
 
 .helper div {
 padding: 3px 5px;
+}
+
+.selected-none
+{
+
+}
+
+.selected-offer
+{
+    background-color:#E9F7EF;
+}
+
+.selected-vote
+{
+    background: #228B22;
 }

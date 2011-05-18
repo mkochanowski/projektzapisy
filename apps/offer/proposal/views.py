@@ -13,6 +13,7 @@ from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 from django.views.decorators.http   import require_POST
+from django.contrib                 import messages
 from copy                           import deepcopy
 
 from apps.users.models            import Program
@@ -411,26 +412,52 @@ def offer_create( request ):
     """
         Widok listy przedmiotów, które można wybrać w ramach oferty dydaktycznej
     """
+    if request.method == "POST":
+        courses = map( int, request.POST.getlist('courses[]'))
+
+        for id in courses:
+            proposal = Proposal.objects.get(pk = id, deleted = False)
+            action = int( request.POST.get('course[' + str(id) + ']', 0) )
+            if action == 0:
+                proposal.remove_tag('offer')
+                proposal.remove_tag('vote')
+            elif action == 1:
+                proposal.add_tag('offer')
+                proposal.remove_tag('vote')
+            else:
+                proposal.add_tag('vote')
+                proposal.add_tag('offer')
+        messages.success(request, 'Zmieniono stan oferty')
+
+    all_courses = Proposal.objects.filter(deleted=False).order_by('name')
+    vote_list  = Proposal.get_vote()
+    offer_list = Proposal.get_offer()
+
+    for course in all_courses:
+        if course.id in vote_list:
+            course.state = 'vote'
+        elif course.id in offer_list:
+            course.state = 'offer'
+        else:
+            course.state = 'none'
+            
     data = {
-        'courses' : Proposal.objects.filter(deleted=False).order_by('name'),
+        'courses' : all_courses,
     }    
     
     return render_to_response('offer/proposal/create_offer.html', data, context_instance = RequestContext( request ))
-    
-@require_POST
-@permission_required('proposal.can_create_offer')
-def offer_select(request):
-    """
-        Wybiera lub odznacza przedmiot w ofercie dydaktycznej
-    """    
-    action = request.POST['action']
-    id = request.POST['id']
-    
-    proposal_ = Proposal.objects.get(pk = id, deleted = False)
-    
-    if action == 'select':
-        proposal_.add_tag("offer")
-    else: # unselect
-        proposal_.remove_tag("offer")
-        
-    return HttpResponse('ok')
+
+@login_required
+def get_group(request,group, id):
+    print group
+    print id
+    proposal = Proposal.objects.get( pk = id, deleted = False)
+
+    if group == 'Fans':
+        users = proposal.fans.all()
+    elif group == 'Teachers':
+        users = proposal.teachers.all()
+    else:
+        users = proposal.helpers.all()
+
+    return render_to_response('offer/proposal/users_group.html', {'users':users}, context_instance = RequestContext( request ))
