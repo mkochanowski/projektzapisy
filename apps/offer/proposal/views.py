@@ -449,8 +449,6 @@ def offer_create( request ):
 
 @login_required
 def get_group(request,group, id):
-    print group
-    print id
     proposal = Proposal.objects.get( pk = id, deleted = False)
 
     if group == 'Fans':
