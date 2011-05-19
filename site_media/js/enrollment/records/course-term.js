@@ -178,7 +178,6 @@ Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
 		throw new Error('Nieprawidłowy priorytet do ustawienia');
 	
 	$.post(this._queuePrioritySetURL, {
-			csrfmiddlewaretoken: $.cookie('csrftoken'),
 			priority: newPriority
 		}, function(data)
 	{
@@ -217,7 +216,6 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 	enroll = !!enroll;
 
 	$.post(Fereol.Enrollment.CourseTerm._setEnrolledURL, {
-		csrfmiddlewaretoken: $.cookie('csrftoken'),
 		group: this.id,
 		enroll: enroll
 	}, function(data)

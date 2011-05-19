@@ -12,9 +12,22 @@ Fereol.init = function()
 	});
 
 	Fereol.initSubsystemTypeSelector();
+	Fereol.initCSRFTokenHandling();
 };
 
 $(Fereol.init);
+
+/**
+ * Obsługa CSRF Token
+ */
+Fereol.initCSRFTokenHandling = function()
+{
+	$('html').ajaxSend(function(event, xhr, settings)
+	{
+		if (settings.type.toLowerCase() == 'post')
+			xhr.setRequestHeader('X-CSRFToken', $.cookies.get('csrftoken'));
+	});
+};
 
 /*******************************************************************************
  * Zarządzanie podsystemami.
