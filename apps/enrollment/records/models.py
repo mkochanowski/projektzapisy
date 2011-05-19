@@ -287,6 +287,11 @@ class Record(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
+            if group.type=='1':
+                course = group.course
+                records = Record.objects.filter(group__course=course, student=student).exclude(group__type='1')
+                for r in records:
+                    Record.remove_student_from_group(user_id, r.group.id)
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             if not group.course.semester.is_current_semester():
