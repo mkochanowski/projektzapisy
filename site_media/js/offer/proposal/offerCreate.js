@@ -3,6 +3,8 @@ Offer = new Object();
 
 Offer.init = function()
 {
+
+    Offer.hideSemesters()
     $('.course-state').change(Offer.changeState);
     $('.show-teachers').click(Offer.showTeachers);
     $('.show-helpers').click(Offer.showHelpers);
@@ -10,6 +12,14 @@ Offer.init = function()
 }
 
 $(Offer.init);
+
+Offer.hideSemesters = function()
+{
+    $('.selected-none, .selected-offer').each(function(i, elem)
+    {
+        $(elem).find('.select-semester').hide();
+    })
+}
 
 Offer.changeState = function()
 {
@@ -33,6 +43,14 @@ Offer.changeState = function()
     var tr = $(this).parent().parent()
     $(tr).removeClass()
     $(tr).addClass('selected-' + type)
+    if( type === 'vote')
+    {
+        $(this).parent().parent().find('.select-semester').show();
+    }
+    else
+    {
+        $(this).parent().parent().find('.select-semester').hide();
+    }
 }
 
 Offer.showHelpers = function()

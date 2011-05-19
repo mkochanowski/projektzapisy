@@ -418,6 +418,8 @@ def offer_create( request ):
         for id in courses:
             proposal = Proposal.objects.get(pk = id, deleted = False)
             action = int( request.POST.get('course[' + str(id) + ']', 0) )
+            proposal.remove_tag('summer')
+            proposal.remove_tag('winter')
             if action == 0:
                 proposal.remove_tag('offer')
                 proposal.remove_tag('vote')
@@ -427,12 +429,22 @@ def offer_create( request ):
             else:
                 proposal.add_tag('vote')
                 proposal.add_tag('offer')
+                semester =  request.POST.get('course_semester[' + str(id) + ']', 'brak')
+                
+                if semester == 'letni':
+                    proposal.add_tag('summer')
+                elif semester == 'zimowy':
+                    proposal.add_tag('winter')
+
         messages.success(request, 'Zmieniono stan oferty')
 
     all_courses = Proposal.objects.filter(deleted=False).order_by('name')
-    vote_list  = Proposal.get_vote()
-    offer_list = Proposal.get_offer()
+    vote_list  = Proposal.get_pks_by_tag('vote')
+    offer_list = Proposal.get_pks_by_tag('offer')
 
+    summer_list = Proposal.get_pks_by_tag('summer')
+    winter_list = Proposal.get_pks_by_tag('winter')
+    
     for course in all_courses:
         if course.id in vote_list:
             course.state = 'vote'
@@ -440,6 +452,13 @@ def offer_create( request ):
             course.state = 'offer'
         else:
             course.state = 'none'
+
+        if course.id in summer_list:
+            course.semester = 'summer'
+        elif course.id in winter_list:
+            course.semester = 'winter'
+        else:
+            course.semester = 'none'
             
     data = {
         'courses' : all_courses,

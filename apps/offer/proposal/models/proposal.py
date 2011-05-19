@@ -258,9 +258,5 @@ class Proposal( models.Model ):
         return self.has_tag('english')
 
     @staticmethod
-    def get_offer():
-        return Proposal.objects.filter(tags__name='offer').values_list('pk', flat=True)
-
-    @staticmethod
-    def get_vote():
-        return Proposal.objects.filter(tags__name='vote').values_list('pk', flat=True)
+    def get_pks_by_tag(tag):
+        return Proposal.get_by_tag(tag).values_list('pk', flat=True)

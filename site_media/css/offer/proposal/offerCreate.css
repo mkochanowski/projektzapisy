@@ -23,6 +23,10 @@
     border-top: 1px solid #cccccc;
 }
 
+#offerCreate table td select{
+    height: 25px;
+}
+
 .helpers div {
     display: none;
 }
@@ -39,16 +43,11 @@
     width: 500px;
 }
 .teacher div {
-padding: 3px 5px;
+    padding: 3px 5px;
 }
 
 .helper div {
-padding: 3px 5px;
-}
-
-.selected-none
-{
-
+    padding: 3px 5px;
 }
 
 .selected-offer
@@ -60,3 +59,21 @@ padding: 3px 5px;
 {
     background: #228B22;
 }
+
+#offer-button
+{
+    margin-top:10px;
+    margin-right: 20px;
+}
+
+.state
+{
+    width:40px;
+    text-align:center;
+}
+
+.cen a,.cen a:hover
+{
+    color:#000000;
+}
+
