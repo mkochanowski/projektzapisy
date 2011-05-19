@@ -252,7 +252,7 @@ def queue_set_priority(request, group_id, method):
         group = Group.objects.get(id=group_id)
         queue = Queue.objects.get(student=request.user.student, group=group)
         priority = int(priority)
-        if priority > 10 or priority < 1:
+        if priority > settings.QUEUE_PRIORITY_LIMIT or priority < 1:
             return AjaxFailureMessage.auto_render('FatalError', \
                 'Nieprawidłowa wartość priorytetu.', message_context);
         if queue.priority != priority:

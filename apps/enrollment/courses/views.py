@@ -11,6 +11,7 @@ from apps.enrollment.courses.exceptions import NonCourseException
 from apps.users.models import BaseUser
 
 import logging
+from django.conf import settings
 logger = logging.getLogger()
 
 ''' generates template data for filtering and list of courses '''
@@ -202,6 +203,7 @@ def course(request, slug):
         data.update({
             'course' : course,
             'tutorials' : tutorials,
+            'priority_limit': settings.QUEUE_PRIORITY_LIMIT
         })
 
         return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )

@@ -632,3 +632,25 @@ input.bigButton
 	margin: 5px;
 }
 /*** WIDOK PROFILU UŻYTKOWNIKA  - koniec ***/
+
+.right
+{
+    float:right;
+}
+
+#offer-button
+{
+    margin-top:10px;
+    margin-right: 20px;
+}
+
+.state
+{
+    width:60px;
+    text-align:center;
+}
+
+.cen a,.cen a:hover
+{
+    color:#000000;
+}
