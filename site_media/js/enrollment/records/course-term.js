@@ -222,15 +222,19 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 	{
 		var result = AjaxMessage.fromJSON(data);
 		self._isLoading = false;
-		if (self.isEnrolled)
+		if (result.isSuccess() ||
+			result.code == 'Queued' || result.code == 'AlreadyQueued')
 		{
-			self.isEnrolled = false;
-			self.enrolledCount--;
-		}
-		if (self.isQueued)
-		{
-			self.isQueued = false;
-			self.queuedCount--;
+			if (self.isEnrolled)
+			{
+				self.isEnrolled = false;
+				self.enrolledCount--;
+			}
+			if (self.isQueued)
+			{
+				self.isQueued = false;
+				self.queuedCount--;
+			}
 		}
 		if (result.isSuccess())
 		{
@@ -265,6 +269,22 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 					}
 					alsoEnrolled.refreshView();
 				})
+			}
+			else if (self.type == 1) // wykład
+			{
+				// zaznaczenie innych grup z tego przedmiotu jako "nie zapisane"
+				// (wypisanie z wykładu skutkuje wypisaniem z całego przedmiotu)
+				CourseView._termsList.forEach(function(e)
+				{
+					if (e.id == self.id)
+						return;
+					if (e.isEnrolled)
+					{
+						e.isEnrolled = false;
+						e.enrolledCount--;
+					}
+					e.refreshView();
+				});
 			}
 		}
 		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')
