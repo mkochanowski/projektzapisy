@@ -70,8 +70,8 @@ def set_enrolled(request, method):
     message_context = None if is_ajax else request
 
     if not request.user.is_authenticated():
-        return AjaxFailureMessage('NotAuthenticated', 'Nie jesteś zalogowany.',\
-            message_context)
+        return AjaxFailureMessage.auto_render('NotAuthenticated', \
+            'Nie jesteś zalogowany.', message_context)
 
     try:
         group_id = int(request.POST['group'])
