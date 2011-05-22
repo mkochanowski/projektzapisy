@@ -10,7 +10,8 @@ from django.db import models
 from apps.users.models import Student
 
 from apps.enrollment.courses.models import Group
-from apps.enrollment.courses.models import PointsOfCourses
+from apps.enrollment.courses.models import PointsOfCourses,\
+                                        PointsOfCourseEntities
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.courses.exceptions import NonCourseException
 
@@ -19,6 +20,7 @@ from itertools import cycle
 
 from django.db.models import signals
 #from django.dispatch import receiver
+from settings import ECTS_LIMIT_DURATION, ECTS_LIMIT
 
 
 STATUS_ENROLLED = '1'
@@ -285,6 +287,11 @@ class Record(models.Model):
         try:
             student = user.student
             group = Group.objects.get(id=group_id)
+            if group.type=='1':
+                course = group.course
+                records = Record.enrolled.filter(group__course=course, student=student).exclude(group__type='1')
+                for r in records:
+                    Record.remove_student_from_group(user_id, r.group.id)
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             if not group.course.semester.is_current_semester():
@@ -467,7 +474,11 @@ class Queue(models.Model):
     def get_point(program,course):
       pos = PointsOfCourses.objects.filter(course=course, program=program).values()
       if not pos:
-         return 0  # tu powinien szukać defaultowej wartości
+         point = PointsOfCourseEntities.objects.filter(entity = course.entity).values()
+         if point:
+            return point[0]["value"]
+         else:
+            return 0
       else:
          return pos[0]["value"]
 
@@ -475,23 +486,25 @@ class Queue(models.Model):
     def is_ECTS_points_limit_exceeded(user_id, group_id):
       """check if the sum of ECTS points for every course student is enrolled on, exceeds limit"""
       try:
-            point_limit_duration = 14 # number of days from records openning when 40 ECTS point limit is in force TODO
+
             group = Group.objects.get(id=group_id)
             """ Sprawdzenie, czy obowiązuje jeszcze limit ECTS"""
-            if group.course.semester.records_opening + timedelta(days=point_limit_duration) < datetime.now():
-		return False
+            if group.course.semester.records_opening + timedelta(days=ECTS_LIMIT_DURATION) < datetime.now():
+                return False
             """ Obliczenie sumy punktów ECTS"""
             groups = Record.get_groups_for_student(user_id)
             courses = set([g.course for g in groups])
             program = User.objects.get(id=user_id).student.program
+            points = Queue.get_point(program, group.course)
             ects = sum([Queue.get_point(program,course) for course in courses])
             if group.course not in courses:
-	        ects += Queue.get_point(program,group.course)
-	    """ Porównanie sumy z obowiązującym limitem"""
-            if ects <= 40:
-	        return False
-	    else:
-	        return True 
+                ects += Queue.get_point(program,group.course)
+    	    """ Porównanie sumy z obowiązującym limitem"""
+
+            if ects <= ECTS_LIMIT - points:
+                return False
+            else:
+                return True
       except Student.DoesNotExist:
             logger.error('Queue.count_ECTS_points(user_id)  throws Student.DoesNotExist exception (parameters: user_id = %d)' % (int(user_id)))
             raise NonStudentException()

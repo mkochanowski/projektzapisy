@@ -56,14 +56,18 @@ def vote( request ):
         Voting
     """
     subs = Proposal.get_by_tag('vote').order_by('name')
+
+    winter_list = Proposal.get_pks_by_tag('winter')
+    summer_list = Proposal.get_pks_by_tag('summer')
+
     winter_subs  = []
     summer_subs  = []
     unknown_subs = []
     
     for sub in subs:
-        if   sub.in_summer():
+        if  sub.pk in summer_list:
             summer_subs.append(sub)
-        elif sub.in_winter():
+        elif sub.pk in winter_list:
             winter_subs.append(sub)
         else:
             unknown_subs.append(sub)

@@ -10,7 +10,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ('semester',)
     search_fields = ('name',)
     fieldsets = [
-        (None,               {'fields': ['entity','name']}),
+        (None,               {'fields': ['entity','name'], 'classes': ['long_name']}),
         ('Szczegóły', {'fields': ['teachers','description','semester','type','slug'], 'classes': ['collapse']}),
         ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
@@ -34,8 +34,8 @@ class CourseInline(admin.TabularInline):
 class CourseEntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'shortName')
     search_fields = ('name', 'shortName')
-    inlines = [
-        CourseInline,
+    fieldsets = [
+        (None,               {'fields': ['name','shortName'], 'classes': ['long_name']}),
     ]
         
 class PointsOfCoursesAdmin(admin.ModelAdmin):

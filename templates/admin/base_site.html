@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'Fereol site admin' %}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="/site_media/css/admin.css">
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">{% trans 'Fereol administration' %}</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

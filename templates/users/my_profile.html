@@ -32,13 +32,13 @@ Studia zamawiane:<br/>
 <table>
     {% for t in terms %}
         <tr>
-        <td><b>{{t.name}}</b> : {{t.term}}</td>
+        <td><b>{{t.name}}</b>:</td><td>{{t.term|date:"H:i, d.m.Y"}}</td>
         </tr>
     {% endfor %}
 </table>
 <br/>
 <a class="change_profile" href="{% url password-change %}">zmień hasło</a>
-<a class="change_profile" href="{% url email-change %}">zmień adres email</a>
+<a href="{% url email_change %}">zmień adres email</a>
 {%if zamawiany%}
 <a class="change_bank_account" href="{% url bank-account-change %}">zmień numer konta bankowego</a>
 {%endif%}

@@ -632,3 +632,9 @@ input.bigButton
 	margin: 5px;
 }
 /*** WIDOK PROFILU UŻYTKOWNIKA  - koniec ***/
+
+.right
+{
+    float:right;
+}
+

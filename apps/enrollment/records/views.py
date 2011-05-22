@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -69,8 +70,8 @@ def set_enrolled(request, method):
     message_context = None if is_ajax else request
 
     if not request.user.is_authenticated():
-        return AjaxFailureMessage('NotAuthenticated', 'Nie jesteś zalogowany.',\
-            message_context)
+        return AjaxFailureMessage.auto_render('NotAuthenticated', \
+            'Nie jesteś zalogowany.', message_context)
 
     try:
         group_id = int(request.POST['group'])
@@ -184,6 +185,14 @@ def set_enrolled(request, method):
             'się ona w semestrze innym niż aktualny.'
         return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
             message_context)
+    except ECTS_Limit_Exception:
+        if is_ajax:
+            return AjaxFailureMessage.auto_render('ECTSLimit', 'Przekroczyłeś limit ECTS')
+        else:
+            messages.error(request, 'Przekroczony limit 40 ECTS')
+            return redirect('course-page', slug=Group.objects.\
+                    get(id=group_id).course_slug())
+
 
 @require_POST
 def records_set_locked(request, method):
@@ -243,7 +252,7 @@ def queue_set_priority(request, group_id, method):
         group = Group.objects.get(id=group_id)
         queue = Queue.objects.get(student=request.user.student, group=group)
         priority = int(priority)
-        if priority > 10 or priority < 1:
+        if priority > settings.QUEUE_PRIORITY_LIMIT or priority < 1:
             return AjaxFailureMessage.auto_render('FatalError', \
                 'Nieprawidłowa wartość priorytetu.', message_context);
         if queue.priority != priority:

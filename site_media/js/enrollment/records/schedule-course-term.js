@@ -355,7 +355,6 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype.setPinned = function(pinned)
 		return;
 
 	$.post(SchedulePrototype.urls['set-pinned'], {
-		csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
 		group: this.groupID,
 		pin: pinned
 	}, function(data)
@@ -387,22 +386,25 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype.setEnrolled = function(enrolled)
 		return;
 
 	$.post(SchedulePrototype.urls['set-enrolled'], {
-		csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
 		group: this.groupID,
 		enroll: enrolled
 	}, function(data)
 	{
 		var result = AjaxMessage.fromJSON(data);
 		self._isLoading = false;
-		if (self.isEnrolled)
+		if (result.isSuccess() ||
+			result.code == 'Queued' || result.code == 'AlreadyQueued')
 		{
-			self.isEnrolled = false;
-			self.enrolledCount--;
-		}
-		if (self.isQueued)
-		{
-			self.isQueued = false;
-			self.queuedCount--;
+			if (self.isEnrolled)
+			{
+				self.isEnrolled = false;
+				self.enrolledCount--;
+			}
+			if (self.isQueued)
+			{
+				self.isQueued = false;
+				self.queuedCount--;
+			}
 		}
 		if (result.isSuccess())
 		{
@@ -441,6 +443,22 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype.setEnrolled = function(enrolled)
 						alsoEnrolledTo._updateVisibility();
 					});
 				})
+			}
+			else if (self.type == 1) // wykład
+			{
+				// zaznaczenie innych grup z tego przedmiotu jako "nie zapisane"
+				// (wypisanie z wykładu skutkuje wypisaniem z całego przedmiotu)
+				self.course.terms.forEach(function(e)
+				{
+					if (e.groupID == self.groupID)
+						return;
+					if (e.isEnrolled)
+					{
+						e.isEnrolled = false;
+						e.enrolledCount--;
+					}
+					e._updateVisibility();
+				});
 			}
 		}
 		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')

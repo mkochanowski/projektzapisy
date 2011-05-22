@@ -5,6 +5,7 @@
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/offer/proposal/offerCreate.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/jquery/jquery.colorbox.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/common/dialog_box.css" type="text/css" />
 {% endblock %}
 
 {% block scripts %}    
@@ -22,37 +23,58 @@
 
 {% block content %}
 	<div id="offerCreate">
-		<table cellspacing="0">
-			<tr>
-				<th></th>
-				<th style="text-align: left;">Przedmiot</th>
-				<th>Poparcie</th>
-				<th>Chętni do poprowadzenia</th>
-				<th>Chętni do pomocy</th>
-			</tr>
-			{% for course in courses %}
-			<tr {% if course.in_offer %}class="selected"{% endif %}>
-				<td>
-					<input type="checkbox" name="selectCourse" value="{{ course.id }}" autocomplete="off" {% if course.in_offer %}checked{% endif %} />
-				</td>
-				<td>{{ course.name }}</td>
-				<td class="cen">{{ course.fans_count }}</td>
-				<td class="cen">
-					{% ifequal course.teachers_count 0 %}0
-					{% else %}
-						<a href="#" course="{{ course.id }}" class="teachersDetails">{{ course.teachers_count }}</a>
-					{% endifequal %}
-				</td>
-				<td class="cen">
-					{% ifequal course.helpers_count 0 %}0
-					{% else %}
-						<a href="#" course="{{ course.id }}" class="helpersDetails">{{ course.helpers_count }}</a>
-					{% endifequal %}
-				</td>
-			</tr>
-			{% endfor %}
-		</table>
-
+        <form method="POST">
+            <table cellspacing="0">
+                <tr>
+                    <th></th>
+                    <th>Oferta</th>
+                    <th>Głosowanie</th>
+                    <th>Semestr</th>
+                    <th style="text-align: left;">Przedmiot</th>
+                    <th>Pójdą</th>
+                    <th>Poprowadzą</th>
+                    <th>Pomogą</th>
+                </tr>
+                {% for course in courses %}
+                <tr class="selected-{{ course.state }}">
+                    <td class="state">
+                        <input type="radio" class="course-state" name="course[{{ course.id }}]" value="0" autocomplete="off" {% if course.state == "none"  %}checked {% endif %}/>
+                    </td>
+                    <td class="state">
+                        <input type="radio" class="course-state" name="course[{{ course.id }}]" value="1" autocomplete="off" {% if course.state == "offer"  %}checked {% endif %}/>
+                    </td>
+                    <td class="state">
+                        <input type="radio" class="course-state" name="course[{{ course.id }}]" value="2" autocomplete="off" {% if course.state == "vote"  %}checked {% endif %}/>
+                    </td>
+                    <td class="state">
+                        <select class="select-semester" name="course_semester[{{ course.id }}]">
+                            <option value="brak"></option>
+                            <option value="zimowy"{% if course.semester == "winter" %} selected{% endif %}>Zimowy</option>
+                            <option value="letni"{% if course.semester == "summer" %} selected{% endif %}>Letni</option>
+                        </select>
+                    </td>
+                    <td>{{ course.name }}<input type="hidden" name="courses[]" value="{{ course.id }}"></td>
+                    <td class="cen">{% if course.fans_count == 0 %}0
+                        {% else %}
+                            <a link="{{ course.id }}" class="show-fans">{{ course.fans_count }}</a>
+                        {% endif %}</td>
+                    <td class="cen">
+                        {% if course.teachers_count == 0 %}0
+                        {% else %}
+                            <a link="{{ course.id }}" class="show-teachers">{{ course.teachers_count }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="cen">
+                        {% if course.helpers_count == 0 %}0
+                        {% else %}
+                            <a link="{{ course.id }}" class="show-helpers">{{ course.helpers_count }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <input type="submit" class="right" id="offer-button" value="Zapisz">
+       </form>
 		<div class="teachers">
 			{% for course in courses %}
 				<div class="teacher" id="teachers{{ course.id }}">
@@ -77,4 +99,5 @@
 			{% endfor %}
 		</div>
 	</div>
+{% include 'common/dialog_box.html' %}
 {% endblock %}

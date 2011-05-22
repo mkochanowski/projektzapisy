@@ -13,6 +13,7 @@ from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
 from django.views.decorators.http   import require_POST
+from django.contrib                 import messages
 from copy                           import deepcopy
 
 from apps.users.models            import Program
@@ -207,7 +208,6 @@ def proposal_form(request, sid = None):
         for one_type in types:
             if one_type != "":
                 number_of_types = number_of_types + 1
-        print number_of_types
 
         if  ( proposal_name == "" or proposal_ects == "" or proposal_description == ""
             or proposal_requirements == "" or proposal_lectures == -1
@@ -412,26 +412,69 @@ def offer_create( request ):
     """
         Widok listy przedmiotów, które można wybrać w ramach oferty dydaktycznej
     """
+    if request.method == "POST":
+        courses = map( int, request.POST.getlist('courses[]'))
+
+        for id in courses:
+            proposal = Proposal.objects.get(pk = id, deleted = False)
+            action = int( request.POST.get('course[' + str(id) + ']', 0) )
+            proposal.remove_tag('summer')
+            proposal.remove_tag('winter')
+            if action == 0:
+                proposal.remove_tag('offer')
+                proposal.remove_tag('vote')
+            elif action == 1:
+                proposal.add_tag('offer')
+                proposal.remove_tag('vote')
+            else:
+                proposal.add_tag('vote')
+                proposal.add_tag('offer')
+                semester =  request.POST.get('course_semester[' + str(id) + ']', 'brak')
+                
+                if semester == 'letni':
+                    proposal.add_tag('summer')
+                elif semester == 'zimowy':
+                    proposal.add_tag('winter')
+
+        messages.success(request, 'Zmieniono stan oferty')
+
+    all_courses = Proposal.objects.filter(deleted=False).order_by('name')
+    vote_list  = Proposal.get_pks_by_tag('vote')
+    offer_list = Proposal.get_pks_by_tag('offer')
+
+    summer_list = Proposal.get_pks_by_tag('summer')
+    winter_list = Proposal.get_pks_by_tag('winter')
+    
+    for course in all_courses:
+        if course.id in vote_list:
+            course.state = 'vote'
+        elif course.id in offer_list:
+            course.state = 'offer'
+        else:
+            course.state = 'none'
+
+        if course.id in summer_list:
+            course.semester = 'summer'
+        elif course.id in winter_list:
+            course.semester = 'winter'
+        else:
+            course.semester = 'none'
+            
     data = {
-        'courses' : Proposal.objects.filter(deleted=False).order_by('name'),
+        'courses' : all_courses,
     }    
     
     return render_to_response('offer/proposal/create_offer.html', data, context_instance = RequestContext( request ))
-    
-@require_POST
-@permission_required('proposal.can_create_offer')
-def offer_select(request):
-    """
-        Wybiera lub odznacza przedmiot w ofercie dydaktycznej
-    """    
-    action = request.POST['action']
-    id = request.POST['id']
-    
-    proposal_ = Proposal.objects.get(pk = id, deleted = False)
-    
-    if action == 'select':
-        proposal_.add_tag("offer")
-    else: # unselect
-        proposal_.remove_tag("offer")
-        
-    return HttpResponse('ok')
+
+@login_required
+def get_group(request,group, id):
+    proposal = Proposal.objects.get( pk = id, deleted = False)
+
+    if group == 'Fans':
+        users = proposal.fans.all()
+    elif group == 'Teachers':
+        users = proposal.teachers.all()
+    else:
+        users = proposal.helpers.all()
+
+    return render_to_response('offer/proposal/users_group.html', {'users':users}, context_instance = RequestContext( request ))

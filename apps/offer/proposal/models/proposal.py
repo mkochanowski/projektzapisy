@@ -256,3 +256,7 @@ class Proposal( models.Model ):
             (if it has tag english)
         """
         return self.has_tag('english')
+
+    @staticmethod
+    def get_pks_by_tag(tag):
+        return Proposal.get_by_tag(tag).values_list('pk', flat=True)

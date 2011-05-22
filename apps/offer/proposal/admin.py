@@ -19,6 +19,10 @@ class ProposalAdmin( admin.ModelAdmin ):
     prepopulated_fields = { 'slug' : ( 'name', ) }
     list_display = ( 'name', 'owner', )
     search_fields = ( 'name', 'fans', 'teachers', 'tags', 'owner', )
+    fieldsets = [
+        (None,               {'fields': ['name','owner', 'tags', 'slug'], 'classes': ['long_name']}),
+    ]
+
     
 class ProposalDescriptionAdmin( admin.ModelAdmin ):
     search_fields = ( 'description', 'requirements', 'comments', 'author', 'tags', )

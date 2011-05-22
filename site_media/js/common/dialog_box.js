@@ -31,7 +31,7 @@ Fereol.dialog.show = function()
     $('#box').focus();
 }
 
-Fereol.dialog.init();
+$(Fereol.dialog.init);
 
 Fereol.dialog.setTitle = function(html)
 {

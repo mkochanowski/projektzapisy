@@ -1,66 +1,86 @@
-$(document).ready(
-	function()
-	{
-		$('[name=selectCourse]').click(selectCourse);
-		$('.teachersDetails').each(showTeachersDetails);
-		$('.helpersDetails').each(showHelpersDetails);
-		//$('.teachersDetails').click(showTeachersDetails);
-	}
-);
 
-function selectCourse()
+Offer = new Object();
+
+Offer.init = function()
 {
-	var tr = $(this).parent().parent();
-	var action;
 
-	if ($(this).is(':checked'))
-	{
-		tr.addClass('selected');
-		$(this).attr('checked', true);
-		action = 'select';
-	}
-	else
-	{
-		tr.removeClass('selected');
-		$(this).removeAttr('checked');
-		action = 'unselect';
-	}
-
-	$.ajax({
-		type    : 'POST',
-		url     : '/proposal/offer/select/',
-		data    : {
-			'action'    : action,
-			'id'        : $(this).val()
-		},
-		success : function ()
-		{
-		},
-		error : function()
-		{
-			if (action == "unselect")
-			{
-				tr.addClass('selected');
-			}
-			else
-			{
-				tr.removeClass('selected');
-			}
-			alert('Operacja wyboru nie powidła się');
-		}
-	});
+    Offer.hideSemesters()
+    $('.course-state').change(Offer.changeState);
+    $('.show-teachers').click(Offer.showTeachers);
+    $('.show-helpers').click(Offer.showHelpers);
+    $('.show-fans').click(Offer.showFans);
 }
 
-function showTeachersDetails()
-{
-	var id = $(this).attr('course');
+$(Offer.init);
 
-	$(this).colorbox({ "inline" : true, "href" : "#teachers" + id, "title" : ""});
+Offer.hideSemesters = function()
+{
+    $('.selected-none, .selected-offer').each(function(i, elem)
+    {
+        $(elem).find('.select-semester').hide();
+    })
 }
 
-function showHelpersDetails()
+Offer.changeState = function()
 {
-	var id = $(this).attr('course');
+    var new_value = $(this).val();
 
-	$(this).colorbox({ "inline" : true, "href" : "#helpers" + id, "title" : ""});
+    var type = ''
+    switch ( new_value )
+    {
+        case '0':
+            type = 'none'
+            break;
+
+        case '1':
+            type = 'offer'
+            break;
+
+        case '2':
+            type = 'vote'
+            break;
+    }
+    var tr = $(this).parent().parent()
+    $(tr).removeClass()
+    $(tr).addClass('selected-' + type)
+    if( type === 'vote')
+    {
+        $(this).parent().parent().find('.select-semester').show();
+    }
+    else
+    {
+        $(this).parent().parent().find('.select-semester').hide();
+    }
+}
+
+Offer.showHelpers = function()
+{
+    Offer.show('Helpers', $(this).attr('link') )
+    return false;
+}
+
+Offer.showTeachers = function()
+{
+    Offer.show('Teachers', $(this).attr('link') )
+    return false;
+}
+
+Offer.showFans = function()
+{
+    Offer.show('Fans', $(this).attr('link') )
+    return false;
+}
+
+Offer.show = function(group, id)
+{
+    $.ajax({
+        type: "POST",
+        dataType: "html",
+        url: "/proposal/get" + group +"/" + id + "/",
+        success: function(resp){
+            Fereol.dialog.setHTML(resp);
+            Fereol.dialog.setTitle("Podgląd ankiety");
+            Fereol.dialog.show();
+        }
+    });
 }

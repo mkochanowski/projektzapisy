@@ -74,15 +74,12 @@ class PollForm( forms.Form ):
             poll_section.description = section.description
             poll_section.questions   = []
             poll_section.leading     = False
-            print questions
             if str( type( questions[ 0 ])) == \
                 "<class 'apps.grade.poll.models.single_choice_question.SingleChoiceQuestion'>":
                 questionOrdering  = SingleChoiceQuestionOrdering.objects.select_related().get( 
                         sections = section,
                         question = questions[ 0 ])
-                print 'jestem tu, przedemna'
                 if questionOrdering.is_leading:
-                    print "is leading!!!"
                     title   += '_question-%d-leading' % questions[ 0 ].pk
                     if post_data:
                         answer = post_data.get( title, None )

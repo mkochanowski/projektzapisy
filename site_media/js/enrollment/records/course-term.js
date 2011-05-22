@@ -97,7 +97,7 @@ Fereol.Enrollment.CourseTerm.prototype.convertControlsToAJAX = function()
 	var priorityCell = this._container.find('td.priority').assertOne();
 	priorityCell.empty();
 	this._prioritySelector = $.create('select').appendTo(priorityCell);
-	for (var i = 1; i <= 10; i++)
+	for (var i = 1; i <= priority_limit; i++)
 	{
 		var priorityOption = $.create('option', {value: i}).text(i);
 		if (i === this.queuePriority)
@@ -174,11 +174,10 @@ Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
 {
 	var self = this;
 	this._prioritySelector.attr('disabled', true);
-	if (newPriority < 1 || newPriority > 10)
+	if (newPriority < 1 || newPriority > priority_limit)
 		throw new Error('Nieprawidłowy priorytet do ustawienia');
 	
 	$.post(this._queuePrioritySetURL, {
-			csrfmiddlewaretoken: $.cookie('csrftoken'),
 			priority: newPriority
 		}, function(data)
 	{
@@ -217,22 +216,25 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 	enroll = !!enroll;
 
 	$.post(Fereol.Enrollment.CourseTerm._setEnrolledURL, {
-		csrfmiddlewaretoken: $.cookie('csrftoken'),
 		group: this.id,
 		enroll: enroll
 	}, function(data)
 	{
 		var result = AjaxMessage.fromJSON(data);
 		self._isLoading = false;
-		if (self.isEnrolled)
+		if (result.isSuccess() ||
+			result.code == 'Queued' || result.code == 'AlreadyQueued')
 		{
-			self.isEnrolled = false;
-			self.enrolledCount--;
-		}
-		if (self.isQueued)
-		{
-			self.isQueued = false;
-			self.queuedCount--;
+			if (self.isEnrolled)
+			{
+				self.isEnrolled = false;
+				self.enrolledCount--;
+			}
+			if (self.isQueued)
+			{
+				self.isQueued = false;
+				self.queuedCount--;
+			}
 		}
 		if (result.isSuccess())
 		{
@@ -267,6 +269,22 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 					}
 					alsoEnrolled.refreshView();
 				})
+			}
+			else if (self.type == 1) // wykład
+			{
+				// zaznaczenie innych grup z tego przedmiotu jako "nie zapisane"
+				// (wypisanie z wykładu skutkuje wypisaniem z całego przedmiotu)
+				CourseView._termsList.forEach(function(e)
+				{
+					if (e.id == self.id)
+						return;
+					if (e.isEnrolled)
+					{
+						e.isEnrolled = false;
+						e.enrolledCount--;
+					}
+					e.refreshView();
+				});
 			}
 		}
 		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')

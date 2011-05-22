@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login
@@ -48,13 +48,11 @@ def student_profile(request, user_id):
         if request.is_ajax():
             return render_to_response('users/ajax_student_profile.html', data, context_instance=RequestContext(request))
         else:
-            begin = 'A'
-            end   = 'B'
-            char  = 'A'
-            students = Student.get_list(begin, end)
+            begin = student.user.last_name[0]
+            students = Student.get_list(begin)
             students = Record.recorded_students(students)
             data['students'] = students
-            data['char']     = char
+            data['char']     = begin
             return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except NonStudentException:
@@ -81,10 +79,8 @@ def employee_profile(request, user_id):
         if request.is_ajax():
             return render_to_response('users/ajax_employee_profile.html', data, context_instance=RequestContext(request))
         else:
-            begin = 'A'
-            end   = 'B'
-            char  = 'A'
-            employees = Employee.get_list(begin, end)
+            begin = user.last_name[0]
+            employees = Employee.get_list(begin)
             semester = Semester.get_current_semester()
             employees = Group.teacher_in_present(employees, semester)
 
@@ -93,11 +89,10 @@ def employee_profile(request, user_id):
                 e.short_old = e.user.first_name[:2] + e.user.last_name[:2]
 
             data['employees'] = employees
-            data['char'] = char
+            data['char'] = begin
               
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
-
-
+        
     except NonEmployeeException:
         logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % user_id )
         request.user.message_set.create(message="Nie ma takiego pracownika.")
@@ -114,9 +109,17 @@ def email_change(request):
         data = request.POST.copy()
         form = EmailChangeForm(data, instance=request.user)
         if form.is_valid():
+            email = form.cleaned_data['email']
+
+            user = User.objects.filter(email=email)
+
+            if user and user <> request.user:
+                messages.error(request, "Podany adres jest już przypisany do innego użytkownika!")
+                return render_to_response('users/email_change_form.html', {'form':form}, context_instance=RequestContext(request))
+
             form.save()
             logger.info('User (%s) changed email' % request.user.get_full_name())
-            request.user.message_set.create(message="Twój adres e-mail został zmieniony.")
+            messages.success(request, message="Twój adres e-mail został zmieniony.")
             return HttpResponseRedirect(reverse('my-profile'))
     else:
         form = EmailChangeForm({'email' : request.user.email})
@@ -156,7 +159,7 @@ def my_profile(request):
     points = zamawiany and zamawiany.points or 0
     if current_semester:
         try:
-            point_limit_duration = settings.POINT_LIMIT_DURATION 
+            point_limit_duration = settings.ECTS_LIMIT_DURATION
             t0 = current_semester.records_opening - request.user.student.get_t0_interval()       
             terms = [
             {"name":"T0", "term":t0},

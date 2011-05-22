@@ -23,11 +23,7 @@
 u
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
-    <li><a href="{% url latest_news category %}">
-		{% ifequal category "enrollment" %}Zapisy{% endifequal %}
-        {% ifequal category "offer" %}Oferta{% endifequal %}
-        {% ifequal category "grade" %}Ocena zajęć{% endifequal %}
-        </a>
+    <li><a href="{% url latest_news category %}">{% ifequal category "enrollment" %}Zapisy{% endifequal %}{% ifequal category "offer" %}Oferta{% endifequal %}{% ifequal category "grade" %}Ocena zajęć{% endifequal %}</a>
 	</li>
     <li id="news-nav">
 		{% if archive_view %}Archiwum aktualności{% endif %}

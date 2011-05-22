@@ -155,7 +155,6 @@ SchedulePrototype.initRecordsLocking = function()
 		updateLockButton();
 		
 		$.post(lockURL, {
-			csrfmiddlewaretoken: $.cookie('csrftoken'), // TODO: nowe jquery tego podobno nie wymaga
 			lock: isLocked
 		}, function(data)
 		{
