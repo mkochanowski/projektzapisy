@@ -33,7 +33,8 @@ from django.core.mail import send_mail
 
 from apps.email_change.forms import EmailChangeForm
 from apps.email_change.utils import generate_key
-
+from django.contrib.auth.models import User
+from django.contrib import messages
 
 @login_required
 def email_change_view(request, extra_context={},
@@ -53,6 +54,12 @@ def email_change_view(request, extra_context={},
             Site = cache.get_model('sites', 'Site')
             
             email = form.cleaned_data.get('email')
+            user = User.objects.filter(email=email)
+
+            if user and user <> request.user:
+                messages.error(request, "Podany adres jest już przypisany do innego użytkownika!")
+                return render_to_response(template_name, {'form':form}, context_instance=RequestContext(request))
+
             verification_key = generate_key(request.user, email)
             
             current_site = Site.objects.get_current()
