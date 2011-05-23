@@ -64,6 +64,7 @@ def course(request, slug):
         records = Record.enrolled.filter(group__course=course)
         queues = Queue.queued.filter(group__course=course)
         groups = list(Group.objects.filter(course=course))
+        requirements = map(lambda x: x.name, course.requirements.all())
         try:
             student = request.user.student
             course.is_recording_open = course.is_recording_open_for_student(student)
@@ -203,7 +204,8 @@ def course(request, slug):
         data.update({
             'course' : course,
             'tutorials' : tutorials,
-            'priority_limit': settings.QUEUE_PRIORITY_LIMIT
+            'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
+            'requirements' : requirements
         })
 
         return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )

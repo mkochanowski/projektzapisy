@@ -55,6 +55,7 @@ class Course( models.Model ):
     laboratories = models.IntegerField(verbose_name='pracownia')
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
     repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
+    requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+')
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method
