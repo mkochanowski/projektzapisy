@@ -57,9 +57,11 @@
 				{% endif %}
 				<li>
 					<span>Wymagane:</span>
-					<a onclick="alert('to tylko przykład')">JFiZO</a>,
-					Matematyka w zakresie szkoły średniej,
-					<a onclick="alert('to tylko przykład')">AiSD</a>
+                    {% if requirements %}
+                        {{ requirements|join:", " }}
+                    {% else %}
+                        brak
+                    {% endif %}
 				</li>
 				{% if course.can_enroll_from %}
 					<li>
