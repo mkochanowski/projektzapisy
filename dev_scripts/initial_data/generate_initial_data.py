@@ -30,7 +30,7 @@ db_config_big = {
 	'MIN_NON_LECTURE_GROUPS_FOR_COURSE': 1,
 	'MAX_NON_LECTURE_GROUPS_FOR_COURSE': 5,
 	'LECTURES_LIMITS': [20, 30, 40, 50, 60, 100, 200],
-	'NON_LECTURE_LIMITS': [20, 30],
+	'NON_LECTURE_LIMITS': [15, 20],
 	'DELAY_MINUTES_FOR_COURSE_LOW': 0,
 	'DELAY_MINUTES_FOR_COURSE_HIGH': 3 * 24 * 60,
 	'NUM_OF_RECORDS': 3000,
@@ -69,6 +69,7 @@ config = db_config_big
 for arg in sys.argv[1:]:
 	if arg == 'small':
 		config = db_config_small
+        print "change!"
 	
 COURSES = json.loads(open('courses_data.json', 'r').read())
 
@@ -105,7 +106,7 @@ s += input_data
 #########################################################################
 
 # Generate users
-id_start = 2
+id_start = 200
 
 # Generate users for student
 username = 2
@@ -345,7 +346,7 @@ def generate_polls(semesters, groups):
             poll_id += 1
     return polls_raw    
     
-s += ''.join( generate_polls(semesters, groups_sem) )
+#s += ''.join( generate_polls(semesters, groups_sem) )
 
 #########################################################################
 #                      Generate answers for polls                       #
@@ -384,7 +385,7 @@ def generate_answers_full():
         answers_raw += answer
     return answers_raw
     
-s += ''.join( generate_answers_full() )
+#s += ''.join( generate_answers_full() )
 
 # Convert to readable format using indents and add close bracket
 s = s.replace('@!@', spaces)[:-2] + '\n]'
