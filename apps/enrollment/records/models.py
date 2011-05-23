@@ -22,6 +22,7 @@ from django.db.models import signals
 #from django.dispatch import receiver
 from settings import ECTS_LIMIT_DURATION, ECTS_LIMIT
 
+from apps.enrollment.utils import mail_enrollment_from_queue
 
 STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
@@ -314,6 +315,7 @@ class Record(models.Model):
                 new_student = queued.student
                 Record.add_student_to_group(new_student.user.id, group_id)
                 Queue.remove_student_low_priority_records(new_student.user.id, group_id, queued.priority)
+                mail_enrollment_from_queue( student, group )
                 logger.info('User %s <id: %s> replaced user %s <id: %s> in group [%s] <id: %s>.',  user.username, user.id, new_student.user.username, new_student.user.id, group, group.id)
             return record
 
