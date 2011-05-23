@@ -85,6 +85,16 @@ class Record(models.Model):
         }
 
     @staticmethod
+    def get_student_records_objects(student, semester):
+        '''
+            TODO: po wywaleniu get_student_records zmienić nazwę na właśnie tą
+        '''
+        return Record.objects.\
+            filter(student=student, group__course__semester=semester).\
+            select_related('group', 'group__course', 'group__course__entity',\
+            'group__course__type');
+
+    @staticmethod
     def get_student_enrolled_ids(student, semester):
         return Record.enrolled.\
             filter(student=student, group__course__semester=semester).\
