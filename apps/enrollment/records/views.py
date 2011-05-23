@@ -289,7 +289,7 @@ def records(request, group_id):
         return render_to_response('common/error.html',\
             context_instance=RequestContext(request))
 
-def prepare_courses_with_terms(terms, records = None):
+def prepare_courses_with_terms(terms, records = []):
     courses_list = []
     courses_map = {}
     def add_course_to_map(course):
