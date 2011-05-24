@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/common/dialog_box.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/grade/questionset_create.css" type="text/css" />
+	<link rel="stylesheet" href="/site_media/css/enrollment/courses.css" type="text/css" />
     {% block extra-styles %}
     {% endblock %}
 {% endblock %}
@@ -25,8 +26,10 @@
 
 {{ fdata }}
 
-{% block content %}
 
+
+
+{% block content %}
     <div id='poll-managment-menu'>
 	<ul>
            <li{% if tab == "template_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-templates %}">Lista szablonów</a></li>

@@ -424,7 +424,7 @@ def delete_objects( request, object, object_list ):
 
     return counter
 
-def make_paginator( request, object):
+def make_paginator( request, object=None, objects=None):
     """
     Prepare paginator to view.
 
@@ -432,7 +432,9 @@ def make_paginator( request, object):
     @param request - request, for get
     @param object  - type of object to paginate for example Poll, Section
     """
-    objects = object.objects.filter(deleted=False)
+    if object:
+        objects = object.objects.filter(deleted=False)
+        
     paginator = Paginator(objects, 25)
 
     # Make sure page request is an int. If not, deliver first page.
@@ -625,7 +627,7 @@ def make_poll_from_template( request, template):
 
     return poll
 
-def make_poll(request, template, group=None, orgin=None):
+def make_poll(request, template, group=None, origin=None):
     template['iterate_group'] = group
     poll = make_poll_from_template(request, template)
     poll.origin = origin
