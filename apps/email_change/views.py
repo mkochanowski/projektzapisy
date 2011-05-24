@@ -33,6 +33,7 @@ from django.core.mail import send_mail
 
 from apps.email_change.forms import EmailChangeForm
 from apps.email_change.utils import generate_key
+from apps.email_change.models import EmailChangeRequest
 from django.contrib.auth.models import User
 from django.contrib import messages
 

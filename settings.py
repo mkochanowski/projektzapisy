@@ -116,7 +116,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'paranoidsessions.ParanoidSessionMiddleware',
+    #'paranoidsessions.ParanoidSessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -155,6 +155,7 @@ INSTALLED_APPS = (
     'apps.grade.poll',
     'apps.grade.ticket_create',
     'apps.mobile',
+    'apps.email_change'
 )
 
 FIXTURE_DIRS = (
