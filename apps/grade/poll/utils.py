@@ -718,7 +718,7 @@ def prepare_data_for_create_poll( request, group_id = 0 ):
         group                = Group.objects.get(pk=group_id)
         data['group']        = group.pk
         data['type']         = group.type
-        data['course_id']   = group.course.pk
+        data['course_id']    = group.course.pk
         data['semester']     = group.course.semester.pk
         data['groups']       = Group.objects.filter(type=group.type, course=group.course).order_by('teacher')
 

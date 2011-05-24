@@ -371,7 +371,7 @@ def poll_create_for_group():
     pass
 
 @employee_required
-def poll_create(request, group_id = 0):
+def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
