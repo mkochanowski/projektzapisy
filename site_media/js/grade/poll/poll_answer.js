@@ -27,6 +27,7 @@ Poll.answer.init = function()
     	var father = $(this).parents('.poll-section-leading');
         $(father).nextAll().show()
     });
+    $('.poll-section-leading').nextAll().hide();
     
     $('input[value="-1"].poll-section-choice:not(:checked)').each(Poll.answer.hideOther);
     $('#poll-form').submit(Poll.answer.cleanup);
