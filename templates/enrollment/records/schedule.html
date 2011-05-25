@@ -59,6 +59,12 @@
 				<th class="ects">ECTS</th>
 			</tr>
 		</thead>
+		<tfoot>
+			<tr>
+				<td>Suma ECTS:</td>
+				<td class="ects">?</td>
+			</tr>
+		</tfoot>
 		<tbody>
 			{% for course in courses %}
 				<tr class="courseHeader">
@@ -75,6 +81,7 @@
 					<input type="hidden" name="type" value="{{ course.info.type }}" />
 					<input type="hidden" name="short" value="{{ course.info.short }}" />
 					<input type="hidden" name="url" value="{% url course-page course.info.slug %}" />
+					{% if course.terms %}
 					<ul>
 						{% for term in course.terms %}
 						<li>
@@ -90,14 +97,9 @@
 						</li>
 						{% endfor %}
 					</ul>
+					{% endif %}
 				</td></tr>
 			{% endfor %}
 		</tbody>
-		<tfoot>
-			<tr>
-				<td>Suma ECTS:</td>
-				<td class="ects">?</td>
-			</tr>
-		</tfoot>
 	</table>
 {% endblock %}

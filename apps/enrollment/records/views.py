@@ -289,25 +289,28 @@ def records(request, group_id):
         return render_to_response('common/error.html',\
             context_instance=RequestContext(request))
 
-def prepare_courses_with_terms(terms):
+def prepare_courses_with_terms(terms, records = []):
     courses_list = []
     courses_map = {}
+    def add_course_to_map(course):
+        if course.pk in courses_map:
+            return
+        course_info = {
+            'object': course,
+            'info': {
+                'id' : course.pk,
+                'name': course.name,
+                'short': course.entity.get_short_name(),
+                'type': course.type.pk,
+                'slug': course.slug,
+            },
+            'terms': []
+        }
+        courses_map[course.pk] = course_info
+        courses_list.append(course_info)
     for term in terms:
         course = term.group.course
-        if not course.pk in courses_map:
-            course_info = {
-                'object': course,
-                'info': {
-                    'id' : course.pk,
-                    'name': course.name,
-                    'short': course.entity.get_short_name(),
-                    'type': course.type.pk,
-                    'slug': course.slug,
-                },
-                'terms': []
-            }
-            courses_map[course.pk] = course_info
-            courses_list.append(course_info)
+        add_course_to_map(course)
         term_info = {
             'id': term.pk,
             'group': term.group.pk,
@@ -327,6 +330,8 @@ def prepare_courses_with_terms(terms):
             'object': term,
             'info': term_info
         })
+    for record in records:
+        add_course_to_map(record.group.course)
     return courses_list
 
 @login_required
@@ -345,7 +350,8 @@ def own(request):
             context_instance=RequestContext(request))
 
     courses = prepare_courses_with_terms(\
-        Term.get_all_in_semester(default_semester, student))
+        Term.get_all_in_semester(default_semester, student),\
+        Record.get_student_records_objects(student, default_semester))
 
     terms_by_days = [None for i in range(8)] # dni numerowane od 1
     for course in courses:

@@ -11,11 +11,13 @@ from django.http                       import HttpResponse, \
 from django.shortcuts                  import render_to_response
 from django.template                   import RequestContext
 from django.utils                      import simplejson
+from apps.enrollment.courses.models.course import CourseEntity
 from apps.users.decorators             import student_required, employee_required
 from django.contrib.auth.decorators    import login_required
 from django.core.servers.basehttp import FileWrapper
 
-from apps.enrollment.courses.models import Semester, Group, Course, GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models import Semester, Group, Course, GROUP_TYPE_CHOICES, \
+                                           CourseEntity
                                               
 from apps.grade.ticket_create.utils  import from_plaintext
 from apps.grade.ticket_create.models import PublicKey, \
@@ -59,7 +61,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               make_template_from_db,\
                                               get_groups_for_user, make_pages, edit_poll
 
-from apps.users.models               import Employee
+from apps.users.models               import Employee, Program
 
 from form_utils                        import get_section_form_data, \
                                               validate_section_form, \
@@ -369,7 +371,7 @@ def poll_create_for_group():
     pass
 
 @employee_required
-def poll_create(request, group_id = 0):
+def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
@@ -479,13 +481,55 @@ def polls_list( request ):
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect('/news/grade')
-    page, paginator  = make_paginator(request, Poll)
+
+    if request.method == 'POST':
+
+        kwargs = {}
+        if 'q' in request.POST:
+            kwargs['title__icontains'] = request.POST['q']
+            data['q'] = request.POST['q']
+
+        if int(request.POST['filter-semester']) > 0:
+            kwargs['semester__pk'] = int(request.POST['filter-semester'])
+            data['filter_semester'] = int(request.POST['filter-semester'])
+
+        if int(request.POST['filter-course']) > 0:
+            kwargs['group__course__entity__pk'] = int(request.POST['filter-course'])
+            data['filter_course'] = int(request.POST['filter-course'])
+
+        if int(request.POST['filter-studies_type']) > 0:
+            kwargs['studies_type__pk']  = int(request.POST['filter-studies_type'])
+            data['filter_studies_type'] = int(request.POST['filter-studies_type'])
+
+        if int(request.POST['filter-type']) > 0:
+            kwargs['group__type'] = int(request.POST['filter-type'])
+            data['filter_type'] = request.POST['filter-type']
+
+        if 'my-polls' in request.POST and request.POST['my-polls'] == 'on':
+            kwargs['author'] = request.user.employee
+            data['my_polls'] = True
+
+        if int(request.POST['filter-employee']) > 0:
+            kwargs['group__teacher__pk'] = int(request.POST['filter-employee'])
+            data['filter_employee'] =  int(request.POST['filter-employee'])
+
+        polls = Poll.objects.filter( **kwargs )
+        page, paginator  = make_paginator(request, objects=polls)
+    else:
+        page, paginator  = make_paginator(request, object=Poll)
+        
     data['polls'] = page
     data['polls_word'] = declination_poll(paginator.count, True)
     data['grade']      = grade
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']    = paginator._get_page_range()
     data['tab']            = "poll_list"
+    data['semesters']      = Semester.objects.all()
+    data['courses']        = CourseEntity.objects.all().order_by('name')
+    data['employees']      = Employee.objects.all().\
+                    select_related().order_by('user__last_name', 'user__first_name')
+    data['studies_types']    = Program.objects.all()
+    data['types']            = GROUP_TYPE_CHOICES
     data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))

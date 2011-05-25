@@ -116,7 +116,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'paranoidsessions.ParanoidSessionMiddleware',
+    #'paranoidsessions.ParanoidSessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -155,6 +155,7 @@ INSTALLED_APPS = (
     'apps.grade.poll',
     'apps.grade.ticket_create',
     'apps.mobile',
+    'apps.email_change'
 )
 
 FIXTURE_DIRS = (
@@ -182,7 +183,7 @@ ECTS_LIMIT_DURATION = 14 # abs(t1-t2), in days
 ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
 ECTS_LIMIT = 40
 
-QUEUE_PRIORITY_LIMIT = 10
+QUEUE_PRIORITY_LIMIT = 5
 
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
