@@ -439,12 +439,11 @@ class RemoveFirstStudentFromQueue(TestCase):
         self.assertRaises(NonGroupException, Queue.remove_first_student_from_queue, group_id)
     
     def testEmptyQueue(self):
-        self.assertEqual(Queue.remove_first_student_from_queue(self.group.id),False)
+        self.assertFalse(Queue.remove_first_student_from_queue(self.group.id))
 
 #Checking same as test below - WHY?   
     def testWithECTSLimitExceeded(self):
-        removed = Queue.objects.get(group=self.group3.id, student=self.student4.id).student
-        self.assertEqual(Queue.remove_first_student_from_queue(self.group3.id).student,removed)
+        self.assertFalse(Queue.remove_first_student_from_queue(self.group3.id))
         
     def testRemoveFirstStudentFromQueue(self):
         removed = Queue.objects.get(group=self.group2.id, student=self.student2.id).student
