@@ -1,5 +1,5 @@
 ﻿{% extends "grade/poll/managment/base.html" %}
-
+{% load dynamic_truncate_tag %}
 {% block scripts %}
 <script src="/site_media/js/grade/managment/list.js" type="application/javascript"></script>
 <script src="/site_media/js/grade/managment/poll_list.js" type="application/javascript"></script>
@@ -13,6 +13,95 @@
     <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/grade/poll-managment.css" type="text/css" />
     <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+{% endblock %}
+
+{% block top-bar %}
+    <div id="pollsList-top-bar" class="main-top-bar">
+        <form action="" method="POST" id="filter-form">
+            <fieldset>
+                <legend><span>Filtrowanie</span></legend>
+                <div class="main-filter-input">
+                    <input class="text filter-phrase" name="q" type="text" value="{{ q }}"/>
+                    <input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
+                    <div class="clear"></div>
+                    <input type="submit" class="right" value="filtruj" />
+                </div>
+            </fieldset>
+            <fieldset class="course-type-filter">
+                <legend><span>Rodzaj przedmiotu</span></legend>
+                <table>
+                <tr>
+                    <td>
+                        <label for="pollFilter-semester">Semestr:</label>
+                    </td>
+                    <td>
+                        <select id="pollFilter-semester" name="filter-semester">
+                            <option value="0">dowolny</option>
+                            {% for semester in semesters %}
+                            <option value="{{ semester.id }}"{% if filter_semester == semester.id %} selected{% endif %}>{{ semester }}{% if semester.is_current %} (bieżący){% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <label for="pollFilter-course">Przedmiot:</label>
+                    </td>
+                    <td>
+                        <select id="pollFilter-course" name="filter-course">
+                            <option value="0">dowolny</option>
+                            {% for course in courses %}
+                            <option value="{{ course.id }}"{% if filter_course == course.id %} selected{% endif %}>{% truncate course.name 40 %}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="pollFilter-studies_type">Typ studiów:</label>
+                    </td>
+                    <td>
+                        <select id="pollFilter-studies_type" name="filter-studies_type">
+                            <option value="0">dowolny</option>
+                            {% for type in studies_types %}
+                            <option value="{{ type.id }}"{% if filter_studies_type == type.id %} selected{% endif %}>{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <label for="pollFilter-type">Typ zajęć:</label>
+                    </td>
+                    <td>
+                        <select id="pollFilter-type" name="filter-type">{{ filter_type }}
+                            <option value="0">dowolny</option>
+                            {% for type in types %}
+                            <option value="{{ type.0 }}"{% if filter_type == type.0 %} selected{% endif %}>{{ type.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="checkbox" name="my-polls" id="my-polls"{% if my_polls%} checked{% endif %}>
+                    </td>
+                    <td>
+                        <label for="my-polls">Ankiety utworzone przeze mnie</label>
+                    </td>
+                    <td>
+                        <label for="pollFilter-employee">Prowadzący:</label>
+                    </td>
+                    <td>
+                        <select id="pollFilter-employee" name="filter-employee">
+                            <option value="0">dowolny</option>
+                            {% for employee in employees %}
+                            <option value="{{ employee.id }}"{% if filter_employee == employee.id %} selected{% endif %}>{{ employee }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            </fieldset>
+            </form>
+        </div>
+
 {% endblock %}
 
 {% block poll-managment %}
@@ -53,26 +142,26 @@
 
 <div class="pagination">
     Strony: {% if polls.has_previous %}
-        <a href="?page={{ polls.previous_page_number }}" class="prev">&lsaquo;&lsaquo; poprzednia</a>
+        <a href="?page={{ polls.previous_page_number }}" class="prev link">&lsaquo;&lsaquo; poprzednia</a>
     {% endif %}
     {% for page in pages %}
         {% if page > 0 %}
             {% ifequal page polls.number %}
-                <span class="current page">{{ page }}</span>
+                <span class="current page link">{{ page }}</span>
             {% else %}
-                <a href="?page={{ page }}" class="page">{{ page }}</a>
+                <a href="?page={{ page }}" class="page link">{{ page }}</a>
             {% endifequal %}
         {% else %}
             ...
         {% endif %}
     {% endfor %}
     {% if polls.has_next %}
-        <a href="?page={{ polls.next_page_number }}" class="next">następna &rsaquo;&rsaquo;</a>
+        <a href="?page={{ polls.next_page_number }}" class="next link">następna &rsaquo;&rsaquo;</a>
     {% endif %}
 
     {% if polls.paginator.num_pages > 1 %}
     <form action="" method="GET" style="float:right;">
-        Przejdź do: <select name="page" onchange="submit()">
+        Przejdź do: <select name="page" id="go_to_page">
             {% for p in pages_range %}
                 <option value="{{ p }}"{% if p == polls.number %} selected{% endif %}>{{ p }}</option>
             {% endfor %}

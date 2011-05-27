@@ -6,6 +6,17 @@ Poll.list = new Object();
 
 Poll.list.init = function()
 {
+    $('#go_to_page').change(function()
+    {
+        $('#filter-form').attr('action', '?' + $(this).val() ).submit();
+    })
+
+    $('.link').click(function(e)
+    {
+        $('#filter-form').attr('action', $(this).attr('href')).submit();
+        e.preventDefault()
+    })
+
     $('.poll_list_a').click(function()
     {
         var html = Poll.list.getHTML( $(this).attr('href') )
