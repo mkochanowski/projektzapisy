@@ -37,7 +37,7 @@ logger = logging.getLogger()
 def student_profile(request, user_id):
     """student profile"""
     try:
-        student = Student.objects.get(user__pk=user_id)
+        student = Student.objects.get(pk=user_id)
         groups = Student.get_schedule(student)
 
         data = {

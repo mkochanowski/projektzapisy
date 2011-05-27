@@ -85,7 +85,7 @@ Wybierz studenta z menu po prawej.
 		<ul class="students">
 			{% for s in students %}
                 <li>
-                    <a href="{% url student-profile s.user.id %}" class="student-profile-link">{{s.get_full_name}}</a>
+                    <a href="{% url student-profile s.pk %}" class="student-profile-link">{{s.get_full_name}}</a>
                     <input type="hidden" name="student-id" value="{{ s.user.student.id }}" />
                     <input type="hidden" name="student-email" value="{{ s.user.email }}" />
                     <input type="hidden" name="student-album" value="{{ s.matricula }}" />
