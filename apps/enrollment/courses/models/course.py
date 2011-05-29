@@ -66,6 +66,18 @@ class Course( models.Model ):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.slug = slugify('%s %s' % (self.name, self.semester))
+            if not self.type:
+                self.type = self.entity.type
+            if not self.lectures:
+                self.lectures = self.entity.lectures
+            if not self.exercises:
+                self.exercises = self.entity.exercises
+            if not self.laboratories:
+                self.laboratories = self.entity.laboratories
+            if not self.repetitions:
+                self.repetitions = self.entity.repetitions
+            if not self.description:
+                self.description = self.entity.description
         super(Course, self).save(*args, **kwargs)
         
     def is_recording_open_for_student(self, student):
