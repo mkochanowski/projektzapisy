@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
-FEREOL_PATH = '../..'
+#### TO CHANGE #####
 SCHEDULE_FILE = './PlanPrzedmiotów.txt'
+LIMITS = {'1' : 200, '9' : 200, '2' : 20, '3' : 16 , '5' : 16 , '6' : 16 }
+####  #####
+
+FEREOL_PATH = '../../..'
 
 import sys
 import os
@@ -29,8 +33,8 @@ import re
 regex = re.compile('\s+(?P<day>pn|wt|śr|czw|pi)\s+(?P<start_time>\d{1,2})-(?P<end_time>\d{1,2})\s+\((?P<type>wykład|repetytorium|ćwiczenia|pracownia|ćwicz\+pracownia|seminarium)\)\s+(?P<teacher>[^,]*),\s+(?P<rooms>.*)')
 
 GROUP_TYPES = { 'wykład' : '1', 'repetytorium' : '9', 'ćwiczenia' : '2', 'pracownia' : '3' ,'ćwicz+pracownia' : '5' ,'seminarium' : '6' }
+
 DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' }
-LIMITS = {'1' : 200, '9' : 200, '2' : 20, '3' : 16 , '5' : 16 , '6' : 16 }
 
 def lower_pl(s):
     return s.lower().replace('Ą','ą').replace('Ć','ć').replace('Ę','ę').replace('Ł','ł').replace('Ń','ń').replace('Ó','ó').replace('Ś','ś').replace('Ż','ż').replace('Ź','ź')

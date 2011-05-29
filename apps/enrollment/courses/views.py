@@ -195,8 +195,8 @@ def course(request, slug):
             { 'name' : 'Ćwiczenio-pracownie', 'groups' : seminar, 'type' : 6},
             { 'name' : 'Seminarium', 'groups' : exer_labs, 'type' : 5},
             { 'name' : 'Lektorat', 'groups' : language, 'type' : 7},
-            { 'name' : 'Zajęcia', 'groups' : sport, 'type' : 8},
-            { 'name' : 'Project', 'groups' : project, 'type' : 10},
+            { 'name' : 'Zajęcia sportowe', 'groups' : sport, 'type' : 8},
+            { 'name' : 'Projekt', 'groups' : project, 'type' : 10},
             ]
 
         data = prepare_courses_list_to_render(request)
