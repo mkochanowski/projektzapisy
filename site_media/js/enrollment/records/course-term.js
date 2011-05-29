@@ -138,6 +138,9 @@ Fereol.Enrollment.CourseTerm.prototype.refreshView = function()
 	{
 		this._setEnrolledAction = false;
 		newEnrolledButtonLabel = 'wypisz z kolejki';
+		this._prioritySelector.children('option').attr('selected', false);
+		this._prioritySelector.children('option[value=' + this.queuePriority +
+			']').attr('selected', 'selected');
 	}
 	else
 	{
@@ -293,6 +296,7 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 			self.queuedCount++;
 			if (self.enrolledCount < self.groupLimit)
 				self.enrolledCount = self.groupLimit;
+			self.queuePriority = 1;
 			result.displayMessageBox();
 		}
 		else

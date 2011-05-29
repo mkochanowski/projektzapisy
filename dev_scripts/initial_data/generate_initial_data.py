@@ -69,7 +69,6 @@ config = db_config_big
 for arg in sys.argv[1:]:
 	if arg == 'small':
 		config = db_config_small
-        print "change!"
 	
 COURSES = json.loads(open('courses_data.json', 'r').read())
 
