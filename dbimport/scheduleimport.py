@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 FEREOL_PATH = '../..'
+SCHEDULE_FILE = './PlanPrzedmiotów.txt'
 
 import sys
 import os
@@ -14,7 +15,7 @@ if __name__ == '__main__':
     setup_environ(settings)
 
 from apps.enrollment.records.models import Record, STATUS_ENROLLED
-from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom
+from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities, PointsOfCourses
 from apps.users.models import Student, Employee
 
 from django.template.defaultfilters import slugify
@@ -29,6 +30,7 @@ regex = re.compile('\s+(?P<day>pn|wt|śr|czw|pi)\s+(?P<start_time>\d{1,2})-(?P<e
 
 GROUP_TYPES = { 'wykład' : '1', 'repetytorium' : '9', 'ćwiczenia' : '2', 'pracownia' : '3' ,'ćwicz+pracownia' : '5' ,'seminarium' : '6' }
 DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' }
+LIMITS = {'1' : 200, '9' : 200, '2' : 20, '3' : 16 , '5' : 16 , '6' : 16 }
 
 def lower_pl(s):
     return s.lower().replace('Ą','ą').replace('Ć','ć').replace('Ę','ę').replace('Ł','ł').replace('Ń','ń').replace('Ó','ó').replace('Ś','ś').replace('Ż','ż').replace('Ź','ź')
@@ -89,10 +91,12 @@ def import_schedule(file, semester):
 
                 group_type = GROUP_TYPES[g.group('type')]
                 teacher = find_teacher(g.group('teacher'))
+                limit = LIMITS[group_type]
 
                 group = Group.objects.create(course=course,
                                              teacher=teacher,
-                                             type=group_type)
+                                             type=group_type,
+                                             limit=limit)
                 term = Term.objects.create(dayOfWeek=dayOfWeek,
                                            start_time=start_time,
                                            end_time=end_time,
@@ -107,28 +111,23 @@ def import_schedule(file, semester):
             shortName = name[:29]
             entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
 
-            course_type = entity.type
-            description = entity.description
-            lectures = entity.lectures
-            exercises = entity.exercises
-            laboratories = entity.laboratories
-            repetitions = entity.repetitions
             slug = str(semester.year) + semester.type + '_' + slugify(name)
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
                                                  semester=semester,
-                                                 type=course_type,
                                                  slug = slug,
-                                                 description = description,
-                                                 lectures = lectures,
-                                                 exercises = exercises,
-                                                 laboratories = laboratories,
-                                                 repetitions = repetitions
                                                  )
-        
+                points = PointsOfCourseEntities.objects.filter(entity=entity)
+                for p in points:
+                    type_of_point = p.type_of_point
+                    value = p.value
+                    poc = PointsOfCourses.objects.create(course=course, type_of_point=type_of_point, value=value)
+
+
             except Exception, e:
                 print 'Error during creating course:%s. \nError: %s ' % (name, e)
+
         else:
             continue
 
@@ -147,7 +146,7 @@ def get_semester():
 
 def scheduleimport():
     semester = get_semester()
-    file = open('./PlanPrzedmiotów.txt')
+    file = open(SCHEDULE_FILE)
     import_schedule(file, semester)
 
 
