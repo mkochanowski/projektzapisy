@@ -94,7 +94,6 @@ StudentsList.ajax.parseList = function(data)
         loadStudentProfile($(this).attr('href'));
          return false;
     })
-    StudentsList.emptyFilterWarningVisible = false;
     StudentsList.studentFilter.doFilter()
 }
 
