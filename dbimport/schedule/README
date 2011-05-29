@@ -1,0 +1,23 @@
+Skrypt `scheduleimport.py' ma za zadanie zimportować plan zajęć do bazy.
+Przykładowy plik z planem zajęć znajduje się w obecnym katalogu w pliku `PlanPrzedmiotów.txt'.
+
+Uwagi
+=====
+Będziesz miał mniej pracy, jeżeli w systemie są już wprowadzone podstawy przedmiotów wraz z godzinami, typem zajęć, opisem i punktami.
+Skrypt przekopiuje te dane z odpowiedniej podstawy przedmiotu do przedmiotu i nie będziesz musiał wprowadzać tego ręcznie.
+
+
+Import planu zajęć
+==================
+1. Otwórz plik `scheduleimport.py' i zaktualizuj zmienną SCHEDULE_FILE tak, by wyznaczała ścieżkę do pliku z planem zajęć.
+   Ew. zaktualizuj zmienną LIMITS, w której trzymany jest limit miejsc w grupach dla danego rodzaju zajęć.
+
+2. Wykonaj komendy:
+$ cd /fereol/dbimport/schedule/
+$ python scheduleimport.py
+3. Skrypt utworzył nowy semestr. 
+  a) sprawdź, czy przedmioty i grupy zostały utworzone poprawnie dla tego semestru;
+  b) popraw typ zajęć, punkty i liczbę godzin (wykłady,...) dla każdego przedmiotu (jeżeli zachodzi taka potrzeba)
+  c) popraw limity grup, jeżeli zachodzi taka potrzeba
+  d) zmień ustawienia nowo dodanego semestru 
+4. Jeżeli coś poszło nie tak i chcesz zacząć od nowa, możesz usunąć dodany semestr, a kaskadowo zostaną usunięte wszystkie przedmioty i grupy przypisane do tego semestru.

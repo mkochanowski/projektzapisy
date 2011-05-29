@@ -152,12 +152,12 @@ def proposal_vote_summary( request, slug ):
         Summary for given course
     """
     course = Proposal.objects.get( slug=slug )
-    points, voters = SingleVote.get_points_and_voters( course )
-    users = SingleVote.get_voters( course )
+    points, votes = SingleVote.get_points_and_voters( course )
+    voters = SingleVote.get_voters( course )
     
     data = { 'proposal' : course,
              'points'   : points,
-             'votes'    : voters,
-             'users'    : users}
+             'votes'    : votes,
+             'voters'    : voters}
            
     return render_to_response('offer/vote/proposal_summary.html', data, context_instance = RequestContext( request ))

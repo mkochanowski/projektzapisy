@@ -190,19 +190,19 @@ def course(request, slug):
             { 'name' : 'Wykłady', 'groups' : lectures, 'type' : 1},
             { 'name' : 'Repetytorium', 'groups' : repertory, 'type' : 9},
             { 'name' : 'Ćwiczenia', 'groups' : exercises, 'type' : 2},
-            { 'name' : 'Pracownia', 'groups' : exercises_adv, 'type' : 4},
-            { 'name' : 'Ćwiczenia (poziom zaaansowany)', 'groups' : laboratories, 'type' : 3},
+            { 'name' : 'Pracownia', 'groups' : laboratories, 'type' : 3},
+            { 'name' : 'Ćwiczenia (poziom zaawansowany)', 'groups' : exercises_adv, 'type' : 4},
             { 'name' : 'Ćwiczenio-pracownie', 'groups' : seminar, 'type' : 6},
             { 'name' : 'Seminarium', 'groups' : exer_labs, 'type' : 5},
             { 'name' : 'Lektorat', 'groups' : language, 'type' : 7},
-            { 'name' : 'Zajęcia', 'groups' : sport, 'type' : 8},
-            { 'name' : 'Project', 'groups' : project, 'type' : 10},
+            { 'name' : 'Zajęcia sportowe', 'groups' : sport, 'type' : 8},
+            { 'name' : 'Projekt', 'groups' : project, 'type' : 10},
             ]
-        
 
         data = prepare_courses_list_to_render(request)
         data.update({
             'course' : course,
+            'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
             'requirements' : requirements

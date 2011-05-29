@@ -94,7 +94,6 @@ StudentsList.ajax.parseList = function(data)
         loadStudentProfile($(this).attr('href'));
          return false;
     })
-    StudentsList.emptyFilterWarningVisible = false;
     StudentsList.studentFilter.doFilter()
 }
 
@@ -182,7 +181,7 @@ StudentsList.parseStudent = function()
 
         var student = new StudentsList.student();
 
-        student.id = studentContainer.children('input[name=student-id]').
+        student.id = studentContainer.children('input[name=student-user-id]').
                 assertOne().attr('value').castToInt();
         student.name = studentContainer.children('a.student-profile-link').assertOne().text();
         student.email = studentContainer.children('input[name=student-email]').

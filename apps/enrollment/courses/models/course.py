@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.template.defaultfilters import slugify
+from apps.enrollment.courses.models.points import PointsOfCourses, PointsOfCourseEntities
 
 from student_options import StudentOptions
 
@@ -66,6 +67,18 @@ class Course( models.Model ):
     def save(self, *args, **kwargs):
         if not self.pk:
             self.slug = slugify('%s %s' % (self.name, self.semester))
+            if not self.type:
+                self.type = self.entity.type
+            if not self.lectures:
+                self.lectures = self.entity.lectures
+            if not self.exercises:
+                self.exercises = self.entity.exercises
+            if not self.laboratories:
+                self.laboratories = self.entity.laboratories
+            if not self.repetitions:
+                self.repetitions = self.entity.repetitions
+            if not self.description:
+                self.description = self.entity.description
         super(Course, self).save(*args, **kwargs)
         
     def is_recording_open_for_student(self, student):
@@ -114,7 +127,26 @@ class Course( models.Model ):
             return "nieznany semestr"
         else:
             return self.semester.get_name()
-    
+
+    def get_points(self, student):
+        '''
+            returns points for course, and optionally for certain student
+        '''
+        pts = None
+        if student:
+            try:
+                pts = PointsOfCourses.objects.get(course=self, \
+                    program=student.program)
+            except PointsOfCourses.DoesNotExist:
+                pts = None
+        if not pts:
+            try:
+                pts = PointsOfCourseEntities.objects.get(entity=self.entity)
+            except PointsOfCourseEntities.DoesNotExist:
+                pts = None
+        return pts;
+        
+
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'

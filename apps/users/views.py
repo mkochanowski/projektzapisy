@@ -37,7 +37,7 @@ logger = logging.getLogger()
 def student_profile(request, user_id):
     """student profile"""
     try:
-        student = Student.objects.get(user__pk=user_id)
+        student = User.objects.get(id=user_id).student
         groups = Student.get_schedule(student)
 
         data = {
@@ -55,7 +55,7 @@ def student_profile(request, user_id):
             data['char']     = begin
             return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
-    except NonStudentException:
+    except Student.DoesNotExist:
         logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % int(user_id) )
         request.user.message_set.create(message="Nie ma takiego studenta.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
@@ -93,12 +93,12 @@ def employee_profile(request, user_id):
               
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
         
-    except NonEmployeeException:
-        logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % user_id )
+    except Employee.DoesNotExist:
+        logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % int(user_id) )
         request.user.message_set.create(message="Nie ma takiego pracownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
-        logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % user_id )
+        logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
         request.user.message_set.create(message="Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     

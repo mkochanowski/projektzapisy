@@ -35,7 +35,8 @@ class CourseEntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'shortName')
     search_fields = ('name', 'shortName')
     fieldsets = [
-        (None,               {'fields': ['name','shortName'], 'classes': ['long_name']}),
+        (None,               {'fields': ['name','shortName','type','description'], 'classes': ['long_name']}),
+        ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
         
 class PointsOfCoursesAdmin(admin.ModelAdmin):
