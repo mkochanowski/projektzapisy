@@ -75,7 +75,7 @@ class SingleVote ( models.Model ):
         current_state = SystemState.get_state(year)
         votes = SingleVote.objects.filter( course = proposal, state=current_state )
         
-        users = []
+        voters = []
         for vote in votes:
-            users.append(vote.student.user)
-        return users
+            voters.append({'user': vote.student.user, 'points': vote.value})
+        return voters

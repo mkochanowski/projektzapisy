@@ -22,7 +22,7 @@
 			Na ten przedmiot zagłosowało osób: <strong>{{ votes }}</strong>;
 			oddając punktów: <strong>{{ points }}</strong>.
 		</p>
-		{% if users %}
+		{% if voters %}
 			<h3>Lista głosujących na ten przedmiot</h3>
 			<table>
 				<thead>
@@ -33,11 +33,11 @@
 					</tr>
 				</thead>
 				<tbody>
-					{% for us in users %}
+					{% for voter in voters %}
 						<tr>
-							<td>{{ us.first_name }}</td>
-							<td>{{ us.last_name }}</td>
-							<td class="number" title="TODO">?</td>
+							<td>{{ voter.user.first_name }}</td>
+							<td>{{ voter.user.last_name }}</td>
+							<td class="number">{{ voter.points }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>
