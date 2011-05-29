@@ -132,6 +132,7 @@ class Course( models.Model ):
         '''
             returns points for course, and optionally for certain student
         '''
+        pts = None
         if student:
             try:
                 pts = PointsOfCourses.objects.get(course=self, \
