@@ -40,10 +40,10 @@
 						{% endfor %}
 					</li>
 				{% endif %}
-				{% if course.ects %}
+				{% if points %}
 					<li>
-						<span>Punkty ECTS:</span>
-						{{course.ects}}
+						<span>Punkty {{ points.type_of_point.name }}:</span>
+						{{ points.value }}
 					</li>
 				{% endif %}
 				{% if course.lectures or course.exercises or course.laboratories or course.repetitions %}

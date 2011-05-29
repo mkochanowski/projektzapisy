@@ -484,6 +484,9 @@ class Queue(models.Model):
 
     @staticmethod
     def get_point(program,course):
+      """
+          TODO: OMFG, to nie powinno być w modelu kolejki
+      """
       pos = PointsOfCourses.objects.filter(course=course, program=program).values()
       if not pos:
          point = PointsOfCourseEntities.objects.filter(entity = course.entity).values()
@@ -496,7 +499,10 @@ class Queue(models.Model):
 
     @staticmethod
     def is_ECTS_points_limit_exceeded(user_id, group_id):
-      """check if the sum of ECTS points for every course student is enrolled on, exceeds limit"""
+      """
+          check if the sum of ECTS points for every course student is enrolled on, exceeds limit
+          TODO: OMFG, to nie powinno być w modelu kolejki
+      """
       try:
 
             group = Group.objects.get(id=group_id)

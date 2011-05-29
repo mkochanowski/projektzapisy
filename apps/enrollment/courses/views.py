@@ -198,11 +198,11 @@ def course(request, slug):
             { 'name' : 'Zajęcia', 'groups' : sport, 'type' : 8},
             { 'name' : 'Project', 'groups' : project, 'type' : 10},
             ]
-        
 
         data = prepare_courses_list_to_render(request)
         data.update({
             'course' : course,
+            'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
             'requirements' : requirements

@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.template.defaultfilters import slugify
+from apps.enrollment.courses.models.points import PointsOfCourses, PointsOfCourseEntities
 
 from student_options import StudentOptions
 
@@ -126,7 +127,25 @@ class Course( models.Model ):
             return "nieznany semestr"
         else:
             return self.semester.get_name()
-    
+
+    def get_points(self, student):
+        '''
+            returns points for course, and optionally for certain student
+        '''
+        if student:
+            try:
+                pts = PointsOfCourses.objects.get(course=self, \
+                    program=student.program)
+            except PointsOfCourses.DoesNotExist:
+                pts = None
+        if not pts:
+            try:
+                pts = PointsOfCourseEntities.objects.get(entity=self.entity)
+            except PointsOfCourseEntities.DoesNotExist:
+                pts = None
+        return pts;
+        
+
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'

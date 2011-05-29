@@ -51,6 +51,7 @@
 		</div>
 	</div>
 
+	{% if courses %}
 	<h2>Zajęcia, na które jesteś zapisany</h2>
 	<table id="enr-schedule-listByCourse">
 		<thead>
@@ -102,4 +103,5 @@
 			{% endfor %}
 		</tbody>
 	</table>
+	{% endif %}
 {% endblock %}
