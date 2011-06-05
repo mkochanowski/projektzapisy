@@ -186,7 +186,7 @@ ECTS_LIMIT = 40
 QUEUE_PRIORITY_LIMIT = 5
 
 # that's only the example of settings_local.py file contents:
-#SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
+SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
 SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
