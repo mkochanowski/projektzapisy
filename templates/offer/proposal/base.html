@@ -42,6 +42,7 @@
 
 {% block content %}
 	<div id="od-proposal-proposalmenu">
+		<a href="/proposal/add/" id="od-proposal-addlink">Dodaj przedmiot</a>
 		<ul id="od-proposal-proposallist">
 			{% for sub in proposals %}
 				<li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}>
@@ -50,7 +51,6 @@
 			   {% empty %}<li>Brak przedmiotów</li>
 			{% endfor %}
 		</ul>
-		<a href="/proposal/add/" id="od-proposal-addlink">Dodaj przedmiot</a>
 	</div>
 	<div id="od-proposal-contents">
 		{% block proposal-content %}
