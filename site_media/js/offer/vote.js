@@ -82,9 +82,8 @@ Vote.initCounters = function()
 	Vote.totalCoursesCount = $('#od-vote-form').find('select').length;
 	Vote.wantedCoursesCount = $('#od-vote-form').find('.isFan').length;
 
-	var onlyWantedLabel = $('#od-vote-onlywanted').parent().children('label').getDOM();
-	onlyWantedLabel.appendChild(document.createTextNode(' (' +
-		Vote.wantedCoursesCount + ' z ' + Vote.totalCoursesCount + ')'));
+	if (Vote.wantedCoursesCount == 0)
+		$('#od-vote-onlywanted').assertOne().attr('disabled', true);
 
 	// włączenie liczników
 
