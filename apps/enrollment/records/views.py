@@ -351,7 +351,7 @@ def own(request):
 
     courses = prepare_courses_with_terms(\
         Term.get_all_in_semester(default_semester, student),\
-        Record.get_student_records_objects(student, default_semester))
+        Record.get_student_enrolled_objects(student, default_semester))
 
     terms_by_days = [None for i in range(8)] # dni numerowane od 1
     for course in courses:
