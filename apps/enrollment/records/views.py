@@ -332,6 +332,8 @@ def prepare_courses_with_terms(terms, records = []):
         })
     for record in records:
         add_course_to_map(record.group.course)
+    courses_list = sorted(courses_list, \
+        key=lambda course: course['info']['name'])
     return courses_list
 
 @login_required
