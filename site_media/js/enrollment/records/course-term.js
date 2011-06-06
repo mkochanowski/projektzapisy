@@ -97,9 +97,13 @@ Fereol.Enrollment.CourseTerm.prototype.convertControlsToAJAX = function()
 	var priorityCell = this._container.find('td.priority').assertOne();
 	priorityCell.empty();
 	this._prioritySelector = $.create('select').appendTo(priorityCell);
-	for (var i = 1; i <= priority_limit; i++)
+	for (var i = 1; i <= CourseView.priorityLimit; i++)
 	{
 		var priorityOption = $.create('option', {value: i}).text(i);
+		if (i == 1)
+			priorityOption.text('1 (w ostateczności)');
+		if (i == CourseView.priorityLimit)
+			priorityOption.text(CourseView.priorityLimit + ' (bardzo chcę)');
 		if (i === this.queuePriority)
 			priorityOption.attr('selected', 'selected');
 		this._prioritySelector.append(priorityOption);
@@ -177,7 +181,7 @@ Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
 {
 	var self = this;
 	this._prioritySelector.attr('disabled', true);
-	if (newPriority < 1 || newPriority > priority_limit)
+	if (newPriority < 1 || newPriority > CourseView.priorityLimit)
 		throw new Error('Nieprawidłowy priorytet do ustawienia');
 	
 	$.post(this._queuePrioritySetURL, {

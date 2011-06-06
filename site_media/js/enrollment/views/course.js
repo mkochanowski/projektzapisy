@@ -19,6 +19,8 @@ CourseView.init = function()
 	CourseView.detailsVisible = null;
 
 	CourseView.isEnrollmentOpen = ($('.setEnrolledButton').size() > 0);
+	CourseView.priorityLimit = $('input[name=priority-limit]').assertOne().
+		attr('value').castToInt();
 
 	CourseView._initDetailsToggleSwitch();
 	CourseView._initExpandableDescription();
