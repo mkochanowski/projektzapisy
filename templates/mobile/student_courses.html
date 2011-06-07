@@ -13,16 +13,6 @@
                 Brak przedmiotów w tej kategorii.
             </div>
         {% endfor %}
-    <h3>Przedmioty przypięte:</h3>
-        {% for p in pinned %}
-            <div class="course-outer">
-            <a href= "/course/{{ p.slug }}/" >
-            <div class="course-inner">{{ p.name }} </div></a></div>
-        {% empty %}
-            <div style="font-style:italic;">
-                Brak przedmiotów w tej kategorii.
-            </div>
-        {% endfor %}
     <h3>Przedmioty, na które głosowałeś:</h3>
         {% for v in voted %}
             <div class="course-outer">

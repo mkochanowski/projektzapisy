@@ -236,6 +236,11 @@
 	text-align: center;
 }
 
+#enr-course-view .tutorial table td.priority select
+{
+	width: 35px;
+}
+
 #enr-course-view .tutorial table td.priority
 {
 	white-space: nowrap;
