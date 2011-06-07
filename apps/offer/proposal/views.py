@@ -118,8 +118,37 @@ def proposal( request, slug, descid = None ):
 def proposal_form(request, sid = None):
     """
         Form to add and edit proposal
+
     """
-    
+
+    """
+
+    proposal = Proposal.objects.get_or_404(id=sid) # sid = description id??
+
+
+    if 'cancel' in request.POST:
+        redirect show
+
+    if request.POST:
+        form = ProposalCreator(request=request)
+
+        if form.save():
+            commit
+            messages.success(request, "Udalo sie")
+            redirect show
+        else:
+            rollback
+            messages.error(request, "Nie udalo sie")
+
+    else:
+        form = ProposalCreator(instance=proposal)
+
+    data = {}
+    data['form'] = form
+    return render_to_response( 'offer/proposal/form.html', data, context_instance = RequestContext(request));
+
+    """
+
     edit_mode = True if sid else False    
     books_to_form = []
     success = False

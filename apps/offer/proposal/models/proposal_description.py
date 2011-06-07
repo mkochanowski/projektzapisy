@@ -58,6 +58,10 @@ class ProposalDescription(models.Model):
     def __unicode__(self):
         return '[' + self.author.__unicode__() + ']' + self.proposal.name 
 
+    @staticmethod
+    def get_newest( proposal ):
+        pass
+
     def get_newer( self, proposal ):
         """
             Gets next description (by date) if exists
@@ -77,7 +81,7 @@ class ProposalDescription(models.Model):
         description = ProposalDescription.objects.filter(proposal = proposal, 
                                                          pk__lt = self.id)
         if description:
-            return description[description.count()-1]
+            return description[-1]
         else:
             return None
     
