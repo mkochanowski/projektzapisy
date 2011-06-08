@@ -37,10 +37,11 @@ SchedulePrototype.init = function()
 		new Schedule.Time(18, 20), new Schedule.Time(19, 10), $.create('div').text('e')));
 	*/
 
-	
 	SchedulePrototype.initCourseList(enrolledGroupIDs, pinnedGroupIDs, queuedGroupIDs);
 	SchedulePrototype.initFilter();
 	SchedulePrototype.initRecordsLocking();
+
+	$.dataInvalidate(); // zawsze chcemy świeżych danych
 };
 
 SchedulePrototype.urls = {};
