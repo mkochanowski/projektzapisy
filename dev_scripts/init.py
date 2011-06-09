@@ -162,6 +162,11 @@ with open('init-data/early-init.sql', 'w') as datasql:
 		sql_true + ', ' + sql_true + ', ' + sql_true + ', ' + 
 		sql_now + ', ' + sql_now + ');\n')
 
+# tylko postgresql
+with open('init-data/very-early-init.sql', 'w') as datasql:
+	datasql.write('ALTER TABLE auth_permission ALTER "name" TYPE character varying(255);\n');
+	datasql.write('ALTER TABLE auth_permission ALTER "codename" TYPE character varying(255);\n');
+
 with open('init-data/init.sql', 'w') as datasql:
 	school_year = int(datetime.date.today().strftime('%Y'))
 	month = int(datetime.date.today().strftime('%m'))
@@ -257,6 +262,9 @@ os.chdir(OS_CWD)
 shutil.copyfile('init-data/settings_local.py', SOURCE_DIR + '/settings_local.py')
 os.chdir(SOURCE_DIR)
 os.system('python manage.py syncdb < ../init-data/init.in')
+if not config_dbsqlite:
+	print '\033[91m' + 'Podaj hasło do bazy postgresql' + '\033[0m'
+	os.system('python manage.py dbshell < ../init-data/very-early-init.sql')
 os.system('python manage.py migrate')
 if not config_dbsqlite:
 	print '\033[91m' + 'Podaj hasło do bazy postgresql' + '\033[0m'
@@ -276,6 +284,7 @@ if True:
 	os.chdir('init-data')
 	os.remove('init.in');
 	os.remove('init.json');
+	os.remove('very-early-init.sql');
 	os.remove('early-init.sql');
 	os.remove('init.sql');
 	os.remove('initial-db.json');
