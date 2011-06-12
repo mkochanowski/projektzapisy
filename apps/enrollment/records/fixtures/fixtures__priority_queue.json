@@ -260,6 +260,16 @@
         }
     },
     {
+        "pk": 106, 
+        "model": "courses.group", 
+        "fields": {
+            "limit": 1, 
+            "type": "3", 
+            "teacher": 1000, 
+            "course": 100
+        }
+    },
+    {
         "pk": 100, 
         "model": "courses.classroom", 
         "fields": {
@@ -469,6 +479,24 @@
         }
     },
     {
+        "pk": 6, 
+        "model": "records.record", 
+        "fields": {
+            "status": "1", 
+            "group": 106, 
+            "student": 104
+        }
+    },
+    {
+        "pk": 7, 
+        "model": "records.record", 
+        "fields": {
+            "status": "1", 
+            "group": 106, 
+            "student": 100
+        }
+    },
+    {
         "pk": 1, 
         "model": "records.queue", 
         "fields": {
@@ -527,7 +555,16 @@
             "student": 101, 
             "time": "2010-12-23 15:32:20"
         }
+    },
+	{
+        "pk": 7, 
+        "model": "records.queue", 
+        "fields": {
+            "priority": 5, 
+            "group": 106, 
+            "student": 101, 
+            "time": "2010-12-23 15:32:20"
+        }
     }
-
 ]
 

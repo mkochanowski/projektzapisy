@@ -308,15 +308,16 @@ class Record(models.Model):
             if not group.course.semester.is_current_semester():
             	raise NotCurrentSemesterException
             record = Record.enrolled.get(group=group, student=student)
-            queued = Queue.remove_first_student_from_queue(group_id)
             record.delete()
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id)) 
-            if queued and (Record.number_of_students(group=group) < group.limit) :
-                new_student = queued.student
-                Record.add_student_to_group(new_student.user.id, group_id)
-                Queue.remove_student_low_priority_records(new_student.user.id, group_id, queued.priority)
-                mail_enrollment_from_queue( student, group )
-                logger.info('User %s <id: %s> replaced user %s <id: %s> in group [%s] <id: %s>.',  user.username, user.id, new_student.user.username, new_student.user.id, group, group.id)
+            if Record.number_of_students(group=group) < group.limit:
+            	queued = Queue.remove_first_student_from_queue(group_id)
+            	if queued:
+	                new_student = queued.student
+	                Record.add_student_to_group(new_student.user.id, group_id)
+	                Queue.remove_student_low_priority_records(new_student.user.id, group_id, queued.priority)
+	                mail_enrollment_from_queue( student, group )
+	                logger.info('User %s <id: %s> replaced user %s <id: %s> in group [%s] <id: %s>.',  user.username, user.id, new_student.user.username, new_student.user.id, group, group.id)
             return record
 
         except Record.DoesNotExist:
