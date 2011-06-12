@@ -134,7 +134,8 @@ with open('init-data/init.json', 'w') as datajson:
 			'model': 'users.student',
 			'fields': {
 				'matricula': int(config.get('super-user', 'matricula')),
-				'user': 1
+				'user': 1,
+				'program': 1
 			}
 		}
 	]
@@ -269,8 +270,8 @@ os.system('python manage.py migrate')
 if not config_dbsqlite:
 	print '\033[91m' + 'Podaj hasło do bazy postgresql' + '\033[0m'
 os.system('python manage.py dbshell < ../init-data/early-init.sql')
-os.system('python manage.py loaddata ../init-data/init.json')
 os.system('python manage.py loaddata ../init-data/initial-db.json')
+os.system('python manage.py loaddata ../init-data/init.json')
 if not config_dbsqlite:
 	print '\033[91m' + 'Podaj hasło do bazy postgresql' + '\033[0m'
 os.system('python manage.py dbshell < ../init-data/init.sql')

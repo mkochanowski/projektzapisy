@@ -1,4 +1,5 @@
 {% extends "enrollment/base.html" %}
+{% load fereol_common %}
 
 {% block main-subtitle %}Plan zajęć{% endblock %}
 
@@ -57,13 +58,13 @@
 		<thead>
 			<tr>
 				<th>Przedmiot</th>
-				<th class="ects">ECTS</th>
+				<th class="ects">{{ points_type }}</th>
 			</tr>
 		</thead>
 		<tfoot>
 			<tr>
-				<td>Suma ECTS:</td>
-				<td class="ects">?</td>
+				<td>Suma punktów {{ points_type }}:</td>
+				<td class="ects">{{  points_sum }}</td>
 			</tr>
 		</tfoot>
 		<tbody>
@@ -74,7 +75,11 @@
 							{{ course.info.name }}
 						</a>
 					</td>
-					<td rowspan="2" class="ects">?</td>
+					<td rowspan="2" class="ects">
+						{% if points|hash:course.info.id %}
+							{{ points|hash:course.info.id|getattribute:'value' }}
+						{% endif %}
+					</td>
 				</tr>
 				<tr class="courseDetails"><td>
 					<input type="hidden" name="id" value="{{ course.info.id }}" />
