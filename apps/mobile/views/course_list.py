@@ -44,7 +44,7 @@ def coursesEnrolled(request):
 	try:
 		student = request.user.student
 	except Student.DoesNotExist:
-		return ([], [], [])
+		return ([], [])
 	semester = Semester.objects.filter(visible = True)
 	semester = filter(lambda s : s.is_current_semester(), semester) #???
 	records = Record.objects.filter(student = student, group__course__semester__in = semester).select_related('group', 'group__type', 'group__course').order_by('group__course').reverse()
