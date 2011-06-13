@@ -377,8 +377,6 @@ def own(request):
     points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
 
     data = {
-        'is_student': BaseUser.is_student(request.user),
-        'is_employee': BaseUser.is_employee(request.user),
         'terms_by_days': terms_by_days,
         'courses': courses,
         'points': points,
@@ -429,8 +427,6 @@ def schedule_prototype(request):
             })
     
     data = {
-        'is_student': BaseUser.is_student(request.user),
-        'is_employee': BaseUser.is_employee(request.user),
         'student_records': Record.get_student_records_ids(student, \
             default_semester),
         'courses' : courses,

@@ -22,11 +22,8 @@ def prepare_courses_list_to_render(request):
     try:
         student = request.user.student
         records_history = student.get_records_history()
-        student = True
     except Student.DoesNotExist:
         records_history = []
-        student = False
-    employee = BaseUser.is_employee(request.user)
 
     semester_courses = []
     for semester in semesters:
@@ -42,8 +39,6 @@ def prepare_courses_list_to_render(request):
             course.update( { 'was_enrolled' : course['id'] in records_history } )
 
     render_data = {
-        'is_student' : student,
-        'is_employee' : employee,
         'semester_courses': semester_courses,
         'types_list' : Type.get_all_for_jsfilter(),
         'default_semester': Semester.get_default_semester()

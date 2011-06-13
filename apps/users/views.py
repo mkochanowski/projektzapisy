@@ -201,9 +201,7 @@ def employees_list(request, begin = 'A'):
     else:
         data = {
             "employees" : employees,
-            "char": begin,
-            "is_student" : BaseUser.is_student(request.user),
-            "is_employee" : BaseUser.is_employee(request.user),
+            "char": begin
             }  
     
         return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
@@ -219,9 +217,8 @@ def students_list(request, begin = 'A'):
     else:
         data = { 
             "students" : students, 
-            "char": begin,
-            "is_student" : BaseUser.is_student(request.user),
-            "is_employee" : BaseUser.is_employee(request.user), }
+            "char": begin
+        }
         return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
 @login_required
