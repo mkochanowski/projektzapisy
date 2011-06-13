@@ -751,14 +751,31 @@ def poll_answer( request, slug, pid ):
     data[ 'title' ]     = poll.title
     data[ 'desc' ]      = poll.description
     data[ 'pid']        = pid
-        
+
     try:
-        poll_cands = filter( lambda (x, show, l): show, data[ 'polls' ])[0][2]
+        poll_cands = []
+        for poll_to_show in data[ 'polls' ]:
+
+            polls = []
+            for poll_details in poll_to_show[2]:
+                polls.append((poll_details, poll_to_show[0][1]))
+
+            poll_cands.extend(polls)
+
     except IndexError:
         poll_cands = []
-    
+
+
     try:
-        finished_cands = filter( lambda (x, show, l): show, data[ 'finished' ])[0][2]
+
+        finished_cands = []
+        for poll_to_show in data[ 'finished' ]:
+
+            polls = []
+            for poll_details in poll_to_show[2]:
+                polls.append((poll_details, poll_to_show[0][1]))
+
+            finished_cands.extend(polls)
     except:
         finished_cands = []
 
@@ -966,12 +983,13 @@ def poll_answer( request, slug, pid ):
             form.setFields( poll, st )
 
         data[ 'form' ]   = form
+        data[ 'pid']     = int(pid)
         
         if request.method == "POST" and (not data['form_errors'] or st.finished):
             if request.POST.get( 'Next', default=None ):
-                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['next'][0]))
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + str( data['next'][3]) + '/' + str( data['next'][0]))
             if request.POST.get( 'Prev', default=None ):
-                return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( data['prev'][0]))
+                return HttpResponseRedirect( '/grade/poll/poll_answer/' + str( data['prev'][3]) + '/' + str( data['prev'][0]))
             if request.POST.get( 'Save', default=None ):
                 return HttpResponseRedirect( '/grade/poll/poll_answer/' + slug + '/' + str( pid ))
     else:

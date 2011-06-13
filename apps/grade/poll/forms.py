@@ -257,7 +257,7 @@ class PollForm( forms.Form ):
                             label     = u'Zakończ oceniać',
                             required  = False,
                             initial   = False,
-                            help_text = u'Jeśli zaznaczysz to pole, utracisz mozliwość edycji ankiety po zapisaniu.' )
+                            help_text = u'Ankieta zakończona - Jeśli zaznaczysz to pole, utracisz mozliwość edycji tej ankiety.' )
             field.type  = 'finish'
             self.finish = field
             self.fields[ u'finish' ] = field
