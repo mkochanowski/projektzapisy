@@ -146,6 +146,35 @@ class Course( models.Model ):
                 pts = None
         return pts;
         
+    @staticmethod
+    def get_points_for_courses(courses, program):
+        '''
+            returns points for courses in certain studies program
+
+            format: map with keys = course ids
+        '''
+        points = {}
+        course_points = PointsOfCourses.objects.filter(course__in = courses, \
+            program=program).select_related('course')
+        courses_without_points = []
+        course_entities = []
+        for course in courses:
+            cpoints = filter(lambda cpoints: cpoints.course == course, course_points)
+            if len(cpoints) == 1:
+                cpoints = cpoints.pop()
+                points[course.pk] = cpoints
+            else:
+                courses_without_points.append(course)
+                course_entities.append(course.entity)
+        entity_points = PointsOfCourseEntities.objects.filter( \
+            entity__in = course_entities).select_related('entity')
+        for course in courses_without_points:
+            epoints = filter(lambda cpoints: cpoints.entity == course.entity, \
+                entity_points)
+            if len(epoints) == 1:
+                epoints = epoints.pop()
+                points[course.pk] = epoints
+        return points
 
     class Meta:
         verbose_name = 'przedmiot'

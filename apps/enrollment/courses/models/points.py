@@ -24,6 +24,9 @@ class PointsOfCourseEntities(models.Model):
         verbose_name_plural = 'zależności podstawy przedmiotu-punkty'
         app_label = 'courses'
 
+    def __unicode__(self):
+        return '%s: %s %s' % (self.entity.name, self.value, self.type_of_point)
+    
 class PointsOfCourses(models.Model):
     course = models.ForeignKey('Course', verbose_name='przedmiot')
     type_of_point = models.ForeignKey('PointTypes', verbose_name='rodzaj punktów')

@@ -430,28 +430,32 @@
         "pk": 0, 
         "model": "users.program", 
         "fields": {
-            "name": "in\u017cynierskie"
+            "name": "in\u017cynierskie",
+            "type_of_points": 1
         }
     }, 
     {
         "pk": 1, 
         "model": "users.program", 
         "fields": {
-            "name": "magisterskie"
+            "name": "magisterskie",
+            "type_of_points": 1
         }
     }, 
     {
         "pk": 2, 
         "model": "users.program", 
         "fields": {
-            "name": "licencjackie"
+            "name": "licencjackie",
+            "type_of_points": 1
         }
     }, 
     {
         "pk": 3, 
         "model": "users.program", 
         "fields": {
-            "name": "doktoranckie"
+            "name": "doktoranckie",
+            "type_of_points": 1
         }
     },
     {

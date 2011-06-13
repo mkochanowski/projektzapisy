@@ -3,9 +3,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from exceptions import NonEmployeeException, NonStudentException
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from apps.enrollment.courses.models import Group, Semester
+from apps.enrollment.courses.models.points import PointTypes
 
 import datetime
 
@@ -251,6 +251,7 @@ class Program( models.Model ):
         Program of student studies
     """
     name = models.CharField(max_length=50, unique=True, verbose_name="Program")
+    type_of_points = models.ForeignKey(PointTypes, verbose_name='rodzaj punktów')
 
     class Meta:
         verbose_name = 'Program studiów'

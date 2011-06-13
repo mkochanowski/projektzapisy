@@ -371,11 +371,19 @@ def own(request):
             })
     terms_by_days = filter(lambda term: term, terms_by_days)
 
+    points_type = student.program.type_of_points
+    course_objects = map(lambda course: course['object'], courses)
+    points = Course.get_points_for_courses(course_objects, student)
+    points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
+
     data = {
         'is_student': BaseUser.is_student(request.user),
         'is_employee': BaseUser.is_employee(request.user),
         'terms_by_days': terms_by_days,
-        'courses': courses
+        'courses': courses,
+        'points': points,
+        'points_type': points_type,
+        'points_sum': points_sum
     }
 
     return render_to_response('enrollment/records/schedule.html',\
