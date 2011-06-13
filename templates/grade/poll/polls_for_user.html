@@ -37,14 +37,13 @@ Zakończono <span id="finished-polls">{{finished_polls}}</span> spośród <span 
         <li><a class="grade-fillable-poll-link" href="{% url grade-poll-polls-for-user poll_sub.0.1 %}">{{ poll_sub.0.0 }}</a>
             <ul class="grade-fillable-poll-sublist">
             {% for poll in poll_sub.2 %}
-                <li><a id="grade-fillable-poll-link-{{poll.0}}" href="{% url grade-poll-poll-answer poll_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
+                <li><a id="grade-fillable-poll-link-{{poll.0}}"{% if  poll.0 == pid %} class="active_poll"{% endif %} href="{% url grade-poll-poll-answer poll_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
             {% endfor %}
             </ul>
         </li>
     {% endfor %}
     </ul>
 {% endif %}
-
 {% if finished %}
     <h4>Ankiety zakończone</h4>
     <ul id="grade-not-fillable-poll-list">
@@ -52,7 +51,7 @@ Zakończono <span id="finished-polls">{{finished_polls}}</span> spośród <span 
         <li><a class="grade-fillable-poll-link"  href="{% url grade-poll-polls-for-user fin_sub.0.1 %}">{{ fin_sub.0.0 }}</a>
         <ul class="grade-not-fillable-poll-sublist">
             {% for poll in fin_sub.2 %}
-                <li><a id="grade-fillable-poll-link-{{poll.0}}" href="{% url grade-poll-poll-answer fin_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
+                <li><a id="grade-fillable-poll-link-{{poll.0}}"{% if pid == poll.0 %} class="active_poll"{% endif %} href="{% url grade-poll-poll-answer fin_sub.0.1 poll.0 %}">{{ poll.3 }}</a></li>
             {% endfor %}
         </ul>
         </li>

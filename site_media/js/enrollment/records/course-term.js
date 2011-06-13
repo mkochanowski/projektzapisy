@@ -183,6 +183,8 @@ Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
 	this._prioritySelector.attr('disabled', true);
 	if (newPriority < 1 || newPriority > CourseView.priorityLimit)
 		throw new Error('Nieprawidłowy priorytet do ustawienia');
+
+	$.dataInvalidate();
 	
 	$.post(this._queuePrioritySetURL, {
 			priority: newPriority
@@ -218,6 +220,7 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 {
 	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
 		return;
+	$.dataInvalidate();
 
 	var self = this;
 	enroll = !!enroll;

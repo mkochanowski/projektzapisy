@@ -112,3 +112,14 @@ def timedelta(delta):
 			return 'za ' + str(minutes) + ' minuty'
 		return 'za ' + str(minutes) + ' minut'
 	return 'za mniej niż minutę'
+
+@register.filter
+def hash(map, key):
+    if key in map:
+        return map[key]
+    else:
+        return None
+
+@register.filter
+def getattribute(object, attribute):
+    return getattr(object, attribute)

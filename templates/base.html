@@ -46,6 +46,13 @@
 	{% endblock %}
 </head>
 <body>
+	<form action="/" method="post" style="display: none">
+		<p><input type="hidden" name="data-invalidated" value="no" /></p>
+	</form>
+	<script type="text/javascript">
+		jQuery.dataInvalidate_check();
+	</script>
+	
 	<div id="main-topContainer">
 		{%if subsystemname %}
 			<p id="main-systemTypeBar">{{ subsystemname }}</p>

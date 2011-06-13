@@ -273,3 +273,28 @@ AjaxMessage.prototype.toString = function()
 	else
 		return 'AjaxMessage';
 };
+
+/**
+ * Zarządzanie automatycznym odświeżaniem danych.
+ */
+
+jQuery.dataInvalidate_check = function()
+{
+	jQuery.dataInvalidate_input = $('input[name=data-invalidated]').assertOne();
+	jQuery.dataInvalidate_invalidated =
+		(jQuery.dataInvalidate_input.attr('value') == 'yes');
+	jQuery.dataInvalidate_input.attr('value', 'no');
+	if (jQuery.dataInvalidate_invalidated)
+	{
+		jQuery.dataInvalidate_invalidated = false;
+		document.location = document.location;
+	}
+};
+
+jQuery.dataInvalidate = function()
+{
+	if (jQuery.dataInvalidate_invalidated)
+		return;
+	jQuery.dataInvalidate_invalidated = true;
+	jQuery.dataInvalidate_input.attr('value', 'yes');
+};

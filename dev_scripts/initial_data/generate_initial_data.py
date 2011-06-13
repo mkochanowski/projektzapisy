@@ -199,6 +199,8 @@ for sub in COURSES:
         courses[course_id] = 2
     record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.course",\n@!@@!@"fields": {\n@!@@!@@!@"lectures": %s,\n@!@@!@@!@"name": "%s",\n@!@@!@@!@"entity": %s,\n@!@@!@@!@"semester": %s,\n@!@@!@@!@"exercises": %s,\n@!@@!@@!@"laboratories": %s,\n@!@@!@@!@"type": %s,\n@!@@!@@!@"slug": "%s",\n@!@@!@@!@"description": "Opis"\n@!@@!@}\n@!@},\n' % (course_id, sub['lectures'], sub['name'], sub['entity'], sub['semester'], sub['exercises'], sub['laboratories'], sub['type'], slug)
     courses_raw.append(record)
+    record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.pointsofcourseentities",\n@!@@!@"fields": {\n@!@@!@@!@"value": %s,\n@!@@!@@!@"type_of_point": 1,\n@!@@!@@!@"entity": %s@!@@!@}\n@!@},\n' % (course_id + 1000, sub['ects'], sub['entity'])
+    courses_raw.append(record)
     course_id += 1
 	
 # Generate courses in year 2010

@@ -65,3 +65,8 @@ hr, .poll-section-field {
     position:absolute;
     right: 55px;
 }
+
+.active_poll
+{
+    background-color: #228B22!important;
+}

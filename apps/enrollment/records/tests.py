@@ -241,6 +241,7 @@ class MoveStudentFromQueueToGroup(TestCase):
         self.same_type_group_hp = Group.objects.get(id=103)
         self.same_type_group_ep = Group.objects.get(id=104)
         self.empty_queue_group = Group.objects.get(id=105)
+        self.congested_group = Group.objects.get(id=106) # with non empty queue
         
         self.semester = Semester.objects.get(id=100)
         self.semester.records_opening = datetime.now()
@@ -259,6 +260,13 @@ class MoveStudentFromQueueToGroup(TestCase):
         self.assertEqual(Record.objects.filter(student=self.student_first_in_queue.id, group=self.full_group.id).count(), 1)
         self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.full_group.id).count(), 0)
     
+    def testWithNoFreePlaceInGroup(self):
+    	self.assertEqual(Record.objects.filter(group=self.congested_group.id).count(), self.congested_group.limit + 1)
+    	queue_count_before = Queue.objects.filter(group=self.congested_group.id).count()
+    	Record.remove_student_from_group(self.student_to_remove.id, self.congested_group.id)
+    	queue_count_after = Queue.objects.filter(group=self.congested_group.id).count()
+    	self.assertEqual(queue_count_before, queue_count_after)
+    	
     def testRemoveStudentLowerPriorityRecords(self):
         self.assertEqual(Queue.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group.id).count(), 1)
         Record.remove_student_from_group(self.student_to_remove.id, self.full_group.id)
@@ -286,7 +294,6 @@ class MoveStudentFromQueueToGroup(TestCase):
         self.assertEqual(Record.objects.filter(student=self.student_first_in_queue.id, group=self.full_group.id).count(), 0)
         self.assertEqual(Record.objects.filter(student=self.student_first_in_queue.id, group=self.same_type_group_hp.id).count(), 1)
     
-
 class GetStudentsInQueue(TestCase):
     fixtures =  ['fixtures__queue']
  
