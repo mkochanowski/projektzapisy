@@ -5,62 +5,59 @@ Feature: User with privileges wants to create a poll.
         And there are some courses with groups for current semester
         And there are some sections created already
         
-    Scenario: Administrator can see all the courses
+    #Scenario: Administrator can see all the courses
 		# Given the grading protocol is "off"
         # And I am logged in with "administrator" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"
-        # And I follow "Tworzenie ankiet"
-        # Then I can select from "4" options in "Przedmiot:"
+        # And I press "Utwórz nową"
+        # Then I can select from "4" options in "Przedmiot: "
                     
-    Scenario: Employee can see only his courses
+    #Scenario: Employee can see only his courses
 		# Given the grading protocol is "off"
         # And I am logged in with "employee" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"
         # And I follow "Tworzenie ankiet"
-        # Then I can select from "2 - chyba, nie pamiętam" options in "Przedmiot:"
-        # And I can select "Przedmiot któryś" as "Przedmiot:"
-        # And I can select "Przedmiot któryś jeszcze" as "Przedmiot:"
+        # Then I can select from "2 - chyba, nie pamiętam" options in "Przedmiot: "
+        # And I can select "Przedmiot któryś" as "Przedmiot: "
+        # And I can select "Przedmiot któryś jeszcze" as "Przedmiot: "
             
-    Scenario: Administrator can only see types of groups for which there are some groups
+    #Scenario: Administrator can only see types of groups for which there are some groups
 		# Given the grading protocol is "off"
         # And I am logged in with "administrator" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"
-        # And I follow "Tworzenie ankiet"
-        # And I select "Przedmiot:" as "jakiś przedmiot z ćwiczeniami"
-        # Then I can select from "2" options in "Typ zajęć:"
-        # And I can select "Wykład" from "Typ zajęć:"
-        # And I can select "Ćwiczenia" from "Typ zajęć:"
+        # And I press "Utwórz nową"
+        # And I select "Przedmiot: " as "jakiś przedmiot z ćwiczeniami"
+        # Then I can select from "2" options in "Typ zajęć: "
+        # And I can select "Wykład" from "Typ zajęć: "
+        # And I can select "Ćwiczenia" from "Typ zajęć: "
         
-    Scenario: Administrator cannot add the same section twice in a poll
+    #Scenario: Administrator cannot add the same section twice in a poll
 		# Given the grading protocol is "off"
         # And I am logged in with "administrator" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"    
-        # And I follow "Tworzenie ankiet"
-        # And I select "Wybierz sekcję:" as "Ogół zajęć"
+        # And I press "Utwórz nową"
+        # And I select "Wybierz sekcję: " as "Ogół zajęć"
         # And I press "Dodaj sekcję"
-        # Then I can't select "Ogół zajęć" from "Wybierz sekcję:"
+        # Then I can't select "Ogół zajęć" from "Wybierz sekcję: "
             
     Scenario: Employee creates a poll for his course for all exercises groups
 		Given the grading protocol is "off"
         And I am logged in with "employee" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie ankiet"
-        And I select "Przedmiot:" as "Przedmiot 1"
-        And I select "Typ zajęć:" as "ćwiczenia"
-        And I fill in "Tytuł:" with "Ankieta dla ćwiczeń z przedmiotu 1"
-        And I select "Wybierz sekcję:" as "Ćwiczenia"
+        And I press "Utwórz nową"
+        And I select "Przedmiot: " as "Przedmiot 1"
+        And I select "Typ zajęć: " as "ćwiczenia"
+        And I fill in "Tytuł: " with "Ankieta dla ćwiczeń z przedmiotu 1"
+        And I select "Wybierz sekcję: " as "Ćwiczenia"
         And I press "Dodaj sekcję"
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"   
-        Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
-        When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 3"
             
@@ -69,18 +66,15 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "employee" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"
-        And I select "Przedmiot:" as "Przedmiot 1"
-        And I select "Typ zajęć:" as "wykład"
-        And I fill in "Tytuł:" with "Ankieta dla wykładu z przedmiotu 1"
-        And I select "Wybierz sekcję:" as "Wykład"
+        And I press "Utwórz nową"
+        And I select "Przedmiot: " as "Przedmiot 1"
+        And I select "Typ zajęć: " as "wykład"
+        And I fill in "Tytuł: " with "Ankieta dla wykładu z przedmiotu 1"
+        And I select "Wybierz sekcję: " as "Wykład"
         And I press "Dodaj sekcję"
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
-        When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 1"        
                 
@@ -89,19 +83,16 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "employee" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"
-        And I select "Przedmiot:" as "Przedmiot 2"
-        And I select "Typ zajęć:" as "ćwiczenia"
-        And I select "Grupa:" as "Pracownik Testowy"
-        And I fill in "Tytuł:" with "Ankieta dla ćwiczeń z przedmiotu 1"
-        And I select "Wybierz sekcję:" as "Ćwiczenia"
+        And I press "Utwórz nową"
+        And I select "Przedmiot: " as "Przedmiot 2"
+        And I select "Typ zajęć: " as "ćwiczenia"
+        And I select "Grupa: " as "Pracownik Testowy"
+        And I fill in "Tytuł: " with "Ankieta dla ćwiczeń z przedmiotu 1"
+        And I select "Wybierz sekcję: " as "Ćwiczenia"
         And I press "Dodaj sekcję"
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
-        When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 1"            
             
@@ -110,13 +101,13 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"
-        And I fill in "Tytuł:" with "Ogół zajęć w instytucie"
-        And I select "Wybierz sekcję:" as "Ogół zajęć"
+        And I press "Utwórz nową"
+        And I fill in "Tytuł: " with "Ogół zajęć w instytucie"
+        And I select "Wybierz sekcję: " as "Ogół zajęć"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
         Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
+        And I wait for a while to see "100 %"
         When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 1"    
@@ -126,17 +117,17 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"    
-        And I fill in "Tytuł:" with "Ankieta do wykładu"
-        And I select "Przedmiot:" as "Wszystkie przedmioty"
-        And I select "Typ zajęć:" as "wykład"        
-        And I select "Wybierz sekcję:" as "Wykład"
+        And I press "Utwórz nową"   
+        And I fill in "Tytuł: " with "Ankieta do wykładu"
+        And I select "Przedmiot: " as "Wszystkie przedmioty"
+        And I select "Typ zajęć: " as "wykład"        
+        And I select "Wybierz sekcję: " as "Wykład"
         And I press "Dodaj sekcję"
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
         Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
+        And I wait for a while to see "100 %"
         When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 4"
@@ -146,17 +137,17 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"    
-        And I fill in "Tytuł:" with "Ankieta do ćwiczeń do przedmiotu 4"
-        And I select "Przedmiot:" as "Przedmiot 4"
-        And I select "Typ zajęć:" as "ćwiczenia"        
-        And I select "Wybierz sekcję:" as "Ćwiczenia"
+        And I press "Utwórz nową"    
+        And I fill in "Tytuł: " with "Ankieta do ćwiczeń do przedmiotu 4"
+        And I select "Przedmiot: " as "Przedmiot 4"
+        And I select "Typ zajęć: " as "ćwiczenia"        
+        And I select "Wybierz sekcję: " as "Ćwiczenia"
         And I press "Dodaj sekcję"        
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
         Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
+        And I wait for a while to see "100 %"
         When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 2"    
@@ -167,17 +158,17 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"        
-        And I fill in "Tytuł:" with "Ankieta do ćwiczeń"
-        And I select "Przedmiot:" as "Wszystkie przedmioty"
-        And I select "Typ zajęć:" as "ćwiczenia"        
-        And I select "Wybierz sekcję:" as "Ćwiczenia"
+        And I press "Utwórz nową"      
+        And I fill in "Tytuł: " with "Ankieta do ćwiczeń"
+        And I select "Przedmiot: " as "Wszystkie przedmioty"
+        And I select "Typ zajęć: " as "ćwiczenia"        
+        And I select "Wybierz sekcję: " as "Ćwiczenia"
         And I press "Dodaj sekcję"        
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
         Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
+        And I wait for a while to see "100 %"
         When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 8"
@@ -188,18 +179,18 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"        
-        And I fill in "Tytuł:" with "Ankieta do ćwiczeń"
-        And I select "Przedmiot:" as "Wszystkie przedmioty"
-        And I select "Typ zajęć:" as "ćwiczenia"      
+        And I press "Utwórz nową"      
+        And I fill in "Tytuł: " with "Ankieta do ćwiczeń"
+        And I select "Przedmiot: " as "Wszystkie przedmioty"
+        And I select "Typ zajęć: " as "ćwiczenia"      
         And I check "Utwórz tylko dla grup bez ankiet"  
-        And I select "Wybierz sekcję:" as "Ćwiczenia"
+        And I select "Wybierz sekcję: " as "Ćwiczenia"
         And I press "Dodaj sekcję"        
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
         Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
+        And I wait for a while to see "100 %"
         When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 6"   
@@ -209,18 +200,18 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"        
-        And I fill in "Tytuł:" with "Ankieta do wykładu, studia licencjackie"
-        And I select "Przedmiot:" as "Wszystkie przedmioty"
-        And I select "Typ zajęć:" as "wykład"
-        And I select "Typ studiów:" as "licencjackie"
-        And I select "Wybierz sekcję:" as "Wykład"
+        And I press "Utwórz nową" 
+        And I fill in "Tytuł: " with "Ankieta do wykładu, studia licencjackie"
+        And I select "Przedmiot: " as "Wszystkie przedmioty"
+        And I select "Typ zajęć: " as "wykład"
+        And I select "Typ studiów: " as "licencjackie"
+        And I select "Wybierz sekcję: " as "Wykład"
         And I press "Dodaj sekcję"        
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
         Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
+        And I wait for a while to see "100 %"
         When I click "generowanie"
         Then I should see "Utworzono ankiety"
         And I should see "Liczba utworzonych ankiet: 4" 
@@ -230,18 +221,15 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "employee" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie ankiet"
-        And I select "Przedmiot:" as "Przedmiot 2"
-        And I select "Typ zajęć:" as "ćwiczenia"
-        And I fill in "Tytuł:" with "Ankieta dla ćwiczeń z przedmiotu 1"
-        And I select "Wybierz sekcję:" as "Ćwiczenia"
+        And I press "Utwórz nową"
+        And I select "Przedmiot: " as "Przedmiot 2"
+        And I select "Typ zajęć: " as "ćwiczenia"
+        And I fill in "Tytuł: " with "Ankieta dla ćwiczeń z przedmiotu 1"
+        And I select "Wybierz sekcję: " as "Ćwiczenia"
         And I press "Dodaj sekcję"
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I should see "Trwa generowanie kluczy"
-        And I wait for a while to see "100%"
-        When I click "generowanie"
         Then I should see "Utworzono ankiety"        
         And I should see "Liczba utworzonych ankiet: 1"
 
@@ -250,19 +238,19 @@ Feature: User with privileges wants to create a poll.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"
-        And I select "Wybierz sekcję:" as "Uwagi"
+        And I press "Utwórz nową"
+        And I select "Wybierz sekcję: " as "Uwagi"
         And I press "Dodaj sekcję"
         And I press "Stwórz ankietę"
-        Then I wait for a while to see "Nie można utworzyć ankiety; brak tytułu"
+        Then I should see "To pole jest wymagane"
             
     Scenario: Administrator fails to create a poll when there are no sections
 		Given the grading protocol is "off"
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"    
-        And I follow "Tworzenie ankiet"
-        And I fill in "Tytuł:" with "Ankieta bez treści"
+        And I press "Utwórz nową"
+        And I fill in "Tytuł: " with "Ankieta bez treści"
         And I press "Stwórz ankietę"
         Then I wait for a while to see "Nie można utworzyć ankiety; ankieta jest pusta"            
             

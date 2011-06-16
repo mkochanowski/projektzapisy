@@ -15,10 +15,7 @@ module NavigationHelpers
       '/news/grade/'
     
     when /poll management page/
-		'/grade/poll_manage'        
-    
-    when /polls filling page/
-        '/grade/poll/polls/all'
+		'/grade/poll_manage'            
 		
     else
           begin

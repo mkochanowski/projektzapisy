@@ -14,6 +14,7 @@ Feature: User with privileges wants to delete some polls.
         And I check "_selected_action" with value "13" 
         And I select "action" as "Usuń wybrane ankiety"
         And I press "Wykonaj"
+        And I press "Usuń"
         Then I should see "Usunięto 1 ankietę"
     
     Scenario: Administrator deletes all polls
@@ -24,6 +25,7 @@ Feature: User with privileges wants to delete some polls.
         And I check "action-toggle" 
         And I select "action" as "Usuń wybrane ankiety"
         And I press "Wykonaj"
+        And I press "Usuń"
         Then I should see "Usunięto 13 ankiet"
                         
     Scenario: Employee deletes his own poll
@@ -34,6 +36,7 @@ Feature: User with privileges wants to delete some polls.
         And I check "_selected_action" with value "1"
         And I select "action" as "Usuń wybrane ankiety"
         And I press "Wykonaj"
+        And I press "Usuń"
         Then I should see "Usunięto 1 ankietę"        
         
     Scenario: Employee deletes all his polls
@@ -44,4 +47,5 @@ Feature: User with privileges wants to delete some polls.
         And I check "action-toggle"    
         And I select "action" as "Usuń wybrane ankiety"
         And I press "Wykonaj"
+        And I press "Usuń"
         Then I should see "Usunięto 2 ankiety"

@@ -30,7 +30,7 @@
                 <label for="courses">Przedmiot: </label>
             </td>
             <td>
-                <select name="course" id="courses">
+                <select name="courses" id="courses">
                     <option value="-1">Nie przypisane do przedmiotu</option>
                     <option value="0"{% if course_id == 0 %} selected{% endif %}>Wszystkie przedmioty</option>
                     {% for sub in courses %}
@@ -76,24 +76,24 @@
             </td>
         </tr>
     </table><hr>
-    <label for="title">Tytuł:</label>
+    <label for="title">Tytuł: </label>
     <input type="text" name="title" id="title" class="required"><br>
 <div class="clear"></div>
-    <label for="description">Opis:</label>
+    <label for="description">Opis: </label>
     <textarea name="description" id="description" rows="4"></textarea>
 <div class="clear"></div>
     <hr>
     <div id="sections-list">
 
         <input type="hidden" class="anysection">
-        Wybrane sekcje:
+        Wybrane sekcje: 
         <ul class="chosen-sections">
         </ul>
     </div>
     <div class='section-add'  id="sections-list-ul">
         <small>(Przeciągnij, aby zmienić kolejność)</small>
         <br/>
-        <label for="sections">Wybierz sekcję:</label>
+        <label for="sections">Wybierz sekcję: </label>
         <select name="section" id="sections">
                <option value="-1">Wybierz...</option>
             {% for section in sections %}

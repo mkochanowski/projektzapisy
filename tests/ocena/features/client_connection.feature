@@ -52,7 +52,8 @@ Feature: User downloads tickets using supplied external client.
         And I follow "Oceń zajęcia"
         When I run client with "ticket_downloaded"
         And I enter generated ticket
-        And I press "Wyślij" 
-        Then I should be on polls filling page
+        And I press "Wyślij"         
+        Then I should see "Twoje ankiety"
+        And I should see "Ankiety dostępne"
         And I should see "Ankieta ogólna"
         And I should not see "Nie udało się zweryfikować podpisu pod biletem."
