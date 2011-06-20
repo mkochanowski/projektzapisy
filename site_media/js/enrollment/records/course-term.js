@@ -18,6 +18,11 @@ Fereol.Enrollment.CourseTerm = function()
 	this.queuedCount = null;
 	this.course = null; // SchedulePrototype.PrototypeCourse
 
+	// w przypadku studentów nie zamawianych - zamawiana część grupy jest
+	// "niedostępna"
+	this.unavailableGroupLimit = null;
+	this.unavailableEnrolledCount = null;
+
 	this._queuePrioritySetURL = null;
 };
 
@@ -38,8 +43,26 @@ Fereol.Enrollment.CourseTerm.fromHTML = function(container)
 		assertOne();
 	sterm._queuedCountCell = container.find('td.termQueuedCount').assertOne();
 
-	sterm.groupLimit = sterm._groupLimitCell.text().castToInt();
-	sterm.enrolledCount = sterm._enrolledCountCell.text().castToInt();
+	sterm.groupLimit = sterm._groupLimitCell.text();
+	sterm.enrolledCount = sterm._enrolledCountCell.text();
+
+	if (sterm.groupLimit.indexOf(' + ') >= 0)
+	{
+		var glarr = sterm.groupLimit.split(' + ');
+		var ecarr = sterm.enrolledCount.split(' + ');
+		if (glarr.length != 2 || ecarr.length != 2)
+			throw new Error('Nieoczekiwana wartość');
+		sterm.groupLimit = glarr[1].castToInt();
+		sterm.unavailableGroupLimit = glarr[0].castToInt();
+		sterm.enrolledCount = ecarr[1].castToInt();
+		sterm.unavailableEnrolledCount = ecarr[0].castToInt();
+	}
+	else
+	{
+		sterm.groupLimit = sterm.groupLimit.castToInt();
+		sterm.enrolledCount = sterm.enrolledCount.castToInt();
+	}
+
 	sterm.queuedCount = sterm._queuedCountCell.text().castToInt();
 	sterm.isEnrolled = container.find('input[name=is-signed-in]').assertOne().
 		attr('value').castToBool();
@@ -157,7 +180,11 @@ Fereol.Enrollment.CourseTerm.prototype.refreshView = function()
 	else
 		this._setEnrolledButton.attr('value', newEnrolledButtonLabel);
 
-	this._enrolledCountCell.text(this.enrolledCount);
+	this._enrolledCountCell.text(
+		this.unavailableGroupLimit ?
+			(this.unavailableEnrolledCount + ' + ' + this.enrolledCount) :
+			this.enrolledCount
+	);
 	this._queuedCountCell.text(this.queuedCount);
 };
 

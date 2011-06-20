@@ -18,6 +18,7 @@ class Group(models.Model):
     teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
     type    = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
+    limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca gwarantowane dla studentów zamawianych')
     
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
@@ -34,10 +35,36 @@ class Group(models.Model):
         """return maximal amount of participants"""
         return self.limit
     
+    def limit_non_zamawiane(self):
+        return self.limit - self.limit_zamawiane
+
+    def available_only_for_zamawiane(self):
+        return (self.limit_zamawiane > 0 and
+            self.number_of_students_non_zamawiane() >=
+            self.limit_non_zamawiane())
+
     def number_of_students(self):
         """Returns number of students enrolled to particular group"""
         from apps.enrollment.records.models import Record
         return Record.enrolled.filter(group=self).count()
+
+    def number_of_students_zamawiane(self):
+        '''
+            Liczba studentów zapisanych w ramach limitu dla studentów
+            zamawianych.
+        '''
+        from apps.enrollment.records.models import Record
+        from apps.users.models import StudiaZamawiane
+        enrolled = Record.enrolled.filter(group=self).values_list( \
+            'student', flat=True)
+        zam = StudiaZamawiane.objects.filter(student__in=enrolled).count()
+        if zam > self.limit_zamawiane:
+            return self.limit_zamawiane
+        else:
+            return zam
+
+    def number_of_students_non_zamawiane(self):
+        return self.number_of_students() - self.number_of_students_zamawiane()
 
     @staticmethod
     def numbers_of_students(semester, enrolled):

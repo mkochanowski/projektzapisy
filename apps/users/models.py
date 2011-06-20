@@ -236,6 +236,16 @@ class Student(BaseUser):
             return zamawiany
         except (User.DoesNotExist, Student.DoesNotExist, StudiaZamawiane.DoesNotExist):
              return None
+
+    def zamawiany(self):
+        return StudiaZamawiane.objects.get(student=self);
+
+    def is_zamawiany(self):
+        try:
+            self.zamawiany()
+            return True
+        except StudiaZamawiane.DoesNotExist:
+            return False
         
     class Meta:
         verbose_name = 'student'

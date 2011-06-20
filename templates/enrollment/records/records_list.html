@@ -22,6 +22,7 @@
 
         <h1>{{group.course.name}}</h1>
 <a href="{% url course-page group.course_slug %}">Powrót</a>
+	<a href="{% url admin:courses_group_change group.pk %}">edycja</a>
         <div class="details">
             <ul class="properties">
                 <li>
@@ -51,7 +52,20 @@
 
 		<br/>
 		<h3>Lista osób zapisanych na przedmiot:</h3>
-		<p>Liczba zapisanych osób: {{students_in_group|length}} / {{group.get_group_limit}}</p>
+		{% if group.limit_zamawiane %}
+			<p>Zapisanych w ramach limitu studiów zamawianych:
+				{{ group.number_of_students_zamawiane }}
+				/ {{ group.limit_zamawiane }}.
+			</p>
+			<p>Zapisanych w ramach limitu dodatkowego:
+				{{ group.number_of_students_non_zamawiane }}
+				/ {{ group.limit_non_zamawiane }}.
+			</p>
+		{% else %}
+			<p>Liczba zapisanych osób: {{students_in_group|length}} /
+			{{group.get_group_limit}}</p>
+		{% endif %}
+
 		<br/>
 		
 		<table>
@@ -67,7 +81,12 @@
 						<td><a href="{% url student-profile student.user.id %}">
 						    {{student.user.get_full_name}}</a></td>
 						<td>{{student.matricula}}</td>
-						<td>{{student.program}}</td>
+						<td>
+							{{student.program}}
+							{% if student.is_zamawiany %}
+								(zamawiane)
+							{% endif %}
+						</td>
 						<td>{{student.semestr}}</td>
 					</tr>
 			
@@ -89,6 +108,12 @@
 							<td><a href="{% url student-profile student.user.id %}"{% if student.pk == user.student.pk %} class="bold"{% endif %}>
 							    {{student.user.get_full_name}}</a></td>
 							<td {% if student.pk == user.student.pk %} class="bold"{% endif %}>{{student.matricula}}</td>
+							<td>
+								{{student.program}}
+								{% if student.is_zamawiany %}
+									(zamawiane)
+								{% endif %}
+							</td>
 						</tr>
 					{% endfor %}
 				</tbody>

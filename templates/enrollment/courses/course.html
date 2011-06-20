@@ -82,7 +82,6 @@
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
 
-
 		{% for tutorial in tutorials %}{% if tutorial.groups %}
 			<div class="tutorial">
 				<h2>{{tutorial.name}}</h2>
@@ -118,8 +117,20 @@
 									<span>{{d}}</span>
 								{% endfor %}
 							</td>
-							<td class="number termLimit">{{ t.get_group_limit }}</td>
-							<td class="number termEnrolledCount">{{ t.enrolled }}</td>
+							<td class="number termLimit">
+								{% if t.limit_zamawiane and not user.student.is_zamawiany %}
+									{{ t.limit_zamawiane }} + {{ t.limit_non_zamawiane }}
+								{% else %}
+									{{ t.limit }}
+								{% endif %}
+							</td>
+							<td class="number termEnrolledCount">
+								{% if t.limit_zamawiane and not user.student.is_zamawiany%}
+									{{ t.number_of_students_zamawiane }} + {{ t.number_of_students_non_zamawiane }}
+								{% else %}
+									{{ t.enrolled }}
+								{% endif %}
+							</td>
 							<td class="number termQueuedCount">{{ t.queued }}</td>
 							<td class="controls">
 								<input type="hidden" name="group-id" value="{{ t.id }}" />
