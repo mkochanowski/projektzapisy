@@ -439,22 +439,16 @@ class RemoveFirstStudentFromQueue(TestCase):
         self.semester.records_closing = datetime.now() + timedelta(days=7)
         self.semester.save()
 
-
-    def testWithoutGivenGroup(self):
-        group_id = self.group2.id
-        self.group2.delete()
-        self.assertRaises(NonGroupException, Queue.remove_first_student_from_queue, group_id)
-    
     def testEmptyQueue(self):
-        self.assertFalse(Queue.remove_first_student_from_queue(self.group.id))
+        self.assertEqual(Queue.remove_first_student_from_queue(self.group), None)
 
 #Checking same as test below - WHY?   
     def testWithECTSLimitExceeded(self):
-        self.assertFalse(Queue.remove_first_student_from_queue(self.group3.id))
+        self.assertEqual(Queue.remove_first_student_from_queue(self.group3), None)
         
     def testRemoveFirstStudentFromQueue(self):
         removed = Queue.objects.get(group=self.group2.id, student=self.student2.id).student
-        self.assertEqual(Queue.remove_first_student_from_queue(self.group2.id).student,removed)
+        self.assertEqual(Queue.remove_first_student_from_queue(self.group2).student, removed)
 
 #TIME DEPENDENCY
 class RemoveStudentLowPriorityRecords(TestCase):
@@ -482,5 +476,5 @@ class RemoveStudentLowPriorityRecords(TestCase):
     def testRemoveStudentLowPriorityRecords(self):
         Queue.remove_student_low_priority_records(self.student2.id, self.group2.id,10)
         self.assertEqual(Queue.objects.filter(group=101, student=self.student2).count(), 0)
-    
+
     

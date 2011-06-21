@@ -135,10 +135,11 @@ def course(request, slug):
             g.enrolled = records.filter(group=g).count()
             g.queued = queues.filter(group=g).count()
 
-            if (g.enrolled >= g.limit):
-                g.is_full = True
+            if g.limit_zamawiane > 0 and student and not student.is_zamawiany():
+                g.is_full = (g.number_of_students_non_zamawiane() >=
+                    g.limit_non_zamawiane())
             else:
-                g.is_full = False
+                g.is_full = (g.enrolled >= g.limit)
 
             if g.type == '1': #faster in good case, bad case - same
                 lectures.append(g);

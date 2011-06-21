@@ -256,7 +256,11 @@ class Record(models.Model):
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
-            if Record.number_of_students(group=group) < group.limit:
+            if (group.limit_zamawiane > 0 and not student.is_zamawiany()):
+                group_is_full = group.number_of_students_non_zamawiane() >= group.limit - group.limit_zamawiane
+            else:
+                group_is_full = group.number_of_students() >= group.limit
+            if not group_is_full:
                 g_id = Record.is_student_in_course_group_type(user_id=user.id, slug=group.course_slug(), group_type=group.type)
                 if g_id and group.type != '1':
                     #logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised AssignedInThisTypeGroupException exception.' % (int(user_id), int(group_id)))
@@ -306,18 +310,13 @@ class Record(models.Model):
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             if not group.course.semester.is_current_semester():
-            	raise NotCurrentSemesterException
+                raise NotCurrentSemesterException
             record = Record.enrolled.get(group=group, student=student)
             record.delete()
-            logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id)) 
-            if Record.number_of_students(group=group) < group.limit:
-            	queued = Queue.remove_first_student_from_queue(group_id)
-            	if queued:
-	                new_student = queued.student
-	                Record.add_student_to_group(new_student.user.id, group_id)
-	                Queue.remove_student_low_priority_records(new_student.user.id, group_id, queued.priority)
-	                mail_enrollment_from_queue( student, group )
-	                logger.info('User %s <id: %s> replaced user %s <id: %s> in group [%s] <id: %s>.',  user.username, user.id, new_student.user.username, new_student.user.id, group, group.id)
+            logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
+
+            Queue.try_enroll_next_student(group)
+
             return record
 
         except Record.DoesNotExist:
@@ -530,34 +529,59 @@ class Queue(models.Model):
 
 
     @staticmethod
-    def remove_first_student_from_queue(group_id):
-        """return FIRST student from queue whose ECTS points limit is not excedeed, remove this student and all students
-        before him from queue"""
-        try:
-            group = Group.objects.get(id=group_id)
-            queue = Queue.queued.filter(group=group).order_by('time')
-            """ Przeszukiwanie kolejki"""
-            for q in queue:
-                student_id = q.student.user.id
-                """ Sprawdzenie mozliwosci zapisania studenta na zajęcia"""
-                if Queue.is_ECTS_points_limit_exceeded(student_id, group_id):
-                    """ Wyrzucenie studenta z kolejki. Jego limit ECTS nie pozwala zapisać go do grupy, na którą oczekuje"""
-                    logger.info('User %s <id: %s> is now removed as first from queue of group "%s" <id %s> but he exceeded ECTS limit' % (q.student.user.username, q.student.user.id, group, group_id))
-                    Queue.remove_student_from_queue(student_id, group_id)
-                else:
-                    logger.info('User %s <id: %s> is now removed as first from queue of group "%s" <id %s>' % (q.student.user.username, q.student.user.id, group, group_id))
-                    return Queue.remove_student_from_queue(student_id, group_id)
+    def remove_first_student_from_queue(group):
+        '''
+            return FIRST student (student's queue record) from queue whose ECTS
+            points limit is not excedeed, remove this student and all students
+            before him from queue
+
+            ignore students, which not "zamawiany", if there is no space for
+            them (but there is some for "zamawiany")
+
+            returns None, when there is no space for students left at all
+        '''
+        if (group.number_of_students() >= group.limit):
+            return None
+        only_zamawiany = group.available_only_for_zamawiane()
+        
+        queue = Queue.queued.filter(group=group).order_by('time')
+        for queued in queue:
+            student = queued.student
+            if (only_zamawiany and not student.is_zamawiany()):
+                continue
+
+            Queue.remove_student_from_queue(student.user.id, group.id)
+
+            # Sprawdzenie mozliwosci zapisania studenta na zajęcia
+            if Queue.is_ECTS_points_limit_exceeded(student.user.id, group.id):
+                # Wyrzucenie studenta z kolejki. Jego limit ECTS nie pozwala
+                # zapisać go do grupy, na którą oczekuje
+                logger.info('User %s <id: %s> is now removed as first from \
+                    queue of group "%s" <id %s> but he exceeded ECTS limit' % \
+                    (student.user.username, student.user.id, group, group.id))
+                continue
+            logger.info('User %s <id: %s> is now removed as first from queue \
+                of group "%s" <id %s>' % \
+                (student.user.username, student.user.id, group, group.id))
+            return queued
+        return None
+
+    @staticmethod
+    def try_enroll_next_student(group):
+        queued = Queue.remove_first_student_from_queue(group)
+        if not queued:
             return False
-        except Queue.DoesNotExist:
-            logger.error('Queue.remove_first_student_from_queue() throws Queue.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
-            raise AlreadyNotAssignedException()
-        except Student.DoesNotExist:
-            logger.error('Queue.remove_first_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
-            raise NonStudentException()
-        except Group.DoesNotExist:
-            logger.error('Queue.remove_first_student_from_group() throws Group.DoesNotExist exception (parameters: group_id = %d)' % (int(group_id)))
-            raise NonGroupException()
-            
+        
+        Record.add_student_to_group(queued.student.user.id, group.id)
+        Queue.remove_student_low_priority_records(queued.student.user.id, \
+            group.id, queued.priority)
+
+        mail_enrollment_from_queue(queued.student, group)
+        logger.info('User %s <id: %s> enrolled from queue in group [%s] \
+            <id: %s>.', queued.student.user.username, queued.student.user.id, \
+            group, group.id)
+        return True
+
     @staticmethod
     def get_groups_for_student(user_id):
         """ Return all groups that student is trying to sign to."""
@@ -605,25 +629,8 @@ class Queue(models.Model):
 
 def add_people_from_queue(sender, instance, **kwargs):
     """adding people from queue to group, after limits' change"""
-    try:
-        """ Pobranie liczby zapisanych studentów"""
-        num_of_people = Record.objects.filter(group=instance).count()
-        queued = True
-        while queued and (num_of_people < instance.limit) :
-            """ Opróżnianie kolejki do momentu osiągnięcia nowego limitu lub jej opróżnienia"""
-            queued = Queue.remove_first_student_from_queue(instance.id)
-            if queued:
-                logger.info('User %s <id: %s> is now added to group "%s" <id: %s> because of limits\' change (parameters instance = %s)' % (queued.student.user.username, queued.student.user.id, queued.group, queued.group.id, instance.id)) #prosze o sprawdzenie, czy sie nie pomylilem                
-                Record.add_student_to_group(queued.student.user.id, instance.id)
-                num_of_people = Record.objects.filter(group=instance).count()
-    except Queue.DoesNotExist:
-        logger.error('Queue.add_people_from_queue throws Queue.DoesNotExist exception (parameters instance = %d)' % (int(instance.id)))
-        raise AlreadyNotAssignedException()
-    except Student.DoesNotExist:
-        logger.error('Queue.add_people_from_queue throws Student.DoesNotExist exception (parameters instance = %d)' % (int(instance.id)))
-        raise NonStudentException()
-    except Group.DoesNotExist:
-        logger.error('Queue.add_people_from_queue throws Group.DoesNotExist exception (parameters instance = %d)' % (int(instance.id)))
-        raise NonGroupException()
+    group=instance
+    while (Queue.try_enroll_next_student(group)):
+        continue
 
 signals.post_save.connect(add_people_from_queue, sender=Group)
