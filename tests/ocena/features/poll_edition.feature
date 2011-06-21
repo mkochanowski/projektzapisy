@@ -6,7 +6,7 @@ Feature: User with privileges wants to edit some polls.
 		And there are polls generated
 		And there are keys generated for polls 
 
-    Scenario: Administrator edits a poll
+    #Scenario: Administrator edits a poll
         # Given I am logged in with "administrator" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"
@@ -22,7 +22,7 @@ Feature: User with privileges wants to edit some polls.
         # Then I should see "Zapisano ankietę"
         # And być może coś jeszcze ciekawego się dzieje
         
-    Scenario: Employee edits his own poll
+    #Scenario: Employee edits his own poll
         # Given I am logged in with "employee" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"
@@ -37,7 +37,7 @@ Feature: User with privileges wants to edit some polls.
         # Then I should see "Zapisano ankietę"
         # And być może coś jeszcze ciekawego się dzieje    
         
-    Scenario: Employee fails to edit a poll that is not his own
+    #Scenario: Employee fails to edit a poll that is not his own
         # Given I am logged in with "employee" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"

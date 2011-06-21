@@ -26,7 +26,7 @@ Feature: User with privileges wants to edit some sections.
         And I fill in "poll[question][5][answers][3]" with "Kryptografii"
         And I press visible "Gotowe"        
         And I press "Zapisz"
-        Then I should see "Sekcja dodana"
+        Then I should see "Sekcja zmieniona"
                 
     Scenario: Employee fails to edit a section
         Given I am logged in with "employee" privileges
@@ -34,4 +34,4 @@ Feature: User with privileges wants to edit some sections.
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji" 
         And I follow "Uwagi"
-        Then "Edytuj" should be disabled
+        Then I should not see "Edytuj"

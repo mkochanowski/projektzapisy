@@ -8,7 +8,8 @@ Feature: User with privileges wants to create a section.
         And I am logged in with "employee" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I fill in "section-title" with "Sekcja przykładowego pracownika"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobał Ci się mój przedmiot?"
@@ -20,7 +21,8 @@ Feature: User with privileges wants to create a section.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I fill in "section-title" with "Sekcja administratora"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobała Ci się moja praca?"
@@ -32,7 +34,8 @@ Feature: User with privileges wants to create a section.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I fill in "section-title" with "Sekcja administratora - złożona"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobała Ci oferta w tym semestrze?"
@@ -74,7 +77,8 @@ Feature: User with privileges wants to create a section.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I fill in "section-title" with "Sekcja administratora - pytanie wiodące"
         And I check "poll[leading]"
         And I fill in "poll[question][0][title]" with "Czy podobała Ci oferta w tym semestrze?"
@@ -101,14 +105,14 @@ Feature: User with privileges wants to create a section.
 		Given the grading protocol is "off"
         And I am logged in with "student" privileges
         And I am on grade main page    
-        When I go to /grade/poll/managment/section_create
+        When I go to /grade/poll/managment/sections_list
         Then I should see "Zaloguj"
     
     Scenario: While grading protocol is active, the administrator tries to create a section
 		Given the grading protocol is "on"
         And I am logged in with "administrator" privileges
         And I am on grade main page    
-        When I go to /grade/poll/managment/section_create
+        When I go to /grade/poll/managment/sections_list
         Then I should see "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona"
     
     Scenario: Administrator tries to create section with no questions
@@ -116,33 +120,36 @@ Feature: User with privileges wants to create a section.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"  
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I fill in "section-title" with "Sekcja administratora"
         And I press "Zapisz"
-	And I should see "Sekcja nie zawiera pytań"
+		Then I should see "Sekcja nie zawiera pytań"
             
     Scenario: Administrator tries to create section without a title
 		Given the grading protocol is "off"
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"      
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I press "Dodaj pytanie" 
         And I fill in "poll[question][1][title]" with "Jak podobała Ci się moja praca?"
         And I press "Zapisz"
-	And I should see "To pole jest wymagane."
+		Then I should see "To pole jest wymagane."
     
     Scenario Outline: Administrator tries to add a question without a question text
 		Given the grading protocol is "off"
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"    
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I fill in "section-title" with "Sekcja administratora"         
         And I press "Dodaj pytanie" 
         And I select "poll[question][1][formtype]" as <typ_pytania>
         And I press "Zapisz"
-	And I should see "To pole jest wymagane."
+		Then I should see "To pole jest wymagane."
         
     Examples:
         | typ_pytania |
@@ -155,13 +162,14 @@ Feature: User with privileges wants to create a section.
         And I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
-        And I follow "Tworzenie sekcji"      
+        And I follow "Lista sekcji"
+        And I press "Utwórz nową"
         And I fill in "section-title" with "Sekcja administratora"
         And I press "Dodaj pytanie" 
         And I select "poll[question][1][formtype]" as <typ_pytania>
         And I fill in "poll[question][1][title]" with "Treść pytania"
         And I press "Zapisz"
-	And I should see "To pole jest wymagane."
+		Then I should see "To pole jest wymagane."
 
     Examples:
         | typ_pytania |

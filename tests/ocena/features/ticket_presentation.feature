@@ -11,8 +11,8 @@ Feature: Anonymous user wants to present tickets for polls in order to anonymous
         When I follow "Oceń zajęcia"
         And I fill in "Podaj wygenerowane bilety:" with <ticket>
         And I press "Wyślij" 
-        Then I should be on polls filling page
-        Then I should not see "Nie udało się zweryfikować podpisu pod biletem."
+        Then I should see "Twoje ankiety"
+        And I should not see "Nie udało się zweryfikować podpisu pod biletem."
         
         Examples:
             | ticket  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
@@ -26,8 +26,6 @@ Feature: Anonymous user wants to present tickets for polls in order to anonymous
         And I fill in "Podaj wygenerowane bilety:" with <ticket>
         And I press "Wyślij" 
         And I sleep for 2 seconds
-        When I follow "Ankiety ogólne"
-        And I follow "Ankieta ogólna"
         And I fill in "poll-13_section-4_question-5-open" with "Matematycznych"
         And I fill in "poll-13_section-4_question-6-open" with "Praktycznych"
         And I press "Zapisz ankietę"

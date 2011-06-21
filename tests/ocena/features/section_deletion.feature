@@ -13,6 +13,7 @@ Feature: User with privileges wants to delete some sections.
         And I check "_selected_action" with value "1" 
         And I select "action" as "Usuń wybrane sekcje"
         And I press "Wykonaj"
+        And I press "Usuń"        
         Then I should see "Usunięto 1 sekcję"    
     
     Scenario: Administrator deletes all sections
@@ -23,6 +24,7 @@ Feature: User with privileges wants to delete some sections.
         And I check "action-toggle" 
         And I select "action" as "Usuń wybrane sekcje"
         And I press "Wykonaj"
+        And I press "Usuń"        
         Then I should see "Usunięto 4 sekcje"    
         
     Scenario: Employee fails to delete one section
