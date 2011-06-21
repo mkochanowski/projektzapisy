@@ -1,6 +1,6 @@
 Feature: User with privileges wants to delete some polls.
 
-    Background:
+    Scenario: First preparations
         Given I start new scenario
         And the grading protocol is "off"
 		And there are polls generated
@@ -16,18 +16,7 @@ Feature: User with privileges wants to delete some polls.
         And I press "Wykonaj"
         And I press "Usuń"
         Then I should see "Usunięto 1 ankietę"
-    
-    Scenario: Administrator deletes all polls
-        Given I am logged in with "administrator" privileges
-        And I am on grade main page
-        When I follow "Zarządzaj ankietami"
-        And I follow "Lista ankiet"
-        And I check "action-toggle" 
-        And I select "action" as "Usuń wybrane ankiety"
-        And I press "Wykonaj"
-        And I press "Usuń"
-        Then I should see "Usunięto 13 ankiet"
-                        
+                            
     Scenario: Employee deletes his own poll
         Given I am logged in with "employee" privileges
         And I am on grade main page
@@ -48,4 +37,15 @@ Feature: User with privileges wants to delete some polls.
         And I select "action" as "Usuń wybrane ankiety"
         And I press "Wykonaj"
         And I press "Usuń"
-        Then I should see "Usunięto 2 ankiety"
+        Then I should see "Usunięto 1 ankietę"
+
+    Scenario: Administrator deletes all polls
+        Given I am logged in with "administrator" privileges
+        And I am on grade main page
+        When I follow "Zarządzaj ankietami"
+        And I follow "Lista ankiet"
+        And I check "action-toggle" 
+        And I select "action" as "Usuń wybrane ankiety"
+        And I press "Wykonaj"
+        And I press "Usuń"
+        Then I should see "Usunięto 10 ankiet"

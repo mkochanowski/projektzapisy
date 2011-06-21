@@ -1,6 +1,6 @@
 Feature: User with privileges wants to delete some sections.
 
-    Background:
+    Scenario: Preparations
         Given I start new scenario
         And the grading protocol is "off"
         And there are some sections created already        
@@ -15,18 +15,7 @@ Feature: User with privileges wants to delete some sections.
         And I press "Wykonaj"
         And I press "Usuń"        
         Then I should see "Usunięto 1 sekcję"    
-    
-    Scenario: Administrator deletes all sections
-        Given I am logged in with "administrator" privileges
-        And I am on grade main page
-        When I follow "Zarządzaj ankietami"
-        And I follow "Lista sekcji"
-        And I check "action-toggle" 
-        And I select "action" as "Usuń wybrane sekcje"
-        And I press "Wykonaj"
-        And I press "Usuń"        
-        Then I should see "Usunięto 4 sekcje"    
-        
+
     Scenario: Employee fails to delete one section
         Given I am logged in with "employee" privileges
         And I am on grade main page
@@ -40,3 +29,15 @@ Feature: User with privileges wants to delete some sections.
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"  
         Then I cannot check "action-toggle"    
+        
+    
+    Scenario: Administrator deletes all sections
+        Given I am logged in with "administrator" privileges
+        And I am on grade main page
+        When I follow "Zarządzaj ankietami"
+        And I follow "Lista sekcji"
+        And I check "action-toggle" 
+        And I select "action" as "Usuń wybrane sekcje"
+        And I press "Wykonaj"
+        And I press "Usuń"        
+        Then I should see "Usunięto 3 sekcje"    

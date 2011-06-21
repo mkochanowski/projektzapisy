@@ -1,6 +1,6 @@
 Feature: User with privileges wants to edit some polls.
 
-    Background:
+	Scenario: Preparations
         Given I start new scenario
         And the grading protocol is "off"
 		And there are polls generated

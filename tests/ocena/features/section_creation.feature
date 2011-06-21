@@ -1,11 +1,11 @@
 Feature: User with privileges wants to create a section.
     
-    Background:
+    Scenario: Preparations
         Given I start new scenario
+        And the grading protocol is "off"
     
     Scenario: Employee creates a simple section
-		Given the grading protocol is "off"
-        And I am logged in with "employee" privileges
+		Given I am logged in with "employee" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -17,8 +17,7 @@ Feature: User with privileges wants to create a section.
         Then I should see "Sekcja dodana"
     
     Scenario: Administrator creates a simple section
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
+		Given I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -30,8 +29,7 @@ Feature: User with privileges wants to create a section.
         Then I should see "Sekcja dodana"    
     
     Scenario: Administrator creates a more complex section with many different types of questions
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
+		Given I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -73,8 +71,7 @@ Feature: User with privileges wants to create a section.
         Then I should see "Sekcja dodana"    
             
     Scenario: Administrator creates a section with opening question
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
+		Given I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -102,22 +99,13 @@ Feature: User with privileges wants to create a section.
         Then I should see "Sekcja dodana" 
     
     Scenario: Student enters the section creation page
-		Given the grading protocol is "off"
-        And I am logged in with "student" privileges
+		Given I am logged in with "student" privileges
         And I am on grade main page    
         When I go to /grade/poll/managment/sections_list
         Then I should see "Zaloguj"
     
-    Scenario: While grading protocol is active, the administrator tries to create a section
-		Given the grading protocol is "on"
-        And I am logged in with "administrator" privileges
-        And I am on grade main page    
-        When I go to /grade/poll/managment/sections_list
-        Then I should see "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona"
-    
     Scenario: Administrator tries to create section with no questions
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
+		Given I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -127,8 +115,7 @@ Feature: User with privileges wants to create a section.
 		Then I should see "Sekcja nie zawiera pytań"
             
     Scenario: Administrator tries to create section without a title
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
+		Given I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -139,8 +126,7 @@ Feature: User with privileges wants to create a section.
 		Then I should see "To pole jest wymagane."
     
     Scenario Outline: Administrator tries to add a question without a question text
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
+		Given I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -158,8 +144,7 @@ Feature: User with privileges wants to create a section.
         | "Pytanie wielokrotnego wyboru" |
     
     Scenario Outline: Administrator tries to add a choice question with no choices
-		Given the grading protocol is "off"
-        And I am logged in with "administrator" privileges
+		Given I am logged in with "administrator" privileges
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"
@@ -175,3 +160,12 @@ Feature: User with privileges wants to create a section.
         | typ_pytania |
         | "Pytanie jednokrotnego wyboru" |
         | "Pytanie wielokrotnego wyboru" |
+
+    Scenario: While grading protocol is active, the administrator tries to create a section
+		Given I start new scenario
+		And the grading protocol is "on"
+        And I am logged in with "administrator" privileges
+        And I am on grade main page    
+        When I go to /grade/poll/managment/sections_list
+        Then I should see "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona"
+    
