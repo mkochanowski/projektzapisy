@@ -6,40 +6,41 @@ Feature: User with privileges wants to create a poll.
         And there are some sections created already
         And the grading protocol is "off"
         
-    #Scenario: Administrator can see all the courses
-        # Given I am logged in with "administrator" privileges
-        # And I am on grade main page
-        # When I follow "Zarządzaj ankietami"
-        # And I press "Utwórz nową"
-        # Then I can select from "4" options in "Przedmiot: "
+    Scenario: Administrator can see all the courses
+        Given I am logged in with "administrator" privileges
+        And I am on grade main page
+        When I follow "Zarządzaj ankietami"
+        And I press "Utwórz nową"
+        Then I can select from "4" options in "Przedmiot: "
                     
-    #Scenario: Employee can see only his courses
-		# Given I am logged in with "employee" privileges
-        # And I am on grade main page
-        # When I follow "Zarządzaj ankietami"
-        # And I follow "Tworzenie ankiet"
-        # Then I can select from "2 - chyba, nie pamiętam" options in "Przedmiot: "
-        # And I can select "Przedmiot któryś" as "Przedmiot: "
-        # And I can select "Przedmiot któryś jeszcze" as "Przedmiot: "
+    Scenario: Employee can see only his courses
+		Given I am logged in with "employee" privileges
+        And I am on grade main page
+        When I follow "Zarządzaj ankietami"
+        And I press "Utwórz nową"
+        Then I can select from "3" options in "Przedmiot: "
+        And I can select "Przedmiot 1" as "Przedmiot: "
+        And I can select "Przedmiot 3" as "Przedmiot: "
+        And I can select "Przedmiot 4" as "Przedmiot: "
             
     #Scenario: Administrator can only see types of groups for which there are some groups
 		# Given I am logged in with "administrator" privileges
         # And I am on grade main page
         # When I follow "Zarządzaj ankietami"
         # And I press "Utwórz nową"
-        # And I select "Przedmiot: " as "jakiś przedmiot z ćwiczeniami"
+        # And I select "Przedmiot: " as "Przedmiot 1"
         # Then I can select from "2" options in "Typ zajęć: "
-        # And I can select "Wykład" from "Typ zajęć: "
-        # And I can select "Ćwiczenia" from "Typ zajęć: "
+        # And I can select "wykład" from "Typ zajęć: "
+        # And I can select "ćwiczenia" from "Typ zajęć: "
         
-    #Scenario: Administrator cannot add the same section twice in a poll
-		# Given I am logged in with "administrator" privileges
-        # And I am on grade main page
-        # When I follow "Zarządzaj ankietami"    
-        # And I press "Utwórz nową"
-        # And I select "Wybierz sekcję: " as "Ogół zajęć"
-        # And I press "Dodaj sekcję"
-        # Then I can't select "Ogół zajęć" from "Wybierz sekcję: "
+    Scenario: Administrator cannot add the same section twice in a poll
+		Given I am logged in with "administrator" privileges
+        And I am on grade main page
+        When I follow "Zarządzaj ankietami"    
+        And I press "Utwórz nową"
+        And I select "Wybierz sekcję: " as "Ogół zajęć"
+        And I press "Dodaj sekcję"
+        Then I can not select "Ogół zajęć" from "Wybierz sekcję: "
             
     Scenario: Employee creates a poll for his course for all exercises groups
 		Given I am logged in with "employee" privileges

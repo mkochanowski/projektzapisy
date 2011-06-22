@@ -256,3 +256,19 @@ When /^I enter generated ticket$/ do
     file.close
     fill_in("Podaj wygenerowane bilety:", :with => ticket_client)
 end
+
+Then /^I can select from "([^"]*)" options in "([^"]*)"$/ do |number, field|
+	page.has_select? field, :count=>number
+end
+
+Then /^I can select "([^"]*)" as "([^"]*)"$/ do |value, field|
+	page.has_select? field, :options =>[value]
+end
+
+Then /^I can not select "([^"]*)" from "([^"]*)"$/ do |value, field|
+	page.has_no_select? field, :options =>[value]
+end
+
+When /^I delete "([^"]*)" section$/ do |name|
+	page.find(:xpath, "//*[text()=\"#{name}\"]/following-sibling::*[@alt=\"usuń\"]").click()
+end
