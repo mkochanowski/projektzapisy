@@ -159,6 +159,12 @@ Given /^there are polls generated$/ do
 	load_fixture "polls"
 end
 
+Given /^there are templates generated$/ do
+	load_fixture "groups"
+	load_fixture "polls"
+	load_fixture "templates"
+end
+
 Given /^there are keys generated for polls$/ do
 	load_fixture "keys_for_polls"
 end

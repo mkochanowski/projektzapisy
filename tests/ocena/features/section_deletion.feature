@@ -28,8 +28,7 @@ Feature: User with privileges wants to delete some sections.
         And I am on grade main page
         When I follow "Zarządzaj ankietami"
         And I follow "Lista sekcji"  
-        Then I cannot check "action-toggle"    
-        
+        Then I cannot check "action-toggle"            
     
     Scenario: Administrator deletes all sections
         Given I am logged in with "administrator" privileges

@@ -199,7 +199,6 @@ Feature: User with privileges wants to create a poll.
         And I press "Stwórz ankietę"
         Then I wait for a while to see "Nie można utworzyć ankiety; ankieta jest pusta"            
         
-            
     Scenario: Administrator creates a poll for all the exercises when there is already a poll for some exercises
 		Given I start new scenario
         And there are some courses with groups for current semester
