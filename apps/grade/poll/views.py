@@ -303,7 +303,7 @@ def ajax_get_courses(request):
     if request.is_ajax():
         if request.method == 'POST':
             semester = int( request.POST.get('semester', '0') )
-            courses = courses_list( Course.objects.filter(semester=semester).order_by('name') )
+            courses = course_list( Course.objects.filter(semester=semester).order_by('name') )
             message = simplejson.dumps( courses )
     return HttpResponse(message)
 

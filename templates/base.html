@@ -61,7 +61,9 @@
 			{% if user.is_staff %}
 					<a href="/fereol_admin/">Panel administracyjny</a> |
 			{% endif %}
-                        <a href="{% url help %}">Pomoc</a> |
+            {% block help %}
+                    <a href="{% url help %}">Pomoc</a> |
+            {% endblock %}
 			{% if user.is_authenticated %}
 				Jesteś zalogowany jako
 				<a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>

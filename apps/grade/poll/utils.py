@@ -155,10 +155,6 @@ def prepare_data( request, slug ):
 
 def get_next( poll_list, finished_list, poll_id ):
     ret = False
-    print "*************"
-    print poll_list
-
-    print "*************"
     for (p_id, t, st, s), slug in poll_list:
         if ret: return (p_id, t, s, slug)
         ret = p_id == poll_id

@@ -32,3 +32,9 @@ def export( request ):
 def admin( request ):
     return render_to_response('help/admin.html', {}, context_instance = RequestContext(request))
 
+def employee( request ):
+    return render_to_response('help/employee.html', {}, context_instance = RequestContext(request))
+
+def offer( request ):
+    return render_to_response('help/offer.html', {}, context_instance = RequestContext(request))
+

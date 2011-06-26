@@ -8,5 +8,7 @@ urlpatterns = patterns('apps.help.views',
     url(r'^grade/$', 'grade', name='help-grade'),
     url(r'^mobile/$', 'mobile', name='help-mobile'),
     url(r'^export/$', 'export', name='help-export'),
-    url(r'^admin/$', 'admin', name='adminasdf'),
+    url(r'^admin/$', 'admin', name='help-admin'),
+    url(r'^employee/$', 'employee', name='help-employee'),
+    url(r'^offer/$', 'offer', name='help-offer'),
 )
