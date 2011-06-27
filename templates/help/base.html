@@ -15,10 +15,10 @@
 <h2>Menu</h2>
 <ul>
     <li><a href="{% url help-terms %}">Terminy</a></li>
-    <li><a href="{% url help-rules %}">Zasady</a></li>
+    <li><a href="{% url help-rules %}">Zasady zapisów</a></li>
     <li><a href="{% url help-enrollment %}">System zapisów</a></li>
-    <li><a href="{% url help-mobile %}">Wersja mobilna</a></li>
-    <li><a href="{% url help-export %}">Export planu zajęć</a></li>
+    <!-- TODO(jak będzie mobilna) <li><a href="{% url help-mobile %}">Wersja mobilna</a></li> /!-->
+    <!-- TODO(jak będzie eksport, to go podlinkować do pomocy) <li><a href="{% url help-export %}">Eksport planu zajęć</a></li> /!-->
     <li><a href="{% url help-grade %}">Ocena zajęć</a></li>
     <li><a href="{% url help-offer %}">Kształtowanie oferty dydaktycznej</a></li>
     {% if user.employee %}
