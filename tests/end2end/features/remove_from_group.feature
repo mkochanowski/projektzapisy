@@ -11,5 +11,5 @@ Feature: Student wants to remove himself from a group in order not to learn too 
     And I press "wypisz" next to "group-id" with value "152"
     And I sleep for 2 seconds
     Then I should see "Zostałeś wypisany z grupy."
-    Then I should see button "zapisz" next to "group-id" with value "152"
+    And I should see button "zapisz" next to "group-id" with value "152"
   

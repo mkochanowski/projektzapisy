@@ -50,7 +50,7 @@ When /^(?:|I )press "([^"]*)"$/ do |button|
 end
 
 When /^(?:|I )press "([^"]*)" next to "([^"]*)" with value "([^"]*)"$/ do |button, name, value|
-    page.find(:xpath, "//*[@name=\"#{name}\" and @value=\"#{value}\"]/following-sibling::*").click_button(button)
+    page.find(:xpath, "//input[@name=\"#{name}\" and @value=\"#{value}\"]/following-sibling::input[@type=\"button\" and @value=\"#{button}\"]").click
 end
 
 When /^(?:|I )follow "([^"]*)"$/ do |link|
@@ -72,7 +72,7 @@ Then /^(?:|I )should see "([^"]*)"(?: within "([^"]*)")$/ do |text, selector|
 end
 
 Then /^(?:|I )should see button "([^"]*)" next to "([^"]*)" with value "([^"]*)"$/ do |button, name, value|
-    page.find(:xpath, "//*[@name=\"#{name}\" and @value=\"#{value}\"]/following-sibling::*").should have_button(button)
+    page.should have_xpath("//*[@name=\"#{name}\" and @value=\"#{value}\"]/following-sibling::input[@type=\"button\" and @value=\"#{button}\"]")
 end
 
 Then /^(?:|I )should see "([^"]*)"$/ do |text|  

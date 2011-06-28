@@ -14,7 +14,6 @@ Scenario: Successful adding to group
     And I enroll to group with id "201" on mobile
     Then I should see "Zostałeś zapisany do grupy."
     When I follow "przejdź do pełnej wersji"
-    And I am logged in #one day this should be deleted
     And I follow "System zapisów"
     And I follow "Przedmioty"
     And I follow "Bazy danych"

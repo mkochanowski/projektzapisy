@@ -9,7 +9,7 @@ Feature: User wants to sign in in order to use functions which aren't publicly a
     And I fill in "Nazwa użytkownika" with "student-test"
     And I fill in "Hasło" with "aaa"
     And I press "Zaloguj"
-    Then I should be on my profile page
+    Then I should be on the home page
 
   Scenario: Unsuccessful signing in with invalid user name
     When I follow "zaloguj"

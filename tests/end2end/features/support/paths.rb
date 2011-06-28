@@ -11,6 +11,9 @@ module NavigationHelpers
     when /the home\s?page/
       '/'
       
+    when /the home page/
+      '/'
+        
     when /my profile page/
       '/users/'
 

@@ -4,7 +4,7 @@ require 'selenium-webdriver'
 require 'capybara/cucumber'
 
 Capybara.default_driver = :selenium
-Capybara.app_host = "http://localhost:8000"
+Capybara.app_host = "http://localhost.localhost:8000"
 Capybara.default_wait_time = 5 # we wait for 5 seconds until failing a test
 
 Capybara.register_driver :selenium_remote_ie do |app|
