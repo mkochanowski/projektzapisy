@@ -21,4 +21,5 @@ urlpatterns = patterns('apps.users.views',
     url('^students/$', 'students_list', name='students-list'),
     url('^students/(?P<begin>[A-Z]|(All))/$', 'students_list', name='students-char-list'),
     url('^employees/(?P<begin>[A-Z]|(All))/$', 'employees_list', name='employees-char-list'),
+    url('^ical/$', 'create_ical_file', name='ical')
 )

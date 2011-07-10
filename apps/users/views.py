@@ -32,6 +32,13 @@ import datetime
 
 import logging
 logger = logging.getLogger()
+import vobject
+from apps.enrollment.courses.models import GROUP_TYPE_CHOICES
+
+GTC = {}
+for (x,y) in GROUP_TYPE_CHOICES:
+    GTC[x]=y[:2]
+
 
 @login_required
 def student_profile(request, user_id):
@@ -159,6 +166,7 @@ def my_profile(request):
     points = zamawiany and zamawiany.points or 0
     if current_semester:
         try:
+
             point_limit_duration = settings.ECTS_LIMIT_DURATION
             t0 = current_semester.records_opening - request.user.student.get_t0_interval()       
             terms = [
@@ -235,3 +243,62 @@ def login_plus_remember_me(request, *args, **kwargs):
             request.session.set_expiry(0)
     return login(request, *args, **kwargs)
     
+@login_required
+def create_ical_file(request):
+    user = request.user
+    user_id = user.id
+    user_full_name = user.get_full_name()
+    semester = Semester.get_default_semester()
+    semester_beginning = semester.semester_beginning
+    semester_beginning_weekday = semester_beginning.weekday() + 1
+    semester_ending = semester.semester_ending
+    until = semester_ending.strftime("%Y%m%dT235959Z")
+    
+    
+    cal = vobject.iCalendar()
+    cal.add('x-wr-timezone').value = 'Europe/Warsaw'
+    cal.add('version').value = '2.0'
+    cal.add('prodid').value = 'Fereol'
+    cal.add('calscale').value = 'GREGORIAN'
+    cal.add('calname').value = user_full_name + ' - schedule'
+    cal.add('method').value = 'PUBLISH'
+
+    if BaseUser.is_student(user):
+        groups = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user_id))
+        for group in groups:
+            course_name = group.course.name
+            group_type = GTC[group.type]
+            try:
+                terms = group.get_all_terms()
+            except IndexError:
+                continue
+            for term in terms:
+                start_time = term.start_time
+                end_time = term.end_time
+                weekday = int(term.dayOfWeek)
+                classroom_number = term.classroom.number
+        
+                diff = semester_beginning_weekday - weekday
+                if diff<0:
+                    diff += 7
+                diff = 7 - diff
+                start_date = semester_beginning + datetime.timedelta(days=diff)
+                start_datetime = datetime.datetime.combine(start_date, start_time)
+                end_datetime = datetime.datetime.combine(start_date, end_time)
+        
+                event = cal.add('vevent')
+                event.add('summary').value = '%s, %s, s.%s' % (course_name,group_type,classroom_number)
+                event.add('dtstart').value  = start_datetime
+                event.add('dtend').value = end_datetime
+                event.add('rrule').value = "FREQ=WEEKLY;UNTIL=%s" % (until,)
+    elif BaseUser.is_employee(user):
+        """
+        TODO
+        """
+        pass
+    else:
+        pass
+    cal_str = cal.serialize()
+    response = HttpResponse(cal_str, content_type='application/calendar')
+    response['Content-Disposition'] = 'attachment; filename=schedule.ical'
+    return response    
