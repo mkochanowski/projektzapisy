@@ -161,6 +161,8 @@ class Student(BaseUser):
     program = models.ForeignKey('Program', verbose_name='Program Studiów', null=True, default=None)
     block = models.BooleanField(verbose_name="blokada planu", default = False)
     semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
+    status = models.PositiveIntegerField(default=0, verbose_name="Status")
+    status.help_text = "0 - aktywny student, 1 - skreślony student"
 
 
     def get_type_of_studies(self):

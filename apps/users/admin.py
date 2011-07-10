@@ -7,7 +7,7 @@ from apps.users.models import Employee, Student, Program, StudiaZamawiane
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('matricula','get_full_name','ects','get_type_of_studies')
     fieldsets = [
-        (None,               {'fields': ['user','matricula']}),
+        (None,               {'fields': ['user','matricula','status']}),
         ('Studia', {'fields': ['program','semestr']}),
         ('Zapisy', {'fields': ['records_opening_delay_minutes','block']}),
         ('Ogłoszenia mailowe', {'fields': ['receive_mass_mail_enrollment','receive_mass_mail_offer'], 'classes': ['collapse']}),
