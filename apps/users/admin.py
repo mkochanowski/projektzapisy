@@ -9,7 +9,7 @@ class StudentAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['user','matricula','status']}),
         ('Studia', {'fields': ['program','semestr']}),
-        ('Zapisy', {'fields': ['records_opening_delay_minutes','block']}),
+        ('Zapisy', {'fields': ['records_opening_bonus_minutes','block']}),
         ('Ogłoszenia mailowe', {'fields': ['receive_mass_mail_enrollment','receive_mass_mail_offer'], 'classes': ['collapse']}),
     ]
     search_fields = ('user__first_name', 'user__last_name', 'matricula')

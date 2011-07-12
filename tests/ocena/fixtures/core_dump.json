@@ -169,7 +169,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 0, 
-            "records_opening_delay_minutes": 0, 
+            "records_opening_bonus_minutes": 0, 
             "receive_mass_mail_offer": true, 
             "user": 2, 
             "matricula": "112233", 

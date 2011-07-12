@@ -62,7 +62,7 @@ class TermAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','group')
 
 class StudentOptionsAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__','records_opening_delay_minutes')
+    list_display = ('__unicode__','records_opening_bonus_minutes')
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
 admin.site.register(Course, CourseAdmin)

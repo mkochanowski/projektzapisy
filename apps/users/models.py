@@ -157,7 +157,7 @@ class Student(BaseUser):
     '''
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
-    records_opening_delay_minutes = models.PositiveIntegerField(default=0, verbose_name="Opóźnienie w otwarciu zapisów (minuty)")
+    records_opening_bonus_minutes = models.PositiveIntegerField(default=0, verbose_name="Przyspieszenie otwarcia zapisów (minuty)")
     program = models.ForeignKey('Program', verbose_name='Program Studiów', null=True, default=None)
     block = models.BooleanField(verbose_name="blokada planu", default = False)
     semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
@@ -172,7 +172,7 @@ class Student(BaseUser):
     get_type_of_studies.short_description = 'Studia'
 
     def get_t0_interval(self):
-        return datetime.timedelta(minutes=(self.records_opening_delay_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
+        return datetime.timedelta(minutes=(self.records_opening_bonus_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
 
     def get_records_history(self):
         '''

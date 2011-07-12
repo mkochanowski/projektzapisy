@@ -53,13 +53,13 @@ class AddStudentToGroupTest(TestCase):
 
 #TIME DEPENDENCY
     def testCourseWithRecordsNotOpenForStudent(self):
-        self.user.student.records_opening_delay_minutes = 0
+        self.user.student.records_opening_bonus_minutes = 0
         self.user.student.save()
         self.exercise_group.course.semester.records_opening = datetime.now()
         self.exercise_group.course.semester.records_closing = datetime.now()
         self.exercise_group.course.semester.save()
         student_options = StudentOptions.objects.get(student=self.user.student, course=self.exercise_group.course)
-        student_options.records_opening_delay_hours = 10
+        student_options.records_opening_bonus_hours = 10
         student_options.save()
         self.assertRaises(RecordsNotOpenException, Record.add_student_to_group, self.user.id, self.exercise_group.id)        
         
@@ -363,13 +363,13 @@ class AddStudentToQueue(TestCase):
         self.assertEqual(Queue.objects.filter(group=self.group.id).count(), 1)
           
     def testWithRecordsNotOpenForStudent(self):
-        self.user.student.records_opening_delay_hours = 0
+        self.user.student.records_opening_bonus_hours = 0
         self.user.student.save()
         self.group.course.semester.records_opening = datetime.now()
         self.group.course.semester.records_closing = datetime.now()
         self.group.course.semester.save()
         student_options = StudentOptions.objects.get(student=self.user.student, course=self.group.course)
-        student_options.records_opening_delay_minutes = 10
+        student_options.records_opening_bonus_minutes = 10
         student_options.save()
         self.assertRaises(RecordsNotOpenException, Queue.add_student_to_queue, self.user.id, self.group.id)
 

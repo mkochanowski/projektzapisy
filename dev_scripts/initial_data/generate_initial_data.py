@@ -18,8 +18,8 @@ db_config_big = {
 	'NUM_OF_STUDENTS': 500,
 	'ECTS_LOW': 0,
 	'ECTS_HIGH': 300,
-	'DELAY_MINUTES_FOR_STUDENT_LOW': 0,
-	'DELAY_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
+	'BONUS_MINUTES_FOR_STUDENT_LOW': 0,
+	'BONUS_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
 	'STUDIES_PROGRAMS': [1, 2],
 	'SEMESTERS_FOR_STUDIES_PROGRAMS': {1: [1, 2, 3, 4, 5, 6], 2: [1, 2, 3, 4]},
 # employees
@@ -31,8 +31,8 @@ db_config_big = {
 	'MAX_NON_LECTURE_GROUPS_FOR_COURSE': 5,
 	'LECTURES_LIMITS': [20, 30, 40, 50, 60, 100, 200],
 	'NON_LECTURE_LIMITS': [15, 20],
-	'DELAY_MINUTES_FOR_COURSE_LOW': 0,
-	'DELAY_MINUTES_FOR_COURSE_HIGH': 3 * 24 * 60,
+	'BONUS_MINUTES_FOR_COURSE_LOW': 0,
+	'BONUS_MINUTES_FOR_COURSE_HIGH': 3 * 24 * 60,
 	'NUM_OF_RECORDS': 3000,
 	}
 
@@ -41,8 +41,8 @@ db_config_small = {
 	'NUM_OF_STUDENTS': 25,
 	'ECTS_LOW': 0,
 	'ECTS_HIGH': 300,
-	'DELAY_MINUTES_FOR_STUDENT_LOW': 0,
-	'DELAY_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
+	'BONUS_MINUTES_FOR_STUDENT_LOW': 0,
+	'BONUS_MINUTES_FOR_STUDENT_HIGH': 3 * 24 * 60,
 	'STUDIES_PROGRAMS': [1, 2],
 	'SEMESTERS_FOR_STUDIES_PROGRAMS': {1: [1, 2, 3, 4, 5, 6], 2: [1, 2, 3, 4]},
 # employees
@@ -56,8 +56,8 @@ db_config_small = {
 	'LECTURES_LIMITS': [20, 30, 40, 50, 60, 100, 200],
 	'NON_LECTURE_LIMITS': [20, 30],
 # students_options 
-	'DELAY_MINUTES_FOR_COURSE_LOW': 0,
-	'DELAY_MINUTES_FOR_COURSE_HIGH': 3 * 24 * 60,
+	'BONUS_MINUTES_FOR_COURSE_LOW': 0,
+	'BONUS_MINUTES_FOR_COURSE_HIGH': 3 * 24 * 60,
 # records
 	'NUM_OF_RECORDS': 100,
 	}
@@ -129,10 +129,10 @@ s += ''.join(users_raw)
 students_raw = []
 for student_id in range(first_user_for_student_id, last_user_for_student_id + 1):
 	ects = rand(config['ECTS_LOW'], config['ECTS_HIGH'])
-	delay = rand(config['DELAY_MINUTES_FOR_STUDENT_LOW'], config['DELAY_MINUTES_FOR_STUDENT_HIGH'])
+	bonus = rand(config['BONUS_MINUTES_FOR_STUDENT_LOW'], config['BONUS_MINUTES_FOR_STUDENT_HIGH'])
 	program = choice(config['STUDIES_PROGRAMS'])
 	semestr = choice(config['SEMESTERS_FOR_STUDIES_PROGRAMS'][program])
-	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.student",\n@!@@!@"fields": {\n@!@@!@@!@"ects": %s,\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"matricula": "%s",\n@!@@!@@!@"program": %s,\n@!@@!@@!@"semestr": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (student_id, ects, delay, student_id, student_id, program, semestr)
+	record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "users.student",\n@!@@!@"fields": {\n@!@@!@@!@"ects": %s,\n@!@@!@@!@"records_opening_bonus_minutes": %s,\n@!@@!@@!@"receive_mass_mail_offer": true,\n@!@@!@@!@"user": %s,\n@!@@!@@!@"matricula": "%s",\n@!@@!@@!@"program": %s,\n@!@@!@@!@"semestr": %s,\n@!@@!@@!@"receive_mass_mail_enrollment": true\n@!@@!@}\n@!@},\n' % (student_id, ects, bonus, student_id, student_id, program, semestr)
 	students_raw.append(record)
 s += ''.join(students_raw)
 
@@ -274,8 +274,8 @@ student_options_id = 1
 student_options_raw = []
 for student in range(first_user_for_student_id, last_user_for_student_id):
 	for course in range(course_id_start, course_id_end):
-		delay = rand(config['DELAY_MINUTES_FOR_COURSE_LOW'], config['DELAY_MINUTES_FOR_COURSE_HIGH'])
-		record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.studentoptions",\n@!@@!@"fields": {\n@!@@!@@!@"records_opening_delay_minutes": %s,\n@!@@!@@!@"student": %s,\n@!@@!@@!@"course": %s\n@!@@!@}\n@!@},\n' % (student_options_id, delay, student, course)
+		bonus = rand(config['BONUS_MINUTES_FOR_COURSE_LOW'], config['BONUS_MINUTES_FOR_COURSE_HIGH'])
+		record = '@!@{\n@!@@!@"pk": %s,\n@!@@!@"model": "courses.studentoptions",\n@!@@!@"fields": {\n@!@@!@@!@"records_opening_bonus_minutes": %s,\n@!@@!@@!@"student": %s,\n@!@@!@@!@"course": %s\n@!@@!@}\n@!@},\n' % (student_options_id, bonus, student, course)
 		student_options_raw.append(record)
 		student_options_id += 1
 s += ''.join(student_options_raw)

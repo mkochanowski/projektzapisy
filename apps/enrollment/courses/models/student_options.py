@@ -11,7 +11,7 @@ class StudentOptions( models.Model ):
     """ Used for defining time bonus in records - for Student, Course. Student gets bonuses if voted for course. """
     course = models.ForeignKey('Course', verbose_name = 'przedmiot')
     student = models.ForeignKey('users.Student', verbose_name = 'student')
-    records_opening_delay_minutes = models.IntegerField(verbose_name='Przyspieszenie otwarcia zapisów na ten przedmiot (minuty)')
+    records_opening_bonus_minutes = models.IntegerField(default=0, verbose_name='Przyspieszenie otwarcia zapisów na ten przedmiot (minuty)')
 
     options_cache = {}
 
@@ -47,7 +47,7 @@ class StudentOptions( models.Model ):
 
     def get_opening_bonus_timedelta(self):
         """ returns records opening bonus as timedelta """
-        return timedelta(minutes=self.records_opening_delay_minutes)
+        return timedelta(minutes=self.records_opening_bonus_minutes)
 
     class Meta:
         verbose_name = 'zależność przedmiot-student'

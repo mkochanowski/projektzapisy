@@ -129,7 +129,7 @@
         "pk": 100, 
         "model": "courses.studentoptions", 
         "fields": {
-            "records_opening_delay_minutes": 8,
+            "records_opening_bonus_minutes": 8,
             "student": 100, 
             "course": 100
         }
@@ -353,7 +353,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_minutes": 0,
+            "records_opening_bonus_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 100, 
             "matricula": "1000000", 
@@ -366,7 +366,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_minutes": 0,
+            "records_opening_bonus_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 101, 
             "matricula": "1000001", 
@@ -379,7 +379,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_minutes": 0,
+            "records_opening_bonus_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 102, 
             "matricula": "1000002", 
@@ -392,7 +392,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_minutes": 0,
+            "records_opening_bonus_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 103, 
             "matricula": "1000003", 
@@ -405,7 +405,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_minutes": 0,
+            "records_opening_bonus_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 104, 
             "matricula": "1000004", 
@@ -418,7 +418,7 @@
         "model": "users.student", 
         "fields": {
             "ects": 134, 
-            "records_opening_delay_minutes": 0,
+            "records_opening_bonus_minutes": 0,
             "receive_mass_mail_offer": true, 
             "user": 105, 
             "matricula": "1000005", 
