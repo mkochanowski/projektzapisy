@@ -57,6 +57,10 @@ class Course( models.Model ):
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
     repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+')
+    web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+                                verify_exists= True,
+								blank        = True,
+                                null         = True )
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method

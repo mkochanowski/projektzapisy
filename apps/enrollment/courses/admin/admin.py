@@ -11,7 +11,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     fieldsets = [
         (None,               {'fields': ['entity','name'], 'classes': ['long_name']}),
-        ('Szczegóły', {'fields': ['teachers','requirements','description','semester','type','slug'], 'classes': ['collapse']}),
+        ('Szczegóły', {'fields': ['teachers','requirements','description','semester','type','slug','web_page'], 'classes': ['collapse']}),
         ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
 
