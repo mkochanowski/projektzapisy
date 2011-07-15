@@ -139,16 +139,18 @@ class Course( models.Model ):
         pts = None
         if student:
             try:
-                pts = PointsOfCourses.objects.get(course=self, \
-                    program=student.program)
+                pts = PointsOfCourses.objects.filter(course=self, program=student.program)
             except PointsOfCourses.DoesNotExist:
                 pts = None
         if not pts:
             try:
-                pts = PointsOfCourseEntities.objects.get(entity=self.entity)
+                pts = PointsOfCourseEntities.objects.filter(entity=self.entity)
             except PointsOfCourseEntities.DoesNotExist:
                 pts = None
-        return pts;
+        if pts:
+            return pts[0]
+        else:
+            return 0
         
     @staticmethod
     def get_points_for_courses(courses, program):
