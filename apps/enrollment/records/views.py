@@ -373,7 +373,7 @@ def own(request):
 
     points_type = student.program.type_of_points
     course_objects = map(lambda course: course['object'], courses)
-    points = Course.get_points_for_courses(course_objects, student)
+    points = Course.get_points_for_courses(course_objects, student.program)
     points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
 
     data = {
