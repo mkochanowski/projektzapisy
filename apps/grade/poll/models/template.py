@@ -13,7 +13,6 @@ from apps.enrollment.courses.models.course import Course
 
 from apps.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
-from apps.grade.ticket_create.models import PublicKey                                              
 from section                         import SectionOrdering, Section
 
 class Template( models.Model ):
