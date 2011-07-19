@@ -1,5 +1,5 @@
+from group import Group
 from course_type import *
-from group import *
 from course import *
 from student_options import *
 from classroom import *

@@ -5,10 +5,12 @@ from django.utils.safestring           import SafeUnicode
 from apps.users.models               import Employee, \
                                               Student, \
                                               Program
-from apps.enrollment.courses.models import Group, \
-                                              Course, \
-                                              Semester, \
+from apps.enrollment.courses.models.group import Group, \
                                               GROUP_TYPE_CHOICES
+
+from apps.enrollment.courses.models.semester import Semester
+from apps.enrollment.courses.models.course import Course
+
 from apps.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
 from apps.grade.ticket_create.models import PublicKey                                              

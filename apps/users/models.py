@@ -4,7 +4,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from apps.users.exceptions import NonEmployeeException, NonStudentException
-from apps.enrollment.courses.models import Group, Semester
 from apps.enrollment.courses.models.points import PointTypes
 
 import datetime
@@ -80,6 +79,8 @@ class Employee(BaseUser):
         Method used to verify whether user is allowed to create a poll for certain group 
         (== he is an admin, a teacher for this course or a teacher for this group)
         """
+        from apps.enrollment.courses.models import Group
+
         try:
             group = Group.objects.get(pk=group_id)
             return ( group.teacher == self or self in group.course.teachers.all() or self.user.is_staff )
@@ -107,6 +108,8 @@ class Employee(BaseUser):
 
     @staticmethod
     def get_all_groups_in_semester(user_id):
+        from apps.enrollment.courses.models import Group, Semester
+
         user = User.objects.get(id=user_id)
         semester = Semester.get_current_semester()
         try:
@@ -119,6 +122,8 @@ class Employee(BaseUser):
 
     @staticmethod
     def get_all_groups(user_id):
+        from apps.enrollment.courses.models import Group
+
         user = User.objects.get(id=user_id)
         try:
             employee = user.employee
@@ -178,6 +183,8 @@ class Student(BaseUser):
         '''
         Returns list of ids of course s that student was enrolled for.
         '''
+        from apps.enrollment.courses.models import Semester
+
         default_semester = Semester.get_default_semester()
         records = self.records.exclude(group__course__semester = default_semester)
         records_list = map(lambda x: x.group.course.entity.id, records)

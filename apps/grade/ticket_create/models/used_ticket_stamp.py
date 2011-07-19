@@ -1,9 +1,10 @@
 # -*- coding: utf8 -*-
 from django.db                import models
-from apps.grade.poll.models import Poll
 from apps.users.models      import Student
 
 class UsedTicketStamp( models.Model ):
+    from apps.grade.poll.models.poll import Poll
+
     student = models.ForeignKey( Student,
                                  verbose_name = "student" )
     poll    = models.ForeignKey( Poll,

@@ -7,7 +7,6 @@ from open_question                   import OpenQuestion, \
                                             OpenQuestionOrdering
 from section                         import Section, \
                                             SectionOrdering
-from poll                            import Poll
 from saved_ticket                    import SavedTicket
 from open_question_answer            import OpenQuestionAnswer
 from single_choice_question_answer   import SingleChoiceQuestionAnswer

@@ -13,12 +13,13 @@ from apps.grade.poll.models import Option, \
                                      SingleChoiceQuestion, \
                                      MultipleChoiceQuestion, \
                                      Section, \
-                                     Poll, \
                                      SavedTicket, \
                                      OpenQuestionAnswer, \
                                      SingleChoiceQuestionAnswer, \
                                      MultipleChoiceQuestionAnswer, Template, \
                                      TemplateSections
+
+from apps.grade.poll.models.poll import Poll
 
 admin.site.register( Option )
 admin.site.register( OpenQuestionOrdering )

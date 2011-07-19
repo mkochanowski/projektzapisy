@@ -3,7 +3,6 @@
 from django.db import models
 
 from course import *
-from apps.enrollment.records.models import *
 from django.db.models import Count
 
 # w przypadku edycji, poprawić też javascript: Fereol.Enrollment.ScheduleCourseTerm.groupTypes
