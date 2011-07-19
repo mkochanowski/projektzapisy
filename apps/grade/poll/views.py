@@ -16,9 +16,12 @@ from apps.users.decorators             import student_required, employee_require
 from django.contrib.auth.decorators    import login_required
 from django.core.servers.basehttp import FileWrapper
 
-from apps.enrollment.courses.models import Semester, Group, Course, GROUP_TYPE_CHOICES, \
-                                           CourseEntity
-                                              
+
+from apps.enrollment.courses.models.group import Group, GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models.course import Course, CourseEntity
+from apps.enrollment.courses.models.semester import Semester
+
+
 from apps.grade.ticket_create.utils  import from_plaintext
 from apps.grade.ticket_create.models import PublicKey, \
                                               PrivateKey

@@ -5,13 +5,14 @@ from django.utils.safestring           import SafeUnicode
 from apps.users.models               import Employee, \
                                               Student, \
                                               Program
-from apps.enrollment.courses.models import Group, \
-                                              Course, \
-                                              Semester, \
+from apps.enrollment.courses.models.group import Group, \
                                               GROUP_TYPE_CHOICES
+
+from apps.enrollment.courses.models.semester import Semester
+from apps.enrollment.courses.models.course import Course
+
 from apps.enrollment.records.models  import Record, \
                                               STATUS_ENROLLED
-from apps.grade.ticket_create.models import PublicKey                                              
 from section                           import SectionOrdering
 from saved_ticket                       import SavedTicket
 from origin                          import Origin
@@ -110,6 +111,8 @@ class Poll( models.Model ):
         return result
     
     def as_row( self ):
+        from apps.grade.ticket_create.models.public_key import PublicKey
+
         res  = u"<tr><td>"
         res += unicode( self.pk ) + u'</td><td>'
         res += unicode( self.title ) + u'</td><td>'
@@ -146,17 +149,23 @@ class Poll( models.Model ):
     
     @staticmethod
     def get_current_polls():
+        from apps.grade.ticket_create.models.public_key import PublicKey
+
         pks = PublicKey.objects.all().values_list( 'poll', flat=True )
         return Poll.objects.filter( pk__in = pks, deleted=False )
         
     @staticmethod
     def get_current_semester_polls_without_keys():
+        from apps.grade.ticket_create.models.public_key import PublicKey
+
         semester = Semester.get_current_semester()
         polls_with_keys = PublicKey.objects.all().values_list( 'poll' )
         return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys)
 
     @staticmethod
     def count_current_semester_polls_without_keys():
+        from apps.grade.ticket_create.models.public_key import PublicKey
+
         semester = Semester.get_current_semester()
         polls_with_keys = PublicKey.objects.all().values( 'poll' )
         return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys).count()

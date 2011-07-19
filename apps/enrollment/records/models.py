@@ -4,14 +4,12 @@ from apps.enrollment.records.exceptions import ECTS_Limit_Exception
 from apps.enrollment.records.exceptions import NotCurrentSemesterException
 
 from apps.enrollment.courses.models.course import Course
+from apps.enrollment.courses.models.group import Group
 from django.contrib.auth.models import User
 from django.db import models
 
 from apps.users.models import Student
 
-from apps.enrollment.courses.models import Group
-from apps.enrollment.courses.models import PointsOfCourses,\
-                                        PointsOfCourseEntities
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.courses.exceptions import NonCourseException
 
@@ -38,6 +36,10 @@ class EnrolledManager(models.Manager):
         return super(EnrolledManager, self).get_query_set().filter(status=STATUS_ENROLLED)
 
 class Record(models.Model):
+    from apps.enrollment.courses.models import Group
+    from apps.enrollment.courses.models import PointsOfCourses,\
+                                        PointsOfCourseEntities
+
     group = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='records')
     status = models.CharField(max_length=1, choices=RECORD_STATUS, verbose_name='status')
@@ -352,6 +354,10 @@ def queue_priority(value):
         raise ValidationError(u'%s is not a priority' % value)
 
 class Queue(models.Model):
+    from apps.enrollment.courses.models import Group
+    from apps.enrollment.courses.models import PointsOfCourses,\
+                                        PointsOfCourseEntities
+
     group   = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
     time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
@@ -632,5 +638,7 @@ def add_people_from_queue(sender, instance, **kwargs):
     group=instance
     while (Queue.try_enroll_next_student(group)):
         continue
+
+
 
 signals.post_save.connect(add_people_from_queue, sender=Group)
