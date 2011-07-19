@@ -33,7 +33,7 @@ import datetime
 import logging
 logger = logging.getLogger()
 import vobject
-from apps.enrollment.courses.models import GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 
 GTC = {}
 for (x,y) in GROUP_TYPE_CHOICES:

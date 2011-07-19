@@ -11,7 +11,7 @@ from apps.enrollment.courses.models   import Semester, \
                                                 Group,\
                                                 Course
 from apps.enrollment.records.models    import Record
-from apps.grade.poll.models            import Poll
+from apps.grade.poll.models.poll            import Poll
 from apps.grade.ticket_create.utils    import generate_keys_for_polls, \
                                                 generate_keys,          \
                                                 group_polls_by_course, \
