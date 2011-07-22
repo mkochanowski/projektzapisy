@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from apps.enrollment.courses.models.points import PointTypes
-
+from apps.enrollment.courses.models import Semester
 import datetime
 
 from fereol import settings
@@ -176,8 +176,25 @@ class Student(BaseUser):
         return '%s, semestr %s' % (self.program , semestr)
     get_type_of_studies.short_description = 'Studia'
 
+    def participated_in_last_grade(self):
+        from apps.grade.ticket_create.models import UsedTicketStamp
+        current_semester = Semester.get_current_semester()
+        previous_semester = current_semester.get_previous_semester()
+        used_tickets = UsedTicketStamp.objects.filter(student=self,poll__semester=previous_semester)
+        if len(used_tickets)==0:
+            return False
+        else:
+            return True
+
     def get_t0_interval(self):
-        return datetime.timedelta(minutes=(self.records_opening_bonus_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
+        """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
+        base = self.records_opening_bonus_minutes + self.ects * settings.ECTS_BONUS
+        points_for_one_day = 720 # =12h*60m
+        points_for_one_night = 720
+        number_of_nights_to_add = base / points_for_one_day 
+        minutes = base + number_of_nights_to_add * points_for_one_night
+        grade = self.participated_in_last_grade() and 1440 or 0
+        return datetime.timedelta(minutes=minutes+grade+120)
 
     def get_records_history(self):
         '''
