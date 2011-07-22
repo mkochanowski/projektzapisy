@@ -316,9 +316,9 @@ def prepare_courses_with_terms(terms, records = []):
             'group': term.group.pk,
             'group_url': reverse('records-group', args=[term.group.pk]),
             'group_type': int(term.group.type),
-            'teacher': term.group.teacher.user.get_full_name(),
-            'teacher_url': reverse('employee-profile', \
-                args=[term.group.teacher.user.id]),
+            'teacher': term.group.teacher and term.group.teacher.user.get_full_name() or 'nieznany prowadzący',
+            'teacher_url': term.group.teacher and reverse('employee-profile', \
+                args=[term.group.teacher.user.id]) or '',
             'classroom': int(term.classroom.number),
             'day': int(term.dayOfWeek),
             'start_time': [term.start_time.hour, term.start_time.minute],

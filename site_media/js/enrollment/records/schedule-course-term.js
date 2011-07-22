@@ -214,9 +214,15 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 		this.scheduleTerm.timeFrom.toString() + '-' +
 		this.scheduleTerm.timeTo.toString() + ')'
 	).appendTo(this.popupContents);
-	$.create('p', {className: 'teacher'}).text('Prowadzący: ').
-		appendTo(this.popupContents).append($.create('a').text(this.teacher).
-		attr('href', this.teacherURL));
+    if(this.teacherURL==''){
+        $.create('p', {className: 'teacher'}).text('Prowadzący: ').        
+            appendTo(this.popupContents).append($.create('span').text(this.teacher));
+    }
+    else {
+        $.create('p', {className: 'teacher'}).text('Prowadzący: ').
+            appendTo(this.popupContents).append($.create('a').text(this.teacher).        
+            attr('href', this.teacherURL));
+    }
 	$.create('p', {className: 'classroom'}).text(
 		'Sala: ' + this.classroom
 	).appendTo(this.popupContents);
