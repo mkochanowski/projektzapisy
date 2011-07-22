@@ -3,6 +3,7 @@ from django.conf.urls.defaults import *
 from apps.news.models import News
 
 urlpatterns = patterns('apps.news.views',
+    url(r'^$','all_news',name='news-all'),
     url(r'^(?P<cat>[\w\-_]+)/$', 'latest_news', name='latest_news'),
     url(r'^(?P<cat>[\w\-_]+)/add/$', 'add', name='news-add'),
     url(r'^(?P<cat>[\w\-_]+)/edit/(?P<nid>\d+)/$', 'edit', name='news-edit'),

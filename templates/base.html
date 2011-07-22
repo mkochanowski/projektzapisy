@@ -58,24 +58,19 @@
 			<p id="main-systemTypeBar">{{ subsystemname }}</p>
 		{% endif %}
 		<p id="main-signinBar">
-			{% if user.is_staff %}
-					<a href="/fereol_admin/">Panel administracyjny</a> |
-			{% endif %}
-            {% block help %}
-                    <a href="{% url help %}">Pomoc</a> |
-            {% endblock %}
 			{% if user.is_authenticated %}
-				Jesteś zalogowany jako
-				<a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
-				{% if user.student %}
-					({{user.student.matricula}})
-				{% endif %}
-				&ndash;
-				<a href="{% url user-logout %}">wyloguj</a>
+				Witaj, {{ user.first_name }} |
+				<a href="{% url my-profile %}">Moje konto</a> |
+                {% if user.is_staff %}
+                        <a href="/fereol_admin/">Panel administracyjny</a> |
+                {% endif %}
+                <a href="{% url news-all %}">Aktualności</a> |
+                <a href="{% url help %}">Pomoc</a> |
+                <a href="{% url user-logout %}">Wyloguj</a>
 			{% else %}
-				Nie jesteś zalogowany
-				&ndash;
-				<a href="{% url user-login %}?next={{request.path}}">zaloguj</a>
+				Witaj! |
+				<a href="{% url news-all %}">Aktualności</a> |
+				<a href="{% url user-login %}?next={{request.path}}">Zaloguj</a>
 			{% endif %}
 		</p>
 	</div>
@@ -85,9 +80,9 @@
 			<div id="main-menu">
 				<ul id="main-menu-list">
 					{% block main-menu %}
-						<li><a href="{% url latest_news 'enrollment' %}">System zapisów</a></li>
-						<li><a href="{% url latest_news 'offer' %}">Kształtowanie oferty dydaktycznej</a></li>
-						<li><a href="{% url latest_news 'grade' %}">Ocena zajęć</a></li>
+						<li><a href="{% url course-list %}">System zapisów</a></li>
+						<li><a href="{% url  proposal-list %}">Kształtowanie oferty dydaktycznej</a></li>
+						<li><a href="{% url  latest_news 'grade' %}">Ocena zajęć</a></li>
 					{% endblock %}
 				</ul>
 			</div>

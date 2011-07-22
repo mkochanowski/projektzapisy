@@ -23,7 +23,6 @@ DATABASE_ENGINE = 'sqlite3'              # 'postgresql_psycopg2', 'postgresql', 
 DATABASE_NAME = os.path.join(PROJECT_PATH, 'database/db.sqlite3') # Or path to database file if using sqlite3.
 DATABASE_USER = ''                       # Not used with sqlite3.
 DATABASE_PASSWORD = ''                   # Not used with sqlite3.
-
 DATABASE_HOST = ''                       # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''                       # Set to empty string for default. Not used with sqlite3.
 
@@ -180,7 +179,7 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
 #settings for enrollment
 ECTS_LIMIT_DURATION = 14 # abs(t1-t2), in days
-ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1)
+ECTS_BONUS = 7 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
 ECTS_LIMIT = 40
 
 QUEUE_PRIORITY_LIMIT = 5

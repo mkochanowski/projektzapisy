@@ -15,11 +15,12 @@ from django.views.generic.create_update import delete_object
 
 from apps.news.forms import NewsForm
 from apps.news.models import News
-from apps.news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
+from apps.news.utils import NEWS_PER_PAGE, prepare_data, prepare_data_all, render_items, \
      get_search_results_data, mail_news_enrollment,  mail_news_grade, \
      mail_news_offer, render_with_category_template, render_with_device_detection
 from apps.enrollment.courses.models import Semester
 from apps.users.models import BaseUser
+from django.template.loader import get_template
 
 def main_page( request ):
     """
@@ -55,6 +56,25 @@ def latest_news(request, cat):
     if json:
         return HttpResponse(simplejson.dumps(data))
     return display_news_list(request, data)
+
+def all_news(request):
+    """
+        Latest news
+    """
+    json = request.GET.get('json', None)
+    items = News.objects.exclude(category='-').order_by('-date')
+    data = prepare_data_all(request, items)
+    if json:
+        return HttpResponse(simplejson.dumps(data))
+
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    data['grade'] = grade
+
+    temp = get_template('news/list_all.html')
+    return HttpResponse(temp.render(RequestContext(request,data)))
 
 def paginated_news(request, cat,
                    beginwith,

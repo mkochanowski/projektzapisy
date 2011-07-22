@@ -34,6 +34,11 @@
 	font-weight: bold;
 }
 
+#main-topContainer a
+{
+    color: #666;
+}
+
 #main-topContainer #main-signinBar
 {
 	text-align: right;
