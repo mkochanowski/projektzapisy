@@ -341,9 +341,7 @@ def own(request):
     ''' own schedule view '''
 
     default_semester = Semester.get_default_semester()
-    if not default_semester:
-        raise RuntimeError('Nie ma aktywnego semestru')
-
+        
     try:
         student = request.user.student
     except Student.DoesNotExist:
@@ -354,6 +352,18 @@ def own(request):
     courses = prepare_courses_with_terms(\
         Term.get_all_in_semester(default_semester, student),\
         Record.get_student_enrolled_objects(student, default_semester))
+
+    if not default_semester:
+        data = {
+            'terms_by_days': {},
+            'courses': [],
+            'points': [],
+            'points_type': student.program.type_of_points,
+            'points_sum': 0
+        }
+        request.user.message_set.create(message='Brak aktywnego semestru.')
+        return render_to_response('enrollment/records/schedule.html',\
+            data, context_instance = RequestContext(request))
 
     terms_by_days = [None for i in range(8)] # dni numerowane od 1
     for course in courses:
@@ -399,7 +409,15 @@ def schedule_prototype(request):
 
     default_semester = Semester.get_default_semester()
     if not default_semester:
-        raise RuntimeError('Nie ma aktywnego semestru')
+        request.user.message_set.create(message='Brak aktywnego semestru.')
+        data = {
+            'student_records': [],
+            'courses' : [],
+            'semester' : 'nieokreślony',
+            'types_list' : []
+        }
+        return render_to_response('enrollment/records/schedule_prototype.html',\
+            data, context_instance = RequestContext(request))        
 
     StudentOptions.preload_cache(student, default_semester)
 
