@@ -80,9 +80,9 @@
 			<div id="main-menu">
 				<ul id="main-menu-list">
 					{% block main-menu %}
-						<li><a href="{% url course-list %}">System zapisów</a></li>
-						<li><a href="{% url  proposal-list %}">Kształtowanie oferty dydaktycznej</a></li>
-						<li><a href="{% url  latest_news 'grade' %}">Ocena zajęć</a></li>
+						<li><a href="{% url enrollment-main %}">System zapisów</a></li>
+						<li><a href="{% url offer-main %}">Kształtowanie oferty dydaktycznej</a></li>
+						<li><a href="{% url grade-main %}">Ocena zajęć</a></li>
 					{% endblock %}
 				</ul>
 			</div>

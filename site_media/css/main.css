@@ -248,6 +248,7 @@
 #main-content.wide
 {
 	padding: 15px 20px;
+    min-height: 140px;
 }
 
 /*** ZAWARTOŚĆ - koniec ***/

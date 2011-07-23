@@ -7,6 +7,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
     
+    url(r'^$',  'apps.grade.poll.views.main',           name='grade-main'),
     url(r'^enable_grade$',  'apps.grade.poll.views.enable_grade',           name='grade-enable-grade'),
     url(r'^disable_grade$', 'apps.grade.poll.views.disable_grade',          name='grade-disable-grade'),
     

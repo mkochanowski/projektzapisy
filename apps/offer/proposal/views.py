@@ -26,6 +26,9 @@ from apps.offer.proposal.exceptions      import NonStudentException, NonEmployee
 import logging
 logger = logging.getLogger("")
 
+def main(request):
+    return render_to_response( 'offer/base.html', {}, context_instance = RequestContext( request ))
+
 @require_POST
 @login_required
 def become(request, slug, group):

@@ -99,16 +99,22 @@
 #od-news-form label
 {
 	display: block;
-	width: 70px;
+	width: 80px;
 	float: left;
 	padding-top: 11px;
     margin-bottom: 5px;
 }
 
-#od-news-form #id_title, #od-news-form #id_category
+#od-news-form select
+{
+    width: 130px;
+    font-size: 20px;
+}
+
+#od-news-form #id_title
 {
 	font-size: 20px;
-	width: 500px;
+	width: 490px;
 }
 
 #od-news-form #id_body_tbl
@@ -119,4 +125,8 @@
 #od-news-form p {
     display: block;   
     margin-bottom: 20px;
+}
+
+#news_title_category {
+    font-size: 10px;
 }
