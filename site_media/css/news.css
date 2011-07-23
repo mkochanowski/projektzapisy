@@ -99,18 +99,24 @@
 #od-news-form label
 {
 	display: block;
-	width: 50px;
+	width: 70px;
 	float: left;
 	padding-top: 11px;
+    margin-bottom: 5px;
 }
 
-#od-news-form #id_title
+#od-news-form #id_title, #od-news-form #id_category
 {
-	font-size: 30px;
-	width: 580px;
+	font-size: 20px;
+	width: 500px;
 }
 
 #od-news-form #id_body_tbl
 {
 	width: 583px !important; /* todo: powinno się dać inaczej */
+}
+
+#od-news-form p {
+    display: block;   
+    margin-bottom: 20px;
 }

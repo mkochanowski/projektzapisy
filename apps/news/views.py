@@ -13,7 +13,7 @@ from django.template import RequestContext
 from django.utils import simplejson
 from django.views.generic.create_update import delete_object
 
-from apps.news.forms import NewsForm
+from apps.news.forms import NewsForm, NewsAllForm
 from apps.news.models import News
 from apps.news.utils import NEWS_PER_PAGE, prepare_data, prepare_data_all, render_items, \
      get_search_results_data, mail_news_enrollment,  mail_news_grade, \
@@ -149,6 +149,38 @@ def add(request, cat):
     return render_with_category_template('news/form.html',
         RequestContext(request, {
         'category': cat,
+        'form': form,
+        'adding': True,
+        'grade' : grade,
+        }))
+
+@permission_required('news.add_news')
+def all_news_add(request):
+    """
+        Add news
+    """
+    if request.method == 'POST':
+        form = NewsAllForm(request.POST)
+        if form.is_valid():
+            news = form.save(commit=False)
+            news.author = request.user
+            news.save()
+            request.user.message_set.create(message="Opublikowano ogłoszenie.")
+            """if cat == 'offer':
+                mail_news_offer(news)
+            elif cat == 'enrollment':
+                mail_news_enrollment(news)
+            elif cat == 'grade':
+                mail_news_grade(news)"""
+            return redirect(all_news)
+    else:
+        form = NewsAllForm()
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    return render_with_category_template('news/form_all.html',
+        RequestContext(request, {
         'form': form,
         'adding': True,
         'grade' : grade,
