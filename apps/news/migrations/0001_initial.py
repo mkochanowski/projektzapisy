@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'News'
         db.create_table('news_news', (
             ('body', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('category', self.gf('django.db.models.fields.SlugField')(default='-', max_length=15, db_index=True)),
+            ('category', self.gf('django.db.models.fields.CharField')(default='-', max_length=15)),
             ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
@@ -67,7 +67,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'News'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'body': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'category': ('django.db.models.fields.SlugField', [], {'default': "'-'", 'max_length': '15', 'db_index': 'True'}),
+            'category': ('django.db.models.fields.CharField', [], {'default': "'-'", 'max_length': '15'}),
             'date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '255'})
