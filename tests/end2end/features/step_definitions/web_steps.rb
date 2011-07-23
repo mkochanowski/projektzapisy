@@ -23,7 +23,7 @@ end
 
 Given /I am logged in/ do
   Given %{I am on the home page} 
-    And %{I follow "zaloguj"}
+    And %{I follow "Zaloguj"}
     And %{I fill in "Nazwa użytkownika" with "student-test"}
     And %{I fill in "Hasło" with "aaa"}
     And %{I press "Zaloguj"}
@@ -117,11 +117,16 @@ Then /^I unenroll to group with id "([^"]*)" on mobile$/ do |gid|
   page.find(:xpath, "//form[@action=\"\/group\/#{gid}\/resign\/\"]/input").click
 end
 
-When /^I pin the group "([^"]*)"$/ do |gid|
-   page.find(:xpath, "//div[@id=\"schedule-term-#{gid}-#{gid}\"]/div/div/div/div[@title=\"Przypnij\"]").click
+When /^I pin the group "([^"]*)" near "([^"]*)"$/ do |text1, text2|
+  place = page.find(:xpath, "//*[text()=\"#{text2}\"]/following-sibling::*[text()=\"#{text1}\"]")
+  #place.native.hover()
+  place.find(:xpath, "following-sibling::div/span[@title=\"przypnij do planu\"]" ).click
 end
 
 When /^I enroll in a pinned group "([^"]*)"$/ do |gid|
    page.find(:xpath, "//div[@id=\"schedule-term-#{gid}-#{gid}\"]/div/div/div/div[@title=\"Zapisz\"]").click
 end
 
+Then /^I should see "([^"]*)" near "([^"]*)"$/ do |text1, text2|
+ page.should have_xpath("//*[text()=\"#{text2}\"]/following-sibling::*[text()=\"#{text1}\"]")
+end
