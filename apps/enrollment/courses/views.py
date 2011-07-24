@@ -14,6 +14,10 @@ import logging
 from django.conf import settings
 logger = logging.getLogger()
 
+
+def main(request):
+    return render_to_response( 'enrollment/main.html', {}, context_instance = RequestContext( request ))
+
 ''' generates template data for filtering and list of courses '''
 def prepare_courses_list_to_render(request):
     semesters = Semester.objects.filter(visible=True)

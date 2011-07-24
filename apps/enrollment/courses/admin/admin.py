@@ -7,11 +7,11 @@ from apps.enrollment.courses.models import *
 class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name', 'semester')}
     list_display = ('name', 'semester', 'lectures', 'exercises', 'laboratories','repetitions')
-    list_filter = ('semester',)
+    list_filter = ('semester','type')
     search_fields = ('name',)
     fieldsets = [
         (None,               {'fields': ['entity','name'], 'classes': ['long_name']}),
-        ('Szczegóły', {'fields': ['teachers','requirements','description','semester','type','slug','web_page'], 'classes': ['collapse']}),
+        ('Szczegóły', {'fields': ['teachers','requirements','description','semester','english','type','slug','web_page'], 'classes': ['collapse']}),
         ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
 
@@ -27,6 +27,7 @@ class SemesterAdmin(admin.ModelAdmin):
         ('Czas trwania semestru', {'fields': ['semester_beginning','semester_ending']}),
         ('Czas trwania zapisów', {'fields': ['records_opening','records_closing']}),
     ]
+    list_editable = ('visible',)
 
 class CourseInline(admin.TabularInline):
     model = Course

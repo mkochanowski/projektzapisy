@@ -316,9 +316,9 @@ def prepare_courses_with_terms(terms, records = []):
             'group': term.group.pk,
             'group_url': reverse('records-group', args=[term.group.pk]),
             'group_type': int(term.group.type),
-            'teacher': term.group.teacher.user.get_full_name(),
-            'teacher_url': reverse('employee-profile', \
-                args=[term.group.teacher.user.id]),
+            'teacher': term.group.teacher and term.group.teacher.user.get_full_name() or 'nieznany prowadzący',
+            'teacher_url': term.group.teacher and reverse('employee-profile', \
+                args=[term.group.teacher.user.id]) or '',
             'classroom': int(term.classroom.number),
             'day': int(term.dayOfWeek),
             'start_time': [term.start_time.hour, term.start_time.minute],
@@ -341,9 +341,7 @@ def own(request):
     ''' own schedule view '''
 
     default_semester = Semester.get_default_semester()
-    if not default_semester:
-        raise RuntimeError('Nie ma aktywnego semestru')
-
+        
     try:
         student = request.user.student
     except Student.DoesNotExist:
@@ -354,6 +352,18 @@ def own(request):
     courses = prepare_courses_with_terms(\
         Term.get_all_in_semester(default_semester, student),\
         Record.get_student_enrolled_objects(student, default_semester))
+
+    if not default_semester:
+        data = {
+            'terms_by_days': {},
+            'courses': [],
+            'points': [],
+            'points_type': student.program.type_of_points,
+            'points_sum': 0
+        }
+        request.user.message_set.create(message='Brak aktywnego semestru.')
+        return render_to_response('enrollment/records/schedule.html',\
+            data, context_instance = RequestContext(request))
 
     terms_by_days = [None for i in range(8)] # dni numerowane od 1
     for course in courses:
@@ -373,7 +383,7 @@ def own(request):
 
     points_type = student.program.type_of_points
     course_objects = map(lambda course: course['object'], courses)
-    points = Course.get_points_for_courses(course_objects, student)
+    points = Course.get_points_for_courses(course_objects, student.program)
     points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
 
     data = {
@@ -399,7 +409,15 @@ def schedule_prototype(request):
 
     default_semester = Semester.get_default_semester()
     if not default_semester:
-        raise RuntimeError('Nie ma aktywnego semestru')
+        request.user.message_set.create(message='Brak aktywnego semestru.')
+        data = {
+            'student_records': [],
+            'courses' : [],
+            'semester' : 'nieokreślony',
+            'types_list' : []
+        }
+        return render_to_response('enrollment/records/schedule_prototype.html',\
+            data, context_instance = RequestContext(request))        
 
     StudentOptions.preload_cache(student, default_semester)
 

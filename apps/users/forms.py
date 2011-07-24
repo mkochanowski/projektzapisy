@@ -13,3 +13,4 @@ class BankAccountChangeForm(forms.ModelForm):
     class Meta:
         fields = ['bank_account']
         model = StudiaZamawiane
+

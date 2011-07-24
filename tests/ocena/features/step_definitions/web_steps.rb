@@ -31,7 +31,7 @@ end
 Given /I am logged in with "([^"]*)" privileges/ do |privileges|
   Given %{I am on the home page}
     And %{I follow "Ocena zajęć"}
-    And %{I follow "zaloguj"}
+    And %{I follow "Zaloguj"}
     if privileges == "student" then
 		And %{I fill in "Nazwa użytkownika" with "student-test"}
 		And %{I fill in "Hasło" with "student-test"}
@@ -114,7 +114,7 @@ When /^(?:|I )fill in "([^"]*)" with value "([^"]*)" with "([^"]*)"$/ do |field,
 end
 
 When /^(?:|I )select "([^"]*)" as "([^"]*)"$/ do |field, value|
-    select(value, :from => field )
+  select(value, :from => field )
 end
 
 When /^(?:|I )choose "([^"]*)" as "([^"]*)"$/ do |field, value|
@@ -194,6 +194,19 @@ Given /^there is a poll for some exercises$/ do
     load_fixture "exercises_przedmiot_4"
 end
 
+Given /^there are courses without a poll$/ do
+  load_fixture "new_course"
+end
+
+Then /^I should see a warning "([^"]*)"$/ do |arg1|
+  page.should have_content(arg1)
+end
+
+When /^I press "([^"]*)" in warning window$/ do |arg1|
+  page.click_link_or_button(arg1)
+end
+
+
 When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 	if arg == "all" then
 		# odznaczenie obu checkboxów
@@ -208,8 +221,8 @@ When /^I uncheck "([^"]*)" checkboxes in tickets grouping options$/ do |arg|
 end
 
 Then /^I wait for a while to see "([^"]*)"$/ do |text|  
-    sleep 15
-    wait_until(5) { page.should have_content(text) }
+    sleep 5
+    wait_until(10) { page.should have_content(text) }
 end
 
 Then /^"([^"]*)" should be filled with "([^"]*)"$/ do |field, value|

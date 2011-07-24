@@ -4,9 +4,8 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from apps.users.exceptions import NonEmployeeException, NonStudentException
-from apps.enrollment.courses.models import Group, Semester
 from apps.enrollment.courses.models.points import PointTypes
-
+from apps.enrollment.courses.models import Semester
 import datetime
 
 from fereol import settings
@@ -29,11 +28,18 @@ class BaseUser(models.Model):
     receive_mass_mail_grade = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
+    last_news_view = models.DateTimeField(default=datetime.datetime.now())
         
     def get_full_name(self):
         return self.user.get_full_name()
     get_full_name.short_description = 'Użytkownik'
-    
+
+    def get_number_of_news(self):
+        from apps.news.models import News
+        news = News.objects.exclude(category='-').filter(date__gte=self.last_news_view)
+        count_news = len(news)
+        return count_news
+
     @staticmethod
     def get(user_id):
         try:
@@ -80,6 +86,8 @@ class Employee(BaseUser):
         Method used to verify whether user is allowed to create a poll for certain group 
         (== he is an admin, a teacher for this course or a teacher for this group)
         """
+        from apps.enrollment.courses.models import Group
+
         try:
             group = Group.objects.get(pk=group_id)
             return ( group.teacher == self or self in group.course.teachers.all() or self.user.is_staff )
@@ -107,6 +115,8 @@ class Employee(BaseUser):
 
     @staticmethod
     def get_all_groups_in_semester(user_id):
+        from apps.enrollment.courses.models import Group, Semester
+
         user = User.objects.get(id=user_id)
         semester = Semester.get_current_semester()
         try:
@@ -119,6 +129,8 @@ class Employee(BaseUser):
 
     @staticmethod
     def get_all_groups(user_id):
+        from apps.enrollment.courses.models import Group
+
         user = User.objects.get(id=user_id)
         try:
             employee = user.employee
@@ -171,13 +183,32 @@ class Student(BaseUser):
         return '%s, semestr %s' % (self.program , semestr)
     get_type_of_studies.short_description = 'Studia'
 
+    def participated_in_last_grade(self):
+        from apps.grade.ticket_create.models import UsedTicketStamp
+        current_semester = Semester.get_current_semester()
+        previous_semester = current_semester.get_previous_semester()
+        used_tickets = UsedTicketStamp.objects.filter(student=self,poll__semester=previous_semester)
+        if len(used_tickets)==0:
+            return False
+        else:
+            return True
+
     def get_t0_interval(self):
-        return datetime.timedelta(minutes=(self.records_opening_bonus_minutes + self.ects * settings.ECTS_BONUS)) #TODO: Sprawdzić, czy student brał udział w ocenie zajęć, jezeli tak - dodać datetime.timedelta(days=1) -- poprawić przy merge'owaniu z oceną...
+        """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
+        base = self.records_opening_bonus_minutes + self.ects * settings.ECTS_BONUS
+        points_for_one_day = 720 # =12h*60m
+        points_for_one_night = 720
+        number_of_nights_to_add = base / points_for_one_day 
+        minutes = base + number_of_nights_to_add * points_for_one_night
+        grade = self.participated_in_last_grade() and 1440 or 0
+        return datetime.timedelta(minutes=minutes+grade+120)
 
     def get_records_history(self):
         '''
         Returns list of ids of course s that student was enrolled for.
         '''
+        from apps.enrollment.courses.models import Semester
+
         default_semester = Semester.get_default_semester()
         records = self.records.exclude(group__course__semester = default_semester)
         records_list = map(lambda x: x.group.course.entity.id, records)

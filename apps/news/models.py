@@ -33,12 +33,14 @@ class NewsManager(models.Manager):
             Get a number of news 
         """
         return self.category(category)[beginwith:(beginwith+quantity)]
+
     def category(self, category):
         """
             Return news tagged with a given tag.
         """
         return self.filter(category = category)
-
+              
+        
 # suggested news items categories - not enforced
 CATEGORIES = (
     ('-', 'Hidden'),
@@ -57,8 +59,9 @@ class News(models.Model):
                             blank=True)
     date = models.DateTimeField(default=datetime.now)
     author = models.ForeignKey(User)
-    category = models.SlugField(max_length=15,
+    category = models.CharField(max_length=15,
                                 verbose_name=u'Kategoria',
+                                choices=CATEGORIES,
                                 default='-')
     
     objects = NewsManager()

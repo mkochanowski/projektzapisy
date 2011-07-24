@@ -34,6 +34,15 @@
 	font-weight: bold;
 }
 
+#main-topContainer a.unread {
+    color: #bf3030;
+}
+
+#main-topContainer a
+{
+    color: #666;
+}
+
 #main-topContainer #main-signinBar
 {
 	text-align: right;
@@ -243,6 +252,7 @@
 #main-content.wide
 {
 	padding: 15px 20px;
+    min-height: 140px;
 }
 
 /*** ZAWARTOŚĆ - koniec ***/
@@ -635,6 +645,5 @@ input.bigButton
 
 .right
 {
-    float:right;
+    float: right;
 }
-

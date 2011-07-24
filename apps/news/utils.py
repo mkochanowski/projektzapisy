@@ -99,6 +99,17 @@ def prepare_data(request, items,
     data['search_view']  = False
     return data
 
+def prepare_data_all(request, items,
+                 beginwith=0, quantity=NEWS_PER_PAGE,
+                 archive_view=False, category = None):
+    """
+        Prepares data
+    """
+    data = {}
+    data['content']     = render_items(request, items)
+    data['search_view']  = False
+    return data
+
 def render_search_newer_group(category, page, query):
     """
         Renders search result

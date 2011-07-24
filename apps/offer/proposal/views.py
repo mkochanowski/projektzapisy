@@ -15,6 +15,8 @@ from django.shortcuts               import redirect
 from django.views.decorators.http   import require_POST
 from django.contrib                 import messages
 from copy                           import deepcopy
+from Crypto.Hash import MD5
+
 
 from apps.users.models            import Program
 
@@ -26,8 +28,6 @@ from apps.offer.proposal.exceptions      import NonStudentException, NonEmployee
 import logging
 logger = logging.getLogger("")
 
-#dodawanie haszy do formularza - w views.py:
-from Crypto.Hash import MD5
 
 def get_hash():
     md5 = MD5.new()
@@ -37,43 +37,8 @@ def get_hash():
     hash = md5.hexdigest()
     return hash
 
-"""def hash_checked( function, request=None, sid = None ):
-    """
-# Decorator that checks if form's hash has already been stored in session.
-"""
-    def inner(request):
-        if request.method == 'POST' and 'hash' in request.POST.items().keys():
-            hash = request.POST.items()['hash']
-            if 'hashes' in request.session.keys() and hash not in request.session['hashes']:
-                return function( request, sid )
-            else:
-                pass # wyjątek ??? return None ???
-        else:
-            pass #???"""
-
-from django.http                    import HttpResponseNotModified
-
-"""
-class hash_checked(object):
-
-    def __init__(self, *args):
-        self.request = args[0]
-        #self.sid = sid
-
-    def __call__(self, request, sid=None):
-        h = request.POST.get('form-hash', '')
-        if not ('hashes' in request.session.keys()):
-            request.session['hashes'] = [h]
-        if h in request.session['hashes']:
-            return redirect("proposal-page" , slug=proposal_.slug)
-        request.session['hashes'].append(h)
-        request.session.modified = True
-
-        return f( *args )
-"""
-
-
-
+def main(request):
+    return render_to_response( 'offer/main.html', {}, context_instance = RequestContext( request ))
 
 @require_POST
 @login_required
@@ -163,7 +128,7 @@ def proposal( request, slug, descid = None ):
     }
     return render_to_response( 'offer/proposal/view.html', data, context_instance = RequestContext( request ) )
 
-#@hash_checked
+
 @login_required
 def proposal_form(request, sid = None):
     """
@@ -234,7 +199,7 @@ def proposal_form(request, sid = None):
     if request.method == 'POST':
         h = request.POST.get('form-hash', '')
         if not ('hashes' in request.session.keys()):
-            request.session['hashes'] = [h]
+            request.session['hashes'] = []
         if h in request.session['hashes']:
             return redirect("proposal-page" , slug=proposal_.slug)
         request.session['hashes'].append(h)
@@ -414,7 +379,6 @@ def proposal_form(request, sid = None):
         'types'                 : types,
         'typesName'             : types_name,
         'form_hash'             : form_hash,
-        'hasze'                 : request.session['hashes']
     }
 
     if success:

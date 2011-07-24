@@ -12,10 +12,10 @@ module NavigationHelpers
       '/'
       
     when /grade main page/
-      '/news/grade/'
+      '/grade/'
     
     when /poll management page/
-		'/grade/poll_manage'            
+	'/grade/poll_manage'            
 		
     else
           begin

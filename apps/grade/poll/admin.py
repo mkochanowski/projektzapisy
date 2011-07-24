@@ -4,21 +4,19 @@
 """
 
 from django.contrib         import admin
-from apps.grade.poll.models import Option, \
-                                     OpenQuestionOrdering, \
-                                     SingleChoiceQuestionOrdering, \
-                                     MultipleChoiceQuestionOrdering, \
-                                     SectionOrdering, \
-                                     OpenQuestion, \
-                                     SingleChoiceQuestion, \
-                                     MultipleChoiceQuestion, \
-                                     Section, \
-                                     Poll, \
-                                     SavedTicket, \
-                                     OpenQuestionAnswer, \
-                                     SingleChoiceQuestionAnswer, \
-                                     MultipleChoiceQuestionAnswer, Template, \
-                                     TemplateSections
+
+from apps.grade.poll.models.option import Option
+from apps.grade.poll.models.open_question import OpenQuestion, OpenQuestionOrdering
+from apps.grade.poll.models.multiple_choice_question import MultipleChoiceQuestion, MultipleChoiceQuestionOrdering
+from apps.grade.poll.models.single_choice_question import SingleChoiceQuestion, SingleChoiceQuestionOrdering
+from apps.grade.poll.models.section import Section, SectionOrdering
+from apps.grade.poll.models.template import Template, TemplateSections
+from apps.grade.poll.models.open_question_answer import OpenQuestionAnswer
+from apps.grade.poll.models.single_choice_question_answer import SingleChoiceQuestionAnswer
+from apps.grade.poll.models.multiple_choice_question_answer import MultipleChoiceQuestionAnswer
+from apps.grade.poll.models.saved_ticket import SavedTicket
+
+from apps.grade.poll.models.poll import Poll
 
 admin.site.register( Option )
 admin.site.register( OpenQuestionOrdering )

@@ -16,7 +16,7 @@ class Semester( models.Model ):
     visible = models.BooleanField(verbose_name='widoczny')
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.CharField(max_length=7, default='0', verbose_name='rok akademicki')
-    records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów') # T0
+    records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów', help_text='Godzina powinna być ustawiona na 00:00:00, by studenci mieli otwarcie między 10:00 a 22:00.') 
     records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
     semester_beginning = models.DateField(null = False, verbose_name='Data rozpoczęcia semestru')
     semester_ending = models.DateField(null = False, verbose_name='Data zakończenia semestru')
@@ -36,7 +36,24 @@ class Semester( models.Model ):
         if self.semester_beginning == None or self.semester_ending == None:
             return False
         return (self.semester_beginning <= datetime.now().date() and self.semester_ending >= datetime.now().date())
-    
+
+    def get_previous_semester(self):
+        """ returns previous semester """
+        year = self.year
+        if self.type=='l':
+            try:
+                Semester.objects.filter(year=year,type='z')[0]
+            except KeyError:
+                return None
+        else:
+            prev_year = (int(year[0:4])-1)
+            year = prev_year+'/'+year[2:4]
+            try:
+                Semester.objects.filter(year=year,type='l')[0]
+            except KeyError:
+                return None
+                
+                
     @staticmethod
     def get_current_semester():
         """ if exist, it returns current semester. otherwise return None """ 
@@ -71,6 +88,7 @@ class Semester( models.Model ):
         """ Answers if course is sat as visible (displayed on course lists) """
         param = id
         return Semester.objects.get(id = param).visible 
+
 
     class Meta:
         verbose_name = 'semestr'

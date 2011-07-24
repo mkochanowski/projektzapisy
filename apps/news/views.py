@@ -13,13 +13,15 @@ from django.template import RequestContext
 from django.utils import simplejson
 from django.views.generic.create_update import delete_object
 
-from apps.news.forms import NewsForm
+from apps.news.forms import NewsForm, NewsAllForm
 from apps.news.models import News
-from apps.news.utils import NEWS_PER_PAGE, prepare_data, render_items, \
+from apps.news.utils import NEWS_PER_PAGE, prepare_data, prepare_data_all, render_items, \
      get_search_results_data, mail_news_enrollment,  mail_news_grade, \
      mail_news_offer, render_with_category_template, render_with_device_detection
 from apps.enrollment.courses.models import Semester
 from apps.users.models import BaseUser
+from django.template.loader import get_template
+import datetime
 
 def main_page( request ):
     """
@@ -186,3 +188,127 @@ def delete(request, nid):
             'news': news,
             'grade' : grade,
         }))
+
+# NOWA WERSJA AKTUALNOŚCI ZE ZMERGOWANYMI SYSTEMAMI PONIZEJ
+
+def all_news(request):
+    """
+        Latest news
+    """
+    try:
+        student = request.user.student
+        student.last_news_view = datetime.datetime.now()
+        student.save()
+    except:
+        try:
+            employee = request.user.employee
+            employee.last_news_view = datetime.datetime.now()
+            employee.save()   
+        except:
+            pass
+    
+    json = request.GET.get('json', None)
+    items = News.objects.exclude(category='-').order_by('-date')
+    data = prepare_data_all(request, items)
+    if json:
+        return HttpResponse(simplejson.dumps(data))
+
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    data['grade'] = grade
+
+    temp = get_template('news/list_all.html')
+    return HttpResponse(temp.render(RequestContext(request,data)))
+
+@permission_required('news.add_news')
+def all_news_add(request):
+    """
+        Add news
+    """
+    if request.method == 'POST':
+        form = NewsAllForm(request.POST)
+        if form.is_valid():
+            news = form.save(commit=False)
+            news.author = request.user
+            news.save()
+            request.user.message_set.create(message="Opublikowano ogłoszenie.")
+            """if cat == 'offer':
+                mail_news_offer(news)
+            elif cat == 'enrollment':
+                mail_news_enrollment(news)
+            elif cat == 'grade':
+                mail_news_grade(news)"""
+            return redirect(all_news)
+    else:
+        form = NewsAllForm()
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    """return render_with_category_template('news/form_all.html',
+        RequestContext(request, {
+        'form': form,
+        'adding': True,
+        'grade' : grade,
+        }))"""
+    data = {
+        'form': form,
+        'adding': True,
+        'grade' : grade,
+        }
+    temp = get_template('news/form_all.html')
+    return HttpResponse(temp.render(RequestContext(request,data)))
+        
+@permission_required('news.delete_news')
+def all_news_delete(request, nid):
+    """ Delete news item"""
+    news = get_object_or_404(News, pk=nid)
+    category = news.category
+    if request.method == 'POST':
+        news.delete()
+        request.user.message_set.create(message="Usunięto ogłoszenie.")
+        return redirect(all_news)
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    data = {
+            'news': news,
+            'grade' : grade,
+        }
+    temp = get_template('news/confirm_delete_all.html')
+    return HttpResponse(temp.render(RequestContext(request,data)))
+    
+        
+@permission_required('news.change_news')
+def all_news_edit(request, nid):
+    """
+        Edit news
+    """
+    if request.method == 'POST':
+        form = NewsAllForm(request.POST)
+        if form.is_valid():
+            news = form.save(commit=False)
+            old_news = News.objects.get(pk=nid)
+            news.id = nid
+            news.author = old_news.author
+            news.date = old_news.date
+            news.category  = old_news.category
+            news.save()
+            request.user.message_set.create(message="Zapisano zmiany w ogłoszeniu.")
+            return redirect(all_news)
+    else:
+        news_instance = get_object_or_404(News, pk=nid)
+        form = NewsAllForm(instance = news_instance)
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False        
+    data = {
+        'form': form,
+        'grade' : grade,
+        }
+    temp = get_template('news/form_all.html')
+    return HttpResponse(temp.render(RequestContext(request,data)))

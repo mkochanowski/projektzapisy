@@ -58,24 +58,27 @@
 			<p id="main-systemTypeBar">{{ subsystemname }}</p>
 		{% endif %}
 		<p id="main-signinBar">
-			{% if user.is_staff %}
-					<a href="/fereol_admin/">Panel administracyjny</a> |
-			{% endif %}
-            {% block help %}
-                    <a href="{% url help %}">Pomoc</a> |
-            {% endblock %}
 			{% if user.is_authenticated %}
-				Jesteś zalogowany jako
-				<a href="{% url my-profile %}">{{ user.first_name }} {{user.last_name }}</a>
-				{% if user.student %}
-					({{user.student.matricula}})
-				{% endif %}
-				&ndash;
-				<a href="{% url user-logout %}">wyloguj</a>
+				Witaj, {{ user.first_name }} |
+				<a href="{% url my-profile %}">Moje konto</a> |
+                {% if user.is_staff %}
+                        <a href="/fereol_admin/">Panel administracyjny</a> |
+                {% endif %}
+                {% if user.student and user.student.get_number_of_news > 0 %}
+                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.student.get_number_of_news }})</a> |
+                {% else %}
+                    {% if user.employee and user.employee.get_number_of_news > 0 %}
+                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.employee.get_number_of_news }})</a> |
+                    {% else %}
+                        <a href="{% url news-all %}">Aktualności</a> |    
+                    {% endif %}
+                {% endif %}
+                <a href="{% url help %}">Pomoc</a> |
+                <a href="{% url user-logout %}">Wyloguj</a>
 			{% else %}
-				Nie jesteś zalogowany
-				&ndash;
-				<a href="{% url user-login %}?next={{request.path}}">zaloguj</a>
+				Witaj! |
+				<a href="{% url news-all %}">Aktualności</a> |
+				<a href="{% url user-login %}?next={{request.path}}">Zaloguj</a>
 			{% endif %}
 		</p>
 	</div>
@@ -85,9 +88,9 @@
 			<div id="main-menu">
 				<ul id="main-menu-list">
 					{% block main-menu %}
-						<li><a href="{% url latest_news 'enrollment' %}">System zapisów</a></li>
-						<li><a href="{% url latest_news 'offer' %}">Kształtowanie oferty dydaktycznej</a></li>
-						<li><a href="{% url latest_news 'grade' %}">Ocena zajęć</a></li>
+						<li><a href="{% url enrollment-main %}">System zapisów</a></li>
+						<li><a href="{% url offer-main %}">Kształtowanie oferty dydaktycznej</a></li>
+						<li><a href="{% url grade-main %}">Ocena zajęć</a></li>
 					{% endblock %}
 				</ul>
 			</div>
