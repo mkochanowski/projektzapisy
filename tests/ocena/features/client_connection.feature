@@ -1,6 +1,7 @@
 Feature: User downloads tickets using supplied external client.
-// We do not know, as of yet, how to avoid printing output on console -- 
-// it seems that <out is not working properly
+ 
+    // We do not know, as of yet, how to avoid printing output on console -- 
+    // it seems that <out is not working properly
     Background:
         Given I start new scenario
         And there are polls generated 
@@ -9,7 +10,7 @@ Feature: User downloads tickets using supplied external client.
         And I am signed for groups with polls
         
     Scenario: Non downloaded tickets should be downloadable
-        Given I am logged in with "student" privileges	
+        Given I am logged in with "student" privileges  
         And I am on grade main page
         And I follow "Pobierz bilety"
         When I run client with "no_tickets_downloaded"
@@ -18,28 +19,28 @@ Feature: User downloads tickets using supplied external client.
         And I should not see "Bilet już pobrano"
         
     Scenario: Downloaded ticket should not be downloadable
-        Given I am logged in with "student" privileges	
+        Given I am logged in with "student" privileges  
         And I am on grade main page
         And I follow "Pobierz bilety"
         When I run client with "ticket_downloaded"
         And I press "Pobierz bilety"
         Then I wait for a while to see "Pomyślnie wygenerowano bilety"
-		And I should see "Ankieta: Ankieta ogólna"
+        And I should see "Ankieta: Ankieta ogólna"
         And I should see "Bilet już pobrano"
         
     Scenario: Part of grouping downloaded by client grouping selected in fereol
-        Given I am logged in with "student" privileges	
+        Given I am logged in with "student" privileges  
         And I am on grade main page
         And I follow "Pobierz bilety"
         When I run client with "part_of_grouping_downloaded"
         And I press "Pobierz bilety"
         Then I wait for a while to see "Pomyślnie wygenerowano bilety"
-		And I should see "Ankieta: Ankieta wykładu, Przedmiot 1: wykład - Pracownik Testowy"
+        And I should see "Ankieta: Ankieta wykładu, Przedmiot 1: wykład - Pracownik Testowy"
         And I should see "Bilet już pobrano"
         And tickets should not be connected
         
     Scenario: Tickets downloaded in fereol are not downloadable
-        Given I am logged in with "student" privileges	
+        Given I am logged in with "student" privileges  
         And I am on grade main page
         And I follow "Pobierz bilety"
         And I press "Pobierz bilety"
