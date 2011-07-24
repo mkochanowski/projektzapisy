@@ -34,6 +34,10 @@
 	font-weight: bold;
 }
 
+#main-topContainer a.unread {
+    color: #bf3030;
+}
+
 #main-topContainer a
 {
     color: #666;
@@ -641,6 +645,5 @@ input.bigButton
 
 .right
 {
-    float:right;
+    float: right;
 }
-

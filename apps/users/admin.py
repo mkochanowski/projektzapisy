@@ -10,7 +10,7 @@ class StudentAdmin(admin.ModelAdmin):
         (None,               {'fields': ['user','matricula','status']}),
         ('Studia', {'fields': ['program','semestr','ects']}),
         ('Zapisy', {'fields': ['records_opening_bonus_minutes','block']}),
-        ('Ogłoszenia mailowe', {'fields': ['receive_mass_mail_enrollment','receive_mass_mail_offer'], 'classes': ['collapse']}),
+        ('Inne', {'fields': ['receive_mass_mail_enrollment','receive_mass_mail_offer','receive_mass_mail_grade','last_news_view'], 'classes': ['collapse']}),
     ]
     search_fields = ('user__first_name', 'user__last_name', 'matricula')
     list_filter = ('program',)
