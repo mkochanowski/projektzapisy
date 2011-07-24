@@ -153,7 +153,7 @@ def bank_account_change(request):
 def password_change_done(request):
     '''informs if password were changed'''
     logger.info('User (%s) changed password' % request.user.get_full_name())
-    request.user.message_set.create(message="Twóje hasło zostało zmienione.")
+    request.user.message_set.create(message="Twoje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
 
 @login_required  
