@@ -86,7 +86,8 @@ from apps.news.views import display_news_list
 #not really nice to change naming convention, is it? --AM
 
 def main(request):
-    return render_to_response( 'grade/base.html', {}, context_instance = RequestContext( request ))
+    grade = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/base.html', { 'grade' : grade}, context_instance = RequestContext( request ))
 
 @employee_required
 def template_form(request, group_id = 0):
@@ -104,7 +105,7 @@ def templates( request ):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect('/news/grade')
+        return HttpResponseRedirect( reverse( 'grade-main' ))
     data = {}
     page, paginator = make_paginator( request, Template )
     data['templates'] = page
@@ -123,22 +124,22 @@ def template_actions( request ):
     """
     data = {}
     data['grade']  = Semester.get_current_semester().is_grade_active
-
+    
     if request.method == 'POST':
         action = request.POST.get('action')
-
+        
         ### delete
         if action == 'delete_selected':
             data['templates'] = get_objects( request, Template)
             return render_to_response( 'grade/poll/managment/templates_confirm.html',
                                        data, context_instance = RequestContext( request ))
-
+                                       
         ### use
         elif action == 'use_selected':
             data['templates'] = get_objects( request, Template)
             return render_to_response( 'grade/poll/managment/templates_confirm_use.html',
                                        data, context_instance = RequestContext( request ))
-
+                                       
     ### Nothing happend, back to list.
     return HttpResponseRedirect(reverse('grade-poll-templates'))
 
@@ -184,9 +185,8 @@ def create_poll_from_template(request, templates):
         polls_list.extend(polls)
     message   = make_message_from_polls(polls_list)
     messages.success(request, message)
-
+    
     return len(message)
-
 
 @employee_required
 def show_template( request, template_id ):
@@ -244,7 +244,7 @@ def enable_grade( request ):
          
         messages.success(request, "Ocena zajęć otwarta" )
     
-    return HttpResponseRedirect('/news/grade')
+    return HttpResponseRedirect( reverse( 'grade-main' ))
 
 @employee_required
 def disable_grade( request ):
@@ -273,7 +273,7 @@ def disable_grade( request ):
     else:
         messages.error( request, "Nie można zamknąć oceny; system nie był uruchomiony" )
     
-    return HttpResponseRedirect('/news/grade')
+    return HttpResponseRedirect( reverse( 'grade-main' ))
 
 #### Poll creation ####
 
@@ -319,7 +319,8 @@ def edit_section(request, section_id):
     from django.template import loader
     form = PollForm()
     form.setFields( None, None, section_id )
-    return render_to_response( 'grade/poll/section_edit.html', {"form": form}, context_instance = RequestContext( request ))
+    grade = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/poll/section_edit.html', {"form": form, 'grade':grade}, context_instance = RequestContext( request ))
 
 @employee_required
 def poll_form(request, group_id = 0):
@@ -351,7 +352,7 @@ def poll_edit(request):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect('/news/grade')
+        return HttpResponseRedirect( reverse( 'grade-main' ))
 
     if request.method == "POST":
         for_all = ( request.POST.get('for_all') == 'on' )
@@ -381,7 +382,7 @@ def poll_create(request):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect('/news/grade')
+        return HttpResponseRedirect( reverse( 'grade-main' ))
 
     if request.method == "POST":
         try:
@@ -425,7 +426,7 @@ def sections_list( request ):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect('/news/grade')
+        return HttpResponseRedirect( reverse( 'grade-main' ))
     page, paginator = make_paginator( request, Section )
     data['sections'] = page
     data['sections_word'] = declination_section(paginator.count, True)
@@ -440,7 +441,7 @@ def show_section( request, section_id):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect('/news/grade')
+        return HttpResponseRedirect( reverse( 'grade-main' ))
     form = PollForm()
     form.setFields( None, None, section_id )
     data = {}
@@ -457,11 +458,14 @@ def show_section( request, section_id):
 def get_section(request, section_id):
     form = PollForm()
     form.setFields( None, None, section_id )
-    return render_to_response( 'grade/poll/poll_section.html', {"form": form, "section_id": section_id}, context_instance = RequestContext( request ))
+    grade = Semester.get_current_semester().is_grade_active
+    return render_to_response( 'grade/poll/poll_section.html', {"form": form, "section_id": section_id, 'grade':grade}, context_instance = RequestContext( request ))
 
 @employee_required
 def section_actions( request ):
     data = {}
+    grade = Semester.get_current_semester().is_grade_active
+    data[ 'grade' ] = grade
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'delete_selected':
@@ -486,7 +490,7 @@ def polls_list( request ):
     grade = Semester.get_current_semester().is_grade_active
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect('/news/grade')
+        return HttpResponseRedirect( reverse( 'grade-main' ))
 
     if request.method == 'POST':
 
@@ -557,6 +561,7 @@ def show_poll( request, poll_id):
 @employee_required
 def poll_actions( request ):
     data = {}
+    data[ 'grade' ] = Semester.get_current_semester().is_grade_active
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'delete_selected':
@@ -589,7 +594,8 @@ def poll_manage(request):
     grade = Semester.get_current_semester().is_grade_active
     data = {}
     data['semesters']  = Semester.objects.all() 
-    return render_to_response ('grade/poll/manage.html', {'grade' : grade}, context_instance = RequestContext( request ))
+    data['grade']      = grade
+    return render_to_response ('grade/poll/manage.html', data, context_instance = RequestContext( request ))
 
 @employee_required()
 def get_section_form(request):
@@ -608,7 +614,7 @@ def questionset_create(request):
     
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect('/news/grade')
+        return HttpResponseRedirect( reverse( 'grade-main' ))
 
     if request.method == "POST":
         form_data = get_section_form_data( request.POST )
@@ -1010,7 +1016,7 @@ def poll_answer( request, slug, pid ):
 def poll_end_grading( request ):
     request.session.clear()
     
-    return HttpResponseRedirect( '/news/grade/' )
+    return HttpResponseRedirect( reverse( 'grade-main' ))
 
 #### Poll results ####
 @login_required
