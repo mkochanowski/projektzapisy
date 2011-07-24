@@ -28,11 +28,18 @@ class BaseUser(models.Model):
     receive_mass_mail_grade = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
+    last_news_view = models.DateTimeField(default=datetime.datetime.now())
         
     def get_full_name(self):
         return self.user.get_full_name()
     get_full_name.short_description = 'Użytkownik'
-    
+
+    def get_number_of_news(self):
+        from apps.news.models import News
+        news = News.objects.exclude(category='-').filter(date__gte=self.last_news_view)
+        count_news = len(news)
+        return count_news
+
     @staticmethod
     def get(user_id):
         try:
