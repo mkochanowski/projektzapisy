@@ -86,8 +86,7 @@ Feature: Anonymous user, who has just entered his tickets, wants to fill some po
         Then I should see "Ankieta: Ankieta ćwiczeń zapisana"
         And "poll-5_section-2_question-2-multi-other" should be filled with "często nie przychodził"
         And "poll-5_section-2_question-2-multi--1" should be checked
-
-	
+    
     Scenario: User fills other field in a multiple choice question and unchecks in
         Given I am on grade main page
         And I follow "Oceń zajęcia"

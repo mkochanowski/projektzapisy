@@ -1,10 +1,10 @@
 Feature: User with privileges wants to edit some polls.
 
-	Scenario: Preparations
+    Scenario: Preparations
         Given I start new scenario
         And the grading protocol is "off"
-		And there are polls generated
-		And there are keys generated for polls 
+        And there are polls generated
+        And there are keys generated for polls 
 
     Scenario: Administrator edits a poll
         Given I am logged in with "administrator" privileges
