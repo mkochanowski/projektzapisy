@@ -6,7 +6,7 @@ Feature: student wants to enroll in all the groups that he pinned on his schedul
     And I am on schedule prototype page
   
   @TODO
-  Scenario: Schedule prototype lets the student pin three groups
+  Scenario: Schedule prototype lets the student pin two groups
     When I click on "Wprowadzenie do logiki formalnej"
     Then I should see "Zdzisława Jarosz" near "Logika formalna"
     #When I pin the group "Zdzisława Jarosz" near "Logika formalna"

@@ -11,4 +11,4 @@ search_index/*
 settings_local.py
 /apache
 .idea/
-
+.rvmrc

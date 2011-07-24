@@ -1,12 +1,10 @@
 Feature: student wants to enroll in a group that he pinned to his schedule
 
-  Scenario: Preparations
-    Given I start new scenario
-    Given I am logged in
-    And I am on schedule prototype page
-
   @TODO
   Scenario: Schedule prototype lets the student pin two groups
+     Given I start new scenario
+     And I am logged in
+     And I am on schedule prototype page
      When I click on "Zastosowania wielomianów Czebyszewa"    
      Then I should see "Zdzisława Jarosz" near "Zast. w. Czebyszewa"
      #When I pin the group "Zdzisława Jarosz" near "Zast. w. Czebyszewa"
