@@ -61,6 +61,7 @@ class Course( models.Model ):
                                 verify_exists= True,
 								blank        = True,
                                 null         = True )
+    english = models.BooleanField(default=False, verbose_name='angielski')
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method
