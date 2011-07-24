@@ -86,8 +86,11 @@ from apps.news.views import display_news_list
 #not really nice to change naming convention, is it? --AM
 
 def main(request):
-    grade = Semester.get_current_semester().is_grade_active
-    return render_to_response( 'grade/base.html', { 'grade' : grade}, context_instance = RequestContext( request ))
+    try:
+        grade = Semester.get_current_semester().is_grade_active
+    except:
+        grade = False
+    return render_to_response( 'grade/main.html', { 'grade' : grade }, context_instance = RequestContext( request ))
 
 @employee_required
 def template_form(request, group_id = 0):

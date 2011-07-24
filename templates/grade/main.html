@@ -1,0 +1,19 @@
+{% extends "grade/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/common/mainPage.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/results.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />    
+{% endblock %}
+
+{% block content %}
+    <div id="mainPage-container">
+        <div>
+            <a href="{% url grade-main %}">Ocena zajęć</a>
+            <span>System oceny zajęć w Instytucie
+                Informatyki Uniwersytetu Wrocławskiego.</span>
+        </div>
+    </div>
+{% endblock %}
