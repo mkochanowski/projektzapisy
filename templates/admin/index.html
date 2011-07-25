@@ -51,9 +51,13 @@
         <table>
             <caption>Import</caption>
             <tr>
-                <th scope="row">Plan semestru</th>
-                <td><a href="{{ model.admin_url }}courses/import_semester" class="addlink">Importuj</a></td>
+                <th scope="row">Plan semestru z sekretariatu</th>
+                <td><a href="{{ model.admin_url }}courses/import_schedule" class="addlink">Importuj</a></td>
             </tr>
+            <tr>
+                <th scope="row">Plan semestru z pliku xml</th>
+                <td><a href="{{ model.admin_url }}courses/import_semester" class="addlink">Importuj</a></td>
+            </tr>            
         </table>
     </div>
 {% else %}

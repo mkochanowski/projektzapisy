@@ -43,5 +43,6 @@ urlpatterns = patterns('',
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     (r'^fereol_admin/courses/import_semester', 'apps.enrollment.courses.admin.views.import_semester'),
+    (r'^fereol_admin/courses/import_schedule', 'apps.enrollment.courses.admin.views.import_schedule'),
     (r'^fereol_admin/', include(admin.site.urls)),
 )
