@@ -22,13 +22,17 @@ class Term( models.Model ):
         app_label = 'courses'
     
     @staticmethod
-    def get_all_in_semester(semester, student=None):
+    def get_all_in_semester(semester, student=None, employee=None):
         filtered = Term.objects.filter(group__course__semester=semester)
         
         if student:
             from apps.enrollment.records.models import Record
             filtered = filtered.filter(group__id__in=\
                 Record.get_student_enrolled_ids(student, semester))
+                
+        if employee:
+            from apps.enrollment.records.models import Record
+            filtered = filtered.filter(group__teacher=employee)
             
         return filtered.select_related('classroom', 'group', 'group__course', \
             'group__course__semester', 'group__course__entity',

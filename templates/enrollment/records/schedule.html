@@ -58,13 +58,22 @@
 		<thead>
 			<tr>
 				<th>Przedmiot</th>
-				<th class="ects">{{ points_type }}</th>
+				{% if user.student %}
+                    <th class="ects">{{ points_type }}</th>
+                {% else %}
+                    <th class="ects">Godziny</th>
+                {% endif %}
 			</tr>
 		</thead>
 		<tfoot>
 			<tr>
+			{% if user.student %}
 				<td>Suma punktów {{ points_type }}:</td>
-				<td class="ects">{{  points_sum }}</td>
+				<td class="ects">{{ points_sum }}</td>
+            {% else %}
+                <td>Liczba godzin:</td>
+                <td class="ects">{{ hours_sum }}</td>    
+            {% endif %}
 			</tr>
 		</tfoot>
 		<tbody>
