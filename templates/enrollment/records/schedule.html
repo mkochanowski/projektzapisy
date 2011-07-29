@@ -24,6 +24,7 @@
 {% endblock %}
 
 {% block content %}
+    <a href="{% url ical %}" style="float:right;">Eksportuj do ical</a>
 	<div id="enr-schedule-scheduleContainer">
 		<div class="byWeekDays">
 			<h2>Zajęcia z podziałem na dni</h2>
@@ -53,7 +54,11 @@
 	</div>
 
 	{% if courses %}
-	<h2>Zajęcia, na które jesteś zapisany</h2>
+	{% if user.student %}
+        <h2>Zajęcia, na które jesteś zapisany</h2>
+	{% else %}
+        <h2>Zajęcia, które prowadzisz</h2>
+	{% endif %}
 	<table id="enr-schedule-listByCourse">
 		<thead>
 			<tr>

@@ -35,9 +35,11 @@ logger = logging.getLogger()
 import vobject
 from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 
-GTC = {}
-for (x,y) in GROUP_TYPE_CHOICES:
-    GTC[x]=y[:2]
+
+GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
+        '4': 'cw', '5': 'cw+prac',
+        '6': 'sem', '7': 'lek', '8': 'WF',
+        '9': 'rep', '10': 'proj'}
 
 
 @login_required
@@ -263,41 +265,46 @@ def create_ical_file(request):
     cal.add('calname').value = user_full_name + ' - schedule'
     cal.add('method').value = 'PUBLISH'
 
-    if BaseUser.is_student(user):
-        groups = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user_id))
-        for group in groups:
-            course_name = group.course.name
-            group_type = GTC[group.type]
-            try:
-                terms = group.get_all_terms()
-            except IndexError:
-                continue
-            for term in terms:
-                start_time = term.start_time
-                end_time = term.end_time
-                weekday = int(term.dayOfWeek)
-                classroom_number = term.classroom.number
-        
-                diff = semester_beginning_weekday - weekday
-                if diff<0:
-                    diff += 7
-                diff = 7 - diff
-                start_date = semester_beginning + datetime.timedelta(days=diff)
-                start_datetime = datetime.datetime.combine(start_date, start_time)
-                end_datetime = datetime.datetime.combine(start_date, end_time)
-        
-                event = cal.add('vevent')
-                event.add('summary').value = '%s, %s, s.%s' % (course_name,group_type,classroom_number)
-                event.add('dtstart').value  = start_datetime
-                event.add('dtend').value = end_datetime
-                event.add('rrule').value = "FREQ=WEEKLY;UNTIL=%s" % (until,)
-    elif BaseUser.is_employee(user):
-        """
-        TODO
-        """
+    groups_employee = []
+    groups_student = []
+    try:
+        user.student
+        groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user_id))
+    except Student.DoesNotExist:
         pass
-    else:
+    try:
+        user.employee
+        groups_employee = map(lambda x: x, Group.objects.filter(course__semester = semester, teacher = user.employee))
+    except Employee.DoesNotExist:
         pass
+    groups = groups_employee + groups_student
+    for group in groups:
+        course_name = group.course.name
+        group_type = GTC[group.type]
+        try:
+            terms = group.get_all_terms()
+        except IndexError:
+            continue
+        for term in terms:
+            start_time = term.start_time
+            end_time = term.end_time
+            weekday = int(term.dayOfWeek)
+            classroom_number = term.classroom.number
+    
+            diff = semester_beginning_weekday - weekday
+            if diff<0:
+                diff += 7
+            diff = 7 - diff
+            start_date = semester_beginning + datetime.timedelta(days=diff)
+            start_datetime = datetime.datetime.combine(start_date, start_time)
+            end_datetime = datetime.datetime.combine(start_date, end_time)
+    
+            event = cal.add('vevent')
+            event.add('summary').value = '%s, %s, s.%s' % (course_name,group_type,classroom_number)
+            event.add('dtstart').value  = start_datetime
+            event.add('dtend').value = end_datetime
+            event.add('rrule').value = "FREQ=WEEKLY;UNTIL=%s" % (until,)
+
     cal_str = cal.serialize()
     response = HttpResponse(cal_str, content_type='application/calendar')
     response['Content-Disposition'] = 'attachment; filename=schedule.ical'
