@@ -1,7 +1,5 @@
 Feature: User downloads tickets using supplied external client.
- 
-    // We do not know, as of yet, how to avoid printing output on console -- 
-    // it seems that <out is not working properly
+
     Background:
         Given I start new scenario
         And there are polls generated 

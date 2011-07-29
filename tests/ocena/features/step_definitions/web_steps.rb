@@ -17,7 +17,7 @@ end
 def run_client(input_file)
     path = "../../site_media/Downloads/"
     system "rm -rf tickets.txt"
-    system "python #{path}client.py < client_input/#{input_file}"
+    system "python #{path}client.py < client_input/#{input_file} > out"
     system "rm -rf out"
 end
 
