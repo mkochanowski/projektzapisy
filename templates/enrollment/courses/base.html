@@ -51,7 +51,12 @@
 					{% endfor %}
 				</select>
 			</span>
-			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+			{% if user.student %}
+                <span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+            {% else %}
+                <span class="checkbox" style="display: none;"><input type="checkbox" id="enr-hidesigned" checked="unchecked"/><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+			{% endif %}
+			
 		</fieldset>
 	</div>
 {% endblock %}

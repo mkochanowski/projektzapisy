@@ -64,7 +64,15 @@
                 {% if user.is_staff %}
                         <a href="/fereol_admin/">Panel administracyjny</a> |
                 {% endif %}
-                <a href="{% url news-all %}">Aktualności</a> |
+                {% if user.student and user.student.get_number_of_news > 0 %}
+                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.student.get_number_of_news }})</a> |
+                {% else %}
+                    {% if user.employee and user.employee.get_number_of_news > 0 %}
+                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.employee.get_number_of_news }})</a> |
+                    {% else %}
+                        <a href="{% url news-all %}">Aktualności</a> |    
+                    {% endif %}
+                {% endif %}
                 <a href="{% url help %}">Pomoc</a> |
                 <a href="{% url user-logout %}">Wyloguj</a>
 			{% else %}

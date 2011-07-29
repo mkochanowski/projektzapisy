@@ -46,7 +46,7 @@
 				{% if course.lectures or course.exercises or course.laboratories or course.repetitions %}
 					<li>
 						<span>Liczba godzin:</span>
-						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.lectures or course.laboratories or course.repetitions %}+{% endif %}{% endif %}
+						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.exercises or course.laboratories or course.repetitions %}+{% endif %}{% endif %}
 						{% if course.repetitions %}{{course.repetitions}} (rep) {%if course.lectures or course.laboratories %}+{% endif %}{% endif %}
 						{% if course.exercises %}{{course.exercises}} (ćw) {%if course.laboratories %}+{% endif %}{% endif %}
 						{% if course.laboratories %}{{course.laboratories}} (prac){% endif %}
@@ -58,14 +58,12 @@
                         <a href="{{ course.web_page }}">{{ course.web_page }}</a>
                     </li>
                 {% endif %}
-				<li>
-					<span>Wymagane:</span>
-                    {% if requirements %}
+                {% if requirements %}
+                    <li>                
+                        <span>Wymagane:</span>
                         {{ requirements|join:", " }}
-                    {% else %}
-                        brak
+                    <li>                        
                     {% endif %}
-				</li>
 				{% if course.can_enroll_from %}
 					<li>
 						<span>Możesz zapisać się od:</span>

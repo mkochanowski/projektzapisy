@@ -114,7 +114,7 @@ When /^(?:|I )fill in "([^"]*)" with value "([^"]*)" with "([^"]*)"$/ do |field,
 end
 
 When /^(?:|I )select "([^"]*)" as "([^"]*)"$/ do |field, value|
-    select(value, :from => field )
+  select(value, :from => field )
 end
 
 When /^(?:|I )choose "([^"]*)" as "([^"]*)"$/ do |field, value|

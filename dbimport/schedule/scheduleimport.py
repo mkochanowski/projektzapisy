@@ -148,10 +148,11 @@ def get_semester():
                                        semester_ending=semester_ending)
     return semester
 
-def scheduleimport():
+@transaction.commit_on_success
+def scheduleimport(data):
     semester = get_semester()
-    file = open(SCHEDULE_FILE)
+    file = data #open(SCHEDULE_FILE)
     import_schedule(file, semester)
 
 
-scheduleimport()
+

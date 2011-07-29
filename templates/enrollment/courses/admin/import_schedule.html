@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% load i18n adminmedia %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">
+{% trans "Home" %}</a> > Import planu semestru</div>{% endblock %}
+
+{% block title %}Import planu semestru{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <form enctype="multipart/form-data" action="/fereol_admin/courses/import_schedule/" method="post">
+        {{ form.as_p }}
+        <input type="submit" value="Importuj" />
+    </form>
+    {% if errormsg %}
+    <p><b>Treść błędu:</b><br />{{errormsg|linebreaks}}</p>
+    {% endif %}
+</div>
+{% endblock %}

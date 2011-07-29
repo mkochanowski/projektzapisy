@@ -133,6 +133,10 @@
 				{% endif %}
 			</ul>
 		</div>
+        
+        {% if form_hash %}
+            <input type="hidden" value="{{ form_hash }}" name="form-hash"/>
+        {% endif %}
 
 		<hr />
 

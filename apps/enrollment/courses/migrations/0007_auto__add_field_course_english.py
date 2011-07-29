@@ -8,20 +8,14 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Deleting field 'StudentOptions.records_opening_delay_minutes'
-        db.delete_column('courses_studentoptions', 'records_opening_delay_minutes')
-
-        # Adding field 'StudentOptions.records_opening_bonus_minutes'
-        db.add_column('courses_studentoptions', 'records_opening_bonus_minutes', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
+        # Adding field 'Course.english'
+        db.add_column('courses_course', 'english', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Adding field 'StudentOptions.records_opening_delay_minutes'
-        db.add_column('courses_studentoptions', 'records_opening_delay_minutes', self.gf('django.db.models.fields.IntegerField')(default=0), keep_default=False)
-
-        # Deleting field 'StudentOptions.records_opening_bonus_minutes'
-        db.delete_column('courses_studentoptions', 'records_opening_bonus_minutes')
+        # Deleting field 'Course.english'
+        db.delete_column('courses_course', 'english')
     
     
     models = {
@@ -77,6 +71,7 @@ class Migration(SchemaMigration):
         'courses.course': {
             'Meta': {'unique_together': "(('name', 'semester'),)", 'object_name': 'Course'},
             'description': ('django.db.models.fields.TextField', [], {}),
+            'english': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'entity': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['courses.CourseEntity']"}),
             'exercises': ('django.db.models.fields.IntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -174,7 +169,7 @@ class Migration(SchemaMigration):
             'consultations': ('django.db.models.fields.TextField', [], {}),
             'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 7, 24, 23, 33, 9, 61619)'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 7, 24, 23, 33, 25, 733726)'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
@@ -192,7 +187,7 @@ class Migration(SchemaMigration):
             'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 7, 24, 23, 33, 9, 61619)'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 7, 24, 23, 33, 25, 733726)'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
             'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),

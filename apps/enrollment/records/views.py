@@ -266,6 +266,7 @@ def queue_set_priority(request, group_id, method):
         return AjaxFailureMessage.auto_render('NotQueued',\
             'Nie jesteś w kolejce do tej grupy.', message_context)
 
+@login_required
 def records(request, group_id):
     '''
         Group records view - list of all students enrolled and queued to group.
@@ -332,6 +333,7 @@ def prepare_courses_with_terms(terms, records = []):
         })
     for record in records:
         add_course_to_map(record.group.course)
+        
     courses_list = sorted(courses_list, \
         key=lambda course: course['info']['name'])
     return courses_list
@@ -344,21 +346,28 @@ def own(request):
         
     try:
         student = request.user.student
+        courses = prepare_courses_with_terms(\
+            Term.get_all_in_semester(default_semester, student),\
+            Record.get_student_enrolled_objects(student, default_semester))  
+        is_student = True
     except Student.DoesNotExist:
-        request.user.message_set.create(message='Nie jesteś studentem.')
-        return render_to_response('common/error.html', \
-            context_instance=RequestContext(request))
+        try:
+            employee = request.user.employee
+            is_student = False
+            courses = prepare_courses_with_terms(\
+                Term.get_all_in_semester(default_semester, employee=employee))
+        except Employee.DoesNotExist:
+            request.user.message_set.create(message='Nie jesteś pracownikiem ani studentem.')
+            return render_to_response('common/error.html', \
+                context_instance=RequestContext(request))
 
-    courses = prepare_courses_with_terms(\
-        Term.get_all_in_semester(default_semester, student),\
-        Record.get_student_enrolled_objects(student, default_semester))
 
     if not default_semester:
         data = {
             'terms_by_days': {},
             'courses': [],
             'points': [],
-            'points_type': student.program.type_of_points,
+            'points_type': None,
             'points_sum': 0
         }
         request.user.message_set.create(message='Brak aktywnego semestru.')
@@ -381,11 +390,17 @@ def own(request):
             })
     terms_by_days = filter(lambda term: term, terms_by_days)
 
-    points_type = student.program.type_of_points
-    course_objects = map(lambda course: course['object'], courses)
-    points = Course.get_points_for_courses(course_objects, student.program)
-    points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
-
+    if is_student:
+        points_type = student.program.type_of_points
+        course_objects = map(lambda course: course['object'], courses)
+        points = Course.get_points_for_courses(course_objects, student.program)
+        points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)  
+        points_type = student.program.type_of_points 
+    else:
+        points_type = None
+        points = None
+        points_sum = None 
+        points_type = None  
     data = {
         'terms_by_days': terms_by_days,
         'courses': courses,

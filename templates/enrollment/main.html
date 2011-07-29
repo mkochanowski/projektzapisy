@@ -1,0 +1,20 @@
+{% extends "enrollment/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/common/mainPage.css" type="text/css" />
+{% endblock %}
+
+{% block main-navigation %}
+    <li><a href="/">Strona główna</a></li>
+    <li>Zapisy</li>
+{% endblock %}
+
+{% block content %}
+    <div id="mainPage-container">
+        <div>
+            <a href="{% url enrollment-main %}">System zapisów</a>
+            <span>System zapisów na zajęcia w Instytucie Informatyki
+                Uniwersytetu Wrocławskiego.</span>
+        </div>
+    </div>
+{% endblock %}

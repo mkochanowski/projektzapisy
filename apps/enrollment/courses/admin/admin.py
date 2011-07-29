@@ -11,7 +11,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     fieldsets = [
         (None,               {'fields': ['entity','name'], 'classes': ['long_name']}),
-        ('Szczegóły', {'fields': ['teachers','requirements','description','semester','type','slug','web_page'], 'classes': ['collapse']}),
+        ('Szczegóły', {'fields': ['teachers','requirements','description','semester','english','type','slug','web_page'], 'classes': ['collapse']}),
         ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
 
@@ -45,9 +45,15 @@ class PointsOfCoursesAdmin(admin.ModelAdmin):
     search_fields = ('course__name', )
     list_filter = ('program',)
 
+class TermInline(admin.TabularInline):
+    model = Term
+
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('__unicode__',)
-    search_fields = ('course','teacher')
+    search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
+    inlines = [
+        TermInline,
+    ]
 
 class TypeAdmin(admin.ModelAdmin):
     list_display = ('name','group','meta_type')

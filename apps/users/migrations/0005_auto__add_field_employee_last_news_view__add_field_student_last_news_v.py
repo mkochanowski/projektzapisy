@@ -8,20 +8,20 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Deleting field 'Student.records_opening_delay_minutes'
-        db.delete_column('users_student', 'records_opening_delay_minutes')
+        # Adding field 'Employee.last_news_view'
+        db.add_column('users_employee', 'last_news_view', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2011, 7, 24, 12, 11, 6, 863756)), keep_default=False)
 
-        # Adding field 'Student.records_opening_bonus_minutes'
-        db.add_column('users_student', 'records_opening_bonus_minutes', self.gf('django.db.models.fields.PositiveIntegerField')(default=0), keep_default=False)
+        # Adding field 'Student.last_news_view'
+        db.add_column('users_student', 'last_news_view', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2011, 7, 24, 12, 11, 6, 863756)), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Adding field 'Student.records_opening_delay_minutes'
-        db.add_column('users_student', 'records_opening_delay_minutes', self.gf('django.db.models.fields.PositiveIntegerField')(default=0), keep_default=False)
+        # Deleting field 'Employee.last_news_view'
+        db.delete_column('users_employee', 'last_news_view')
 
-        # Deleting field 'Student.records_opening_bonus_minutes'
-        db.delete_column('users_student', 'records_opening_bonus_minutes')
+        # Deleting field 'Student.last_news_view'
+        db.delete_column('users_student', 'last_news_view')
     
     
     models = {
@@ -71,6 +71,7 @@ class Migration(SchemaMigration):
             'consultations': ('django.db.models.fields.TextField', [], {}),
             'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 7, 24, 12, 11, 6, 863756)'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
@@ -88,6 +89,7 @@ class Migration(SchemaMigration):
             'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 7, 24, 12, 11, 6, 863756)'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
             'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),

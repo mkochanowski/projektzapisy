@@ -3,8 +3,8 @@ Feature: User with privileges wants to delete some polls.
     Scenario: First preparations
         Given I start new scenario
         And the grading protocol is "off"
-		And there are polls generated
-		And there are keys generated for polls        
+        And there are polls generated
+        And there are keys generated for polls        
 
     Scenario: Administrator deletes a poll
         Given I am logged in with "administrator" privileges

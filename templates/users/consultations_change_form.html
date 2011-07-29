@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block main-navigation %}
+<li><a href="{% url my-profile %}">Profil</a></li>
+<li><a href="{% url consultations-change %}">Zmień konsultacje</a></li>
+{% endblock %}
+
+{% block content %}
+<form action='' method="post" autocomplete="off">
+	<fieldset>
+		<legend>Zmień konsultacje</legend>
+		{{form.as_p}}
+		<input type="submit" value="zmień"/>
+	</fieldset>
+</form>
+{% endblock %}

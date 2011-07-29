@@ -15,6 +15,8 @@ from django.shortcuts               import redirect
 from django.views.decorators.http   import require_POST
 from django.contrib                 import messages
 from copy                           import deepcopy
+from Crypto.Hash import MD5
+
 
 from apps.users.models            import Program
 
@@ -26,8 +28,17 @@ from apps.offer.proposal.exceptions      import NonStudentException, NonEmployee
 import logging
 logger = logging.getLogger("")
 
+
+def get_hash():
+    md5 = MD5.new()
+    md5.update(str(datetime.now()))
+    md5 = MD5.new()
+    md5.update(str(datetime.now()))
+    hash = md5.hexdigest()
+    return hash
+
 def main(request):
-    return render_to_response( 'offer/base.html', {}, context_instance = RequestContext( request ))
+    return render_to_response( 'offer/main.html', {}, context_instance = RequestContext( request ))
 
 @require_POST
 @login_required
@@ -117,6 +128,7 @@ def proposal( request, slug, descid = None ):
     }
     return render_to_response( 'offer/proposal/view.html', data, context_instance = RequestContext( request ) )
 
+
 @login_required
 def proposal_form(request, sid = None):
     """
@@ -160,6 +172,8 @@ def proposal_form(request, sid = None):
     proposal_comments = ""
     proposal_www = ""
     types_name = Type.get_types()
+    form_hash = get_hash()
+    haszki=[]
 
     types_table = {}
 
@@ -181,8 +195,17 @@ def proposal_form(request, sid = None):
         
         except:            
             edit_mode = False
-    
-    if request.method == 'POST':        
+
+    if request.method == 'POST':
+        h = request.POST.get('form-hash', '')
+        if not ('hashes' in request.session.keys()):
+            request.session['hashes'] = []
+        if h in request.session['hashes']:
+            return redirect("proposal-page" , slug=proposal_.slug)
+        request.session['hashes'].append(h)
+        request.session.modified = True
+
+
         if not edit_mode:
             proposal_ = Proposal()
             
@@ -239,7 +262,7 @@ def proposal_form(request, sid = None):
         number_of_types = 0
         for one_type in types:
             if one_type != "":
-                number_of_types = number_of_types + 1
+                number_of_types += 1
 
         if  ( proposal_name == "" or proposal_ects == "" or proposal_description == ""
             or proposal_requirements == "" or proposal_lectures == -1
@@ -338,7 +361,7 @@ def proposal_form(request, sid = None):
         english = False
     except AttributeError:
         english = False
-    
+
     data = {
         'editForm'              : True,
         'editMode'              : edit_mode,
@@ -354,9 +377,10 @@ def proposal_form(request, sid = None):
         'proposals'             : proposals_,
         'proposalHours'         : apps.offer.proposal.models.proposal_description.PROPOSAL_HOURS,
         'types'                 : types,
-        'typesName'             : types_name
+        'typesName'             : types_name,
+        'form_hash'             : form_hash,
     }
-    
+
     if success:
         return redirect("proposal-page" , slug=proposal_.slug)
     else:

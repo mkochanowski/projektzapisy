@@ -24,7 +24,7 @@ from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 
-from apps.users.forms import EmailChangeForm, BankAccountChangeForm
+from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm
 
 from datetime import timedelta
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
@@ -35,9 +35,11 @@ logger = logging.getLogger()
 import vobject
 from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 
-GTC = {}
-for (x,y) in GROUP_TYPE_CHOICES:
-    GTC[x]=y[:2]
+
+GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
+        '4': 'cw', '5': 'cw+prac',
+        '6': 'sem', '7': 'lek', '8': 'WF',
+        '9': 'rep', '10': 'proj'}
 
 
 @login_required
@@ -149,11 +151,33 @@ def bank_account_change(request):
         form = BankAccountChangeForm({'bank_account': zamawiany.bank_account})
     return render_to_response('users/bank_account_change_form.html', {'form':form}, context_instance=RequestContext(request))
 
+@login_required
+def consultations_change(request):
+    '''function that enables consultations changing'''
+    try:
+        employee = request.user.employee     
+        if request.POST:
+            data = request.POST.copy()
+            form = ConsultationsChangeForm(data, instance=employee)
+            if form.is_valid():
+                form.save()
+                logger.info('User (%s) changed consultations' % request.user.get_full_name())
+                request.user.message_set.create(message="Twoje dane zostały zmienione.")
+                return HttpResponseRedirect(reverse('my-profile'))
+        else:
+            zamawiany = Student.get_zamawiany(request.user.id)
+            form = ConsultationsChangeForm({'consultations': employee.consultations, 'homepage': employee.homepage, 'room': employee.room})
+        return render_to_response('users/consultations_change_form.html', {'form':form}, context_instance=RequestContext(request))
+    except Employee.DoesNotExist:
+        request.user.message_set.create(message='Nie jesteś pracownikiem.')
+        return render_to_response('common/error.html', \
+                context_instance=RequestContext(request))
+
 @login_required  
 def password_change_done(request):
     '''informs if password were changed'''
     logger.info('User (%s) changed password' % request.user.get_full_name())
-    request.user.message_set.create(message="Twóje hasło zostało zmienione.")
+    request.user.message_set.create(message="Twoje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
 
 @login_required  
@@ -164,6 +188,16 @@ def my_profile(request):
     zamawiany = Student.get_zamawiany(request.user.id)
     comments = zamawiany and zamawiany.comments or ''
     points = zamawiany and zamawiany.points or 0
+    try:
+        consultations = request.user.employee.consultations
+        room = request.user.employee.room
+        homepage = request.user.employee.homepage
+        room = room and room or ''
+        homepage = homepage and homepage or ''
+    except Employee.DoesNotExist:
+        consultations = ''
+        homepage = ''
+        room = ''
     if current_semester:
         try:
 
@@ -188,6 +222,9 @@ def my_profile(request):
         'zamawiany' : zamawiany,
         'comments' : comments,
         'points' : points,
+        'consultations' : consultations,
+        'room' : room,
+        'homepage' : homepage
     }
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
@@ -263,41 +300,46 @@ def create_ical_file(request):
     cal.add('calname').value = user_full_name + ' - schedule'
     cal.add('method').value = 'PUBLISH'
 
-    if BaseUser.is_student(user):
-        groups = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user_id))
-        for group in groups:
-            course_name = group.course.name
-            group_type = GTC[group.type]
-            try:
-                terms = group.get_all_terms()
-            except IndexError:
-                continue
-            for term in terms:
-                start_time = term.start_time
-                end_time = term.end_time
-                weekday = int(term.dayOfWeek)
-                classroom_number = term.classroom.number
-        
-                diff = semester_beginning_weekday - weekday
-                if diff<0:
-                    diff += 7
-                diff = 7 - diff
-                start_date = semester_beginning + datetime.timedelta(days=diff)
-                start_datetime = datetime.datetime.combine(start_date, start_time)
-                end_datetime = datetime.datetime.combine(start_date, end_time)
-        
-                event = cal.add('vevent')
-                event.add('summary').value = '%s, %s, s.%s' % (course_name,group_type,classroom_number)
-                event.add('dtstart').value  = start_datetime
-                event.add('dtend').value = end_datetime
-                event.add('rrule').value = "FREQ=WEEKLY;UNTIL=%s" % (until,)
-    elif BaseUser.is_employee(user):
-        """
-        TODO
-        """
+    groups_employee = []
+    groups_student = []
+    try:
+        user.student
+        groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user_id))
+    except Student.DoesNotExist:
         pass
-    else:
+    try:
+        user.employee
+        groups_employee = map(lambda x: x, Group.objects.filter(course__semester = semester, teacher = user.employee))
+    except Employee.DoesNotExist:
         pass
+    groups = groups_employee + groups_student
+    for group in groups:
+        course_name = group.course.name
+        group_type = GTC[group.type]
+        try:
+            terms = group.get_all_terms()
+        except IndexError:
+            continue
+        for term in terms:
+            start_time = term.start_time
+            end_time = term.end_time
+            weekday = int(term.dayOfWeek)
+            classroom_number = term.classroom.number
+    
+            diff = semester_beginning_weekday - weekday
+            if diff<0:
+                diff += 7
+            diff = 7 - diff
+            start_date = semester_beginning + datetime.timedelta(days=diff)
+            start_datetime = datetime.datetime.combine(start_date, start_time)
+            end_datetime = datetime.datetime.combine(start_date, end_time)
+    
+            event = cal.add('vevent')
+            event.add('summary').value = '%s, %s, s.%s' % (course_name,group_type,classroom_number)
+            event.add('dtstart').value  = start_datetime
+            event.add('dtend').value = end_datetime
+            event.add('rrule').value = "FREQ=WEEKLY;UNTIL=%s" % (until,)
+
     cal_str = cal.serialize()
     response = HttpResponse(cal_str, content_type='application/calendar')
     response['Content-Disposition'] = 'attachment; filename=schedule.ical'

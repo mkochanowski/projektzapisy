@@ -115,6 +115,8 @@ def timedelta(delta):
 
 @register.filter
 def hash(map, key):
+    if not map:
+        return None
     if key in map:
         return map[key]
     else:

@@ -21,6 +21,7 @@ from apps.news.utils import NEWS_PER_PAGE, prepare_data, prepare_data_all, rende
 from apps.enrollment.courses.models import Semester
 from apps.users.models import BaseUser
 from django.template.loader import get_template
+import datetime
 
 def main_page( request ):
     """
@@ -194,6 +195,18 @@ def all_news(request):
     """
         Latest news
     """
+    try:
+        student = request.user.student
+        student.last_news_view = datetime.datetime.now()
+        student.save()
+    except:
+        try:
+            employee = request.user.employee
+            employee.last_news_view = datetime.datetime.now()
+            employee.save()   
+        except:
+            pass
+    
     json = request.GET.get('json', None)
     items = News.objects.exclude(category='-').order_by('-date')
     data = prepare_data_all(request, items)
