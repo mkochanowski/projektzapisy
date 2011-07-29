@@ -266,6 +266,7 @@ def queue_set_priority(request, group_id, method):
         return AjaxFailureMessage.auto_render('NotQueued',\
             'Nie jesteś w kolejce do tej grupy.', message_context)
 
+@login_required
 def records(request, group_id):
     '''
         Group records view - list of all students enrolled and queued to group.
