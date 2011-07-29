@@ -129,21 +129,21 @@ def send_package(idUser, passwordUser, i, e, n, m ):
     try:
         response = urllib2.urlopen(req)
     except urllib2.HTTPError, er:
-        print er.code
-        print er.msg
-        print er.headers
-        print er.fp.read()
+        print er.code.encode('utf-8')
+        print er.msg.encode('utf-8')
+        print er.headers.encode('utf-8')
+        print er.fp.read().encode('utf-8')
 
     # zapisywanie wyników
     try:
         st_response = response.read()
         save_result(k, n, m, st_response)
     except ValueError, err:
-        print u"nie udało się pobrać biletu"
-        print st_response.decode('utf-8')
+        print u"nie udało się pobrać biletu".encode('utf-8')
+        print st_response.decode('utf-8').encode('utf-8')
     except IndexError, err:
-        print u"nie udało się pobrać biletu"
-        print st_response.decode('utf-8')
+        print u"nie udało się pobrać biletu".encode('utf-8')
+        print st_response.decode('utf-8').encode('utf-8')
 
 def get_user():
     """
@@ -189,7 +189,7 @@ def save_result(k, n, m, st_response):
     file_with_result.write( sp_response[0] )
     file_with_result.close()
     # wyświetlanie informacji, że pobieranie biletu zakończyło się sukcesem
-    print u"pobrano bilet: \n" + sp_response[0].decode('utf-8') + u'\n'
+    print (u"pobrano bilet: \n" + sp_response[0].decode('utf-8') + u'\n').encode('utf-8')
 
 
 def get_key(pollList,sendList):
@@ -248,10 +248,10 @@ def get_poll_list(idUser, passwordUser):
     # analiza odpowiedzi serwera
     try: response = urllib2.urlopen(req)
     except urllib2.HTTPError, er:
-        print er.code
-        print er.msg
-        print er.headers
-        print er.fp.read()
+        print er.code.encode('utf-8')
+        print er.msg.encode('utf-8')
+        print er.headers.encode('utf-8')
+        print er.fp.read().encode('utf-8')
 
     st = response.read()
     return st
@@ -292,13 +292,13 @@ def menu(st_m):
                     txt =""
                     for t in v.decode('utf-8').split("%%%"):
                         txt+= t + " "
-                    print "  " + str(i)+ '.0 ' + txt
+                    print ("  " + str(i)+ '.0 ' + txt).encode('utf-8')
                     good_res.append(str(i)+'.0')
                     i+=1
-                print "------"
+                print "------".encode('utf-8')
             else:
                 n1, v1, s1 = st[0]
-                print str(i)+'.0'+ " " +v1.decode('utf-8').split("%%%").pop(0) + u' ( powiązane )'
+                print (str(i)+'.0'+ " " +v1.decode('utf-8').split("%%%").pop(0) + u' ( powiązane )').encode('utf-8')
                 good_res.append(str(i)+'.0')
                 j=1
                 for n,v,s in st:
@@ -308,21 +308,21 @@ def menu(st_m):
                     txt =""
                     for t in vl:
                         txt+= t + " "
-                    print "  " + str(i)+'.'+str(j)+ " " + txt
+                    print ("  " + str(i)+'.'+str(j)+ " " + txt).encode('utf-8')
                     good_res.append(str(i)+'.'+str(j))
                     j+=1
                 i+=1
-                print "------"
+                print "------".encode('utf-8')
                 
-        print u"ankiety do wysłania:"
+        print u"ankiety do wysłania:".encode('utf-8')
         choosen_list = u"["
         for p in poll_list:
             choosen_list += unicode(p)+u","
         choosen_list += u"]"
-        print choosen_list
-        print u"podaj numer ankiety do wysłania"
-        print u"u 'nr_ankiety' usuwa numer ankiety z listy"
-        print u"(  0 - wysyła dane, -1 - konczy działanie )"
+        print choosen_list.encode('utf-8')
+        print u"podaj numer ankiety do wysłania".encode('utf-8')
+        print u"u 'nr_ankiety' usuwa numer ankiety z listy".encode('utf-8')
+        print u"(  0 - wysyła dane, -1 - konczy działanie )".encode('utf-8')
 
         # pobieranie polecenia użytkownika
         pos=raw_input()
@@ -392,8 +392,8 @@ def client():
 
     # sprawdzenie czy w trakcie pobierania kluczy do ankiet nie powstał błąd
     if len(pollSt.split('???'))<2:
-        print u"nie udało się pobrać biletu"
-        print pollSt.decode("utf-8")
+        print u"nie udało się pobrać biletu".encode('utf-8')
+        print pollSt.decode("utf-8").encode('utf-8')
         return
 
     # zamiana odpowiedzi servera na postać listową
@@ -404,7 +404,7 @@ def client():
 
     # -1 kończy działanie bez wysyłania zapytania
     if sendList.pop(0) == '-1':
-        print u"Pobieranie biletów zostało anulowane"
+        print u"Pobieranie biletów zostało anulowane".encode('utf-8')
         return
 
     # wybieranie odpowiednich kluczy publicznych
