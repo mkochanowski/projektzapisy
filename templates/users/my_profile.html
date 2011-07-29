@@ -19,8 +19,19 @@ Moje dane:
 <ul>
 	<li>login: {{user.username}}</li>
 	<li>email: {{user.email}}</li>
-        {%if zamawiany%}<li>numer konta bankowego: {{zamawiany.bank_account}}</li>{%endif%}
+    {%if zamawiany%}<li>numer konta bankowego: {{zamawiany.bank_account}}</li>{%endif%}
+    {% if user.employee %}
+    <li>pokój: {{ room }}</li>
+    <li>strona domowa: {{ homepage }} </li>
+    {%endif%}
 </ul>
+
+{% if user.employee %}
+<br/>
+Konsultacje:
+<br/>
+{{ consultations }}    
+{% endif %}
 
 {% if zamawiany %}<br/>
 Studia zamawiane:<br/>
@@ -38,9 +49,14 @@ Studia zamawiane:<br/>
 </table>
 <br/>
 <a class="change_profile" href="{% url password-change %}">zmień hasło</a>
+&nbsp;
 <a href="{% url email_change %}">zmień adres email</a>
 {%if zamawiany%}
+&nbsp;
 <a class="change_bank_account" href="{% url bank-account-change %}">zmień numer konta bankowego</a>
 {%endif%}
-
+{% if user.employee %}
+&nbsp;
+<a href="{% url consultations-change %}">zmień inne dane</a>
+{% endif %}
 {% endblock %}

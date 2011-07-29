@@ -24,7 +24,7 @@ from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 
-from apps.users.forms import EmailChangeForm, BankAccountChangeForm
+from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm
 
 from datetime import timedelta
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
@@ -151,6 +151,28 @@ def bank_account_change(request):
         form = BankAccountChangeForm({'bank_account': zamawiany.bank_account})
     return render_to_response('users/bank_account_change_form.html', {'form':form}, context_instance=RequestContext(request))
 
+@login_required
+def consultations_change(request):
+    '''function that enables consultations changing'''
+    try:
+        employee = request.user.employee     
+        if request.POST:
+            data = request.POST.copy()
+            form = ConsultationsChangeForm(data, instance=employee)
+            if form.is_valid():
+                form.save()
+                logger.info('User (%s) changed consultations' % request.user.get_full_name())
+                request.user.message_set.create(message="Twoje dane zostały zmienione.")
+                return HttpResponseRedirect(reverse('my-profile'))
+        else:
+            zamawiany = Student.get_zamawiany(request.user.id)
+            form = ConsultationsChangeForm({'consultations': employee.consultations, 'homepage': employee.homepage, 'room': employee.room})
+        return render_to_response('users/consultations_change_form.html', {'form':form}, context_instance=RequestContext(request))
+    except Employee.DoesNotExist:
+        request.user.message_set.create(message='Nie jesteś pracownikiem.')
+        return render_to_response('common/error.html', \
+                context_instance=RequestContext(request))
+
 @login_required  
 def password_change_done(request):
     '''informs if password were changed'''
@@ -166,6 +188,16 @@ def my_profile(request):
     zamawiany = Student.get_zamawiany(request.user.id)
     comments = zamawiany and zamawiany.comments or ''
     points = zamawiany and zamawiany.points or 0
+    try:
+        consultations = request.user.employee.consultations
+        room = request.user.employee.room
+        homepage = request.user.employee.homepage
+        room = room and room or ''
+        homepage = homepage and homepage or ''
+    except Employee.DoesNotExist:
+        consultations = ''
+        homepage = ''
+        room = ''
     if current_semester:
         try:
 
@@ -190,6 +222,9 @@ def my_profile(request):
         'zamawiany' : zamawiany,
         'comments' : comments,
         'points' : points,
+        'consultations' : consultations,
+        'room' : room,
+        'homepage' : homepage
     }
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
