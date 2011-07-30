@@ -32,7 +32,7 @@
                 <li>
                     <span>Prowadzący:</span>
                     {% if group.teacher %}
-                        <a href="{% url employee-profile group.teacher.user.id %}">{{group.get_teacher_full_name}}</a>
+                        <a href="{% url employee-profile group.teacher.user.id %}" class="person">{{group.get_teacher_full_name}}</a>
                     {% else %}
                         {{group.get_teacher_full_name}}
                     {% endif %}
@@ -78,7 +78,7 @@
 			<tbody>
 				{% for student in students_in_group %}
 					<tr>
-						<td><a href="{% url student-profile student.user.id %}">
+						<td><a href="{% url student-profile student.user.id %}" class="person">
 						    {{student.user.get_full_name}}</a></td>
 						<td>{{student.matricula}}</td>
 						<td>

@@ -647,3 +647,19 @@ input.bigButton
 {
     float: right;
 }
+
+
+a { 
+    text-decoration: none;     
+}
+a:hover  { 
+    text-decoration: underline; 
+}
+
+ul.courses-list li a, div#main-navigation a{
+    color: #000000;
+}
+
+a.person, ul.employees li a, ul.students li a  {
+    color: #333;
+}

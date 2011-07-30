@@ -34,7 +34,7 @@
 					<li>
 						<span>Prowadzący:</span>
 						{% for teacher in course.teachers.all %}
-							<a href="{% url employee-profile teacher.user.id %}">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
+							<a href="{% url employee-profile teacher.user.id %}" class="person">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
 						{% endfor %}
 					</li>
 				{% endif %}
@@ -47,7 +47,8 @@
 				{% if course.lectures or course.exercises or course.laboratories or course.repetitions %}
 					<li>
 						<span>Liczba godzin:</span>
-						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.exercises or course.laboratories or course.repetitions %}+{% endif %}{% endif %}
+						{% if course.lectures %}{{course.lectures}} (wyk) {%if course.exercises or course.laboratories or course.repetitions or course.exercises_laboratories %}+{% endif %}{% endif %}
+						{% if course.exercises_laboratories %}{{course.exercises_laboratories}} (ćw+prac) {%if course.exercises or course.laboratories or course.repetitions %}+{% endif %}{% endif %}
 						{% if course.repetitions %}{{course.repetitions}} (rep) {%if course.lectures or course.laboratories %}+{% endif %}{% endif %}
 						{% if course.exercises %}{{course.exercises}} (ćw) {%if course.laboratories %}+{% endif %}{% endif %}
 						{% if course.laboratories %}{{course.laboratories}} (prac){% endif %}
@@ -64,7 +65,7 @@
                         <span>Wymagane:</span>
                         {{ requirements|join:", " }}
                     <li>                        
-                    {% endif %}
+                {% endif %}
                 <li>
                     <span>Konsultacje:</span>
                     <a href="{% url course-consiltations-page course.slug %}">link</a>
@@ -114,7 +115,7 @@
 						<tr {% if t.signed %} class="signed" {% endif %} >
 							<td>
 								{% if t.teacher %}
-									<a href="{% url employee-profile t.teacher.user.id %}">
+									<a href="{% url employee-profile t.teacher.user.id %}" class="person">
 										{{ t.teacher.user.get_full_name }}
 									</a>
 								{% else %}

@@ -59,7 +59,7 @@
 		{% endif %}
 		<p id="main-signinBar">
 			{% if user.is_authenticated %}
-				Witaj, {{ user.first_name }} |
+				Witaj, {{ user.get_full_name }} |
 				<a href="{% url my-profile %}">Moje konto</a> |
                 {% if user.is_staff %}
                         <a href="/fereol_admin/">Panel administracyjny</a> |

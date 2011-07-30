@@ -6,13 +6,13 @@ from apps.enrollment.courses.models import *
 
 class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name', 'semester')}
-    list_display = ('name', 'semester', 'lectures', 'exercises', 'laboratories','repetitions')
+    list_display = ('name', 'semester', 'lectures', 'exercises_laboratories','exercises', 'laboratories','repetitions')
     list_filter = ('semester','type')
     search_fields = ('name',)
     fieldsets = [
         (None,               {'fields': ['entity','name'], 'classes': ['long_name']}),
         ('Szczegóły', {'fields': ['teachers','requirements','description','semester','english','type','slug','web_page'], 'classes': ['collapse']}),
-        ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
+        ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises_laboratories','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
 
 class ClassroomAdmin(admin.ModelAdmin):

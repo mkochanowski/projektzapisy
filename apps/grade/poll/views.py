@@ -225,6 +225,10 @@ def rules(request):
 @employee_required
 def enable_grade( request ):
     semester = Semester.get_current_semester()
+
+    if not semester:
+        messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
+        return render_to_response( 'grade/main.html', { 'grade' : False }, context_instance = RequestContext( request ))    
     if semester.is_grade_active:
         messages.error( request, "Nie można otworzyć oceny; ocena jest już otwarta")
     elif Poll.get_polls_for_semester().count() == 0:
@@ -490,7 +494,13 @@ def delete_sections( request ):
 @employee_required
 def polls_list( request ):
     data = {}
-    grade = Semester.get_current_semester().is_grade_active
+    semester = Semester.get_current_semester() 
+        
+    if not semester:
+        messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
+        return render_to_response( 'grade/main.html', { 'grade' : False }, context_instance = RequestContext( request ))
+        
+    grade = semester.is_grade_active    
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
@@ -1029,14 +1039,19 @@ def poll_results( request, mode='S', poll_id = None ):
     #   Filtry!!!
     
     data = {}
-    data['grade'] = Semester.get_current_semester().is_grade_active
+    semester = Semester.get_current_semester()
+    
+    if not semester:
+        messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
+        return render_to_response( 'grade/main.html', { 'grade' : False }, context_instance = RequestContext( request ))
+        
+    data['grade'] = semester.is_grade_active
     
     if mode == 'S':
         data['mode']  = 'course'
     elif mode == 'T':
         data['mode']  = 'teacher'
-    
-    semester      = Semester.get_current_semester()
+
     if semester.is_grade_active:
         messages.info( request, "Ocena zajęć jest otwarta; wyniki nie są kompletne." )
     

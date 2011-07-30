@@ -62,6 +62,7 @@ class Course( models.Model ):
 								blank        = True,
                                 null         = True )
     english = models.BooleanField(default=False, verbose_name='angielski')
+    exercises_laboratories = models.IntegerField(verbose_name='ćw+prac', default=0)
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method

@@ -16,6 +16,8 @@
 	<li>Konsultacje</li>
 {% endblock %}
 
+
+
 {% block content %}
     <div id="enr-course-view">
 
@@ -31,7 +33,7 @@
                     <li>
                         <span>Prowadzący:</span>
                         {% for teacher in course.teachers.all %}
-                            <a href="{% url employee-profile teacher.user.id %}">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
+                            <a href="{% url employee-profile teacher.user.id %}" class="person">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
                         {% endfor %}
                     </li>
                 {% endif %}
@@ -88,7 +90,7 @@
 			<tbody>
 				{% for employee in employees %}
 					<tr>
-						<td><a href="{% url employee-profile employee.user.id %}">
+						<td><a href="{% url employee-profile employee.user.id %}" class="person">
 						    {{employee.user.get_full_name}}</a></td>
 						<td>{% if employee.room %}{{employee.room}}{% endif %}</td>
 						<td>{{employee.consultations}}</td>
