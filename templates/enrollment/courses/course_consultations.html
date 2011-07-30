@@ -90,7 +90,7 @@
 					<tr>
 						<td><a href="{% url employee-profile employee.user.id %}">
 						    {{employee.user.get_full_name}}</a></td>
-						<td>{{employee.room}}</td>
+						<td>{% if employee.room %}{{employee.room}}{% endif %}</td>
 						<td>{{employee.consultations}}</td>
 					</tr>
 				{% endfor %}

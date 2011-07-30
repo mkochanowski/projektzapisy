@@ -216,16 +216,16 @@ def course(request, slug):
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 
-
 @login_required
 def course_consultations(request, slug):
     try:
         course = Course.visible.get(slug=slug)
         employees = set(map(lambda x: x.teacher, Group.objects.filter(course=course)))
-        data = {
+        data = prepare_courses_list_to_render(request)
+        data.update({
             'course' : course,
             'employees' : employees
-        }
+        })
         return render_to_response( 'enrollment/courses/course_consultations.html', data, context_instance = RequestContext( request ) )
 
     except (Course.DoesNotExist, NonCourseException):
