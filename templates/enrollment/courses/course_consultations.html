@@ -1,0 +1,103 @@
+{% extends "enrollment/courses/base.html" %}
+
+{% block main-subtitle %}
+	{{group.course.name}}
+	Konsultacje
+{% endblock %}
+
+{% block main-navigation %}
+	<li><a href="{% url main-page %}">Strona główna</a></li>
+	<li><a href="{% url enrollment-main %}">Zapisy</a></li>
+	<li><a href="{% url course-list %}">Przedmioty</a></li>
+	<li>
+		<a href="{% url course-page course.slug %}"
+			>{{group.course.name}}</a>
+	</li>
+	<li>Konsultacje</li>
+{% endblock %}
+
+{% block content %}
+    <div id="enr-course-view">
+
+        <h1>{{course.name}}</h1>
+
+        <div class="details">
+            <ul class="properties">
+                <li>
+                    <span>Rodzaj:</span>
+                    {{course.type}}
+                </li>
+                {% if course.teachers.all %}
+                    <li>
+                        <span>Prowadzący:</span>
+                        {% for teacher in course.teachers.all %}
+                            <a href="{% url employee-profile teacher.user.id %}">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </li>
+                {% endif %}
+                {% if points %}
+                    <li>
+                        <span>Punkty {{ points.type_of_point.name }}:</span>
+                        {{ points.value }}
+                    </li>
+                {% endif %}
+                {% if course.lectures or course.exercises or course.laboratories or course.repetitions %}
+                    <li>
+                        <span>Liczba godzin:</span>
+                        {% if course.lectures %}{{course.lectures}} (wyk) {%if course.exercises or course.laboratories or course.repetitions %}+{% endif %}{% endif %}
+                        {% if course.repetitions %}{{course.repetitions}} (rep) {%if course.lectures or course.laboratories %}+{% endif %}{% endif %}
+                        {% if course.exercises %}{{course.exercises}} (ćw) {%if course.laboratories %}+{% endif %}{% endif %}
+                        {% if course.laboratories %}{{course.laboratories}} (prac){% endif %}
+                    </li>
+                {% endif %}
+                {% if course.web_page %}
+                    <li>
+                        <span>Strona www:</span>
+                        <a href="{{ course.web_page }}">{{ course.web_page }}</a>
+                    </li>
+                {% endif %}
+                {% if requirements %}
+                    <li>                
+                        <span>Wymagane:</span>
+                        {{ requirements|join:", " }}
+                    <li>                        
+                    {% endif %}
+                <li>
+                    <span>Konsultacje:</span>
+                    <a href="{% url course-consiltations-page course.slug %}">link</a>
+                </li>
+            </ul>
+
+            <div class="footer"></div>
+        </div>
+
+        <hr>
+
+		<br/>
+		<h3>Konsultacje prowadzących:</h3>
+
+		<br/>
+		
+		{% if employees %}
+		<table>
+			<thead>
+				<td>Imię i nazwisko</td>
+				<td>Pokój</td>
+				<td>Konsultacje</td>
+			</thead>
+			<tbody>
+				{% for employee in employees %}
+					<tr>
+						<td><a href="{% url employee-profile employee.user.id %}">
+						    {{employee.user.get_full_name}}</a></td>
+						<td>{{employee.room}}</td>
+						<td>{{employee.consultations}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table><br />
+		{% else %}
+		Brak prowadzących.
+		{% endif %}
+	</div>
+{% endblock %}

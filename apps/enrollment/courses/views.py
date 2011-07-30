@@ -214,3 +214,21 @@ def course(request, slug):
         logger.error('Function course(slug = %s) throws Course.DoesNotExist exception.' % unicode(slug) )
         request.user.message_set.create(message="Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+
+
+@login_required
+def course_consultations(request, slug):
+    try:
+        course = Course.visible.get(slug=slug)
+        employees = set(map(lambda x: x.teacher, Group.objects.filter(course=course)))
+        data = {
+            'course' : course,
+            'employees' : employees
+        }
+        return render_to_response( 'enrollment/courses/course_consultations.html', data, context_instance = RequestContext( request ) )
+
+    except (Course.DoesNotExist, NonCourseException):
+        logger.error('Function course_consultations(slug = %s) throws Course.DoesNotExist exception.' % unicode(slug) )
+        request.user.message_set.create(message="Przedmiot nie istnieje.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))

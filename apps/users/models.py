@@ -79,7 +79,7 @@ class Employee(BaseUser):
     '''
     consultations = models.TextField(verbose_name="konsultacje")
     homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="")
-    room = models.PositiveIntegerField(verbose_name="pokój", null=True)
+    room = models.CharField(verbose_name="pokój", default="", max_length=6)
         
     def has_privileges_for_group(self, group_id):
         """

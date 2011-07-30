@@ -19,6 +19,8 @@
 {% endblock %}
 
 {% block content %}
+
+{{ employees }}
 	<div id="enr-course-view">
 
 		<h1>{{course.name}}</h1>
@@ -64,6 +66,10 @@
                         {{ requirements|join:", " }}
                     <li>                        
                     {% endif %}
+                <li>
+                    <span>Konsultacje:</span>
+                    <a href="{% url course-consiltations-page course.slug %}">link</a>
+                </li>
 				{% if course.can_enroll_from %}
 					<li>
 						<span>Możesz zapisać się od:</span>
