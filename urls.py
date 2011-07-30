@@ -18,11 +18,11 @@ urlpatterns = patterns('',
     #HELP
     (r'^help/', include('apps.help.urls')),
     #Z
-    url('^enrollment/$', 'apps.enrollment.courses.views.main', name='enrollment-main'),
+    #url('^enrollment/$', 'apps.enrollment.courses.views.main', name='enrollment-main'),
     (r'^courses/', include('apps.enrollment.courses.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),
     # OD
-    url('^offer/$', 'apps.offer.proposal.views.main', name='offer-main'),
+    #url('^offer/$', 'apps.offer.proposal.views.main', name='offer-main'),
     (r'^prefs/', include('apps.offer.preferences.urls')),
     (r'^proposal/', include('apps.offer.proposal.urls')),
     (r'^news/', include('apps.news.urls')),

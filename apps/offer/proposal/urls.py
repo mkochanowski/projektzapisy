@@ -17,5 +17,6 @@ urlpatterns = patterns( 'apps.offer.proposal.views',
     url( '^restore/(?P<descid>[0-9]+)/$',            'proposal_restore',            name='proposal-restore' ),
     url('^(?P<slug>[\w\-_]+)/(?P<descid>[0-9]+)/?$', 'proposal',                    name='proposal-page-archival'),
     url('^(?P<slug>[\w\-_]+)',                       'proposal',                    name='proposal-page'),
-    url('^$',                                        'proposals',                   name='proposal-list' ),    
+    url('^$',                                        'proposals',                   name='proposal-list' ), 
+    url('^$',                                        'proposals',                   name='offer-main' ),   
 )
