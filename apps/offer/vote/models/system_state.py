@@ -4,19 +4,22 @@
     System State for vote
     Default values are dafined as module variables
 """
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
 from datetime  import date
 
 DEFAULT_YEAR       = date.today().year 
-DEFAULT_MAX_POINTS = 3
-DEFAULT_MAX_VOTE   = 30
+DEFAULT_MAX_POINTS = 30
+DEFAULT_MAX_VOTE   = 3
 DEFAULT_DAY_BEG    = 1          #
 DEFAULT_DAY_END    = 31         # Te dane trzeba będzie tak ustawić
 DEFAULT_MONTH_BEG  = 1          # żeby były prawdziwe. Na razie tak
-DEFAULT_MONTH_END  = 12         # jest wygodnie, chociażby do testów
+DEFAULT_MONTH_END  = 7         # jest wygodnie, chociażby do testów
 DEFAULT_VOTE_BEG   = date(DEFAULT_YEAR, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
 DEFAULT_VOTE_END   = date(DEFAULT_YEAR, DEFAULT_MONTH_END, DEFAULT_DAY_END)
+DEFAULT_CORRECTION_BEG   = date(DEFAULT_YEAR, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
+DEFAULT_CORRECTION_END   = date(DEFAULT_YEAR, DEFAULT_MONTH_END, DEFAULT_DAY_END)
 
 class SystemState( models.Model ):
     """
@@ -28,7 +31,7 @@ class SystemState( models.Model ):
                     default      = date.today().year)
 
     max_points = models.IntegerField( 
-                    verbose_name = 'Maksimum punktów na przedmiot',
+                    verbose_name = 'Maksimum punktów na przedmioty',
                     default      = DEFAULT_MAX_POINTS )
                     
     max_vote   = models.IntegerField(
@@ -42,6 +45,14 @@ class SystemState( models.Model ):
     vote_end   = models.DateField(
                     verbose_name = 'Koniec głosowania',
                     default      = DEFAULT_VOTE_END)
+
+    correction_beg   = models.DateField(
+                    verbose_name = 'Początek korekty',
+                    default      = DEFAULT_CORRECTION_BEG )
+
+    correction_end   = models.DateField(
+                    verbose_name = 'Koniec korekty',
+                    default      = DEFAULT_CORRECTION_END)
                     
     class Meta:
         verbose_name        = 'ustawienia głosowania'
@@ -60,8 +71,8 @@ class SystemState( models.Model ):
         if not year:
             year = date.today().year
         try:
-            return SystemState.objects.filter(year=year)[0]
-        except IndexError:
+            return SystemState.objects.get(year=year)
+        except ObjectDoesNotExist:
             return SystemState.create_default_state(year)
     
     @staticmethod
@@ -74,52 +85,30 @@ class SystemState( models.Model ):
         new_state = SystemState()
         new_state.year      = year
         new_state.max_points = DEFAULT_MAX_POINTS
-        new_state.max_vote   = DEFAULT_MAX_VOTE
         new_state.vote_beg   = date(year, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
         new_state.vote_end   = date(year, DEFAULT_MONTH_END, DEFAULT_DAY_END)
+        new_state.correction_beg   = date(year, DEFAULT_MONTH_END+1, DEFAULT_DAY_BEG)
+        new_state.correction_end   = date(year, 12, DEFAULT_DAY_END)
         new_state.save()
         return new_state
-        
-    @staticmethod
-    def get_max_points(year = None):
-        """
-            Get max points per course
-        """
-        state = SystemState.get_state(year)
-        return state.max_points
-        
-    @staticmethod
-    def get_max_vote(year = None):
-        """
-            Get max vote value
-        """
-        state = SystemState.get_state(year)
-        return state.max_vote
-        
-    
-    @staticmethod
-    def get_vote_beg(year = None):
-        """
-            Get vote beggining date
-        """
-        state = SystemState.get_state(year)
-        return state.vote_beg
-        
-    @staticmethod
-    def get_vote_end(year = None):
-        """
-            Get vote ending date
-        """
-        state = SystemState.get_state(year)
-        return state.vote_end
-        
-    @staticmethod
-    def is_vote_active():
+
+
+    def is_system_active(self):
+        return self.is_vote_active() or self.is_correction_active()
+
+    def is_vote_active(self):
         """
             Checks if vote is active
         """
-        vote_beg = SystemState.get_vote_beg()
-        vote_end = SystemState.get_vote_end()
         today = date.today()
         
-        return vote_beg <= today <= vote_end
+        return self.vote_beg <= today <= self.vote_end
+
+
+    def is_correction_active(self):
+        """
+            Checks if correction is active
+        """
+        today = date.today()
+
+        return self.correction_beg <= today <= self.correction_end

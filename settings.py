@@ -182,6 +182,8 @@ ECTS_LIMIT_DURATION = 14 # abs(t1-t2), in days
 ECTS_BONUS = 7 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
 ECTS_LIMIT = 40
 
+VOTE_LIMIT = 60
+
 QUEUE_PRIORITY_LIMIT = 5
 
 # that's only the example of settings_local.py file contents:
