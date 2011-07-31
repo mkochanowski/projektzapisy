@@ -5,6 +5,7 @@ from apps.enrollment.records.exceptions import NotCurrentSemesterException
 
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group  import Group
+from apps.enrollment.courses.models.semester  import Semester
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -507,22 +508,25 @@ class Queue(models.Model):
           TODO: OMFG, to nie powinno być w modelu kolejki
       """
       try:
-        
+            semester = Semester.get_default_semester()
+            user = User.objects.get(id=user_id)
+            student = user.student
             group = Group.objects.get(id=group_id)
             """ Sprawdzenie, czy obowiązuje jeszcze limit ECTS"""
             if group.course.semester.records_opening + timedelta(days=ECTS_LIMIT_DURATION) < datetime.now():
                 return False
             """ Obliczenie sumy punktów ECTS"""
-            groups = Record.get_groups_for_student(user_id)
+            groups = map(lambda x: x.group, Record.objects.filter(student=student, group__course__semester__in=[semester]))
             courses = set([g.course for g in groups])
             program = User.objects.get(id=user_id).student.program
             points = Queue.get_point(program, group.course)
             ects = sum([Queue.get_point(program,course) for course in courses])
+
             if group.course not in courses:
-                ects += Queue.get_point(program,group.course)
+                ects += points
+
     	    """ Porównanie sumy z obowiązującym limitem"""
-          
-            if ects <= ECTS_LIMIT - points:
+            if ects <= ECTS_LIMIT:
                 return False
             else:
                 return True
