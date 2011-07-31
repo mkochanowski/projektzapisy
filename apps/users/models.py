@@ -220,14 +220,14 @@ class Student(BaseUser):
         def next_char(begin):
             return chr(ord(begin) + 1)
         if begin == 'Z':
-            return Student.objects.filter(user__last_name__gte=begin).\
+            return Student.objects.filter(status=0,user__last_name__gte=begin).\
                     select_related().order_by('user__last_name', 'user__first_name')
         elif begin == 'All':
-            return Student.objects.all().\
+            return Student.objects.filter(status=0).\
                     select_related().order_by('user__last_name', 'user__first_name')
         else:
             end = next_char(begin)
-            return Student.objects.filter(user__last_name__range=(begin, end)).\
+            return Student.objects.filter(status=0,user__last_name__range=(begin, end)).\
                     select_related().order_by('user__last_name', 'user__first_name')
 
     @staticmethod

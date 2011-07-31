@@ -21,8 +21,9 @@
 
 
         <h1>{{group.course.name}}</h1>
-<a href="{% url course-page group.course_slug %}">Powrót</a>
-	<a href="{% url admin:courses_group_change group.pk %}">edycja</a>
+        {% if user.is_staff %}
+        <a href="{% url admin:courses_group_change group.pk %}">Edycja</a>
+        {% endif %}
         <div class="details">
             <ul class="properties">
                 <li>

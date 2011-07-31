@@ -23,7 +23,9 @@
 	<div id="enr-course-view">
 
 		<h1>{{course.name}}</h1>
-
+        {% if user.is_staff %}
+        <a href="{% url admin:courses_course_change course.pk %}">Edycja</a>
+        {% endif %}
 		<div class="details">
 			<ul class="properties">
 				<li>
@@ -81,7 +83,7 @@
 
 			<div class="description">
 				<h2>Opis przedmiotu:</h2>
-				<p>{{course.description}}</p>
+				<p>{{course.description|safe}}</p>
 			</div>
 
 			<div class="footer"></div>
