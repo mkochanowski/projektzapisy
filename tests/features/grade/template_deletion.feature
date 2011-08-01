@@ -1,7 +1,7 @@
 Feature: User with privileges wants to delete some templates.
 
     Scenario: Preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And the grading protocol is "off"
         And there are templates generated
 

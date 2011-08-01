@@ -2,10 +2,6 @@
 require 'uri'
 require 'cgi'
 
-Then /^(?:|I )should see link "([^"]*)"$/ do |link|  
-	page.should have_link(link)
-end
-
 Then /^(?:|I )should see link "([^"]*)"$/ do |text|
   find_link(text).visible?
 end

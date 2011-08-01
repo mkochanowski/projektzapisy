@@ -1,7 +1,7 @@
 Feature: Student wants to remove himself from a group in order not to learn too much
 
   Background:
-    Given I start new scenario
+    Given I start new scenario for "enrollment"
     And I am logged in
     When I enroll in "Rachunek lambda" in group with id "152"    
 

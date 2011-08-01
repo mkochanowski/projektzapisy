@@ -1,7 +1,7 @@
 Feature: student wants to enroll in all the groups that he pinned on his schedule
 
   Background:
-    Given I start new scenario
+    Given I start new scenario for "enrollment"
     And I am logged in
     And I am on schedule prototype page
   

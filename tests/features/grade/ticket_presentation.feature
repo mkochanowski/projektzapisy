@@ -1,7 +1,7 @@
 Feature: Anonymous user wants to present tickets for polls in order to anonymously fill the polls
 
     Scenario: Preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And the grading protocol is "on"
         And there are polls generated
         And there are keys generated for polls        

@@ -2,7 +2,7 @@ Feature: student wants to enroll in a group that he pinned to his schedule
 
   @TODO
   Scenario: Schedule prototype lets the student pin two groups
-     Given I start new scenario
+     Given I start new scenario for "enrollment"
      And I am logged in
      And I am on schedule prototype page
      When I click on "Zastosowania wielomianów Czebyszewa"    

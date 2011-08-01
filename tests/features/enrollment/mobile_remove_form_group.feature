@@ -1,7 +1,7 @@
 Feature: Student wants to remove himself from a group on fereol-mobile
 
 Background:
-    Given I start new scenario
+    Given I start new scenario for "enrollment"
     And I am logged in
 
 Scenario: Student unenrolls from a group

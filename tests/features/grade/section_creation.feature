@@ -1,7 +1,7 @@
 Feature: User with privileges wants to create a section.
     
     Scenario: Preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And the grading protocol is "off"
     
     Scenario: Employee creates a simple section
@@ -162,7 +162,7 @@ Feature: User with privileges wants to create a section.
         | "Pytanie wielokrotnego wyboru" |
 
     Scenario: While grading protocol is active, the administrator tries to create a section
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And the grading protocol is "on"
         And I am logged in with "administrator" privileges
         And I am on grade main page    

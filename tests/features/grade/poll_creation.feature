@@ -1,7 +1,7 @@
 Feature: User with privileges wants to create a poll.
 
     Scenario: First preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And there are some courses with groups for current semester
         And there are some sections created already
         And the grading protocol is "off"
@@ -203,7 +203,7 @@ Feature: User with privileges wants to create a poll.
         Then I wait for a while to see "Nie można utworzyć ankiety; ankieta jest pusta"            
         
     Scenario: Administrator creates a poll for all the exercises when there is already a poll for some exercises
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And there are some courses with groups for current semester
         And there are some sections created already
         And the grading protocol is "off"
@@ -227,7 +227,7 @@ Feature: User with privileges wants to create a poll.
         And I should see "Liczba utworzonych ankiet: 8"
             
     Scenario: Administrator creates a poll for all the exercises without polls
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And there are some courses with groups for current semester
         And there are some sections created already     
         And the grading protocol is "off"
@@ -252,7 +252,7 @@ Feature: User with privileges wants to create a poll.
         And I should see "Liczba utworzonych ankiet: 6"   
                         
     Scenario: Administrator fails to create a poll when the grading protocol is on
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And the grading protocol is "on"
         And I am logged in with "administrator" privileges
         And I am on grade main page 

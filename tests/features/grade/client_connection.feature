@@ -1,7 +1,7 @@
 Feature: User downloads tickets using supplied external client.
 
     Background:
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And there are polls generated 
         And there are keys generated for polls
         And the grading protocol is "on"

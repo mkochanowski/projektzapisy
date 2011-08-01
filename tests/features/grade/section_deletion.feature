@@ -1,7 +1,7 @@
 Feature: User with privileges wants to delete some sections.
 
     Scenario: Preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And the grading protocol is "off"
         And there are some sections created already        
 

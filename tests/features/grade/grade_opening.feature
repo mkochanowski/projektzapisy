@@ -1,7 +1,7 @@
 Feature: Behaviour of the system when trying to open grading
 
     Background:
-      Given I start new scenario      
+      Given I start new scenario for "grade"      
       And the grading protocol is "off"     
       And I am logged in with "administrator" privileges
       And I am on grade main page

@@ -1,7 +1,7 @@
 Feature: Student wants to add himself to group in order to learn something
 
   Scenario: Preparations
-    Given I start new scenario    
+    Given I start new scenario for "enrollment"    
     
   Scenario: courses page is accessible
     Given I am logged in

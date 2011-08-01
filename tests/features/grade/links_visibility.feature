@@ -1,7 +1,7 @@
 Feature: Which links are visibile to which users, depending on the state of the grading protocol
 
   Scenario: Anonymous user with grade protocol off
-    Given I start new scenario  
+    Given I start new scenario for "grade"  
     And the grading protocol is "off"
     And I am on grade main page
     Then I should see link "Aktualności"
@@ -46,7 +46,7 @@ Feature: Which links are visibile to which users, depending on the state of the 
     And I should see link "Wyniki oceny"        
 
   Scenario: Anonymous user with grade protocol on
-    Given I start new scenario      
+    Given I start new scenario for "grade"      
     And the grading protocol is "on"
     And I am on grade main page
     Then I should see link "Aktualności" 

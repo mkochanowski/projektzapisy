@@ -1,7 +1,7 @@
 Feature: Student wants to see the classes he enrolled in in his schedule
 
   Scenario: 
-    Given I start new scenario
+    Given I start new scenario for "enrollment"
     And I am logged in
     And I enroll in "Bazy danych" in group with id "201"
     And I enroll in "Licencjacki projekt programistyczny" in group with id "174"

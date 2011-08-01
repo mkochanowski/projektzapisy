@@ -1,7 +1,7 @@
 Feature: User with privileges wants to create a template for poll.
 
     Scenario: First preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And there are some courses with groups for current semester
         And there are some sections created already
         And the grading protocol is "off"

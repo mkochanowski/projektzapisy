@@ -1,7 +1,7 @@
 Feature:  Student wants to add himself to group in order to learn something on fereol-mobile
 
 Background:
-     Given I start new scenario
+     Given I start new scenario for "enrollment"
      And I am on the mobile home page
      And I follow "Zapisy"
      And I fill in "Nazwa użytkownika" with "student-test"

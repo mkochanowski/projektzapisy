@@ -1,7 +1,7 @@
 Feature: Behaviour of the system when someone tries to do something they do not have permission to do
 
 	Background:
-        Given I start new scenario      
+        Given I start new scenario for "grade"      
 
 	@TODO
     Scenario: Student wants to open grade

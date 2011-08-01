@@ -7,7 +7,7 @@ def load_fixture(fixture)
     system "#{path}manage.py loaddata #{path}tests/fixtures/#{fixture}.json -v 0"
 end
 
-Given /I start new scenario for "([^"]*)"/ do |ferol_part|
+Given /I start new scenario for "([^"]*)"/ do |fereol_part|
     path = "../"
     system "#{path}manage.py flush --noinput -v 0"
     system "#{path}manage.py migrate --fake -v 0"

@@ -1,7 +1,7 @@
 Feature: Filters in poll management are working properly
 
     Scenario: Preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And there are templates generated
         And the grading protocol is "off"
     

@@ -2,7 +2,7 @@
 require 'uri'
 require 'cgi'
 
-Given /I am logged in with "([^"]*)" privileges/ do |privileges|
+Given /I am logged in with "([^"]*)" privileges$/ do |privileges|
   Given %{I am on the home page}
     And %{I follow "Ocena zajęć"}
     And %{I follow "Zaloguj"}
@@ -19,7 +19,7 @@ Given /I am logged in with "([^"]*)" privileges/ do |privileges|
     And %{I press "Zaloguj"}
 end
 
-Given /I am logged in/ do
+Given /I am logged in$/ do
   Given %{I am on the home page} 
     And %{I follow "Zaloguj"}
     And %{I fill in "Nazwa użytkownika" with "student-test"}

@@ -1,7 +1,7 @@
 Feature: Anonymous user, who has just entered his tickets, wants to fill some polls
 
     Scenario: Preparations
-        Given I start new scenario
+        Given I start new scenario for "grade"
         And there are polls generated 
         And there are keys generated for polls
         And I am signed for groups with polls

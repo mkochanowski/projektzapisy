@@ -1,7 +1,7 @@
 Feature: User wants to see a list of pinned and enrolled lecture in mobile-fereol
 
 Background:
-    Given I start new scenario
+    Given I start new scenario for "enrollment"
     And I am on the home page
     And I am logged in
 

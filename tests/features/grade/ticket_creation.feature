@@ -1,7 +1,7 @@
 Feature: Student wants to create tickets for polls
 
     Background:
-        Given I start new scenario    
+        Given I start new scenario for "grade"    
 
     Scenario: Student successfully creates tickets for all his polls (with grouping)
         Given the grading protocol is "on"
