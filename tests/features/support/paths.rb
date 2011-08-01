@@ -11,12 +11,30 @@ module NavigationHelpers
     when /the home\s?page/
       '/'
       
+    when /the home page/
+      '/'
+        
+    when /my profile page/
+      '/users/'
+
+    when /the mobile home page/
+      'http://m.localhost.localhost:8000/'
+      
+    when /courses page/
+      '/courses/'
+      
+    when /schedule page/
+      '/records/schedule/'
+    
+    when /schedule prototype page/
+       '/records/schedule/prototype/'
+    
     when /grade main page/
       '/grade/'
     
     when /poll management page/
-	'/grade/poll_manage'            
-		
+	'/grade/poll_manage'       
+    
     else
           begin
             page_name =~ /the (.*) page/
