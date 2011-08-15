@@ -65,6 +65,7 @@ Wybierz pracownika z menu po prawej.
 		</fieldset>
 	</div>
     <div id="user-alpha-list" class="main-top-bar">
+        <span class="consultations"><a href="{% url consultations-list %}">Konsultacje</a></span>
         <ul id="user-list-menu">
             <li><a href="{% url employees-char-list 'A' %}" class="ajax{% if char == 'A' %} active{% endif %}">A</a></li>
             <li><a href="{% url employees-char-list 'B' %}" class="ajax{% if char == 'B' %} active{% endif %}">B</a></li>

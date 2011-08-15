@@ -1,0 +1,36 @@
+{% extends "users/employees_list.html" %}
+{% block profile_styles %}
+	<link rel="stylesheet" href="/site_media/css/jquery/jquery.ui.schedule.css" type="text/css" />
+{% endblock %}
+{% block profile_scripts %}
+	<script src="/site_media/js/jquery/jquery.ui.schedule.js" type="text/javascript"></script>
+	<script src="/site_media/js/enrollment/records/schedule.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+        <h3>Konsultacje prowadzących:</h3>
+
+        <br/>
+        
+        {% if employees %}
+        <table>
+            <thead>
+                <td>Imię i nazwisko</td>
+                <td>Pokój</td>
+                <td>Konsultacje</td>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                    <tr>
+                        <td><a href="{% url employee-profile employee.user.id %}" class="person">
+                            {{employee.user.get_full_name}}</a></td>
+                        <td>{% if employee.room %}{{employee.room}}{% endif %}</td>
+                        <td>{{employee.consultations}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table><br />
+        {% else %}
+        Brak prowadzących.
+        {% endif %}
+{% endblock %}

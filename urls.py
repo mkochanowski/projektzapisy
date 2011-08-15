@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     #url('^enrollment/$', 'apps.enrollment.courses.views.main', name='enrollment-main'),
     (r'^courses/', include('apps.enrollment.courses.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),
+    url(r'^consultations/$', 'apps.users.views.consultations_list', name="consultations-list"),
     # OD
     #url('^offer/$', 'apps.offer.proposal.views.main', name='offer-main'),
     (r'^prefs/', include('apps.offer.preferences.urls')),

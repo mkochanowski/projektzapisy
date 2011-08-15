@@ -21,6 +21,10 @@
     margin: 10px;
 }
 
+span.consultations {
+    margin: 10px;
+    float: left;
+}
 
 #user-list-menu > li
 {

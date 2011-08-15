@@ -73,7 +73,6 @@ def student_profile(request, user_id):
         request.user.message_set.create(message="Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
-@login_required
 def employee_profile(request, user_id):
     """student profile"""
     try:
@@ -229,7 +228,6 @@ def my_profile(request):
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
 
-@login_required
 def employees_list(request, begin = 'A'):
 
     employees = Employee.get_list(begin)
@@ -250,6 +248,23 @@ def employees_list(request, begin = 'A'):
             }  
     
         return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
+
+def consultations_list(request, begin='A'):
+
+    employees = Employee.get_list('All')
+    semester = Semester.get_current_semester()
+    employees = Group.teacher_in_present(employees, semester)
+
+    if request.is_ajax():
+        employees = prepare_ajax_employee_list(employees)
+        return AjaxSuccessMessage(message="ok", data=employees)
+    else:
+        data = {
+            "employees" : employees,
+            "char": begin
+            }          
+        return render_to_response('users/consultations_list.html', data, context_instance=RequestContext(request))
+
 
 @login_required
 def students_list(request, begin = 'A'):
