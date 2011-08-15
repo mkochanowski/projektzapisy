@@ -14,7 +14,9 @@
         {% if user.student %}
 	<li><a href="{% url schedule-prototype %}">Prototyp planu</a></li>
         {% endif %}
+        {% endif %}
 	<li><a href="{% url employees-list %}">Pracownicy</a></li>
+        {% if user.student or user.employee %}
 	<li><a href="{% url students-list %}">Studenci</a></li>
         {% endif %}
 {% endblock %}

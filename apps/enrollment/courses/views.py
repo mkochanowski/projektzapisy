@@ -18,16 +18,20 @@ logger = logging.getLogger()
 def main(request):
     return render_to_response( 'enrollment/main.html', {}, context_instance = RequestContext( request ))
 
-''' generates template data for filtering and list of courses '''
 def prepare_courses_list_to_render(request):
+    ''' generates template data for filtering and list of courses '''
+    
     semesters = Semester.objects.filter(visible=True)
     courses = Course.visible.all()
 
-    try:
-        student = request.user.student
-        records_history = student.get_records_history()
-    except Student.DoesNotExist:
+    if request.user.is_anonymous():
         records_history = []
+    else:
+        try:
+            student = request.user.student
+            records_history = student.get_records_history()
+        except Student.DoesNotExist:
+            records_history = []
 
     semester_courses = []
     for semester in semesters:
@@ -50,13 +54,11 @@ def prepare_courses_list_to_render(request):
     return render_data
 
 
-@login_required
 def courses(request):
     return render_to_response('enrollment/courses/courses_list.html',
         prepare_courses_list_to_render(request), context_instance=RequestContext(request))
 
    
-@login_required
 def course(request, slug):
     try:
         course = Course.visible.get(slug=slug)
@@ -64,63 +66,45 @@ def course(request, slug):
         queues = Queue.queued.filter(group__course=course)
         groups = list(Group.objects.filter(course=course))
         requirements = map(lambda x: x.name, course.requirements.all())
-        try:
-            student = request.user.student
-            course.is_recording_open = course.is_recording_open_for_student(student)
-            course.can_enroll_from = course.get_enrollment_opening_time(student)
-            if course.can_enroll_from:
-                course.can_enroll_interval = course.can_enroll_from - datetime.now()
-            
-            student_queues = queues.filter(student=student)
-            student_queues_groups = map(lambda x: x.group, student_queues)
-            student_groups = map(lambda x: x.group, records.filter(student=student))
+        if request.user.is_anonymous():
+                student = None
+                course.is_recording_open = False
+                student_queues = None
+                student_groups = None
+                for g in groups:
+                    g.priority = None
+                    g.is_in_diff = False
+                    g.signed = False
+                pass
+        else:
+            try:
+                student = request.user.student
+                course.is_recording_open = course.is_recording_open_for_student(student)
+                course.can_enroll_from = course.get_enrollment_opening_time(student)
+                if course.can_enroll_from:
+                    course.can_enroll_interval = course.can_enroll_from - datetime.now()
+                
+                student_queues = queues.filter(student=student)
+                student_queues_groups = map(lambda x: x.group, student_queues)
+                student_groups = map(lambda x: x.group, records.filter(student=student))
 
-            for g in groups:
-                if g in student_queues_groups:
-                    g.priority = student_queues.get(group=g).priority
-                g.enrolled = records
-                g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
-                if g in student_groups:
-                    g.signed = True
-
-
-            '''records = Record.objects.filter(student=student)    <--- prawdopodobnie niepotrzebne...
-            if records:
-                for record in records:
-                    if ( record.group.course == course ):
-                        if record.group.type == '2':
-                            course.user_enrolled_to_exercise = True;
-                            break;
-                        elif record.group.type == '3':
-                            course.user_enrolled_to_laboratory = True;
-                            break;
-                        elif record.group.type == '4':
-                            course.user_enrolled_to_eaoratory = True;
-                            break;
-                        elif record.group.type == '5':
-                            course.user_enrolled_to_exlaboratory = True;
-                            break;
-                        elif record.group.type == '6':
-                            course.user_enrolled_to_seminar = True;
-                            break;
-                        elif record.group.type == '7':
-                            course.user_enrolled_to_langoratory = True;
-                            break;
-                        elif record.group.type == '8':
-                            course.user_enrolled_to_ssoratory = True;
-                            break;
-                        else:
-                            break;'''
-        except Student.DoesNotExist:
-            student = None
-            course.is_recording_open = False
-            student_queues = None
-            student_groups = None
-            for g in groups:
-                g.priority = None
-                g.is_in_diff = False
-                g.signed = False
-            pass
+                for g in groups:
+                    if g in student_queues_groups:
+                        g.priority = student_queues.get(group=g).priority
+                    g.enrolled = records
+                    g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
+                    if g in student_groups:
+                        g.signed = True
+            except Student.DoesNotExist:
+                student = None
+                course.is_recording_open = False
+                student_queues = None
+                student_groups = None
+                for g in groups:
+                    g.priority = None
+                    g.is_in_diff = False
+                    g.signed = False
+                pass
 
         
         lectures = []
@@ -216,7 +200,6 @@ def course(request, slug):
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 
-@login_required
 def course_consultations(request, slug):
     try:
         course = Course.visible.get(slug=slug)
