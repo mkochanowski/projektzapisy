@@ -48,7 +48,7 @@ class Course( models.Model ):
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
-    type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
+    type = models.ForeignKey('Type', verbose_name='rodzaj')
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     description = models.TextField(verbose_name='opis') 
     lectures = models.IntegerField(verbose_name='wykład')
