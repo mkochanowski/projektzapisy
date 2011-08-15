@@ -6,16 +6,19 @@
 	<script src="/site_media/js/enrollment/records/schedule.js" type="text/javascript"></script>
 {% endblock %}
 
-<h3>Dane:</h3>
+<h3>{{employee.get_full_name}}</h3>
+<br/>
 <ul>
-	<li>{{employee.get_full_name}}</li>
-	<li>email: <a href="mailto:{{employee.user.email}}">{{employee.user.email}}</a></li>
-	<li>strona: <a href="{{employee.homepage}}">{{employee.homepage}}</a></li>
+    <li>adres email: {% if employee.user.email %}<a href="mailto:{{employee.user.email}}">{{employee.user.email}}</a>{% else %}brak danych{% endif %}</li>
+    <li>adres strony domowej: {% if employee.homepage %}<a href="{{employee.homepage}}">{{employee.homepage}}</a>{% else %}brak danych{% endif %}</li>
+    <li>pokój: {% if employee.room %}{{employee.room}}{% else %}brak danych{% endif %}</li>
 </ul>
 <br \>
 <h3>Konsultacje:</h3>
 <p>{{employee.consultations}}</p>
-<br \>
+<br \><br \>
+<h3>Plan zajęć:</h3>
+<br/>
 <div id="schedule-wrapper">
 	{% for group in groups %}
 		{% for term in group.terms_ %}

@@ -6,12 +6,15 @@
 	<script src="/site_media/js/enrollment/records/schedule.js" type="text/javascript"></script>
 {% endblock %}
 
-<h3>Dane:</h3>
+<h3>{{student.get_full_name}}</h3>
+<br \>
 <ul>
-	<li>{{student.get_full_name}}</li>
-	<li>email: {{student.user.email}}</li>
-	<li>punkty ECTS: {{student.ects}}</li>
+    <li>adres email: {% if student.user.email %}<a href="mailto:{{student.user.email}}">{{student.user.email}}</a>{% else %}brak danych{% endif %}</li>
+    <li>punkty ECTS: {{student.ects}}</li>
 </ul>
+<br \><br \>
+<h3>Plan zajęć:</h3>
+<br/>
 <div id="schedule-wrapper">
 	{% for group in groups %}
 		{% for term in group.terms_ %}
