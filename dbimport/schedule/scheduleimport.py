@@ -58,7 +58,7 @@ def find_teacher(t):
     if len(teachers)==0:
         username = teacher_name+teacher_surname
         user = User.objects.create(first_name=teacher_name, last_name=teacher_surname, username=username)
-        teacher = Employee.objects.create(user=user, consultations="a")
+        teacher = Employee.objects.create(user=user, consultations="")
     elif len(teachers)>1:
         print 'Error: more then one teacher of name: %s, and surname: %s.' % (teacher_name,teacher_surname)
     else:

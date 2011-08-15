@@ -165,7 +165,9 @@
 										{% endif %}{% endif %}{% endif %}
 									</div></form>
 								{% endif %}
+								{% if user.student or user.employee %}
 								<a href="{% url records-group t.id %}">lista</a>
+								{% endif %}
 							</td>
 							{% if course.is_recording_open %}
 								<td class="priority">
