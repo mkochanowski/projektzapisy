@@ -78,7 +78,7 @@ def stop_be(request, slug, group):
         request.user.message_set.create(message="Nie jesteś pracownkiem.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
-@login_required
+
 def proposals(request):
     """
         Proposal list
@@ -90,7 +90,6 @@ def proposals(request):
             'mode' : 'list'
         }, context_instance = RequestContext(request) )
 
-@login_required
 def proposal( request, slug, descid = None ):
     """
         Single proposal
@@ -104,7 +103,7 @@ def proposal( request, slug, descid = None ):
         proposal_.description = newest
         descid = proposal_.description.id
 
-    can_edit = (proposal_.owner == None 
+    can_edit = ((proposal_.owner == None and request.user.is_authenticated())
                or request.user.is_staff
                or request.user == proposal_.owner)
     proposals_ = Proposal.objects.filter(deleted=False).order_by('name')

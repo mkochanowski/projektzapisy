@@ -42,7 +42,9 @@
 
 {% block content %}
 	<div id="od-proposal-proposalmenu">
+        {% if user.student or user.employee %}
 		<a href="/proposal/add/" id="od-proposal-addlink">Dodaj przedmiot</a>
+		{% endif %}
 		<ul id="od-proposal-proposallist">
 			{% for sub in proposals %}
 				<li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}>
