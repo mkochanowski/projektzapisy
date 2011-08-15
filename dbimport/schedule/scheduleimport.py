@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #### TO CHANGE #####
-SCHEDULE_FILE = './PlanPrzedmiotów.txt'
+SCHEDULE_FILE = '/home/gosia/Desktop/plan'
 LIMITS = {'1' : 200, '9' : 200, '2' : 20, '3' : 16 , '5' : 16 , '6' : 16 }
 ####  #####
 
@@ -116,11 +116,14 @@ def import_schedule(file, semester):
             entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
 
             slug = str(semester.year) + semester.type + '_' + slugify(name)
+            print slug
+            type = guess_type(name)
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
                                                  semester=semester,
                                                  slug = slug,
+                                                 type=type
                                                  )
                 points = PointsOfCourseEntities.objects.filter(entity=entity)
                 for p in points:
@@ -139,20 +142,24 @@ def get_semester():
     today = datetime.today()
     type = today.month in [12,1,2,3,4,5] and 'l' or 'z'
     year = today.year
+    next_year = (year+1)%100
+    year = str(year)+'/'+str(next_year)
     semester_beginning = today
     semester_ending = today 
-    semester = Semester.objects.create(visible=False,
-                                       type=type,
-                                       year=year,
-                                       semester_beginning=semester_beginning,
-                                       semester_ending=semester_ending)
+    semester = Semester.objects.get_or_create(type=type,
+                                              year=year,
+                                              defaults = {
+                                                  'visible' : False,
+                                                  'semester_beginning' : semester_beginning,
+                                                  'semester_ending' : semester_ending})[0]
     return semester
 
 @transaction.commit_on_success
 def scheduleimport(data):
     semester = get_semester()
-    file = data #open(SCHEDULE_FILE)
+    file = data
+    #file = open(SCHEDULE_FILE)
     import_schedule(file, semester)
 
-
+#scheduleimport('')
 

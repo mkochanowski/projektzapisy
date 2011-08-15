@@ -302,7 +302,7 @@ def prepare_courses_with_terms(terms, records = []):
                 'id' : course.pk,
                 'name': course.name,
                 'short': course.entity.get_short_name(),
-                'type': course.type.pk,
+                'type': course.type and course.type.pk or 1,
                 'slug': course.slug,
             },
             'terms': []
@@ -320,7 +320,7 @@ def prepare_courses_with_terms(terms, records = []):
             'teacher': term.group.teacher and term.group.teacher.user.get_full_name() or 'nieznany prowadzący',
             'teacher_url': term.group.teacher and reverse('employee-profile', \
                 args=[term.group.teacher.user.id]) or '',
-            'classroom': int(term.classroom.number),
+            'classroom': term.classroom.number and int(term.classroom.number) or 0,
             'day': int(term.dayOfWeek),
             'start_time': [term.start_time.hour, term.start_time.minute],
             'end_time': [term.end_time.hour, term.end_time.minute],
