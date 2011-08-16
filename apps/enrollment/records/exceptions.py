@@ -48,3 +48,5 @@ class ECTS_Limit_Exception(Exception):
 class NotCurrentSemesterException(Exception):
     """is thrown when someone tries to sign out from group in semester different than current semester"""
     pass
+class InactiveStudentException(Exception):
+	"""is thrown when inactive user tries to enroll to group"""

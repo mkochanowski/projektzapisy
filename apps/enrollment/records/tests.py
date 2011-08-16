@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 from apps.enrollment.courses.models import Course, Group, StudentOptions, Semester
 from apps.enrollment.records.models import Record, Queue
-from apps.enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException, NotCurrentSemesterException
+from apps.enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException, NotCurrentSemesterException, InactiveStudentException
 from apps.enrollment.courses.exceptions import NonCourseException
 from apps.users.models import Employee, Student
 
@@ -40,6 +40,11 @@ class AddStudentToGroupTest(TestCase):
     def testWithNonStudentUser(self):
         self.user.student.delete()
         self.assertRaises(NonStudentException, Record.add_student_to_group, self.user.id, self.exercise_group.id)
+        
+    def testWithInactiveStudent(self):
+    	self.user.student.status = 1
+    	self.user.student.save()
+    	self.assertRaises(InactiveStudentException, Record.add_student_to_group, self.user.id, self.exercise_group.id)
 
     def testWithoutGivenGroup(self):
         group_id = self.exercise_group.id

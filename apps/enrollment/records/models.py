@@ -2,6 +2,7 @@
 from apps.enrollment.records.exceptions import NonGroupException
 from apps.enrollment.records.exceptions import ECTS_Limit_Exception 
 from apps.enrollment.records.exceptions import NotCurrentSemesterException
+from apps.enrollment.records.exceptions import InactiveStudentException
 
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group  import Group
@@ -251,6 +252,8 @@ class Record(models.Model):
         user = User.objects.get(id=user_id)
         try:
             student = user.student
+            if not student.is_active():
+            	raise InactiveStudentException
             group = Group.objects.get(id=group_id)
             new_records = []
             if not group.course.is_recording_open_for_student(student):

@@ -192,6 +192,16 @@ def set_enrolled(request, method):
             messages.error(request, 'Przekroczony limit 40 ECTS')
             return redirect('course-page', slug=Group.objects.\
                     get(id=group_id).course_slug())
+    except InactiveStudentException:
+        message = 'Nie możesz się zapisać, ponieważ nie jesteś aktywnym ' + \
+            'studentem.'
+        if is_ajax:
+            return AjaxFailureMessage.auto_render('InactiveStudent', message, \
+                message_context)
+        else:
+            messages.error(request, message)
+            return redirect('course-page', slug=Group.objects.\
+                    get(id=group_id).course_slug())
 
 
 @require_POST
@@ -262,7 +272,7 @@ def queue_set_priority(request, group_id, method):
         else:
             return redirect("course-page", slug=queue.group_slug())
     except Queue.DoesNotExist:
-    	transaction.rollback()
+        transaction.rollback()
         return AjaxFailureMessage.auto_render('NotQueued',\
             'Nie jesteś w kolejce do tej grupy.', message_context)
 

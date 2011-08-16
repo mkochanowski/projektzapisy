@@ -176,7 +176,10 @@ class Student(BaseUser):
     status = models.PositiveIntegerField(default=0, verbose_name="Status")
     status.help_text = "0 - aktywny student, 1 - skreślony student"
 
-
+    
+    def is_active(self):
+        return (self.status == 0)
+        
     def get_type_of_studies(self):
         """ returns type of studies """
         semestr = {1:'pierwszy',2:'drugi',3:'trzeci',4:'czwarty',5:'piąty',6:'szósty',7:'siódmy',8:'ósmy',9:'dziewiąty',10:'dziesiąty',0:'niezdefiniowany'}[self.semestr]
