@@ -41,7 +41,7 @@ class CourseEntityAdmin(admin.ModelAdmin):
     ]
         
 class PointsOfCoursesAdmin(admin.ModelAdmin):
-    list_display = ('course', 'program', 'value')
+    list_display = ('course', 'program','type_of_point','value')
     search_fields = ('course__name', )
     list_filter = ('program',)
 
