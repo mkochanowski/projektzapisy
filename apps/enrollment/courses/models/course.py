@@ -50,13 +50,13 @@ class Course( models.Model ):
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     type = models.ForeignKey('Type', verbose_name='rodzaj')
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
-    description = models.TextField(verbose_name='opis') 
+    description = models.TextField(verbose_name='opis', blank=True) 
     lectures = models.IntegerField(verbose_name='wykład')
     exercises = models.IntegerField(verbose_name='ćwiczenia')
     laboratories = models.IntegerField(verbose_name='pracownia')
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
     repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
-    requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+')
+    requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
                                 verify_exists= True,
 								blank        = True,
