@@ -311,7 +311,7 @@ class StudiaZamawiane(models.Model):
         Model przechowuje dodatkowe informacje o studentach zamawianych
     """
     student = models.OneToOneField(Student, verbose_name='Student')
-    points =  models.FloatField(verbose_name='Punkty')
+    points =  models.FloatField(verbose_name='Punkty', null=True, blank=True)
     comments = models.TextField(verbose_name='Uwagi', blank=True)
     bank_account = models.CharField(max_length=40, blank=True, verbose_name="Numer konta bankowego")
 
