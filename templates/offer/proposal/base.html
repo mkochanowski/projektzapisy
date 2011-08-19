@@ -56,7 +56,11 @@
 	</div>
 	<div id="od-proposal-contents">
 		{% block proposal-content %}
+            {% if user.student or user.employee %}
 			<p id="od-proposal-mainMessage">Wybierz przedmiot z menu po lewej lub dodaj nowy.</p>
+			{% else %}
+			<p id="od-proposal-mainMessage">Wybierz przedmiot z menu po lewej.</p>
+			{% endif %}
 		{% endblock %}
 		<div style="clear: left"></div>
 	</div>
