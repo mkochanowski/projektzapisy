@@ -49,7 +49,8 @@ class TermInline(admin.TabularInline):
     model = Term
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__',)
+    list_display = ('course', 'teacher','type','limit','limit_zamawiane')
+    list_filter = ('teacher',)
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
         TermInline,
