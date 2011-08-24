@@ -64,7 +64,7 @@ def course(request, slug):
         course = Course.visible.get(slug=slug)
         records = Record.enrolled.filter(group__course=course)
         queues = Queue.queued.filter(group__course=course)
-        groups = list(Group.objects.filter(course=course).order_by('term__dayOfWeek','term__start_time','term__end_time'))
+        groups = set(Group.objects.filter(course=course).order_by('term__dayOfWeek','term__start_time','term__end_time'))
         requirements = map(lambda x: x.name, course.requirements.all())
         if request.user.is_anonymous():
                 student = None
@@ -150,7 +150,7 @@ def course(request, slug):
             elif g.type == '10':
                 project.append(g);
             else:
-                break;
+                break
 
         '''lectures = groups.filter(type='1') #probably better, but you can't extend objects in QuerySet
         exercises = groups.filter(type='2')
@@ -176,8 +176,8 @@ def course(request, slug):
             { 'name' : 'Ćwiczenia', 'groups' : exercises, 'type' : 2},
             { 'name' : 'Pracownia', 'groups' : laboratories, 'type' : 3},
             { 'name' : 'Ćwiczenia (poziom zaawansowany)', 'groups' : exercises_adv, 'type' : 4},
-            { 'name' : 'Ćwiczenio-pracownie', 'groups' : seminar, 'type' : 6},
-            { 'name' : 'Seminarium', 'groups' : exer_labs, 'type' : 5},
+            { 'name' : 'Ćwiczenio-pracownie', 'groups' : exer_labs, 'type' : 5},
+            { 'name' : 'Seminarium', 'groups' : seminar, 'type' : 6},
             { 'name' : 'Lektorat', 'groups' : language, 'type' : 7},
             { 'name' : 'Zajęcia sportowe', 'groups' : sport, 'type' : 8},
             { 'name' : 'Projekt', 'groups' : project, 'type' : 10},

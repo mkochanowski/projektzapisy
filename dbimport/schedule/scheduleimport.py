@@ -39,6 +39,10 @@ DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' }
 def lower_pl(s):
     return s.lower().replace('Ą','ą').replace('Ć','ć').replace('Ę','ę').replace('Ł','ł').replace('Ń','ń').replace('Ó','ó').replace('Ś','ś').replace('Ż','ż').replace('Ź','ź')
 
+def upper_pl(s):
+    return s.upper().replace('ą','Ą').replace('ć','Ć').replace('ę','Ę').replace('ł','Ł').replace('ń','Ń').replace('ó','Ó').replace('ś','Ś').replace('ż','Ż').replace('ź','Ź')
+
+
 def guess_type(name):
     return Type.objects.all()[0]
 
@@ -51,7 +55,7 @@ def find_teacher(t):
         teacher_name = teacher_full_name[0]
         teacher_surname = teacher_full_name[1]
     if len(teacher_full_name)==3:
-        teacher_name = teacher_full_name[0]+teacher_full_name[1]
+        teacher_name = teacher_full_name[0]+' '+teacher_full_name[1]
         teacher_surname = teacher_full_name[2]
     teachers = Employee.objects.filter(user__first_name=teacher_name, user__last_name=teacher_surname)
 
@@ -111,7 +115,7 @@ def import_schedule(file, semester):
                 print 'Error: line`'+line+'\' don\'t match regexp.'
 
         elif line.startswith(' '):
-            name = lower_pl(line[1:-1])
+            name = ' '.join(map(lambda x: len(x)>0 and x[0]+lower_pl(x[1:]) or x, line[1:-1].split(' ')))
             shortName = name[:29]
             entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
 
