@@ -3,6 +3,13 @@
 #### TO CHANGE #####
 SCHEDULE_FILE = '/home/gosia/Desktop/plan'
 LIMITS = {'1' : 300, '9' : 300, '2' : 20, '3' : 15 , '5' : 18 , '6' : 15 }
+
+O1 = ['analizamatematyczna','algebra','logikadlainformatyków','elementyrachunkuprawdopodobieństwa','metodyprobabilistyczneistatystyka']
+O2 = ['matematykadyskretna','programowanie','analizanumeryczna','algorytmyistrukturydanych']
+O3 = ['językiformalneizłożonośćobliczeniowa']
+Oinz = ['fizykadlainformatyków','podstawyelektroniki,elektrotechnikiimiernictwa']
+I1 = ['wstępdoinformatyki','architekturasystemówkomputerowych','bazydanych','systemyoperacyjne','siecikomputerowe','inżynieriaoprogramowania']
+Iinz = ['systemywbudowane','podstawygrafikikomputerowej','sztucznainteligencja','komunikacjaczłowiek-komputer']
 ####  #####
 
 FEREOL_PATH = '../../..'
@@ -36,6 +43,27 @@ GROUP_TYPES = { 'wykład' : '1', 'repetytorium' : '9', 'ćwiczenia' : '2', 'prac
 
 DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' }
 
+types = [('Informatyczny 1','I1'),
+         ('Informatyczny 2','I2'),
+         ('Informatyczny inż.','Iinż'),
+         ('Obowiązkowy 1','O1'),
+         ('Obowiązkowy 2','O2'),
+         ('Obowiązkowy 3','O3'),
+         ('Obowiązkowy inż.','Oinż'),
+         ('Kurs','K'), 
+         ('Projekt','P'), 
+         ('Seminarium','S'), 
+         ('Nieinformatyczny','N'), 
+         ('Wychowanie fizyczne','WF'), 
+         ('Lektorat','L'), 
+         ('Inne','?')]
+
+COURSE_TYPE = {}
+
+for t in types:
+    td = Type.objects.get_or_create(name=t[0], short_name=t[1], group=None, meta_type=False)[0]
+    COURSE_TYPE[t[1]] = td
+
 def lower_pl(s):
     return s.lower().replace('Ą','ą').replace('Ć','ć').replace('Ę','ę').replace('Ł','ł').replace('Ń','ń').replace('Ó','ó').replace('Ś','ś').replace('Ż','ż').replace('Ź','ź')
 
@@ -44,7 +72,26 @@ def upper_pl(s):
 
 
 def guess_type(name):
-    return Type.objects.all()[0]
+    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)',''))
+    if name in O1:
+        return COURSE_TYPE['O1']
+    elif name in O2:
+        return COURSE_TYPE['O2']
+    elif name in O3:
+        return COURSE_TYPE['O3']
+    elif name in Oinz:
+        return COURSE_TYPE['Oinż']
+    elif name in I1:
+        return COURSE_TYPE['I1']
+    elif name in Iinz:
+        return COURSE_TYPE['Iinż']
+    elif 'kurs' in name:
+        return COURSE_TYPE['K']
+    elif 'seminarium' in name:
+        return COURSE_TYPE['S']
+    elif 'projekt' in name:
+        return COURSE_TYPE['P']
+    return COURSE_TYPE['I2']
 
 def find_teacher(t):
     teacher_full_name = map(lambda x: len(x)>0 and x[0]+lower_pl(x[1:]) or x,t.split(' '))
@@ -115,7 +162,18 @@ def import_schedule(file, semester):
                 print 'Error: line`'+line+'\' don\'t match regexp.'
 
         elif line.startswith(' '):
-            name = ' '.join(map(lambda x: len(x)>0 and x[0]+lower_pl(x[1:]) or x, line[1:-1].split(' ')))
+            name = line[1:-1]
+            if name.startswith('SEMINARIUM: '):
+                extra = 'Seminarium: '
+                name = name.replace('SEMINARIUM: ','')
+            elif name.startswith('PROJEKT: '):
+                extra = 'Projekt: '
+                name = name.replace('PROJEKT: ','')
+            else:
+                extra = ''
+            name = len(name)>0 and name[0]+lower_pl(name[1:]) or name
+            name = name.replace('(l)','(L)').replace('(m)','(M)')
+            name = extra+name
             shortName = name[:29]
             entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
 
