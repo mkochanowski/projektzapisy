@@ -18,6 +18,13 @@ from mailer import send_html_mail
 from apps.news.models import News
 from apps.users.models import Employee, Student
 
+CATEGORIES = {
+    '-': 'Ukryte',
+    'offer': 'Oferta',
+    'enrollment': 'Zapisy',
+    'grade': 'Ocena zajęć',
+}
+
 MASS_MAIL_FROM = 'noreply@example.com'
 NEWS_PER_PAGE = 5
 
@@ -49,6 +56,8 @@ def render_items(request, items):
     """
         Renders items
     """
+    for item in items:
+        item.category = CATEGORIES[item.category]
     con = RequestContext(request, {
         'object_list':items,
     } )
