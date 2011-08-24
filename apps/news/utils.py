@@ -22,7 +22,7 @@ CATEGORIES = {
     '-': 'Ukryte',
     'offer': 'Oferta',
     'enrollment': 'Zapisy',
-    'grade': 'Ocena zajęć',
+    'grade': 'Ocena',
 }
 
 MASS_MAIL_FROM = 'noreply@example.com'
