@@ -61,7 +61,7 @@ types = [('Informatyczny 1','I1'),
 COURSE_TYPE = {}
 
 for t in types:
-    td = Type.objects.get_or_create(name=t[0], short_name=t[1], group=None, meta_type=False)[0]
+    td = Type.objects.get_or_create(name=t[0], defaults = {'short_name':t[1], 'group':None, 'meta_type':False})[0]
     COURSE_TYPE[t[1]] = td
 
 def lower_pl(s):
