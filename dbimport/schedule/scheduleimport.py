@@ -43,27 +43,6 @@ GROUP_TYPES = { 'wykład' : '1', 'repetytorium' : '9', 'ćwiczenia' : '2', 'prac
 
 DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' }
 
-types = [('Informatyczny 1','I1'),
-         ('Informatyczny 2','I2'),
-         ('Informatyczny inż.','Iinż'),
-         ('Obowiązkowy 1','O1'),
-         ('Obowiązkowy 2','O2'),
-         ('Obowiązkowy 3','O3'),
-         ('Obowiązkowy inż.','Oinż'),
-         ('Kurs','K'), 
-         ('Projekt','P'), 
-         ('Seminarium','S'), 
-         ('Nieinformatyczny','N'), 
-         ('Wychowanie fizyczne','WF'), 
-         ('Lektorat','L'), 
-         ('Inne','?')]
-
-COURSE_TYPE = {}
-
-for t in types:
-    td = Type.objects.get_or_create(name=t[0], defaults = {'short_name':t[1], 'group':None, 'meta_type':False})[0]
-    COURSE_TYPE[t[1]] = td
-
 def lower_pl(s):
     return s.lower().replace('Ą','ą').replace('Ć','ć').replace('Ę','ę').replace('Ł','ł').replace('Ń','ń').replace('Ó','ó').replace('Ś','ś').replace('Ż','ż').replace('Ź','ź')
 
@@ -71,7 +50,7 @@ def upper_pl(s):
     return s.upper().replace('ą','Ą').replace('ć','Ć').replace('ę','Ę').replace('ł','Ł').replace('ń','Ń').replace('ó','Ó').replace('ś','Ś').replace('ż','Ż').replace('ź','Ź')
 
 
-def guess_type(name):
+def guess_type(name,COURSE_TYPE):
     name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)',''))
     if name in O1:
         return COURSE_TYPE['O1']
@@ -128,6 +107,27 @@ def get_classroom(rooms):
     
 
 def import_schedule(file, semester):
+    types = [('Informatyczny 1','I1'),
+            ('Informatyczny 2','I2'),
+            ('Informatyczny inż.','Iinż'),
+            ('Obowiązkowy 1','O1'),
+            ('Obowiązkowy 2','O2'),
+            ('Obowiązkowy 3','O3'),
+            ('Obowiązkowy inż.','Oinż'),
+            ('Kurs','K'), 
+            ('Projekt','P'), 
+            ('Seminarium','S'), 
+            ('Nieinformatyczny','N'), 
+            ('Wychowanie fizyczne','WF'), 
+            ('Lektorat','L'), 
+            ('Inne','?')]
+
+    COURSE_TYPE = {}
+
+    for t in types:
+        td = Type.objects.get_or_create(name=t[0], defaults = {'short_name':t[1], 'group':None, 'meta_type':False})[0]
+        COURSE_TYPE[t[1]] = td
+
     course = None
     while True:
         line = file.readline()
@@ -179,7 +179,7 @@ def import_schedule(file, semester):
 
             slug = str(semester.year) + semester.type + '_' + slugify(name)
             print slug
-            type = guess_type(name)
+            type = guess_type(name,COURSE_TYPE)
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
