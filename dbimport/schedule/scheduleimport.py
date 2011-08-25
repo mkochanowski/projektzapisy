@@ -53,24 +53,24 @@ def upper_pl(s):
 def guess_type(name,COURSE_TYPE):
     name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)',''))
     if name in O1:
-        return COURSE_TYPE['O1']
+        return COURSE_TYPE['O1'],'O1'
     elif name in O2:
-        return COURSE_TYPE['O2']
+        return COURSE_TYPE['O2'],'O2'
     elif name in O3:
-        return COURSE_TYPE['O3']
+        return COURSE_TYPE['O3'],'O3'
     elif name in Oinz:
-        return COURSE_TYPE['Oinż']
+        return COURSE_TYPE['Oinż'],'Oinż'
     elif name in I1:
-        return COURSE_TYPE['I1']
+        return COURSE_TYPE['I1'],'I1'
     elif name in Iinz:
-        return COURSE_TYPE['Iinż']
+        return COURSE_TYPE['Iinż'],'Iinż'
     elif 'kurs' in name:
-        return COURSE_TYPE['K']
+        return COURSE_TYPE['K'],'K'
     elif 'seminarium' in name:
-        return COURSE_TYPE['S']
+        return COURSE_TYPE['S'],'S'
     elif 'projekt' in name:
-        return COURSE_TYPE['P']
-    return COURSE_TYPE['I2']
+        return COURSE_TYPE['P'],'P'
+    return COURSE_TYPE['I2'],'I2'
 
 def find_teacher(t):
     teacher_full_name = map(lambda x: len(x)>0 and x[0]+lower_pl(x[1:]) or x,t.split(' '))
@@ -99,7 +99,10 @@ def find_teacher(t):
 def get_classroom(rooms):
     try:
         room = rooms[0] #FIXIT
-        classroom = Classroom.objects.get_or_create(number=room)[0]
+        if room.replace(' ','')=='':
+            classroom = Classroom.objects.get_or_create(number='0')[0]
+        else:
+            classroom = Classroom.objects.get_or_create(number=room)[0]
     except IndexError:
         classroom = Classroom.objects.get_or_create(number='0')[0]
 
@@ -125,7 +128,7 @@ def import_schedule(file, semester):
     COURSE_TYPE = {}
 
     for t in types:
-        td = Type.objects.get_or_create(name=t[0], defaults = {'short_name':t[1], 'group':None, 'meta_type':False})[0]
+        td = Type.objects.get_or_create(name=t[0], meta_type=False, defaults = {'short_name':t[1], 'group':None})[0]
         COURSE_TYPE[t[1]] = td
 
     course = None
@@ -134,7 +137,7 @@ def import_schedule(file, semester):
         if not line:
             return
         if line.startswith('  '):
-            if line=='  \n':
+            if line.replace(' ','')=='\n':
                 continue
             g = regex.match(line)
             try:
@@ -147,7 +150,20 @@ def import_schedule(file, semester):
                 group_type = GROUP_TYPES[g.group('type')]
                 teacher = find_teacher(g.group('teacher'))
                 limit = LIMITS[group_type]
-
+                
+                t = 15*(int(g.group('end_time'))-int(g.group('start_time')))
+                print t
+                if group_type=='1':
+                    lectures += t
+                elif group_type=='9':
+                    repetitions += t
+                elif group_type=='2':
+                    exercises = exercises and exercises or t
+                elif group_type=='3':
+                    laboratorie = laboratories and laboratories or t
+                elif group_type=='5':
+                    exercises_laboratories = exercises_laboratories and exercises_laboratories or t
+                    
                 group = Group.objects.create(course=course,
                                              teacher=teacher,
                                              type=group_type,
@@ -162,6 +178,12 @@ def import_schedule(file, semester):
                 print 'Error: line`'+line+'\' don\'t match regexp.'
 
         elif line.startswith(' '):
+            if line==' \n':
+                continue
+            
+            if course:
+                course.lectures, course.exercises, course.laboratories, course.repetitions, course.exercises_laboratories = lectures, exercises, laboratories, repetitions, exercises_laboratories
+                course.save()
             name = line[1:-1]
             if name.startswith('SEMINARIUM: '):
                 extra = 'Seminarium: '
@@ -172,14 +194,16 @@ def import_schedule(file, semester):
             else:
                 extra = ''
             name = len(name)>0 and name[0]+lower_pl(name[1:]) or name
-            name = name.replace('(l)','(L)').replace('(m)','(M)')
+            name = name.replace('(l)','(L)').replace('(m)','(M)').replace('(b)','(B)')
             name = extra+name
+            name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA')
             shortName = name[:29]
             entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
+            lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
 
             slug = str(semester.year) + semester.type + '_' + slugify(name)
             print slug
-            type = guess_type(name,COURSE_TYPE)
+            type,short_type = guess_type(name,COURSE_TYPE)
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
