@@ -46,20 +46,22 @@
         {% endfor %}
         </table>
         </div>
+        {% if app.name == 'Courses' %}
+        <div class="module">
+            <table>
+                <caption>Import</caption>
+                <tr>
+                    <th scope="row">Plan semestru z sekretariatu</th>
+                    <td><a href="{{ model.admin_url }}import_schedule" class="addlink">Importuj</a></td>
+                </tr>
+                <tr>
+                    <th scope="row">Plan semestru z pliku xml</th>
+                    <td><a href="{{ model.admin_url }}import_semester" class="addlink">Importuj</a></td>
+                </tr>            
+            </table>
+        </div>
+        {% endif %}
     {% endfor %}
-    <div class="module">
-        <table>
-            <caption>Import</caption>
-            <tr>
-                <th scope="row">Plan semestru z sekretariatu</th>
-                <td><a href="{{ model.admin_url }}courses/import_schedule" class="addlink">Importuj</a></td>
-            </tr>
-            <tr>
-                <th scope="row">Plan semestru z pliku xml</th>
-                <td><a href="{{ model.admin_url }}courses/import_semester" class="addlink">Importuj</a></td>
-            </tr>            
-        </table>
-    </div>
 {% else %}
     <p>{% trans "You don't have permission to edit anything." %}</p>
 {% endif %}
