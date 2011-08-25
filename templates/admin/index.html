@@ -46,7 +46,7 @@
         {% endfor %}
         </table>
         </div>
-        {% if app.name == 'Courses' %}
+        {% if app.name == 'Courses' and app_list|length < 2 %}
         <div class="module">
             <table>
                 <caption>Import</caption>

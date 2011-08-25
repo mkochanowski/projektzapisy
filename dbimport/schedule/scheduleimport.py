@@ -26,8 +26,8 @@ if __name__ == '__main__':
     setup_environ(settings)
 
 from apps.enrollment.records.models import Record, STATUS_ENROLLED
-from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities, PointsOfCourses
-from apps.users.models import Student, Employee
+from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities, PointsOfCourses, PointTypes
+from apps.users.models import Student, Employee, Program
 
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
@@ -51,7 +51,7 @@ def upper_pl(s):
 
 
 def guess_type(name,COURSE_TYPE):
-    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)',''))
+    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','()'))
     if name in O1:
         return COURSE_TYPE['O1'],'O1'
     elif name in O2:
@@ -79,7 +79,7 @@ def find_teacher(t):
         teacher_surname = teacher_full_name[0]
     if len(teacher_full_name)==2:
         teacher_name = teacher_full_name[0]
-        teacher_surname = teacher_full_name[1]
+        teacher_surname = teacher_full_name[1] 
     if len(teacher_full_name)==3:
         teacher_name = teacher_full_name[0]+' '+teacher_full_name[1]
         teacher_surname = teacher_full_name[2]
@@ -87,6 +87,7 @@ def find_teacher(t):
 
     if len(teachers)==0:
         username = teacher_name+teacher_surname
+        teacher_surname = teacher_surname.replace('Denivelle','de Nivelle')
         user = User.objects.get_or_create(first_name=teacher_name, last_name=teacher_surname, username=username)[0]
         teacher = Employee.objects.create(user=user, consultations="")
     elif len(teachers)>1:
@@ -95,6 +96,44 @@ def find_teacher(t):
         teacher = teachers[0]
     return teacher
 
+def guess_points(name,t):
+    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','()'))
+    if t=='O1':
+        if name=='analizamatematyczna':
+            return 10,10
+        elif name in ['algebra','logikadlainformatyków']:
+            return 7,7
+        elif name=='elementyrachunkuprawdopodobieństwa':
+            return 3,3
+        elif name=='metodyprobabilistyczneistatystyka':
+            return 6,6
+    elif t=='O2':
+        if name=='matematykadyskretna':
+            return 6,9
+        elif name=='programowanie':
+            return 9,12
+        elif name=='analizanumeryczna':
+            return 8,12
+        elif name=='algorytmyistrukturydanych':
+            return 9,13
+    elif t=='O3':
+        return 9,9
+    elif t=='Oinż':
+        if name=='fizykadlainformatyków':
+            return 6,6
+        elif name=='podstawyelektroniki,elektrotechnikiimiernictwa':
+            return 4,4
+    elif t=='I1':
+        return 6,6
+    elif t=='Iinż':
+        return 6,6
+    elif t=='K':
+        return 5,5
+    elif t=='S':
+        return 3,3
+    elif t=='P':
+        return 4,4
+    return 6,6
 
 def get_classroom(rooms):
     try:
@@ -107,7 +146,12 @@ def get_classroom(rooms):
         classroom = Classroom.objects.get_or_create(number='0')[0]
 
     return classroom
-    
+
+def get_points_values():
+    ects = PointTypes.objects.get_or_create(name='ECTS')[0]
+    program_lic = Program.objects.get_or_create(name='', type_of_points=ects)[0]
+    program_mgr = Program.objects.get_or_create(name='', type_of_points=ects)[0]
+    return ects, program_lic, program_mgr
 
 def import_schedule(file, semester):
     types = [('Informatyczny 1','I1'),
@@ -126,6 +170,8 @@ def import_schedule(file, semester):
             ('Inne','?')]
 
     COURSE_TYPE = {}
+
+    ects, program_lic, program_mgr = get_points_values()
 
     for t in types:
         td = Type.objects.get_or_create(name=t[0], meta_type=False, defaults = {'short_name':t[1], 'group':None})[0]
@@ -160,7 +206,7 @@ def import_schedule(file, semester):
                 elif group_type=='2':
                     exercises = exercises and exercises or t
                 elif group_type=='3':
-                    laboratorie = laboratories and laboratories or t
+                    laboratories = laboratories and laboratories or t
                 elif group_type=='5':
                     exercises_laboratories = exercises_laboratories and exercises_laboratories or t
                     
@@ -196,7 +242,7 @@ def import_schedule(file, semester):
             name = len(name)>0 and name[0]+lower_pl(name[1:]) or name
             name = name.replace('(l)','(L)').replace('(m)','(M)').replace('(b)','(B)')
             name = extra+name
-            name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA')
+            name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight')
             shortName = name[:29]
             entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
             lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
@@ -211,12 +257,21 @@ def import_schedule(file, semester):
                                                  slug = slug,
                                                  type=type
                                                  )
+                
                 points = PointsOfCourseEntities.objects.filter(entity=entity)
+                '''
                 for p in points:
                     type_of_point = p.type_of_point
                     value = p.value
                     poc = PointsOfCourses.objects.create(course=course, type_of_point=type_of_point, value=value)
-
+                '''
+                value_lic, value_mgr = guess_points(name,short_type)
+                
+                if not points:
+                     PointsOfCourseEntities.objects.create(entity=entity,type_of_point=ects,value=value_mgr)
+                    
+                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_lic,value=value_lic)
+                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_mgr,value=value_mgr)
 
             except Exception, e:
                 print 'Error during creating course:%s. \nError: %s ' % (name, e)
