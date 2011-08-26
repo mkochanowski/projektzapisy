@@ -1,7 +1,42 @@
 # -*- coding: utf-8 -*-
+"""
+DZIAŁANIE
+=========
+Importuje plan zajęć do nowo stworzonego semestru z pliku .txt z sekretariatu.
 
+
+CO NALEŻY WIEDZIEĆ
+==================
+- semestr powstaje z daty dzisiejszej; jeżeli w systemie już taki semestr jest, należy usunąć (wraz z przedmiotami)
+- pusta linia na początku pliku powinna być
+- jeżeli typy źle się importują (np. nie ma tych w O1), to:
+    . skopiuj plik do justpaste.it
+    . kliknij udostępniany link 
+    . skopiuj z przeglądarki z powrotem do pliku nowego
+    . spróbuj zimportować ten plik, mi pomogło
+
+CO POPRAWIAĆ PO IMPORCIE
+========================
+- przedmioty, które potencjalnie mają zły typ, są w Informatyczny 2
+
+URUCHAMIANIE
+============
+Z panelu admina:
+wejdź w /fereol_admin/courses i kliknij importowanie planu zajęć z sekretariatu.
+
+Jeżeli chcesz importować z konsoli, a nie z panelu admina, odkomentuj:
+#scheduleimport('')
+#file = open(SCHEDULE_FILE)
+i zakomentuj
+file = data.
+
+Uruchomienie:
+$ python scheduleimport.py
+
+
+"""
 #### TO CHANGE #####
-SCHEDULE_FILE = '/home/gosia/Desktop/plan'
+SCHEDULE_FILE = '/home/gosia/Desktop/pp.txt'
 LIMITS = {'1' : 300, '9' : 300, '2' : 20, '3' : 15 , '5' : 18 , '6' : 15 }
 
 O1 = ['analizamatematyczna','algebra','logikadlainformatyków','elementyrachunkuprawdopodobieństwa','metodyprobabilistyczneistatystyka']
@@ -10,9 +45,9 @@ O3 = ['językiformalneizłożonośćobliczeniowa']
 Oinz = ['fizykadlainformatyków','podstawyelektroniki,elektrotechnikiimiernictwa']
 I1 = ['wstępdoinformatyki','architekturasystemówkomputerowych','bazydanych','systemyoperacyjne','siecikomputerowe','inżynieriaoprogramowania']
 Iinz = ['systemywbudowane','podstawygrafikikomputerowej','sztucznainteligencja','komunikacjaczłowiek-komputer']
-####  #####
-
 FEREOL_PATH = '../../..'
+
+####  #####
 
 import sys
 import os
@@ -178,6 +213,7 @@ def import_schedule(file, semester):
         COURSE_TYPE[t[1]] = td
 
     course = None
+    lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
     while True:
         line = file.readline()
         if not line:
@@ -198,7 +234,6 @@ def import_schedule(file, semester):
                 limit = LIMITS[group_type]
                 
                 t = 15*(int(g.group('end_time'))-int(g.group('start_time')))
-                print t
                 if group_type=='1':
                     lectures += t
                 elif group_type=='9':
