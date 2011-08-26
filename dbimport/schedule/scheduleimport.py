@@ -122,7 +122,7 @@ def find_teacher(t):
 
     if len(teachers)==0:
         username = teacher_name+teacher_surname
-        teacher_surname = teacher_surname.replace('Denivelle','de Nivelle')
+        teacher_surname = teacher_surname
         user = User.objects.get_or_create(first_name=teacher_name, last_name=teacher_surname, username=username)[0]
         teacher = Employee.objects.create(user=user, consultations="")
     elif len(teachers)>1:
