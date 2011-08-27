@@ -11,7 +11,7 @@ Zwracany format:
 <podstawa przedmiotu> := <kod przedmiotu w fereolu>\t<nazwa przedmiotu w fereolu>\t<rodzaj przedmiotu>\n
 
 <przedmioty> := <przedmiot>*
-<przedmiot> := <nazwa>\n<kod podstawy tego przedmiotu w fereolu>\n<kod tego przedmiotu w fereolu>\n<opis>\n<prowadzacy>\n<angielski>\n<grupy>\n======\n\n
+<przedmiot> := <nazwa>\n<kod tego przedmiotu w fereolu>\n<kod podstawy tego przedmiotu w fereolu>\n<opis>\n<prowadzacy>\n<angielski>\n<grupy>\n<ects>\n======\n\n
 
 <grupy> := (<grupa>\n)*
 <grupa> := GRUPA\t<kod grupy w fereolu>\t<kod przedmiotu tej grupy>\t<prowadzacy1>\t<limit>\t<rodzaj zajec>\t<limit zamawianych>\t<terminy>
@@ -19,7 +19,7 @@ Zwracany format:
 <prowadzacy> := (<prowadzacy1>;)*<prowadzacy1>
 <prowadzacy1> := <imie z nazwiskiem>
 
-<rodzaj przedmiotu> := O|I|K|P|S|N|WF|L|?
+<rodzaj przedmiotu> := Obowiązkowy 1|Obowiązkowy 2|Obowiązkowy 3|Informatyczny 1|Informatyczny 2|Kurs|Projekt|Seminarium|Nieinformatyczny|Wychowanie Fizyczne|Lektorat|Inne
 <rodzaj zajec> := w|c|p|C|r|s|l
 <angielski> := 0|1
 
@@ -62,7 +62,10 @@ Uwagi:
 * repetytorium wykładem
 * projekt pracownią
 """
-f = open('asdf','a')
+
+### TO CHANGE ###
+f = open('result_file','a')
+### ###
 
 GROUP_TYPE_CHOICES = {'1': 'w', '2': 'c', '3': 'p',
         '4': 'C', '5': 'r',
@@ -82,7 +85,7 @@ def export():
             typ = entity.type.name
         except:
             typ = "XXX"
-        f.write('%s\t%s\t%s\n' % (kod_przed,nazwa,typ))
+        f.write('%s\t%s\t%s\n' % (kod_przed,nazwa.encode('utf-8'),typ.encode('utf-8')))
     
     f.write('\n\n======\n\n')
     
@@ -95,7 +98,8 @@ def export():
         if kod_uz=='':
             kod_uz='XXX'
         angielski = 1
-        f.write('%s\n%s\n%s\n%s\n%s\n%s\n' % (nazwa,kod_przed_sem,kod_przed,opis,kod_uz,angielski))
+        ects = course.get_points()
+        f.write('%s\n%s\n%s\n%s\n%s\n%s\n%s\n' % (nazwa,kod_przed_sem,kod_przed,opis,kod_uz,angielski,ects))
         
         groups = course.groups.all()
         for group in groups:

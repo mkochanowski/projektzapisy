@@ -134,7 +134,7 @@ class Course( models.Model ):
         else:
             return self.semester.get_name()
 
-    def get_points(self, student):
+    def get_points(self, student=None):
         '''
             returns points for course, and optionally for certain student
         '''
