@@ -19,7 +19,7 @@ Zwracany format:
 <prowadzacy> := (<prowadzacy1>;)*<prowadzacy1>
 <prowadzacy1> := <imie z nazwiskiem>
 
-<rodzaj przedmiotu> := Obowiązkowy 1|Obowiązkowy 2|Obowiązkowy 3|Informatyczny 1|Informatyczny 2|Kurs|Projekt|Seminarium|Nieinformatyczny|Wychowanie Fizyczne|Lektorat|Inne
+<rodzaj przedmiotu> := Obowiązkowy 1|Obowiązkowy 2|Obowiązkowy 3|Obowiązkowy inż.|Informatyczny 1|Informatyczny 2|Informatyczny inż.|Kurs|Projekt|Seminarium|Nieinformatyczny|Wychowanie Fizyczne|Lektorat|Inne
 <rodzaj zajec> := w|c|p|C|r|s|l
 <angielski> := 0|1
 
@@ -99,7 +99,11 @@ def export():
             kod_uz='XXX'
         angielski = 1
         ects = course.get_points()
-        f.write('%s\n%s\n%s\n%s\n%s\n%s\n%s\n' % (nazwa,kod_przed_sem,kod_przed,opis,kod_uz,angielski,ects))
+        if ects:
+            ects = ects.value
+        else:
+            ects = 0
+        f.write('%s\n%s\n%s\n%s\n%s\n%s\n%s\n' % (nazwa.encode('utf-8'),kod_przed_sem,kod_przed,opis.encode('utf-8'),kod_uz.encode('utf-8'),angielski,ects))
         
         groups = course.groups.all()
         for group in groups:
@@ -110,7 +114,7 @@ def export():
             rodzaj_zajec = GROUP_TYPE_CHOICES[group.type]
             zamawiane_bonus = group.limit_zamawiane
             terminy = ';'.join(['-'.join([t.dayOfWeek,str(t.start_time),str(t.end_time),t.classroom.number]) for t in group.term.all()])
-            f.write('GRUPA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (kod_grupy,kod_przed_sem,kod_uz,max_osoby,rodzaj_zajec,zamawiane_bonus,terminy))
+            f.write('GRUPA\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (kod_grupy,kod_przed_sem,kod_uz.encode('utf-8'),max_osoby,rodzaj_zajec,zamawiane_bonus,terminy.encode('utf-8')))
     
         f.write('\n======\n\n')
     
