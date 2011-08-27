@@ -18,6 +18,9 @@ CO NALEŻY WIEDZIEĆ
 CO POPRAWIAĆ PO IMPORCIE
 ========================
 - przedmioty, które potencjalnie mają zły typ, są w Informatyczny 2
+- punkty dla przedmiotów L/M
+- niepolskie nazwiska
+- wykłady posiadające dwa terminy trzeba zmergować
 
 URUCHAMIANIE
 ============
@@ -86,7 +89,7 @@ def upper_pl(s):
 
 
 def guess_type(name,COURSE_TYPE):
-    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','()'))
+    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)',''))
     if name in O1:
         return COURSE_TYPE['O1'],'O1'
     elif name in O2:
@@ -236,14 +239,24 @@ def import_schedule(file, semester):
                 t = 15*(int(g.group('end_time'))-int(g.group('start_time')))
                 if group_type=='1':
                     lectures += t
+                    if course:
+                        course.teachers.add(teacher)
+                        course.save()
                 elif group_type=='9':
                     repetitions += t
                 elif group_type=='2':
                     exercises = exercises and exercises or t
                 elif group_type=='3':
                     laboratories = laboratories and laboratories or t
+                    if course and course.type and course.type.name=='Projekt':
+                        course.teachers.add(teacher)
+                        course.save()
                 elif group_type=='5':
                     exercises_laboratories = exercises_laboratories and exercises_laboratories or t
+                elif group_type=='6':
+                    if course:
+                        course.teachers.add(teacher)
+                        course.save()
                     
                 group = Group.objects.create(course=course,
                                              teacher=teacher,
@@ -279,12 +292,12 @@ def import_schedule(file, semester):
             name = extra+name
             name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight')
             shortName = name[:29]
-            entity = CourseEntity.objects.get_or_create(name=name,shortName=shortName)[0]
+            type,short_type = guess_type(name,COURSE_TYPE)
+            entity = CourseEntity.objects.get_or_create(name=name, defaults = {'shortName':shortName,'type':type})[0]
             lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
 
             slug = str(semester.year) + semester.type + '_' + slugify(name)
             print slug
-            type,short_type = guess_type(name,COURSE_TYPE)
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
