@@ -11,7 +11,7 @@ GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
         ('9', 'repetytorium'), ('10', 'projekt')]
 
-GROUP_EXTRA_CHOICES = [('',''),('grupa rezerwowa','grupa rezerwowa'),('grupa licencjacka','grupa licencjacka'),('grupa magisterska','grupa magisterska'),('grupa zaawansowana','grupa zaawansowana'),('wykład okrojony','wykład okrojony')]
+GROUP_EXTRA_CHOICES = [('',''),('grupa rezerwowa','grupa rezerwowa'),('grupa licencjacka','grupa licencjacka'),('grupa magisterska','grupa magisterska'),('grupa zaawansowana','grupa zaawansowana'),(u'wykład okrojony','wykład okrojony')]
 
 class Group(models.Model):
     """group for course"""
