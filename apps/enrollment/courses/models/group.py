@@ -7,9 +7,11 @@ from django.db.models import Count
 
 # w przypadku edycji, poprawić też javascript: Fereol.Enrollment.ScheduleCourseTerm.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
-        ('4', 'ćwiczenia (grupa zaawansowana)'), ('5', 'ćwiczenio-pracownia'),
+        ('5', 'ćwiczenio-pracownia'),
         ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
         ('9', 'repetytorium'), ('10', 'projekt')]
+
+GROUP_EXTRA_CHOICES = [('',''),('grupa rezerwowa','grupa rezerwowa'),('grupa licencjacka','grupa licencjacka'),('grupa magisterska','grupa magisterska'),('grupa zaawansowana','grupa zaawansowana'),(u'wykład okrojony','wykład okrojony')]
 
 class Group(models.Model):
     """group for course"""
@@ -18,6 +20,7 @@ class Group(models.Model):
     type    = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca gwarantowane dla studentów zamawianych')
+    extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe impormacje', default='', blank=True)
     
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""

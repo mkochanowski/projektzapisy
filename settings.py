@@ -122,8 +122,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'middleware.mobile_detector.mobileDetectionMiddleware',
-    'middleware.mobileMiddleware.SubdomainMiddleware',
+    #'middleware.mobile_detector.mobileDetectionMiddleware',
+    #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware'
 )
 
@@ -153,7 +153,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
-    'apps.mobile',
+    #'apps.mobile',
     'apps.email_change'
 )
 

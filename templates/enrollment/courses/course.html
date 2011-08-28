@@ -104,7 +104,7 @@
 							<th>Prowadzący</th>
 							<th class="term">Termin zajęć</th>
 							<th title="Maksymalna liczba osób, które mogą zapisać się na przedmiot" class="number">Limit</th>
-							<th title="Liczba aktualnie zapisanych osób" class="number termEnrolledHeader">Zapis.</th>
+							<th title="Liczba aktualnie zapisanych osób" class="number termEnrolledHeader">Zapisani</th>
 							<th title="Liczba osób oczekujących na zapis" class="number termQueuedHeader">Kolejka</th>
 							<td class="controls"></td>
 							{% if course.is_recording_open and user.student.is_active %}
@@ -123,6 +123,9 @@
 								{% else %}
 									(nieznany prowadzący)
 								{% endif %}
+								{% if t.extra %}
+								<br/><span class="small">{{ t.extra }}</span>
+								{% endif%}
 							</td>
 							<td class="term">
 								{% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
