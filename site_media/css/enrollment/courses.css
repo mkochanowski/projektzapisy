@@ -189,9 +189,9 @@
 	background: #e9e9e9;
 }
 
-#enr-course-view .tutorial table th.extra
+#enr-course-view .small
 {
-    width: 50px;
+    font-size: smaller;
 }
 
 #enr-course-view .tutorial table th.term
@@ -199,10 +199,6 @@
 	width: 160px;
 }
 
-#enr-course-view .tutorial table td.extra
-{
-    font-size: 12px;
-}
 
 #enr-course-view .tutorial table td.term span
 {
