@@ -5,6 +5,10 @@ from django.db import models
 from course import *
 from django.db.models import Count
 
+import logging
+
+backup_logger = logging.getLogger('project.backup')
+
 # w przypadku edycji, poprawić też javascript: Fereol.Enrollment.ScheduleCourseTerm.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('5', 'ćwiczenio-pracownia'),
@@ -22,6 +26,18 @@ class Group(models.Model):
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca gwarantowane dla studentów zamawianych')
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
     
+    def save(self, *args, **kwargs):
+        try:
+            old_group = Group.objects.get(id=self.id)
+            if self.limit != old_group.limit:
+                backup_logger.info('[04] limit of group <%s> has changed from <%s> to <%s>' % (self.id, old_group.limit, self.limit))
+            if self.limit_zamawiane != old_group.limit_zamawiane:
+                backup_logger.info('[05] limit-zamawiane of group <%s> has changed from <%s> to <%s>' % (self.id, old_group.limit_zamawiane, self.limit_zamawiane))
+        except Group.DoesNotExist:
+            # TO DO: add logging of create new group
+            pass            
+        super(Group, self).save(*args, **kwargs)
+            
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
         if self.teacher is None:
