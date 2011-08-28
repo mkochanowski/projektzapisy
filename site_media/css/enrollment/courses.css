@@ -196,7 +196,7 @@
 
 #enr-course-view .tutorial table th.term
 {
-	width: 160px;
+	width: 180px;
 }
 
 
@@ -232,7 +232,7 @@
 #enr-course-view .tutorial table th.number
 {
 	white-space: nowrap;
-	width: 30px;
+	width: 35px;
 	padding: 0 5px;
 }
 
