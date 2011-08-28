@@ -31,7 +31,8 @@ STATUS_QUEUED = '1'
 RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'oczekujący')]
 
 import logging
-logger = logging.getLogger()
+logger = logging.getLogger('project.default')
+backup_logger = logging.getLogger('project.backup')
 
 class EnrolledManager(models.Manager):
     def get_query_set(self):
@@ -230,20 +231,20 @@ class Record(models.Model):
             new_records = []
             for l in lectures:
                 if (l not in groups) and (Record.number_of_students(group=l) < l.limit):
-                    record = Record.objects.get(group=l, student=student)
-                    if record: 
-                        if record.status == STATUS_PINNED:
+                    record, created = Record.objects.get_or_create(group=l, student=student)
+                    if created:
+                        record.status = STATUS_ENROLLED
+                        record.save()
+                    elif record.status == STATUS_PINNED:
                             record.status = STATUS_ENROLLED
                             record.save()
-                            new_records.append(record)
-            logger.info('User %s <id: %s> is automaticaly added to lectures of Course: [%s] <id: %s>' % (user.username, user.id, course.name, course.id))
+                    new_records.append(record)
+                    logger.info('User %s <id: %s> is automaticaly added to lecture <id: %s> of Course: [%s] <id: %s>' % (user.username, user.id, l.id, course.name, course.id))
+                    backup_logger.info('[02] user <%s> is automaticaly added to lecture group <%s>' % (user.id, l.id))
             return new_records
         except Student.DoesNotExist:
             logger.error('Record.add_student_to_lecture_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, course_id = %d)' % (int(user_id), int(course_id)))
             raise NonStudentException()
-        except Record.DoesNotExist:
-            new_records.append(Record.objects.create(group=l, student=student, status=STATUS_ENROLLED))
-            return new_records
           
     
     @staticmethod
@@ -274,16 +275,20 @@ class Record(models.Model):
                     new_records.extend(Record.add_student_to_lecture_group(user_id, group.course.id))
                 if Queue.is_ECTS_points_limit_exceeded(user_id, group_id) :
                     raise ECTS_Limit_Exception()
-                record = Record.objects.get(group=group, student=student)
-                
-                if record.status == STATUS_ENROLLED:
-                    raise AlreadyAssignedException()
+                record, created = Record.objects.get_or_create(group=group, student=student)
+    
+                if not created:
+                    if record.status == STATUS_ENROLLED:
+                        raise AlreadyAssignedException()
                 
                 record.status = STATUS_ENROLLED
                 record.save()
-                
+                backup_logger.info('[01] user <%s> is added to group <%s>' % (user.id, group.id))
                 new_records.append(record)
-                logger.info('User %s <id: %s> who has been pinned to group: [%s] <id: %s> is currently added to this group and no longer pinned.' % (user.username, user.id, group, group.id))
+                if created:
+                    logger.info('User %s <id: %s> is added to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))                     
+                else:
+                    logger.info('User %s <id: %s> who has been pinned to group: [%s] <id: %s> is currently added to this group and no longer pinned.' % (user.username, user.id, group, group.id))
                 return new_records
             else:
                 logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
@@ -294,10 +299,6 @@ class Record(models.Model):
         except Group.DoesNotExist:
             logger.error('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
-        except Record.DoesNotExist:
-            new_records.append(Record.objects.create(group=group, student=student, status=STATUS_ENROLLED))
-            logger.info('User %s <id: %s> is added to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))     
-            return new_records
     
     @staticmethod
     def remove_student_from_group(user_id, group_id):
@@ -316,6 +317,7 @@ class Record(models.Model):
                 raise NotCurrentSemesterException
             record = Record.enrolled.get(group=group, student=student)
             record.delete()
+            backup_logger.info('[03] user <%s> is removed from group <%s>' % (user.id, group.id))
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             
             Queue.try_enroll_next_student(group)

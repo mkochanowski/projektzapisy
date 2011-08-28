@@ -25,17 +25,25 @@ class AddStudentToGroupTest(TestCase):
 	            "teacher": 3, 
 	            "course": 1
 	        }
-	    LECTURE_GROUP:
+	    LECTURE_GROUPS:
 		    "fields": {
 	            "limit": 120, 
 	            "type": "1", 
 	            "teacher": 3, 
 	            "course": 1
+	        },
+   		    "fields": {
+	            "limit": 100, 
+	            "type": "1", 
+	            "teacher": 3, 
+	            "course": 1
 	        }
+
     	"""
         self.user = User.objects.get(id=5)
         self.exercise_group = Group.objects.get(id=1)
         self.lecture_group = Group.objects.get(id=3)
+        self.lecture_group2 = Group.objects.get(id=5)
     		
     def testWithNonStudentUser(self):
         self.user.student.delete()
@@ -76,8 +84,11 @@ class AddStudentToGroupTest(TestCase):
     def testAddStudentToNonLectureGroupAndAutomaticalyAddToLectureGroup(self):
         self.assertEqual(Record.objects.count(), 0)
         records = Record.add_student_to_group(self.user.id, self.exercise_group.id)
-        self.assertEqual(records[0].group, self.lecture_group)
-        self.assertEqual(records[1].group, self.exercise_group)
+        groups_records = [r.group for r in records]
+        self.assert_(len(groups_records) == 3)
+        self.assert_(self.exercise_group in groups_records)
+        self.assert_(self.lecture_group in groups_records)
+        self.assert_(self.lecture_group2 in groups_records)
 
 class RemoveStudentFromGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__courses']
@@ -159,14 +170,15 @@ class GetGroupsForStudentTest(TestCase):
     	"""
         self.user = User.objects.get(id=5)
         self.lecture_group_1 = Group.objects.get(id=3)
+        self.lecture_group_2 = Group.objects.get(id=5)
         self.exercise_group = Group.objects.get(id=1)
         
-        self.lecture_group_2 = Group.objects.get(id=4)
+        self.lecture_group_3 = Group.objects.get(id=4)
     
         #Automaticaly add student to lecture_group_1
         self.records_1 = Record.add_student_to_group(self.user.id, self.exercise_group.id)
         
-        self.records_2 = Record.add_student_to_group(self.user.id, self.lecture_group_2.id)
+        self.records_2 = Record.add_student_to_group(self.user.id, self.lecture_group_3.id)
     
     def testWithNonStudentUser(self):
         self.user.student.delete()
@@ -174,10 +186,11 @@ class GetGroupsForStudentTest(TestCase):
         
     def testGetGroupsForStudent(self):
         groups = Record.get_groups_for_student(self.user.id)
-        self.assert_(len(groups) == 3)
+        self.assert_(len(groups) == 4)
         self.assert_(self.lecture_group_1 in groups)
-        self.assert_(self.exercise_group in groups)
         self.assert_(self.lecture_group_2 in groups)
+        self.assert_(self.exercise_group in groups)
+        self.assert_(self.lecture_group_3 in groups)
         
 class GetStudentsInGroupTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__courses']
@@ -204,7 +217,8 @@ class AssignmentToGroupsWithSameTypes(TestCase):
 
         self.group1 = Group.objects.get(id=1)
         self.group2 = Group.objects.get(id=2)
-        self.lecture1 = Group.objects.get(id=3)
+        self.lecture11 = Group.objects.get(id=3)
+        self.lecture12 = Group.objects.get(id=5)
         self.lecture2 = Group.objects.get(id=4)
 			
         semester = self.group1.course.semester
@@ -212,7 +226,7 @@ class AssignmentToGroupsWithSameTypes(TestCase):
         semester.semester_ending = datetime.now().date() + timedelta(days=1)
         semester.save()
         
-        self.record = Record.objects.create(student=self.user.student, group=self.lecture1)
+        self.record = Record.objects.create(student=self.user.student, group=self.lecture11)
         
     def testAssignToAnotherLecture(self):
         Record.add_student_to_group(self.user.id, self.lecture2.id) 
@@ -220,14 +234,14 @@ class AssignmentToGroupsWithSameTypes(TestCase):
 
     def testAssignToGroupForFirstTime(self):
         Record.add_student_to_group(self.user.id, self.group1.id)
-        self.assertEqual(Record.objects.count(), 2)
+        self.assertEqual(Record.objects.count(), 3)
         
     def testAssignToCurrentlyBookedGroupWithSameType(self):
         self.assertEqual(Record.objects.count(), 1)
         Record.add_student_to_group(self.user.id, self.group1.id)
-        self.assertEqual(Record.objects.count(), 2)
+        self.assertEqual(Record.objects.count(), 3)
         Record.add_student_to_group(self.user.id, self.group2.id)
-        self.assertEqual(Record.objects.count(), 2)
+        self.assertEqual(Record.objects.count(), 3)
         
 class MoveStudentFromQueueToGroup(TestCase):
     fixtures =  ['fixtures__priority_queue']

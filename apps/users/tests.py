@@ -25,7 +25,7 @@ class EmployeeGroupsTest(TestCase):
     def testEmployeeGroups(self):
         groups = Employee.get_all_groups(self.user.id)
         groups_id = [g.id for g in groups]
-        self.assertEquals(groups_id, [1,3])
+        self.assertEquals(groups_id, [1, 3, 5])
         
 class EmployeeScheduleTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__courses']
@@ -53,7 +53,7 @@ class EmployeeScheduleTest(TestCase):
         groups_term_id = map(lambda x: x.id, groups_term_id)
         
         for g in groups_id:
-        	self.assert_(g in [1, 3])
+        	self.assert_(g in [1, 3, 5])
         for s in groups_course:
         	self.assert_(s in [course_1, course_1])
         for t in groups_term_id:
@@ -82,6 +82,7 @@ class StudentScheduleTest(TestCase):
         self.user = User.objects.get(id=5)
         self.exercise_group = Group.objects.get(id=1)
         self.lecture_group = Group.objects.get(id=3)
+        self.lecture_group_2 = Group.objects.get(id=5)        
         #Automaticaly add student to lecture group
         self.record = Record.add_student_to_group(self.user.id, self.exercise_group.id)
         
@@ -111,7 +112,7 @@ class StudentScheduleTest(TestCase):
         groups_term_id = map(lambda x: x.id, groups_term_id)
         
         for g in groups_id:
-        	self.assert_(g in [self.exercise_group.id, self.lecture_group.id])
+        	self.assert_(g in [self.exercise_group.id, self.lecture_group.id, self.lecture_group_2.id])
         for s in groups_course:
         	self.assert_(s in [course_1, course_1])
         for t in groups_term_id:
