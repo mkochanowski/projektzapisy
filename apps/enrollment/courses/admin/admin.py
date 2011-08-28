@@ -50,7 +50,7 @@ class TermInline(admin.TabularInline):
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane')
-    list_filter = ('teacher',)
+    list_filter = ('type','teacher',)
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
         TermInline,
@@ -66,8 +66,9 @@ class TermAdmin(admin.ModelAdmin):
         ('Termin', {'fields': ['dayOfWeek','start_time','end_time']}),
         ('Miejsce', {'fields': ['classroom']}),
     ]
-    list_filter = ('classroom','dayOfWeek')
+    list_filter = ('dayOfWeek','classroom')
     list_display = ('__unicode__','group')
+    search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
 
 class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
