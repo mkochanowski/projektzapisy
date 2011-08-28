@@ -11,6 +11,8 @@ GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
         ('9', 'repetytorium'), ('10', 'projekt')]
 
+GROUP_EXTRA_CHOICES = [('',''),('rez','rez'),('(L)','(L)'),('(M)','(M)'),('zaawan','zaawan')]
+
 class Group(models.Model):
     """group for course"""
     course = models.ForeignKey('Course', verbose_name='przedmiot', related_name='groups')
@@ -18,6 +20,7 @@ class Group(models.Model):
     type    = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca gwarantowane dla studentów zamawianych')
+    extra = models.CharField(max_length=6, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe impormacje', default='')
     
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""

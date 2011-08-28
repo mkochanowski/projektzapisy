@@ -65,5 +65,8 @@ class Term( models.Model ):
     def period_string(self):
         return "%s – %s" % (self.start_time.strftime("%H"), self.end_time.strftime("%H"))
         
+    def get_dayOfWeek_display_short(self):
+        return { '1': 'pn', '2': 'wt', '3': 'śr', '4': 'cz', '5': 'pt', '6': 'so', '7': 'nd'}[self.dayOfWeek]
+        
     def __unicode__(self):
-        return "%s (%s-%s) s.%s" % (self.get_dayOfWeek_display(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom.number)
+        return "%s %s-%s (s.%s)" % (self.get_dayOfWeek_display_short(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom.number)
