@@ -64,7 +64,7 @@ def course(request, slug):
         course = Course.visible.get(slug=slug)
         records = Record.enrolled.filter(group__course=course)
         queues = Queue.queued.filter(group__course=course)
-        groups = set(Group.objects.filter(course=course).order_by('term__dayOfWeek','term__start_time','term__end_time'))
+        groups = list(Group.objects.filter(course=course).order_by('term__dayOfWeek','term__start_time','term__end_time').distinct())
         requirements = map(lambda x: x.name, course.requirements.all())
         if request.user.is_anonymous():
                 student = None
