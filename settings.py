@@ -153,7 +153,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
-    'apps.mobile',
+    #'apps.mobile',
     'apps.email_change'
 )
 
