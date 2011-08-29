@@ -11,7 +11,7 @@ StudentsList.init = function()
 {
 	StudentsList.initStudentLists();
 	StudentsList.initFilter();
-	$('.student-profile-link').click(function(event){
+	$('.student-profile-link').live('click',function(event){
         event.preventDefault();
 	    loadStudentProfile($(this).attr('href'));
     })
@@ -90,10 +90,6 @@ StudentsList.ajax.parseList = function(data)
     }
     StudentsList.parseStudent();
     StudentsList.runStudents( StudentsList.studentFilter );
-	$('.student-profile-link').click(function(){
-        loadStudentProfile($(this).attr('href'));
-         return false;
-    })
     StudentsList.studentFilter.doFilter()
 }
 

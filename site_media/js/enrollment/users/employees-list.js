@@ -11,7 +11,7 @@ EmployeesList.init = function()
 {
 	EmployeesList.initEmployeeLists();
 	EmployeesList.initFilter();
-	$('.employee-profile-link').click(function(event){
+	$('.employee-profile-link').live('click', function(event){
         event.preventDefault();
 	    loadEmployeeProfile($(this).attr('href'));
     })
@@ -89,10 +89,6 @@ EmployeesList.ajax.parseList = function(data)
     }
     EmployeesList.parseEmployee();
     EmployeesList.runEmployees( EmployeesList.employeeFilter );
-	$('.employee-profile-link').click(function(){
-        loadEmployeeProfile($(this).attr('href'));
-         return false;
-    })
 }
 
 
