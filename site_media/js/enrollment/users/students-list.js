@@ -11,9 +11,9 @@ StudentsList.init = function()
 {
 	StudentsList.initStudentLists();
 	StudentsList.initFilter();
-	$('.student-profile-link').click(function(){
-	      loadStudentProfile($(this).attr('href'));
-         return false;
+	$('.student-profile-link').click(function(event){
+        event.preventDefault();
+	    loadStudentProfile($(this).attr('href'));
     })
 };
 

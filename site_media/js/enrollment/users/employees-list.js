@@ -11,10 +11,9 @@ EmployeesList.init = function()
 {
 	EmployeesList.initEmployeeLists();
 	EmployeesList.initFilter();
-	$('.employee-profile-link').click(function(){
-
-	      loadEmployeeProfile($(this).attr('href'));
-         return false;
+	$('.employee-profile-link').click(function(event){
+        event.preventDefault();
+	    loadEmployeeProfile($(this).attr('href'));
     })
 };
 
