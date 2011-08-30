@@ -2,6 +2,10 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.db.models.loading import cache
+from django.template import Context
+from django.template.loader import render_to_string
 
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from apps.enrollment.courses.models.points import PointTypes
@@ -315,9 +319,50 @@ class StudiaZamawiane(models.Model):
     comments = models.TextField(verbose_name='Uwagi', blank=True)
     bank_account = models.CharField(max_length=40, blank=True, verbose_name="Numer konta bankowego")
 
+    def save(self, *args, **kwargs):
+        try:
+            old_sz = StudiaZamawiane.objects.get(id=self.id)
+            if self.bank_account != old_sz.bank_account:
+                Site = cache.get_model('sites', 'Site')
+                current_site = Site.objects.get_current()
+                site_name, domain = current_site.name, current_site.domain
+                subject = '[Fereol] Zmiana numeru konta bankowego'
+                c = {
+                    'site_domain': domain,
+                    'site_name': site_name.replace('\n',''),
+                    'user': self.student.user,
+                    'old_account' : old_sz.bank_account,
+                    'new_account' : self.bank_account,
+                }
+                context = Context(c)
+                message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
+                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context) 
+                
+                emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
+                
+                send_mail(subject, message_user, None, [self.student.user.email])
+                send_mail(subject, message_employee, None ,emails)
+                logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
+        except KeyError:
+            pass            
+        super(StudiaZamawiane, self).save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Studia zamawiane'
         verbose_name_plural = 'Studia zamawiane'
 
     def __unicode__(self):
         return 'Student zamawiany: '+str(self.student)
+
+class StudiaZamawianeMaileOpiekunow(models.Model):
+    """
+        Model przechowuje maile, na które są wysyłane maile o zmianie numeru konta bankowego studentów zamawianych
+    """
+    email = models.CharField(max_length=100)
+    
+    class Meta:
+        verbose_name = 'Studia zamawiane - opiekunowie'
+        verbose_name_plural = 'Studia zamawiane - opiekunowie'
+        
+    def __unicode__(self):
+        return self.email

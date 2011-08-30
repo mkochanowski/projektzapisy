@@ -1,0 +1,17 @@
+{% autoescape off %}
+Witamy,
+
+Na portalu {{ site_domain }} dokonano zmiany numeru konta bankowego studenta.
+
+Dane studenta:
+    - imię i nazwisko: {{ user.get_full_name }}
+    - id użytkownika w bazie: {{ user.id }}
+    - stary numer: {{ old_account }}.
+    - nowy numer: {{ new_account }}.
+
+Dziękujemy,
+Zespół {{ site_name }}
+
+---
+Informacja wygenerowana automatycznie, nie odpowiadaj na nią.
+{% endautoescape %}

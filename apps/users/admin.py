@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from apps.users.models import Employee, Student, Program, StudiaZamawiane
+from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('matricula','get_full_name','ects','get_type_of_studies')
@@ -37,3 +37,4 @@ admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Program)
 admin.site.register(StudiaZamawiane, StudiaZamawianeAdmin)
+admin.site.register(StudiaZamawianeMaileOpiekunow)
