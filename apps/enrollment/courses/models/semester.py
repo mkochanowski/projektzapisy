@@ -46,11 +46,11 @@ class Semester( models.Model ):
             except KeyError:
                 return None
         else:
-            prev_year = (int(year[0:4])-1)
+            prev_year = str(int(year[0:4])-1)
             year = prev_year+'/'+year[2:4]
             try:
                 Semester.objects.filter(year=year,type='l')[0]
-            except KeyError:
+            except:
                 return None
                 
                 
