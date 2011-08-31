@@ -142,5 +142,5 @@ def log_delete_group(sender, instance, **kwargs):
     backup_logger.info('[07] group <%s> has been deleted' % instance.id)
     
 signals.pre_save.connect(log_limits_change, sender=Group)        
-#signals.post_save.connect(log_add_group, sender=Group)                               
+signals.post_save.connect(log_add_group, sender=Group)                               
 signals.post_delete.connect(log_delete_group, sender=Group)                               

@@ -124,6 +124,94 @@
             "email": "aaa@aa.pl", 
             "date_joined": "2010-11-04 14:42:09"
         }
+   },
+   {
+        "pk": 1000, 
+        "model": "users.employee", 
+        "fields": {
+            "consultations": "pn 10:00 - 12:00", 
+            "receive_mass_mail_offer": true, 
+            "user": 1000, 
+            "receive_mass_mail_enrollment": true
+        }
+    }, 
+    {
+        "pk": 100, 
+        "model": "users.student", 
+        "fields": {
+            "ects": 134, 
+            "records_opening_bonus_minutes": 0,
+            "receive_mass_mail_offer": true, 
+            "user": 100, 
+            "matricula": "1000000", 
+            "program": 1, 
+            "receive_mass_mail_enrollment": true
+        }
+    }, 
+    {
+        "pk": 101, 
+        "model": "users.student", 
+        "fields": {
+            "ects": 134, 
+            "records_opening_bonus_minutes": 0,
+            "receive_mass_mail_offer": true, 
+            "user": 101, 
+            "matricula": "1000001", 
+            "program": 1, 
+            "receive_mass_mail_enrollment": true
+        }
+    }, 
+    {
+        "pk": 102, 
+        "model": "users.student", 
+        "fields": {
+            "ects": 134, 
+            "records_opening_bonus_minutes": 0,
+            "receive_mass_mail_offer": true, 
+            "user": 102, 
+            "matricula": "1000002", 
+            "program": 1, 
+            "receive_mass_mail_enrollment": true
+        }
+    },
+    {
+        "pk": 103, 
+        "model": "users.student", 
+        "fields": {
+            "ects": 134, 
+            "records_opening_bonus_minutes": 0,
+            "receive_mass_mail_offer": true, 
+            "user": 103, 
+            "matricula": "1000003", 
+            "program": 1, 
+            "receive_mass_mail_enrollment": true
+        }
+    },
+    {
+        "pk": 104, 
+        "model": "users.student", 
+        "fields": {
+            "ects": 134, 
+            "records_opening_bonus_minutes": 0,
+            "receive_mass_mail_offer": true, 
+            "user": 104, 
+            "matricula": "1000004", 
+            "program": 1, 
+            "receive_mass_mail_enrollment": true
+        }
+    },
+    {
+        "pk": 105, 
+        "model": "users.student", 
+        "fields": {
+            "ects": 134, 
+            "records_opening_bonus_minutes": 0,
+            "receive_mass_mail_offer": true, 
+            "user": 105, 
+            "matricula": "1000005", 
+            "program": 1, 
+            "receive_mass_mail_enrollment": true
+        }
     }, 
    {
         "pk": 1, 
@@ -313,94 +401,6 @@
             "year": 2010
         }
     }, 
-    {
-        "pk": 1000, 
-        "model": "users.employee", 
-        "fields": {
-            "consultations": "pn 10:00 - 12:00", 
-            "receive_mass_mail_offer": true, 
-            "user": 1000, 
-            "receive_mass_mail_enrollment": true
-        }
-    }, 
-    {
-        "pk": 100, 
-        "model": "users.student", 
-        "fields": {
-            "ects": 134, 
-            "records_opening_bonus_minutes": 0,
-            "receive_mass_mail_offer": true, 
-            "user": 100, 
-            "matricula": "1000000", 
-            "program": 1, 
-            "receive_mass_mail_enrollment": true
-        }
-    }, 
-    {
-        "pk": 101, 
-        "model": "users.student", 
-        "fields": {
-            "ects": 134, 
-            "records_opening_bonus_minutes": 0,
-            "receive_mass_mail_offer": true, 
-            "user": 101, 
-            "matricula": "1000001", 
-            "program": 1, 
-            "receive_mass_mail_enrollment": true
-        }
-    }, 
-    {
-        "pk": 102, 
-        "model": "users.student", 
-        "fields": {
-            "ects": 134, 
-            "records_opening_bonus_minutes": 0,
-            "receive_mass_mail_offer": true, 
-            "user": 102, 
-            "matricula": "1000002", 
-            "program": 1, 
-            "receive_mass_mail_enrollment": true
-        }
-    },
-    {
-        "pk": 103, 
-        "model": "users.student", 
-        "fields": {
-            "ects": 134, 
-            "records_opening_bonus_minutes": 0,
-            "receive_mass_mail_offer": true, 
-            "user": 103, 
-            "matricula": "1000003", 
-            "program": 1, 
-            "receive_mass_mail_enrollment": true
-        }
-    },
-    {
-        "pk": 104, 
-        "model": "users.student", 
-        "fields": {
-            "ects": 134, 
-            "records_opening_bonus_minutes": 0,
-            "receive_mass_mail_offer": true, 
-            "user": 104, 
-            "matricula": "1000004", 
-            "program": 1, 
-            "receive_mass_mail_enrollment": true
-        }
-    },
-    {
-        "pk": 105, 
-        "model": "users.student", 
-        "fields": {
-            "ects": 134, 
-            "records_opening_bonus_minutes": 0,
-            "receive_mass_mail_offer": true, 
-            "user": 105, 
-            "matricula": "1000005", 
-            "program": 1, 
-            "receive_mass_mail_enrollment": true
-        }
-    },
     {
         "pk": 0, 
         "model": "users.program", 
