@@ -283,7 +283,7 @@ class Record(models.Model):
                 
                 record.status = STATUS_ENROLLED
                 record.save()
-                backup_logger.info('[01] user <%s> is added to group <%s>' % (user.id, group.id))
+                #backup_logger.info('[01] user <%s> is added to group <%s>' % (user.id, group.id))
                 new_records.append(record)
                 if created:
                     logger.info('User %s <id: %s> is added to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))                     
@@ -317,7 +317,7 @@ class Record(models.Model):
                 raise NotCurrentSemesterException
             record = Record.enrolled.get(group=group, student=student)
             record.delete()
-            backup_logger.info('[03] user <%s> is removed from group <%s>' % (user.id, group.id))
+            #backup_logger.info('[03] user <%s> is removed from group <%s>' % (user.id, group.id))
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             
             Queue.try_enroll_next_student(group)
@@ -646,3 +646,14 @@ def add_people_from_queue(sender, instance, **kwargs):
         continue
 
 signals.post_save.connect(add_people_from_queue, sender=Group)
+
+def log_add_record(sender, instance, created, **kwargs):
+    if instance.status == STATUS_ENROLLED:
+        backup_logger.info('[01] user <%s> is added to group <%s>' % (instance.student.user.id, instance.group.id))
+        
+def log_delete_record(sender, instance, **kwargs):
+    if instance.status == STATUS_ENROLLED and instance.group:
+        backup_logger.info('[03] user <%s> is removed from group <%s>' % (instance.student.user.id, instance.group.id))
+           
+signals.post_save.connect(log_add_record, sender=Record)                               
+signals.pre_delete.connect(log_delete_record, sender=Record) 

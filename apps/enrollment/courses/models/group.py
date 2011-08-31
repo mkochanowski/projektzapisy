@@ -1,9 +1,10 @@
 # -*- coding: utf8 -*-
 
 from django.db import models
+from django.db.models import signals
+from django.db.models import Count
 
 from course import *
-from django.db.models import Count
 
 import logging
 
@@ -25,19 +26,7 @@ class Group(models.Model):
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca gwarantowane dla studentów zamawianych')
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
-    
-    def save(self, *args, **kwargs):
-        try:
-            old_group = Group.objects.get(id=self.id)
-            if self.limit != old_group.limit:
-                backup_logger.info('[04] limit of group <%s> has changed from <%s> to <%s>' % (self.id, old_group.limit, self.limit))
-            if self.limit_zamawiane != old_group.limit_zamawiane:
-                backup_logger.info('[05] limit-zamawiane of group <%s> has changed from <%s> to <%s>' % (self.id, old_group.limit_zamawiane, self.limit_zamawiane))
-        except Group.DoesNotExist:
-            # TO DO: add logging of create new group
-            pass            
-        super(Group, self).save(*args, **kwargs)
-            
+                 
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
         if self.teacher is None:
@@ -120,3 +109,38 @@ class Group(models.Model):
         return "%s: %s - %s" % (unicode(self.course.entity.get_short_name()),
                                 unicode(self.get_type_display()), 
                                 unicode(self.get_teacher_full_name()))
+
+def log_add_group(sender, instance, created, **kwargs):
+    if created:
+        group = instance
+        GROUP_TYPE_MAPPING = {'1': 'w', '2': 'c', '3': 'p',
+        '4': 'C', '5': 'r',
+        '6': 's', '7': 'l', '8': 'l',
+        '9': 'w', '10': 'p'}
+        kod_grupy = group.id 
+        kod_przed_sem = group.course.id
+        kod_uz = group.teacher and group.teacher.user.get_full_name() or "XXX"
+        max_osoby = group.limit
+        rodzaj_zajec = GROUP_TYPE_MAPPING[group.type]
+        zamawiane_bonus = group.limit_zamawiane
+        message = '[06] group has been created <%s><%s><%s><%s><%s><%s>' % (kod_grupy,kod_przed_sem,kod_uz.encode('utf-8'),max_osoby,rodzaj_zajec,zamawiane_bonus)
+        backup_logger.info(message)
+
+def log_limits_change(sender, instance, **kwargs):
+    try:
+        group = instance
+        old_group = Group.objects.get(id=group.id)
+        
+        if group.limit != old_group.limit:
+            backup_logger.info('[04] limit of group <%s> has changed from <%s> to <%s>' % (group.id, old_group.limit, group.limit))
+        if group.limit_zamawiane != old_group.limit_zamawiane:
+            backup_logger.info('[05] limit-zamawiane of group <%s> has changed from <%s> to <%s>' % (group.id, old_group.limit_zamawiane, group.limit_zamawiane))
+    except Group.DoesNotExist:
+        pass
+        
+def log_delete_group(sender, instance, **kwargs):
+    backup_logger.info('[07] group <%s> has been deleted' % instance.id)
+    
+signals.pre_save.connect(log_limits_change, sender=Group)        
+#signals.post_save.connect(log_add_group, sender=Group)                               
+signals.post_delete.connect(log_delete_group, sender=Group)                               

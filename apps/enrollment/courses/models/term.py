@@ -1,13 +1,19 @@
 # -*- coding: utf8 -*-
 
 from django.db import models
+from django.db.models import signals
+
 from datetime import time
+
+import logging
+
+backup_logger = logging.getLogger('project.backup')
 
 DAYS_OF_WEEK = [( '1', 'poniedziałek' ), ( '2', 'wtorek' ), ( '3', 'środa' ), ( '4', 'czwartek'), ( '5', 'piątek'), ( '6', 'sobota'), ( '7', 'niedziela')]
 
 HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)] 
   
-class Term( models.Model ):
+class Term(models.Model):
     """terms of groups"""
     dayOfWeek = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia') 
     start_time = models.TimeField(verbose_name = 'rozpoczęcie')
@@ -70,3 +76,30 @@ class Term( models.Model ):
         
     def __unicode__(self):
         return "%s %s-%s (s.%s)" % (self.get_dayOfWeek_display_short(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom.number)
+
+def log_edit_term(sender, instance, **kwargs):
+    try:
+        term = instance
+        old_term = Term.objects.get(id=term.id)
+        old_term_format = '-'.join([old_term.dayOfWeek,str(old_term.start_time),str(old_term.end_time),old_term.classroom.number])
+        term_format = '-'.join([term.dayOfWeek,str(term.start_time),str(term.end_time),term.classroom.number])
+        message = '[09] term for group <%s> has been updated from <%s> to <%s>' % (term.group.id, old_term_format.encode('utf-8'), term_format.encode('utf-8')) 
+        backup_logger.info(message)
+    except Term.DoesNotExist:
+        pass
+
+def log_add_term(sender, instance, created, **kwargs):
+    term = instance
+    term_format = '-'.join([term.dayOfWeek,str(term.start_time),str(term.end_time),term.classroom.number])
+    if created:
+        message = '[08] term <%s> for group <%s> has been created' % (term_format.encode('utf-8'), term.group.id) 
+        backup_logger.info(message)
+        
+def log_delete_term(sender, instance, **kwargs):
+    term = instance
+    term_format = '-'.join([term.dayOfWeek,str(term.start_time),str(term.end_time),term.classroom.number])
+    backup_logger.info('[10] term <%s> for group <%s> has been deleted' % (term_format.encode('utf-8'), term.group.id))
+            
+signals.pre_save.connect(log_edit_term, sender=Term)          
+signals.post_save.connect(log_add_term, sender=Term)                               
+signals.pre_delete.connect(log_delete_term, sender=Term)  
