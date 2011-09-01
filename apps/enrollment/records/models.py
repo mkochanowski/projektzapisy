@@ -257,6 +257,8 @@ class Record(models.Model):
             	raise InactiveStudentException
             group = Group.objects.get(id=group_id)
             new_records = []
+            if not group.course.semester.is_current_semester():
+                raise NotCurrentSemesterException
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
@@ -311,10 +313,10 @@ class Record(models.Model):
                 records = Record.enrolled.filter(group__course=course, student=student).exclude(group__type='1')
                 for r in records:
                     Record.remove_student_from_group(user_id, r.group.id)
-            if not group.course.is_recording_open_for_student(student):
-                raise RecordsNotOpenException()
             if not group.course.semester.is_current_semester():
                 raise NotCurrentSemesterException
+            if not group.course.is_recording_open_for_student(student):
+                raise RecordsNotOpenException()
             record = Record.enrolled.get(group=group, student=student)
             record.delete()
             #backup_logger.info('[03] user <%s> is removed from group <%s>' % (user.id, group.id))
