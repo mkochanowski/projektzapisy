@@ -203,6 +203,7 @@ CoursesList.Course = function()
 	this.semester = null;
 	this.container = null;
 	this.visible = true;
+	this.type = null;
 	this.wasEnrolled = null; // czy aktualny student był zapisany
 };
 

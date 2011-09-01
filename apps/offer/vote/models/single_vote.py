@@ -102,10 +102,10 @@ class SingleVote ( models.Model ):
         """
         from apps.offer.proposal.models.proposal import Proposal
 
-        if not year:
-            year = date.today().year
 
-        proposals = Proposal.get_by_tag('offer')
+        year = year if year else date.today().year
+
+        proposals     = Proposal.get_offer()
         current_state = SystemState.get_state(year)
 
         old_votes = SingleVote.objects.\
@@ -120,8 +120,7 @@ class SingleVote ( models.Model ):
         for proposal in new_votes:
             vote = SingleVote(student=student,
                                course=proposal,
-                               state=current_state,
-                               value=0)
+                               state=current_state)
             vote.save()
 
 
@@ -133,7 +132,10 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes         = SingleVote.objects.filter(student=voter, course__in=proposals, state=current_state)
+        votes         = SingleVote.objects.filter(student=voter, course__in=proposals, state=current_state)\
+                    .select_related('course',
+                                    'course__description',
+                                    'course__description__type')
         return votes
 
 

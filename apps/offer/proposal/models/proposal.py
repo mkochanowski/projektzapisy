@@ -8,55 +8,100 @@ from datetime import datetime
 
 from django.db                  import models
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 from apps.offer.proposal.exceptions import NonStudentException, NonEmployeeException
 
 import re
 
-from apps.offer.proposal.models.proposal_tag import ProposalTag
+
 from apps.users.models                       import Employee, Student
+from django.template.defaultfilters import slugify
+
+class NoRemovedManager(models.Manager):
+    def get_query_set(self):
+        return super(NoRemovedManager, self).get_query_set().filter(deleted=False)
+
+class FiltredManager(models.Manager):
+    def get_query_set(self):
+        return super(FiltredManager, self).get_query_set().filter(deleted=False, for_student=True)
+
 
 class Proposal( models.Model ):
     """
         Proposal of course
     """
-    name = models.CharField(max_length = 255,
-                            verbose_name = 'nazwa przedmiotu' )
-    slug = models.SlugField(max_length = 255,
-                            unique = True, verbose_name='odnośnik' )
-    fans     = models.ManyToManyField('users.Student', blank=True, 
-                                      verbose_name='poszli by na to')
-    teachers = models.ManyToManyField('users.Employee', blank=True, related_name='proposal_teachers_related',
+    from apps.offer.proposal.models.proposal_description import ProposalDescription
+
+    PROPOSAL_STATUS = [(0, 'Propozycja'), (1, 'Oferta'), (2, 'Głosowanie')]
+    SEMESTER_LIST   = [('u', 'Nieustolony'), ('w', 'Zima'), ('s', 'Lato')]
+    name     = models.CharField(max_length = 255,
+                                 unique = True,
+                                verbose_name = 'nazwa przedmiotu' )
+    slug     = models.SlugField(max_length = 255,
+                                 unique = True,
+                                 verbose_name='odnośnik' )
+    fans     = models.ManyToManyField('users.Student',
+                                      verbose_name='poszli by na to',
+                                        blank=True)
+    teachers = models.ManyToManyField('users.Employee',
+                                      blank=True,
+                                      related_name='proposal_teachers_related',
                                       verbose_name='poprowadziliby to')
-    helpers = models.ManyToManyField('users.Employee', blank=True,  related_name='proposal_helpers_related',
+    helpers  = models.ManyToManyField('users.Employee',
+                                      blank=True,
+                                      related_name='proposal_helpers_related',
                                       verbose_name='pomogliby poprowadzić to')
-    tags = models.ManyToManyField(ProposalTag, blank = True)
-    owner = models.ForeignKey(User, related_name='wlasciciel', verbose_name='wlasciciel', null = True, blank=True)
-    deleted = models.BooleanField(default=False, verbose_name="usuniety")
-                
+    owner    = models.ForeignKey(User,
+                                 related_name='wlasciciel',
+                                 verbose_name='wlasciciel',
+                                 null = True, blank=True)
+    hidden   = models.BooleanField(verbose_name='ukryta',
+                                   default=False)
+    deleted  = models.BooleanField(default=False,
+                                   verbose_name="usuniety")
+    status   = models.IntegerField(choices=PROPOSAL_STATUS,
+                                   default=0,
+                                   verbose_name="status przedmiotu"
+                                )
+    semester = models.CharField(choices=SEMESTER_LIST,
+                                default='b',
+                                max_length=1,
+                                verbose_name="przypisane do semestru")
+
+    for_student = models.BooleanField(default=True,
+                                      verbose_name='widoczna dla studentów')
+
+    student = models.BooleanField(default=False,
+                                    verbose_name="propozycja studenta")
+    description = models.ForeignKey(ProposalDescription,
+                                    related_name='proposals_set')
+
+
+    objects   = models.Manager()
+    filtred   = FiltredManager()
+    noremoved = NoRemovedManager()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super(Proposal, self).save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
         app_label = 'proposal'
+        ordering = ['name']
         permissions = (
             ("can_create_offer", u"Może tworzyć ofertę dydaktyczną"),
             ("can_delete_proposal", u"Może usuwać propozycje"),
         )
-    
-    def description(self):
-        """
-            Get last description.
-        """
-        if self.descriptions.filter(deleted=False).count() > 0:
-            return self.descriptions.filter(deleted=False).order_by('-date')[0]
-        else:
-            return None            
+
 
     def entry_date(self):
         """
             Get date of first "description" - when this proposal was entered.
         """
-        return self.descriptions.filter(deleted=False).order_by('date').values('date')[0]['date']
+        return self.description.date
 
     def is_new(self):
         """
@@ -76,15 +121,15 @@ class Proposal( models.Model ):
 
         try:
             if group == 'fans':
-                if self.fans.get(id=user.id):
+                if self.fans.get(id=user.student.id):
                     return True
                 return False
             elif group == 'teachers':
-                if self.teachers.get(id = user.id):
+                if self.teachers.get(id = user.employee.id):
                     return True
                 return False
             elif group == 'helpers':
-                if self.helpers.get(id = user.id):
+                if self.helpers.get(id = user.employee.id):
                     return True
                 return False
 
@@ -92,7 +137,7 @@ class Proposal( models.Model ):
             return False
         except Employee.DoesNotExist:
             return False            
-            
+
     def add_user_to_group(self, user, group):
         """
             Add user to group
@@ -163,100 +208,41 @@ class Proposal( models.Model ):
     
     def __unicode__(self):
         return self.name
-  
-    def create_slug(self, name):
-        """
-            Creates slug
-        """
-        slug = name.lower()
-        slug = re.sub(u'ą', "a", slug)
-        slug = re.sub(u'ę', "e", slug)
-        slug = re.sub(u'ś', "s", slug)
-        slug = re.sub(u'ć', "c", slug)
-        slug = re.sub(u'ż', "z", slug)
-        slug = re.sub(u'ź', "z", slug)
-        slug = re.sub(u'ł', "l", slug)
-        slug = re.sub(u'ó', "o", slug)
-        slug = re.sub(u'ć', "c", slug)
-        slug = re.sub(u'ń', "n", slug)
-        slug = re.sub("\W", "-", slug)
-        slug = re.sub("-+", "-", slug)
-        slug = re.sub("^-", "", slug)
-        slug = re.sub("-$", "", slug)
-        return slug
-        
-    def has_tag( self, tag_name ):
-        """
-            Checks if proposal has specified tag
-        """
-        for tag in self.tags.all():
-            if tag.__unicode__() == tag_name:
-                return True
-        return False
-    
-    @staticmethod
-    def get_by_tag(tag_name):
-        """
-            Return proposals by tag.
-        """
-        return Proposal.objects.filter(tags__name=tag_name)
-    
-    def add_tag(self, tag_name):
-        """
-            Apply tag to the proposal
-        """
-        try:
-            tag = ProposalTag.objects.get(name=tag_name) 
-        except ProposalTag.DoesNotExist:
-            tag = ProposalTag.objects.create(name=tag_name)
-        finally:
-            self.tags.add(tag)
-    
-    def remove_tag(self, tag_name):
-        """
-            Remove tag from the proposal.
-        """
-        try:
-            tag = ProposalTag.objects.get(name=tag_name)
-            self.tags.remove(tag)
-        except ProposalTag.DoesNotExist:
-            pass
 
     def in_offer(self):
         """
             Checks if course is in offer
-            (if it has tag offer)
         """
-        return self.has_tag('offer')
+        return self.status > 0
     
     def in_summer( self ):
         """
             Checks if course is in summer semester
-            (if it has tag summer)
         """
-        return self.has_tag('summer')
+        return self.semester == 's'
         
     def in_winter( self ):
         """
             Checks if course is in winter semester
-            (if it has tag winter)
         """
-        return self.has_tag('winter')
-        
-    def is_exam( self ):
-        """
-            Checks if proposal has exam
-            (if it has tag exam)
-        """               
-        return self.has_tag('exam')
-        
-    def in_english( self ):
-        """
-            Checks if classes in english are possible
-            (if it has tag english)
-        """
-        return self.has_tag('english')
+        return self.semester == 'w'
 
     @staticmethod
-    def get_pks_by_tag(tag):
-        return Proposal.get_by_tag(tag).values_list('pk', flat=True)
+    def get_offer():
+        return Proposal.filtred.filter(status__gt=0)
+
+    @staticmethod
+    def get_vote():
+        return Proposal.filtred.filter(status=2)
+
+    @staticmethod
+    def get_winter():
+        return Proposal.filtred.filter(semester='w')
+
+    @staticmethod
+    def get_summer():
+        return Proposal.filtred.filter(semester='s')
+
+    @staticmethod
+    def get_unknown():
+        return Proposal.filtred.filter(semester='u')

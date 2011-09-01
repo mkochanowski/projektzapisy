@@ -25,7 +25,7 @@
 			</div>
 
 			<p class="link"><a href="{% url vote %}">Głosuj</a></p>
-		{% elif isCorrectionActive %}
+		{% else %}{% if isCorrectionActive %}
             <div id="od-correction-main-rules">
 				<!--
 					TU FAJNIE BYŁOBY DAĆ JAKIEŚ PRAWDZIWE ZASADY :)
@@ -35,6 +35,7 @@
         {% else %}
 			<p class="disabled-link">Głosowanie nie jest w tej chwili aktywne.</p>
 		{% endif %}
+    {% endif %}
 		<p class="link"><a href="{% url vote-summary %}">Podsumowanie głosowania</a></p>
 		<p class="link"><a href="{% url vote-view %}">Pokaż mój głos</a></p>
 	</div>

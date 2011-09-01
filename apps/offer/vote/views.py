@@ -22,7 +22,7 @@ def vote( request ):
     from vote_form import VoteFormsets
 
     student = request.user.student
-    state = SystemState.get_state()
+    state   = SystemState.get_state()
 
     if not state.is_system_active():
         raise Http404
@@ -49,7 +49,10 @@ def vote( request ):
     else:
         SingleVote.make_votes(student)
 
-    data = { 'formset': formset, 'proposalTypes': Type.objects.all(), 'isCorrectionActive' : state.is_correction_active() }
+    data = { 'formset':             formset,
+             'proposalTypes':       Type.objects.all().select_related('group'),
+             'isCorrectionActive' : state.is_correction_active() }
+
     return render_to_response ('offer/vote/form.html', data, context_instance = RequestContext( request ))
 
 @student_required
@@ -57,7 +60,8 @@ def vote_main( request ):
     """
         Vote main page
     """
-    data = { 'isVoteActive' : SystemState.is_system_active() }
+    sytem_state = SystemState.get_state()
+    data = { 'isVoteActive' : sytem_state.is_system_active() }
     return render_to_response ('offer/vote/index.html', data, context_instance = RequestContext( request ))
 
 
@@ -91,7 +95,7 @@ def vote_summary( request ):
     """
         summary for vote
     """
-    subs = Proposal.get_by_tag('vote').order_by('name')
+    subs = Proposal.get_vote.order_by('name')
     
     summer = []
     winter = []
@@ -117,7 +121,7 @@ def proposal_vote_summary( request, slug ):
     """
         Summary for given course
     """
-    course = Proposal.objects.get( slug=slug )
+    course = Proposal.filtred.get( slug=slug )
     points, votes = SingleVote.get_points_and_voters( course )
     voters = SingleVote.get_voters( course )
     

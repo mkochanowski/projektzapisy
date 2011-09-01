@@ -8,9 +8,7 @@ from django.contrib import admin
 
 from apps.offer.proposal.models import Proposal, \
                                   ProposalDescription, \
-                                  ProposalTag, \
-                                  ProposalDescriptionTag,\
-                                  DescriptionTypes
+                                  Book
 
 class ProposalAdmin( admin.ModelAdmin ):
     """
@@ -18,23 +16,24 @@ class ProposalAdmin( admin.ModelAdmin ):
     """
     prepopulated_fields = { 'slug' : ( 'name', ) }
     list_display = ( 'name', 'owner', )
-    search_fields = ( 'name', 'fans', 'teachers', 'tags', 'owner', )
+    search_fields = ( 'name', 'fans', 'teachers', 'owner', )
     fieldsets = [
-        (None,               {'fields': ['name','owner', 'tags', 'slug'], 'classes': ['long_name']}),
+        (None,               {'fields': ['name','owner', 'slug' ], 'classes': ['long_name']}),
+        (None,          {'fields': ['for_student', 'semester', 'status', 'deleted', 'hidden', 'student']}),
     ]
 
-    
+class BookInline(admin.TabularInline):
+    model = Book
+
 class ProposalDescriptionAdmin( admin.ModelAdmin ):
-    search_fields = ( 'description', 'requirements', 'comments', 'author', 'tags', )
+    search_fields = ( 'description', 'requirements', 'comments', 'author', )
     list_display = ( 'proposal', 'author', 'date', )
-    list_filter= ( 'author', 'tags', )
+    list_filter= ( 'author', )
     list_select_related = True
+    inlines = [
+        BookInline,
+    ]
     
-class DescriptionTypesAdmin( admin.ModelAdmin ):
-     list_filters = ( 'lecture_type.name', )
         
 admin.site.register( Proposal, ProposalAdmin )
 admin.site.register( ProposalDescription, ProposalDescriptionAdmin )
-admin.site.register( ProposalTag )
-admin.site.register( ProposalDescriptionTag )
-admin.site.register( DescriptionTypes, DescriptionTypesAdmin )

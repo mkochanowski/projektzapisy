@@ -11,19 +11,21 @@ class Book( models.Model ):
         Book for bibliography
     """
     
-    proposal = models.ForeignKey('Proposal', verbose_name = 'przedmiot', related_name = 'books')
-    name = models.TextField( verbose_name = 'nazwa' )
-    order = models.IntegerField(verbose_name = 'kolejność')
+    proposal_description = models.ForeignKey('ProposalDescription',
+                                             verbose_name = 'przedmiot',
+                                             related_name = 'books')
+    name                 = models.CharField( max_length=255, verbose_name = u'tytuł' )
+    order                = models.IntegerField(verbose_name = 'kolejność')
     
     class Meta:
-        verbose_name = 'książka'
+        verbose_name        = 'książka'
         verbose_name_plural = 'książki'
-        app_label = 'proposal'
-        ordering = ('order',)
+        app_label           = 'proposal'
+        ordering            = ('order',)
 
 
     def __str__(self):
         return self.name
 
     def __unicode__(self):
-        return self.name            
+        return self.name

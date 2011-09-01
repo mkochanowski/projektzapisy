@@ -158,7 +158,7 @@ Prefs.Undecided.prototype.init = function()
 
 			var sub = new Prefs.Course();
 			sub.id = data.id;
-			sub.types = data.types;
+			sub.type = data.type;
 			sub.name = data.name;
 			sub.hideURL = data.hideurl;
 			sub.unhideURL = data.unhideurl;
@@ -236,7 +236,7 @@ Prefs.Undecided.prototype.init = function()
 Prefs.Course = function()
 {
 	this.id = null;
-	this.types = new Array();
+	this.type = null;
 	this.name = null;
 	this.collapsed = false;
 	this.hidden = false;
@@ -253,7 +253,7 @@ Prefs.Course.fromElement = function(element)
 
 	var sub = new Prefs.Course();
 	sub.id = Number(el.children('.pref-id').val());
-	sub.types = el.children('.pref-type').val().trim().split(new RegExp(' +'));
+	sub.type = el.children('.pref-type').val()
 	sub.name = el.children('.name').text().trim();
 	sub.hideURL = el.children('.pref-hide-url').val().trim();
 	sub.unhideURL = el.children('.pref-unhide-url').val().trim();
@@ -411,7 +411,7 @@ Prefs.initFilter = function()
 		function(element, courseType)
 	{
 		var course = element.data;
-		return (course.types.indexOf(courseType) >= 0);
+		return (course.type == courseType);
 	}));
 
 	for (var i = 0; i < Prefs.courses.length; i++)

@@ -15,6 +15,9 @@ from django.core.urlresolvers import reverse
 import settings
 
 class VoteFormset():
+    """
+        Class
+    """
     def __init__(self, post, *args, **kwargs):
         from apps.offer.proposal.models.proposal import Proposal
         from django.forms.models import modelformset_factory
@@ -24,37 +27,39 @@ class VoteFormset():
         student         = kwargs.pop('student',    None)
         self.correction = kwargs.pop('correction', None)
 
-        if not tag:
+        if tag == 'winter':
+            proposals  = Proposal.filtred.filter(status=2, semester='w').select_related('description')
+        elif tag=='summer':
+            proposals  = Proposal.filtred.filter(status=2, semester='s').select_related('description')
+        else:
             tag = 'unknown'
-            proposals = Proposal.objects\
-                        .filter(Q(tags__name='vote'),\
-                               ~Q(tags__name='summer'),
-                               ~Q(tags__name='winter'))
-            self.votes = SingleVote.get_votes_for_proposal(student, proposals)
-        else:
-            proposals  = Proposal.get_by_tag(tag)
-            self.votes = SingleVote.get_votes_for_proposal(student, proposals)
+            proposals = Proposal.filtred\
+                        .filter(status=2, semester='u').select_related('description')
 
-        if self.correction:
-            fields = ('correction',)
-        else:
-            fields = ('value',)
-
-        SingleVoteFormset = modelformset_factory( SingleVote, fields=fields, extra=0 )
+        votes = SingleVote.get_votes_for_proposal(student, proposals)
 
 
-        self.formset = SingleVoteFormset(post, queryset=self.votes, prefix=tag )
+        fields = ('correction',) if self.correction else ('value',)
+
+
+        SingleVoteFormset = modelformset_factory( SingleVote,
+                                                  fields = fields,
+                                                  extra  = 0 )
+
+        self.formset = SingleVoteFormset(post,
+                                         queryset = votes,
+                                         prefix   = tag )
         self.errors  = []
 
     def points(self):
         counter = 0
 
-        if self.correction:
-            for form in self.formset:
-                counter += max(form.instance.value, form.cleaned_data['correction'])
-        else:
-            for form in self.formset:
-                counter += form.cleaned_data['value']
+        field = 'correction' if self.correction else 'vote'
+
+        for form in self.formset:
+            counter += form.cleaned_data[field]
+
+        return counter
 
     def is_valid(self):
         if self.formset.is_valid():
@@ -67,20 +72,19 @@ class VoteFormset():
 
             return True
 
-        else:
-            return False
+        return False
 
 
     def save(self):
-        self.formset.save()
-        #TODO: How to do it better?
-        if not self.correction:
-            for form in self.formset:
-                vote = form.instance
-                vote.correction = vote.value
-                vote.save()
 
-        return True
+        instances = self.formset.save(commit=False)
+
+        if not self.correction:
+            for instance in instances:
+                instance.correction = instance.value
+                instance.save()
+
+        return instances
 
 
 class VoteFormsets():
@@ -96,9 +100,17 @@ class VoteFormsets():
             correction        = False
             self.points_limit = state.max_points
 
-        self.summer  = VoteFormset(post, student=student, tag='summer',  correction=correction)
-        self.winter  = VoteFormset(post, student=student, tag='winter', correction=correction)
-        self.unknown = VoteFormset(post, student=student, correction=correction)
+        self.summer  = VoteFormset(post,
+                                   student    = student,
+                                   tag        = 'summer',
+                                   correction = correction)
+        self.winter  = VoteFormset(post,
+                                   student    = student,
+                                   tag        = 'winter',
+                                   correction = correction)
+        self.unknown = VoteFormset(post,
+                                   student    = student,
+                                   correction = correction)
         self.errors = []
 
 
@@ -109,27 +121,24 @@ class VoteFormsets():
     
     def is_valid(self):
 
-        if not self.summer.is_valid():
-            self.errors = self.errors + self.summer.errors
-            return False
+        self.errors = self.errors + self.summer.errors
+        self.errors = self.errors + self.winter.errors
+        self.errors = self.errors + self.unknown.errors
 
-        if not self.winter.is_valid():
-            self.errors = self.errors + self.winter.errors
-            return False
+        is_valid = self.summer.is_valid() and self.winter.is_valid() and self.unknown.is_valid()
 
-        if not self.unknown.is_valid():
-            self.errors = self.errors + self.unknown.errors
-            return False
+        if not is_valid:
+                return False
+
 
         points = self.points()
-
-        if points > self.points_limit:
+        if  points > self.points_limit:
             self.errors.append(u'Limit ' + str(self.points_limit) +u' punktów przekroczony o ' + \
                                str((points - self.points_limit)) )
             return False
 
-        else:
-            return True
+
+        return True
 
 
     def save(self):

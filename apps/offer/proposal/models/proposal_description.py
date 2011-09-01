@@ -3,53 +3,45 @@
 """
     Description of proposal
 """
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
 from django.contrib.auth.models import User
 
-from apps.offer.proposal.models.proposal_description_tag import ProposalDescriptionTag
-          
-PROPOSAL_HOURS = (
-    (0, 0),
-    (15, 15),
-    (30, 30),
-    (45, 45),
-    (60, 60),
-)
 
+class NoRemovedManager(models.Manager):
+    def get_query_set(self):
+        return super(NoRemovedManager, self).get_query_set().filter(deleted=False)
 
 class ProposalDescription(models.Model):
     """
         Description of proposal
     """
-    proposal = models.ForeignKey('Proposal', related_name = 'descriptions')
+    proposal     = models.ForeignKey('Proposal', related_name = 'descriptions_set')
     description  = models.TextField( verbose_name = 'opis' )
     requirements = models.TextField( verbose_name = 'wymagania' )
-    comments     = models.TextField( verbose_name = 'uwagi', blank = True )
-    
-    date         = models.DateTimeField(verbose_name = 'data dodania')
-    tags         = models.ManyToManyField(ProposalDescriptionTag, blank = True)
+    comments     = models.TextField( blank = True, null=True,
+                                     verbose_name = 'uwagi' )
+    date         = models.DateTimeField(auto_now=True,
+                                        verbose_name = 'data dodania')
     author       = models.ForeignKey(User, related_name='autor')
     
-    ects         = models.IntegerField(verbose_name ='sugerowana liczba punktów ECTS')
-    
-    lectures     = models.IntegerField(verbose_name = 'liczba godzin wykładów',
-                                            choices = PROPOSAL_HOURS)
-    repetitories = models.IntegerField(verbose_name = 'liczba godzin repetytoriów',
-                                            choices = PROPOSAL_HOURS)
-    seminars     = models.IntegerField(verbose_name = 'liczba godzin seminariów',
-                                            choices = PROPOSAL_HOURS)
-    exercises    = models.IntegerField(verbose_name = 'liczba godzin ćwiczeń',
-                                            choices = PROPOSAL_HOURS)
-    laboratories = models.IntegerField(verbose_name =' liczba godzin pracowni',
-                                            choices = PROPOSAL_HOURS)
-    deleted = models.BooleanField(verbose_name='usunięty', default=False)
-    web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+    deleted      = models.BooleanField(default=False,
+                                       verbose_name='usunięty')
+    exam         = models.BooleanField(choices=((False, 'Nie'), (True, 'Tak')),
+                                       default=False,
+                                       verbose_name='z egzaminem')
+    english      = models.BooleanField(default=False,
+                                       verbose_name=u'możliwe zajęcia po angielsku')
+    web_page     = models.URLField( verbose_name = 'Strona WWW przedmiotu',
                                 verify_exists= True,
 								blank        = True,
                                 null         = True )
-                                
-    
+    type         = models.ForeignKey('courses.Type',      related_name = 'descriptionstypes')
+
+    objects      = models.Manager()
+    noremoved    = NoRemovedManager()
+
     class Meta:
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotów'
@@ -58,72 +50,14 @@ class ProposalDescription(models.Model):
     def __unicode__(self):
         return '[' + self.author.__unicode__() + ']' + self.proposal.name 
 
-    @staticmethod
-    def get_newest( proposal ):
-        pass
-
-    def get_newer( self, proposal ):
-        """
-            Gets next description (by date) if exists
-        """
-        description = ProposalDescription.objects.filter(
-                                                proposal = proposal, 
-                                                pk__gt   = self.id)
-        if description:
-            return description[0]
-        else:
+    def get_newer(self):
+        try:
+            return ProposalDescription.noremoved.filter(proposal=self.proposal, id__gt=self.id).order_by('date')[0:1].get()
+        except ObjectDoesNotExist:
             return None
 
-    def get_older( self, proposal ):
-        """
-            Gets previous description (by date) if exists
-        """
-        description = ProposalDescription.objects.filter(proposal = proposal, 
-                                                         pk__lt = self.id)
-        if description:
-            return description[description.count()-1]
-        else:
+    def get_older(self):
+        try:
+            return ProposalDescription.noremoved.filter(proposal=self.proposal, date__lt=self.date).order_by('-date')[0:1].get()
+        except ObjectDoesNotExist:
             return None
-    
-    @staticmethod
-    def get_by_tag(tag):
-        """
-            Return proposal descriptions by tag.
-        """
-        return ProposalDescription.objects.filter(tags__name=tag)
-    
-    def add_tag(self, tag_name):
-        """
-            Apply tag to the proposal description.
-        """
-        try:
-            tag = ProposalDescriptionTag.objects.get(name=tag_name) 
-        except ProposalDescriptionTag.DoesNotExist:
-            tag = ProposalDescriptionTag.objects.create(name=tag_name)
-        finally:
-            self.tags.add(tag)
-    
-    def remove_tag(self, tag_name):
-        """
-            Remove tag from the proposal description.
-        """
-        try:
-            tag = ProposalDescriptionTag.objects.get(name=tag_name)
-            self.tags.remove(tag)
-        except ProposalDescriptionTag.DoesNotExist:
-            pass
-
-    def types(self):
-        """
-            Return proposal types
-        """
-
-        # TODO: WTF?! po co to przypisywanie .type w getterze?! No i nie było
-        # returna - dodałem
-        tmp = {}
-        for types in self.descriptiontypes.all():
-            tmp[types.id] = types
-        self.type = tmp
-        
-        return self.descriptiontypes.all()
-

@@ -16,7 +16,6 @@
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
 	<li><a href="{% url offer-main %}">Oferta</a></li>
-	<li><a href="{% url proposal-list %}">Propozycje</a></li>
 	<li>Wybór przedmiotów do oferty dydaktycznej</li>
 {% endblock %}
 
@@ -24,80 +23,53 @@
 {% block content %}
 	<div id="offerCreate">
         <form method="POST">
+        {{  proposals.management_form }}
             <table cellspacing="0">
                 <tr>
-                    <th></th>
-                    <th>Oferta</th>
-                    <th>Głosowanie</th>
+                    <th>Status</th>
                     <th>Semestr</th>
                     <th style="text-align: left;">Przedmiot</th>
                     <th>Pójdą</th>
                     <th>Poprowadzą</th>
                     <th>Pomogą</th>
+                    <th>Widoczny</th>
                 </tr>
-                {% for course in courses %}
-                <tr class="selected-{{ course.state }}">
+                {% for proposal in proposals %}
+                <tr class="selected-{{ proposal.instance.status }}">
+                    {% for field in proposal.hidden_fields %}
+                        {{ field }}
+                        {% endfor %}
                     <td class="state">
-                        <input type="radio" class="course-state" name="course[{{ course.id }}]" value="0" autocomplete="off" {% if course.state == "none"  %}checked {% endif %}/>
+                        {{ proposal.status }}
                     </td>
                     <td class="state">
-                        <input type="radio" class="course-state" name="course[{{ course.id }}]" value="1" autocomplete="off" {% if course.state == "offer"  %}checked {% endif %}/>
+                        {{ proposal.semester }}
                     </td>
-                    <td class="state">
-                        <input type="radio" class="course-state" name="course[{{ course.id }}]" value="2" autocomplete="off" {% if course.state == "vote"  %}checked {% endif %}/>
-                    </td>
-                    <td class="state">
-                        <select class="select-semester" name="course_semester[{{ course.id }}]">
-                            <option value="brak"></option>
-                            <option value="zimowy"{% if course.semester == "winter" %} selected{% endif %}>Zimowy</option>
-                            <option value="letni"{% if course.semester == "summer" %} selected{% endif %}>Letni</option>
-                        </select>
-                    </td>
-                    <td>{{ course.name }}<input type="hidden" name="courses[]" value="{{ course.id }}"></td>
-                    <td class="cen">{% if course.fans_count == 0 %}0
+                    <td>{{ proposal.instance.name }}</td>
+                    <td class="cen">{% if proposal.instance.num_fans == 0 %}0
                         {% else %}
-                            <a link="{{ course.id }}" class="show-fans">{{ course.fans_count }}</a>
+                            <a link="{{ proposal.instance.id }}" class="show-fans">{{ proposal.instance.num_fans }}</a>
                         {% endif %}</td>
                     <td class="cen">
-                        {% if course.teachers_count == 0 %}0
+                        {% if proposal.instance.num_teachers == 0 %}0
                         {% else %}
-                            <a link="{{ course.id }}" class="show-teachers">{{ course.teachers_count }}</a>
+                            <a link="{{ proposal.instance.id }}" class="show-teachers">{{ proposal.instance.num_teachers }}</a>
                         {% endif %}
                     </td>
                     <td class="cen">
-                        {% if course.helpers_count == 0 %}0
+                        {% if proposal.instance.num_helpers == 0 %}0
                         {% else %}
-                            <a link="{{ course.id }}" class="show-helpers">{{ course.helpers_count }}</a>
+                            <a link="{{ proposal.instance.id }}" class="show-helpers">{{ proposal.instance.num_helpers }}</a>
                         {% endif %}
+                    </td>
+                    <td>
+                        {{ proposal.for_student }}
                     </td>
                 </tr>
                 {% endfor %}
             </table>
             <input type="submit" class="right" id="offer-button" value="Zapisz">
        </form>
-		<div class="teachers">
-			{% for course in courses %}
-				<div class="teacher" id="teachers{{ course.id }}">
-					{% for teacher in course.teachers.all %}
-					<div>{{ teacher.first_name }} {{ teacher.last_name }}</div>
-					{% endfor %}
-				</div>
-			{% empty %}
-				 <div>- brak -</div>
-			{% endfor %}
-		</div>
-
-		<div class="helpers">
-			{% for course in courses %}
-				<div class="helper" id="helpers{{ course.id }}">
-					{% for helper in course.helpers.all %}
-					<div>{{ helper.first_name }} {{ helper.last_name }}</div>
-					{% endfor %}
-				</div>
-			{% empty %}
-				 <div>- brak -</div>
-			{% endfor %}
-		</div>
 	</div>
 {% include 'common/dialog_box.html' %}
 {% endblock %}

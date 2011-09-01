@@ -26,7 +26,7 @@ def get_employees_unset(employee):
     Returns courses in offer for which employee's preferences
     are undetermined.
     """
-    props = Proposal.get_by_tag('offer')
-    props = props.exclude(preference__employee=employee)
-    return props
+    return Proposal.get_offer()\
+                    .exclude(preference__employee=employee)
+
     

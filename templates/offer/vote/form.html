@@ -68,10 +68,12 @@
                         {{ field }}
                     {% endfor %}
                 <li class="od-vote-course winter {% for type in form.instance.course.description.types %} course-type-{{ type.lecture_type.id }}{% endfor %}">
-                   <label for="id_{{ form.value.html_name }}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
                     {% if isCorrectionActive %}
                         <input type="hidden" class="value" value="{{ form.instance.value }}">
-                        {{ form.correction }}{% else %}{{ form.value }}
+                        {{ form.correction }}
+                    {% else %}
+                        {{ form.value }}
                     {% endif %}
                 </li>
                 {% endfor %}
@@ -84,7 +86,7 @@
                     {% for field in  form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
-                   <label for="id_{{ form.value.html_name }}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
                     {% if isCorrectionActive %}
                         <input type="hidden" class="value" value="{{ form.instance.value }}">
                         {{ form.correction }}{% else %}
@@ -96,11 +98,11 @@
         <div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr nieokreślony</h2>
             <ul>
                 {% for form in formset.unknown.formset %}
-                <li class="od-vote-course unknown {% for type in form.instance.course.description.types %} course-type-{{ type.lecture_type.id }}{% endfor %}">
+                <li class="od-vote-course unknown course-type-{{ form.instance.course.description.type.id }}">
                     {% for field in  form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
-                   <label for="id_{{ form.value.html_name }}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
                     {% if isCorrectionActive %}
                         <input type="hidden" class="value" value="{{ form.instance.value }}">
                         {{ form.correction }}{% else %}{{ form.value }}
