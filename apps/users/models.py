@@ -352,7 +352,7 @@ class StudiaZamawiane(models.Model):
         verbose_name_plural = 'Studia zamawiane'
 
     def __unicode__(self):
-        return 'Student zamawiany: '+str(self.student)
+        return 'Student zamawiany: '+str(self.student).decode('utf-8')
 
 class StudiaZamawianeMaileOpiekunow(models.Model):
     """
