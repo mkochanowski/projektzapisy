@@ -109,9 +109,8 @@ class Course( models.Model ):
                 return False
 
     def get_enrollment_opening_time(self, student):
-        """ returns apps.enrollment opening time as datetime object or None if apps.enrollment is opened / was opened """
+        """ returns course opening time as datetime object or None if course is opened / was opened """
         records_opening = self.semester.records_opening
-
         try:
             stud_opt = StudentOptions.get_cached(student, self)
             interval = stud_opt.get_opening_bonus_timedelta()
@@ -121,10 +120,11 @@ class Course( models.Model ):
         if records_opening == None:
             return False
         else:
-            if records_opening - interval < datetime.now():
+            student_opening = records_opening - student.get_t0_interval()
+            if student_opening - interval < datetime.now():
                 return None
             else:
-                return records_opening - interval
+                return student_opening - interval
     
     def get_semester_name(self):
         """ returns name of semester course is linked to """
