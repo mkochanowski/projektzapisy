@@ -45,9 +45,9 @@ class StudentOptions( models.Model ):
         else: # not miss, but doesn't exists
             raise StudentOptions.DoesNotExist()
 
-    def get_opening_bonus_timedelta(self):
-        """ returns records opening bonus as timedelta """
-        return timedelta(minutes=self.records_opening_bonus_minutes)
+    def get_opening_delay_timedelta(self):
+        """ returns records opening delay as timedelta """
+        return timedelta(minutes=(-1)*self.records_opening_bonus_minutes+4320)
 
     class Meta:
         verbose_name = 'zależność przedmiot-student'

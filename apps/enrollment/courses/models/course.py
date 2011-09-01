@@ -93,14 +93,15 @@ class Course( models.Model ):
         records_closing = self.semester.records_closing
         try:
             stud_opt = StudentOptions.get_cached(student, self)
-            interval = stud_opt.get_opening_bonus_timedelta()
+            interval = stud_opt.get_opening_delay_timedelta()
         except StudentOptions.DoesNotExist:
-            interval = timedelta(minutes=0)
+            interval = timedelta(minutes=4320)
 
         if records_opening == None:
             return False
         else:
-            if records_opening - interval < datetime.now():
+            student_opening = records_opening - student.get_t0_interval()
+            if student_opening + interval < datetime.now():
                 if records_closing == None:
                     return True
                 else:
@@ -113,18 +114,18 @@ class Course( models.Model ):
         records_opening = self.semester.records_opening
         try:
             stud_opt = StudentOptions.get_cached(student, self)
-            interval = stud_opt.get_opening_bonus_timedelta()
+            interval = stud_opt.get_opening_delay_timedelta()
         except StudentOptions.DoesNotExist:
-            interval = timedelta(minutes=0)
+            interval = timedelta(minutes=4320)
 
         if records_opening == None:
             return False
         else:
             student_opening = records_opening - student.get_t0_interval()
-            if student_opening - interval < datetime.now():
+            if student_opening + interval < datetime.now():
                 return None
             else:
-                return student_opening - interval
+                return student_opening + interval
     
     def get_semester_name(self):
         """ returns name of semester course is linked to """

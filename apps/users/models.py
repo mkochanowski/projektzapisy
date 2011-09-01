@@ -208,7 +208,7 @@ class Student(BaseUser):
         number_of_nights_to_add = base / points_for_one_day 
         minutes = base + number_of_nights_to_add * points_for_one_night
         grade = self.participated_in_last_grade() and 1440 or 0
-        return datetime.timedelta(minutes=minutes+grade+120)
+        return datetime.timedelta(minutes=minutes+grade+120)+datetime.timedelta(days=3)
 
     def get_records_history(self):
         '''
