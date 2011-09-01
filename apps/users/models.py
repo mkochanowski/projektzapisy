@@ -343,7 +343,7 @@ class StudiaZamawiane(models.Model):
                 send_mail(subject, message_user, None, [self.student.user.email])
                 send_mail(subject, message_employee, None ,emails)
                 logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
-        except KeyError:
+        except:
             pass            
         super(StudiaZamawiane, self).save(*args, **kwargs)
 
