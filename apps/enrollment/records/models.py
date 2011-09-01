@@ -523,7 +523,7 @@ class Queue(models.Model):
             if group.course.semester.records_opening + timedelta(days=ECTS_LIMIT_DURATION) < datetime.now():
                 return False
             """ Obliczenie sumy punktów ECTS"""
-            groups = map(lambda x: x.group, Record.objects.filter(student=student, group__course__semester__in=[semester]))
+            groups = map(lambda x: x.group, Record.objects.filter(student=student, group__course__semester__in=[semester], status=STATUS_ENROLLED))
             courses = set([g.course for g in groups])
             program = User.objects.get(id=user_id).student.program
             points = Queue.get_point(program, group.course)
