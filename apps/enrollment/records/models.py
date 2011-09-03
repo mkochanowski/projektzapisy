@@ -226,7 +226,7 @@ class Record(models.Model):
         course = Course.objects.get(id=course_id) # using in logger
         try:
             student = user.student
-            lectures = Group.objects.filter(course=course_id, type='1')
+            lectures = Group.objects.filter(course=course_id, type__in=['1','9'])
             groups = Record.get_groups_for_student(user_id)
             new_records = []
             for l in lectures:
