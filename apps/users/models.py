@@ -102,7 +102,10 @@ class Employee(BaseUser):
     @staticmethod
     def get_list(begin):
         def next_char(begin):
-            return chr(ord(begin) + 1)
+            try:
+                return chr(ord(begin) + 1)
+            except ValueError:
+                return chr(90)
         if begin == 'Z':
             return Employee.objects.filter(user__last_name__gte=begin).\
                     select_related().order_by('user__last_name', 'user__first_name')
@@ -225,7 +228,10 @@ class Student(BaseUser):
     @staticmethod
     def get_list(begin = 'A'):
         def next_char(begin):
-            return chr(ord(begin) + 1)
+            try:
+                return chr(ord(begin) + 1)
+            except ValueError:
+                return chr(90)
         if begin == 'Z':
             return Student.objects.filter(status=0,user__last_name__gte=begin).\
                     select_related().order_by('user__last_name', 'user__first_name')
