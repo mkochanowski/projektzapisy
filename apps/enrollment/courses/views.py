@@ -200,7 +200,8 @@ def course(request, slug):
 
     except (Course.DoesNotExist, NonCourseException):
         logger.error('Function course(slug = %s) throws Course.DoesNotExist exception.' % unicode(slug) )
-        request.user.message_set.create(message="Przedmiot nie istnieje.")
+        if not request.user.is_anonymous():
+            request.user.message_set.create(message="Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 
