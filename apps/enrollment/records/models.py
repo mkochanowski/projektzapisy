@@ -273,10 +273,10 @@ class Record(models.Model):
                     #raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException
                     Record.remove_student_from_group(user_id, g_id)
                 
-                if group.type != '1':
-                    new_records.extend(Record.add_student_to_lecture_group(user_id, group.course.id))
                 if Queue.is_ECTS_points_limit_exceeded(user_id, group_id) :
                     raise ECTS_Limit_Exception()
+                if group.type != '1':
+                    new_records.extend(Record.add_student_to_lecture_group(user_id, group.course.id))
                 record, created = Record.objects.get_or_create(group=group, student=student)
     
                 if not created:
