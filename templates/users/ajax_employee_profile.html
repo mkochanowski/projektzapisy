@@ -9,7 +9,9 @@
 <h3>{{employee.get_full_name}}</h3>
 <br/>
 <ul>
+    {% if user.is_authenticated %}
     <li>adres email: {% if employee.user.email %}<a href="mailto:{{employee.user.email}}">{{employee.user.email}}</a>{% else %}brak danych{% endif %}</li>
+    {% endif %}
     <li>adres strony domowej: {% if employee.homepage %}<a href="{{employee.homepage}}">{{employee.homepage}}</a>{% else %}brak danych{% endif %}</li>
     <li>pokój: {% if employee.room %}{{employee.room}}{% else %}brak danych{% endif %}</li>
 </ul>
