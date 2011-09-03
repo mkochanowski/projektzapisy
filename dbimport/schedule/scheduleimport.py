@@ -46,7 +46,7 @@ O1 = ['analizamatematyczna','algebra','logikadlainformatyków','elementyrachunku
 O2 = ['matematykadyskretna','programowanie','analizanumeryczna','algorytmyistrukturydanych']
 O3 = ['językiformalneizłożonośćobliczeniowa']
 Oinz = ['fizykadlainformatyków','podstawyelektroniki,elektrotechnikiimiernictwa']
-I1 = ['wstępdoinformatyki','architekturasystemówkomputerowych','bazydanych','systemyoperacyjne','siecikomputerowe','inżynieriaoprogramowania']
+I1 = ['wstępdoinformatyki','architekturasystemówkomputerowych','architekturysystemówkomputerowych','bazydanych','systemyoperacyjne','siecikomputerowe','inżynieriaoprogramowania']
 Iinz = ['systemywbudowane','podstawygrafikikomputerowej','sztucznainteligencja','komunikacjaczłowiek-komputer']
 FEREOL_PATH = '../../..'
 
@@ -258,10 +258,16 @@ def import_schedule(file, semester):
                         course.teachers.add(teacher)
                         course.save()
                     
-                group = Group.objects.create(course=course,
-                                             teacher=teacher,
-                                             type=group_type,
-                                             limit=limit)
+                if group_type=='1':    
+                    group = Group.objects.get_or_create(course=course,
+                                                        teacher=teacher,
+                                                        type=group_type,
+                                                        limit=limit)[0]
+                else:
+                    group = Group.objects.create(course=course,
+                                                        teacher=teacher,
+                                                        type=group_type,
+                                                        limit=limit)
                 term = Term.objects.create(dayOfWeek=dayOfWeek,
                                            start_time=start_time,
                                            end_time=end_time,
