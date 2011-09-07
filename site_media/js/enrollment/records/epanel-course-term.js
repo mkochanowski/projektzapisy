@@ -8,7 +8,6 @@ if (!Fereol.Enrollment)
 Fereol.Enrollment.EPanelCourseTerm = function()
 {
 	this.courseTerm = null; // model danych
-	this.course = null; // SchedulePrototype.PrototypeCourse
 };
 
 Fereol.Enrollment.EPanelCourseTerm.fromHTML = function(container)
@@ -20,6 +19,7 @@ Fereol.Enrollment.EPanelCourseTerm.fromHTML = function(container)
 
 	sterm.courseTerm = Fereol.Enrollment.CourseTerm.fromJSON(container.
 		find('input[name=group-json]').assertOne().attr('value'));
+	sterm.courseTerm.updateListeners.push(function() { sterm.refreshView(); });
 
 	sterm._groupLimitCell = container.find('td.termLimit').assertOne();
 	sterm._enrolledCountCell = container.find('td.termEnrolledCount').
@@ -59,7 +59,7 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
 	this._setEnrolledButton.click(function()
 	{
 		MessageBox.clear();
-		self.setEnrolled(self._setEnrolledAction);
+		self.courseTerm.setEnrolled(self._setEnrolledAction);
 	});
 
 	var priorityCell = this._container.find('td.priority').assertOne();
@@ -138,122 +138,6 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.refreshView = function()
 			this.courseTerm.enrolledCount
 	);
 	this._queuedCountCell.text(this.courseTerm.queuedCount);
-};
-
-/**
- * Zapisuje lub wypisuje użytkownika do/z grupy lub kolejki (w zależności od
- * wolnych miejsc.
- *
- * Założenie: zmiany limitów grup odbywają się rzadko. Zmiana taka może
- * spowodować operowanie na nieświeżych danych, np. użytkownik może obserwować
- * nieprawidłowe liczniki grup. Na przykład, jeżeli przy próbie zapisania się
- * do grupy (w której było 10 zajętych miejsc na 20 w sumie) zostaną
- * zmniejszone w niej limity (do równo 10), użytkownik zamiast stanu 10/10
- * ujrzy 20/20 (i siebie w kolejce). Po odświeżeniu zobaczy prawidłowy stan.
- *
- * Zawsze jedak akcja "zapisania" zapisze go do grupy lub kolejki, akcja
- * "wypisania" analogicznie wypisze. Akcja "zapisania", jeżeli zapisze go do
- * kolejki, NIE wypisze z grupy, niezależnie od etykiety przycisku (która może
- * brzmieć "przepisz do innej grupy").
- *
- * @param enroll true, jeżeli zapisać; false aby wypisać
- */
-Fereol.Enrollment.EPanelCourseTerm.prototype.setEnrolled = function(enroll)
-{
-	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
-		return;
-	$.dataInvalidate();
-
-	var self = this;
-	enroll = !!enroll;
-
-	$.post(Fereol.Enrollment.CourseTerm._setEnrolledURL, {
-		group: this.courseTerm.id,
-		enroll: enroll
-	}, function(data)
-	{
-		var result = AjaxMessage.fromJSON(data);
-		self._isLoading = false;
-		if (result.isSuccess() ||
-			result.code == 'Queued' || result.code == 'AlreadyQueued')
-		{
-			if (self.courseTerm.isEnrolled)
-			{
-				self.courseTerm.isEnrolled = false;
-				self.courseTerm.enrolledCount--;
-			}
-			if (self.courseTerm.isQueued)
-			{
-				self.courseTerm.isQueued = false;
-				self.courseTerm.queuedCount--;
-			}
-		}
-		if (result.isSuccess())
-		{
-			if (enroll)
-			{
-				self.courseTerm.isEnrolled = true;
-				self.courseTerm.enrolledCount++;
-
-				// zaznaczanie innych grup tego samego typu jako "nie zapisane"
-				CourseView._termsList.forEach(function(e)
-				{
-					if (e.id == self.courseTerm.id || e.type != self.courseTerm.type)
-						return;
-					if (e.courseTerm.isEnrolled)
-					{
-						e.courseTerm.isEnrolled = false;
-						e.courseTerm.enrolledCount--;
-					}
-					e.refreshView();
-				});
-
-				// zaznaczanie powiązanych jako "zapisane"
-				result.data['connected_group_ids'].forEach(
-					function(alsoEnrolledID)
-				{
-					if (alsoEnrolledID == self.courseTerm.id)
-						return;
-					var alsoEnrolled = CourseView._termsMap[alsoEnrolledID];
-					if (!alsoEnrolled.courseTerm.isEnrolled)
-					{
-						alsoEnrolled.courseTerm.isEnrolled = true;
-						alsoEnrolled.courseTerm.enrolledCount++;
-					}
-					alsoEnrolled.refreshView();
-				})
-			}
-			else if (self.courseTerm.type == 1) // wykład
-			{
-				// zaznaczenie innych grup z tego przedmiotu jako "nie zapisane"
-				// (wypisanie z wykładu skutkuje wypisaniem z całego przedmiotu)
-				CourseView._termsList.forEach(function(e)
-				{
-					if (e.id == self.courseTerm.id)
-						return;
-					if (e.courseTerm.isEnrolled)
-					{
-						e.courseTerm.isEnrolled = false;
-						e.courseTerm.enrolledCount--;
-					}
-					e.refreshView();
-				});
-			}
-		}
-		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')
-		{
-			self.courseTerm.isQueued = true;
-			self.courseTerm.queuedCount++;
-			if (self.courseTerm.enrolledCount < self.courseTerm.limit)
-				self.courseTerm.enrolledCount = self.courseTerm.limit;
-			self.queuePriority = 1;
-			result.displayMessageBox();
-		}
-		else
-			result.displayMessageBox();
-		self.refreshView();
-		Fereol.Enrollment.CourseTerm._setLoading(false);
-	}, 'json');
 };
 
 Fereol.Enrollment.EPanelCourseTerm.prototype.toString = function()

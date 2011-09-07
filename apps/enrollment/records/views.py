@@ -83,19 +83,28 @@ def set_enrolled(request, method):
     if request.user.student.block:
         return AjaxFailureMessage.auto_render('ScheduleLocked', \
             'Twój plan jest zablokowany.', message_context);
+    student = request.user.student
 
     logger.info('User %s <id: %s> set himself %s to group with id: %s' % \
         (request.user.username, request.user.id, \
         ('enrolled' if set_enrolled else 'not enrolled'), group_id))
 
-    def prepare_group_counts(course):
-        counts = {}
+    def prepare_group_data(course, student):
+        queued = Queue.queued.filter(group__course=course)
+        enrolled_ids = Record.enrolled.filter(group__course=course, \
+            student=student).values_list('group__id', flat=True)
+        queued_ids = queued.filter(student=student). \
+            values_list('group__id', flat=True)
+        pinned_ids = Record.pinned.filter(group__course=course, \
+            student=student).values_list('group__id', flat=True)
+        queue_priorities = Queue.queue_priorities_map(queued)
+
+        data = {}
         for group in course.groups.all():
-            counts[group.id] = {
-                'enrolled': group.number_of_students(),
-                'limit': group.limit
-            }
-        return counts
+            data[group.id] = group.serialize_for_ajax(
+                enrolled_ids, queued_ids, pinned_ids,
+                queue_priorities, student)
+        return data
 
     try:
         group = Group.objects.get(id=group_id)
@@ -118,17 +127,9 @@ def set_enrolled(request, method):
             record = Record.remove_student_from_group(request.user.id, group_id)
             message = 'Zostałeś wypisany z wybranej grupy.'
 
-        connected_group_ids = None
-        if connected_records:
-            connected_group_ids = []
-            for record in connected_records:
-                connected_group_ids.append(record.group.pk)
-
         if is_ajax:
-            return AjaxSuccessMessage(message, { \
-                'connected_group_ids': connected_group_ids,
-                'group_counts': prepare_group_counts(group.course)
-            })
+            return AjaxSuccessMessage(message,
+                prepare_group_data(group.course, student))
         else:
             request.user.message_set.create(message=message)
             return redirect('course-page', slug=record.group_slug())
@@ -145,7 +146,8 @@ def set_enrolled(request, method):
     except AlreadyAssignedException:
         message = 'Jesteś już zapisany do tej grupy.'
         if is_ajax:
-            return AjaxSuccessMessage(message)
+            return AjaxSuccessMessage(message,
+                prepare_group_data(group.course, student))
         else:
             request.user.message_set.create(message=message)
             return redirect('course-page', slug=Group.objects.\
@@ -157,7 +159,8 @@ def set_enrolled(request, method):
         except AlreadyNotAssignedException:
             message = 'Jesteś już wypisany z tej grupy.'
         if is_ajax:
-            return AjaxSuccessMessage(message)
+            return AjaxSuccessMessage(message,
+                prepare_group_data(group.course, student))
         else:
             request.user.message_set.create(message=message)
             return redirect('course-page', slug=Group.objects.\
@@ -172,7 +175,7 @@ def set_enrolled(request, method):
             message = 'Grupa jest pełna. Zostałeś zapisany do kolejki.'
             if is_ajax:
                 return AjaxFailureMessage.auto_render('Queued', message,\
-                    message_context)
+                    message_context, prepare_group_data(group.course, student))
             else:
                 request.user.message_set.create(message=message)
                 return redirect('course-page', slug=Group.objects.\

@@ -52,6 +52,13 @@ Fereol.Enrollment.CourseTerm.groupTypes =
    10: ['projekt', 'proj']
 };
 
+Fereol.Enrollment.CourseTerm._byID = {};
+
+Fereol.Enrollment.CourseTerm.prototype._register = function()
+{
+	Fereol.Enrollment.CourseTerm._byID[this.id] = this;
+};
+
 Fereol.Enrollment.CourseTerm.prototype._notifyUpdateListeners = function()
 {
 	this.updateListeners.forEach(function(listener)
@@ -70,6 +77,7 @@ Fereol.Enrollment.CourseTerm.fromJSON = function(json)
 	ct.type = raw['type'].castToInt();
 	ct.updateFromJSON(json);
 
+	ct._register();
 	return ct;
 };
 
@@ -115,6 +123,50 @@ Fereol.Enrollment.CourseTerm.prototype.isFull = function()
 };
 
 /******************************************************************************/
+
+/**
+ * Zapisuje lub wypisuje użytkownika do/z grupy lub kolejki (w zależności od
+ * wolnych miejsc.
+ *
+ * @param enroll true, jeżeli zapisać; false aby wypisać
+ */
+Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
+{
+	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
+		return;
+	$.dataInvalidate();
+
+	var self = this;
+	enroll = !!enroll;
+
+	$.post(Fereol.Enrollment.CourseTerm._setEnrolledURL, {
+		group: this.id,
+		enroll: enroll
+	}, function(data)
+	{
+		var result = AjaxMessage.fromJSON(data);
+
+		if (result.isSuccess())
+		{
+			// do nothing special
+		}
+		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')
+			result.displayMessageBox();
+		else
+			result.displayMessageBox();
+
+		if (result.data)
+		{
+			for (var gid in result.data)
+				Fereol.Enrollment.CourseTerm._byID[gid].
+					updateFromJSON(result.data[gid]);
+			for (var gid in result.data)
+				Fereol.Enrollment.CourseTerm._byID[gid]._notifyUpdateListeners();
+		}
+		
+		Fereol.Enrollment.CourseTerm._setLoading(false);
+	}, 'json');
+};
 
 /**
  * Zmienia priorytet grupy.

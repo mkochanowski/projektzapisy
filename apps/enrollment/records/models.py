@@ -244,6 +244,11 @@ class Record(models.Model):
                             record.status = STATUS_ENROLLED
                             record.save()
                     new_records.append(record)
+                    try:
+                        queued = Queue.queued.get(group=l, student=student)
+                        queued.delete()
+                    except Queue.DoesNotExist:
+                        pass
                     logger.info('User %s <id: %s> is automaticaly added to lecture <id: %s> of Course: [%s] <id: %s>' % (user.username, user.id, l.id, course.name, course.id))
                     backup_logger.info('[02] user <%s> is automaticaly added to lecture group <%s>' % (user.id, l.id))
             return new_records
