@@ -79,7 +79,7 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
 	this._prioritySelector.change(function()
 	{
 		MessageBox.clear();
-		self.changePriority(self._prioritySelector.attr('value').
+		self.courseTerm.changePriority(self._prioritySelector.attr('value').
 			castToInt());
 	});
 
@@ -141,33 +141,6 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.refreshView = function()
 };
 
 /**
- * Zmienia priorytet grupy.
- *
- * @param newPriority nowy priorytet (1-10)
- */
-Fereol.Enrollment.EPanelCourseTerm.prototype.changePriority = function(newPriority)
-{
-	var self = this;
-	this._prioritySelector.attr('disabled', true);
-	if (newPriority < 1 || newPriority > CourseView.priorityLimit)
-		throw new Error('Nieprawidłowy priorytet do ustawienia');
-
-	$.dataInvalidate();
-	
-	$.post(Fereol.Enrollment.CourseTerm._setQueuePriorityURL, {
-			id: this.courseTerm.id,
-			priority: newPriority
-		}, function(data)
-	{
-		var result = AjaxMessage.fromJSON(data);
-		if (result.isSuccess())
-			self._prioritySelector.attr('disabled', false);
-		else
-			result.displayMessageBox();
-	}, 'json');
-};
-
-/**
  * Zapisuje lub wypisuje użytkownika do/z grupy lub kolejki (w zależności od
  * wolnych miejsc.
  *
@@ -187,7 +160,7 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.changePriority = function(newPriori
  */
 Fereol.Enrollment.EPanelCourseTerm.prototype.setEnrolled = function(enroll)
 {
-	if (!Fereol.Enrollment.EPanelCourseTerm._setLoading(true))
+	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
 		return;
 	$.dataInvalidate();
 
@@ -279,28 +252,17 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.setEnrolled = function(enroll)
 		else
 			result.displayMessageBox();
 		self.refreshView();
-		Fereol.Enrollment.EPanelCourseTerm._setLoading(false);
+		Fereol.Enrollment.CourseTerm._setLoading(false);
 	}, 'json');
-};
-
-/**
- * Włącza lub wyłącza tryb komunikacji z serwerem. W tym trybie może być tylko
- * jeden "wątek".
- *
- * @param loading true, jeżeli włączyć
- * @return true, jeżeli zakończono powodzeniem
- */
-Fereol.Enrollment.EPanelCourseTerm._setLoading = function(loading)
-{
-	loading = !!loading;
-	if (loading && Fereol.Enrollment.EPanelCourseTerm._isLoading)
-		return false;
-	Fereol.Enrollment.EPanelCourseTerm._isLoading = loading;
-	$('input.setEnrolledButton').attr('disabled', loading);
-	return true;
 };
 
 Fereol.Enrollment.EPanelCourseTerm.prototype.toString = function()
 {
 	return 'EPanelCourseTerm';
 };
+
+Fereol.Enrollment.CourseTerm.loadingListeners.push(function(isLoading)
+{
+	$('input.setEnrolledButton').attr('disabled', isLoading);
+	$('td.priority select').attr('disabled', isLoading);
+});

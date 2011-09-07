@@ -23,6 +23,8 @@ Fereol.Enrollment.CourseTerm = function()
 	this.unavailableEnrolledCount = null;
 	this.queuedCount = null;
 
+	this.updateListeners = [];
+
 	if (!Fereol.Enrollment.CourseTerm._setEnrolledURL)
 		Fereol.Enrollment.CourseTerm._setEnrolledURL =
 			$('input[name=ajax-set-enrolled-url]').assertOne().attr('value');
@@ -30,6 +32,10 @@ Fereol.Enrollment.CourseTerm = function()
 		Fereol.Enrollment.CourseTerm._setQueuePriorityURL =
 			$('input[name=ajax-set-queue-priority-url]').assertOne().
 				attr('value');
+	if (!Fereol.Enrollment.CourseTerm._priorityLimit)
+		Fereol.Enrollment.CourseTerm._priorityLimit =
+			$('input[name=priority-limit]').assertOne().attr('value').
+				castToInt();
 };
 
 Fereol.Enrollment.CourseTerm.groupTypes =
@@ -44,6 +50,14 @@ Fereol.Enrollment.CourseTerm.groupTypes =
 	8: ['wf', 'wf'],
     9: ['repetytorium', 'rep'],
    10: ['projekt', 'proj']
+};
+
+Fereol.Enrollment.CourseTerm.prototype._notifyUpdateListeners = function()
+{
+	this.updateListeners.forEach(function(listener)
+	{
+		listener();
+	});
 };
 
 Fereol.Enrollment.CourseTerm.fromJSON = function(json)
@@ -100,7 +114,66 @@ Fereol.Enrollment.CourseTerm.prototype.isFull = function()
 	return this.availableLimit() <= this.availableEnrolledCount();
 };
 
+/******************************************************************************/
+
+/**
+ * Zmienia priorytet grupy.
+ *
+ * @param newPriority nowy priorytet (1-10)
+ */
+Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
+{
+	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
+		return;
+
+	var self = this;
+	if (newPriority < 1 ||
+		newPriority > Fereol.Enrollment.CourseTerm._priorityLimit)
+		throw new Error('Nieprawidłowy priorytet do ustawienia');
+
+	$.dataInvalidate();
+
+	$.post(Fereol.Enrollment.CourseTerm._setQueuePriorityURL, {
+			id: this.id,
+			priority: newPriority
+		}, function(data)
+	{
+		var result = AjaxMessage.fromJSON(data);
+		if (result.isSuccess())
+		{
+			Fereol.Enrollment.CourseTerm._setLoading(false);
+			this._notifyUpdateListeners();
+		}
+		else
+			result.displayMessageBox();
+	}, 'json');
+};
+
+/******************************************************************************/
+
 Fereol.Enrollment.CourseTerm.prototype.toString = function()
 {
 	return 'CourseTerm#' + this.id;
 }
+
+/**
+ * Włącza lub wyłącza tryb komunikacji z serwerem. W tym trybie może być tylko
+ * jeden "wątek".
+ *
+ * @param loading true, jeżeli włączyć
+ * @return true, jeżeli zakończono powodzeniem
+ */
+Fereol.Enrollment.CourseTerm._setLoading = function(loading)
+{
+	loading = !!loading;
+	if (loading && Fereol.Enrollment.CourseTerm._isLoading)
+		return false;
+	Fereol.Enrollment.CourseTerm._isLoading = loading;
+	Fereol.Enrollment.CourseTerm.loadingListeners.forEach(function(e)
+	{
+		e(loading);
+	});
+	return true;
+};
+
+Fereol.Enrollment.CourseTerm.loadingListeners = [];
