@@ -33,18 +33,21 @@ def prepare_courses_list_to_render(request):
         except Student.DoesNotExist:
             records_history = []
 
+    default_semester = Semester.get_default_semester()
+
     semester_courses = []
     for semester in semesters:
         semester_courses.append({
             'id': semester.pk,
             'name': semester.get_name(),
-            'is_current': semester.is_current_semester(),
+            'is_current': semester.is_current_semester(), #TODO: być może zbędne
+            'is_default': (semester == default_semester),
             'courses': courses.filter(semester__id__exact=semester.pk).
                 order_by('name').values('id', 'name', 'type', 'slug')
         })
     for semester in semester_courses:
         for course in semester['courses']:
-            course.update( { 'was_enrolled' : course['id'] in records_history } )
+            course.update({ 'was_enrolled' : course['id'] in records_history })
 
     render_data = {
         'semester_courses': semester_courses,

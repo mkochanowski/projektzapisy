@@ -45,8 +45,5 @@ class AlreadyQueuedException(Exception):
 class ECTS_Limit_Exception(Exception):
     """is thrown when user tries to queue for the same group twice """
     pass
-class NotCurrentSemesterException(Exception):
-    """is thrown when someone tries to sign out from group in semester different than current semester"""
-    pass
 class InactiveStudentException(Exception):
 	"""is thrown when inactive user tries to enroll to group"""

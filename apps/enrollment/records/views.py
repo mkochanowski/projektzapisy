@@ -179,12 +179,6 @@ def set_enrolled(request, method):
                 'zamknięte.'
         return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
             message_context)
-    except NotCurrentSemesterException:
-        transaction.rollback()
-        message = 'Nie możesz się wypisać z tej grupy, ponieważ znajduje ' + \
-            'się ona w semestrze innym niż aktualny.'
-        return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
-            message_context)
     except ECTS_Limit_Exception:
         if is_ajax:
             return AjaxFailureMessage.auto_render('ECTSLimit', 'Przekroczyłeś limit ECTS')

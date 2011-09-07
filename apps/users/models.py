@@ -195,9 +195,10 @@ class Student(BaseUser):
 
     def participated_in_last_grade(self):
         from apps.grade.ticket_create.models import UsedTicketStamp
-        current_semester = Semester.get_current_semester()
-        previous_semester = current_semester.get_previous_semester()
-        used_tickets = UsedTicketStamp.objects.filter(student=self,poll__semester=previous_semester)
+        previous_semester = Semester.get_default_semester(). \
+            get_previous_semester()
+        used_tickets = UsedTicketStamp.objects.filter(student=self, \
+            poll__semester=previous_semester)
         if len(used_tickets)==0:
             return False
         else:
@@ -259,7 +260,9 @@ class Student(BaseUser):
     @staticmethod
     def get_schedule(student):
         try:
-            groups = [g for g in Student.get_all_groups(student) if g.course.semester.is_current_semester()]
+            default_semester = Semester.get_default_semester()
+            groups = [g for g in Student.get_all_groups(student) \
+                if g.course.semester == default_semester] #TODO: nieoptymalnie
             courses = set([group.course for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
