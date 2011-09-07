@@ -148,7 +148,10 @@ def log_add_group(sender, instance, created, **kwargs):
         '9': 'w', '10': 'p'}
         kod_grupy = group.id 
         kod_przed_sem = group.course.id
-        kod_uz = group.teacher and group.teacher.user.get_full_name() or "XXX"
+        teacher_name_array = (group.teacher and group.teacher.user.get_full_name() or u"Nieznany prowadzący").split(" ")
+	kod_uz = teacher_name_array[0]
+	if teacher_name_array[0] != teacher_name_array[-1]:
+		kod_uz += " " + teacher_name_array[-1]
         max_osoby = group.limit
         rodzaj_zajec = GROUP_TYPE_MAPPING[group.type]
         zamawiane_bonus = group.limit_zamawiane
