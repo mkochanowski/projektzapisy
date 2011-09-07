@@ -10,7 +10,7 @@ import logging
 
 backup_logger = logging.getLogger('project.backup')
 
-# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.ScheduleCourseTerm.groupTypes
+# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.CourseTerm.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('5', 'ćwiczenio-pracownia'),
         ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
@@ -73,6 +73,11 @@ class Group(models.Model):
     def number_of_students_non_zamawiane(self):
         return self.number_of_students() - self.number_of_students_zamawiane()
 
+    def number_of_queued_students(self):
+        """Returns number of students queued to particular group"""
+        from apps.enrollment.records.models import Queue
+        return Queue.queued.filter(group=self).count()
+
     @staticmethod
     def numbers_of_students(semester, enrolled):
         '''
@@ -99,7 +104,31 @@ class Group(models.Model):
             employee.teacher = employee.pk in teachers
 
         return employees
-    
+
+    def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
+        student=None):
+        """ Dumps this group state to form readable by JavaScript """
+        from django.utils import simplejson
+
+        zamawiany = student and student.is_zamawiany()
+        data = {
+            'id': self.pk,
+            'type': int(self.type),
+
+            'is_enrolled': self.id in enrolled,
+            'is_queued': self.id in queued,
+            'is_pinned': self.id in pinned,
+
+            'limit': self.limit,
+            'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
+            'enrolled_count': self.number_of_students(),
+            'unavailable_enrolled_count': self.number_of_students_zamawiane(),
+            'queued_count': self.number_of_queued_students(),
+            'queue_priority': queue_priorities.get(self.pk)
+        }
+        
+        return simplejson.dumps(data);
+
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'

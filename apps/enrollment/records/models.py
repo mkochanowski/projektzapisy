@@ -27,7 +27,7 @@ from apps.enrollment.utils import mail_enrollment_from_queue
 STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
 STATUS_QUEUED = '1'
-RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'oczekujący')]
+RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'przypięty')]
 
 import logging
 logger = logging.getLogger('project.default')
@@ -38,6 +38,11 @@ class EnrolledManager(models.Manager):
         """ Returns only enrolled students. """
         return super(EnrolledManager, self).get_query_set().filter(status=STATUS_ENROLLED)
 
+class PinnedManager(models.Manager):
+    def get_query_set(self):
+        """ Returns only enrolled students. """
+        return super(PinnedManager, self).get_query_set().filter(status=STATUS_PINNED)
+
 class Record(models.Model):
     group = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='records')
@@ -45,6 +50,7 @@ class Record(models.Model):
     
     objects = models.Manager()
     enrolled = EnrolledManager()
+    pinned = PinnedManager()
     
     @staticmethod
     def recorded_students(students):
@@ -625,7 +631,15 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.error('Queue.remove_student_low_priority_records throws Group.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
             raise NonGroupException()
-    
+
+    @staticmethod
+    def queue_priorities_map(queue_set):
+        raw = queue_set.values('group__id', 'priority')
+        m = {}
+        for r in raw:
+            m[r['group__id']] = r['priority']
+        return m
+
     def group_slug(self):
         return self.group.course_slug()
     

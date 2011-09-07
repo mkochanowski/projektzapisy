@@ -65,9 +65,13 @@ def courses(request):
 def course(request, slug):
     try:
         course = Course.visible.get(slug=slug)
-        records = Record.enrolled.filter(group__course=course)
-        queues = Queue.queued.filter(group__course=course)
-        groups = list(Group.objects.filter(course=course).order_by('term__dayOfWeek','term__start_time','term__end_time'))
+
+        enrolled = Record.enrolled.filter(group__course=course)
+        pinned = Record.pinned.filter(group__course=course)
+        queued = Queue.queued.filter(group__course=course)
+
+        groups = list(Group.objects.filter(course=course).
+            order_by('term__dayOfWeek','term__start_time','term__end_time'))
         seen = []
         seen_append = seen.append
         groups = [ x for x in groups if x not in seen and not seen_append(x)]
@@ -86,22 +90,31 @@ def course(request, slug):
         else:
             try:
                 student = request.user.student
+
+                enrolled_ids = enrolled.filter(student=student).values_list('group__id', flat=True)
+                queued_ids = queued.filter(student=student).values_list('group__id', flat=True)
+                pinned_ids = pinned.filter(student=student).values_list('group__id', flat=True)
+                queue_priorities = Queue.queue_priorities_map(queued)
+
                 course.is_recording_open = course.is_recording_open_for_student(student)
                 course.can_enroll_from = course.get_enrollment_opening_time(student)
                 if course.can_enroll_from:
                     course.can_enroll_interval = course.can_enroll_from - datetime.now()
                 
-                student_queues = queues.filter(student=student)
+                student_queues = queued.filter(student=student)
                 student_queues_groups = map(lambda x: x.group, student_queues)
-                student_groups = map(lambda x: x.group, records.filter(student=student))
+                student_groups = map(lambda x: x.group, enrolled.filter(student=student))
 
                 for g in groups:
                     if g in student_queues_groups:
                         g.priority = student_queues.get(group=g).priority
-                    g.enrolled = records
                     g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
                     if g in student_groups:
                         g.signed = True
+                    g.serialized = g.serialize_for_ajax(
+                        enrolled_ids, queued_ids, pinned_ids,
+                        queue_priorities, student
+                    )
             except Student.DoesNotExist:
                 student = None
                 course.is_recording_open = False
@@ -127,8 +140,8 @@ def course(request, slug):
 
 
         for g in groups:
-            g.enrolled = records.filter(group=g).count()
-            g.queued = queues.filter(group=g).count()
+            g.enrolled = enrolled.filter(group=g).count()
+            g.queued = queued.filter(group=g).count()
 
             if g.limit_zamawiane > 0 and student and not student.is_zamawiany():
                 g.is_full = (g.number_of_students_non_zamawiane() >=

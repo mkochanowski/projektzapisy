@@ -88,9 +88,18 @@ def set_enrolled(request, method):
         (request.user.username, request.user.id, \
         ('enrolled' if set_enrolled else 'not enrolled'), group_id))
 
+    def prepare_group_counts(course):
+        counts = {}
+        for group in course.groups.all():
+            counts[group.id] = {
+                'enrolled': group.number_of_students(),
+                'limit': group.limit
+            }
+        return counts
+
     try:
+        group = Group.objects.get(id=group_id)
         if set_enrolled:
-            group = Group.objects.get(id=group_id)
             moved = Record.is_student_in_course_group_type(\
                 user_id=request.user.id, slug=group.course_slug(),\
                 group_type=group.type) #TODO: omg ale crap
@@ -116,7 +125,10 @@ def set_enrolled(request, method):
                 connected_group_ids.append(record.group.pk)
 
         if is_ajax:
-            return AjaxSuccessMessage(message, connected_group_ids)
+            return AjaxSuccessMessage(message, { \
+                'connected_group_ids': connected_group_ids,
+                'group_counts': prepare_group_counts(group.course)
+            })
         else:
             request.user.message_set.create(message=message)
             return redirect('course-page', slug=record.group_slug())
@@ -236,7 +248,7 @@ def records_set_locked(request, method):
 @require_POST
 @login_required
 @transaction.commit_on_success
-def queue_set_priority(request, group_id, method):
+def set_queue_priority(request, method):
     '''
         Sets new priority for queue of some group
     '''
@@ -244,6 +256,7 @@ def queue_set_priority(request, group_id, method):
     message_context = None if is_ajax else request
 
     try:
+        group_id = int(request.POST['id'])
         priority = int(request.POST['priority'])
     except MultiValueDictKeyError:
         return AjaxFailureMessage.auto_render('InvalidRequest',\

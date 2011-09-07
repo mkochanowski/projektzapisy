@@ -50,20 +50,6 @@ Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle = {
 	PROTOTYPE: 2
 };
 
-Fereol.Enrollment.ScheduleCourseTerm.groupTypes =
-{
-	1: ['wykład', 'wyk'],
-	2: ['ćwiczenia', 'ćw'],
-	3: ['pracownia', 'prac'],
-	4: ['ćwiczenia (zaaw)', 'ćw-z'],
-	5: ['ćwiczenia + prac.', 'ćw+prac'],
-	6: ['seminarium', 'sem'],
-	7: ['lektorat', 'lek'],
-	8: ['wf', 'wf'],
-    9: ['repetytorium', 'rep'],
-   10: ['projekt', 'proj']
-};
-
 Fereol.Enrollment.ScheduleCourseTerm.byGroups = {};
 
 Fereol.Enrollment.ScheduleCourseTerm.prototype.isEnrolledOrQueued = function()
@@ -134,7 +120,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 			appendTo(this.container);
 		this._typeLabel = $.create('span', {className: 'type'}).
 			appendTo(this.container).attr('title',
-			Fereol.Enrollment.ScheduleCourseTerm.groupTypes[this.type][0]);
+			Fereol.Enrollment.CourseTerm.groupTypes[this.type][0]);
 
 		this._classroomLabel = $.create('span', {className: 'classroom'}).
 			appendTo(this.container);
@@ -208,7 +194,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 	$.create('h2', {className: 'name'}).appendTo(this.popupContents).append(
 		$.create('a').text(this.course.name).attr('href', this.course.url));
 	$.create('p', {className: 'typeAndTerm'}).text(
-		Fereol.Enrollment.ScheduleCourseTerm.groupTypes[this.type][0].
+		Fereol.Enrollment.CourseTerm.groupTypes[this.type][0].
 			capitalize() +
 		' (' + Schedule.dayNames[this.scheduleTerm.day].toLowerCase() + ' ' +
 		this.scheduleTerm.timeFrom.toString() + '-' +
@@ -329,7 +315,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._onResize = function(isFullSize)
 			CLASSROOM_PADDING) + 'px'
 	});
 
-	this._typeLabel.text(Fereol.Enrollment.ScheduleCourseTerm.
+	this._typeLabel.text(Fereol.Enrollment.CourseTerm.
 		groupTypes[this.type][isFullSize?0:1]).css({
 		top: (this._typeLabel.parent().innerHeight() -
 			this._typeLabel.height() -
@@ -433,8 +419,11 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype.setEnrolled = function(enrolled)
 					e._updateVisibility();
 				});
 
+				$.log(result.data);
+				//TODO
+
 				// zaznaczanie powiązanych jako "zapisane"
-				result.data.forEach(function(e)
+				result.data['connected_group_ids'].forEach(function(e)
 				{
 					if (e == self.groupID)
 						return;

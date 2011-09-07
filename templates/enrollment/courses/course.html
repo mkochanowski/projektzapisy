@@ -15,6 +15,7 @@
 	<script src="/site_media/js/components/messageBox.js" type="text/javascript"></script>
 
 	<script src="/site_media/js/enrollment/records/course-term.js" type="text/javascript"></script>
+	<script src="/site_media/js/enrollment/records/epanel-course-term.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/views/course.js" type="text/javascript"></script>
 {% endblock %}
 
@@ -92,6 +93,7 @@
 		{% block messages %}{% endblock %}{% include 'common/messages.html' %}
 
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
+		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
 
 		{% for tutorial in tutorials %}{% if tutorial.groups %}
@@ -134,14 +136,14 @@
 							</td>
 							<td class="number termLimit">
 								{% if t.limit_zamawiane and not user.student.is_zamawiany %}
-									{{ t.limit_zamawiane }} + {{ t.limit_non_zamawiane }}
+									{{ t.limit_non_zamawiane }} + {{ t.limit_zamawiane }}
 								{% else %}
 									{{ t.limit }}
 								{% endif %}
 							</td>
 							<td class="number termEnrolledCount">
 								{% if t.limit_zamawiane and not user.student.is_zamawiany%}
-									{{ t.number_of_students_zamawiane }} + {{ t.number_of_students_non_zamawiane }}
+									{{ t.number_of_students_non_zamawiane }} + {{ t.number_of_students_zamawiane }}
 								{% else %}
 									{{ t.enrolled }}
 								{% endif %}
@@ -149,6 +151,7 @@
 							<td class="number termQueuedCount">{{ t.queued }}</td>
 							<td class="controls">
 								<input type="hidden" name="group-id" value="{{ t.id }}" />
+								<input type="hidden" name="group-json" value="{{ t.serialized }}" />
 								<input type="hidden" name="is-signed-in" value="{% if t.signed %}true{% else %}false{% endif %}" />
 								{% if course.is_recording_open and user.student.is_active %}
 									<form action="{% url records-set-enrolled %}" method="post" class="setEnrolled"><div>
@@ -175,17 +178,18 @@
 							{% if course.is_recording_open and user.student.is_active %}
 								<td class="priority">
 									{% if t.priority %}
-										<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
+										<form action="{% url records-set-queue-priority %}" method="post"><div>
+											<input type="hidden" name="id" value="{{ t.id }}" />
 											<input type="hidden" name="priority" value="{{ t.priority|add:-1}}" />
 											<input type="submit" value="-" {% if t.priority <= 1 %} disabled="disabled" {% endif %} />
 										</div></form>
 										<span>{{ t.priority }}</span>
-										<form action="{% url records-queue-set-priority t.id %}" method="post"><div>
+										<form action="{% url records-set-queue-priority %}" method="post"><div>
+											<input type="hidden" name="id" value="{{ t.id }}" />
 											<input type="hidden" name="priority" value="{{ t.priority|add:1}}" />
 											<input type="submit" value="+" {% if t.priority >= priority_limit %} disabled="disabled" {% endif %} />
 										</div></form>
 									{% endif %}
-									<input type="hidden" name="ajax-priority-url" value="{% url records-queue-set-priority t.id '.json' %}" />
 								</td>
 							{% endif %}
 						</tr>
