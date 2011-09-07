@@ -63,8 +63,8 @@ class Record(models.Model):
     @staticmethod
     def number_of_students(group):
         """Returns number of students enrolled to particular group"""
-        group_ = group
-        return Record.enrolled.filter(group=group_).count()
+        #TODO: zbędne!
+        return group.number_of_students()
     
     @staticmethod
     def get_student_records_ids(student, semester):
@@ -317,7 +317,7 @@ class Record(models.Model):
             #backup_logger.info('[03] user <%s> is removed from group <%s>' % (user.id, group.id))
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             
-            Queue.try_enroll_next_student(group)
+            Queue.try_enroll_next_student(group) #TODO: być może zbędne
             
             return record
             
@@ -330,7 +330,10 @@ class Record(models.Model):
         except Group.DoesNotExist:
             logger.error('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
-    
+
+    @staticmethod
+    def on_student_remove_from_group(sender, instance, **kwargs):
+        Queue.try_enroll_next_student(instance.group)
     
     def group_slug(self):
         return self.group.course_slug()
@@ -652,3 +655,4 @@ def log_delete_record(sender, instance, **kwargs):
            
 signals.post_save.connect(log_add_record, sender=Record)                               
 signals.pre_delete.connect(log_delete_record, sender=Record) 
+signals.post_delete.connect(Record.on_student_remove_from_group, sender=Record)
