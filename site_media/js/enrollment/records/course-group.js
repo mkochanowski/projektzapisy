@@ -10,6 +10,10 @@ Fereol.Enrollment.CourseGroup = function()
 	this.id = null;
 	this.type = null;
 
+	this.url = null;
+	this.teacherName = null;
+	this.teacherURL = null;
+
 	this.isEnrolled = null; // czy student jest zapisany
 	this.isQueued = null; // czy jest "w kolejce"
 	this.isPinned = null; // czy przypiął do planu
@@ -87,6 +91,13 @@ Fereol.Enrollment.CourseGroup.fromJSON = function(json)
 
 	ct.id = raw['id'].castToInt();
 	ct.type = raw['type'].castToInt();
+
+	ct.url = raw['url'];
+	ct.teacherName = raw['teacher_name'];
+	ct.teacherURL = raw['teacher_url'];
+	if (!ct.teacherURL)
+		ct.teacherURL = null;
+
 	ct.updateFromJSON(json);
 
 	ct._register();

@@ -9,6 +9,8 @@ if (!Fereol.Enrollment)
 Fereol.Enrollment.ScheduleCourseTerm = function()
 {
 	this.id = null;
+	this.classroom = null;
+	
 	this.isPrototyped = false; // czy jest tymczasowo wyświetlony w prototypie
 	this._isVisible = false;
 	this.displayStyle =
@@ -26,10 +28,6 @@ Fereol.Enrollment.ScheduleCourseTerm = function()
 
 	// do wywalenia
 	this.course = null; // SchedulePrototype.PrototypeCourse lub Schedule.PrototypeCourse
-	this.groupURL = null;
-	this.classroom = null;
-	this.teacher = null;
-	this.teacherURL = null;
 };
 
 Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle = {
@@ -54,7 +52,6 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 		sterm._updateControls();
 	});
 
-	sterm.groupURL = raw.group_url;
 	sterm.scheduleTerm = new Schedule.Term(
 		raw.day.castToInt() - 1,
 		new Schedule.Time(raw.start_time[0].castToInt(), raw.start_time[1].castToInt()),
@@ -68,8 +65,6 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 	};
 
 	sterm.classroom = raw.classroom.castToInt();
-	sterm.teacher = raw.teacher;
-	sterm.teacherURL = raw.teacher_url;
 
 	Fereol.Enrollment.ScheduleCourseTerm._byID[sterm.id] = sterm;
 
@@ -92,7 +87,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 
 		$.create('span', {className: 'name'}).text(this.course.shortName).
 			attr('title', this.course.name).appendTo(this.container);
-		this._teacherLabel = $.create('span', {className: 'teacher'}).text(this.teacher).
+		this._teacherLabel = $.create('span', {className: 'teacher'}).text(this.group.teacherName).
 			appendTo(this.container);
 		this._typeLabel = $.create('span', {className: 'type'}).
 			appendTo(this.container).attr('title',
@@ -176,14 +171,16 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 		this.scheduleTerm.timeFrom.toString() + '-' +
 		this.scheduleTerm.timeTo.toString() + ')'
 	).appendTo(this.popupContents);
-    if(this.teacherURL==''){
-        $.create('p', {className: 'teacher'}).text('Prowadzący: ').        
-            appendTo(this.popupContents).append($.create('span').text(this.teacher));
+    if (this.group.teacherURL)
+	{
+		$.create('p', {className: 'teacher'}).text('Prowadzący: ').
+			appendTo(this.popupContents).append($.create('a').text(this.group.teacherName).
+			attr('href', this.group.teacherURL));
     }
-    else {
-        $.create('p', {className: 'teacher'}).text('Prowadzący: ').
-            appendTo(this.popupContents).append($.create('a').text(this.teacher).        
-            attr('href', this.teacherURL));
+    else
+	{
+		$.create('p', {className: 'teacher'}).text('Prowadzący: ').
+			appendTo(this.popupContents).append($.create('span').text(this.group.teacherName));
     }
 	$.create('p', {className: 'classroom'}).text(
 		'Sala: ' + this.classroom
@@ -195,7 +192,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 		var enrolled = $.create('p', {className: 'enrolledCount'}).
 			text('Zapisanych: ').appendTo(this.popupContents);
 		$.create('a', {
-			href: this.groupURL,
+			href: this.group.url,
 			title: 'zapisanych osób: ' + this.group.enrolledCount +
 				', limit miejsc w grupie: ' + this.group.limit
 		}).appendTo(enrolled).
@@ -226,7 +223,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 	{
 		$.create('p', {className: 'groupListLink'}).appendTo(
 			this.popupContents).append($.create('a', {
-			href: this.groupURL
+			href: this.group.url
 		}).text('lista osób zapisanych do grupy'));
 	}
 };

@@ -41,7 +41,8 @@ class Group(models.Model):
     @staticmethod
     def get_groups_by_semester(semester):
         """ returns all groups in semester """
-        return Group.objects.filter(course__semester=semester).all()
+        return Group.objects.filter(course__semester=semester). \
+            select_related('teacher', 'teacher__user').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
@@ -151,11 +152,18 @@ class Group(models.Model):
         student_counts, student=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.utils import simplejson
+        from django.core.urlresolvers import reverse
 
         zamawiany = student and student.is_zamawiany()
         data = {
             'id': self.pk,
             'type': int(self.type),
+
+            'url': reverse('records-group', args=[self.pk]),
+            'teacher_name': self.teacher and self.teacher.user.get_full_name() \
+                or 'nieznany prowadzący',
+            'teacher_url': self.teacher and reverse('employee-profile', args= \
+                [self.teacher.user.id]) or '',
 
             'is_enrolled': self.id in enrolled,
             'is_queued': self.id in queued,
@@ -163,9 +171,10 @@ class Group(models.Model):
 
             'limit': self.limit,
             'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
-            'enrolled_count': student_counts[self.pk]['enrolled'], #self.number_of_students(), # 57->111
-            'unavailable_enrolled_count': student_counts[self.pk]['enrolled_zamawiane'], #self.number_of_students_zamawiane(), # 111->165
-            'queued_count': student_counts[self.pk]['queued'], #self.number_of_queued_students(), # 165->219
+            'enrolled_count': student_counts[self.pk]['enrolled'],
+            'unavailable_enrolled_count': \
+                student_counts[self.pk]['enrolled_zamawiane'],
+            'queued_count': student_counts[self.pk]['queued'],
             'queue_priority': queue_priorities.get(self.pk)
         }
         
