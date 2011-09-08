@@ -25,9 +25,6 @@ Fereol.Enrollment.ScheduleCourseTerm = function()
 
 	this._containerReady = false;
 	this._controlsReady = false;
-
-	// do wywalenia
-	this.course = null; // SchedulePrototype.PrototypeCourse lub Schedule.PrototypeCourse
 };
 
 Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle = {
@@ -85,8 +82,8 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 	{
 		this._containerReady = true;
 
-		$.create('span', {className: 'name'}).text(this.course.shortName).
-			attr('title', this.course.name).appendTo(this.container);
+		$.create('span', {className: 'name'}).text(this.group.course.shortName).
+			attr('title', this.group.course.name).appendTo(this.container);
 		this._teacherLabel = $.create('span', {className: 'teacher'}).text(this.group.teacherName).
 			appendTo(this.container);
 		this._typeLabel = $.create('span', {className: 'type'}).
@@ -164,7 +161,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 	this.popupContents.empty();
 	
 	$.create('h2', {className: 'name'}).appendTo(this.popupContents).append(
-		$.create('a').text(this.course.name).attr('href', this.course.url));
+		$.create('a').text(this.group.course.name).attr('href', this.group.course.url));
 	$.create('p', {className: 'typeAndTerm'}).text(
 		this.group.getTypeName(true).capitalize() +
 		' (' + Schedule.dayNames[this.scheduleTerm.day].toLowerCase() + ' ' +
@@ -267,11 +264,11 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 	}).attr('title', this.group.isPinned ? 'odepnij od planu' : 'przypnij do planu');
 	this._signInOutButton.css({
 		backgroundPosition: this.group.isEnrolledOrQueued() ? '-12px 0' : '0 0',
-		display: this.course.isRecordingOpen ? '' : 'none'
+		display: this.group.course.isRecordingOpen ? '' : 'none'
 	}).attr('title', this.group.isEnrolledOrQueued() ? 'wypisz się' +
 		(this.group.isQueued ? ' z kolejki' : '') : 'zapisz się');
 	this._controlsEmpty = this.group.isEnrolledOrQueued() &&
-		!this.course.isRecordingOpen;
+		!this.group.course.isRecordingOpen;
 };
 
 Fereol.Enrollment.ScheduleCourseTerm.prototype._onResize = function(isFullSize)
@@ -306,7 +303,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype.setPrototyped = function(prototyp
 
 Fereol.Enrollment.ScheduleCourseTerm.prototype.toString = function()
 {
-	return this.course.toString() + ' - ' + this.scheduleTerm.toString();
+	return this.group.course.name + ' - ' + this.scheduleTerm.toString();
 };
 
 Fereol.Enrollment.CourseGroup.loadingListeners.push(function(isLoading)

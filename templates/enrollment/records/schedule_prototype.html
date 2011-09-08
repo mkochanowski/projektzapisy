@@ -71,19 +71,12 @@
 	<div id="enr-schedulePrototype-scheduleContainer">
 		<p>Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu
 			planu nie może bez niej działać.</p>
-		<input type="hidden" name="pinned" value="{{ student_records.pinned }}" />
-		<input type="hidden" name="enrolled" value="{{ student_records.enrolled }}" />
-		<input type="hidden" name="queued" value="{{ student_records.queued }}" />
-
 		<input type="hidden" name="courses" value="{{ courses_json }}" />
 		<input type="hidden" name="groups" value="{{ groups_json }}" />
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
 		<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
-
-		<input type="hidden" name="setPinnedUrl" value="{% url schedule-prototype-set-pinned %}" />
-		<input type="hidden" name="setEnrolledUrl" value="{% url records-set-enrolled '.json' %}" />
 	</div>
 {% endblock %}
  

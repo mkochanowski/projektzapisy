@@ -508,7 +508,6 @@ def schedule_prototype(request):
     data = {
         'courses_json': prepare_courses_json(all_groups, student),
         'groups_json': all_groups_json,
-        'student_records': None,#record_ids,
         'courses' : courses,
         'semester' : default_semester,
         'types_list' : Type.get_all_for_jsfilter(),

@@ -10,17 +10,6 @@ SchedulePrototype = new Object();
 SchedulePrototype.init = function()
 {
 	var scheduleContainer = $('#enr-schedulePrototype-scheduleContainer').assertOne();
-	var pinnedGroupIDs = $.parseJSON(scheduleContainer.
-		children('input[name=pinned]').assertOne().attr('value'));
-	var enrolledGroupIDs = $.parseJSON(scheduleContainer.
-		children('input[name=enrolled]').assertOne().attr('value'));
-	var queuedGroupIDs = $.parseJSON(scheduleContainer.
-		children('input[name=queued]').assertOne().attr('value'));
-
-	SchedulePrototype.urls['set-pinned'] = scheduleContainer.
-		children('input[name=setPinnedUrl]').assertOne().attr('value').trim();
-	SchedulePrototype.urls['set-enrolled'] = scheduleContainer.
-		children('input[name=setEnrolledUrl]').assertOne().attr('value').trim();
 
 	SchedulePrototype.initGroups();
 
@@ -39,7 +28,7 @@ SchedulePrototype.init = function()
 		new Schedule.Time(18, 20), new Schedule.Time(19, 10), $.create('div').text('e')));
 	*/
 
-	SchedulePrototype.initCourseList(enrolledGroupIDs, pinnedGroupIDs, queuedGroupIDs);
+	SchedulePrototype.initCourseList();
 	SchedulePrototype.initFilter();
 	SchedulePrototype.initRecordsLocking();
 
@@ -90,7 +79,7 @@ SchedulePrototype.initFilter = function()
 		'phrase', '.filter-phrase', function(element, value)
 	{
 		var course = element.data;
-		return (course.name.toLowerCase().indexOf(value) >= 0);
+		return (course.model.name.toLowerCase().indexOf(value) >= 0);
 	}));
 
 	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
@@ -106,7 +95,7 @@ SchedulePrototype.initFilter = function()
 		function(element, courseType)
 	{
 		var course = element.data;
-		return (course.type == courseType);
+		return (course.model.type == courseType);
 	}));
 
 	SchedulePrototype.courseList.forEach(function(course)
@@ -210,7 +199,7 @@ SchedulePrototype.initGroups = function()
 
 SchedulePrototype.courseList = [];
 
-SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
+SchedulePrototype.initCourseList = function()
 {
 	var courseList = $('#enr-schedulePrototype-course-list');
 
@@ -221,13 +210,10 @@ SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
 		var course = new SchedulePrototype.PrototypeCourse();
 		SchedulePrototype.courseList.push(course);
 
-		course.id = elem.children('input[name=id]').attr('value').castToInt();
-		course.name = elem.children('label').disableDragging().text().trim();
-		course.shortName = elem.children('input[name=short]').attr('value').trim();
-		course.url = elem.children('input[name=url]').attr('value').trim();
-		course.type = elem.children('input[name=type]').attr('value').castToInt();
+		course.model = Fereol.Enrollment.Course.getByID(
+			elem.children('input[name=id]').attr('value').castToInt());
+
 		course.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
-		course.isRecordingOpen = elem.children('input[name=isRecordingOpen]').attr('value').castToBool();
 		course._listElementContainer = elem;
 		course._prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
 
@@ -239,7 +225,6 @@ SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
 				elem.attr('value'));
 			sterm.displayStyle =
 				Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.PROTOTYPE;
-			sterm.course = course;
 
 			sterm.assignSchedule(SchedulePrototype.schedule);
 
@@ -274,13 +259,8 @@ SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
 
 SchedulePrototype.PrototypeCourse = function()
 {
-	this.id = null;
-	this.name = null;
-	this.shortName = null;
-	this.url = null;
-	this.type = null;
-	this.isRecordingOpen = null;
-	
+	this.model = null; // model danych
+
 	this.wasEnrolled = null;
 	
 	this.terms = [];
@@ -312,10 +292,5 @@ SchedulePrototype.PrototypeCourse.prototype.setVisible = function(visible)
 
 SchedulePrototype.PrototypeCourse.prototype.toString = function()
 {
-	if (this.shortName)
-		return this.shortName;
-	else if (this.name)
-		return this.name;
-	else
-		return 'SchedulePrototype.PrototypeCourse';
+	return 'PrototypeCourse@' + this.model.toString();
 };
