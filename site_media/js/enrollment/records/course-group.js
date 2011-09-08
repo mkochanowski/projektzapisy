@@ -28,6 +28,9 @@ Fereol.Enrollment.CourseGroup = function()
 	if (!Fereol.Enrollment.CourseGroup._setEnrolledURL)
 		Fereol.Enrollment.CourseGroup._setEnrolledURL =
 			$('input[name=ajax-set-enrolled-url]').assertOne().attr('value');
+	if (!Fereol.Enrollment.CourseGroup._setPinnedURL)
+		Fereol.Enrollment.CourseGroup._setPinnedURL =
+			$('input[name=ajax-set-pinned-url]').assertOne().attr('value');
 	if (!Fereol.Enrollment.CourseGroup._setQueuePriorityURL)
 		Fereol.Enrollment.CourseGroup._setQueuePriorityURL =
 			$('input[name=ajax-set-queue-priority-url]').assertOne().
@@ -133,6 +136,16 @@ Fereol.Enrollment.CourseGroup.prototype.isFull = function()
 	return this.availableLimit() <= this.availableEnrolledCount();
 };
 
+Fereol.Enrollment.CourseGroup.prototype.isEnrolledOrQueued = function()
+{
+	return this.isEnrolled || this.isQueued;
+};
+
+Fereol.Enrollment.CourseGroup.prototype.getTypeName = function(fullName)
+{
+	return Fereol.Enrollment.CourseGroup.groupTypes[this.type][fullName ? 0:1];
+};
+
 /******************************************************************************/
 
 /**
@@ -147,8 +160,14 @@ Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 		return;
 	$.dataInvalidate();
 
+//	TODO:
+//	if (!this.course.isRecordingOpen)
+//		throw new Error('Zapisy na ten przedmiot są zamknięte');
+
 	var self = this;
 	enroll = !!enroll;
+	if (this.isEnrolled == enroll)
+		return;
 
 	$.post(Fereol.Enrollment.CourseGroup._setEnrolledURL, {
 		group: this.id,
@@ -176,6 +195,33 @@ Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 					_notifyUpdateListeners();
 		}
 		
+		Fereol.Enrollment.CourseGroup._setLoading(false);
+	}, 'json');
+};
+
+Fereol.Enrollment.CourseGroup.prototype.setPinned = function(pinned)
+{
+	if (!Fereol.Enrollment.CourseGroup._setLoading(true))
+		return;
+	$.dataInvalidate();
+
+	var self = this;
+	pinned = !!pinned;
+	if (this.isPinned == pinned)
+		return;
+
+	$.post(Fereol.Enrollment.CourseGroup._setPinnedURL, {
+		group: this.id,
+		pin: pinned
+	}, function(data)
+	{
+		var result = AjaxMessage.fromJSON(data);
+		if (result.isSuccess())
+			self.isPinned = pinned;
+		else
+			result.displayMessageBox();
+
+		self._notifyUpdateListeners();
 		Fereol.Enrollment.CourseGroup._setLoading(false);
 	}, 'json');
 };

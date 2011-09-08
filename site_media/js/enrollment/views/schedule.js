@@ -10,6 +10,8 @@ ScheduleView = new Object();
 
 ScheduleView.init = function()
 {
+	ScheduleView.initGroups();
+
 	var scheduleContainer = $('#enr-schedule-scheduleContainer').assertOne();
 
 	ScheduleView.schedule = new Schedule(scheduleContainer, {
@@ -21,6 +23,16 @@ ScheduleView.init = function()
 $(ScheduleView.init);
 
 ScheduleView.courseList = [];
+
+ScheduleView.initGroups = function()
+{
+	var groupsRAW = $.parseJSON(
+		$('#enr-schedule-scheduleContainer input[name=groups]').val());
+	groupsRAW.forEach(function(groupRAW)
+	{
+		Fereol.Enrollment.CourseGroup.fromJSON(groupRAW);
+	});
+};
 
 ScheduleView.initCourseList = function()
 {

@@ -232,10 +232,6 @@ SchedulePrototype.initCourseList = function(enrolled, pinned, queued)
 				elem.attr('value'));
 			sterm.displayStyle =
 				Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.PROTOTYPE;
-			sterm.isPinned = (pinned.indexOf(sterm.groupID) >= 0);
-			sterm.isEnrolled = (enrolled.indexOf(sterm.groupID) >= 0);
-			sterm.isQueued = (queued.indexOf(sterm.groupID) >= 0);
-			sterm.isPrototyped = false;
 			sterm.course = course;
 
 			sterm.assignSchedule(SchedulePrototype.schedule);

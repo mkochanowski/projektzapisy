@@ -360,6 +360,19 @@ def prepare_courses_with_terms(terms, records = []):
         key=lambda course: course['info']['name'])
     return courses_list
 
+def prepare_groups_json(student, semester, groups):
+    record_ids = Record.get_student_records_ids(student, semester)
+    queue_priorities = Queue.queue_priorities_map(
+        Queue.get_student_queues(student, semester))
+    student_counts = Group.get_students_counts(groups)
+    groups_json = []
+    for group in groups:
+        groups_json.append(group.serialize_for_ajax(
+            record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
+            queue_priorities, student_counts, student
+        ))
+    return '[' + (', '.join(groups_json)) + ']'
+
 @login_required
 def own(request):
     ''' own schedule view '''
@@ -376,6 +389,7 @@ def own(request):
         try:
             employee = request.user.employee
             is_student = False
+            student = None
             courses = prepare_courses_with_terms(\
                 Term.get_all_in_semester(default_semester, employee=employee))
         except Employee.DoesNotExist:
@@ -412,6 +426,9 @@ def own(request):
             })
     terms_by_days = filter(lambda term: term, terms_by_days)
 
+    all_groups_json = prepare_groups_json(student, default_semester, \
+        Group.get_groups_by_semester(default_semester)) # TODO: tylko grupy, na które jest zapisany
+
     if is_student:
         points_type = student.program.type_of_points
         course_objects = map(lambda course: course['object'], courses)
@@ -424,11 +441,13 @@ def own(request):
         points_sum = None 
         points_type = None  
     data = {
+        'groups': all_groups_json,
         'terms_by_days': terms_by_days,
         'courses': courses,
         'points': points,
         'points_type': points_type,
-        'points_sum': points_sum
+        'points_sum': points_sum,
+        'priority_limit': settings.QUEUE_PRIORITY_LIMIT
     }
 
     return render_to_response('enrollment/records/schedule.html',\
@@ -481,22 +500,12 @@ def schedule_prototype(request):
                 'json': simplejson.dumps(term['info'])
             })
 
-    record_ids = Record.get_student_records_ids(student, default_semester)
-    queue_priorities = Queue.queue_priorities_map(
-        Queue.get_student_queues(student, default_semester))
-    all_groups = Group.get_groups_by_semester(default_semester)
-    student_counts = Group.get_students_counts(all_groups)
-    all_groups_json = []
-    for group in all_groups:
-        all_groups_json.append(group.serialize_for_ajax(
-            record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
-            queue_priorities, student_counts, student
-        ))
-    all_groups_json = '[' + (', '.join(all_groups_json)) + ']'
+    all_groups_json = prepare_groups_json(student, default_semester, \
+        Group.get_groups_by_semester(default_semester))
     
     data = {
         'groups': all_groups_json,
-        'student_records': record_ids,
+        'student_records': None,#record_ids,
         'courses' : courses,
         'semester' : default_semester,
         'types_list' : Type.get_all_for_jsfilter(),
