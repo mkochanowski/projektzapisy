@@ -193,6 +193,13 @@ SchedulePrototype.initRecordsLocking = function()
 
 SchedulePrototype.initGroups = function()
 {
+	var coursesRAW = $.parseJSON($(
+		'#enr-schedulePrototype-scheduleContainer input[name=courses]').val());
+	coursesRAW.forEach(function(courseRAW)
+	{
+		Fereol.Enrollment.Course.fromJSON(courseRAW);
+	});
+
 	var groupsRAW = $.parseJSON(
 		$('#enr-schedulePrototype-scheduleContainer input[name=groups]').val());
 	groupsRAW.forEach(function(groupRAW)
@@ -272,8 +279,10 @@ SchedulePrototype.PrototypeCourse = function()
 	this.shortName = null;
 	this.url = null;
 	this.type = null;
-	this.wasEnrolled = null;
 	this.isRecordingOpen = null;
+	
+	this.wasEnrolled = null;
+	
 	this.terms = [];
 	this.isPrototyped = false;
 	this._listElementContainer = null;

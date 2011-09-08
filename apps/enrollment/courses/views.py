@@ -71,6 +71,7 @@ def course(request, slug):
         queued = Queue.queued.filter(group__course=course)
 
         groups = list(Group.objects.filter(course=course).
+            select_related('course', 'teacher', 'teacher__user').
             order_by('term__dayOfWeek','term__start_time','term__end_time'))
         seen = []
         seen_append = seen.append
@@ -208,6 +209,7 @@ def course(request, slug):
         data = prepare_courses_list_to_render(request)
         data.update({
             'course' : course,
+            'course_json': course.serialize_for_ajax(student),
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,

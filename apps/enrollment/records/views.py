@@ -367,6 +367,12 @@ def prepare_groups_json(student, semester, groups):
         ))
     return '[' + (', '.join(groups_json)) + ']'
 
+def prepare_courses_json(groups, student):
+    courses_json = []
+    for group in groups:
+        courses_json.append(group.course.serialize_for_ajax(student))
+    return '[' + (', '.join(courses_json)) + ']'
+
 @login_required
 def own(request):
     ''' own schedule view '''
@@ -420,8 +426,9 @@ def own(request):
             })
     terms_by_days = filter(lambda term: term, terms_by_days)
 
-    all_groups_json = prepare_groups_json(student, default_semester, \
-        Group.get_groups_by_semester(default_semester)) # TODO: tylko grupy, na które jest zapisany
+    # TODO: tylko grupy, na które jest zapisany
+    all_groups = Group.get_groups_by_semester(default_semester)
+    all_groups_json = prepare_groups_json(student, default_semester, all_groups)
 
     if is_student:
         points_type = student.program.type_of_points
@@ -435,7 +442,8 @@ def own(request):
         points_sum = None 
         points_type = None  
     data = {
-        'groups': all_groups_json,
+        'courses_json': prepare_courses_json(all_groups, student),
+        'groups_json': all_groups_json,
         'terms_by_days': terms_by_days,
         'courses': courses,
         'points': points,
@@ -494,11 +502,12 @@ def schedule_prototype(request):
                 'json': simplejson.dumps(term['info'])
             })
 
-    all_groups_json = prepare_groups_json(student, default_semester, \
-        Group.get_groups_by_semester(default_semester))
+    all_groups = Group.get_groups_by_semester(default_semester)
+    all_groups_json = prepare_groups_json(student, default_semester, all_groups)
     
     data = {
-        'groups': all_groups_json,
+        'courses_json': prepare_courses_json(all_groups, student),
+        'groups_json': all_groups_json,
         'student_records': None,#record_ids,
         'courses' : courses,
         'semester' : default_semester,

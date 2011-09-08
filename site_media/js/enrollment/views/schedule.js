@@ -26,6 +26,13 @@ ScheduleView.courseList = [];
 
 ScheduleView.initGroups = function()
 {
+	var coursesRAW = $.parseJSON($(
+		'#enr-schedule-scheduleContainer input[name=courses]').val());
+	coursesRAW.forEach(function(courseRAW)
+	{
+		Fereol.Enrollment.Course.fromJSON(courseRAW);
+	});
+
 	var groupsRAW = $.parseJSON(
 		$('#enr-schedule-scheduleContainer input[name=groups]').val());
 	groupsRAW.forEach(function(groupRAW)

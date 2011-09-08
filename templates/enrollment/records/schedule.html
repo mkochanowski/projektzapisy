@@ -13,6 +13,7 @@
 	<script src="/site_media/js/components/schedule.js" type="text/javascript"></script>
 	<!--<script src="/site_media/js/components/messageBox.js" type="text/javascript"></script>-->
 
+	<script src="/site_media/js/enrollment/records/course.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/records/course-group.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/records/schedule-course-term.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/views/schedule.js" type="text/javascript"></script>
@@ -28,7 +29,8 @@
     <a href="{% url ical %}" style="float:right;">Eksportuj do ical</a>
 	<div id="enr-schedule-scheduleContainer">
 
-		<input type="hidden" name="groups" value="{{ groups }}" />
+		<input type="hidden" name="courses" value="{{ courses_json }}" />
+		<input type="hidden" name="groups" value="{{ groups_json }}" />
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
 		<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />

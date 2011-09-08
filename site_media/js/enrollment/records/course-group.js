@@ -9,6 +9,7 @@ Fereol.Enrollment.CourseGroup = function()
 {
 	this.id = null;
 	this.type = null;
+	this.course = null;
 
 	this.url = null;
 	this.teacherName = null;
@@ -91,6 +92,7 @@ Fereol.Enrollment.CourseGroup.fromJSON = function(json)
 
 	ct.id = raw['id'].castToInt();
 	ct.type = raw['type'].castToInt();
+	ct.course = Fereol.Enrollment.Course.getByID(raw['course'].castToInt());
 
 	ct.url = raw['url'];
 	ct.teacherName = raw['teacher_name'];

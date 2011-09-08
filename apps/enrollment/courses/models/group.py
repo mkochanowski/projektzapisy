@@ -42,7 +42,8 @@ class Group(models.Model):
     def get_groups_by_semester(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teacher', 'teacher__user').all()
+            select_related('teacher', 'teacher__user', 'course', \
+                'course__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
@@ -158,6 +159,7 @@ class Group(models.Model):
         data = {
             'id': self.pk,
             'type': int(self.type),
+            'course': int(self.course.pk),
 
             'url': reverse('records-group', args=[self.pk]),
             'teacher_name': self.teacher and self.teacher.user.get_full_name() \

@@ -16,6 +16,7 @@
 	<script src="/site_media/js/common/listFilter.js" type="text/javascript"></script>
 	<script src="/site_media/js/common/listFilter-courseType.js" type="text/javascript"></script>
 
+	<script src="/site_media/js/enrollment/records/course.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/records/course-group.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/records/schedule-course-term.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/views/schedule-prototype.js" type="text/javascript"></script>
@@ -74,7 +75,8 @@
 		<input type="hidden" name="enrolled" value="{{ student_records.enrolled }}" />
 		<input type="hidden" name="queued" value="{{ student_records.queued }}" />
 
-		<input type="hidden" name="groups" value="{{ groups }}" />
+		<input type="hidden" name="courses" value="{{ courses_json }}" />
+		<input type="hidden" name="groups" value="{{ groups_json }}" />
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
 		<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
