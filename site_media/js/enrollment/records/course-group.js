@@ -5,7 +5,7 @@
 if (!Fereol.Enrollment)
 	Fereol.Enrollment = new Object();
 
-Fereol.Enrollment.CourseTerm = function()
+Fereol.Enrollment.CourseGroup = function()
 {
 	this.id = null;
 	this.type = null;
@@ -25,20 +25,20 @@ Fereol.Enrollment.CourseTerm = function()
 
 	this.updateListeners = [];
 
-	if (!Fereol.Enrollment.CourseTerm._setEnrolledURL)
-		Fereol.Enrollment.CourseTerm._setEnrolledURL =
+	if (!Fereol.Enrollment.CourseGroup._setEnrolledURL)
+		Fereol.Enrollment.CourseGroup._setEnrolledURL =
 			$('input[name=ajax-set-enrolled-url]').assertOne().attr('value');
-	if (!Fereol.Enrollment.CourseTerm._setQueuePriorityURL)
-		Fereol.Enrollment.CourseTerm._setQueuePriorityURL =
+	if (!Fereol.Enrollment.CourseGroup._setQueuePriorityURL)
+		Fereol.Enrollment.CourseGroup._setQueuePriorityURL =
 			$('input[name=ajax-set-queue-priority-url]').assertOne().
 				attr('value');
-	if (!Fereol.Enrollment.CourseTerm._priorityLimit)
-		Fereol.Enrollment.CourseTerm._priorityLimit =
+	if (!Fereol.Enrollment.CourseGroup._priorityLimit)
+		Fereol.Enrollment.CourseGroup._priorityLimit =
 			$('input[name=priority-limit]').assertOne().attr('value').
 				castToInt();
 };
 
-Fereol.Enrollment.CourseTerm.groupTypes =
+Fereol.Enrollment.CourseGroup.groupTypes =
 {
 	1: ['wykład', 'wyk'],
 	2: ['ćwiczenia', 'ćw'],
@@ -52,14 +52,21 @@ Fereol.Enrollment.CourseTerm.groupTypes =
    10: ['projekt', 'proj']
 };
 
-Fereol.Enrollment.CourseTerm._byID = {};
+Fereol.Enrollment.CourseGroup._byID = {};
 
-Fereol.Enrollment.CourseTerm.prototype._register = function()
+Fereol.Enrollment.CourseGroup.prototype._register = function()
 {
-	Fereol.Enrollment.CourseTerm._byID[this.id] = this;
+	Fereol.Enrollment.CourseGroup._byID[this.id] = this;
 };
 
-Fereol.Enrollment.CourseTerm.prototype._notifyUpdateListeners = function()
+Fereol.Enrollment.CourseGroup.getByID = function(id)
+{
+	if (!Fereol.Enrollment.CourseGroup._byID[id])
+		throw new Error('Grupa nie istnieje');
+	return Fereol.Enrollment.CourseGroup._byID[id];
+};
+
+Fereol.Enrollment.CourseGroup.prototype._notifyUpdateListeners = function()
 {
 	this.updateListeners.forEach(function(listener)
 	{
@@ -67,11 +74,11 @@ Fereol.Enrollment.CourseTerm.prototype._notifyUpdateListeners = function()
 	});
 };
 
-Fereol.Enrollment.CourseTerm.fromJSON = function(json)
+Fereol.Enrollment.CourseGroup.fromJSON = function(json)
 {
 	var raw = $.parseJSON(json);
 
-	var ct = new Fereol.Enrollment.CourseTerm();
+	var ct = new Fereol.Enrollment.CourseGroup();
 
 	ct.id = raw['id'].castToInt();
 	ct.type = raw['type'].castToInt();
@@ -81,7 +88,7 @@ Fereol.Enrollment.CourseTerm.fromJSON = function(json)
 	return ct;
 };
 
-Fereol.Enrollment.CourseTerm.prototype.updateFromJSON = function(json)
+Fereol.Enrollment.CourseGroup.prototype.updateFromJSON = function(json)
 {
 	var raw = $.parseJSON(json);
 
@@ -98,7 +105,7 @@ Fereol.Enrollment.CourseTerm.prototype.updateFromJSON = function(json)
 		this.queuePriority = raw['queue_priority'].castToInt();
 };
 
-Fereol.Enrollment.CourseTerm.prototype.availableLimit = function()
+Fereol.Enrollment.CourseGroup.prototype.availableLimit = function()
 {
 	if (this.limit === null ||
 		this.unavailableLimit === null)
@@ -106,7 +113,7 @@ Fereol.Enrollment.CourseTerm.prototype.availableLimit = function()
 	return this.limit - this.unavailableLimit;
 };
 
-Fereol.Enrollment.CourseTerm.prototype.availableEnrolledCount = function()
+Fereol.Enrollment.CourseGroup.prototype.availableEnrolledCount = function()
 {
 	if (this.enrolledCount === null ||
 		this.unavailableEnrolledCount === null)
@@ -117,7 +124,7 @@ Fereol.Enrollment.CourseTerm.prototype.availableEnrolledCount = function()
 /**
  * @return true, jeżeli grupa jest pełna
  */
-Fereol.Enrollment.CourseTerm.prototype.isFull = function()
+Fereol.Enrollment.CourseGroup.prototype.isFull = function()
 {
 	return this.availableLimit() <= this.availableEnrolledCount();
 };
@@ -130,16 +137,16 @@ Fereol.Enrollment.CourseTerm.prototype.isFull = function()
  *
  * @param enroll true, jeżeli zapisać; false aby wypisać
  */
-Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
+Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 {
-	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
+	if (!Fereol.Enrollment.CourseGroup._setLoading(true))
 		return;
 	$.dataInvalidate();
 
 	var self = this;
 	enroll = !!enroll;
 
-	$.post(Fereol.Enrollment.CourseTerm._setEnrolledURL, {
+	$.post(Fereol.Enrollment.CourseGroup._setEnrolledURL, {
 		group: this.id,
 		enroll: enroll
 	}, function(data)
@@ -158,13 +165,14 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
 		if (result.data)
 		{
 			for (var gid in result.data)
-				Fereol.Enrollment.CourseTerm._byID[gid].
+				Fereol.Enrollment.CourseGroup.getByID(gid).
 					updateFromJSON(result.data[gid]);
 			for (var gid in result.data)
-				Fereol.Enrollment.CourseTerm._byID[gid]._notifyUpdateListeners();
+				Fereol.Enrollment.CourseGroup.getByID(gid).
+					_notifyUpdateListeners();
 		}
 		
-		Fereol.Enrollment.CourseTerm._setLoading(false);
+		Fereol.Enrollment.CourseGroup._setLoading(false);
 	}, 'json');
 };
 
@@ -173,19 +181,19 @@ Fereol.Enrollment.CourseTerm.prototype.setEnrolled = function(enroll)
  *
  * @param newPriority nowy priorytet (1-10)
  */
-Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
+Fereol.Enrollment.CourseGroup.prototype.changePriority = function(newPriority)
 {
-	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
+	if (!Fereol.Enrollment.CourseGroup._setLoading(true))
 		return;
 
 	var self = this;
 	if (newPriority < 1 ||
-		newPriority > Fereol.Enrollment.CourseTerm._priorityLimit)
+		newPriority > Fereol.Enrollment.CourseGroup._priorityLimit)
 		throw new Error('Nieprawidłowy priorytet do ustawienia');
 
 	$.dataInvalidate();
 
-	$.post(Fereol.Enrollment.CourseTerm._setQueuePriorityURL, {
+	$.post(Fereol.Enrollment.CourseGroup._setQueuePriorityURL, {
 			id: this.id,
 			priority: newPriority
 		}, function(data)
@@ -193,7 +201,7 @@ Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
 		var result = AjaxMessage.fromJSON(data);
 		if (result.isSuccess())
 		{
-			Fereol.Enrollment.CourseTerm._setLoading(false);
+			Fereol.Enrollment.CourseGroup._setLoading(false);
 			this._notifyUpdateListeners();
 		}
 		else
@@ -203,9 +211,9 @@ Fereol.Enrollment.CourseTerm.prototype.changePriority = function(newPriority)
 
 /******************************************************************************/
 
-Fereol.Enrollment.CourseTerm.prototype.toString = function()
+Fereol.Enrollment.CourseGroup.prototype.toString = function()
 {
-	return 'CourseTerm#' + this.id;
+	return 'CourseGroup#' + this.id;
 }
 
 /**
@@ -215,17 +223,17 @@ Fereol.Enrollment.CourseTerm.prototype.toString = function()
  * @param loading true, jeżeli włączyć
  * @return true, jeżeli zakończono powodzeniem
  */
-Fereol.Enrollment.CourseTerm._setLoading = function(loading)
+Fereol.Enrollment.CourseGroup._setLoading = function(loading)
 {
 	loading = !!loading;
-	if (loading && Fereol.Enrollment.CourseTerm._isLoading)
+	if (loading && Fereol.Enrollment.CourseGroup._isLoading)
 		return false;
-	Fereol.Enrollment.CourseTerm._isLoading = loading;
-	Fereol.Enrollment.CourseTerm.loadingListeners.forEach(function(e)
+	Fereol.Enrollment.CourseGroup._isLoading = loading;
+	Fereol.Enrollment.CourseGroup.loadingListeners.forEach(function(e)
 	{
 		e(loading);
 	});
 	return true;
 };
 
-Fereol.Enrollment.CourseTerm.loadingListeners = [];
+Fereol.Enrollment.CourseGroup.loadingListeners = [];

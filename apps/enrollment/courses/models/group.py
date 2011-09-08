@@ -10,7 +10,7 @@ import logging
 
 backup_logger = logging.getLogger('project.backup')
 
-# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.CourseTerm.groupTypes
+# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.CourseGroup.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('5', 'ćwiczenio-pracownia'),
         ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),

@@ -120,7 +120,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 			appendTo(this.container);
 		this._typeLabel = $.create('span', {className: 'type'}).
 			appendTo(this.container).attr('title',
-			Fereol.Enrollment.CourseTerm.groupTypes[this.type][0]);
+			Fereol.Enrollment.CourseGroup.groupTypes[this.type][0]);
 
 		this._classroomLabel = $.create('span', {className: 'classroom'}).
 			appendTo(this.container);
@@ -194,7 +194,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 	$.create('h2', {className: 'name'}).appendTo(this.popupContents).append(
 		$.create('a').text(this.course.name).attr('href', this.course.url));
 	$.create('p', {className: 'typeAndTerm'}).text(
-		Fereol.Enrollment.CourseTerm.groupTypes[this.type][0].
+		Fereol.Enrollment.CourseGroup.groupTypes[this.type][0].
 			capitalize() +
 		' (' + Schedule.dayNames[this.scheduleTerm.day].toLowerCase() + ' ' +
 		this.scheduleTerm.timeFrom.toString() + '-' +
@@ -315,7 +315,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._onResize = function(isFullSize)
 			CLASSROOM_PADDING) + 'px'
 	});
 
-	this._typeLabel.text(Fereol.Enrollment.CourseTerm.
+	this._typeLabel.text(Fereol.Enrollment.CourseGroup.
 		groupTypes[this.type][isFullSize?0:1]).css({
 		top: (this._typeLabel.parent().innerHeight() -
 			this._typeLabel.height() -
