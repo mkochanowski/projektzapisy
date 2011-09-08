@@ -38,6 +38,11 @@ class Group(models.Model):
         """return all terms of current group""" 
         return self.term.all()
 
+    @staticmethod
+    def get_groups_by_semester(semester):
+        """ returns all groups in semester """
+        return Group.objects.filter(course__semester=semester).all()
+
     def get_group_limit(self):
         """return maximal amount of participants"""
         return self.limit
@@ -93,6 +98,43 @@ class Group(models.Model):
             count_map[r['group__pk']] = r['group__pk__count']
         return count_map
 
+    @staticmethod
+    def get_students_counts(groups):
+        from apps.enrollment.records.models import Record, Queue
+        from apps.users.models import StudiaZamawiane
+
+        counts = {}
+        for group in groups:
+            counts[group.pk] = {
+                'enrolled': 0,
+                'enrolled_zamawiane': 0,
+                'queued': 0
+            }
+
+        enrolled_counts = Record.enrolled.filter(group__in=groups).\
+            values('group__pk').order_by().annotate(Count('group__pk'))
+        for r in enrolled_counts:
+            counts[r['group__pk']]['enrolled'] = int(r['group__pk__count'])
+
+        #TODO: baza na tym umrze
+        enrolled_students = Record.enrolled.filter(group__in=groups). \
+            values_list('student', flat=True)
+        enrolled_zam_students = StudiaZamawiane.objects.filter(student__in= \
+            enrolled_students).values_list('student', flat=True)
+        enrolled_zam_counts = Record.enrolled.filter(group__in=groups,
+            student__in=enrolled_zam_students).\
+            values('group__pk').order_by().annotate(Count('group__pk'))
+        for r in enrolled_zam_counts:
+            counts[r['group__pk']]['enrolled_zamawiane'] = \
+                int(r['group__pk__count'])
+
+        queued_counts = Queue.queued.filter(group__in=groups).\
+            values('group__pk').order_by().annotate(Count('group__pk'))
+        for r in queued_counts:
+            counts[r['group__pk']]['queued'] = int(r['group__pk__count'])
+
+        return counts
+
     def course_slug(self):
         return self.course.slug
 
@@ -106,7 +148,7 @@ class Group(models.Model):
         return employees
 
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
-        student=None):
+        student_counts, student=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.utils import simplejson
 
@@ -121,9 +163,9 @@ class Group(models.Model):
 
             'limit': self.limit,
             'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
-            'enrolled_count': self.number_of_students(),
-            'unavailable_enrolled_count': self.number_of_students_zamawiane(),
-            'queued_count': self.number_of_queued_students(),
+            'enrolled_count': student_counts[self.pk]['enrolled'], #self.number_of_students(), # 57->111
+            'unavailable_enrolled_count': student_counts[self.pk]['enrolled_zamawiane'], #self.number_of_students_zamawiane(), # 111->165
+            'queued_count': student_counts[self.pk]['queued'], #self.number_of_queued_students(), # 165->219
             'queue_priority': queue_priorities.get(self.pk)
         }
         

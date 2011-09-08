@@ -11,6 +11,8 @@ if (!Fereol.Enrollment)
 
 Fereol.Enrollment.ScheduleCourseTerm = function()
 {
+	this.group = null; // model danych
+
 	this.id = null;
 	this.groupID = null;
 	this.groupURL = null;

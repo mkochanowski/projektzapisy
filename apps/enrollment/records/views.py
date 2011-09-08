@@ -90,6 +90,7 @@ def set_enrolled(request, method):
         ('enrolled' if set_enrolled else 'not enrolled'), group_id))
 
     def prepare_group_data(course, student):
+        groups = course.groups.all()
         queued = Queue.queued.filter(group__course=course)
         enrolled_ids = Record.enrolled.filter(group__course=course, \
             student=student).values_list('group__id', flat=True)
@@ -98,12 +99,13 @@ def set_enrolled(request, method):
         pinned_ids = Record.pinned.filter(group__course=course, \
             student=student).values_list('group__id', flat=True)
         queue_priorities = Queue.queue_priorities_map(queued)
+        student_counts = Group.get_students_counts(groups)
 
         data = {}
-        for group in course.groups.all():
+        for group in groups:
             data[group.id] = group.serialize_for_ajax(
                 enrolled_ids, queued_ids, pinned_ids,
-                queue_priorities, student)
+                queue_priorities, student_counts, student)
         return data
 
     try:
@@ -478,13 +480,27 @@ def schedule_prototype(request):
             term.update({ # TODO: do szablonu
                 'json': simplejson.dumps(term['info'])
             })
+
+    record_ids = Record.get_student_records_ids(student, default_semester)
+    queue_priorities = Queue.queue_priorities_map(
+        Queue.get_student_queues(student, default_semester))
+    all_groups = Group.get_groups_by_semester(default_semester)
+    student_counts = Group.get_students_counts(all_groups)
+    all_groups_json = []
+    for group in all_groups:
+        all_groups_json.append(group.serialize_for_ajax(
+            record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
+            queue_priorities, student_counts, student
+        ))
+    all_groups_json = '[' + (', '.join(all_groups_json)) + ']'
     
     data = {
-        'student_records': Record.get_student_records_ids(student, \
-            default_semester),
+        'groups': all_groups_json,
+        'student_records': record_ids,
         'courses' : courses,
         'semester' : default_semester,
-        'types_list' : Type.get_all_for_jsfilter()
+        'types_list' : Type.get_all_for_jsfilter(),
+        'priority_limit': settings.QUEUE_PRIORITY_LIMIT
     }
     return render_to_response('enrollment/records/schedule_prototype.html',\
         data, context_instance = RequestContext(request))

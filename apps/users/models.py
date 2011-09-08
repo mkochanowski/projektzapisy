@@ -289,12 +289,16 @@ class Student(BaseUser):
     def zamawiany(self):
         return StudiaZamawiane.objects.get(student=self);
 
+    is_zamawiany_cache = None
     def is_zamawiany(self):
+        if not (self.is_zamawiany_cache is None):
+            return self.is_zamawiany_cache
         try:
             self.zamawiany()
-            return True
+            self.is_zamawiany_cache = True
         except StudiaZamawiane.DoesNotExist:
-            return False
+            self.is_zamawiany_cache = False
+        return self.is_zamawiany_cache
         
     class Meta:
         verbose_name = 'student'

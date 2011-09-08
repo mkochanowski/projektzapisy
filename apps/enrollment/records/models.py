@@ -380,7 +380,15 @@ class Queue(models.Model):
         self.priority = value
         self.save()
         return self
-    
+
+    @staticmethod
+    def get_student_queues(student, semester):
+        return Queue.queued.filter(student=student,
+            group__course__semester=semester)
+        for queue in raw:
+            queues[queue.id] = queue
+        return queues
+
     @staticmethod
     def number_of_students(group):
         """Returns number of students queued to particular group"""

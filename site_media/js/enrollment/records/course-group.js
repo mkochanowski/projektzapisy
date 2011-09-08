@@ -76,7 +76,9 @@ Fereol.Enrollment.CourseGroup.prototype._notifyUpdateListeners = function()
 
 Fereol.Enrollment.CourseGroup.fromJSON = function(json)
 {
-	var raw = $.parseJSON(json);
+	var raw = json;
+	if (typeof raw == 'string')
+		raw = $.parseJSON(json);
 
 	var ct = new Fereol.Enrollment.CourseGroup();
 
@@ -90,7 +92,9 @@ Fereol.Enrollment.CourseGroup.fromJSON = function(json)
 
 Fereol.Enrollment.CourseGroup.prototype.updateFromJSON = function(json)
 {
-	var raw = $.parseJSON(json);
+	var raw = json;
+	if (typeof raw == 'string')
+		raw = $.parseJSON(json);
 
 	this.isEnrolled = !!raw['is_enrolled'];
 	this.isQueued = !!raw['is_queued'];

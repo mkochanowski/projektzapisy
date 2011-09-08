@@ -22,6 +22,8 @@ SchedulePrototype.init = function()
 	SchedulePrototype.urls['set-enrolled'] = scheduleContainer.
 		children('input[name=setEnrolledUrl]').assertOne().attr('value').trim();
 
+	SchedulePrototype.initGroups();
+
 	SchedulePrototype.schedule = new Schedule(scheduleContainer);
 
 	/* //testowe
@@ -187,6 +189,16 @@ SchedulePrototype.initRecordsLocking = function()
 			toggleClass('locked', isLocked).
 			toggleClass('unlocked', !isLocked);
 	})
+};
+
+SchedulePrototype.initGroups = function()
+{
+	var groupsRAW = $.parseJSON(
+		$('#enr-schedulePrototype-scheduleContainer input[name=groups]').val());
+	groupsRAW.forEach(function(groupRAW)
+	{
+		Fereol.Enrollment.CourseGroup.fromJSON(groupRAW);
+	});
 };
 
 SchedulePrototype.courseList = [];
