@@ -185,7 +185,7 @@ class Course( models.Model ):
                 points[course.pk] = epoints
         return points
 
-    def serialize_for_ajax(self, student):
+    def serialize_for_ajax(self, student = None):
         from django.utils import simplejson
         from django.core.urlresolvers import reverse
         
@@ -195,7 +195,8 @@ class Course( models.Model ):
             'short_name': self.entity.get_short_name(),
             'type': self.type and self.type.pk or 1,
             'url': reverse('course-page', args=[self.slug]),
-            'is_recording_open': self.is_recording_open_for_student(student)
+            'is_recording_open': False if (student is None) else \
+                self.is_recording_open_for_student(student)
         }
 
         return simplejson.dumps(data)

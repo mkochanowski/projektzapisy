@@ -17,6 +17,7 @@ from django.conf import settings
 
 from apps.users.exceptions import NonUserException, NonEmployeeException,\
                                  NonStudentException
+from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException                                 
 from apps.users.utils import prepare_ajax_students_list,\
                              prepare_ajax_employee_list
 
@@ -50,9 +51,9 @@ def student_profile(request, user_id):
         groups = Student.get_schedule(student)
 
         data = {
-	            'groups' : groups,
-	            'student' : student,
-	        }
+                'groups' : groups,
+                'student' : student,
+            }
 
         if request.is_ajax():
             return render_to_response('users/ajax_student_profile.html', data, context_instance=RequestContext(request))
@@ -109,6 +110,11 @@ def employee_profile(request, user_id):
         logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
         request.user.message_set.create(message="Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except MoreThanOneCurrentSemesterException:
+        data = {'employee' : employee}
+        logger.error('Function employee_profile throws MoreThanOneCurrentSemesterException.' )
+        request.user.message_set.create(message="Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
+        return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
     
 @login_required
 def email_change(request):
@@ -207,11 +213,10 @@ def my_profile(request):
             {"name":"T0 + 24h", "term":t0 + timedelta(days=1)},
             {"name":"T0 + 48h", "term":t0 + timedelta(days=2)},
             {"name":"T0 + 72h", "term":t0 + timedelta(days=3)},
-            {"name":"T1", "term":current_semester.records_opening},
-            {"name":"T2", "term":current_semester.records_opening + timedelta(days=point_limit_duration)},
-            {"name":"T3", "term":current_semester.records_closing},
+            {"name":"Zniesienie limitu 40 ECTS", "term":current_semester.records_opening + timedelta(days=point_limit_duration)},
+            {"name":"Koniec zapisów", "term":current_semester.records_closing},
             ]
-        except:
+        except KeyError:
             terms = []
     else:
         terms = []
@@ -231,8 +236,13 @@ def my_profile(request):
 def employees_list(request, begin = 'A'):
 
     employees = Employee.get_list(begin)
-    semester = Semester.get_current_semester()
-    employees = Group.teacher_in_present(employees, semester)
+    try:
+        semester = Semester.get_current_semester()
+        employees = Group.teacher_in_present(employees, semester)
+    except MoreThanOneCurrentSemesterException:
+        logger.error('Function employee_list throws MoreThanOneCurrentSemesterException.' )
+        request.user.message_set.create(message="Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
+        employees = Employee.objects.all()
 
     for e in employees:
         e.short_new = e.user.first_name[:1] + e.user.last_name[:2]
