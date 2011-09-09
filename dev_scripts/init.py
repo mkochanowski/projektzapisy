@@ -275,6 +275,8 @@ os.system('python manage.py loaddata ../init-data/init.json')
 if not config_dbsqlite:
 	print '\033[91m' + 'Podaj hasło do bazy postgresql' + '\033[0m'
 os.system('python manage.py dbshell < ../init-data/init.sql')
+if os.path.exists('../local.sql'):
+	os.system('python manage.py dbshell < ../local.sql')
 os.chdir(OS_CWD)
 
 ################################################################################

@@ -1,7 +1,6 @@
 #-*- coding: utf-8 -*-
 from apps.enrollment.records.exceptions import NonGroupException
 from apps.enrollment.records.exceptions import ECTS_Limit_Exception 
-from apps.enrollment.records.exceptions import NotCurrentSemesterException
 from apps.enrollment.records.exceptions import InactiveStudentException
 
 from apps.enrollment.courses.models.course import Course
@@ -28,7 +27,7 @@ from apps.enrollment.utils import mail_enrollment_from_queue
 STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
 STATUS_QUEUED = '1'
-RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'oczekujący')]
+RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'przypięty')]
 
 import logging
 logger = logging.getLogger('project.default')
@@ -39,6 +38,11 @@ class EnrolledManager(models.Manager):
         """ Returns only enrolled students. """
         return super(EnrolledManager, self).get_query_set().filter(status=STATUS_ENROLLED)
 
+class PinnedManager(models.Manager):
+    def get_query_set(self):
+        """ Returns only enrolled students. """
+        return super(PinnedManager, self).get_query_set().filter(status=STATUS_PINNED)
+
 class Record(models.Model):
     group = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='records')
@@ -46,6 +50,7 @@ class Record(models.Model):
     
     objects = models.Manager()
     enrolled = EnrolledManager()
+    pinned = PinnedManager()
     
     @staticmethod
     def recorded_students(students):
@@ -64,8 +69,8 @@ class Record(models.Model):
     @staticmethod
     def number_of_students(group):
         """Returns number of students enrolled to particular group"""
-        group_ = group
-        return Record.enrolled.filter(group=group_).count()
+        #TODO: zbędne!
+        return group.number_of_students()
     
     @staticmethod
     def get_student_records_ids(student, semester):
@@ -239,6 +244,11 @@ class Record(models.Model):
                             record.status = STATUS_ENROLLED
                             record.save()
                     new_records.append(record)
+                    try:
+                        queued = Queue.queued.get(group=l, student=student)
+                        queued.delete()
+                    except Queue.DoesNotExist:
+                        pass
                     logger.info('User %s <id: %s> is automaticaly added to lecture <id: %s> of Course: [%s] <id: %s>' % (user.username, user.id, l.id, course.name, course.id))
                     backup_logger.info('[02] user <%s> is automaticaly added to lecture group <%s>' % (user.id, l.id))
             return new_records
@@ -257,8 +267,6 @@ class Record(models.Model):
             	raise InactiveStudentException
             group = Group.objects.get(id=group_id)
             new_records = []
-            if not group.course.semester.is_current_semester():
-                raise NotCurrentSemesterException
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
@@ -313,8 +321,6 @@ class Record(models.Model):
                 records = Record.enrolled.filter(group__course=course, student=student).exclude(group__type='1')
                 for r in records:
                     Record.remove_student_from_group(user_id, r.group.id)
-            if not group.course.semester.is_current_semester():
-                raise NotCurrentSemesterException
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             record = Record.enrolled.get(group=group, student=student)
@@ -322,7 +328,7 @@ class Record(models.Model):
             #backup_logger.info('[03] user <%s> is removed from group <%s>' % (user.id, group.id))
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             
-            Queue.try_enroll_next_student(group)
+            Queue.try_enroll_next_student(group) #TODO: być może zbędne
             
             return record
             
@@ -335,7 +341,10 @@ class Record(models.Model):
         except Group.DoesNotExist:
             logger.error('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
-    
+
+    @staticmethod
+    def on_student_remove_from_group(sender, instance, **kwargs):
+        Queue.try_enroll_next_student(instance.group)
     
     def group_slug(self):
         return self.group.course_slug()
@@ -371,7 +380,15 @@ class Queue(models.Model):
         self.priority = value
         self.save()
         return self
-    
+
+    @staticmethod
+    def get_student_queues(student, semester):
+        return Queue.queued.filter(student=student,
+            group__course__semester=semester)
+        for queue in raw:
+            queues[queue.id] = queue
+        return queues
+
     @staticmethod
     def number_of_students(group):
         """Returns number of students queued to particular group"""
@@ -474,8 +491,6 @@ class Queue(models.Model):
             group = Group.objects.get(id=group_id)
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
-            if not group.course.semester.is_current_semester():
-            	raise NotCurrentSemesterException
             record = Queue.queued.get(group=group, student=student)
             record.delete()
             logger.info('User %s <id: %s> is now removed from queue of group "%s" <id: %s>' % (user.username, user.id, group, group.id)) 
@@ -629,7 +644,15 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.error('Queue.remove_student_low_priority_records throws Group.DoesNotExist exception (parameters user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
             raise NonGroupException()
-    
+
+    @staticmethod
+    def queue_priorities_map(queue_set):
+        raw = queue_set.values('group__id', 'priority')
+        m = {}
+        for r in raw:
+            m[r['group__id']] = r['priority']
+        return m
+
     def group_slug(self):
         return self.group.course_slug()
     
@@ -659,3 +682,4 @@ def log_delete_record(sender, instance, **kwargs):
            
 signals.post_save.connect(log_add_record, sender=Record)                               
 signals.pre_delete.connect(log_delete_record, sender=Record) 
+signals.post_delete.connect(Record.on_student_remove_from_group, sender=Record)

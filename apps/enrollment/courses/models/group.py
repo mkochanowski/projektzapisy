@@ -10,7 +10,7 @@ import logging
 
 backup_logger = logging.getLogger('project.backup')
 
-# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.ScheduleCourseTerm.groupTypes
+# w przypadku edycji, poprawić też javascript: Fereol.Enrollment.CourseGroup.groupTypes
 GROUP_TYPE_CHOICES = [('1', 'wykład'), ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('5', 'ćwiczenio-pracownia'),
         ('6', 'seminarium'), ('7', 'lektorat'), ('8', 'WF'),
@@ -37,6 +37,13 @@ class Group(models.Model):
     def get_all_terms(self):
         """return all terms of current group""" 
         return self.term.all()
+
+    @staticmethod
+    def get_groups_by_semester(semester):
+        """ returns all groups in semester """
+        return Group.objects.filter(course__semester=semester). \
+            select_related('teacher', 'teacher__user', 'course', \
+                'course__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
@@ -73,6 +80,11 @@ class Group(models.Model):
     def number_of_students_non_zamawiane(self):
         return self.number_of_students() - self.number_of_students_zamawiane()
 
+    def number_of_queued_students(self):
+        """Returns number of students queued to particular group"""
+        from apps.enrollment.records.models import Queue
+        return Queue.queued.filter(group=self).count()
+
     @staticmethod
     def numbers_of_students(semester, enrolled):
         '''
@@ -88,6 +100,43 @@ class Group(models.Model):
             count_map[r['group__pk']] = r['group__pk__count']
         return count_map
 
+    @staticmethod
+    def get_students_counts(groups):
+        from apps.enrollment.records.models import Record, Queue
+        from apps.users.models import StudiaZamawiane
+
+        counts = {}
+        for group in groups:
+            counts[group.pk] = {
+                'enrolled': 0,
+                'enrolled_zamawiane': 0,
+                'queued': 0
+            }
+
+        enrolled_counts = Record.enrolled.filter(group__in=groups).\
+            values('group__pk').order_by().annotate(Count('group__pk'))
+        for r in enrolled_counts:
+            counts[r['group__pk']]['enrolled'] = int(r['group__pk__count'])
+
+        #TODO: baza na tym umrze
+        enrolled_students = Record.enrolled.filter(group__in=groups). \
+            values_list('student', flat=True)
+        enrolled_zam_students = StudiaZamawiane.objects.filter(student__in= \
+            enrolled_students).values_list('student', flat=True)
+        enrolled_zam_counts = Record.enrolled.filter(group__in=groups,
+            student__in=enrolled_zam_students).\
+            values('group__pk').order_by().annotate(Count('group__pk'))
+        for r in enrolled_zam_counts:
+            counts[r['group__pk']]['enrolled_zamawiane'] = \
+                int(r['group__pk__count'])
+
+        queued_counts = Queue.queued.filter(group__in=groups).\
+            values('group__pk').order_by().annotate(Count('group__pk'))
+        for r in queued_counts:
+            counts[r['group__pk']]['queued'] = int(r['group__pk__count'])
+
+        return counts
+
     def course_slug(self):
         return self.course.slug
 
@@ -99,7 +148,40 @@ class Group(models.Model):
             employee.teacher = employee.pk in teachers
 
         return employees
-    
+
+    def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
+        student_counts, student=None):
+        """ Dumps this group state to form readable by JavaScript """
+        from django.utils import simplejson
+        from django.core.urlresolvers import reverse
+
+        zamawiany = student and student.is_zamawiany()
+        data = {
+            'id': self.pk,
+            'type': int(self.type),
+            'course': int(self.course.pk),
+
+            'url': reverse('records-group', args=[self.pk]),
+            'teacher_name': self.teacher and self.teacher.user.get_full_name() \
+                or 'nieznany prowadzący',
+            'teacher_url': self.teacher and reverse('employee-profile', args= \
+                [self.teacher.user.id]) or '',
+
+            'is_enrolled': self.id in enrolled,
+            'is_queued': self.id in queued,
+            'is_pinned': self.id in pinned,
+
+            'limit': self.limit,
+            'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
+            'enrolled_count': student_counts[self.pk]['enrolled'],
+            'unavailable_enrolled_count': \
+                student_counts[self.pk]['enrolled_zamawiane'],
+            'queued_count': student_counts[self.pk]['queued'],
+            'queue_priority': queue_priorities.get(self.pk)
+        }
+        
+        return simplejson.dumps(data);
+
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
@@ -119,7 +201,10 @@ def log_add_group(sender, instance, created, **kwargs):
         '9': 'w', '10': 'p'}
         kod_grupy = group.id 
         kod_przed_sem = group.course.id
-        kod_uz = group.teacher and group.teacher.user.get_full_name() or "XXX"
+        teacher_name_array = (group.teacher and group.teacher.user.get_full_name() or u"Nieznany prowadzący").split(" ")
+	kod_uz = teacher_name_array[0]
+	if teacher_name_array[0] != teacher_name_array[-1]:
+		kod_uz += " " + teacher_name_array[-1]
         max_osoby = group.limit
         rodzaj_zajec = GROUP_TYPE_MAPPING[group.type]
         zamawiane_bonus = group.limit_zamawiane

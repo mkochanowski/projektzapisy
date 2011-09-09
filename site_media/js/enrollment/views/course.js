@@ -10,6 +10,8 @@ CourseView = new Object();
  */
 CourseView.init = function()
 {
+	Fereol.Enrollment.Course.fromJSON($('input[name=ajax-course-data]').val());
+
 	CourseView._detailsContainer = $('#enr-course-view .details').assertOne();
 
 	// wysokość panelu szczegółów (w stanie "widoczny")
@@ -41,7 +43,7 @@ CourseView._initTermsList = function()
 	CourseView._termsMap = new Object();
 	$('#enr-course-view > .tutorial tbody tr').each(function(idx, elem)
 	{
-		var term = Fereol.Enrollment.CourseTerm.fromHTML($(elem));
+		var term = Fereol.Enrollment.EPanelCourseTerm.fromHTML($(elem));
 		CourseView._termsList.push(term);
 		CourseView._termsMap[term.id] = term;
 		term.convertControlsToAJAX();

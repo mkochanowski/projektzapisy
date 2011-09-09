@@ -39,6 +39,7 @@
                             <option value="0">dowolny</option>
                             {% for semester in semesters %}
                             <option value="{{ semester.id }}"{% if filter_semester == semester.id %} selected{% endif %}>{{ semester }}{% if semester.is_current %} (bieżący){% endif %}</option>
+							{% comment %} semester.is_current czy semester.is_default? {% endcomment %}
                             {% endfor %}
                         </select>
                     </td>

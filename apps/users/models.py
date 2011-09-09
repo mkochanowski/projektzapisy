@@ -193,15 +193,21 @@ class Student(BaseUser):
         return '%s, semestr %s' % (self.program , semestr)
     get_type_of_studies.short_description = 'Studia'
 
+    participated_in_last_grade_cache = None
     def participated_in_last_grade(self):
+        if not (self.participated_in_last_grade_cache is None):
+            return self.participated_in_last_grade_cache
+
         from apps.grade.ticket_create.models import UsedTicketStamp
-        current_semester = Semester.get_current_semester()
-        previous_semester = current_semester.get_previous_semester()
-        used_tickets = UsedTicketStamp.objects.filter(student=self,poll__semester=previous_semester)
+        previous_semester = Semester.get_default_semester(). \
+            get_previous_semester()
+        used_tickets = UsedTicketStamp.objects.filter(student=self, \
+            poll__semester=previous_semester)
         if len(used_tickets)==0:
-            return False
+            self.participated_in_last_grade_cache = False
         else:
-            return True
+            self.participated_in_last_grade_cache = True
+        return self.participated_in_last_grade_cache
 
     def get_t0_interval(self):
         """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
@@ -259,7 +265,9 @@ class Student(BaseUser):
     @staticmethod
     def get_schedule(student):
         try:
-            groups = [g for g in Student.get_all_groups(student) if g.course.semester.is_current_semester()]
+            default_semester = Semester.get_default_semester()
+            groups = [g for g in Student.get_all_groups(student) \
+                if g.course.semester == default_semester] #TODO: nieoptymalnie
             courses = set([group.course for group in groups])
             for group in groups:
                 group.terms_ = group.get_all_terms()
@@ -286,12 +294,16 @@ class Student(BaseUser):
     def zamawiany(self):
         return StudiaZamawiane.objects.get(student=self);
 
+    is_zamawiany_cache = None
     def is_zamawiany(self):
+        if not (self.is_zamawiany_cache is None):
+            return self.is_zamawiany_cache
         try:
             self.zamawiany()
-            return True
+            self.is_zamawiany_cache = True
         except StudiaZamawiane.DoesNotExist:
-            return False
+            self.is_zamawiany_cache = False
+        return self.is_zamawiany_cache
         
     class Meta:
         verbose_name = 'student'

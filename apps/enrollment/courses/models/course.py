@@ -95,7 +95,7 @@ class Course( models.Model ):
             stud_opt = StudentOptions.get_cached(student, self)
             interval = stud_opt.get_opening_delay_timedelta()
         except StudentOptions.DoesNotExist:
-            interval = timedelta(minutes=4320)
+            interval = timedelta(minutes=4320) #TODO: 3 dni -> to powinno chyba wylądować w konfigu
 
         if records_opening == None:
             return False
@@ -184,6 +184,22 @@ class Course( models.Model ):
                 epoints = epoints.pop()
                 points[course.pk] = epoints
         return points
+
+    def serialize_for_ajax(self, student):
+        from django.utils import simplejson
+        from django.core.urlresolvers import reverse
+        
+        data = {
+            'id': self.pk,
+            'name': self.name,
+            'short_name': self.entity.get_short_name(),
+            'type': self.type and self.type.pk or 1,
+            'url': reverse('course-page', args=[self.slug]),
+            'is_recording_open': self.is_recording_open_for_student(student)
+        }
+
+        return simplejson.dumps(data)
+
 
     class Meta:
         verbose_name = 'przedmiot'

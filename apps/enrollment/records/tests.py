@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 from apps.enrollment.courses.models import Course, Group, StudentOptions, Semester
 from apps.enrollment.records.models import Record, Queue
-from apps.enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException, NotCurrentSemesterException, InactiveStudentException
+from apps.enrollment.records.exceptions import NonStudentException, NonGroupException, AlreadyAssignedException, OutOfLimitException, AlreadyNotAssignedException, AssignedInThisTypeGroupException, RecordsNotOpenException, AlreadyQueuedException, InactiveStudentException
 from apps.enrollment.courses.exceptions import NonCourseException
 from apps.users.models import Employee, Student
 
@@ -115,14 +115,7 @@ class RemoveStudentFromGroupTest(TestCase):
         self.assertEqual(Record.objects.count(), 0)
         self.assertRaises(AlreadyNotAssignedException, Record.remove_student_from_group, self.user.id, self.group.id)
         self.assertEqual(Record.objects.count(), 0)
-	
-    def testWithGroupInDifferentSemesterThanCurrent(self):
-    	semester = self.group.course.semester
-    	semester.semester_ending = datetime.now().date() - timedelta(days=1)
-    	semester.save()
-    	self.assertFalse(semester.is_current_semester())    
-    	self.assertRaises(NotCurrentSemesterException, Record.remove_student_from_group, self.user.id, self.group.id)
-    	
+
     def testAfterRecordsClosing(self):
     	semester = self.group.course.semester
     	semester.semester_ending = datetime.now().date() + timedelta(days=1)
@@ -418,14 +411,7 @@ class RemoveStudentFromQueue(TestCase):
     
     def testStudentNotAssignedToQueue(self):
         self.assertRaises(AlreadyNotAssignedException, Queue.remove_student_from_queue, self.student1.id, self.group.id)
-    
-    def testWithGroupInDifferentSemesterThanCurrent(self):
-    	semester = self.group.course.semester
-    	semester.semester_ending = datetime.now().date() - timedelta(days=1)
-    	semester.save()
-    	self.assertFalse(semester.is_current_semester())    
-    	self.assertRaises(NotCurrentSemesterException, Queue.remove_student_from_queue, self.user.id, self.group.id)
-    	
+
     def testAfterRecordsClosing(self):
     	semester = self.group.course.semester
     	semester.semester_ending = datetime.now().date() + timedelta(days=1)

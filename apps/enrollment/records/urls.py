@@ -6,8 +6,8 @@ urlpatterns = patterns('apps.enrollment.records.views',
     # records
     url('^set-enrolled(?P<method>\.json)?$',\
         'set_enrolled', name='records-set-enrolled'),
-    url('^(?P<group_id>[\d]+)/queue_set_priority(?P<method>\.json)?$',\
-        'queue_set_priority', name='records-queue-set-priority'),
+    url('^set-queue-priority(?P<method>\.json)?$',\
+        'set_queue_priority', name='records-set-queue-priority'),
     url('^(?P<group_id>[\d]+)/records$',\
         'records', name='records-group'),
     url('^set-locked(?P<method>\.json)?$',\
