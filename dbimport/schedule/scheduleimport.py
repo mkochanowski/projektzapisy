@@ -91,7 +91,7 @@ def upper_pl(s):
 
 
 def guess_type(name,COURSE_TYPE):
-    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','').replace('(ANG)',''))
+    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','').replace('(ang)',''))
     if name in O1:
         return COURSE_TYPE['O1'],'O1'
     elif name in O2:
