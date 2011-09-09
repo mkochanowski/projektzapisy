@@ -39,7 +39,7 @@ $ python scheduleimport.py
 
 """
 #### TO CHANGE #####
-SCHEDULE_FILE = '/home/gosia/Desktop/pp.txt'
+SCHEDULE_FILE = '/home/gosia/Desktop/plannnnn'
 LIMITS = {'1' : 300, '9' : 300, '2' : 20, '3' : 15 , '5' : 18 , '6' : 15 }
 
 O1 = ['analizamatematyczna','algebra','logikadlainformatyków','elementyrachunkuprawdopodobieństwa','metodyprobabilistyczneistatystyka']
@@ -75,11 +75,11 @@ from datetime import datetime
 import re
 
 
-regex = re.compile('\s+(?P<day>pn|wt|śr|czw|pi)\s+(?P<start_time>\d{1,2})-(?P<end_time>\d{1,2})\s+\((?P<type>wykład|repetytorium|ćwiczenia|pracownia|ćwicz\+pracownia|seminarium)\)\s+(?P<teacher>[^,]*),\s+(?P<rooms>.*)')
+regex = re.compile('\s+(?P<day>pn|wt|śr|czw|pi|so|ni)\s+(?P<start_time>\d{1,2})-(?P<end_time>\d{1,2})\s+\((?P<type>wykład|repetytorium|ćwiczenia|pracownia|ćwicz\+pracownia|seminarium)\)\s+(?P<teacher>[^,]*),\s+(?P<rooms>.*)')
 
 GROUP_TYPES = { 'wykład' : '1', 'repetytorium' : '9', 'ćwiczenia' : '2', 'pracownia' : '3' ,'ćwicz+pracownia' : '5' ,'seminarium' : '6' }
 
-DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' }
+DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' , 'so' : '6', 'ni' : '7'}
 
 def lower_pl(s):
     return s.lower().replace('Ą','ą').replace('Ć','ć').replace('Ę','ę').replace('Ł','ł').replace('Ń','ń').replace('Ó','ó').replace('Ś','ś').replace('Ż','ż').replace('Ź','ź')
@@ -89,7 +89,7 @@ def upper_pl(s):
 
 
 def guess_type(name,COURSE_TYPE):
-    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)',''))
+    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','').replace('(ANG)',''))
     if name in O1:
         return COURSE_TYPE['O1'],'O1'
     elif name in O2:
@@ -106,7 +106,7 @@ def guess_type(name,COURSE_TYPE):
         return COURSE_TYPE['K'],'K'
     elif 'seminarium' in name:
         return COURSE_TYPE['S'],'S'
-    elif 'projekt' in name:
+    elif 'projekt' in name and 'projektowanie' not in name:
         return COURSE_TYPE['P'],'P'
     return COURSE_TYPE['I2'],'I2'
 
@@ -135,7 +135,7 @@ def find_teacher(t):
     return teacher
 
 def guess_points(name,t):
-    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','()'))
+    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)',''))
     if t=='O1':
         if name=='analizamatematyczna':
             return 10,10
@@ -296,12 +296,12 @@ def import_schedule(file, semester):
             name = len(name)>0 and name[0]+lower_pl(name[1:]) or name
             name = name.replace('(l)','(L)').replace('(m)','(M)').replace('(b)','(B)')
             name = extra+name
-            name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight')
+            name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight').replace('ruby','Ruby').replace('rails','Rails')
             shortName = name[:29]
             type,short_type = guess_type(name,COURSE_TYPE)
             entity = CourseEntity.objects.get_or_create(name=name, defaults = {'shortName':shortName,'type':type})[0]
             lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
-
+            english = '(ang)' in name
             slug = str(semester.year) + semester.type + '_' + slugify(name)
             print slug
             try:
@@ -309,7 +309,8 @@ def import_schedule(file, semester):
                                                  entity=entity,
                                                  semester=semester,
                                                  slug = slug,
-                                                 type=type
+                                                 type=type,
+                                                 english=english
                                                  )
                 
                 points = PointsOfCourseEntities.objects.filter(entity=entity)
