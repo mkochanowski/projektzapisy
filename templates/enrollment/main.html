@@ -1,10 +1,11 @@
 {% extends "enrollment/base.html" %}
 
 {% block styles %}
+    {{ block.super }}
     <link rel="stylesheet" href="/site_media/css/common/mainPage.css" type="text/css" />
 {% endblock %}
 
-{% block main-navigation %}
+{% block bread %}
     <li><a href="/">Strona główna</a></li>
     <li>Zapisy</li>
 {% endblock %}

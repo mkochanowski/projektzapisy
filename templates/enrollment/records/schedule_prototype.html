@@ -3,11 +3,13 @@
 {% block main-subtitle %}Prototyp planu zajęć{% endblock %}
 
 {% block styles %}
+    {{ block.super }}
 	<link rel="stylesheet" href="/site_media/css/common/schedule.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/common/schedule-courses.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/enrollment/schedule-prototype.css" type="text/css" />
 {% endblock %}
-{% block scripts %}
+{% block js %}
+    {{ block.super }}
 	<script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
 	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
 	<script src="/site_media/js/components/schedule.js" type="text/javascript"></script>
@@ -16,17 +18,19 @@
 	<script src="/site_media/js/common/listFilter.js" type="text/javascript"></script>
 	<script src="/site_media/js/common/listFilter-courseType.js" type="text/javascript"></script>
 
+	<script src="/site_media/js/enrollment/records/course.js" type="text/javascript"></script>
+	<script src="/site_media/js/enrollment/records/course-group.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/records/schedule-course-term.js" type="text/javascript"></script>
 	<script src="/site_media/js/enrollment/views/schedule-prototype.js" type="text/javascript"></script>
 {% endblock %}
  
-{% block main-navigation %}
+{% block bread %}
 	<li><a href="{% url main-page %}">Strona główna</a></li>
 	<li><a href="{% url enrollment-main %}">Zapisy</a></li>
 	<li>Prototyp planu</li>
 {% endblock %}
 
-{% block top-bar %}
+{% block filter %}
 	<div id="enr-schedulePrototype-top-bar" class="main-top-bar" style="display: none">
 		<fieldset>
 			<legend><span>Filtrowanie</span></legend>
@@ -69,12 +73,12 @@
 	<div id="enr-schedulePrototype-scheduleContainer">
 		<p>Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu
 			planu nie może bez niej działać.</p>
-		<input type="hidden" name="pinned" value="{{ student_records.pinned }}" />
-		<input type="hidden" name="enrolled" value="{{ student_records.enrolled }}" />
-		<input type="hidden" name="queued" value="{{ student_records.queued }}" />
-
-		<input type="hidden" name="setPinnedUrl" value="{% url schedule-prototype-set-pinned %}" />
-		<input type="hidden" name="setEnrolledUrl" value="{% url records-set-enrolled '.json' %}" />
+		<input type="hidden" name="courses" value="{{ courses_json }}" />
+		<input type="hidden" name="groups" value="{{ groups_json }}" />
+		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
+		<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
+		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
+		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
 	</div>
 {% endblock %}
  

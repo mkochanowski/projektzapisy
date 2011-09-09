@@ -1,6 +1,3 @@
-#employees-list h2, #students-list h2 { margin: 20px 10px; padding: 0;}
-#employees-list ul, #students-list ul {list-style: none; margin: 10px; }
-#employees-list li, #students-list li { margin: 5px 0; }
 
 .profile-loading { 
 	position: absolute; top:0; left:0; width:100%; height:100%; min-height:32px; 

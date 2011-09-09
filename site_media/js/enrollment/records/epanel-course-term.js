@@ -7,8 +7,7 @@ if (!Fereol.Enrollment)
 
 Fereol.Enrollment.EPanelCourseTerm = function()
 {
-	this.courseTerm = null; // model danych
-	this.course = null; // SchedulePrototype.PrototypeCourse
+	this.group = null; // model danych
 };
 
 Fereol.Enrollment.EPanelCourseTerm.fromHTML = function(container)
@@ -18,8 +17,9 @@ Fereol.Enrollment.EPanelCourseTerm.fromHTML = function(container)
 	var sterm = new Fereol.Enrollment.EPanelCourseTerm();
 	sterm._container = container;
 
-	sterm.courseTerm = Fereol.Enrollment.CourseTerm.fromJSON(container.
+	sterm.group = Fereol.Enrollment.CourseGroup.fromJSON(container.
 		find('input[name=group-json]').assertOne().attr('value'));
+	sterm.group.updateListeners.push(function() { sterm.refreshView(); });
 
 	sterm._groupLimitCell = container.find('td.termLimit').assertOne();
 	sterm._enrolledCountCell = container.find('td.termEnrolledCount').
@@ -59,7 +59,7 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
 	this._setEnrolledButton.click(function()
 	{
 		MessageBox.clear();
-		self.setEnrolled(self._setEnrolledAction);
+		self.group.setEnrolled(self._setEnrolledAction);
 	});
 
 	var priorityCell = this._container.find('td.priority').assertOne();
@@ -72,14 +72,14 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
 			priorityOption.text('1 (w ostateczności)');
 		if (i == CourseView.priorityLimit)
 			priorityOption.text(CourseView.priorityLimit + ' (bardzo chcę)');
-		if (i === this.courseTerm.queuePriority)
+		if (i === this.group.queuePriority)
 			priorityOption.attr('selected', 'selected');
 		this._prioritySelector.append(priorityOption);
 	}
 	this._prioritySelector.change(function()
 	{
 		MessageBox.clear();
-		self.courseTerm.changePriority(self._prioritySelector.attr('value').
+		self.group.changePriority(self._prioritySelector.attr('value').
 			castToInt());
 	});
 
@@ -91,27 +91,27 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
  */
 Fereol.Enrollment.EPanelCourseTerm.prototype.refreshView = function()
 {
-	this._prioritySelector.toggle(this.courseTerm.isQueued);
-	this._container.toggleClass('signed', this.courseTerm.isEnrolled);
+	this._prioritySelector.toggle(this.group.isQueued);
+	this._container.toggleClass('signed', this.group.isEnrolled);
 
 	this._setEnrolledAction = null;
 	var newEnrolledButtonLabel = null;
-	if (this.courseTerm.isEnrolled)
+	if (this.group.isEnrolled)
 	{
 		this._setEnrolledAction = false;
 		newEnrolledButtonLabel = 'wypisz';
 	}
-	else if (!this.courseTerm.isFull())
+	else if (!this.group.isFull())
 	{
 		this._setEnrolledAction = true;
 		newEnrolledButtonLabel = 'zapisz'; //TODO: przenieś
 	}
-	else if (this.courseTerm.isQueued)
+	else if (this.group.isQueued)
 	{
 		this._setEnrolledAction = false;
 		newEnrolledButtonLabel = 'wypisz z kolejki';
 		this._prioritySelector.children('option').attr('selected', false);
-		this._prioritySelector.children('option[value=' + this.courseTerm.queuePriority +
+		this._prioritySelector.children('option[value=' + this.group.queuePriority +
 			']').attr('selected', 'selected');
 	}
 	else
@@ -126,134 +126,18 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.refreshView = function()
 		this._setEnrolledButton.attr('value', newEnrolledButtonLabel);
 
 	this._groupLimitCell.text(
-		this.courseTerm.unavailableLimit ?
-			(this.courseTerm.availableLimit() + ' + ' +
-				this.courseTerm.unavailableLimit) :
-			this.courseTerm.limit
+		this.group.unavailableLimit ?
+			(this.group.availableLimit() + ' + ' +
+				this.group.unavailableLimit) :
+			this.group.limit
 	);
 	this._enrolledCountCell.text(
-		this.courseTerm.unavailableLimit ?
-			(this.courseTerm.availableEnrolledCount() + ' + ' +
-				this.courseTerm.unavailableEnrolledCount) :
-			this.courseTerm.enrolledCount
+		this.group.unavailableLimit ?
+			(this.group.availableEnrolledCount() + ' + ' +
+				this.group.unavailableEnrolledCount) :
+			this.group.enrolledCount
 	);
-	this._queuedCountCell.text(this.courseTerm.queuedCount);
-};
-
-/**
- * Zapisuje lub wypisuje użytkownika do/z grupy lub kolejki (w zależności od
- * wolnych miejsc.
- *
- * Założenie: zmiany limitów grup odbywają się rzadko. Zmiana taka może
- * spowodować operowanie na nieświeżych danych, np. użytkownik może obserwować
- * nieprawidłowe liczniki grup. Na przykład, jeżeli przy próbie zapisania się
- * do grupy (w której było 10 zajętych miejsc na 20 w sumie) zostaną
- * zmniejszone w niej limity (do równo 10), użytkownik zamiast stanu 10/10
- * ujrzy 20/20 (i siebie w kolejce). Po odświeżeniu zobaczy prawidłowy stan.
- *
- * Zawsze jedak akcja "zapisania" zapisze go do grupy lub kolejki, akcja
- * "wypisania" analogicznie wypisze. Akcja "zapisania", jeżeli zapisze go do
- * kolejki, NIE wypisze z grupy, niezależnie od etykiety przycisku (która może
- * brzmieć "przepisz do innej grupy").
- *
- * @param enroll true, jeżeli zapisać; false aby wypisać
- */
-Fereol.Enrollment.EPanelCourseTerm.prototype.setEnrolled = function(enroll)
-{
-	if (!Fereol.Enrollment.CourseTerm._setLoading(true))
-		return;
-	$.dataInvalidate();
-
-	var self = this;
-	enroll = !!enroll;
-
-	$.post(Fereol.Enrollment.CourseTerm._setEnrolledURL, {
-		group: this.courseTerm.id,
-		enroll: enroll
-	}, function(data)
-	{
-		var result = AjaxMessage.fromJSON(data);
-		self._isLoading = false;
-		if (result.isSuccess() ||
-			result.code == 'Queued' || result.code == 'AlreadyQueued')
-		{
-			if (self.courseTerm.isEnrolled)
-			{
-				self.courseTerm.isEnrolled = false;
-				self.courseTerm.enrolledCount--;
-			}
-			if (self.courseTerm.isQueued)
-			{
-				self.courseTerm.isQueued = false;
-				self.courseTerm.queuedCount--;
-			}
-		}
-		if (result.isSuccess())
-		{
-			if (enroll)
-			{
-				self.courseTerm.isEnrolled = true;
-				self.courseTerm.enrolledCount++;
-
-				// zaznaczanie innych grup tego samego typu jako "nie zapisane"
-				CourseView._termsList.forEach(function(e)
-				{
-					if (e.id == self.courseTerm.id || e.type != self.courseTerm.type)
-						return;
-					if (e.courseTerm.isEnrolled)
-					{
-						e.courseTerm.isEnrolled = false;
-						e.courseTerm.enrolledCount--;
-					}
-					e.refreshView();
-				});
-
-				// zaznaczanie powiązanych jako "zapisane"
-				result.data['connected_group_ids'].forEach(
-					function(alsoEnrolledID)
-				{
-					if (alsoEnrolledID == self.courseTerm.id)
-						return;
-					var alsoEnrolled = CourseView._termsMap[alsoEnrolledID];
-					if (!alsoEnrolled.courseTerm.isEnrolled)
-					{
-						alsoEnrolled.courseTerm.isEnrolled = true;
-						alsoEnrolled.courseTerm.enrolledCount++;
-					}
-					alsoEnrolled.refreshView();
-				})
-			}
-			else if (self.courseTerm.type == 1) // wykład
-			{
-				// zaznaczenie innych grup z tego przedmiotu jako "nie zapisane"
-				// (wypisanie z wykładu skutkuje wypisaniem z całego przedmiotu)
-				CourseView._termsList.forEach(function(e)
-				{
-					if (e.id == self.courseTerm.id)
-						return;
-					if (e.courseTerm.isEnrolled)
-					{
-						e.courseTerm.isEnrolled = false;
-						e.courseTerm.enrolledCount--;
-					}
-					e.refreshView();
-				});
-			}
-		}
-		else if (result.code == 'Queued' || result.code == 'AlreadyQueued')
-		{
-			self.courseTerm.isQueued = true;
-			self.courseTerm.queuedCount++;
-			if (self.courseTerm.enrolledCount < self.courseTerm.limit)
-				self.courseTerm.enrolledCount = self.courseTerm.limit;
-			self.queuePriority = 1;
-			result.displayMessageBox();
-		}
-		else
-			result.displayMessageBox();
-		self.refreshView();
-		Fereol.Enrollment.CourseTerm._setLoading(false);
-	}, 'json');
+	this._queuedCountCell.text(this.group.queuedCount);
 };
 
 Fereol.Enrollment.EPanelCourseTerm.prototype.toString = function()
@@ -261,7 +145,7 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.toString = function()
 	return 'EPanelCourseTerm';
 };
 
-Fereol.Enrollment.CourseTerm.loadingListeners.push(function(isLoading)
+Fereol.Enrollment.CourseGroup.loadingListeners.push(function(isLoading)
 {
 	$('input.setEnrolledButton').attr('disabled', isLoading);
 	$('td.priority select').attr('disabled', isLoading);

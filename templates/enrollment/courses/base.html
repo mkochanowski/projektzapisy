@@ -31,7 +31,7 @@
 		</fieldset>
 		<fieldset id="enr-coursesList-other">
 			<legend><span>Inne</span></legend>
-			<span class="selectbox">
+			<span class="selectbox" style="display:block; float:none;">
 				<label for="enr-courseFilter-semester">Semestr:</label>
 				<select id="enr-courseFilter-semester">
 					<option value="0">dowolny</option>
@@ -41,9 +41,9 @@
 				</select>
 			</span>
 			{% if user.student %}
-                <span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+                <span class="checkbox" style="display:block; float:none;"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
             {% else %}
-                <span class="checkbox" style="display: none;"><input type="checkbox" id="enr-hidesigned" checked="unchecked"/><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+                <span class="checkbox" style="display: none; float:none;"><input type="checkbox" id="enr-hidesigned" checked="unchecked"/><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
 			{% endif %}
 			
 		</fieldset>

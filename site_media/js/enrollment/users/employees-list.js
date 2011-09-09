@@ -34,8 +34,12 @@ function loadEmployeeProfile(profileUrl){
         complete: function(){
     
             $loadingDiv.remove();
+            history.pushState({}, "Profil pracownika", profileUrl);
+
         }
     });
+
+
 }
 
 $(EmployeesList.init);
@@ -69,9 +73,10 @@ EmployeesList.ajax.getList = function(link)
         async: false,
         dataType: 'json',
         data: '',
-        success: EmployeesList.ajax.parseList
-    });
+        success: function(data){ EmployeesList.ajax.parseList(data); }
 
+    });
+    history.pushState({}, "Lista pracowników", link);
 }
 
 EmployeesList.ajax.parseList = function(data)
@@ -79,7 +84,6 @@ EmployeesList.ajax.parseList = function(data)
     $('#employees-list').removeClass('profile-loading');
     var employee_list = $('#employees-list').assertOne().children('ul.employees');
     $(employee_list).children().remove();
-    EmployeesList.employeeFilter.clearElements();
     if ( data.data )
     {
         $.each(data.data, function(i, employee)
@@ -89,6 +93,8 @@ EmployeesList.ajax.parseList = function(data)
     }
     EmployeesList.parseEmployee();
     EmployeesList.runEmployees( EmployeesList.employeeFilter );
+    EmployeesList.employeeFilter.doFilter();
+
 }
 
 

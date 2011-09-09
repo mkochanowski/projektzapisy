@@ -58,8 +58,26 @@
                         Dydaktyczna</a></li>
                     <li{% if system_type = 'ocena' %} class="active"{% endif %}><a href="#contact">Ocena Zajęć</a></li>
                 </ul>
+			{% if user.is_authenticated %}
+				Witaj, {{ user.get_full_name }} |
+				<a href="{% url my-profile %}">Moje konto</a> |
+                {% if user.is_staff %}
+                        <a href="/fereol_admin/">Panel administracyjny</a> |
+                {% endif %}
+                {% if user.student and user.student.get_number_of_news > 0 %}
+                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.student.get_number_of_news }})</a> |
+                {% else %}
+                    {% if user.employee and user.employee.get_number_of_news > 0 %}
+                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.employee.get_number_of_news }})</a> |
+                    {% else %}
+                        <a href="{% url news-all %}">Aktualności</a> |
+                    {% endif %}
+                {% endif %}
+                <a href="{% url help %}">Pomoc</a> |
+                <a href="{% url user-logout %}">Wyloguj</a>
+			{% else %}
 
-                <form action="{#   url login %}#}"><!-- TODO: redirect  -->
+                <form action="{% url user-login %}?next={{request.path}}"><!-- TODO: redirect  -->
                     <div class="inline-inputs">
                         <label for="id_login">login:</label>
                         <input class="small" type="text" id="id_login">
@@ -70,6 +88,7 @@
                         <button class="btn small" type="submit">Loguj &raquo;</button>
                     </div>
                 </form>
+           {% endif %}
             </div>
             <!-- end up-menu  -->
         </div>

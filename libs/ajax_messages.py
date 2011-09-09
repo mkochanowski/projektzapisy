@@ -21,11 +21,11 @@ class AjaxSuccessMessage(AjaxMessage):
 		AjaxMessage.__init__(self, 'success', 'ok', message, data = data)
 
 class AjaxFailureMessage(AjaxMessage):
-	def __init__(self, code, message):
-		AjaxMessage.__init__(self, 'failure', code, message)
+	def __init__(self, code, message, data = None):
+		AjaxMessage.__init__(self, 'failure', code, message, data)
 
 	@staticmethod
-	def auto_render(code, message, request = None):
+	def auto_render(code, message, request = None, data = None):
 		'''
 			Automatically select best way to render message: if this is AJAX
 			request (request parameter is None), it returns JSON; if not
@@ -33,10 +33,10 @@ class AjaxFailureMessage(AjaxMessage):
 		'''
 
 		if request:
-			data = {
+			rdata = {
 				'messages': [message]
 			}
-			return render_to_response('common/error.html', data, \
+			return render_to_response('common/error.html', rdata, \
 				context_instance=RequestContext(request))
 		else:
-			return AjaxFailureMessage(code, message)
+			return AjaxFailureMessage(code, message, data)

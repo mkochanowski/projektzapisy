@@ -83,19 +83,30 @@ def set_enrolled(request, method):
     if request.user.student.block:
         return AjaxFailureMessage.auto_render('ScheduleLocked', \
             'Twój plan jest zablokowany.', message_context);
+    student = request.user.student
 
     logger.info('User %s <id: %s> set himself %s to group with id: %s' % \
         (request.user.username, request.user.id, \
         ('enrolled' if set_enrolled else 'not enrolled'), group_id))
 
-    def prepare_group_counts(course):
-        counts = {}
-        for group in course.groups.all():
-            counts[group.id] = {
-                'enrolled': group.number_of_students(),
-                'limit': group.limit
-            }
-        return counts
+    def prepare_group_data(course, student):
+        groups = course.groups.all()
+        queued = Queue.queued.filter(group__course=course)
+        enrolled_ids = Record.enrolled.filter(group__course=course, \
+            student=student).values_list('group__id', flat=True)
+        queued_ids = queued.filter(student=student). \
+            values_list('group__id', flat=True)
+        pinned_ids = Record.pinned.filter(group__course=course, \
+            student=student).values_list('group__id', flat=True)
+        queue_priorities = Queue.queue_priorities_map(queued)
+        student_counts = Group.get_students_counts(groups)
+
+        data = {}
+        for group in groups:
+            data[group.id] = group.serialize_for_ajax(
+                enrolled_ids, queued_ids, pinned_ids,
+                queue_priorities, student_counts, student)
+        return data
 
     try:
         group = Group.objects.get(id=group_id)
@@ -118,17 +129,9 @@ def set_enrolled(request, method):
             record = Record.remove_student_from_group(request.user.id, group_id)
             message = 'Zostałeś wypisany z wybranej grupy.'
 
-        connected_group_ids = None
-        if connected_records:
-            connected_group_ids = []
-            for record in connected_records:
-                connected_group_ids.append(record.group.pk)
-
         if is_ajax:
-            return AjaxSuccessMessage(message, { \
-                'connected_group_ids': connected_group_ids,
-                'group_counts': prepare_group_counts(group.course)
-            })
+            return AjaxSuccessMessage(message,
+                prepare_group_data(group.course, student))
         else:
             request.user.message_set.create(message=message)
             return redirect('course-page', slug=record.group_slug())
@@ -145,7 +148,8 @@ def set_enrolled(request, method):
     except AlreadyAssignedException:
         message = 'Jesteś już zapisany do tej grupy.'
         if is_ajax:
-            return AjaxSuccessMessage(message)
+            return AjaxSuccessMessage(message,
+                prepare_group_data(group.course, student))
         else:
             request.user.message_set.create(message=message)
             return redirect('course-page', slug=Group.objects.\
@@ -157,7 +161,8 @@ def set_enrolled(request, method):
         except AlreadyNotAssignedException:
             message = 'Jesteś już wypisany z tej grupy.'
         if is_ajax:
-            return AjaxSuccessMessage(message)
+            return AjaxSuccessMessage(message,
+                prepare_group_data(group.course, student))
         else:
             request.user.message_set.create(message=message)
             return redirect('course-page', slug=Group.objects.\
@@ -172,7 +177,7 @@ def set_enrolled(request, method):
             message = 'Grupa jest pełna. Zostałeś zapisany do kolejki.'
             if is_ajax:
                 return AjaxFailureMessage.auto_render('Queued', message,\
-                    message_context)
+                    message_context, prepare_group_data(group.course, student))
             else:
                 request.user.message_set.create(message=message)
                 return redirect('course-page', slug=Group.objects.\
@@ -332,16 +337,10 @@ def prepare_courses_with_terms(terms, records = []):
         term_info = {
             'id': term.pk,
             'group': term.group.pk,
-            'group_url': reverse('records-group', args=[term.group.pk]),
-            'group_type': int(term.group.type),
-            'teacher': term.group.teacher and term.group.teacher.user.get_full_name() or 'nieznany prowadzący',
-            'teacher_url': term.group.teacher and reverse('employee-profile', \
-                args=[term.group.teacher.user.id]) or '',
             'classroom': term.classroom.number and int(term.classroom.number) or 0,
             'day': int(term.dayOfWeek),
             'start_time': [term.start_time.hour, term.start_time.minute],
             'end_time': [term.end_time.hour, term.end_time.minute],
-            'limit': int(term.group.get_group_limit()),
         }
         courses_map[course.pk]['terms'].append({
             'id': term.pk,
@@ -354,6 +353,25 @@ def prepare_courses_with_terms(terms, records = []):
     courses_list = sorted(courses_list, \
         key=lambda course: course['info']['name'])
     return courses_list
+
+def prepare_groups_json(student, semester, groups):
+    record_ids = Record.get_student_records_ids(student, semester)
+    queue_priorities = Queue.queue_priorities_map(
+        Queue.get_student_queues(student, semester))
+    student_counts = Group.get_students_counts(groups)
+    groups_json = []
+    for group in groups:
+        groups_json.append(group.serialize_for_ajax(
+            record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
+            queue_priorities, student_counts, student
+        ))
+    return '[' + (', '.join(groups_json)) + ']'
+
+def prepare_courses_json(groups, student):
+    courses_json = []
+    for group in groups:
+        courses_json.append(group.course.serialize_for_ajax(student))
+    return '[' + (', '.join(courses_json)) + ']'
 
 @login_required
 def own(request):
@@ -371,6 +389,7 @@ def own(request):
         try:
             employee = request.user.employee
             is_student = False
+            student = None
             courses = prepare_courses_with_terms(\
                 Term.get_all_in_semester(default_semester, employee=employee))
         except Employee.DoesNotExist:
@@ -407,6 +426,10 @@ def own(request):
             })
     terms_by_days = filter(lambda term: term, terms_by_days)
 
+    # TODO: tylko grupy, na które jest zapisany
+    all_groups = Group.get_groups_by_semester(default_semester)
+    all_groups_json = prepare_groups_json(student, default_semester, all_groups)
+
     if is_student:
         points_type = student.program.type_of_points
         course_objects = map(lambda course: course['object'], courses)
@@ -419,11 +442,14 @@ def own(request):
         points_sum = None 
         points_type = None  
     data = {
+        'courses_json': prepare_courses_json(all_groups, student),
+        'groups_json': all_groups_json,
         'terms_by_days': terms_by_days,
         'courses': courses,
         'points': points,
         'points_type': points_type,
-        'points_sum': points_sum
+        'points_sum': points_sum,
+        'priority_limit': settings.QUEUE_PRIORITY_LIMIT
     }
 
     return render_to_response('enrollment/records/schedule.html',\
@@ -475,13 +501,17 @@ def schedule_prototype(request):
             term.update({ # TODO: do szablonu
                 'json': simplejson.dumps(term['info'])
             })
+
+    all_groups = Group.get_groups_by_semester(default_semester)
+    all_groups_json = prepare_groups_json(student, default_semester, all_groups)
     
     data = {
-        'student_records': Record.get_student_records_ids(student, \
-            default_semester),
+        'courses_json': prepare_courses_json(all_groups, student),
+        'groups_json': all_groups_json,
         'courses' : courses,
         'semester' : default_semester,
-        'types_list' : Type.get_all_for_jsfilter()
+        'types_list' : Type.get_all_for_jsfilter(),
+        'priority_limit': settings.QUEUE_PRIORITY_LIMIT
     }
     return render_to_response('enrollment/records/schedule_prototype.html',\
         data, context_instance = RequestContext(request))

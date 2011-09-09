@@ -10,6 +10,8 @@ CourseView = new Object();
  */
 CourseView.init = function()
 {
+	Fereol.Enrollment.Course.fromJSON($('input[name=ajax-course-data]').val());
+
 	CourseView._detailsContainer = $('#enr-course-view .details').assertOne();
 
 	// wysokość panelu szczegółów (w stanie "widoczny")
