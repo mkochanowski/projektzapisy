@@ -1,128 +1,149 @@
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
-
 {% load fereol_common %}
-{% captureas subsystemname %}{% block main-subsystemname %}{% endblock %}{% endcaptureas %}
-{% captureas subtitle %}{% block main-subtitle %}{% endblock %}{% endcaptureas %}
 
+<!DOCTYPE html>
+<html lang="pl">
 <head>
-	<title>
-		{%if subtitle %} {{ subtitle }} &ndash; {% endif %}
-		{%if subsystemname %} {{ subsystemname }} (Fereol) {% else %} Fereol {% endif %}
-	</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <title>{% block title %}Fereol{% endblock %}</title>
+    <meta name="description"
+          content="System obsługi cyklu dydaktycznego Instytut Informatyki Uniwersytetu Wrocławskiego">
+    <meta name="author" content="KSI i Studenci Instytutu Informatyki Uniwersytetu Wrocławskiego">
 
-	<link rel="stylesheet" href="/site_media/css/general.css" type="text/css" />
-	<link rel="stylesheet" href="/site_media/css/main.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/common/dialog_box.css" type="text/css" />
-	{% block mainstyles %}
-	{% endblock %}
-	{% block styles %}
-	{% endblock %}
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-	<link rel="shortcut icon" href="/site_media/favicon.ico" />
+    <!-- Le styles -->
+    <link href="/site_media/css/bootstrap-1.2.0.css" rel="stylesheet">
+    <link href="/site_media/css/fereol.css" rel="stylesheet">
+    <!-- Le fav and touch icons -->
+	<link rel="shortcut icon" href="/site_media/favicon.ico">
+    <link rel="apple-touch-icon" href="/site_media/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/site_media/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/site_media/images/apple-touch-icon-114x114.png">
+    {% block styles %}{% endblock %}
+    <script src="/site_media/js/jquery/jquery-1.5.2.js"></script>
+    <script src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js" type="text/javascript"></script>
+    <script src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js"></script>
+    <script src="/site_media/js/jquery/baseExtensions.js"></script>
+    <script src="/site_media/js/main.js"></script>
 
-	<script src="/site_media/js/jquery/jquery-1.5.2.js" type="text/javascript"></script>
-	<script src="/site_media/js/jquery/jquery-ui-1.8.9.custom.min.js" type="text/javascript"></script>
-	<script src="/site_media/js/jquery/jquery.cookies.2.2.0.min.js" type="text/javascript"></script>
-	<script src="/site_media/js/jquery/baseExtensions.js" type="text/javascript"></script>
-	<script src="/site_media/js/main.js" type="text/javascript"></script>
-	<script src="/site_media/js/common/dialog_box.js" type="text/javascript"></script>
-	{% if user.is_superuser and keys_to_create %}
-		<script src="/site_media/js/grade/ticket_create/keys_generate.js" type="text/javascript"></script>
-		<script type="text/javascript">
-			var url_generate = '{% url grade-ticket-keys-generator %}';
-			var url_progress = '{% url grade-ticket-keys-progress  %}';
-		</script>
-	{% endif %}
-	{% block mainscripts %}
-	{% endblock %}
-	{% block scripts %}
-	{% endblock %}
+    {% block js %}{% endblock %}
+	{% block rss %}{% endblock %}
+    {% block head_extra %}{% endblock %}
 
-	{% block rss %}
-	{% endblock %}
 </head>
+
 <body>
-	<form action="/" method="post" style="display: none">
-		<p><input type="hidden" name="data-invalidated" value="no" /></p>
-	</form>
-	<script type="text/javascript">
-		jQuery.dataInvalidate_check();
-	</script>
-	
-	<div id="main-topContainer">
-		{%if subsystemname %}
-			<p id="main-systemTypeBar">{{ subsystemname }}</p>
-		{% endif %}
-		<p id="main-signinBar">
-			{% if user.is_authenticated %}
-				Witaj, {{ user.get_full_name }} |
-				<a href="{% url my-profile %}">Moje konto</a> |
-                {% if user.is_staff %}
-                        <a href="/fereol_admin/">Panel administracyjny</a> |
-                {% endif %}
-                {% if user.student and user.student.get_number_of_news > 0 %}
-                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.student.get_number_of_news }})</a> |
-                {% else %}
-                    {% if user.employee and user.employee.get_number_of_news > 0 %}
-                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.employee.get_number_of_news }})</a> |
-                    {% else %}
-                        <a href="{% url news-all %}">Aktualności</a> |    
-                    {% endif %}
-                {% endif %}
-                <a href="{% url help %}">Pomoc</a> |
-                <a href="{% url user-logout %}">Wyloguj</a>
-			{% else %}
-				Witaj! |
-				<a href="{% url news-all %}">Aktualności</a> |
-				<a href="{% url user-login %}?next={{request.path}}">Zaloguj</a>
-			{% endif %}
-		</p>
-	</div>
-	<div id="main-container">
-		<div id="main-header">
-			<h1><a href="/">Fereol</a></h1>
-			<div id="main-menu">
-				<ul id="main-menu-list">
-					{% block main-menu %}
-						<li><a href="{% url enrollment-main %}">System zapisów</a></li>
-						<li><a href="{% url offer-main %}">Kształtowanie oferty dydaktycznej</a></li>
-						<li><a href="{% url grade-main %}">Ocena zajęć</a></li>
-					{% endblock %}
-				</ul>
-			</div>
-			<div class="clear"></div>
-		</div>
-		<div id="main-navigation">
-			<ul>
-				{% block main-navigation %}
-					<li><a href="/">Strona główna</a></li>
-				{% endblock %}
-			</ul>
-		</div>
-		<div id="main-content-container" class="{% block sidebar-class %}{% endblock %}">
-			{% block top-bar %}
-			{% endblock %}
-			{% block sidebar %}
-			{% endblock %}
-			<div id="main-content" class="{% block content-class %}normal{% endblock %}">
-				{% block messages %}
-					{% include 'common/messages.html' %}
-				{% endblock %}
-				{% block content %}
-				{% endblock %}
-                {% block special %}
+
+
+<form action="/" method="post" style="display: none">
+    <p><input type="hidden" name="data-invalidated" value="no" /></p>
+</form>
+<script type="text/javascript">
+    jQuery.dataInvalidate_check();
+</script>
+
+<div class="top">
+    <div class="topbar">
+        <div class="fill">
+            <!-- up-menu  -->
+            <div class="container">
+
+                <ul>
+                    <li{% if system_type = 'zapisy' %} class="active"{% endif %}><a href="#about">System Zapisów</a>
+                    </li>
+                    <li{% if system_type = 'oferta' %} class="active"{% endif %}><a href="#contact">Oferta
+                        Dydaktyczna</a></li>
+                    <li{% if system_type = 'ocena' %} class="active"{% endif %}><a href="#contact">Ocena Zajęć</a></li>
+                </ul>
+
+                <form action="{#   url login %}#}"><!-- TODO: redirect  -->
+                    <div class="inline-inputs">
+                        <label for="id_login">login:</label>
+                        <input class="small" type="text" id="id_login">
+
+                        <label for="id_password">hasło:</label>
+                        <input class="small" type="password" id="id_password">
+
+                        <button class="btn small" type="submit">Loguj &raquo;</button>
+                    </div>
+                </form>
+            </div>
+            <!-- end up-menu  -->
+        </div>
+    </div>
+
+
+    <div class="header">
+        <div class="logo">
+            <a href="{% comment %}{% url main %}{% endcomment %}">
+                <img src="/site_media/images/logo.png">
+            </a>
+        </div>
+    </div>
+    <!-- down-menu  -->
+    <div class="topbar">
+        <div class="fill">
+            <div class="container">
+                <ul id="main-menu-list">
+                    {% block system_menu %}
+                        {# end system_menu #}
+                    {% endblock %}
+                </ul>
+
+
+            </div>
+        </div>
+    </div>
+    <!-- end down-menu  -->
+</div>
+
+
+
+<div class="container">
+    {% block filter %}
+    {# end filter #}
+    {% endblock %}
+    <div class="container space">
+
+        {% for message in messages %}
+	        <div class="alert-message {{ message.tags }}">
+		        {{ message|safestring }}
+	        </div>
+        {% endfor %}
+
+
+        <div id="main-content-container" class="row show-grid sidebar-right">
+            {% block center %}
+            <div class="span11 columns">
+                {% block bread %}
                 {% endblock %}
-				<div style="clear: right"></div>
-			</div>
-		</div>
-		<div id="main-footer">
-			{# <a href="{% url on-mobile %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
-			&copy; 2010 <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>
-		</div>
-	</div>
+
+            <div id="main-content">
+            {% block content %}
+            {% endblock %}
+            </div>
+
+                </div>
+        <div class="span5 columns">
+            {% block sidebar %}
+            {% endblock %}
+        </div>
+        {% endblock %}
+    </div>
+</div>
+
+
+<footer>
+    <p>
+        {# <a href="{% url on-mobile %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
+        &copy; 2011 <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a></p>
+</footer>
+
+</div>
+<!-- /container -->
+
 </body>
 </html>

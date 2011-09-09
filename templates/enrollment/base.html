@@ -6,17 +6,19 @@
 
 {% block content-class %}wide{% endblock %}
 
-{% block main-menu %}
-	<li><a href="{% url course-list %}">Przedmioty</a></li>
 
-        {% if user.student or user.employee %}
-	<li><a href="{% url schedule-own %}">Plan zajęć</a></li>
-        {% if user.student %}
-	<li><a href="{% url schedule-prototype %}">Prototyp planu</a></li>
-        {% endif %}
-        {% endif %}
-	<li><a href="{% url employees-list %}">Pracownicy</a></li>
-        {% if user.student or user.employee %}
-	<li><a href="{% url students-list %}">Studenci</a></li>
-        {% endif %}
+{% block system_menu %}
+    <li{% if system_action == 'courses' %} class="active"{% endif %}><a
+            href="/courses/">Przedmioty</a></li>
+     {% if user.student or user.employee %}
+    <li{% if system_action = 'schelud' %} class="active"{% endif %}><a href="/records/schedule/">Plan
+        zajęć</a></li>{% endif %}
+    {% if user.student %}
+    <li{% if system_action = 'prototype' %} class="active"{% endif %}><a
+            href="/records/schedule/prototype/">Prototyp planu</a></li>{% endif %}
+    <li{% if system_action = 'employees' %} class="active"{% endif %}><a href="/users/employees/">Pracownicy</a>
+    </li>{% if user.student or user.employee %}
+    <li{% if system_action = 'students' %} class="active"{% endif %}><a href="/users/students/">Studenci</a>
+    </li>{% endif %}
+    {# end system_menu #}
 {% endblock %}

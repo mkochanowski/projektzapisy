@@ -43,7 +43,7 @@ Sidebar.init = function()
 	Sidebar.isRightSidebar = Sidebar._mainContentContainer.
 		hasClass('sidebar-right');
 	Sidebar.isDetachable = !Sidebar._mainContentContainer.hasClass('sidebar-non-detachable');
-
+/*
 	if (Sidebar.isDetachable)
 	{
 		// akcja chowania lub ukrywania sidebara
@@ -53,6 +53,7 @@ Sidebar.init = function()
 		};
 
 		// generowanie przycisków ukrywania i pokazywania sidebara
+
 		Sidebar._hideButton = $.create('a',
 			{ className: 'main-sidebar-toggle-button hide' }).
 			appendTo(Sidebar._sidebarContainer).text(Sidebar.isRightSidebar?'>':'<').
@@ -61,8 +62,10 @@ Sidebar.init = function()
 			{ className: 'main-sidebar-toggle-button show' }).
 			prependTo($(Sidebar._mainContent)).text(Sidebar.isRightSidebar?'<':'>').
 			disableDragging().click(toggleVisibility);
-	}
 
+
+	}
+*/
 	// ustalenie widoczności sidebara na podstawie cookie, lub (jeżeli
 	// niedostępne) kodu html (czy główny kontener ma klasę sidebar-visible)
 	var cookieStatus = $.cookies.get('sidebar-visible');
@@ -88,6 +91,7 @@ Sidebar.setVisible = function(visible)
 	Sidebar.visible = visible;
 	$.cookies.set('sidebar-visible', Sidebar.visible);
 
+    /*
 	if (Sidebar.isDetachable)
 	{
 		// najpierw ukrywamy oba przyciski
@@ -111,7 +115,7 @@ Sidebar.setVisible = function(visible)
 		if (Sidebar.isDetachable)
 			Sidebar._showButton.css('display', 'block');
 	}
-
+*/
 	Sidebar._notifyObservers();
 };
 

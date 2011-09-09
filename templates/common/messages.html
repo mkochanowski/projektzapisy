@@ -1,7 +1,3 @@
 {% load fereol_common %}
 
-{% for message in messages %}
-	<div class={% if message.tags == error %}"error-message"{% else %}"main-message"{% endif %}>
-		{{ message|safestring }}
-	</div>
-{% endfor %}
+
