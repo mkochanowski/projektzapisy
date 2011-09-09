@@ -73,6 +73,8 @@ from django.db import transaction
 
 from datetime import datetime
 import re
+import logging
+logger = logging.getLogger()
 
 
 regex = re.compile('\s+(?P<day>pn|wt|śr|czw|pi|so|ni)\s+(?P<start_time>\d{1,2})-(?P<end_time>\d{1,2})\s+\((?P<type>wykład|repetytorium|ćwiczenia|pracownia|ćwicz\+pracownia|seminarium)\)\s+(?P<teacher>[^,]*),\s+(?P<rooms>.*)')
@@ -303,7 +305,8 @@ def import_schedule(file, semester):
             lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
             english = '(ang)' in name
             slug = str(semester.year) + semester.type + '_' + slugify(name)
-            print slug
+            #print slug
+            logger.info('Scheduleimport create course %s' % name)
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
