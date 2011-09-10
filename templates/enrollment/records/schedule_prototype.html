@@ -46,7 +46,7 @@
 				<span class="checkbox">
 					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
 					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
-					<label for="filter-course-type-{{ type.id }}">{{ type.name }}</label>
+					<label for="filter-course-type-{{ type.id }}"><span>{{ type.name }}</span></label>
 				</span>
 			{% endfor %}
 		</fieldset>

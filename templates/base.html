@@ -60,7 +60,7 @@
                 </ul>
 			{% if user.is_authenticated %}
                 <div class="user-panel">
-				Witaj, {{ user.get_full_name }} |
+				Witaj, <strong>{{ user.get_full_name }}</strong> |
 				<a href="{% url my-profile %}">Moje konto</a> |
                 {% if user.is_staff %}
                         <a href="/fereol_admin/">Panel administracyjny</a> |
@@ -98,10 +98,13 @@
 
 
     <div class="header">
+
+            <div class="container">
         <div class="logo">
             <a href="{% comment %}{% url main %}{% endcomment %}">
                 <img src="/site_media/images/logo.png">
             </a>
+        </div>
         </div>
     </div>
     <!-- down-menu  -->

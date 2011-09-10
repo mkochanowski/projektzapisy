@@ -40,7 +40,7 @@
 
 #main-topContainer a
 {
-    color: #666;
+    prepare_courses_list_to_rendercolor: #666;
 }
 
 #main-topContainer #main-signinBar
