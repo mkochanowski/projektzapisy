@@ -22,13 +22,12 @@
 {% endblock %}
 
 {% block bread %}
-	<li><a href="{% url main-page %}">Strona główna</a></li>
-	<li><a href="{% url enrollment-main %}">Zapisy</a></li>
-	<li>Plan zajęć</li>
+	<a href="{% url main-page %}">Strona główna</a> &raquo;
+	<a href="{% url enrollment-main %}">Zapisy</a> &raquo;
+	<h2>Plan zajęć</h2>
 {% endblock %}
 
 {% block content %}
-    <a href="{% url ical %}" style="float:right;">Eksportuj do ical</a>
 	<div id="enr-schedule-scheduleContainer">
 
 		<input type="hidden" name="courses" value="{{ courses_json }}" />
@@ -65,6 +64,8 @@
 		</div>
 	</div>
 
+    <div  style="float:left;"><a href="{% url ical %}">Eksportuj do ical</a>
+    </div>
 	{% if courses %}
 	{% if user.student %}
         <h2>Zajęcia, na które jesteś zapisany</h2>

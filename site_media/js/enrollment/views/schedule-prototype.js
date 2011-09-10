@@ -79,7 +79,7 @@ SchedulePrototype.initFilter = function()
 		'phrase', '.filter-phrase', function(element, value)
 	{
 		var course = element.data;
-		return (course.model.name.toLowerCase().indexOf(value) >= 0);
+		return (course.model.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
 	}));
 
 	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(

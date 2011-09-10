@@ -29,7 +29,6 @@ function loadEmployeeProfile(profileUrl){
         success: function(resp){
             $profileDiv.empty();
             $profileDiv.append($(resp));
-            
         },
         complete: function(){
     

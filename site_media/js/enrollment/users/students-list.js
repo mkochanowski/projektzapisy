@@ -33,8 +33,10 @@ function loadStudentProfile(profileUrl){
         },
         complete: function(){
             $loadingDiv.remove();
+            history.pushState({}, "Profil pracownika", profileUrl);
         }
     });
+
 }
 
 $(StudentsList.init);
@@ -70,7 +72,8 @@ StudentsList.ajax.getList = function(link)
         async: false,
         dataType: 'json',
         data: '',
-        success: StudentsList.ajax.parseList
+        success: StudentsList.ajax.parseList,
+        complete: function() { history.pushState({}, "Profil pracownika", link); }
     });
 
 }
