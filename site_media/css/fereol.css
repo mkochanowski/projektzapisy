@@ -1,3 +1,4 @@
+.logo { margin-left:20px; }
 .right { float: right; }
 div.header
 {
@@ -162,7 +163,7 @@ table th:nth-child(5) { text-align: center; }
     border-radius: 0 0 7px 28px;
     float: right;
     height: 21px;
-    padding: 5px 5px 5px 8px;
+    padding: 6px 10px 5px 15px;
 }
 
 .user-panel a, .user-panel a:hover { text-shadow: none; color:#0069D6;}
