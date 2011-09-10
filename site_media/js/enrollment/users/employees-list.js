@@ -73,7 +73,12 @@ EmployeesList.ajax.getList = function(link)
         async: false,
         dataType: 'json',
         data: '',
-        success: function(data){ EmployeesList.ajax.parseList(data); }
+        success: function(data){ EmployeesList.ajax.parseList(data); },
+        complete: function(){
+
+        $('.main-side-message').remove()
+	    EmployeesList.initEmployeeLists();
+	    EmployeesList.initFilter();}
 
     });
     history.pushState({}, "Lista pracowników", link);
@@ -90,11 +95,8 @@ EmployeesList.ajax.parseList = function(data)
         {
             $.tmpl( "employee", employee).appendTo(employee_list);
         })
-    }
-    EmployeesList.parseEmployee();
-    EmployeesList.runEmployees( EmployeesList.employeeFilter );
-    EmployeesList.employeeFilter.doFilter();
 
+    }
 }
 
 
@@ -155,15 +157,6 @@ EmployeesList.initFilter = function()
         return name || short_old || short_new || email;
 	}));
 
-	EmployeesList.employeeFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
-		'showRecorded', '#enr-hidenotteacher', function(element, value)
-	{
-		if (!value)
-			return true;
-		var employee = element.data;
-		return employee.teacher;
-	}));
-
 
     EmployeesList.runEmployees( EmployeesList.employeeFilter );
 
@@ -181,7 +174,6 @@ EmployeesList.parseEmployee = function()
         employeeContainer = $(employeeContainer)
 
         var employee = new EmployeesList.employee();
-
         employee.id = employeeContainer.children('input[name=employee-id]').
                 assertOne().attr('value').castToInt();
         employee.name = employeeContainer.children('a.employee-profile-link').assertOne().text();
@@ -192,12 +184,8 @@ EmployeesList.parseEmployee = function()
         employee.short_new = employeeContainer.children('input[name=employee-short_new]').
                 assertOne().attr('value');
 
-        employee.teacher = employeeContainer.children('input[name=employee-teacher]').
-                assertOne().attr('value').castToBool()
-
         employee.container = employeeContainer;
-
-        EmployeesList.employees[employee.id] = employee;
+        EmployeesList.employees[i] = employee;
 
     });
 }
@@ -230,7 +218,6 @@ EmployeesList.employee = function()
 	this.email = null;
     this.short_old = null; // index
     this.short_new = null; // index
-    this.teacher = false; // index
 	this.container = null;
 	this.visible = true;
 };
