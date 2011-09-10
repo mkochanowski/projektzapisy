@@ -59,6 +59,7 @@
                     <li{% if system_type = 'ocena' %} class="active"{% endif %}><a href="#contact">Ocena Zajęć</a></li>
                 </ul>
 			{% if user.is_authenticated %}
+                <div class="user-panel">
 				Witaj, {{ user.get_full_name }} |
 				<a href="{% url my-profile %}">Moje konto</a> |
                 {% if user.is_staff %}
@@ -75,6 +76,7 @@
                 {% endif %}
                 <a href="{% url help %}">Pomoc</a> |
                 <a href="{% url user-logout %}">Wyloguj</a>
+                </div>
 			{% else %}
 
                 <form action="{% url user-login %}?next={{request.path}}"><!-- TODO: redirect  -->

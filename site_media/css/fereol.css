@@ -151,3 +151,18 @@ table th:nth-child(5) { text-align: center; }
     float: none;
     width:auto;
 }
+
+.user-panel {
+   background: none repeat scroll 0 0 #FFFFFF;
+    border-bottom: 2px solid #00689F;
+    border-left: 3px solid #00689F;
+    border-right: 2px solid #00689F;
+    -webkit-border-radius: 0 0 7px 28px;
+    -moz-border-radius: 0 0 7px 28px;
+    border-radius: 0 0 7px 28px;
+    float: right;
+    height: 21px;
+    padding: 5px 5px 5px 8px;
+}
+
+.user-panel a, .user-panel a:hover { text-shadow: none; color:#0069D6;}
