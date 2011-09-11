@@ -4,6 +4,9 @@ from django.contrib import admin
 
 from apps.enrollment.courses.models import *
 
+class GroupInline(admin.TabularInline):
+    model = Group
+
 class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name', 'semester')}
     list_display = ('name', 'semester', 'lectures', 'exercises_laboratories','exercises', 'laboratories','repetitions')
@@ -14,6 +17,7 @@ class CourseAdmin(admin.ModelAdmin):
         ('Szczegóły', {'fields': ['teachers','requirements','description','semester','english','type','slug','web_page'], 'classes': ['collapse']}),
         ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises_laboratories','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
+    inlines = [GroupInline, ]
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('number', 'capacity', 'building')

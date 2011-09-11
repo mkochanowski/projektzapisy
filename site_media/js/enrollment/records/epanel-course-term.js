@@ -42,7 +42,7 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
 	if ($.browser.opera)
 	{
 		this._setEnrolledButton = $.create('button', {
-			className: 'setEnrolledButton'
+			className: 'setEnrolledButton btn small'
 		}).insertAfter(setEnrolledForm);
 		this._setEnrolledButtonAlternative = true;
 	}
@@ -50,7 +50,7 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
 	{
 		this._setEnrolledButton = $.create('input', {
 			type: 'button',
-			className: 'setEnrolledButton'
+			className: 'setEnrolledButton btn small'
 		}).insertAfter(setEnrolledForm);
 		this._setEnrolledButtonAlternative = false;
 	}
@@ -96,15 +96,19 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.refreshView = function()
 
 	this._setEnrolledAction = null;
 	var newEnrolledButtonLabel = null;
+    var typeClass = null
 	if (this.group.isEnrolled)
 	{
 		this._setEnrolledAction = false;
 		newEnrolledButtonLabel = 'wypisz';
+        typeClass = 'danger';
+
 	}
 	else if (!this.group.isFull())
 	{
 		this._setEnrolledAction = true;
 		newEnrolledButtonLabel = 'zapisz'; //TODO: przenieś
+        typeClass = 'success';
 	}
 	else if (this.group.isQueued)
 	{
@@ -113,11 +117,13 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.refreshView = function()
 		this._prioritySelector.children('option').attr('selected', false);
 		this._prioritySelector.children('option[value=' + this.group.queuePriority +
 			']').attr('selected', 'selected');
+        typeClass = 'danger';
 	}
 	else
 	{
 		this._setEnrolledAction = true;
 		newEnrolledButtonLabel = 'zapisz do kolejki';
+        typeClass = 'success';
 	}
 
 	if (this._setEnrolledButtonAlternative)
@@ -125,6 +131,9 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.refreshView = function()
 	else
 		this._setEnrolledButton.attr('value', newEnrolledButtonLabel);
 
+    this._setEnrolledButton.removeClass('success')
+    this._setEnrolledButton.removeClass('danger')
+    this._setEnrolledButton.addClass(typeClass)
 	this._groupLimitCell.text(
 		this.group.unavailableLimit ?
 			(this.group.availableLimit() + ' + ' +

@@ -2,6 +2,8 @@
  * Aktualności
  */
 
+#news-content { margin-top: 15px; }
+
 .od-news-item
 {
 	margin-bottom: 50px;
@@ -10,7 +12,6 @@
 .od-news-header
 {
 	width: 100%;
-	text-align: right;
 }
 
 .od-news-header h2
@@ -23,6 +24,7 @@
 	height: 1.5em;
 	padding-right: 15px;
 	vertical-align: sub;
+    font-style: italic;
 }
 
 .od-news-body

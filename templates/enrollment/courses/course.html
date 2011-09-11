@@ -102,8 +102,6 @@
 
 </div>
 <hr>
-
-
 		{% for tutorial in tutorials %}{% if tutorial.groups %}
 			<div class="tutorial">
 				<h2>{{tutorial.name}}</h2>
@@ -116,7 +114,7 @@
 							<th title="Maksymalna liczba osób, które mogą zapisać się na przedmiot" class="number">Limit</th>
 							<th title="Liczba aktualnie zapisanych osób" class="number termEnrolledHeader">Zapisani</th>
 							<th title="Liczba osób oczekujących na zapis" class="number termQueuedHeader">Kolejka</th>
-							<td class="controls"></td>
+							<th class="controls"></th>
 							{% if course.is_recording_open and user.student.is_active %}
 								<th class="priority">Priorytet</th>
 							{% endif %}

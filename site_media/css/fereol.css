@@ -173,3 +173,11 @@ table th:nth-child(5) { text-align: center; }
 .filter-course-type-metaSwitch {
     margin-bottom: -6px;    font-size: 10px;    float: right;    clear: left;
 }
+
+
+.main-filter-input input[type="text"] { padding-right: 25px; }
+
+#enr-course-view .tutorial table tr.signed td
+{
+	background: #e9e9e9;
+}
