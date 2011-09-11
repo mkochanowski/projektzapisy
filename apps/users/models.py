@@ -304,7 +304,10 @@ class Student(BaseUser):
         except StudiaZamawiane.DoesNotExist:
             self.is_zamawiany_cache = False
         return self.is_zamawiany_cache
-        
+
+    def is_first_year_student(self):
+	return (self.semestr in [1,2]) and (self.program.id in [0,2]) 
+
     class Meta:
         verbose_name = 'student'
         verbose_name_plural = 'studenci'

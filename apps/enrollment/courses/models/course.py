@@ -52,17 +52,19 @@ class Course( models.Model ):
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący', blank=True)
     description = models.TextField(verbose_name='opis', blank=True, default='') 
     lectures = models.IntegerField(verbose_name='wykład')
+    repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
     exercises = models.IntegerField(verbose_name='ćwiczenia')
     laboratories = models.IntegerField(verbose_name='pracownia')
+    exercises_laboratories = models.IntegerField(verbose_name='ćw+prac', default=0)
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
-    repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
                                 verify_exists= True,
 								blank        = True,
                                 null         = True )
-    english = models.BooleanField(default=False, verbose_name='angielski')
-    exercises_laboratories = models.IntegerField(verbose_name='ćw+prac', default=0)
+    english = models.BooleanField(default=False, verbose_name='przedmiot prowadzony w j.angielskim')
+    exam = models.BooleanField(verbose_name='egzamin')
+    suggested_for_first_year = models.BooleanField(verbose_name='polecany dla pierwszego roku')
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method

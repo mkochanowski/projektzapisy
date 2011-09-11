@@ -326,6 +326,9 @@ def prepare_courses_with_terms(terms, records = []):
                 'short': course.entity.get_short_name(),
                 'type': course.type and course.type.pk or 1,
                 'slug': course.slug,
+		'exam': course.exam,
+		'english': course.english,
+		'suggested_for_first_year': course.suggested_for_first_year,
             },
             'terms': []
         }
@@ -490,6 +493,9 @@ def schedule_prototype(request):
             #TODO: kod w prepare_courses_list_to_render moim zdaniem nie
             #      zadziała
             'was_enrolled': 'False',
+	    'english': course['object'].english,
+	    'exam': course['object'].exam,
+	    'suggested_for_first_year': course['object'].suggested_for_first_year,
         })
         for term in course['terms']:
             term['info'].update({

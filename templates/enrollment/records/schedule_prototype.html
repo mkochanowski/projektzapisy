@@ -50,6 +50,9 @@
 		<fieldset id="enr-schedulePrototype-other">
 			<legend><span>Inne</span></legend>
 			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">Pokaż przedmioty prowadzone w j.angielskim</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">Pokaż przedmioty kończące się egzaminem</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">Pokaż przedmioty sugerowane dla 1 roku</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -94,6 +97,9 @@
 				<input type="hidden" name="type" value="{{ course.info.type }}" />
 				<input type="hidden" name="short" value="{{ course.info.short }}" />
 				<input type="hidden" name="wasEnrolled" value="{{ course.info.was_enrolled }}" />
+				<input type="hidden" name="english" value="{{ course.info.english }}" />
+				<input type="hidden" name="exam" value="{{ course.info.exam }}" />
+				<input type="hidden" name="suggested_for_first_year" value="{{ course.info.suggested_for_first_year }}" />
 				<input type="hidden" name="isRecordingOpen" value="{{ course.info.is_recording_open }}" />
 				<input type="hidden" name="url" value="{% url course-page course.info.slug %}" />
 				{% for term in course.terms %}

@@ -58,6 +58,20 @@
 						{% if course.laboratories %}{{course.laboratories}} (prac){% endif %}
 					</li>
 				{% endif %}
+		{% if course.english %}
+		    <li>
+                        Przedmiot prowadzony w j.angielskim
+                    </li>
+                {% endif %}
+		{% if course.suggested_for_first_year %}
+		    <li>
+			Zalecany dla pierwszego roku
+                    </li>
+                {% endif %}
+		<li>
+		    <span>Egzamin:</span>
+		    {% if course.exam %}Tak{% else %}Nie{% endif %}
+                </li>
                 {% if course.web_page %}
                     <li>
                         <span>Strona www:</span>
