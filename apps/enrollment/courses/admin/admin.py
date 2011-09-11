@@ -3,9 +3,11 @@
 from django.contrib import admin
 
 from apps.enrollment.courses.models import *
+from apps.enrollment.records.models import Record
 
 class GroupInline(admin.TabularInline):
     model = Group
+    extra = 0
 
 class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name', 'semester')}
@@ -51,13 +53,19 @@ class PointsOfCoursesAdmin(admin.ModelAdmin):
 
 class TermInline(admin.TabularInline):
     model = Term
+    extra = 0
+
+class RecordInline(admin.TabularInline):
+    model = Record
+    extra = 0
+
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane')
     list_filter = ('type','teacher',)
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
-        TermInline,
+        TermInline,RecordInline,
     ]
 
 class TypeAdmin(admin.ModelAdmin):
