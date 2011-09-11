@@ -23,7 +23,8 @@
 <div class="container space">
 <div class="row show-grid">
     <div class="span5 columns loginbox">
-<form class="form-stacked" action="{% url apps.users.views.login_plus_remember_me %}">
+<form class="form-stacked" action="{% url apps.users.views.login_plus_remember_me %}" method="POST">
+        {% csrf_token %}
         <fieldset>
           <div class="clearfix">
             <label for="id_username">{{ form.username.label_tag }}</label>

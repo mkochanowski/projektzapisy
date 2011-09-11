@@ -79,8 +79,10 @@
                 </div>
 			{% else %}
 
-                <form action="{% url user-login %}?next={{request.path}}"><!-- TODO: redirect  -->
+                <form action="{% url apps.users.views.login_plus_remember_me %}" method="POST">
+                    {% csrf_token %}
                     <div class="inline-inputs">
+                        <input type="hidden" name="next" value="{{request.path}}" />
                         <label for="id_login">login:</label>
                         <input class="small" type="text" id="id_login">
 
