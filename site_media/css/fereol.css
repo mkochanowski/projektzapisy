@@ -10,8 +10,11 @@ background: #00689f; /* Old browsers */
 
 div.top { margin-bottom:25px;}
 div.top .topbar { position:relative;}
+div.top .topbar .fill{ position:relative; min-height:40px;}
 div.top .btn { padding:4px; color:#808080;}
-div.top .topbar ul a { color:#FFFFFF; }
+div.top .topbar ul a { color:#FFFFFF; font-size:18px; }
+div.top .systemtopbar .fill { background-color: #00689F; background-image:none; }
+div.top .systemtopbar ul a { color:#FFFFFF; font-size:15px;}
 div.top .topbar form { min-height:35px; float:right;}
 div.top .topbar .inline-inputs label { float:none; color:#FFFFFF; }
 

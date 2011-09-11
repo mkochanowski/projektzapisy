@@ -46,17 +46,17 @@
 </script>
 
 <div class="top">
-    <div class="topbar">
+    <div class="topbar systemtopbar">
         <div class="fill">
             <!-- up-menu  -->
             <div class="container">
 
                 <ul>
-                    <li class="active"><a href="#about">System Zapisów</a>
+                    <li class="active"><a href="{% url enrollment-main %}">System Zapisów</a>
                     </li>
-                    <li{% if system_type = 'oferta' %} class="active"{% endif %}><a href="#contact">Oferta
+                    <li{% if system_type = 'oferta' %} class="active"{% endif %}><a href="{% url offer-main %}">Oferta
                         Dydaktyczna</a></li>
-                    <li{% if system_type = 'ocena' %} class="active"{% endif %}><a href="#contact">Ocena Zajęć</a></li>
+                    <li{% if system_type = 'ocena' %} class="active"{% endif %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
                 </ul>
 			{% if user.is_authenticated %}
                 <div class="user-panel">
