@@ -52,7 +52,7 @@
 			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
                         <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">Pokaż przedmioty prowadzone w j.angielskim</label></span>
                         <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">Pokaż przedmioty kończące się egzaminem</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">Pokaż przedmioty sugerowane dla 1 roku</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">Pokaż tylko przedmioty zalecane dla 1 roku</label></span>
 		</fieldset>
 	</div>
 {% endblock %}

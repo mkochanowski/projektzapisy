@@ -142,10 +142,10 @@ CoursesList.initFilter = function()
 	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
 		'showSyggestedForFirstYear', '#enr-courseFilter-suggestedForFirstYear', function(element, value)
 	{
-		if(value)
+		if(!value)
 			return true;
 		var course = element.data;
-		return !course.suggested_for_first_year;
+		return course.suggested_for_first_year;
 	}));
 
 	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createCourseTypeFilter(
