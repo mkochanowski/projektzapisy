@@ -12,13 +12,6 @@
 
 {% block filter %}
 	<div id="enr-coursesList-top-bar" class="main-top-bar" style="display: none">
-		<fieldset>
-			<legend><span>Filtrowanie</span></legend>
-			<div class="main-filter-input">
-				<input class="text filter-phrase" type="text" />
-				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
-			</div>
-		</fieldset>
 		<fieldset class="course-type-filter">
 			<legend><span>Rodzaj przedmiotu</span></legend>
 			{% for type in types_list %}
