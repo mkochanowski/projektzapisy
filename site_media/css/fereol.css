@@ -3,8 +3,7 @@ div.header
 {
 
 background: #00689f; /* Old browsers */
- border-bottom: 1px solid #0b203d;
-    height:96px;
+    height:105px;
 
 }
 
@@ -12,9 +11,15 @@ div.top { margin-bottom:25px;}
 div.top .topbar { position:relative;}
 div.top .topbar .fill{ position:relative; min-height:40px;}
 div.top .btn { padding:4px; color:#808080;}
-div.top .topbar ul a { color:#FFFFFF; font-size:18px; }
-div.top .systemtopbar .fill { background-color: #00689F; background-image:none; }
+div.top .topbar ul a { color:#FFFFFF; font-size:16px; }
+div.top .systemtopbar .fill { background-color: #00689F; background-image:none; box-shadow: none; }
 div.top .systemtopbar ul a { color:#FFFFFF; font-size:15px;}
+div.top .systemtopbar ul li { margin-right:5px; background-color:#005f92; font-size:15px;
+  -webkit-border-radius: 5px  5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;}
+div.top .systemtopbar ul li.active { background-color:#FFFFFF; color:#005f92; background-image:none; font-size:15px;}
+div.top .systemtopbar ul li.active a { text-shadow:none; background-color:transparent; color:#005f92; background-image:none; font-size:15px;}
 div.top .topbar form { min-height:35px; float:right;}
 div.top .topbar .inline-inputs label { float:none; color:#FFFFFF; }
 
@@ -157,9 +162,6 @@ table th:nth-child(5) { text-align: center; }
 
 .user-panel {
    background: none repeat scroll 0 0 #FFFFFF;
-    border-bottom: 2px solid #00689F;
-    border-left: 3px solid #00689F;
-    border-right: 2px solid #00689F;
     -webkit-border-radius: 0 0 7px 28px;
     -moz-border-radius: 0 0 7px 28px;
     border-radius: 0 0 7px 7px;

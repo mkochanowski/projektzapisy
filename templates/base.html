@@ -46,7 +46,7 @@
 </script>
 
 <div class="top">
-    <div class="topbar systemtopbar">
+    <div class="topbar">
         <div class="fill">
             <!-- up-menu  -->
             <div class="container">
@@ -60,10 +60,10 @@
                 </ul>
 			{% if user.is_authenticated %}
                 <div class="user-panel">
-				Witaj, <strong>{{ user.get_full_name }}</strong> |
+				Witaj, <strong>{% if user.is_staff %}{{ user.first_name }}{% else %}{{ user.get_full_name }}{% endif %}</strong> |
 				<a href="{% url my-profile %}">Moje konto</a> |
                 {% if user.is_staff %}
-                        <a href="/fereol_admin/">Panel administracyjny</a> |
+                        <a href="/fereol_admin/">Admin</a> |
                 {% endif %}
                 {% if user.student and user.student.get_number_of_news > 0 %}
                     <a href="{% url news-all %}" class="unread">Aktualności({{ user.student.get_number_of_news }})</a> |
@@ -84,12 +84,14 @@
                     <div class="inline-inputs">
                         <input type="hidden" name="next" value="{{request.path}}" />
                         <label for="id_login">login:</label>
-                        <input class="small" type="text" id="id_login">
+                        <input class="small" type="text" id="id_login" name="username">
 
                         <label for="id_password">hasło:</label>
-                        <input class="small" type="password" id="id_password">
+                        <input class="small" type="password" id="id_password" name="password">
 
                         <button class="btn small" type="submit">Loguj &raquo;</button>
+                        <input type="checkbox" value="true" id="xlInput3" name="remember_me">
+                        <label for="xlInput3">Zapamiętaj mnie</label>
                     </div>
                 </form>
            {% endif %}
@@ -110,7 +112,7 @@
         </div>
     </div>
     <!-- down-menu  -->
-    <div class="topbar">
+    <div class="topbar systemtopbar">
         <div class="fill">
             <div class="container">
                 <ul id="main-menu-list">
