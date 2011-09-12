@@ -244,6 +244,8 @@ def import_schedule(file, semester):
                 group_type = GROUP_TYPES[g.group('type')]
                 teacher = find_teacher(g.group('teacher'))
                 limit = LIMITS[group_type]
+                if 'CCNA' in course.name or 'ccna' in course.name:
+                    limit = 18
                 
                 t = 15*(int(g.group('end_time'))-int(g.group('start_time')))
                 if group_type=='1':
