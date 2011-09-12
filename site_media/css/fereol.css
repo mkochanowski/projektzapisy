@@ -187,5 +187,6 @@ table th:nth-child(5) { text-align: center; }
 input.small { width:auto; }
 
 .topbar div > ul .active a, .nav .active a {
+    background-color: rgba(0, 0, 0, 0.7);
     font-weight: bold;
 }
