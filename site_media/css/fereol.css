@@ -2,7 +2,7 @@
 div.header
 {
 
-background: #00689f; /* Old browsers */
+background: #00709e; /* Old browsers */
     height:105px;
 
 }
@@ -12,7 +12,7 @@ div.top .topbar { position:relative;}
 div.top .topbar .fill{ position:relative; min-height:40px;}
 div.top .btn { padding:4px; color:#808080;}
 div.top .topbar ul a { color:#FFFFFF; font-size:16px; }
-div.top .systemtopbar .fill { background-color: #00689F; background-image:none; box-shadow: none; }
+div.top .systemtopbar .fill { background-color: #00709e; background-image:none; box-shadow: none; }
 div.top .systemtopbar ul a { color:#FFFFFF; font-size:15px;}
 div.top .systemtopbar ul li { margin-right:5px; background-color:#005f92; font-size:15px;
   -webkit-border-radius: 5px  5px 0 0;
