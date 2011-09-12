@@ -185,3 +185,7 @@ table th:nth-child(5) { text-align: center; }
 }
 
 input.small { width:auto; }
+
+.topbar div > ul .active a, .nav .active a {
+    font-weight: bold;
+}
