@@ -11,7 +11,7 @@ div.top { margin-bottom:25px;}
 div.top .topbar { position:relative;}
 div.top .topbar .fill{ position:relative; min-height:35px;}
 div.top .btn { padding:4px; color:#808080;}
-div.top .topbar ul a { color:#FFFFFF; font-size:16px; }
+div.top .topbar ul a { color:#FFFFFF; font-size:15px; }
 div.top .systemtopbar .fill { background-color: #00709e; background-image:none; box-shadow: none; }
 div.top .systemtopbar ul a { padding: 8px 10px 8px 10px; color:#FFFFFF; font-size:15px;}
 div.top .systemtopbar ul li {  margin-right:5px; background-color:#005f92; font-size:15px;
