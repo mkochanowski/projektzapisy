@@ -9,6 +9,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding field 'Course.suggested_for_first_year'
+        db.add_column('courses_course', 'exam', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True), keep_default=False)
         db.add_column('courses_course', 'suggested_for_first_year', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True), keep_default=False)
     
     
