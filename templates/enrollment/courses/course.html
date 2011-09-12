@@ -158,10 +158,11 @@
 									{{ t.limit }}
 								{% endif %}
 							</td>
-							<td class="number termEnrolledCount">
 								{% if t.limit_zamawiane and not user.student.is_zamawiany%}
+                                    <td class="number termEnrolledCount" title=" Limit dla studentów niezamawianych {{t.number_of_students_non_zamawiane}} + miejsce gwarantowane dla studentów zamawianych {{ t.number_of_students_zamawiane }}." >
 									{{ t.number_of_students_non_zamawiane }} + {{ t.number_of_students_zamawiane }}
 								{% else %}
+                                    <td class="number termEnrolledCount">
 									{{ t.enrolled }}
 								{% endif %}
 							</td>
