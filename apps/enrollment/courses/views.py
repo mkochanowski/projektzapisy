@@ -43,7 +43,7 @@ def prepare_courses_list_to_render(request):
             'is_current': semester.is_current_semester(), #TODO: być może zbędne
             'is_default': (semester == default_semester),
             'courses': courses.filter(semester__id__exact=semester.pk).
-                order_by('name').values('id', 'name', 'type', 'slug')
+                order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year')
         })
     for semester in semester_courses:
         for course in semester['courses']:

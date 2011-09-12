@@ -90,6 +90,30 @@ SchedulePrototype.initFilter = function()
 		var course = element.data;
 		return !course.wasEnrolled;
 	}));
+	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showEnglish', '#enr-courseFilter-english', function(element, value)
+	{
+		if(value)
+			return true;
+		var course = element.data;
+		return !course.english;
+	}));
+	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showExam', '#enr-courseFilter-exam', function(element, value)
+	{
+		if(value)
+			return true;
+		var course = element.data;
+		return !course.exam;
+	}));
+	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showSyggestedForFirstYear', '#enr-courseFilter-suggestedForFirstYear', function(element, value)
+	{
+		if(value)
+			return true;
+		var course = element.data;
+		return !course.suggested_for_first_year;
+	}));
 
 	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createCourseTypeFilter(
 		function(element, courseType)
@@ -214,6 +238,9 @@ SchedulePrototype.initCourseList = function()
 			elem.children('input[name=id]').attr('value').castToInt());
 
 		course.wasEnrolled = elem.children('input[name=wasEnrolled]').attr('value').castToBool();
+		course.english = elem.children('input[name=english]').attr('value').castToBool();
+		course.exam = elem.children('input[name=exam]').attr('value').castToBool();
+		course.suggested_for_first_year = elem.children('input[name=suggested_for_first_year]').attr('value').castToBool();
 		course._listElementContainer = elem;
 		course._prototypedCheckbox = elem.find('input[type=checkbox]').assertOne();
 
@@ -262,7 +289,9 @@ SchedulePrototype.PrototypeCourse = function()
 	this.model = null; // model danych
 
 	this.wasEnrolled = null;
-	
+	this.english = null;
+	this.exam = null;
+	this.suggested_for_first_year = null;
 	this.terms = [];
 	this.isPrototyped = false;
 	this._listElementContainer = null;

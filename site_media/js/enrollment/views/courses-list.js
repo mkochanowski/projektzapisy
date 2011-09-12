@@ -50,6 +50,12 @@ CoursesList.initCourseLists = function()
 			course.container = courseContainer;
 			course.wasEnrolled = courseContainer.children('input[name=wasEnrolled]').
 				assertOne().attr('value').castToBool();
+			course.english = courseContainer.children('input[name=english]').
+				assertOne().attr('value').castToBool();
+			course.exam = courseContainer.children('input[name=exam]').
+				assertOne().attr('value').castToBool();
+			course.suggested_for_first_year = courseContainer.children('input[name=suggested_for_first_year]').
+				assertOne().attr('value').castToBool();
 			semester.addCourse(course);
 			CoursesList.courses[course.id] = course;
 		});
@@ -116,6 +122,30 @@ CoursesList.initFilter = function()
 			return true;
 		var course = element.data;
 		return !course.wasEnrolled;
+	}));
+	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showEnglish', '#enr-courseFilter-english', function(element, value)
+	{
+		if(value)
+			return true;
+		var course = element.data;
+		return !course.english;
+	}));
+	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showExam', '#enr-courseFilter-exam', function(element, value)
+	{
+		if(value)
+			return true;
+		var course = element.data;
+		return !course.exam;
+	}));
+	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
+		'showSyggestedForFirstYear', '#enr-courseFilter-suggestedForFirstYear', function(element, value)
+	{
+		if(value)
+			return true;
+		var course = element.data;
+		return !course.suggested_for_first_year;
 	}));
 
 	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createCourseTypeFilter(
@@ -204,6 +234,9 @@ CoursesList.Course = function()
 	this.container = null;
 	this.visible = true;
 	this.wasEnrolled = null; // czy aktualny student był zapisany
+	this.english = null;
+	this.exam = null;
+	this.suggested_for_first_year = null;
 };
 
 /**
