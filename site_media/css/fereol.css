@@ -7,7 +7,6 @@ background: #00709e; /* Old browsers */
 
 }
 
-div.top { margin-bottom:25px;}
 div.top .topbar { position:relative;}
 div.top .topbar .fill{ position:relative; min-height:35px;}
 div.top .btn { padding:4px; color:#808080;}
@@ -48,25 +47,6 @@ div.space2 { margin-top: 50px; }
 .students li { margin-bottom:5px; }
 
 
-.main-filter-input .reset
-{
-	border: 0;
-
-	height: 23px;
-	background-color: white;
-	font-weight: bold;
-
-	position: relative;
-	left: -23px;
-
-}
-
-.main-filter-input .reset:hover
-{
-	background-color: #cccccc;
-	cursor: pointer;
-}
-
 .course-type-filter
 {
 	width: 300px;
@@ -77,62 +57,7 @@ div.space2 { margin-top: 50px; }
 	min-width: 150px;
 }
 
-/*** PANEL FILTROWANIA ***/
 
-.main-top-bar
-{
-	border-bottom: 1px solid #cccccc;
-	height: 100%;
-	overflow: hidden;
-}
-
-.main-top-bar fieldset
-{
-	position: relative;
-	border: 0;
-	float: left;
-	border-right: 1px dotted #cccccc;
-	margin: 0;
-	padding: 10px;
-	display: block;
-
-	min-height: 30px;
-
-	padding-top: 20px;
-
-	padding-bottom: 110px;
-	margin-bottom: -100px;
-}
-
-
-.main-top-bar fieldset:last-child
-{
-	border: 0;
-}
-
-.main-top-bar fieldset legend
-{
-	margin-bottom:5px;
-}
-
-.main-top-bar fieldset legend span
-{
-	position: absolute;
-	white-space: nowrap;
-	font-size: 16px;
-	left: -5px;
-}
-
-.main-top-bar fieldset > span
-{
-	float: left;
-}
-
-.main-top-bar .selectbox
-{
-	overflow: hidden;
-	height: 100%;
-}
 /*** PANEL FILTROWANIA - koniec ***/
 
 table td:nth-child(3),
@@ -190,3 +115,17 @@ input.small { width:auto; }
     background-color: rgba(0, 0, 0, 0.7);
     font-weight: bold;
 }
+
+#enr-coursesList-other span { float:none; display: block; }
+
+#enr-coursesList-top-bar .checkbox label {
+    vertical-align: top;}
+
+#enr-coursesList-other input[type="checkbox"] { margin-right: 3px; }
+
+.bread, .main-top-bar { margin-bottom: 10px; }
+
+
+.filter-phrase { width:190px; }
+
+.main-top-bar fieldset:nth-child(1) { width:280px; }

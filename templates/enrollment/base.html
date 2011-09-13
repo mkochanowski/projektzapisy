@@ -2,23 +2,20 @@
 
 {% load news_extras %}
 
-{% block main-subsystemname %}System zapisów{% endblock %}
-
-{% block content-class %}wide{% endblock %}
-
+{% block enrollment_active %} class="active"{% endblock %}
 
 {% block system_menu %}
-    <li{% if system_action == 'courses' %} class="active"{% endif %}><a
+    <li{% block enrollment_menu_courses %}{% endblock %}><a
             href="/courses/">Przedmioty</a></li>
      {% if user.student or user.employee %}
-    <li{% if system_action = 'schelud' %} class="active"{% endif %}><a href="/records/schedule/">Plan
+    <li{% block enrollment_menu_schedule %}{% endblock %}><a href="/records/schedule/">Plan
         zajęć</a></li>{% endif %}
     {% if user.student %}
-    <li{% if system_action = 'prototype' %} class="active"{% endif %}><a
+    <li{% block enrollment_menu_prototype %}{% endblock %}><a
             href="/records/schedule/prototype/">Prototyp planu</a></li>{% endif %}
-    <li{% if system_action = 'employees' %} class="active"{% endif %}><a href="/users/employees/">Pracownicy</a>
+    <li{% block enrollment_menu_employees %}{% endblock %}><a href="/users/employees/">Pracownicy</a>
     </li>{% if user.student or user.employee %}
-    <li{% if system_action = 'students' %} class="active"{% endif %}><a href="/users/students/">Studenci</a>
+    <li{% block enrollment_menu_students %}{% endblock %}><a href="/users/students/">Studenci</a>
     </li>{% endif %}
     {# end system_menu #}
 {% endblock %}

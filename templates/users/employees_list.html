@@ -21,18 +21,22 @@
 	<a href="{% url enrollment-main %}">Zapisy</a> &raquo;
 	<h2>Pracownicy</h2>
 {% endblock %}
+{% block enrollment_menu_employees %} class="active"{% endblock %}
+
 
 {% block content %}
 <div id="employee-profile">
-Wybierz pracownika z menu po prawej.
+    <div class="alert-message warning">
+        <a href="#" class="close">×</a>
+        <p>Wybierz pracownika z listy</p>
+    </div>
 </div>
 {% endblock %}
 
-{% block sidebar-class %}sidebar-right sidebar-visible{% endblock %}
 {% block sidebar %}
 <div id="main-sidebar">
 	<div id="employees-list">
-		<h5>Lista pracowników</h5>
+		<h2>Lista pracowników</h2>
 		<ul  class="employees">
 			{% for e in employees %}
 			<li><a href="{% url employee-profile e.user.id %}" class="employee-profile-link">{{e.get_full_name}}</a>

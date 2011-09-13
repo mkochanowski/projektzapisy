@@ -48,20 +48,18 @@ EmployeesList.ajax = new Object();
 
 EmployeesList.ajax.init = function()
 {
-
-    EmployeesList.ajax.activeA = $('.active');
+    EmployeesList.ajax.activeA =  $('#user-list-menu li.active').assertOne();
     $('.ajax').click(function(){
 	    $('#employees-list').addClass('profile-loading');
         EmployeesList.ajax.getList($(this).attr('href'));
 
-        if ($('.active').size() > 0)
-        {
-            $('.active').removeClass('active')
-        }
+        $(EmployeesList.ajax.activeA).removeClass('active')
+        EmployeesList.ajax.activeA = $(this)
         $(this).addClass('active');
 
         return false;
     });
+    
 }
 $(EmployeesList.ajax.init)
 EmployeesList.ajax.getList = function(link)

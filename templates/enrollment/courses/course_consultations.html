@@ -6,17 +6,16 @@
 {% endblock %}
 
 {% block bread %}
-	<li><a href="{% url main-page %}">Strona główna</a></li>
-	<li><a href="{% url enrollment-main %}">Zapisy</a></li>
-	<li><a href="{% url course-list %}">Przedmioty</a></li>
-	<li>
-		<a href="{% url course-page course.slug %}"
-			>{{course.name}}</a>
-	</li>
-	<li>Konsultacje</li>
+	<a href="{% url main-page %}">Strona główna</a> &raquo;
+	<a href="{% url enrollment-main %}">Zapisy</a> &raquo;
+	<a href="{% url course-list %}">Przedmioty</a> &raquo;
+	<a href="{% url course-page course.slug %}"
+			>{{course.name}}</a> &raquo;
+
+	<h3>Konsultacje</h3>
 {% endblock %}
 
-
+{% block enrollment_menu_courses %} class="active"{% endblock %}
 
 {% block content %}
     <div id="enr-course-view">

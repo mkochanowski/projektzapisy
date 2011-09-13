@@ -16,6 +16,7 @@
 
     <!-- Le styles -->
     <link href="/site_media/css/bootstrap-1.2.0.css" rel="stylesheet">
+    <link href="/site_media/css/main.css" rel="stylesheet">
     <link href="/site_media/css/fereol.css" rel="stylesheet">
     <!-- Le fav and touch icons -->
 	<link rel="shortcut icon" href="/site_media/favicon.ico">
@@ -52,11 +53,11 @@
             <div class="container">
 
                 <ul>
-                    <li class="active"><a href="{% url enrollment-main %}">System Zapisów</a>
+                    <li{% block enrollment_active %}{% endblock %}><a href="{% url enrollment-main %}">System Zapisów</a>
                     </li>
-                    <li{% if system_type = 'oferta' %} class="active"{% endif %}><a href="{% url offer-main %}">Oferta
+                    <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta
                         Dydaktyczna</a></li>
-                    <li{% if system_type = 'ocena' %} class="active"{% endif %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
+                    <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
                 </ul>
 			{% if user.is_authenticated %}
                 <div class="user-panel">
@@ -136,11 +137,11 @@
 
 
 <div class="container">
-    {% block filter %}
-    {# end filter #}
-    {% endblock %}
     <div class="container space">
-
+        <div class="bread">
+                {% block bread %}
+                {% endblock %}
+        </div>
         {% for message in messages %}
 	        <div class="alert-message {{ message.tags }}">
 		        {{ message|safestring }}
@@ -148,15 +149,18 @@
         {% endfor %}
 
 
+    {% block filter %}
+    {# end filter #}
+    {% endblock %}
         <div id="main-content-container" class="row show-grid sidebar-right">
             {% block center %}
             <div class="span11 columns">
-                {% block bread %}
-                {% endblock %}
+
 
             <div id="main-content">
             {% block content %}
             {% endblock %}
+            &nbsp;
             </div>
 
                 </div>

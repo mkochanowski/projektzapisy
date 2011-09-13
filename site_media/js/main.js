@@ -13,6 +13,13 @@ Fereol.init = function()
 
 	Fereol.initSubsystemTypeSelector();
 	Fereol.initCSRFTokenHandling();
+
+    $('.close').live('click', function(event){
+        event.preventDefault();
+        $(this).parent().hide('slow', function(){ $(this).remove(); });
+
+
+    } )
 };
 
 $(Fereol.init);

@@ -106,104 +106,7 @@
 
 /*** PASEK LOGOWANIA I NAZWY PODSYSTEMU - koniec ***/
 
-/*** NAGŁÓWEK ***/
 
-#main-header
-{
-	position: relative;
-	min-height: 32px;
-	padding: 5px;
-	border-bottom: 1px solid #cccccc;
-	background: #fff5b3 url('/site_media/images/top-bg.png') repeat-x;
-
-	-moz-border-radius: 3px 3px 0 0;
-	-webkit-border-radius: 3px 3px 0 0;
-	border-radius: 3px 3px 0 0;
-}
-
-#main-header h1
-{
-	font-weight: normal;
-	text-transform: uppercase;
-	font-size: 28px;
-}
-
-#main-header h1 a
-{
-	color: black;
-	text-decoration: none;
-	float: left;
-	text-shadow: 1px 1px #CCCCCC;
-}
-
-#main-menu
-{
-	float: right;
-	width: 800px;
-	text-align: right;
-	padding: 6px 10px;
-}
-
-#main-header ul, #main-header li
-{
-	margin: 0;
-	padding: 0;
-}
-
-#main-header li
-{
-	display: inline;
-}
-
-#main-header li:before
-{
-	content: '| ';
-	padding: 10px;
-	font-size: 16px;
-	color: #cccccc;
-}
-
-#main-header li:first-child:before
-{
-	content: '';
-	padding: 0;
-}
-
-#main-header ul
-{
-	width: 800px;
-}
-
-/*** NAGŁÓWEK - koniec ***/
-
-/*** BREADCRUMBS (pasek nawigacyjny) ***/
-
-#main-navigation
-{
-	border-bottom: 1px solid #cccccc;
-	padding: 5px;
-	background: #f8f8f8;
-}
-
-#main-navigation ul, #main-navigation li
-{
-	margin: 0;
-	padding: 0;
-	display: inline;
-}
-
-#main-navigation li:before
-{
-	content: '» ';
-	padding-left: 5px;
-	padding-right: 5px;
-}
-
-#main-navigation li:first-child:before
-{
-	content: '';
-	padding: 0;
-}
 
 /*** BREADCRUMBS - koniec ***/
 
@@ -369,32 +272,9 @@ a.main-sidebar-toggle-button:hover
 	background: #dddddd;
 }
 
-#main-sidebar h2
-{
-	padding: 15px;
-	padding-left: 25px;
-	padding-right: 5px;
-	font-size: 16px;
-	font-weight: bold;
-	text-align: center;
-}
-
-#main-sidebar ul
-{
-	padding-left: 25px;
-}
 
 /*** SIDEBAR - koniec ***/
 
-
-/*** KOMUNIKATY ***/
-
-.message { /* TODO: zastąpić main-message */
-	text-align: center;
-	font-weight: bold;
-	color: red;
-	margin: 10px 0px;
-}
 
 /*** KOMUNIKATY - koniec ***/
 
@@ -403,7 +283,7 @@ a.main-sidebar-toggle-button:hover
 .main-top-bar
 {
 	background: #f8f8f8;
-	border-bottom: 1px solid #cccccc;
+	border: 1px solid #cccccc;
 	height: 100%;
 	overflow: hidden;
 }
@@ -436,6 +316,7 @@ a.main-sidebar-toggle-button:hover
 	position: absolute;
 	height: 1px;
 	font-size: 1px;
+    margin-left: 0px;
 }
 
 .main-top-bar fieldset legend span
@@ -643,23 +524,4 @@ input.bigButton
 }
 /*** WIDOK PROFILU UŻYTKOWNIKA  - koniec ***/
 
-.right
-{
-    float: right;
-}
 
-
-a { 
-    text-decoration: none;     
-}
-a:hover  { 
-    text-decoration: underline; 
-}
-
-ul.courses-list li a, div#main-navigation a{
-    color: #000000;
-}
-
-a.person, ul.employees li a, ul.students li a  {
-    color: #333;
-}

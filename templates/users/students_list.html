@@ -70,9 +70,14 @@
     </div>
 {% endblock %}
 
+{% block enrollment_menu_students %} class="active"{% endblock %}
+
 {% block content %}
 <div id="student-profile">
-Wybierz studenta z menu po prawej.
+    <div class="alert-message warning">
+        <a href="#" class="close">×</a>
+        <p>Wybierz studenta z listy</p>
+    </div>
 </div>
 {% endblock %}
 
