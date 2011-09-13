@@ -166,6 +166,7 @@ class Employee(BaseUser):
         verbose_name = 'pracownik'
         verbose_name_plural = 'Pracownicy'
         app_label = 'users'
+        ordering = ['user__last_name', 'user__first_name']
       
     def __unicode__(self):
         return unicode(self.user.get_full_name())
@@ -312,6 +313,7 @@ class Student(BaseUser):
         verbose_name = 'student'
         verbose_name_plural = 'studenci'
         app_label = 'users'
+        ordering = ['user__last_name', 'user__first_name']
     
     def __unicode__(self):
         return unicode(self.user.get_full_name())
