@@ -42,6 +42,9 @@ $ python scheduleimport.py
 SCHEDULE_FILE = '/home/gosia/Desktop/plannnnn'
 LIMITS = {'1' : 300, '9' : 300, '2' : 20, '3' : 15 , '5' : 18 , '6' : 15 }
 
+FIRST_YEAR_FRIENDLY = ['logikadlainformatyków','analizamatematyczna','algebra','kursjęzykaansiczelementamic++','wstępdoinformatyki',
+                       'wstępdoprogramowania','programowanie','programowanieobiektowe','kursjęzykapascal',
+                       'architekturysystemówkomputerowych', 'architekturasystemówkomputerowych']
 O1 = ['analizamatematyczna','algebra','logikadlainformatyków','elementyrachunkuprawdopodobieństwa','metodyprobabilistyczneistatystyka']
 O2 = ['matematykadyskretna','programowanie','analizanumeryczna','algorytmyistrukturydanych']
 O3 = ['językiformalneizłożonośćobliczeniowa']
@@ -92,25 +95,29 @@ def upper_pl(s):
 
 def guess_type(name,COURSE_TYPE):
     name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','').replace('(ang)',''))
+    if name in FIRST_YEAR_FRIENDLY:
+        first_year = True
+    else:
+        first_year = False
     if name in O1:
-        return COURSE_TYPE['O1'],'O1'
+        return COURSE_TYPE['O1'],'O1', first_year, True
     elif name in O2:
-        return COURSE_TYPE['O2'],'O2'
+        return COURSE_TYPE['O2'],'O2', first_year, True
     elif name in O3:
-        return COURSE_TYPE['O3'],'O3'
+        return COURSE_TYPE['O3'],'O3', first_year, True
     elif name in Oinz:
-        return COURSE_TYPE['Oinż'],'Oinż'
+        return COURSE_TYPE['Oinż'],'Oinż', first_year, True
     elif name in I1:
-        return COURSE_TYPE['I1'],'I1'
+        return COURSE_TYPE['I1'],'I1', first_year, True
     elif name in Iinz:
-        return COURSE_TYPE['Iinż'],'Iinż'
+        return COURSE_TYPE['Iinż'],'Iinż', first_year, True
     elif 'kurs' in name:
-        return COURSE_TYPE['K'],'K'
+        return COURSE_TYPE['K'],'K', first_year, False
     elif 'seminarium' in name:
-        return COURSE_TYPE['S'],'S'
+        return COURSE_TYPE['S'],'S', first_year, False
     elif 'projekt' in name and 'projektowanie' not in name:
-        return COURSE_TYPE['P'],'P'
-    return COURSE_TYPE['I2'],'I2'
+        return COURSE_TYPE['P'],'P', first_year, False
+    return COURSE_TYPE['I2'],'I2', first_year, True
 
 def find_teacher(t):
     teacher_full_name = map(lambda x: len(x)>0 and x[0]+lower_pl(x[1:]) or x,t.split(' '))
@@ -128,7 +135,7 @@ def find_teacher(t):
     if len(teachers)==0:
         username = teacher_name+teacher_surname
         teacher_surname = teacher_surname
-        user = User.objects.get_or_create(first_name=teacher_name, last_name=teacher_surname, username=username)[0]
+        user = User.objects.get_or_create(first_name=teacher_name.decode('utf-8'), last_name=teacher_surname.decode('utf-8'), username=username.decode('utf-8'))[0]
         teacher = Employee.objects.create(user=user, consultations="")
     elif len(teachers)>1:
         print 'Error: more then one teacher of name: %s, and surname: %s.' % (teacher_name,teacher_surname)
@@ -237,6 +244,8 @@ def import_schedule(file, semester):
                 group_type = GROUP_TYPES[g.group('type')]
                 teacher = find_teacher(g.group('teacher'))
                 limit = LIMITS[group_type]
+                if 'CCNA' in course.name or 'ccna' in course.name:
+                    limit = 18
                 
                 t = 15*(int(g.group('end_time'))-int(g.group('start_time')))
                 if group_type=='1':
@@ -300,22 +309,23 @@ def import_schedule(file, semester):
             name = extra+name
             name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight').replace('ruby','Ruby').replace('rails','Rails')
             shortName = name[:29]
-            type,short_type = guess_type(name,COURSE_TYPE)
+            type,short_type,first_year,exam = guess_type(name,COURSE_TYPE)
             entity = CourseEntity.objects.get_or_create(name=name, defaults = {'shortName':shortName,'type':type})[0]
             lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
             english = '(ang)' in name
             slug = str(semester.year) + semester.type + '_' + slugify(name)
             #print slug
-            logger.info('Scheduleimport create course %s' % name)
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
                                                  semester=semester,
                                                  slug = slug,
                                                  type=type,
-                                                 english=english
+                                                 english=english,
+                                                 suggested_for_first_year=first_year,
+                                                 exam=exam
                                                  )
-                
+                logger.info('[Scheduleimport] Created course %s' % name)
                 points = PointsOfCourseEntities.objects.filter(entity=entity)
                 '''
                 for p in points:
