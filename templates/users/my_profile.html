@@ -1,22 +1,55 @@
 {% extends "base.html" %}
 
-{% block main-navigation %}
-	<li><a href="{% url main-page %}">Strona główna</a></li>
-	<li>Mój profil</li>
+{% block bread %}
+	<a href="{% url main-page %}">Strona główna</a> &raquo;
+	<h3>Mój profil</h3>
 {% endblock %}
 
 {% block content %}
 	
-Moje dane:
-<ul>
-	<li>login: {{user.username}}</li>
-	<li>email: {{user.email}}</li>
-    {%if zamawiany%}<li>numer konta bankowego: {{zamawiany.bank_account}}</li>{%endif%}
+<h4>Moje dane</h4>
+    <table class="zebra-striped">
+        <tr>
+            <td>login</td>
+            <td>{{user.username}}</td>
+        </tr>
+        <tr>
+            <td>email</td>
+            <td>{{user.email}}</td>
+        </tr>
+        {%if zamawiany%}
+            <tr>
+            <td>numer konta bankowego</td>
+            <td>{{zamawiany.bank_account}}</td>
+        </tr>{%endif%}
+
     {% if user.employee %}
-    <li>pokój: {{ room }}</li>
-    <li>strona domowa: {{ homepage }} </li>
+        <tr>
+            <td>pokój</td>
+            <td>{{ room }}</td>
+        </tr>
+        <tr>
+            <td>strona domowa</td>
+            <td>{{ homepage }}</td>
+        </tr>
+        <tr>
+            <td>login</td>
+            <td></td>
+        </tr>
     {%endif%}
-</ul>
+    </table>
+
+    <a class="change_profile" href="{% url password-change %}">zmień hasło</a>
+&nbsp;
+<a href="{% url email_change %}">zmień adres email</a>
+{%if zamawiany%}
+&nbsp;
+<a class="change_bank_account" href="{% url bank-account-change %}">zmień numer konta bankowego</a>
+{%endif%}
+{% if user.employee %}
+&nbsp;
+<a href="{% url consultations-change %}">zmień inne dane</a>
+{% endif %}
 
 {% if user.employee %}
 <br/>
@@ -32,7 +65,8 @@ Studia zamawiane:<br/>
 {% endif %}
 
 <br/>
-<table>
+<h4>Terminy zapisów</h4>
+<table class="zebra-striped">
     {% for t in terms %}
         <tr>
         <td><b>{{t.name}}</b>:</td><td>{{t.term|date:"H:i, d.m.Y"}}</td>
@@ -40,15 +74,5 @@ Studia zamawiane:<br/>
     {% endfor %}
 </table>
 <br/>
-<a class="change_profile" href="{% url password-change %}">zmień hasło</a>
-&nbsp;
-<a href="{% url email_change %}">zmień adres email</a>
-{%if zamawiany%}
-&nbsp;
-<a class="change_bank_account" href="{% url bank-account-change %}">zmień numer konta bankowego</a>
-{%endif%}
-{% if user.employee %}
-&nbsp;
-<a href="{% url consultations-change %}">zmień inne dane</a>
-{% endif %}
+
 {% endblock %}

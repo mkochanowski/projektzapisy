@@ -18,7 +18,7 @@ div.top .systemtopbar ul li {  margin-right:5px; background-color:#005f92; font-
   -moz-border-radius: 5px 5px 0 0;
   border-radius: 5px 5px 0 0;}
 div.top .systemtopbar ul li.active { background-color:#FFFFFF; color:#005f92; background-image:none; font-size:15px;}
-div.top .systemtopbar ul li.active a { text-shadow:none; background-color:transparent; color:#005f92; background-image:none; font-size:15px;}
+div.top .systemtopbar ul li.active a { font-weight: normal; text-shadow:none; background-color:transparent; color:#005f92; background-image:none; font-size:15px;}
 div.top .topbar form { min-height:35px; float:right;}
 div.top .topbar .inline-inputs label { float:none; color:#FFFFFF; }
 
@@ -36,8 +36,10 @@ div.space { margin-top: 25px; }
 div.space2 { margin-top: 50px; }
 
 
+#enr-schedulePrototype-top-bar fieldset,
 #enr-coursesList-top-bar fieldset{ float:left; }
-#enr-coursesList-top-bar fieldset legend { font-size:16px; }
+#enr-coursesList-top-bar fieldset legend,
+#enr-schedulePrototype-top-bar fieldset legend { font-size:16px; }
 #enr-schedulePrototype-top-bar label,
 #enr-StudentsList-top-bar label,
 #enr-coursesList-top-bar label { float:none; }
@@ -70,7 +72,8 @@ table th:nth-child(5) { text-align: center; }
 .controls form { margin: 0 0 0 0; display: inline-block;}
 
 
-#enr-EmployeesList-top-bar label { float:none;  }
+#enr-EmployeesList-top-bar label,
+#enr-schedulePrototype-top-bar label { float:none;  }
 
 .schedule-table { width:auto;}
 
@@ -116,11 +119,14 @@ input.small { width:auto; }
     font-weight: bold;
 }
 
+#enr-schedulePrototype-other span,
 #enr-coursesList-other span { float:none; display: block; }
 
+#enr-schedulePrototype-top-bar .checkbox label,
 #enr-coursesList-top-bar .checkbox label {
     vertical-align: top;}
 
+#enr-schedulePrototype-other input[type="checkbox"],
 #enr-coursesList-other input[type="checkbox"] { margin-right: 3px; }
 
 .bread, .main-top-bar { margin-bottom: 10px; }

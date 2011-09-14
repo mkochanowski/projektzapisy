@@ -4,9 +4,8 @@
 
 <form action='' method="post" autocomplete="off">{% csrf_token %}
 	<fieldset>
-		<legend>Zmień adres e-mail</legend>
 		{{form.as_p}}
-		<input type="submit" value="zmień"/>
+		<input type="submit" class="btn success" value="zmień">
 	</fieldset>
 </form>
         
