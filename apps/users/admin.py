@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from django import forms
+from django.contrib.auth.models import User
 
 from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow
 
@@ -16,8 +18,7 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = ('program','status','semestr')
     ordering = ['user__last_name','user__first_name']
     list_display_links = ('get_full_name',)
-
-
+        
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('get_full_name','homepage','room','consultations',)
     search_fields = ('user__first_name', 'user__last_name', 'user__username')

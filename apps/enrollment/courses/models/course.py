@@ -26,6 +26,7 @@ class CourseEntity(models.Model):
         verbose_name = 'Podstawa przedmiotu'
         verbose_name_plural = 'Podstawy przedmiotów'
         app_label = 'courses'
+        ordering = ['name']
         
     def __unicode__(self):
         return '%s' % (self.name, )
@@ -209,6 +210,7 @@ class Course( models.Model ):
         verbose_name_plural = 'przedmioty'
         app_label = 'courses'
         unique_together = (('name', 'semester'),)
+        ordering = ['name']
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.get_semester_name())

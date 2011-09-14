@@ -24,9 +24,9 @@ class Group(models.Model):
     teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
     type    = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
-    limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca gwarantowane dla studentów zamawianych')
+    limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych', help_text='miejsca gwarantowane dla studentów zamawianych')
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
-                 
+
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
         if self.teacher is None:
@@ -37,6 +37,10 @@ class Group(models.Model):
     def get_all_terms(self):
         """return all terms of current group""" 
         return self.term.all()
+
+    def get_terms_as_string(self):
+      return ",".join(map(lambda x: "%s %s-%s" % (x.get_dayOfWeek_display(), x.start_time.hour, x.end_time.hour), self.term.all()))
+    get_terms_as_string.short_description = 'Terminy zajęć'
 
     @staticmethod
     def get_groups_by_semester(semester):
