@@ -143,7 +143,7 @@ def render_search_older_group(category, page, query):
     tem = get_template('news/search_older_group.html')
     return tem.render(con)
 
-def get_search_results_data(request, category):
+def get_search_results_data(request, category=None):
     """
         Gets search result
     """

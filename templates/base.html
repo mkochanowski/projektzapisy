@@ -19,7 +19,7 @@
     <link href="/site_media/css/main.css" rel="stylesheet">
     <link href="/site_media/css/fereol.css" rel="stylesheet">
     <!-- Le fav and touch icons -->
-	<link rel="shortcut icon" href="/site_media/favicon.ico">
+    <link rel="shortcut icon" href="/site_media/favicon.ico">
     <link rel="apple-touch-icon" href="/site_media/images/apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/site_media/images/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="/site_media/images/apple-touch-icon-114x114.png">
@@ -31,7 +31,7 @@
     <script src="/site_media/js/main.js"></script>
 
     {% block js %}{% endblock %}
-	{% block rss %}{% endblock %}
+    {% block rss %}{% endblock %}
     {% block head_extra %}{% endblock %}
 
 </head>
@@ -40,7 +40,7 @@
 
 
 <form action="/" method="post" style="display: none">
-    <p><input type="hidden" name="data-invalidated" value="no" /></p>
+    <p><input type="hidden" name="data-invalidated" value="no"/></p>
 </form>
 <script type="text/javascript">
     jQuery.dataInvalidate_check();
@@ -53,49 +53,54 @@
             <div class="container">
 
                 <ul>
-                    <li{% block enrollment_active %}{% endblock %}><a href="{% url enrollment-main %}">System Zapisów</a>
+                    <li{% block enrollment_active %}{% endblock %}><a href="{% url enrollment-main %}">System
+                        Zapisów</a>
                     </li>
                     <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta
                         Dydaktyczna</a></li>
                     <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
                 </ul>
-			{% if user.is_authenticated %}
-                <div class="user-panel">
-				Witaj, <strong>{% if user.is_staff %}{{ user.first_name }}{% else %}{{ user.get_full_name }}{% endif %}</strong> |
-				<a href="{% url my-profile %}">Moje konto</a> |
-                {% if user.is_staff %}
-                        <a href="/fereol_admin/">Admin</a> |
-                {% endif %}
-                {% if user.student and user.student.get_number_of_news > 0 %}
-                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.student.get_number_of_news }})</a> |
-                {% else %}
-                    {% if user.employee and user.employee.get_number_of_news > 0 %}
-                    <a href="{% url news-all %}" class="unread">Aktualności({{ user.employee.get_number_of_news }})</a> |
-                    {% else %}
-                        <a href="{% url news-all %}">Aktualności</a> |
-                    {% endif %}
-                {% endif %}
-                <a href="{% url help %}">Pomoc</a> |
-                <a href="{% url user-logout %}">Wyloguj</a>
-                </div>
-			{% else %}
-
-                <form action="{% url apps.users.views.login_plus_remember_me %}" method="POST">
-                    {% csrf_token %}
-                    <div class="inline-inputs">
-                        <input type="hidden" name="next" value="{{request.path}}" />
-                        <label for="id_login">login:</label>
-                        <input class="small" type="text" id="id_login" name="username">
-
-                        <label for="id_password">hasło:</label>
-                        <input class="small" type="password" id="id_password" name="password">
-
-                        <button class="btn small" type="submit">Loguj &raquo;</button>
-                        <input type="checkbox" value="true" id="xlInput3" name="remember_me">
-                        <label for="xlInput3">Zapamiętaj mnie</label>
+                {% if user.is_authenticated %}
+                    <div class="user-panel">
+                        Witaj,
+                        <strong>{% if user.is_staff %}{{ user.first_name }}{% else %}{{ user.get_full_name }}{% endif %}</strong>
+                        |
+                        <a href="{% url my-profile %}">Moje konto</a> |
+                        {% if user.is_staff %}
+                            <a href="/fereol_admin/">Admin</a> |
+                        {% endif %}
+                        {% if user.student and user.student.get_number_of_news > 0 %}
+                            <a href="{% url news-all %}"
+                               class="unread">Aktualności({{ user.student.get_number_of_news }})</a> |
+                            {% else %}
+                            {% if user.employee and user.employee.get_number_of_news > 0 %}
+                                <a href="{% url news-all %}"
+                                   class="unread">Aktualności({{ user.employee.get_number_of_news }})</a> |
+                            {% else %}
+                                <a href="{% url news-all %}">Aktualności</a> |
+                            {% endif %}
+                        {% endif %}
+                        <a href="{% url help %}">Pomoc</a> |
+                        <a href="{% url user-logout %}">Wyloguj</a>
                     </div>
-                </form>
-           {% endif %}
+                {% else %}
+
+                    <form action="{% url apps.users.views.login_plus_remember_me %}" method="POST">
+                        {% csrf_token %}
+                        <div class="inline-inputs">
+                            <input type="hidden" name="next" value="{{request.path}}"/>
+                            <label for="id_login">login:</label>
+                            <input class="small" type="text" id="id_login" name="username">
+
+                            <label for="id_password">hasło:</label>
+                            <input class="small" type="password" id="id_password" name="password">
+
+                            <button class="btn small" type="submit">Loguj &raquo;</button>
+                            <input type="checkbox" value="true" id="xlInput3" name="remember_me">
+                            <label for="xlInput3">Zapamiętaj mnie</label>
+                        </div>
+                    </form>
+                {% endif %}
             </div>
             <!-- end up-menu  -->
         </div>
@@ -104,17 +109,17 @@
 
     <div class="header">
 
-            <div class="container">
-        <div class="logo">
-            <a href="{% comment %}{% url main %}{% endcomment %}">
-                <img src="/site_media/images/logotyp.jpg">
-            </a>
-        </div>
-        <div class="logo">
-            <a href="{% comment %}{% url main %}{% endcomment %}">
-                <img src="/site_media/images/instytut.png">
-            </a>
-        </div>
+        <div class="container">
+            <div class="logo">
+                <a href="{% comment %}{% url main %}{% endcomment %}">
+                    <img src="/site_media/images/logotyp.jpg">
+                </a>
+            </div>
+            <div class="logo">
+                <a href="{% comment %}{% url main %}{% endcomment %}">
+                    <img src="/site_media/images/instytut.png">
+                </a>
+            </div>
         </div>
     </div>
     <!-- down-menu  -->
@@ -139,45 +144,45 @@
 <div class="container">
     <div class="container space">
         <div class="bread">
-                {% block bread %}
-                {% endblock %}
+            {% block bread %}
+            {% endblock %}
         </div>
+
         {% for message in messages %}
-	        <div class="alert-message {{ message.tags }}">
-		        {{ message|safestring }}
-	        </div>
+            <div class="alert-message {{ message.tags }}">
+                {{ message }}
+            </div>
         {% endfor %}
 
-
-    {% block filter %}
-    {# end filter #}
-    {% endblock %}
+        {% block filter %}
+            {# end filter #}
+        {% endblock %}
         <div id="main-content-container" class="row show-grid sidebar-right">
             {% block center %}
-            <div class="span{% block content-width %}11{% endblock %} columns">
+                <div class="span{% block content-width %}11{% endblock %} columns">
 
 
-            <div id="main-content">
-            {% block content %}
-            {% endblock %}
-            &nbsp;
-            </div>
+                    <div id="main-content">
+                        {% block content %}
+                        {% endblock %}
+                        &nbsp;
+                    </div>
 
                 </div>
-        <div class="span{% block sidebar-width %}5{% endblock %} columns">
-            {% block sidebar %}
+                <div class="span{% block sidebar-width %}5{% endblock %} columns">
+                    {% block sidebar %}
+                    {% endblock %}
+                </div>
             {% endblock %}
         </div>
-        {% endblock %}
     </div>
-</div>
 
 
-<footer>
-    <p>
-        {# <a href="{% url on-mobile %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
-        &copy; 2011 <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a></p>
-</footer>
+    <footer>
+        <p>
+            {# <a href="{% url on-mobile %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
+            &copy; 2011 <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a></p>
+    </footer>
 
 </div>
 <!-- /container -->

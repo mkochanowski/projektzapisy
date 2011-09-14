@@ -34,14 +34,8 @@
 	font-weight: bold;
 }
 
-#main-topContainer a.unread {
-    color: #bf3030;
-}
-
-#main-topContainer a
-{
-    prepare_courses_list_to_rendercolor: #666;
-}
+#main-topContainer a.unread { color: #bf3030; }
+#main-topContainer a { color: #666; }
 
 #main-topContainer #main-signinBar
 {
@@ -66,7 +60,6 @@
 	display: none;
 	opacity: .95;
 
-	padding: 0;
 	padding-bottom: 5px;
 	background: #f8f8f8;
 	border: 1px solid #cccccc;
@@ -293,14 +286,8 @@ a.main-sidebar-toggle-button:hover
 	border: 0;
 	float: left;
 	border-right: 1px dotted #cccccc;
-	margin: 0;
-	padding: 10px;
-	display: block;
-
 	min-height: 30px;
-
 	padding-top: 20px;
-
 	padding-bottom: 110px;
 	margin-bottom: -100px;
 }
@@ -315,7 +302,7 @@ a.main-sidebar-toggle-button:hover
 	position: absolute;
 	height: 1px;
 	font-size: 1px;
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .main-top-bar fieldset legend span
@@ -354,7 +341,6 @@ a.main-sidebar-toggle-button:hover
 	border: 1px solid #999999;
 	height: 20px;
 	float: left;
-	padding-left: 20px;
 	background: white url('/site_media/images/search-ico.png') no-repeat 3px 4px;
 	padding: 1px 4px 1px 20px;
 
@@ -363,14 +349,6 @@ a.main-sidebar-toggle-button:hover
 	border-radius: 4px 0 0 4px;
 }
 
-.main-filter-input .text:focus
-{
-	outline: 1px solid #A8D6FF;
-
-	-moz-outline-radius: 5px 0 0 5px;
-	-webkit-outline-radius: 5px 0 0 5px;
-	outline-radius: 5px 0 0 5px;
-}
 
 .main-filter-input .reset
 {
@@ -464,11 +442,7 @@ input[type=checkbox].partialCheck
 	opacity: 0.3;
 }
 
-
-.mcePlaceHolder
-{
-	display: inline-block !important;
-}
+.mcePlaceHolder{ display: inline-block !important; }
 
 .filter-course-type-metaSwitch
 {
@@ -478,15 +452,8 @@ input[type=checkbox].partialCheck
 	margin-bottom: -6px;
 }
 
-.course-type-filter
-{
-	width: 300px;
-}
-
-.course-type-filter > span
-{
-	min-width: 150px;
-}
+.course-type-filter { width: 300px; }
+.course-type-filter > span { min-width: 150px; }
 
 /*** KOMPONENTY - koniec ***/
 
@@ -495,5 +462,3 @@ input[type=checkbox].partialCheck
 	margin: 5px;
 }
 /*** WIDOK PROFILU UŻYTKOWNIKA  - koniec ***/
-
-

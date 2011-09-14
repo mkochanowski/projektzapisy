@@ -34,12 +34,12 @@ def main_page( request ):
     return render_to_response('common/index.html', {'grade':grade}, context_instance = RequestContext(request))
 
 
-def search_page(request, cat):
+def search_page(request):
     """
         Search page
     """
     json = request.GET.get('json', None)
-    data = get_search_results_data(request, cat)
+    data = get_search_results_data(request, None)
     if json:
         return HttpResponse(simplejson.dumps(data))
     if 'message' in data: # error: bad query

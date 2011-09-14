@@ -7,6 +7,7 @@ urlpatterns = patterns('apps.news.views',
     url(r'^add/$', 'all_news_add', name='news-all-add'),
     url(r'^delete/(?P<nid>\d+)/$', 'all_news_delete', name='news-all-delete'),
     url(r'^edit/(?P<nid>\d+)/$', 'all_news_edit', name='news-all-edit'),
+    url(r'^search/$', 'search_page', name='news-search'),
     # STARA WERSJA
     #url(r'^(?P<cat>[\w\-_]+)/$', 'latest_news', name='latest_news'),
     #url(r'^(?P<cat>[\w\-_]+)/add/$', 'add', name='news-add'),
