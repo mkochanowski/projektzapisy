@@ -439,7 +439,7 @@ a.main-sidebar-toggle-button:hover
 
 input[type=checkbox].partialCheck
 {
-	opacity: 0.3;
+	opacity: 0.35;
 }
 
 .mcePlaceHolder{ display: inline-block !important; }

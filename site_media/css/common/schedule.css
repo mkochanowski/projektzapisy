@@ -66,6 +66,8 @@
 	background: #F8F8F8;
 	border-radius: 4px;
 	overflow: hidden;
+	color: black;
+	line-height: 120%;
 }
 
 .schedule .termWithPopup
