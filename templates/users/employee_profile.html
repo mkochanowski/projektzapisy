@@ -13,20 +13,31 @@
 
 {% block content %}
 <div id="employee-profile">
-<h3>{{employee.get_full_name}}</h3>
+<h4>{{employee.get_full_name}}</h4>
 <br/>
-<ul>
+
+    <table class="zebra-striped">
     {% if user.is_authenticated %}
-	<li>adres email: {% if employee.user.email %}<a href="mailto:{{employee.user.email}}">{{employee.user.email}}</a>{% else %}brak danych{% endif %}</li>
-	{% endif %}
-	<li>adres strony domowej: {% if employee.homepage %}<a href="{{employee.homepage}}">{{employee.homepage}}</a>{% else %}brak danych{% endif %}</li>
-	<li>pokój: {% if employee.room %}{{employee.room}}{% else %}brak danych{% endif %}</li>
-</ul>
+        <tr>
+            <td>adres email</td>
+            <td>{% if employee.user.email %}<a href="mailto:{{employee.user.email}}">{{employee.user.email}}</a>{% else %}brak danych{% endif %}</td>
+        </tr>
+    {% endif %}
+        <tr>
+            <td>strona domowa</td>
+            <td>{% if employee.homepage %}<a href="{{employee.homepage}}">{{employee.homepage}}</a>{% else %}brak danych{% endif %}</td>
+        </tr>
+        <tr>
+            <td>pokój</td>
+            <td>{% if employee.room %}{{employee.room}}{% else %}brak danych{% endif %}</td>
+        </tr>
+    </table>
+
 <br \>
-<h3>Konsultacje:</h3>
+<h4>Konsultacje:</h4>
 <p>{{employee.consultations}}</p>
 <br \><br \>
-<h3>Plan zajęć:</h3>
+<h4>Plan zajęć:</h4>
 <br/>
 <div id="schedule-wrapper">
 	{% for group in groups %}

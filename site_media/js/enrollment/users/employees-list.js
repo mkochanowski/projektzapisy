@@ -48,7 +48,7 @@ EmployeesList.ajax = new Object();
 
 EmployeesList.ajax.init = function()
 {
-    EmployeesList.ajax.activeA =  $('#user-list-menu li.active').assertOne();
+    EmployeesList.ajax.activeA =  $('#user-list-menu li a.active').assertOne();
     $('.ajax').click(function(){
 	    $('#employees-list').addClass('profile-loading');
         EmployeesList.ajax.getList($(this).attr('href'));

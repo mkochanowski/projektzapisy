@@ -154,7 +154,7 @@
     {% endblock %}
         <div id="main-content-container" class="row show-grid sidebar-right">
             {% block center %}
-            <div class="span11 columns">
+            <div class="span{% block content-width %}11{% endblock %} columns">
 
 
             <div id="main-content">
@@ -164,7 +164,7 @@
             </div>
 
                 </div>
-        <div class="span5 columns">
+        <div class="span{% block sidebar-width %}5{% endblock %} columns">
             {% block sidebar %}
             {% endblock %}
         </div>

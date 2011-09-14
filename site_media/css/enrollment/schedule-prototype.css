@@ -5,7 +5,7 @@
 #enr-schedulePrototype-course-list
 {
 	list-style: none;
-	padding-left: 5px !important;
+    margin: 0;
 }
 
 #enr-schedulePrototype-course-list li
@@ -19,6 +19,7 @@
 	float: left;
 	width: 25px;
 	text-align: center;
+    margin-top: 1px;
 }
 
 #enr-schedulePrototype-course-list li label
@@ -37,7 +38,7 @@ a#enr-schedulePrototype-setLocked
 {
 	position: absolute;
 	top: 5px;
-	left: 730px;
+    right: -10px;
 
 	display: block;
 	width: 16px;
