@@ -283,12 +283,17 @@ a.main-sidebar-toggle-button:hover
 .main-top-bar fieldset
 {
 	position: relative;
-	border: 0;
 	float: left;
+
+	border: 0;
 	border-right: 1px dotted #cccccc;
+
 	min-height: 30px;
+
+	padding: 10px;
 	padding-top: 20px;
 	padding-bottom: 110px;
+	margin: 0;
 	margin-bottom: -100px;
 }
 

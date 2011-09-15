@@ -94,7 +94,7 @@ CourseView._initDetailsToggleSwitch = function()
     } 
 	// wygenerowanie przycisku chowania panelu
 	var detailsVisibleToggle = $.create('a', { className: 'details-toggle' }).
-		prependTo($('#enr-course-view').assertOne()).text('blabla');
+		prependTo($('#enr-course-view').assertOne());
 
 	// aktualizacja napisu na przycisku chowania
 	var detailsVisibleToggleUpdateText = function()
@@ -110,9 +110,9 @@ CourseView._initDetailsToggleSwitch = function()
 		var visible = CourseView.detailsVisible = !CourseView.detailsVisible;
 		$.cookies.set('CourseView-details-hidden', !visible);
 		if(visible){
-            $('.course-details').show('slow');
+            $('.course-details').slideDown('slow');
         } else {
-            $('.course-details').hide('slow');
+            $('.course-details').slideUp('slow');
         }
 
 		detailsVisibleToggleUpdateText();
