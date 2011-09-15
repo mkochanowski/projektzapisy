@@ -56,9 +56,10 @@
                     <li{% block enrollment_active %}{% endblock %}><a href="{% url enrollment-main %}">System
                         Zapisów</a>
                     </li>
+                {% comment %}
                     <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta
                         Dydaktyczna</a></li>
-                    <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
+                    <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>{% endcomment %}
                 </ul>
                 {% if user.is_authenticated %}
                     <div class="user-panel">
@@ -111,7 +112,7 @@
 
         <div class="container">
             <div class="logo">
-                <a href="{% comment %}{% url main %}{% endcomment %}">
+                <a href="/">
                     <img src="/site_media/images/logotyp.jpg" alt="Uniwersytet Wrocławski">
                 </a>
             </div>
