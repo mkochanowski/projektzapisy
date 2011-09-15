@@ -823,10 +823,10 @@ def poll_answer( request, slug, pid ):
                         field_data = request.POST[ key ]
                     try:
                         form.fields[ key ].clean( field_data )
-                    """ nie działa pod 2.5:
-                    except ValidationError as ve:
+                        """
+                        except ValidationError as ve:
                         errors[ key ] = ve.messages
-                    """
+                        """
                     except ValidationError:
                         errors[ key ] = ""
             
