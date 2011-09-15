@@ -142,3 +142,5 @@ input.small { width:auto; }
 .main-top-bar fieldset:nth-child(1) { width:280px; }
 
 table td.ects { background-color: #FFFFFF!important; }
+
+.priority select { width:auto;}

@@ -69,9 +69,9 @@ Fereol.Enrollment.EPanelCourseTerm.prototype.convertControlsToAJAX = function()
 	{
 		var priorityOption = $.create('option', {value: i}).text(i);
 		if (i == 1)
-			priorityOption.text('1 (w ostateczności)');
+			priorityOption.text('1 (słabo)');
 		if (i == CourseView.priorityLimit)
-			priorityOption.text(CourseView.priorityLimit + ' (bardzo chcę)');
+			priorityOption.text(CourseView.priorityLimit + ' (bardzo)');
 		if (i === this.group.queuePriority)
 			priorityOption.attr('selected', 'selected');
 		this._prioritySelector.append(priorityOption);

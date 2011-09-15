@@ -71,68 +71,6 @@ CourseView._initExpandableDescription = function()
 {
 	var descriptionContainer = CourseView._detailsContainer.children('.description').
 		assertOne();
-	var propertiesContainer = CourseView._detailsContainer.children('ul').assertOne();
-
-	var propertiesHeight = propertiesContainer.outerHeight();
-	var descriptionHeight = descriptionContainer.outerHeight();
-
-	// rozmiary panelu szczegółów w stanie "rozwinięty opis"
-	var fullHeight = Math.max(descriptionHeight, propertiesHeight);
-
-	// generowanie przycisku "pokaż więcej..." dla opisu
-	var moreDescriptionButton = $.create('a', { className: 'more' }).
-		text('pokaż więcej...').appendTo(descriptionContainer);
-	moreDescriptionButton.css('top',
-		(propertiesHeight - moreDescriptionButton.outerHeight()) + 'px');
-
-	// czy opis został już rozwinięty
-	CourseView._descriptionExpanded = false;
-
-	// akcja rozwijania opisu
-	moreDescriptionButton.disableDragging().click(function()
-	{
-		if (CourseView._descriptionExpanded)
-			return;
-		CourseView._descriptionExpanded = true;
-
-		moreDescriptionButton.remove();
-		CourseView._detailsContainer.stop().animate({
-			height: fullHeight + 'px'
-		}, 150);
-
-		CourseView._detailsCurrentHeight = fullHeight;
-	});
-
-	// zwijanie/rozwijanie opisu, w zależności od potrzeby (rozmiaru opisu
-	// i dostępnego miejsca)
-	var initMoreDescriptionSwitch = function()
-	{
-		descriptionHeight = descriptionContainer.outerHeight();
-		fullHeight = Math.max(descriptionHeight, propertiesHeight);
-
-		if (descriptionHeight > propertiesHeight + 15 &&
-			!CourseView._descriptionExpanded)
-		{
-			CourseView._detailsCurrentHeight = propertiesHeight;
-			
-			moreDescriptionButton.css({
-				display: 'block',
-				left: (descriptionContainer.innerWidth() -
-					moreDescriptionButton.outerWidth()) + 'px'
-			});
-		}
-		else
-		{
-			CourseView._detailsCurrentHeight = fullHeight;
-			
-			moreDescriptionButton.css('display', 'none');
-		}
-		if (CourseView.detailsVisible)
-			CourseView._detailsContainer.css('height', CourseView._detailsCurrentHeight + 'px');
-	};
-	initMoreDescriptionSwitch();
-	var moreDescriptionObserver = { update: initMoreDescriptionSwitch };
-	Sidebar.addObserver(moreDescriptionObserver);
 };
 
 /**
@@ -146,12 +84,14 @@ CourseView._initDetailsToggleSwitch = function()
 
 	// ustawienie widoczności panelu na podstawie cookie
 	CourseView.detailsVisible = !$.cookies.get('CourseView-details-hidden');
-	if (!CourseView.detailsVisible)
+	if (!CourseView.detailsVisible){
 		CourseView._detailsContainer.css({
-			height: 0,
 			marginBottom: 0
 		});
-
+        $('.course-details').hide('slow');
+    } else {
+        $('.course-details').show('slow');
+    } 
 	// wygenerowanie przycisku chowania panelu
 	var detailsVisibleToggle = $.create('a', { className: 'details-toggle' }).
 		prependTo($('#enr-course-view').assertOne()).text('blabla');
@@ -169,11 +109,11 @@ CourseView._initDetailsToggleSwitch = function()
 	{
 		var visible = CourseView.detailsVisible = !CourseView.detailsVisible;
 		$.cookies.set('CourseView-details-hidden', !visible);
-
-		CourseView._detailsContainer.stop().animate({
-			height: visible ? CourseView._detailsCurrentHeight : 0,
-			marginBottom: visible ? CourseView._detailsContainerMargin : 0
-		}, 150);
+		if(visible){
+            $('.course-details').show('slow');
+        } else {
+            $('.course-details').hide('slow');
+        }
 
 		detailsVisibleToggleUpdateText();
 	});
