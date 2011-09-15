@@ -44,7 +44,6 @@
                 <input type='hidden' name='employee-email' value='{{ e.user.email }}' />
                 <input type='hidden' name='employee-short_old' value='{{ e.short_old }}' />
                 <input type='hidden' name='employee-short_new' value='{{ e.short_new }}' />
-                <input type='hidden' name='employee-teacher' value='{{ e.teacher }}' />
             </li>
 			{% endfor %}
 		</ul>
@@ -60,10 +59,6 @@
 				<input class="text filter-phrase" type="text" />
 				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
 			</div>
-		</fieldset>
-		<fieldset id="enr-employeeList-other" style="display:none;">
-			<legend><span>Opcje</span></legend>
-			<span class="checkbox"><input type="checkbox" id="enr-hidenotteacher" checked="yes" /><label for="enr-hidenotteacher">Ukryj osoby niesposiadające zajęć</label></span>
 		</fieldset>
 	</div>
     <div id="user-alpha-list" class="main-top-bar">

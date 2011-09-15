@@ -153,15 +153,6 @@ StudentsList.initFilter = function()
         return name || album || email;
 	}));
 
-	StudentsList.studentFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
-		'showRecorded', '#enr-hidenotrecorded', function(element, value)
-	{
-		if (!value)
-			return true;
-		var student = element.data;
-		return student.recorded;
-	}));
-
 
     StudentsList.runStudents( StudentsList.studentFilter );
 
@@ -188,8 +179,6 @@ StudentsList.parseStudent = function()
         student.album = studentContainer.children('input[name=student-album]').
                 assertOne().attr('value');
 
-        student.recorded = studentContainer.children('input[name=student-recorded]').
-                assertOne().attr('value').castToBool()
 
         student.container = studentContainer;
 
@@ -226,7 +215,6 @@ StudentsList.student = function()
 	this.name = null;
 	this.email = null;
     this.album = null; // index
-    this.recorded = false;
 	this.container = null;
 	this.visible = true;
 };
