@@ -5,6 +5,7 @@
 	({{group.get_type_display}}: {{group.get_teacher_full_name}})
 {% endblock %}
 
+{% block enrollment_menu_courses %} class="active"{% endblock %}
 
 {% block styles %}
     {{ block.super }}
@@ -22,6 +23,8 @@
 
 	{{group.get_type_display}}: {{group.get_teacher_full_name}}
 {% endblock %}
+
+
 
 {% block content %}
 	<div id="enr-group-view">

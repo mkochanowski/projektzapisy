@@ -51,7 +51,7 @@ StudentsList.ajax = new Object();
 StudentsList.ajax.init = function()
 {
 
-    StudentsList.ajax.activeA =  $('#user-list-menu li.active').assertOne();
+    StudentsList.ajax.activeA =  $('#user-list-menu li a.active').assertOne();
     $('.ajax').click(function(){
 	    $('#students-list').addClass('profile-loading');
         StudentsList.ajax.getList($(this).attr('href'));
