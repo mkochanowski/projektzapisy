@@ -29,7 +29,7 @@ def main_page( request ):
         Main page
     """
     try:
-        news = News.objects.all()[0]
+        news = News.objects.exclude(category='-')[0]
     except ObjectDoesNotExist:
         news = None
 

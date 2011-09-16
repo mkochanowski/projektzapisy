@@ -11,7 +11,7 @@ class NewsAdmin(admin.ModelAdmin):
     """
         News admin manager
     """
-    fields = ('title', 'body', 'author')
+    fields = ('title', 'body', 'author', 'category')
     list_display = ('title', 'date')
     list_filter  = ['date']
 
