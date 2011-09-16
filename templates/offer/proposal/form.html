@@ -8,37 +8,25 @@
 
 {% block proposal-content %}
 	<form action="" method="post" id="od-proposal-form">
-		<p class="title">
-			<input id="od-proposal-form-name" type="text" name="name" value="{{ proposal.name }}" />
-		</p>
+        {{ forms.proposal.non_field_errors }}
+        {{ forms.description.non_field_errors }}
+        {{ forms.books.non_field_errors }}
 
-		<ul class="infoBox">
+        <p class="title">
+            {{ forms.proposal.name }}
+            {{ forms.proposal.name.errors }}
+
+        </p>
+
+<ul class="infoBox">
 			<li id="od-proposal-form-types">
 				Typ przedmiotu:
-				<ul>
-							{% if types %}
-								{% for type in types %}
-								<li class="type">
-									<select name="types[]">
-									  {% for typeName in typesName %}
-										 <option value="{{ typeName.id }}"{% ifequal typeName.id type.lecture_type.id %} selected="selected"{% endifequal %}>{{ typeName.name }}</option>
-									  {% endfor %}
-									 </select>
-								</li>
-								{% endfor %}
-							{% else %}
-					<li class="type">
-						<select name="types[]">
-								 <option class="label" value="">- wybierz -</option>
-								 {% for typeName in typesName %}
-								 <option value="{{ typeName.id }}">{{ typeName.name }}</option>
-								 {% endfor %}
-							{% endif %}
-						 </select>
-					</li>
-				</ul>
+                {{ forms.description.type }}
+				{{ forms.description.type.errors }}
 			</li>
-			</li>
+
+            {% if user.teacher %}
+
 			<li class="proposedOwner">
 				<label for="od-proposal-form-lock">Zablokuj innym edycję:</label>
 				<select class="main-labelledSelect" id="od-proposal-form-lock" name="owner">
@@ -46,93 +34,44 @@
 				   <option value="yes" {% if proposal.owner %}{% endif %}>Tak</option>
 				</select>
 			</li>
-			<li class="proposedTime">
-				<label>Wymiar godzin:</label>
-				<span>
-					<label for="od-proposal-form-time-lectures">wyk.</label>
-					<select class="main-labelledSelect" id="od-proposal-form-time-lectures" name="lectures" title="sugerowana liczbę godzin wykładów">
-						{% for hour in proposalHours %}
-							<option value="{{ hour.0 }}"{% ifequal proposal.description.lectures hour.0 %} selected=selected{% endifequal %}>{{ hour.1 }}</option>
-						{% endfor %}
-					</select>
-				</span>
-				<span>
-					<label for="od-proposal-form-time-repetitories">rep.</label>
-					<select class="main-labelledSelect" id="od-proposal-form-time-repetitories" name="repetitories" title="sugerowana liczbę godzin repetytoriów">
-						{% for hour in proposalHours %}
-							<option value="{{ hour.0 }}"{% ifequal proposal.description.repetitories hour.0 %} selected=selected{% endifequal %}>{{ hour.1 }}</option>
-						{% endfor %}
-					</select>
-				</span>
-				<span>
-					<label for="od-proposal-form-time-seminars">sem.</label>
-					<select class="main-labelledSelect" id="od-proposal-form-time-seminars" name="seminars" title="sugerowana liczbę godzin seminariów">
-						{% for hour in proposalHours %}
-							<option value="{{ hour.0 }}"{% ifequal proposal.description.seminars hour.0 %}  selected=selected{% endifequal %}>{{ hour.1 }}</option>
-						{% endfor %}
-					</select>
-				</span>
-				<span>
-					<label for="od-proposal-form-time-exercises">ćw.</label>
-					<select class="main-labelledSelect" id="od-proposal-form-time-exercises" name="exercises" title="sugerowana liczbę godzin ćwiczeń">
-						{% for hour in proposalHours %}
-							<option value="{{ hour.0 }}"{% ifequal proposal.description.exercises hour.0 %} selected=selected{% endifequal %}>{{ hour.1 }}</option>
-						{% endfor %}
-					</select>
-				</span>
-				<span>
-					<label for="od-proposal-form-time-laboratories">lab.</label>
-					<select class="main-labelledSelect" id="od-proposal-form-time-laboratories" name="laboratories" title="sugerowana liczbę godzin pracowni">
-						{% for hour in proposalHours %}
-							<option value="{{ hour.0 }}"{% ifequal proposal.description.laboratories hour.0 %} selected=selected{% endifequal %}>{{ hour.1 }}</option>
-						{% endfor %}
-					</select>
-				 </span>
-			</li>
-			<li>
-				<label for="od-proposal-form-ects">Sugerowana ilość punktów ECTS:</label>
-				<input type="text" name="ects" id="od-proposal-form-ects" value="{{ proposal.description.ects }}" />
-			</li>
+
+            {% endif %}
+
 			<li class="exam">
-				<label for="od-proposal-form-exam">Egzamin:</label>
-				<select class="main-labelledSelect" id="od-proposal-form-exam" name="exam">
-				   <option value="no">Nie</option>
-				   <option value="yes" {% if exam %}selected="selected"{% endif %}>Tak</option>
-				</select>
+                {{ forms.description.exam.errors }}
+				<label for="id_description-exam">Egzamin:</label>
+                {{ forms.description.exam }}
+
 			</li>
 			<li class="classesInEnglish">
-				<label for="od-proposal-form-classes-in-english">Możliwe zajęcia w języku angielskim:</label>
-				<select class="main-labelledSelect" id="od-proposal-form-classes-in-english" name="classes-in-english">
-				   <option value="no">Nie</option>
-				   <option value="yes" {% if english %}selected="selected"{% endif %}>Tak</option>
-				</select>
+                {{ forms.description.english.errors }}
+				<label for="id_description-english">Możliwe zajęcia w języku angielskim:</label>
+				{{ forms.description.english }}
 			</li>
 		</ul>
 
-		<h3>Opis przedmiotu</h3>
-		<p><textarea name="description" rows="12" cols="70">{{ proposalDescription }}</textarea></p>
+        <h3>Opis przedmiotu</h3>
+		<p>{{ forms.description.description.errors }}{{ forms.description.description }}</p>
 
 		<h3>Wymagania</h3>
-		<p><textarea name="requirements" rows="12" cols="70">{{ proposalRequirements }}</textarea></p>
+		<p>{{ forms.description.requirements.errors }}{{ forms.description.requirements }}</p>
 
 		<h3>Uwagi do potencjalnych prowadzących i dyrekcji</h3>
-		<p><textarea name="comments" rows="5" cols="70">{{ proposalComments }}</textarea></p>
+		<p>{{ forms.description.comments.errors }}{{ forms.description.comments }}</p>
 
 		<h3>Strona przedmiotu</h3>
-		<p><input id="od-proposal-web-page" type="text" name="web-page" {% if proposalWWW %} value="{{ proposalWWW }}" {% endif %} /></p>
+		<p>{{ forms.description.web_page.errors }}{{ forms.description.web_page }}</p>
 
-		<h3>Literatura:</h3>
+    	<h3>Literatura:</h3>
 		<div id="od-proposal-form-books">
+            {{  forms.books.management_form }}
 			<ul>
-				{% if books %}
-					{% for book in books %}
-						<li class="book"><input type="text" name="books[]" value="{{ book.name }}" /></li>
-					{% endfor %}
-				{% else %}
-					<li class="book"><input type="text" name="books[]" /></li>
-				{% endif %}
+                {% for form in forms.books %}
+				<li class="book">{{ form }}</li>
+                {% endfor %}
 			</ul>
 		</div>
+
         
         {% if form_hash %}
             <input type="hidden" value="{{ form_hash }}" name="form-hash"/>

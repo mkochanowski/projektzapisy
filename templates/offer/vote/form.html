@@ -3,55 +3,115 @@
 {% block main-subtitle %}Formularz głosowania{% endblock %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona główna</a></li>
-	<li><a href="{% url offer-main %}">Oferta</a></li>
-	<li><a href="{% url vote-main %}">Głosowanie</a></li>
-	<li>Formularz głosowania</li>
+    <li><a href="/">Strona główna</a></li>
+    <li><a href="{% url vote-main %}">Głosowanie</a></li>
+    <li>Formularz głosowania</li>
 {% endblock %}
 
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css"/>
 {% endblock %}
 
 {% block scripts %}
-	<script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>
-	<script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
+{#    <script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>#}
+    <script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
 
-	<script type="text/javascript" src="/site_media/js/common/listFilter.js"></script>
-	<script type="text/javascript" src="/site_media/js/common/listFilter-courseType.js"></script>
-	<script type="text/javascript" src="/site_media/js/offer/vote.js"></script>
+    <script type="text/javascript" src="/site_media/js/common/listFilter.js"></script>
+    <script type="text/javascript" src="/site_media/js/common/listFilter-courseType.js"></script>
+    <script type="text/javascript" src="/site_media/js/offer/vote.js"></script>
+    {% if isCorrectionActive %}
+    <script type="text/javascript" src="/site_media/js/offer/correction.js"></script>
+    {% endif %}
 {% endblock %}
 
 {% block top-bar %}
-	<div id="od-vote-top-bar" class="main-top-bar" style="display: none">
-		<fieldset id="od-vote-filter">
-			<legend><span>Filtrowanie</span></legend>
-			<div class="main-filter-input">
-				<input class="text filter-phrase" type="text" />
-				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
-			</div>
-		</fieldset>
-		<fieldset class="course-type-filter">
-			<legend><span>Rodzaj przedmiotu</span></legend>
-			{% for type in proposalTypes %}
-				<span class="checkbox">
-					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
-					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
+    <div id="od-vote-top-bar" class="main-top-bar" style="display: none">
+        <fieldset id="od-vote-filter">
+            <legend><span>Filtrowanie</span></legend>
+            <div class="main-filter-input">
+                <input class="text filter-phrase" type="text"/>
+                <input class="reset filter-phrase-reset" type="button" value="X" style="display:none;"/>
+            </div>
+        </fieldset>
+        <fieldset class="course-type-filter">
+            <legend><span>Rodzaj przedmiotu</span></legend>
+            {% for type in proposalTypes %}
+                <span class="checkbox">
+					<input type="checkbox" checked="checked"
+                           id="filter-course-type-{{ type.id }}" {% if type.meta_type %}
+                           class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
+					<input type="hidden" class="group-id" value="{{ type.group.id }}"/>
 					<label for="filter-course-type-{{ type.id }}">{{ type.name }}</label>
 				</span>
-			{% endfor %}
-		</fieldset>
-		<fieldset id="od-vote-other">
-			<legend><span>Inne</span></legend>
-			<span class="checkbox"><input type="checkbox" id="od-vote-onlywanted" /><label for="od-vote-onlywanted" title="Pokazuje tylko te propozycje przedmiotów, które oznaczyłeś przyciskiem &quot;Pójdę na to&quot;">Pokaż tylko przedmioty, na które chcę iść</label></span>
-			<span class="checkbox"><input type="checkbox" id="od-vote-withoutcompleted" disabled="disabled" /><label for="od-vote-withoutcompleted">Nie pokazuj przedmiotów, na które już chodziłem</label></span>
-		</fieldset>
-	</div>
+            {% endfor %}
+        </fieldset>
+        <fieldset id="od-vote-other">
+            <legend><span>Inne</span></legend>
+            <span class="checkbox"><input type="checkbox" id="od-vote-onlywanted"/><label for="od-vote-onlywanted"
+                                                                                          title="Pokazuje tylko te propozycje przedmiotów, które oznaczyłeś przyciskiem &quot;Pójdę na to&quot;">Pokaż
+                tylko przedmioty, na które chcę iść</label></span>
+            <span class="checkbox"><input type="checkbox" id="od-vote-withoutcompleted" disabled="disabled"/><label
+                    for="od-vote-withoutcompleted">Nie pokazuj przedmiotów, na które już chodziłem</label></span>
+        </fieldset>
+    </div>
 {% endblock %}
 
 {% block content %}
-	<form action="" method="post" id="od-vote-form">
-		{{ form.as_lists }}
-		<p id="od-vote-submitBar"><input type="submit" value="Głosuj" /></p>
-	</form>
+    <form action="" method="post" id="od-vote-form">
+        {{ formset.winter.formset.management_form }}
+        {{ formset.summer.formset.management_form }}
+        {{ formset.unknown.formset.management_form }}
+        <div class="od-vote-semester" id="od-vote-semester-winter"><h2>Semestr zimowy</h2>
+            <ul>
+                {% for form in formset.winter.formset %}
+                    {% for field in  form.hidden_fields %}
+                        {{ field }}
+                    {% endfor %}
+                <li class="od-vote-course winter {% for type in form.instance.course.description.types %} course-type-{{ type.lecture_type.id }}{% endfor %}">
+                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                    {% if isCorrectionActive %}
+                        <input type="hidden" class="value" value="{{ form.instance.value }}">
+                        {{ form.correction }}
+                    {% else %}
+                        {{ form.value }}
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="od-vote-semester" id="od-vote-semester-summer"><h2>Semestr letni</h2>
+            <ul>
+                {% for form in formset.summer.formset %}
+                <li class="od-vote-course summer {% for type in form.instance.course.description.types %} course-type-{{ type.lecture_type.id }}{% endfor %}">
+                    {% for field in  form.hidden_fields %}
+                        {{ field }}
+                    {% endfor %}
+                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                    {% if isCorrectionActive %}
+                        <input type="hidden" class="value" value="{{ form.instance.value }}">
+                        {{ form.correction }}{% else %}
+                        {{ form.value }}{% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr nieokreślony</h2>
+            <ul>
+                {% for form in formset.unknown.formset %}
+                <li class="od-vote-course unknown course-type-{{ form.instance.course.description.type.id }}">
+                    {% for field in  form.hidden_fields %}
+                        {{ field }}
+                    {% endfor %}
+                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                    {% if isCorrectionActive %}
+                        <input type="hidden" class="value" value="{{ form.instance.value }}">
+                        {{ form.correction }}{% else %}{{ form.value }}
+                    {% endif %}
+                </li>
+                {% endfor %}</ul>
+        </div>
+
+        <p id="od-vote-submitBar"><input type="submit" value="Głosuj"/></p>
+    </form>
+       <p id="od-vote-maxPoints">Maksymalna liczba punktów do wykorzystania: <span>{{ formset.points_limit }}</span></p>
 {% endblock %}

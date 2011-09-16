@@ -25,9 +25,17 @@
 			</div>
 
 			<p class="link"><a href="{% url vote %}">Głosuj</a></p>
-		{% else %}
+		{% else %}{% if isCorrectionActive %}
+            <div id="od-correction-main-rules">
+				<!--
+					TU FAJNIE BYŁOBY DAĆ JAKIEŚ PRAWDZIWE ZASADY :)
+				-->
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas fringilla nulla sed nibh porta ultricies. Fusce lobortis nibh at ante consectetur gravida. Cras varius, nibh sit amet semper ornare, metus velit euismod eros, a lobortis ipsum sem eget nulla. Ut sagittis sodales ligula, ac congue erat mattis ut. Proin velit massa, dapibus venenatis rutrum vitae, malesuada id lacus. Suspendisse potenti. Etiam fermentum eros a lacus facilisis pulvinar. Phasellus interdum aliquet lacus, quis molestie arcu interdum commodo. Integer pellentesque sodales lorem, in suscipit metus imperdiet vel. Aliquam erat volutpat. Integer pharetra vestibulum odio eget congue. Pellentesque pellentesque enim eget nisl pulvinar vitae fringilla nisi molestie.
+			</div>
+        {% else %}
 			<p class="disabled-link">Głosowanie nie jest w tej chwili aktywne.</p>
 		{% endif %}
+    {% endif %}
 		<p class="link"><a href="{% url vote-summary %}">Podsumowanie głosowania</a></p>
 		<p class="link"><a href="{% url vote-view %}">Pokaż mój głos</a></p>
 	</div>

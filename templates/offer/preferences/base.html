@@ -79,15 +79,14 @@
 			{% for pref in prefs %}
 				<li {% if pref.hidden %}class="hidden"{% endif %}>
 					<span class="name">{{pref.name}}</span>
-
 					<input type="hidden" class="pref-id" value="{{ pref.id }}" />
-					<input type="hidden" class="pref-type" value="{% for type in pref.desc.types %}{{ type.lecture_type.id }} {% endfor %}" />
+					<input type="hidden" class="pref-type" value="{{ pref.proposal.description.type.id}}" />
 					<input type="hidden" class="pref-hide-url" value="{% url prefs-hide pref.id %}" />
 					<input type="hidden" class="pref-unhide-url" value="{% url prefs-unhide pref.id %}" />
 					<input type="hidden" class="pref-is-new" value="{% if pref.is_new %}1{% else %}0{% endif %}" />
 
 					<ul>
-						{% ifnotequal pref.desc.lectures 0 %}
+						{% ifnotequal pref.description.lectures 0 %}
 						<li>
 							Wykład:
 							<select name="lecture-{{ pref.id }}" class="lecture">
@@ -95,7 +94,7 @@
 							</select>
 						</li>
 						{% endifnotequal %}
-						{% ifnotequal pref.desc.repetitories 0 %}
+						{% ifnotequal pref.description.repetitories 0 %}
 						<li>
 							Repetytorium:
 							<select name="review-lecture-{{ pref.id }}" class="review-lecture">
@@ -103,7 +102,7 @@
 							</select>
 						</li>
 						{% endifnotequal %}
-						{% ifnotequal pref.desc.exercises 0 %}
+						{% ifnotequal pref.description.exercises 0 %}
 						<li>
 							Ćwiczenia:
 							<select name="tutorial-{{ pref.id }}" class="tutorial">
@@ -111,7 +110,7 @@
 							</select>
 						</li>
 						{% endifnotequal %}
-						{% ifnotequal pref.desc.laboratories 0 %}
+						{% ifnotequal pref.description.laboratories 0 %}
 						<li>
 							Pracownia:
 							<select name="lab-{{ pref.id }}" class="lab">

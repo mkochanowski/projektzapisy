@@ -41,10 +41,11 @@ def view(request):
     employee = request.user.employee
     if types:
         types = types.split(',')
-    prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query).order_by('proposal__name')
+    prefs = Preference.objects.get_employees_prefs(employee, hidden, types, query).order_by('proposal__name')\
+            .select_related('proposal', 'proposal__description', 'proposal__description__type')
     data = {
         'prefs': prefs,
-        'proposalTypes': Type.objects.all(),
+        'proposalTypes': Type.objects.all().select_related('group'),
     }
     def process_pref(pref):
         """
@@ -59,7 +60,7 @@ def view(request):
         obj['tutorial'] = pref.tutorial
         obj['lab']      = pref.lab
         obj['hidden']   = pref.hidden
-        obj['desc']     = pref.proposal.description()
+        obj['proposal']     = pref.proposal
         return obj
     data['prefs'] = map(process_pref, data['prefs'])
     unset = get_employees_unset(employee)
@@ -81,14 +82,15 @@ def description(request, proposal_id):
           instead of rendering the template
     """
     format = request.GET.get('format', None)
-    description_ = get_object_or_404(Proposal, pk=proposal_id).description()
+    proposal = Proposal.objects.get(id=proposal_id).select_related('description', 'description__type', 'description__type__group').description
+    description = proposal.description
     if format == 'json':
         data = {}
-        data['name'] = description_.proposal.name
-        data['type'] = description_.type
-        data['description'] = description_.description
-        data['requirements'] = description_.requirements
-        data['comments'] = description_.comments
+        data['name'] = proposal.name
+        data['type'] = description.type
+        data['description'] = description.description
+        data['requirements'] = description.requirements
+        data['comments'] = description.comments
         data['books'] = dict(
             [(book.order,book.name) for book
              in description_.proposal.books.all()])
@@ -171,24 +173,21 @@ def init_pref(request, prop_id):
     try:
         if request.method == 'POST':
             employee = request.user.employee
-            course = Proposal.objects.get(pk=prop_id)
+            course = Proposal.noremoved.get(pk=prop_id)
             Preference.objects.init_preference(employee, course)
-            types = []
-            for type in course.description().types():
-                types.append(type.lecture_type.id)
             data = {
                 'Success': 'OK',
                 'name': course.name,
                 'id': course.id,
                 'is_new': course.is_new(),
-                'types': types,
+                'type': course.description.type.id,
                 'hideurl': reverse('prefs-hide', args = [ course.id ] ),
                 'unhideurl': reverse('prefs-unhide', args = [ course.id ] ),
                 'prefchoices': PREFERENCE_CHOICES,
-                'showlectures': (course.description().lectures > 0),
-                'showrepetitories': (course.description().repetitories > 0),
-                'showexercises': (course.description().exercises > 0),
-                'showlaboratories': (course.description().laboratories > 0),
+                'showlectures': True,
+                'showrepetitories': True,
+                'showexercises': True,
+                'showlaboratories': True,
             }
         else:
             data = {'Failure': 'Use POST'}
