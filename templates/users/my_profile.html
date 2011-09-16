@@ -51,12 +51,20 @@
 
 {% if user.employee %}
 <h4>Konsultacje</h4>
+    {% if consultations %}
 {{ consultations }}
+    {% else %}
+        Brak informacji
+    {% endif %}
 {% endif %}
 
 {% if zamawiany %}<br/>
 <h4>Studia zamawiane:</h4>
+    {% if comments %}
 {{ comments|safe }}
+    {% else %}
+        Brak informacji
+    {% endif %}
 {% endif %}
 <h4>Terminy zapisów</h4>
 <table class="table-info">
