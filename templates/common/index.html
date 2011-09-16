@@ -16,7 +16,7 @@
       <h3>{{ news.title }}</h3>
       <h5>{{ news.date|date:"l, d.m.Y"|lower }} - {{ news.author.get_full_name }}</h5>
       <p>{{ news.body|safe }}</p>
-      <p><a class="btn primary large right" href="/news/">Więcej &raquo;</a></p>
+      <p><a class="btn primary right" href="/news/">Więcej &raquo;</a></p>
     </div>
 
     <!-- Example row of columns -->
@@ -31,13 +31,13 @@
         <h2>Oferta Dydaktyczna</h2>
          <p>System kształtowania oferty dydaktycznej w Instytucie
 				Informatyki.</p>
-        <p><a class="btn" href="/">Wkrótce &raquo;</a></p>
+        <p><a class="btn" href="/">Wkrótce</a></p>
      </div>
       <div class="span5">
         <h2>Ocena zajęć</h2>
         <p>System oceny zajęć w Instytucie
 				Informatyki Uniwersytetu Wrocławskiego.</p>
-        <p><a class="btn" href="/">Wkrótce &raquo;</a></p>
+        <p><a class="btn" href="/">Wkrótce</a></p>
       </div>
     </div>
 {% endblock %}
