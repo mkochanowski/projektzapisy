@@ -22,6 +22,7 @@
 			>{{group.course.name}}</a> &raquo;
 
 	{{group.get_type_display}}: {{group.get_teacher_full_name}}
+    <a href="{% url admin:courses_group_change group.pk %}">Edycja</a>
 {% endblock %}
 
 
@@ -32,7 +33,7 @@
 
         <h1>{{group.course.name}}</h1>
         {% if user.is_staff %}
-        <a href="{% url admin:courses_group_change group.pk %}">Edycja</a>
+
         {% endif %}
         <div class="details">
             <table class="table-info">
@@ -68,7 +69,6 @@
 
         <hr>
 
-		<br/>
 		<h3>Lista osób zapisanych na przedmiot:</h3>
 		{% if group.limit_zamawiane %}
 			<p>Zapisanych w ramach limitu studiów zamawianych:
@@ -84,8 +84,8 @@
 			{{group.get_group_limit}}</p>
 		{% endif %}
 
-		<br/>
-		
+
+        {% if students_in_group %}
 		<table class="zebra-striped">
 			<thead>
 				<th>Imię</t>
@@ -115,8 +115,10 @@
 					Brak zapisanych osób.
 				{% endfor %}
 			</tbody>
-		</table><br />
+		</table>
         <a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do grupy]</a>
+
+        {% endif %}
 		<br/>
 		{%if students_in_queue %}
 			<h3>Lista osób oczekujących na zapis:</h3>
