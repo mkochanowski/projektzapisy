@@ -218,6 +218,8 @@ def my_profile(request):
             ]
         except KeyError:
             terms = []
+        except Student.DoesNotExist:
+            terms = []
     else:
         terms = []
     

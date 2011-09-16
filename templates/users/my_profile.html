@@ -66,6 +66,8 @@
         Brak informacji
     {% endif %}
 {% endif %}
+
+{% if terms %}
 <h4>Terminy zapisów</h4>
 <table class="table-info-big">
     {% for t in terms %}
@@ -74,4 +76,5 @@
         </tr>
     {% endfor %}
 </table>
+{% endif %}
 {% endblock %}
