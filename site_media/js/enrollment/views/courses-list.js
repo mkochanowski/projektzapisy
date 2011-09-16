@@ -31,7 +31,7 @@ CoursesList.initCourseLists = function()
 		var semester = new CoursesList.Semester();
 		semester.id = semesterContainer.children('input[name=semester-id]').
 			assertOne().attr('value').castToInt();
-		semester.name = semesterContainer.children('h2').assertOne().
+		semester.name = semesterContainer.children('h3').assertOne().
 			children('span').assertOne().text();
 		semester.container = semesterContainer;
 		CoursesList.semesters[semester.id] = semester;
