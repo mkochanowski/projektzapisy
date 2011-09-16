@@ -237,6 +237,7 @@ def my_profile(request):
 
 def employees_list(request, begin = 'All'):
 
+    employees = Employee.get_list(begin)
     try:
         semester = Semester.get_current_semester()
         employees = Group.teacher_in_present(employees, semester)
