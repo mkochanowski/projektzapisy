@@ -50,27 +50,20 @@
 {% endif %}
 
 {% if user.employee %}
-<br/>
-Konsultacje:
-<br/>
-{{ consultations }}    
+<h4>Konsultacje</h4>
+{{ consultations }}
 {% endif %}
 
 {% if zamawiany %}<br/>
-Studia zamawiane:<br/>
+<h4>Studia zamawiane:</h4>
 {{ comments|safe }}
-<br/>
 {% endif %}
-
-<br/>
 <h4>Terminy zapisów</h4>
-<table class="zebra-striped">
+<table class="table-info">
     {% for t in terms %}
         <tr>
-        <td><b>{{t.name}}</b>:</td><td>{{t.term|date:"H:i, d.m.Y"}}</td>
+        <th>{{t.name}}</th>:</td><td>{{t.term|date:"H:i, d.m.Y"}}</td>
         </tr>
     {% endfor %}
 </table>
-<br/>
-
 {% endblock %}
