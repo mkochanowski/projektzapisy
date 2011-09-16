@@ -2,39 +2,37 @@
 
 {% block bread %}
 	<a href="{% url main-page %}">Strona główna</a> &raquo;
-	<h3>Mój profil</h3>
+	Mój profil
 {% endblock %}
 
 {% block content %}
-	
-<h4>Moje dane</h4>
-    <table class="zebra-striped">
+
+    	<h2>Mój profil</h2>
+
+<h2>Moje dane</h2>
+    <table class="table-info">
         <tr>
-            <td>login</td>
+            <th>login</th>
             <td>{{user.username}}</td>
         </tr>
         <tr>
-            <td>email</td>
+            <th>email</th>
             <td>{{user.email}}</td>
         </tr>
         {%if zamawiany%}
             <tr>
-            <td>numer konta bankowego</td>
+            <th>numer konta bankowego</th>
             <td>{{zamawiany.bank_account}}</td>
         </tr>{%endif%}
 
     {% if user.employee %}
         <tr>
-            <td>pokój</td>
+            <th>pokój</th>
             <td>{{ room }}</td>
         </tr>
         <tr>
-            <td>strona domowa</td>
+            <th>strona domowa</th>
             <td>{{ homepage }}</td>
-        </tr>
-        <tr>
-            <td>login</td>
-            <td></td>
         </tr>
     {%endif%}
     </table>
