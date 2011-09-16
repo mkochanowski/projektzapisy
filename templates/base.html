@@ -81,7 +81,7 @@
                                 <a href="{% url news-all %}">Aktualności</a> |
                             {% endif %}
                         {% endif %}
-                        <a href="{% url help %}">Pomoc</a> |
+                        {% comment %}<a href="{% url help %}">Pomoc</a> |{% endcomment %}
                         <a href="{% url user-logout %}">Wyloguj</a>
                     </div>
                 {% else %}
