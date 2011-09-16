@@ -7,7 +7,7 @@
 {% block content-class %}narrow{% endblock %}
 
 {% block rss %}
-	<link href="/feeds/news/" rel="alternate" type="application/rss+xml" title="Aktualności RSS" />
+	{% comment %}<link href="/feeds/news/" rel="alternate" type="application/rss+xml" title="Aktualności RSS" />{% endcomment %}
 {% endblock %}
 
 {% block styles %}
@@ -41,11 +41,11 @@ u
 			<a href="{% url news-all-add %}">Dodaj ogłoszenie</a>
 		{% endif %}
 
-		<div class="od-news-navigator">
+		{% comment %}<div class="od-news-navigator">
 			<a href="/feeds/news/{{category}}/" title="Aktualności RSS" id="od-news-rss-icon">
 				<img src="/site_media/images/rss.png" alt="RSS" />
 			</a>
-		</div>
+		</div>{% endcomment %}
 		
 		<div style="clear: both;"></div>
 	</div>
