@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block main-navigation %}
-<li><a href="{% url my-profile %}">Profil</a></li>
-<li><a href="{% url consultations-change %}">Zmień konsultacje</a></li>
+<a href="/">Strona główna</a> &raquo;
+<a href="{% url my-profile %}">Moje konto</a> &raquo;
+Zmień konsultacje
 {% endblock %}
 
 {% block content %}
