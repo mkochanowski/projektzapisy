@@ -13,9 +13,9 @@
 {% block center %}
     <h1>Aktualności</h1>
     <div class="hero-unit">
-      <h3>Ocena zajęć ruszyła</h3>
-      <h5>2011-06-28 - Paweł Rychlikowski</h5>
-      <p>do 21 lipca będzie można oceniać zajęcia. Bardzo zachęcam, żeby wszyscy skorzystali z tej możliwości. Udział w ocenie służy przede wszystkim anonimowemu przekazaniu władzom instytutu Waszych opinii o zajęciach, a ponieważ bardzo nam na tym zależy, dodatkowo premiujemy osoby oceniające wcześniejszym czasem otwarcia zapisów.</p>
+      <h3>{{ news.title }}</h3>
+      <h5>{{ news.date }} - {{ news.author }}</h5>
+      <p>{{ news.body }}</p>
       <p><a class="btn primary large right" href="/news/">Więcej &raquo;</a></p>
     </div>
 

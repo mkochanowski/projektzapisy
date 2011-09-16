@@ -15,4 +15,8 @@ class NewsAdmin(admin.ModelAdmin):
     list_display = ('title', 'date')
     list_filter  = ['date']
 
+    class Media:
+        js = ('/site_media/js/tiny_mce/tiny_mce.js',
+              '/site_media/js/textareas.js',)
+
 admin.site.register(News, NewsAdmin)

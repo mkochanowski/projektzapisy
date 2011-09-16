@@ -6,6 +6,7 @@
 
 from django.contrib.auth.decorators import permission_required
 # from django.core.urlresolvers import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect # , Http404
 from django.shortcuts import get_object_or_404, render_to_response, \
      redirect
@@ -28,10 +29,11 @@ def main_page( request ):
         Main page
     """
     try:
-        grade = Semester.get_current_semester().is_grade_active
-    except:
-        grade = False
-    return render_to_response('common/index.html', {'grade':grade}, context_instance = RequestContext(request))
+        news = News.objects.all()[0]
+    except ObjectDoesNotExist:
+        news = None
+
+    return render_to_response('common/index.html', {'news': news}, context_instance = RequestContext(request))
 
 
 def search_page(request):
