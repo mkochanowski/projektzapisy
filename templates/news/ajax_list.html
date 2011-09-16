@@ -5,8 +5,8 @@
   {% for news in object_list %}
   <div class="od-news-item">
     <div class="od-news-header">
-      <h3>{{ news.title }}<small>&nbsp;{{news.category}}</small></h3>
-      <span class="od-news-date">{{ news.date|date:"l, d.m.Y"|lower }}</span>
+      <h3>{{ news.title }}</h3>
+      <span class="od-news-date">{{ news.date|date:"l, d.m.Y" }}</span>
     </div>
     <div class="od-news-body">
       {{ news.body|safe }}
