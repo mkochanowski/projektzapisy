@@ -13,9 +13,6 @@
     </div>
     <div class="od-news-footer">
       {{ news.author.first_name }} {{ news.author.last_name }}
-      {% if perms.news.change_news %}
-      <a href="/fereol_admin/news/news/{{ news.id }}/">Edytuj</a>
-      {% endif %}
     </div>
   </div>
   {% endfor %}
