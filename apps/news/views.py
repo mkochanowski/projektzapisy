@@ -210,7 +210,7 @@ def all_news(request):
             pass
     
     json = request.GET.get('json', None)
-    items = News.objects.all()
+    items = News.objects.exclude(category='-')
     data = prepare_data_all(request, items)
     if json:
         return HttpResponse(simplejson.dumps(data))
