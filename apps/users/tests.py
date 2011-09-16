@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 from apps.enrollment.records.models import Record
 from apps.enrollment.courses.models import Course, Term, Group
-from apps.users.models import Employee, Student
+from apps.users.models import Employee, Student, StudiaZamawiane
 from apps.users.exceptions import NonEmployeeException, NonStudentException
         
 class EmployeeGroupsTest(TestCase):
@@ -117,3 +117,24 @@ class StudentScheduleTest(TestCase):
         	self.assert_(s in [course_1, course_1])
         for t in groups_term_id:
         	self.assert_(t in [term_1, term_2])
+
+class IBANTest(TestCase):
+   def setUp(self):
+	self.valid_polish = 'PL08109000049916589081209234'
+	self.invalid_polish = 'PL08119000049916589081209234'
+	self.not_alphanum = 'PL0810&000049916589081209234'
+	self.without_country_code = '08109000049916589081209234'
+
+   def testWithNotAlphaNumeric(self):
+	self.assertFalse(StudiaZamawiane.check_iban(self.not_alphanum))
+
+   def testWithoutCountryCode(self):
+	self.assertFalse(StudiaZamawiane.check_iban(self.without_country_code))
+
+   def testWithInvalidPolish(self):
+	self.assertFalse(StudiaZamawiane.check_iban(self.invalid_polish))
+
+   def testWithValidPolish(self):
+	self.assert_(StudiaZamawiane.check_iban(self.valid_polish))
+	
+
