@@ -29,6 +29,9 @@ class Semester( models.Model ):
 		
     def get_name(self):
         """ returns name of semester """
+        #TODO: wymuszanie formatu roku "XXXX/YY" zamiast "XXXX"
+        if len(self.year) != 7:
+            return '%s %s (BLAD)' % (self.get_type_display() , self.year)
         return '%s %s' % (self.get_type_display() , self.year)
 
     def is_current_semester(self):
@@ -42,14 +45,14 @@ class Semester( models.Model ):
         year = self.year
         if self.type=='l':
             try:
-                Semester.objects.filter(year=year,type='z')[0]
+                return Semester.objects.filter(year=year,type='z')[0]
             except KeyError:
                 return None
         else:
             prev_year = str(int(year[0:4])-1)
             year = prev_year+'/'+year[2:4]
             try:
-                Semester.objects.filter(year=year,type='l')[0]
+                return Semester.objects.filter(year=year,type='l')[0]
             except:
                 return None
                 
