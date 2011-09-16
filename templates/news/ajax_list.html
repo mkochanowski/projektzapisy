@@ -9,7 +9,7 @@
       <span class="od-news-date">{{ news.date|date:"l, d.m.Y"|lower }}</span>
     </div>
     <div class="od-news-body">
-      {{ news.body|bbcode|nl2br|safe }}
+      {{ news.body|safe }}
     </div>
     <div class="od-news-footer">
       {{ news.author.first_name }} {{ news.author.last_name }}
