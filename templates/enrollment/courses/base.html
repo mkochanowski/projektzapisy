@@ -58,7 +58,7 @@
 		<div id="course-list">
 			{% for semester in semester_courses %}
 				<div class="semester">
-					<h2>Semestr <span>{{ semester.name }}</span></h2>
+					<h3>Semestr <span>{{ semester.name }}</span></h3>
 					<input type="hidden" name="semester-id" value="{{ semester.id }}" />
 					<ul class="courses-list">
 						{% for course in semester.courses %}
