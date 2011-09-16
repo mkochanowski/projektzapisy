@@ -58,11 +58,11 @@ DATABASES = {
 #EMAIL_HOST_PASSWORD = 'password'
 #EMAIL_PORT = 587
 
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_COURSE_PREFIX = '[Fereol] ' # please don't remove the trailing space
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 1025
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+#EMAIL_COURSE_PREFIX = '[Fereol] ' # please don't remove the trailing space
 
 #loggin settings:
 
