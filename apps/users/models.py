@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.db.models.loading import cache
 from django.template import Context
 from django.template.loader import render_to_string
-
+from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from apps.enrollment.courses.models.points import PointTypes
 from apps.enrollment.courses.models import Semester
@@ -369,6 +369,32 @@ class StudiaZamawiane(models.Model):
         except:
             pass            
         super(StudiaZamawiane, self).save(*args, **kwargs)
+
+    def clean(self):
+        if not StudiaZamawiane.check_iban(self.bank_account):
+            raise ValidationError('Podany numer konta nie jest poprawny')
+
+    @staticmethod
+    def _normalize_char(c):
+        if c.isalpha():
+	        return str(ord(c.lower()) - ord('a') + 10)
+        return c
+
+    @staticmethod
+    def check_iban(number):
+	    """Checks if given number is valid IBAN"""
+	    lengths = {'pl': 28}
+	    if not number.isalnum():
+	        return False
+	    country_code = number[:2].lower()
+	    if not country_code.isalpha():
+	        return False
+	    valid_length = lengths.get(country_code)
+	    if valid_length is not None:
+	        if len(number) != valid_length:
+	            return False
+	    code = int(''.join(map(StudiaZamawiane._normalize_char, number[4:] + number[:4])))
+	    return code % 97 == 1	        
 
     class Meta:
         verbose_name = 'Studia zamawiane'
