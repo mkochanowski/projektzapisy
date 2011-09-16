@@ -13,7 +13,7 @@ background: #00709e; /* Old browsers */
 }
 
 div.top .topbar { position:relative;}
-div.top .topbar .fill{ position:relative;  height: auto;}
+div.top .topbar .fill{ position:relative;  height: auto!important;}
 div.top .btn { padding:4px; color:#808080;}
 div.top .topbar ul a { color:#FFFFFF; font-size:15px; }
 div.top .systemtopbar .fill { background-color: #00709e; background-image:none; box-shadow: none; }
