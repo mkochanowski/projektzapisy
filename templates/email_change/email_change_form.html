@@ -1,11 +1,19 @@
 {% extends "email_change/base.html" %}
-
+z
 {% block content %}
 
 <form action='' method="post" autocomplete="off">{% csrf_token %}
 	<fieldset>
-		{{form.as_p}}
-		<input type="submit" class="btn success" value="zmień">
+        <legend><h2>Zmień adres email</h2></legend>
+		<div class="clearfix">
+            <label for="id_email">Email</label>
+            <div class="input">
+              <input type="text" size="30" name="email" id="id_email" class="xlarge" value="{{ form.email.value }}">
+            </div>
+          </div>
+        <div class="actions">
+            <input type="submit" class="btn success" value="resetuj">
+          </div>
 	</fieldset>
 </form>
         

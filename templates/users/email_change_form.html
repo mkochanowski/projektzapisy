@@ -3,12 +3,13 @@
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
 <a href="{% url my-profile %}">Moje konto</a>< &raquo;
-<h3>Zmień e-mail</h3>
+Zmień e-mail
 {% endblock %}
 
 {% block content %}
 <form action='' method="post" autocomplete="off">
 	<fieldset>
+        <legend><h2>Zmień adres email</h2></legend>
 		{{form.as_p}}
 		<input type="submit" class="btn success" value="zmień"/>
 	</fieldset>
