@@ -39,7 +39,7 @@ urlpatterns = patterns('',
 
 
 
-if not settings.RELASE:
+if not settings.RELEASE:
     urlpatterns += patterns('',
 
     (r'^vote/', include('apps.offer.vote.urls')),

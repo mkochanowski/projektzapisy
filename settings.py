@@ -7,7 +7,7 @@ PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = True
 
-RELASE = False
+RELEASE = False
 
 TEMPLATE_DEBUG = DEBUG
 
