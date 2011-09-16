@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 
@@ -219,10 +220,7 @@ def course(request, slug):
         return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )
 
     except (Course.DoesNotExist, NonCourseException):
-        logger.error('Function course(slug = %s) throws Course.DoesNotExist exception.' % unicode(slug) )
-        if not request.user.is_anonymous():
-            request.user.message_set.create(message="Przedmiot nie istnieje.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        raise Http404
 
 
 def course_consultations(request, slug):
