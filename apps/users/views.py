@@ -235,9 +235,8 @@ def my_profile(request):
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
 
-def employees_list(request, begin = 'A'):
+def employees_list(request, begin = 'All'):
 
-    employees = Employee.get_list(begin)
     try:
         semester = Semester.get_current_semester()
         employees = Group.teacher_in_present(employees, semester)
