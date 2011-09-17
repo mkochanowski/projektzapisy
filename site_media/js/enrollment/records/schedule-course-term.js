@@ -61,7 +61,7 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 		sterm._onResize(isFullSize);
 	};
 
-	sterm.classroom = raw.classroom.castToInt();
+	sterm.classroom = raw.classroom;
 
 	Fereol.Enrollment.ScheduleCourseTerm._byID[sterm.id] = sterm;
 
