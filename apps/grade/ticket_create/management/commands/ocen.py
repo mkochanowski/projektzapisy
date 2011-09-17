@@ -16,6 +16,7 @@ class Command(BaseCommand):
             try:
                 u.student = Student.objects.get(matricula=line)
             except ObjectDoesNotExist:
+                print "bad"
                 pass
             u.semester_id = args[1]
             u.save()
