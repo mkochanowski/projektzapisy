@@ -2,9 +2,10 @@
 from django.contrib                    import admin
 from apps.grade.ticket_create.models import PublicKey, \
                                               PrivateKey, \
-                                              UsedTicketStamp
+                                              UsedTicketStamp, StudentGraded
  
 admin.site.register( PublicKey )
 admin.site.register( PrivateKey )
 admin.site.register( UsedTicketStamp )                                              
-                                
+admin.site.register( StudentGraded )
+
