@@ -27,6 +27,10 @@ class Group(models.Model):
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych', help_text='miejsca gwarantowane dla studentów zamawianych')
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
 
+    cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
+    cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
+    cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
+
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
         if self.teacher is None:
@@ -58,91 +62,45 @@ class Group(models.Model):
 
     def available_only_for_zamawiane(self):
         return (self.limit_zamawiane > 0 and
-            self.number_of_students_non_zamawiane() >=
+            self.get_count_of_enrolled_non_zamawiane() >=
             self.limit_non_zamawiane())
 
-    def number_of_students(self):
-        """Returns number of students enrolled to particular group"""
-        from apps.enrollment.records.models import Record
-        return Record.enrolled.filter(group=self).count()
+    def get_count_of_enrolled(self):
+        self.update_students_counts_if_empty()
+        return self.cache_enrolled
 
-    def number_of_students_zamawiane(self):
-        '''
-            Liczba studentów zapisanych w ramach limitu dla studentów
-            zamawianych.
-        '''
-        from apps.enrollment.records.models import Record
+    def get_count_of_enrolled_zamawiane(self):
+        self.update_students_counts_if_empty()
+        return self.cache_enrolled_zam
+
+    def get_count_of_enrolled_non_zamawiane(self):
+        return self.get_count_of_enrolled() - \
+            self.get_count_of_enrolled_zamawiane()
+
+    def get_count_of_queued(self):
+        self.update_students_counts_if_empty()
+        return self.cache_queued
+
+    def update_students_counts_if_empty(self):
+        if (self.cache_enrolled is None) or (self.cache_enrolled_zam is None) \
+            or (self.cache_queued is None):
+            self.update_students_counts()
+
+    def update_students_counts(self):
+        from apps.enrollment.records.models import Record, Queue
         from apps.users.models import StudiaZamawiane
-        enrolled = Record.enrolled.filter(group=self).values_list( \
+
+        self.cache_enrolled = Record.enrolled.filter(group=self).count()
+        self.cache_queued = Queue.queued.filter(group=self).count()
+
+        enrolled_zam = Record.enrolled.filter(group=self).values_list(\
             'student', flat=True)
-        zam = StudiaZamawiane.objects.filter(student__in=enrolled).count()
-        if zam > self.limit_zamawiane:
-            return self.limit_zamawiane
-        else:
-            return zam
-
-    def number_of_students_non_zamawiane(self):
-        return self.number_of_students() - self.number_of_students_zamawiane()
-
-    def number_of_queued_students(self):
-        """Returns number of students queued to particular group"""
-        from apps.enrollment.records.models import Queue
-        return Queue.queued.filter(group=self).count()
-
-    @staticmethod
-    #TODO: baza na tym umiera
-    def numbers_of_students(semester, enrolled):
-        '''
-            Returns numbers of students enrolled to all groups in particular
-            semester
-        '''
-        from apps.enrollment.records.models import Record, Queue
-        manager = Record.enrolled if enrolled else Queue.queued
-        raw_counts = manager.filter(group__course__semester=semester).\
-            values('group__pk').order_by().annotate(Count('group__pk'))
-        count_map = {}
-        for r in raw_counts:
-            count_map[r['group__pk']] = r['group__pk__count']
-        return count_map
-
-    @staticmethod
-    def get_students_counts(groups):
-        from apps.enrollment.records.models import Record, Queue
-        from apps.users.models import StudiaZamawiane
-
-        counts = {}
-        '''
-        for group in groups:
-            counts[group.pk] = {
-                'enrolled': 0,
-                'enrolled_zamawiane': 0,
-                'queued': 0
-            }
-
-        enrolled_counts = Record.enrolled.filter(group__in=groups).\
-            values('group__pk').order_by().annotate(Count('group__pk'))
-        for r in enrolled_counts:
-            counts[r['group__pk']]['enrolled'] = int(r['group__pk__count'])
-
-        #TODO: baza na tym umrze
-        enrolled_students = Record.enrolled.filter(group__in=groups). \
-            values_list('student', flat=True)
-        enrolled_zam_students = StudiaZamawiane.objects.filter(student__in= \
-            enrolled_students).values_list('student', flat=True)
-        enrolled_zam_counts = Record.enrolled.filter(group__in=groups,
-            student__in=enrolled_zam_students).\
-            values('group__pk').order_by().annotate(Count('group__pk'))
-        for r in enrolled_zam_counts:
-            counts[r['group__pk']]['enrolled_zamawiane'] = \
-                int(r['group__pk__count'])
-
-        queued_counts = Queue.queued.filter(group__in=groups).\
-            values('group__pk').order_by().annotate(Count('group__pk'))
-        for r in queued_counts:
-            counts[r['group__pk']]['queued'] = int(r['group__pk__count'])
-        '''
+        self.cache_enrolled_zam = StudiaZamawiane.objects.filter(student__in=\
+            enrolled_zam).count()
+        if self.cache_enrolled_zam > self.cache_enrolled:
+            self.cache_enrolled_zam = self.cache_enrolled
         
-        return counts
+        self.save()
 
     def course_slug(self):
         return self.course.slug
@@ -157,7 +115,7 @@ class Group(models.Model):
         return employees
 
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
-        student_counts, student=None):
+        student=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.utils import simplejson
         from django.core.urlresolvers import reverse
@@ -180,10 +138,10 @@ class Group(models.Model):
 
             'limit': self.limit,
             'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
-            'enrolled_count': 0,#student_counts[self.pk]['enrolled'],
-            'unavailable_enrolled_count': 0,#\
-                #student_counts[self.pk]['enrolled_zamawiane'],
-            'queued_count': 0,#student_counts[self.pk]['queued'],
+            'enrolled_count': self.get_count_of_enrolled(),
+            'unavailable_enrolled_count': 0 if zamawiany else \
+                self.get_count_of_enrolled_zamawiane(),
+            'queued_count': self.get_count_of_queued(),
             'queue_priority': queue_priorities.get(self.pk)
         }
         

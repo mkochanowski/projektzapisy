@@ -118,8 +118,6 @@ def course(request, slug):
                 student_queues_groups = map(lambda x: x.group, student_queues)
                 student_groups = map(lambda x: x.group, enrolled.filter(student=student))
 
-                student_counts = Group.get_students_counts(groups)
-
                 for g in groups:
                     if g in student_queues_groups:
                         g.priority = student_queues.get(group=g).priority
@@ -128,7 +126,7 @@ def course(request, slug):
                         g.signed = True
                     g.serialized = g.serialize_for_ajax(
                         enrolled_ids, queued_ids, pinned_ids,
-                        queue_priorities, student_counts, student
+                        queue_priorities, student
                     )
             except Student.DoesNotExist:
                 student = None
@@ -193,7 +191,7 @@ def course(request, slug):
 
 
             if g.limit_zamawiane > 0 and student and not student.is_zamawiany():
-                g.is_full = (g.number_of_students_non_zamawiane() >=
+                g.is_full = (g.get_count_of_enrolled_non_zamawiane() >=
                     g.limit_non_zamawiane())
             else:
                 g.is_full = (g.enrolled >= g.limit)

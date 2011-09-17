@@ -19,7 +19,7 @@
                                 {{ term }}<br/>
                             {% endfor %}
                             {{ lecture.get_teacher_full_name }}<br/>
-                            ({{ lecture.number_of_students }}/{{ lecture.limit }})</p>
+                            ({{ lecture.get_count_of_enrolled }}/{{ lecture.limit }})</p>
                             {% if not lecture.signed %}
                                 <form action='/group/{{lecture.id}}/assign/' name='enrol_unenrol' method="post">
                                     <input type='submit' class="signbutton" value="Zapisz" name='enrol' />
@@ -39,7 +39,7 @@
                                 {{ term }}<br/>
                             {% endfor %}
                             {{ ex.get_teacher_full_name }}<br/>
-                            ({{ ex.number_of_students }}/{{ ex.limit }})
+                            ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                             </p>
                             {% if course.user_enrolled_to_exercise == ex.id %}
                                 <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post"> <input type='submit' class="signbutton" value="Wypisz" name='unenrol' /></form>
@@ -66,7 +66,7 @@
                                 {{ term }}<br/>
                             {% endfor %}
                             {{ ex.get_teacher_full_name }}<br/>
-                            ({{ ex.number_of_students }}/{{ ex.limit }})
+                            ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                             </p>
                             {% if course.user_enrolled_to_exlaboratory == ex.id %}
                                 <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
@@ -94,7 +94,7 @@
                                 {{ term }}<br/>
                             {% endfor %}
                             {{ lab.get_teacher_full_name }}<br/>
-                            ({{ lab.number_of_students }}/{{ lab.limit }})
+                            ({{ lab.get_count_of_enrolled }}/{{ lab.limit }})
                             </p>
                             {% if course.user_enrolled_to_laboratory == lab.id %}
                                 <form action='/group/{{lab.id}}/resign/' name='enrol_unenrol' method="post">
@@ -124,7 +124,7 @@
                                 {{ term }}<br/>
                             {% endfor %}
                             {{ ex.get_teacher_full_name }}<br/>
-                            ({{ ex.number_of_students }}/{{ ex.limit }})
+                            ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                             </p>
                             {% if course.user_enrolled_to_exercise == ex.id %}
                                 <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
@@ -151,7 +151,7 @@
                     {% endfor %}
                     {{ ex.get_teacher_full_name }}
                     <br/>
-                    ({{ ex.number_of_students }}/{{ ex.limit }})
+                    ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                     </p>
                     {% if course.user_enrolled_to_seminar == ex.id %}
                         <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
@@ -182,7 +182,7 @@
                     {% endfor %}
                     {{ ex.get_teacher_full_name }}
                     <br/>
-                    ({{ ex.number_of_students }}/{{ ex.limit }})
+                    ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                     </p>
                     {% if course.user_enrolled_to_exercise == ex.id %}
                         <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">
@@ -211,7 +211,7 @@
                     {% endfor %}
                     {{ ex.get_teacher_full_name }}
                     <br/>
-                    ({{ ex.number_of_students }}/{{ ex.limit }})
+                    ({{ ex.get_count_of_enrolled }}/{{ ex.limit }})
                     </p>
                     {% if course.user_enrolled_to_exercise == ex.id %}
                         <form action='/group/{{ex.id}}/resign/' name='enrol_unenrol' method="post">

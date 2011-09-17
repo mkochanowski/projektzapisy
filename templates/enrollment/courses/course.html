@@ -183,7 +183,7 @@
                         </td>
                         <td class="number termEnrolledCount">
                             {% if t.limit_zamawiane and not user.student.is_zamawiany %}
-                                {{ t.number_of_students_non_zamawiane }} + {{ t.number_of_students_zamawiane }}
+                                {{ t.get_count_of_enrolled_non_zamawiane }} + {{ t.get_count_of_enrolled_zamawiane }}
                             {% else %}
                                 {{ t.enrolled }}
                             {% endif %}

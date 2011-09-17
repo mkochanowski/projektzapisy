@@ -100,13 +100,12 @@ def set_enrolled(request, method):
         pinned_ids = Record.pinned.filter(group__course=course, \
             student=student).values_list('group__id', flat=True)
         queue_priorities = Queue.queue_priorities_map(queued)
-        student_counts = Group.get_students_counts(groups)
 
         data = {}
         for group in groups:
             data[group.id] = group.serialize_for_ajax(
                 enrolled_ids, queued_ids, pinned_ids,
-                queue_priorities, student_counts, student)
+                queue_priorities, student)
         return data
 
     try:
@@ -345,6 +344,10 @@ def prepare_courses_with_terms(terms, records = []):
             'day': int(term.dayOfWeek),
             'start_time': [term.start_time.hour, term.start_time.minute],
             'end_time': [term.end_time.hour, term.end_time.minute],
+
+            #TODO: to chyba zbędne?
+            #'enrolled_count': term.group.get_count_of_enrolled(),
+            #'queued_count': term.group.get_count_of_queued(),
         }
         courses_map[course.pk]['terms'].append({
             'id': term.pk,
@@ -366,17 +369,14 @@ def prepare_groups_json(student, semester, groups):
     queue_priorities = Queue.queue_priorities_map(
         Queue.get_student_queues(student, semester))
     TimerDebugPanel.timer_stop('pgj_2')
-    TimerDebugPanel.timer_start('pgj_3', 'prepare_groups_json - student_counts')
-    student_counts = Group.get_students_counts(groups)
-    TimerDebugPanel.timer_stop('pgj_3')
     groups_json = []
-    TimerDebugPanel.timer_start('pgj_4', 'prepare_groups_json - serialize')
+    TimerDebugPanel.timer_start('pgj_3', 'prepare_groups_json - serialize')
     for group in groups:
         groups_json.append(group.serialize_for_ajax(
             record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
-            queue_priorities, student_counts, student
+            queue_priorities, student
         ))
-    TimerDebugPanel.timer_stop('pgj_4')
+    TimerDebugPanel.timer_stop('pgj_3')
     return '[' + (', '.join(groups_json)) + ']'
 
 def prepare_courses_json(groups, student):
@@ -497,8 +497,6 @@ def schedule_prototype(request):
     TimerDebugPanel.timer_stop('preload_cache')
 
     TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')
-    enrolled_students_counts = {}#Group.numbers_of_students(default_semester, True)
-    queued_students_counts = {}#Group.numbers_of_students(default_semester, False)
     courses = prepare_courses_with_terms(\
         Term.get_all_in_semester(default_semester))
     for course in courses:
@@ -513,12 +511,6 @@ def schedule_prototype(request):
 	    'suggested_for_first_year': course['object'].suggested_for_first_year,
         })
         for term in course['terms']:
-            term['info'].update({
-                'enrolled_count': int(enrolled_students_counts[term['id']]) \
-                    if enrolled_students_counts.has_key(term['id']) else 0,
-                'queued_count': int(queued_students_counts[term['id']]) \
-                    if queued_students_counts.has_key(term['id']) else 0,
-            })
             term.update({ # TODO: do szablonu
                 'json': simplejson.dumps(term['info'])
             })
