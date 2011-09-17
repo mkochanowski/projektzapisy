@@ -86,6 +86,17 @@
      </table>
 {% endif %}
 
+{% if grade %}
+    <table class="table-info-big">
+        <tr>
+            {% for semester in grade %}
+            <th>{{ semester }}</th>
+            <td>{% if semester.graded > 0 %}Tak{% else %}Nie{% endif %}</td>
+            {% endfor %}
+        </tr>
+    </table>
+{% endif %}
+
 {% if terms %}
 <h4>Terminy zapisów</h4>
 <table class="table-info-big">
