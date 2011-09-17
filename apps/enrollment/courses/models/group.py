@@ -169,10 +169,10 @@ class Group(models.Model):
             'course': int(self.course.pk),
 
             'url': reverse('records-group', args=[self.pk]),
-            'teacher_name': 'nieznany prowadzący',#self.teacher and self.teacher.user.get_full_name() \
-                #or 'nieznany prowadzący',
-            'teacher_url': '',#self.teacher and reverse('employee-profile', args= \
-                #[self.teacher.user.id]) or '',
+            'teacher_name': self.teacher and self.teacher.user.get_full_name() \
+                or 'nieznany prowadzący',
+            'teacher_url': self.teacher and reverse('employee-profile', args= \
+                [self.teacher.user.id]) or '',
 
             'is_enrolled': self.id in enrolled,
             'is_queued': self.id in queued,
@@ -184,7 +184,7 @@ class Group(models.Model):
             'unavailable_enrolled_count': 0,#\
                 #student_counts[self.pk]['enrolled_zamawiane'],
             'queued_count': 0,#student_counts[self.pk]['queued'],
-            'queue_priority': 0,#queue_priorities.get(self.pk)
+            'queue_priority': queue_priorities.get(self.pk)
         }
         
         return simplejson.dumps(data);
