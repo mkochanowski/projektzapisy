@@ -235,7 +235,9 @@ class Student(BaseUser):
         from apps.enrollment.courses.models import Semester
 
         default_semester = Semester.get_default_semester()
-        records = self.records.exclude(group__course__semester = default_semester)
+        records = self.records.exclude(group__course__semester = \
+            default_semester).select_related('group', 'group__course', \
+            'group__course__entity')
         records_list = map(lambda x: x.group.course.entity.id, records)
         return list(frozenset(records_list))
 
