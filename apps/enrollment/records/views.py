@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
 
+from debug_toolbar.panels.timer import TimerDebugPanel
 from apps.enrollment.courses.models import *
 from apps.users.models import *
 from apps.enrollment.records.models import *
@@ -468,6 +469,7 @@ def schedule_prototype(request):
         return render_to_response('common/error.html', \
             context_instance=RequestContext(request))
 
+    TimerDebugPanel.timer_start('loading_semester', 'Pobieranie semestru')
     default_semester = Semester.get_default_semester()
     if not default_semester:
         request.user.message_set.create(message='Brak aktywnego semestru.')
@@ -478,10 +480,15 @@ def schedule_prototype(request):
             'types_list' : []
         }
         return render_to_response('enrollment/records/schedule_prototype.html',\
-            data, context_instance = RequestContext(request))        
+            data, context_instance = RequestContext(request))
+    TimerDebugPanel.timer_stop('loading_semester')
 
+    TimerDebugPanel.timer_start('preload_cache', \
+        'Przygotowywanie cache StudentOptions')
     StudentOptions.preload_cache(student, default_semester)
+    TimerDebugPanel.timer_stop('preload_cache')
 
+    TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')
     enrolled_students_counts = Group.numbers_of_students(default_semester, True)
     queued_students_counts = Group.numbers_of_students(default_semester, False)
     courses = prepare_courses_with_terms(\
@@ -507,10 +514,13 @@ def schedule_prototype(request):
             term.update({ # TODO: do szablonu
                 'json': simplejson.dumps(term['info'])
             })
+    TimerDebugPanel.timer_stop('data_prepare')
 
+    TimerDebugPanel.timer_start('json_prepare', 'Przygotowywanie JSON')
     all_groups = Group.get_groups_by_semester(default_semester)
     all_groups_json = prepare_groups_json(student, default_semester, all_groups)
-    
+    TimerDebugPanel.timer_stop('json_prepare')
+
     data = {
         'courses_json': prepare_courses_json(all_groups, student),
         'groups_json': all_groups_json,
