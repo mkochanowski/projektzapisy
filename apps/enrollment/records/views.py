@@ -370,11 +370,13 @@ def prepare_groups_json(student, semester, groups):
     student_counts = Group.get_students_counts(groups)
     TimerDebugPanel.timer_stop('pgj_3')
     groups_json = []
+    TimerDebugPanel.timer_start('pgj_4', 'prepare_groups_json - serialize')
     for group in groups:
         groups_json.append(group.serialize_for_ajax(
             record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
             queue_priorities, student_counts, student
         ))
+    TimerDebugPanel.timer_stop('pgj_4')
     return '[' + (', '.join(groups_json)) + ']'
 
 def prepare_courses_json(groups, student):
