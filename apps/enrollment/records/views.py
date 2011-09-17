@@ -495,8 +495,8 @@ def schedule_prototype(request):
     TimerDebugPanel.timer_stop('preload_cache')
 
     TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')
-    enrolled_students_counts = Group.numbers_of_students(default_semester, True)
-    queued_students_counts = Group.numbers_of_students(default_semester, False)
+    enrolled_students_counts = {}#Group.numbers_of_students(default_semester, True)
+    queued_students_counts = {}#Group.numbers_of_students(default_semester, False)
     courses = prepare_courses_with_terms(\
         Term.get_all_in_semester(default_semester))
     for course in courses:
