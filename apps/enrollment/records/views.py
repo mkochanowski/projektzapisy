@@ -359,10 +359,16 @@ def prepare_courses_with_terms(terms, records = []):
     return courses_list
 
 def prepare_groups_json(student, semester, groups):
+    TimerDebugPanel.timer_start('pgj_1', 'prepare_groups_json - record_ids')
     record_ids = Record.get_student_records_ids(student, semester)
+    TimerDebugPanel.timer_stop('pgj_1')
+    TimerDebugPanel.timer_start('pgj_2', 'prepare_groups_json - queue_priorities')
     queue_priorities = Queue.queue_priorities_map(
         Queue.get_student_queues(student, semester))
+    TimerDebugPanel.timer_stop('pgj_2')
+    TimerDebugPanel.timer_start('pgj_3', 'prepare_groups_json - student_counts')
     student_counts = Group.get_students_counts(groups)
+    TimerDebugPanel.timer_stop('pgj_3')
     groups_json = []
     for group in groups:
         groups_json.append(group.serialize_for_ajax(
@@ -516,10 +522,12 @@ def schedule_prototype(request):
             })
     TimerDebugPanel.timer_stop('data_prepare')
 
-    TimerDebugPanel.timer_start('json_prepare', 'Przygotowywanie JSON')
+    TimerDebugPanel.timer_start('json_prepare_1', 'Przygotowywanie JSON - st1')
     all_groups = Group.get_groups_by_semester(default_semester)
+    TimerDebugPanel.timer_stop('json_prepare_1')
+    TimerDebugPanel.timer_start('json_prepare_2', 'Przygotowywanie JSON - st2')
     all_groups_json = prepare_groups_json(student, default_semester, all_groups)
-    TimerDebugPanel.timer_stop('json_prepare')
+    TimerDebugPanel.timer_stop('json_prepare_2')
 
     data = {
         'courses_json': prepare_courses_json(all_groups, student),
