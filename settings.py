@@ -251,21 +251,22 @@ SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
 
-local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
-if os.path.isfile(local_settings_file):
-    execfile(local_settings_file)
-
 SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
 
+DEBUG_TOOLBAR_ALLOWED_USERS = [
+    "209067", # Tomasz Wasilczyk
+    "209138", # Arkadiusz Flinik
+    "208934",
+    "gosia"
+]
+
 def show_toolbar(request):
-    allowed_users = [
-        "209067", # Tomasz Wasilczyk
-        "209138", # Arkadiusz Flinik
-        "208934",
-        "gosia"
-    ]
-    if request.user and request.user.username in allowed_users:
+    if request.user and request.user.username in DEBUG_TOOLBAR_ALLOWED_USERS:
         return True
     return False
 
 DEBUG_TOOLBAR_CONFIG['SHOW_TOOLBAR_CALLBACK'] = show_toolbar
+
+local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
+if os.path.isfile(local_settings_file):
+    execfile(local_settings_file)
