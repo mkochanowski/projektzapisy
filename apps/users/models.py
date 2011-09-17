@@ -201,7 +201,10 @@ class Student(BaseUser):
         from apps.grade.ticket_create.models import UsedTicketStamp
         previous1_semester = Semester.get_default_semester(). \
             get_previous_semester()
-        previous2_semester = previous1_semester.get_previous_semester()
+        if not previous1_semester:
+            previous2_semester = None
+        else:
+            previous2_semester = previous1_semester.get_previous_semester()
         #TODO: to można zrobić jednym zapytaniem
         used1_tickets = UsedTicketStamp.objects.filter(student=self, \
             poll__semester=previous1_semester)
