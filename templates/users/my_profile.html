@@ -88,12 +88,14 @@
 
 {% if grade %}
     <table class="table-info-big">
-        <tr>
             {% for semester in grade %}
+
+        <tr>
             <th>{{ semester }}</th>
             <td>{% if semester.graded > 0 %}Tak{% else %}Nie{% endif %}</td>
-            {% endfor %}
+
         </tr>
+            {% endfor %}
     </table>
 {% endif %}
 
