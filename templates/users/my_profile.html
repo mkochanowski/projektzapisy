@@ -105,7 +105,17 @@
 <table class="table-info-big">
     {% for t in terms %}
         <tr>
-        <th>{{t.name}}</th></td><td>{{t.term|date:"H:i, d.m.Y"}}</td>
+        <th>{{t.name}}</th>
+            <td>
+                {{t.term|date:"H:i, d.m.Y"}}
+                {% if t.courses %}
+                    <ul class="voted-courses">
+                    {% for c in t.courses %}
+                        <li><a href="{% url course-page c.slug %}">{{c.name}}</a></li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </td>                    
         </tr>
     {% endfor %}
 </table>

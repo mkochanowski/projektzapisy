@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from apps.enrollment.courses.models.points import PointTypes
 from apps.enrollment.courses.models import Semester
+from apps.enrollment.courses.models import StudentOptions
 import datetime
 
 from fereol import settings
@@ -228,6 +229,12 @@ class Student(BaseUser):
         grade = self.participated_in_last_grades() * 1440
         return datetime.timedelta(minutes=minutes+grade+120)+datetime.timedelta(days=3)
 
+    def get_voted_courses(self, given_points):
+        """ returns courses which were voted with given_points by student """
+        minutes = given_points * 60 * 24
+        current_semester = Semester.get_default_semester()
+        return map(lambda x: x.course, StudentOptions.objects.filter(course__semester__id__exact=current_semester.id).filter(student=self, records_opening_bonus_minutes=minutes).order_by('course__name'))
+        
     def get_records_history(self):
         '''
         Returns list of ids of course s that student was enrolled for.

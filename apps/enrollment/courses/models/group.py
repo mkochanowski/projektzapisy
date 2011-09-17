@@ -90,6 +90,7 @@ class Group(models.Model):
         return Queue.queued.filter(group=self).count()
 
     @staticmethod
+    #TODO: baza na tym umiera
     def numbers_of_students(semester, enrolled):
         '''
             Returns numbers of students enrolled to all groups in particular
@@ -110,6 +111,7 @@ class Group(models.Model):
         from apps.users.models import StudiaZamawiane
 
         counts = {}
+        '''
         for group in groups:
             counts[group.pk] = {
                 'enrolled': 0,
@@ -138,7 +140,8 @@ class Group(models.Model):
             values('group__pk').order_by().annotate(Count('group__pk'))
         for r in queued_counts:
             counts[r['group__pk']]['queued'] = int(r['group__pk__count'])
-
+        '''
+        
         return counts
 
     def course_slug(self):
@@ -177,10 +180,10 @@ class Group(models.Model):
 
             'limit': self.limit,
             'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
-            'enrolled_count': student_counts[self.pk]['enrolled'],
-            'unavailable_enrolled_count': \
-                student_counts[self.pk]['enrolled_zamawiane'],
-            'queued_count': student_counts[self.pk]['queued'],
+            'enrolled_count': 0,#student_counts[self.pk]['enrolled'],
+            'unavailable_enrolled_count': 0,#\
+                #student_counts[self.pk]['enrolled_zamawiane'],
+            'queued_count': 0,#student_counts[self.pk]['queued'],
             'queue_priority': queue_priorities.get(self.pk)
         }
         

@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
 
+from debug_toolbar.panels.timer import TimerDebugPanel
 from apps.enrollment.courses.models import *
 from apps.users.models import *
 from apps.enrollment.records.models import *
@@ -358,16 +359,24 @@ def prepare_courses_with_terms(terms, records = []):
     return courses_list
 
 def prepare_groups_json(student, semester, groups):
+    TimerDebugPanel.timer_start('pgj_1', 'prepare_groups_json - record_ids')
     record_ids = Record.get_student_records_ids(student, semester)
+    TimerDebugPanel.timer_stop('pgj_1')
+    TimerDebugPanel.timer_start('pgj_2', 'prepare_groups_json - queue_priorities')
     queue_priorities = Queue.queue_priorities_map(
         Queue.get_student_queues(student, semester))
+    TimerDebugPanel.timer_stop('pgj_2')
+    TimerDebugPanel.timer_start('pgj_3', 'prepare_groups_json - student_counts')
     student_counts = Group.get_students_counts(groups)
+    TimerDebugPanel.timer_stop('pgj_3')
     groups_json = []
+    TimerDebugPanel.timer_start('pgj_4', 'prepare_groups_json - serialize')
     for group in groups:
         groups_json.append(group.serialize_for_ajax(
             record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
             queue_priorities, student_counts, student
         ))
+    TimerDebugPanel.timer_stop('pgj_4')
     return '[' + (', '.join(groups_json)) + ']'
 
 def prepare_courses_json(groups, student):
@@ -468,6 +477,7 @@ def schedule_prototype(request):
         return render_to_response('common/error.html', \
             context_instance=RequestContext(request))
 
+    TimerDebugPanel.timer_start('loading_semester', 'Pobieranie semestru')
     default_semester = Semester.get_default_semester()
     if not default_semester:
         request.user.message_set.create(message='Brak aktywnego semestru.')
@@ -478,12 +488,17 @@ def schedule_prototype(request):
             'types_list' : []
         }
         return render_to_response('enrollment/records/schedule_prototype.html',\
-            data, context_instance = RequestContext(request))        
+            data, context_instance = RequestContext(request))
+    TimerDebugPanel.timer_stop('loading_semester')
 
+    TimerDebugPanel.timer_start('preload_cache', \
+        'Przygotowywanie cache StudentOptions')
     StudentOptions.preload_cache(student, default_semester)
+    TimerDebugPanel.timer_stop('preload_cache')
 
-    enrolled_students_counts = Group.numbers_of_students(default_semester, True)
-    queued_students_counts = Group.numbers_of_students(default_semester, False)
+    TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')
+    enrolled_students_counts = {}#Group.numbers_of_students(default_semester, True)
+    queued_students_counts = {}#Group.numbers_of_students(default_semester, False)
     courses = prepare_courses_with_terms(\
         Term.get_all_in_semester(default_semester))
     for course in courses:
@@ -507,10 +522,15 @@ def schedule_prototype(request):
             term.update({ # TODO: do szablonu
                 'json': simplejson.dumps(term['info'])
             })
+    TimerDebugPanel.timer_stop('data_prepare')
 
+    TimerDebugPanel.timer_start('json_prepare_1', 'Przygotowywanie JSON - st1')
     all_groups = Group.get_groups_by_semester(default_semester)
+    TimerDebugPanel.timer_stop('json_prepare_1')
+    TimerDebugPanel.timer_start('json_prepare_2', 'Przygotowywanie JSON - st2')
     all_groups_json = prepare_groups_json(student, default_semester, all_groups)
-    
+    TimerDebugPanel.timer_stop('json_prepare_2')
+
     data = {
         'courses_json': prepare_courses_json(all_groups, student),
         'groups_json': all_groups_json,

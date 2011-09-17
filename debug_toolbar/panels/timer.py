@@ -21,6 +21,20 @@ class TimerDebugPanel(DebugPanel):
         has_content = True
         has_resource = True
 
+    timers = {}
+
+    @staticmethod
+    def timer_start(id, name):
+        TimerDebugPanel.timers[id] = {
+            'name': name,
+            'start': time.time(),
+            'stop': None
+        }
+
+    @staticmethod
+    def timer_stop(id):
+        TimerDebugPanel.timers[id]['stop'] = time.time()
+
     def process_request(self, request):
         self._start_time = time.time()
         if self.has_resource:
@@ -74,7 +88,7 @@ class TimerDebugPanel(DebugPanel):
 #        usrss = self._end_rusage.ru_isrss
 
         # TODO l10n on values
-        rows = (
+        rows = [
             (_('User CPU time'), '%0.3f msec' % utime),
             (_('System CPU time'), '%0.3f msec' % stime),
             (_('Total CPU time'), '%0.3f msec' % (utime + stime)),
@@ -83,7 +97,15 @@ class TimerDebugPanel(DebugPanel):
 #            ('Memory use', '%d max RSS, %d shared, %d unshared' % (rss, srss, urss + usrss)),
 #            ('Page faults', '%d no i/o, %d requiring i/o' % (minflt, majflt)),
 #            ('Disk operations', '%d in, %d out, %d swapout' % (blkin, blkout, swap)),
-        )
+        ]
+
+        for timer in TimerDebugPanel.timers:
+            timer = TimerDebugPanel.timers[timer]
+            if (timer['stop'] is None):
+                time = '?'
+            else:
+                time = '%0.3f msec' % ((timer['stop'] - timer['start']) * 1000)
+            rows.append((timer['name'], time))
 
         context = self.context.copy()
         context.update({
