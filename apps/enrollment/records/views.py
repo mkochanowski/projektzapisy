@@ -340,7 +340,7 @@ def prepare_courses_with_terms(terms, records = []):
         term_info = {
             'id': term.pk,
             'group': term.group.pk,
-            'classroom': term.classroom.number and int(term.classroom.number) or 0,
+            'classroom': term.classroom.number or 0,
             'day': int(term.dayOfWeek),
             'start_time': [term.start_time.hour, term.start_time.minute],
             'end_time': [term.end_time.hour, term.end_time.minute],
