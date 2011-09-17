@@ -72,11 +72,11 @@
 		<h3>Lista osób zapisanych na przedmiot:</h3>
 		{% if group.limit_zamawiane %}
 			<p>Zapisanych w ramach limitu studiów zamawianych:
-				{{ group.number_of_students_zamawiane }}
+				{{ group.get_count_of_enrolled_zamawiane }}
 				/ {{ group.limit_zamawiane }}.
 			</p>
 			<p>Zapisanych w ramach limitu dodatkowego:
-				{{ group.number_of_students_non_zamawiane }}
+				{{ group.get_count_of_enrolled_non_zamawiane }}
 				/ {{ group.limit_non_zamawiane }}.
 			</p>
 		{% else %}

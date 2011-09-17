@@ -64,14 +64,7 @@ class Record(models.Model):
             student.recorded = student.id in recorded
         
         return students
-    
-    
-    @staticmethod
-    def number_of_students(group):
-        """Returns number of students enrolled to particular group"""
-        #TODO: zbędne!
-        return group.number_of_students()
-    
+
     @staticmethod
     def get_student_records_ids(student, semester):
         records = Record.objects.\
@@ -137,8 +130,8 @@ class Record(models.Model):
                 g.priority = Queue.get_priority(user_id, g.id)
                 g.limit = g.get_group_limit()
                 g.classrooms = g.get_all_terms()
-                g.enrolled = Record.number_of_students(g)
-                g.queued = Queue.number_of_students(g)
+                g.enrolled = g.get_count_of_enrolled()
+                g.queued = g.get_count_of_queued()
                 g.is_in_diff = Record.is_student_in_course_group_type(user_id=user_id, slug=slug, group_type=group_type)
                 if g in student_groups:
                     g.signed = True
@@ -235,7 +228,8 @@ class Record(models.Model):
             groups = Record.get_groups_for_student(user_id)
             new_records = []
             for l in lectures:
-                if (l not in groups) and (Record.number_of_students(group=l) < l.limit):
+                #TODO: nie podoba mi się to
+                if (l not in groups) and (l.get_count_of_enrolled() < l.limit):
                     record, created = Record.objects.get_or_create(group=l, student=student)
                     if created:
                         record.status = STATUS_ENROLLED
@@ -271,9 +265,9 @@ class Record(models.Model):
                 raise RecordsNotOpenException()
             # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
             if (group.limit_zamawiane > 0 and not student.is_zamawiany()):
-                group_is_full = group.number_of_students_non_zamawiane() >= group.limit - group.limit_zamawiane
+                group_is_full = group.get_count_of_enrolled_non_zamawiane() >= group.limit_non_zamawiane()
             else:
-                group_is_full = group.number_of_students() >= group.limit
+                group_is_full = group.get_count_of_enrolled() >= group.limit
             if not group_is_full:
                 g_id = Record.is_student_in_course_group_type(user_id=user.id, slug=group.course_slug(), group_type=group.type)
                 if g_id and group.type != '1':
@@ -345,6 +339,7 @@ class Record(models.Model):
     @staticmethod
     def on_student_remove_from_group(sender, instance, **kwargs):
         Queue.try_enroll_next_student(instance.group)
+        instance.group.update_students_counts()
     
     def group_slug(self):
         return self.group.course_slug()
@@ -389,12 +384,6 @@ class Queue(models.Model):
             queues[queue.id] = queue
         return queues
 
-    @staticmethod
-    def number_of_students(group):
-        """Returns number of students queued to particular group"""
-        group_ = group
-        return Queue.queued.filter(group=group_).count()
-    
     @staticmethod
     def get_priority(user_id, group_id):
         """ Returns priority of student in group queue"""
@@ -569,7 +558,7 @@ class Queue(models.Model):
             
             returns None, when there is no space for students left at all
         '''
-        if (group.number_of_students() >= group.limit):
+        if (group.get_count_of_enrolled() >= group.limit):
             return None
         only_zamawiany = group.available_only_for_zamawiane()
         
@@ -679,7 +668,13 @@ def log_add_record(sender, instance, created, **kwargs):
 def log_delete_record(sender, instance, **kwargs):
     if instance.status == STATUS_ENROLLED and instance.group:
         backup_logger.info('[03] user <%s> is removed from group <%s>' % (instance.student.user.id, instance.group.id))
-           
+
+def update_group_counts(sender, instance, **kwargs):
+    instance.group.update_students_counts()
+
 signals.post_save.connect(log_add_record, sender=Record)                               
 signals.pre_delete.connect(log_delete_record, sender=Record) 
+signals.post_save.connect(update_group_counts, sender=Record)
 signals.post_delete.connect(Record.on_student_remove_from_group, sender=Record)
+signals.post_save.connect(update_group_counts, sender=Queue)
+signals.post_delete.connect(update_group_counts, sender=Queue)

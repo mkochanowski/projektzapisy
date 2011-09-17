@@ -178,8 +178,7 @@ Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 
 	var self = this;
 	enroll = !!enroll;
-	if (this.isEnrolled == enroll)
-		return;
+	//nie sprawdzamy if enroll == isEnrolled (bo jest jeszcze kolejka)
 
 	$.post(Fereol.Enrollment.CourseGroup._setEnrolledURL, {
 		group: this.id,

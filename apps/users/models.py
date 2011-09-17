@@ -195,6 +195,7 @@ class Student(BaseUser):
         return '%s, semestr %s' % (self.program , semestr)
     get_type_of_studies.short_description = 'Studia'
 
+    #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
     participated_in_last_grades_cache = None
     def participated_in_last_grades(self):
         if not (self.participated_in_last_grades_cache is None):
@@ -312,6 +313,7 @@ class Student(BaseUser):
     def zamawiany(self):
         return StudiaZamawiane.objects.get(student=self);
 
+    #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
     is_zamawiany_cache = None
     def is_zamawiany(self):
         if not (self.is_zamawiany_cache is None):

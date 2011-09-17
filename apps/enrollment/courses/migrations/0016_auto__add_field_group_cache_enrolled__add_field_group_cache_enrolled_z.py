@@ -8,14 +8,26 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Adding field 'Course.suggested_for_first_year'
-        db.add_column('courses_course', 'suggested_for_first_year', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True), keep_default=False)
+        # Adding field 'Group.cache_enrolled'
+        db.add_column('courses_group', 'cache_enrolled', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True), keep_default=False)
+
+        # Adding field 'Group.cache_enrolled_zam'
+        db.add_column('courses_group', 'cache_enrolled_zam', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True), keep_default=False)
+
+        # Adding field 'Group.cache_queued'
+        db.add_column('courses_group', 'cache_queued', self.gf('django.db.models.fields.PositiveIntegerField')(null=True, blank=True), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Deleting field 'Course.suggested_for_first_year'
-        db.delete_column('courses_course', 'suggested_for_first_year')
+        # Deleting field 'Group.cache_enrolled'
+        db.delete_column('courses_group', 'cache_enrolled')
+
+        # Deleting field 'Group.cache_enrolled_zam'
+        db.delete_column('courses_group', 'cache_enrolled_zam')
+
+        # Deleting field 'Group.cache_queued'
+        db.delete_column('courses_group', 'cache_queued')
     
     
     models = {
@@ -66,7 +78,7 @@ class Migration(SchemaMigration):
             'building': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '75', 'blank': 'True'}),
             'capacity': ('django.db.models.fields.PositiveSmallIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'number': ('django.db.models.fields.CharField', [], {'max_length': '4'})
+            'number': ('django.db.models.fields.CharField', [], {'max_length': '20'})
         },
         'courses.course': {
             'Meta': {'unique_together': "(('name', 'semester'),)", 'object_name': 'Course'},
@@ -104,6 +116,9 @@ class Migration(SchemaMigration):
         },
         'courses.group': {
             'Meta': {'object_name': 'Group'},
+            'cache_enrolled': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'cache_enrolled_zam': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'cache_queued': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'course': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'groups'", 'to': "orm['courses.Course']"}),
             'extra': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -173,7 +188,7 @@ class Migration(SchemaMigration):
             'consultations': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 9, 11, 11, 14, 54, 525397)'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 9, 17, 16, 52, 48, 338744)'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
@@ -191,7 +206,7 @@ class Migration(SchemaMigration):
             'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 9, 11, 11, 14, 54, 525397)'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 9, 17, 16, 52, 48, 338744)'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
             'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
