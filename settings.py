@@ -257,3 +257,14 @@ if os.path.isfile(local_settings_file):
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
 
+def show_toolbar(request):
+    allowed_users = {
+        "209067", # Tomasz Wasilczyk
+        "209138", # Arkadiusz Flinik
+        "gosia"
+    }
+    if request.user and request.user.username in allowed_users:
+        return True
+    return False
+
+DEBUG_TOOLBAR_CONFIG['SHOW_TOOLBAR_CALLBACK'] = show_toolbar
