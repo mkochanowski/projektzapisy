@@ -202,7 +202,10 @@ class Student(BaseUser):
         from apps.grade.ticket_create.models import UsedTicketStamp
         previous1_semester = Semester.get_default_semester(). \
             get_previous_semester()
-        previous2_semester = previous1_semester.get_previous_semester()
+        if not previous1_semester:
+            previous2_semester = None
+        else:
+            previous2_semester = previous1_semester.get_previous_semester()
         #TODO: to można zrobić jednym zapytaniem
         used1_tickets = UsedTicketStamp.objects.filter(student=self, \
             poll__semester=previous1_semester)
@@ -239,7 +242,9 @@ class Student(BaseUser):
         from apps.enrollment.courses.models import Semester
 
         default_semester = Semester.get_default_semester()
-        records = self.records.exclude(group__course__semester = default_semester)
+        records = self.records.exclude(group__course__semester = \
+            default_semester).select_related('group', 'group__course', \
+            'group__course__entity')
         records_list = map(lambda x: x.group.course.entity.id, records)
         return list(frozenset(records_list))
 

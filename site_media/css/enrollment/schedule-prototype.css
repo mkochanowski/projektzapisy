@@ -63,7 +63,6 @@ a#enr-schedulePrototype-setLocked.unlocked
 #enr-schedulePrototype-uncheckAll
 {
 	font-size: 10px;
-	position: relative;
-	top: 10px;
-	left: 5px;
+	display: inline-block;
+    margin-bottom: 5px;
 }

@@ -10,7 +10,7 @@
     <h1>Aktualności</h1>
     <div class="hero-unit">
       <h3>{{ news.title }}</h3>
-      <h5>{{ news.date|date:"l, d.m.Y" }} - {{ news.author.get_full_name }}</h5>
+      <h5>{{ news.date|date:"l, d.m.Y - G:i" }} - {{ news.author.get_full_name }}</h5>
       <p>{{ news.body|safe }}</p>
       <p><a class="btn primary right" href="/news/">Więcej &raquo;</a></p>
     </div>

@@ -193,6 +193,7 @@ def my_profile(request):
     zamawiany = Student.get_zamawiany(request.user.id)
     comments = zamawiany and zamawiany.comments or ''
     points = zamawiany and zamawiany.points or 0
+
     try:
         consultations = request.user.employee.consultations
         room = request.user.employee.room
@@ -217,12 +218,21 @@ def my_profile(request):
             {"name":"Zniesienie limitu 40 ECTS", "term":current_semester.records_opening + timedelta(days=point_limit_duration)},
             {"name":"Koniec zapisów", "term":current_semester.records_closing},
             ]
+
+            grade = Semester.objects.filter(id__in=[41,42])\
+                .order_by('-id')\
+                .extra(select={'graded' : "SELECT COUNT(*) FROM ticket_create_studentgraded " +
+                                "WHERE ticket_create_studentgraded.student_id="+str(request.user.student.id)+
+                                " AND ticket_create_studentgraded.semester_id=courses_semester.id" })
+
         except KeyError:
             terms = []
         except Student.DoesNotExist:
             terms = []
+            grade = {}
     else:
         terms = []
+        grade = {}
     
     data = {
         'terms' : terms,
@@ -231,7 +241,8 @@ def my_profile(request):
         'points' : points,
         'consultations' : consultations,
         'room' : room,
-        'homepage' : homepage
+        'homepage' : homepage,
+        'grade' : grade
     }
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))

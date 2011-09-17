@@ -90,6 +90,7 @@ class Group(models.Model):
         return Queue.queued.filter(group=self).count()
 
     @staticmethod
+    #TODO: baza na tym umiera
     def numbers_of_students(semester, enrolled):
         '''
             Returns numbers of students enrolled to all groups in particular
@@ -116,7 +117,7 @@ class Group(models.Model):
                 'enrolled_zamawiane': 0,
                 'queued': 0
             }
-
+        '''
         enrolled_counts = Record.enrolled.filter(group__in=groups).\
             values('group__pk').order_by().annotate(Count('group__pk'))
         for r in enrolled_counts:
@@ -138,7 +139,8 @@ class Group(models.Model):
             values('group__pk').order_by().annotate(Count('group__pk'))
         for r in queued_counts:
             counts[r['group__pk']]['queued'] = int(r['group__pk__count'])
-
+        '''
+        
         return counts
 
     def course_slug(self):

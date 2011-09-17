@@ -238,7 +238,7 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
 #settings for enrollment
 ECTS_LIMIT_DURATION = 14 # abs(t1-t2), in days
-ECTS_BONUS = 7 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
+ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
 ECTS_LIMIT = 40
 
 VOTE_LIMIT = 60
@@ -251,9 +251,22 @@ SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
+
+DEBUG_TOOLBAR_ALLOWED_USERS = [
+    "209067", # Tomasz Wasilczyk
+    "209138", # Arkadiusz Flinik
+    "208934",
+    "gosia"
+]
+
+def show_toolbar(request):
+    if request.user and request.user.username in DEBUG_TOOLBAR_ALLOWED_USERS:
+        return True
+    return False
+
+DEBUG_TOOLBAR_CONFIG['SHOW_TOOLBAR_CALLBACK'] = show_toolbar
+
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
-

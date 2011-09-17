@@ -67,6 +67,39 @@
     {% endif %}
 {% endif %}
 
+{% if user.student %}
+<br/>
+<h4>Moje studia</h4>
+     <table class="table-info">
+        <tr>
+            <th>Punkty ECTS</th>
+            <td>{{user.student.ects}}</td>
+        </tr>
+        <tr>
+            <th>Program</th>
+            <td>{{user.student.program}}</td>
+        </tr>
+        <tr>
+            <th>Semestr</th>
+            <td>{{user.student.semestr}}</td>
+        </tr>
+     </table>
+{% endif %}
+
+{% if grade %}
+    <h4>Ocena zajęć</h4>
+    <table class="table-info-big">
+            {% for semester in grade %}
+
+        <tr>
+            <th>{{ semester }}</th>
+            <td>{% if semester.graded > 0 %}Tak{% else %}Nie{% endif %}</td>
+
+        </tr>
+            {% endfor %}
+    </table>
+{% endif %}
+
 {% if terms %}
 <h4>Terminy zapisów</h4>
 <table class="table-info-big">
