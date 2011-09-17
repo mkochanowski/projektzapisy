@@ -261,6 +261,7 @@ def show_toolbar(request):
     allowed_users = [
         "209067", # Tomasz Wasilczyk
         "209138", # Arkadiusz Flinik
+        "208934",
         "gosia"
     ]
     if request.user and request.user.username in allowed_users:
