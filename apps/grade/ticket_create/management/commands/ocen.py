@@ -9,15 +9,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         print "Plik: " + args[0]
-        f = open(args[0], 'r')
+        f = open(args[0], 'r+')
         for line in f:
             print line
             u = StudentGraded()
             try:
-                u.student = Student.objects.get(matricula=line)
+                u.student = Student.objects.get(matricula=line.rstrip())
+                u.semester_id = args[1]
+                u.save()
+                print "ok"
             except ObjectDoesNotExist:
-                print "bad"
-                pass
-            u.semester_id = args[1]
-            u.save()
-            print "ok"
+               print ":( " 
