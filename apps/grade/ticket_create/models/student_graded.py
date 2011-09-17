@@ -15,4 +15,5 @@ class StudentGraded( models.Model ):
 
     def __unicode__(self):
         return unicode( self.student ) + " " + unicode( self.semester )
+    
 
