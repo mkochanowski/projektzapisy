@@ -129,7 +129,7 @@ class Course( models.Model ):
                 return None
             else:
                 return student_opening + interval
-    
+        
     def get_semester_name(self):
         """ returns name of semester course is linked to """
         if self.semester is None:

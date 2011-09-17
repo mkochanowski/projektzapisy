@@ -145,3 +145,5 @@ input.small { width:auto; }
 table td.ects { background-color: #FFFFFF!important; }
 
 .priority select { width:auto;}
+
+table ul.voted-courses { list-style: none; margin: 5px 0 0 0; padding: 0;}
