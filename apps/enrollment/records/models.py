@@ -1,4 +1,5 @@
 #-*- coding: utf-8 -*-
+from django.core.exceptions import ValidationError
 from apps.enrollment.records.exceptions import NonGroupException
 from apps.enrollment.records.exceptions import ECTS_Limit_Exception 
 from apps.enrollment.records.exceptions import InactiveStudentException

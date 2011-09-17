@@ -25,6 +25,7 @@ class Term(models.Model):
         #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
         verbose_name = 'termin'
         verbose_name_plural = 'terminy'
+        ordering  = ['dayOfWeek']
         app_label = 'courses'
     
     @staticmethod

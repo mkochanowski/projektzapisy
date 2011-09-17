@@ -23,7 +23,17 @@ def prepare_courses_list_to_render(request):
     ''' generates template data for filtering and list of courses '''
     
     semesters = Semester.objects.filter(visible=True)
-    courses = Course.visible.all()
+
+
+    courses = Course.visible.all().filter(semester__visible=True).order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
+
+    semester_courses_list = {}
+
+    for course in courses:
+        if course['semester'] not in semester_courses_list:
+            semester_courses_list[course['semester']] = []
+
+        semester_courses_list[course['semester']].append(course)
 
     if request.user.is_anonymous():
         records_history = []
@@ -43,8 +53,7 @@ def prepare_courses_list_to_render(request):
             'name': semester.get_name(),
             'is_current': semester.is_current_semester(), #TODO: być może zbędne
             'is_default': (semester == default_semester),
-            'courses': courses.filter(semester__id__exact=semester.pk).
-                order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year')
+            'courses': semester_courses_list[semester.id]
         })
     for semester in semester_courses:
         for course in semester['courses']:
@@ -66,10 +75,12 @@ def courses(request):
 def course(request, slug):
     try:
         course = Course.visible.get(slug=slug)
-
-        enrolled = Record.enrolled.filter(group__course=course)
-        pinned = Record.pinned.filter(group__course=course)
-        queued = Queue.queued.filter(group__course=course)
+        course.teachers_list = course.teachers.all()
+        enrolled = Record.enrolled.filter(group__course=course).select_related('group', 'student')
+        pinned = Record.pinned.filter(group__course=course).select_related('group', 'student')
+        queued = Queue.queued.filter(group__course=course).select_related('group', 'student').extra(select={'counted':
+                    'SELECT COUNT(*) FROM "courses_group"' +
+                    'WHERE ("courses_group"."course_id" = '+ str(course.id)  + ' AND "records_queue"."group_id" = "courses_group"."id" )'})
 
         groups = list(Group.objects.filter(course=course).
             select_related('course', 'teacher', 'teacher__user').
@@ -142,10 +153,44 @@ def course(request, slug):
         repertory = []
         project = []
 
+        groups_ids = []
 
         for g in groups:
+            groups_ids.append(g.id)
+        qc= queued.filter(group__in=groups_ids)
+        queued_list = {}
+        for q in qc:
+            if not q.group.id in queued_list:
+                queued_list[q.group.id] = []
+
+            queued_list[q.group.id].append(q)
+
+        terms_list = {}
+
+        terms = Term.objects.filter(group__in=groups_ids).select_related('classroom', 'group')
+
+        for term in terms:
+            if term.group.id in terms_list:
+                terms_list[term.group.id].append(term)
+            else:
+                terms_list[term.group.id] = []
+                terms_list[term.group.id].append(term)
+
+        for g in groups:
+            if g.id in terms_list:
+                g.terms_list = terms_list[g.id]
+            else:
+                g.terms_list = []
+                
             g.enrolled = enrolled.filter(group=g).count()
-            g.queued = queued.filter(group=g).count()
+            g.queued = []
+
+            try:
+                for q in queued_list[g.id]:
+                    g.queued.append(q.counted)
+            except KeyError:
+                pass
+
 
             if g.limit_zamawiane > 0 and student and not student.is_zamawiany():
                 g.is_full = (g.number_of_students_non_zamawiane() >=

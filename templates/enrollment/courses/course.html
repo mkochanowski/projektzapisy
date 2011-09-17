@@ -52,11 +52,11 @@
                 <th>Rodzaj</th>
                 <td>{{ course.type }}</td>
             </tr>
-            {% if course.teachers.all %}
+            {% if course.teachers_list %}
                 <tr>
                     <th>Prowadzący</th>
                     <td>
-                        {% for teacher in course.teachers.all %}
+                        {% for teacher in course.teachers_list %}
                             <a href="{% url employee-profile teacher.user.id %}"
                                class="person">{{ teacher.user.get_full_name }}</a>{% if not forloop.last %}, {% endif %}
                         {% endfor %}</td>
@@ -170,7 +170,7 @@
                             {% endif %}
                         </td>
                         <td class="term">
-                            {% for d in t.get_all_terms|dictsort:"dayOfWeek" %}
+                            {% for d in t.terms_list %}
                                 <span>{{ d }}</span>
                             {% endfor %}
                         </td>
@@ -188,7 +188,7 @@
                                 {{ t.enrolled }}
                             {% endif %}
                         </td>
-                        <td class="number termQueuedCount">{{ t.queued }}</td>
+                        <td class="number termQueuedCount">{% if t.queued %}{{ t.queued }}{% else %}0{% endif %}</td>
                         <td class="controls">
                             <input type="hidden" name="group-id" value="{{ t.id }}"/>
                             <input type="hidden" name="group-json" value='{{ t.serialized }}'/>
