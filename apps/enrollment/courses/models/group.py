@@ -111,13 +111,14 @@ class Group(models.Model):
         from apps.users.models import StudiaZamawiane
 
         counts = {}
+        '''
         for group in groups:
             counts[group.pk] = {
                 'enrolled': 0,
                 'enrolled_zamawiane': 0,
                 'queued': 0
             }
-        '''
+
         enrolled_counts = Record.enrolled.filter(group__in=groups).\
             values('group__pk').order_by().annotate(Count('group__pk'))
         for r in enrolled_counts:
@@ -179,10 +180,10 @@ class Group(models.Model):
 
             'limit': self.limit,
             'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
-            'enrolled_count': student_counts[self.pk]['enrolled'],
-            'unavailable_enrolled_count': \
-                student_counts[self.pk]['enrolled_zamawiane'],
-            'queued_count': student_counts[self.pk]['queued'],
+            'enrolled_count': 0,#student_counts[self.pk]['enrolled'],
+            'unavailable_enrolled_count': 0,#\
+                #student_counts[self.pk]['enrolled_zamawiane'],
+            'queued_count': 0,#student_counts[self.pk]['queued'],
             'queue_priority': queue_priorities.get(self.pk)
         }
         
