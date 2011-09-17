@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = 'ocenia'
 
     def handle(self, *args, **options):
-        f = open(args[0], 'w')
+        f = open(args[0], 'r')
         for line in f:
             u = StudentGraded()
             try:
