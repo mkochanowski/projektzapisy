@@ -238,7 +238,7 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
 #settings for enrollment
 ECTS_LIMIT_DURATION = 14 # abs(t1-t2), in days
-ECTS_BONUS = 7 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
+ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
 ECTS_LIMIT = 40
 
 VOTE_LIMIT = 60
