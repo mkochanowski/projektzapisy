@@ -1,0 +1,90 @@
+<div id="employee-profile">
+	<h2>{{employee.get_full_name}}</h2>
+
+	<table class="table-info">
+	{% if user.is_authenticated %}
+		<tr>
+			<th>adres email</th>
+			<td>
+				{% if employee.user.email %}
+					<a href="mailto:{{employee.user.email}}">
+						{{employee.user.email}}
+					</a>
+				{% else %}
+					brak danych
+				{% endif %}
+			</td>
+		</tr>
+	{% endif %}
+		<tr>
+			<th>strona domowa</th>
+			<td>
+				{% if employee.homepage %}
+					<a href="{{employee.homepage}}">{{employee.homepage}}</a>
+				{% else %}
+					brak danych
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<th>pokój</th>
+			<td>
+				{% if employee.room %}
+					{{employee.room}}
+				{% else %}
+					brak danych
+				{% endif %}
+			</td>
+		</tr>
+	</table>
+
+	<h3>Konsultacje:</h3>
+	<p>{{employee.consultations}}</p>
+
+	<h3>Plan zajęć:</h3>
+	<div id="user-schedule-scheduleContainer">
+		<input type="hidden" name="courses" value="{{ courses_json }}" />
+		<input type="hidden" name="groups" value="{{ groups_json }}" />
+		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
+		<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
+		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
+		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
+
+		<div class="byWeekDays">
+			<h2>Zajęcia z podziałem na dni</h2>
+			{% for day in terms_by_days %}
+				<h3>{{ day.day_name|capfirst }}</h3>
+				<ul>
+					{% for term in day.terms %}
+						<li>
+							<span class="time">
+								{{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
+							</span>
+							<span class="name">
+								{{ term.object.group.course.name }}
+							</span>
+							<span class="type">
+								&ndash;
+								{{ term.object.group.get_type_display }}
+							</span>
+							<span class="classroom">
+								(sala {{ term.object.classroom.number }})
+							</span>
+						</li>
+					{% endfor %}
+				</ul>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div id="user-schedule-listByCourse" style="display:none">
+		{% for course in courses %}
+			<span>
+				<input type="hidden" name="id" value="{{ course.info.id }}" />
+				{% for term in course.terms %}
+					<input type="hidden" name="term" value="{{ term.json }}" />
+				{% endfor %}
+			</span>
+		{% endfor %}
+	</div>
+</div>

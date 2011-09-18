@@ -18,6 +18,7 @@ Fereol.Enrollment.CourseGroup = function()
 	this.isEnrolled = null; // czy student jest zapisany
 	this.isQueued = null; // czy jest "w kolejce"
 	this.isPinned = null; // czy przypiął do planu
+	this.isTeacher = null; // czy jest prowadzącym daną grupę
 	this.queuePriority = null; // jeżeli jest w kolejce, to jaki ma priorytet
 
 	// w przypadku studentów nie zamawianych - zamawiana część grupy jest
@@ -115,6 +116,7 @@ Fereol.Enrollment.CourseGroup.prototype.updateFromJSON = function(json)
 	this.isEnrolled = !!raw['is_enrolled'];
 	this.isQueued = !!raw['is_queued'];
 	this.isPinned = !!raw['is_pinned'];
+	this.isTeacher = !!raw['is_teacher'];
 
 	this.limit = raw['limit'].castToInt();
 	this.unavailableLimit = raw['unavailable_limit'].castToInt();

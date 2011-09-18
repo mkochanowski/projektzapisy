@@ -126,7 +126,7 @@ class Employee(BaseUser):
         from apps.enrollment.courses.models import Group, Semester
 
         user = User.objects.get(id=user_id)
-        semester = Semester.get_current_semester()
+        semester = Semester.get_default_semester()
         try:
             employee = user.employee
             groups = Group.objects.filter(teacher=employee, course__semester=semester)

@@ -77,8 +77,6 @@ ProposalsList.initFilter = function()
 		'phrase', '.filter-phrase', function(element, value)
 	{
 		var proposal = element.data;
-		if (!proposal.name)
-			$.log(proposal);
 		return (proposal.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
 	}));
 

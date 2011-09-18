@@ -115,7 +115,7 @@ class Group(models.Model):
         return employees
 
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
-        student=None):
+        student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.utils import simplejson
         from django.core.urlresolvers import reverse
@@ -132,6 +132,8 @@ class Group(models.Model):
             'teacher_url': self.teacher and reverse('employee-profile', args= \
                 [self.teacher.user.id]) or '',
 
+            'is_teacher': False if (employee is None) else \
+                self.teacher.id == employee.id,
             'is_enrolled': self.id in enrolled,
             'is_queued': self.id in queued,
             'is_pinned': self.id in pinned,

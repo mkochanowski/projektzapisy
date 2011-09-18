@@ -142,7 +142,10 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 		!this.group.isEnrolledOrQueued());
 
 	var shouldBeVisible = (this.group.isPinned || this.isPrototyped ||
-		this.group.isEnrolledOrQueued());
+		this.group.isEnrolledOrQueued() || this.group.isTeacher);
+	if (this.displayStyle == Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.
+		SCHEDULE)
+		shouldBeVisible = true;
 	if (shouldBeVisible == this._isVisible)
 		return;
 	this._isVisible = shouldBeVisible;
