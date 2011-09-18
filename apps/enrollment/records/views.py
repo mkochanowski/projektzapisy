@@ -113,10 +113,9 @@ def set_enrolled(request, method):
         group = Group.objects.get(id=group_id)
         if set_enrolled:
             moved = Record.is_student_in_course_group_type(\
-                user_id=request.user.id, slug=group.course_slug(),\
+                user=request.user, slug=group.course_slug(),\
                 group_type=group.type) #TODO: omg ale crap
-            connected_records = Record.add_student_to_group(request.user.id,\
-                group_id)
+            connected_records = Record.add_student_to_group(request.user, group)
             record = connected_records[0]
             if moved:
                 message = 'Zostałeś przeniesiony do wybranej grupy.'
@@ -127,7 +126,7 @@ def set_enrolled(request, method):
                 'powiązanych.'
         else:
             connected_records = None
-            record = Record.remove_student_from_group(request.user.id, group_id)
+            record = Record.remove_student_from_group(request.user, group)
             message = 'Zostałeś wypisany z wybranej grupy.'
 
         if is_ajax:

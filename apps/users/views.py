@@ -326,7 +326,6 @@ def login_plus_remember_me(request, *args, **kwargs):
 @login_required
 def create_ical_file(request):
     user = request.user
-    user_id = user.id
     user_full_name = user.get_full_name()
     semester = Semester.get_default_semester()
     semester_beginning = semester.semester_beginning
@@ -347,7 +346,7 @@ def create_ical_file(request):
     groups_student = []
     try:
         user.student
-        groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user_id))
+        groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user))
     except Student.DoesNotExist:
         pass
     try:
