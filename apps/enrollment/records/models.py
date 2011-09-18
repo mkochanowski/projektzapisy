@@ -52,6 +52,9 @@ class Record(models.Model):
     enrolled = EnrolledManager()
     pinned = PinnedManager()
     
+    def get_semester_name(self):
+        return self.group.course.semester.get_name()
+    
     @staticmethod
     def recorded_students(students):
         """ Returns students with information about his/her records """
