@@ -117,7 +117,6 @@ class Group(models.Model):
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
         student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
-        from django.utils import simplejson
         from django.core.urlresolvers import reverse
 
         zamawiany = student and student.is_zamawiany()
@@ -147,7 +146,7 @@ class Group(models.Model):
             'queue_priority': queue_priorities.get(self.pk)
         }
         
-        return simplejson.dumps(data);
+        return data;
 
     class Meta:
         verbose_name = 'grupa'

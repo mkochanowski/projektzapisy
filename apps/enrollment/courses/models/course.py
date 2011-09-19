@@ -189,7 +189,6 @@ class Course( models.Model ):
         return points
 
     def serialize_for_ajax(self, student = None):
-        from django.utils import simplejson
         from django.core.urlresolvers import reverse
         
         data = {
@@ -202,7 +201,7 @@ class Course( models.Model ):
                 self.is_recording_open_for_student(student)
         }
 
-        return simplejson.dumps(data)
+        return data
 
 
     class Meta:

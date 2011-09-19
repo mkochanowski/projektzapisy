@@ -104,9 +104,9 @@ def set_enrolled(request, method):
 
         data = {}
         for group in groups:
-            data[group.id] = group.serialize_for_ajax(
+            data[group.id] = simplejson.dumps(group.serialize_for_ajax(
                 enrolled_ids, queued_ids, pinned_ids,
-                queue_priorities, student)
+                queue_priorities, student))
         return data
 
     try:

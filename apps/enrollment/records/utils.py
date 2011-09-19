@@ -76,13 +76,13 @@ def prepare_groups_json(semester, groups, student=None, employee=None):
             queue_priorities, student=student, employee=employee
         ))
     TimerDebugPanel.timer_stop('pgj_3')
-    return '[' + (', '.join(groups_json)) + ']'
+    return simplejson.dumps(groups_json)
 
 def prepare_courses_json(groups, student):
     courses_json = []
     for group in groups:
         courses_json.append(group.course.serialize_for_ajax(student))
-    return '[' + (', '.join(courses_json)) + ']'
+    return simplejson.dumps(courses_json)
 
 def prepare_schedule_courses(request, for_student = None, for_employee = None):
     if not (for_student is None) and not (for_employee is None):
