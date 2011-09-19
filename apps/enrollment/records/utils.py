@@ -6,8 +6,11 @@ from debug_toolbar.panels.timer import TimerDebugPanel
 
 from apps.enrollment.courses.models import Term
 from apps.enrollment.records.models import *
+from apps.users.models import *
 
-def prepare_courses_with_terms(terms, records = []):
+def prepare_courses_with_terms(terms, records = None):
+    if records is None:
+        records = []
     courses_list = []
     courses_map = {}
     def add_course_to_map(course):
