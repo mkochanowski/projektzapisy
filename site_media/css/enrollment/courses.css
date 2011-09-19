@@ -155,9 +155,9 @@
 
 	border-spacing: 0;
 
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
+	-moz-border-radius: 4px 4px 2px 2px;
+	-webkit-border-radius: 4px 4px 2px 2px;
+	border-radius: 4px 4px 2px 2px;
 }
 
 #enr-course-view .tutorial table tbody tr

@@ -89,13 +89,27 @@
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
 	</div>
+    <ul id="schedule-legend">
+        <li>
+            <div class="legend-box enrolled"></div> - jesteś zapisany do tej grupy
+        </li>
+        <li>
+            <div class="legend-box queued"></div> - jesteś w kolejce do tej grupy
+        </li>
+        <li>
+            <div class="legend-box pinned"></div> - grupa przypięta do prototypu
+        </li>
+        <li>
+            <div class="legend-box normal"></div> - pozostałe
+        </li>
+    </ul>
 {% endblock %}
 
 {% block sidebar-width %}4{% endblock %}
 {% block sidebar %}
-	<div id="main-sidebar">
+	<div id="main-sidebar" class="prototype-sidebar">
 		<h3>Semestr {{ semester }}</h3>
-
+        <hr>
 		<ul id="enr-schedulePrototype-course-list">
 			{% for course in courses %}
 			<li>

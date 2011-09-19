@@ -269,7 +269,7 @@ SchedulePrototype.initCourseList = function()
 	});
 
 	SchedulePrototype.uncheckAllButton = $.create('a').attr('id',
-		'enr-schedulePrototype-uncheckAll').insertBefore(courseList).
+		'enr-schedulePrototype-uncheckAll').insertBefore($(courseList).parent().find('hr')).
 		text('odznacz wszystkie').disableDragging().click(function()
 	{
 		SchedulePrototype.courseList.forEach(function(course)

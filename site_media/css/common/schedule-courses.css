@@ -2,6 +2,7 @@
  * Style dotyczące osadzenia terminów przedmiotów w komponencie terminarza.
  */
 
+#schedule-legend .enrolled,
 .schedule .enrolled,
 .schedule .enrolled .classroom,
 .schedule .enrolled .type
@@ -9,13 +10,14 @@
 	background: #E0EEEE !important; /* wheat */
 }
 
+#schedule-legend .queued,
 .schedule .queued,
 .schedule .queued .classroom,
 .schedule .queued .type
 {
 	background: #f5e5c4 !important;
 }
-
+#schedule-legend .pinned,
 .schedule .pinned,
 .schedule .pinned .classroom,
 .schedule .pinned .type
