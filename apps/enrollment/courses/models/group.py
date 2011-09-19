@@ -30,6 +30,7 @@ class Group(models.Model):
     cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
     cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
     cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
+    disable_update_signal = False
 
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
@@ -60,24 +61,37 @@ class Group(models.Model):
     def limit_non_zamawiane(self):
         return self.limit - self.limit_zamawiane
 
-    def available_only_for_zamawiane(self):
+    def available_only_for_zamawiane(self, dont_use_cache=False):
         return (self.limit_zamawiane > 0 and
-            self.get_count_of_enrolled_non_zamawiane() >=
-            self.limit_non_zamawiane())
+            self.get_count_of_enrolled_non_zamawiane(dont_use_cache= \
+            dont_use_cache) >= self.limit_non_zamawiane())
 
-    def get_count_of_enrolled(self):
+    def get_count_of_enrolled(self, dont_use_cache=False):
+        from apps.enrollment.records.models import Record
+        if dont_use_cache:
+            return Record.enrolled.filter(group=self).count()
         self.update_students_counts_if_empty()
         return self.cache_enrolled
 
-    def get_count_of_enrolled_zamawiane(self):
+    def get_count_of_enrolled_zamawiane(self, dont_use_cache=False):
+        from apps.enrollment.records.models import Record
+        from apps.users.models import StudiaZamawiane
+        if dont_use_cache:
+            enrolled_zam = Record.enrolled.filter(group=self).values_list(\
+                'student', flat=True)
+            return StudiaZamawiane.objects.filter(student__in=\
+                enrolled_zam).count()
         self.update_students_counts_if_empty()
         return self.cache_enrolled_zam
 
-    def get_count_of_enrolled_non_zamawiane(self):
-        return self.get_count_of_enrolled() - \
-            self.get_count_of_enrolled_zamawiane()
+    def get_count_of_enrolled_non_zamawiane(self, dont_use_cache=False):
+        return self.get_count_of_enrolled(dont_use_cache=dont_use_cache) - \
+            self.get_count_of_enrolled_zamawiane(dont_use_cache=dont_use_cache)
 
-    def get_count_of_queued(self):
+    def get_count_of_queued(self, dont_use_cache=False):
+        from apps.enrollment.records.models import Queue
+        if dont_use_cache:
+            return Queue.queued.filter(group=self).count()
         self.update_students_counts_if_empty()
         return self.cache_queued
 
@@ -87,20 +101,13 @@ class Group(models.Model):
             self.update_students_counts()
 
     def update_students_counts(self):
-        from apps.enrollment.records.models import Record, Queue
-        from apps.users.models import StudiaZamawiane
-
-        self.cache_enrolled = Record.enrolled.filter(group=self).count()
-        self.cache_queued = Queue.queued.filter(group=self).count()
-
-        enrolled_zam = Record.enrolled.filter(group=self).values_list(\
-            'student', flat=True)
-        self.cache_enrolled_zam = StudiaZamawiane.objects.filter(student__in=\
-            enrolled_zam).count()
-        if self.cache_enrolled_zam > self.cache_enrolled:
-            self.cache_enrolled_zam = self.cache_enrolled
-        
+        self.cache_enrolled = self.get_count_of_enrolled(dont_use_cache=True)
+        self.cache_queued = self.get_count_of_queued(dont_use_cache=True)
+        self.cache_enrolled_zam = self.get_count_of_enrolled_zamawiane( \
+            dont_use_cache=True)
+        Group.disable_update_signal = True
         self.save()
+        Group.disable_update_signal = False
 
     def course_slug(self):
         return self.course.slug
@@ -159,6 +166,8 @@ class Group(models.Model):
                                 unicode(self.get_teacher_full_name()))
 
 def log_add_group(sender, instance, created, **kwargs):
+    if Group.disable_update_signal:
+        return
     if created:
         group = instance
         GROUP_TYPE_MAPPING = {'1': 'w', '2': 'c', '3': 'p',
@@ -178,6 +187,8 @@ def log_add_group(sender, instance, created, **kwargs):
         backup_logger.info(message)
 
 def log_limits_change(sender, instance, **kwargs):
+    if Group.disable_update_signal:
+        return
     try:
         group = instance
         old_group = Group.objects.get(id=group.id)
@@ -194,4 +205,4 @@ def log_delete_group(sender, instance, **kwargs):
     
 signals.pre_save.connect(log_limits_change, sender=Group)        
 signals.post_save.connect(log_add_group, sender=Group)                               
-signals.post_delete.connect(log_delete_group, sender=Group)                               
+signals.post_delete.connect(log_delete_group, sender=Group)
