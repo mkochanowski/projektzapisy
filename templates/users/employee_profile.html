@@ -1,57 +1,7 @@
 {% extends "users/employees_list.html" %}
-{% block styles %}
-    {{ block.super }}
-	<link rel="stylesheet" href="/site_media/css/jquery/jquery.ui.schedule.css" type="text/css" />
-{% endblock %}
-{% block js %}
-    {{ block.super }}
-	<script src="/site_media/js/jquery/jquery.ui.schedule.js" type="text/javascript"></script>
-	<script src="/site_media/js/enrollment/records/schedule.js" type="text/javascript"></script>
-{% endblock %}
 
 {% block enrollment_menu_employees %} class="active"{% endblock %}
 
 {% block content %}
-<div id="employee-profile">
-<h2>{{employee.get_full_name}}</h2>
-    <table class="table-info">
-    {% if user.is_authenticated %}
-        <tr>
-            <th>adres email</th>
-            <td>{% if employee.user.email %}<a href="mailto:{{employee.user.email}}">{{employee.user.email}}</a>{% else %}brak danych{% endif %}</td>
-        </tr>
-    {% endif %}
-        <tr>
-            <th>strona domowa</th>
-            <td>{% if employee.homepage %}<a href="{{employee.homepage}}">{{employee.homepage}}</a>{% else %}brak danych{% endif %}</td>
-        </tr>
-        <tr>
-            <th>pokój</th>
-            <td>{% if employee.room %}{{employee.room}}{% else %}brak danych{% endif %}</td>
-        </tr>
-    </table>
-
-
-<h4>Konsultacje:</h4>
-<p>{{employee.consultations}}</p>
-<h4>Plan zajęć:</h4>
-<div id="schedule-wrapper">
-	{% for group in groups %}
-		{% for term in group.terms_ %}
-			<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}" 
-				courseID="{{group.course_.pk}}"
-				groupID="{{group.pk}}"
-				termID="{{term.pk}}"
-				from="{{ term.time_from_in_minutes }}" 
-				minutes="{{ term.length_in_minutes }}" 
-				day="{{ term.day_in_zero_base }}"
-				status="fixed">
-				{{group}}<br/>
-				(s.{{term.classroom}})
-			</div>
-		{% endfor %}
-	{% endfor %}
-</div>
-<br/>
-</div>
+	{% include "users/employee_profile_contents.html" %}
 {% endblock %}

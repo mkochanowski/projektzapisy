@@ -17,6 +17,7 @@ from apps.users.models import *
 from apps.enrollment.records.models import *
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.courses.views import prepare_courses_list_to_render
+from apps.enrollment.records.utils import *
 
 from libs.ajax_messages import *
 
@@ -103,19 +104,18 @@ def set_enrolled(request, method):
 
         data = {}
         for group in groups:
-            data[group.id] = group.serialize_for_ajax(
+            data[group.id] = simplejson.dumps(group.serialize_for_ajax(
                 enrolled_ids, queued_ids, pinned_ids,
-                queue_priorities, student)
+                queue_priorities, student))
         return data
 
     try:
         group = Group.objects.get(id=group_id)
         if set_enrolled:
             moved = Record.is_student_in_course_group_type(\
-                user_id=request.user.id, slug=group.course_slug(),\
+                user=request.user, slug=group.course_slug(),\
                 group_type=group.type) #TODO: omg ale crap
-            connected_records = Record.add_student_to_group(request.user.id,\
-                group_id)
+            connected_records = Record.add_student_to_group(request.user, group)
             record = connected_records[0]
             if moved:
                 message = 'Zostałeś przeniesiony do wybranej grupy.'
@@ -126,7 +126,7 @@ def set_enrolled(request, method):
                 'powiązanych.'
         else:
             connected_records = None
-            record = Record.remove_student_from_group(request.user.id, group_id)
+            record = Record.remove_student_from_group(request.user, group)
             message = 'Zostałeś wypisany z wybranej grupy.'
 
         if is_ajax:
@@ -312,157 +312,49 @@ def records(request, group_id):
         return render_to_response('common/error.html',\
             context_instance=RequestContext(request))
 
-def prepare_courses_with_terms(terms, records = []):
-    courses_list = []
-    courses_map = {}
-    def add_course_to_map(course):
-        if course.pk in courses_map:
-            return
-        course_info = {
-            'object': course,
-            'info': {
-                'id' : course.pk,
-                'name': course.name,
-                'short': course.entity.get_short_name(),
-                'type': course.type and course.type.pk or 1,
-                'slug': course.slug,
-		'exam': course.exam,
-		'english': course.english,
-		'suggested_for_first_year': course.suggested_for_first_year,
-            },
-            'terms': []
-        }
-        courses_map[course.pk] = course_info
-        courses_list.append(course_info)
-    for term in terms:
-        course = term.group.course
-        add_course_to_map(course)
-        term_info = {
-            'id': term.pk,
-            'group': term.group.pk,
-            'classroom': term.classroom.number or 0,
-            'day': int(term.dayOfWeek),
-            'start_time': [term.start_time.hour, term.start_time.minute],
-            'end_time': [term.end_time.hour, term.end_time.minute],
-
-            #TODO: to chyba zbędne?
-            #'enrolled_count': term.group.get_count_of_enrolled(),
-            #'queued_count': term.group.get_count_of_queued(),
-        }
-        courses_map[course.pk]['terms'].append({
-            'id': term.pk,
-            'object': term,
-            'info': term_info
-        })
-    for record in records:
-        add_course_to_map(record.group.course)
-        
-    courses_list = sorted(courses_list, \
-        key=lambda course: course['info']['name'])
-    return courses_list
-
-def prepare_groups_json(student, semester, groups):
-    TimerDebugPanel.timer_start('pgj_1', 'prepare_groups_json - record_ids')
-    record_ids = Record.get_student_records_ids(student, semester)
-    TimerDebugPanel.timer_stop('pgj_1')
-    TimerDebugPanel.timer_start('pgj_2', 'prepare_groups_json - queue_priorities')
-    queue_priorities = Queue.queue_priorities_map(
-        Queue.get_student_queues(student, semester))
-    TimerDebugPanel.timer_stop('pgj_2')
-    groups_json = []
-    TimerDebugPanel.timer_start('pgj_3', 'prepare_groups_json - serialize')
-    for group in groups:
-        groups_json.append(group.serialize_for_ajax(
-            record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
-            queue_priorities, student
-        ))
-    TimerDebugPanel.timer_stop('pgj_3')
-    return '[' + (', '.join(groups_json)) + ']'
-
-def prepare_courses_json(groups, student):
-    courses_json = []
-    for group in groups:
-        courses_json.append(group.course.serialize_for_ajax(student))
-    return '[' + (', '.join(courses_json)) + ']'
-
 @login_required
 def own(request):
     ''' own schedule view '''
 
     default_semester = Semester.get_default_semester()
-        
+    if not default_semester:
+        raise RuntimeError('Brak aktywnego semestru')
+
     try:
         student = request.user.student
-        courses = prepare_courses_with_terms(\
-            Term.get_all_in_semester(default_semester, student),\
-            Record.get_student_enrolled_objects(student, default_semester))  
-        is_student = True
     except Student.DoesNotExist:
+        student = None
         try:
             employee = request.user.employee
-            is_student = False
-            student = None
-            courses = prepare_courses_with_terms(\
-                Term.get_all_in_semester(default_semester, employee=employee))
         except Employee.DoesNotExist:
-            request.user.message_set.create(message='Nie jesteś pracownikiem ani studentem.')
-            return render_to_response('common/error.html', \
-                context_instance=RequestContext(request))
+            employee = None
+    if student is None and employee is None:
+        request.user.message_set.create(message = \
+            'Nie jesteś pracownikiem ani studentem.')
+        return render_to_response('common/error.html', \
+            context_instance=RequestContext(request))
 
+    if student:
+        courses = prepare_schedule_courses(request, for_student=student)
+    elif employee:
+        courses = prepare_schedule_courses(request, for_employee=employee)
 
-    if not default_semester:
-        data = {
-            'terms_by_days': {},
-            'courses': [],
-            'points': [],
-            'points_type': None,
-            'points_sum': 0
-        }
-        request.user.message_set.create(message='Brak aktywnego semestru.')
-        return render_to_response('enrollment/records/schedule.html',\
-            data, context_instance = RequestContext(request))
+    data = prepare_schedule_data(request, courses)
 
-    terms_by_days = [None for i in range(8)] # dni numerowane od 1
-    for course in courses:
-        for term in course['terms']:
-            day = int(term['object'].dayOfWeek)
-            if not terms_by_days[day]:
-                terms_by_days[day] = {
-                    'day_id': day,
-                    'day_name': term['object'].get_dayOfWeek_display(),
-                    'terms': []
-                }
-            terms_by_days[day]['terms'].append(term)
-            term.update({ # TODO: do szablonu
-                'json': simplejson.dumps(term['info'])
-            })
-    terms_by_days = filter(lambda term: term, terms_by_days)
-
-    # TODO: tylko grupy, na które jest zapisany
-    all_groups = Group.get_groups_by_semester(default_semester)
-    all_groups_json = prepare_groups_json(student, default_semester, all_groups)
-
-    if is_student:
-        points_type = student.program.type_of_points
+    if student:
         course_objects = map(lambda course: course['object'], courses)
         points = Course.get_points_for_courses(course_objects, student.program)
         points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)  
         points_type = student.program.type_of_points 
-    else:
-        points_type = None
-        points = None
-        points_sum = None 
-        points_type = None  
-    data = {
-        'courses_json': prepare_courses_json(all_groups, student),
-        'groups_json': all_groups_json,
-        'terms_by_days': terms_by_days,
+        data.update({
+            'points': points,
+            'points_type': points_type,
+            'points_sum': points_sum
+        })
+
+    data.update({
         'courses': courses,
-        'points': points,
-        'points_type': points_type,
-        'points_sum': points_sum,
-        'priority_limit': settings.QUEUE_PRIORITY_LIMIT
-    }
+    })
 
     return render_to_response('enrollment/records/schedule.html',\
         data, context_instance = RequestContext(request))
@@ -520,7 +412,8 @@ def schedule_prototype(request):
     all_groups = Group.get_groups_by_semester(default_semester)
     TimerDebugPanel.timer_stop('json_prepare_1')
     TimerDebugPanel.timer_start('json_prepare_2', 'Przygotowywanie JSON - st2')
-    all_groups_json = prepare_groups_json(student, default_semester, all_groups)
+    all_groups_json = prepare_groups_json(default_semester, all_groups, \
+        student=student)
     TimerDebugPanel.timer_stop('json_prepare_2')
 
     data = {

@@ -84,7 +84,7 @@ class StudentScheduleTest(TestCase):
         self.lecture_group = Group.objects.get(id=3)
         self.lecture_group_2 = Group.objects.get(id=5)        
         #Automaticaly add student to lecture group
-        self.record = Record.add_student_to_group(self.user.id, self.exercise_group.id)
+        self.record = Record.add_student_to_group(self.user, self.exercise_group)
         
 #    def testWithNotStudentUser(self):
 #        TODO: function changes, change test

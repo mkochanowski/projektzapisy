@@ -101,8 +101,6 @@ CoursesList.initFilter = function()
 		'phrase', '.filter-phrase', function(element, value)
 	{
 		var course = element.data;
-		if (!course.name)
-			$.log(course);
 		return (course.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
 	}));
 

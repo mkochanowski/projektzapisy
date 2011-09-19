@@ -1,40 +1,7 @@
 {% extends "users/students_list.html" %}
 
-
 {% block enrollment_menu_students %} class="active"{% endblock %}
 
 {% block content %}
-<div id="student-profile">
-
-<h2>{{student.get_full_name}}</h2>
-
-<table class="table-info">
-	<tr>
-        <th>adres email</th> <td>{% if student.user.email %}<a href="mailto:{{student.user.email}}">{{student.user.email}}</a>{% else %}brak danych{% endif %}</td>
-    </tr>
-	<tr>
-        <th>punkty ECTS</th> <td>{{student.ects}}</td>
-    </tr>
-</table>
-<h3>Plan zajęć:</h3>
-<div id="schedule-wrapper">
-	{% for group in groups %}
-		{% for term in group.terms_ %}
-			<div style="background-color:{{ group.background_color }};  border-color:{{ group.border_color }}"
-				courseID="{{group.course_.pk}}"
-				groupID="{{group.pk}}"
-				termID="{{term.pk}}"
-				from="{{ term.time_from_in_minutes }}"
-				minutes="{{ term.length_in_minutes }}"
-				day="{{ term.day_in_zero_base }}"
-				status="fixed">
-				{{group}}<br/>
-				(s.{{term.classroom}})
-			</div>
-		{% endfor %}
-	{% endfor %}
-</div>
-</div>
+	{% include "users/student_profile_contents.html" %}
 {% endblock %}
-
-

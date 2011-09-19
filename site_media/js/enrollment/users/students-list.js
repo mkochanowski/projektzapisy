@@ -29,18 +29,11 @@ function loadStudentProfile(profileUrl){
         success: function(resp){
             $profileDiv.empty();
             $profileDiv.append($(resp));
-
         },
         complete: function(){
             $loadingDiv.remove();
             history.pushState({}, "Profil pracownika", profileUrl);
-
-        	$('.schedule-table-simple tr:even').addClass('even');
-	        $('#schedule-wrapper').schedule({
-		    hourColumnWidth: 40,
-		    dayColumnWidth: Math.floor(($('#schedule-wrapper').width() - 140)/6),
-		    dayList: ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota']});
-
+			UserScheduleView.init();
         }
     });
 
@@ -151,8 +144,6 @@ StudentsList.initFilter = function()
 		'phrase', '.filter-phrase', function(element, value)
 	{
 		var student = element.data;
-		if (!student.name)
-			$.log(student);
 		var name  = (student.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
         var album = (student.album.toLowerCase().indexOf(value.toLowerCase()) >= 0);
         var email = (student.email.toLowerCase().indexOf(value.toLowerCase()) >= 0);

@@ -27,6 +27,8 @@ from apps.enrollment.records.models import Record
 
 from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm
 
+from apps.enrollment.records.utils import *
+
 from datetime import timedelta
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
 import datetime
@@ -34,7 +36,6 @@ import datetime
 import logging
 logger = logging.getLogger()
 import vobject
-from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
 
 
 GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
@@ -47,16 +48,17 @@ GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
 def student_profile(request, user_id):
     """student profile"""
     try:
-        student = User.objects.get(id=user_id).student
-        groups = Student.get_schedule(student)
-
-        data = {
-                'groups' : groups,
-                'student' : student,
-            }
+        user = User.objects.get(id=user_id)
+        student = user.student
+        courses = prepare_schedule_courses(request, for_student=student)
+        data = prepare_schedule_data(request, courses)
+        data.update({
+            'courses': courses,
+            'student': student
+        })
 
         if request.is_ajax():
-            return render_to_response('users/ajax_student_profile.html', data, context_instance=RequestContext(request))
+            return render_to_response('users/student_profile_contents.html', data, context_instance=RequestContext(request))
         else:
             begin = student.user.last_name[0]
             students = Student.get_list(begin)
@@ -75,18 +77,20 @@ def student_profile(request, user_id):
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 def employee_profile(request, user_id):
-    """student profile"""
+    """employee profile"""
     try:
         user = User.objects.get(id=user_id)
         employee = user.employee
-        groups = Employee.get_schedule(user.id)
+        courses = prepare_schedule_courses(request, for_employee=employee)
+        data = prepare_schedule_data(request, courses)
+        data.update({
+            'courses': courses,
+            'employee': employee
+        })
         
-        data = {
-            'groups' : groups,
-            'employee' : employee,
-        }
         if request.is_ajax():
-            return render_to_response('users/ajax_employee_profile.html', data, context_instance=RequestContext(request))
+            return render_to_response('users/employee_profile_contents.html', \
+                data, context_instance=RequestContext(request))
         else:
             begin = user.last_name[0]
             employees = Employee.get_list(begin)
@@ -322,7 +326,6 @@ def login_plus_remember_me(request, *args, **kwargs):
 @login_required
 def create_ical_file(request):
     user = request.user
-    user_id = user.id
     user_full_name = user.get_full_name()
     semester = Semester.get_default_semester()
     semester_beginning = semester.semester_beginning
@@ -343,7 +346,7 @@ def create_ical_file(request):
     groups_student = []
     try:
         user.student
-        groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user_id))
+        groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user))
     except Student.DoesNotExist:
         pass
     try:

@@ -48,12 +48,16 @@ class Semester( models.Model ):
                 return Semester.objects.filter(year=year,type='z')[0]
             except KeyError:
                 return None
+            except IndexError:
+                return None
         else:
             prev_year = str(int(year[0:4])-1)
             year = prev_year+'/'+year[2:4]
             try:
                 return Semester.objects.filter(year=year,type='l')[0]
-            except:
+            except KeyError:
+                return None
+            except IndexError:
                 return None
                 
                 

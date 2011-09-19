@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
+from django.utils import simplejson
 
 from apps.enrollment.courses.models         import *
 from apps.enrollment.records.models          import *
@@ -124,10 +125,10 @@ def course(request, slug):
                     g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
                     if g in student_groups:
                         g.signed = True
-                    g.serialized = g.serialize_for_ajax(
+                    g.serialized = simplejson.dumps(g.serialize_for_ajax(
                         enrolled_ids, queued_ids, pinned_ids,
                         queue_priorities, student
-                    )
+                    ))
             except Student.DoesNotExist:
                 student = None
                 course.is_recording_open = False
@@ -253,7 +254,7 @@ def course(request, slug):
         data = prepare_courses_list_to_render(request)
         data.update({
             'course' : course,
-            'course_json': course.serialize_for_ajax(student),
+            'course_json': simplejson.dumps(course.serialize_for_ajax(student)),
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,

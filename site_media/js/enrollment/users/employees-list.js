@@ -21,25 +21,20 @@ function loadEmployeeProfile(profileUrl){
     var $profileDiv = $('#employee-profile'),
     $loadingDiv = $('<div>&nbsp;</div>').addClass('profile-loading');
     $profileDiv.append($loadingDiv);
+	var $mainDiv = $('#main-content').assertOne();
     
     $.ajax({
         type: "POST",
         dataType: "html",
         url: profileUrl,
         success: function(resp){
-            $profileDiv.empty();
-            $profileDiv.append($(resp));
+            $mainDiv.empty();
+            $mainDiv.append($(resp));
         },
         complete: function(){
-    
             $loadingDiv.remove();
             history.pushState({}, "Profil pracownika", profileUrl);
-            $('.schedule-table-simple tr:even').addClass('even');
-	        $('#schedule-wrapper').schedule({
-		    hourColumnWidth: 40,
-		    dayColumnWidth: Math.floor(($('#schedule-wrapper').width() - 140)/6),
-		    dayList: ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota']});
-
+			UserScheduleView.init();
         }
     });
 
@@ -149,8 +144,6 @@ EmployeesList.initFilter = function()
 		'phrase', '.filter-phrase', function(element, value)
 	{
 		var employee = element.data;
-		if (!employee.name)
-			$.log(employee);
 		var name  = (employee.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
         var short_old = (employee.short_old.toLowerCase().indexOf(value.toLowerCase()) >= 0);
         var short_new = (employee.short_new.toLowerCase().indexOf(value.toLowerCase()) >= 0);
