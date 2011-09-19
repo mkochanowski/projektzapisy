@@ -16,6 +16,13 @@
 	background: #f5e5c4 !important;
 }
 
+.schedule .pinned,
+.schedule .pinned .classroom,
+.schedule .pinned .type
+{
+	background: #EFF0F0 !important;
+}
+
 .schedule .full
 {
 	background-image: url('/site_media/images/schedule-warning.png');

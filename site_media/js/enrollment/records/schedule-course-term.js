@@ -136,6 +136,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 	}
 	this._updateControls();
 
+	this.container.toggleClass('pinned', this.group.isPinned);
 	this.container.toggleClass('enrolled', this.group.isEnrolled);
 	this.container.toggleClass('queued', this.group.isQueued);
 	this.container.toggleClass('full', this.group.isFull() &&
