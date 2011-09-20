@@ -20,6 +20,7 @@ class Term(models.Model):
     end_time = models.TimeField(verbose_name = 'zakończenie')
     classroom = models.ForeignKey('Classroom', verbose_name='sala')
     group = models.ForeignKey('Group', verbose_name='grupa', related_name='term')
+    classrooms = models.ManyToManyField('Classroom', related_name='new_classrooms')
 
     class Meta:
         #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
@@ -27,6 +28,7 @@ class Term(models.Model):
         verbose_name_plural = 'terminy'
         ordering  = ['dayOfWeek']
         app_label = 'courses'
+    
     
     @staticmethod
     def get_all_in_semester(semester, student=None, employee=None):
