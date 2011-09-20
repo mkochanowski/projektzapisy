@@ -177,7 +177,8 @@
     <footer>
         <p>
             {# <a href="{% url on-mobile %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
-            &copy; 2011 <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a></p>
+            &copy; 2011 <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>{% if user.is_authenticated %} | Błędy i nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@ii.uni.wroc.pl">zapisy@ii.uni.wroc.pl</a>{% endif %}</p>
+
     </footer>
 
 </div>
