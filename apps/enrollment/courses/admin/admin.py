@@ -20,7 +20,7 @@ class CourseAdmin(admin.ModelAdmin):
         ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises_laboratories','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
     inlines = [GroupInline, ]
-    filter_horizontal = ['teachers']
+    filter_horizontal = ['requirements']
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('number', 'capacity', 'building')
