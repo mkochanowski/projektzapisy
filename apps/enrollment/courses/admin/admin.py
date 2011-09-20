@@ -56,17 +56,13 @@ class TermInline(admin.TabularInline):
     model = Term
     extra = 0
 
-class RecordInline(admin.TabularInline):
-    model = Record
-    extra = 0
-
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','get_terms_as_string')
     list_filter = ('type','teacher',)
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
-        TermInline,RecordInline,
+        TermInline,
     ]
 
 class TypeAdmin(admin.ModelAdmin):
