@@ -73,7 +73,7 @@ class TermAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['group']}),
         ('Termin', {'fields': ['dayOfWeek','start_time','end_time']}),
-        ('Miejsce', {'fields': ['classroom']}),
+        ('Miejsce', {'fields': ['classroom','classrooms']}),
     ]
     list_filter = ('dayOfWeek','classroom')
     list_display = ('__unicode__','group')

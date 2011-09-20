@@ -20,7 +20,7 @@ class Term(models.Model):
     end_time = models.TimeField(verbose_name = 'zakończenie')
     classroom = models.ForeignKey('Classroom', verbose_name='sala')
     group = models.ForeignKey('Group', verbose_name='grupa', related_name='term')
-    classrooms = models.ManyToManyField('Classroom', related_name='new_classrooms')
+    classrooms = models.ManyToManyField('Classroom', related_name='new_classrooms', verbose_name='sale')
 
     class Meta:
         #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
