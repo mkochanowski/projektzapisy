@@ -46,7 +46,7 @@
 <div id="enr-course-view">
 
     <h2>{{ course.name }}</h2>
-    <div class="details course-details">
+    <div class="details course-details{% if details_hidden %} hidden{% endif %}">
         <table class="table-info">
             <tr>
                 <th>Rodzaj</th>

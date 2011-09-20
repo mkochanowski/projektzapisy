@@ -251,8 +251,10 @@ def course(request, slug):
             { 'name' : 'Projekt', 'groups' : project, 'type' : 10},
             ]
 
+        courseView_details_hidden = request.COOKIES.get('CourseView-details-hidden', False) == 'true'
         data = prepare_courses_list_to_render(request)
         data.update({
+            'details_hidden': courseView_details_hidden,
             'course' : course,
             'course_json': simplejson.dumps(course.serialize_for_ajax(student)),
             'points' : course.get_points(student),
