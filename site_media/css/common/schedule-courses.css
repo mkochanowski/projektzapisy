@@ -89,8 +89,8 @@
 	background: white;
 	top: 0;
 	left: 0;
-	width: 18px;
 	cursor: default;
+    width: 34px;
 
 	border: 1px solid #666666;
 	border-top: 0;
@@ -121,6 +121,7 @@
 .schedule .term .controls span.pinUnpin
 {
 	background-position: 0 -12px;
+    float: left;
 }
 
 .schedule .term .controls div.loadingIndicator
@@ -129,7 +130,7 @@
 	width: 16px;
 	height: 16px;
 	margin: 1px;
-
+    float:left;
 	background: no-repeat url('/site_media/images/loading-small.gif');
 }
 
