@@ -3,7 +3,6 @@
 from django.db import models
 from django.template.defaultfilters import slugify
 from apps.enrollment.courses.models.points import PointsOfCourses, PointsOfCourseEntities
-from apps.users.models import Employee
 
 from student_options import StudentOptions
 
@@ -51,7 +50,7 @@ class Course( models.Model ):
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     type = models.ForeignKey('Type', verbose_name='rodzaj')
-    teachers = models.ManyToManyField(Employee, verbose_name='prowadzący', blank=True)
+    teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący', blank=True)
     description = models.TextField(verbose_name='opis', blank=True, default='') 
     lectures = models.IntegerField(verbose_name='wykład')
     repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
