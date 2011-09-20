@@ -182,11 +182,11 @@ def course(request, slug):
                 g.terms_list = []
                 
             g.enrolled = enrolled.filter(group=g).count()
-            g.queued = []
+            g.queued = 0
 
             try:
                 for q in queued_list[g.id]:
-                    g.queued.append(q.counted)
+                    g.queued += q.counted
             except KeyError:
                 pass
 
