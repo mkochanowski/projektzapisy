@@ -375,6 +375,7 @@ class StudiaZamawiane(models.Model):
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
+                subject_employee = 'Zmiana numeru konta %s -> %s' % (self.student.matricula, self.bank_account and self.bank_account or '')
                 c = {
                     'site_domain': domain,
                     'site_name': site_name.replace('\n',''),
@@ -389,7 +390,7 @@ class StudiaZamawiane(models.Model):
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
                 
                 send_mail(subject, message_user, None, [self.student.user.email])
-                send_mail(subject, message_employee, None ,emails)
+                send_mail(subject_employee, message_employee, None ,emails)
                 logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
         except:
             pass     
@@ -398,6 +399,9 @@ class StudiaZamawiane(models.Model):
         super(StudiaZamawiane, self).save(*args, **kwargs)
 
     def clean(self):
+        self.bank_account = self.bank_account.upper().replace(' ', '')
+        if not self.bank_account[:2].isalpha():
+            self.bank_account = 'PL' + self.bank_account
         if not StudiaZamawiane.check_iban(self.bank_account):
             raise ValidationError('Podany numer konta nie jest poprawny')
 
@@ -410,6 +414,7 @@ class StudiaZamawiane(models.Model):
     @staticmethod
     def check_iban(number):
         """Checks if given number is valid IBAN"""
+        number = number.replace(' ', '')
         if number is None or number=='':
             return True
         lengths = {'pl': 28}
@@ -417,7 +422,8 @@ class StudiaZamawiane(models.Model):
             return False
         country_code = number[:2].lower()
         if not country_code.isalpha():
-            return False
+            number = 'pl' + number
+            country_code = 'pl'
         valid_length = lengths.get(country_code)
         if valid_length is not None:
             if len(number) != valid_length:

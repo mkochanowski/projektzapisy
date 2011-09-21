@@ -148,7 +148,8 @@ class Group(models.Model):
             'unavailable_limit': 0 if zamawiany else self.limit_zamawiane,
             'enrolled_count': self.get_count_of_enrolled(),
             'unavailable_enrolled_count': 0 if zamawiany else \
-                self.get_count_of_enrolled_zamawiane(),
+                min(self.get_count_of_enrolled_zamawiane(),
+                    self.limit_zamawiane),
             'queued_count': self.get_count_of_queued(),
             'queue_priority': queue_priorities.get(self.pk)
         }

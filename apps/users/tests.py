@@ -119,22 +119,37 @@ class StudentScheduleTest(TestCase):
         	self.assert_(t in [term_1, term_2])
 
 class IBANTest(TestCase):
-   def setUp(self):
-	self.valid_polish = 'PL08109000049916589081209234'
-	self.invalid_polish = 'PL08119000049916589081209234'
-	self.not_alphanum = 'PL0810&000049916589081209234'
-	self.without_country_code = '08109000049916589081209234'
+    def setUp(self):
+        self.not_alphanum = 'PL0810&000049916589081209234'
+        self.invalid_polish = 'PL08119000049916589081209234'
+        self.invalid_without_country_code = '08109000039916589081209234'
+        self.invalid_polish_wrong_length= '0810900003991658908120923'
+        self.valid_polish = 'PL08109000049916589081209234'
+        self.valid_polish_without_country_code = '08109000049916589081209234'
+        self.valid_polish_spaced = '17 1140 2004 0000 3202 5905 0681'
+        self.valid_greece = 'GR16 0110 1250 0000 0001 2300 695'
+        
+    def testWithNotAlphaNumeric(self):
+        self.assertFalse(StudiaZamawiane.check_iban(self.not_alphanum))
 
-   def testWithNotAlphaNumeric(self):
-	self.assertFalse(StudiaZamawiane.check_iban(self.not_alphanum))
+    def testWithInvalidPolish(self):
+        self.assertFalse(StudiaZamawiane.check_iban(self.invalid_polish))
 
-   def testWithoutCountryCode(self):
-	self.assertFalse(StudiaZamawiane.check_iban(self.without_country_code))
+    def testWithInvalidWithoutCountryCode(self):
+        self.assertFalse(StudiaZamawiane.check_iban(self.invalid_without_country_code))
 
-   def testWithInvalidPolish(self):
-	self.assertFalse(StudiaZamawiane.check_iban(self.invalid_polish))
+    def testWithPolishWithWrongLength(self):
+        self.assertFalse(StudiaZamawiane.check_iban(self.invalid_polish_wrong_length))
 
-   def testWithValidPolish(self):
-	self.assert_(StudiaZamawiane.check_iban(self.valid_polish))
-	
+    def testWithValidPolish(self):
+        self.assert_(StudiaZamawiane.check_iban(self.valid_polish))
+
+    def testWithValidSpaced(self):
+        self.assert_(StudiaZamawiane.check_iban(self.valid_polish_spaced))
+
+    def testWithValidPolishWithoutCountryCode(self):
+        self.assert_(StudiaZamawiane.check_iban(self.valid_polish_without_country_code))
+
+    def testWithValidGreece(self):	
+        self.assert_(StudiaZamawiane.check_iban(self.valid_greece))
 
