@@ -379,8 +379,8 @@ class StudiaZamawiane(models.Model):
                     'site_domain': domain,
                     'site_name': site_name.replace('\n',''),
                     'student': self.student,
-                    'old_account' : old_sz.bank_account,
-                    'new_account' : self.bank_account,
+                    'old_account' : old_sz.bank_account and old_sz.bank_account or '',
+                    'new_account' : self.bank_account and self.bank_account or '',
                 }
                 context = Context(c)
                 message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
