@@ -4,14 +4,14 @@ Witamy,
 Na portalu {{ site_domain }} dokonano zmiany numeru konta bankowego studenta.
 
 Dane studenta:
-    - imię i nazwisko: {{ user.get_full_name }}
-    - id użytkownika w bazie: {{ user.id }}
-    - stary numer: {{ old_account }}.
-    - nowy numer: {{ new_account }}.
+    - imię i nazwisko: {{ student.user.get_full_name }}
+    - indeks: {{ student.matricula }}
+    - stary numer konta bankowego: {{ old_account }}
+    - nowy numer konta bankowego: {{ new_account }}
 
 Dziękujemy,
 Zespół {{ site_name }}
 
 ---
-Informacja wygenerowana automatycznie, nie odpowiadaj na nią.
+Informacja została wygenerowana automatycznie, nie odpowiadaj na nią.
 {% endautoescape %}

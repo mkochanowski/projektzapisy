@@ -332,7 +332,7 @@ class Student(BaseUser):
         return self.is_zamawiany_cache
 
     def is_first_year_student(self):
-	return (self.semestr in [1,2]) and (self.program.id in [0,2]) 
+        return (self.semestr in [1,2]) and (self.program.id in [0,2]) 
 
     class Meta:
         verbose_name = 'student'
@@ -364,8 +364,8 @@ class StudiaZamawiane(models.Model):
     """
     student = models.OneToOneField(Student, verbose_name='Student')
     points =  models.FloatField(verbose_name='Punkty', null=True, blank=True)
-    comments = models.TextField(verbose_name='Uwagi', blank=True)
-    bank_account = models.CharField(max_length=40, blank=True, verbose_name="Numer konta bankowego")
+    comments = models.TextField(verbose_name='Uwagi', blank=True, null=True)
+    bank_account = models.CharField(max_length=40, null=True, blank=True, verbose_name="Numer konta bankowego")
 
     def save(self, *args, **kwargs):
         try:
@@ -378,9 +378,9 @@ class StudiaZamawiane(models.Model):
                 c = {
                     'site_domain': domain,
                     'site_name': site_name.replace('\n',''),
-                    'user': self.student.user,
-                    'old_account' : old_sz.bank_account,
-                    'new_account' : self.bank_account,
+                    'student': self.student,
+                    'old_account' : old_sz.bank_account and old_sz.bank_account or '',
+                    'new_account' : self.bank_account and self.bank_account or '',
                 }
                 context = Context(c)
                 message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
@@ -392,7 +392,9 @@ class StudiaZamawiane(models.Model):
                 send_mail(subject, message_employee, None ,emails)
                 logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
         except:
-            pass            
+            pass     
+        if self.bank_account=='':
+            self.bank_account = None
         super(StudiaZamawiane, self).save(*args, **kwargs)
 
     def clean(self):
@@ -402,24 +404,26 @@ class StudiaZamawiane(models.Model):
     @staticmethod
     def _normalize_char(c):
         if c.isalpha():
-	        return str(ord(c.lower()) - ord('a') + 10)
+            return str(ord(c.lower()) - ord('a') + 10)
         return c
 
     @staticmethod
     def check_iban(number):
-	    """Checks if given number is valid IBAN"""
-	    lengths = {'pl': 28}
-	    if not number.isalnum():
-	        return False
-	    country_code = number[:2].lower()
-	    if not country_code.isalpha():
-	        return False
-	    valid_length = lengths.get(country_code)
-	    if valid_length is not None:
-	        if len(number) != valid_length:
-	            return False
-	    code = int(''.join(map(StudiaZamawiane._normalize_char, number[4:] + number[:4])))
-	    return code % 97 == 1	        
+        """Checks if given number is valid IBAN"""
+        if number is None or number=='':
+            return True
+        lengths = {'pl': 28}
+        if not number.isalnum():
+            return False
+        country_code = number[:2].lower()
+        if not country_code.isalpha():
+            return False
+        valid_length = lengths.get(country_code)
+        if valid_length is not None:
+            if len(number) != valid_length:
+                return False
+        code = int(''.join(map(StudiaZamawiane._normalize_char, number[4:] + number[:4])))
+        return code % 97 == 1            
 
     class Meta:
         verbose_name = 'Studia zamawiane'
