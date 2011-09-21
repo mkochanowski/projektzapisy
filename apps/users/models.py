@@ -18,6 +18,10 @@ from fereol import settings
 import logging
 logger = logging.getLogger()
 
+class Related(models.Manager):
+    def get_query_set(self):
+        return super(Related, self).get_query_set().select_related('user')
+
 class BaseUser(models.Model):
     '''
     User abstract class. For every app user there is entry in django.auth.
@@ -34,7 +38,9 @@ class BaseUser(models.Model):
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
     last_news_view = models.DateTimeField(default=datetime.datetime.now())
-        
+
+    objects = Related()
+
     def get_full_name(self):
         return self.user.get_full_name()
     get_full_name.short_description = 'Użytkownik'

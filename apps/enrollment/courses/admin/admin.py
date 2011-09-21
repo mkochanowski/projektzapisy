@@ -21,6 +21,13 @@ class CourseAdmin(admin.ModelAdmin):
     ]
     inlines = [GroupInline, ]
     filter_horizontal = ['requirements']
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(CourseAdmin, self).queryset(request)
+       return qs.select_related('semester', 'type')
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('number', 'capacity', 'building')
@@ -64,10 +71,19 @@ class GroupAdmin(admin.ModelAdmin):
     inlines = [
         TermInline,
     ]
+    list_select_related = True
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(GroupAdmin, self).queryset(request)
+       return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type')
 
 class TypeAdmin(admin.ModelAdmin):
     list_display = ('name','group','meta_type')
     list_filter = ('group','meta_type')
+
 
 class TermAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -78,6 +94,13 @@ class TermAdmin(admin.ModelAdmin):
     list_filter = ('dayOfWeek','classroom')
     list_display = ('__unicode__','group')
     search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(CourseAdmin, self).queryset(request)
+       return qs.select_related('classroom', 'group')
 
 class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
