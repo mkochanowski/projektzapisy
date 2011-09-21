@@ -1,9 +1,12 @@
 {% extends "help/base.html" %}
 
 {% block content %} 
-<h2>Export planu zajęć</h2>
+<h2>Eksport planu zajęć</h2><br/>
 
-Powiedzienie, że można do ical (a co to?, a co z tym zrobię?) i fajnie by było, jakby do pdf też można było :)
-Generalnie powiedzenie, skąd to można zrobić.
+Plan zajęć można wyeksportować do pliku w formacie <a href="http://www.google.com/search?q=iCalendar">iCalendar</a>.<br/>
+Jest to format pliku przechowującego dane kalendarzowe(terminy, plany zajęć). Można go zaimportować do swojej ulubionej aplikacji-organizera.<br/>
+Plik można pobrać w widoku planu zajęć klikając w link <a href="{% url ical %}">Eksportuj do ical</a>.<br/><br/>
+    <img src="/site_media/help/enrollment/enrollment8.png" id="enrollment8" title="Zapisy"/><br/><br/>
+
 
 {% endblock %} 
