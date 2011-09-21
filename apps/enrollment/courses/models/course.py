@@ -37,6 +37,12 @@ class CourseEntity(models.Model):
         else:
             return self.shortName
 
+class Related(models.Manager):
+    """ Manager for course objects with visible semester """
+    def get_query_set(self):
+        """ Returns all courses which have marked semester as visible """
+        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom')
+
 class VisibleManager(models.Manager):
     """ Manager for course objects with visible semester """
     def get_query_set(self):
@@ -70,7 +76,7 @@ class Course( models.Model ):
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method
     
-    objects = models.Manager()
+    objects = Related()
     visible = VisibleManager()
     
     def save(self, *args, **kwargs):

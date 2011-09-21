@@ -8,6 +8,7 @@ from apps.enrollment.records.models import Record
 class GroupInline(admin.TabularInline):
     model = Group
     extra = 0
+    raw_id_fields = ("teacher",)
 
 class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name', 'semester')}
@@ -21,6 +22,14 @@ class CourseAdmin(admin.ModelAdmin):
     ]
     inlines = [GroupInline, ]
     filter_horizontal = ['requirements']
+
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(CourseAdmin, self).queryset(request)
+       return qs.select_related('semester', 'type')
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('number', 'capacity', 'building')
@@ -56,18 +65,30 @@ class TermInline(admin.TabularInline):
     model = Term
     extra = 0
 
+class RecordInline(admin.TabularInline):
+    model = Record
+    extra = 0
+    raw_id_fields = ("student",)
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','get_terms_as_string')
     list_filter = ('type','teacher',)
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
-        TermInline,
+        TermInline,RecordInline
     ]
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(GroupAdmin, self).queryset(request)
+       return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type')
 
 class TypeAdmin(admin.ModelAdmin):
     list_display = ('name','group','meta_type')
     list_filter = ('group','meta_type')
+
 
 class TermAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -78,6 +99,13 @@ class TermAdmin(admin.ModelAdmin):
     list_filter = ('dayOfWeek','classroom')
     list_display = ('__unicode__','group')
     search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(TermAdmin, self).queryset(request)
+       return qs.select_related('classroom', 'group')
 
 class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
