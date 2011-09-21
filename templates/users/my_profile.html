@@ -22,7 +22,7 @@
         {%if zamawiany%}
             <tr>
             <th>numer konta bankowego</th>
-            <td>{{zamawiany.bank_account}}</td>
+            <td>{% if zamawiany.bank_account != None %}{{zamawiany.bank_account}}{% endif %}</td>
         </tr>{%endif%}
 
     {% if user.employee %}
