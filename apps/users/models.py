@@ -375,6 +375,7 @@ class StudiaZamawiane(models.Model):
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
+                subject_employee = 'Zmiana numeru konta %s -> %s' % (self.student.matricula, self.bank_account and self.bank_account or '')
                 c = {
                     'site_domain': domain,
                     'site_name': site_name.replace('\n',''),
@@ -389,7 +390,7 @@ class StudiaZamawiane(models.Model):
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
                 
                 send_mail(subject, message_user, None, [self.student.user.email])
-                send_mail(subject, message_employee, None ,emails)
+                send_mail(subject_employee, message_employee, None ,emails)
                 logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
         except:
             pass     
