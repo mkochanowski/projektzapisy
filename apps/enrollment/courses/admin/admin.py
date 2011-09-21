@@ -8,6 +8,7 @@ from apps.enrollment.records.models import Record
 class GroupInline(admin.TabularInline):
     model = Group
     extra = 0
+    raw_id_fields = ("teacher",)
 
 class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name', 'semester')}
@@ -21,6 +22,7 @@ class CourseAdmin(admin.ModelAdmin):
     ]
     inlines = [GroupInline, ]
     filter_horizontal = ['requirements']
+
     def queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
@@ -63,15 +65,18 @@ class TermInline(admin.TabularInline):
     model = Term
     extra = 0
 
+class RecordInline(admin.TabularInline):
+    model = Record
+    extra = 0
+    raw_id_fields = ("student",)
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','get_terms_as_string')
     list_filter = ('type','teacher',)
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
-        TermInline,
+        TermInline,RecordInline
     ]
-    list_select_related = True
     def queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
@@ -99,7 +104,7 @@ class TermAdmin(admin.ModelAdmin):
        Filter the objects displayed in the change_list to only
        display those for the currently signed in user.
        """
-       qs = super(CourseAdmin, self).queryset(request)
+       qs = super(TermAdmin, self).queryset(request)
        return qs.select_related('classroom', 'group')
 
 class StudentOptionsAdmin(admin.ModelAdmin):
