@@ -31,7 +31,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 class StudiaZamawianeAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','points','comments')
-    search_fields = ('student__user__first_name', 'student__user__last_name', 'student__user__matricula')
+    search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
     ordering = ['student__user__last_name','student__user__first_name']
 
 admin.site.register(Employee, EmployeeAdmin)
