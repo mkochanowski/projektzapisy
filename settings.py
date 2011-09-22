@@ -274,9 +274,12 @@ if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
 
 
-
+### TODO: memcache!!!!
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
+
+### Compressor:
+COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
