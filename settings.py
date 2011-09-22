@@ -147,7 +147,7 @@ MEDIA_ROOT = 'site_media'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/site_media/'
 
 USE_ETAGS = True
 
@@ -203,6 +203,7 @@ INSTALLED_APPS = (
     'haystack',
     'mailer',
     'south',
+    'compressor',
     'apps.enrollment.courses',
     'apps.enrollment.records',
     'apps.news',
@@ -271,3 +272,11 @@ DEBUG_TOOLBAR_CONFIG['SHOW_TOOLBAR_CALLBACK'] = show_toolbar
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
+
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
