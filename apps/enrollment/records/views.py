@@ -10,6 +10,7 @@ from django.utils import simplejson
 from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
+from django.core.cache import cache as mcache
 
 from debug_toolbar.panels.timer import TimerDebugPanel
 from apps.enrollment.courses.models import *
@@ -388,38 +389,55 @@ def schedule_prototype(request):
     StudentOptions.preload_cache(student, default_semester)
     TimerDebugPanel.timer_stop('preload_cache')
 
-    TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')
-    courses = prepare_courses_with_terms(\
-        Term.get_all_in_semester(default_semester))
-    for course in courses:
-        course['info'].update({
-            'is_recording_open': course['object'].\
-                is_recording_open_for_student(student),
-            #TODO: kod w prepare_courses_list_to_render moim zdaniem nie
-            #      zadziała
-            'was_enrolled': 'False',
-	    'english': course['object'].english,
-	    'exam': course['object'].exam,
-	    'suggested_for_first_year': course['object'].suggested_for_first_year,
-        })
-        for term in course['terms']:
-            term.update({ # TODO: do szablonu
-                'json': simplejson.dumps(term['info'])
+    TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')    
+    cached_courses = mcache.get('schedule_prototype_courses', 'DoesNotExist')
+    if cached_courses == 'DoesNotExist':
+        courses = prepare_courses_with_terms(\
+            Term.get_all_in_semester(default_semester))
+        for course in courses:
+            course['info'].update({
+                'is_recording_open': course['object'].\
+                    is_recording_open_for_student(student),
+                #TODO: kod w prepare_courses_list_to_render moim zdaniem nie
+                #      zadziała
+                'was_enrolled': 'False',
+	        'english': course['object'].english,
+	        'exam': course['object'].exam,
+	        'suggested_for_first_year': course['object'].suggested_for_first_year,
             })
+            for term in course['terms']:
+                term.update({ # TODO: do szablonu
+                    'json': simplejson.dumps(term['info'])
+                })
+        mcache.set('schedule_prototype_courses', courses)
+        cached_courses = courses
+               
     TimerDebugPanel.timer_stop('data_prepare')
 
     TimerDebugPanel.timer_start('json_prepare_1', 'Przygotowywanie JSON - st1')
-    all_groups = Group.get_groups_by_semester(default_semester)
+    
+    cached_all_groups = mcache.get('schedule_prototype_all_groups', 'DoesNotExist')
+    if cached_all_groups == 'DoesNotExist':        
+        cached_all_groups = Group.get_groups_by_semester(default_semester)
+        mcache.set('schedule_prototype_all_groups', cached_all_groups)
+        
+        mcache.delete('schedule_prototype_courses_json')        
+        
     TimerDebugPanel.timer_stop('json_prepare_1')
     TimerDebugPanel.timer_start('json_prepare_2', 'Przygotowywanie JSON - st2')
-    all_groups_json = prepare_groups_json(default_semester, all_groups, \
+    all_groups_json = prepare_groups_json(default_semester, cached_all_groups, \
         student=student)
     TimerDebugPanel.timer_stop('json_prepare_2')
 
+    cached_courses_json = mcache.get('schedule_prototype_courses_json', 'DoesNotExist')
+    if cached_courses_json == 'DoesNotExist':
+        cached_courses_json = prepare_courses_json(cached_all_groups, student)
+        mcache.set('schedule_prototype_courses_json', cached_courses_json)
+        
     data = {
-        'courses_json': prepare_courses_json(all_groups, student),
+        'courses_json': cached_courses_json,
         'groups_json': all_groups_json,
-        'courses' : courses,
+        'courses' : cached_courses,
         'semester' : default_semester,
         'types_list' : Type.get_all_for_jsfilter(),
         'priority_limit': settings.QUEUE_PRIORITY_LIMIT

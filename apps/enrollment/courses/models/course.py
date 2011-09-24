@@ -1,12 +1,14 @@
 # -*- coding: utf8 -*-
 
+from datetime import timedelta, datetime
+
 from django.db import models
 from django.template.defaultfilters import slugify
+from django.db.models import signals
+from django.core.cache import cache as mcache
+
 from apps.enrollment.courses.models.points import PointsOfCourses, PointsOfCourseEntities
-
 from student_options import StudentOptions
-
-from datetime import timedelta, datetime
 
 import logging
 logger = logging.getLogger()
@@ -219,4 +221,11 @@ class Course( models.Model ):
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.get_semester_name())
-		
+
+def recache(sender, **kwargs):
+    mcache.delete('schedule_prototype_courses')
+    mcache.delete('schedule_prototype_all_groups')
+    mcache.delete('schedule_prototype_courses_json')
+    
+signals.post_save.connect(recache)        
+signals.post_delete.connect(recache)	

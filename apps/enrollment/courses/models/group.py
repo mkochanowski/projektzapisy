@@ -3,6 +3,7 @@
 from django.db import models
 from django.db.models import signals
 from django.db.models import Count
+from django.core.cache import cache as mcache
 
 from course import *
 
@@ -207,3 +208,13 @@ def log_delete_group(sender, instance, **kwargs):
 signals.pre_save.connect(log_limits_change, sender=Group)        
 signals.post_save.connect(log_add_group, sender=Group)                               
 signals.post_delete.connect(log_delete_group, sender=Group)
+
+def recache(sender, **kwargs):
+    if Group.disable_update_signal:
+        return
+    mcache.delete('schedule_prototype_courses')
+    mcache.delete('schedule_prototype_all_groups')
+    mcache.delete('schedule_prototype_courses_json')
+    
+signals.post_save.connect(recache, sender=Group)        
+signals.post_delete.connect(recache, sender=Group)	
