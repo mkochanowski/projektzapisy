@@ -212,9 +212,8 @@ signals.post_delete.connect(log_delete_group, sender=Group)
 def recache(sender, **kwargs):
     if Group.disable_update_signal:
         return
-    mcache.delete('schedule_prototype_courses')
-    mcache.delete('schedule_prototype_all_groups')
-    mcache.delete('schedule_prototype_courses_json')
+    mcache.clear()
+
     
 signals.post_save.connect(recache, sender=Group)        
 signals.post_delete.connect(recache, sender=Group)	

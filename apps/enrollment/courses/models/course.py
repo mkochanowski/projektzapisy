@@ -223,9 +223,7 @@ class Course( models.Model ):
         return '%s (%s)' % (self.name, self.get_semester_name())
 
 def recache(sender, **kwargs):
-    mcache.delete('schedule_prototype_courses')
-    mcache.delete('schedule_prototype_all_groups')
-    mcache.delete('schedule_prototype_courses_json')
+    mcache.clear()
     
 signals.post_save.connect(recache)        
 signals.post_delete.connect(recache)	

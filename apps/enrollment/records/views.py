@@ -390,7 +390,7 @@ def schedule_prototype(request):
     TimerDebugPanel.timer_stop('preload_cache')
 
     TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')    
-    cached_courses = mcache.get('schedule_prototype_courses', 'DoesNotExist')
+    cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), 'DoesNotExist')
     if cached_courses == 'DoesNotExist':
         courses = prepare_courses_with_terms(\
             Term.get_all_in_semester(default_semester))
@@ -409,19 +409,18 @@ def schedule_prototype(request):
                 term.update({ # TODO: do szablonu
                     'json': simplejson.dumps(term['info'])
                 })
-        mcache.set('schedule_prototype_courses', courses)
         cached_courses = courses
-               
+        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), cached_courses)        
+                   
     TimerDebugPanel.timer_stop('data_prepare')
 
     TimerDebugPanel.timer_start('json_prepare_1', 'Przygotowywanie JSON - st1')
     
-    cached_all_groups = mcache.get('schedule_prototype_all_groups', 'DoesNotExist')
+    cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')   
     if cached_all_groups == 'DoesNotExist':        
+        mcache.delete("schedule_prototype_courses_json_%s" % student.id)        
         cached_all_groups = Group.get_groups_by_semester(default_semester)
-        mcache.set('schedule_prototype_all_groups', cached_all_groups)
-        
-        mcache.delete('schedule_prototype_courses_json')        
+        mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)                
         
     TimerDebugPanel.timer_stop('json_prepare_1')
     TimerDebugPanel.timer_start('json_prepare_2', 'Przygotowywanie JSON - st2')
@@ -429,10 +428,10 @@ def schedule_prototype(request):
         student=student)
     TimerDebugPanel.timer_stop('json_prepare_2')
 
-    cached_courses_json = mcache.get('schedule_prototype_courses_json', 'DoesNotExist')
+    cached_courses_json = mcache.get("schedule_prototype_courses_json_%s" % student.id, 'DoesNotExist')
     if cached_courses_json == 'DoesNotExist':
         cached_courses_json = prepare_courses_json(cached_all_groups, student)
-        mcache.set('schedule_prototype_courses_json', cached_courses_json)
+        mcache.set("schedule_prototype_courses_json_%s" % student.id, cached_courses_json)
         
     data = {
         'courses_json': cached_courses_json,

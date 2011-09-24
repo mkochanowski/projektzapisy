@@ -109,9 +109,7 @@ signals.post_save.connect(log_add_term, sender=Term)
 signals.pre_delete.connect(log_delete_term, sender=Term)  
 
 def recache(sender, **kwargs):
-    mcache.delete('schedule_prototype_courses')
-    mcache.delete('schedule_prototype_all_groups')
-    mcache.delete('schedule_prototype_courses_json')
+    mcache.clear()
     
 signals.post_save.connect(recache, sender=Term)        
 signals.post_delete.connect(recache, sender=Term)	
