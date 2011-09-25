@@ -38,7 +38,7 @@ def prepare_courses_with_terms(terms, records = None):
         term_info = {
             'id': term.pk,
             'group': term.group.pk,
-            'classroom': term.classroom.number or 0,
+            'classroom': ', '.join(map(lambda x: x.number, term.classrooms.all())),
             'day': int(term.dayOfWeek),
             'start_time': [term.start_time.hour, term.start_time.minute],
             'end_time': [term.end_time.hour, term.end_time.minute],

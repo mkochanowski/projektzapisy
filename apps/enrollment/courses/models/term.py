@@ -44,7 +44,7 @@ class Term(models.Model):
             from apps.enrollment.records.models import Record
             filtered = filtered.filter(group__teacher=employee)
             
-        return filtered.select_related('classroom', 'group', 'group__course', \
+        return filtered.select_related('classroom', 'classrooms', 'group', 'group__course', \
             'group__course__semester', 'group__course__entity',
             'group__course__type', \
             'group__teacher', 'group__teacher__user').\
@@ -79,7 +79,8 @@ class Term(models.Model):
         return { '1': 'pn', '2': 'wt', '3': 'śr', '4': 'cz', '5': 'pt', '6': 'so', '7': 'nd'}[self.dayOfWeek].decode('utf8')
         
     def __unicode__(self):
-        return "%s %s-%s (s.%s)" % (self.get_dayOfWeek_display_short(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), self.classroom.number)
+        classrooms = ', '.join(map(lambda x: x.number, self.classrooms.all()))
+        return "%s %s-%s (s.%s)" % (self.get_dayOfWeek_display_short(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), classrooms)
 
 def log_edit_term(sender, instance, **kwargs):
     try:
