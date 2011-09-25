@@ -617,15 +617,24 @@ class Queue(models.Model):
     def remove_student_low_priority_records(user_id, group_id, priority) :
         """ Funkcja, która czyści kolejkę z wpisów do grup z tego samego przedmiotu o tym samym rodzaju ale mniejszym priorytecie"""
         user = User.objects.get(id = user_id)
-        try :
+        try:
+
+            """ Pobranie listy grup z tego samego przedmiotu i tego samego typu, na które próbuje się zapisać student"""
+            """ Dalej są jakieś herezje, imho powinno być:
+            group = Group.objects.get(id = group_id).select_related('course')
+            queued = Queue.queued.filter(student=user.student, group__course=group.course, group__type=group.type).select_related('group') #jedno zapytanie zamiast kilkudziesieciu!!!!
+                for queue in queued:
+                    if queue.priority <= priority:
+                        logger.info('User %s <id: %s> is now removed from queue of group "%s" <id: %s> because of low priority (%s)' % (user.username, user.id, queue.group, queue.group.id, priority))
+                        Queue.remove_student_from_queue(user_id,q_g.id)
+            """
             student = user.student
             group = Group.objects.get(id = group_id)
             course = Course.objects.get(slug = group.course_slug())
-            """ Pobranie listy grup z tego samego przedmiotu i tego samego typu, na które próbuje się zapisać student"""
             queued_group = [g for g in Queue.get_groups_for_student(user) if g.course == course and g.type == group.type]
             """ Usunięcie wszystkich wpisów z kolejki, które są na liście queued_group i posiadają niższy priorytet od zadanego"""
             for q_g in queued_group :
-                record = Queue.queued.get(student = student,group = q_g)
+                record = Queue.queued.get(student = student,group = q_g) #WTF?!
                 if (record.priority <= priority) :
                     logger.info('User %s <id: %s> is now removed from queue of group "%s" <id: %s> because of low priority (%s)' % (user.username, user.id, q_g, q_g.id, priority))
                     Queue.remove_student_from_queue(user_id,q_g.id)

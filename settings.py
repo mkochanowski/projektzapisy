@@ -203,7 +203,7 @@ INSTALLED_APPS = (
     'haystack',
     'mailer',
     'south',
-    'compressor',
+#    'compressor',
     'apps.enrollment.courses',
     'apps.enrollment.records',
     'apps.news',
