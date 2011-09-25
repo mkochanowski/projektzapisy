@@ -166,7 +166,7 @@ def course(request, slug):
 
         terms_list = {}
 
-        terms = Term.objects.filter(group__in=groups_ids).select_related('classroom', 'group')
+        terms = Term.objects.filter(group__in=groups_ids).select_related('classroom', 'group','classrooms')
 
         for term in terms:
             if term.group.id in terms_list:
