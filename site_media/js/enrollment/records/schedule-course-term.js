@@ -90,10 +90,12 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 			appendTo(this.container).attr('title',
 			this.group.getTypeName(true));
 
-		this._classroomLabel = $.create('span', {className: 'classroom'}).
-			appendTo(this.container);
 		if (this.classroom)
+		{
+			this._classroomLabel = $.create('span', {className: 'classroom'}).
+				appendTo(this.container);
 			this._classroomLabel.text('s. ' + this.classroom);
+		}
 
 		this._controlsBox = null;
 		if (this.displayStyle ==
@@ -183,9 +185,10 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 		$.create('p', {className: 'teacher'}).text('Prowadzący: ').
 			appendTo(this.popupContents).append($.create('span').text(this.group.teacherName));
     }
-	$.create('p', {className: 'classroom'}).text(
-		'Sala: ' + this.classroom
-	).appendTo(this.popupContents);
+	if (this.classroom)
+		$.create('p', {className: 'classroom'}).text(
+			'Sala: ' + this.classroom
+		).appendTo(this.popupContents);
 
 	if (this.displayStyle ==
 		Fereol.Enrollment.ScheduleCourseTerm.DisplayStyle.PROTOTYPE)
@@ -297,14 +300,15 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._onResize = function(isFullSize)
 {
 	var CLASSROOM_PADDING = 2;
 
-	this._classroomLabel.css({
-		left: (this._classroomLabel.parent().innerWidth() -
-			CLASSROOM_PADDING * 2 -
-			this._classroomLabel.width()) + 'px',
-		top: (this._classroomLabel.parent().innerHeight() -
-			this._classroomLabel.height() -
-			CLASSROOM_PADDING) + 'px'
-	});
+	if (this.classroom)
+		this._classroomLabel.css({
+			left: (this._classroomLabel.parent().innerWidth() -
+				CLASSROOM_PADDING * 2 -
+				this._classroomLabel.width()) + 'px',
+			top: (this._classroomLabel.parent().innerHeight() -
+				this._classroomLabel.height() -
+				CLASSROOM_PADDING) + 'px'
+		});
 
 	this._typeLabel.text(this.group.getTypeName(isFullSize)).css({
 		top: (this._typeLabel.parent().innerHeight() -
