@@ -319,8 +319,10 @@ def logout(request):
 def login_plus_remember_me(request, *args, **kwargs):
     ''' funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika'''
     if request.method == 'POST':
-        if not request.POST.get('remember_me', None):
-            request.session.set_expiry(0)
+        if request.POST.get('remember_me', None):
+            request.session.set_expiry(datetime.timedelta(14))
+        else:
+            request.session.set_expiry(0) # on browser close
     return login(request, *args, **kwargs)
     
 @login_required
