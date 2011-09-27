@@ -10,6 +10,9 @@ UserScheduleView = new Object();
 
 UserScheduleView.init = function()
 {
+	if ($('div#student-profile > table.table-info').length == 0)
+		return;
+
 	UserScheduleView.initGroups();
 
 	var scheduleContainer = $('#user-schedule-scheduleContainer').assertOne();
