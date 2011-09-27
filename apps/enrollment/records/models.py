@@ -21,7 +21,7 @@ from itertools import cycle
 
 from django.db.models import signals
 #from django.dispatch import receiver
-from settings import ECTS_LIMIT_DURATION, ECTS_LIMIT
+from settings import ECTS_LIMIT
 
 from apps.enrollment.utils import mail_enrollment_from_queue
 
@@ -523,7 +523,7 @@ class Queue(models.Model):
             semester = Semester.get_default_semester()
             student = user.student
             """ Sprawdzenie, czy obowiązuje jeszcze limit ECTS"""
-            if group.course.semester.records_opening + timedelta(days=ECTS_LIMIT_DURATION) < datetime.now():
+            if group.course.semester.records_ects_limit_abolition < datetime.now():
                 return False
             """ Obliczenie sumy punktów ECTS"""
             groups = map(lambda x: x.group, \
