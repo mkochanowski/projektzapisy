@@ -94,11 +94,10 @@ def set_enrolled(request, method):
 
     def prepare_group_data(course, student):
         groups = course.groups.all()
-        queued = Queue.queued.filter(group__course=course)
+        queued = Queue.queued.filter(group__course=course, student=student)
         enrolled_ids = Record.enrolled.filter(group__course=course, \
             student=student).values_list('group__id', flat=True)
-        queued_ids = queued.filter(student=student). \
-            values_list('group__id', flat=True)
+        queued_ids = queued.values_list('group__id', flat=True)
         pinned_ids = Record.pinned.filter(group__course=course, \
             student=student).values_list('group__id', flat=True)
         queue_priorities = Queue.queue_priorities_map(queued)
