@@ -22,6 +22,7 @@ class Semester( models.Model ):
     semester_ending = models.DateField(null = False, verbose_name='Data zakończenia semestru')
 
     is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna' )
+    records_ects_limit_abolition = models.DateTimeField(null = True, verbose_name='Czas zniesienia limitu 40 ECTS') 
 
     def get_courses(self):
         """ gets all courses linked to semester """

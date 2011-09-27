@@ -41,7 +41,7 @@ class SemesterAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['year','type','visible']}),
         ('Czas trwania semestru', {'fields': ['semester_beginning','semester_ending']}),
-        ('Czas trwania zapisów', {'fields': ['records_opening','records_closing']}),
+        ('Czas trwania zapisów', {'fields': ['records_opening','records_ects_limit_abolition','records_closing']}),
     ]
     list_editable = ('visible',)
 
