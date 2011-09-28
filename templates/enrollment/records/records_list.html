@@ -154,6 +154,7 @@
 					{% endfor %}
 				</tbody>
 			</table>
+			<a href="mailto:{% for student in students_in_queue %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do kolejki]</a>
 		{% endif %}
 	</div>
 {% endblock %}
