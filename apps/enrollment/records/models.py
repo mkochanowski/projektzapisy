@@ -523,7 +523,8 @@ class Queue(models.Model):
             semester = Semester.get_default_semester()
             student = user.student
             """ Sprawdzenie, czy obowiązuje jeszcze limit ECTS"""
-            if group.course.semester.records_ects_limit_abolition < datetime.now():
+            limit_abortion_date = group.course.semester.records_ects_limit_abolition
+            if limit_abortion_date and limit_abortion_date < datetime.now():
                 return False
             """ Obliczenie sumy punktów ECTS"""
             groups = map(lambda x: x.group, \
