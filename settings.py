@@ -268,11 +268,6 @@ def show_toolbar(request):
 
 DEBUG_TOOLBAR_CONFIG['SHOW_TOOLBAR_CALLBACK'] = show_toolbar
 
-local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
-if os.path.isfile(local_settings_file):
-    execfile(local_settings_file)
-
-
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
@@ -287,3 +282,8 @@ CACHES = {
 
 ### Compressor:
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
+
+
+local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
+if os.path.isfile(local_settings_file):
+    execfile(local_settings_file)
