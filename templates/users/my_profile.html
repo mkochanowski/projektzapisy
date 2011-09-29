@@ -58,17 +58,21 @@
     {% endif %}
 {% endif %}
 
-{% if zamawiany %}<br/>
+{% if zamawiany %}
 <h4>Studia zamawiane</h4>
-    {% if comments %}
-{{ comments|safe }}
-    {% else %}
-        Brak informacji
-    {% endif %}
+        <table class="table-info">
+            <tr>
+                <th>Punkty</th>
+                <td>{% if points %}{{points}}{% endif %}</td>
+            </tr>
+            <tr>
+                <th>Uwagi</th>
+                <td>{{ comments|safe }}</td>
+            </tr>            
+        </table>
 {% endif %}
 
 {% if user.student %}
-<br/>
 <h4>Moje studia</h4>
      <table class="table-info">
         <tr>

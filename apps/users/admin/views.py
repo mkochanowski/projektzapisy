@@ -11,6 +11,9 @@ from tempfile import NamedTemporaryFile
 import os
 from apps.users.models import StudiaZamawiane
 
+FEREOL_PATH = os.getcwd()
+path.append(FEREOL_PATH + '/dbimport/zamawiani')
+from import_zamawiani_info import importzamawianiinfo
 
 class ZamawianiImportForm(forms.Form):
     file = forms.FileField(max_length=255, label='Plik z danymi')
@@ -29,7 +32,7 @@ def import_zamawiani(request):
             zamawianifile.seek(0)
             try: 
                 pass
-                #scheduleimport(schedulefile)
+                importzamawianiinfo(zamawianifile)
             except Exception:
                 errormsg = unicode(exc_info()[0]) + ' ' + unicode(exc_info()[1]) + '\n\n'
                 errormsg += u'Traceback:\n'
