@@ -33,6 +33,7 @@ urlpatterns = patterns('',
     (r'^fereol_admin/courses/import_schedule', 'apps.enrollment.courses.admin.views.import_schedule'),
     (r'^fereol_admin/users/export_zamawiani', 'apps.users.admin.views.export_zamawiani'),
     (r'^fereol_admin/users/import_zamawiani', 'apps.users.admin.views.import_zamawiani'),
+    (r'^fereol_admin/users/import_new_zamawiani', 'apps.users.admin.views.import_new_zamawiani'),
     (r'^fereol_admin/', include(admin.site.urls)),
 
 )

@@ -4,11 +4,12 @@
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="/fereol_admin/">
 {% trans "Home" %}</a> > <a href="/fereol_admin/users/">Users</a> > Import studentów zamawianych</div>{% endblock %}
 
-{% block title %}Import planu semestru{% endblock %}
+{% block title %}Import studentów zamawianych{% endblock %}
 
 {% block content %}
+{{action}}
 <div id="content-main">
-    <form enctype="multipart/form-data" action="/fereol_admin/users/import_zamawiani/" method="post">
+    <form enctype="multipart/form-data" action="{{action}}" method="post">
         {{ form.as_p }}
         <input type="submit" value="Importuj" />
     </form>
