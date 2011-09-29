@@ -205,7 +205,7 @@
 
 #enr-course-view .tutorial td.controls .setEnrolledButton
 {
-	width: 120px;
+	width: 110px;
 	vertical-align: middle;
 	white-space: normal;
 }
@@ -230,7 +230,7 @@
 
 #enr-course-view .tutorial table td.priority select
 {
-	width: 35px;
+	width: 45px;
 }
 
 #enr-course-view .tutorial table td.priority
