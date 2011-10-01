@@ -139,7 +139,7 @@
     {% for tutorial in tutorials %}{% if tutorial.groups %}
         <div class="tutorial">
             <h2>{{ tutorial.name }} {% if user.is_staff %}&nbsp;&nbsp; 
-            <small>(Studenci w grupach: {{tutorial.statistics.in_group}}, studenci bez grupy: {{tutorial.statistics.in_queue}})</small>{% endif %}</h2>
+            <small class='right'>(Studenci w grupach: {{tutorial.statistics.in_group}}, studenci bez grupy: {{tutorial.statistics.in_queue}})</small>{% endif %}</h2>
             <input type="hidden" name="tutorial-type" value="{{ tutorial.type }}"/>
             <table class="zebra-striped">
                 <thead>
