@@ -24,7 +24,7 @@ def import_zamawiani_info(file):
             points = line[1]
             comments = line[2]
         except:
-            raise ImportError('Błędny format danych w lini %s' % (i,))
+            raise ImportError('Bledny format danych w lini %s' % (i,))
         
         try:
             student = Student.objects.get(matricula=matricula)

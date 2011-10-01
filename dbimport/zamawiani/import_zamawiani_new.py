@@ -18,7 +18,7 @@ def import_zamawiani_new(file):
         if re.sub('\s','',matricula)=='':
             continue
         if len(matricula)!=6:
-            raise ImportError('Niepoprawny indeks długosci rożnej od 6: %s' % (matricula,))
+            raise ImportError('Niepoprawny indeks dlugosci roznej od 6: %s' % (matricula,))
         if re.sub('\d','',matricula)!='':
             raise ImportError('Niepoprawne znaki w indeksie %s' % (matricula,))
              
