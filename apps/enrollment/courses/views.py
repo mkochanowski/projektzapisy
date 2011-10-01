@@ -238,17 +238,51 @@ def course(request, slug):
         language.name = "Lektorat"
         sport.name = "Zajęcia"'''
 
+        statistics = {}
+        for group_type in xrange(1,11):
+            statistics[str(group_type)] = {"in_group": 0, "in_queue": 0}  
+
+        if request.user.is_staff:
+            from django.db import connection
+            cursor = connection.cursor()
+            statistics_sql = """
+                SELECT type, SUM(s), COUNT(s) FROM
+                (
+                    SELECT type, student_id, MAX(rodzaj) as s FROM 
+                    ( 
+                            SELECT records_record.student_id, courses_group."type", 1 as rodzaj FROM courses_group
+                            JOIN records_record ON (records_record.group_id = courses_group.id)
+                            WHERE records_record.status = '1' AND courses_group.course_id = %s
+                        UNION
+                            SELECT DISTINCT records_queue.student_id, courses_group."type", 0 as rodzaj FROM courses_group
+                            JOIN records_queue ON (records_queue.group_id = courses_group.id)
+                            WHERE courses_group.course_id = %s
+                    ) AS r
+                    GROUP BY type, student_id
+                ) AS p
+                GROUP BY type
+            """
+            cursor.execute(statistics_sql, [course.id, course.id])
+            for row in cursor.fetchall():
+                try:
+                    statistics[str(row[0])] = {"in_group": row[1], "in_queue": row[2]}
+                except:
+                    pass
+            
+            
+            
+
         tutorials = [
-            { 'name' : 'Wykłady', 'groups' : lectures, 'type' : 1},
-            { 'name' : 'Repetytorium', 'groups' : repertory, 'type' : 9},
-            { 'name' : 'Ćwiczenia', 'groups' : exercises, 'type' : 2},
-            { 'name' : 'Pracownia', 'groups' : laboratories, 'type' : 3},
-            { 'name' : 'Ćwiczenia (poziom zaawansowany)', 'groups' : exercises_adv, 'type' : 4},
-            { 'name' : 'Ćwiczenio-pracownie', 'groups' : exer_labs, 'type' : 5},
-            { 'name' : 'Seminarium', 'groups' : seminar, 'type' : 6},
-            { 'name' : 'Lektorat', 'groups' : language, 'type' : 7},
-            { 'name' : 'Zajęcia sportowe', 'groups' : sport, 'type' : 8},
-            { 'name' : 'Projekt', 'groups' : project, 'type' : 10},
+            { 'name' : 'Wykłady', 'groups' : lectures, 'type' : 1, 'statistics':statistics['1']},
+            { 'name' : 'Repetytorium', 'groups' : repertory, 'type' : 9, 'statistics':statistics['9']},
+            { 'name' : 'Ćwiczenia', 'groups' : exercises, 'type' : 2, 'statistics':statistics['2']},
+            { 'name' : 'Pracownia', 'groups' : laboratories, 'type' : 3, 'statistics':statistics['3']},
+            { 'name' : 'Ćwiczenia (poziom zaawansowany)', 'groups' : exercises_adv, 'type' : 4, 'statistics':statistics['4']},
+            { 'name' : 'Ćwiczenio-pracownie', 'groups' : exer_labs, 'type' : 5, 'statistics':statistics['5']},
+            { 'name' : 'Seminarium', 'groups' : seminar, 'type' : 6, 'statistics':statistics['6']},
+            { 'name' : 'Lektorat', 'groups' : language, 'type' : 7, 'statistics':statistics['7']},
+            { 'name' : 'Zajęcia sportowe', 'groups' : sport, 'type' : 8, 'statistics':statistics['8']},
+            { 'name' : 'Projekt', 'groups' : project, 'type' : 10, 'statistics':statistics['10']},
             ]
 
         courseView_details_hidden = request.COOKIES.get('CourseView-details-hidden', False) == 'true'
