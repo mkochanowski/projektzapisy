@@ -246,7 +246,7 @@ def course(request, slug):
             from django.db import connection
             cursor = connection.cursor()
             statistics_sql = """
-                SELECT type, SUM(s), COUNT(s) FROM
+                SELECT type, SUM(s), COUNT(*) FROM
                 (
                     SELECT type, student_id, MAX(rodzaj) as s FROM 
                     ( 
