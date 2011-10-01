@@ -3,7 +3,7 @@
 
 	<table class="table-info">
 		<tr>
-			<th>adres email</th>
+			<th>Adres email</th>
 			<td>
 				{% if student.user.email %}
 					<a href="mailto:{{student.user.email}}">
@@ -14,10 +14,24 @@
 				{% endif %}
 			</td>
 		</tr>
-		<tr>
-			<th>punkty ECTS</th>
-			<td>{{student.ects}}</td>
-		</tr>
+        <tr>
+            <th>Nr indeksu</th>
+            <td>{{student.matricula}}</td>
+        </tr>	
+        <tr>
+            <th>Rodzaj studiów</th>
+            <td>{{student.program}}</td>
+        </tr>
+        <tr>
+            <th>Semestr</th>
+            <td>{{student.semestr}}</td>
+        </tr>
+        {% if user.is_staff %}
+        <tr>
+            <th>Punkty ECTS</th>
+            <td>{{student.ects}}</td>
+        </tr>        
+        {% endif %}
 	</table>
 
 	<h3>Plan zajęć:</h3>
