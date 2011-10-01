@@ -14,7 +14,7 @@
     <li{% block enrollment_menu_prototype %}{% endblock %}><a
             href="/records/schedule/prototype/">Prototyp planu</a></li>{% endif %}
     <li{% block enrollment_menu_employees %}{% endblock %}><a href="/users/employees/">Pracownicy</a>
-    </li>{% if user.student or user.employee %}
+    </li>{% if user.student or user.employee or user.is_staff %}
     <li{% block enrollment_menu_students %}{% endblock %}><a href="/users/students/">Studenci</a>
     </li>{% endif %}
     {# end system_menu #}
