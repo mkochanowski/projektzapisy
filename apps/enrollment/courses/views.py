@@ -246,7 +246,7 @@ def course(request, slug):
             from django.db import connection
             cursor = connection.cursor()
             statistics_sql = """
-                SELECT type, SUM(s), COUNT(*) FROM
+                SELECT type, SUM(s), COUNT(s) FROM
                 (
                     SELECT type, student_id, MAX(rodzaj) as s FROM 
                     ( 
@@ -265,7 +265,7 @@ def course(request, slug):
             cursor.execute(statistics_sql, [course.id, course.id])
             for row in cursor.fetchall():
                 try:
-                    statistics[str(row[0])] = {"in_group": row[1], "in_queue": row[2]}
+                    statistics[str(row[0])] = {"in_group": row[1], "in_queue": row[2]-row[1]}
                 except:
                     pass
             
