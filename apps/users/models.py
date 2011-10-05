@@ -415,7 +415,7 @@ class StudiaZamawiane(models.Model):
     def check_iban(number):
         """Checks if given number is valid IBAN"""
         number = number.replace(' ', '')
-        if number is None or number=='':
+        if number=='PL' or number=='' or number is None:
             return True
         lengths = {'pl': 28}
         if not number.isalnum():
