@@ -370,7 +370,7 @@ class StudiaZamawiane(models.Model):
     def save(self, *args, **kwargs):
         try:
             old_sz = StudiaZamawiane.objects.get(id=self.id)
-            if self.bank_account != old_sz.bank_account:
+            if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
                 Site = cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
