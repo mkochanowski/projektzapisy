@@ -18,6 +18,8 @@ from fereol import settings
 import logging
 logger = logging.getLogger()
 
+EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
+
 class Related(models.Manager):
     def get_query_set(self):
         return super(Related, self).get_query_set().select_related('user')
@@ -91,6 +93,7 @@ class Employee(BaseUser):
     consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
     homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
+    status = models.PositiveIntegerField(default=0, choices=EMPLOYEE_STATUS_CHOICES, verbose_name="Status")
         
     def has_privileges_for_group(self, group_id):
         """
@@ -114,14 +117,14 @@ class Employee(BaseUser):
             except ValueError:
                 return chr(90)
         if begin == 'Z':
-            return Employee.objects.filter(user__last_name__gte=begin).\
+            return Employee.objects.filter(user__last_name__gte=begin, status=0).\
                     select_related().order_by('user__last_name', 'user__first_name')
         elif begin == 'All':
-            return Employee.objects.all().\
+            return Employee.objects.filter(status=0).\
                     select_related().order_by('user__last_name', 'user__first_name')
         else:
             end = next_char(begin)
-            return Employee.objects.filter(user__last_name__range=(begin, end)).\
+            return Employee.objects.filter(user__last_name__range=(begin, end), status=0).\
                     select_related().order_by('user__last_name', 'user__first_name')
 
 

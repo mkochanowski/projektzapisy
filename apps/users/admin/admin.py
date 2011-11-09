@@ -23,7 +23,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('get_full_name','homepage','room','consultations',)
     search_fields = ('user__first_name', 'user__last_name', 'user__username')
     fieldsets = [
-        (None,               {'fields': ['user','homepage','room','consultations']}),
+        (None,               {'fields': ['user','status','homepage','room','consultations']}),
         ('Ogłoszenia mailowe', {'fields': ['receive_mass_mail_enrollment','receive_mass_mail_offer'], 'classes': ['collapse']}),
     ]
     ordering = ['user__last_name','user__first_name']
