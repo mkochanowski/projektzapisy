@@ -21,6 +21,7 @@ class StudentAdmin(admin.ModelAdmin):
         
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('get_full_name','homepage','room','consultations',)
+    list_filter = ('status',)
     search_fields = ('user__first_name', 'user__last_name', 'user__username')
     fieldsets = [
         (None,               {'fields': ['user','status','homepage','room','consultations']}),
