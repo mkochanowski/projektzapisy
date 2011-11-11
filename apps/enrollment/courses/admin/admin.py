@@ -94,9 +94,9 @@ class TermAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['group']}),
         ('Termin', {'fields': ['dayOfWeek','start_time','end_time']}),
-        ('Miejsce', {'fields': ['classroom','classrooms']}),
+        ('Miejsce', {'fields': ['classrooms',]}),
     ]
-    list_filter = ('dayOfWeek','classroom')
+    list_filter = ('dayOfWeek',)
     list_display = ('__unicode__','group')
     search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
     def queryset(self, request):
@@ -105,7 +105,7 @@ class TermAdmin(admin.ModelAdmin):
        display those for the currently signed in user.
        """
        qs = super(TermAdmin, self).queryset(request)
-       return qs.select_related('classroom', 'group')
+       return qs.select_related('classrooms', 'group')
 
 class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
