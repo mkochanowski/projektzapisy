@@ -4,7 +4,20 @@ from django.contrib import admin
 from django import forms
 from django.contrib.auth.models import User
 
-from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow
+from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser
+
+class ExtendedUserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'first_name', 'last_name', 'is_staff')
+    fieldsets = [
+        (None, {'fields': ('username', 'password')}),
+        ('Dane osobowe', {'fields': ('first_name', 'last_name', 'email')}),
+        ('Dodatkowe dane', {'fields': ('is_student', 'is_employee', 'is_zamawiany')}),
+        ('Uprawnienia', {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
+        ('Ważne daty', {'fields': ('last_login', 'date_joined')}),
+        ('Grupy', {'fields': ('groups',)})
+    ]
+    list_filter = ('is_staff', 'is_superuser', 'is_student', 'is_employee', 'is_zamawiany')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('matricula','get_full_name','ects','get_type_of_studies')
@@ -35,6 +48,7 @@ class StudiaZamawianeAdmin(admin.ModelAdmin):
     search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
     ordering = ['student__user__last_name','student__user__first_name']
 
+admin.site.register(ExtendedUser, ExtendedUserAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Program)
