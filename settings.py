@@ -194,7 +194,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
+    #'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -216,6 +216,10 @@ INSTALLED_APPS = (
     'apps.grade.ticket_create',
     #'apps.mobile',
     'apps.email_change'
+)
+
+AUTHENTICATION_BACKENDS = (
+    'apps.users.auth_backend.ExtendedUserModelBackend',
 )
 
 FIXTURE_DIRS = (
