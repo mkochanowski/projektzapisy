@@ -30,6 +30,10 @@ class ExtendedUser(User):
     is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
 
     objects = UserManager()
+    
+    class Meta:
+        verbose_name = 'użutkownik'
+        verbose_name_plural = 'użytkownicy'
 
 
 class BaseUser(models.Model):

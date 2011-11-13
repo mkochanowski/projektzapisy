@@ -153,7 +153,7 @@ class Course( models.Model ):
         pts = None
         if student:
             try:
-                pts = PointsOfCourses.objects.filter(course=self, program=student.program)
+                pts = PointsOfCourses.objects.filter(course=self, program=student.program_id)
             except PointsOfCourses.DoesNotExist:
                 pts = None
         if not pts:
@@ -165,7 +165,8 @@ class Course( models.Model ):
             return pts[0]
         else:
             return 0
-        
+
+
     @staticmethod
     def get_points_for_courses(courses, program):
         '''
@@ -196,17 +197,17 @@ class Course( models.Model ):
                 points[course.pk] = epoints
         return points
 
-    def serialize_for_ajax(self, student = None):
+    def serialize_for_ajax(self, student = None, is_recording_open = None):
         from django.core.urlresolvers import reverse
         
         data = {
             'id': self.pk,
             'name': self.name,
             'short_name': self.entity.get_short_name(),
-            'type': self.type and self.type.pk or 1,
+            'type': self.type_id and self.type_id or 1,
             'url': reverse('course-page', args=[self.slug]),
-            'is_recording_open': False if (student is None) else \
-                self.is_recording_open_for_student(student)
+            'is_recording_open': is_recording_open is not None and is_recording_open or (False if (student is None) else \
+                self.is_recording_open_for_student(student))
         }
 
         return data

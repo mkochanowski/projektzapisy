@@ -653,6 +653,13 @@ class Queue(models.Model):
         for r in raw:
             m[r['group__id']] = r['priority']
         return m
+    
+    @staticmethod
+    def queue_priorities_map_values(queue_values):
+        m = {}
+        for r in queue_values:
+            m[r['group_id']] = r['priority']
+        return m
 
     def group_slug(self):
         return self.group.course_slug()

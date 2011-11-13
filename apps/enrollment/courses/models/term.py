@@ -77,8 +77,23 @@ class Term(models.Model):
         
     def get_dayOfWeek_display_short(self):
         return { '1': 'pn', '2': 'wt', '3': 'śr', '4': 'cz', '5': 'pt', '6': 'so', '7': 'nd'}[self.dayOfWeek].decode('utf8')
-        
+    
+    @staticmethod
+    def get_groups_terms(groups_ids):
+        """
+        Optimized query returning terms as string for group ids.
+        """
+        return map(lambda x: {'group_id':x.group_id,'term_as_string': "%s %s-%s (s.%s)" % (x.get_dayOfWeek_display_short(), x.start_time.strftime("%H:%M"), x.end_time.strftime("%H:%M"), x.classrooms_as_string)},
+                   Term.objects.filter(group__in=groups_ids).extra(select={'classrooms_as_string': """
+                                    SELECT array_to_string(array(SELECT courses_classroom.number FROM courses_term_classrooms
+                                    JOIN courses_classroom 
+                                    ON (courses_classroom.id = courses_term_classrooms.classroom_id)
+                                    WHERE courses_term.id=courses_term_classrooms.term_id),',')"""}))
+    
     def __unicode__(self):
+        """
+        N query problem with self.classrooms.all(). If you want to optimize, use Term.get_groups_terms.
+        """
         classrooms = self.classrooms.all()
         if len(classrooms) > 0:
             classrooms = ' (s.' + ', '.join(map(lambda x: x.number, self.classrooms.all())) + ')'

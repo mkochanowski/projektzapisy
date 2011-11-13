@@ -4,6 +4,7 @@ from django.db import models
 from course import Course
 from django.core.exceptions import MultipleObjectsReturned
 from apps.enrollment.courses.exceptions import *
+from django.db.models import Q
 
 from datetime import datetime
 
@@ -75,21 +76,27 @@ class Semester( models.Model ):
     @staticmethod
     def get_default_semester():
         """Jeżeli istnieje semestr na który zapisy są otwarte, zwracany jest ten semestr, jeżeli taki nie istnieje zwracany jest semestr, który obecnie trwa. W przypadku gdy nie trwa żaden semestr, zwracany jest najbliższy semestr na który będzie można się zapisać lub None w przypadku braku takiego semestru """ 
-        try:
-            return Semester.objects.get(records_opening__lte =datetime.now(), records_closing__gte= datetime.now())
-        except Semester.DoesNotExist:
-            current_semester = Semester.get_current_semester()
-            if current_semester:
-                return current_semester
+        now = datetime.now()
+        now_date = now.date()
+        semesters = list(Semester.objects.filter(
+            Q(semester_beginning__lte=now_date, semester_ending__gte= now_date) 
+            | 
+            Q(records_opening__lte=now, records_closing__gte=now)))
+
+        if len(semesters)>1:
+            semesters_with_open_records = [s for s in semesters if s.semester_beginning<=now_date and s.semester_ending<=now_date]
+            if len(semesters_with_open_records)==1:
+                return semesters_with_open_records[0]
             else:
-                next_semester = Semester.objects.filter(records_opening__gte =datetime.now()).order_by('records_opening')
-                if next_semester.exists():
-                    return next_semester[0]
-                else:
-                    return None
-                        
-        except MultipleObjectsReturned:
-            raise MoreThanOneSemesterWithOpenRecordsException()  
+                raise MoreThanOneSemesterWithOpenRecordsException() 
+        elif len(semesters)==1:
+            return semesters[0]
+        else:
+            next_semester = Semester.objects.filter(records_opening__gte =now).order_by('records_opening')
+            if next_semester.exists():
+                return next_semester[0]
+            else:
+                return None
 
     @staticmethod
     def is_visible(id):

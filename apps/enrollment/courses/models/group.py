@@ -123,15 +123,15 @@ class Group(models.Model):
         return employees
 
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
-        student=None, employee=None):
+        student=None, employee=None, user=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.core.urlresolvers import reverse
-
-        zamawiany = student and student.is_zamawiany()
+        
+        zamawiany = user and user.is_zamawiany
         data = {
             'id': self.pk,
             'type': int(self.type),
-            'course': int(self.course.pk),
+            'course': self.course_id,
 
             'url': reverse('records-group', args=[self.pk]),
             'teacher_name': self.teacher and self.teacher.user.get_full_name() \
@@ -152,11 +152,11 @@ class Group(models.Model):
                 min(self.get_count_of_enrolled_zamawiane(),
                     self.limit_zamawiane),
             'queued_count': self.get_count_of_queued(),
-            'queue_priority': queue_priorities.get(self.pk)
+            'queue_priority': queue_priorities.get(self.pk,-1)
         }
         
         return data;
-
+         
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
