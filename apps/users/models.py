@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UserManager
 from django.core.mail import send_mail
 from django.db.models.loading import cache
 from django.template import Context
@@ -24,6 +24,14 @@ class Related(models.Manager):
     def get_query_set(self):
         return super(Related, self).get_query_set().select_related('user')
 
+class ExtendedUser(User):    
+    is_student = models.BooleanField(default = False, verbose_name="czy student?")
+    is_employee = models.BooleanField(default = False, verbose_name="czy pracownik?")
+    is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
+
+    objects = UserManager()
+
+
 class BaseUser(models.Model):
     '''
     User abstract class. For every app user there is entry in django.auth.
@@ -40,7 +48,7 @@ class BaseUser(models.Model):
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
     last_news_view = models.DateTimeField(default=datetime.datetime.now())
-
+    
     objects = Related()
 
     def get_full_name(self):
@@ -236,7 +244,9 @@ class Student(BaseUser):
         points_for_one_night = 720
         number_of_nights_to_add = base / points_for_one_day 
         minutes = base + number_of_nights_to_add * points_for_one_night
-        grade = self.participated_in_last_grades() * 1440
+        # TODO: to bardzo muli
+        #grade = self.participated_in_last_grades() * 1440
+        grade = 0
         return datetime.timedelta(minutes=minutes+grade+120)+datetime.timedelta(days=3)
 
     def get_voted_courses(self, given_points):
@@ -245,13 +255,13 @@ class Student(BaseUser):
         current_semester = Semester.get_default_semester()
         return map(lambda x: x.course, StudentOptions.objects.filter(course__semester__id__exact=current_semester.id).filter(student=self, records_opening_bonus_minutes=minutes).order_by('course__name'))
         
-    def get_records_history(self):
+    def get_records_history(self,default_semester=None):
         '''
         Returns list of ids of course s that student was enrolled for.
         '''
-        from apps.enrollment.courses.models import Semester
-
-        default_semester = Semester.get_default_semester()
+        if not default_semester:
+            from apps.enrollment.courses.models import Semester
+            default_semester = Semester.get_default_semester()
         records = self.records.exclude(group__course__semester = \
             default_semester).select_related('group', 'group__course', \
             'group__course__entity')
