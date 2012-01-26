@@ -8,8 +8,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
 from datetime  import date
+from apps.enrollment.courses.models.semester import Semester
 
-DEFAULT_YEAR       = date.today().year 
+DEFAULT_YEAR       = date.today().year - 2
 DEFAULT_MAX_POINTS = 30
 DEFAULT_MAX_VOTE   = 3
 DEFAULT_DAY_BEG    = 1          #
@@ -25,9 +26,17 @@ class SystemState( models.Model ):
     """
         System state for vote
     """
+
+    semester_winter  = models.ForeignKey( Semester,
+                    verbose_name= 'Semestr zimowy',
+                    related_name = 'winter_votes')
+
+    semester_summer = models.ForeignKey( Semester,
+                    verbose_name = 'Semestr letni',
+                    related_name = 'summer_votes')
+
     year      = models.IntegerField(
                     verbose_name = 'Rok akademicki',
-                    unique       = True,
                     default      = date.today().year)
 
     max_points = models.IntegerField( 

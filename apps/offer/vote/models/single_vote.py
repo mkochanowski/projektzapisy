@@ -7,6 +7,7 @@
 from datetime  import date
 from django.db import models
 from django.db.models.aggregates import Sum
+from apps.enrollment.courses.models.course import CourseEntity, Course
 
 from apps.offer.proposal.models          import Proposal
 from apps.offer.vote.models.system_state import SystemState
@@ -20,7 +21,11 @@ class SingleVote ( models.Model ):
     student = models.ForeignKey('users.Student',
                                 verbose_name='głosujący')
 
-    course = models.ForeignKey(Proposal,
+    entity = models.ForeignKey(CourseEntity, verbose_name='podstawa')
+
+    course   = models.ForeignKey(Course, null=True, blank=True)
+
+    proposal = models.ForeignKey(Proposal, null=True, blank=True,
                                verbose_name='przedmiot')
 
     state = models.ForeignKey('vote.SystemState',
