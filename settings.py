@@ -28,6 +28,17 @@ DATABASES = {
  	    'HOST' : '',
  	    'CHARSET' : 'utf8',
  	    'USE_UNICODE' : True,
+        },
+
+     'fereol2012' : {
+        'ENGINE' : 'postgresql_psycopg2',
+ 	    'NAME' : 'fereol2012',
+ 	    'PORT' : '',
+ 	    'USER' : 'fereol',
+	    'PASSWORD' : 'fereol',
+ 	    'HOST' : '',
+ 	    'CHARSET' : 'utf8',
+ 	    'USE_UNICODE' : True,
         }
  }
 """
