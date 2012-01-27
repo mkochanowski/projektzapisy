@@ -51,5 +51,5 @@ for user in Student.objects.using('fereol2012').all():
 
 
 
-    #u.save()
+    u.save()
 
