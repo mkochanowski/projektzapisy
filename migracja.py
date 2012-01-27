@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.core.exceptions import ObjectDoesNotExist
-from apps.users.models import Student, Program
 
 
 __author__ = 'maciek'
@@ -20,6 +18,9 @@ if __name__ == '__main__':
     sys.path.append(FEREOL_PATH + 'fereol/')
     from fereol import settings
     setup_environ(settings)
+
+from django.core.exceptions import ObjectDoesNotExist
+from apps.users.models import Student, Program
 
 
 for user in Student.objects.using('fereol2012').all():
