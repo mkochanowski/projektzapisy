@@ -1,8 +1,10 @@
 # -*- coding: utf8 -*-
 
 from datetime import timedelta, datetime
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
+from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.db.models import signals
 from django.core.cache import cache as mcache
@@ -123,10 +125,12 @@ class Course( models.Model ):
     def get_enrollment_opening_time(self, student):
         """ returns course opening time as datetime object or None if course is opened / was opened """
         records_opening = self.semester.records_opening
+        from apps.offer.vote.models.single_vote import SingleVote
+
         try:
-            stud_opt = StudentOptions.get_cached(student, self)
-            interval = stud_opt.get_opening_delay_timedelta()
-        except StudentOptions.DoesNotExist:
+            vote = SingleVote.objects.get(Q(semester=self.semester), Q(student=student), Q(state__semester_winter=self.semester) | Q(state__semester_summer=self.semester) )
+            interval = timedelta(minutes=(-1440)*vote.correction+4320)
+        except ObjectDoesNotExist:
             interval = timedelta(minutes=4320)
 
         if records_opening == None:
