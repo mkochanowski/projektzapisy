@@ -24,6 +24,8 @@ from apps.users.models import Student, Program
 
 
 for user in Student.objects.using('fereol2012').all():
+    print "User przetwarzany: " + user.matricula
+
     try:
         u = Student.objects.get(matricula=user.matricula)
     except ObjectDoesNotExist:
@@ -34,7 +36,7 @@ for user in Student.objects.using('fereol2012').all():
         print "Brak zmiany ECTS " + user.matricula
 
     u.ects = max(u.ects, user.ects)
-    u.semestr = user.semester
+    u.semestr = user.semestr
     if user.status == 1:
         print "User o numerze " + user.matricula + " skreslony"
 
@@ -44,6 +46,8 @@ for user in Student.objects.using('fereol2012').all():
         u.program = Program.objects.get(id= user.program_id)
     except ObjectDoesNotExist:
         print "Program nieznaleziony: " + user.program
+
+
 
     #u.save()
 
