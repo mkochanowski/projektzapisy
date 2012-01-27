@@ -48,7 +48,7 @@ except ObjectDoesNotExist:
 
 for nazwa, glos, osoba in vote_list:
     try:
-        entity = CourseEntity.objects.get(name=nazwa)
+        entity = CourseEntity.objects.get(name__iexact=nazwa)
         course = Course.objects.get(entity=entity, semester=semester)
     except ObjectDoesNotExist:
         print "Nie znaleziono: " + nazwa
@@ -61,7 +61,7 @@ for nazwa, glos, osoba in vote_list:
         continue
 
     try:
-        vote = SingleVote(student=student, state=state)
+        vote = SingleVote(student=student, state=state, course=course)
     except ObjectDoesNotExist:
         vote = SingleVote()
 
