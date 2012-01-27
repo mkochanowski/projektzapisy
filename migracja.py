@@ -34,6 +34,8 @@ for user in Student.objects.using('fereol2012').all():
 
     if u.ects >= user.ects:
         print "Brak zmiany ECTS " + user.matricula
+    else:
+        print "Zmiana ECTS"
 
     u.ects = max(u.ects, user.ects)
     u.semestr = user.semestr
