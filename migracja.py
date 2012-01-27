@@ -37,7 +37,7 @@ for user in Student.objects.using('fereol2012').all():
 
     u.ects = max(u.ects, user.ects)
     u.semestr = user.semestr
-    if user.status == 1:
+    if u.status == 0 and user.status == 1:
         print "User o numerze " + user.matricula + " skreslony"
 
     u.status = user.status
