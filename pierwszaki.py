@@ -24,11 +24,11 @@ if __name__ == '__main__':
 from apps.users.models import Student
 
 
-students = Student.objects.filter(status=0, ects=0)
-
-for s in students:
-    s.records_opening_bonus_minutes = 1440
-    s.save()
+#students = Student.objects.filter(status=0, ects=0)
+#
+#for s in students:
+#    s.records_opening_bonus_minutes = 1440
+#    s.save()
 
 
 f = open("pierwszaki.txt", "r")
@@ -37,7 +37,6 @@ for l in f:
 
     pola = l.split()
 
-    print "Przetwarzanie: " + pola[-2] + " " + pola[-1]
     try:
         s = Student.objects.get(matricula=pola[-2])
     except ObjectDoesNotExist:
