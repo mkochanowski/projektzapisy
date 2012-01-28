@@ -6,8 +6,8 @@ from apps.grade.ticket_create.models import PublicKey, \
 
 
 class StudentGradedAdmin( admin.ModelAdmin ):
-    list_display = ('student', 'student__matricula', 'semester')
-    search_fields = ('student__matricula','student__user__first_name','student__user__last_name','semester')
+    list_display = ('student',  'semester')
+    search_fields = ('student',)
 
 admin.site.register( PublicKey )
 admin.site.register( PrivateKey )
