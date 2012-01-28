@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.core.exceptions import ObjectDoesNotExist
-
 
 __author__ = 'maciek'
 
@@ -22,6 +20,9 @@ if __name__ == '__main__':
 
 
 from apps.users.models import Student
+from django.core.exceptions import ObjectDoesNotExist
+from apps.enrollment.courses.models.course import Course
+from apps.offer.vote.models import SingleVote
 
 
 #students = Student.objects.filter(status=0, ects=0)
@@ -32,6 +33,19 @@ from apps.users.models import Student
 
 
 f = open("pierwszaki.txt", "r")
+
+
+lista = []
+
+lista.append(Course.objects.get(name=u"Algebra"))
+lista.append(Course.objects.get(name=u"Programowanie (L)"))
+lista.append(Course.objects.get(name=u"Programowanie (M)"))
+lista.append(Course.objects.get(name=u"Programowanie obiektowe"))
+lista.append(Course.objects.get(name=u"Kurs języka C++"))
+lista.append(Course.objects.get(name=u"Kurs języka Pascal"))
+lista.append(Course.objects.get(name=u"Kurs: tworzenie aplikacji interaktywnych w Pythonie"))
+
+
 
 for l in f:
 
@@ -47,7 +61,15 @@ for l in f:
         print "Student " + pola[-2] + " powtarza"
         continue
 
-    s.records_opening_bonus_minutes += int(pola[-1])
+    #s.records_opening_bonus_minutes += int(pola[-1])
 
+    for p in lista:
+        v = SingleVote()
+        v.student = s
+        v.course = p
+        v.entity = p.entity
+        v.value = 3
+        v.correction = 3
+        v.save()
 
-    s.save()
+    #s.save()
