@@ -243,7 +243,7 @@ class Student(BaseUser):
 
     def get_t0_interval(self):
         """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
-        base = self.records_opening_bonus_minutes + self.ects * settings.ECTS_BONUS + 480
+        base = self.records_opening_bonus_minutes + self.ects * settings.ECTS_BONUS
         points_for_one_day = 720 # =12h*60m
         points_for_one_night = 720
         number_of_nights_to_add = base / points_for_one_day 
