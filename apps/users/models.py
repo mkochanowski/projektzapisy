@@ -216,30 +216,9 @@ class Student(BaseUser):
         return '%s, semestr %s' % (self.program , semestr)
     get_type_of_studies.short_description = 'Studia'
 
-    #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
-    participated_in_last_grades_cache = None
     def participated_in_last_grades(self):
-        if not (self.participated_in_last_grades_cache is None):
-            return self.participated_in_last_grades_cache
-        from apps.grade.ticket_create.models import UsedTicketStamp
-        previous1_semester = Semester.get_default_semester(). \
-            get_previous_semester()
-        if not previous1_semester:
-            previous2_semester = None
-        else:
-            previous2_semester = previous1_semester.get_previous_semester()
-        #TODO: to można zrobić jednym zapytaniem
-        used1_tickets = UsedTicketStamp.objects.filter(student=self, \
-            poll__semester=previous1_semester)
-        used2_tickets = UsedTicketStamp.objects.filter(student=self, \
-            poll__semester=previous2_semester)
-        participated = 0
-        if len(used1_tickets) > 0:
-            participated += 1
-        if len(used2_tickets) > 0:
-            participated += 1
-        self.participated_in_last_grades_cache = participated
-        return self.participated_in_last_grades_cache
+        from apps.grade.ticket_create.models.student_graded import StudentGraded
+        return StudentGraded.objects.count(student=self, semester_id__in=[41, 42]).count()
 
     def get_t0_interval(self):
         """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
@@ -249,9 +228,7 @@ class Student(BaseUser):
         number_of_nights_to_add = base / points_for_one_day 
         minutes = base + number_of_nights_to_add * points_for_one_night
         minutes += self.records_opening_bonus_minutes
-        # TODO: to bardzo muli
-        #grade = self.participated_in_last_grades() * 1440
-        grade = 0
+        grade = self.participated_in_last_grades() * 1440
         return datetime.timedelta(minutes=minutes+grade+120)+datetime.timedelta(days=3)
 
     def get_voted_courses(self, given_points):
