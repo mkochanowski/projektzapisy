@@ -72,6 +72,7 @@ for l in f:
         v.course = p
         v.entity = p.entity
         v.value = 3
+        v.state_id = 4
         v.correction = 3
         v.save()
 
