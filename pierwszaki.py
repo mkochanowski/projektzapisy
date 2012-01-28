@@ -44,7 +44,7 @@ lista.append(Course.objects.get(name=u"Algebra", semester=semester))
 lista.append(Course.objects.get(name=u"Programowanie (L)", semester=semester))
 lista.append(Course.objects.get(name=u"Programowanie (M)", semester=semester))
 lista.append(Course.objects.get(name=u"Programowanie obiektowe", semester=semester))
-lista.append(Course.objects.get(name=u"Kurs języka C++"), semester=semester))
+lista.append(Course.objects.get(name=u"Kurs języka C++", semester=semester))
 lista.append(Course.objects.get(name=u"Kurs języka Pascal", semester=semester))
 lista.append(Course.objects.get(name=u"Kurs: tworzenie aplikacji interaktywnych w Pythonie", semester=semester))
 
