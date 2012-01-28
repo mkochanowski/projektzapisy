@@ -11,8 +11,6 @@ import os
 from django.core.management import setup_environ
 from datetime import time
 
-from apps.users.models import Student
-
 
 
 if __name__ == '__main__':
@@ -21,6 +19,9 @@ if __name__ == '__main__':
     from fereol import settings
     setup_environ(settings)
 
+
+
+from apps.users.models import Student
 
 
 students = Student.objects.filter(status=0, ects=0)
