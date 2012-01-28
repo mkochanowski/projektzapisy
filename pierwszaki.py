@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 __author__ = 'maciek'
 
 FEREOL_PATH = '../'
@@ -23,7 +24,7 @@ from apps.users.models import Student
 from django.core.exceptions import ObjectDoesNotExist
 from apps.enrollment.courses.models.course import Course
 from apps.offer.vote.models import SingleVote
-
+from apps.enrollment.courses.models.semester import Semester
 
 #students = Student.objects.filter(status=0, ects=0)
 #
