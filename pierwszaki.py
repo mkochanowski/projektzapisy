@@ -50,21 +50,15 @@ lista.append(Course.objects.get(name=u"Kurs: tworzenie aplikacji interaktywnych 
 
 
 
-for l in f:
+for s in Student.objects.filter(status=0, ects=0):
 
-    pola = l.split()
-
-    try:
-        s = Student.objects.get(matricula=pola[-2])
-    except ObjectDoesNotExist:
-        print "Nie znaleziona studenta " + pola[-2]
-        continue
-
-    if s.ects > 0:
-        print "Student " + pola[-2] + " powtarza"
-        continue
 
     #s.records_opening_bonus_minutes += int(pola[-1])
+
+    if SingleVote.objects.filter(student=s).count() > 0:
+        continue
+
+    print "Przetwarzanie: " + s.matricula
 
     for p in lista:
         v = SingleVote()
