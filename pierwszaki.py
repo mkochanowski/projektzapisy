@@ -37,13 +37,15 @@ f = open("pierwszaki.txt", "r")
 
 lista = []
 
-lista.append(Course.objects.get(name=u"Algebra"))
-lista.append(Course.objects.get(name=u"Programowanie (L)"))
-lista.append(Course.objects.get(name=u"Programowanie (M)"))
-lista.append(Course.objects.get(name=u"Programowanie obiektowe"))
-lista.append(Course.objects.get(name=u"Kurs języka C++"))
-lista.append(Course.objects.get(name=u"Kurs języka Pascal"))
-lista.append(Course.objects.get(name=u"Kurs: tworzenie aplikacji interaktywnych w Pythonie"))
+semester = Semester.get_current_semester()
+
+lista.append(Course.objects.get(name=u"Algebra", semester=semester))
+lista.append(Course.objects.get(name=u"Programowanie (L)"), semester=semester)
+lista.append(Course.objects.get(name=u"Programowanie (M)"), semester=semester)
+lista.append(Course.objects.get(name=u"Programowanie obiektowe"), semester=semester)
+lista.append(Course.objects.get(name=u"Kurs języka C++"), semester=semester)
+lista.append(Course.objects.get(name=u"Kurs języka Pascal"), semester=semester)
+lista.append(Course.objects.get(name=u"Kurs: tworzenie aplikacji interaktywnych w Pythonie"), semester=semester)
 
 
 
