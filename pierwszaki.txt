@@ -180,7 +180,7 @@ Szydłowski Oskar 247288 50
 Szymański Paweł 248082 30
 Świderski Paweł 221293 98
 Tracz Mateusz 248083 33
-Tsyupa Oleh 246160 58
+Tsyupa Oleh 99999 58
 Tynkiewicz Krzysztof 248086 7
 Urbański Tomasz 248087 24
 Walecki Tomasz 248088 63

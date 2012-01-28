@@ -50,4 +50,4 @@ for l in f:
     s.records_opening_bonus_minutes += int(pola[-1])
 
 
-    # s.save()
+    s.save()
