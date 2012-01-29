@@ -45,6 +45,7 @@
 
 
     {% if voters %}
+        <small class="right">(Studenci w grupach: {{ voters.count }})</small>
         {% include "enrollment/records/students_list.html" with students=voters %}
     {% else %}
         Nikt nie oddał głosu.
