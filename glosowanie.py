@@ -72,7 +72,7 @@ for nazwa, glos, osoba in vote_list:
 
     try:
         vote = SingleVote.objects.get(student=student, state=state, course=course)
-        pass
+        continue
     except ObjectDoesNotExist:
         vote = SingleVote()
 
