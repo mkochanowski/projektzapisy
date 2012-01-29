@@ -73,7 +73,7 @@
             </tr>
             <tr>
                 <th>Oddane głosy</th>
-                <td><a href="{% url course-votes course.slug %}">link</a></td>
+                <td> {{ course.votes_count }} <a href="{% url course-votes course.slug %}">lista</a></td>
             </tr>
         {% if course.can_enroll_from %}
             <tr>

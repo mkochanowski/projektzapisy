@@ -99,7 +99,16 @@ class Course( models.Model ):
             if not self.description:
                 self.description = self.entity.description
         super(Course, self).save(*args, **kwargs)
-        
+
+
+
+    def votes_count(self, semester=None):
+        from apps.offer.vote.models import SingleVote
+        return SingleVote.objects\
+                 .filter(Q(course=self), Q(state__semester_summer=self.semester) | Q(state__semester_winter=self.semester))\
+                 .count()
+
+
     def is_recording_open_for_student(self, student):
         """ gives the answer to question: is course opened for apps.enrollment for student at the very moment? """
         records_opening = self.semester.records_opening
