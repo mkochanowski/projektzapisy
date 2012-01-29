@@ -71,6 +71,10 @@
                 <th>Konsultacje</th>
                 <td><a href="{% url course-consiltations-page course.slug %}">link</a></td>
             </tr>
+            <tr>
+                <th>Oddane głosy</th>
+                <td><a href="{% url course-votes course.slug %}">link</a></td>
+            </tr>
         {% if course.can_enroll_from %}
             <tr>
                 <th>Możesz zapisać się od</th>
