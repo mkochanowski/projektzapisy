@@ -3,7 +3,7 @@
  Analiza numeryczna (L)                                                                                             |      3 | 210728
  Architektury systemów komputerowych                                                                                |      3 | 210728
  Bazy danych                                                                                                        |      3 | 210728
- CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 210728
+ CCNA exploration 1: Network Fundamentals                                                                           |      3 | 210728
  Kryptografia                                                                                                       |      3 | 210728
  Kurs języka Java                                                                                                   |      3 | 210728
  Kurs programowania pod Windows w technologii .NET                                                                  |      3 | 210728
@@ -501,7 +501,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241642
  Architektury systemów komputerowych                                                                                |      3 | 241642
  Bazy danych                                                                                                        |      3 | 241642
- CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241642
+ CCNA exploration 1: Network Fundamentals                                                                           |      3 | 241642
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 241642
  Kryptografia                                                                                                       |      3 | 241642
  Kurs języka Java                                                                                                   |      3 | 241642
@@ -557,7 +557,7 @@
  Rozszerzony kurs języka Python                                                                                     |      3 | 221030
  Seminarium: Co nowego w bazach danych?                                                                             |      2 | 221030
  Seminarium: Pozycjonowanie stron internetowych                                                                     |      3 | 221030
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      1 | 221030
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                                |      1 | 221030
  Systemy wbudowane                                                                                                  |      3 | 221030
  Sztuczna inteligencja                                                                                              |      3 | 221030
  Technologie Semantic Web                                                                                           |      3 | 221030
@@ -620,7 +620,7 @@
  Analiza programów komputerowych                                                                                    |      2 | 221122
  Analiza wariancji i danych                                                                                         |      2 | 221122
  Architektury systemów komputerowych                                                                                |      3 | 221122
- CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221122
+ CCNA exploration 1: Network Fundamentals                                                                           |      3 | 221122
  Dwa tysiące lat judaizmu                                                                                           |      1 | 221122
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 221122
  Kryptografia                                                                                                       |      2 | 221122
@@ -808,7 +808,7 @@
  Analiza matematyczna 2                                                                                             |      1 | 241630
  Analiza numeryczna (L)                                                                                             |      3 | 241630
  Architektury systemów komputerowych                                                                                |      1 | 241630
- CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241630
+ CCNA exploration 1: Network Fundamentals                                                                           |      3 | 241630
  Eksploracja danych                                                                                                 |      1 | 241630
  Kurs języka ANSI C z elementami C++                                                                                |      3 | 241630
  Kurs języka Java                                                                                                   |      1 | 241630
@@ -5941,4 +5941,3 @@
  Programowanie (M)                                                                                                      |      2 | 221109
  Programowanie (M)                                                                                                      |      3 | 221039
  Programowanie (M)                                                                                                      |      1 | 169845
-
