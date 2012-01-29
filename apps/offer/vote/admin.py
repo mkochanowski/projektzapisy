@@ -109,6 +109,9 @@ class SystemStateAdminForm( ModelForm ):
                                     
         return data
 
+class SingleVoteAdmin( admin.ModelAdmin ):
+    raw_id_fields = ('student', )
+
 class StateAdmin( admin.ModelAdmin ):
     """
         System State Administration
@@ -116,6 +119,6 @@ class StateAdmin( admin.ModelAdmin ):
     form = SystemStateAdminForm
 
 admin.site.register( SystemState, StateAdmin )
-admin.site.register( SingleVote )
+admin.site.register( SingleVote, SingleVoteAdmin )
 
 
