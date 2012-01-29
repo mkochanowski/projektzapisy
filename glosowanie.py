@@ -46,8 +46,10 @@ except ObjectDoesNotExist:
 
 byly = {}
 przedmioty = {}
+users = {}
 
 for nazwa, glos, osoba in vote_list:
+
 
     if not nazwa in przedmioty:
 
@@ -64,11 +66,15 @@ for nazwa, glos, osoba in vote_list:
     else:
         entity, course = przedmioty[nazwa]
 
-    try:
-        student = Student.objects.get(matricula=osoba)
-    except ObjectDoesNotExist:
-        print "Nie znaleziono: " + osoba
-        continue
+    if not osoba in users:
+        try:
+            student = Student.objects.get(matricula=osoba)
+            users[osoba] = student
+        except ObjectDoesNotExist:
+            print "Nie znaleziono: " + osoba
+            continue
+    else:
+        student = users[osoba]
 
     try:
         vote = SingleVote.objects.get(student=student, state=state, course=course)

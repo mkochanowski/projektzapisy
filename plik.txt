@@ -3,7 +3,7 @@
  Analiza numeryczna (L)                                                                                             |      3 | 210728
  Architektury systemów komputerowych                                                                                |      3 | 210728
  Bazy danych                                                                                                        |      3 | 210728
- CCNA Exploration 1                                                                                                 |      3 | 210728
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 210728
  Kryptografia                                                                                                       |      3 | 210728
  Kurs języka Java                                                                                                   |      3 | 210728
  Kurs programowania pod Windows w technologii .NET                                                                  |      3 | 210728
@@ -390,7 +390,7 @@
  Sieci neuronowe                                                                                                    |      2 | 241692
  Socjotechnika                                                                                                      |      2 | 241692
  Algorytmy i struktury danych (M)                                                                                   |      3 | 221134
- CCNA Exploration 1                                                                                                 |      3 | 221134
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221134
  CCNA Exploration 2                                                                                                 |      3 | 221134
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 221134
  Kurs Blendera                                                                                                      |      3 | 221134
@@ -446,7 +446,7 @@
  Praktyka optymalizacji                                                                                             |      3 | 221141
  Równoległe algorytmy sztucznej inteligencji                                                                        |      3 | 221141
  Seminarium: Programowanie w teorii typów                                                                           |      3 | 221141
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 221141
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 221141
  Sieci neuronowe                                                                                                    |      3 | 221141
  Sztuczna inteligencja                                                                                              |      3 | 221141
  Eksploracja danych                                                                                                 |      3 | 221105
@@ -463,7 +463,7 @@
  Systemy wbudowane                                                                                                  |      3 | 221105
  Algorytmy i struktury danych (M)                                                                                   |      3 | 221132
  Bazy danych                                                                                                        |      3 | 221132
- CCNA Exploration 1                                                                                                 |      3 | 221132
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221132
  CCNA Exploration 2                                                                                                 |      3 | 221132
  CCNA Exploration 4                                                                                                 |      2 | 221132
  Inżynieria oprogramowania                                                                                          |      3 | 221132
@@ -501,7 +501,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241642
  Architektury systemów komputerowych                                                                                |      3 | 241642
  Bazy danych                                                                                                        |      3 | 241642
- CCNA Exploration 1                                                                                                 |      3 | 241642
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241642
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 241642
  Kryptografia                                                                                                       |      3 | 241642
  Kurs języka Java                                                                                                   |      3 | 241642
@@ -521,7 +521,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241708
  Architektury systemów komputerowych                                                                                |      1 | 241708
  Bazy danych                                                                                                        |      2 | 241708
- CCNA Exploration 1                                                                                                 |      1 | 241708
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      1 | 241708
  Inżynieria oprogramowania                                                                                          |      2 | 241708
  Kurs języka Java                                                                                                   |      3 | 241708
  Kurs pracy w systemie Linux                                                                                        |      3 | 241708
@@ -543,7 +543,7 @@
  Algorytmy ewolucyjne                                                                                               |      3 | 221030
  Algorytmy funkcjonalne i trwałe struktury danych                                                                   |      1 | 221030
  Analiza programów komputerowych                                                                                    |      2 | 221030
- CCNA Exploration 1                                                                                                 |      3 | 221030
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221030
  Efektywne tworzenie oprogramowania                                                                                 |      3 | 221030
  Integracja informacji                                                                                              |      3 | 221030
  Kryptografia                                                                                                       |      1 | 221030
@@ -557,7 +557,7 @@
  Rozszerzony kurs języka Python                                                                                     |      3 | 221030
  Seminarium: Co nowego w bazach danych?                                                                             |      2 | 221030
  Seminarium: Pozycjonowanie stron internetowych                                                                     |      3 | 221030
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      1 | 221030
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      1 | 221030
  Systemy wbudowane                                                                                                  |      3 | 221030
  Sztuczna inteligencja                                                                                              |      3 | 221030
  Technologie Semantic Web                                                                                           |      3 | 221030
@@ -620,7 +620,7 @@
  Analiza programów komputerowych                                                                                    |      2 | 221122
  Analiza wariancji i danych                                                                                         |      2 | 221122
  Architektury systemów komputerowych                                                                                |      3 | 221122
- CCNA Exploration 1                                                                                                 |      3 | 221122
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221122
  Dwa tysiące lat judaizmu                                                                                           |      1 | 221122
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 221122
  Kryptografia                                                                                                       |      2 | 221122
@@ -808,7 +808,7 @@
  Analiza matematyczna 2                                                                                             |      1 | 241630
  Analiza numeryczna (L)                                                                                             |      3 | 241630
  Architektury systemów komputerowych                                                                                |      1 | 241630
- CCNA Exploration 1                                                                                                 |      3 | 241630
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241630
  Eksploracja danych                                                                                                 |      1 | 241630
  Kurs języka ANSI C z elementami C++                                                                                |      3 | 241630
  Kurs języka Java                                                                                                   |      1 | 241630
@@ -910,7 +910,7 @@
  Teoretyczne podstawy języków programowania                                                                         |      3 | 221100
  Testowanie oprogramowania                                                                                          |      3 | 221100
  Algorytmy i struktury danych (M)                                                                                   |      3 | 221004
- CCNA Exploration 1                                                                                                 |      3 | 221004
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221004
  Kurs języka Java                                                                                                   |      3 | 221004
  Kurs projektowania aplikacji ASP.NET i Silverlight                                                                 |      3 | 221004
  Kurs WWW                                                                                                           |      3 | 221004
@@ -1022,7 +1022,7 @@
  Obliczenia i wnioskowanie w systemie Coq                                                                           |      3 | 233210
  Optymalizacja dyskretna                                                                                            |      3 | 233210
  Programowanie obiektowe                                                                                            |      3 | 233210
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 233210
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 233210
  Systemy operacyjne                                                                                                 |      3 | 233210
  Systemy wbudowane                                                                                                  |      3 | 233210
  Testowanie oprogramowania                                                                                          |      3 | 233210
@@ -1145,7 +1145,7 @@
  Przetwarzanie dużych danych                                                                                        |      3 | 208933
  Rozszerzony kurs języka Python                                                                                     |      1 | 208933
  Seminarium: Programowanie w teorii typów                                                                           |      3 | 208933
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 208933
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 208933
  Socjotechnika                                                                                                      |      1 | 208933
  Systemy wbudowane                                                                                                  |      3 | 208933
  Złożoność obliczeniowa                                                                                             |      2 | 208933
@@ -1153,7 +1153,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241698
  Architektury systemów komputerowych                                                                                |      3 | 241698
  Bazy danych                                                                                                        |      2 | 241698
- CCNA Exploration 1                                                                                                 |      2 | 241698
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      2 | 241698
  Kurs Blendera                                                                                                      |      1 | 241698
  Kurs języka Java                                                                                                   |      3 | 241698
  Kurs WWW                                                                                                           |      1 | 241698
@@ -1220,7 +1220,7 @@
  Systemy wbudowane                                                                                                  |      1 | 170697
  Testowanie oprogramowania                                                                                          |      1 | 170697
  Architektury systemów komputerowych                                                                                |      3 | 241647
- CCNA Exploration 1                                                                                                 |      3 | 241647
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241647
  CCNA Exploration 2                                                                                                 |      3 | 241647
  Kurs języka C++                                                                                                    |      3 | 241647
  Kurs języka Java                                                                                                   |      3 | 241647
@@ -1254,7 +1254,7 @@
  Analiza numeryczna (L)                                                                                             |      3 | 241614
  Architektury systemów komputerowych                                                                                |      3 | 241614
  Buddyzm                                                                                                            |      3 | 241614
- CCNA Exploration 1                                                                                                 |      3 | 241614
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241614
  CCNA Exploration 2                                                                                                 |      3 | 241614
  CCNA Exploration 4                                                                                                 |      2 | 241614
  Inżynieria oprogramowania                                                                                          |      3 | 241614
@@ -1544,7 +1544,7 @@
  Pewne algorytmy symboliczne                                                                                        |      3 | 233207
  Programowanie funkcyjne                                                                                            |      3 | 233207
  Rozszerzony kurs języka Python                                                                                     |      3 | 233207
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      2 | 233207
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      2 | 233207
  Sieci komputerowe                                                                                                  |      3 | 233207
  Złożoność obliczeniowa                                                                                             |      3 | 233207
  Algorytmiczna Teoria Gier                                                                                          |      3 | 241704
@@ -1555,7 +1555,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241704
  Analiza programów komputerowych                                                                                    |      2 | 241704
  Bazy danych                                                                                                        |      3 | 241704
- CCNA Exploration 1                                                                                                 |      3 | 241704
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241704
  CCNA Exploration 2                                                                                                 |      3 | 241704
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 241704
  Kryptografia                                                                                                       |      3 | 241704
@@ -1810,7 +1810,7 @@
  Analiza numeryczna (L)                                                                                             |      3 | 241700
  Analiza numeryczna (M)                                                                                             |      3 | 241700
  Bazy danych                                                                                                        |      3 | 241700
- CCNA Exploration 1                                                                                                 |      3 | 241700
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241700
  CCNA Exploration 2                                                                                                 |      3 | 241700
  Inżynieria oprogramowania                                                                                          |      3 | 241700
  Kurs języka Pascal                                                                                                 |      3 | 241700
@@ -1842,7 +1842,7 @@
  Algebra                                                                                                            |      3 | 241602
  Algorytmy i struktury danych (M)                                                                                   |      3 | 241602
  Analiza numeryczna (L)                                                                                             |      3 | 241602
- CCNA Exploration 1                                                                                                 |      3 | 241602
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241602
  Inżynieria oprogramowania                                                                                          |      3 | 241602
  Kurs języka Java                                                                                                   |      3 | 241602
  Kurs pracy w systemie Linux                                                                                        |      3 | 241602
@@ -1878,7 +1878,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241760
  Architektury systemów komputerowych                                                                                |      2 | 241760
  Bazy danych                                                                                                        |      2 | 241760
- CCNA Exploration 1                                                                                                 |      3 | 241760
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241760
  CCNA Exploration 2                                                                                                 |      2 | 241760
  Inżynieria oprogramowania                                                                                          |      3 | 241760
  Kurs pracy w systemie Linux                                                                                        |      2 | 241760
@@ -1891,7 +1891,7 @@
  Rachunek prawdopodobieństwa i statystyka                                                                           |      3 | 241760
  Sieci komputerowe                                                                                                  |      1 | 241760
  Buddyzm                                                                                                            |      3 | 200061
- CCNA Exploration 1                                                                                                 |      3 | 200061
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 200061
  Efektywne tworzenie oprogramowania                                                                                 |      3 | 200061
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 200061
  Kurs Blendera                                                                                                      |      3 | 200061
@@ -1957,7 +1957,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241635
  Architektury systemów komputerowych                                                                                |      2 | 241635
  Bazy danych                                                                                                        |      3 | 241635
- CCNA Exploration 1                                                                                                 |      3 | 241635
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241635
  Eksploracja danych                                                                                                 |      2 | 241635
  Inżynieria oprogramowania                                                                                          |      2 | 241635
  Kryptografia                                                                                                       |      3 | 241635
@@ -2013,7 +2013,7 @@
  Sztuczna inteligencja                                                                                              |      3 | 233134
  Analiza matematyczna                                                                                               |      3 | 233045
  Analiza numeryczna (L)                                                                                             |      3 | 233045
- CCNA Exploration 1                                                                                                 |      3 | 233045
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233045
  Global governance w rozwoju regionalnym: zarządzanie rozwojem pomiędzy biznesem, sektorem publicznym a obywatelami |      2 | 233045
  Inżynieria oprogramowania                                                                                          |      3 | 233045
  Kurs języka ANSI C z elementami C++                                                                                |      3 | 233045
@@ -2098,7 +2098,7 @@
  Analiza numeryczna (L)                                                                                             |      3 | 241711
  Architektury systemów komputerowych                                                                                |      3 | 241711
  Bazy danych                                                                                                        |      3 | 241711
- CCNA Exploration 1                                                                                                 |      3 | 241711
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241711
  Inżynieria oprogramowania                                                                                          |      3 | 241711
  Kurs Blendera                                                                                                      |      3 | 241711
  Kurs języka C++                                                                                                    |      3 | 241711
@@ -2118,7 +2118,7 @@
  Algorytmy i struktury danych (M)                                                                                   |      3 | 233165
  Analiza numeryczna (L)                                                                                             |      3 | 233165
  Bazy danych                                                                                                        |      3 | 233165
- CCNA Exploration 1                                                                                                 |      3 | 233165
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233165
  CCNA Exploration 2                                                                                                 |      3 | 233165
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 233165
  Kurs języka C++                                                                                                    |      3 | 233165
@@ -2131,7 +2131,7 @@
  Systemy operacyjne                                                                                                 |      3 | 233165
  Algorytmy i struktury danych (M)                                                                                   |      3 | 221050
  Analiza numeryczna (M)                                                                                             |      3 | 221050
- CCNA Exploration 1                                                                                                 |      3 | 221050
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221050
  Efektywne tworzenie oprogramowania                                                                                 |      3 | 221050
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 221050
  Kurs Blendera                                                                                                      |      3 | 221050
@@ -2151,7 +2151,7 @@
  Algorytmy rozproszone                                                                                              |      2 | 221053
  Algorytmy tekstowe                                                                                                 |      3 | 221053
  Analiza numeryczna (M)                                                                                             |      3 | 221053
- CCNA Exploration 1                                                                                                 |      3 | 221053
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221053
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 221053
  Matematyka dyskretna (M)                                                                                           |      3 | 221053
  Pewne algorytmy symboliczne                                                                                        |      2 | 221053
@@ -2234,7 +2234,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 233157
  Bazy danych                                                                                                        |      3 | 233157
  Buddyzm                                                                                                            |      3 | 233157
- CCNA Exploration 1                                                                                                 |      3 | 233157
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233157
  CCNA Exploration 2                                                                                                 |      3 | 233157
  Dwa tysiące lat judaizmu                                                                                           |      3 | 233157
  Inżynieria oprogramowania                                                                                          |      3 | 233157
@@ -2318,7 +2318,7 @@
  Architektury systemów komputerowych                                                                                |      3 | 241765
  Bazy danych                                                                                                        |      3 | 241765
  Buddyzm                                                                                                            |      3 | 241765
- CCNA Exploration 1                                                                                                 |      3 | 241765
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241765
  CCNA Exploration 2                                                                                                 |      3 | 241765
  Dwa tysiące lat judaizmu                                                                                           |      3 | 241765
  Filozofia matematyki                                                                                               |      3 | 241765
@@ -2459,7 +2459,7 @@
  Optymalizacja kombinatoryczna                                                                                      |      3 | 233186
  Przetwarzanie dużych danych                                                                                        |      3 | 233186
  Seminarium: Co nowego w bazach danych?                                                                             |      3 | 233186
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 233186
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 233186
  Seminarium: Zastosowania algorytmów ewolucyjnych                                                                   |      2 | 233186
  Sieci neuronowe                                                                                                    |      3 | 233186
  Systemy operacyjne                                                                                                 |      3 | 233186
@@ -2479,7 +2479,7 @@
  Analiza numeryczna (L)                                                                                             |      3 | 241620
  Analiza numeryczna (M)                                                                                             |      3 | 241620
  Architektury systemów komputerowych                                                                                |      3 | 241620
- CCNA Exploration 1                                                                                                 |      3 | 241620
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241620
  Kurs Blendera                                                                                                      |      3 | 241620
  Kurs języka Java                                                                                                   |      3 | 241620
  Matematyka dyskretna (L)                                                                                           |      3 | 241620
@@ -2575,14 +2575,14 @@
  Pewne algorytmy symboliczne                                                                                        |      3 | 221131
  Seminar: Tutorials of CADE.                                                                                        |      2 | 221131
  Seminarium aproksymacyjno-optymalizacyjno-kombinatoryczne                                                          |      3 | 221131
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 221131
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 221131
  Sztuczna inteligencja                                                                                              |      3 | 221131
  Złożoność obliczeniowa                                                                                             |      3 | 221131
  Algorytmy i struktury danych (M)                                                                                   |      3 | 226181
  Algorytmy Internetu                                                                                                |      3 | 226181
  Algorytmy tekstowe                                                                                                 |      3 | 226181
  Bazy danych                                                                                                        |      3 | 226181
- CCNA Exploration 1                                                                                                 |      3 | 226181
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 226181
  Efektywne tworzenie oprogramowania                                                                                 |      3 | 226181
  Inżynieria oprogramowania                                                                                          |      3 | 226181
  Kurs języka C++                                                                                                    |      3 | 226181
@@ -2656,7 +2656,7 @@
  Algorytmy rozproszone                                                                                              |      1 | 220993
  Algorytmy tekstowe                                                                                                 |      1 | 220993
  Analiza programów komputerowych                                                                                    |      1 | 220993
- CCNA Exploration 1                                                                                                 |      3 | 220993
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 220993
  Eksploracja danych                                                                                                 |      3 | 220993
  Integracja informacji                                                                                              |      1 | 220993
  Kurs programowania pod Windows w technologii .NET                                                                  |      3 | 220993
@@ -2764,7 +2764,7 @@
  Algorytmy tekstowe                                                                                                 |      1 | 241737
  Analiza numeryczna (M)                                                                                             |      3 | 241737
  Bazy danych                                                                                                        |      3 | 241737
- CCNA Exploration 1                                                                                                 |      3 | 241737
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241737
  Eksploracja danych                                                                                                 |      1 | 241737
  Inżynieria oprogramowania                                                                                          |      3 | 241737
  Języki formalne i złożoność obliczeniowa                                                                           |      3 | 241737
@@ -2792,7 +2792,7 @@
  Przetwarzanie dużych danych                                                                                        |      3 | 220989
  Seminarium: Co nowego w bazach danych?                                                                             |      3 | 220989
  Seminarium: Programowanie w teorii typów                                                                           |      3 | 220989
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 220989
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 220989
  Sieci neuronowe                                                                                                    |      3 | 220989
  Systemy wbudowane                                                                                                  |      3 | 220989
  Algorytmy metaheurystyczne                                                                                         |      3 | 209153
@@ -2825,7 +2825,7 @@
  Przetwarzanie dużych danych                                                                                        |      3 | 209169
  Seminarium - Aukcje, Głosowania, Gry                                                                               |      2 | 209169
  Seminarium aproksymacyjno-optymalizacyjno-kombinatoryczne                                                          |      3 | 209169
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      1 | 209169
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      1 | 209169
  Socjotechnika                                                                                                      |      3 | 209169
  Sztuczna inteligencja                                                                                              |      3 | 209169
  Zaawansowane technologie Javy                                                                                      |      3 | 209169
@@ -3157,7 +3157,7 @@
  Analiza numeryczna (L)                                                                                             |      3 | 233119
  Architektury systemów komputerowych                                                                                |      3 | 233119
  Bazy danych                                                                                                        |      3 | 233119
- CCNA Exploration 1                                                                                                 |      3 | 233119
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233119
  CCNA Exploration 2                                                                                                 |      3 | 233119
  Inżynieria oprogramowania                                                                                          |      3 | 233119
  Kurs języka Java                                                                                                   |      3 | 233119
@@ -3184,7 +3184,7 @@
  Algebra                                                                                                            |      3 | 241699
  Analiza numeryczna (L)                                                                                             |      3 | 241699
  Architektury systemów komputerowych                                                                                |      3 | 241699
- CCNA Exploration 1                                                                                                 |      3 | 241699
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241699
  CCNA Exploration 2                                                                                                 |      3 | 241699
  Inżynieria oprogramowania                                                                                          |      3 | 241699
  Kurs Blendera                                                                                                      |      3 | 241699
@@ -3400,7 +3400,7 @@
  Integracja informacji                                                                                              |      2 | 221072
  Analiza numeryczna (L)                                                                                             |      3 | 241768
  Integracja informacji                                                                                              |      3 | 221135
- CCNA Exploration 1                                                                                                 |      3 | 241768
+ CCNA exploration 1: Network Fundamentals                                                                           |      3 | 241768
  CCNA Exploration 2                                                                                                 |      3 | 241768
  Integracja informacji                                                                                              |      3 | 233184
  CCNA Exploration 4                                                                                                 |      3 | 241768
@@ -3927,7 +3927,7 @@
  Kurs: Ruby on Rails                                                                                                |      3 | 221048
  Kurs: Ruby on Rails                                                                                                |      3 | 221056
  Seminarium: Pozycjonowanie stron internetowych                                                                     |      3 | 209116
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 209116
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 209116
  Technologie Semantic Web                                                                                           |      3 | 209116
  Kurs: Ruby on Rails                                                                                                |      3 | 221108
  Kurs: Ruby on Rails                                                                                                |      1 | 221144
@@ -4066,7 +4066,7 @@
  Buddyzm                                                                                                            |      3 | 241762
  Seminarium: Bezpieczeństwo i ochrona informacji                                                                    |      3 | 209111
  Seminarium: Bezpieczeństwo i ochrona informacji                                                                    |      3 | 209124
- CCNA Exploration 1                                                                                                 |      3 | 241762
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241762
  Seminarium: Bezpieczeństwo i ochrona informacji                                                                    |      3 | 209160
  Seminarium: Bezpieczeństwo i ochrona informacji                                                                    |      3 | 209163
  Eksploracja danych                                                                                                 |      2 | 241762
@@ -4235,7 +4235,7 @@
  Analiza numeryczna (M)                                                                                             |      3 | 241773
  Seminarium: Programowanie w teorii typów                                                                           |      3 | 208937
  Bazy danych                                                                                                        |      2 | 241773
- CCNA Exploration 1                                                                                                 |      2 | 241773
+ CCNA exploration 1: Network Fundamentals                                                                           |      2 | 241773
  Inżynieria oprogramowania                                                                                          |      1 | 241773
  Języki formalne i złożoność obliczeniowa                                                                           |      1 | 241773
  Kurs języka Java                                                                                                   |      3 | 241773
@@ -4900,7 +4900,7 @@
  Eksploracja danych                                                                                                 |      3 | 209141
  Architektury systemów komputerowych                                                                                |      3 | 241694
  Bazy danych                                                                                                        |      3 | 241694
- CCNA Exploration 1                                                                                                 |      2 | 241694
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      2 | 241694
  CCNA Exploration 2                                                                                                 |      1 | 241694
  Filozofia matematyki                                                                                               |      2 | 241694
  Inżynieria oprogramowania                                                                                          |      2 | 241694
@@ -5127,11 +5127,11 @@
  Sztuczna inteligencja                                                                                              |      2 | 241593
  Sztuczna inteligencja                                                                                              |      3 | 221043
  Sztuczna inteligencja                                                                                              |      3 | 221140
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      1 | 233131
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 221121
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 221096
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 200030
- Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne.                                               |      3 | 208937
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      1 | 233131
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 221121
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 221096
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 200030
+ Seminarium: Teoria automatów, klasyczne i nowe wyniki algorytmiczne                                               |      3 | 208937
  Pewne algorytmy symboliczne                                                                                        |      3 | 221121
  Pewne algorytmy symboliczne                                                                                        |      3 | 241653
  Pewne algorytmy symboliczne                                                                                        |      3 | 221116
@@ -5376,45 +5376,45 @@
  Kurs Blendera                                                                                                      |      3 | 200396
  Kurs Blendera                                                                                                      |      2 | 241665
  Kurs Blendera                                                                                                      |      3 | 233247
- CCNA Exploration 1                                                                                                 |      2 | 241702
- CCNA Exploration 1                                                                                                 |      3 | 233104
- CCNA Exploration 1                                                                                                 |      3 | 241671
- CCNA Exploration 1                                                                                                 |      3 | 241653
- CCNA Exploration 1                                                                                                 |      3 | 220992
- CCNA Exploration 1                                                                                                 |      2 | 241691
- CCNA Exploration 1                                                                                                 |      3 | 221048
- CCNA Exploration 1                                                                                                 |      3 | 221047
- CCNA Exploration 1                                                                                                 |      3 | 200126
- CCNA Exploration 1                                                                                                 |      3 | 241668
- CCNA Exploration 1                                                                                                 |      3 | 233197
- CCNA Exploration 1                                                                                                 |      3 | 221075
- CCNA Exploration 1                                                                                                 |      3 | 241649
- CCNA Exploration 1                                                                                                 |      3 | 229274
- CCNA Exploration 1                                                                                                 |      2 | 221067
- CCNA Exploration 1                                                                                                 |      1 | 169842
- CCNA Exploration 1                                                                                                 |      3 | 241731
- CCNA Exploration 1                                                                                                 |      3 | 241629
- CCNA Exploration 1                                                                                                 |      3 | 209102
- CCNA Exploration 1                                                                                                 |      3 | 241638
- CCNA Exploration 1                                                                                                 |      3 | 241678
- CCNA Exploration 1                                                                                                 |      3 | 241657
- CCNA Exploration 1                                                                                                 |      3 | 241746
- CCNA Exploration 1                                                                                                 |      3 | 241755
- CCNA Exploration 1                                                                                                 |      3 | 209141
- CCNA Exploration 1                                                                                                 |      3 | 241757
- CCNA Exploration 1                                                                                                 |      3 | 209160
- CCNA Exploration 1                                                                                                 |      3 | 241687
- CCNA Exploration 1                                                                                                 |      2 | 241728
- CCNA Exploration 1                                                                                                 |      3 | 221109
- CCNA Exploration 1                                                                                                 |      2 | 241665
- CCNA Exploration 1                                                                                                 |      3 | 241748
- CCNA Exploration 1                                                                                                 |      3 | 208932
- CCNA Exploration 1                                                                                                 |      3 | 233183
- CCNA Exploration 1                                                                                                 |      3 | 233247
- CCNA Exploration 1                                                                                                 |      3 | 241607
- CCNA Exploration 1                                                                                                 |      3 | 241681
- CCNA Exploration 1                                                                                                 |      1 | 169845
- CCNA Exploration 1                                                                                                 |      3 | 233171
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      2 | 241702
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233104
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241671
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241653
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 220992
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      2 | 241691
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221048
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221047
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 200126
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241668
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233197
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221075
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241649
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 229274
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      2 | 221067
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      1 | 169842
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241731
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241629
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 209102
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241638
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241678
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241657
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241746
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241755
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 209141
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241757
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 209160
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241687
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      2 | 241728
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 221109
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      2 | 241665
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241748
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 208932
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233183
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233247
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241607
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 241681
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      1 | 169845
+ CCNA exploration 1: Network Fundamentals                                                                                                 |      3 | 233171
  Algebra                                                                                                            |      3 | 233104
  Algebra                                                                                                            |      3 | 241771
  Algebra                                                                                                            |      3 | 241724
@@ -5829,3 +5829,116 @@
  Programowanie                                                                                                      |      2 | 221109
  Programowanie                                                                                                      |      3 | 221039
  Programowanie                                                                                                      |      1 | 169845
+ Programowanie (L)                                                                                                      |      3 | 210728
+ Programowanie (L)                                                                                                      |      3 | 221132
+ Programowanie (L)                                                                                                      |      3 | 241708
+ Programowanie (L)                                                                                                      |      3 | 209189
+ Programowanie (L)                                                                                                      |      2 | 221107
+ Programowanie (L)                                                                                                      |      3 | 233121
+ Programowanie (L)                                                                                                      |      3 | 221009
+ Programowanie (L)                                                                                                      |      3 | 241630
+ Programowanie (L)                                                                                                      |      3 | 220986
+ Programowanie (L)                                                                                                      |      3 | 233237
+ Programowanie (L)                                                                                                      |      1 | 233151
+ Programowanie (L)                                                                                                      |      2 | 241747
+ Programowanie (L)                                                                                                      |      3 | 241770
+ Programowanie (L)                                                                                                      |      3 | 221034
+ Programowanie (L)                                                                                                      |      3 | 200110
+ Programowanie (L)                                                                                                      |      3 | 241700
+ Programowanie (L)                                                                                                      |      3 | 241602
+ Programowanie (L)                                                                                                      |      3 | 233134
+ Programowanie (L)                                                                                                      |      3 | 233045
+ Programowanie (L)                                                                                                      |      3 | 221142
+ Programowanie (L)                                                                                                      |      1 | 186779
+ Programowanie (L)                                                                                                      |      3 | 221002
+ Programowanie (L)                                                                                                      |      3 | 221064
+ Programowanie (L)                                                                                                      |      3 | 241679
+ Programowanie (L)                                                                                                      |      3 | 226181
+ Programowanie (L)                                                                                                      |      3 | 233149
+ Programowanie (L)                                                                                                      |      3 | 233162
+ Programowanie (L)                                                                                                      |      3 | 233119
+ Programowanie (L)                                                                                                      |      3 | 233167
+ Programowanie (L)                                                                                                      |      3 | 241762
+ Programowanie (L)                                                                                                      |      3 | 221013
+ Programowanie (L)                                                                                                      |      3 | 200035
+ Programowanie (L)                                                                                                      |      3 | 233221
+ Programowanie (L)                                                                                                      |      3 | 208923
+ Programowanie (L)                                                                                                      |      3 | 233104
+ Programowanie (L)                                                                                                      |      3 | 241724
+ Programowanie (L)                                                                                                      |      3 | 241738
+ Programowanie (L)                                                                                                      |      3 | 241662
+ Programowanie (L)                                                                                                      |      3 | 221135
+ Programowanie (L)                                                                                                      |      3 | 221127
+ Programowanie (L)                                                                                                      |      3 | 241709
+ Programowanie (L)                                                                                                      |      3 | 241668
+ Programowanie (L)                                                                                                      |      3 | 209083
+ Programowanie (L)                                                                                                      |      3 | 221027
+ Programowanie (L)                                                                                                      |      1 | 229274
+ Programowanie (L)                                                                                                      |      3 | 241605
+ Programowanie (L)                                                                                                      |      3 | 200010
+ Programowanie (L)                                                                                                      |      3 | 221067
+ Programowanie (L)                                                                                                      |      2 | 233222
+ Programowanie (L)                                                                                                      |      3 | 241657
+ Programowanie (L)                                                                                                      |      3 | 241752
+ Programowanie (L)                                                                                                      |      3 | 233190
+ Programowanie (L)                                                                                                      |      3 | 204925
+ Programowanie (L)                                                                                                      |      2 | 221109
+ Programowanie (L)                                                                                                      |      3 | 221039
+ Programowanie (L)                                                                                                      |      1 | 169845
+ Programowanie (M)                                                                                                      |      3 | 210728
+ Programowanie (M)                                                                                                      |      3 | 221132
+ Programowanie (M)                                                                                                      |      3 | 241708
+ Programowanie (M)                                                                                                      |      3 | 209189
+ Programowanie (M)                                                                                                      |      2 | 221107
+ Programowanie (M)                                                                                                      |      3 | 233121
+ Programowanie (M)                                                                                                      |      3 | 221009
+ Programowanie (M)                                                                                                      |      3 | 241630
+ Programowanie (M)                                                                                                      |      3 | 220986
+ Programowanie (M)                                                                                                      |      3 | 233237
+ Programowanie (M)                                                                                                      |      1 | 233151
+ Programowanie (M)                                                                                                      |      2 | 241747
+ Programowanie (M)                                                                                                      |      3 | 241770
+ Programowanie (M)                                                                                                      |      3 | 221034
+ Programowanie (M)                                                                                                      |      3 | 200110
+ Programowanie (M)                                                                                                      |      3 | 241700
+ Programowanie (M)                                                                                                      |      3 | 241602
+ Programowanie (M)                                                                                                      |      3 | 233134
+ Programowanie (M)                                                                                                      |      3 | 233045
+ Programowanie (M)                                                                                                      |      3 | 221142
+ Programowanie (M)                                                                                                      |      1 | 186779
+ Programowanie (M)                                                                                                      |      3 | 221002
+ Programowanie (M)                                                                                                      |      3 | 221064
+ Programowanie (M)                                                                                                      |      3 | 241679
+ Programowanie (M)                                                                                                      |      3 | 226181
+ Programowanie (M)                                                                                                      |      3 | 233149
+ Programowanie (M)                                                                                                      |      3 | 233162
+ Programowanie (M)                                                                                                      |      3 | 233119
+ Programowanie (M)                                                                                                      |      3 | 233167
+ Programowanie (M)                                                                                                      |      3 | 241762
+ Programowanie (M)                                                                                                      |      3 | 221013
+ Programowanie (M)                                                                                                      |      3 | 200035
+ Programowanie (M)                                                                                                      |      3 | 233221
+ Programowanie (M)                                                                                                      |      3 | 208923
+ Programowanie (M)                                                                                                      |      3 | 233104
+ Programowanie (M)                                                                                                      |      3 | 241724
+ Programowanie (M)                                                                                                      |      3 | 241738
+ Programowanie (M)                                                                                                      |      3 | 241662
+ Programowanie (M)                                                                                                      |      3 | 221135
+ Programowanie (M)                                                                                                      |      3 | 221127
+ Programowanie (M)                                                                                                      |      3 | 241709
+ Programowanie (M)                                                                                                      |      3 | 241668
+ Programowanie (M)                                                                                                      |      3 | 209083
+ Programowanie (M)                                                                                                      |      3 | 221027
+ Programowanie (M)                                                                                                      |      1 | 229274
+ Programowanie (M)                                                                                                      |      3 | 241605
+ Programowanie (M)                                                                                                      |      3 | 200010
+ Programowanie (M)                                                                                                      |      3 | 221067
+ Programowanie (M)                                                                                                      |      2 | 233222
+ Programowanie (M)                                                                                                      |      3 | 241657
+ Programowanie (M)                                                                                                      |      3 | 241752
+ Programowanie (M)                                                                                                      |      3 | 233190
+ Programowanie (M)                                                                                                      |      3 | 204925
+ Programowanie (M)                                                                                                      |      2 | 221109
+ Programowanie (M)                                                                                                      |      3 | 221039
+ Programowanie (M)                                                                                                      |      1 | 169845
+
