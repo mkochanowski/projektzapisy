@@ -141,6 +141,19 @@ def courses(request):
     return render_to_response('enrollment/courses/courses_list.html',
         prepare_courses_list_to_render(request), context_instance=RequestContext(request))
 
+def votes(request, slug):
+    from apps.offer.vote.models import SystemState, SingleVote
+    data, course = prepare_courses_list_to_render_and_return_course(request, course_slug=slug)
+
+    data['course'] = course
+    data['voters'] = map(lambda x: x.student, SingleVote.objects\
+                .filter(Q(course__slug=slug),
+                            Q(state__semester_winter=data['default_semester']) |
+                            Q(state__semester_summer=data['default_semester']))\
+                .select_related('student', 'student__user'))
+
+    return render_to_response('enrollment/courses/voters.html', data, context_instance=RequestContext(request))
+
 def course(request, slug):
     try:
         default_semester = Semester.get_default_semester()

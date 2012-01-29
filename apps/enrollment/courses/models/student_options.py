@@ -9,7 +9,7 @@ logger = logging.getLogger()
 
 class StudentOptions( models.Model ):
     """ Used for defining time bonus in records - for Student, Course. Student gets bonuses if voted for course. """
-    course = models.ForeignKey('Course', verbose_name = 'przedmiot')
+    course  = models.ForeignKey('Course', verbose_name = 'przedmiot')
     student = models.ForeignKey('users.Student', verbose_name = 'student')
     records_opening_bonus_minutes = models.IntegerField(default=0, verbose_name='Przyspieszenie otwarcia zapisów na ten przedmiot (minuty)')
 

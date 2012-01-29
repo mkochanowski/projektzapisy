@@ -33,41 +33,7 @@
 	<div id="enr-group-view">
 
 
-        <h1>{{group.course.name}}</h1>
-        {% if user.is_staff %}
-
-        {% endif %}
-        <div class="details">
-            <table class="table-info">
-                <tr>
-                    <th>Typ</th>
-                    <td>{{group.get_type_display}}</td>
-                </tr>
-
-                    <tr>
-                        <th>Prowadzący</th>
-                        <td>
-
-                    {% if group.teacher %}
-                        <a href="{% url employee-profile group.teacher.user.id %}" class="person">{{group.get_teacher_full_name}}</a>
-                    {% else %}
-                        {{group.get_teacher_full_name}}
-                    {% endif %}</td>
-                    </tr>
-
-                <tr>
-                    <th>Termin</th>
-                    <td>
-                    {% for term in group.get_all_terms %}
-                        {{term}}{%if not forloop.last %}, {% endif %}
-                    {% endfor %}</td>
-                </tr>
-
-
-            </table>
-
-
-        </div>
+        {% include "enrollment/courses/course_head.html" %}
 
         <hr>
 
@@ -88,36 +54,7 @@
 
 
         {% if students_in_group %}
-		<table class="zebra-striped">
-			<thead>
-				<th>Imię</t>
-				<th>Nazwisko</t>
-				<th>Nr indeksu</th>
-				<th>Rodzaj studiów</th>
-				<th>Semestr</th>
-			</thead>
-			<tbody>
-				{% for student in students_in_group %}
-					<tr>
-						<td><a href="{% url student-profile student.user.id %}" class="person">
-						    {{student.user.first_name}}</a></td>
-						<td><a href="{% url student-profile student.user.id %}" class="person">
-						    {{student.user.last_name}}</a></td>
-						<td>{{student.matricula}}</td>
-						<td>
-							{{student.program}}
-							{% if student.is_zamawiany %}
-								(zamawiane)
-							{% endif %}
-						</td>
-						<td>{{student.semestr}}</td>
-					</tr>
-			
-				{% empty %}
-					Brak zapisanych osób.
-				{% endfor %}
-			</tbody>
-		</table>
+		    {% include "enrollment/records/students_list.html" with students=students_in_group %}
         <a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do grupy]</a>
 
         {% endif %}
@@ -126,34 +63,9 @@
 			<h3>Lista osób oczekujących na zapis:</h3>
 			<p> Liczba osób oczekujących na zapis: {{students_in_queue|length}} </p>
 			<br/>
-		<table class="zebra-striped">
-			<thead>
-				<th>Imię</t>
-				<th>Nazwisko</t>
-				<th>Nr indeksu</th>
-				<th>Rodzaj studiów</th>
-				<th>Semestr</th>
-			</thead>
-				<tbody>
-					{% for student in students_in_queue %}
-						<tr>
-							<td><a href="{% url student-profile student.user.id %}"{% if student.pk == user.student.pk %} class="bold"{% endif %}>
-							    {{student.user.first_name}}</a></td>
-							<td><a href="{% url student-profile student.user.id %}"{% if student.pk == user.student.pk %} class="bold"{% endif %}>
-							    {{student.user.last_name}}</a></td>
-							<td {% if student.pk == user.student.pk %} class="bold"{% endif %}>{{student.matricula}}</td>
-							<td>
-								{{student.program}}
-								{% if student.is_zamawiany %}
-									(zamawiane)
-								{% endif %}
-							</td>
 
-						    <td>{{student.semestr}}</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+            {% include "enrollment/records/students_list.html" with students=students_in_queue %}
+
 			<a href="mailto:{% for student in students_in_queue %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do kolejki]</a>
 		{% endif %}
 	</div>

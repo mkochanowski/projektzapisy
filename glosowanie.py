@@ -22,12 +22,12 @@ if __name__ == '__main__':
 f = open("plik.txt", "r")
 
 vote_list = []
-
 for line in f:
     l = line.split('|')
     vote_list.append((l[0].strip(), int(l[1].strip()), l[2].strip()))
 
 from django.core.exceptions import ObjectDoesNotExist
+
 from apps.enrollment.courses.models.course import CourseEntity, Course
 from apps.enrollment.courses.models.semester import Semester
 from apps.offer.vote.models.single_vote import SingleVote
