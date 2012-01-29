@@ -89,8 +89,8 @@ def prepare_courses_list_to_render_and_return_course(request,default_semester=No
                 'semester': x.semester_id,
                 'was_enrolled': x.was_enrolled
                 }
-    
-    semesters = Semester.objects.filter(visible=True)   
+
+    semesters = Semester.objects.filter(visible=True)
     courses = Course.visible.all().order_by('name')#.values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
 
     semester_courses_list = {}
@@ -141,6 +141,7 @@ def courses(request):
     return render_to_response('enrollment/courses/courses_list.html',
         prepare_courses_list_to_render(request), context_instance=RequestContext(request))
 
+@login_required
 def votes(request, slug):
     from apps.offer.vote.models import SystemState, SingleVote
     data, course = prepare_courses_list_to_render_and_return_course(request, course_slug=slug)
