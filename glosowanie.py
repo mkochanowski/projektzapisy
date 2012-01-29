@@ -44,15 +44,25 @@ except ObjectDoesNotExist:
     state.semester_summer = semester
     state.save()
 
-
+byly = {}
+przedmioty = {}
 
 for nazwa, glos, osoba in vote_list:
-    try:
-        entity = CourseEntity.objects.get(name__iexact=nazwa)
-        course = Course.objects.get(entity=entity, semester=semester)
-    except ObjectDoesNotExist:
-        print "Nie znaleziono: " + nazwa
-        continue
+
+    if not nazwa in przedmioty:
+
+        try:
+            entity = CourseEntity.objects.get(name__iexact=nazwa)
+            course = Course.objects.get(entity=entity, semester=semester)
+
+            przedmioty[nazwa] = (entity, course)
+        except ObjectDoesNotExist:
+            if not nazwa in byly:
+                print "Nie znaleziono: " + nazwa
+                byly[nazwa] = True
+            continue
+    else:
+        entity, course = przedmioty[nazwa]
 
     try:
         student = Student.objects.get(matricula=osoba)
@@ -61,7 +71,8 @@ for nazwa, glos, osoba in vote_list:
         continue
 
     try:
-        vote = SingleVote(student=student, state=state, course=course)
+        vote = SingleVote.objects.get(student=student, state=state, course=course)
+        pass
     except ObjectDoesNotExist:
         vote = SingleVote()
 
