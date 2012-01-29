@@ -151,6 +151,7 @@ def votes(request, slug):
                             Q(state__semester_winter=data['default_semester']) |
                             Q(state__semester_summer=data['default_semester']))\
                 .select_related('student', 'student__user'))
+    data['voters_count'] = len(data['voters'])
 
     return render_to_response('enrollment/courses/voters.html', data, context_instance=RequestContext(request))
 
