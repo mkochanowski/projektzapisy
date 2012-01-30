@@ -109,6 +109,7 @@ class TermAdmin(admin.ModelAdmin):
 
 class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
+    search_fields = ('course__name',)
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
 class PointsOfCoursesAdmin(admin.ModelAdmin):
