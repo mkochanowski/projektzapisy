@@ -112,6 +112,8 @@ class StudentOptionsAdmin(admin.ModelAdmin):
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
 class PointsOfCoursesAdmin(admin.ModelAdmin):
+
+    list_display = ('__unicode__','program', 'type_of_point', 'value')
     def queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
