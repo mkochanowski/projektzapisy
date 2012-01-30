@@ -83,6 +83,51 @@ EMAIL_COURSE_PREFIX = '[Fereol] ' # please don't remove the trailing space
 #INTERNAL_IPS = ('127.0.0.1',)
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,    
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s | %(message)s'
+        },
+    },
+    'handlers': {
+        'standard_file': {
+            'class' : 'logging.handlers.RotatingFileHandler',
+            'level': 'INFO',
+            'filename': os.path.join(PROJECT_PATH, 'logs/log.log'),
+            'maxBytes': 104857600,
+            'backupCount': 5,
+            'formatter': 'simple'
+        },
+        'backup_file': {
+            'class' : 'logging.handlers.RotatingFileHandler',
+            'level': 'INFO',
+
+            'filename': os.path.join(PROJECT_PATH, 'logs/backup.log'),
+            'maxBytes': 104857600,
+            'backupCount': 5,
+            'formatter': 'simple'
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
+     },
+    'loggers': {
+        'project.default': {
+            'handlers': ['standard_file', 'mail_admins'],
+            'level': 'INFO'
+        },
+        'project.backup': {
+            'handlers': ['backup_file'],
+            'level': 'INFO'
+
+        }
+    }
+}
+
+
 def custom_show_toolbar(request):
     if ('HTTP_HOST' in request.META) and (request.META['HTTP_HOST'][0:2] == 'm.'):
         return False
