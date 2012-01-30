@@ -48,8 +48,21 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
     semester_courses_list_setdefault = semester_courses_list.setdefault
 
 
+    def map_course(x):
+        return {
+                'id': x.id,
+                'name': x.name,
+                'type': x.type_id,
+                'slug': x.slug,
+                'english': x.english,
+                'exam': x.exam,
+                'suggested_for_first_year': x.suggested_for_first_year,
+                'semester': x.semester_id,
+                'was_enrolled': x.was_enrolled
+                }
+
     for course in courses:
-        semester_courses_list_setdefault(course.semester.id,[]).append(course)
+        semester_courses_list_setdefault(course.semester.id,[]).append(map_course(course))
 
     semester_courses = []
     semester_courses_append = semester_courses.append
@@ -61,6 +74,7 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
             'is_default': (semester == default_semester),
             'courses': semester_courses_list[semester.id]
         })
+
 
     render_data = {
         'semester_courses': semester_courses,
