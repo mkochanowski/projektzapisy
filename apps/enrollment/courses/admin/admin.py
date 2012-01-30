@@ -111,6 +111,15 @@ class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
+class PointsOfCoursesAdmin(admin.ModelAdmin):
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(PointsOfCoursesAdmin, self).queryset(request)
+       return qs.select_related('course', 'type_of_point', 'program', 'program__type_of_points', 'course__semester', 'course__type')
+
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseEntity, CourseEntityAdmin)
 admin.site.register(StudentOptions,StudentOptionsAdmin)

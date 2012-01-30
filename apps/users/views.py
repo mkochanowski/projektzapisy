@@ -48,8 +48,7 @@ GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
 def student_profile(request, user_id):
     """student profile"""
     try:
-        user = User.objects.get(id=user_id)
-        student = user.student
+        student = Student.objects.select_related('user').get(user=user_id)
         courses = prepare_schedule_courses(request, for_student=student)
         data = prepare_schedule_data(request, courses)
         data.update({
