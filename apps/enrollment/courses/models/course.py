@@ -146,7 +146,7 @@ class Course( models.Model ):
             return False
         else:
             student_opening = records_opening - student.get_t0_interval()
-            if student_opening + interval > datetime.now():
+            if student_opening + interval < datetime.now():
                 return None
             else:
                 return student_opening + interval
