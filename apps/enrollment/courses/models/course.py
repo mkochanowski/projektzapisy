@@ -55,7 +55,7 @@ class VisibleManager(models.Manager):
 
 class Course( models.Model ):
     """course in offer"""
-    entity = models.ForeignKey(CourseEntity, verbose_name='podstawa przedmiotu')
+    entity  = models.ForeignKey(CourseEntity, verbose_name='podstawa przedmiotu')
     name = models.CharField(max_length=255, verbose_name='nazwa przedmiotu')
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
@@ -146,7 +146,7 @@ class Course( models.Model ):
             return False
         else:
             student_opening = records_opening - student.get_t0_interval()
-            if student_opening + interval < datetime.now():
+            if student_opening + interval > datetime.now():
                 return None
             else:
                 return student_opening + interval
