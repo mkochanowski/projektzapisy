@@ -111,7 +111,7 @@ def prepare_courses_list_to_render_and_return_course(request,default_semester=No
                                          ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
                                          ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
                                          ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
-                                         ' AND "records_record"."status" = \'1\' AND "records_record"."semester_id" <> "cc"."semester_id")'})
+                                         ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "cc"."semester_id")'})
     else:
         courses = Course.visible.all().order_by('name')
 
