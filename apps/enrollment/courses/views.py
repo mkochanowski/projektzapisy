@@ -29,29 +29,27 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
     
    
     semesters = Semester.objects.filter(visible=True)
+    if hasattr(user, "student"):
+        courses = Course.visible.all().order_by('name')\
+            .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
+                                         ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
+                                         ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
+                                         ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
+                                                 ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
+        for c in courses:
+            c.was_enrolled = c.in_history > 0
+    else:
+        courses = Course.visible.all().order_by('name')
+        for c in courses:
+            c.was_enrolled = False
 
-    courses = Course.visible.all().order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
 
     semester_courses_list = {}
     semester_courses_list_setdefault = semester_courses_list.setdefault
 
-    # ponieważ: a) to poniższe i tak nam nie działa w systemie (jak teraz doszłam, na dole porównujemy entity_id z course_id, więc ma prawo
-    # nie działać (ale mogę się mylić); b) jest tu bardzo wolne zapytanie, które trzeba jakoś zoptymalizować
-    """
-    if user.is_anonymous():
-        records_history = []
-    else:
-        try:
-            if not student:
-                student = user.student
-            records_history = student.get_records_history(default_semester) # bardzo wolne zapytanie, zajmuje połowę czasu
-        except Student.DoesNotExist:
-            records_history = []
-    """
 
     for course in courses:
-        course['was_enrolled'] = False #course['id'] in records_history -----> poprawić, patrz komentarz powyżej
-        semester_courses_list_setdefault(course['semester'],[]).append(course)
+        semester_courses_list_setdefault(course.semester.id,[]).append(course)
 
     semester_courses = []
     semester_courses_append = semester_courses.append
@@ -92,30 +90,25 @@ def prepare_courses_list_to_render_and_return_course(request,default_semester=No
                 }
 
     semesters = Semester.objects.filter(visible=True)
-    courses = Course.visible.all().order_by('name')
+    if hasattr(user, "student"):
+        courses = Course.visible.all().order_by('name')\
+        .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
+                                     ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
+                                     ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
+                                     ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
+                                             ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
+    else:
+        courses = Course.visible.all().order_by('name')
 
 
     semester_courses_list = {}
     semester_courses_list_setdefault = semester_courses_list.setdefault
 
-    # ponieważ: a) to poniższe i tak nam nie działa w systemie (jak teraz doszłam, na dole porównujemy entity_id z course_id, więc ma prawo
-    # nie działać (ale mogę się mylić); b) jest tu bardzo wolne zapytanie, które trzeba jakoś zoptymalizować
-    """
-    if user.is_anonymous():
-        records_history = []
-    else:
-        try:
-            if not student:
-                student = user.student
-            records_history = student.get_records_history(default_semester) # bardzo wolne zapytanie, zajmuje połowę czasu
-        except Student.DoesNotExist:
-            records_history = []
-    """
 
     result_course = None
     for course in courses:
         if hasattr(course, "in_history"):
-            course.was_enrolled = course.in_history > 0 #course['id'] in records_history -----> poprawić, patrz komentarz powyżej
+            course.was_enrolled = int(course.in_history) > 0
         else:
             course.was_enrolled = False
         semester_courses_list_setdefault(course.semester_id,[]).append(map_course(course))
