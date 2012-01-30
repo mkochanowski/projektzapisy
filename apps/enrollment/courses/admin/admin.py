@@ -112,7 +112,7 @@ class StudentOptionsAdmin(admin.ModelAdmin):
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
 class PointsOfCoursesAdmin(admin.ModelAdmin):
-
+    list_filter = ('program', 'course__semester' , 'type_of_point', 'value')
     list_display = ('course', 'program', 'type_of_point', 'value')
     def queryset(self, request):
        """
