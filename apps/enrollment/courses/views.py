@@ -28,16 +28,8 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
         user = request.user
     
    
-    semesters = Semester.objects.filter(visible=True)
-    if user.student and user.student.id == 351:
-        courses = Course.visible.all().order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester', 'in_history')\
-            .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
-                                         ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
-                                         ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
-                                         ' WHERE (cc."entity_id" = "courses_course"."entity_id  AND "records_record"."student_id" = '+ user.student.id+ ' )'})
-    else:
-        courses = Course.visible.all().order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
-
+    semesters = Semester.objects.filter(visible=True)   
+    courses = Course.visible.all().order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
 
     semester_courses_list = {}
     semester_courses_list_setdefault = semester_courses_list.setdefault
@@ -99,15 +91,7 @@ def prepare_courses_list_to_render_and_return_course(request,default_semester=No
                 }
 
     semesters = Semester.objects.filter(visible=True)
-    if user.student and user.student.id == 351:
-        courses = Course.visible.all().order_by('name')\
-            .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
-                                         ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
-                                         ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
-                                         ' WHERE (cc."entity_id" = "courses_course"."entity_id  AND "records_record"."student_id" = '+ user.student.id+ ' )'})
-    else:
-        courses = Course.visible.all().order_by('name')
-
+    courses = Course.visible.all().order_by('name')#.values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
 
     semester_courses_list = {}
     semester_courses_list_setdefault = semester_courses_list.setdefault
@@ -128,10 +112,7 @@ def prepare_courses_list_to_render_and_return_course(request,default_semester=No
 
     result_course = None
     for course in courses:
-        if course.in_history:
-            course.was_enrolled = course.in_history > 0 #course['id'] in records_history -----> poprawić, patrz komentarz powyżej
-        else:
-            course.was_enrolled
+        course.was_enrolled = False #course['id'] in records_history -----> poprawić, patrz komentarz powyżej
         semester_courses_list_setdefault(course.semester_id,[]).append(map_course(course))
         if course_slug and course_slug==course.slug:
             result_course = course
