@@ -113,7 +113,7 @@ class StudentOptionsAdmin(admin.ModelAdmin):
 
 class PointsOfCoursesAdmin(admin.ModelAdmin):
 
-    list_display = ('program', 'type_of_point', 'value')
+    list_display = ('course', 'program', 'type_of_point', 'value')
     def queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
