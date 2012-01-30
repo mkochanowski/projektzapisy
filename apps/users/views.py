@@ -43,6 +43,8 @@ GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
         '6': 'sem', '7': 'lek', '8': 'WF',
         '9': 'rep', '10': 'proj'}
 
+def error(request):
+    raise NotImplementedError
 
 @login_required
 def student_profile(request, user_id):
