@@ -268,7 +268,7 @@ LOGGING = {
 
 
 INSTALLED_APPS = (
-    #'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -289,7 +289,8 @@ INSTALLED_APPS = (
     'apps.grade.poll',
     'apps.grade.ticket_create',
     #'apps.mobile',
-    'apps.email_change'
+    'apps.email_change',
+    'django_extensions'
 )
 
 AUTHENTICATION_BACKENDS = (
