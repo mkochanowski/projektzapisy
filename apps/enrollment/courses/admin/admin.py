@@ -31,7 +31,7 @@ class CourseAdmin(admin.ModelAdmin):
             q['course__semester__id__exact'] = Semester.get_current_semester()
             request.GET = q
             request.META['QUERY_STRING'] = request.GET.urlencode()
-        return super(GroupAdmin,self).changelist_view(request, extra_context=extra_context)
+        return super(CourseAdmin,self).changelist_view(request, extra_context=extra_context)
 
 
     def queryset(self, request):
