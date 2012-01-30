@@ -193,7 +193,7 @@ def password_change_done(request):
 def my_profile(request):
     '''profile site'''
     logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
-    current_semester = Semester.get_default_semester()
+    current_semester = Semester.get_current_semester()
     zamawiany = Student.get_zamawiany(request.user.id)
     comments = zamawiany and zamawiany.comments or ''
     points = zamawiany and zamawiany.points or 0
