@@ -115,6 +115,7 @@ LOGGING = {
         }
      },
     'loggers': {
+      
         'project.default': {
             'handlers': ['standard_file', 'mail_admins'],
             'level': 'INFO'
@@ -247,9 +248,14 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler',
         }
      },
+    
     'loggers': {
+        '': {
+            'handlers': ['mail_admins', 'root'],
+            'level': 'DEBUG'
+        },
         'project.default': {
-            'handlers': ['standard_file', 'mail_admins', 'root'],
+            'handlers': ['standard_file', 'mail_admins'],
             'level': 'DEBUG'
         },
         'project.backup': {
