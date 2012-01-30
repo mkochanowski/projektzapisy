@@ -38,11 +38,11 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
                                                  ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})\
             .values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester', 'in_history')
         for c in courses:
-            c.was_enrolled = c.in_history > 0
+            c['was_enrolled'] = int(c['in_history']) > 0
     else:
         courses = Course.visible.all().order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
         for c in courses:
-            c.was_enrolled = False
+            c['was_enrolled'] = False
 
 
     semester_courses_list = {}
