@@ -23,6 +23,17 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [GroupInline, ]
     filter_horizontal = ['requirements']
 
+    def changelist_view(self, request, extra_context=None):
+
+        if not request.GET.has_key('course__semester__id__exact'):
+
+            q = request.GET.copy()
+            semester = Semester.get_current_semester()
+            q['course__semester__id__exact'] = semester.id
+            request.GET = q
+            request.META['QUERY_STRING'] = request.GET.urlencode()
+        return super(CourseAdmin,self).changelist_view(request, extra_context=extra_context)
+
 
     def queryset(self, request):
        """
@@ -79,6 +90,16 @@ class GroupAdmin(admin.ModelAdmin):
         TermInline,RecordInline
     ]
 
+    def changelist_view(self, request, extra_context=None):
+
+        if not request.GET.has_key('course__semester__id__exact'):
+
+            q = request.GET.copy()
+            semester = Semester.get_current_semester()
+            q['course__semester__id__exact'] = semester.id
+            request.GET = q
+            request.META['QUERY_STRING'] = request.GET.urlencode()
+        return super(GroupAdmin,self).changelist_view(request, extra_context=extra_context)
 
     def queryset(self, request):
        """
