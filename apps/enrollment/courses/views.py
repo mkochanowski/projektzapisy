@@ -41,7 +41,7 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
     else:
         courses = Course.visible.all().order_by('name').values('id', 'name', 'type', 'slug', 'english', 'exam', 'suggested_for_first_year', 'semester')
         for c in courses:
-            c.was_enrolled = False
+            c['was_enrolled'] = False
 
 
     semester_courses_list = {}
