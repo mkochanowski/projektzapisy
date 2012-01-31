@@ -262,12 +262,16 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 
 		this._signInOutButton.click(function()
 		{
+            if (!confirm("Czy na pewno chcesz to zrobić?"))
+                    return;
 			MessageBox.clear();
 			self.group.setEnrolled(!self.group.isEnrolledOrQueued());
 		});
 
 		this._pinUnpinButton.click(function()
 		{
+            if (!confirm("Czy na pewno chcesz to zrobić?"))
+                    return;
 			MessageBox.clear();
 			self.group.setPinned(!self.group.isPinned);
 		});
