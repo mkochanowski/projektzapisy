@@ -30,7 +30,7 @@ class PointsOfCourseEntities(models.Model):
 class PointsOfCourses(models.Model):
     course = models.ForeignKey('Course', verbose_name='przedmiot')
     type_of_point = models.ForeignKey('PointTypes', verbose_name='rodzaj punktów')
-    program = models.ForeignKey('users.Program', verbose_name='Program Studiów', null=True, default=None)
+    program = models.ForeignKey('users.Program', verbose_name='Program Studiów', null=True, blank=True, default=None)
     value = models.PositiveSmallIntegerField(verbose_name='liczba punktów')
 
     class Meta:
@@ -38,3 +38,5 @@ class PointsOfCourses(models.Model):
         verbose_name_plural = 'zależności przedmiot-punkty'
         app_label = 'courses'
 
+    def __unicode__(self):
+        return '%s: %s %s' % (self.course.name, self.value, self.type_of_point)
