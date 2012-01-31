@@ -171,12 +171,15 @@ Fereol.Enrollment.CourseGroup.prototype.getTypeName = function(fullName)
  */
 Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 {
+
+    if (!confirm("Czy na pewno chcesz to zrobić?"))
+        return;
+
 	if (!Fereol.Enrollment.CourseGroup._setLoading(true))
 		return;
 	$.dataInvalidate();
 
-    if (!confirm("Czy na pewno chcesz to zrobić?"))
-        return;
+
 
 	if (!this.course.isRecordingOpen)
 		throw new Error('Zapisy na ten przedmiot są zamknięte');
