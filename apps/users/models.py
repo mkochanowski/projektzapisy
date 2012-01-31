@@ -253,7 +253,7 @@ class Student(BaseUser):
 
 
     @staticmethod
-    def get_list(begin = 'A'):
+    def get_list(begin='All'):
         def next_char(begin):
             try:
                 return chr(ord(begin) + 1)
