@@ -74,7 +74,7 @@ DATABASES = {
 #EMAIL_HOST_USER = ''
 #EMAIL_HOST_PASSWORD = ''
 
-EMAIL_COURSE_PREFIX = '[Fereol] ' # please don't remove the trailing space
+EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing space
 
 #loggin settings:
 
