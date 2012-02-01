@@ -9,7 +9,7 @@ from django.template import Context, RequestContext
 from django.template.loader import get_template
 import codecs
 
-MASS_MAIL_FROM = 'noreply@example.com'
+MASS_MAIL_FROM = 'zapisy@ii.uni.wroc.pl'
 
 def render_email_enrollment_from_queue(student, group):
     """
