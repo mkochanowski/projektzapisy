@@ -127,7 +127,7 @@
 								{{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
 							</span>
 							<span class="classroom">
-								(sala {{ term.object.classroom.number }})
+								 {{ term.object.numbers }}
 							</span>
 							<input type="hidden" name="term" value="{{ term.json }}" />
 						</li>

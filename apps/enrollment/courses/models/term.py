@@ -96,16 +96,21 @@ class Term(models.Model):
                                     JOIN courses_classroom 
                                     ON (courses_classroom.id = courses_term_classrooms.classroom_id)
                                     WHERE courses_term.id=courses_term_classrooms.term_id),',')"""}))
-    
+
+    def numbers(self):
+        classrooms = self.classrooms.all()
+        if len(classrooms) > 0:
+            classrooms = ' (s.' + ', '.join(map(lambda x: x.number, classrooms)) + ')'
+        else:
+            classrooms = ''
+
+        print classrooms
+
     def __unicode__(self):
         """
         N query problem with self.classrooms.all(). If you want to optimize, use Term.get_groups_terms.
         """
-        classrooms = self.classrooms.all()
-        if len(classrooms) > 0:
-            classrooms = ' (s.' + ', '.join(map(lambda x: x.number, self.classrooms.all())) + ')'
-        else:
-            classrooms = ''
+        classrooms = self.numbers()
         return "%s %s-%s%s" % (self.get_dayOfWeek_display_short(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), classrooms)
 
 def log_edit_term(sender, instance, **kwargs):
