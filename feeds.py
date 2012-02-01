@@ -7,7 +7,8 @@ from django.contrib.syndication.views import Feed
 class LatestNews(Feed):
     base_title_prefix = ""
     base_title_suffix = ": ogłoszenia"
-    description = ""
+    title = "Zapisy - newsy"
+    description = u"Aktualności z Systemu Zapisów Insytutu Informatyki UWr"
 
     
     def link(self):
@@ -27,3 +28,9 @@ class LatestNews(Feed):
     
     def item_pubdate(self, item):
         return item.date
+
+    def item_description(self, item):
+        return item.body
+
+    def item_title(self, item):
+        return item.title
