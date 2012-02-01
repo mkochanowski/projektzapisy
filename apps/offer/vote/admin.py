@@ -112,6 +112,15 @@ class SystemStateAdminForm( ModelForm ):
 class SingleVoteAdmin( admin.ModelAdmin ):
     raw_id_fields = ('student', )
 
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(SingleVoteAdmin, self).queryset(request)
+       return qs.select_related('student', 'student__user', 'course', 'course__semester', 'course__type', 'entity',
+           'proposal', 'state')
+
 class StateAdmin( admin.ModelAdmin ):
     """
         System State Administration
@@ -120,5 +129,3 @@ class StateAdmin( admin.ModelAdmin ):
 
 admin.site.register( SystemState, StateAdmin )
 admin.site.register( SingleVote, SingleVoteAdmin )
-
-
