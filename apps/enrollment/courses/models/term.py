@@ -19,9 +19,9 @@ class Term(models.Model):
     dayOfWeek = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia') 
     start_time = models.TimeField(verbose_name = 'rozpoczęcie')
     end_time = models.TimeField(verbose_name = 'zakończenie')
-    classroom = models.ForeignKey('Classroom', verbose_name='sala')
+    classroom = models.ForeignKey('Classroom', verbose_name='sala', null=True, blank=True)
     group = models.ForeignKey('Group', verbose_name='grupa', related_name='term')
-    classrooms = models.ManyToManyField('Classroom', related_name='new_classrooms', verbose_name='sale')
+    classrooms = models.ManyToManyField('Classroom', related_name='new_classrooms', verbose_name='sale', null=True, blank=True)
 
     class Meta:
         #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
@@ -39,6 +39,13 @@ class Term(models.Model):
             from apps.enrollment.records.models import Record
             filtered = filtered.filter(group__id__in=\
                 Record.get_student_enrolled_ids(student, semester))
+            """
+            inaczej można, powinno być jedno zapytanie mniej
+            filtered.extra(where='"courses_group"."id" in' + (Record.enrolled.\
+                        filter(student=student, group__course__semester=semester).\
+                        values('group__pk', flat=True)).query.__str__() )
+
+           """
                 
         if employee:
             from apps.enrollment.records.models import Record
