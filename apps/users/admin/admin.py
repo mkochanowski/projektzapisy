@@ -31,6 +31,16 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = ('program','status','semestr')
     ordering = ['user__last_name','user__first_name']
     list_display_links = ('get_full_name',)
+
+    def queryset(self, request):
+       qs = super(StudentAdmin, self).queryset(request)
+       return qs.select_related('program', 'program__type_of_points', 'user')
+
+class ProgramAdmin(admin.ModelAdmin):
+
+    def queryset(self, request):
+       qs = super(ProgramAdmin, self).queryset(request)
+       return qs.select_related('type_of_points')
         
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ('get_full_name','homepage','room','consultations',)
@@ -43,14 +53,23 @@ class EmployeeAdmin(admin.ModelAdmin):
     ordering = ['user__last_name','user__first_name']
     list_display_links = ('get_full_name',)
 
+    def queryset(self, request):
+       qs = super(EmployeeAdmin, self).queryset(request)
+       return qs.select_related('user')
+
+
 class StudiaZamawianeAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','points','comments')
     search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
     ordering = ['student__user__last_name','student__user__first_name']
 
+    def queryset(self, request):
+       qs = super(StudiaZamawianeAdmin, self).queryset(request)
+       return qs.select_related('student', 'student__user')
+
 admin.site.register(ExtendedUser, ExtendedUserAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Student, StudentAdmin)
-admin.site.register(Program)
+admin.site.register(Program, ProgramAdmin)
 admin.site.register(StudiaZamawiane, StudiaZamawianeAdmin)
 admin.site.register(StudiaZamawianeMaileOpiekunow)
