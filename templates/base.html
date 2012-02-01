@@ -88,13 +88,13 @@
                         <div class="inline-inputs">
                             <input type="hidden" name="next" value="{{request.path}}"/>
                             <label for="id_login">login:</label>
-                            <input class="small" type="text" id="id_login" name="username">
+                            <input class="small" tabindex="1" type="text" id="id_login" name="username">
 
                             <label for="id_password">hasło:</label>
-                            <input class="small" type="password" id="id_password" name="password">
+                            <input class="small" tabindex="2"  type="password" id="id_password" name="password">
 
-                            <button class="btn small" type="submit">Loguj &raquo;</button>
-                            <input type="checkbox" value="true" id="xlInput3" name="remember_me">
+                            <button class="btn small" tabindex="4"  type="submit">Loguj &raquo;</button>
+                            <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me">
                             <label for="xlInput3">Zapamiętaj mnie</label>
                         </div>
                     </form>
