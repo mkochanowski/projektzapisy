@@ -18,7 +18,7 @@ class LatestNews(Feed):
         return News.objects.exclude(category='-').select_related('author')[:10]
     
     def item_link(self, item):
-        return ("/news/")
+        return ("/news/#news_" + str(item.id))
     
     def item_author_name(self, item):
         return item.author.get_full_name()
