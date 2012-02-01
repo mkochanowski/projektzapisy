@@ -104,7 +104,7 @@ class Term(models.Model):
         else:
             classrooms = ''
 
-        print classrooms
+        return classrooms
 
     def __unicode__(self):
         """
