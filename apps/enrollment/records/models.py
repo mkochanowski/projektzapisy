@@ -214,13 +214,13 @@ class Record(models.Model):
             logger.info('User %s <id: %s> is no longer pinned to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             return record
         except Record.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Record.DoesNotExist exception' % (int(user_id), int(group_id)))
+            logger.warning('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Record.DoesNotExist exception' % (int(user_id), int(group_id)))
             raise AlreadyNotPinnedException()
         except Student.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Student.DoesNotExist exception' % (int(user_id), int(group_id)))
+            logger.warning('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Student.DoesNotExist exception' % (int(user_id), int(group_id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.error('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Group.DoesNotExist exception' % (int(user_id), int(group_id)))
+            logger.warning('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Group.DoesNotExist exception' % (int(user_id), int(group_id)))
             raise NonGroupException()
     
     @staticmethod
