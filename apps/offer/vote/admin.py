@@ -111,6 +111,9 @@ class SystemStateAdminForm( ModelForm ):
 
 class SingleVoteAdmin( admin.ModelAdmin ):
     raw_id_fields = ('student', )
+    list_display = ('student','course','correction', 'state')
+    list_filter = ('entity', 'state', 'course__semester')
+    search_fields = ('student__matricula', 'student__user__first_name', 'student__user__last_name', 'student__user__username')
 
     def queryset(self, request):
        """
