@@ -472,7 +472,7 @@ class Queue(models.Model):
     def remove_student_from_queue(user_id, group_id):
         """remove student from queue"""
         try:
-            student = Student.objects.select_related('user'.get(user__id=user_id))
+            student = Student.objects.select_related('user').get(user__id=user_id)
 
             record = Queue.queued.select_related('group').get(group__id=group_id, student=student)
             group = record.group
