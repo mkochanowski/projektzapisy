@@ -271,7 +271,7 @@ Fereol.Enrollment.CourseGroup.prototype.changePriority = function(newPriority)
 		if (result.isSuccess())
 		{
 			Fereol.Enrollment.CourseGroup._setLoading(false);
-			this._notifyUpdateListeners();
+            self._notifyUpdateListeners();
 		}
 		else
 			result.displayMessageBox();
