@@ -33,4 +33,14 @@ def all_news(request):
 
     return render_to_response('news/list_all.html', data, context_instance = RequestContext(request))
 
+def main_page( request ):
+    """
+        Main page
+    """
+    try:
+        news = News.objects.exclude(category='-').select_related('author')[0]
+    except ObjectDoesNotExist:
+        news = None
+
+    return render_to_response('common/index.html', {'news': news}, context_instance = RequestContext(request))
 
