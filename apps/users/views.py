@@ -78,7 +78,7 @@ def student_profile(request, user_id):
 def employee_profile(request, user_id):
     """employee profile"""
     try:
-        user = User.objects.get(id=user_id).select_related('employee')
+        user = User.objects.select_related('employee').get(id=user_id)
         employee = user.employee
 
     except Employee.DoesNotExist:
