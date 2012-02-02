@@ -419,7 +419,7 @@ class Queue(models.Model):
     def add_student_to_queue(user_id, group_id,priority=1):
         """ Assign student to queue"""
         try:
-            student = Student.objects.get(user__id=user_id).select_related('user')
+            student = Student.objects.select_related('user').get(user__id=user_id)
             if not Group.objects.get(id=group_id).course.\
                 is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
@@ -451,8 +451,8 @@ class Queue(models.Model):
     def change_student_priority(user_id, group_id, new_priority) :
         """change student's priority in group queue"""
         try:
-            student = Student.objects.get(user__id=user_id).select_related('user')
-            record = Queue.objects.get(student=student, group__id=group_id).select_related('group')
+            student = Student.objects.select_related('user').get(user__id=user_id)
+            record = Queue.objects.select_related('group').get(student=student, group__id=group_id)
             """ Podstawienie nowej wartości"""
             record.priority = new_priority
             record.save()
@@ -472,9 +472,9 @@ class Queue(models.Model):
     def remove_student_from_queue(user_id, group_id):
         """remove student from queue"""
         try:
-            student = Student.objects.get(user__id=user_id).select_related('user')
+            student = Student.objects.select_related('user'.get(user__id=user_id))
 
-            record = Queue.queued.get(group__id=group_id, student=student).select_related('group')
+            record = Queue.queued.select_related('group').get(group__id=group_id, student=student)
             group = record.group
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
