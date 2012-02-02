@@ -67,6 +67,7 @@
                 <td>{{ requirements|join:", " }}</td>
             </tr>
         {% endif %}
+        {% if False %}
             <tr>
                 <th>Konsultacje</th>
                 <td><a href="{% url course-consiltations-page course.slug %}">link</a></td>
@@ -75,6 +76,7 @@
                 <th>Oddane głosy</th>
                 <td> {{ course.votes_count }} <a href="{% url course-votes course.slug %}">lista</a></td>
             </tr>
+        {% endif %}
         {% if course.can_enroll_from %}
             <tr>
                 <th>Możesz zapisać się od</th>

@@ -198,7 +198,7 @@ def course(request, slug):
             extra({
                 'enrolled': "SELECT COUNT(*) FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s'" % (STATUS_ENROLLED,),
                 'queued': "SELECT COUNT(*) FROM records_queue WHERE courses_group.id=records_queue.group_id",
-                'priority': "SELECT COALESCE((SELECT priority FROM records_queue WHERE courses_group.id=records_queue.group_id AND records_queue.student_id=%s),-1)" % (student_id,),
+                'priority': "SELECT COALESCE((SELECT priority FROM records_queue WHERE courses_group.id=records_queue.group_id AND records_queue.student_id=%s),0)" % (student_id,),
                 'signed': "SELECT COALESCE((SELECT id FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s' AND records_record.student_id=%s),0)" % (STATUS_ENROLLED,student_id)}).
             select_related('teacher', 'teacher__user'))
         

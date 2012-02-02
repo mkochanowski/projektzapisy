@@ -259,6 +259,7 @@ Fereol.Enrollment.CourseGroup.prototype.changePriority = function(newPriority)
 	if (newPriority < 1 ||
 		newPriority > Fereol.Enrollment.CourseGroup._priorityLimit)
 		throw new Error('Nieprawidłowy priorytet do ustawienia');
+	this.queuePriority = newPriority;
 
 	$.dataInvalidate();
 
