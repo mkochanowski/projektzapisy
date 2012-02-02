@@ -13,8 +13,8 @@ from fereol.feeds import LatestNews
 
 urlpatterns = patterns('',
     #MAIN PAGE
-    url('^$', 'apps.news.views.main_page', name='main-page'),
-    url(r'^42$', 'apps.users.views.error', name='fake-error'),
+    url('^$', 'apps.news.views.all_news', name='main-page'),
+    url('^$', 'apps.news.views.all_news', name='main-page'),
     #HELP
     (r'^help/', include('apps.help.urls')),
     #Z

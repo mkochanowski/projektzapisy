@@ -25,10 +25,10 @@ from libs.ajax_messages import *
 @require_POST
 @transaction.commit_on_success
 def prototype_set_pinned(request):
-    '''
+    """
         Response for AJAX query for pinning or un-pinning group from student's
         schedule.
-    '''
+    """
     if not request.user.is_authenticated():
         return AjaxFailureMessage('NotAuthenticated', 'Nie jesteś zalogowany.')
 
@@ -41,64 +41,64 @@ def prototype_set_pinned(request):
     try:
         if set_pinned:
             Record.pin_student_to_group(request.user.id, group_id)
-            return AjaxSuccessMessage(\
+            return AjaxSuccessMessage(
                 'Grupa została przypięta do Twojego planu.')
         else:
             Record.unpin_student_from_group(request.user.id, group_id)
             return AjaxSuccessMessage('Grupa została odpięta od Twojego planu.')
     except NonStudentException:
         transaction.rollback()
-        return AjaxFailureMessage('NonStudent', \
-            'Nie możesz przypinać grup do planu, bo nie jesteś studentem.');
+        return AjaxFailureMessage('NonStudent',
+            'Nie możesz przypinać grup do planu, bo nie jesteś studentem.')
     except NonGroupException:
         transaction.rollback()
-        return AjaxFailureMessage('NonGroup', \
-            'Nie możesz przypiąć tej grupy, bo już nie istnieje.');
+        return AjaxFailureMessage('NonGroup',
+            'Nie możesz przypiąć tej grupy, bo już nie istnieje.')
     except AlreadyPinnedException:
         transaction.rollback()
-        return AjaxSuccessMessage( \
-            'Grupa jest już przypięta do Twojego planu.');
+        return AjaxSuccessMessage(
+            'Grupa jest już przypięta do Twojego planu.')
     except AlreadyNotPinnedException:
         transaction.rollback()
-        return AjaxSuccessMessage( \
-            'Grupa jest już odpięta od Twojego planu.');
+        return AjaxSuccessMessage(
+            'Grupa jest już odpięta od Twojego planu.')
 
 @require_POST
 @transaction.commit_on_success
 def set_enrolled(request, method):
-    '''
+    """
         Set student assigned (or not) to group.
-    '''
+    """
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
 
     if not request.user.is_authenticated():
-        return AjaxFailureMessage.auto_render('NotAuthenticated', \
+        return AjaxFailureMessage.auto_render('NotAuthenticated',
             'Nie jesteś zalogowany.', message_context)
 
     try:
         group_id = int(request.POST['group'])
         set_enrolled = request.POST['enroll'] == 'true'
     except MultiValueDictKeyError:
-        return AjaxFailureMessage.auto_render('InvalidRequest', \
+        return AjaxFailureMessage.auto_render('InvalidRequest',
             'Nieprawidłowe zapytanie.', message_context)
 
     if request.user.student.block:
-        return AjaxFailureMessage.auto_render('ScheduleLocked', \
-            'Twój plan jest zablokowany.', message_context);
+        return AjaxFailureMessage.auto_render('ScheduleLocked',
+            'Twój plan jest zablokowany.', message_context)
     student = request.user.student
 
     logger.info('User %s <id: %s> set himself %s to group with id: %s' % \
-        (request.user.username, request.user.id, \
+        (request.user.username, request.user.id,
         ('enrolled' if set_enrolled else 'not enrolled'), group_id))
 
     def prepare_group_data(course, student):
         groups = course.groups.all()
         queued = Queue.queued.filter(group__course=course, student=student)
-        enrolled_ids = Record.enrolled.filter(group__course=course, \
+        enrolled_ids = Record.enrolled.filter(group__course=course,
             student=student).values_list('group__id', flat=True)
         queued_ids = queued.values_list('group__id', flat=True)
-        pinned_ids = Record.pinned.filter(group__course=course, \
+        pinned_ids = Record.pinned.filter(group__course=course,
             student=student).values_list('group__id', flat=True)
         queue_priorities = Queue.queue_priorities_map(queued)
 
@@ -109,11 +109,19 @@ def set_enrolled(request, method):
                 queue_priorities, student))
         return data
 
+
     try:
         group = Group.objects.get(id=group_id)
+    except ObjectDoesNotExist:
+        transaction.rollback()
+        return AjaxFailureMessage.auto_render('NonGroup',
+            'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona już' +\
+            ' nie istnieje.', message_context)
+
+    try:
         if set_enrolled:
-            moved = Record.is_student_in_course_group_type(\
-                user=request.user, slug=group.course_slug(),\
+            moved = Record.is_student_in_course_group_type(
+                user=request.user, slug=group.course_slug(),
                 group_type=group.type) #TODO: omg ale crap
             connected_records = Record.add_student_to_group(request.user, group)
             record = connected_records[0]
@@ -125,7 +133,6 @@ def set_enrolled(request, method):
                 message = 'Zostałeś zapisany do wybranej grupy oraz grup ' + \
                 'powiązanych.'
         else:
-            connected_records = None
             record = Record.remove_student_from_group(request.user, group)
             message = 'Zostałeś wypisany z wybranej grupy.'
 
@@ -133,7 +140,7 @@ def set_enrolled(request, method):
             return AjaxSuccessMessage(message,
                 prepare_group_data(group.course, student))
         else:
-            request.user.message_set.create(message=message)
+            messages.info(request, message)
             return redirect('course-page', slug=record.group_slug())
     except NonStudentException:
         transaction.rollback()
@@ -151,7 +158,7 @@ def set_enrolled(request, method):
             return AjaxSuccessMessage(message,
                 prepare_group_data(group.course, student))
         else:
-            request.user.message_set.create(message=message)
+            messages.info(request, message)
             return redirect('course-page', slug=Group.objects.\
                 get(id=group_id).course_slug())
     except AlreadyNotAssignedException:
@@ -164,7 +171,7 @@ def set_enrolled(request, method):
             return AjaxSuccessMessage(message,
                 prepare_group_data(group.course, student))
         else:
-            request.user.message_set.create(message=message)
+            messages.info(request, message)
             return redirect('course-page', slug=Group.objects.\
                 get(id=group_id).course_slug())
     except OutOfLimitException:
@@ -176,15 +183,15 @@ def set_enrolled(request, method):
                 pass
             message = 'Grupa jest pełna. Zostałeś zapisany do kolejki.'
             if is_ajax:
-                return AjaxFailureMessage.auto_render('Queued', message,\
+                return AjaxFailureMessage.auto_render('Queued', message,
                     message_context, prepare_group_data(group.course, student))
             else:
-                request.user.message_set.create(message=message)
+                messages.info(request, message)
                 return redirect('course-page', slug=Group.objects.\
                     get(id=group_id).course_slug())
         except AlreadyQueuedException:
             return AjaxFailureMessage.auto_render('AlreadyQueued',
-                'Jesteś już zapisany do kolejki.', \
+                'Jesteś już zapisany do kolejki.',
                 message_context)
     except RecordsNotOpenException:
         transaction.rollback()
@@ -194,7 +201,7 @@ def set_enrolled(request, method):
         else:
             message = 'Nie możesz się wypisać, ponieważ zapisy są już ' + \
                 'zamknięte.'
-        return AjaxFailureMessage.auto_render('RecordsNotOpen', message, \
+        return AjaxFailureMessage.auto_render('RecordsNotOpen', message,
             message_context)
     except ECTS_Limit_Exception:
         if is_ajax:
@@ -207,7 +214,7 @@ def set_enrolled(request, method):
         message = 'Nie możesz się zapisać, ponieważ nie jesteś aktywnym ' + \
             'studentem.'
         if is_ajax:
-            return AjaxFailureMessage.auto_render('InactiveStudent', message, \
+            return AjaxFailureMessage.auto_render('InactiveStudent', message,
                 message_context)
         else:
             messages.error(request, message)
@@ -217,25 +224,25 @@ def set_enrolled(request, method):
 
 @require_POST
 def records_set_locked(request, method):
-    '''
+    """
         Locks or unlocks records for student to prevent mistakes.
-    '''
+    """
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
 
     if not request.user.is_authenticated():
-        return AjaxFailureMessage.auto_render('NotAuthenticated',\
+        return AjaxFailureMessage.auto_render('NotAuthenticated',
             'Nie jesteś zalogowany.', message_context)
 
     try:
         lock = request.POST['lock'] == 'true'
     except MultiValueDictKeyError:
-        return AjaxFailureMessage.auto_render('InvalidRequest',\
+        return AjaxFailureMessage.auto_render('InvalidRequest',
             'Nieprawidłowe zapytanie.', message_context)
 
     try:
         logger.info('User %s  <id: %d> %s his/her records' %\
-            (request.user.username, request.user.id,\
+            (request.user.username, request.user.id,
             ('locks' if lock else 'unlocks')))
         request.user.student.records_set_locked(lock)
 
@@ -243,20 +250,20 @@ def records_set_locked(request, method):
         if is_ajax:
             return AjaxSuccessMessage(message)
         else:
-            request.user.message_set.create(message=message)
+            messages.info(request, message)
             return redirect('schedule-prototype')
     except Student.DoesNotExist:
         transaction.rollback()
-        return AjaxFailureMessage.auto_render('NonStudent',\
+        return AjaxFailureMessage.auto_render('NonStudent',
             'Nie jesteś studentem.', message_context)
 
 @require_POST
 @login_required
 @transaction.commit_on_success
 def set_queue_priority(request, method):
-    '''
+    """
         Sets new priority for queue of some group
-    '''
+    """
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
 
@@ -264,19 +271,19 @@ def set_queue_priority(request, method):
         group_id = int(request.POST['id'])
         priority = int(request.POST['priority'])
     except MultiValueDictKeyError:
-        return AjaxFailureMessage.auto_render('InvalidRequest',\
+        return AjaxFailureMessage.auto_render('InvalidRequest',
             'Nieprawidłowe zapytanie.', message_context)
 
     try:
         if request.user.student.block:
-            return AjaxFailureMessage.auto_render('ScheduleLocked', \
-                'Twój plan jest zablokowany.', message_context);
+            return AjaxFailureMessage.auto_render('ScheduleLocked',
+                'Twój plan jest zablokowany.', message_context)
 
         queue = Queue.objects.select_related('group').get(student=request.user.student, group__id=group_id)
-        priority = int(priority)
+        #priority = int(priority) WTF? to już jest int
         if priority > settings.QUEUE_PRIORITY_LIMIT or priority < 1:
-            return AjaxFailureMessage.auto_render('FatalError', \
-                'Nieprawidłowa wartość priorytetu.', message_context);
+            return AjaxFailureMessage.auto_render('FatalError',
+                'Nieprawidłowa wartość priorytetu.', message_context)
         if queue.priority != priority:
             queue.set_priority(priority)
         if is_ajax:
@@ -285,14 +292,14 @@ def set_queue_priority(request, method):
             return redirect("course-page", slug=queue.group_slug())
     except Queue.DoesNotExist:
         transaction.rollback()
-        return AjaxFailureMessage.auto_render('NotQueued',\
+        return AjaxFailureMessage.auto_render('NotQueued',
             'Nie jesteś w kolejce do tej grupy.', message_context)
 
 @login_required
 def records(request, group_id):
-    '''
+    """
         Group records view - list of all students enrolled and queued to group.
-    '''
+    """
     try:
         group = Group.objects.get(id=group_id)
         students_in_group = Record.get_students_in_group(group_id)
@@ -308,18 +315,19 @@ def records(request, group_id):
         return render_to_response('enrollment/records/records_list.html', data,
             context_instance=RequestContext(request))
     except NonGroupException:
-        request.user.message_set.create(message="Podana grupa nie istnieje.")
-        return render_to_response('common/error.html',\
+        messages.info(request, "Podana grupa nie istnieje.")
+        return render_to_response('common/error.html',
             context_instance=RequestContext(request))
 
 @login_required
 def own(request):
-    ''' own schedule view '''
+    """ own schedule view """
 
     default_semester = Semester.get_default_semester()
     if not default_semester:
         raise RuntimeError('Brak aktywnego semestru')
 
+    employee = None
     try:
         student = request.user.student
     except Student.DoesNotExist:
@@ -329,14 +337,13 @@ def own(request):
         except Employee.DoesNotExist:
             employee = None
     if student is None and employee is None:
-        request.user.message_set.create(message = \
-            'Nie jesteś pracownikiem ani studentem.')
-        return render_to_response('common/error.html', \
+        messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
+        return render_to_response('common/error.html',
             context_instance=RequestContext(request))
 
     if student:
         courses = prepare_schedule_courses(request, for_student=student)
-    elif employee:
+    else: #musi isnieć na mocy if kilka linii wyżej
         courses = prepare_schedule_courses(request, for_employee=employee)
 
     data = prepare_schedule_data(request, courses)
@@ -356,34 +363,34 @@ def own(request):
         'courses': courses,
     })
 
-    return render_to_response('enrollment/records/schedule.html',\
+    return render_to_response('enrollment/records/schedule.html',
         data, context_instance = RequestContext(request))
 
 @login_required       
 def schedule_prototype(request):
-    ''' schedule prototype view '''
+    """ schedule prototype view """
     try:
         student = request.user.student
     except Student.DoesNotExist:
-        request.user.message_set.create(message='Nie jesteś studentem.')
-        return render_to_response('common/error.html', \
+        messages.info(request, 'Nie jesteś studentem.')
+        return render_to_response('common/error.html',
             context_instance=RequestContext(request))
 
     TimerDebugPanel.timer_start('loading_semester', 'Pobieranie semestru')
     default_semester = Semester.get_default_semester()
     if not default_semester:
-        request.user.message_set.create(message='Brak aktywnego semestru.')
+        messages.info(request, 'Brak aktywnego semestru.')
         data = {
             'student_records': [],
             'courses' : [],
             'semester' : 'nieokreślony',
             'types_list' : []
         }
-        return render_to_response('enrollment/records/schedule_prototype.html',\
+        return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
     TimerDebugPanel.timer_stop('loading_semester')
 
-    TimerDebugPanel.timer_start('preload_cache', \
+    TimerDebugPanel.timer_start('preload_cache',
         'Przygotowywanie cache StudentOptions')
     StudentOptions.preload_cache(student, default_semester)
     TimerDebugPanel.timer_stop('preload_cache')
@@ -391,15 +398,8 @@ def schedule_prototype(request):
     TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')    
     cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), 'DoesNotExist')
     if cached_courses == 'DoesNotExist':
-        """
-        was_enroled_sql = 'SELECT COUNT(*) FROM "records_record"' \
-                                ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
-                                ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
-                                ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(student.id)+ '' \
-                                ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'
-        """
+
         terms = Term.get_all_in_semester(default_semester )
-#                    .extra(select={'was_enro'})
         courses = prepare_courses_with_terms( terms )
         for course in courses:
             course['info'].update({
@@ -431,7 +431,7 @@ def schedule_prototype(request):
         
     TimerDebugPanel.timer_stop('json_prepare_1')
     TimerDebugPanel.timer_start('json_prepare_2', 'Przygotowywanie JSON - st2')
-    all_groups_json = prepare_groups_json(default_semester, cached_all_groups, \
+    all_groups_json = prepare_groups_json(default_semester, cached_all_groups,
         student=student)
     TimerDebugPanel.timer_stop('json_prepare_2')
 
@@ -448,5 +448,5 @@ def schedule_prototype(request):
         'types_list' : Type.get_all_for_jsfilter(),
         'priority_limit': settings.QUEUE_PRIORITY_LIMIT
     }
-    return render_to_response('enrollment/records/schedule_prototype.html',\
+    return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))

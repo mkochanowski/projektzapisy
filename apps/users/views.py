@@ -43,8 +43,6 @@ GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
         '6': 'sem', '7': 'lek', '8': 'WF',
         '9': 'rep', '10': 'proj'}
 
-def error(request):
-    raise NotImplementedError
 
 @login_required
 def student_profile(request, user_id):
@@ -70,18 +68,29 @@ def student_profile(request, user_id):
 
     except Student.DoesNotExist:
         logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % int(user_id) )
-        request.user.message_set.create(message="Nie ma takiego studenta.")
+        messages.error(request, "Nie ma takiego studenta.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
         logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
-        request.user.message_set.create(message="Nie ma takiego użytkownika.")
+        messages.error(request, "Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
 def employee_profile(request, user_id):
     """employee profile"""
     try:
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(id=user_id).select_related('employee')
         employee = user.employee
+
+    except Employee.DoesNotExist:
+        logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % int(user_id) )
+        messages.error(request, "Nie ma takiego pracownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+    except User.DoesNotExist:
+        logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
+        messages.error(request, "Nie ma takiego użytkownika.")
+        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
+    try:
         courses = prepare_schedule_courses(request, for_employee=employee)
         data = prepare_schedule_data(request, courses)
         data.update({
@@ -90,7 +99,7 @@ def employee_profile(request, user_id):
         })
         
         if request.is_ajax():
-            return render_to_response('users/employee_profile_contents.html', \
+            return render_to_response('users/employee_profile_contents.html',
                 data, context_instance=RequestContext(request))
         else:
             begin = user.last_name[0]
@@ -107,23 +116,16 @@ def employee_profile(request, user_id):
               
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
         
-    except Employee.DoesNotExist:
-        logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % int(user_id) )
-        request.user.message_set.create(message="Nie ma takiego pracownika.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
-    except User.DoesNotExist:
-        logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
-        request.user.message_set.create(message="Nie ma takiego użytkownika.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+
     except MoreThanOneCurrentSemesterException:
         data = {'employee' : employee}
         logger.error('Function employee_profile throws MoreThanOneCurrentSemesterException.' )
-        request.user.message_set.create(message="Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
+        messages.error(request, "Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
         return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
     
 @login_required
 def email_change(request):
-    '''function that enables mail changing'''
+    """function that enables mail changing"""
     if request.POST:
         data = request.POST.copy()
         form = EmailChangeForm(data, instance=request.user)
@@ -146,7 +148,7 @@ def email_change(request):
 
 @login_required
 def bank_account_change(request):
-    '''function that enables bank account changing'''
+    """function that enables bank account changing"""
     if request.POST:
         data = request.POST.copy()
         zamawiany = Student.get_zamawiany(request.user.id)
@@ -154,7 +156,7 @@ def bank_account_change(request):
         if form.is_valid():
             form.save()
             logger.info('User (%s) changed bank account' % request.user.get_full_name())
-            request.user.message_set.create(message="Twój numer konta bankowego został zmieniony.")
+            messages.success(request, "Twój numer konta bankowego został zmieniony.")
             return HttpResponseRedirect(reverse('my-profile'))
     else:
         zamawiany = Student.get_zamawiany(request.user.id)
@@ -163,7 +165,7 @@ def bank_account_change(request):
 
 @login_required
 def consultations_change(request):
-    '''function that enables consultations changing'''
+    """function that enables consultations changing"""
     try:
         employee = request.user.employee     
         if request.POST:
@@ -172,27 +174,26 @@ def consultations_change(request):
             if form.is_valid():
                 form.save()
                 logger.info('User (%s) changed consultations' % request.user.get_full_name())
-                request.user.message_set.create(message="Twoje dane zostały zmienione.")
+                messages.success(request, "Twoje dane zostały zmienione.")
                 return HttpResponseRedirect(reverse('my-profile'))
         else:
-            zamawiany = Student.get_zamawiany(request.user.id)
             form = ConsultationsChangeForm({'consultations': employee.consultations, 'homepage': employee.homepage, 'room': employee.room})
         return render_to_response('users/consultations_change_form.html', {'form':form}, context_instance=RequestContext(request))
     except Employee.DoesNotExist:
-        request.user.message_set.create(message='Nie jesteś pracownikiem.')
-        return render_to_response('common/error.html', \
+        messages.error(request, 'Nie jesteś pracownikiem.')
+        return render_to_response('common/error.html',
                 context_instance=RequestContext(request))
 
 @login_required  
 def password_change_done(request):
-    '''informs if password were changed'''
+    """informs if password were changed"""
     logger.info('User (%s) changed password' % request.user.get_full_name())
-    request.user.message_set.create(message="Twoje hasło zostało zmienione.")
+    messages.success(request, "Twoje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
 
 @login_required  
 def my_profile(request):
-    '''profile site'''
+    """profile site"""
     logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
     current_semester = Semester.get_current_semester()
     zamawiany = Student.get_zamawiany(request.user.id)
@@ -209,6 +210,9 @@ def my_profile(request):
         consultations = ''
         homepage = ''
         room = ''
+
+    grade = {}
+
     if current_semester:
         try:
 
@@ -236,7 +240,6 @@ def my_profile(request):
             grade = {}
     else:
         terms = []
-        grade = {}
     
     data = {
         'terms' : terms,
@@ -259,7 +262,7 @@ def employees_list(request, begin = 'All'):
         employees = Group.teacher_in_present(employees, semester)
     except MoreThanOneCurrentSemesterException:
         logger.error('Function employee_list throws MoreThanOneCurrentSemesterException.' )
-        request.user.message_set.create(message="Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
+        messages.success(request, "Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
         employees = Employee.objects.all()
 
     for e in employees:
@@ -311,13 +314,13 @@ def students_list(request, begin = 'A'):
 
 @login_required
 def logout(request):
-    '''logout'''
+    """logout"""
     logger.info('User %s <id: %s> is logged out ' % (request.user.username, request.user.id))    
     auth.logout(request)
     return HttpResponseRedirect('/')
 
 def login_plus_remember_me(request, *args, **kwargs):
-    ''' funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika'''
+    """ funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika"""
     if request.method == 'POST':
         if request.POST.get('remember_me', None):
             request.session.set_expiry(datetime.timedelta(14))
@@ -347,12 +350,10 @@ def create_ical_file(request):
     groups_employee = []
     groups_student = []
     try:
-        user.student
         groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user))
     except Student.DoesNotExist:
         pass
     try:
-        user.employee
         groups_employee = map(lambda x: x, Group.objects.filter(course__semester = semester, teacher = user.employee))
     except Employee.DoesNotExist:
         pass

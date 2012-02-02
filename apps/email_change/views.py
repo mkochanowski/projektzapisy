@@ -99,7 +99,7 @@ def email_change_view(request, extra_context={},
             message = render_to_string(email_message_template_name, context_instance=context)
             
             send_mail('[Fereol] Weryfikacja zmiany adresu email', message, None, [email])
-            request.user.message_set.create(message="Mail zawierający link weryfikacyjny został wysłany na Twój nowy adres email. Postępuj zgodnie z instrukcjami w tym mailu by z sukcesem zmienić Twój obecny adres email.")
+            messages.success(request, "Mail zawierający link weryfikacyjny został wysłany na Twój nowy adres email. Postępuj zgodnie z instrukcjami w tym mailu by z sukcesem zmienić Twój obecny adres email.")
             # Redirect
             return redirect(success_url)
     
@@ -137,7 +137,7 @@ def email_verify_view(request, verification_key, extra_context={},
         # Success. Replace the user's email with the new email
         request.user.email = ecr.email
         request.user.save()
-        request.user.message_set.create(message="Mail został pomyślnie zmieniony.")
+        messages.success(request, "Mail został pomyślnie zmieniony.")
         # Delete the email change request
         ecr.delete()
         

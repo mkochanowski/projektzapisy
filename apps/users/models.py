@@ -76,19 +76,11 @@ class BaseUser(models.Model):
 
     @staticmethod
     def is_student(user):
-        try:
-            student = user.student
-            return True
-        except:
-            return False
+        return hasattr(user, "student")
 
     @staticmethod
     def is_employee(user):
-        try:
-            employee = request.user.employee
-            return True
-        except:
-            return False
+        return hasattr(user, "employee")
 
     def __unicode__(self):
         return self.get_full_name
@@ -246,7 +238,7 @@ class Student(BaseUser):
             from apps.enrollment.courses.models import Semester
             default_semester = Semester.get_default_semester()
         records = self.records.exclude(group__course__semester = \
-            default_semester).select_related('group', 'group__course', \
+            default_semester).select_related('group', 'group__course',
             'group__course__entity')
         records_list = map(lambda x: x.group.course.entity.id, records)
         return list(frozenset(records_list))

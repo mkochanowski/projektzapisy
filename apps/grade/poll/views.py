@@ -76,7 +76,7 @@ from django.utils.encoding import smart_str, smart_unicode
 from apps.grade.poll.exceptions import NoTitleException, NoSectionException, \
                                     NoPollException
 
-from apps.news.views import display_news_list
+
 ########################################
 #### POLL MANAGMENT
 ########################################
@@ -226,6 +226,7 @@ def rules(request):
 def enable_grade( request ):
     semester = Semester.get_current_semester()
 
+    raise NotImplementedError
     if not semester:
         messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
         return render_to_response( 'grade/main.html', { 'grade' : False }, context_instance = RequestContext( request ))    
@@ -238,7 +239,7 @@ def enable_grade( request ):
         data = {}
         data['category'] = 'grade'
         data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
-        return display_news_list(request, data)
+        return None
     else:
         semester.is_grade_active = True
         news = News()
@@ -549,6 +550,7 @@ def polls_list( request ):
     data['tab']            = "poll_list"
     data['semesters']      = Semester.objects.all()
     data['courses']        = CourseEntity.objects.all().order_by('name')
+    data['sections']       = Section.objects.all()
     data['employees']      = Employee.objects.all().\
                     select_related().order_by('user__last_name', 'user__first_name')
     data['studies_types']    = Program.objects.all()
