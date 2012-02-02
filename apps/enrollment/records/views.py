@@ -271,8 +271,8 @@ def set_queue_priority(request, method):
         if request.user.student.block:
             return AjaxFailureMessage.auto_render('ScheduleLocked', \
                 'Twój plan jest zablokowany.', message_context);
-        group = Group.objects.get(id=group_id)
-        queue = Queue.objects.get(student=request.user.student, group=group)
+
+        queue = Queue.objects.get(student=request.user.student, group__id=group_id).select_related('group')
         priority = int(priority)
         if priority > settings.QUEUE_PRIORITY_LIMIT or priority < 1:
             return AjaxFailureMessage.auto_render('FatalError', \
@@ -391,8 +391,16 @@ def schedule_prototype(request):
     TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')    
     cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), 'DoesNotExist')
     if cached_courses == 'DoesNotExist':
-        courses = prepare_courses_with_terms(\
-            Term.get_all_in_semester(default_semester))
+        """
+        was_enroled_sql = 'SELECT COUNT(*) FROM "records_record"' \
+                                ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
+                                ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
+                                ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(student.id)+ '' \
+                                ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'
+        """
+        terms = Term.get_all_in_semester(default_semester )
+#                    .extra(select={'was_enro'})
+        courses = prepare_courses_with_terms( terms )
         for course in courses:
             course['info'].update({
                 'is_recording_open': course['object'].\
