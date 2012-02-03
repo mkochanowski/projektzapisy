@@ -372,5 +372,5 @@ def course_consultations(request, slug):
 
     except (Course.DoesNotExist, NonCourseException):
         logger.error('Function course_consultations(slug = %s) throws Course.DoesNotExist exception.' % unicode(slug) )
-        messages.error(request, +"Przedmiot nie istnieje.")
+        messages.error(request, "Przedmiot nie istnieje.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
