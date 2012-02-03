@@ -18,7 +18,7 @@ Fereol.Enrollment.EPanelCourseTerm.fromHTML = function(container)
 	sterm._container = container;
 
 	sterm.group = Fereol.Enrollment.CourseGroup.fromJSON(container.
-		find('input[name=group-json]').assertOne().attr('value'));
+		find('input[name^=group-json]').assertOne().attr('value'));
 	sterm.group.updateListeners.push(function() { sterm.refreshView(); });
 
 	sterm._groupLimitCell = container.find('td.termLimit').assertOne();
