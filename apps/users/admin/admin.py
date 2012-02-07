@@ -4,7 +4,7 @@ from django.contrib import admin
 from django import forms
 from django.contrib.auth.models import User
 
-from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser
+from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser, UserProfile
 
 class ExtendedUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'is_staff')
@@ -57,6 +57,18 @@ class EmployeeAdmin(admin.ModelAdmin):
        qs = super(EmployeeAdmin, self).queryset(request)
        return qs.select_related('user')
 
+class StudentInline(admin.StackedInline):
+    model = Student
+    extra = 0
+    max_num = 1
+
+class EmployeeInline(admin.StackedInline):
+    model = Employee
+    extra = 0
+    max_num = 1
+
+class ProfileInline(admin.StackedInline):
+    model = UserProfile
 
 class StudiaZamawianeAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','points','comments')
@@ -67,9 +79,21 @@ class StudiaZamawianeAdmin(admin.ModelAdmin):
        qs = super(StudiaZamawianeAdmin, self).queryset(request)
        return qs.select_related('student', 'student__user')
 
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+
+UserAdmin.list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
+UserAdmin.inlines += [ProfileInline, StudentInline, EmployeeInline]
+UserAdmin.list_filter = ('is_active', 'is_staff', '_profile_cache__is_student',
+                         '_profile_cache__is_employee', '_profile_cache__is_zamawiany')
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+
 admin.site.register(ExtendedUser, ExtendedUserAdmin)
-admin.site.register(Employee, EmployeeAdmin)
-admin.site.register(Student, StudentAdmin)
+#admin.site.register(Employee, EmployeeAdmin)
+#admin.site.register(Student, StudentAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(StudiaZamawiane, StudiaZamawianeAdmin)
 admin.site.register(StudiaZamawianeMaileOpiekunow)

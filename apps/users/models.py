@@ -38,7 +38,7 @@ class ExtendedUser(User):
 
 class UserProfile(models.Model):
     # This field is required.
-    user         = models.OneToOneField(User)
+    user         = models.OneToOneField(User, related_name='_profile_cache')
     is_student   = models.BooleanField(default = False, verbose_name="czy student?")
     is_employee  = models.BooleanField(default = False, verbose_name="czy pracownik?")
     is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
@@ -48,7 +48,6 @@ class BaseUser(models.Model):
     User abstract class. For every app user there is entry in django.auth.
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
-    user = models.OneToOneField(User, verbose_name="Użytkownik")
     receive_mass_mail_enrollment = models.BooleanField(
         default = True, 
         verbose_name="otrzymuje mailem ogłoszenia Zapisów")
@@ -101,6 +100,8 @@ class Employee(BaseUser):
     '''
     Employee.
     '''
+
+    user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='employee')
     consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
     homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
@@ -196,6 +197,8 @@ class Student(BaseUser):
     ''' 
     Student.
     '''
+
+    user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='student')
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_bonus_minutes = models.PositiveIntegerField(default=0, verbose_name="Przyspieszenie otwarcia zapisów (minuty)")

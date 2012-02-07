@@ -292,10 +292,10 @@ INSTALLED_APPS = (
     'apps.email_change',
     'django_extensions'
 )
-#
-#AUTHENTICATION_BACKENDS = (
-#    'apps.users.auth_backend.ExtendedUserModelBackend',
-#)
+
+AUTHENTICATION_BACKENDS = (
+    'apps.users.auth_backend.BetterBackend',
+)
 
 AUTH_PROFILE_MODULE = 'app.users.models.UserProfile'
 
