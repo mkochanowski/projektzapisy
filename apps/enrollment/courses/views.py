@@ -63,7 +63,7 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
                 }
 
     for course in courses:
-        semester_courses_list_setdefault(course.semester.id,[]).append(map_course(course))
+        semester_courses_list_setdefault(course.semester_id,[]).append(map_course(course))
 
     semester_courses = []
     semester_courses_append = semester_courses.append
