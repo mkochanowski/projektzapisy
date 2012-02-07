@@ -297,7 +297,7 @@ INSTALLED_APPS = (
 #    'apps.users.auth_backend.ExtendedUserModelBackend',
 #)
 
-AUTH_PROFILE_MODULE = 'app.users.models.UserProfile'
+AUTH_PROFILE_MODULE = 'users.UserProfile'
 
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
