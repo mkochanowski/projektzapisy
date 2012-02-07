@@ -328,14 +328,11 @@ def own(request):
         raise RuntimeError('Brak aktywnego semestru')
 
     employee = None
-    try:
+    student  = None
+    if request.user.student:
         student = request.user.student
-    except Student.DoesNotExist:
-        student = None
-        try:
-            employee = request.user.employee
-        except Employee.DoesNotExist:
-            employee = None
+    elif request.user.employee:
+        employee = request.user.employee
     if student is None and employee is None:
         messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
         return render_to_response('common/error.html',

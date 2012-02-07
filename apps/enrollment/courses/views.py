@@ -179,7 +179,7 @@ def course(request, slug):
             student = None
             student_id = 0
         else:
-            if user.student:
+            if hasattr(user, 'student') and user.student:
                 student = user.student
                 student_id = student.id
             else:
