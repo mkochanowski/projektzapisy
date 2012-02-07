@@ -126,7 +126,11 @@ def log_edit_term(sender, instance, **kwargs):
 
 def log_add_term(sender, instance, created, **kwargs):
     term = instance
-    term_format = '-'.join([term.dayOfWeek,str(term.start_time),str(term.end_time),term.classroom.number])
+    if term.classroom and hasattr(term.classroom, "number"):
+        number = term.classroom.number
+    else:
+        number = ''
+    term_format = '-'.join([term.dayOfWeek,str(term.start_time),str(term.end_time),number])
     if created:
         message = '[08] term <%s> for group <%s> has been created' % (term_format.encode('utf-8'), term.group.id) 
         backup_logger.info(message)
