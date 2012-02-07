@@ -179,10 +179,10 @@ def course(request, slug):
             student = None
             student_id = 0
         else:
-            try:
+            if user.student:
                 student = user.student
                 student_id = student.id
-            except Student.DoesNotExist:
+            else:
                 student = None
                 student_id = 0
         
