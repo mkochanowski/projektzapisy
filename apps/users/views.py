@@ -214,30 +214,35 @@ def my_profile(request):
     grade = {}
 
     if current_semester:
-        try:
+        if request.user.student:
+            try:
 
-            student = request.user.student
-            t0 = current_semester.records_opening - student.get_t0_interval()       
-            terms = [
-            {"name":"T0", "term":t0, "courses": student.get_voted_courses(3)},
-            {"name":"T0 + 24h", "term":t0 + timedelta(days=1), "courses": student.get_voted_courses(2)},
-            {"name":"T0 + 48h", "term":t0 + timedelta(days=2), "courses": student.get_voted_courses(1)},
-            {"name":"T0 + 72h", "term":t0 + timedelta(days=3), "courses": []},
-            {"name":"Zniesienie limitu 40 ECTS", "term":current_semester.records_ects_limit_abolition},
-            {"name":"Koniec zapisów", "term":current_semester.records_closing},
-            ]
+                student = request.user.student
+                t0 = current_semester.records_opening - student.get_t0_interval()
+                terms = [
+                {"name":"T0", "term":t0, "courses": student.get_voted_courses(3)},
+                {"name":"T0 + 24h", "term":t0 + timedelta(days=1), "courses": student.get_voted_courses(2)},
+                {"name":"T0 + 48h", "term":t0 + timedelta(days=2), "courses": student.get_voted_courses(1)},
+                {"name":"T0 + 72h", "term":t0 + timedelta(days=3), "courses": []},
+                {"name":"Zniesienie limitu 40 ECTS", "term":current_semester.records_ects_limit_abolition},
+                {"name":"Koniec zapisów", "term":current_semester.records_closing},
+                ]
 
-            grade = Semester.objects.filter(id__in=[41,42])\
-                .order_by('-id')\
-                .extra(select={'graded' : "SELECT COUNT(*) FROM ticket_create_studentgraded " +
-                                "WHERE ticket_create_studentgraded.student_id="+str(request.user.student.id)+
-                                " AND ticket_create_studentgraded.semester_id=courses_semester.id" })
+                grade = Semester.objects.filter(id__in=[41,42])\
+                    .order_by('-id')\
+                    .extra(select={'graded' : "SELECT COUNT(*) FROM ticket_create_studentgraded " +
+                                    "WHERE ticket_create_studentgraded.student_id="+str(request.user.student.id)+
+                                    " AND ticket_create_studentgraded.semester_id=courses_semester.id" })
 
-        except KeyError:
-            terms = []
-        except Student.DoesNotExist:
+            except KeyError:
+                terms = []
+            except Student.DoesNotExist:
+                terms = []
+                grade = {}
+        else:
             terms = []
             grade = {}
+
     else:
         terms = []
     
