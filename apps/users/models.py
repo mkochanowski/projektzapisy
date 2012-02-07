@@ -11,6 +11,7 @@ from apps.users.exceptions import NonEmployeeException, NonStudentException
 from apps.enrollment.courses.models.points import PointTypes
 from apps.enrollment.courses.models import Semester
 from apps.enrollment.courses.models import StudentOptions
+from django.db.models.signals import post_save
 import datetime
 
 from fereol import settings
@@ -35,6 +36,12 @@ class ExtendedUser(User):
         verbose_name = 'użutkownik'
         verbose_name_plural = 'użytkownicy'
 
+class UserProfile(models.Model):
+    # This field is required.
+    user         = models.OneToOneField(User)
+    is_student   = models.BooleanField(default = False, verbose_name="czy student?")
+    is_employee  = models.BooleanField(default = False, verbose_name="czy pracownik?")
+    is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
 
 class BaseUser(models.Model):
     '''
@@ -438,3 +445,14 @@ class StudiaZamawianeMaileOpiekunow(models.Model):
         
     def __unicode__(self):
         return self.email
+
+
+
+# definition of UserProfile from above
+# ...
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)

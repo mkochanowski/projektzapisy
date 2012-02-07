@@ -292,10 +292,12 @@ INSTALLED_APPS = (
     'apps.email_change',
     'django_extensions'
 )
+#
+#AUTHENTICATION_BACKENDS = (
+#    'apps.users.auth_backend.ExtendedUserModelBackend',
+#)
 
-AUTHENTICATION_BACKENDS = (
-    'apps.users.auth_backend.ExtendedUserModelBackend',
-)
+AUTH_PROFILE_MODULE = 'app.users.models.UserProfile'
 
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
