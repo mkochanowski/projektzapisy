@@ -200,13 +200,13 @@ def my_profile(request):
     comments = zamawiany and zamawiany.comments or ''
     points = zamawiany and zamawiany.points or 0
 
-    try:
+    if request.user.employee:
         consultations = request.user.employee.consultations
         room = request.user.employee.room
         homepage = request.user.employee.homepage
         room = room and room or ''
         homepage = homepage and homepage or ''
-    except Employee.DoesNotExist:
+    else:
         consultations = ''
         homepage = ''
         room = ''
