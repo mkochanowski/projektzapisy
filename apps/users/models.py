@@ -82,11 +82,11 @@ class BaseUser(models.Model):
 
     @staticmethod
     def is_student(user):
-        return hasattr(user, "student")
+        return hasattr(user, "student") and user.student
 
     @staticmethod
     def is_employee(user):
-        return hasattr(user, "employee")
+        return hasattr(user, "employee") and user.employee
 
     def __unicode__(self):
         return self.get_full_name

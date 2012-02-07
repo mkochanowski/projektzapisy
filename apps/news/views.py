@@ -18,12 +18,12 @@ def all_news(request):
         Latest news
     """
 
-    if hasattr(request.user, 'student'):
+    if hasattr(request.user, 'student') and request.user.student:
         student = request.user.student
         student.last_news_view = datetime.datetime.now()
         student.save()
 
-    elif hasattr(request.user, 'employee'):
+    elif hasattr(request.user, 'employee')  and request.user.employee:
         employee = request.user.employee
         employee.last_news_view = datetime.datetime.now()
         employee.save()
