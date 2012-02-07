@@ -200,7 +200,7 @@ def my_profile(request):
     comments = zamawiany and zamawiany.comments or ''
     points = zamawiany and zamawiany.points or 0
 
-    if request.user.employee:
+    if hasattr(request.user, 'employee') and request.user.employee:
         consultations = request.user.employee.consultations
         room = request.user.employee.room
         homepage = request.user.employee.homepage
