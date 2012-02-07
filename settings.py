@@ -297,7 +297,7 @@ AUTHENTICATION_BACKENDS = (
     'apps.users.auth_backend.BetterBackend',
 )
 
-AUTH_PROFILE_MODULE = 'app.users.models.UserProfile'
+AUTH_PROFILE_MODULE = 'users.UserProfile'
 
 FIXTURE_DIRS = (
     os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
