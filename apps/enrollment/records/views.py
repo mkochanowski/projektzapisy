@@ -398,6 +398,7 @@ def schedule_prototype(request):
 
         terms = Term.get_all_in_semester(default_semester )
         courses = prepare_courses_with_terms( terms )
+        cached_courses []
         for course in courses:
             course['info'].update({
                 'is_recording_open': course['object'].\
@@ -413,10 +414,9 @@ def schedule_prototype(request):
                 term.update({ # TODO: do szablonu
                     'json': simplejson.dumps(term['info'])
                 })
-        cached_courses = courses
+            cached_courses.append(course['info'])
         mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), cached_courses)
     else:
-
         logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student.id))
                    
     TimerDebugPanel.timer_stop('data_prepare')
