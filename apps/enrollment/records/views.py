@@ -447,6 +447,8 @@ def schedule_prototype(request):
         logger.debug("miss schedule_prototype_courses_json_%s" % student.id)
         cached_courses_json = prepare_courses_json(cached_all_groups, student)
         mcache.set("schedule_prototype_courses_json_%s" % student.id, cached_courses_json)
+    else:
+        logger.debug("in cache schedule_prototype_courses_json_%s" % student.id)
         
     data = {
         'courses_json': cached_courses_json,
