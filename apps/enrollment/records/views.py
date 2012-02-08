@@ -405,7 +405,7 @@ def schedule_prototype(request):
                 term.update({ # TODO: do szablonu
                     'json': simplejson.dumps(term['info'])
                 })
-                jsons.append(simplejson.dumps(term['info']))
+                jsons.append({'json': simplejson.dumps(term['info'])})
             course['info'].update({
                 'is_recording_open': course['object'].\
                     is_recording_open_for_student(student),
@@ -415,7 +415,7 @@ def schedule_prototype(request):
 	        'english': course['object'].english,
 	        'exam': course['object'].exam,
 	        'suggested_for_first_year': course['object'].suggested_for_first_year,
-            'terms': jsons
+            'terms':jsons
             })
             ccourses.append(course['info'])
         cached_courses = ccourses
