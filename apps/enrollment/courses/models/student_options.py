@@ -39,11 +39,10 @@ class StudentOptions( models.Model ):
         if not student.id in cache:
             cache[student.id] = {}
         if not course.semester.id in cache[student.id]: # miss
-            return StudentOptions.objects.get(course=course, student=student)
-        if course.id in cache[student.id][course.semester.id]: # get
-            return cache[student.id][course.semester.id][course.id]
-        else: # not miss, but doesn't exists
-            raise StudentOptions.DoesNotExist()
+            cache[student.id][course.semester.id] = {}
+        if not course.id in cache[student.id][course.semester.id]: # get
+            cache[student.id][course.semester.id][course.id] = StudentOptions.objects.get(course=course, student=student)
+        return cache[student.id][course.semester.id][course.id]
 
     def get_opening_delay_timedelta(self):
         """ returns records opening delay as timedelta """

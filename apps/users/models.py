@@ -224,6 +224,9 @@ class Student(BaseUser):
 
     def get_t0_interval(self):
         """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
+        if hasattr(self, '_counted_t0'):
+            return self._counted_t0
+
         base =  self.ects * settings.ECTS_BONUS
         points_for_one_day = 720 # =12h*60m
         points_for_one_night = 720
@@ -231,7 +234,8 @@ class Student(BaseUser):
         minutes = base + number_of_nights_to_add * points_for_one_night
         minutes += self.records_opening_bonus_minutes
         grade = self.participated_in_last_grades() * 1440
-        return datetime.timedelta(minutes=minutes+grade+120)+datetime.timedelta(days=3)
+        self._counted_t0 =  datetime.timedelta(minutes=minutes+grade+120)+datetime.timedelta(days=3)
+        return self._counted_t0
 
     def get_voted_courses(self, given_points):
         """ returns courses which were voted with given_points by student """
