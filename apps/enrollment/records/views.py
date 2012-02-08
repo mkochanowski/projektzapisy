@@ -435,8 +435,16 @@ def schedule_prototype(request):
         student=student)
     TimerDebugPanel.timer_stop('json_prepare_2')
 
+    cached_test = mcache.get("test_cache", "DoesNotExist")
+
+    if cached_test == 'DoesNotExist':
+        logger.debug("test missed")
+        mcache.set("test_cache", 2)
+    else:
+        logger.debug("test is in cache")
     cached_courses_json = mcache.get("schedule_prototype_courses_json_%s" % student.id, 'DoesNotExist')
     if cached_courses_json == 'DoesNotExist':
+        logger.debug("miss schedule_prototype_courses_json_%s" % student.id)
         cached_courses_json = prepare_courses_json(cached_all_groups, student)
         mcache.set("schedule_prototype_courses_json_%s" % student.id, cached_courses_json)
         
