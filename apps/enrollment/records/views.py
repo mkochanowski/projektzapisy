@@ -400,6 +400,10 @@ def schedule_prototype(request):
         courses = prepare_courses_with_terms( terms )
         ccourses = []
         for course in courses:
+            for term in course['terms']:
+                term.update({ # TODO: do szablonu
+                    'json': simplejson.dumps(term['info'])
+                })
             course['info'].update({
                 'is_recording_open': course['object'].\
                     is_recording_open_for_student(student),
@@ -409,11 +413,8 @@ def schedule_prototype(request):
 	        'english': course['object'].english,
 	        'exam': course['object'].exam,
 	        'suggested_for_first_year': course['object'].suggested_for_first_year,
+            'terms': course['terms']
             })
-            for term in course['terms']:
-                term.update({ # TODO: do szablonu
-                    'json': simplejson.dumps(term['info'])
-                })
             ccourses.append(course['info'])
         cached_courses = ccourses
         mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), cached_courses)

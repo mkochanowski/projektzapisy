@@ -112,17 +112,17 @@
 		<ul id="enr-schedulePrototype-course-list">
 			{% for course in courses %}
 			<li>
-				<span class="checkbox"><input type="checkbox" id="enr-schedulePrototype-course-{{ course.info.id }}" /></span>
-				<label for="enr-schedulePrototype-course-{{ course.info.id }}">{{ course.info.name }}</label>
-				<input type="hidden" name="id" value="{{ course.info.id }}" />
-				<input type="hidden" name="type" value="{{ course.info.type }}" />
-				<input type="hidden" name="short" value="{{ course.info.short }}" />
-				<input type="hidden" name="wasEnrolled" value="{{ course.info.was_enrolled }}" />
-				<input type="hidden" name="english" value="{{ course.info.english }}" />
-				<input type="hidden" name="exam" value="{{ course.info.exam }}" />
-				<input type="hidden" name="suggested_for_first_year" value="{{ course.info.suggested_for_first_year }}" />
-				<input type="hidden" name="isRecordingOpen" value="{{ course.info.is_recording_open }}" />
-				<input type="hidden" name="url" value="{% url course-page course.info.slug %}" />
+				<span class="checkbox"><input type="checkbox" id="enr-schedulePrototype-course-{{ course.id }}" /></span>
+				<label for="enr-schedulePrototype-course-{{ course.id }}">{{ course.name }}</label>
+				<input type="hidden" name="id" value="{{ course.id }}" />
+				<input type="hidden" name="type" value="{{ course.type }}" />
+				<input type="hidden" name="short" value="{{ course.short }}" />
+				<input type="hidden" name="wasEnrolled" value="{{ course.was_enrolled }}" />
+				<input type="hidden" name="english" value="{{ course.english }}" />
+				<input type="hidden" name="exam" value="{{ course.exam }}" />
+				<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />
+				<input type="hidden" name="isRecordingOpen" value="{{ course.is_recording_open }}" />
+				<input type="hidden" name="url" value="{% url course-page course.slug %}" />
 				{% for term in course.terms %}
 					<input type="hidden" name="term" value="{{ term.json }}" />
 				{% endfor %}
