@@ -303,7 +303,7 @@ def consultations_list(request, begin='A'):
 
 
 @login_required
-def students_list(request, begin = 'A'):
+def students_list(request, begin = 'All'):
     students = Student.get_list(begin)
     students = Record.recorded_students(students)
 
