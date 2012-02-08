@@ -86,8 +86,12 @@
                     <form action="{% url apps.users.views.login_plus_remember_me %}" method="POST">
                         {% csrf_token %}
                         <div class="inline-inputs">
-                            <input type="hidden" name="next" value="{{request.path}}"/>
-                            <label for="id_login">login:</label>
+                            {% if request.path == '/' %}
+                                <input type="hidden" name="next" value="{% url schedule-own %}"/>
+                            {% else %}
+                                <input type="hidden" name="next" value="{{request.path}}"/>
+                            {% endif %}
+                            <label for="id_login">użytkownik:</label>
                             <input class="small" tabindex="1" type="text" id="id_login" name="username">
 
                             <label for="id_password">hasło:</label>
