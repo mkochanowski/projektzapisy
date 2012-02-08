@@ -103,7 +103,7 @@
                         <td class="number termQueuedCount">{% if t.queued %}{{ t.queued }}{% else %}0{% endif %}</td>
                         <td class="controls">
                             <input type="hidden" name="group-id" value="{{ t.id }}"/>
-                            <input type="hidden" name="group-json-{{ now "Hms" }}" value='{{ t.serialized }}'/>
+                            <input type="hidden" name="group-json-{% now "Hms" %}" value='{{ t.serialized }}'/>
                             <input type="hidden" name="is-signed-in"
                                    value="{% if t.signed %}true{% else %}false{% endif %}"/>
                             {% if course.is_recording_open and user.student.is_active %}
