@@ -395,15 +395,17 @@ def schedule_prototype(request):
     TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')    
     cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), 'DoesNotExist')
     if cached_courses == 'DoesNotExist':
-
+        logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student.id))
         terms = Term.get_all_in_semester(default_semester )
         courses = prepare_courses_with_terms( terms )
         ccourses = []
         for course in courses:
+            jsons = []
             for term in course['terms']:
                 term.update({ # TODO: do szablonu
                     'json': simplejson.dumps(term['info'])
                 })
+                jsons.append(simplejson.dumps(term['info']))
             course['info'].update({
                 'is_recording_open': course['object'].\
                     is_recording_open_for_student(student),
@@ -413,7 +415,7 @@ def schedule_prototype(request):
 	        'english': course['object'].english,
 	        'exam': course['object'].exam,
 	        'suggested_for_first_year': course['object'].suggested_for_first_year,
-            'terms': course['terms']
+            'terms': jsons
             })
             ccourses.append(course['info'])
         cached_courses = ccourses
