@@ -103,6 +103,8 @@ class Term(models.Model):
                                     WHERE courses_term.id=courses_term_classrooms.term_id),',')"""}))
 
     def numbers(self):
+        if hasattr(self, 'classrooms_as_string'):
+            return self.classrooms_as_string
         classrooms = self.classrooms.all()
         if len(classrooms) > 0:
             classrooms = ' (s.' + ', '.join(map(lambda x: x.number, classrooms)) + ')'
