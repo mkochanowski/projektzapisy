@@ -60,6 +60,13 @@ class Group(models.Model):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
             select_related('teacher', 'teacher__user', 'course', \
+            'course__type', 'course__entity', 'course__semester').all()
+
+    @staticmethod
+    def get_groups_by_semester_opt(semester):
+        """ returns all groups in semester """
+        return Group.objects.filter(course__semester=semester). \
+            select_related('teacher', 'teacher__user', 'course', \
                 'course__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):
@@ -133,7 +140,7 @@ class Group(models.Model):
         student=None, employee=None, user=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.core.urlresolvers import reverse
-        
+
         zamawiany = user and user.get_profile().is_zamawiany
         data = {
             'id': self.pk,

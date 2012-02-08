@@ -426,7 +426,7 @@ def schedule_prototype(request):
         logger.debug('Cache miss with semester id: %s' % \
                 default_semester.id)
         mcache.delete("schedule_prototype_courses_json_%s" % student.id)        
-        cached_all_groups = Group.get_groups_by_semester(default_semester)
+        cached_all_groups = Group.get_groups_by_semester_opt(default_semester)
         mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)                
         
     TimerDebugPanel.timer_stop('json_prepare_1')
