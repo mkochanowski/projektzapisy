@@ -228,7 +228,7 @@ LOGGING = {
         },
         'root': {
             'class' : 'logging.handlers.RotatingFileHandler',
-            'level': 'INFO',
+            'level': 'DEBUG',
             'filename': os.path.join(PROJECT_PATH, 'logs/root.log'),
             'maxBytes': 104857600,
             'backupCount': 5,

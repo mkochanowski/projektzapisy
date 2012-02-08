@@ -421,7 +421,10 @@ def schedule_prototype(request):
     TimerDebugPanel.timer_start('json_prepare_1', 'Przygotowywanie JSON - st1')
     
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')   
-    if cached_all_groups == 'DoesNotExist':        
+    if cached_all_groups == 'DoesNotExist':
+
+        logger.debug('Cache miss with semester id: %s' % \
+                default_semester.id)
         mcache.delete("schedule_prototype_courses_json_%s" % student.id)        
         cached_all_groups = Group.get_groups_by_semester(default_semester)
         mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)                
