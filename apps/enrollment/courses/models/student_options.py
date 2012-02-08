@@ -25,7 +25,7 @@ class StudentOptions( models.Model ):
         if not semester.id in StudentOptions.options_cache[student.id]:
             StudentOptions.options_cache[student.id][semester.id] = {}
         for option in StudentOptions.objects.filter(course__semester=semester,\
-            student=student).all():
+            student=student).all().select_related('course'):
             StudentOptions.options_cache[student.id][semester.id]\
                 [option.course.id] = option
 
