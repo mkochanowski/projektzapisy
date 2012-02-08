@@ -414,7 +414,10 @@ def schedule_prototype(request):
                     'json': simplejson.dumps(term['info'])
                 })
         cached_courses = courses
-        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), cached_courses)        
+        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), cached_courses)
+    else:
+
+        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student.id))
                    
     TimerDebugPanel.timer_stop('data_prepare')
 
