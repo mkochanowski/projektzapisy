@@ -81,6 +81,9 @@ def employee_profile(request, user_id):
         user = User.objects.select_related('employee').get(id=user_id)
         employee = user.employee
 
+        if not employee:
+            raise Employee.DoesNotExist
+
     except Employee.DoesNotExist:
         logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % int(user_id) )
         messages.error(request, "Nie ma takiego pracownika.")
