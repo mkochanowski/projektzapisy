@@ -112,6 +112,7 @@ def templates( request ):
 
     data = prepare_data_for_create_template( request )
     page, paginator = make_paginator( request, Template )
+    data['semesters'] = Semester.objects.all()
     data['templates'] = page
     data['grade']  = grade
     data['template_word'] = declination_template(paginator.count)

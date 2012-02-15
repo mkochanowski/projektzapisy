@@ -24,6 +24,14 @@
 		<option value="use_selected">Zastosuj wybrane szablony</option>
 		</select>
 	</label>
+    <label>Semester:
+        <select name="semester">
+            {% for semester in semesters %}
+            <option value="{{ semester.id }}">{{ semester }}</option>
+            {% endfor %}
+        </select>
+
+    </label>
    	<button value="0" name="index" title="Wykonaj wybraną akcję" class="button" type="submit">Wykonaj</button>
         <span class="action-counter" style="display: inline;"><span id="object_count">0</span> z {{templates.object_list.count}} wybranych</span>
     <button id="new-template" value="0" name="create" title="Utwórz nowy" class="button" type="submit" style="position:absolute;right:80px">Utwórz nowy</button>
