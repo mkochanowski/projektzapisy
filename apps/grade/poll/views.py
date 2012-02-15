@@ -62,7 +62,7 @@ from apps.grade.poll.utils           import check_signature, \
                                               make_message_from_polls, save_template_in_session, \
                                               make_polls_for_all, get_templates,\
                                               make_template_from_db,\
-                                              get_groups_for_user, make_pages, edit_poll
+                                              get_groups_for_user, make_pages, edit_poll, prepare_data_for_create_template
 
 from apps.users.models               import Employee, Program
 
