@@ -110,7 +110,7 @@ def templates( request ):
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
 
-    data = prepare_data_for_create_poll( request )
+    data = prepare_data_for_create_template( request )
     page, paginator = make_paginator( request, Template )
     data['templates'] = page
     data['grade']  = grade
