@@ -68,14 +68,10 @@ Poll.list.init = function()
         return false;
     })
 
-    $('#new-section').click(function()
+    $('#new-section').click(function(event)
     {
-        var html = Poll.list.getCreateSection();
-        Fereol.dialog.setHTML(html);
-        Fereol.dialog.setTitle("Nowa sekcja");
-        Fereol.dialog.show();
-        Poll.section.init();
-        return false;
+        event.preventDefault();
+        $('#new-section').click(function(event){event.preventDefault();$('.modal').show();})
     })
 
     $('#new-poll').click(function()

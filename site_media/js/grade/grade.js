@@ -6,7 +6,8 @@ FormGenerator.init = function()
 {
 	FormGenerator.questions = 0;
         FormGenerator.form      = $("#poll-form");
-	$("#add-question").click ( function(){
+	$("#add-question").click ( function(event){
+        event.preventDefault();
 		FormGenerator.addQuestion(); }
 	)
 }

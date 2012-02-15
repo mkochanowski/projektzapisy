@@ -162,3 +162,11 @@
 {
 	background: #eeeeee;
 }
+
+.poll-type-filter {
+    width: 640px;
+}
+
+.poll-type-filter div {
+    width:213px; float:left;
+}

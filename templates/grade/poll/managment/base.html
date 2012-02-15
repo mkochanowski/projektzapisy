@@ -8,13 +8,12 @@
 	<link rel="stylesheet" href="/site_media/css/common/dialog_box.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/grade/questionset_create.css" type="text/css" />
 	<link rel="stylesheet" href="/site_media/css/enrollment/courses.css" type="text/css" />
-    {% block extra-styles %}
-    {% endblock %}
 {% endblock %}
 
-{% block mainscripts %}
+{% block js %}
+    {{ block.super }}
     <script type="text/javascript" src="/site_media/js/jquery/jquery-tmpl/jquery.tmpl.js"></script>
-    <script type="text/javascript" src="/site_media/js/jquery/jquery-validation-1.8.0/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/site_media/js/jquery/jquery.validate.js"></script>
     <script type="text/javascript" src="/site_media/js/jquery/jquery-validation-1.8.0/localization/messages_pl.js"></script>
 {% endblock %}
 
@@ -30,15 +29,7 @@
 
 
 {% block content %}
-    <div id='poll-managment-menu'>
-	<ul>
-           <li{% if tab == "template_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-templates %}">Lista szablonów</a></li>
-           <li{% if tab == "poll_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
-           <li{% if tab == "section_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
-           <li{% if tab == "group_without" %} class="active_tab"{% endif %}><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
-	</ul>
-    </div>
-    <div id="grade-managment-main">
+    <div>
         {% block poll-managment %}
             
         {% endblock %}

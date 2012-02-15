@@ -16,9 +16,7 @@ Fereol.init = function()
 
     $('.close').live('click', function(event){
         event.preventDefault();
-        $(this).parent().hide('slow', function(){ $(this).remove(); });
-
-
+        $(this).parent().parent().hide('slow', function(){ $(this).remove(); });
     } )
 };
 

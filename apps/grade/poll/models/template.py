@@ -1,26 +1,19 @@
 # -*- coding: utf8 -*-
 from django.db                         import models
-from django.utils.safestring           import SafeUnicode
 
 from apps.users.models               import Employee, \
-                                              Student, \
                                               Program
-from apps.enrollment.courses.models.group import Group, \
-                                              GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models.group import GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models.course import CourseEntity
 
-from apps.enrollment.courses.models.semester import Semester
-from apps.enrollment.courses.models.course import Course
-
-from apps.enrollment.records.models  import Record, \
-                                              STATUS_ENROLLED
 from section                         import SectionOrdering, Section
 
 class Template( models.Model ):
     title             = models.CharField( max_length = 40, verbose_name = 'tytuł' )
     description       = models.TextField( blank = True, verbose_name = 'opis' )
     studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
-    course           = models.ForeignKey( Course, verbose_name = 'przedmiot', blank = True, null = True)
-    no_course        = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'nie przypisany' )
+    course            = models.ForeignKey( CourseEntity, verbose_name = 'przedmiot', blank = True, null = True)
+    no_course         = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'nie przypisany' )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięty' )
     group_type        = models.CharField( max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     sections          = models.ManyToManyField( Section, verbose_name = 'sekcje',

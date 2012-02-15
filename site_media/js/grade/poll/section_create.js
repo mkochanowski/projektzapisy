@@ -26,7 +26,7 @@ jQuery.validator.addClassRules("anyanswer", {
 });
 
 ///////////////////////////////////////////////////////////
-//// Functions  run after page load
+//// Functions  runs after page load
 ///////////////////////////////////////////////////////////
 
 
@@ -38,15 +38,14 @@ Poll.section.init = function()
     Poll.section.questionContainer = $("#poll-form");
     Poll.section.havelastLi        = false; // to change active question
 
-    $(".leading").attr('checked', false)
+    $(".leading").attr('checked', false);
     /* set events */
-    $("#add-question").click(Poll.section.createQuestion)
+    $("#add-question").click(function(event){event.preventDefault();Poll.section.createQuestion();})
     $("input[type=text]").focus(function(){ this.select(); });
     $("textarea").focus(function(){ this.select(); });
     $(".leading").change(Poll.section.changeLeading);
-
     // send form
-    $("#questionset").validate();
+
 
     /* enter don't sending */
     $("form").keypress(function(e)
@@ -124,6 +123,10 @@ Poll.section.showEdit = function()
     });
 
 }
+$(document).ready(function () {
+    Poll.section.init();
+  })
+
 
 /*
 * Function using during section edit.
@@ -182,7 +185,7 @@ Poll.section.editParser = function()
     })
     $(".leading").change(Poll.section.changeLeading);
 
-    $("#add-question").click(Poll.section.createQuestion);
+    $("#add-question").click(function(event){event.preventDefault();Poll.section.createQuestion();});
 
 
     $(Poll.section.questionContainer).sortable({
@@ -257,8 +260,6 @@ Poll.section.createQuestion = function( )
 
 Poll.section.questionCreator = function( position, data )
 {
-
-
     // create object in position:
     var li;
 
@@ -350,9 +351,7 @@ Poll.section.addAnswer = function( li, data )
         $(li).find('select[name$="[choiceLimit]"]').children().last().remove()
     });
 
-
     var limit_select = $(li).find('select[name$="[choiceLimit]"]')
-
     var options = $(limit_select).
             children().last().val().castToInt();
 
@@ -478,7 +477,7 @@ Poll.section.createEdit = function( li )
      Poll.section.lastLi     = li;
     $(li).find('.section-show').remove();
     $(li).children('.section-edit').show();
-    $("#questionset").validate().element('.anyquestion');
+    $("#questionset").validate({}).element('.anyquestion');
 }
 
 /*
@@ -497,23 +496,20 @@ Poll.section.changeType = function( li )
     var div       = $(li).children('.section-edit');
     var answerset = $(li).find('.answerset');
 
-
     $(li).find('.option').hide();
     $(poll_types[formtype].options).each(function(index, value)
     {
         $(li).find('.' + value).show();
-    })
+    });
     $(poll_types[formtype].optionOn).each(function(index, value)
     {
         $(li).find('.' + value).attr('checked', true)
-    })
+    });
 
     $(li).find('input[name="addQuestion"]').remove();
     if( !poll_types[formtype].haveAnswers)
     {
         $(answerset).empty();
-
-        
         $(li).find('select[name$="[choiceLimit]"]').children(':gt(0)').remove()
 
     }
@@ -636,8 +632,10 @@ Poll.section.changeLeading = function()
         $(leadingQuestion)
                 .find('.typeSelect')
                 .val("single")
-                .hide()
-                .change()
+                .trigger('change')
+
+        $(leadingQuestion)
+                .find('.typeSelectDiv').hide();
 
         // hide delete button
         $(leadingQuestion)
@@ -662,7 +660,7 @@ Poll.section.changeLeading = function()
                 Poll.section.havelastLi = false;
             }
         }
-        $("#questionset").validate().element('.anyquestion');
+        $("#questionset").validate({}).element('.anyquestion');
         $("#questionset").valid();
     }
 }
@@ -670,16 +668,16 @@ Poll.section.changeLeading = function()
 
 Poll.section.validate = function(li)
 {
-    var element_tilte   = $(li).find('input[name$="[title]"]');
-    var element_answers = $(li).find('.anyanswer');
-    var a = $("#questionset").validate().element(element_tilte);
-    var b = $("#questionset").validate().element(element_answers);
+    var element_tilte   = $(li).find();
+    var element_answers = $(li).find();
+    var a = $("#questionset").validate().element('input[name$="][title]"]');
+    var b = $("#questionset").validate().element('.anyanswer');
 
     var c = true;
 
     $(li).find('.question-answer').each(function(i, elem)
     {
-        c = c && $("#questionset").validate().element(elem);
+        c = c && $("#questionset").validate({}).element(elem);
     })
 
     return a && b && c;

@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block main-subsystemname %}
-	Ocena zajęć
-{% endblock %} 
-
 {% load news_extras %}
+
+{% block grade_active %} class="active"{% endblock %}
+
+{% block content-width %}16{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
@@ -18,15 +18,20 @@
 	<li>Ocena zajęć</li>
 {% endblock %}
 
-{% block main-menu %}
+
+
+{% block system_menu %}
+    {% if not grade and user.employee or not grade and user.is_superuser %}
+           <li{% if tab == "template_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-templates %}">Lista szablonów</a></li>
+           <li{% if tab == "poll_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
+           <li{% if tab == "section_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
+           <li{% if tab == "group_without" %} class="active_tab"{% endif %}><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
+    {% endif %}
     {%if user.student and grade %}
         <li><a href="{% url grade-ticket-connections-choice %}">Pobierz bilety</a></li>
     {% endif %}
     {% if grade and user.student or grade and user.is_anonymous %}
         <li><a href="{% url grade-poll-tickets-enter%}">Oceń zajęcia</a></li>    
-    {% endif %}
-    {% if not grade and user.employee or not grade and user.is_superuser %}        
-        <li><a href="{% url grade-poll-list %}">Zarządzaj ankietami</a></li>
     {% endif %}
     {% if user.is_superuser and grade %}        
         <li><a href="{% url grade-disable-grade %}">Zamknij ocenę</a></li> 
@@ -40,8 +45,7 @@
     
 {% endblock %}
 
-{% block content %}
-{% endblock %}
+{% block content %}{% endblock %}
 
 {% block special %}
     {% include 'common/dialog_box.html' %}

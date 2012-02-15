@@ -61,6 +61,8 @@ Poll.create.init = function()
     $("#poll-create").validate();
 }
 
+$(Poll.create.init);
+
 Poll.create.changeCourses = function()
 {
     var course = $('#courses').val();
@@ -147,6 +149,7 @@ Poll.create.createOption = function(value, text)
 Poll.create.addSection = function()
 {
     var value = $(Poll.create.sections).val();
+    alert(value);
     if ( value === "-1" )
     {
         return false;

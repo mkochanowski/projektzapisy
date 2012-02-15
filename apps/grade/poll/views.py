@@ -109,7 +109,8 @@ def templates( request ):
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
-    data = {}
+
+    data = prepare_data_for_create_poll( request )
     page, paginator = make_paginator( request, Template )
     data['templates'] = page
     data['grade']  = grade
@@ -296,7 +297,10 @@ def autocomplete(request):
             model_results = Option.objects.filter(content__istartswith=value).\
                 distinct().values_list('content', flat=True)
             results = [ x for x in model_results ]
-    json = simplejson.dumps(results)
+    if results:
+        json = simplejson.dumps(results)
+    else:
+        json = ""
     return HttpResponse(json, mimetype='application/javascript')
 
 @employee_required

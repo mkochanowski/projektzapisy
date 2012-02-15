@@ -20,7 +20,7 @@ from apps.enrollment.records.models        import Group
 from apps.grade.poll.exceptions             import NoTitleException, NoPollException, \
                                                     NoSectionException
 
-from apps.enrollment.courses.models import Semester, Group, Course, GROUP_TYPE_CHOICES
+from apps.enrollment.courses.models import Semester, Group, Course, GROUP_TYPE_CHOICES, CourseEntity
 from apps.users.models               import Program
 
 from django.core.paginator             import Paginator, InvalidPage, EmptyPage
@@ -467,12 +467,12 @@ def groups_list( groups ):
 def make_template_from_db( request, template):
 
     var = {}
-    var['type']           = template.group_type
-    var['sections']       = template.sections.all()
+    var['type']            = template.group_type
+    var['sections']        = template.sections.all()
     var['studies_type']   = template.studies_type
-    var['title']          = template.title
+    var['title']           = template.title
     var['description']    = template.description
-    var['course']        = template.course
+    var['course']          = template.course
     var['semester']       = Semester.get_current_semester()
     var['groups_without'] = 'off'
     var['group']          = None
@@ -731,6 +731,24 @@ def prepare_data_for_create_poll( request, group_id = 0 ):
 
     data['studies_types']    = Program.objects.all()
     data['semesters']        = Semester.objects.all()
+    data['sections']         = Section.objects.filter(deleted=False)
+    data['types']            = GROUP_TYPE_CHOICES
+
+    return data
+
+def prepare_data_for_create_template( request, group_id = 0 ):
+    data = pop_template_from_session( request )
+
+    if group_id > 0:
+        group                = Group.objects.get(pk=group_id)
+        data['group']        = group.pk
+        data['type']         = group.type
+        data['course_id']    = group.course.pk
+        data['groups']       = Group.objects.filter(type=group.type, course=group.course).order_by('teacher')
+
+    data['courses'] = CourseEntity.objects.all()
+
+    data['studies_types']    = Program.objects.all()
     data['sections']         = Section.objects.filter(deleted=False)
     data['types']            = GROUP_TYPE_CHOICES
 
