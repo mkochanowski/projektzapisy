@@ -31,7 +31,7 @@ $.extend($.fn, {
 		// Add novalidate tag if HTML5.
 		this.attr('novalidate', 'novalidate');
 		validator = new $.validator( options, this[0] );
-        $.data(this[0], 'validator', validator, 1337);
+        $.data(this[0], 'validator', validator);
 
 		if ( validator.settings.onsubmit ) {
 			var inputsAndButtons = this.find("input, button");

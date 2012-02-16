@@ -78,6 +78,7 @@ Poll.section.init = function()
 
     $('.only-edit').show();
     $('.only-show').hide();
+    $("#questionset").validate()
 }
 
 Poll.section.showEdit = function()
@@ -660,7 +661,7 @@ Poll.section.changeLeading = function()
                 Poll.section.havelastLi = false;
             }
         }
-        $("#questionset").validate({}).element('.anyquestion');
+        $("#questionset").validate().element('.anyquestion');
         $("#questionset").valid();
     }
 }
@@ -677,7 +678,7 @@ Poll.section.validate = function(li)
 
     $(li).find('.question-answer').each(function(i, elem)
     {
-        c = c && $("#questionset").validate({}).element(elem);
+        c = c && $("#questionset").validate().element(elem);
     })
 
     return a && b && c;
