@@ -27,7 +27,7 @@ poll_types['open'] = {
     haveAnswers: false,
     options:   [],
     optionsOn: []
-}
+};
 
 poll_types['single'] = {
     type: 'single',
@@ -37,7 +37,7 @@ poll_types['single'] = {
     answers: [],
     options: ['isScale'],
     optionOn: []
-}
+};
 
 poll_types['multi'] = {
     type: 'multi',
@@ -47,7 +47,7 @@ poll_types['multi'] = {
     answers: [],
     options: ['choiceLimit', 'hasOther'],
     optionOn: []
-}
+};
 
 poll_types['yes_no'] = {
     type: 'yes_no',
@@ -57,7 +57,7 @@ poll_types['yes_no'] = {
     answers: ['tak', 'nie'],
     options: ['isScale'],
     optionOn: []
-}
+};
 
 poll_types['scale5'] = {
     type: 'scale5',
@@ -67,4 +67,35 @@ poll_types['scale5'] = {
     answers: ['1', '2', '3', '4', '5'],
     options: ['isScale'],
     optionOn: ['scale']
-}
+};
+
+
+poll_types['scaled'] = {
+    type: 'scaled',
+    realtype: 'single',
+    name: 'Skala opisowa',
+    haveAnswers: true,
+    answers: ['zdecydowanie tak', 'raczej tak', 'trudno powiedzieć', 'raczej nie', 'zdecydowanie nie'],
+    options: ['isScale'],
+    optionOn: ['scale']
+};
+
+poll_types['scalep'] = {
+    type:'scalep',
+    realtype:'single',
+    name:'Skala - liczba godzin',
+    haveAnswers:true,
+    answers:['Regularnie (do 4 nieobecności)', 'Nieregularnie (5-9 nieobecności)', 'Rzadko (10-14 nieobecności)', 'Wcale'],
+    options:['isScale'],
+    optionOn:['scale']
+};
+
+poll_types['scalew'] = {
+    type: 'scalew',
+    realtype: 'single',
+    name: 'Skala - nakład pracy',
+    haveAnswers: true,
+    answers: ['Wcale', 'Mniej niż 1 godz.', 'około 2 godz.', 'około 4 godz.', 'Więcej niż 6 godz.'],
+    options: ['isScale'],
+    optionOn: ['scale']
+};
