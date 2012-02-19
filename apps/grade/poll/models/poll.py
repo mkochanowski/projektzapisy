@@ -191,8 +191,11 @@ class Poll( models.Model ):
 
     @staticmethod
     def get_all_polls_for_student( student ):
-        return filter( lambda x: x.is_student_entitled_to_poll( student ), 
-                       Poll.get_current_polls())
+        groups = Record.objects.filter( student = student,
+                                                 status  = STATUS_ENROLLED ).select_related('group')\
+                                .values_list('group__id', flat=True)
+
+        return filter( lambda x: x in groups, Poll.get_current_polls() )
     
     @staticmethod
     def get_all_polls_for_group( group, semester = None ):
