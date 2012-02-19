@@ -193,6 +193,8 @@ def get_ticket_and_signed_ticket_from_session( session, slug, poll_id ):
         return None, None
 
 def getGroups(request, template):
+
+
     if template['course'] == -1:
         return {}
 
@@ -200,6 +202,10 @@ def getGroups(request, template):
         return template['group']
 
     kwargs = {}
+
+    if template['semester']:
+        kwargs['course__semester'] = semester
+
     if template['course']:
         kwargs['course__entity'] = template['course']
 
