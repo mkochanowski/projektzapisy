@@ -31,6 +31,7 @@ class Command(BaseCommand):
                     groups_without = 'off',
                     group          = None)
             groups   = getGroups({}, t)
+            print groups
             origin = Origin()
             origin.save()
 
