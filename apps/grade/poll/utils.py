@@ -203,13 +203,13 @@ def getGroups(request, template):
 
     kwargs = {}
 
-    if template['semester']:
-        kwargs['course__semester'] = semester
+    if 'semester' in template:
+        kwargs['course__semester'] = template['semester']
 
-    if template['course']:
+    if 'course' in template:
         kwargs['course__entity'] = template['course']
 
-    if template['type']:
+    if 'type' in template:
         kwargs['type'] = template['type']
 
     return Group.objects.filter(**kwargs)
