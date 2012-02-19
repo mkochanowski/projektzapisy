@@ -17,7 +17,6 @@ class Command(BaseCommand):
         semester  = Semester.objects.get(id=args[0])
         print semester
         templates = Template.objects.filter(pk__in=args[1:])
-        print templates
         prych     = Employee.objects.get(user__pk=43)
         for template in templates:
             t = dict(
@@ -31,7 +30,6 @@ class Command(BaseCommand):
                     groups_without = 'off',
                     group          = None)
             groups   = getGroups({}, t)
-            print groups
             origin = Origin()
             origin.save()
 

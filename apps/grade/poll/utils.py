@@ -203,16 +203,14 @@ def getGroups(request, template):
 
     kwargs = {}
 
-    if 'semester' in template:
+    if template['semester']:
         kwargs['course__semester'] = template['semester']
 
-    if 'course' in template:
+    if template['course']:
         kwargs['course__entity'] = template['course']
 
-    if 'type' in template:
+    if template['type']:
         kwargs['type'] = template['type']
-    gr = Group.objects.filter(**kwargs)
-    print gr.query
     return Group.objects.filter(**kwargs)
 
 def poll_cmp_courses( p1, p2 ):
