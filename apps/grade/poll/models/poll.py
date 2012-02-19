@@ -194,8 +194,9 @@ class Poll( models.Model ):
                        Poll.get_current_polls())
     
     @staticmethod
-    def get_all_polls_for_group( group ):
-        semester = Semester.get_current_semester()
+    def get_all_polls_for_group( group, semester = None ):
+        if not semester:
+            semester = Semester.get_current_semester()
         return Poll.objects.filter( semester = semester, group = group, deleted=False )
     
     def get_section_by_id(self, section_id):

@@ -185,6 +185,14 @@ def create_poll_from_template(request, templates):
         template = make_template_from_db( request, tmpl)
         groups   = getGroups(request, template)
         if groups:
+            polls = []
+            origin = Origin()
+            origin.save()
+            for group in groups:
+                if template['groups_without'] == 'on' and Poll.get_all_polls_for_group(group, template.semeter).count()>0:
+                    continue
+
+
             polls = make_polls_for_groups(request, groups, template)
         else:
             polls = make_polls_for_all( request, template )

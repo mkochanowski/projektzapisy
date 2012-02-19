@@ -611,10 +611,16 @@ def make_poll_from_template( request, template):
     return poll
 
 def make_poll(request, template, group=None, origin=None):
-    template['iterate_group'] = group
-    poll = make_poll_from_template(request, template)
+    poll = Poll()
+    poll.author       = request.user.employee
+    poll.title        = template['title']
+    poll.description  = template['description']
+    poll.semester     = template['semester']
+    poll.group        = group
+    poll.studies_type = template['studies_type']
     poll.origin = origin
     poll.save()
+
     make_section_for_poll(request, poll, template)
     return poll
 
@@ -624,9 +630,7 @@ def make_polls_for_groups( request, groups, template ):
     origin = Origin()
     origin.save()
     for group in groups:
-        if template['groups_without'] == 'on' and Poll.get_all_polls_for_group(group):
-            continue
-        if not request.user.employee.has_privileges_for_group(group.pk):
+        if template['groups_without'] == 'on' and Poll.get_all_polls_for_group(group, template.semeter).count()>0:
             continue
 
         poll = make_poll(request, template, group, origin)
