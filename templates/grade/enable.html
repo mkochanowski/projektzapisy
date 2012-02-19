@@ -1,0 +1,36 @@
+{% extends "grade/base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" href="/site_media/css/common/mainPage.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/results.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
+    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+{% endblock %}
+
+{% block grade_active %} class="active"{% endblock %}
+
+{% block content %}
+    <div id="mainPage-container">
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for semester in semesters %}
+                    <tr>
+                    <form action="{% if semester.is_grade_active %}{% url grade-disable-grade %}{% else %}{% url grade-enable-grade %}{% endif %}" method="POST">
+                        <input type="hidden" name="semester_id" value="{{ semester.id }}">
+                        <td>{{ semester }}</td>
+                        <td><button type="submit" class="btn{% if not semester.is_grade_active %} success{% else %} delete{% endif %}">{% if semester.is_grade_active %}Zamknij{% else %}Otwórz{% endif %} ocenę</button></td>
+                    </form>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+

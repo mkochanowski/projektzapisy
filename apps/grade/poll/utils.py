@@ -32,7 +32,7 @@ def check_signature( ticket, signed_ticket, public_key ):
     return pk.verify( ticket, (signed_ticket,) )
 
 def group_polls_and_tickets_by_course( poll_and_ticket_list ):
-    if poll_and_ticket_list == []: return []
+    if not poll_and_ticket_list: return []
     
     poll_and_ticket_list.sort( lambda (p1, t1, st1), (p2, t2, st2): poll_cmp( p1, p2 ))
     
@@ -86,11 +86,11 @@ def create_slug( name ):
     slug = re.sub("-$", "", slug)
     return slug
 
-def get_polls_for_course((( sub, slug ), get), groupped_polls ):
+def get_polls_for_course(( ( sub, slug ), get), groupped_polls ):
     if get:
-        return (( sub, slug ), u'jest')
+        return ( sub, slug ), u'jest'
     else:
-        return (( sub, slug ), [])
+        return ( sub, slug ), []
 
 def prepare_data( request, slug ):
     data = { 'errors'   : [], 
@@ -156,12 +156,12 @@ def prepare_data( request, slug ):
 def get_next( poll_list, finished_list, poll_id ):
     ret = False
     for (p_id, t, st, s), slug in poll_list:
-        if ret: return (p_id, t, s, slug)
+        if ret: return p_id, t, s, slug
         ret = p_id == poll_id
     
     ret = False
     for (p_id, t, st, s), slug in finished_list:
-        if ret: return (p_id, t, s, slug)
+        if ret: return p_id, t, s, slug
         ret = p_id == poll_id
         
     return None
@@ -195,34 +195,18 @@ def get_ticket_and_signed_ticket_from_session( session, slug, poll_id ):
 def getGroups(request, template):
     if template['course'] == -1:
         return {}
+
     if template['group']:
         return template['group']
-    if template['type']:
-        if template['course']:
-            sub = request.user.employee in template['course'].teachers.all()
-            if request.user.is_staff or sub:
-                groups = Group.objects.filter( type=template['type'], course=template['course'] )
-            else:
-                groups = Group.objects.filter( type=template['type'], course=template['course'], teacher=request.user.employee )
-        else:
-            if request.user.is_staff:
-                groups = Group.objects.filter( type=template['type'] )
-            else:
-                groups = Group.objects.filter( type=template['type'], teacher=request.user.employee )
-    else:
-        if template['course']:
-            sub = request.user.employee in template['course'].teachers.all()
-            if request.user.is_staff or sub:
-                groups = Group.objects.filter( course=template['course'] )
-            else:
-                groups = Group.objects.filter( course=template['course'], teacher=request.user.employee )
-        else:
-            if request.user.is_staff:
-                groups = Group.objects.filter( course__semester = template['semester'] )
-            else:
-                groups = Group.objects.filter( course__semester = template['semester'], teacher=request.user.employee   )
 
-    return groups
+    kwargs = {}
+    if template['course']:
+        kwargs['course__entity'] = template['course']
+
+    if template['type']:
+        kwargs['type'] = template['type']
+
+    return Group.objects.filter(**kwargs)
 
 def poll_cmp_courses( p1, p2 ):
     if p1.group:
@@ -319,11 +303,11 @@ def declination_section(num, nominative = False):
     return u'sekcji'
 
 def declination_template(num):
-	if (num == 1):
-		return u'szablon'
-	if (num in [2,3,4]):
-		return u'szablony'
-	return 'szablonów'
+    if num == 1:
+        return u'szablon'
+    if num in [2,3,4]:
+        return u'szablony'
+    return 'szablonów'
    
 ####  HELPER FOR UNICODE + CSV -- Python's CSV does not support unicode 
 
@@ -420,7 +404,7 @@ def delete_objects( request, object, object_list ):
         element = object.objects.get(pk=pk)
         element.deleted = True
         element.save()
-        counter = counter + 1
+        counter += 1
 
     return counter
 
@@ -445,9 +429,9 @@ def make_paginator( request, object=None, objects=None):
 
     # If page request (9999) is out of range, deliver last page of results.
     try:
-        return (paginator.page(page), paginator)
+        return paginator.page(page), paginator
     except (EmptyPage, InvalidPage):
-        return (paginator.page(paginator.num_pages), paginator)
+        return paginator.page(paginator.num_pages), paginator
 
 def course_list( courses ):
     course_list = []
@@ -466,18 +450,17 @@ def groups_list( groups ):
 
 def make_template_from_db( request, template):
 
-    var = {}
-    var['type']            = template.group_type
-    var['sections']        = template.sections.all()
-    var['studies_type']   = template.studies_type
-    var['title']           = template.title
-    var['description']    = template.description
-    var['course']          = template.course
-    var['semester']       = Semester.get_current_semester()
-    var['groups_without'] = 'off'
-    var['group']          = None
+    return dict(
+        type           = template.group_type,
+        sections       = template.sections.all(),
+        studies_type   = template.studies_type,
+        title          = template.title,
+        description    = template.description,
+        course         = template.course,
+        semester       = Semester.objects.get(id=request.POST['semester']),
+        groups_without = 'off',
+        group          = None)
 
-    return var
 
 def make_template_variables( request ):
     """
@@ -489,11 +472,11 @@ def make_template_variables( request ):
     """
     var = {}
 
-    if (request.POST.get('title', '') == ''):
+    if request.POST.get('title', '') == '':
         raise NoTitleException
 
     type         = int(request.POST.get('type', 0))
-    if type == 0:
+    if not type:
         type = None
 
     studies_type = int(request.POST.get('studies-type', -1))
@@ -504,8 +487,8 @@ def make_template_variables( request ):
 
     course      = int(request.POST.get('course', 0))
     if course > 0:
-        course = Course.objects.get(pk=course)
-    elif course == 0:
+        course = CourseEntity.objects.get(pk=course)
+    elif not course:
         course = None
     else:
         course = -1
@@ -570,7 +553,7 @@ def prepare_sections_for_template( request, template):
         @param Template template
     """
     sections_list = request.POST.getlist('sections[]')
-    if len(sections_list)==0:
+    if not len(sections_list):
         raise NoSectionException
 
     for section in sections_list:
@@ -594,7 +577,7 @@ def get_templates( request ):
 def make_section_for_poll(request, poll, template={}):
     if 'sections' in template:
         sections = template['sections']
-        if sections == []:
+        if not sections:
             raise NoSectionException
         for section in sections:
             pollSection = SectionOrdering()
@@ -605,7 +588,7 @@ def make_section_for_poll(request, poll, template={}):
 
     else:
         sections = request.POST.getlist('sections[]')
-        if sections == []:
+        if not sections:
             raise NoSectionException
 
         for (i, section) in enumerate(sections):
@@ -649,7 +632,7 @@ def make_polls_for_groups( request, groups, template ):
         poll = make_poll(request, template, group, origin)
         polls.append(unicode(poll))
 
-    if (len(polls)==0):
+    if not len(polls):
         raise NoPollException
     return polls
 
@@ -661,7 +644,7 @@ def make_polls_for_all( request, template ):
 
     polls.append(unicode(poll))
 
-    if (len(polls)==0):
+    if not len(polls):
         raise NoPollException
     return polls
 
@@ -676,14 +659,11 @@ def save_template_in_session( request, template ):
     request.session['polls_len']    =  template['polls_len']
 
 def pop_template_from_session( request ):
-    template = {}
-    template['studies_type']    = request.session.get('studies_type', None)
-    template['semester']        = request.session.get('semester', None)
-    template['group']           = request.session.get('group', None)
-    template['type']            = unicode(request.session.get('type', 0))
-    template['course']         = request.session.get('course', None)
-    template['groups_without']  = request.session.get('groups_without', None)
-    template['polls_len']       = request.session.get('polls_len', None)
+    template = {'studies_type': request.session.get('studies_type', None),
+                'semester': request.session.get('semester', None), 'group': request.session.get('group', None),
+                'type': unicode(request.session.get('type', 0)), 'course': request.session.get('course', None),
+                'groups_without': request.session.get('groups_without', None),
+                'polls_len': request.session.get('polls_len', None)}
     #clear session for future
     if 'studies_type' in request.session:
         del request.session['studies_type']
@@ -774,7 +754,7 @@ def make_pages( pages, page_number ):
 
     list = range(1, 6)
     if page_number > 8:
-	    list.extend( [-1])
+        list.extend( [-1])
 
     first = max(page_number-2, 6)
     last = min(page_number+3, pages)

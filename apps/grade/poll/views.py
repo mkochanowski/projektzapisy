@@ -127,9 +127,8 @@ def template_actions( request ):
         Action for templates
         @author mjablonski
     """
-    data = {}
-    data['grade']  = Semester.get_current_semester().is_grade_active
-    
+    data = {'grade': Semester.get_current_semester().is_grade_active}
+
     if request.method == 'POST':
         action = request.POST.get('action')
         
@@ -141,6 +140,8 @@ def template_actions( request ):
                                        
         ### use
         elif action == 'use_selected':
+            semester_id        = request.POST['semester']
+            data['semester']  = Semester.objects.get(id=semester_id)
             data['templates'] = get_objects( request, Template)
             return render_to_response( 'grade/poll/managment/templates_confirm_use.html',
                                        data, context_instance = RequestContext( request ))
@@ -182,11 +183,11 @@ def create_poll_from_template(request, templates):
     polls_list = []
     for tmpl in templates:
         template = make_template_from_db( request, tmpl)
-        groups    = getGroups(request, template)
+        groups   = getGroups(request, template)
         if groups:
-            polls     = make_polls_for_groups(request, groups, template)
+            polls = make_polls_for_groups(request, groups, template)
         else:
-            polls     = make_polls_for_all( request, template )
+            polls = make_polls_for_all( request, template )
         polls_list.extend(polls)
     message   = make_message_from_polls(polls_list)
     messages.success(request, message)
@@ -197,11 +198,8 @@ def create_poll_from_template(request, templates):
 def show_template( request, template_id ):
     template = Template.objects.get(pk=template_id)
     form = PollForm()
-    form.setFields( template, None, None )
-    data = {}
-    data['form']     = form
-    data['template'] = template
-    data['grade']    = Semester.get_current_semester().is_grade_active
+    form.setFields(template)
+    data = {'form': form, 'template': template, 'grade': Semester.get_current_semester().is_grade_active}
     if request.is_ajax():
         return render_to_response( 'grade/poll/managment/ajax_show_template.html', data, context_instance = RequestContext( request ))
     else:
@@ -226,35 +224,33 @@ def rules(request):
 
 @employee_required
 def enable_grade( request ):
-    semester = Semester.get_current_semester()
 
-    raise NotImplementedError
-    if not semester:
-        messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
-        return render_to_response( 'grade/main.html', { 'grade' : False }, context_instance = RequestContext( request ))    
-    if semester.is_grade_active:
-        messages.error( request, "Nie można otworzyć oceny; ocena jest już otwarta")
-    elif Poll.get_polls_for_semester().count() == 0:
-        messages.error( request, "Nie można otworzyć oceny; brak ankiet")
-    elif Poll.get_current_semester_polls_without_keys().count() != 0:
-        messages.error( request, "Nie można otworzyć oceny; brak kluczy dla ankiet")
-        data = {}
-        data['category'] = 'grade'
-        data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
-        return None
-    else:
-        semester.is_grade_active = True
-        news = News()
-        news.author   = request.user
-        news.title    = u"Otwarto ocenę zajęć"
-        news.body     = u"Ocena zajęć została otwarta. Zapraszamy do wypełniania ankiet."
-        news.category = 'grade'
-        news.save()
-        semester.save()
-         
-        messages.success(request, "Ocena zajęć otwarta" )
-    
-    return HttpResponseRedirect( reverse( 'grade-main' ))
+    if request.method == 'POST':
+        sid      = request.POST.get('semester_id')
+        try:
+            semester = Semester.objects.get(id=sid)
+        except ObjectDoesNotExist:
+            semester = None
+            messages.error(request, "Podany semester nie istnieje")
+
+        if semester:
+            if semester.is_grade_active:
+                messages.error( request, "Nie można otworzyć oceny; ocena jest już otwarta")
+            elif not Poll.get_polls_for_semester(semester=semester).count():
+                messages.error( request, "Nie można otworzyć oceny; brak ankiet")
+            elif Poll.get_semester_polls_without_keys(semester=semester).count():
+                messages.error( request, "Nie można otworzyć oceny; brak kluczy dla ankiet")
+            else:
+                semester.is_grade_active = True
+                semester.save()
+                messages.success(request, "Ocena zajęć otwarta" )
+
+    data = dict(
+        semesters = Semester.objects.all()
+    )
+
+    return render_to_response('grade/enable.html', data, context_instance= RequestContext(request))
+
 
 @employee_required
 def disable_grade( request ):
@@ -560,7 +556,7 @@ def polls_list( request ):
                     select_related().order_by('user__last_name', 'user__first_name')
     data['studies_types']    = Program.objects.all()
     data['types']            = GROUP_TYPE_CHOICES
-    data['keys_to_create'] = Poll.count_current_semester_polls_without_keys()
+    data['keys_to_create'] = Poll.count_polls_without_keys()
 
     return render_to_response( 'grade/poll/managment/polls_list.html', data, context_instance = RequestContext( request ))
 

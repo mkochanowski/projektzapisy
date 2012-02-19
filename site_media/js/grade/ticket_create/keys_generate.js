@@ -9,9 +9,7 @@ Ticket.keys_generate.init = function()
     if( $('#keys_to_create').text().castToInt() > 0)
     {
         var html = "<div><span>Trwa generowanie kluczy</span>( <span id='keys-percent'>0</span> % )<div id='progressbar'></div></div>"
-        Fereol.dialog.setHTML(html);
-        Fereol.dialog.setTitle("Generowanie kluczy");
-        Fereol.dialog.show();
+        $('#creator').html(html);
     	$("#progressbar").progressbar({ value: 0 });
 	    Ticket.keys_generate.keys   = $('#keys_to_create').text().castToInt()
         Ticket.keys_generate.start();

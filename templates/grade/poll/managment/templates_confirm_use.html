@@ -3,6 +3,9 @@
 {% block poll-managment %}
     Czy na pewno chcesz zastosować poniższe szablony?
     <form action="{% url grade-poll-use-template %}" method="POST">
+        {% if semester %}
+            <input type="hidden" name="semester" value="{{ semester.id }}">
+        {% endif %}
         <ul>
             {% for template in templates %}
                 <li>

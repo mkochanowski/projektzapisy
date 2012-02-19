@@ -159,7 +159,7 @@ def save_private_keys(polls_private_keys):
         pkey.save()
 
 def generate_keys_for_polls():
-    poll_list = Poll.get_current_semester_polls_without_keys()
+    poll_list = Poll.get_polls_without_keys()
     pub_list  = []
     priv_list = []
     cache.set('generated-keys', '0')

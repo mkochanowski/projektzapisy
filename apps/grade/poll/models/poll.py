@@ -153,14 +153,32 @@ class Poll( models.Model ):
 
         pks = PublicKey.objects.all().values_list( 'poll', flat=True )
         return Poll.objects.filter( pk__in = pks, deleted=False )
-        
-    @staticmethod
-    def get_current_semester_polls_without_keys():
-        from apps.grade.ticket_create.models.public_key import PublicKey
 
-        semester = Semester.get_current_semester()
+    @staticmethod
+    def get_semester_polls_without_keys(semester = None):
+        from apps.grade.ticket_create.models.public_key import PublicKey
+        if not semester:
+            semester = Semester.get_current_semester()
+
         polls_with_keys = PublicKey.objects.all().values_list( 'poll' )
         return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys)
+    @staticmethod
+    def get_polls_without_keys():
+        from apps.grade.ticket_create.models.public_key import PublicKey
+
+        polls_with_keys = PublicKey.objects.all()
+        return Poll.objects.filter( deleted=False ).exclude( pk__in = polls_with_keys)
+
+    @staticmethod
+    def get_current_semester_polls_without_keys():
+        return Poll.get_semester_polls_without_keys()
+
+    @staticmethod
+    def count_polls_without_keys():
+        from apps.grade.ticket_create.models.public_key import PublicKey
+
+        polls_with_keys = PublicKey.objects.all()
+        return Poll.objects.filter(deleted=False ).exclude( pk__in = polls_with_keys).count()
 
     @staticmethod
     def count_current_semester_polls_without_keys():

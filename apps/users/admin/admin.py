@@ -91,7 +91,7 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
-admin.site.register(ExtendedUser, ExtendedUserAdmin)
+#admin.site.register(ExtendedUser, ExtendedUserAdmin)
 #admin.site.register(Employee, EmployeeAdmin)
 #admin.site.register(Student, StudentAdmin)
 admin.site.register(Program, ProgramAdmin)
