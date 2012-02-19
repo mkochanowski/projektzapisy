@@ -15,7 +15,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         semester  = Semester.objects.get(id=args[0])
+        print semester
         templates = Template.objects.filter(pk__in=args[1:])
+        print templates
         prych     = Employee.objects.get(user__pk=43)
         for template in templates:
             t = dict(
