@@ -94,7 +94,7 @@ def main(request):
 
 @employee_required
 def template_form(request, group_id = 0):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =  Semester.objects.filter(is_grade_active=True).count() > 0
     data = prepare_data_for_create_poll( request, group_id )
     data['grade'] =  grade
     return render_to_response( 'grade/poll/ajax_template_create.html', data, context_instance = RequestContext( request ))
@@ -105,7 +105,7 @@ def templates( request ):
         List of templates
         @author mjablonski
     """
-    grade = Semester.get_current_semester().is_grade_active
+    grade =  Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
@@ -127,7 +127,7 @@ def template_actions( request ):
         Action for templates
         @author mjablonski
     """
-    data = {'grade': Semester.get_current_semester().is_grade_active}
+    data = {'grade':   Semester.objects.filter(is_grade_active=True).count() > 0}
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -207,7 +207,7 @@ def show_template( request, template_id ):
     template = Template.objects.get(pk=template_id)
     form = PollForm()
     form.setFields(template)
-    data = {'form': form, 'template': template, 'grade': Semester.get_current_semester().is_grade_active}
+    data = {'form': form, 'template': template, 'grade':   Semester.objects.filter(is_grade_active=True).count() > 0}
     if request.is_ajax():
         return render_to_response( 'grade/poll/managment/ajax_show_template.html', data, context_instance = RequestContext( request ))
     else:
@@ -227,7 +227,7 @@ def create_template(request):
 
 
 def rules(request):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     return render_to_response ('grade/rules.html', {'grade' : grade }, context_instance = RequestContext ( request ))
 
 @employee_required
@@ -336,19 +336,19 @@ def edit_section(request, section_id):
     from django.template import loader
     form = PollForm()
     form.setFields( None, None, section_id )
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     return render_to_response( 'grade/poll/section_edit.html', {"form": form, 'grade':grade}, context_instance = RequestContext( request ))
 
 @employee_required
 def poll_form(request, group_id = 0):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =  Semester.objects.filter(is_grade_active=True).count() > 0
     data = prepare_data_for_create_poll( request, group_id )
     data['grade'] =  grade
     return render_to_response( 'grade/poll/ajax_poll_create.html', data, context_instance = RequestContext( request ))
 
 @employee_required
 def poll_edit_form(request, poll_id):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =  Semester.objects.filter(is_grade_active=True).count() > 0
     poll = Poll.objects.get( pk=poll_id )
     data = prepare_data_for_create_poll( request )
 
@@ -366,7 +366,7 @@ def poll_edit_form(request, poll_id):
 
 @employee_required
 def poll_edit(request):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
@@ -396,7 +396,7 @@ def poll_create_for_group():
 
 @employee_required
 def poll_create(request):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
@@ -440,7 +440,7 @@ def sections_list( request ):
         aren't allowed to any such action.
     """
     data = {}
-    grade = Semester.get_current_semester().is_grade_active
+    grade =  Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
@@ -455,7 +455,7 @@ def sections_list( request ):
 
 @employee_required
 def show_section( request, section_id):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
         messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
         return HttpResponseRedirect( reverse( 'grade-main' ))
@@ -475,13 +475,13 @@ def show_section( request, section_id):
 def get_section(request, section_id):
     form = PollForm()
     form.setFields( None, None, section_id )
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     return render_to_response( 'grade/poll/poll_section.html', {"form": form, "section_id": section_id, 'grade':grade}, context_instance = RequestContext( request ))
 
 @employee_required
 def section_actions( request ):
     data = {}
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     data[ 'grade' ] = grade
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -576,7 +576,7 @@ def show_poll( request, poll_id):
     data = {}
     data['form']    = form
     data['poll_id'] = poll_id
-    data['grade']   = Semester.get_current_semester().is_grade_active
+    data['grade']   =   Semester.objects.filter(is_grade_active=True).count() > 0
     if request.is_ajax():
         return render_to_response( 'grade/poll/managment/ajax_show_poll.html', data, context_instance = RequestContext( request ))
     else:
@@ -585,7 +585,7 @@ def show_poll( request, poll_id):
 @employee_required
 def poll_actions( request ):
     data = {}
-    data[ 'grade' ] = Semester.get_current_semester().is_grade_active
+    data[ 'grade' ] =   Semester.objects.filter(is_grade_active=True).count() > 0
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'delete_selected':
@@ -609,13 +609,13 @@ def delete_polls( request ):
 def groups_without_poll( request ):
     data = {}
     data['groups'] = Poll.get_groups_without_poll()
-    data['grade']  = Semester.get_current_semester().is_grade_active
+    data['grade']  =   Semester.objects.filter(is_grade_active=True).count() > 0
     data['tab']    = "group_without"
     return render_to_response( 'grade/poll/managment/groups_without_polls.html', data, context_instance = RequestContext( request ))
 
 @employee_required
 def poll_manage(request):
-    grade = Semester.get_current_semester().is_grade_active
+    grade =   Semester.objects.filter(is_grade_active=True).count() > 0
     data = {}
     data['semesters']  = Semester.objects.all() 
     data['grade']      = grade
@@ -624,7 +624,7 @@ def poll_manage(request):
 @employee_required()
 def get_section_form(request):
     data          = {}
-    grade         = Semester.get_current_semester().is_grade_active
+    grade         =    Semester.objects.filter(is_grade_active=True).count() > 0
     data['grade'] = grade
     
     return render_to_response ('grade/poll/ajax_section_create.html', data, context_instance = RequestContext( request ))
@@ -633,7 +633,7 @@ def get_section_form(request):
 @employee_required    
 def questionset_create(request):
     data          = {}
-    grade         = Semester.get_current_semester().is_grade_active
+    grade         =   Semester.objects.filter(is_grade_active=True).count() > 0
     data['grade'] = grade
     
     if grade:
@@ -678,7 +678,7 @@ def grade_logout(request):
     return HttpResponseRedirect(reverse('grade-poll-tickets-enter'))
 
 def tickets_enter(request):
-    grade = Semester.get_current_semester().is_grade_active
+    grade = Semester.objects.filter(is_grade_active=True).count()>0
     data = {}
     
     if request.method == "POST":
@@ -763,7 +763,7 @@ def polls_for_user( request, slug ):
         return HttpResponseRedirect( reverse('grade-poll-tickets-enter') )
     
     data = prepare_data( request, slug )
-    data[ 'grade' ] = Semester.get_current_semester().is_grade_active
+    data[ 'grade' ] =   Semester.objects.filter(is_grade_active=True).count() > 0
     if data['polls']:
         (_, s), _, list = data['polls'][0]
         id, _, _, _ = list[0]
@@ -1037,7 +1037,7 @@ def poll_answer( request, slug, pid ):
                  'slug' : slug,
                  'link_name' : poll.to_url_title() }
     
-    data[ 'grade' ] = Semester.get_current_semester().is_grade_active
+    data[ 'grade' ] =   Semester.objects.filter(is_grade_active=True).count() > 0
     
     return render_to_response( 'grade/poll/poll_answer.html', data, context_instance = RequestContext( request ))
    
@@ -1195,7 +1195,7 @@ def poll_results( request, mode='S', poll_id = None ):
 @login_required
 def poll_results_detailed( request, mode, poll_id, st_id = None ):
     data = {}
-    data['grade'] = Semester.get_current_semester().is_grade_active
+    data['grade'] =   Semester.objects.filter(is_grade_active=True).count() > 0
     
     if mode == 'S':
         data['mode']  = 'course'
