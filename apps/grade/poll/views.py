@@ -87,7 +87,7 @@ from apps.grade.poll.exceptions import NoTitleException, NoSectionException, \
 
 def main(request):
     try:
-        grade = Semester.get_current_semester().is_grade_active
+        grade = Semester.objects.filter(is_grade_active=True).count() > 0
     except:
         grade = False
     return render_to_response( 'grade/main.html', { 'grade' : grade }, context_instance = RequestContext( request ))

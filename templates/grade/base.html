@@ -44,12 +44,3 @@
 {#    {% endif %}#}
 {#    #}
 {% endblock %}
-
-{% block content %}{% endblock %}
-
-{% block special %}
-    {% include 'common/dialog_box.html' %}
-{% if user.is_superuser and keys_to_create %}
-    <div style="display:none" id="keys_to_create">{{ keys_to_create }}</div>
-{% endif %}
-{% endblock %}
