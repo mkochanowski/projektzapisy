@@ -47,7 +47,7 @@ class Command(BaseCommand):
                     poll.origin = origin
                     poll.save()
 
-                    if 'sections' in template:
+                    if 'sections' in t:
                             sections = t['sections']
 
                             for section in sections:
