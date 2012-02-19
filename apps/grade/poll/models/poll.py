@@ -149,9 +149,10 @@ class Poll( models.Model ):
     
     @staticmethod
     def get_current_polls():
+        from apps.grade.ticket_create.models.public_key import PublicKey
         return Poll.objects.filter(deleted=False )\
                     .select_related('semester', 'group', 'group__course', 'studies_type')\
-                    .extra(where=['(SELECT COUNT(*) FROM ticket_create_publickey WHERE poll_id = poll_poll.id GROUP BY poll_id) = 0'])
+                    .extra(where=['(SELECT COUNT(*) FROM ticket_create_publickey WHERE poll_id = poll_poll.id GROUP BY poll_id) = 1'])
 
 
     @staticmethod
