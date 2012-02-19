@@ -148,8 +148,7 @@ class Poll( models.Model ):
         return filter( lambda g: g.pk not in polls, groups)
     
     @staticmethod
-    def get_current_polls(student):
-        from apps.grade.ticket_create.models.public_key import PublicKey
+    def get_current_polls():
         return Poll.objects.filter(deleted=False )\
                     .select_related('semester', 'group', 'group__course', 'studies_type')\
                     .extra(where=['(SELECT COUNT(*) FROM ticket_create_publickey WHERE poll_id = poll_poll.id GROUP BY poll_id) = 0'])
