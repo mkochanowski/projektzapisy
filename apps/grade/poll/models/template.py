@@ -16,7 +16,7 @@ class Template( models.Model ):
     no_course         = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'nie przypisany' )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięty' )
     exam              = models.BooleanField( blank = False, null = False, default = True, verbose_name = 'przedmiot z egzaminem' )
-    group_type        = models.CharField( max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
+    group_type        = models.CharField( blank = False, null = False, max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     sections          = models.ManyToManyField( Section, verbose_name = 'sekcje',
                                                 through = 'TemplateSections')
     author            = models.ForeignKey( Employee, verbose_name = 'autor' )

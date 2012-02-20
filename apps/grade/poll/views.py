@@ -185,9 +185,8 @@ def create_poll_from_template(request, templates):
             origin = Origin()
             origin.save()
             for group in groups:
-                if template['groups_without'] == 'on' and Poll.get_all_polls_for_group(group, template.semeter).count()>0:
+                if template['groups_without'] == 'on' and Poll.get_all_polls_for_group(group, template.semeter).count() > 0:
                     continue
-
 
             polls = make_polls_for_groups(request, groups, template)
         else:

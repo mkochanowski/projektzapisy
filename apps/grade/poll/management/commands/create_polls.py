@@ -20,7 +20,7 @@ class Command(BaseCommand):
         prych     = Employee.objects.get(user__pk=43)
         for template in templates:
             t = dict(
-                    type           = template.group_type,
+                    type           = None if template.group_type == '--' else template.group_type,
                     sections       = template.sections.all(),
                     studies_type   = template.studies_type,
                     title          = template.title,

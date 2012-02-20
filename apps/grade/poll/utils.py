@@ -460,7 +460,7 @@ def groups_list( groups ):
 def make_template_from_db( request, template):
 
     return dict(
-        type           = template.group_type,
+        type           = None if template.group_type == '--' else template.group_type,
         sections       = template.sections.all(),
         studies_type   = template.studies_type,
         title          = template.title,
@@ -548,7 +548,7 @@ def prepare_template( request ):
         tmpl.no_course = False
         tmpl.course    = variables['course']
 
-    tmpl.group_type   = variables['type']
+    tmpl.group_type   = variables['type'] if variables['type'] else '--'
 
     tmpl.save()
 
