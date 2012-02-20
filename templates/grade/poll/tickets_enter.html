@@ -6,23 +6,25 @@
 	<li>Weryfikacja biletów</li>
 {% endblock %}
 {% block content %}
-<!--
-    {% if error %}
-        <div class="grade-error-message">
-        <h4>{{ error }}</h4>
-        </div>
-    {% endif %}
--->
 	{% if user.is_authenticated %}
-		<div class='main-message'><h3>Uwaga</h3>
-		Aby ankieta pozostała anonimowa należy się <a href="{% url grade-logout %}">wylogować</a></div>
+        <div class="alert-message">
+            <strong>Uwaga!</strong> Aby ankieta pozostała anonimowa należy się <a href="{% url grade-logout %}">wylogować</a>.
+        </div>
 	{% else %}
 		<div id='grade-tickets-enter'>
 		<form action="" method="post" enctype="multipart/form-data">
-		<table id='grade-tickets-enter-form'>
-			{{ form.as_p }}
-		</table>
-		<input id= "grade-tickets-enter-button" type="submit" value="Wyślij" />
+
+                      <h2>Wprowadzanie kluczy</h2>
+                        <label for="id_ticketsfield" class="span4">Podaj wygenerowane klucze</label>
+
+                            <textarea name="ticketsfield" cols="80" rows="20" id="id_ticketsfield"></textarea>
+                          <p class="help-block">Jeżeli nie posiadasz jeszcze kluczy, zaloguj się i je wygeneruj.</p>
+
+            <label for="id_ticketsfile" class="span4">lub wybierz plik z biletami:</label>
+            <input type="file" id="id_ticketsfile" name="ticketsfile">
+                      <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Rozpocznij ocenę</button>
+                      </div>
 		</form>
 		</div>
 	{% endif %}
