@@ -88,12 +88,10 @@ def get_url():
     """
 
     # pobieranie adresu serwera. Jeżeli plik z adresem nie istnieje podawana jest wartość domyślna
-    # TODO:
-    #   przerobić tak, żeby domyślnie tu był adres fereola i nie dawać możliwości zmiany
     try:
         file_with_url = open("url.txt","r")
     except IOError, err:
-        return u'http://localhost:8000/grade/ticket/client_connection'
+        return u'https://zapisy.ii.uni.wroc.pl/grade/ticket/client_connection'
     return file_with_url.read() + u'grade/ticket/client_connection'
 
 
