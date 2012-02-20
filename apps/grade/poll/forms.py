@@ -23,7 +23,8 @@ class TicketsForm( forms.Form ):
                                  label     = "Podaj wygenerowane bilety",
                                  help_text = "Wklej tutaj pobrane wcześniej bilety.",
                                  required  = False )
-    ticketsfile = forms.FileField( label    = "Lub wybierz plik z biletami:",
+    ticketsfile = forms.FileField( widget=forms.HiddenInput,
+                                   label    = "Lub wybierz plik z biletami:",
                                    required = False )
 
 
