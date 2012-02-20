@@ -18,6 +18,11 @@ from apps.grade.poll.models.saved_ticket import SavedTicket
 
 from apps.grade.poll.models.poll import Poll
 
+class PollAdmin(admin.ModelAdmin):
+    list_filter = ('semester', )
+    search_fields = ('title', )
+
+
 admin.site.register( Option )
 admin.site.register( OpenQuestionOrdering )
 admin.site.register( SingleChoiceQuestionOrdering )
@@ -27,7 +32,7 @@ admin.site.register( OpenQuestion )
 admin.site.register( SingleChoiceQuestion )
 admin.site.register( MultipleChoiceQuestion )
 admin.site.register( Section )
-admin.site.register( Poll )
+admin.site.register( Poll, PollAdmin )
 admin.site.register( SavedTicket )
 admin.site.register( OpenQuestionAnswer )
 admin.site.register( SingleChoiceQuestionAnswer )
