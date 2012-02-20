@@ -1,13 +1,13 @@
 {% extends "grade/base.html" %}
 
 {% block main-navigation %}
-	<li><a href="/">Strona główna</a></li>
-	<li><a href="{% url grade-main %}">Ocena zajęć</a></li>
-    <li>Lista kluczy publicznych</li>
+	<a href="/">Strona główna</a>  &raquo;
+	<a href="{% url grade-main %}">Ocena zajęć</a> &raquo;
+    Lista kluczy publicznych
 {% endblock %}
 
 {% block content %}
-    <table border="1">
+    <table>
     {% for l in list %}
         {{ l.poll.as_row }}
     {% endfor %}
