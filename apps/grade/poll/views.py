@@ -1276,8 +1276,12 @@ def poll_results_detailed( request, mode, poll_id, st_id = None ):
     return render_to_response ('grade/poll/poll_detailed_results.html', data, context_instance = RequestContext ( request ))
 
 @login_required
-def save_csv(request, mode, poll_id):    
-    poll = Poll.objects.get( pk = poll_id )
+def save_csv(request, mode, poll_id):
+    try:
+        poll = Poll.objects.get( pk = poll_id )
+    except ObjectDoesNotExist:
+        raise Http404
+
     csv_title = generate_csv_title(poll)
 
     # For each section: section title and contents of all questions
@@ -1294,7 +1298,7 @@ def save_csv(request, mode, poll_id):
         for section, section_answers in sections_list:        
             # Actual answers to these questions                       
             for question, question_answer in section_answers:
-                if question_answer == []:
+                if not question_answer:
                     answer.append(u'')
                 else:                    
                     answer.append( unicode(question_answer[0]) )
