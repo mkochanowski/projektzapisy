@@ -55,8 +55,8 @@
                     </li>
                 {% comment %}
                     <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta
-                        Dydaktyczna</a></li>
-                    <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>{% endcomment %}
+                        Dydaktyczna</a></li>{% endcomment %}
+                    <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
                 </ul>
                 {% if user.is_authenticated %}
                     <div class="user-panel">
