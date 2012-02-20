@@ -12,11 +12,11 @@ urlpatterns = patterns('',
     url(r'^poll_answer/(?P<slug>[\w\-_]+)/(?P<pid>[0-9]+)/$', 'apps.grade.poll.views.poll_answer', name='grade-poll-poll-answer'),
     url(r'^end_grading/$', 'apps.grade.poll.views.poll_end_grading', name='poll-end-grading'),
     
-    url(r'^poll_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.poll_results', name='grade-poll-poll-results'),
-    url(r'^poll_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)/details/(?P<st_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.poll_results_detailed', name='grade-poll-poll-results-detailed'),
-    url(r'^share_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.share_results_toggle', name='grade-poll-share-results'),
-    url(r'^save_csv/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.save_csv', name='grade-poll-save-csv'),
-    
+#    url(r'^poll_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.poll_results', name='grade-poll-poll-results'),
+#    url(r'^poll_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)/details/(?P<st_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.poll_results_detailed', name='grade-poll-poll-results-detailed'),
+#    url(r'^share_results/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.share_results_toggle', name='grade-poll-share-results'),
+#    url(r'^save_csv/(?P<mode>[S,T])(?P<poll_id>[1-9][0-9]*)?$', 'apps.grade.poll.views.save_csv', name='grade-poll-save-csv'),
+#
     url(r'^managment/polls_list/$', 'apps.grade.poll.views.polls_list', name='grade-poll-list'),
     url(r'^managment/sections_list/$', 'apps.grade.poll.views.sections_list', name='grade-poll-sections-list'),
     url(r'^managment/groups_without_polls/$', 'apps.grade.poll.views.groups_without_poll', name='grade-poll-groups_without_polls'),
