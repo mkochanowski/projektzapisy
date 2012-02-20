@@ -1020,7 +1020,7 @@ def poll_answer( request, slug, pid ):
         data[ 'form' ]   = form
         data[ 'pid']     = int(pid)
         
-        if request.method == "POST" and (not data['form_errors'] or st.finished):
+        if request.method == "POST" and (not ('form_errors' in data and data['form_errors']) or st.finished):
             if request.POST.get( 'Next', default=None ):
                 return HttpResponseRedirect( '/grade/poll/poll_answer/' + str( data['next'][3]) + '/' + str( data['next'][0]))
             if request.POST.get( 'Prev', default=None ):
