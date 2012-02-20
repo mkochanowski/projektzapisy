@@ -110,7 +110,7 @@ def templates( request ):
     page, paginator = make_paginator( request, Template )
     data['semesters'] = Semester.objects.all()
     data['templates'] = page
-    data['grade']  = grade
+    data['grade']  = True
     data['template_word'] = declination_template(paginator.count)
     data['pages']  = make_pages( paginator.num_pages+1, page.number )
     data['pages_range']  = range( 1, paginator.num_pages+1 )
