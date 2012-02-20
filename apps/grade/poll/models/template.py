@@ -15,6 +15,7 @@ class Template( models.Model ):
     course            = models.ForeignKey( CourseEntity, verbose_name = 'przedmiot', blank = True, null = True)
     no_course         = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'nie przypisany' )
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięty' )
+    exam              = models.BooleanField( blank = False, null = False, default = True, verbose_name = 'przedmiot z egzaminem' )
     group_type        = models.CharField( max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     sections          = models.ManyToManyField( Section, verbose_name = 'sekcje',
                                                 through = 'TemplateSections')

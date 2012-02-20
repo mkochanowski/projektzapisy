@@ -26,6 +26,7 @@ class Command(BaseCommand):
                     title          = template.title,
                     description    = template.description,
                     course         = template.course,
+                    exam           = template.exam,
                     semester       = semester,
                     groups_without = 'off',
                     group          = None)

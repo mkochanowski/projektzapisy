@@ -105,10 +105,6 @@ def templates( request ):
         List of templates
         @author mjablonski
     """
-    grade =  Semester.objects.filter(is_grade_active=True).count() > 0
-    if grade:
-        messages.error( request, "Ocena zajęć jest otwarta; operacja nie jest w tej chwili dozwolona" )
-        return HttpResponseRedirect( reverse( 'grade-main' ))
 
     data = prepare_data_for_create_template( request )
     page, paginator = make_paginator( request, Template )

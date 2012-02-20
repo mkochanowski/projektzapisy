@@ -211,6 +211,10 @@ def getGroups(request, template):
 
     if template['type']:
         kwargs['type'] = template['type']
+
+    if template['exam']:
+        kwargs['course__exam'] = True
+
     return Group.objects.filter(**kwargs)
 
 def poll_cmp_courses( p1, p2 ):
@@ -511,12 +515,13 @@ def make_template_variables( request ):
         semester = Semester.get_current_semester()
     var['type']           = type
     var['studies_type']   = studies_type
-    var['course']        = course
+    var['course']         = course
     var['title']          = request.POST.get('title', '')
     var['semester']       = semester
     var['description']    = request.POST.get('description', '')
     var['groups_without'] = request.POST.get('poll-only-without', 'off')
-    var['group']          = group
+    var['group']           = group
+    var['exam']           = request.POST.get('exam', False)
     return var
 
 def prepare_template( request ):
@@ -533,6 +538,7 @@ def prepare_template( request ):
     tmpl.title        = variables['title']
     tmpl.description  = variables['description']
     tmpl.studies_type = variables['studies_type']
+    tmpl.exam         = variables['exam']
     tmpl.author       = request.user.employee
 
     if variables['course'] == -1:
