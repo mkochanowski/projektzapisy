@@ -1049,7 +1049,7 @@ def poll_results( request, mode='S', poll_id = None ):
     #   Filtry!!!
     
     data = {}
-    semester = Semester.get_current_semester()
+    semester = Semester.objects.filter(is_grade_active=True).order_by('-pk')[0]
     
     if not semester:
         messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
@@ -1067,7 +1067,7 @@ def poll_results( request, mode='S', poll_id = None ):
     
     if not poll_id:
         polls = filter( lambda x: x.is_user_entitled_to_view_result( request.user ), 
-                                Poll.get_polls_for_semester())
+                                Poll.get_polls_for_semester(semester=semester))
         request.session['polls_by_course'] = group_polls_by_course( polls )
         request.session['polls_by_teacher'] = group_polls_by_teacher( polls )
     
