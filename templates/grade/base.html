@@ -40,7 +40,7 @@
     {% if user.is_superuser %}
         <li><a href="{% url grade-ticket-keys-generate %}">Wygeneruj klucze</a></li>
     {% endif %}
-    {% if user.is_superuser %}
+    {% if user.is_superuser or user.employee %}
         <li><a href="{% url grade-poll-poll-results 'S' %}">Wyniki oceny</a></li>
     {% endif %}
 {#    #}

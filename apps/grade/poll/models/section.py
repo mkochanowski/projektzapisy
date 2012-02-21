@@ -24,7 +24,7 @@ class Section( models.Model ):
         return unicode( self.title )
         
     def all_questions( self ):
-        open            = OpenQuestionOrdering.objects.filter( sections = self ).select_related()
+        open            = OpenQuestionOrdering.objects.filter( sections = self ).select_related('question')
         single_choice   = SingleChoiceQuestionOrdering.objects.filter( sections = self ).select_related()
         multiple_choice = MultipleChoiceQuestionOrdering.objects.filter( sections = self ).select_related()
         
