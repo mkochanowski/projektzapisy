@@ -12,7 +12,7 @@ class StudentGradedAdmin( admin.ModelAdmin ):
                      'student__matricula',)
 
 class UsedTicketStampAdmin( admin.ModelAdmin ):
-    list_display = ['student__user__first_name', 'student__user__last_name', 'poll' ]
+    list_display = ['student', 'poll' ]
     search_fields = ('student__user__first_name',
                      'student__user__last_name',
                      'student__matricula',)
