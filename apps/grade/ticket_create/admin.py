@@ -7,10 +7,18 @@ from apps.grade.ticket_create.models import PublicKey, \
 
 class StudentGradedAdmin( admin.ModelAdmin ):
     list_display = ('student',  'semester')
-    search_fields = ('student',)
+    search_fields = ('student__user__first_name',
+                     'student__user__last_name',
+                     'student__matricula',)
+
+class UsedTicketStampAdmin( admin.ModelAdmin ):
+    list_display = ['student__user__first_name', 'student__user__last_name', 'poll' ]
+    search_fields = ('student__user__first_name',
+                     'student__user__last_name',
+                     'student__matricula',)
 
 admin.site.register( PublicKey )
 admin.site.register( PrivateKey )
-admin.site.register( UsedTicketStamp )                                              
+admin.site.register( UsedTicketStamp, UsedTicketStampAdmin )
 admin.site.register( StudentGraded, StudentGradedAdmin )
 
