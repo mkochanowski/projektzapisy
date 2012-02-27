@@ -329,6 +329,13 @@ def logout(request):
 
 def login_plus_remember_me(request, *args, **kwargs):
     """ funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika"""
+
+    if 'polls' in request.session:
+        del request.session['polls']
+
+    if 'finished' in request.session:
+        del request.session['finished']
+
     if request.method == 'POST':
         if request.POST.get('remember_me', None):
             request.session.set_expiry(datetime.timedelta(14))

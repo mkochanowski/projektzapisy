@@ -673,6 +673,9 @@ def grade_logout(request):
     return HttpResponseRedirect(reverse('grade-poll-tickets-enter'))
 
 def tickets_enter(request):
+    if request.user.is_authenticated():
+        return render_to_response( 'grade/poll/user_is_authenticated.html', {}, context_instance = RequestContext( request ))
+
     grade = Semester.objects.filter(is_grade_active=True).count()>0
     data = {}
     
