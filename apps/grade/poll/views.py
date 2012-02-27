@@ -774,6 +774,9 @@ def polls_for_user( request, slug ):
     return render_to_response( 'grade/poll/polls_for_user.html', data, context_instance = RequestContext( request ))
     
 def poll_answer( request, slug, pid ):
+    if request.user.is_authenticated():
+        return render_to_response( 'grade/poll/user_is_authenticated.html', {}, context_instance = RequestContext( request ))
+    
     poll       = Poll.objects.get( pk = pid )
     public_key = PublicKey.objects.get( poll = poll )
 
