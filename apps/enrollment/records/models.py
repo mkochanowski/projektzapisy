@@ -338,8 +338,9 @@ class Record(models.Model):
 
     @staticmethod
     def on_student_remove_from_group(sender, instance, **kwargs):
-        Queue.try_enroll_next_student(instance.group)
-        instance.group.update_students_counts()
+        if instance.group.course.semester.records_opening <= datetime.now() < instance.group.course.semester.records_closing:
+            Queue.try_enroll_next_student(instance.group)
+            instance.group.update_students_counts()
     
     def group_slug(self):
         return self.group.course_slug()
