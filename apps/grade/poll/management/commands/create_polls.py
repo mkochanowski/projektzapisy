@@ -25,6 +25,7 @@ class Command(BaseCommand):
                     studies_type   = template.studies_type,
                     title          = template.title,
                     description    = template.description,
+                    no_course      = template.no_course,
                     course         = template.course,
                     exam           = template.exam,
                     semester       = semester,
@@ -34,7 +35,7 @@ class Command(BaseCommand):
             origin = Origin()
             origin.save()
 
-            if groups:
+            if groups and not template.no_course:
                 for group in groups:
                     if t['groups_without'] == 'on' and Poll.get_all_polls_for_group(group, semester).count()>0:
                         continue
