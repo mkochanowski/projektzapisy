@@ -82,10 +82,14 @@ class StudiaZamawianeAdmin(admin.ModelAdmin):
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-UserAdmin.list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
-UserAdmin.inlines += [ProfileInline, StudentInline, EmployeeInline]
-UserAdmin.list_filter = ('is_active', 'is_staff', '_profile_cache__is_student',
-                         '_profile_cache__is_employee', '_profile_cache__is_zamawiany')
+
+
+class UserAdmin(UserAdmin):
+    inlines =  [StudentInline, ProfileInline, EmployeeInline]
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
+    list_filter = ('is_active', 'is_staff', '_profile_cache__is_student',
+                          '_profile_cache__is_employee', '_profile_cache__is_zamawiany')
+
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
