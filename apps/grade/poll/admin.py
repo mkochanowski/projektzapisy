@@ -22,6 +22,9 @@ class PollAdmin(admin.ModelAdmin):
     list_filter = ('semester', )
     search_fields = ('title', )
 
+    def queryset(self, request):
+       qs = super(PollAdmin, self).queryset(request)
+       return qs.select_related('author', 'author__user', 'group', 'group__course', 'group__teacher', 'group__teacher__user')
 
 admin.site.register( Option )
 admin.site.register( OpenQuestionOrdering )
