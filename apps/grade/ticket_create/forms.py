@@ -40,7 +40,7 @@ class PollCombineForm( forms.Form ):
 
                 field = forms.BooleanField( label     = SafeUnicode( title ),
                                             required  = False,
-                                            initial   = True,
+                                            initial   = False,
                                             help_text = u'Powiąż ocenę'
 					  ) # this is NOT escaped
                 

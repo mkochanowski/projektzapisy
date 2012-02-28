@@ -140,10 +140,10 @@ class Record(models.Model):
                 g.is_in_diff = Record.is_student_in_course_group_type(user=user, slug=slug, group_type=group_type)
                 if g in student_groups:
                     g.signed = True
-                if (g.enrolled >= g.limit):
-                    g.is_full = True
-                else:
+                if g.enrolled < g.limit:
                     g.is_full = False
+                else:
+                    g.is_full = True
         except Course.DoesNotExist:
             logger.warning('Record.get_groups_with_records_for_course(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
             raise NonCourseException()
