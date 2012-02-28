@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from apps.enrollment.records.exceptions import NonGroupException
 from apps.enrollment.records.exceptions import ECTS_Limit_Exception 
 from apps.enrollment.records.exceptions import InactiveStudentException
@@ -338,9 +338,13 @@ class Record(models.Model):
 
     @staticmethod
     def on_student_remove_from_group(sender, instance, **kwargs):
-        if instance.group.course.semester.records_opening <= datetime.now() < instance.group.course.semester.records_closing:
-            Queue.try_enroll_next_student(instance.group)
-            instance.group.update_students_counts()
+        try:
+            group = instance.group
+            if group.course.semester.records_opening <= datetime.now() < group.course.semester.records_closing:
+                Queue.try_enroll_next_student(group)
+                instance.group.update_students_counts()
+        except ObjectDoesNotExist:
+            pass
     
     def group_slug(self):
         return self.group.course_slug()
