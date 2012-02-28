@@ -4,6 +4,7 @@
 """
 
 from django.contrib         import admin
+from django import forms
 
 from apps.grade.poll.models.option import Option
 from apps.grade.poll.models.open_question import OpenQuestion, OpenQuestionOrdering
@@ -18,13 +19,30 @@ from apps.grade.poll.models.saved_ticket import SavedTicket
 
 from apps.grade.poll.models.poll import Poll
 
+
+class PollAdminForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PollAdminForm, self).__init__(*args, **kwargs)
+        self.fields['group'].queryset  = self.fields['group'].queryset.select_related('course', 'course__entity', 'teacher', 'teacher__user')
+        self.fields['author'].queryset = self.fields['author'].queryset.select_related('user')
+
+
+
 class PollAdmin(admin.ModelAdmin):
     list_filter = ('semester', )
     search_fields = ('title', )
+    form = PollAdminForm
 
     def queryset(self, request):
        qs = super(PollAdmin, self).queryset(request)
        return qs.select_related('author', 'author__user', 'group', 'group__course', 'group__teacher', 'group__teacher__user')
+
+class TemplateAdmin(admin.ModelAdmin):
+
+    def queryset(self, request):
+       qs = super(TemplateAdmin, self).queryset(request)
+       return qs.select_related('studies_type', 'course', 'author', 'author__user')
+
 
 admin.site.register( Option )
 admin.site.register( OpenQuestionOrdering )
@@ -40,5 +58,5 @@ admin.site.register( SavedTicket )
 admin.site.register( OpenQuestionAnswer )
 admin.site.register( SingleChoiceQuestionAnswer )
 admin.site.register( MultipleChoiceQuestionAnswer )
-admin.site.register( Template )
+admin.site.register( Template, TemplateAdmin )
 
