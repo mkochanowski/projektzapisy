@@ -162,6 +162,7 @@ class Poll( models.Model ):
 
         polls_with_keys = PublicKey.objects.all().values_list( 'poll' )
         return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys)
+
     @staticmethod
     def get_polls_without_keys():
         from apps.grade.ticket_create.models.public_key import PublicKey

@@ -61,12 +61,15 @@ class Command(BaseCommand):
                                 pollSection.save()
 
             else:
-                poll = Poll()
-                poll.author       = prych
-                poll.title        = t['title']
-                poll.description  = t['description']
-                poll.semester     = t['semester']
-                poll.group        = None
-                poll.studies_type = t['studies_type']
-                poll.origin = origin
+                poll = Poll.objects.get(id=2353)
                 poll.save()
+
+                if 'sections' in t:
+                        sections = t['sections']
+
+                        for section in sections:
+                            pollSection = SectionOrdering()
+                            pollSection.poll = poll
+                            pollSection.position = section.pk
+                            pollSection.section = section
+                            pollSection.save()
