@@ -4,6 +4,7 @@ from django.http                         import HttpResponse, HttpResponseRedire
 from django.shortcuts                    import render_to_response
 from django.template                     import RequestContext
 from django.utils                        import simplejson
+from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.users.decorators             import student_required, employee_required
 from django.contrib.auth.decorators      import login_required
 
@@ -87,6 +88,10 @@ def ajax_get_rsa_keys_step2( request ):
 def connections_choice( request ):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     students_polls = Poll.get_all_polls_for_student( request.user.student )
+    if students_polls:
+        semester = students_polls[0].semester
+    else:
+        semester = None
     groupped_polls = group_polls_by_course( students_polls )
     connected = any(len(x) > 1 for x in groupped_polls)
     if grade:
@@ -118,6 +123,11 @@ def connections_choice( request ):
                     messages.error( request, SafeUnicode( message ))
                 data = { 'tickets' : to_plaintext( tickets_to_serve ),
                          'grade' : grade }
+
+                if tickets_to_serve:
+                    StudentGraded.objects.get_or_create(student=request.user.student,
+                                                      semester=semester)
+
                 return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
                 
         else:

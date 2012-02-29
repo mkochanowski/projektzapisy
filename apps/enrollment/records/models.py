@@ -591,6 +591,10 @@ class Queue(models.Model):
     
     @staticmethod
     def try_enroll_next_student(group):
+
+        if not group.enrollment_are_open():
+            return False
+
         queued = Queue.remove_first_student_from_queue(group)
         if not queued:
             return False
@@ -673,11 +677,16 @@ class Queue(models.Model):
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
 
-def add_people_from_queue(sender, instance, **kwargs):
+def add_people_from_queue(sender, group, **kwargs):
     """adding people from queue to group, after limits' change"""
+
+
+    if not group.enrollment_are_open():
+        return
+
     if Group.disable_update_signal:
         return
-    group=instance
+
     while (Queue.try_enroll_next_student(group)):
         continue
 
@@ -690,7 +699,14 @@ def log_delete_record(sender, instance, **kwargs):
         backup_logger.info('[03] user <%s> is removed from group <%s>' % (instance.student.user.id, instance.group.id))
 
 def update_group_counts(sender, instance, **kwargs):
-    instance.group.update_students_counts()
+    try:
+        group = instance.group
+        if not group.enrollment_are_open():
+            return
+
+        instance.group.update_students_counts()
+    except ObjectDoesNotExist:
+        pass
 
 signals.post_save.connect(log_add_record, sender=Record)                               
 signals.pre_delete.connect(log_delete_record, sender=Record) 

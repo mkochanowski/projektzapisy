@@ -14,6 +14,7 @@ from django.utils import simplejson
 from django.db.models import Q
 
 from django.conf import settings
+from apps.grade.ticket_create.models.student_graded import StudentGraded
 
 from apps.users.exceptions import NonUserException, NonEmployeeException,\
                                  NonStudentException
@@ -231,11 +232,7 @@ def my_profile(request):
                 {"name":"Koniec zapisów", "term":current_semester.records_closing},
                 ]
 
-                grade = Semester.objects.filter(id__in=[41,42])\
-                    .order_by('-id')\
-                    .extra(select={'graded' : "SELECT COUNT(*) FROM ticket_create_studentgraded " +
-                                    "WHERE ticket_create_studentgraded.student_id="+str(request.user.student.id)+
-                                    " AND ticket_create_studentgraded.semester_id=courses_semester.id" })
+                grade = [x.semester for x in StudentGraded.objects.filter(student=student)]
 
             except KeyError:
                 terms = []

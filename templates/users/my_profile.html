@@ -9,7 +9,6 @@
 
 {% block content %}
 
-    	<h2></h2>
 
 <h4>Moje dane</h4>
     <table class="table-info">
@@ -93,14 +92,12 @@
 {% endif %}
 
 {% if grade %}
-    <h4>Ocena zajęć</h4>
+    <h4>Udział w Ocenie zajęć</h4>
     <table class="table-info-big">
             {% for semester in grade %}
 
         <tr>
-            <th>{{ semester }}</th>
-            <td>{% if semester.graded > 0 %}Tak{% else %}Nie{% endif %}</td>
-
+            <td>{{ semester }}</td>
         </tr>
             {% endfor %}
     </table>

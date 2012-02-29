@@ -169,8 +169,13 @@ class Group(models.Model):
             'queue_priority': queue_priorities.get(self.pk,-1)
         }
         
-        return data;
-         
+        return data
+
+    def enrollment_are_open(self):
+        semester = self.course.semester
+
+        return semester.records_opening <= datetime.now() < semester.records_closing
+
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
