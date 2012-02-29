@@ -11,6 +11,17 @@ class StudentGradedAdmin( admin.ModelAdmin ):
                      'student__user__last_name',
                      'student__matricula',)
 
+    list_filter = ('semester',)
+
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(StudentGradedAdmin, self).queryset(request)
+       return qs.select_related('semester', 'student', 'student__user')
+
+
 class UsedTicketStampAdmin( admin.ModelAdmin ):
     list_display = ['student', 'poll' ]
     search_fields = ('student__user__first_name',
