@@ -82,17 +82,7 @@
         <span class="result-details">
             <a href="{% url grade-poll-poll-results-detailed link_mode pid %}">Szczegółowe wyniki</a>
         </span>
-        {% if show_share_toggle %}
-            <span class="share-results-toggle">
-                <a href="{% url grade-poll-share-results link_mode pid %}">
-                    {% if share_state %}
-                        Przestań udostępniać wyniki
-                    {% else %}
-                        Udostępnij wyniki
-                    {% endif %}
-                </a>
-            </span>
-        {% endif %}
+
 {#        <span class="save-csv">#}
 {#            <a href="{% url grade-poll-save-csv link_mode pid %}">Pobierz ankietę jako plik csv</a>#}
 {#        </span>#}
