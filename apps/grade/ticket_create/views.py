@@ -163,6 +163,11 @@ def client_connection( request ):
             if groupNumber == u"*":
                 st=u""
                 students_polls = Poll.get_all_polls_for_student( user.student )
+
+                if students_polls:
+                    semester = students_polls[0].semester
+                    StudentGraded.objects.get_or_create(student=user.student,
+                                                      semester=semester)
                 groupped_polls = group_polls_by_course( students_polls )
                 for polls in groupped_polls:
                     
