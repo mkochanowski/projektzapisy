@@ -17,7 +17,13 @@ StudentsList.init = function()
 	StudentsList.initFilter();
 };
 
+StudentsList.activeStudentProfile = null;
+
 function loadStudentProfile(profileUrl){
+	if (StudentsList.activeStudentProfile == profileUrl)
+		return;
+	StudentsList.activeStudentProfile = profileUrl;
+
     var $profileDiv = $('#student-profile'),
     $loadingDiv = $('<div>&nbsp;</div>').addClass('profile-loading');
     $profileDiv.append($loadingDiv);
