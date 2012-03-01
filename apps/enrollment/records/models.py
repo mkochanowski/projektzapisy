@@ -677,8 +677,10 @@ class Queue(models.Model):
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
 
-def add_people_from_queue(sender, group, **kwargs):
+def add_people_from_queue(sender, instance, **kwargs):
     """adding people from queue to group, after limits' change"""
+
+    group = instance
 
 
     if not group.enrollment_are_open():
