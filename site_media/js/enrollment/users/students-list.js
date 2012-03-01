@@ -9,12 +9,12 @@ StudentsList = new Object();
  */
 StudentsList.init = function()
 {
+    $('.student-profile-link').live('click',function(event){
+           event.preventDefault();
+   	    loadStudentProfile($(this).attr('href'));
+       });
 	StudentsList.initStudentLists();
 	StudentsList.initFilter();
-	$('.student-profile-link').live('click',function(event){
-        event.preventDefault();
-	    loadStudentProfile($(this).attr('href'));
-    })
 };
 
 function loadStudentProfile(profileUrl){
@@ -133,11 +133,15 @@ StudentsList.initFilter = function()
 	
 	StudentsList.studentFilter.afterFilter = function(matchedElementsCount)
 	{
+        if (matchedElementsCount == 1){
+            $('#students-list').find("li:not([style])").find('a').trigger('click');
+        }
 		var visible = (matchedElementsCount == 0);
 		if (StudentsList.emptyFilterWarningVisible == visible)
 			return;
 		StudentsList.emptyFilterWarningVisible = visible;
 		StudentsList.emptyFilterWarning.css('display', visible?'':'none');
+
 	};
 
 	StudentsList.studentFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(

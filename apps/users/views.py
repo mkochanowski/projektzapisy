@@ -303,7 +303,7 @@ def consultations_list(request, begin='A'):
 
 
 @login_required
-def students_list(request, begin = 'All'):
+def students_list(request, begin = 'All', query=None):
     students = Student.get_list(begin)
     students = Record.recorded_students(students)
 
@@ -313,7 +313,8 @@ def students_list(request, begin = 'All'):
     else:
         data = { 
             "students" : students, 
-            "char": begin
+            "char": begin,
+            "query": query
         }
         return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 

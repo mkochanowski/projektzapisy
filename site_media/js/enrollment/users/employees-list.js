@@ -138,6 +138,10 @@ EmployeesList.initFilter = function()
 			return;
 		EmployeesList.emptyFilterWarningVisible = visible;
 		EmployeesList.emptyFilterWarning.css('display', visible?'':'none');
+
+        if (matchedElementsCount == 1){
+            $('#employees-list').find('a').click();
+        }
 	};
 
 	EmployeesList.employeeFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(

@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     (r'^grade/', include('apps.grade.urls')),
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
     (r'^feeds/news/$', LatestNews()),
+    url(r's/(?P<query>.*)/$', 'apps.users.views.students_list', name='users-list-search'),
 
     (r'^fereol_admin/courses/import_semester', 'apps.enrollment.courses.admin.views.import_semester'),
     (r'^fereol_admin/courses/import_schedule', 'apps.enrollment.courses.admin.views.import_schedule'),

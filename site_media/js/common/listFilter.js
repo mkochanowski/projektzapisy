@@ -214,10 +214,17 @@ ListFilter.CustomFilters.createSimpleTextFilter = function(name, formElementSele
 
 	filter.deserialize = function(serialized)
 	{
-		if (filter.value == serialized)
-			return false;
 
-		filter.value = serialized;
+        var val = $(formElementSelector).val();
+
+        if (filter.value == serialized &&  val === '' )
+      			return false;
+
+        if ( val !== '' ){
+            filter.value = val;
+        } else {
+		    filter.value = serialized;
+        }
 		return true;
 	};
 
