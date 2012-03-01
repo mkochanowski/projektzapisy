@@ -67,7 +67,7 @@
 		<fieldset>
 			<legend><span>Filtrowanie</span></legend>
 			<div class="main-filter-input">
-				<input class="text filter-phrase" type="text" />
+				<input class="text filter-phrase" type="text"{% if query %} value="{{ query }}"{% endif %} />
 				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
 			</div>
 		</fieldset>

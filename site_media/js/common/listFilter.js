@@ -136,7 +136,6 @@ ListFilter.prototype.runThread = function(doNotLoadCookie)
 	{
 		if (!thisObj.threadIsRunning)
 			return;
-		
 		if (thisObj.mainFilter.loadFromForm() || firstRun)
 		{
 			$.cookies.set('listFilter-' + thisObj.name, thisObj.mainFilter.serialize());

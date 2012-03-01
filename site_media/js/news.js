@@ -7,16 +7,16 @@ News = Object();
 News.init = function()
 {
 	var category = $('#od-news-search-form').attr('action').split('/')[2];
-	$('#od-news-search-form').submit(function()
-	{
-		News.loadPage('/news/' + category + '/search/?json=true&' +
-			'q=' + $('#od-news-search-q').attr('value'));
-		return false;
-	});
-	$('#od-news-search-reset').click(function()
-	{
-		News.loadPage('/news/' + category + '/?json=true');
-	});
+//	$('#od-news-search-form').submit(function()
+//	{
+//		News.loadPage('/news/' + category + '/search/?json=true&' +
+//			'q=' + $('#od-news-search-q').attr('value'));
+//		return false;
+//	});
+//	$('#od-news-search-reset').click(function()
+//	{
+//		News.loadPage('/news/' + category + '/?json=true');
+//	});
 };
 
 $(News.init);

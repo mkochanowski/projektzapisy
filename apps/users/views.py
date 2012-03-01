@@ -259,7 +259,7 @@ def my_profile(request):
 
     return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
 
-def employees_list(request, begin = 'All'):
+def employees_list(request, begin = 'All', query=None):
 
     employees = Employee.get_list(begin)
     try:
@@ -280,7 +280,8 @@ def employees_list(request, begin = 'All'):
     else:
         data = {
             "employees" : employees,
-            "char": begin
+            "char": begin,
+            "query": query
             }  
     
         return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))

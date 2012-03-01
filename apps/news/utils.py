@@ -11,8 +11,6 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import Context, RequestContext
 from django.template.loader import get_template
-from haystack.forms import SearchForm
-from haystack.query import SearchQuerySet
 from mailer import send_html_mail
 
 from apps.news.models import News

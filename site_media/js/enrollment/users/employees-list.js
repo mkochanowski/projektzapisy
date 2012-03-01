@@ -133,15 +133,14 @@ EmployeesList.initFilter = function()
 	
 	EmployeesList.employeeFilter.afterFilter = function(matchedElementsCount)
 	{
+        if (matchedElementsCount == 1){
+            $('#employees-list').find("li:not([style])").find('a').trigger('click');
+        }
 		var visible = (matchedElementsCount == 0);
 		if (EmployeesList.emptyFilterWarningVisible == visible)
 			return;
 		EmployeesList.emptyFilterWarningVisible = visible;
 		EmployeesList.emptyFilterWarning.css('display', visible?'':'none');
-
-        if (matchedElementsCount == 1){
-            $('#employees-list').find('a').click();
-        }
 	};
 
 	EmployeesList.employeeFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(

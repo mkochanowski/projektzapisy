@@ -29,11 +29,6 @@ http://south.aeracode.org/
 - fedora: Django-south
 - debian/ubuntu: python-django-south
 
-* haystack >= 1.0.1 (dołączone w repozytorium projektu)
-http://haystacksearch.org/
-
-* whoosh >= 0.3.18 (dołączone w repozytorium projektu)
-http://bitbucket.org/mchaput/whoosh/wiki/Home
 
 * django-mailer >= 0.2.0 (dołączone w repozytorium projektu)
 http://github.com/jtauber/django-mailer/
@@ -78,11 +73,6 @@ ALTER TABLE auth_permission ALTER "codename" TYPE character varying(255);
 
 == Konfiguracja ==
 
-* Wyszukiwanie aktualności
-
-Aby poprawnie działała aplikacja aktualności, należy ustawić
-uprawnienia odczytu/zapisu dla procesu serwera http do katalogu
-wskazywanego przez zmienną HAYSTACK_WHOOSH_PATH.
 
 * Rozsyłanie maili
 

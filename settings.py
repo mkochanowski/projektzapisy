@@ -274,7 +274,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.messages',
-    'haystack',
     'mailer',
     'south',
 #    'compressor',
@@ -308,10 +307,6 @@ LOGIN_REDIRECT_URL = '/users/'
 
 SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
 
-HAYSTACK_SITECONF = 'search_sites'
-HAYSTACK_SEARCH_ENGINE = 'whoosh'
-HAYSTACK_WHOOSH_PATH = os.path.join(PROJECT_PATH, 'search_index')
-HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
 
 #TODO: udokumentowac zaleznosci!
 #TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
