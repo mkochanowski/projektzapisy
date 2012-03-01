@@ -89,22 +89,28 @@ ListFilter.prototype.doFilter = function()
 {
 	var thisObj = this;
 	var matchedElementsCount = 0;
+	var matchedElements = [];
 	this.objectsList.forEach(function(element)
 	{
 		var matches = thisObj.mainFilter.match(element);
 		element.setVisible(matches);
 		if (matches)
+		{
 			matchedElementsCount++;
+			matchedElements.push(element);
+		}
 	});
-	this.afterFilter(matchedElementsCount);
+	this.afterFilter(matchedElementsCount, matchedElements);
 };
 
 /**
  * Wykonywany po filtrowaniu (które przyniosło zmiany) - do przeciążenia.
  *
+ * @todo parametr matchedElementsCount do usunięcia, na razie zachowujemy ze wzgl. na zgodność API
  * @param matchedElementsCount liczba elementów pasujących do filtra
+ * @param matchedElements elementy pasujące do filtra
  */
-ListFilter.prototype.afterFilter = function(matchedElementsCount) {}
+ListFilter.prototype.afterFilter = function(matchedElementsCount, matchedElements) {}
 
 /**
  * Uruchamia wątek filtrowania.

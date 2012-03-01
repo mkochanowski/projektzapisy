@@ -17,7 +17,13 @@ StudentsList.init = function()
 	StudentsList.initFilter();
 };
 
+StudentsList.activeStudentProfile = null;
+
 function loadStudentProfile(profileUrl){
+	if (StudentsList.activeStudentProfile == profileUrl)
+		return;
+	StudentsList.activeStudentProfile = profileUrl;
+
     var $profileDiv = $('#student-profile'),
     $loadingDiv = $('<div>&nbsp;</div>').addClass('profile-loading');
     $profileDiv.append($loadingDiv);
@@ -131,11 +137,12 @@ StudentsList.initFilter = function()
 
 	StudentsList.studentFilter = new ListFilter('StudentsList-students', studentFilterForm.getDOM());
 	
-	StudentsList.studentFilter.afterFilter = function(matchedElementsCount)
+	StudentsList.studentFilter.afterFilter = function(matchedElementsCount, matchedElements)
 	{
-        if (matchedElementsCount == 1){
-            $('#students-list').find("li:not([style])").find('a').trigger('click');
-        }
+		if (matchedElements.length == 1)
+		{
+			matchedElements[0].data.container.children('a').assertOne().trigger('click');
+		}
 		var visible = (matchedElementsCount == 0);
 		if (StudentsList.emptyFilterWarningVisible == visible)
 			return;
