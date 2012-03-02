@@ -363,9 +363,9 @@ if os.path.isfile(os.path.join(PROJECT_PATH, 'pipeline.py')):
     execfile(os.path.join(PROJECT_PATH, 'pipeline.py'))
 
 PIPELINE = True
-#PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.jsmin.JSMinCompressor'
-PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
+PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
+#PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.jsmin.JSMinCompressor'
+#PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
 
 STATIC_URL = '/static/'
 STATIC_ROOT =  os.path.join(PROJECT_PATH, 'static')
