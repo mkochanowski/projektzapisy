@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% load fereol_common %}
-
+{% load compressed %}
 {% block main-subtitle %}Aktualności{% endblock %}
 
 {% block content-class %}narrow{% endblock %}
@@ -11,16 +11,11 @@
 {% endblock %}
 
 {% block styles %}
-    {{ block.super }}
-    <link rel="stylesheet" href="/site_media/css/news.css" type="text/css"/>
-    <link rel="stylesheet" href="/site_media/css/common/dialog_box.css" type="text/css"/>
+    {% compressed_css 'news' %}
 {% endblock %}
 
 {% block js %}
-    {{ block.super }}
-    <script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
-    <script src="/site_media/js/news.js" type="text/javascript"></script>
-    <script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
+    {% compressed_js 'news' %}
 {% endblock %}
 u
 {% block bread %}

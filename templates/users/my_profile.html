@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+{% load compressed %}
+
+{% block styles %}
+    {% compressed_css 'main' %}
+{% endblock %}
+
 
 {% block bread %}
 	<a href="{% url main-page %}">Strona główna</a> &raquo;

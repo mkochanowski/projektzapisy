@@ -1,7 +1,7 @@
 {% extends "grade/base.html" %}
-
+{% load compressed %}
 {% block styles %}
-    <link rel="stylesheet" href="/site_media/css/grade/tickets_save.css" type="text/css" />
+    {% compressed_css 'ticketssave' %}
 {% endblock %}
 
 {% block main-navigation %}

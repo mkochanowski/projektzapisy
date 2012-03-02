@@ -1,7 +1,7 @@
 ﻿{% extends "grade/base.html" %}
-
+{% load compressed %}
 {% block js %}
-<script src="/site_media/js/grade/poll/poll_results.js" type="text/javascript"></script>
+{% compressed_js 'pollresult' %}
 {% endblock %}
 
 {% load news_extras %}

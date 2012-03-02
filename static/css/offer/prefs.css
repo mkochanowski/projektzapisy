@@ -1,0 +1,212 @@
+#od-prefs-top-bar fieldset
+{
+	min-height: 40px;
+}
+
+#od-prefs-top-bar fieldset > span
+{
+	min-width: 150px;
+}
+
+#od-prefs-filter .main-filter-input
+{
+	margin-top: 7px;
+}
+
+#od-prefs-other
+{
+	width: 390px;
+}
+
+#od-prefs-other span.checkbox
+{
+    width: 390px;
+}
+
+/******************************************************************************/
+
+ul#od-prefs-undecided
+{
+	list-style: none;
+	padding: 0 10px;
+}
+
+ul#od-prefs-undecided li
+{
+	padding: 1px 0;
+}
+
+ul#od-prefs-undecided input
+{
+	border: 0;
+	background: white url('/site_media/images/larrow.png') no-repeat center;
+	text-indent: 50px;
+	overflow: hidden;
+	width: 30px;
+
+	cursor: pointer;
+
+	border: 1px solid #999999;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+ul#od-prefs-undecided input:hover
+{
+	background-color: #cccccc;
+}
+
+#od-prefs-viewmode-selection
+{
+	position: absolute;
+	top: 3px;
+	left: 3px;
+}
+
+#od-prefs-submitBar
+{
+    padding-top: 30px;
+    clear: both;
+    text-align: center;
+}
+
+#od-prefs-submitBar input
+{
+    padding: 5px 40px;
+}
+
+#od-prefs-form .emptyFilterWarning
+{
+    border: 1px solid #cccccc;
+    background: #FFF5B3;
+
+    padding: 5px 10px;
+    font-size: 13px;
+    width: 530px;
+    margin: auto;
+    margin-top: 20px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+/******************************************************************************/
+
+#od-prefs-list
+{
+	list-style: none;
+	padding: 0;
+    padding-bottom: 7px;
+	width: 550px;
+	border: 1px solid #cccccc;
+	background: #f8f8f8;
+
+	margin: auto;
+	margin-top: 20px;
+
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+#od-prefs-list > li
+{
+	border-bottom: 1px solid #cccccc;
+	min-height: 25px;
+}
+
+#od-prefs-list > li > span
+{
+    display: inline-block;
+    padding: 4px;
+    padding-bottom: 2px;
+}
+
+#od-prefs-list .od-prefs-toggleHidden,
+#od-prefs-list .od-prefs-toggleCollapse
+{
+	height: 25px;
+	border: 0;
+	background: #f8f8f8;
+	padding: 1px;
+
+	cursor: pointer;
+}
+
+#od-prefs-list .name
+{
+    max-width: 420px;
+    vertical-align: top;
+}
+
+#od-prefs-list .od-prefs-toggleHidden
+{
+	float: right;
+	border-left: 1px dotted #cccccc;
+	width: 90px;
+}
+
+#od-prefs-list .od-prefs-toggleCollapse
+{
+	border-right: 1px dotted #cccccc;
+	width: 25px;
+}
+
+#od-prefs-list li:first-child .od-prefs-toggleHidden
+{
+	-moz-border-radius-topright: 3px;
+	-webkit-border-top-right-radius: 3px;
+	border-top-right-radius: 3px;
+}
+
+#od-prefs-list li:first-child .od-prefs-toggleCollapse
+{
+	-moz-border-radius-topleft: 3px;
+	-webkit-border-top-left-radius: 3px;
+	border-top-left-radius: 3px;
+}
+
+#od-prefs-list .od-prefs-toggleHidden:hover,
+#od-prefs-list .od-prefs-toggleCollapse:hover
+{
+	background-color: #cccccc;
+}
+
+#od-prefs-list ul
+{
+	border-top: 1px dotted #cccccc;
+	list-style: none;
+	padding: 10px;
+	background: white;
+}
+
+#od-prefs-list li.collapsed ul
+{
+	display: none;
+}
+
+#od-prefs-list li.hidden
+{
+    display: none;
+}
+
+#od-prefs-list ul li
+{
+	padding-left: 220px;
+	padding-right: 90px;
+	height: 25px;
+    padding-top: 5px;
+}
+
+#od-prefs-list ul li select
+{
+	float: right;
+	height: 25px;
+    position: relative;
+    top: -3px;
+}
+
+/******************************************************************************/

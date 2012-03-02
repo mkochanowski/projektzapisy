@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
+{% load compressed %}
+
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/common/mainPage.css" type="text/css" />
+    {% compressed_css 'mainpage' %}
 {% endblock %}
 
  {% block main-subtitle %}Strona główna{% endblock %}

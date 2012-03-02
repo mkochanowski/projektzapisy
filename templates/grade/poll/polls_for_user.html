@@ -1,7 +1,7 @@
 {% extends "grade/base.html" %}
-
-{% block scripts %}
-<script src="/site_media/js/grade/poll/poll_answer.js" type="text/javascript"></script>
+{% load compressed %}
+{% block js %}
+    {% compressed_js "gradeuserpoll" %}
 {% endblock %}
 
 {% block main-navigation %}

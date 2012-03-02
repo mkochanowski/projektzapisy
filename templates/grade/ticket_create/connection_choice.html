@@ -1,14 +1,11 @@
 {% extends "grade/base.html" %}
-
+{% load compressed %}
 {% block styles %}
-    <link rel="stylesheet" href="/site_media/css/grade/connections_choice.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+    {% compressed_css 'connectionchoice' %}
 {% endblock %}
 
 {% block js %}
-<script type="application/javascript" src="/site_media/js/jquery/tooltip.jquery.js"></script>
-<script src="/site_media/js/grade/ticket_create/BigInt.js" type="text/javascript"></script>
-<script src="/site_media/js/grade/ticket_create/ticket_create.js" type="text/javascript"></script>
+    {% compressed_js 'connectionchoice' %}
 {% endblock %}
 
 {% block main-subtitle %}Pobieranie kluczy{% endblock %}

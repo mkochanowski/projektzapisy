@@ -1,19 +1,11 @@
 {% extends "grade/base.html" %}
-
-{% block styles %}
-    <link rel="stylesheet" href="/site_media/css/common/mainPage.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/grade/results.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
-{% endblock %}
-
+{% load compressed %}
 {% block js %}
     <script type="text/javascript">
         var url_generate = "{% url grade-ticket-keys-generator %}";
         var url_progress = "{% url grade-ticket-keys-progress %}";
     </script>
-    <script type="text/javascript" src="/site_media/js/grade/ticket_create/keys_generate.js"></script>
+    {% compressed_js 'keysgenerate' %}
 {% endblock %}
 
 {% block grade_active %} class="active"{% endblock %}

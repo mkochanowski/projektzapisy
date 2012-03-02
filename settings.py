@@ -171,7 +171,7 @@ USE_ETAGS = True
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
@@ -201,7 +201,9 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
     #'middleware.mobileMiddleware.SubdomainMiddleware',
-    'middleware.error_handling.ErrorHandlerMiddleware'
+    'middleware.error_handling.ErrorHandlerMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
+    'pipeline.middleware.MinifyHTMLMiddleware',
 )
 
 ROOT_URLCONF = 'fereol.urls'
@@ -274,9 +276,10 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.messages',
+    'django.contrib.staticfiles',
     'mailer',
     'south',
-#    'compressor',
+    'pipeline',
     'apps.enrollment.courses',
     'apps.enrollment.records',
     'apps.news',
@@ -356,10 +359,29 @@ CACHES = {
     }
 }
 
-### Compressor:
-COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
+if os.path.isfile(os.path.join(PROJECT_PATH, 'pipeline.py')):
+    execfile(os.path.join(PROJECT_PATH, 'pipeline.py'))
 
+PIPELINE = True
+PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
+
+
+STATIC_URL = '/static/'
+STATIC_ROOT =  os.path.join(PROJECT_PATH, 'static')
+STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
+PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
+STATICFILES_FINDERS = (
+  'pipeline.finders.PipelineFinder',
+  'django.contrib.staticfiles.finders.FileSystemFinder',
+  'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+)
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_PATH, 'site_media'),
+)
 
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
+
+

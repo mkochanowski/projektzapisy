@@ -1,16 +1,14 @@
 {% extends "base.html" %}
 
 {% load news_extras %}
+{% load compressed %}
 
 {% block grade_active %} class="active"{% endblock %}
 
 {% block content-width %}16{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="/site_media/css/grade/poll.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/grade/results.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/grade/answer.css" type="text/css" />
-    <link rel="stylesheet" href="/site_media/css/ui-progressbar.css" type="text/css" />
+    {% compressed_css 'gradebase' %}
 {% endblock %}
 
 {% block bread %}

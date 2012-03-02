@@ -1,11 +1,13 @@
 {% extends "base.html" %}
+{% load compressed %}
+
 
 {% block main-navigation %}
     <li>Zaloguj</li>
 {% endblock %}
 
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/common/login.css" type="text/css" />
+	{% compressed_css "login" %}
 {% endblock %}
 
 {% block content %}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-
+{% load compressed %}
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/help.css" type="text/css" />
+	{% compressed_css 'help' %}
 {% endblock %}
 
 {% block main-subtitle %}Pomoc{% endblock %}
