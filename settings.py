@@ -198,7 +198,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.csrf.CsrfResponseMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+#    'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
     #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
@@ -287,7 +287,7 @@ INSTALLED_APPS = (
     'apps.offer.proposal',
     'apps.offer.vote',
     'apps.users',
-    'debug_toolbar',
+#    'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
     #'apps.mobile',
@@ -363,6 +363,8 @@ if os.path.isfile(os.path.join(PROJECT_PATH, 'pipeline.py')):
     execfile(os.path.join(PROJECT_PATH, 'pipeline.py'))
 
 PIPELINE = True
+PIPELINE_AUTO = False
+PIPELINE_VERSION = True
 PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
 #PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.jsmin.JSMinCompressor'
 #PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
@@ -371,6 +373,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT =  os.path.join(PROJECT_PATH, 'static')
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
+PIPELINE_VERSIONING = 'pipeline.versioning.hash.MD5Versioning'
 STATICFILES_FINDERS = (
   'pipeline.finders.PipelineFinder',
   'django.contrib.staticfiles.finders.FileSystemFinder',
