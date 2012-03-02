@@ -16,8 +16,13 @@ EmployeesList.init = function()
 	    loadEmployeeProfile($(this).attr('href'));
     })
 };
+EmployeesList.activeStudentProfile = null;
 
 function loadEmployeeProfile(profileUrl){
+    if (EmployeesList.activeStudentProfile == profileUrl)
+    		return;
+    EmployeesList.activeStudentProfile = profileUrl;
+
     var $profileDiv = $('#employee-profile'),
     $loadingDiv = $('<div>&nbsp;</div>').addClass('profile-loading');
     $profileDiv.append($loadingDiv);
@@ -131,11 +136,13 @@ EmployeesList.initFilter = function()
 
 	EmployeesList.employeeFilter = new ListFilter('EmployeesList-employees', employeeFilterForm.getDOM());
 	
-	EmployeesList.employeeFilter.afterFilter = function(matchedElementsCount)
+	EmployeesList.employeeFilter.afterFilter = function(matchedElementsCount, matchedElements)
 	{
-        if (matchedElementsCount == 1){
-            $('#employees-list').find("li:not([style])").find('a').trigger('click');
-        }
+        if (matchedElements.length == 1)
+      		{
+      			matchedElements[0].data.container.children('a').assertOne().trigger('click');
+      		}
+
 		var visible = (matchedElementsCount == 0);
 		if (EmployeesList.emptyFilterWarningVisible == visible)
 			return;
