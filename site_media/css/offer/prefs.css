@@ -39,7 +39,7 @@ ul#od-prefs-undecided li
 ul#od-prefs-undecided input
 {
 	border: 0;
-	background: white url('/site_media/images/larrow.png') no-repeat center;
+	background: white url('/images/larrow.png') no-repeat center;
 	text-indent: 50px;
 	overflow: hidden;
 	width: 30px;
