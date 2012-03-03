@@ -36,7 +36,7 @@
 			<a href="#"><img class="tooltip" src="/site_media/images/documentinfo.png"></a>
 		{% endif %}
 	</h3> 
-	<table id = "grade-connection-choice-form">
+	<table id = "grade-connection-choice-form">{% csrf_token %}
             {{ form.as_table }}
 	</table>
         <input id="connection_choice_button" class="btn" type="submit" value="Pobierz bilety">
