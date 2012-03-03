@@ -19,7 +19,7 @@ Ticket.create.init = function () {
     Ticket.create.used = false;
 
     $("#connection_choice_button").click(function (event) {
-        event.preventDefault()
+        event.preventDefault();
         if (Ticket.create.used) {
             return false;
         }
