@@ -202,7 +202,6 @@ MIDDLEWARE_CLASSES = (
     #'middleware.mobile_detector.mobileDetectionMiddleware',
     #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
-    'django.middleware.gzip.GZipMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
 )
 

@@ -15,7 +15,7 @@ class OpenQuestion( BaseQuestion ):
         app_label           = 'poll'
     
     def get_all_answers_from_poll( self, poll, section ):
-        sts = SavedTicket.objects.filter( poll = poll, finished = True )
+        sts = SavedTicket.objects.filter( poll = poll )
         result = []
         for st in sts:
             result += st.openquestionanswer_set.filter( question = self, section = section )
