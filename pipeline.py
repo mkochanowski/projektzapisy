@@ -18,7 +18,7 @@ PIPELINE_CSS = {
             'css/fereol.css',
             'css/grade/tickets_save.css'
         ),
-        'output_filename': 'css/main.min.css',
+        'output_filename': 'css/ticketssave.min.css',
         'extra_context': {
             'media': 'screen,projection',
         },
@@ -31,7 +31,7 @@ PIPELINE_CSS = {
             'css/grade/connections_choice.css',
             'css/ui-progressbar.css'
         ),
-        'output_filename': 'css/main.min.css',
+        'output_filename': 'css/connectionchoice.min.css',
         'extra_context': {
             'media': 'screen,projection',
         },
@@ -191,7 +191,7 @@ PIPELINE_JS = {
             'js/grade/ticket_create/BigInt.js',
             'js/grade/ticket_create/ticket_create.js',
             ),
-            'output_filename': 'js/main.min.js',
+            'output_filename': 'js/connectionchoice.min.js',
         },
     'keysgenerate': {
         'source_filenames': (
