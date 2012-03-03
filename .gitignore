@@ -12,3 +12,4 @@ settings_local.py
 /apache
 .idea/
 .rvmrc
+static/
