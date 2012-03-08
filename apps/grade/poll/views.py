@@ -257,7 +257,8 @@ def enable_grade( request ):
 
 @employee_required
 def disable_grade( request ):
-    semester = Semester.get_current_semester()
+    semester_id = request.POST.get('semester_id')
+    semester = Semester.objects.get(id=semester_id)
     
     if semester.is_grade_active:
         news = News()
