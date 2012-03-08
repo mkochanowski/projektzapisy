@@ -267,7 +267,7 @@ def disable_grade( request ):
 #        PublicKey.objects.all().delete()
 #        PrivateKey.objects.all().delete()
         
-        for st in SavedTicket.objects.all():
+        for st in SavedTicket.objects.filter(finished=False):
             # TODO: oznaczyć je jako archiwalne!
             st.finished = True
             st.save()
@@ -1049,7 +1049,7 @@ def poll_results( request, mode='S', poll_id = None ):
     #   Filtry!!!
     
     data = {}
-    semester = Semester.objects.filter(is_grade_active=True).order_by('-pk')[0]
+    semester = Semester.objects.get(id=45)
     
     if not semester:
         messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
