@@ -264,8 +264,8 @@ def disable_grade( request ):
         semester.is_grade_active = False
         semester.save()
         
-        PublicKey.objects.all().delete()
-        PrivateKey.objects.all().delete()
+#        PublicKey.objects.all().delete()
+#        PrivateKey.objects.all().delete()
         
         for st in SavedTicket.objects.all():
             # TODO: oznaczyć je jako archiwalne!
