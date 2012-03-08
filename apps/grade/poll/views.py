@@ -261,13 +261,6 @@ def disable_grade( request ):
     semester = Semester.objects.get(id=semester_id)
     
     if semester.is_grade_active:
-        news = News()
-        news.author   = request.user
-        news.title    = u"Zamknięto ocenę zajęć"
-        news.body     = u"Ocena zajęć zakończyła się. Można już oglądać wyniki ankiet."
-        news.category = 'grade'
-        news.save()
-    
         semester.is_grade_active = False
         semester.save()
         
