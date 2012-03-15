@@ -86,11 +86,11 @@ def employee_profile(request, user_id):
             raise Employee.DoesNotExist
 
     except Employee.DoesNotExist:
-        logger.error('Function employee_profile(user_id = %d) throws NonEmployeeException while acessing to non existing employee.' % int(user_id) )
+        logger.error('Function employee_profile(user_id = %s) throws NonEmployeeException while acessing to non existing employee.' % str(user_id) )
         messages.error(request, "Nie ma takiego pracownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
-        logger.error('Function employee_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
+        logger.error('Function employee_profile(id = %s) throws User.DoesNotExist while acessing to non existing user.' % str(user_id) )
         messages.error(request, "Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
