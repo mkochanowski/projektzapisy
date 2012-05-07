@@ -39,7 +39,7 @@ class Command(BaseCommand):
         if options['group']:
             groups = Group.objects.filter(course__semester=semester)
             for g in groups:
-                for t in g.term:
+                for t in g.term.all():
                     print str(g.id) + ' ' + str(t)
 
         if options['type']:
