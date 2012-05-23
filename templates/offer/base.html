@@ -1,18 +1,90 @@
 {% extends "base.html" %}
+{% load compressed %}
 
-{% load news_extras %}
+{% block js %}
+    {% compressed_js 'courses' %}
+{% endblock %}
 
-{% block main-subsystemname %}Kształtowanie oferty dydaktycznej{% endblock %}
+{% block styles %}
+    {% compressed_css 'main' %}
+{% endblock %}
 
-{% block main-menu %}
-	{% if user.student %}
-		<li><a href="{% url vote-main %}">Głosowanie</a></li>
-	{% endif %}
-	{% if user.employee %}
-		<li><a href="{% url prefs-default-view %}">Preferencje</a></li>
-	{% endif %}
-	<li><a href="{% url proposal-list %}">Propozycje</a></li>
-	{% if perms.can_create_offer %}
-		<li><a href="{% url proposal-offer-create %}">Wybór oferty</a></li>
-	{% endif %}
+
+{% block offer_active %} class="active"{% endblock %}
+
+{% block system_menu %}
+    {% if user.student or user.employee %}
+    <li{% block enrollment_menu_courses %}{% endblock %}><a
+            href="/courses/">Moje Propozycje</a></li>{% endif %}
+    <li{% block offer_menu_offer %}{% endblock %}><a href="/records/schedule/">Oferta</a></li>
+
+    {# end system_menu #}
+{% endblock %}
+
+
+
+{% block filter %}
+{#	<div id="enr-coursesList-top-bar" class="main-top-bar" style="display: none">#}
+{#		<fieldset>#}
+{#			<legend><span>Filtrowanie</span></legend>#}
+{#			<div class="main-filter-input">#}
+{#				<input class="text filter-phrase" type="text" />#}
+{#				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />#}
+{#			</div>#}
+{#		</fieldset>#}
+{#		<fieldset class="course-type-filter">#}
+{#			<legend><span>Rodzaj przedmiotu</span></legend>#}
+{#			{% for type in types_list %}#}
+{#				<span class="checkbox">#}
+{#					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>#}
+{#					<input type="hidden" class="group-id" value="{{ type.group.id }}" />#}
+{#					<label for="filter-course-type-{{ type.id }}">{{ type.name }}</label>#}
+{#				</span>#}
+{#			{% endfor %}#}
+{#		</fieldset>#}
+{#		<fieldset id="enr-coursesList-other">#}
+{#			<legend><span>Inne</span></legend>#}
+{#			<span class="selectbox" style="display:block; float:none;">#}
+{#				<label for="enr-courseFilter-semester">Semestr:</label>#}
+{#				<select id="enr-courseFilter-semester">#}
+{#					<option value="0">dowolny</option>#}
+{#					{% for semester in semester_courses %}#}
+{#						<option value="{{ semester.id }}" {% if semester.id == default_semester.id %} selected="selected" {% endif %}>{{ semester.name }}{% if semester.is_default %} (bieżący){% endif %}</option>#}
+{#					{% endfor %}#}
+{#				</select>#}
+{#			</span>#}
+{#			{% if user.student %}#}
+{#                                <span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>#}
+{#                        {% else %}#}
+{#                                <span class="checkbox" style="display: none;"><input type="checkbox" id="enr-hidesigned"/><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>#}
+{#		        {% endif %}#}
+{#                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">Pokaż przedmioty prowadzone w j.angielskim</label></span>#}
+{#                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">Pokaż przedmioty kończące się egzaminem</label></span>#}
+{#                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">Pokaż tylko przedmioty zalecane dla 1 roku</label></span>#}
+{#		</fieldset>#}
+{#	</div>#}
+{% endblock %}
+
+
+{% block sidebar %}
+	<div id="main-sidebar">
+		<div id="course-list">
+				<div class="semester">
+					<h3>Przedmioty w ofercie</h3>
+					<input type="hidden" name="semester-id" value="{{ semester.id }}" />
+					<ul class="courses-list">
+						{% for course in proposals %}
+							<li>
+								<a href="{% url offer-page course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
+{#								<input type="hidden" name="type" value="{{ course.type }}" />#}
+{#								<input type="hidden" name="wasEnrolled" value="{{ course.was_enrolled }}" />#}
+{#								<input type="hidden" name="english" value="{{ course.english }}" />#}
+{#								<input type="hidden" name="exam" value="{{ course.exam }}" />#}
+{#								<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />#}
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+		</div>
+	</div>
 {% endblock %}

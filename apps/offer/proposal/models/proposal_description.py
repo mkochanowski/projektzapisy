@@ -17,27 +17,27 @@ class ProposalDescription(models.Model):
     """
         Description of proposal
     """
-    proposal     = models.ForeignKey('Proposal', related_name = 'descriptions_set')
-    description  = models.TextField( verbose_name = 'opis' )
-    requirements = models.TextField( verbose_name = 'wymagania' )
-    comments     = models.TextField( blank = True, null=True,
-                                     verbose_name = 'uwagi' )
-    date         = models.DateTimeField(auto_now=True,
-                                        verbose_name = 'data dodania')
-    author       = models.ForeignKey(User, related_name='autor')
-    
-    deleted      = models.BooleanField(default=False,
-                                       verbose_name='usunięty')
-    exam         = models.BooleanField(choices=((False, 'Nie'), (True, 'Tak')),
-                                       default=False,
-                                       verbose_name='z egzaminem')
-    english      = models.BooleanField(default=False,
-                                       verbose_name=u'możliwe zajęcia po angielsku')
-    web_page     = models.URLField( verbose_name = 'Strona WWW przedmiotu',
-                                verify_exists= True,
-								blank        = True,
-                                null         = True )
-    type         = models.ForeignKey('courses.Type',      related_name = 'descriptionstypes')
+#    proposal     = models.ForeignKey('Proposal', related_name = 'descriptions_set')
+#    description  = models.TextField( verbose_name = 'opis' )
+#    requirements = models.TextField( verbose_name = 'wymagania' )
+#    comments     = models.TextField( blank = True, null=True,
+#                                     verbose_name = 'uwagi' )
+#    date         = models.DateTimeField(auto_now=True,
+#                                        verbose_name = 'data dodania')
+#    author       = models.ForeignKey(User, related_name='autor')
+#
+#    deleted      = models.BooleanField(default=False,
+#                                       verbose_name='usunięty')
+#    exam         = models.BooleanField(choices=((False, 'Nie'), (True, 'Tak')),
+#                                       default=False,
+#                                       verbose_name='z egzaminem')
+#    english      = models.BooleanField(default=False,
+#                                       verbose_name=u'możliwe zajęcia po angielsku')
+#    web_page     = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+#                                verify_exists= True,
+#								blank        = True,
+#                                null         = True )
+#    type         = models.ForeignKey('courses.Type',      related_name = 'descriptionstypes')
 
     objects      = models.Manager()
     noremoved    = NoRemovedManager()

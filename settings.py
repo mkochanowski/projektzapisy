@@ -46,7 +46,7 @@ DATABASES = {
 
 DATABASES = {
      'default' : {
-        'ENGINE' : 'sqlite3',
+        'ENGINE' : 'django.db.backends.sqlite3',
  	    'NAME' : os.path.join(PROJECT_PATH, 'database/db.sqlite3'),
  	    'PORT' : '',
  	    'USER' : '',
@@ -55,7 +55,7 @@ DATABASES = {
  	    'CHARSET' : 'utf8',
  	    'USE_UNICODE' : True,
         }
- }
+}
 
 
 # mass-mail account
@@ -177,11 +177,21 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
 
 # List of callables that know how to import templates from various sources.
+
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#    'django.template.loaders.eggs.load_template_source',
+    ('django.template.loaders.cached.Loader', (
+
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.eggs.Loader',
+     )),
 )
+
+#TEMPLATE_LOADERS = (
+#    'django.template.loaders.filesystem.Loader',
+#    'django.template.loaders.app_directories.Loader',
+##    'django.template.loaders.eggs.load_template_source',
+#)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
@@ -192,13 +202,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'paranoidsessions.ParanoidSessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.middleware.csrf.CsrfResponseMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
     #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
@@ -286,7 +294,7 @@ INSTALLED_APPS = (
     'apps.offer.proposal',
     'apps.offer.vote',
     'apps.users',
-#    'debug_toolbar',
+    'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
     #'apps.mobile',
@@ -340,6 +348,7 @@ DEBUG_TOOLBAR_ALLOWED_USERS = [
 ]
 
 def show_toolbar(request):
+    return True
     if request.user and request.user.username in DEBUG_TOOLBAR_ALLOWED_USERS:
         return True
     return False

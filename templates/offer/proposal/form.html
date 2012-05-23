@@ -1,86 +1,11 @@
-{% extends "offer/proposal/base.html" %}
+{% extends 'offer/proposal/proposal.html' %}
 
-{% block main-subtitle %}Edycja propozycji{% if proposal.name %}:{% endif %} {{proposal.name}}{% endblock %}
-
-{% block proposal-scripts %}
-	<script type="text/javascript" src="/site_media/js/offer/proposal/form.js"></script>
-{% endblock %}
-
-{% block proposal-content %}
-	<form action="" method="post" id="od-proposal-form">
-        {{ forms.proposal.non_field_errors }}
-        {{ forms.description.non_field_errors }}
-        {{ forms.books.non_field_errors }}
-
-        <p class="title">
-            {{ forms.proposal.name }}
-            {{ forms.proposal.name.errors }}
-
-        </p>
-
-<ul class="infoBox">
-			<li id="od-proposal-form-types">
-				Typ przedmiotu:
-                {{ forms.description.type }}
-				{{ forms.description.type.errors }}
-			</li>
-
-            {% if user.teacher %}
-
-			<li class="proposedOwner">
-				<label for="od-proposal-form-lock">Zablokuj innym edycję:</label>
-				<select class="main-labelledSelect" id="od-proposal-form-lock" name="owner">
-				   <option value="no">Nie</option>
-				   <option value="yes" {% if proposal.owner %}{% endif %}>Tak</option>
-				</select>
-			</li>
-
-            {% endif %}
-
-			<li class="exam">
-                {{ forms.description.exam.errors }}
-				<label for="id_description-exam">Egzamin:</label>
-                {{ forms.description.exam }}
-
-			</li>
-			<li class="classesInEnglish">
-                {{ forms.description.english.errors }}
-				<label for="id_description-english">Możliwe zajęcia w języku angielskim:</label>
-				{{ forms.description.english }}
-			</li>
-		</ul>
-
-        <h3>Opis przedmiotu</h3>
-		<p>{{ forms.description.description.errors }}{{ forms.description.description }}</p>
-
-		<h3>Wymagania</h3>
-		<p>{{ forms.description.requirements.errors }}{{ forms.description.requirements }}</p>
-
-		<h3>Uwagi do potencjalnych prowadzących i dyrekcji</h3>
-		<p>{{ forms.description.comments.errors }}{{ forms.description.comments }}</p>
-
-		<h3>Strona przedmiotu</h3>
-		<p>{{ forms.description.web_page.errors }}{{ forms.description.web_page }}</p>
-
-    	<h3>Literatura:</h3>
-		<div id="od-proposal-form-books">
-            {{  forms.books.management_form }}
-			<ul>
-                {% for form in forms.books %}
-				<li class="book">{{ form }}</li>
-                {% endfor %}
-			</ul>
-		</div>
-
-        
-        {% if form_hash %}
-            <input type="hidden" value="{{ form_hash }}" name="form-hash"/>
-        {% endif %}
-
-		<hr />
-
-		<p id="od-proposal-form-submitBar">
-			<input class="bigButton" type="submit" value="{% if editMode %}zapisz{% else %}zgłoś przedmiot{% endif %}" />
-		</p>
-	</form>
+{% block content %}
+    <form action="{% url proposal-form %}" method="POST">
+        {% csrf_token %}
+        <table>
+        {{ form }}
+        </table>
+        <button type="submit" class="btn btn-success">Zapisz</button>
+    </form>
 {% endblock %}

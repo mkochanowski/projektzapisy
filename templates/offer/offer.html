@@ -1,0 +1,9 @@
+{% extends "offer/base.html" %}
+
+{% block offer_menu_offer %} class="active"{% endblock %}
+
+{% block content %}
+    {% if proposal %}
+        {% include 'offer/proposal.html' with course=proposal %}
+    {% endif %}
+{% endblock %}

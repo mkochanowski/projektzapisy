@@ -1,0 +1,33 @@
+{% extends "offer/base.html" %}
+
+{% block enrollment_menu_courses %} class="active"{% endblock %}
+
+{% block content %}
+    {% if proposal %}
+        {% include 'offer/proposal.html' with course=proposal %}
+    {% endif %}
+{% endblock %}
+
+
+{% block sidebar %}
+	<div id="main-sidebar">
+		<div id="course-list">
+				<div class="semester">
+					<h3>Moje propozycje</h3>
+					<ul class="courses-list">
+						{% for course in proposals %}
+							<li>
+								<a href="{% url offer-page course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
+{#								<input type="hidden" name="type" value="{{ course.type }}" />#}
+{#								<input type="hidden" name="wasEnrolled" value="{{ course.was_enrolled }}" />#}
+{#								<input type="hidden" name="english" value="{{ course.english }}" />#}
+{#								<input type="hidden" name="exam" value="{{ course.exam }}" />#}
+{#								<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />#}
+							</li>
+						{% endfor %}
+					</ul>
+                    <a href="{% url proposal-form %}"><button class="btn btn-primary">Dodaj</button></a>
+				</div>
+		</div>
+	</div>
+{% endblock %}
