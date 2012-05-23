@@ -1,0 +1,84 @@
+<div id="od-proposal-view">
+
+	<h2>{{course.name}}</h2>
+
+    <table class="table-info">
+        <tr>
+            <th>Typ</th>
+            <td>{{ course.type }}</td>
+        </tr>
+        {% if course.owner %}
+            <tr>
+                <th>Prowadzący</th>
+                <td>
+                    <a href="{% url employee-profile course.owner.user.id %}"
+                           class="person">{{ course.owner.user.get_full_name }}</a>
+                    </td>
+            </tr>
+        {% endif %}
+
+        {% if course.lectures or course.exercises or course.laboratories or course.repetitions %}
+            <tr>
+                <th>Liczba godzin</th>
+                <td>{% if course.lectures %}{{ course.lectures }}
+                    (wyk) {% if course.exercises or course.laboratories or course.repetitions or course.exercises_laboratories %}
+                        +{% endif %}{% endif %}
+                    {% if course.exercises_laboratories %}{{ course.exercises_laboratories }}
+                        (ćw+prac) {% if course.exercises or course.laboratories or course.repetitions %}
+                        +{% endif %}{% endif %}
+                    {% if course.repetitions %}{{ course.repetitions }}
+                        (rep) {% if course.lectures or course.laboratories %}+{% endif %}{% endif %}
+                    {% if course.exercises %}{{ course.exercises }} (ćw) {% if course.laboratories %}
+                        +{% endif %}{% endif %}
+                    {% if course.laboratories %}{{ course.laboratories }} (prac){% endif %}</td>
+            </tr>
+        {% endif %}
+        {% if course.english %}
+            <tr>
+                <th>Przedmiot prowadzony w języku angielskim</th>
+                <td>Tak</td>
+            </tr>
+        {% endif %}
+
+            <tr>
+                <th>Egzamin</th>
+                <td>{% if course.exam %}Tak{% else %}Nie{% endif %}</td>
+            </tr>
+    {% if course.web_page %}
+            <tr>
+                <th>Strona WWW</th>
+                <td><a href="{{ course.web_page }}">{{ course.web_page }}</a></td>
+            </tr>{% endif %}
+        {% if requirements %}
+            <tr>
+                <th>Wymagane</th>
+                <td>{{ requirements|join:", " }}</td>
+            </tr>
+        {% endif %}
+
+    </table>
+
+    <div class="description">
+
+        <h5>Opis przedmiotu:</h5>
+        {% if course.description %}
+        <p>{{ course.description|safe }}</p>
+        {% else %}
+            <p>Brak</p>
+        {% endif %}
+    </div>
+
+    <div class="footer"></div>
+
+	<div class="actions">
+        <div class="action right">
+        <a href="{% url proposal-edit course.slug %}">Edytuj</a>
+        </div>
+        {% if course.owner %}
+            {% if course.owner == user.employee %}
+                Edytuj
+            {% endif %}
+        {% endif %}
+	</div>
+
+</div>

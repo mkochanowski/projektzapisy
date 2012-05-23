@@ -10,21 +10,49 @@ from django.db.models import signals
 from django.core.cache import cache as mcache
 
 from apps.enrollment.courses.models.points import PointsOfCourses, PointsOfCourseEntities
+from apps.offer.proposal.exceptions import NotOwnerException
 from student_options import StudentOptions
 
 import logging
 logger = logging.getLogger()
 
+class NoRemoved(models.Manager):
+    """ Manager for course objects with visible semester """
+    def get_query_set(self):
+        """ Returns all courses which have marked semester as visible """
+        return super(NoRemoved, self).get_query_set().filter(deleted=False)
+
 class CourseEntity(models.Model):
+
+    statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'),(2, u'Poddana pod głosowanie'),)
     """entity of particular course title"""
-    name = models.CharField(max_length=100, verbose_name='nazwa')
-    shortName = models.CharField(max_length=30, null=True, verbose_name='skrócona nazwa')
-    type = models.ForeignKey('Type', null=True, verbose_name='rodzaj')
-    description = models.TextField(verbose_name='opis', default='', blank=True) 
-    lectures = models.IntegerField(verbose_name='wykład', default=0)
-    exercises = models.IntegerField(verbose_name='ćwiczenia', default=0)
-    laboratories = models.IntegerField(verbose_name='pracownia', default=0)
-    repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
+    name         = models.CharField(max_length=100,
+                              verbose_name='nazwa', unique=True)
+    shortName    = models.CharField(max_length=30,
+                              verbose_name='skrócona nazwa',
+                              null=True, blank=True)
+    status  = models.IntegerField(choices=statuses, default=1)
+    type         = models.ForeignKey('Type',
+                              verbose_name='rodzaj',
+                              null=True)
+    description  = models.TextField(verbose_name='opis',
+                              null=True, blank=True,
+                              default='')
+
+    requirements = models.ManyToManyField("self",
+                                verbose_name='wymagania',
+                                related_name='+',
+                                blank=True, null=True)
+    english      = models.BooleanField(default=False,
+                                verbose_name='przedmiot prowadzony w j.angielskim')
+    exam         = models.BooleanField(verbose_name='egzamin',
+                                default=True)
+
+    deleted = models.BooleanField(verbose_name='ukryty', default=False)
+    owner   = models.ForeignKey('users.Employee', verbose_name='prowadzący', blank=True, null=True)
+    slug    = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
+
+    noremoved = NoRemoved()
 
     class Meta:
         verbose_name = 'Podstawa przedmiotu'
@@ -40,6 +68,32 @@ class CourseEntity(models.Model):
             return self.name
         else:
             return self.shortName
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.slug = slugify('%s' % (self.name,))
+        super(CourseEntity, self).save(*args, **kwargs)
+
+    @staticmethod
+    def get_proposals():
+        return CourseEntity.noremoved.all()
+
+    @staticmethod
+    def get_proposal(slug):
+        return CourseEntity.noremoved.get(slug=slug)
+
+    @staticmethod
+    def get_employee_proposals(employee):
+        return CourseEntity.noremoved.filter(owner=employee)
+
+    @staticmethod
+    def get_employee_proposal(employee, slug):
+        proposal = CourseEntity.noremoved.get(slug=slug)
+
+        if proposal.owner == employee:
+            return proposal
+        else:
+            raise NotOwnerException
 
 class Related(models.Manager):
     """ Manager for course objects with visible semester """

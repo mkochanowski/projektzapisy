@@ -1,22 +1,28 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
+from apps.enrollment.courses.models.course import CourseEntity
 from apps.offer.proposal.models.proposal import Proposal
 
 
-def prepare_proposals_data(request):
-    data = {}
+def proposal_for_offer(slug):
+    if slug:
+        try:
+            return CourseEntity.get_proposal(slug)
+        except ObjectDoesNotExist:
+            raise Http404
+
+    return None
 
 
-    """
-        Proposals list
-    """
-    try:
-        if not request.user.is_staff:
-            _ = request.user.employee
-        proposals = Proposal.noremoved.order_by('name')
-    except ObjectDoesNotExist:
-        proposals = Proposal.filtred.order_by('name')
 
-    data['proposals'] = proposals
+def employee_proposal(employee, slug):
+    if slug:
+        try:
+            proposal = CourseEntity.get_employee_proposal(employee, slug)
+        except ObjectDoesNotExist:
+            raise Http404
+    else:
+        proposal = None
 
-    return data
+    return proposal

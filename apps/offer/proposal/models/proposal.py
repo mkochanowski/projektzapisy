@@ -26,6 +26,27 @@ class FiltredManager(models.Manager):
     def get_query_set(self):
         return super(FiltredManager, self).get_query_set().filter(deleted=False, for_student=True)
 
+class Przedmiot(models.Model):
+    kod_uz = models.IntegerField()
+    nazwa = models.TextField()
+    name = models.TextField()
+    punkty = models.IntegerField()
+    rodzaj = models.IntegerField()
+    liczba_godzin = models.TextField(null=True, blank=True)
+    egzamin = models.BooleanField()
+    angielski = models.BooleanField()
+    aktualny = models.BooleanField()
+    strona_domowa = models.TextField()
+    wymagania = models.TextField()
+    program = models.TextField()
+    opis = models.TextField()
+    literatura = models.TextField()
+    semestr  = models.IntegerField()
+    punkty2007  = models.IntegerField()
+    rodzaj2007  = models.IntegerField()
+
+    class Meta:
+        app_label = 'proposal'
 
 class Proposal( models.Model ):
     """
@@ -35,47 +56,74 @@ class Proposal( models.Model ):
 
     PROPOSAL_STATUS = [(0, 'Propozycja'), (1, 'Oferta'), (2, 'Głosowanie')]
     SEMESTER_LIST   = [('u', 'Nieustolony'), ('w', 'Zima'), ('s', 'Lato')]
-    name     = models.CharField(max_length = 255,
-                                 unique = True,
-                                verbose_name = 'nazwa przedmiotu' )
-    slug     = models.SlugField(max_length = 255,
-                                 unique = True,
-                                 verbose_name='odnośnik' )
-    fans     = models.ManyToManyField('users.Student',
-                                      verbose_name='poszli by na to',
-                                        blank=True)
-    teachers = models.ManyToManyField('users.Employee',
-                                      blank=True,
-                                      related_name='proposal_teachers_related',
-                                      verbose_name='poprowadziliby to')
-    helpers  = models.ManyToManyField('users.Employee',
-                                      blank=True,
-                                      related_name='proposal_helpers_related',
-                                      verbose_name='pomogliby poprowadzić to')
-    owner    = models.ForeignKey(User,
-                                 related_name='wlasciciel',
-                                 verbose_name='wlasciciel',
-                                 null = True, blank=True)
-    hidden   = models.BooleanField(verbose_name='ukryta',
-                                   default=False)
-    deleted  = models.BooleanField(default=False,
-                                   verbose_name="usuniety")
-    status   = models.IntegerField(choices=PROPOSAL_STATUS,
-                                   default=0,
-                                   verbose_name="status przedmiotu"
-                                )
-    semester = models.CharField(choices=SEMESTER_LIST,
-                                default='b',
-                                max_length=1,
-                                verbose_name="przypisane do semestru")
-
-    for_student = models.BooleanField(default=True,
-                                      verbose_name='widoczna dla studentów')
-
-    student = models.BooleanField(default=False,
-                                    verbose_name="propozycja studenta")
-    description = models.ForeignKey(ProposalDescription,
-                                    related_name='proposals_set')
+#    name     = models.CharField(max_length = 255,
+#                                 unique = True,
+#                                verbose_name = 'nazwa przedmiotu' )
+#    slug     = models.SlugField(max_length = 255,
+#                                 unique = True,
+#                                 verbose_name='odnośnik' )
+##    fans     = models.ManyToManyField('users.Student',
+##                                      verbose_name='poszli by na to',
+##                                        blank=True)
+##    teachers = models.ManyToManyField('users.Employee',
+##                                      blank=True,
+##                                      related_name='proposal_teachers_related',
+##                                      verbose_name='poprowadziliby to')
+##    helpers  = models.ManyToManyField('users.Employee',
+##                                      blank=True,
+##                                      related_name='proposal_helpers_related',
+##                                      verbose_name='pomogliby poprowadzić to')
+#    owner    = models.ForeignKey(User,
+#                                 related_name='wlasciciel',
+#                                 verbose_name='wlasciciel',
+#                                 null = True, blank=True)
+#    hidden   = models.BooleanField(verbose_name='ukryta',
+#                                   default=False)
+#    deleted  = models.BooleanField(default=False,
+#                                   verbose_name="usuniety")
+#    status   = models.IntegerField(choices=PROPOSAL_STATUS,
+#                                   default=0,
+#                                   verbose_name="status przedmiotu",
+#                                    help_text=u'Propozycja - widoczna jedynie dla autora i administratora<br/>' \
+#                                              u'Oferta - przedmiot widoczny w ofercie, nieobecny w głosowaniu<br/>' \
+#                                              u'Głosowanie - przedmiot widoczny zarówno w ofercie jak i głosowaniu'
+#                                )
+#    semester = models.CharField(choices=SEMESTER_LIST,
+#                                default='b',
+#                                max_length=1,
+#                                verbose_name="przypisane do semestru")
+#
+##    for_student = models.BooleanField(default=True,
+##                                      verbose_name='widoczna dla studentów')
+#
+#    student = models.BooleanField(default=False,
+#                                    verbose_name="propozycja studenta")
+##    description = models.ForeignKey(ProposalDescription,
+##                                    verbose_name=''
+##                                    related_name='proposals_set')
+#
+#    description = models.TextField(verbose_name='opis')
+#
+#    requirements = models.TextField( verbose_name = 'wymagania' )
+#    comments     = models.TextField( blank = True, null=True,
+#                                     verbose_name = 'uwagi' )
+#    date         = models.DateTimeField(auto_now=True,
+#                                        verbose_name = 'data dodania')
+#
+#    deleted      = models.BooleanField(default=False,
+#                                       verbose_name='usunięty')
+#    exam         = models.BooleanField(choices=((False, 'Nie'), (True, 'Tak')),
+#                                       default=False,
+#                                       verbose_name='z egzaminem')
+#    english      = models.BooleanField(default=False,
+#                                       verbose_name=u'możliwe zajęcia po angielsku')
+#    web_page     = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+#                                verify_exists= True,
+#								blank        = True,
+#                                null         = True )
+#    course_type         = models.ForeignKey('courses.Type',
+#                                verbose_name= u'Typ',
+#                                related_name = 'descriptionstypes')
 
 
     objects   = models.Manager()
@@ -90,7 +138,7 @@ class Proposal( models.Model ):
         verbose_name = 'przedmiot'
         verbose_name_plural = 'przedmioty'
         app_label = 'proposal'
-        ordering = ['name']
+#        ordering = ['name']
         permissions = (
             ("can_create_offer", u"Może tworzyć ofertę dydaktyczną"),
             ("can_delete_proposal", u"Może usuwać propozycje"),
