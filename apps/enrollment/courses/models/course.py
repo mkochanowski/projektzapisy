@@ -27,7 +27,7 @@ class CourseEntity(models.Model):
     statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'),(2, u'Poddana pod głosowanie'),)
     """entity of particular course title"""
     name         = models.CharField(max_length=100,
-                              verbose_name='nazwa', unique=True)
+                              verbose_name='nazwa')
     shortName    = models.CharField(max_length=30,
                               verbose_name='skrócona nazwa',
                               null=True, blank=True)
