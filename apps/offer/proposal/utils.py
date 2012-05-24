@@ -16,10 +16,10 @@ def proposal_for_offer(slug):
 
 
 
-def employee_proposal(employee, slug):
+def employee_proposal(user, slug):
     if slug:
         try:
-            proposal = CourseEntity.get_employee_proposal(employee, slug)
+            proposal = CourseEntity.get_employee_proposal(user, slug)
         except ObjectDoesNotExist:
             raise Http404
     else:

@@ -43,7 +43,7 @@ def proposal(request, slug=None):
       List of user proposal
     """
     try:
-        proposals = CourseEntity.get_employee_proposals(request.user.employee)
+        proposals = CourseEntity.get_employee_proposals(request.user)
         proposal  = employee_proposal(request.user.employee, slug)
     except NotOwnerException:
         return redirect('offer-page', slug=slug)
@@ -55,11 +55,11 @@ def proposal(request, slug=None):
 def proposal_edit(request, slug=None):
 
     proposal = None
-    proposals = CourseEntity.get_employee_proposals(request.user.employee)
+    proposals = CourseEntity.get_employee_proposals(request.user)
 
     if slug:
         try:
-            proposal = CourseEntity.get_employee_proposal(request.user.employee, slug)
+            proposal = CourseEntity.get_employee_proposal(request.user, slug)
         except NotOwnerException:
             raise Http404
 
