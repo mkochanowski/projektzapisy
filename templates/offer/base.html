@@ -2,7 +2,10 @@
 {% load compressed %}
 
 {% block js %}
-    {% compressed_js 'courses' %}
+    {% compressed_js 'proposal' %}
+
+    <script src='/static/js/tiny_mce/tiny_mce.js'></script>
+    <script src='/static/js/offer/proposal/proposal.js'></script>
 {% endblock %}
 
 {% block styles %}
@@ -13,10 +16,10 @@
 {% block offer_active %} class="active"{% endblock %}
 
 {% block system_menu %}
-    {% if user.student or user.employee %}
+    {% if user.employee %}
     <li{% block enrollment_menu_courses %}{% endblock %}><a
-            href="/courses/">Moje Propozycje</a></li>{% endif %}
-    <li{% block offer_menu_offer %}{% endblock %}><a href="/records/schedule/">Oferta</a></li>
+            href="{% url my-proposal %}">Moje Propozycje</a></li>{% endif %}
+    <li{% block offer_menu_offer %}{% endblock %}><a href="{% url offer-main %}">Oferta</a></li>
 
     {# end system_menu #}
 {% endblock %}

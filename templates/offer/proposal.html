@@ -72,13 +72,12 @@
 
 	<div class="actions">
         <div class="action right">
-        <a href="{% url proposal-edit course.slug %}">Edytuj</a>
-        </div>
-        {% if course.owner %}
-            {% if course.owner == user.employee %}
-                Edytuj
+
+            {% if user.is_staff or course.owner == user.employee %}
+                <a href="{% url proposal-edit course.slug %}">Edytuj</a>
             {% endif %}
-        {% endif %}
+
+        </div>
 	</div>
 
 </div>

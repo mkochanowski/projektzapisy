@@ -363,4 +363,17 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/studentlist.min.js',
     },
+
+    'proposal': {
+        'source_filenames': (
+            'js/jquery/jquery-1.5.2.js',
+            'js/jquery/jquery-ui-1.8.17.custom.js',
+            'js/jquery/jquery.cookies.2.2.0.min.js',
+            'js/jquery/baseExtensions.js',
+            'js/main.js',
+        ),
+        'output_filename': 'js/proposal.min.js',
+
+
+    }
 }
