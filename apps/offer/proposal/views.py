@@ -17,6 +17,7 @@ from apps.offer.proposal.exceptions      import  NotOwnerException
 
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal
+from apps.users.decorators import employee_required
 
 logger = logging.getLogger("")
 
@@ -38,6 +39,7 @@ def offer(request, slug=None):
 
 
 @login_required
+@employee_required
 def proposal(request, slug=None):
     """
       List of user proposal
@@ -52,6 +54,7 @@ def proposal(request, slug=None):
 
 
 @login_required
+@employee_required
 def proposal_edit(request, slug=None):
 
     proposal = None
