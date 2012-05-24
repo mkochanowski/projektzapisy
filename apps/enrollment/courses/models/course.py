@@ -83,14 +83,14 @@ class CourseEntity(models.Model):
         return CourseEntity.noremoved.get(slug=slug)
 
     @staticmethod
-    def get_employee_proposals(employee):
-        return CourseEntity.noremoved.filter(owner=employee)
+    def get_employee_proposals(user):
+        return CourseEntity.noremoved.filter(owner=user.employee)
 
     @staticmethod
-    def get_employee_proposal(employee, slug):
+    def get_employee_proposal(user, slug):
         proposal = CourseEntity.noremoved.get(slug=slug)
 
-        if proposal.owner == employee:
+        if user.is_staff or proposal.owner == user.employee:
             return proposal
         else:
             raise NotOwnerException

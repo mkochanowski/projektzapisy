@@ -2,6 +2,8 @@
  * Style odpowiadające za wygląd głównego szablonu (logo, menu, stopka itp)
  */
 
+#id_requirements { width: 280px; height: 300px;}
+
 #main-container
 {
 	width: 1000px;
