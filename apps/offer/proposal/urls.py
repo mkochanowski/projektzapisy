@@ -9,10 +9,3 @@ urlpatterns = patterns( 'apps.offer.proposal.views',
 
 
 )
-"""
-+ 1. widok oferty
-+ 2. widok propozycji w ofercie
-3. widok 'moich'
-4. widok propozycji w 'moich'
-5. formularz edycji
-"""
