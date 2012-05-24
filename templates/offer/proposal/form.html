@@ -1,7 +1,11 @@
 {% extends 'offer/proposal/proposal.html' %}
 
 {% block content %}
+    {% if proposal %}
     <form action="{% url proposal-form %}" method="POST">
+    {%  else %}
+    <form action="{% url proposal-edit proposal.slug %}" method="POST">
+    {% endif %}
         {% csrf_token %}
         <table>
         {{ form }}
