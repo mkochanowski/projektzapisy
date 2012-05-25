@@ -76,6 +76,7 @@ def proposal_edit(request, slug=None):
                 proposal.owner = request.user.employee
             proposal.save()
             messages.success(request, u'Propozycja zapisana')
+            form.save_m2m()
             return redirect('my-proposal-show', slug=proposal.slug)
     else:
         form = ProposalForm(instance=proposal)
