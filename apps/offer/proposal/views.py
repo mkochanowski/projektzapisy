@@ -46,7 +46,7 @@ def proposal(request, slug=None):
     """
     try:
         proposals = CourseEntity.get_employee_proposals(request.user)
-        proposal  = employee_proposal(request.user.employee, slug)
+        proposal  = employee_proposal(request.user, slug)
     except NotOwnerException:
         return redirect('offer-page', slug=slug)
 
@@ -71,8 +71,9 @@ def proposal_edit(request, slug=None):
         if form.is_valid():
             proposal = form.save(commit=False)
             proposal.owner = request.user.employee
+            proposal.save()
             messages.success(request, u'Propozycja zapisana')
+            return redirect('my-proposal-show', slug=proposal.slug)
     else:
         form = ProposalForm(instance=proposal)
-
     return TemplateResponse(request, 'offer/proposal/form.html', locals())
