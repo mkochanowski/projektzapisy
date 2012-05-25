@@ -8,7 +8,7 @@ from django.db import models
 class Migration(DataMigration):
     def forwards(self, orm):
         for e in orm.CourseEntity.objects.all():
-            e.slug = slugify('%s' % (e.name,))
+            e.slug = slugify('%s_%s' % (e.name, str(e.id)))
             e.save()
 
     

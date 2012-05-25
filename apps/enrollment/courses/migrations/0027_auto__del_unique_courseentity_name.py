@@ -7,15 +7,15 @@ from django.db import models
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        pass
-        # Adding unique constraint on 'CourseEntity', fields ['name']
-        #db.create_unique('courses_courseentity', ['name'])
+        
+        # Removing unique constraint on 'CourseEntity', fields ['name']
+        db.delete_unique('courses_courseentity', ['name'])
     
     
     def backwards(self, orm):
         
-        # Removing unique constraint on 'CourseEntity', fields ['name']
-        db.delete_unique('courses_courseentity', ['name'])
+        # Adding unique constraint on 'CourseEntity', fields ['name']
+        db.create_unique('courses_courseentity', ['name'])
     
     
     models = {
@@ -34,7 +34,7 @@ class Migration(SchemaMigration):
         },
         'auth.user': {
             'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 17, 0, 9, 25, 83209)'}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 23, 13, 56, 37, 456022)'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -42,7 +42,7 @@ class Migration(SchemaMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 17, 0, 9, 25, 83094)'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 23, 13, 56, 37, 455691)'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -93,15 +93,14 @@ class Migration(SchemaMigration):
         'courses.courseentity': {
             'Meta': {'object_name': 'CourseEntity'},
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'exercises': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'description': ('django.db.models.fields.TextField', [], {'default': "''", 'null': 'True', 'blank': 'True'}),
+            'english': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'exam': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'laboratories': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'lectures': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['users.Employee']", 'null': 'True', 'blank': 'True'}),
-            'repetitions': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True'}),
+            'requirements': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'requirements_rel_+'", 'null': 'True', 'to': "orm['courses.CourseEntity']"}),
+            'shortName': ('django.db.models.fields.CharField', [], {'max_length': '30', 'null': 'True', 'blank': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'max_length': '255', 'unique': 'True', 'null': 'True', 'db_index': 'True'}),
             'status': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['courses.Type']", 'null': 'True'})
@@ -182,7 +181,7 @@ class Migration(SchemaMigration):
             'consultations': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'homepage': ('django.db.models.fields.URLField', [], {'default': "''", 'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 17, 0, 9, 24, 955231)'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 23, 13, 56, 36, 977319)'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_grade': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'receive_mass_mail_offer': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
@@ -201,7 +200,7 @@ class Migration(SchemaMigration):
             'block': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'ects': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 17, 0, 9, 24, 955231)'}),
+            'last_news_view': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 5, 23, 13, 56, 36, 977319)'}),
             'matricula': ('django.db.models.fields.CharField', [], {'default': "''", 'unique': 'True', 'max_length': '20'}),
             'program': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['users.Program']", 'null': 'True'}),
             'receive_mass_mail_enrollment': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
