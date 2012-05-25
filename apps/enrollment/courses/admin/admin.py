@@ -65,6 +65,8 @@ class CourseEntityAdmin(admin.ModelAdmin):
     search_fields = ('name', 'shortName')
     fieldsets = [
         (None,               {'fields': ['name','shortName','type','description'], 'classes': ['long_name']}),
+        (None,               {'fields': ['owner']}),
+
     ]
         
 class PointsOfCoursesAdmin(admin.ModelAdmin):
