@@ -57,12 +57,14 @@ def proposal(request, slug=None):
 @employee_required
 def proposal_edit(request, slug=None):
 
+    owner = None
     proposal = None
     proposals = CourseEntity.get_employee_proposals(request.user)
 
     if slug:
         try:
             proposal = CourseEntity.get_employee_proposal(request.user, slug)
+            owner = proposal.owner
         except NotOwnerException:
             raise Http404
 
@@ -70,7 +72,8 @@ def proposal_edit(request, slug=None):
         form = ProposalForm(data=request.POST, instance=proposal)
         if form.is_valid():
             proposal = form.save(commit=False)
-            proposal.owner = request.user.employee
+            if not owner:
+                proposal.owner = request.user.employee
             proposal.save()
             messages.success(request, u'Propozycja zapisana')
             return redirect('my-proposal-show', slug=proposal.slug)
