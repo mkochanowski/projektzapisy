@@ -30,8 +30,9 @@ class CourseEntity(models.Model):
                               verbose_name='nazwa', unique=True)
     shortName    = models.CharField(max_length=30,
                               verbose_name='skrócona nazwa',
-                              null=True, blank=True)
-    status  = models.IntegerField(choices=statuses, default=1)
+                              null=True, blank=True,
+                              help_text=u'Opcjonalna skrócona nazwa, używana na np. planie. Przykłady: JFiZO, AiSD')
+    status  = models.IntegerField(choices=statuses, default=1, help_text=u'Wersja robocza widoczna jest jedynie dla jej autora')
     type         = models.ForeignKey('Type',
                               verbose_name='rodzaj',
                               null=True)
@@ -40,7 +41,7 @@ class CourseEntity(models.Model):
                               default='')
 
     requirements = models.ManyToManyField("self",
-                                verbose_name='wymagania',
+                                verbose_name='wymagane przedmioty',
                                 related_name='+',
                                 blank=True, null=True)
     english      = models.BooleanField(default=False,
