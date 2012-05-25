@@ -17,12 +17,7 @@
 					<ul class="courses-list">
 						{% for course in proposals %}
 							<li>
-								<a href="{% url offer-page course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
-{#								<input type="hidden" name="type" value="{{ course.type }}" />#}
-{#								<input type="hidden" name="wasEnrolled" value="{{ course.was_enrolled }}" />#}
-{#								<input type="hidden" name="english" value="{{ course.english }}" />#}
-{#								<input type="hidden" name="exam" value="{{ course.exam }}" />#}
-{#								<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />#}
+								<a href="{% url my-proposal-show course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
 							</li>
 						{% endfor %}
 					</ul>

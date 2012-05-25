@@ -2,9 +2,9 @@
 
 {% block content %}
     {% if proposal %}
-    <form action="{% url proposal-form %}" method="POST">
+        <form action="{% url proposal-edit proposal.slug %}" method="POST">
     {%  else %}
-    <form action="{% url proposal-edit proposal.slug %}" method="POST">
+        <form action="{% url proposal-form %}" method="POST">
     {% endif %}
         {% csrf_token %}
         <table>

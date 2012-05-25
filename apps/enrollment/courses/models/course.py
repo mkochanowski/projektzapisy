@@ -76,7 +76,7 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposals():
-        return CourseEntity.noremoved.all()
+        return CourseEntity.noremoved.filter(status__gte=1)
 
     @staticmethod
     def get_proposal(slug):
