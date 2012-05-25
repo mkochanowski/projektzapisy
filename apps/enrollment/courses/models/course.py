@@ -25,6 +25,7 @@ class NoRemoved(models.Manager):
 class CourseEntity(models.Model):
 
     statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'),(2, u'Poddana pod głosowanie'),)
+    semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
     """entity of particular course title"""
     name         = models.CharField(max_length=100,
                               verbose_name='nazwa')
@@ -33,6 +34,9 @@ class CourseEntity(models.Model):
                               null=True, blank=True,
                               help_text=u'Opcjonalna skrócona nazwa, używana na np. planie. Przykłady: JFiZO, AiSD')
     status  = models.IntegerField(choices=statuses, default=1, help_text=u'Wersja robocza widoczna jest jedynie dla jej autora')
+
+    semester = models.CharField(max_length=1, choices=semesters, default='u', verbose_name='semestr')
+
     type         = models.ForeignKey('Type',
                               verbose_name='rodzaj',
                               null=True)
