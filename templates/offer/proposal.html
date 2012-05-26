@@ -55,6 +55,18 @@
                 <td>{{ requirements|join:", " }}</td>
             </tr>
         {% endif %}
+        {% if course.created %}
+            <tr>
+                <th>Utworzono:</th>
+                <td>{{ course.created }}</td>
+            </tr>
+    {% endif %}
+        {% if course.edited %}
+                <tr>
+                    <th>Aktualizacja:</th>
+                    <td>{{ course.edited }}</td>
+                </tr>
+        {% endif %}
 
     </table>
 
