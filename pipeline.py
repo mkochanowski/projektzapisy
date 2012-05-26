@@ -175,7 +175,7 @@ PIPELINE_CSS = {
             'css/fereol.css',
             'css/offer/proposal.css'
         ),
-        'output_filename': 'css/main.min.css',
+        'output_filename': 'css/proposal.min.css',
         'extra_context': {
             'media': 'screen,projection',
         },
