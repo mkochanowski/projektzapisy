@@ -1,0 +1,21 @@
+.legend-box {
+    border: 1px solid;
+    border-radius: 3px 3px 3px 3px;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    vertical-align: middle;
+}
+
+#proposal-legend {
+    list-style: none;
+}
+
+
+li.work, li.work a { color:#ff4500;}
+li.offer,li.offer a { color:#0069D6;}
+li.vote, li.vote a { color:green!important;}
+
+#proposal-legend .work { background-color: #ff4500;}
+#proposal-legend .offer { background-color: #0069D6;}
+#proposal-legend .vote { background-color: green;}

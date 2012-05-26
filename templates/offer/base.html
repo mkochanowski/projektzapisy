@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% load compressed %}
 
+
+{% block title %}System Oferty{% endblock %}
+
 {% block js %}
     {% compressed_js 'proposal' %}
 
@@ -16,10 +19,10 @@
 {% block offer_active %} class="active"{% endblock %}
 
 {% block system_menu %}
+    <li{% block offer_menu_offer %}{% endblock %}><a href="{% url offer-main %}">Oferta</a></li>
     {% if user.employee %}
     <li{% block enrollment_menu_courses %}{% endblock %}><a
             href="{% url my-proposal %}">Moje Propozycje</a></li>{% endif %}
-    <li{% block offer_menu_offer %}{% endblock %}><a href="{% url offer-main %}">Oferta</a></li>
 
     {# end system_menu #}
 {% endblock %}

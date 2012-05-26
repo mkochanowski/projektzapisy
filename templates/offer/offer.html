@@ -2,6 +2,15 @@
 
 {% block offer_menu_offer %} class="active"{% endblock %}
 
+{% block main-subtitle %}
+    {% if proposal %}
+        {{ proposal.name }}
+    {% else %}
+        Oferta Dydaktyczna
+    {% endif %}{% endblock %}
+
+
+
 {% block content %}
     {% if proposal %}
         {% include 'offer/proposal.html' with course=proposal %}
