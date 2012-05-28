@@ -49,12 +49,10 @@
                 <th>Strona WWW</th>
                 <td><a href="{{ course.web_page }}">{{ course.web_page }}</a></td>
             </tr>{% endif %}
-        {% if requirements %}
             <tr>
-                <th>Wymagane</th>
-                <td>{{ requirements|join:", " }}</td>
+                <th>Wymagania</th>
+                <td>{{ course.requirements.all|join:", " }}</td>
             </tr>
-        {% endif %}
         {% if course.created %}
             <tr>
                 <th>Utworzono:</th>
