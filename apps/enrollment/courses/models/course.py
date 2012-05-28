@@ -20,7 +20,7 @@ class NoRemoved(models.Manager):
     """ Manager for course objects with visible semester """
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
-        return super(NoRemoved, self).get_query_set().filter(deleted=False)
+        return super(NoRemoved, self).get_query_set().filter(deleted=False, owner__isnull=False)
 
 class CourseEntity(models.Model):
 
