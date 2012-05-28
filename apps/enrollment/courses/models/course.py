@@ -57,8 +57,8 @@ class CourseEntity(models.Model):
     owner   = models.ForeignKey('users.Employee', verbose_name='prowadzący', blank=True, null=True)
     slug    = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
 
-    created = models.DateTimeField(verbose_name='Utworzono', auto_now=True)
-    edited  = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now_add=True)
+    created = models.DateTimeField(verbose_name='Utworzono', auto_now_add=True)
+    edited  = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now=True)
 
     noremoved = NoRemoved()
     objects   = models.Manager()
