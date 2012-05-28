@@ -129,7 +129,10 @@ class Employee(BaseUser):
 
     @staticmethod
     def get_actives():
-        return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name')
+        return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name'). extra(
+                        where=["(SELECT COUNT(*) FROM courses_courseentity WHERE courses_courseentity.owner_id=users_employee.id)>0"]
+        )
+
 
     @staticmethod
     def get_list(begin):
