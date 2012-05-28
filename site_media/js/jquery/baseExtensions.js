@@ -16,8 +16,8 @@ if (!String.prototype.trim) // IE8 <3
 
 String.prototype.castToInt = function(acceptNull)
 {
-	if (acceptNull && !this.trim())
-		return null;
+	if (acceptNull && !this.trim()){
+		return null;}
 	var val = parseInt(this.trim());
 	if (isNaN(val))
 		throw new Error('Nieprawidłowa wartość');

@@ -121,6 +121,16 @@ class Employee(BaseUser):
             logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
         return False
 
+    def get_sex(self):
+        if self.user.first_name[-1] == 'a':
+            return 'K'
+        else:
+            return 'M'
+
+    @staticmethod
+    def get_actives():
+        return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name')
+
     @staticmethod
     def get_list(begin):
         def next_char(begin):
@@ -210,8 +220,14 @@ class Student(BaseUser):
 
     
     def is_active(self):
-        return (self.status == 0)
-        
+        return self.status == 0
+
+    def get_sex(self):
+        if self.user.first_name[-1] == 'a':
+            return 'K'
+        else:
+            return 'M'
+
     def get_type_of_studies(self):
         """ returns type of studies """
         semestr = {1:'pierwszy',2:'drugi',3:'trzeci',4:'czwarty',5:'piąty',6:'szósty',7:'siódmy',8:'ósmy',9:'dziewiąty',10:'dziesiąty',0:'niezdefiniowany'}[self.semestr]

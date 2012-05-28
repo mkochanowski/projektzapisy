@@ -43,10 +43,13 @@ div.space2 { margin-top: 50px; }
 
 
 #enr-schedulePrototype-top-bar fieldset,
+#enr-proposalsList-top-bar fieldset,
 #enr-coursesList-top-bar fieldset{ float:left; }
 #enr-coursesList-top-bar fieldset legend,
+#enr-proposalsList-top-bar fieldset legend,
 #enr-schedulePrototype-top-bar fieldset legend { font-size:16px; }
 #enr-schedulePrototype-top-bar label,
+#enr-proposalsList-top-bar label,
 #enr-StudentsList-top-bar label,
 #enr-coursesList-top-bar label { float:none; }
 

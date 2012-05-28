@@ -33,7 +33,7 @@ class CourseEntity(models.Model):
                               verbose_name='skrócona nazwa',
                               null=True, blank=True,
                               help_text=u'Opcjonalna skrócona nazwa, używana na np. planie. Przykłady: JFiZO, AiSD')
-    status  = models.IntegerField(choices=statuses, default=1, help_text=u'Wersja robocza widoczna jest jedynie dla jej autora')
+    status   = models.IntegerField(choices=statuses, default=1, help_text=u'Wersja robocza widoczna jest jedynie dla jej autora')
 
     semester = models.CharField(max_length=1, choices=semesters, default='u', verbose_name='semestr')
 
@@ -61,6 +61,7 @@ class CourseEntity(models.Model):
     edited  = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now_add=True)
 
     noremoved = NoRemoved()
+    objects   = models.Manager()
 
     class Meta:
         verbose_name = 'Podstawa przedmiotu'

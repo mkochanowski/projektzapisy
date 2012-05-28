@@ -384,6 +384,10 @@ PIPELINE_JS = {
             'js/jquery/jquery.cookies.2.2.0.min.js',
             'js/jquery/baseExtensions.js',
             'js/main.js',
+            'js/components/topBarFilter.js',
+           	'js/common/listFilter.js',
+           	'js/common/listFilter-courseType.js',
+            'js/offer/proposal/proposals-list.js'
         ),
         'output_filename': 'js/proposal.min.js',
 
