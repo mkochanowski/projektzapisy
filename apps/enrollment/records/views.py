@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import csv
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.shortcuts import redirect
@@ -11,6 +13,7 @@ from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
 from django.core.cache import cache as mcache
+from apps.users.decorators import employee_required
 
 from debug_toolbar.panels.timer import TimerDebugPanel
 from apps.enrollment.courses.models import *
@@ -318,6 +321,24 @@ def records(request, group_id):
         messages.info(request, "Podana grupa nie istnieje.")
         return render_to_response('common/error.html',
             context_instance=RequestContext(request))
+
+@employee_required
+def records_csv(request, group_id):
+    try:
+        students_in_group = Record.get_students_in_group(group_id)
+
+        response = HttpResponse(mimetype='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=group'+ str(group_id) +'.csv'
+
+        writer = UnicodeWriter(response)
+        for s in students_in_group:
+            writer.writerow([s.user.first_name, s.user.last_name, s.matricula])
+
+        return response
+
+    except NonGroupException:
+        raise Http404
+
 
 @login_required
 def own(request):

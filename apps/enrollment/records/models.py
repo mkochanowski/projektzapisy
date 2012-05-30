@@ -153,7 +153,7 @@ class Record(models.Model):
     def get_students_in_group(group_id):
         try:
             group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Record.enrolled.filter(group=group).order_by('student__user__last_name','student__user__first_name'))
+            return map(lambda x: x.student, Record.enrolled.select_related('user').filter(group=group).order_by('student__user__last_name','student__user__first_name'))
         except Group.DoesNotExist:
             raise NonGroupException()
     

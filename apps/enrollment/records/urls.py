@@ -10,6 +10,8 @@ urlpatterns = patterns('apps.enrollment.records.views',
         'set_queue_priority', name='records-set-queue-priority'),
     url('^(?P<group_id>[\d]+)/records$',\
         'records', name='records-group'),
+    url('^(?P<group_id>[\d]+)/records/csv$',\
+        'records_csv', name='records-csv'),
     url('^set-locked(?P<method>\.json)?$',\
         'records_set_locked', name='records-set-locked' ),
 
