@@ -7,7 +7,7 @@ Zmień numer konta bankowego
 {% endblock %}
 
 {% block content %}
-<form action='' method="post" autocomplete="off">
+<form action='' method="post" autocomplete="off">{% csrf_token %}
 	<fieldset>
 		<legend>Zmień numer konta bankowego</legend>
 		{{form.as_p}}

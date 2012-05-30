@@ -7,7 +7,7 @@ Zmień e-mail
 {% endblock %}
 
 {% block content %}
-<form action='' method="post" autocomplete="off">
+<form action='' method="post" autocomplete="off">{% csrf_token %}
 	<fieldset>
         <legend><h2>Zmień adres email</h2></legend>
 		{{form.as_p}}
