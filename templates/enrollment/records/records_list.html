@@ -57,7 +57,7 @@
 		    {% include "enrollment/records/students_list.html" with students=students_in_group %}
         <a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do grupy]</a>
             {% if user.employee %}
-                <a href="{% url records-csv  group.id %}">Wersja CSV</a>{% elif %}
+                <a href="{% url records-csv  group.id %}">Wersja CSV</a>{% endif %}
         {% endif %}
 		<br/>
 		{%if students_in_queue %}
