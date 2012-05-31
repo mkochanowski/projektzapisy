@@ -61,14 +61,23 @@ class CourseInline(admin.TabularInline):
     model = Course
 
 class CourseEntityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'shortName')
-    search_fields = ('name', 'shortName')
+    list_display = ('name', 'shortName', 'owner')
+    search_fields = ('name', 'shortName', 'owner__user__first_name', 'owner__user__last_name' )
     fieldsets = [
         (None,               {'fields': ['name','shortName','type','description'], 'classes': ['long_name']}),
         (None,               {'fields': ['owner']}),
 
     ]
-        
+    list_filter = ('semester', 'owner', 'status', 'type', )
+
+    def queryset(self, request):
+       """
+       Filter the objects displayed in the change_list to only
+       display those for the currently signed in user.
+       """
+       qs = super(CourseEntityAdmin, self).queryset(request)
+       return qs.select_related('owner', 'owner__user', 'type')
+
 class PointsOfCoursesAdmin(admin.ModelAdmin):
     list_display = ('course', 'program','type_of_point','value')
     search_fields = ('course__name', )
