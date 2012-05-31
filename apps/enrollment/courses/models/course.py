@@ -26,6 +26,10 @@ class CourseEntity(models.Model):
 
     statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'),(2, u'Poddana pod głosowanie'),)
     semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
+    ectslist = [(x, str(x)) for x in range(1, 15) ]
+
+    hours = [(15, '15'), (30, '30'), (45, '45'), (60, '60')]
+
     """entity of particular course title"""
     name         = models.CharField(max_length=100,
                               verbose_name='nazwa')
@@ -52,6 +56,13 @@ class CourseEntity(models.Model):
                                 verbose_name='przedmiot prowadzony w j.angielskim')
     exam         = models.BooleanField(verbose_name='egzamin',
                                 default=True)
+
+    web_page     = models.URLField(verbose_name='strona www', null=True, blank=True)
+    ects         = models.IntegerField(choices=ectslist, null=True, blank=True)
+    lectures = models.IntegerField(choices=hours, null=True, blank=True)
+    exercises  = models.IntegerField(choices=hours, null=True, blank=True)
+    laboratories  = models.IntegerField(choices=hours, null=True, blank=True)
+    repetitions = models.IntegerField(choices=hours, null=True, blank=True)
 
     deleted = models.BooleanField(verbose_name='ukryty', default=False)
     owner   = models.ForeignKey('users.Employee', verbose_name='prowadzący', blank=True, null=True)
