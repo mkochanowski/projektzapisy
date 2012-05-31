@@ -65,7 +65,8 @@ class CourseEntityAdmin(admin.ModelAdmin):
     search_fields = ('name', 'shortName', 'owner__user__first_name', 'owner__user__last_name' )
     fieldsets = [
         (None,               {'fields': ['name','shortName','type','description'], 'classes': ['long_name']}),
-        (None,               {'fields': ['owner']}),
+        (None,               {'fields': ['owner', 'status', 'semester', 'requirements']}),
+        (None,               {'fields': ['english', 'exam', 'deleted']}),
 
     ]
     list_filter = ('semester', 'owner', 'status', 'type', )

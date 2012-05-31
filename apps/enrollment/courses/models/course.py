@@ -46,7 +46,7 @@ class CourseEntity(models.Model):
 
     requirements = models.ManyToManyField("self",
                                 verbose_name='wymagane przedmioty',
-                                related_name='+',
+                                symmetrical=False,
                                 blank=True, null=True)
     english      = models.BooleanField(default=False,
                                 verbose_name='przedmiot prowadzony w j.angielskim')
@@ -60,8 +60,8 @@ class CourseEntity(models.Model):
     created = models.DateTimeField(verbose_name='Utworzono', auto_now_add=True)
     edited  = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now=True)
 
-    noremoved = NoRemoved()
     objects   = models.Manager()
+    noremoved = NoRemoved()
 
     class Meta:
         verbose_name = 'Podstawa przedmiotu'
