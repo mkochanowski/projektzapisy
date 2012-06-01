@@ -27,9 +27,9 @@ class VoteFormset():
         self.correction = kwargs.pop('correction', None)
 
         if tag == 'winter':
-            proposals  = CourseEntity.objects.filter(status=2, semester='w', deleted=False)
+            proposals  = CourseEntity.objects.filter(status=2, semester='z', deleted=False)
         elif tag=='summer':
-            proposals  = CourseEntity.objects.filter(status=2, semester='s', deleted=False)
+            proposals  = CourseEntity.objects.filter(status=2, semester='l', deleted=False)
         else:
             tag = 'unknown'
             proposals = CourseEntity.objects.filter(status=2, semester='u', deleted=False)
