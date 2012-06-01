@@ -37,7 +37,7 @@ class SingleVote ( models.Model ):
         verbose_name        = 'pojedynczy głos'
         verbose_name_plural = 'pojedyncze głosy'
         app_label           = 'vote'
-        ordering            = ('student', '-value', 'course')
+        ordering            = ('student', 'entity', '-value' )
         
         unique_together = ('course', 'state', 'student')
         

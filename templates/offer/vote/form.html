@@ -84,7 +84,7 @@
                     {% for field in  form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
-                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                    <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="{% url offer-page form.instance.entity.slug %}">{{ form.instance.entity.name }}</a></label>
                     {% if isCorrectionActive %}
                         <input type="hidden" class="value" value="{{ form.instance.value }}">
                         {{ form.correction }}{% else %}
