@@ -29,11 +29,13 @@ class SystemState( models.Model ):
 
     semester_winter  = models.ForeignKey( Semester,
                     verbose_name= 'Semestr zimowy',
-                    related_name = 'winter_votes')
+                    related_name = 'winter_votes',
+                    null=True, blank=True)
 
     semester_summer = models.ForeignKey( Semester,
                     verbose_name = 'Semestr letni',
-                    related_name = 'summer_votes')
+                    related_name = 'summer_votes',
+                    null=True, blank=True)
 
     year      = models.IntegerField(
                     verbose_name = 'Rok akademicki',
