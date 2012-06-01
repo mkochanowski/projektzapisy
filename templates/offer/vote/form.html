@@ -1,6 +1,8 @@
-{% extends "offer/base.html" %}
+{% extends "offer/vote/index.html" %}
 
-{% block main-subtitle %}Formularz głosowania{% endblock %}
+{% load compressed %}
+
+{% block main-subtitle %}Głosowanie{% endblock %}
 
 {% block main-navigation %}
     <li><a href="/">Strona główna</a></li>
@@ -8,19 +10,12 @@
     <li>Formularz głosowania</li>
 {% endblock %}
 
-{% block styles %}
-    <link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css"/>
-{% endblock %}
+{% block js %}
 
-{% block scripts %}
-{#    <script type="text/javascript" src="/site_media/js/components/topBarFilter.js"></script>#}
-    <script type="text/javascript" src="/site_media/js/components/messageBox.js"></script>
-
-    <script type="text/javascript" src="/site_media/js/common/listFilter.js"></script>
-    <script type="text/javascript" src="/site_media/js/common/listFilter-courseType.js"></script>
-    <script type="text/javascript" src="/site_media/js/offer/vote.js"></script>
-    {% if isCorrectionActive %}
-    <script type="text/javascript" src="/site_media/js/offer/correction.js"></script>
+    {% if not isCorrectionActive %}
+        {% compressed_js 'vote_form' %}
+    {% else %}
+        {% compressed_js 'correction_form' %}
     {% endif %}
 {% endblock %}
 
@@ -57,18 +52,19 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" id="od-vote-form">
+    <form action="" method="post" id="od-vote-form">{% csrf_token %}
         {{ formset.winter.formset.management_form }}
         {{ formset.summer.formset.management_form }}
         {{ formset.unknown.formset.management_form }}
+        {% if formset.winter.formset.total_form_count > 0 %}
         <div class="od-vote-semester" id="od-vote-semester-winter"><h2>Semestr zimowy</h2>
             <ul>
                 {% for form in formset.winter.formset %}
                     {% for field in  form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
-                <li class="od-vote-course winter {% for type in form.instance.course.description.types %} course-type-{{ type.lecture_type.id }}{% endfor %}">
-                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                <li class="od-vote-course winter course-type-{{ form.instance.entity.type.id }}">
+                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="{% url offer-page form.instance.entity.slug %}">{{ form.instance.entity.name }}</a></label>
                     {% if isCorrectionActive %}
                         <input type="hidden" class="value" value="{{ form.instance.value }}">
                         {{ form.correction }}
@@ -79,10 +75,12 @@
                 {% endfor %}
             </ul>
         </div>
+        {% endif %}
+        {% if formset.summer.formset.total_form_count > 0 %}
         <div class="od-vote-semester" id="od-vote-semester-summer"><h2>Semestr letni</h2>
             <ul>
                 {% for form in formset.summer.formset %}
-                <li class="od-vote-course summer {% for type in form.instance.course.description.types %} course-type-{{ type.lecture_type.id }}{% endfor %}">
+                <li class="od-vote-course summer course-type-{{ form.instance.entity.type.id }}">
                     {% for field in  form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
@@ -95,14 +93,16 @@
                 {% endfor %}
             </ul>
         </div>
+        {% endif %}
+        {% if formset.unknown.formset.total_form_count > 0 %}
         <div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr nieokreślony</h2>
             <ul>
                 {% for form in formset.unknown.formset %}
-                <li class="od-vote-course unknown course-type-{{ form.instance.course.description.type.id }}">
+                <li class="od-vote-course unknown course-type-{{ form.instance.entity.type.id }}">
                     {% for field in  form.hidden_fields %}
                         {{ field }}
                     {% endfor %}
-                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="/proposal/{{ form.instance.course.slug }}">{{ form.instance.course }}</a></label>
+                    <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="{% url offer-page form.instance.entity.slug %}">{{ form.instance.entity.name }}</a></label>
                     {% if isCorrectionActive %}
                         <input type="hidden" class="value" value="{{ form.instance.value }}">
                         {{ form.correction }}{% else %}{{ form.value }}
@@ -110,6 +110,7 @@
                 </li>
                 {% endfor %}</ul>
         </div>
+        {% endif %}
 
         <p id="od-vote-submitBar"><input type="submit" value="Głosuj"/></p>
     </form>

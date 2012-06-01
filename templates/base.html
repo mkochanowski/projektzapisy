@@ -140,13 +140,13 @@
             {% block bread %}
             {% endblock %}
         </div>
-
+        {% block messages %}
         {% for message in messages %}
             <div class="alert-message {{ message.tags }}">
                 {{ message }}
             </div>
         {% endfor %}
-
+        {% endblock %}
         {% block filter %}
             {# end filter #}
         {% endblock %}

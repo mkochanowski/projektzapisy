@@ -7,6 +7,7 @@
 from django                   import forms
 from django.core.exceptions   import ObjectDoesNotExist
 from django.utils.safestring  import SafeUnicode
+from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.offer.vote.models import SystemState
 from apps.offer.vote.models import SingleVote
@@ -19,22 +20,19 @@ class VoteFormset():
         Class
     """
     def __init__(self, post, *args, **kwargs):
-        from apps.offer.proposal.models.proposal import Proposal
         from django.forms.models import modelformset_factory
-        from django.db.models import Q
 
         tag             = kwargs.pop('tag',        None)
         student         = kwargs.pop('student',    None)
         self.correction = kwargs.pop('correction', None)
 
         if tag == 'winter':
-            proposals  = Proposal.filtred.filter(status=2, semester='w').select_related('description')
+            proposals  = CourseEntity.objects.filter(status=2, semester='w', deleted=False)
         elif tag=='summer':
-            proposals  = Proposal.filtred.filter(status=2, semester='s').select_related('description')
+            proposals  = CourseEntity.objects.filter(status=2, semester='s', deleted=False)
         else:
             tag = 'unknown'
-            proposals = Proposal.filtred\
-                        .filter(status=2, semester='u').select_related('description')
+            proposals = CourseEntity.objects.filter(status=2, semester='u', deleted=False)
 
         votes = SingleVote.get_votes_for_proposal(student, proposals)
 
@@ -54,7 +52,7 @@ class VoteFormset():
     def points(self):
         counter = 0
 
-        field = 'correction' if self.correction else 'vote'
+        field = 'correction' if self.correction else 'value'
 
         for form in self.formset:
             counter += form.cleaned_data[field]

@@ -25,14 +25,11 @@ class SingleVote ( models.Model ):
 
     course   = models.ForeignKey(Course, null=True, blank=True)
 
-    proposal = models.ForeignKey(Proposal, null=True, blank=True,
-                               verbose_name='przedmiot')
 
     state = models.ForeignKey('vote.SystemState',
                               verbose_name='ustawienia głosowania')
 
-    value = models.IntegerField(choices=votes, default=0, verbose_name='punkty')
-
+    value      = models.IntegerField(choices=votes, default=0, verbose_name='punkty')
     correction = models.IntegerField(choices=votes, default=0, verbose_name='korekta')
 
     	
@@ -110,23 +107,23 @@ class SingleVote ( models.Model ):
 
         year = year if year else date.today().year
 
-        proposals     = Proposal.get_offer()
+        proposals     = CourseEntity.objects.filter(status=2, deleted=False)
         current_state = SystemState.get_state(year)
 
         old_votes = SingleVote.objects.\
                         filter(student=student, state=current_state).\
-                        values_list('course__id', flat=True).order_by('course__id')
+                        values_list('entity__id', flat=True).order_by('entity__id')
 
         new_votes = []
         for proposal in proposals:
             if proposal.id not in old_votes:
-                new_votes.append(proposal)
+                new_votes.append(SingleVote(student=student,
+                                               entity=proposal,
+                                               state=current_state))
 
-        for proposal in new_votes:
-            vote = SingleVote(student=student,
-                               course=proposal,
-                               state=current_state)
-            vote.save()
+        if new_votes:
+            SingleVote.objects.bulk_create(new_votes)
+
 
 
     @staticmethod
@@ -137,13 +134,19 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes         = SingleVote.objects.filter(student=voter, course__in=proposals, state=current_state)\
-                    .select_related('course',
-                                    'course__description',
-                                    'course__description__type')
-        return votes
+
+        return SingleVote.objects.filter(student=voter, entity__in=proposals, state=current_state)\
+                    .select_related('entity',
+                                    'entity__owner',
+                                    'entity__owner__user',
+                                    'entity__type')
+
 
 
     @staticmethod
     def sum_votes( student, state ):
         return SingleVote.objects.filter(student=student, state=state).aggregate(votes=Sum('value'))
+
+
+    def get_vote(self):
+        return self.correction

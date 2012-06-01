@@ -26,7 +26,7 @@ Vote.init = function()
 	$('#od-vote-top-bar').find('label').disableDragging();
 
 	Vote.initCounters();
-	Vote.initFilter();
+//	Vote.initFilter();
 };
 
 $(Vote.init);
@@ -36,6 +36,7 @@ $(Vote.init);
  */
 Vote.initCounters = function()
 {
+    var sum = 0;
 	// licznik punktów dla konkretnego semestru
 	$('div.od-vote-semester').each(function(i, semesterNode)
 	{
@@ -80,10 +81,6 @@ Vote.initCounters = function()
 	maxPointsNode.appendChild(document.createTextNode('.'));
 
 	Vote.totalCoursesCount = $('#od-vote-form').find('select').length;
-	Vote.wantedCoursesCount = $('#od-vote-form').find('.isFan').length;
-
-	if (Vote.wantedCoursesCount == 0)
-		$('#od-vote-onlywanted').assertOne().attr('disabled', true);
 
 	// włączenie liczników
 

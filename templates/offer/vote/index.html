@@ -1,4 +1,5 @@
 {% extends "offer/base.html" %}
+{% load compressed %}
 
 {% block main-subtitle %}Głosowanie{% endblock %}
 
@@ -8,11 +9,16 @@
 	<li>Głosowanie</li>
 {% endblock %}
 
+{% block js %}{% endblock %}
+
 {% block styles %}
-	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
+	{% compressed_css 'vote' %}
 {% endblock %}
 
-{% block content-class %}narrow{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block content-width %}16{% endblock %}
+
 {% block content %}
 	<div id="od-vote-main">
 		{% if isVoteActive %}

@@ -180,6 +180,18 @@ PIPELINE_CSS = {
             'media': 'screen,projection',
         },
     },
+    'vote': {
+        'source_filenames': (
+            'css/bootstrap-1.2.0.css',
+            'css/main.css',
+            'css/fereol.css',
+            'css/offer/vote.css'
+        ),
+        'output_filename': 'css/vote.min.css',
+        'extra_context': {
+            'media': 'screen,projection',
+        },
+    },
 }
 
 PIPELINE_JS = {
@@ -192,6 +204,35 @@ PIPELINE_JS = {
             'js/main.js',
             ),
             'output_filename': 'js/main.min.js',
+        },
+    'vote_form': {
+        'source_filenames': (
+            'js/jquery/jquery-1.5.2.js',
+            'js/jquery/jquery-ui-1.8.17.custom.js',
+            'js/jquery/jquery.cookies.2.2.0.min.js',
+            'js/jquery/baseExtensions.js',
+            'js/main.js',
+            'js/components/messageBox.js',
+            'js/common/listFilter.js',
+            'js/common/listFilter-courseType.js',
+            'js/offer/vote.js'
+            ),
+            'output_filename': 'js/vote_form.min.js',
+        },
+    'correction_form': {
+        'source_filenames': (
+            'js/jquery/jquery-1.5.2.js',
+            'js/jquery/jquery-ui-1.8.17.custom.js',
+            'js/jquery/jquery.cookies.2.2.0.min.js',
+            'js/jquery/baseExtensions.js',
+            'js/main.js',
+            'js/components/messageBox.js',
+            'js/common/listFilter.js',
+            'js/common/listFilter-courseType.js',
+            'js/offer/vote.js',
+            'js/offer/correction.js'
+            ),
+            'output_filename': 'js/correction_form.min.js',
         },
     'connectionchoice': {
         'source_filenames': (

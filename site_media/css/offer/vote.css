@@ -182,7 +182,7 @@
 
 .od-vote-semester ul li select
 {
-    height: 21px;
+    width: 55px;
     float: right;
     padding-left: 10px;
 }
