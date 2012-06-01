@@ -70,7 +70,7 @@ def vote_view( request ):
     """
         View of once given vote
     """
-    votes = SingleVote.get_votes( request.user.student ).order_by('course__name')
+    votes = SingleVote.get_votes( request.user.student )
     summer_votes  = []
     winter_votes  = []
     unknown_votes = []
@@ -95,7 +95,7 @@ def vote_summary( request ):
     """
         summary for vote
     """
-    subs = Proposal.get_vote.order_by('name')
+    subs = Proposal.get_vote().order_by('name')
     
     summer = []
     winter = []

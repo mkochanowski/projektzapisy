@@ -41,23 +41,7 @@ class SystemStateAdminForm( ModelForm ):
             
         return data
         
-    def clean_max_vote(self):
-        """
-            Max vote value validation
-        """
-        data = self.cleaned_data['max_vote']
-        max_points_name = SystemState._meta.get_field_by_name('max_points')[0].verbose_name
-        try:
-            aux = self.cleaned_data['max_points']
-        except KeyError:
-            raise ValidationError(max_points_name + " nie jest \
-                                    poprawnie ustawione. Nie można weryfikować.")
-        
-        if data < aux:
-            raise ValidationError("Musi większa lub równa od " + max_points_name + ".")
-               
-        return data
-        
+
     def clean_vote_beg(self):
         """
             Vote beggining validation

@@ -11,14 +11,14 @@ from datetime  import date
 from apps.enrollment.courses.models.semester import Semester
 
 DEFAULT_YEAR       = date.today().year - 2
-DEFAULT_MAX_POINTS = 30
+DEFAULT_MAX_POINTS = 50
 DEFAULT_MAX_VOTE   = 3
 DEFAULT_DAY_BEG    = 1          #
 DEFAULT_DAY_END    = 31         # Te dane trzeba będzie tak ustawić
 DEFAULT_MONTH_BEG  = 1          # żeby były prawdziwe. Na razie tak
 DEFAULT_MONTH_END  = 7         # jest wygodnie, chociażby do testów
-DEFAULT_VOTE_BEG   = date(DEFAULT_YEAR, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
-DEFAULT_VOTE_END   = date(DEFAULT_YEAR, DEFAULT_MONTH_END, DEFAULT_DAY_END)
+DEFAULT_VOTE_BEG   = date(DEFAULT_YEAR, 6, 10)
+DEFAULT_VOTE_END   = date(DEFAULT_YEAR, 7, 10)
 DEFAULT_CORRECTION_BEG   = date(DEFAULT_YEAR, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
 DEFAULT_CORRECTION_END   = date(DEFAULT_YEAR, DEFAULT_MONTH_END, DEFAULT_DAY_END)
 
@@ -96,10 +96,10 @@ class SystemState( models.Model ):
         new_state = SystemState()
         new_state.year      = year
         new_state.max_points = DEFAULT_MAX_POINTS
-        new_state.vote_beg   = date(year, DEFAULT_MONTH_BEG, DEFAULT_DAY_BEG)
-        new_state.vote_end   = date(year, DEFAULT_MONTH_END, DEFAULT_DAY_END)
-        new_state.correction_beg   = date(year, DEFAULT_MONTH_END+1, DEFAULT_DAY_BEG)
-        new_state.correction_end   = date(year, 12, DEFAULT_DAY_END)
+        new_state.vote_beg   = date(year, 6, 10)
+        new_state.vote_end   = date(year, 7, 10)
+        new_state.correction_beg   = date(year, 9, 10)
+        new_state.correction_end   = date(year, 9, 20)
         new_state.save()
         return new_state
 
