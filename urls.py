@@ -39,7 +39,7 @@ urlpatterns = patterns('',
     (r'^fereol_admin/users/import_zamawiani', 'apps.users.admin.views.import_zamawiani'),
     (r'^fereol_admin/users/import_new_zamawiani', 'apps.users.admin.views.import_new_zamawiani'),
     (r'^offer', include('apps.offer.proposal.urls')),
-    (r'^vote', include('apps.offer.vote.urls')),
+    (r'^vote/', include('apps.offer.vote.urls')),
     (r'^fereol_admin/', include(admin.site.urls)),
 
 )
