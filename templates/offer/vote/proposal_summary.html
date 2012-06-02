@@ -31,8 +31,8 @@
 				<tbody>
 					{% for voter in voters %}
 						<tr>
-							<td>{{ voter.user.first_name }}</td>
-							<td>{{ voter.user.last_name }}</td>
+							<td>{{ voter.student.user.first_name }}</td>
+							<td>{{ voter.student.user.last_name }}</td>
 							<td class="number">{{ voter.correction   }}</td>
 						</tr>
 					{% endfor %}
