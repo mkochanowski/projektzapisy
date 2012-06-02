@@ -29,6 +29,8 @@ def vote( request ):
     if not state.is_system_active():
         raise Http404
 
+    SingleVote.make_votes(student)
+
     kwargs = {}
     kwargs['student'] = student
     kwargs['state']   = state
@@ -48,8 +50,7 @@ def vote( request ):
             for error in formset.errors:
                 messages.error(request, error)
 
-    else:
-        SingleVote.make_votes(student)
+
 
     data = { 'formset':             formset,
              'proposalTypes':       Type.objects.all().select_related('group'),
