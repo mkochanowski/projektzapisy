@@ -432,6 +432,30 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/proposal.min.js',
 
+    },
+
+    'proposal_edit': {
+        'source_filenames': (
+            'js/jquery/jquery-1.5.2.js',
+            'js/jquery/jquery-ui-1.8.17.custom.js',
+            'js/jquery/jquery.cookies.2.2.0.min.js',
+            'js/jquery/baseExtensions.js',
+            'js/main.js',
+        
+        'admin/js/core.js',
+        'admin/js/admin/RelatedObjectLookups.js',
+        'admin/js/jquery.js',
+        'admin/js/jquery.init.js',
+        'admin/js/actions.js',
+        'admin/js/urlify.js',
+        'admin/js/prepopulate.js',
+        'admin/js/SelectBox.js',
+        'admin/js/SelectFilter2.js',
+        'js/tiny_mce/tiny_mce.js',
+        'js/offer/proposal/proposal.js'
+
+        ),
+        'output_filename': 'js/proposal_form.min.js',
 
     }
 }

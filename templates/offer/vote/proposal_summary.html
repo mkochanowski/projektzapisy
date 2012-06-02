@@ -1,4 +1,4 @@
-{% extends "offer/base.html" %}
+{% extends "offer/vote/summary.html" %}
 
 {% block main-subtitle %}Podsumowanie głosowania: {{ proposal.name }}{% endblock %}
 
@@ -10,11 +10,7 @@
 	<li>{{ proposal.name }}</li>
 {% endblock %}
 
-{% block styles %}
-	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
-{% endblock %}
 
-{% block content-class %}narrow{% endblock %}
 {% block content %}
 	<div id="od-vote-summary-proposal">
 		<h2>Podsumowanie głosowania: {{ proposal.name }}</h2>
@@ -29,7 +25,7 @@
 					<tr>
 						<th>Imię</th>
 						<th>Nazwisko</th>
-						<th title="Ilość punktów, jakie student przeznaczył na ten przedmiot">Punkty</th>
+						<th title="Liczba punktów, jakie student przeznaczył na ten przedmiot">Punkty</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,7 +33,7 @@
 						<tr>
 							<td>{{ voter.user.first_name }}</td>
 							<td>{{ voter.user.last_name }}</td>
-							<td class="number">{{ voter.points }}</td>
+							<td class="number">{{ voter.correction   }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>

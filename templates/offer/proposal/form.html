@@ -1,15 +1,11 @@
 {% extends 'offer/proposal/proposal.html' %}
+{% load compressed %}
 {% block js %}
-    {{ block.super }}
     <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
     <script type="text/javascript">window.__admin_media_prefix__ = "/static/admin/";</script>
     <script type="text/javascript" src="/fereol_admin/jsi18n/"></script>
-    <script type="text/javascript" src="/static/admin/js/core.js"></script>
-    <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
-    <script type="text/javascript" src="/static/admin/js/jquery.js"></script>
-    <script type="text/javascript" src="/static/admin/js/jquery.init.js"></script><script type="text/javascript" src="/static/admin/js/actions.js"></script><script type="text/javascript" src="/static/admin/js/urlify.js"></script><script type="text/javascript" src="/static/admin/js/prepopulate.js"></script><script type="text/javascript" src="/static/admin/js/SelectBox.js">
-
-    </script><script type="text/javascript" src="/static/admin/js/SelectFilter2.js"></script><style>label { width: 50px;}</style>
+    {% compressed_js 'proposal_edit' %}
+    <style>label { width: 50px;}</style>
 {% endblock %}
 
 

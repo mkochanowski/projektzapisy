@@ -1,0 +1,23 @@
+<h3>{{ label }}</h3>
+
+<table>
+<thead>
+<tr>
+<th>Przedmiot</th>
+<th title="Suma punktów w głosach oddanych na przedmiot">Punktów</th>
+<th title="Liczba osób głosujących na przedmiot">Głosów</th>
+    <th></th>
+</tr>
+</thead>
+<tbody>
+{% for row in semester %}
+<tr>
+<td>{{ row.2.name }}</td>
+<td class="number">{{ row.0 }}</td>
+<td class="number">{{ row.1 }}</td>
+<td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>

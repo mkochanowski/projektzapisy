@@ -94,6 +94,17 @@ class CourseEntity(models.Model):
             self.slug = slugify('%s' % (self.name,))
         super(CourseEntity, self).save(*args, **kwargs)
 
+    def is_summer(self):
+        return self.semester == 'l'
+
+    def is_winter(self):
+        return self.semester == 'z'
+
+    @staticmethod
+    def get_vote():
+        return CourseEntity.noremoved.filter(status=2)
+
+
     @staticmethod
     def get_proposals():
         return CourseEntity.noremoved.filter(status__gte=1)

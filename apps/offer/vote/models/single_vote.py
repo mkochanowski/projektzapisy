@@ -54,7 +54,7 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( student=voter, state=current_state)
+        votes = SingleVote.objects.filter( student=voter, state=current_state,correction__gte=1).select_related('student','student__user', 'entity')
         return votes
 
     @staticmethod
@@ -65,13 +65,15 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( course = proposal, state=current_state )
+        votes = SingleVote.objects.filter( entity = proposal, state=current_state, correction__gte=1 )\
+                    .select_related('student','student__user', 'entity')
         value = 0
-        voters = votes.count()
+        voters = 0
         for vote in votes:
             value += vote.correction
+            voters += 1
 
-        return value, voters
+        return value, voters, votes
 
     @staticmethod
     def get_voters( proposal, year=None ):
@@ -81,7 +83,7 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( course = proposal, state=current_state )
+        votes = SingleVote.objects.filter( entity = proposal, state=current_state ).select_related('student', 'student__user')
 
         voters = []
         for vote in votes:

@@ -6,10 +6,12 @@
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http                    import HttpResponseRedirect, Http404
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
+from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.offer.vote.models                   import SingleVote, SystemState
 from apps.offer.proposal.models               import Proposal
@@ -75,14 +77,14 @@ def vote_view( request ):
     winter_votes  = []
     unknown_votes = []
     vote_sum      = 0
-    for vote_ in votes:
-        vote_sum = vote_sum + vote_.value
-        if   vote_.course.in_summer():
-            summer_votes.append(vote_)
-        elif vote_.course.in_winter():
-            winter_votes.append(vote_)
+    for vote in votes:
+        vote_sum = vote_sum + vote.correction
+        if   vote.entity.is_summer():
+            summer_votes.append(vote)
+        elif vote.entity.is_winter():
+            winter_votes.append(vote)
         else:
-            unknown_votes.append(vote_)
+            unknown_votes.append(vote)
             
     data = {  'summer_votes'  : summer_votes,
               'winter_votes'  : winter_votes,
@@ -95,21 +97,21 @@ def vote_summary( request ):
     """
         summary for vote
     """
-    subs = Proposal.get_vote().order_by('name')
+    subs = CourseEntity.get_vote()
     
     summer = []
     winter = []
     unknown = []
     
     for sub in subs:
-        points, voters = SingleVote.get_points_and_voters( sub )
+        points, voters_count, _ = SingleVote.get_points_and_voters( sub )
         
-        if sub.in_winter():
-            winter.append( (points, voters, sub) )
-        elif sub.in_summer():
-            summer.append( (points, voters, sub) )
+        if sub.is_winter():
+            winter.append( (points, voters_count, sub) )
+        elif sub.is_summer():
+            summer.append( (points, voters_count, sub) )
         else:
-            unknown.append( (points, voters, sub) )
+            unknown.append( (points, voters_count, sub) )
             
     data = { 'winter'  : winter,
              'summer'  : summer,
@@ -121,10 +123,13 @@ def proposal_vote_summary( request, slug ):
     """
         Summary for given course
     """
-    course = Proposal.filtred.get( slug=slug )
-    points, votes = SingleVote.get_points_and_voters( course )
-    voters = SingleVote.get_voters( course )
-    
+    try:
+        course = CourseEntity.noremoved.get( slug=slug )
+    except ObjectDoesNotExist:
+        raise Http404
+
+    points, votes, voters = SingleVote.get_points_and_voters( course )
+
     data = { 'proposal' : course,
              'points'   : points,
              'votes'    : votes,

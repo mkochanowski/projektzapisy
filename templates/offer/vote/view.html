@@ -1,4 +1,4 @@
-{% extends "offer/base.html" %}
+{% extends "offer/vote/summary.html" %}
 
 {% block main-subtitle %}Pokaż mój głos{% endblock %}
 
@@ -8,11 +8,6 @@
 	<li>Pokaż mój głos</li>
 {% endblock %}
 
-{% block styles %}
-	<link rel="stylesheet" href="/site_media/css/offer/vote.css" type="text/css" />
-{% endblock %}
-
-{% block content-class %}narrow{% endblock %}
 {% block content %}
 	<div id="od-vote-view">
 		<h2>Podsumowanie głosowania (<a href="{% url vote %}">głosuj</a>)</h2>
@@ -22,7 +17,7 @@
 					<li><span>Semestr zimowy</span>
 						<ul>
 							{% for vote in winter_votes %}
-								<li><span>{{ vote.course.name }}</span> {{ vote.value }}</li>
+								<li><span>{{ vote.entity.name }}</span> {{ vote.correction }}</li>
 							{% endfor %}
 						</ul>
 					</li>
@@ -32,7 +27,7 @@
 					<li><span>Semestr letni</span>
 						<ul>
 							{% for vote in summer_votes %}
-								<li><span>{{ vote.course.name }}</span> {{ vote.value }}</li>
+								<li><span>{{ vote.entity.name }}</span> {{ vote.correction }}</li>
 							{% endfor %}
 						</ul>
 					</li>
@@ -42,7 +37,7 @@
 					<li><span>Semestr nieokreślony</span>
 						<ul>
 							{% for vote in unknown_votes %}
-								<li><span>{{ vote.course.name }}</span> {{ vote.value }}</li>
+								<li><span>{{ vote.entity.name }}</span> {{ vote.correction }}</li>
 							{% endfor %}
 						</ul>
 					</li>
