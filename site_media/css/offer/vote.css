@@ -110,7 +110,7 @@
 
 .od-vote-semester
 {
-    width: 420px;
+    width: 460px;
     float: left;
     margin: 5px;
     margin-bottom: 35px;
@@ -191,7 +191,8 @@
 {
     position: relative;
     top: 2px;
-    width: 320px;
+    width: 365px;
+    text-align: left;
 }
 
 /*** LISTY PRZEDMIOTÓW W SEMESTRZE - FORMULARZ - koniec ***/
