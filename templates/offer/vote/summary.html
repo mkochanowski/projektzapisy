@@ -25,14 +25,14 @@
         {% if winter or summer or unknown %}
 
         {% if winter %}
-            {% include 'offer/proposal/summary_table.html' with semester=winter label='Semester zimowy' %}
+            {% include 'offer/proposal/summary_table.html' with semester=winter label='Semestr zimowy' %}
         {% endif %}
         {% if summer %}
-            {% include 'offer/proposal/summary_table.html' with semester=summer label='Semester letni' %}
+            {% include 'offer/proposal/summary_table.html' with semester=summer label='Semestr letni' %}
         {% endif %}
 
         {% if unknown %}
-            {% include 'offer/proposal/summary_table.html' with semester=unknown label='Semester nieoznaczony' %}
+            {% include 'offer/proposal/summary_table.html' with semester=unknown label='Semestr nieoznaczony' %}
         {% endif %}
 
 		{% else %}
