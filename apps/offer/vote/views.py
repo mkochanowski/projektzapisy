@@ -31,9 +31,7 @@ def vote( request ):
 
     SingleVote.make_votes(student)
 
-    kwargs = {}
-    kwargs['student'] = student
-    kwargs['state']   = state
+    kwargs = {'student': student, 'state': state}
     if request.method == 'POST':
         kwargs['post'] = request.POST
 

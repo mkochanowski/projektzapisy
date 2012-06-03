@@ -12,7 +12,7 @@
 <tbody>
 {% for row in semester %}
 <tr>
-<td>{{ row.2.name }}</td>
+<td>{% url  %}{{ row.2.name }}</td>
 <td class="number">{{ row.0 }}</td>
 <td class="number">{{ row.1 }}</td>
 <td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>

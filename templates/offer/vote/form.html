@@ -4,14 +4,17 @@
 
 {% block main-subtitle %}Głosowanie{% endblock %}
 
-{% block main-navigation %}
-    <li><a href="/">Strona główna</a></li>
-    <li><a href="{% url vote-main %}">Głosowanie</a></li>
-    <li>Formularz głosowania</li>
+
+{% block bread %}
+    <a href="/">Strona główna</a> &raquo;
+    <a href="{% url offer-main %}">Oferta dydaktyczna</a> &raquo;
+    <a href="{% url vote-main %}">Głosowanie</a> &raquo;
+    Oddaj głos
+    {# end bread #}
 {% endblock %}
 
-{% block js %}
 
+{% block js %}
     {% if not isCorrectionActive %}
         {% compressed_js 'vote_form' %}
     {% else %}
