@@ -57,16 +57,16 @@ def vote( request ):
 
     return render_to_response ('offer/vote/form.html', data, context_instance = RequestContext( request ))
 
+@login_required
 def vote_main( request ):
     """
         Vote main page
     """
     sytem_state = SystemState.get_state()
-    data = { 'isVoteActive' : sytem_state.is_system_active() }
+    data        = { 'isVoteActive' : sytem_state.is_system_active() }
     return render_to_response ('offer/vote/index.html', data, context_instance = RequestContext( request ))
 
 
-@student_required
 def vote_view( request ):
     """
         View of once given vote
@@ -117,7 +117,9 @@ def vote_summary( request ):
              'unknown' : unknown, }
             
     return render_to_response('offer/vote/summary.html', data, context_instance = RequestContext( request ))
-    
+
+
+@login_required
 def proposal_vote_summary( request, slug ):
     """
         Summary for given course
