@@ -57,7 +57,6 @@ def vote( request ):
 
     return render_to_response ('offer/vote/form.html', data, context_instance = RequestContext( request ))
 
-@student_required
 def vote_main( request ):
     """
         Vote main page
