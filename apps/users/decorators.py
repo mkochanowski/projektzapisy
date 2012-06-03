@@ -16,8 +16,11 @@ def student_required(function=None,
     """
     def test_f(user):
         try:
-            user.student
-            return True
+            sth = user.student
+            if sth:
+                return True
+            else:
+                return False
         except AttributeError:
             return False
         except Student.DoesNotExist:
@@ -34,8 +37,11 @@ def employee_required(function=None,
     """
     def test_f(user):
         try:
-            user.employee
-            return True
+            sth = user.employee
+            if sth:
+                return True
+            else:
+                return False
         except AttributeError:
             return False
         except Employee.DoesNotExist:
