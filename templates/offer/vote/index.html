@@ -48,7 +48,7 @@
 				</ol>
 			</div>
 
-			<p class="link"><a href="{% url vote %}">Głosuj</a></p>
+			{% if user.student %}<p class="link"><a href="{% url vote %}">Głosuj</a></p>{% endif %}
 		{% elif isCorrectionActive %}
             <div id="od-correction-main-rules">
 				<!--
