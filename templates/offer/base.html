@@ -21,6 +21,9 @@
     {% if user.employee %}
     <li{% block enrollment_menu_courses %}{% endblock %}><a
             href="{% url my-proposal %}">Moje Propozycje</a></li>{% endif %}
+    {% if user.employee or user.student %}
+    <li{% block offer_menu_vote %}{% endblock %}><a
+            href="{% url vote-main %}">Głosowanie</a></li>{% endif %}
 
     {# end system_menu #}
 {% endblock %}

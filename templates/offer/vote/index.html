@@ -3,10 +3,13 @@
 
 {% block main-subtitle %}Głosowanie{% endblock %}
 
-{% block main-navigation %}
-	<li><a href="/">Strona główna</a></li>
-	<li><a href="{% url offer-main %}">Oferta</a></li>
-	<li>Głosowanie</li>
+{% block offer_menu_vote %} class="active"{% endblock %}
+
+{% block bread %}
+    <a href="/">Strona główna</a> &raquo;
+    <a href="{% url offer-main %}">Oferta dydaktyczna</a> &raquo;
+    <h2>Głosowanie</h2>
+    {# end bread #}
 {% endblock %}
 
 {% block js %}{% endblock %}
@@ -22,16 +25,31 @@
 {% block content %}
 	<div id="od-vote-main">
 		{% if isVoteActive %}
-			<h2>Zasady głosowania</h2>
+			<h3>Zasady głosowania</h3>
 			<div id="od-vote-main-rules">
-				<!--
-					TU FAJNIE BYŁOBY DAĆ JAKIEŚ PRAWDZIWE ZASADY :)
-				-->
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas fringilla nulla sed nibh porta ultricies. Fusce lobortis nibh at ante consectetur gravida. Cras varius, nibh sit amet semper ornare, metus velit euismod eros, a lobortis ipsum sem eget nulla. Ut sagittis sodales ligula, ac congue erat mattis ut. Proin velit massa, dapibus venenatis rutrum vitae, malesuada id lacus. Suspendisse potenti. Etiam fermentum eros a lacus facilisis pulvinar. Phasellus interdum aliquet lacus, quis molestie arcu interdum commodo. Integer pellentesque sodales lorem, in suscipit metus imperdiet vel. Aliquam erat volutpat. Integer pharetra vestibulum odio eget congue. Pellentesque pellentesque enim eget nisl pulvinar vitae fringilla nisi molestie.
+				<ol>
+                    <li><h4>Cele</h4>
+                        <p>
+                            Głosowanie ma na celu wybór przedmiotów na przyszły rok akademicki oraz zoptymalizowanie planu.
+                        </p>
+                    </li>
+                    <li><h4>Przebieg</h4>
+                        <p>Student może przyznać każdemu przedmiotowi <strong>0-1-2-3 punkty</strong>, sygnalizując swoje zainteresowanie przedmiotem.
+                            Suma przyznanych punktów nie może przekroczyć <strong>50</strong>. Swój głos można zmieniać do czasu zakończenia głosowania.
+                        </p>
+                    </li>
+                    <li><h4>Bonus/marchewka</h4>
+                        <p>Każdy oddany punkt na przedmiot daje <strong>24 godzinny bonus</strong> (maksymalnie 72 godziny) otwarcia zapisów na niego.</p>
+                    </li>
+                    <li><h4>Przedmioty 'przegrane'</h4>
+                        <p>Przed rozpoczęciem semestru odbędzie się korekta, podczas której można będzie ponownie przydzielić punkty, które zostały przyznane na przedmioty,
+                        które nie będą prowadzone w tym roku.</p>
+                    </li>
+				</ol>
 			</div>
 
 			<p class="link"><a href="{% url vote %}">Głosuj</a></p>
-		{% else %}{% if isCorrectionActive %}
+		{% elif isCorrectionActive %}
             <div id="od-correction-main-rules">
 				<!--
 					TU FAJNIE BYŁOBY DAĆ JAKIEŚ PRAWDZIWE ZASADY :)
@@ -41,7 +59,7 @@
         {% else %}
 			<p class="disabled-link">Głosowanie nie jest w tej chwili aktywne.</p>
 		{% endif %}
-    {% endif %}
+
 		<p class="link"><a href="{% url vote-summary %}">Podsumowanie głosowania</a></p>
 		<p class="link"><a href="{% url vote-view %}">Pokaż mój głos</a></p>
 	</div>

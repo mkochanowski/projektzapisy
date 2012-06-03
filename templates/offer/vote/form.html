@@ -5,11 +5,12 @@
 {% block main-subtitle %}Głosowanie{% endblock %}
 
 
+
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
     <a href="{% url offer-main %}">Oferta dydaktyczna</a> &raquo;
     <a href="{% url vote-main %}">Głosowanie</a> &raquo;
-    Oddaj głos
+    <h2>Oddaj głos</h2>
     {# end bread #}
 {% endblock %}
 
@@ -22,7 +23,7 @@
     {% endif %}
 {% endblock %}
 
-{% block top-bar %}
+{% block filter %}
     <div id="od-vote-top-bar" class="main-top-bar" style="display: none">
         <fieldset id="od-vote-filter">
             <legend><span>Filtrowanie</span></legend>
@@ -55,67 +56,21 @@
 {% endblock %}
 
 {% block content %}
+    <div id="od-vote-maxPoints">Maksymalna liczba punktów do wykorzystania: <span>{{ formset.points_limit }}</span></div>
     <form action="" method="post" id="od-vote-form">{% csrf_token %}
         {{ formset.winter.formset.management_form }}
         {{ formset.summer.formset.management_form }}
         {{ formset.unknown.formset.management_form }}
         {% if formset.winter.formset.total_form_count > 0 %}
-        <div class="od-vote-semester" id="od-vote-semester-winter"><h2>Semestr zimowy</h2>
-            <ul>
-                {% for form in formset.winter.formset %}
-                    {% for field in  form.hidden_fields %}
-                        {{ field }}
-                    {% endfor %}
-                <li class="od-vote-course winter course-type-{{ form.instance.entity.type.id }}">
-                   <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="{% url offer-page form.instance.entity.slug %}">{{ form.instance.entity.name }}</a></label>
-                    {% if isCorrectionActive %}
-                        <input type="hidden" class="value" value="{{ form.instance.value }}">
-                        {{ form.correction }}
-                    {% else %}
-                        {{ form.value }}
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
+            {% include 'offer/vote/vote_li.html' with label='Semestr zimowy' semester='winter' formset=formset.winter.formset %}
         {% endif %}
         {% if formset.summer.formset.total_form_count > 0 %}
-        <div class="od-vote-semester" id="od-vote-semester-summer"><h2>Semestr letni</h2>
-            <ul>
-                {% for form in formset.summer.formset %}
-                <li class="od-vote-course summer course-type-{{ form.instance.entity.type.id }}">
-                    {% for field in  form.hidden_fields %}
-                        {{ field }}
-                    {% endfor %}
-                    <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="{% url offer-page form.instance.entity.slug %}">{{ form.instance.entity.name }}</a></label>
-                    {% if isCorrectionActive %}
-                        <input type="hidden" class="value" value="{{ form.instance.value }}">
-                        {{ form.correction }}{% else %}
-                        {{ form.value }}{% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
+            {% include 'offer/vote/vote_li.html' with label='Semestr letni' semester='summer' formset=formset.summer.formset %}
         {% endif %}
         {% if formset.unknown.formset.total_form_count > 0 %}
-        <div class="od-vote-semester" id="od-vote-semester-unknown"><h2>Semestr nieokreślony</h2>
-            <ul>
-                {% for form in formset.unknown.formset %}
-                <li class="od-vote-course unknown course-type-{{ form.instance.entity.type.id }}">
-                    {% for field in  form.hidden_fields %}
-                        {{ field }}
-                    {% endfor %}
-                    <label for="id_{% if isCorrectionActive %}{{ form.correction.html_name }}{% else %}{{ form.value.html_name }}{% endif %}"><a href="{% url offer-page form.instance.entity.slug %}">{{ form.instance.entity.name }}</a></label>
-                    {% if isCorrectionActive %}
-                        <input type="hidden" class="value" value="{{ form.instance.value }}">
-                        {{ form.correction }}{% else %}{{ form.value }}
-                    {% endif %}
-                </li>
-                {% endfor %}</ul>
-        </div>
+            {% include 'offer/vote/vote_li.html' with label='Semestr nieokreślony' semester='unknown' formset=formset.unknown.formset %}
         {% endif %}
 
-        <p id="od-vote-submitBar"><input type="submit" value="Głosuj"/></p>
+        <p id="od-vote-submitBar"><input type="submit" class="btn success" value="Głosuj"/></p>
     </form>
-       <p id="od-vote-maxPoints">Maksymalna liczba punktów do wykorzystania: <span>{{ formset.points_limit }}</span></p>
 {% endblock %}

@@ -12,18 +12,20 @@ Vote = Object();
 Vote.init = function()
 {
 	// weryfikacja formularza (i tak potem jest to sprawdzane po stronie serwera)
-	$('#od-vote-form').submit(function()
-	{
-		MessageBox.clear();
-		Vote.refreshCounters();
-		if (Vote.totalPoints <= Vote.maxPoints)
-			return true;
-		MessageBox.display('Przekroczono limit głosowania. Limit wynosi ' +
-			Vote.maxPoints + ', a oddano głos o watości ' + Vote.totalPoints + '.');
-		return false;
-	});
+
 
 	$('#od-vote-top-bar').find('label').disableDragging();
+
+    $('.od-vote-course > select').change(function(){
+        var el = $(this),
+            li = $(this).parent();
+
+        if( el.val() == 0 ){
+            li.removeClass('changed').addClass('removed');
+        } else {
+            li.addClass('changed').removeClass('removed');
+        }
+    })
 
 	Vote.initCounters();
 //	Vote.initFilter();

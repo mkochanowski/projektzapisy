@@ -7,14 +7,13 @@
     <a href="{% url offer-main %}">Oferta dydaktyczna</a> &raquo;
     <a href="{% url vote-main %}">Głosowanie</a> &raquo;
     <a href="{% url vote-summary %}">Podsumowanie</a> &raquo;
-    {{ proposal.name }}
+    <h2>{{ proposal.name }}</h2>
     {# end bread #}
 {% endblock %}
 
 
 {% block content %}
 	<div id="od-vote-summary-proposal">
-		<h2>Podsumowanie głosowania: {{ proposal.name }}</h2>
 		<p>
 			Na ten przedmiot zagłosowało osób: <strong>{{ votes }}</strong>;
 			oddając punktów: <strong>{{ points }}</strong>.
@@ -26,6 +25,7 @@
 					<tr>
 						<th>Imię</th>
 						<th>Nazwisko</th>
+                        <th>Numer indeksu</th>
 						<th title="Liczba punktów, jakie student przeznaczył na ten przedmiot">Punkty</th>
 					</tr>
 				</thead>
@@ -34,6 +34,7 @@
 						<tr>
 							<td>{{ voter.student.user.first_name }}</td>
 							<td>{{ voter.student.user.last_name }}</td>
+							<td>{{ voter.student.matricula }}</td>
 							<td class="number">{{ voter.correction   }}</td>
 						</tr>
 					{% endfor %}

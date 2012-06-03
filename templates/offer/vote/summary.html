@@ -13,7 +13,7 @@
     <a href="/">Strona główna</a> &raquo;
     <a href="{% url offer-main %}">Oferta dydaktyczna</a> &raquo;
     <a href="{% url vote-main %}">Głosowanie</a> &raquo;
-    Podsumowanie
+    <h2>Podsumowanie (<a href="{% url vote %}">głosuj</a>)</h2>
     {# end bread #}
 {% endblock %}
 
@@ -21,7 +21,6 @@
 {% block content-width %}16{% endblock %}
 {% block content %}
 	<div id="od-vote-summary">
-		<h2>Podsumowanie głosowania (<a href="{% url vote %}">głosuj</a>)</h2>
 
         {% if winter or summer or unknown %}
 

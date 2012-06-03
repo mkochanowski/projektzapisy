@@ -42,6 +42,7 @@ def vote( request ):
         if formset.is_valid():
             formset.save()
             messages.success( request, "Oddano poprawny głos" )
+            return redirect('vote')
 
         else:
             messages.error( request, "Nie udało się oddać głosu" )
