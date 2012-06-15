@@ -54,7 +54,8 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( student=voter, state=current_state,correction__gte=1).select_related('student','student__user', 'entity')
+        votes = SingleVote.objects.filter( student=voter, state=current_state,correction__gte=1)\
+                                  .select_related('student','student__user', 'entity')
         return votes
 
     @staticmethod

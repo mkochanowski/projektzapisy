@@ -28,7 +28,7 @@ class VoteFormset():
 
         if tag == 'winter':
             proposals  = CourseEntity.objects.filter(status=2, semester='z', deleted=False)
-        elif tag=='summer':
+        elif tag == 'summer':
             proposals  = CourseEntity.objects.filter(status=2, semester='l', deleted=False)
         else:
             tag = 'unknown'
@@ -55,7 +55,8 @@ class VoteFormset():
         field = 'correction' if self.correction else 'value'
 
         for form in self.formset:
-            counter += form.cleaned_data[field]
+            if not form.instance.entity.type.free_in_vote:
+                counter += form.cleaned_data[field]
 
         return counter
 

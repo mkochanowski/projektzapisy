@@ -9,6 +9,7 @@ class Type(models.Model):
     short_name  = models.CharField(max_length=5, verbose_name='rodzaj zajec (króŧka forma)', default="", unique=False)
     group     = models.ForeignKey("self", null=True, blank=True, verbose_name='grupa')
     meta_type = models.BooleanField(default = False, verbose_name ='Grupa typow')
+    free_in_vote = models.BooleanField(default=False)
 	#TODO: dodać unique na parę (meta_type, name)
     
     @staticmethod

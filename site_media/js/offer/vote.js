@@ -56,10 +56,13 @@ Vote.initCounters = function()
 			var count = 0;
 			for (var i = 0; i < votes.length; i++)
 			{
-				var voteValue = parseInt($.trim(votes[i].value));
-				if (isNaN(voteValue) || voteValue < 0)
-					throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
-				count += voteValue;
+                if (!( $(votes[i]).parent().find('.proposal-type-is_free').val() === 'True') ){
+
+                    var voteValue = parseInt($.trim(votes[i].value));
+                    if (isNaN(voteValue) || voteValue < 0)
+                        throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
+                    count += voteValue;
+                }
 			}
 
 			$(counter).text(count);
@@ -102,10 +105,12 @@ Vote.refreshCounters = function()
 
 	for (var i = 0; i < votes.length; i++)
 	{
+        if (!( $(votes[i]).parent().find('.proposal-type-is_free').val() === 'True') ){
 		var voteValue = parseInt($.trim(votes[i].value));
 		if (isNaN(voteValue) || voteValue < 0)
 			throw new Error('Vote.refreshCounters: nieprawidłowa wartość głosu');
 		totalPoints += voteValue;
+        }
 	}
 
 	$(Vote.maxPointsNode).text(totalPoints + ' z ' + Vote.maxPoints);
