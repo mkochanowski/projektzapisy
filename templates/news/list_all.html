@@ -65,6 +65,15 @@ u
                     </div>
                 {% endfor %}
             </div>
+            <div class="pagination">
+              <ul>
+                <li class="prev{% if not items.has_previous %} disabled{% endif %}"><a {% if items.has_previous %}href="?page={{ items.previous_page_number }}"{% endif %}>&larr; Poprzednia</a></li>
+                {% for index in page_range %}
+                  <li{% if index == items.page %} class="active"{% endif %}><a href="?page={{ index }}">{{ index }}</a></li>
+                {% endfor %}
+                <li class="next{% if not items.has_next %} disabled{% endif %}"><a {% if items.has_next %}href="?page={{ items.next_page_number }}"{% endif %}>Następna &rarr;</a></li>
+              </ul>
+            </div>
         {% else %}
             <p>Nie ma ogłoszeń pasujących do zapytania.</p>
         {% endif %}

@@ -3,6 +3,8 @@
 """
     News views
 """
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -29,7 +31,14 @@ def all_news(request):
         employee.save()
 
     items = News.objects.exclude(category='-')
-    data  = {'items': items}
+    paginator = Paginator(items, 15)
+    page = request.GET.get('page')
+    try:
+        news = paginator.page(page)
+    except (PageNotAnInteger, EmptyPage):
+        news = paginator.page(1)
+
+    data  = {'items': news, 'page_range': paginator.page_range}
 
     return render_to_response('news/list_all.html', data, context_instance = RequestContext(request))
 
