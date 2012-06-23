@@ -15,6 +15,8 @@ class TimerDebugPanel(DebugPanel):
     name = 'Timer'
     template = 'debug_toolbar/panels/timer.html'
 
+    timers = {}
+
     try:  # if resource module not available, don't show content panel
         resource
     except NameError:
@@ -23,6 +25,14 @@ class TimerDebugPanel(DebugPanel):
     else:
         has_content = True
         has_resource = True
+
+    @staticmethod
+    def timer_start(id, name):
+        TimerDebugPanel.timers[id] = {
+            'name': name,
+            'start': time.time(),
+            'stop': None
+        }
 
     def process_request(self, request):
         self._start_time = time.time()
@@ -92,6 +102,15 @@ class TimerDebugPanel(DebugPanel):
 #            ('Page faults', '%d no i/o, %d requiring i/o' % (stats['minflt'], stats['majflt'])),
 #            ('Disk operations', '%d in, %d out, %d swapout' % (stats['blkin'], stats['blkout'], stats['swap'])),
         )
+
+        for timer in TimerDebugPanel.timers:
+            timer = TimerDebugPanel.timers[timer]
+            if timer['stop'] is None:
+                time = '?'
+            else:
+                time = '%0.3f msec' % ((timer['stop'] - timer['start']) * 1000)
+            rows.append((timer['name'], time))
+
         context = self.context.copy()
         context.update({'rows': rows})
         return render_to_string(self.template, context)
