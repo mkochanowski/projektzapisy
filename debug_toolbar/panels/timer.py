@@ -34,6 +34,10 @@ class TimerDebugPanel(DebugPanel):
             'stop': None
         }
 
+    @staticmethod
+    def timer_stop(id):
+        TimerDebugPanel.timers[id]['stop'] = time.time()
+
     def process_request(self, request):
         self._start_time = time.time()
         if self.has_resource:
