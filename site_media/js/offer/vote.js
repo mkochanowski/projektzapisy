@@ -25,14 +25,16 @@ Vote.init = function()
         } else {
             li.addClass('changed').removeClass('removed');
         }
-    })
+    });
+
+
 
 	Vote.initCounters();
 //	Vote.initFilter();
 };
 
 $(Vote.init);
-window.onunload = function(){ Vote.init(); }
+window.onunload = function(){ Vote.init(); $('.od-vote-course > select').trigger('change');  }
 /**
  * Inicjuje liczniki punktów.
  */
