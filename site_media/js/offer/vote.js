@@ -32,7 +32,7 @@ Vote.init = function()
 };
 
 $(Vote.init);
-
+window.onunload = function(){ Vote.init(); }
 /**
  * Inicjuje liczniki punktów.
  */

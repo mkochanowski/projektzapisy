@@ -19,6 +19,9 @@ class Template( models.Model ):
     group_type        = models.CharField( blank = False, null = False, max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     sections          = models.ManyToManyField( Section, verbose_name = 'sekcje',
                                                 through = 'TemplateSections')
+
+    in_grade          = models.BooleanField(default=False, verbose_name=u'Szablon wykorzystywany w ocenie')
+
     author            = models.ForeignKey( Employee, verbose_name = 'autor' )
     
     class Meta:

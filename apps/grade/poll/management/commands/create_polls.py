@@ -10,13 +10,16 @@ from django.core.exceptions import ObjectDoesNotExist
 from apps.users.models import Student, Employee
 
 class Command(BaseCommand):
-    args = '<semester( szablon)+>'
-    help = 'tworzy ankiety na podstawie szablony'
+    args = '<semester+>'
+    help = 'Tworzy ankiety dla semestru. W przypadku braku argumentu bierze aktualny.'
 
     def handle(self, *args, **options):
-        semester  = Semester.objects.get(id=args[0])
+        if len(args) > 0:
+            semester  = Semester.objects.get(id=args[0])
+        else:
+            semester = Semester.get_current_semester()
         print semester
-        templates = Template.objects.filter(pk__in=args[1:])
+        templates = Template.objects.filter(in_grade=True)
         prych     = Employee.objects.get(user__pk=43)
         for template in templates:
             t = dict(
