@@ -93,24 +93,25 @@ def connections_choice( request ):
     else:
         semester = None
     groupped_polls = group_polls_by_course( students_polls )
+    polls_lists, general_polls = Poll.get_polls_list( request.user.student ) #
     connected = any(len(x) > 1 for x in groupped_polls)
     if grade:
         if request.method == "POST":
-            form = PollCombineForm( request.POST, 
+            form = PollCombineForm( request.POST,
                                     polls = groupped_polls )
-             
             if form.is_valid():
                 unblindst = simplejson.loads( request.POST.get('unblindst', '') )
                 unblindt  = simplejson.loads( request.POST.get('unblindt', '') )
                 ts        = simplejson.loads( request.POST.get('ts', '') )
                 connected_groups = connect_groups( groupped_polls, form)
-                groups           = reduce(list.__add__, connected_groups )
+                if connected_groups:
+                    groups           = reduce(list.__add__, connected_groups )
+                else:
+                    groups = []
                 prepared_tickets = zip( groups, unblindt, unblindst )
                 #### final mark:
-    
                 for g, t, unblind in prepared_tickets:
                     secure_mark(request.user, g, t )
-    
                 errors, tickets_to_serve = get_valid_tickets( prepared_tickets )
                 if errors:
                     message = u'Nie udało się pobrać następujących biletów:\n<ul>'
@@ -129,11 +130,12 @@ def connections_choice( request ):
                                                       semester=semester)
 
                 return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
-                
+
         else:
-            form = PollCombineForm( polls = groupped_polls )
+           pass
+#             form = PollCombineForm( polls = groupped_polls )
             
-        data = { 'form' : form, 'grade' : grade, 'connected': connected}
+        data = { 'polls':polls_lists, 'grade' : grade, 'general_polls': general_polls}
         return render_to_response ('grade/ticket_create/connection_choice.html', data, context_instance = RequestContext ( request ))
     else:
         messages.error( request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów" )

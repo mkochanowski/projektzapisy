@@ -15,6 +15,7 @@ from django.db.models import Q
 
 from django.conf import settings
 from apps.grade.ticket_create.models.student_graded import StudentGraded
+from apps.offer.vote.models.single_vote import SingleVote
 
 from apps.users.exceptions import NonUserException, NonEmployeeException,\
                                  NonStudentException
@@ -51,10 +52,12 @@ def student_profile(request, user_id):
     try:
         student = Student.objects.select_related('user').get(user=user_id)
         courses = prepare_schedule_courses(request, for_student=student)
+        votes   = SingleVote.get_votes(student)
         data = prepare_schedule_data(request, courses)
         data.update({
             'courses': courses,
-            'student': student
+            'student': student,
+            'votes': votes
         })
 
         if request.is_ajax():

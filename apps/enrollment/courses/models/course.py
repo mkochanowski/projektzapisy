@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
@@ -104,6 +104,15 @@ class CourseEntity(models.Model):
     def get_vote():
         return CourseEntity.noremoved.filter(status=2)
 
+    @staticmethod
+    def get_voters():
+        from apps.offer.vote.models.single_vote import SingleVote
+        from apps.offer.vote.models.system_state import SystemState
+
+        year = date.today().year
+        current_state = SystemState.get_state(year)
+
+        return SingleVote.objects.distinct('student').filter(state=current_state)
 
     @staticmethod
     def get_proposals():

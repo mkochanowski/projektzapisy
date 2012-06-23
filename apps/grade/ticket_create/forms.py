@@ -43,7 +43,7 @@ class PollCombineForm( forms.Form ):
                                             initial   = False,
                                             help_text = u'Powiąż ocenę'
 					  ) # this is NOT escaped
-                
+
                 self.fields[ label ] = field
                 
     def as_table( self ):

@@ -10,6 +10,9 @@
 	Pobieranie biletów
 {% endblock %}
 
+
+{% block connection-choice %} class="active"{% endblock %}
+
 {% block main-subtitle %}Pobierz klucze{% endblock %}
 
 {% block content %}
@@ -28,8 +31,8 @@
 {#                   onclick='window.open("data:application/octet-stream," + encodeURIComponent($("#keys").text()))'>#}
         </div>
     {% else %}
-        <div class='main-error'>
-            <h4>Niestety nie możesz pobrać żadnych kluczy.</h4>
+        <div class="alert-message">
+            <strong>Uwaga!</strong> Niestety nie możesz pobrać żadnych kluczy..
         </div>
     {% endif %}
 {% endblock %}

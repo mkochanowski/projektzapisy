@@ -51,11 +51,6 @@ padding:10px;
 
 #grade-poll-content
 {
-	border: 1px solid #cccccc;
-
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
 
 	width: 43em;
     float: right;

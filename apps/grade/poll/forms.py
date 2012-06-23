@@ -46,6 +46,7 @@ class PollForm( forms.Form ):
         return loader.render_to_string('grade/poll/poll_show.html', {"errors": errors, "sections": self.sections})
     
     def setFields( self, poll = None, st = None, section_id = None, post_data = None ):
+        self.instance = poll
     	if st:
         	self.finished = st.finished
         else:

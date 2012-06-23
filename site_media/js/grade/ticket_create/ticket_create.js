@@ -29,24 +29,7 @@ Ticket.create.init = function () {
 
     })
 
-    // for Chrome:
-    if ($.browser.webkit) {
-        $('#grade-connection-choice-form').find('th').children('label').each(function () {
 
-            var html = $(this).html()
-            html = html.slice(0, -1)
-            $(this).html(html)
-        });
-    }
-    else {
-        $('#grade-connection-choice-form').find('label').each(function () {
-
-            var html = $(this).html()
-            html = html.slice(0, -1)
-            $(this).html(html)
-        });
-    }
-    $('.tooltip').tooltip();
 
 }
 

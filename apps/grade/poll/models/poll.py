@@ -26,6 +26,9 @@ class Poll( models.Model ):
     group             = models.ForeignKey( Group, verbose_name = 'grupa', blank = True, null = True )
     studies_type      = models.ForeignKey( Program, verbose_name = 'typ studiów', blank = True, null = True )
     share_result      = models.BooleanField( verbose_name = 'udostępnij wyniki', default = False, blank = True )
+
+    finished          = models.BooleanField( verbose_name="zakończona", default=False)
+
     deleted           = models.BooleanField( blank = False, null = False, default = False, verbose_name = 'usunięta' )
     origin            = models.ForeignKey( Origin, verbose_name='zbiór', default=None, blank = True, null= True)
 
@@ -37,7 +40,7 @@ class Poll( models.Model ):
         
     def __unicode__( self ):
         res = unicode( self.title )
-        if self.group: res += u', ' + unicode( self.group.course.name) + u": " + unicode(self.group.get_type_display()) + u" - " + unicode(self.group.get_teacher_full_name())
+        if self.group: res += u', ' + unicode(self.group.get_type_display()) + u" - " + unicode(self.group.get_teacher_full_name())
         if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
         return res
         
@@ -48,9 +51,7 @@ class Poll( models.Model ):
         else:
             sep = u', '
             
-        if self.group: 
-            res += sep + self.group.course.name
-            res += sep + self.group.get_type_display()
+        if self.group:
             res += u': '   + self.group.get_teacher_full_name()
         else:
             res += sep + u'Ankieta ogólna'
@@ -148,10 +149,18 @@ class Poll( models.Model ):
         return filter( lambda g: g.pk not in polls, groups)
     
     @staticmethod
-    def get_current_polls():
-        return Poll.objects.filter(deleted=False )\
-                    .select_related('semester', 'group', 'group__course', 'studies_type', 'group__teacher', 'group__teacher__user')\
-                    .extra(where=['(SELECT COUNT(*) FROM ticket_create_publickey WHERE poll_id = poll_poll.id GROUP BY poll_id) > 0'])
+    def get_current_polls(student=None):
+        semester = Semester.get_current_semester()
+        where = ['((SELECT COUNT(*) FROM ticket_create_publickey WHERE poll_id = poll_poll.id GROUP BY poll_id) > 0)']
+        if student:
+            count = '((SELECT COUNT(*) FROM ticket_create_usedticketstamp WHERE poll_id = poll_poll.id AND student_id = %d) = 0)' % student.id
+            where.append( count )
+
+        return Poll.objects.filter(deleted=False, semester=semester  )\
+                    .select_related('semester', 'group', 'group__course',
+                                    'studies_type', 'group__teacher',
+                                    'group__teacher__user')\
+                    .extra(where=where)
 
 
     @staticmethod
@@ -190,12 +199,30 @@ class Poll( models.Model ):
         return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys).count()
 
     @staticmethod
+    def get_polls_list( student ):
+        polls = Poll.get_all_polls_for_student(student)
+        courses = {}
+        general = []
+        for poll in polls:
+
+            if poll.group:
+
+                if not poll.group.course_id in courses:
+                    courses[poll.group.course_id] = { 'courses': poll.group.course, 'polls': [] }
+                courses[poll.group.course_id]['polls'].append(poll)
+            else:
+                general.append(poll)
+
+        return courses, general
+
+
+    @staticmethod
     def get_all_polls_for_student( student ):
         groups = Record.objects.filter( student = student,
                                                  status  = STATUS_ENROLLED ).select_related('group')\
                                 .values_list('group__id', flat=True)
 
-        return filter( lambda x: not x.group or x.group.id in groups, Poll.get_current_polls() )
+        return filter( lambda x: not x.group or x.group.id in groups, Poll.get_current_polls(student=student) )
     
     @staticmethod
     def get_all_polls_for_group( group, semester = None ):

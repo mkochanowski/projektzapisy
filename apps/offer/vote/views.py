@@ -97,6 +97,7 @@ def vote_summary( request ):
         summary for vote
     """
     subs = CourseEntity.get_vote()
+    voters = CourseEntity.get_voters()
     
     summer = []
     winter = []

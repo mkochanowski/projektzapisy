@@ -2,6 +2,8 @@
 
 {% block main-subtitle %}Wprowadzanie kluczy{% endblock %}
 
+
+
 {% block bread %}
 	<a href="/">Strona główna</a>  &raquo;
 	<a href="{% url grade-main %}">Ocena zajęć</a>  &raquo;
@@ -14,19 +16,19 @@
         </div>
 	{% else %}
 		<div id='grade-tickets-enter'>
-		<form action="." method="post" enctype="multipart/form-data">
+		<form action="{% url grade-poll-tickets-enter %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
                       <h2>Wprowadzanie kluczy</h2>
                         <label for="id_ticketsfield" class="span4">Podaj wygenerowane klucze</label>
 
                             <textarea name="ticketsfield" cols="80" rows="20" id="id_ticketsfield"></textarea>
-                          <p class="help-block">Jeżeli nie posiadasz jeszcze kluczy, zaloguj się i je wygeneruj.</p>
+                         <div style="text-align: center"> <p class="help-block">Jeżeli nie posiadasz jeszcze kluczy, zaloguj się i je wygeneruj.</p>
 
 {#            <label for="id_ticketsfile" class="span4">lub wybierz plik z biletami:</label>#}
-            <input type="file" id="id_ticketsfile" name="ticketsfile">
+{#            <input type="file" id="id_ticketsfile" name="ticketsfile">#}
                       <div class="form-actions">
                         <button class="btn btn-primary" type="submit">Rozpocznij ocenę</button>
-                      </div>
+                      </div></div>
 		</form>
 		</div>
 	{% endif %}

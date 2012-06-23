@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block poll-managment %}
-<form method="POST" action="{% url grade-poll-template-action %}">
+<form method="POST" action="{% url grade-poll-template-action %}">{% csrf_token %}
 <div class="actions">
 	<label>Akcja:
 		<select name="action">

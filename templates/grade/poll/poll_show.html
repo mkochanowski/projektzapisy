@@ -1,14 +1,14 @@
 {% load poll_answers_extra %}
 {% for section in sections %}	
     <div class="poll-section">
-        <button class='grade-section-toggle-button' id='section-toggle-{{section.pk}}'>-</button>
-        <h2 class="poll-section-title" id="poll-section-title-{{section.pk}}">{{section.title}}</h2>
+        <button style="width:25px;height:25px" class='grade-section-toggle-button' id='section-toggle-{{section.pk}}'>-</button>
+        <h4 class="poll-section-title" id="poll-section-title-{{section.pk}}">{{section.title}}</h4>
         <span class="poll-section-description">{{section.description}}</span>
         <div class='section-content' id='section-content-{{section.pk}}'>
 	    {% for field in section.questions %}
         {% if field.type %}
-            <div class="fieldWrapper poll-section-field{% if field.is_leading %} poll-section-leading{% endif %}">                   
-                <h4>{{field.label}}</h4>
+            <div style="margin-bottom: 30px;" class="fieldWrapper poll-section-field{% if field.is_leading %} poll-section-leading{% endif %}">
+                <h7 style="margin-bottom: 10px;display:block;">{{field.label}}</h7>
                 {% if field.description %}<span class="poll-section-description">{{field.description}}</span>{% endif %}
                 {% if field.choice_limit %}{% if field.choice_limit > 0 %}<span class="poll-section-description">Możesz zaznaczyć maksymalnie {{field.choice_limit}} odpowiedzi</span>{% endif %}{% endif %}
                 {% if field.title in errors.keys %} 
@@ -19,7 +19,7 @@
                         </ul></div>
                 {% endif %}
                 {% if field.type == 'single' %}
-                    <ul class="poll-section-answer-list{% if field.scale %} scale{% endif %}">
+                    <ul class="poll-section-answer-list">
                     {% for key, radio in field.widget.choices %}
                         <li  class="poll-section-answer-item">
                             <input type="radio" id="{{field.title}}-{{key}}" class="poll-section-radio{% if key in  field.hide_on %} poll-section-radio-hideon{% else %} poll-section-radio-all{% endif %}" name="{{field.title}}" value="{{key}}"{% if field.initial == key%} checked{% endif %}{% if field.disabled %} disabled="disabled"{% endif %}>

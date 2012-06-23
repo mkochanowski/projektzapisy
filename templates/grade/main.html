@@ -1,15 +1,36 @@
 {% extends "grade/base.html" %}
 
-
+{% block main-subtitle %}Informacje{% endblock %}
 {% block grade_active %} class="active"{% endblock %}
+
+{% block grade-info %} class="active"{% endblock %}
 
 {% block content %}
     <div id="mainPage-container">
-        <div>
-            <a href="{% url grade-main %}">Ocena zajęć</a>
-            <span>System oceny zajęć w Instytucie
-                Informatyki Uniwersytetu Wrocławskiego.</span>
-        </div>
-    </div>
+   		{% if grade %}
+   			<h3>Zasady oceny</h3>
+   			<div id="od-vote-main-rules">
+   				<ol>
+                   <li><h4>Cele</h4>
+                       <p>
+                           Ocena zajęć ma na celu poprawę jakości kształcenia w Instytucie Informatyki UWr
+                       </p>
+                   </li>
+                   <li><h4>Przebieg</h4>
+                       <p>Student może przyznać każdemu przedmiotowi <strong>0-1-2-3 punkty</strong>, sygnalizując swoje zainteresowanie przedmiotem.
+                           Suma przyznanych punktów nie może przekroczyć <strong>50</strong>. Swój głos można zmieniać do czasu zakończenia głosowania.
+                       </p>
+                   </li>
+                   <li><h4>Bonus</h4>
+                       <p>Każdy udział w ocenie daje <strong>24 godzinny bonus</strong> (maksymalnie 48 godziny) otwarcia zapisów na w przyszłym semestrze.</p>
+                   </li>
+   				</ol>
+   			</div>
+
+           {% else %}
+   			<p class="disabled-link">Ocena nie jest w tej chwili aktywna.</p>
+   		{% endif %}
+
+   	</div>
 {% endblock %}
 

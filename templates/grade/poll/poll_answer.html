@@ -13,9 +13,14 @@
 
 
 {% block poll-content %}
-    <form id="poll-form" action="" method="post">
+    <form id="poll-form" action="." method="post">{% csrf_token %}
     	<input type="hidden" id="poll-form-id" value="{{pid}}">
-        <h1>{{ title }}</h1>
+        {% if form.instance.group %}
+            <h2>{{ form.instance.group.course }}</h2>
+        {% else %}
+            <h2>Ankieta Ogólna</h2>
+        {% endif %}
+        <h3>{{ title }}</h3>
         <span>{{ desc }}</span>
             {% if form_errors %}
                 {{ form|as_divs_with_errors:form_errors }}

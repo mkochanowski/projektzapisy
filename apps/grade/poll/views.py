@@ -10,11 +10,10 @@ from django.http                       import HttpResponse, \
                                               Http404
 from django.shortcuts                  import render_to_response
 from django.template                   import RequestContext
+from django.template.response import TemplateResponse
 from django.utils                      import simplejson
 from apps.enrollment.courses.models.course import CourseEntity
-from apps.users.decorators             import student_required, employee_required
-from django.contrib.auth.decorators    import login_required
-from django.core.servers.basehttp import FileWrapper
+from apps.users.decorators             import employee_required
 
 
 from apps.enrollment.courses.models.group import Group, GROUP_TYPE_CHOICES
@@ -70,34 +69,22 @@ from form_utils                        import get_section_form_data, \
                                               validate_section_form, \
                                               section_save
 from django.utils.safestring           import SafeUnicode, mark_safe
-from apps.news.models                import News
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_str
 
 from apps.grade.poll.exceptions import NoTitleException, NoSectionException, \
                                     NoPollException
 
 
-########################################
-#### POLL MANAGMENT
-########################################
-
-
-#### TEMPLATES
-#not really nice to change naming convention, is it? --AM
-
 def main(request):
-    try:
-        grade = Semester.objects.filter(is_grade_active=True).count() > 0
-    except:
-        grade = False
-    return render_to_response( 'grade/main.html', { 'grade' : grade }, context_instance = RequestContext( request ))
+    grade = Semester.objects.filter(is_grade_active=True).count() > 0
+    return TemplateResponse(request, 'grade/main.html', locals())
 
 @employee_required
 def template_form(request, group_id = 0):
     grade =  Semester.objects.filter(is_grade_active=True).count() > 0
     data = prepare_data_for_create_poll( request, group_id )
     data['grade'] =  grade
-    return render_to_response( 'grade/poll/ajax_template_create.html', data, context_instance = RequestContext( request ))
+    return TemplateResponse(request, 'grade/poll/ajax_template_create.html', data)
 
 @employee_required
 def templates( request ):
