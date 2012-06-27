@@ -1084,9 +1084,10 @@ def poll_results( request, mode='S', poll_id = None, semester=None ):
             return render_to_response ('grade/poll/poll_total_results.html', data, context_instance = RequestContext ( request ))
 
         last_visit, created = LastVisit.objects.get_or_create(user=request.user, poll=poll)
+        data['last_visit'] = last_visit.time
         last_visit.save()
 
-        data['last_visit'] = last_visit.time
+
         if poll.is_user_entitled_to_view_result( request.user ):
             poll_answers = poll.all_answers()
             sts_fin      = SavedTicket.objects.filter( poll = poll, finished = True  ).count()
