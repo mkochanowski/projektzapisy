@@ -1,6 +1,6 @@
 {% load fereol_common %}
 {% load compressed %}
-
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -14,10 +14,10 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="/site_media/favicon.ico">
-    <link rel="apple-touch-icon" href="/site_media/images/apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/site_media/images/apple-touch-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/site_media/images/apple-touch-icon-114x114.png">
+    <link rel="shortcut icon" href="{% static 'favicon.ico'%}">
+    <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png'%}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{% static 'images/apple-touch-icon-72x72.png'%}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{% static 'images/apple-touch-icon-114x114.png'%}">
     <!-- Le styles -->
     {% block styles %}
         {% compressed_css 'main' %}
@@ -110,7 +110,7 @@
         <div class="container">
             <div class="logo">
                 <a href="/">
-                    <img src="/site_media/images/logotyp.jpg" alt="Uniwersytet Wrocławski">
+                    <img src="{% static 'images/logotyp.jpg'%}" alt="Uniwersytet Wrocławski">
                 </a>
             </div>
         </div>

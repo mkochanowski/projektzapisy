@@ -8,11 +8,13 @@ from django.core.urlresolvers          import reverse
 from django.http                       import HttpResponse, \
                                               HttpResponseRedirect,\
                                               Http404
-from django.shortcuts                  import render_to_response
+from django.shortcuts                  import render_to_response, redirect
 from django.template                   import RequestContext
 from django.template.response import TemplateResponse
 from django.utils                      import simplejson
+from django.views.decorators.http import require_POST
 from apps.enrollment.courses.models.course import CourseEntity
+from apps.grade.poll.models.last_visit import LastVisit
 from apps.users.decorators             import employee_required
 
 
@@ -1030,19 +1032,22 @@ def poll_end_grading( request ):
 
 #### Poll results ####
 @login_required
-def poll_results( request, mode='S', poll_id = None ):
-    ###
-    # TODO:
-    #   Filtry!!!
-    
+def poll_results( request, mode='S', poll_id = None, semester=None ):
+
     data = {}
-    semester = Semester.objects.get(id=45)
-    
-    if not semester:
-        messages.info( request, "Ocena zajęć jest obecnie zamknięta." )
-        return render_to_response( 'grade/main.html', { 'grade' : False }, context_instance = RequestContext( request ))
-        
-    data['grade'] = semester.is_grade_active
+    try:
+        if not semester:
+            semester = Semester.get_current_semester()
+        else:
+            semester = Semester.objects.get(id=semester)
+    except ObjectDoesNotExist:
+        raise Http404
+
+
+
+    data['grade']    = semester.is_grade_active
+    data['semester'] = semester
+    data['semesters'] = Semester.objects.all()
     
     if mode == 'S':
         data['mode']  = 'course'
@@ -1074,10 +1079,14 @@ def poll_results( request, mode='S', poll_id = None ):
         data['link_mode'] = mode
         try:
             poll              = Poll.objects.get( id = poll_id )
-        except:
+        except ObjectDoesNotExist:
             messages.error(request, u"Podana ankieta nie istnieje." )
             return render_to_response ('grade/poll/poll_total_results.html', data, context_instance = RequestContext ( request ))
-    
+
+        last_visit, created = LastVisit.objects.get_or_create(user=request.user, poll=poll)
+        last_visit.save()
+
+        data['last_visit'] = last_visit.time
         if poll.is_user_entitled_to_view_result( request.user ):
             poll_answers = poll.all_answers()
             sts_fin      = SavedTicket.objects.filter( poll = poll, finished = True  ).count()
@@ -1138,8 +1147,7 @@ def poll_results( request, mode='S', poll_id = None ):
                         
                     elif isinstance( question, OpenQuestion ):
                         mode   = u'open'
-                        q_data = map( lambda x: x.content, question_answers )
-                        s_ans.append(( mode, question.content, q_data, len( q_data) ))
+                        s_ans.append(( mode, question.content, question_answers, len( question_answers) ))
                         
                 answers.append(( section.title, s_ans ))
 
@@ -1175,7 +1183,7 @@ def poll_results( request, mode='S', poll_id = None ):
     return render_to_response ('grade/poll/poll_total_results.html', data, context_instance = RequestContext ( request ))
 
 @login_required
-def poll_results_detailed( request, mode, poll_id, st_id = None ):
+def poll_results_detailed( request, mode, poll_id, st_id = None, semester=None ):
     data = {}
     data['grade'] =   Semester.objects.filter(is_grade_active=True).count() > 0
     
@@ -1183,8 +1191,18 @@ def poll_results_detailed( request, mode, poll_id, st_id = None ):
         data['mode']  = 'course'
     elif mode == 'T':
         data['mode']  = 'teacher'
-    
-    semester      = Semester.get_current_semester()
+
+    try:
+        if not semester:
+            semester      = Semester.get_current_semester()
+        else:
+            semester      = Semester.objects.get(id=semester)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    data['semester'] = semester
+    data['semesters'] = Semester.objects.all()
+
     if semester.is_grade_active:
         messages.info( request, "Ocena zajęć jest otwarta; wyniki nie są kompletne." )
        
@@ -1306,3 +1324,13 @@ def share_results_toggle( request, mode, poll_id ):
     else:
         messages.info( request, u"Przestano udostepniać wyniki ankiety." )
     return HttpResponseRedirect(reverse( 'grade-poll-poll-results', args=[mode, poll_id] ))
+
+
+@login_required()
+@require_POST
+def change_semester( request ):
+    semester = request.POST.get('semester', None)
+    if not semester:
+        raise Http404
+
+    return redirect('grade-poll-poll-results-semester', semester=int(semester), mode='S')

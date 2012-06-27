@@ -129,16 +129,6 @@ LOGGING = {
 }
 
 
-def custom_show_toolbar(request):
-    return False
-    if ('HTTP_HOST' in request.META) and (request.META['HTTP_HOST'][0:2] == 'm.'):
-        return False
-    return DEBUG
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar, 
-    'INTERCEPT_REDIRECTS' : False,
-}
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -207,7 +197,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
     #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
@@ -221,7 +211,7 @@ TEMPLATE_DIRS = (
 )
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,    
+    'disable_existing_loggers': False,
     'formatters': {
         'simple': {
             'format': '%(asctime)s | %(message)s'
@@ -295,7 +285,7 @@ INSTALLED_APPS = (
     'apps.offer.proposal',
     'apps.offer.vote',
     'apps.users',
-#    'debug_toolbar',
+    'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
     #'apps.mobile',
@@ -335,6 +325,7 @@ QUEUE_PRIORITY_LIMIT = 5
 
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
+#SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
 SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
@@ -353,7 +344,12 @@ def show_toolbar(request):
         return True
     return False
 
-DEBUG_TOOLBAR_CONFIG['SHOW_TOOLBAR_CALLBACK'] = show_toolbar
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+    'INTERCEPT_REDIRECTS' : False,
+}
+
 
 CACHES = {
     'default': {
