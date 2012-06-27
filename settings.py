@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Django settings for fereol project.
 
 import os

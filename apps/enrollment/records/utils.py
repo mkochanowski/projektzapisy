@@ -2,6 +2,8 @@
 
 from django.utils import simplejson
 
+from debug_toolbar.panels.timer import TimerDebugPanel
+
 from apps.enrollment.courses.models import Term
 from apps.enrollment.records.models import *
 from apps.users.models import *
@@ -58,15 +60,22 @@ def prepare_courses_with_terms(terms, records = None):
     return courses_list
 
 def prepare_groups_json(semester, groups, student=None, employee=None):
+    TimerDebugPanel.timer_start('pgj_1', 'prepare_groups_json - record_ids')
     record_ids = Record.get_student_records_ids(student, semester)
+    TimerDebugPanel.timer_stop('pgj_1')
+    TimerDebugPanel.timer_start('pgj_2',
+        'prepare_groups_json - queue_priorities')
     queue_priorities = Queue.queue_priorities_map(
         Queue.get_student_queues(student, semester))
+    TimerDebugPanel.timer_stop('pgj_2')
     groups_json = []
+    TimerDebugPanel.timer_start('pgj_3', 'prepare_groups_json - serialize')
     for group in groups:
         groups_json.append(group.serialize_for_ajax(
             record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
             queue_priorities, student=student, employee=employee
         ))
+    TimerDebugPanel.timer_stop('pgj_3')
     return simplejson.dumps(groups_json)
 
 def prepare_courses_json(groups, student):

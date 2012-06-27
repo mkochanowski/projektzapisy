@@ -15,7 +15,7 @@ http://fereol.wasilczyk.pl/wiki/_media/downloads/pycrypto.tar.gz
   potrzebny do tego będzie pakiet python-devel, albo python-dev - 
   w zależności od dystrybucji.
   
-* django = 1.4.x
+* django = 1.2.x
 http://www.djangoproject.com/
 - fedora: Django
 - debian/ubuntu: python-django
@@ -33,7 +33,7 @@ http://south.aeracode.org/
 * django-mailer >= 0.2.0 (dołączone w repozytorium projektu)
 http://github.com/jtauber/django-mailer/
 
-* debug-toolbar >= 0.8.3 
+* debug-toolbar >= 0.8.3 (dołączone w repozytorium projektu)
 http://github.com/robhudson/django-debug-toolbar
 
 * django-paranoid-sessions
@@ -45,16 +45,6 @@ http://pypi.python.org/pypi/vobject
 
 == Uruchomienie (dla developerów) ==
 
-Tworzenie środowiska wirtualnego:
-$ easy_install virtualenv
-$ virtualenv virtualenv
-$ source virtualenv/bin/activate
-$ easy_install django==1.4
-$ easy_install psycopg2
-zainstaluj pyCrypto (instrukcja wyżej)
-$ easy_install lxml
-$ easy_install vobject
-$ easy_install django-debug-toolbar
 
 Przed pierwszym uruchomieniem należy przygotować bazę danych
 i załadować dane:
