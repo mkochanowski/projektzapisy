@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Django settings for fereol project.
 
 import os
@@ -129,6 +130,7 @@ LOGGING = {
 }
 
 
+    return False
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -197,7 +199,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+#    'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
     #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
@@ -285,7 +287,7 @@ INSTALLED_APPS = (
     'apps.offer.proposal',
     'apps.offer.vote',
     'apps.users',
-    'debug_toolbar',
+#    'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
     #'apps.mobile',
@@ -392,4 +394,8 @@ local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
 
-
+"""
+# For debug_toolbar, move to settings_local.py
+INSTALLED_APPS += ('debug_toolbar', )
+MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
+"""
