@@ -3,12 +3,12 @@
 {% block results %}
     {% if results %}
         {% if completness %}
-            <div class="main-message">
-                {{ completness }}
-            </div>
+            <div class="alert-message info">
+                    <a class="close" href="#">×</a>
+                    <p>{{ completness }}</p>
+              </div>
         {% endif %}
         <div class="poll-header">
-            <h1>{{ poll_title }}</h1>
             <h2>{{ poll_course }}</h2>
             <h3>{{ poll_group }} {{ poll_teacher }}</h3>
         </div>
@@ -19,9 +19,11 @@
                     {% for ans_data in s_result.1 %}
                     <tr><th><h4>{{ ans_data.1 }}</h4></th></tr>
                     <tr><td><div class="answers-field">
+
                         {% if ans_data.0 == 'single' %}
+                            <div id="answer-{{ forloop.counter }}-{{ forloop.parentloop.counter }}" class="chart"></div>
                             {% for ans in ans_data.2 %}
-                                <span class="answer-data" style="width: {{ ans_data.3 }}%">
+                                <span class="answer-data">
                                     <div class="answer-text">
                                         {{ ans.0 }}
                                     </div>
@@ -33,7 +35,8 @@
                                     </div>
                                 </span>
                             {% endfor %}
-                        {% else %}{% if ans_data.0 == 'multi' %}
+                        {% elif ans_data.0 == 'multi' %}
+                            <div id="answer-{{ forloop.counter }}-{{ forloop.parentloop.counter }}" class="chart"></div>
                             {% for ans in ans_data.2 %}
                                 <span class="answer-data" style="width: {{ ans_data.3 }}%">
                                     <div class="answer-text">
@@ -60,32 +63,27 @@
                                     {% endif %}
                                 </span>
                             {% endfor %}
-                        {% else %}{% if ans_data.0 == 'open' %}
-                            Liczba odpowiedzi: {{ ans_data.3 }}
+                        {% elif ans_data.0 == 'open' %}
                             {% if ans_data.3 != 0 %}
-                                <br /><a class="show-ans-link" href="">
-                                    Kliknij, aby zobaczyć wszystkie
-                                </a>
                                 <div class="hidden-answers">
                                     <ul>
                                     {% for ans in ans_data.2 %}
-                                        <li>{{ ans }}</li>
+                                        <li{% if last_visit < ans.time %} class="new"{% endif %}>{{ ans.content }}</li>
                                     {% endfor %}
                                     </ul>
                                 </div>
-                            {% endif %}{% endif %}{% endif %}{% endif %}
+                            {% endif %}
+
+                            Liczba odpowiedzi: {{ ans_data.3 }}
+                        {% endif %}
                     </div></td></tr>
                     {% endfor %}
                 </table>
             </div>
         {% endfor %}
         <span class="result-details">
-            <a href="{% url grade-poll-poll-results-detailed link_mode pid %}">Szczegółowe wyniki</a>
+            <a href="{% url grade-poll-poll-results-detailed-semester semester.id link_mode pid %}">Szczegółowe wyniki</a>
         </span>
-
-{#        <span class="save-csv">#}
-{#            <a href="{% url grade-poll-save-csv link_mode pid %}">Pobierz ankietę jako plik csv</a>#}
-{#        </span>#}
     {% else %}
         Wybierz ankietę z menu po prawej
     {% endif %}

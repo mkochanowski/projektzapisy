@@ -9,7 +9,6 @@ Poll.results.init = function()
     var mode = $('#display-mode').val();
     
     $('.connected-polls').hide();
-    $('.hidden-answers').hide();
     $('.result-groupped-list').hide();
 	$('#results-by-course-list').hide();
     $('#courses-list-link').click( function(){
@@ -38,12 +37,7 @@ Poll.results.init = function()
             $('#results-by-teacher-list').show();
         }
     }
-    
-    $('.show-ans-link').click(function(){
-        $(this).siblings('.hidden-answers').slideToggle(250);
-        return false;
-    })
-    
+
     $('.show-other-ans-link').click(function(){
         $(this).parent().siblings('.hidden-answers').slideToggle(250);
         return false;

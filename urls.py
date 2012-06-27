@@ -28,7 +28,7 @@ urlpatterns = patterns('',
     ('accounts/', include('apps.email_change.urls')),
 
     (r'^grade/', include('apps.grade.urls')),
-#    (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
+#    (r'^static/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')}),
     (r'^feeds/news/$', LatestNews()),
     url(r'^s/(?P<query>.*)/$', 'apps.users.views.students_list', name='users-list-search'),
     url(r'^e/(?P<query>.*)/$', 'apps.users.views.employees_list', name='users-list-search'),
@@ -48,7 +48,7 @@ urlpatterns = patterns('',
 
 if not settings.RELEASE:
     urlpatterns += patterns('',
-
+    (r'^static/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'static')}),
     (r'^vote/', include('apps.offer.vote.urls')),
     # OD
     #url('^offer/$', 'apps.offer.proposal.views.main', name='offer-main'),

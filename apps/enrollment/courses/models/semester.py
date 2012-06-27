@@ -36,7 +36,7 @@ class Semester( models.Model ):
         #TODO: wymuszanie formatu roku "XXXX/YY" zamiast "XXXX"
         if len(self.year) != 7:
             return '%s %s (BLAD)' % (self.get_type_display() , self.year)
-        return '%s %s' % (self.get_type_display() , self.year)
+        return '%s %s' % (self.year, self.get_type_display())
 
     def is_current_semester(self):
         """ Answers to question: is semester current semester""" 
