@@ -6,7 +6,7 @@ import logging
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-DEBUG = False
+DEBUG = True
 
 RELEASE = False
 
@@ -80,13 +80,13 @@ EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing spa
 #loggin settings:
 
 #LOG_FILE = os.path.join(PROJECT_PATH, "logs/log.log")
-#LOG_LEVEL = logging.NOTSET
+#LOG_LEVEL = logging.NOTSET 
 #INTERNAL_IPS = ('127.0.0.1',)
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': True,    
     'formatters': {
         'simple': {
             'format': '%(asctime)s | %(message)s'
@@ -116,7 +116,7 @@ LOGGING = {
         }
      },
     'loggers': {
-
+      
         'project.default': {
             'handlers': ['standard_file', 'mail_admins'],
             'level': 'INFO'
@@ -130,7 +130,6 @@ LOGGING = {
 }
 
 
-    return False
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -199,7 +198,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
     #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
@@ -250,7 +249,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler',
         }
      },
-
+    
     'loggers': {
         '': {
             'handlers': ['mail_admins', 'root'],
@@ -287,7 +286,7 @@ INSTALLED_APPS = (
     'apps.offer.proposal',
     'apps.offer.vote',
     'apps.users',
-#    'debug_toolbar',
+    'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
     #'apps.mobile',
@@ -330,7 +329,7 @@ QUEUE_PRIORITY_LIMIT = 5
 #SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
 SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
-TEMPLATE_DEBUG = DEBUG
+#TEMPLATE_DEBUG = DEBUG
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
 
@@ -394,8 +393,4 @@ local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
 
-"""
-# For debug_toolbar, move to settings_local.py
-INSTALLED_APPS += ('debug_toolbar', )
-MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', )
-"""
+
