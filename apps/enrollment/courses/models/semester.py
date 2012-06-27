@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 from django.db import models
 from course import Course
@@ -21,6 +21,8 @@ class Semester( models.Model ):
     records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
     semester_beginning = models.DateField(null = False, verbose_name='Data rozpoczęcia semestru')
     semester_ending = models.DateField(null = False, verbose_name='Data zakończenia semestru')
+    desiderata_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia dezyderat')
+    desiderata_closing = models.DateTimeField(null = True, blank=True, verbose_name='Czas zamknięcia dezyderat')
 
     is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna' )
     records_ects_limit_abolition = models.DateTimeField(null = True, verbose_name='Czas zniesienia limitu 40 ECTS') 
@@ -97,6 +99,13 @@ class Semester( models.Model ):
                 return next_semester[0]
             else:
                 return None
+
+    def desiderata_is_open(self):
+        if self.desiderata_opening is None:
+            return False
+        now = datetime.now()
+        return (self.desiderata_opening <= now and self.desiderata_closing is None) or\
+            (self.desiderata_opening <= now and self.desiderata_closing >= now)
 
     @staticmethod
     def is_visible(id):

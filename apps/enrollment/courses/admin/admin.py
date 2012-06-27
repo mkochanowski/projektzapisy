@@ -55,6 +55,7 @@ class SemesterAdmin(admin.ModelAdmin):
         ('Ocena', {'fields': ['is_grade_active']}),
         ('Czas trwania semestru', {'fields': ['semester_beginning','semester_ending']}),
         ('Czas trwania zapisów', {'fields': ['records_opening','records_ects_limit_abolition','records_closing']}),
+        ('Czas trwania dezyderat', {'fields': ['desiderata_opening', 'desiderata_closing']}),
     ]
     list_editable = ('visible',)
 

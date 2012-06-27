@@ -295,6 +295,7 @@ INSTALLED_APPS = (
     'apps.offer.preferences',
     'apps.offer.proposal',
     'apps.offer.vote',
+    'apps.offer.desiderata',
     'apps.users',
 #    'debug_toolbar',
     'apps.grade.poll',
