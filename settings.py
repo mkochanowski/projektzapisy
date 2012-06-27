@@ -5,7 +5,7 @@ import logging
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-DEBUG = True
+DEBUG = False
 
 RELEASE = False
 
@@ -79,13 +79,13 @@ EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing spa
 #loggin settings:
 
 #LOG_FILE = os.path.join(PROJECT_PATH, "logs/log.log")
-#LOG_LEVEL = logging.NOTSET 
+#LOG_LEVEL = logging.NOTSET
 #INTERNAL_IPS = ('127.0.0.1',)
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,    
+    'disable_existing_loggers': True,
     'formatters': {
         'simple': {
             'format': '%(asctime)s | %(message)s'
@@ -115,7 +115,7 @@ LOGGING = {
         }
      },
     'loggers': {
-      
+
         'project.default': {
             'handlers': ['standard_file', 'mail_admins'],
             'level': 'INFO'
@@ -129,15 +129,6 @@ LOGGING = {
 }
 
 
-def custom_show_toolbar(request):
-    if ('HTTP_HOST' in request.META) and (request.META['HTTP_HOST'][0:2] == 'm.'):
-        return False
-    return DEBUG
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar, 
-    'INTERCEPT_REDIRECTS' : False,
-}
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -220,7 +211,7 @@ TEMPLATE_DIRS = (
 )
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,    
+    'disable_existing_loggers': False,
     'formatters': {
         'simple': {
             'format': '%(asctime)s | %(message)s'
@@ -257,7 +248,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler',
         }
      },
-    
+
     'loggers': {
         '': {
             'handlers': ['mail_admins', 'root'],
@@ -334,9 +325,10 @@ QUEUE_PRIORITY_LIMIT = 5
 
 # that's only the example of settings_local.py file contents:
 #SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
+#SESSION_COOKIE_DOMAIN = '.localhost.localhost' # without port number!
 SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
-#TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = DEBUG
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
 
@@ -348,12 +340,16 @@ DEBUG_TOOLBAR_ALLOWED_USERS = [
 ]
 
 def show_toolbar(request):
-    return True
     if request.user and request.user.username in DEBUG_TOOLBAR_ALLOWED_USERS:
         return True
     return False
 
-DEBUG_TOOLBAR_CONFIG['SHOW_TOOLBAR_CALLBACK'] = show_toolbar
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+    'INTERCEPT_REDIRECTS' : False,
+}
+
 
 CACHES = {
     'default': {
