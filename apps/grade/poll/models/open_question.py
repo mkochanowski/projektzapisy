@@ -18,7 +18,7 @@ class OpenQuestion( BaseQuestion ):
         sts = SavedTicket.objects.filter( poll = poll )
         result = []
         for st in sts:
-            result += st.openquestionanswer_set.filter( question = self, section = section )
+            result += st.openquestionanswer_set.filter( question = self, section = section ).order_by('time')
         return self, result
         
     def get_all_answers_from_poll_for_ticket(self, poll, section, ticket):        
