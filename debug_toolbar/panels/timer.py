@@ -95,7 +95,7 @@ class TimerDebugPanel(DebugPanel):
 
     def content(self):
         stats = self.get_stats()
-        rows = (
+        rows = [
             (_('User CPU time'), _('%(utime)0.3f msec') % stats),
             (_('System CPU time'), _('%(stime)0.3f msec') % stats),
             (_('Total CPU time'), _('%(total)0.3f msec') % stats),
@@ -105,7 +105,7 @@ class TimerDebugPanel(DebugPanel):
 #                                                                   stats['urss'] + stats['usrss'])),
 #            ('Page faults', '%d no i/o, %d requiring i/o' % (stats['minflt'], stats['majflt'])),
 #            ('Disk operations', '%d in, %d out, %d swapout' % (stats['blkin'], stats['blkout'], stats['swap'])),
-        )
+        ]
 
         for timer in TimerDebugPanel.timers:
             timer = TimerDebugPanel.timers[timer]

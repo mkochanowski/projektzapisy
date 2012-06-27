@@ -30,7 +30,7 @@
     {%if user.student and grade %}
         <li{% block connection-choice %}{% endblock %}><a href="{% url grade-ticket-connections-choice %}">Pobierz klucze</a></li>
     {% endif %}
-    {% if grade and user.student%}
+    {% if grade %}
         <li><a href="{% url grade-poll-tickets-enter%}">Oceń zajęcia</a></li>    
     {% endif %}
     {% if user.is_superuser %}
