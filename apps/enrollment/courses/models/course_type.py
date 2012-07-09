@@ -14,7 +14,7 @@ class Type(models.Model):
     have_review_lecture = models.BooleanField(verbose_name=u'Posiada repetytorium', default=False)
     have_lecture = models.BooleanField(verbose_name=u'Posiada wykład', default=False)
     have_tutorial = models.BooleanField(verbose_name=u'Posiada ćwiczenia', default=False)
-    have_lab = models.BooleanField(verbose_name=u'Posiada wykład', default=False)
+    have_lab = models.BooleanField(verbose_name=u'Posiada pracownię', default=False)
     have_tutorial_lab = models.BooleanField(verbose_name=u'Posiada ćwiczenio-pracownię', default=False)
     have_seminar = models.BooleanField(verbose_name=u'Posiada seminarium', default=False)
     have_project = models.BooleanField(verbose_name=u'Posiada projekt', default=False)
