@@ -21,6 +21,9 @@
     {% if user.employee %}
     <li{% block enrollment_menu_courses %}{% endblock %}><a
             href="{% url my-proposal %}">Moje Propozycje</a></li>{% endif %}
+    {% if user.employee %}
+    <li{% block enrollment_preferences %}{% endblock %}><a
+            href="{% url prefs-default-view %}">Preferencje</a></li>{% endif %}
     {% if user.employee or user.student %}
     <li{% block offer_menu_vote %}{% endblock %}><a
             href="{% url vote-main %}">Głosowanie</a></li>{% endif %}
@@ -30,34 +33,5 @@
 
 
 {% block sidebar %}
-	<div id="main-sidebar">
-		<div id="proposal-list">
-				<div class="semester">
-					<h3>Przedmioty w ofercie</h3>
-					<input type="hidden" name="semester-id" value="{{ semester.id }}" />
-					<ul class="proposal-list">
-						{% for course in proposals %}
-							<li  class="{% if course.status == 1 %}offer{% else %}vote{% endif %}">
-								<a href="{% url offer-page course.slug %}" id="proposal-{{ course.id }}">{{ course.name }}</a>
-								<input type="hidden" name="type" value="{% if course.type %}{{ course.type.id }}{% endif %}" />
-								<input type="hidden" name="wasEnrolled" value="false" />
-								<input type="hidden" name="english" value="{{ course.english }}" />
-								<input type="hidden" name="exam" value="{{ course.exam }}" />
-								<input type="hidden" name="status" value="{{ course.status }}" />
-								<input type="hidden" name="teacher" value="{% if course.owner  %}{{ course.owner.id }}{% endif %}" />
-							</li>
-						{% endfor %}
-					</ul>
-
-                    <ul id="proposal-legend">
-                        <li>
-                            <div class="legend-box vote"></div> - przedmiot poddany pod głosowanie
-                        </li>
-                        <li>
-                            <div class="legend-box offer"></div> - przedmiot w ofercie
-                        </li>
-                    </ul>
-				</div>
-		</div>
-	</div>
+    {% include "common/coursesitebar.html" with courses=proposals semester=semester %}
 {% endblock %}

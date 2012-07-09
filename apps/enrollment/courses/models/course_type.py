@@ -10,6 +10,16 @@ class Type(models.Model):
     group     = models.ForeignKey("self", null=True, blank=True, verbose_name='grupa')
     meta_type = models.BooleanField(default = False, verbose_name ='Grupa typow')
     free_in_vote = models.BooleanField(default=False)
+
+    have_review_lecture = models.BooleanField(verbose_name=u'Posiada repetytorium', default=False)
+    have_lecture = models.BooleanField(verbose_name=u'Posiada wykład', default=False)
+    have_tutorial = models.BooleanField(verbose_name=u'Posiada ćwiczenia', default=False)
+    have_lab = models.BooleanField(verbose_name=u'Posiada wykład', default=False)
+    have_tutorial_lab = models.BooleanField(verbose_name=u'Posiada ćwiczenio-pracownię', default=False)
+    have_seminar = models.BooleanField(verbose_name=u'Posiada seminarium', default=False)
+    have_project = models.BooleanField(verbose_name=u'Posiada projekt', default=False)
+
+
 	#TODO: dodać unique na parę (meta_type, name)
     
     @staticmethod

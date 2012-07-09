@@ -106,7 +106,17 @@ class Employee(BaseUser):
     homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
     status = models.PositiveIntegerField(default=0, choices=EMPLOYEE_STATUS_CHOICES, verbose_name="Status")
-        
+
+    def make_preferences(self):
+        from apps.offer.preferences.models import Preference
+
+        Preference.make_preferences(self)
+
+    def get_preferences(self):
+        from apps.offer.preferences.models import Preference
+        return Preference.for_employee(self)
+
+
     def has_privileges_for_group(self, group_id):
         """
         Method used to verify whether user is allowed to create a poll for certain group 
@@ -196,7 +206,7 @@ class Employee(BaseUser):
         except Employee.DoesNotExist:
              logger.error('Function Employee.get_schedule(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
-         
+
     class Meta:
         verbose_name = 'pracownik'
         verbose_name_plural = 'Pracownicy'

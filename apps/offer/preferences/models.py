@@ -5,6 +5,7 @@
 """
 
 from django.db import models
+from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.users.models import Employee
 from apps.offer.proposal.models import Proposal
@@ -65,21 +66,28 @@ class Preference(models.Model):
         for a course.
     """
     employee   = models.ForeignKey(Employee, verbose_name='pracownik')
-    proposal   = models.ForeignKey(Proposal, verbose_name='przedmiot')
+
     hidden     = models.BooleanField(default=False, 
                                      verbose_name='ukryte')
-    
+
+    proposal   = models.ForeignKey(CourseEntity, verbose_name='propozycja')
+
     # preferences
-    lecture    = models.IntegerField(choices=PREFERENCE_CHOICES, 
+    lecture    = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
                                      verbose_name='wykład')
-    review_lecture = models.IntegerField(choices=PREFERENCE_CHOICES, 
+    review_lecture = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
                                      verbose_name='repetytorium')
-    tutorial   = models.IntegerField(choices=PREFERENCE_CHOICES, 
+    tutorial   = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
                                      verbose_name='ćwiczenia')
-    lab        = models.IntegerField(choices=PREFERENCE_CHOICES, 
+    lab        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
                                      verbose_name='pracownia')
-    
-    objects = PreferenceManager()
+    tutorial_lab        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
+                                     verbose_name='ćwiczenio-pracownia')
+    seminar        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
+                                     verbose_name='seminarium')
+    project        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
+                                     verbose_name='projekt')
+
     
     class Meta:
         verbose_name = 'preferencja'
@@ -121,3 +129,27 @@ class Preference(models.Model):
                 raise UnknownPreferenceValue
             self.__setattr__(pref, kwargs[pref])
         self.save()
+
+    @staticmethod
+    def for_employee(employee):
+        return Preference.objects\
+                    .filter(employee=employee, proposal__in_prefs=True, proposal__status__gte=1)\
+                    .select_related('proposal', 'proposal__type', 'employee', 'employee__user')
+
+    @staticmethod
+    def make_preferences(employee):
+        prefsid = Preference.objects\
+                        .filter(employee=employee)\
+                        .order_by('proposal__id')\
+                        .values_list('proposal__id')
+
+        free = CourseEntity.objects.\
+                            exclude(id__in=prefsid).\
+                            filter(in_prefs=True, status__gte=1)
+
+        new_preferences = []
+
+        for pref in free:
+            new_preferences.append(Preference(employee=employee, proposal=pref))
+
+        Preference.objects.bulk_create(new_preferences)

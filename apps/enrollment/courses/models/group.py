@@ -59,14 +59,14 @@ class Group(models.Model):
     def get_groups_by_semester(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teacher', 'teacher__user', 'course', \
+            select_related('teacher', 'teacher__user', 'course',
             'course__type', 'course__entity', 'course__semester').all()
 
     @staticmethod
     def get_groups_by_semester_opt(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teacher', 'teacher__user', 'course', \
+            select_related('teacher', 'teacher__user', 'course',
                 'course__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):

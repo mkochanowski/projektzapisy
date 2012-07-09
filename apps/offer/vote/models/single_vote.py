@@ -59,13 +59,16 @@ class SingleVote ( models.Model ):
         return votes
 
     @staticmethod
-    def get_points_and_voters( proposal, year=None ):
+    def get_points_and_voters( proposal, year=None, state=None ):
         """
             Gets proposal points and voters count in specified year
         """
-        if not year:
-            year = date.today().year
-        current_state = SystemState.get_state(year)
+        if not state:
+            if not year:
+                year = date.today().year
+            current_state = SystemState.get_state(year)
+        else:
+            current_state = state
         votes = SingleVote.objects.filter( entity = proposal, state=current_state, correction__gte=1 )\
                     .select_related('student','student__user', 'entity')
         value = 0

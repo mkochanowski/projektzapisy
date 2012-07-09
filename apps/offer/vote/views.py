@@ -3,6 +3,7 @@
 """
     Vote views
 """
+from datetime import date
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
@@ -102,9 +103,13 @@ def vote_summary( request ):
     summer = []
     winter = []
     unknown = []
-    
+
+
+    year = date.today().year
+    state = SystemState.get_state(year)
+
     for sub in subs:
-        points, voters_count, _ = SingleVote.get_points_and_voters( sub )
+        points, voters_count, _ = SingleVote.get_points_and_voters( sub, year=year, state=state )
         
         if sub.is_winter():
             winter.append( (points, voters_count, sub) )

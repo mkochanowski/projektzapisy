@@ -7,9 +7,8 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('apps.offer.preferences.views',
     url(r'^$',       'view', name='prefs-default-view'),
-    url(r'^description/(?P<proposal_id>\d+)/$', 'description', name='prefs-description'),
-    url(r'^hide/(?P<pref_id>\d+)/$',  'hide',   name='prefs-hide'),
-    url(r'^unhide/(?P<pref_id>\d+)/$','unhide', name='prefs-unhide'),
-    url(r'^save/$', 'save_all_prefs', name='prefs-save-all'),
-    url(r'^init/(?P<prop_id>\d+)/$', 'init_pref', name='prefs-init-pref'),
+    url(r'^hide/$',  'hide',   name='preference-hide'),
+    url(r'^unhide/$',  'unhide',   name='preference-show'),
+    url(r'^save/all$', 'save_all_prefs', name='preference-save-all'),
+    url(r'^save/$', 'save', name='preference-save'),
 )

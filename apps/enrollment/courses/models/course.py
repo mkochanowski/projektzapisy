@@ -71,6 +71,17 @@ class CourseEntity(models.Model):
     created = models.DateTimeField(verbose_name='Utworzono', auto_now_add=True)
     edited  = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now=True)
 
+
+    in_prefs = models.BooleanField(verbose_name='w preferencjach', default=True)
+
+    have_review_lecture = models.NullBooleanField(verbose_name=u'Posiada repetytorium', null=True, blank=True)
+    have_lecture = models.NullBooleanField(verbose_name=u'Posiada wykład', null=True, blank=True)
+    have_tutorial = models.NullBooleanField(verbose_name=u'Posiada ćwiczenia', null=True, blank=True)
+    have_lab = models.NullBooleanField(verbose_name=u'Posiada wykład', null=True, blank=True)
+    have_tutorial_lab = models.NullBooleanField(verbose_name=u'Posiada ćwiczenio-pracownię', null=True, blank=True)
+    have_seminar = models.NullBooleanField(verbose_name=u'Posiada seminarium', null=True, blank=True)
+    have_project = models.NullBooleanField(verbose_name=u'Posiada projekt', null=True, blank=True)
+
     objects   = models.Manager()
     noremoved = NoRemoved()
 
@@ -82,6 +93,34 @@ class CourseEntity(models.Model):
         
     def __unicode__(self):
         return '%s' % (self.name, )
+
+    def test_have(self, name):
+        if self.__getattribute__(name):
+            return  self.__getattribute__(name)
+
+        return self.type.__getattribute__(name)
+
+    def test_have_review_lecture(self):
+        return self.test_have('have_review_lecture')
+
+    def test_have_lecture(self):
+        return self.test_have('have_review_lecture')
+
+    def test_have_tutorial(self):
+        return self.test_have('have_tutorial')
+
+    def test_have_lab(self):
+        return self.test_have('have_lab')
+
+    def test_have_tutorial_lab(self):
+        return self.test_have('have_tutorial_lab')
+
+    def test_have_seminar(self):
+        return self.test_have('have_seminar')
+
+    def test_have_project(self):
+        return self.test_have('have_project')
+
 
     def get_short_name(self):
         if self.shortName is None:
@@ -116,7 +155,8 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposals():
-        return CourseEntity.noremoved.filter(status__gte=1)
+        return CourseEntity.noremoved.filter(status__gte=1)\
+                .select_related('type', 'owner', 'owner__user')
 
     @staticmethod
     def get_proposal(slug):
