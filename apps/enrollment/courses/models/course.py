@@ -104,7 +104,7 @@ class CourseEntity(models.Model):
         return self.test_have('have_review_lecture')
 
     def test_have_lecture(self):
-        return self.test_have('have_review_lecture')
+        return self.test_have('have_lecture')
 
     def test_have_tutorial(self):
         return self.test_have('have_tutorial')
