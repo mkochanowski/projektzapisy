@@ -39,6 +39,7 @@ urlpatterns = patterns('',
     (r'^fereol_admin/users/import_zamawiani', 'apps.users.admin.views.import_zamawiani'),
     (r'^fereol_admin/users/import_new_zamawiani', 'apps.users.admin.views.import_new_zamawiani'),
     (r'^offer', include('apps.offer.proposal.urls')),
+    (r'^prefs/', include('apps.offer.preferences.urls')),
     (r'^desiderata', include('apps.offer.desiderata.urls')),
     (r'^vote/', include('apps.offer.vote.urls')),
     (r'^fereol_admin/', include(admin.site.urls)),
@@ -52,7 +53,6 @@ if not settings.RELEASE:
     (r'^vote/', include('apps.offer.vote.urls')),
     # OD
     #url('^offer/$', 'apps.offer.proposal.views.main', name='offer-main'),
-    (r'^prefs/', include('apps.offer.preferences.urls')),
     # OCENA ZAJĘĆ
     
     (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'site_media')})
