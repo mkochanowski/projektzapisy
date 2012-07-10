@@ -71,20 +71,13 @@ def save(request):
 
 @require_POST
 @employee_required
-def hide(request):
+def hide(request, status):
     """
     Hides preference for employee.
     """
-    return set_hidden(request, True)
+    return set_hidden(request, status)
 
 
-@require_POST
-@employee_required
-def unhide(request):
-    """
-    Unhides preference.
-    """
-    return set_hidden(request, False)
 
 @employee_required
 def save_all_prefs(request):

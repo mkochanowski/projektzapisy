@@ -54,6 +54,8 @@
                         preference.find('.showprop').hide();
                         preference.find('.hideprop').show();
 
+                        $('#course'+id).removeClass('hidden');
+
                     } else {
                         var error     = preference.find('.alert-message.error'),
                             hideerror = function(){
@@ -86,6 +88,8 @@
 
                     preference.find('.showprop').show();
                     preference.find('.hideprop').hide();
+                    alert('#course'+id);
+                    $('#course'+id).addClass('hidden');
 
                 } else {
                     var error = preference.find('.alert-message.error'),
@@ -195,7 +199,7 @@
         <button type="submit" class="btn info showall">Pokaż ukryte</button>&nbsp;
         <button style="display: none;" type="submit" class="btn info hidehidden">Ukryj ukryte</button>&nbsp;
     {% for form in formset %}
-        <div{% if form.instance.hidden %} class="hidden"{% endif %}>
+        <div{% if form.instance.hidden %} class="hidden"{% endif %}><a name="preference{{ form.instance.id}}"></a>
             <h3><a href="{% url offer-page form.instance.proposal.slug %}">{{ form.instance.proposal }}</a></h3>
             {% for hidden in form.hidden_fields %}
             {{ hidden }}
@@ -244,8 +248,8 @@
             </div>
             <div style="text-align: right;">
                 <button type="button" class="btn success saveprop">Zapisz</button>&nbsp;
-                <button type="button" class="btn danger hideprop">Ukryj</button>
-                <button style="display: none;" type="button" class="btn danger showprop">Pokaż</button>
+                <button {% if form.instance.hidden %}style="display: none;" {% endif %}type="button" class="btn danger hideprop">Ukryj</button>
+                <button {% if not form.instance.hidden %}style="display: none;" {% endif %}type="button" class="btn danger showprop">Pokaż</button>
             </div>
             <hr style="margin-top: 5px;">
         </div>
@@ -257,4 +261,29 @@
 {% endblock %}
 
 {% block sidebar %}
+    <div id="main-sidebar">
+    	<div id="proposal-list">
+    			<div class="semester">
+    				<h3>Przedmioty w ofercie</h3>
+    				<ul class="proposal-list">
+    					{% for form in formset %}
+                            {% with course=form.instance.proposal %}
+    						<li id="course{{ form.instance.id }}" {% if form.instance.hidden %}class="hidden"{% endif %}>
+    							<a href="#preference{{ form.instance.id }}" id="proposal-{{ course.id }}">{{ course.name }}</a>
+    						</li>
+                            {% endwith %}
+    					{% endfor %}
+    				</ul>
+
+                       <ul id="proposal-legend">
+                           <li>
+                               <div class="legend-box vote"></div> - przedmiot poddany pod głosowanie
+                           </li>
+                           <li>
+                               <div class="legend-box offer"></div> - przedmiot w ofercie
+                           </li>
+                       </ul>
+    			</div>
+    	</div>
+    </div>
 {% endblock %}
