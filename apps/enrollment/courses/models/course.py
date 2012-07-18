@@ -139,6 +139,18 @@ class CourseEntity(models.Model):
     def is_winter(self):
         return self.semester == 'z'
 
+    def get_all_voters(self, year=None):
+        from apps.offer.vote.models.single_vote import SingleVote
+        from apps.offer.vote.models.system_state import SystemState
+
+        if not year:
+            year = date.today().year
+        current_state = SystemState.get_state(year)
+
+        votes = SingleVote.objects.filter(state=current_state, entity=self).select_related('student', 'student__user').order_by('student__matricula')
+
+        return [vote.student for vote in votes]
+
     @staticmethod
     def get_vote():
         return CourseEntity.noremoved.filter(status=2)
