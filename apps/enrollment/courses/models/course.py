@@ -147,7 +147,7 @@ class CourseEntity(models.Model):
             year = date.today().year
         current_state = SystemState.get_state(year)
 
-        votes = SingleVote.objects.filter(state=current_state, entity=self).select_related('student', 'student__user').order_by('student__matricula')
+        votes = SingleVote.objects.filter(value__gte=1, state=current_state, entity=self).select_related('student', 'student__user').order_by('student__matricula')
 
         return [vote.student for vote in votes]
 
