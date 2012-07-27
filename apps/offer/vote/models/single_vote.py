@@ -87,7 +87,7 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( entity = proposal, state=current_state ).select_related('student', 'student__user')
+        votes = SingleVote.objects.filter( votes__gte=1, entity = proposal, state=current_state ).select_related('student', 'student__user')
 
         voters = []
         for vote in votes:
