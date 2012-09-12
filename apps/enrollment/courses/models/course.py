@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 
 from datetime import timedelta, datetime, date
 from django.core.exceptions import ObjectDoesNotExist
@@ -208,11 +208,11 @@ class Course( models.Model ):
     type = models.ForeignKey('Type', verbose_name='rodzaj')
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący', blank=True)
     description = models.TextField(verbose_name='opis', blank=True, default='') 
-    lectures = models.IntegerField(verbose_name='wykład')
-    repetitions = models.IntegerField(verbose_name='Repetytorium', default=0)
-    exercises = models.IntegerField(verbose_name='ćwiczenia')
-    laboratories = models.IntegerField(verbose_name='pracownia')
-    exercises_laboratories = models.IntegerField(verbose_name='ćw+prac', default=0)
+    lectures = models.IntegerField(verbose_name='wykład', null=True, default=0)
+    repetitions = models.IntegerField(verbose_name='Repetytorium', null=True, default=0)
+    exercises = models.IntegerField(verbose_name='ćwiczenia', null=True, default=0)
+    laboratories = models.IntegerField(verbose_name='pracownia', null=True, default=0)
+    exercises_laboratories = models.IntegerField(verbose_name='ćw+prac', null=True, default=0)
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
