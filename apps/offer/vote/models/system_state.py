@@ -64,7 +64,25 @@ class SystemState( models.Model ):
     correction_end   = models.DateField(
                     verbose_name = 'Koniec korekty',
                     default      = DEFAULT_CORRECTION_END)
-                    
+
+
+    winter_correction_beg   = models.DateField(
+                    verbose_name = 'Początek korekty zimowej',
+                    default      = DEFAULT_CORRECTION_BEG )
+
+    winter_correction_end   = models.DateField(
+                    verbose_name = 'Koniec korekty zimowej',
+                    default      = DEFAULT_CORRECTION_END)
+
+
+    summer_correction_beg   = models.DateField(
+                    verbose_name = 'Początek korekty letniej',
+                    default      = DEFAULT_CORRECTION_BEG )
+
+    summer_correction_end   = models.DateField(
+                    verbose_name = 'Koniec korekty letniej',
+                    default      = DEFAULT_CORRECTION_END)
+
     class Meta:
         verbose_name        = 'ustawienia głosowania'
         verbose_name_plural = 'ustawienia głosowań'
@@ -120,6 +138,16 @@ class SystemState( models.Model ):
         """
             Checks if correction is active
         """
+
+        return self.is_winter_correction_active() or self.is_summer_correction_active()
+
+
+    def is_winter_correction_active(self):
         today = date.today()
 
-        return self.correction_beg <= today <= self.correction_end
+        return self.winter_correction_beg <= today <= self.winter_correction_end
+
+    def is_summer_correction_active(self):
+        today = date.today()
+
+        return self.summer_correction_beg <= today <= self.summer_correction_end

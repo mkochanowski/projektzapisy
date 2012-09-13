@@ -61,13 +61,13 @@
         {{ formset.winter.formset.management_form }}
         {{ formset.summer.formset.management_form }}
         {{ formset.unknown.formset.management_form }}
-        {% if formset.winter.formset.total_form_count > 0 %}
+        {% if formset.winter and formset.winter.formset.total_form_count > 0 %}
             {% include 'offer/vote/vote_li.html' with label='Semestr zimowy' semester='winter' formset=formset.winter.formset %}
         {% endif %}
-        {% if formset.summer.formset.total_form_count > 0 %}
+        {% if formset.summer and formset.summer.formset.total_form_count > 0 %}
             {% include 'offer/vote/vote_li.html' with label='Semestr letni' semester='summer' formset=formset.summer.formset %}
         {% endif %}
-        {% if formset.unknown.formset.total_form_count > 0 %}
+        {% if formset.unknown and formset.unknown.formset.total_form_count > 0 %}
             {% include 'offer/vote/vote_li.html' with label='Semestr nieokreślony' semester='unknown' formset=formset.unknown.formset %}
         {% endif %}
 
