@@ -24,7 +24,12 @@ GROUP_EXTRA_CHOICES = [('',''),
     ('grupa licencjacka','grupa licencjacka'),
     ('grupa magisterska','grupa magisterska'),
     ('grupa zaawansowana','grupa zaawansowana'),
-    (u'wykład okrojony','wykład okrojony'),]
+    (u'wykład okrojony','wykład okrojony'),
+    (u'grupa 1','grupa 1'),
+    (u'grupa 2','grupa 2'),
+    (u'grupa 3','grupa 3'),
+    (u'grupa 4','grupa 4'),
+    (u'grupa 5','grupa 5'),]
 
 class Group(models.Model):
     """group for course"""
