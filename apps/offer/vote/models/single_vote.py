@@ -92,6 +92,15 @@ class SingleVote ( models.Model ):
         return votes
 
     @staticmethod
+    def add_vote_count(proposals, state):
+        return proposals.extra(
+            select = {
+              'votes': "SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.correction > 0 AND vote_singlevote.state_id = %d" % state.id,
+              'voters': "SELECT COUNT(*) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.correction > 0 AND vote_singlevote.state_id = %d" % state.id,
+            },
+        )
+
+    @staticmethod
     def get_points_and_voters( proposal, year=None, state=None ):
         """
             Gets proposal points and voters count in specified year
@@ -104,6 +113,8 @@ class SingleVote ( models.Model ):
             current_state = state
         votes = SingleVote.objects.filter( entity = proposal, state=current_state, correction__gte=1 )\
                     .select_related('student','student__user', 'entity')
+
+
         value = 0
         voters = 0
         for vote in votes:

@@ -97,9 +97,8 @@ def vote_summary( request ):
     """
         summary for vote
     """
-    subs = CourseEntity.get_vote()
-    voters = CourseEntity.get_voters()
-    
+
+
     summer = []
     winter = []
     unknown = []
@@ -108,15 +107,18 @@ def vote_summary( request ):
     year = date.today().year
     state = SystemState.get_state(year)
 
+    subs = CourseEntity.get_vote()
+    subs = SingleVote.add_vote_count(subs, state)
+    subs = subs.values('votes', 'voters', 'name', 'slug', 'semester')
+
     for sub in subs:
-        points, voters_count, _ = SingleVote.get_points_and_voters( sub, year=year, state=state )
-        
-        if sub.is_winter():
-            winter.append( (points, voters_count, sub) )
-        elif sub.is_summer():
-            summer.append( (points, voters_count, sub) )
+
+        if sub['semester'] == 'z':
+            winter.append( (sub['votes'], sub['voters'], sub) )
+        elif sub['semester'] == 'l':
+            summer.append( (sub['votes'], sub['voters'], sub) )
         else:
-            unknown.append( (points, voters_count, sub) )
+            unknown.append( (sub['votes'], sub['voters'], sub) )
             
     data = { 'winter'  : winter,
              'summer'  : summer,
