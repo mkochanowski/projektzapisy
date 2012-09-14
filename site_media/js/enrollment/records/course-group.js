@@ -172,9 +172,10 @@ Fereol.Enrollment.CourseGroup.prototype.getTypeName = function(fullName)
 Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 {
 
+    if( user_is_student ){
     if (!confirm("Czy na pewno chcesz to zrobić?"))
         return;
-
+    }
 	if (!Fereol.Enrollment.CourseGroup._setLoading(true))
 		return;
 	$.dataInvalidate();
@@ -187,7 +188,7 @@ Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 	var self = this;
 	enroll = !!enroll;
 	//nie sprawdzamy if enroll == isEnrolled (bo jest jeszcze kolejka)
-
+    if( user_is_student ){
 	$.post(Fereol.Enrollment.CourseGroup._setEnrolledURL, {
 		group: this.id,
 		enroll: enroll
@@ -216,6 +217,7 @@ Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 		
 		Fereol.Enrollment.CourseGroup._setLoading(false);
 	}, 'json');
+    }
 };
 
 Fereol.Enrollment.CourseGroup.prototype.setPinned = function(pinned)
@@ -228,7 +230,7 @@ Fereol.Enrollment.CourseGroup.prototype.setPinned = function(pinned)
 	pinned = !!pinned;
 	if (this.isPinned == pinned)
 		return;
-
+    if( user_is_student ){
 	$.post(Fereol.Enrollment.CourseGroup._setPinnedURL, {
 		group: this.id,
 		pin: pinned
@@ -243,6 +245,11 @@ Fereol.Enrollment.CourseGroup.prototype.setPinned = function(pinned)
 		self._notifyUpdateListeners();
 		Fereol.Enrollment.CourseGroup._setLoading(false);
 	}, 'json');
+    } else {
+        self.isPinned = pinned;
+        self._notifyUpdateListeners();
+        Fereol.Enrollment.CourseGroup._setLoading(false);
+    }
 };
 
 /**
@@ -262,7 +269,7 @@ Fereol.Enrollment.CourseGroup.prototype.changePriority = function(newPriority)
 	this.queuePriority = newPriority;
 
 	$.dataInvalidate();
-
+    if( user_is_student ){
 	$.post(Fereol.Enrollment.CourseGroup._setQueuePriorityURL, {
 			id: this.id,
 			priority: newPriority
@@ -277,6 +284,10 @@ Fereol.Enrollment.CourseGroup.prototype.changePriority = function(newPriority)
 		else
 			result.displayMessageBox();
 	}, 'json');
+    } else {
+        Fereol.Enrollment.CourseGroup._setLoading(false);
+         self._notifyUpdateListeners();
+    }
 };
 
 /******************************************************************************/
