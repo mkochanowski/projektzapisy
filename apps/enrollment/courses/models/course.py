@@ -255,8 +255,12 @@ class Course( models.Model ):
                  .count()
 
 
-    def is_recording_open_for_student(self, student):
+    def is_recording_open_for_student(self, student=None):
         """ gives the answer to question: is course opened for apps.enrollment for student at the very moment? """
+
+        if not student:
+            return False
+
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
         try:

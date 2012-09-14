@@ -384,15 +384,16 @@ def own(request):
     return render_to_response('enrollment/records/schedule.html',
         data, context_instance = RequestContext(request))
 
-@login_required       
+
 def schedule_prototype(request):
     """ schedule prototype view """
-    try:
+
+    if hasattr(request.user, 'student') and request.user.student:
         student = request.user.student
-    except Student.DoesNotExist:
-        messages.info(request, 'Nie jesteś studentem.')
-        return render_to_response('common/error.html',
-            context_instance=RequestContext(request))
+        student_id = student.id
+    else:
+        student = None
+        student_id = 'None'
 
     TimerDebugPanel.timer_start('loading_semester', 'Pobieranie semestru')
     default_semester = Semester.get_default_semester()
@@ -410,13 +411,14 @@ def schedule_prototype(request):
 
     TimerDebugPanel.timer_start('preload_cache',
         'Przygotowywanie cache StudentOptions')
-    StudentOptions.preload_cache(student, default_semester)
+    if student:
+        StudentOptions.preload_cache(student, default_semester)
     TimerDebugPanel.timer_stop('preload_cache')
-
-    TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')    
-    cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), 'DoesNotExist')
+#
+    TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')
+    cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
     if cached_courses == 'DoesNotExist':
-        logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student.id))
+        logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
         terms = Term.get_all_in_semester(default_semester )
         courses = prepare_courses_with_terms( terms )
         ccourses = []
@@ -440,20 +442,20 @@ def schedule_prototype(request):
             })
             ccourses.append(course['info'])
         cached_courses = ccourses
-        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student.id), cached_courses)
-    else:
-        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student.id))
+        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
+#    else:
+#        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
                    
     TimerDebugPanel.timer_stop('data_prepare')
-
+#
     TimerDebugPanel.timer_start('json_prepare_1', 'Przygotowywanie JSON - st1')
     
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')   
     if cached_all_groups == 'DoesNotExist':
 
-        logger.debug('Cache miss with semester id: %s' % \
-                default_semester.id)
-        mcache.delete("schedule_prototype_courses_json_%s" % student.id)        
+#        logger.debug('Cache miss with semester id: %s' % \
+#                default_semester.id)
+        mcache.delete("schedule_prototype_courses_json_%s" % student_id)
         cached_all_groups = Group.get_groups_by_semester_opt(default_semester)
         mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)                
         
@@ -466,17 +468,17 @@ def schedule_prototype(request):
     cached_test = mcache.get("test_cache", "DoesNotExist")
 
     if cached_test == 'DoesNotExist':
-        logger.debug("test missed")
+#        logger.debug("test missed")
         mcache.set("test_cache", 2)
-    else:
-        logger.debug("test is in cache")
-    cached_courses_json = mcache.get("schedule_prototype_courses_json_%s" % student.id, 'DoesNotExist')
+#    else:
+#        logger.debug("test is in cache")
+    cached_courses_json = mcache.get("schedule_prototype_courses_json_%s" % student_id, 'DoesNotExist')
     if cached_courses_json == 'DoesNotExist':
-        logger.debug("miss schedule_prototype_courses_json_%s" % student.id)
-        cached_courses_json = prepare_courses_json(cached_all_groups, student)
-        mcache.set("schedule_prototype_courses_json_%s" % student.id, cached_courses_json)
-    else:
-        logger.debug("in cache schedule_prototype_courses_json_%s" % student.id)
+#        logger.debug("miss schedule_prototype_courses_json_%s" % student.id)
+        cached_courses_json = prepare_courses_json(cached_all_groups, student) #OK!
+        mcache.set("schedule_prototype_courses_json_%s" % student_id, cached_courses_json)
+#    else:
+#        logger.debug("in cache schedule_prototype_courses_json_%s" % student.id)
         
     data = {
         'courses_json': cached_courses_json,
@@ -488,3 +490,4 @@ def schedule_prototype(request):
     }
     return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))
+

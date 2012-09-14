@@ -90,7 +90,7 @@
 	top: 0;
 	left: 0;
 	cursor: default;
-    width: 34px;
+    width: auto;
 
 	border: 1px solid #666666;
 	border-top: 0;

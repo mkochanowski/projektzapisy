@@ -54,12 +54,14 @@
 {% block content %}
 	<form action="{% url records-set-locked %}" method="post" id="enr-schedulePrototype-setLocked"><div>
 		<input type="hidden" name="ajax-url" value="{% url records-set-locked '.json' %}" />
-		{% if user.student.block %}
-			<input type="hidden" name="lock" value="false" />
-			<input type="submit" value="Odblokuj plan" />
-		{% else %}
-			<input type="hidden" name="lock" value="true" />
-			<input type="submit" value="Zablokuj plan" />
+        {% if request.user.student %}
+            {% if user.student.block %}
+                <input type="hidden" name="lock" value="false" />
+                <input type="submit" value="Odblokuj plan" />
+            {% else %}
+                <input type="hidden" name="lock" value="true" />
+                <input type="submit" value="Zablokuj plan" />
+            {% endif %}
 		{% endif %}
 	</div></form>
 

@@ -65,8 +65,11 @@ def prepare_groups_json(semester, groups, student=None, employee=None):
     TimerDebugPanel.timer_stop('pgj_1')
     TimerDebugPanel.timer_start('pgj_2',
         'prepare_groups_json - queue_priorities')
-    queue_priorities = Queue.queue_priorities_map(
+    if student:
+        queue_priorities = Queue.queue_priorities_map(
         Queue.get_student_queues(student, semester))
+    else:
+        queue_priorities = {}
     TimerDebugPanel.timer_stop('pgj_2')
     groups_json = []
     TimerDebugPanel.timer_start('pgj_3', 'prepare_groups_json - serialize')

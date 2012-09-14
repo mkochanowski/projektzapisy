@@ -11,6 +11,7 @@ SchedulePrototype.init = function()
 {
 	var scheduleContainer = $('#enr-schedulePrototype-scheduleContainer').assertOne();
 
+
 	SchedulePrototype.initGroups();
 
 	SchedulePrototype.schedule = new Schedule(scheduleContainer);
@@ -30,7 +31,9 @@ SchedulePrototype.init = function()
 
 	SchedulePrototype.initCourseList();
 	SchedulePrototype.initFilter();
-	SchedulePrototype.initRecordsLocking();
+    if( user_is_student ){
+	    SchedulePrototype.initRecordsLocking();
+    }
 
 	$.dataInvalidate(); // zawsze chcemy świeżych danych
 };
@@ -169,7 +172,7 @@ SchedulePrototype.initRecordsLocking = function()
 
 		isLocked = !isLocked;
 		updateLockButton();
-		
+		if( user_is_student ){
 		$.post(lockURL, {
 			lock: isLocked
 		}, function(data)
@@ -185,6 +188,7 @@ SchedulePrototype.initRecordsLocking = function()
 				result.displayMessageBox();
 			self._updateVisibility();
 		}, 'json');
+        }
 	});
 
 	lockButton.hover(function()
