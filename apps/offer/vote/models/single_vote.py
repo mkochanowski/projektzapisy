@@ -5,6 +5,7 @@
 """
 
 from datetime  import date
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.aggregates import Sum
 from apps.enrollment.courses.models.course import CourseEntity, Course
@@ -95,7 +96,7 @@ class SingleVote ( models.Model ):
     def add_vote_count(proposals, state):
         return proposals.extra(
             select = {
-              'votes': "SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.correction > 0 AND vote_singlevote.state_id = %d" % state.id,
+              'votes': "SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.state_id = %d" % state.id,
               'voters': "SELECT COUNT(*) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.correction > 0 AND vote_singlevote.state_id = %d" % state.id,
             },
         )
@@ -147,12 +148,19 @@ class SingleVote ( models.Model ):
         pass
 
     @staticmethod
-    def make_votes( student, year=None ):
+    def make_votes( student, year=None, state=None, tag='winter' ):
         """
             Makes 'zero' vote for student - only for proposal without
             vote
         """
         from apps.offer.proposal.models.proposal import Proposal
+
+        correction = state.is_correction_active()
+        semester = None
+        if tag == 'winter':
+            semester = state.semester_winter
+        if tag == 'summer':
+            semester = state.semester_summer
 
 
         year = year if year else date.today().year
@@ -167,9 +175,16 @@ class SingleVote ( models.Model ):
         new_votes = []
         for proposal in proposals:
             if proposal.id not in old_votes:
-                new_votes.append(SingleVote(student=student,
-                                               entity=proposal,
-                                               state=current_state))
+                kwargs = {}
+                kwargs['student'] = student
+                kwargs['entity']  = proposal
+                kwargs['state']   = current_state
+                if correction:
+                    try:
+                        kwargs['course'] = Course.objects.get(semester=semester, entity = proposal)
+                    except ObjectDoesNotExist:
+                        pass
+                new_votes.append(SingleVote(**kwargs))
 
         if new_votes:
             SingleVote.objects.bulk_create(new_votes)

@@ -30,7 +30,7 @@ def vote( request ):
     if not state.is_system_active():
         raise Http404
 
-    SingleVote.make_votes(student)
+    SingleVote.make_votes(student, state=state)
 
     kwargs = {'student': student, 'state': state}
     if request.method == 'POST':
