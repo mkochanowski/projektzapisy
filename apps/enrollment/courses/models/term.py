@@ -144,7 +144,10 @@ def log_add_term(sender, instance, created, **kwargs):
         
 def log_delete_term(sender, instance, **kwargs):
     term = instance
-    term_format = '-'.join([term.dayOfWeek,str(term.start_time),str(term.end_time),term.classroom.number])
+    words = [term.dayOfWeek,str(term.start_time),str(term.end_time)]
+    if term.classroom:
+        words += term.classroom.number
+    term_format = '-'.join(words)
     backup_logger.info('[10] term <%s> for group <%s> has been deleted' % (term_format.encode('utf-8'), term.group.id))
             
 signals.pre_save.connect(log_edit_term, sender=Term)          
