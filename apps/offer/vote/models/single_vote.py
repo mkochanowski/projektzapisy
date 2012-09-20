@@ -33,6 +33,8 @@ class SingleVote ( models.Model ):
     value      = models.IntegerField(choices=votes, default=0, verbose_name='punkty')
     correction = models.IntegerField(choices=votes, default=0, verbose_name='korekta')
 
+    free_vote = models.BooleanField(default=False, verbose_name=u'Głos nie liczy się do limitu')
+    # powyższe pole służy do odróżnienia np glosow dopisanych, ktorych nie chcemy liczyc do limitu
     	
     class Meta:
         verbose_name        = 'pojedynczy głos'
