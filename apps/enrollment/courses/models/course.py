@@ -129,8 +129,11 @@ class CourseEntity(models.Model):
             return self.shortName
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.slug = slugify('%s' % (self.name,))
+        super(CourseEntity, self).save(*args, **kwargs)
+
+        if not self.slug:
+            self.slug = slugify('%d_%s' % (self.pk, self.name,))
+
         super(CourseEntity, self).save(*args, **kwargs)
 
     def is_summer(self):
@@ -230,8 +233,8 @@ class Course( models.Model ):
     visible = VisibleManager()
     
     def save(self, *args, **kwargs):
+        super(Course, self).save(*args, **kwargs)
         if not self.pk:
-            self.slug = slugify('%s %s' % (self.name, self.semester))
             if not self.type:
                 self.type = self.entity.type
             if not self.lectures:
@@ -244,6 +247,10 @@ class Course( models.Model ):
                 self.repetitions = self.entity.repetitions
             if not self.description:
                 self.description = self.entity.description
+
+        if not self.slug:
+            self.slug = slugify('%d %s %s' % (self.pk, self.name))
+
         super(Course, self).save(*args, **kwargs)
 
 
