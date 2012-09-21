@@ -7,7 +7,7 @@ from django.db.models.loading import cache
 from django.template import Context
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
-from apps.users.exceptions import NonEmployeeException, NonStudentException
+from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
 from apps.enrollment.courses.models.points import PointTypes
 from apps.enrollment.courses.models import Semester
 from apps.enrollment.courses.models import StudentOptions
@@ -270,7 +270,8 @@ class Student(BaseUser):
         """ returns courses which were voted with given_points by student """
         current_semester = Semester.get_default_semester()
         from apps.offer.vote.models.single_vote import SingleVote
-        return map(lambda x: x.course, SingleVote.objects.filter(student=self, state__semester_summer=current_semester, correction=given_points).select_related('course').order_by('course__name'))
+        return map(lambda x: x.course, SingleVote.objects.filter(student=self, state__semester_winter=current_semester,
+                                              correction=given_points).select_related('course').order_by('course__name'))
         #return map(lambda x: x.course, StudentOptions.objects.filter(course__semester__id__exact=current_semester.id).filter(student=self, records_opening_bonus_minutes=minutes).order_by('course__name'))
         
     def get_records_history(self,default_semester=None):
@@ -330,7 +331,7 @@ class Student(BaseUser):
                 group.course_ = group.course
             return groups
         except Student.DoesNotExist:
-             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % user.id )
+             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % student )
              raise NonStudentException()
     
     def records_set_locked(self, locked):
@@ -416,7 +417,7 @@ class StudiaZamawiane(models.Model):
                 }
                 context = Context(c)
                 message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
-                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context) 
+                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context)
                 
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
                 
