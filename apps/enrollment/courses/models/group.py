@@ -35,7 +35,7 @@ class Group(models.Model):
     """group for course"""
     course = models.ForeignKey('Course', verbose_name='przedmiot', related_name='groups')
     teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
-    type    = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
+    type    = models.CharField(max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych', help_text='miejsca gwarantowane dla studentów zamawianych')
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
