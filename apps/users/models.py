@@ -249,7 +249,7 @@ class Student(BaseUser):
 
     def participated_in_last_grades(self):
         from apps.grade.ticket_create.models.student_graded import StudentGraded
-        return StudentGraded.objects.filter(student=self, semester__in=[41, 42]).count()
+        return StudentGraded.objects.filter(student=self, semester__in=[45, 239]).count()
 
     def get_t0_interval(self):
         """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
