@@ -101,7 +101,7 @@
                             <input type="hidden" name="is-signed-in"
                                    value="{% if t.signed %}true{% else %}false{% endif %}"/>
                             {% if course.is_recording_open and user.student.is_active %}
-                                <form action="{% url records-set-enrolled %}" method="post" class="setEnrolled">
+                                <form action="{% url records-set-enrolled %}" method="post" class="setEnrolled">{% csrf_token %}
                                     <div>
                                         <input type="hidden" name="group" value="{{ t.id }}"/>
                                         {% if t.signed %}
@@ -133,7 +133,7 @@
                         {% if course.is_recording_open and user.student.is_active %}
                             <td class="priority">
                                 {% if t.priority %}
-                                    <form action="{% url records-set-queue-priority %}" method="post">
+                                    <form action="{% url records-set-queue-priority %}" method="post">{% csrf_token %}
                                         <div>
                                             <input type="hidden" name="id" value="{{ t.id }}"/>
                                             <input type="hidden" name="priority" value="{{ t.priority|add:-1}}"/>
@@ -142,7 +142,7 @@
                                         </div>
                                     </form>
                                     <span>{{ t.priority }}</span>
-                                    <form action="{% url records-set-queue-priority %}" method="post">
+                                    <form action="{% url records-set-queue-priority %}" method="post">{% csrf_token %}
                                         <div>
                                             <input type="hidden" name="id" value="{{ t.id }}"/>
                                             <input type="hidden" name="priority" value="{{ t.priority|add:1}}"/>
