@@ -118,7 +118,7 @@ LOGGING = {
       
         'project.default': {
             'handlers': ['standard_file', 'mail_admins'],
-            'level': 'INFO'
+            'level': 'ERROR'
         },
         'project.backup': {
             'handlers': ['backup_file'],
@@ -250,13 +250,15 @@ LOGGING = {
      },
     
     'loggers': {
-        '': {
-            'handlers': ['mail_admins', 'root'],
-            'level': 'DEBUG'
+        'django.request': {
+            'handlers': ['mail_admins',],
+            'level': 'ERROR',
+            'propagate': True,
         },
         'project.default': {
             'handlers': ['standard_file', 'mail_admins'],
-            'level': 'DEBUG'
+            'level': 'ERROR',
+            'propagate': True
         },
         'project.backup': {
             'handlers': ['backup_file'],
@@ -337,7 +339,7 @@ DEBUG_TOOLBAR_ALLOWED_USERS = [
     "209067", # Tomasz Wasilczyk
     "209138", # Arkadiusz Flinik
     "208934",
-    "gosia"
+    "gosia", "stanislaw"
 ]
 
 def show_toolbar(request):
