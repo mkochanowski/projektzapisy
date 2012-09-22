@@ -231,6 +231,12 @@ class Student(BaseUser):
     status = models.PositiveIntegerField(default=0, verbose_name="Status")
     status.help_text = "0 - aktywny student, 1 - skreślony student"
 
+    t0 = models.DateTimeField(null=True, blank=True)
+
+    def make_t0(self, semester=None):
+        if not semester:
+            semester = Semester.get_current_semester()
+        self.t0 = semester.records_opening - self.get_t0_interval()
     
     def is_active(self):
         return self.status == 0
