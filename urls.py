@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     #url('^enrollment/$', 'apps.enrollment.courses.views.main', name='enrollment-main'),
     (r'^courses/', include('apps.enrollment.courses.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),
+    (r'^statistics/', include('apps.enrollment.statistics.urls')),
     url(r'^consultations/$', 'apps.users.views.consultations_list', name="consultations-list"),
 
     (r'^news/', include('apps.news.urls')),
