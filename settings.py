@@ -320,7 +320,7 @@ SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
 
 #settings for enrollment
 ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
-ECTS_LIMIT = 40
+ECTS_LIMIT = 35
 
 VOTE_LIMIT = 60
 
