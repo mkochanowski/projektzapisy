@@ -1,0 +1,109 @@
+{% load fereol_common %}
+<h2>{{ semester }}</h2>
+<div id="enr-schedule-scheduleContainer" class="schedule">
+
+	<input type="hidden" name="courses" value="{{ courses_json }}" />
+	<input type="hidden" name="groups" value="{{ groups_json }}" />
+	<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
+	<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
+	<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
+	<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
+
+	<div class="byWeekDays">
+		<h2>Zajęcia z podziałem na dni</h2>
+		{% for day in terms_by_days %}
+			<h3>{{ day.day_name|capfirst }}</h3>
+			<ul>
+				{% for term in day.terms %}
+					<li>
+						<span class="time">
+							{{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
+						</span>
+						<span class="name">
+							{{ term.object.group.course.name }}
+						</span>
+						<span class="type">
+							&ndash;
+							{{ term.object.group.get_type_display }}
+						</span>
+						<span class="classroom">
+							(sala {{ term.object.classroom.number }})
+						</span>
+					</li>
+				{% endfor %}
+			</ul>
+		{% endfor %}
+	</div>
+</div>
+
+
+{% if courses %}
+{% if user.student %}
+       <h3>Zajęcia, na które jesteś zapisany</h3>
+{% else %}
+       <h3>Zajęcia, które prowadzisz</h3>
+{% endif %}
+<table id="enr-schedule-listByCourse" class="zebra-striped">
+	<thead>
+		<tr>
+			<th>Przedmiot</th>
+			{% if user.student %}
+                   <th class="ects">{{ points_type }}</th>
+               {% else %}
+                   <th class="ects">Godziny</th>
+               {% endif %}
+		</tr>
+	</thead>
+	<tfoot>
+		<tr>
+		{% if user.student %}
+			<td>Suma punktów {{ points_type }}:</td>
+			<td class="ects">{{ points_sum }}</td>
+           {% else %}
+               <td>Liczba godzin:</td>
+               <td class="ects">{{ hours_sum }}</td>
+           {% endif %}
+		</tr>
+	</tfoot>
+	<tbody>
+		{% for course in courses %}
+			<tr class="courseHeader">
+				<td class="name">
+					<a href="{% url course-page course.info.slug %}">
+						{{ course.info.name }}
+					</a>
+				</td>
+				<td rowspan="2" class="ects">
+					{% if points|hash:course.info.id %}
+						{{ points|hash:course.info.id|getattribute:'value' }}
+					{% endif %}
+				</td>
+			</tr>
+			<tr class="courseDetails"><td>
+				<input type="hidden" name="id" value="{{ course.info.id }}" />
+				<input type="hidden" name="name" value="{{ course.info.name }}" />
+				<input type="hidden" name="type" value="{{ course.info.type }}" />
+				<input type="hidden" name="short" value="{{ course.info.short }}" />
+				<input type="hidden" name="url" value="{% url course-page course.info.slug %}" />
+				{% if course.terms %}
+				<ul>
+					{% for term in course.terms %}
+					<li>
+						<span class="type">{{ term.object.group.get_type_display }}:</span>
+						<span class="term">
+							{{ term.object.get_dayOfWeek_display }}
+							{{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
+						</span>
+						<span class="classroom">
+							 {{ term.object.numbers }}
+						</span>
+						<input type="hidden" name="term" value="{{ term.json }}" />
+					</li>
+					{% endfor %}
+				</ul>
+				{% endif %}
+			</td></tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endif %}

@@ -87,12 +87,12 @@ def prepare_courses_json(groups, student):
         courses_json.append(group.course.serialize_for_ajax(student))
     return simplejson.dumps(courses_json)
 
-def prepare_schedule_courses(request, for_student = None, for_employee = None):
+def prepare_schedule_courses(request, for_student = None, for_employee = None, semester=None):
     if not (for_student is None) and not (for_employee is None):
         raise RuntimeError('Nie można wygenerować jednocześnie dla studenta' + \
             ' i pracownika')
 
-    default_semester = Semester.get_default_semester()
+    default_semester = semester or Semester.get_default_semester()
 
     if not for_employee is None:
         terms = Term.get_all_in_semester(default_semester, employee=for_employee)
@@ -110,7 +110,7 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None):
 
     return prepare_courses_with_terms(terms, records)
 
-def prepare_schedule_data(request, courses):
+def prepare_schedule_data(request, courses, semester=None):
     try:
         if hasattr(request.user, 'student') and request.user.student:
             student = request.user.student
@@ -125,7 +125,7 @@ def prepare_schedule_data(request, courses):
             employee = None
     except Employee.DoesNotExist:
         employee = None
-    default_semester = Semester.get_default_semester()
+    default_semester = semester or Semester.get_default_semester()
 
     terms_by_days = [None for i in range(8)] # dni numerowane od 1
     for course in courses:

@@ -37,117 +37,23 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
                                          ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
                                          ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
                                                  ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
-        for c in courses:
-            c.was_enrolled = c.in_history > 0
     else:
         courses = Course.visible.all().order_by('name')
-        for c in courses:
-            c.was_enrolled = False
 
 
-    semester_courses_list = {}
-    semester_courses_list_setdefault = semester_courses_list.setdefault
 
-
-    def map_course(x):
-        return {
-                'id': x.id,
-                'name': x.name,
-                'type': x.type_id,
-                'slug': x.slug,
-                'english': x.english,
-                'exam': x.exam,
-                'suggested_for_first_year': x.suggested_for_first_year,
-                'semester': x.semester_id,
-                'was_enrolled': x.was_enrolled
-                }
-
-    for course in courses:
-        semester_courses_list_setdefault(course.semester_id,[]).append(map_course(course))
-
-    semester_courses = []
-    semester_courses_append = semester_courses.append
-    for semester in semesters:
-        semester_courses_append({
-            'id': semester.pk,
-            'name': semester.get_name(),
-            'is_current': semester.is_current_semester(), #TODO: być może zbędne
-            'is_default': (semester == default_semester),
-            'courses': semester_courses_list[semester.id]
-        })
-
-
-    render_data = {
-        'semester_courses': semester_courses,
+    return {
+        'courses': courses,
+        'semester_courses': semesters,
         'types_list' : Type.get_all_for_jsfilter(),
         'default_semester': default_semester
     }
-    return render_data
 
 def prepare_courses_list_to_render_and_return_course(request,default_semester=None,user=None, student=None, course_slug=None):
     ''' generates template data for filtering and list of courses '''
-    if not default_semester:
-        default_semester = Semester.get_default_semester()
-    if not user:
-        user = request.user
-    
-    def map_course(x):
-        return {
-                'id': x.id, 
-                'name': x.name, 
-                'type': x.type_id, 
-                'slug': x.slug,
-                'english': x.english,
-                'exam': x.exam,
-                'suggested_for_first_year': x.suggested_for_first_year,
-                'semester': x.semester_id,
-                'was_enrolled': x.was_enrolled
-                }
+    render_data = prepare_courses_list_to_render(request,default_semester,user, student)
+    result_course = Course.objects.get(slug=course_slug) if course_slug else None
 
-    semesters = Semester.objects.filter(visible=True)
-    if hasattr(user, "student") and user.student:
-        courses = Course.visible.all().order_by('name')\
-        .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
-                                     ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
-                                     ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
-                                     ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
-                                             ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
-    else:
-        courses = Course.visible.all().order_by('name')
-
-
-    semester_courses_list = {}
-    semester_courses_list_setdefault = semester_courses_list.setdefault
-
-
-    result_course = None
-    for course in courses:
-        if hasattr(course, "in_history"):
-            course.was_enrolled = int(course.in_history) > 0
-        else:
-            course.was_enrolled = False
-        semester_courses_list_setdefault(course.semester_id,[]).append(map_course(course))
-        if course_slug and course_slug==course.slug:
-            result_course = course
-
-    semester_courses = []
-    semester_courses_append = semester_courses.append
-    for semester in semesters:
-        semester_courses_append({
-            'id': semester.pk,
-            'name': semester.get_name(),
-            'is_current': semester.is_current_semester(), #TODO: być może zbędne
-            'is_default': (semester == default_semester),
-            'courses': semester_courses_list[semester.id]
-        })
-        if result_course and result_course.semester_id==semester.pk:
-            result_course.semester = semester
-
-    render_data = {
-        'semester_courses': semester_courses,
-        'types_list' : Type.get_all_for_jsfilter(),
-        'default_semester': default_semester
-    }
     return render_data, result_course
 
 def courses(request):

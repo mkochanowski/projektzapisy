@@ -1,6 +1,6 @@
 {% extends "enrollment/base.html" %}
 {% load compressed %}
-
+{% load cache %}
 {% block js %}
     {% compressed_js 'courses' %}
 {% endblock %}
@@ -36,7 +36,7 @@
 				<select id="enr-courseFilter-semester">
 					<option value="0">dowolny</option>
 					{% for semester in semester_courses %}
-						<option value="{{ semester.id }}" {% if semester.id == default_semester.id %} selected="selected" {% endif %}>{{ semester.name }}{% if semester.is_default %} (bieżący){% endif %}</option>
+						<option value="{{ semester.id }}" {% if semester.id == default_semester.id %} selected="selected" {% endif %}>{{ semester.year }} {{ semester.get_type_display }}{% if semester.id == default_semester.id %} (bieżący){% endif %}</option>
 					{% endfor %}
 				</select>
 			</span>
@@ -54,26 +54,30 @@
 
 
 {% block sidebar %}
+    {% cache 3600 courses_list request.user %}
 	<div id="main-sidebar">
 		<div id="course-list">
 			{% for semester in semester_courses %}
 				<div class="semester">
-					<h3>Semestr <span>{{ semester.name }}</span></h3>
+					<h3>Semestr <span>{{ semester.year }} {{ semester.get_type_display }}</span></h3>
 					<input type="hidden" name="semester-id" value="{{ semester.id }}" />
 					<ul class="courses-list">
-						{% for course in semester.courses %}
+						{% for course in courses %}
+                            {% if course.semester_id == semester.id %}
 							<li>
 								<a href="{% url course-page course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
-								<input type="hidden" name="type" value="{{ course.type }}" />
-								<input type="hidden" name="wasEnrolled" value="{{ course.was_enrolled }}" />
+								<input type="hidden" name="type" value="{{ course.type_id }}" />
+								<input type="hidden" name="wasEnrolled" value="{% if course.in_history and course.in_history > 0 %}True{% else %}False{% endif %}" />
 								<input type="hidden" name="english" value="{{ course.english }}" />
 								<input type="hidden" name="exam" value="{{ course.exam }}" />
 								<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />
 							</li>
+                            {% endif %}
 						{% endfor %}
 					</ul>
 				</div>
 			{% endfor %}
 		</div>
 	</div>
+    {% endcache %}
 {% endblock %}
