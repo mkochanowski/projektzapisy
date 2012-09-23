@@ -63,7 +63,24 @@ class Semester( models.Model ):
                 return None
             except IndexError:
                 return None
-                
+
+
+    @staticmethod
+    def get_list(user=None):
+        if not user:
+            return Semester.objects.filter(visible=True)
+
+        semesters = Semester.objects.filter(visible=True, semester_beginning__gte=user.date_joined)
+
+        if semesters:
+            return semesters
+
+        return Semester.objects.filter(visible=True)[0]
+
+    @staticmethod
+    def get_by_id(id):
+        return Semester.objects.get(id=id)
+
                 
     @staticmethod
     def get_current_semester():

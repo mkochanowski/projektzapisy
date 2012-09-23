@@ -17,7 +17,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     fieldsets = [
         (None,               {'fields': ['entity','name'], 'classes': ['long_name']}),
-        ('Szczegóły', {'fields': ['teachers','requirements','description','semester','english','exam','suggested_for_first_year','type','slug','web_page'], 'classes': ['collapse']}),
+        ('Szczegóły', {'fields': ['numeryczna_l', 'dyskretna_l', 'teachers','requirements','description','semester','english','exam','suggested_for_first_year','type','slug','web_page'], 'classes': ['collapse']}),
         ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises_laboratories','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
     ]
     inlines = [GroupInline, ]

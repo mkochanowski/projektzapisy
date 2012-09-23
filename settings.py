@@ -325,6 +325,8 @@ ECTS_LIMIT = 35
 
 VOTE_LIMIT = 60
 
+M_PROGRAM = 1
+
 QUEUE_PRIORITY_LIMIT = 5
 
 # that's only the example of settings_local.py file contents:

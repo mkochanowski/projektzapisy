@@ -11,6 +11,8 @@ from django.core.cache import cache as mcache
 
 from apps.enrollment.courses.models.points import PointsOfCourses, PointsOfCourseEntities
 from apps.offer.proposal.exceptions import NotOwnerException
+from apps.users.models import Program
+import settings
 from student_options import StudentOptions
 
 import logging
@@ -228,7 +230,10 @@ class Course( models.Model ):
     
     # XXX: fix tests (fixtures) to safely remove 'null=True' from semester field
     # and also fix get_semester_name method
-    
+
+    dyskretna_l  = models.BooleanField(default=False)
+    numeryczna_l = models.BooleanField(default=False)
+
     objects = Related()
     visible = VisibleManager()
     
@@ -322,8 +327,13 @@ class Course( models.Model ):
         '''
         pts = None
         if student:
+            if ( student.numeryczna_l and self.numeryczna_l) or (student.dyskretna_l and self.dyskretna_l):
+                import settings
+                program = Program.objects.get(id=settings.M_PROGRAM)
+            else:
+                program = student.program_id
             try:
-                pts = PointsOfCourses.objects.filter(course=self, program=student.program_id)
+                pts = PointsOfCourses.objects.filter(course=self, program=program)
             except PointsOfCourses.DoesNotExist:
                 pts = None
         if not pts:
@@ -338,14 +348,14 @@ class Course( models.Model ):
 
 
     @staticmethod
-    def get_points_for_courses(courses, program):
+    def get_points_for_courses(courses, program, student=None):
         '''
             returns points for courses in certain studies program
 
             format: map with keys = course ids
         '''
         points = {}
-        course_points = PointsOfCourses.objects.filter(course__in = courses, \
+        course_points = PointsOfCourses.objects.filter(course__in = courses,
             program=program).select_related('course')
         courses_without_points = []
         course_entities = []
