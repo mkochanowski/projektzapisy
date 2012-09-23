@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block sidebar %}
-    {% cache 500 employees_list %}
+    {% cache 10000 employees_list char %}
 <div id="main-sidebar">
 	<div id="employees-list">
 		<h2>Lista pracowników</h2>
@@ -38,8 +38,8 @@
 			<li><a href="{% url employee-profile e.user.id %}" class="employee-profile-link">{{e.get_full_name}}</a>
                 <input type='hidden' name='employee-id' value='{{ e.id }}' />
                 <input type='hidden' name='employee-email' value='{{ e.user.email }}' />
-                <input type='hidden' name='employee-short_old' value='{{ e.short_old }}' />
-                <input type='hidden' name='employee-short_new' value='{{ e.short_new }}' />
+                <input type='hidden' name='employee-short_old' value='{{ e.user.first_name|slice:":1"}}{{ e.user.last_name|slice:":2"}}' />
+                <input type='hidden' name='employee-short_new' value='{{ e.user.first_name|slice:":2"}}{{ e.user.last_name|slice:":2"}}' />
             </li>
 			{% endfor %}
 		</ul>
