@@ -231,7 +231,7 @@ class Record(models.Model):
             new_records = []
             for l in lectures:
                 #TODO: nie podoba mi się to
-                if (l not in groups) and (l.get_count_of_enrolled(dont_use_cache=True) < l.limit):
+                if (l not in groups) and (l.get_count_of_enrolled(dont_use_cache=False) < l.limit):
                     record, created = Record.objects.get_or_create(group=l, student=student)
                     if created:
                         record.status = STATUS_ENROLLED
@@ -265,9 +265,9 @@ class Record(models.Model):
                 raise RecordsNotOpenException()
             # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
             if (group.limit_zamawiane > 0 and not student.is_zamawiany()):
-                group_is_full = group.get_count_of_enrolled_non_zamawiane(dont_use_cache=True) >= group.limit_non_zamawiane()
+                group_is_full = group.get_count_of_enrolled_non_zamawiane(dont_use_cache=False) >= group.limit_non_zamawiane()
             else:
-                group_is_full = group.get_count_of_enrolled(dont_use_cache=True) >= group.limit
+                group_is_full = group.get_count_of_enrolled(dont_use_cache=False) >= group.limit
             if not group_is_full:
                 g_id = Record.is_student_in_course_group_type(user=user, slug=group.course_slug(), group_type=group.type)
                 if g_id and group.type != '1':
@@ -569,7 +569,7 @@ class Queue(models.Model):
             
             returns None, when there is no space for students left at all
         '''
-        if (group.get_count_of_enrolled(dont_use_cache=True) >= group.limit):
+        if (group.get_count_of_enrolled(dont_use_cache=False) >= group.limit):
             return None
         only_zamawiany = group.available_only_for_zamawiane()
         
