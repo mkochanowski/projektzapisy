@@ -1,5 +1,6 @@
 {% extends "enrollment/base.html" %}
 {% load compressed %}
+{% load cache %}
 {% block styles %}
     {% compressed_css 'userslist' %}
 {% endblock %}
@@ -28,6 +29,7 @@
 {% endblock %}
 
 {% block sidebar %}
+    {% cache 500 employees_list %}
 <div id="main-sidebar">
 	<div id="employees-list">
 		<h2>Lista pracowników</h2>
@@ -43,6 +45,7 @@
 		</ul>
 	</div>
 </div>
+    {% endcache %}
 {% endblock %}
 
 {% block filter %}
