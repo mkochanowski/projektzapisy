@@ -81,19 +81,19 @@ class Group(models.Model):
     def limit_non_zamawiane(self):
         return self.limit - self.limit_zamawiane
 
-    def available_only_for_zamawiane(self, dont_use_cache=True):
+    def available_only_for_zamawiane(self, dont_use_cache=False):
         return (self.limit_zamawiane > 0 and
             self.get_count_of_enrolled_non_zamawiane(dont_use_cache=
             dont_use_cache) >= self.limit_non_zamawiane())
 
-    def get_count_of_enrolled(self, dont_use_cache=True):
+    def get_count_of_enrolled(self, dont_use_cache=False):
         from apps.enrollment.records.models import Record
         if dont_use_cache:
             return Record.enrolled.filter(group=self).count()
         self.update_students_counts_if_empty()
         return self.cache_enrolled
 
-    def get_count_of_enrolled_zamawiane(self, dont_use_cache=True):
+    def get_count_of_enrolled_zamawiane(self, dont_use_cache=False):
         from apps.enrollment.records.models import Record
         from apps.users.models import StudiaZamawiane
         if dont_use_cache:
@@ -104,11 +104,11 @@ class Group(models.Model):
         self.update_students_counts_if_empty()
         return self.cache_enrolled_zam
 
-    def get_count_of_enrolled_non_zamawiane(self, dont_use_cache=True):
+    def get_count_of_enrolled_non_zamawiane(self, dont_use_cache=False):
         return self.get_count_of_enrolled(dont_use_cache=dont_use_cache) - \
             self.get_count_of_enrolled_zamawiane(dont_use_cache=dont_use_cache)
 
-    def get_count_of_queued(self, dont_use_cache=True):
+    def get_count_of_queued(self, dont_use_cache=False):
         from apps.enrollment.records.models import Queue
         if dont_use_cache:
             return Queue.queued.filter(group=self).count()
