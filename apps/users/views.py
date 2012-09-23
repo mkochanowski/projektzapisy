@@ -36,6 +36,8 @@ from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
 import datetime
 
 import logging
+
+from django.core.cache import cache as mcache
 logger = logging.getLogger()
 import vobject
 
@@ -265,17 +267,6 @@ def my_profile(request):
 def employees_list(request, begin = 'All', query=None):
 
     employees = Employee.get_list(begin)
-    try:
-        semester = Semester.get_current_semester()
-        employees = Group.teacher_in_present(employees, semester)
-    except MoreThanOneCurrentSemesterException:
-        logger.error('Function employee_list throws MoreThanOneCurrentSemesterException.' )
-        messages.success(request, "Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
-        employees = Employee.objects.all()
-
-    for e in employees:
-        e.short_new = e.user.first_name[:1] + e.user.last_name[:2]
-        e.short_old = e.user.first_name[:2] + e.user.last_name[:2]
 
     if request.is_ajax():
         employees = prepare_ajax_employee_list(employees)
@@ -287,7 +278,7 @@ def employees_list(request, begin = 'All', query=None):
             "query": query
             }  
     
-        return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
+    return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
 
 def consultations_list(request, begin='A'):
 

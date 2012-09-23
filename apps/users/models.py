@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
 from apps.enrollment.courses.models.points import PointTypes
+from django.core.cache import cache as mcache
 import datetime
 
 from fereol import settings
@@ -64,9 +65,10 @@ class BaseUser(models.Model):
 
     def get_number_of_news(self):
         from apps.news.models import News
-        news = News.objects.exclude(category='-').filter(date__gte=self.last_news_view)
-        count_news = len(news)
-        return count_news
+        if not hasattr(self, '_count_news'):
+            self._count_news = News.objects.exclude(category='-').filter(date__gte=self.last_news_view).count()
+
+        return self._count_news
 
     @staticmethod
     def get(user_id):
@@ -149,15 +151,17 @@ class Employee(BaseUser):
             except ValueError:
                 return chr(90)
         if begin == 'Z':
-            return Employee.objects.filter(user__last_name__gte=begin, status=0).\
+            employees = Employee.objects.filter(user__last_name__gte=begin, status=0).\
                     select_related().order_by('user__last_name', 'user__first_name')
         elif begin == 'All':
-            return Employee.objects.filter(status=0).\
+            employees = Employee.objects.filter(status=0).\
                     select_related().order_by('user__last_name', 'user__first_name')
         else:
             end = next_char(begin)
-            return Employee.objects.filter(user__last_name__range=(begin, end), status=0).\
+            employees = Employee.objects.filter(user__last_name__range=(begin, end), status=0).\
                     select_related().order_by('user__last_name', 'user__first_name')
+
+        return employees
 
 
 

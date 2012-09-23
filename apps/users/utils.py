@@ -17,6 +17,6 @@ def prepare_ajax_employee_list(employees):
               'email': e.user.email,
               'name':     u'%s %s' % (e.user.first_name, e.user.last_name),
               'link': reverse('employee-profile', args=[e.user.id]),
-              'short_old': e.short_old,
-              'short_new': e.short_new},
+              'short_old': e.user.first_name[:2] + e.user.last_name[:2],
+              'short_new': e.user.first_name[:1] + e.user.last_name[:2]},
             employees)
