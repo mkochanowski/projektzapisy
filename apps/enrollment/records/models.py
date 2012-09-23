@@ -152,8 +152,7 @@ class Record(models.Model):
     @staticmethod
     def get_students_in_group(group_id):
         try:
-            group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Record.enrolled.select_related('user').filter(group=group).order_by('student__user__last_name','student__user__first_name'))
+            return Student.objects.filter(records__group_id=group_id, records__status=1).select_related('user')
         except Group.DoesNotExist:
             raise NonGroupException()
     
@@ -414,8 +413,7 @@ class Queue(models.Model):
     def get_students_in_queue(group_id):
         """ Returns state of queue for group ordered by time (FIFO)."""
         try:
-            group = Group.objects.get(id=group_id)
-            return map(lambda x: x.student, Queue.queued.filter(group=group).order_by('time'))
+            return Student.objects.filter(queues__group_id=group_id).select_related('user').order_by('queues__time')
         except Group.DoesNotExist:
             logger.warning('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
             raise NonGroupException()
