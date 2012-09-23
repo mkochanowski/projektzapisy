@@ -260,7 +260,7 @@ class Record(models.Model):
         try:
             student = user.student
             if not student.is_active():
-            	raise InactiveStudentException
+                raise InactiveStudentException
             new_records = []
             if not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
@@ -497,12 +497,20 @@ class Queue(models.Model):
             raise NonGroupException()
     
     @staticmethod
-    def get_point(program,course):
+    def get_point(program, course, student=None):
       """
           TODO: OMFG, to nie powinno być w modelu kolejki
       """
       from apps.enrollment.courses.models import PointsOfCourses,\
                                           PointsOfCourseEntities
+
+      if student and (
+           (student.dyskretna_l and course.dyskretna_l) or
+           (student.numeryczna_l and course.numeryczna_l)
+          ):
+          import settings
+          from apps.users.models import Program
+          program = Program.objects.get(id=settings.M_PROGRAM)
                                           
       pos = PointsOfCourses.objects.filter(course=course, program=program).values()
       if not pos:
@@ -535,8 +543,8 @@ class Queue(models.Model):
                     'group', 'group__course', 'group__course__entity'))
             courses = set([g.course for g in groups])
             program = user.student.program
-            points = Queue.get_point(program, group.course)
-            ects = sum([Queue.get_point(program,course) for course in courses])
+            points = Queue.get_point(program, group.course, student)
+            ects = sum([Queue.get_point(program,course, student) for course in courses])
 
             if group.course not in courses:
                 ects += points

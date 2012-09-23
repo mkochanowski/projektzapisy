@@ -9,9 +9,6 @@ from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
 from apps.enrollment.courses.models.points import PointTypes
-from apps.enrollment.courses.models import Semester
-from apps.enrollment.courses.models import StudentOptions
-from django.db.models.signals import post_save
 import datetime
 
 from fereol import settings
@@ -233,7 +230,11 @@ class Student(BaseUser):
 
     t0 = models.DateTimeField(null=True, blank=True)
 
+    dyskretna_l  = models.BooleanField(default=False)
+    numeryczna_l = models.BooleanField(default=False)
+
     def make_t0(self, semester=None):
+        from apps.enrollment.courses.models import Semester
         if not semester:
             semester = Semester.get_current_semester()
         self.t0 = semester.records_opening - self.get_t0_interval()
@@ -274,6 +275,7 @@ class Student(BaseUser):
 
     def get_voted_courses(self, given_points):
         """ returns courses which were voted with given_points by student """
+        from apps.enrollment.courses.models import Semester
         current_semester = Semester.get_default_semester()
         from apps.offer.vote.models.single_vote import SingleVote
         return map(lambda x: x.course, SingleVote.objects.filter(student=self, state__semester_winter=current_semester,
@@ -327,6 +329,7 @@ class Student(BaseUser):
     
     @staticmethod
     def get_schedule(student):
+        from apps.enrollment.courses.models import Semester
         try:
             default_semester = Semester.get_default_semester()
             groups = [g for g in Student.get_all_groups(student) \
