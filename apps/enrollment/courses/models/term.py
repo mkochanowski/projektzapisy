@@ -124,8 +124,17 @@ def log_edit_term(sender, instance, **kwargs):
     try:
         term = instance
         old_term = Term.objects.get(id=term.id)
-        old_term_format = '-'.join([old_term.dayOfWeek,str(old_term.start_time),str(old_term.end_time),old_term.classroom.number])
-        term_format = '-'.join([term.dayOfWeek,str(term.start_time),str(term.end_time),term.classroom.number])
+        string = [old_term.dayOfWeek,str(old_term.start_time),str(old_term.end_time)]
+        if old_term.classroom:
+            string.append(old_term.classroom.number)
+        string = '-'.join(string)
+        old_term_format = string
+
+        newstring = [term.dayOfWeek,str(term.start_time),str(term.end_time)]
+        if term.classroom:
+            newstring.append(term.classroom.number)
+
+        term_format = '-'.join(newstring)
         message = '[09] term for group <%s> has been updated from <%s> to <%s>' % (term.group.id, old_term_format.encode('utf-8'), term_format.encode('utf-8')) 
         backup_logger.info(message)
     except Term.DoesNotExist:
