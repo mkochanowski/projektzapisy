@@ -121,10 +121,10 @@ class Group(models.Model):
             self.update_students_counts()
 
     def update_students_counts(self):
-        self.cache_enrolled = self.get_count_of_enrolled(dont_use_cache=True)
         self.cache_queued = self.get_count_of_queued(dont_use_cache=True)
-        self.cache_enrolled_zam = self.get_count_of_enrolled_zamawiane( \
+        self.cache_enrolled_zam = self.get_count_of_enrolled_zamawiane(
             dont_use_cache=True)
+        self.cache_enrolled = self.get_count_of_enrolled(dont_use_cache=True)
         Group.disable_update_signal = True
         self.save()
         Group.disable_update_signal = False
