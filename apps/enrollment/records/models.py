@@ -708,10 +708,6 @@ def log_delete_record(sender, instance, **kwargs):
 
 def update_group_counts(sender, instance, **kwargs):
     try:
-        group = instance.group
-        if not group.enrollment_are_open():
-            return
-
         instance.group.update_students_counts()
     except ObjectDoesNotExist:
         pass
