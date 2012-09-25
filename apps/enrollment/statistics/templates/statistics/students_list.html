@@ -2,6 +2,12 @@
 
 {% block enrollment_statistics %} class="active"{% endblock %}
 
+{% block styles %}{{ block.super }}
+<style>
+    .overlimit td { color:red; }
+    .fulllimit td { color:green; }
+</style>
+{% endblock %}
 
 {% block main-subtitle %}Statystyki{% endblock %}
 
@@ -30,7 +36,7 @@
                 <th colspan="7">{{ course.grouper }}</th>
                 </tr>
                 {% for group in course.list|dictsort:'type' %}
-                    <tr>
+                    <tr{% if group.limit < group.cache_enrolled %} class="overlimit"{% elif group.limit == group.cache_enrolled %} class="fulllimit"{% endif %}>
                         <td>{{ group.teacher }}</td>
                         <td>{{ group.get_type_display }}</td>
                         <td>{{ group.limit }}</td>
