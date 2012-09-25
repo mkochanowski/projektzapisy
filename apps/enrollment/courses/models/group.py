@@ -179,7 +179,7 @@ class Group(models.Model):
     def enrollment_are_open(self):
         semester = self.course.semester
 
-        return semester.records_opening <= datetime.now() < semester.records_closing
+        return True
 
     class Meta:
         verbose_name = 'grupa'
