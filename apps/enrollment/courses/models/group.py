@@ -186,6 +186,11 @@ class Group(models.Model):
         verbose_name_plural = 'grupy'
         app_label = 'courses'
 
+    @staticmethod
+    def get_all_in_semester(semester):
+        return Group.objects.filter(course__semester=semester).\
+                    select_related('course', 'course__semester', 'course__entity', 'teacher', 'teacher__user').order_by('course__name')
+
     def __unicode__(self):
         return "%s: %s - %s" % (unicode(self.course.entity.get_short_name()),
                                 unicode(self.get_type_display()), 

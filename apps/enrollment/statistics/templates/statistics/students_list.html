@@ -5,7 +5,47 @@
 
 {% block main-subtitle %}Statystyki{% endblock %}
 
+{% block content-width %}16{% endblock %}
+
 {% block content %}
+
+    {% regroup groups by course as courses_list %}
+
+    <table>
+        <thead>
+            <tr>
+                <th><h4>Prowadzący</h4></th>
+                <th><h4>Typ</h4></th>
+                <th><h4>Miejsca</h4></th>
+                <th><h4>Miejsca zamawiane</h4></th>
+                <th><h4>Zapisani</h4></th>
+                <th><h4>Zapisani zamawiani</h4></th>
+                <th><h4>Kolejka</h4></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses_list %}
+                <tr>
+                <th colspan="7">{{ course.grouper }}</th>
+                </tr>
+                {% for group in course.list|dictsort:'type' %}
+                    <tr>
+                        <td>{{ group.teacher }}</td>
+                        <td>{{ group.get_type_display }}</td>
+                        <td>{{ group.limit }}</td>
+                        <td>{{ group.limit_zamawiane }}</td>
+                        <td>{{ group.cache_enrolled }}</td>
+                        <td>{{ group.cache_enrolled_zam }}</td>
+                        <td>{{ group.cache_queued }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+    <hr>
     <table>
         <thead>
             <tr>
