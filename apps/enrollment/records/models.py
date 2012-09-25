@@ -323,7 +323,7 @@ class Record(models.Model):
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             
             Queue.try_enroll_next_student(group) #TODO: być może zbędne
-            group.course.update_students_counts()
+            group.update_students_counts()
             return record
             
         except Record.DoesNotExist:
