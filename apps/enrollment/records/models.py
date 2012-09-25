@@ -340,9 +340,8 @@ class Record(models.Model):
     def on_student_remove_from_group(sender, instance, **kwargs):
         try:
             group = instance.group
-            if group.course.semester.records_opening <= datetime.now() < group.course.semester.records_closing:
-                Queue.try_enroll_next_student(group)
-                instance.group.update_students_counts()
+            Queue.try_enroll_next_student(group)
+            instance.group.update_students_counts()
         except ObjectDoesNotExist:
             pass
     
