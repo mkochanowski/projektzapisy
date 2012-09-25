@@ -443,7 +443,7 @@ class Queue(models.Model):
                 raise AlreadyQueuedException()
             record.save()
             logger.info('User %s <id: %s> is added to queue of group "%s" <id: %s> with priority = %s' % (student.user.username, student.user.id, group, group_id, priority))
-            group.course.update_students_counts()
+            group.update_students_counts()
             return record
         except Student.DoesNotExist:
             logger.warning('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
