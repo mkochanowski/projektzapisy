@@ -23,6 +23,7 @@ class PointsOfCourseEntities(models.Model):
         verbose_name = 'zależność podstawa przedmiotu-punkty'
         verbose_name_plural = 'zależności podstawy przedmiotu-punkty'
         app_label = 'courses'
+        unique_together = ('entity', 'type_of_point',)
 
     def __unicode__(self):
         return '%s: %s %s' % (self.entity.name, self.value, self.type_of_point)

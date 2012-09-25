@@ -497,6 +497,17 @@ class StudiaZamawianeMaileOpiekunow(models.Model):
         return self.email
 
 
+class Courses(models.Model):
+    semester = models.ForeignKey('courses.Semester')
+    student = models.ForeignKey(Student, primary_key = True) #readonly!
+    course  = models.ForeignKey('courses.Course')
+    value   = models.SmallIntegerField()
+
+    class Meta:
+        managed = False
+
+
+
 
 # definition of UserProfile from above
 # ...
