@@ -234,9 +234,9 @@ class Course( models.Model ):
     dyskretna_l  = models.BooleanField(default=False)
     numeryczna_l = models.BooleanField(default=False)
 
-    objects = Related()
+    objects = models.Manager()
     visible = VisibleManager()
-    
+
     def save(self, *args, **kwargs):
         super(Course, self).save(*args, **kwargs)
         if not self.pk:
