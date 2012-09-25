@@ -258,6 +258,7 @@ class Record(models.Model):
         """ assignes student to group if his records for course are open. If student is pinned to group, pinned becomes enrolled """
         try:
             student = user.student
+            Course.objects.select_for_update().get(id=group.course_id)
             if not student.is_active():
                 raise InactiveStudentException
             new_records = []
