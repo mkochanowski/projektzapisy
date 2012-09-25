@@ -323,7 +323,7 @@ class Record(models.Model):
             logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
             
             Queue.try_enroll_next_student(group) #TODO: być może zbędne
-            
+            group.update_students_counts()
             return record
             
         except Record.DoesNotExist:
@@ -424,10 +424,10 @@ class Queue(models.Model):
         """ Assign student to queue"""
         try:
             student = Student.objects.select_related('user').get(user__id=user_id)
-            if not Group.objects.get(id=group_id).course.\
+            group = Group.objects.select_related('course').get(id=group_id)
+            if not group.course.\
                 is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
-            group = Group.objects.get(id=group_id)
             """ Czy student jest już zapisany na przedmiot"""
             if Record.enrolled.filter(group=group, student=student).count() > 0 :
                 logger.warning('Queue.add_student_to_queue() throws AlreadyAssignedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
@@ -443,6 +443,7 @@ class Queue(models.Model):
                 raise AlreadyQueuedException()
             record.save()
             logger.info('User %s <id: %s> is added to queue of group "%s" <id: %s> with priority = %s' % (student.user.username, student.user.id, group, group_id, priority))
+            group.course.update_students_counts()
             return record
         except Student.DoesNotExist:
             logger.warning('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
