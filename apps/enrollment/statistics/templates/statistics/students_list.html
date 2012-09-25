@@ -59,6 +59,7 @@
                 <th>Nazwisko</th>
                 <th>Index</th>
                 <th>ECTS</th>
+                <th>Punkty w semestrze</th>
                 <th>T0</th>
             </tr>
         </thead>
@@ -69,6 +70,7 @@
                     <td>{{ student.user.last_name }}</td>
                     <td>{{ student.matricula }}</td>
                     <td>{{ student.ects }}</td>
+                    <td>{{ student.semester_points }}</td>
                     <td>{{ student.t0 }}</td>
                 </tr>
             {% endfor %}
