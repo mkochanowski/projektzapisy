@@ -377,7 +377,7 @@ def create_ical_file(request):
             start_time = term.start_time
             end_time = term.end_time
             weekday = int(term.dayOfWeek)
-            classroom_number = term.classroom.number
+            classroom_number = term.classroom.number if term.classroom else 'Nieznana'
     
             diff = semester_beginning_weekday - weekday
             if diff<0:
