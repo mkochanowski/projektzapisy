@@ -570,7 +570,7 @@ class Queue(models.Model):
             
             returns None, when there is no space for students left at all
         '''
-        if (group.get_count_of_enrolled(dont_use_cache=False) >= group.limit):
+        if (group.get_count_of_enrolled(dont_use_cache=True) >= group.limit):
             return None
         only_zamawiany = group.available_only_for_zamawiane()
         
