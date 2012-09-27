@@ -292,18 +292,18 @@ class Record(models.Model):
                 #backup_logger.info('[01] user <%s> is added to group <%s>' % (user.id, group.id))
                 new_records.append(record)
                 if created:
-                    logger.info('User %s <id: %s> is added to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))                     
+                    backup_logger.info('User %s <id: %s> is added to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
                 else:
-                    logger.info('User %s <id: %s> who has been pinned to group: [%s] <id: %s> is currently added to this group and no longer pinned.' % (user.username, user.id, group, group.id))
+                    backup_logger.info('User %s <id: %s> who has been pinned to group: [%s] <id: %s> is currently added to this group and no longer pinned.' % (user.username, user.id, group, group.id))
                 return new_records
             else:
-                logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
+                backup_logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
                 raise OutOfLimitException()
         except Student.DoesNotExist:
-            logger.warning('Record.add_student_to_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
+            backup_logger.warning('Record.add_student_to_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
             raise NonStudentException()
         except Group.DoesNotExist:
-            logger.warning('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
+            backup_logger.warning('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
             raise NonGroupException()
     
     @staticmethod
@@ -599,11 +599,17 @@ class Queue(models.Model):
     @staticmethod
     def try_enroll_next_student(group):
 
+        backup_logger.info('[03] i try run queue for <%s>' % ( group.id))
+
         if not group.enrollment_are_open():
+            backup_logger.info('[03] i fail becouse enrollment_are_open')
             return False
+
+
 
         queued = Queue.remove_first_student_from_queue(group)
         if not queued:
+            backup_logger.info('[03] i fail becouse no queued')
             return False
         
         Record.add_student_to_group(queued.student.user, group)
@@ -611,7 +617,7 @@ class Queue(models.Model):
             group.id, queued.priority)
         
         mail_enrollment_from_queue(queued.student, group)
-        logger.info('User %s <id: %s> enrolled from queue in group [%s] \
+        backup_logger.info('User %s <id: %s> enrolled from queue in group [%s] \
             <id: %s>.', queued.student.user.username, queued.student.user.id, \
             group, group.id)
         return True

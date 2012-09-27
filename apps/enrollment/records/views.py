@@ -26,53 +26,53 @@ from apps.enrollment.records.utils import *
 
 from libs.ajax_messages import *
 
-
-
-@login_required()
-def ajax_get_schedule(request, semester):
-
-    try:
-        semester = Semester.get_by_id(semester)
-    except ObjectDoesNotExist:
-        raise Http404
-
-
-
-    employee = None
-    student  = None
-    if request.user.student:
-        student = request.user.student
-    elif request.user.employee:
-        employee = request.user.employee
-    if student is None and employee is None:
-        messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
-        return render_to_response('common/error.html',
-            context_instance=RequestContext(request))
-
-    if student:
-        courses = prepare_schedule_courses(request, for_student=student, semester=semester)
-    else:
-        courses = prepare_schedule_courses(request, for_employee=employee, semester=semester)
-
-    data = prepare_schedule_data(request, courses, semester=semester)
-
-    if student:
-        course_objects = map(lambda course: course['object'], courses)
-        points = Course.get_points_for_courses(course_objects, student.program)
-        points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
-        points_type = student.program.type_of_points
-        data.update({
-            'points': points,
-            'points_type': points_type,
-            'points_sum': points_sum
-        })
-
-    data.update({
-        'courses': courses,
-        'semester': semester
-    })
-
-    return TemplateResponse(request, 'records/schedule_show.html', data)
+#
+#
+#@login_required()
+#def ajax_get_schedule(request, semester):
+#
+#    try:
+#        semester = Semester.get_by_id(semester)
+#    except ObjectDoesNotExist:
+#        raise Http404
+#
+#
+#
+#    employee = None
+#    student  = None
+#    if request.user.student:
+#        student = request.user.student
+#    elif request.user.employee:
+#        employee = request.user.employee
+#    if student is None and employee is None:
+#        messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
+#        return render_to_response('common/error.html',
+#            context_instance=RequestContext(request))
+#
+#    if student:
+#        courses = prepare_schedule_courses(request, for_student=student, semester=semester)
+#    else:
+#        courses = prepare_schedule_courses(request, for_employee=employee, semester=semester)
+#
+#    data = prepare_schedule_data(request, courses, semester=semester)
+#
+#    if student:
+#        course_objects = map(lambda course: course['object'], courses)
+#        points = Course.get_points_for_courses(course_objects, student.program)
+#        points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
+#        points_type = student.program.type_of_points
+#        data.update({
+#            'points': points,
+#            'points_type': points_type,
+#            'points_sum': points_sum
+#        })
+#
+#    data.update({
+#        'courses': courses,
+#        'semester': semester
+#    })
+#
+#    return TemplateResponse(request, 'records/schedule_show.html', data)
 
 @require_POST
 @transaction.commit_on_success
@@ -164,6 +164,7 @@ def set_enrolled(request, method):
 
     try:
         group = Group.objects.get(id=group_id)
+        Course.objects.select_for_update().get(id=group.course_id)
     except ObjectDoesNotExist:
         transaction.rollback()
         return AjaxFailureMessage.auto_render('NonGroup',
@@ -187,6 +188,8 @@ def set_enrolled(request, method):
         else:
             record = Record.remove_student_from_group(request.user, group)
             message = 'Zostałeś wypisany z wybranej grupy.'
+            Queue.try_enroll_next_student(group)
+
 
         if is_ajax:
             return AjaxSuccessMessage(message,
