@@ -39,6 +39,7 @@ class Group(models.Model):
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych', help_text='miejsca gwarantowane dla studentów zamawianych')
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
+    export_usos = models.BooleanField(default=True, verbose_name='czy eksportować do usos?')
 
     cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
     cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
