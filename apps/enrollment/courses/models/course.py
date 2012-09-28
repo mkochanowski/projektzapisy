@@ -11,7 +11,6 @@ from django.core.cache import cache as mcache
 
 from apps.enrollment.courses.models.points import PointsOfCourses, PointsOfCourseEntities
 from apps.offer.proposal.exceptions import NotOwnerException
-from apps.users.models import Program
 import settings
 from student_options import StudentOptions
 
@@ -322,6 +321,7 @@ class Course( models.Model ):
             return self.semester.get_name()
 
     def get_points(self, student=None):
+        from apps.users.models import Program
         '''
             returns points for course, and optionally for certain student
         '''
