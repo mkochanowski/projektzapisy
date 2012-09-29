@@ -110,7 +110,7 @@
 	overflow: hidden;
 	cursor: pointer;
 	background: no-repeat;
-	background-image: url('/static/images/schedule-prototype-controls.png');
+	background-image: url('/images/schedule-prototype-controls.png');
 }
 
 .legend-box.icons {
