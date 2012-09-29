@@ -100,7 +100,7 @@
 	box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
 }
 
-.schedule .term .controls span
+.schedule .term .controls span, .legend-box.icons
 {
 	display: block;
 	width: 12px;
@@ -110,15 +110,34 @@
 	overflow: hidden;
 	cursor: pointer;
 	background: no-repeat;
-	background-image: url('/images/schedule-prototype-controls.png');
+	background-image: url('/static/images/schedule-prototype-controls.png');
 }
 
-.schedule .term .controls span.signInOut
+.legend-box.icons {
+    border: 0;
+}
+
+.legend-box.icons.signIn
 {
 	background-position: 0 0;
 }
 
-.schedule .term .controls span.pinUnpin
+.legend-box.icons.signOut
+{
+    background-position: -12px 0;
+}
+
+.legend-box.icons.pinIn
+{
+    background-position: 0 -12px;
+}
+
+.legend-box.icons.pinOut
+{
+	background-position: -12px -12px;
+}
+
+.schedule .term .controls span.pinUnpin,
 {
 	background-position: 0 -12px;
     float: left;

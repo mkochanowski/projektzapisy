@@ -43,7 +43,7 @@
 			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
                         <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">Pokaż przedmioty prowadzone w j.angielskim</label></span>
                         <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">Pokaż przedmioty kończące się egzaminem</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">Pokaż tylko przedmioty zalecane dla 1 roku</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear"  style="color:red;">Pokaż tylko przedmioty zalecane dla 1 roku</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -88,7 +88,16 @@
             <div class="legend-box pinned"></div> - grupa przypięta do prototypu
         </li>
         <li>
-            <div class="legend-box normal"></div> - pozostałe
+            <div class="legend-box icons pinIn"></div> - przypnij do prototypu. Widoczność grupy w prototypie zostaje zapamiętana. Przycisk <strong>NIE</strong> zapisuje na zajęcia.
+        </li>
+        <li>
+            <div class="legend-box icons pinOut"></div> - odepnij od prototypu. Przywraca domyślną widoczność grupy w prototypie. Przycisk <strong>NIE</strong> wypisuje z zajęć.
+        </li>
+        <li>
+            <div class="legend-box icons signIn"></div> - zapisz do grupy. Następuje próba zapisu studenta do grupy. Jeżeli przedmiot posiada również wykład, zostaniemy zapisanie na niego automatycznie.
+        </li>
+        <li>
+            <div class="legend-box icons signOut"></div> - wypisz z grupy. Następuje wypisanie z grupy. Wypisanie z wykładu skutkuje wypisaniem się z pozostałych grup przedmiotu.
         </li>
     </ul>
 {% endblock %}
