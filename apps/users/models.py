@@ -193,20 +193,20 @@ class Employee(BaseUser):
              raise NonEmployeeException()
         return groups
     
-    @staticmethod
-    def get_schedule(user_id):
-        user = User.objects.get(id=user_id)
-        try:
-            employee = user.employee
-            groups = [g for g in Employee.get_all_groups_in_semester(user_id) ]
-            courses = set([group.course for group in groups])
-            for group in groups:
-                group.terms_ = group.get_all_terms()
-                group.course_ = group.course
-            return groups
-        except Employee.DoesNotExist:
-             logger.error('Function Employee.get_schedule(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
-             raise NonEmployeeException()
+#    @staticmethod
+#    def get_schedule(user_id):
+#        user = User.objects.get(id=user_id)
+#        try:
+#            employee = user.employee
+#            groups = [g for g in Employee.get_all_groups_in_semester(user_id) ]
+#            courses = set([group.course for group in groups])
+#            for group in groups:
+#                group.terms_ = group.get_all_terms()
+#                group.course_ = group.course
+#            return groups
+#        except Employee.DoesNotExist:
+#             logger.error('Function Employee.get_schedule(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
+#             raise NonEmployeeException()
 
     class Meta:
         verbose_name = 'pracownik'
@@ -299,6 +299,28 @@ class Student(BaseUser):
         records_list = map(lambda x: x.group.course.entity.id, records)
         return list(frozenset(records_list))
 
+    def get_points(self, semester=None):
+        from apps.enrollment.courses.models import Semester
+        if not semester:
+            semester = Semester.get_current_semester
+        courses = Courses.objects.filter(student=self, semester=semester).order_by('course__name')
+
+        points = 0
+        for c in courses: points += c.value
+
+        return courses, points
+
+
+    def get_schedule(self, semester=None):
+        from apps.enrollment.records.models import Record
+        from apps.enrollment.courses.models import Semester
+
+        if not semester:
+            semester = Semester.get_current_semester()
+        return Record.objects.filter(status=1, group__course__semester=semester, student=self)\
+          .select_related('group', 'group__course', 'group__course__type')\
+          .prefetch_related('group__term', 'group__term__classrooms')\
+          .order_by('group__course__name')
 
     @staticmethod
     def get_list(begin='All'):
@@ -331,21 +353,21 @@ class Student(BaseUser):
              raise NonStudentException()
         return groups
     
-    @staticmethod
-    def get_schedule(student):
-        from apps.enrollment.courses.models import Semester
-        try:
-            default_semester = Semester.get_default_semester()
-            groups = [g for g in Student.get_all_groups(student) \
-                if g.course.semester == default_semester] #TODO: nieoptymalnie
-            courses = set([group.course for group in groups])
-            for group in groups:
-                group.terms_ = group.get_all_terms()
-                group.course_ = group.course
-            return groups
-        except Student.DoesNotExist:
-             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % student )
-             raise NonStudentException()
+#    @staticmethod
+#    def get_schedule(student):
+#        from apps.enrollment.courses.models import Semester
+#        try:
+#            default_semester = Semester.get_default_semester()
+#            groups = [g for g in Student.get_all_groups(student) \
+#                if g.course.semester == default_semester] #TODO: nieoptymalnie
+#            courses = set([group.course for group in groups])
+#            for group in groups:
+#                group.terms_ = group.get_all_terms()
+#                group.course_ = group.course
+#            return groups
+#        except Student.DoesNotExist:
+#             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % student )
+#             raise NonStudentException()
     
     def records_set_locked(self, locked):
         self.block = locked
