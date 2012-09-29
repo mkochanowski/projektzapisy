@@ -405,36 +405,37 @@ def own(request):
     if request.user.student:
         student = request.user.student
     elif request.user.employee:
-        employee = request.user.employee
+        messages.info(request, 'Plan pracownika chwilowo wyłączony.')
+        return render_to_response('common/error.html',
+            context_instance=RequestContext(request))
     if student is None and employee is None:
         messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
         return render_to_response('common/error.html',
             context_instance=RequestContext(request))
 
-    if student:
-        courses = prepare_schedule_courses(request, for_student=student)
-    else: #musi isnieć na mocy if kilka linii wyżej
-        courses = prepare_schedule_courses(request, for_employee=employee)
+#    if student:
+#        courses = prepare_schedule_courses(request, for_student=student)
+#    else: #musi isnieć na mocy if kilka linii wyżej
+#        courses = prepare_schedule_courses(request, for_employee=employee)
 
-    data = prepare_schedule_data(request, courses)
 
-    if student:
-        course_objects = map(lambda course: course['object'], courses)
-        points = Course.get_points_for_courses(course_objects, student.program)
-        points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)  
-        points_type = student.program.type_of_points 
-        data.update({
-            'points': points,
-            'points_type': points_type,
-            'points_sum': points_sum
-        })
 
-    data.update({
-        'courses': courses,
-    })
+#    if student:
+#        course_objects = map(lambda course: course['object'], courses)
+#        points = Course.get_points_for_courses(course_objects, student.program)
+#        points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
+#        points_type = student.program.type_of_points
+#        data.update({
+#            'points': points,
+#            'points_type': points_type,
+#            'points_sum': points_sum
+#        })
 
-    return render_to_response('enrollment/records/schedule.html',
-        data, context_instance = RequestContext(request))
+    schedule           = student.get_schedule()
+    points, sum_points = student.get_points()
+
+
+    return TemplateResponse(request, 'enrollment/records/schedule.html', locals())
 
 
 def schedule_prototype(request):

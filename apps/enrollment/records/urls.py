@@ -22,8 +22,8 @@ urlpatterns = patterns('apps.enrollment.records.views',
         'schedule_prototype', name='schedule-prototype' ),
     url('^schedule/prototype/set-pinned$',
         'prototype_set_pinned', name='schedule-prototype-set-pinned' ),
-
-    url('schedule/ajax/(?P<semester>[\d]+)', 'ajax_get_schedule',
-        name='get-schedule'
-       ),
+#
+#    url('schedule/ajax/(?P<semester>[\d]+)', 'ajax_get_schedule',
+#        name='get-schedule'
+#       ),
 )

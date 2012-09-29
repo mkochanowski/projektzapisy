@@ -1,6 +1,8 @@
 {% extends "enrollment/base.html" %}
 {% load fereol_common %}
 {% load compressed %}
+{% load cache %}
+{% load multifor %}
 {% block main-subtitle %}Plan zajęć{% endblock %}
 
 {% block styles %}
@@ -22,43 +24,8 @@
     <div  style="float:right;margin-bottom: 20px;"><a href="{% url ical %}">Eksportuj do ical</a>
     </div>
 	<div id="enr-schedule-scheduleContainer">
-
-		<input type="hidden" name="courses" value="{{ courses_json }}" />
-		<input type="hidden" name="groups" value="{{ groups_json }}" />
-		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
-		<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
-		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
-		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
-
-		<div class="byWeekDays">
-			<h2>Zajęcia z podziałem na dni</h2>
-			{% for day in terms_by_days %}
-				<h3>{{ day.day_name|capfirst }}</h3>
-				<ul>
-					{% for term in day.terms %}
-						<li>
-							<span class="time">
-								{{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
-							</span>
-							<span class="name">
-								{{ term.object.group.course.name }}
-							</span>
-							<span class="type">
-								&ndash;
-								{{ term.object.group.get_type_display }}
-							</span>
-							<span class="classroom">
-								(sala {{ term.object.classroom.number }})
-							</span>
-						</li>
-					{% endfor %}
-				</ul>
-			{% endfor %}
-		</div>
 	</div>
-
-
-	{% if courses %}
+    {% cache 500 own-schedyle request.user %}
 	{% if user.student %}
         <h3>Zajęcia, na które jesteś zapisany</h3>
 	{% else %}
@@ -69,7 +36,7 @@
 			<tr>
 				<th>Przedmiot</th>
 				{% if user.student %}
-                    <th class="ects">{{ points_type }}</th>
+                    <th class="ects">ECTS</th>
                 {% else %}
                     <th class="ects">Godziny</th>
                 {% endif %}
@@ -78,8 +45,8 @@
 		<tfoot>
 			<tr>
 			{% if user.student %}
-				<td>Suma punktów {{ points_type }}:</td>
-				<td class="ects">{{ points_sum }}</td>
+				<td>Suma punktów ECTS:</td>
+				<td class="ects">{{ sum_points }}</td>
             {% else %}
                 <td>Liczba godzin:</td>
                 <td class="ects">{{ hours_sum }}</td>    
@@ -87,45 +54,50 @@
 			</tr>
 		</tfoot>
 		<tbody>
-			{% for course in courses %}
-				<tr class="courseHeader">
-					<td class="name">
-						<a href="{% url course-page course.info.slug %}">
-							{{ course.info.name }}
-						</a>
-					</td>
-					<td rowspan="2" class="ects">
-						{% if points|hash:course.info.id %}
-							{{ points|hash:course.info.id|getattribute:'value' }}
-						{% endif %}
-					</td>
-				</tr>
-				<tr class="courseDetails"><td>
-					<input type="hidden" name="id" value="{{ course.info.id }}" />
-					<input type="hidden" name="name" value="{{ course.info.name }}" />
-					<input type="hidden" name="type" value="{{ course.info.type }}" />
-					<input type="hidden" name="short" value="{{ course.info.short }}" />
-					<input type="hidden" name="url" value="{% url course-page course.info.slug %}" />
-					{% if course.terms %}
-					<ul>
-						{% for term in course.terms %}
-						<li>
-							<span class="type">{{ term.object.group.get_type_display }}:</span>
-							<span class="term">
-								{{ term.object.get_dayOfWeek_display }}
-								{{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
-							</span>
-							<span class="classroom">
-								 {{ term.object.numbers }}
-							</span>
-							<input type="hidden" name="term" value="{{ term.json }}" />
-						</li>
-						{% endfor %}
-					</ul>
-					{% endif %}
-				</td></tr>
-			{% endfor %}
+            {% regroup schedule by group.course as courses %}
+            {% for course in courses; point in points %}
+            <tr class="courseHeader">
+                <td class="name">
+                    <a href="{% url course-page course.grouper.slug %}">
+                        {{ course.grouper.name }}
+                    </a>
+                </td>
+                <td rowspan="2" class="ects">
+                    {{ point.value }}
+                </td>
+            </tr>
+            <tr class="courseDetails">
+                <td>
+                    <input type="hidden" name="id" value="{{ course.grouper.id }}" />
+                    <input type="hidden" name="name" value="{{ course.grouper.name }}" />
+                    <input type="hidden" name="type" value="{{ course.grouper.type }}" />
+                    <input type="hidden" name="short" value="{{ course.grouper.short }}" />
+                    <input type="hidden" name="url" value="{% url course-page course.grouper.slug %}" />
+                    <ul>
+                        {% for item in course.list %}
+                        {% with item.group as group %}
+                        <li>
+                            <span class="type">{{ group.get_type_display }}:</span>
+                            {% for term in group.term.all %}
+                            <span class="term">
+                                {{ term.get_dayOfWeek_display }}
+                                {{ term.start_time|time:'G:i' }}-{{ term.end_time|time:'G:i' }}
+                            </span>
+                            <span class="classroom">sala:
+                                  {% for classroom in term.classrooms.all %}
+                                    {{ classroom.number }}
+                                  {% endfor %}
+                            </span>
+                            {% endfor %}
+                            <input type="hidden" name="term" value="{{ term.json }}" />
+                        </li>
+                        {% endwith %}
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
 		</tbody>
 	</table>
-	{% endif %}
+    {% endcache %}
 {% endblock %}
