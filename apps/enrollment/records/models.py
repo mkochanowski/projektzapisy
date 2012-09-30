@@ -611,15 +611,19 @@ class Queue(models.Model):
         if not queued:
             backup_logger.info('[03] i fail becouse no queued')
             return False
-        
-        Record.add_student_to_group(queued.student.user, group)
-        Queue.remove_student_low_priority_records(queued.student.user.id, \
-            group.id, queued.priority)
-        
-        mail_enrollment_from_queue(queued.student, group)
-        backup_logger.info('User %s <id: %s> enrolled from queue in group [%s] \
+
+        try:
+            Record.add_student_to_group(queued.student.user, group)
+            Queue.remove_student_low_priority_records(queued.student.user.id, \
+                group.id, queued.priority)
+
+            mail_enrollment_from_queue(queued.student, group)
+            backup_logger.info('User %s <id: %s> enrolled from queue in group [%s] \
             <id: %s>.', queued.student.user.username, queued.student.user.id, \
             group, group.id)
+        except OutOfLimitException:
+            pass
+
         return True
     
     @staticmethod
