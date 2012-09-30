@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 
 from apps.enrollment.courses.models import *
 from apps.enrollment.records.models import Record
@@ -34,6 +35,19 @@ class CourseAdmin(admin.ModelAdmin):
             request.META['QUERY_STRING'] = request.GET.urlencode()
         return super(CourseAdmin,self).changelist_view(request, extra_context=extra_context)
 
+    def get_object(self, request, object_id):
+        """
+        Returns an instance matching the primary key provided. ``None``  is
+        returned if no match is found (or the object_id failed validation
+        against the primary key field).
+        """
+        queryset = self.queryset(request)
+        model = queryset.model
+        try:
+            object_id = model._meta.pk.to_python(object_id)
+            return queryset.select_related('semester').get(pk=object_id)
+        except (model.DoesNotExist, ValidationError):
+            return None
 
     def queryset(self, request):
        """
@@ -95,6 +109,11 @@ class RecordInline(admin.TabularInline):
     extra = 0
     raw_id_fields = ("student",)
 
+#    def queryset(self, request):
+#        queryset = super(RecordInline, self).queryset(request)
+#        return queryset.select_related('user')
+
+
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
@@ -102,6 +121,8 @@ class GroupAdmin(admin.ModelAdmin):
     inlines = [
         TermInline,RecordInline
     ]
+
+    raw_id_fields = ('course', 'teacher')
 
     def changelist_view(self, request, extra_context=None):
 
@@ -114,13 +135,15 @@ class GroupAdmin(admin.ModelAdmin):
             request.META['QUERY_STRING'] = request.GET.urlencode()
         return super(GroupAdmin,self).changelist_view(request, extra_context=extra_context)
 
+
+
     def queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
        display those for the currently signed in user.
        """
        qs = super(GroupAdmin, self).queryset(request)
-       return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type')
+       return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type').prefetch_related('term')
 
 class TypeAdmin(admin.ModelAdmin):
     list_display = ('name','group','meta_type')
