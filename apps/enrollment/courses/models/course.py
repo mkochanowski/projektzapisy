@@ -83,6 +83,8 @@ class CourseEntity(models.Model):
     have_seminar = models.NullBooleanField(verbose_name=u'Posiada seminarium', null=True, blank=True)
     have_project = models.NullBooleanField(verbose_name=u'Posiada projekt', null=True, blank=True)
 
+    usos_kod = models.CharField(max_length=20, null=True, blank=True, default='', verbose_name=u'Kod przedmiotu w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
+
     objects   = models.Manager()
     noremoved = NoRemoved()
 
