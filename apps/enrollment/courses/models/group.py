@@ -46,6 +46,8 @@ class Group(models.Model):
     cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
     disable_update_signal = False
 
+    usos_nr = models.IntegerField(null=True, blank=True, verbose_name=u'Nr grupy w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
+
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
         if self.teacher is None:
