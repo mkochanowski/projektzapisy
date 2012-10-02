@@ -158,7 +158,7 @@ class TermAdmin(admin.ModelAdmin):
         ('Miejsce', {'fields': ['classrooms',]}),
     ]
     list_filter = ('dayOfWeek', 'classrooms', 'group__course__semester')
-    list_display = ('__unicode__','group')
+    list_display = ('__unicode__','dayOfWeek','start_time','end_time', 'group')
     search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
     def queryset(self, request):
        """
