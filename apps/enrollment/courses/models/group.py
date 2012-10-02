@@ -74,11 +74,27 @@ class Group(models.Model):
 
         Record.objects.filter(student=student, group=self, status=STATUS_ENROLLED).update(status=STATUS_REMOVED)
 
-    def _remove_from_other_group(self, student):
+    def _remove_from_other_groups(self, student):
         from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
 
         for record in Record.objects.create(student=student, group__course=self.course,
             group__type=self.type, status=STATUS_ENROLLED).select_related('group'):
+
+            record.group.enrolled -= 1
+
+            if student.is_zamawiany():
+                record.group.enrolled_zam -= 1
+
+            record.group.save()
+            record.status=STATUS_REMOVED
+            record.save()
+
+
+    def _remove_from_all_groups(self, student):
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+
+        for record in Record.objects.create(student=student, group__course=self.course,
+                status=STATUS_ENROLLED).select_related('group'):
 
             record.group.enrolled -= 1
 
@@ -109,7 +125,9 @@ class Group(models.Model):
 
         #REMOVE FROM OTHER GROUP
         if self.type not in settings.LETURE_TYPE:
-            self._remove_from_other_group(student)
+            self._remove_from_other_groups(student)
+        else:
+            self._remove_form_all_groups(student)
 
         #ADD TO LECTURE GROUP
         self._add_to_lecture(student)
