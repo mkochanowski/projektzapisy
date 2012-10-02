@@ -234,8 +234,13 @@ class Student(BaseUser):
 
     t0 = models.DateTimeField(null=True, blank=True)
 
+    ects_in_semester = models.SmallIntegerField(default=0)
+
     dyskretna_l  = models.BooleanField(default=False)
     numeryczna_l = models.BooleanField(default=False)
+
+
+
 
     def make_t0(self, semester=None):
         from apps.enrollment.courses.models import Semester
@@ -399,7 +404,10 @@ class Student(BaseUser):
         return self.is_zamawiany_cache
 
     def is_first_year_student(self):
-        return (self.semestr in [1,2]) and (self.program.id in [0,2]) 
+        return (self.semestr in [1,2]) and (self.program.id in [0,2])
+
+    def is_fresh_student(self):
+        return True
 
     class Meta:
         verbose_name = 'student'

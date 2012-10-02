@@ -27,6 +27,7 @@ from apps.enrollment.utils import mail_enrollment_from_queue
 
 STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
+STATUS_REMOVED = '0'
 STATUS_QUEUED = '1'
 RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'przypięty')]
 
@@ -48,6 +49,9 @@ class Record(models.Model):
     group = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='records')
     status = models.CharField(max_length=1, choices=RECORD_STATUS, verbose_name='status')
+
+    created = models.DateTimeField(auto_now_add=True, verbose_name='utworzono')
+    edited  = models.DateTimeField(auto_now=True, verbose_name='zmieniano')
     
     objects = models.Manager()
     enrolled = EnrolledManager()

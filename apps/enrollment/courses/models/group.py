@@ -44,6 +44,11 @@ class Group(models.Model):
     cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
     cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
     cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
+
+    enrolled     = models.PositiveIntegerField(default=0, editable=False, verbose_name='ilość zapisanych studentów')
+    enrolled_zam = models.PositiveIntegerField(default=0, editable=False, verbose_name='ilość zapisanych studentów zamawianych')
+    queued       = models.PositiveIntegerField(default=0, editable=False, verbose_name='ilość studentów w kolejce')
+
     disable_update_signal = False
 
     def get_teacher_full_name(self):
@@ -60,6 +65,74 @@ class Group(models.Model):
     def get_terms_as_string(self):
       return ",".join(map(lambda x: "%s %s-%s" % (x.get_dayOfWeek_display(), x.start_time.hour, x.end_time.hour), self.term.all()))
     get_terms_as_string.short_description = 'Terminy zajęć'
+
+    def remove_student(self, student):
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        self.enrolled -= 1
+        if student.is_zamawiany():
+            self.enrolled_zam -= 1
+
+        Record.objects.filter(student=student, group=self, status=STATUS_ENROLLED).update(status=STATUS_REMOVED)
+
+    def _remove_from_other_group(self, student):
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+
+        for record in Record.objects.create(student=student, group__course=self.course,
+            group__type=self.type, status=STATUS_ENROLLED).select_related('group'):
+
+            record.group.enrolled -= 1
+
+            if student.is_zamawiany():
+                record.group.enrolled_zam -= 1
+
+            record.group.save()
+            record.status=STATUS_REMOVED
+            record.save()
+
+    def _add_to_lecture(self, student):
+        import settings
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        groups = Group.objects.filter(type=settings.LETURE_TYPE)
+        result = []
+        for group in groups:
+            __, created = Record.objects.get_or_create(student=student, group=group)
+            if created:
+                result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
+
+        return result
+
+    def add_student(self, student, commit=True):
+        # zakładamy, że student przeszedł testy
+        #TODO: test me!
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        import settings
+
+        #REMOVE FROM OTHER GROUP
+        if self.type not in settings.LETURE_TYPE:
+            self._remove_from_other_group(student)
+
+        #ADD TO LECTURE GROUP
+        self._add_to_lecture(student)
+
+        Record.objects.create(student=student, group=self)
+        self.enrolled +=1
+        if student.is_zamawiany():
+            self.enrolled_zam += 1
+
+        if commit:
+            self.save()
+
+            
+
+
+    def should_be_rearranged(self):
+        return self.queued > 0
+
+    def have_free_position(self):
+        return self.enrolled < self.limit
+
+    def have_normal_position(self):
+        return self.enrolled - self.enrolled_zam
 
     @staticmethod
     def get_groups_by_semester(semester):

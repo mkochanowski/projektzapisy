@@ -95,6 +95,7 @@ class CourseEntity(models.Model):
     def __unicode__(self):
         return '%s' % (self.name, )
 
+
     def test_have(self, name):
         if self.__getattribute__(name):
             return  self.__getattribute__(name)
@@ -256,6 +257,13 @@ class Course( models.Model ):
             self.slug = slugify('%d %s %s' % (self.pk, self.name))
 
         super(Course, self).save(*args, **kwargs)
+
+    def student_is_in_ects_limit(self, student):
+        #TODO: test me!
+        from apps.enrollment.courses.models import Semester
+        semester = Semester.get_current_semester()
+
+        return semester.get_current_limit() < student.get_ects_with_course(semester, self)
 
 
 
