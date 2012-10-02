@@ -152,14 +152,23 @@ class TypeAdmin(admin.ModelAdmin):
 
 
 class TermAdmin(admin.ModelAdmin):
+
+    def show_start(self, obj):
+        return obj.start_time.strftime('%H:%M')
+
+    def show_end(self, obj):
+        return obj.end_time.strftime('%H:%M')
+
     fieldsets = [
         (None,               {'fields': ['group']}),
         ('Termin', {'fields': ['dayOfWeek','start_time','end_time']}),
         ('Miejsce', {'fields': ['classrooms',]}),
     ]
     list_filter = ('dayOfWeek', 'classrooms', 'group__course__semester')
-    list_display = ('__unicode__','dayOfWeek','start_time','end_time', 'group')
+    list_display = ('__unicode__','dayOfWeek','show_start','show_end', 'group')
     search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
+    ordering = ('dayOfWeek', 'start_time')
+
     def queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
