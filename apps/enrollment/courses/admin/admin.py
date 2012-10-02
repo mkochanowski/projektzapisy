@@ -156,7 +156,7 @@ class TermAdmin(admin.ModelAdmin):
         ('Termin', {'fields': ['dayOfWeek','start_time','end_time']}),
         ('Miejsce', {'fields': ['classrooms',]}),
     ]
-    list_filter = ('dayOfWeek',)
+    list_filter = ('dayOfWeek', 'classrooms', 'group__course__semester')
     list_display = ('__unicode__','group')
     search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
     def queryset(self, request):
@@ -165,7 +165,17 @@ class TermAdmin(admin.ModelAdmin):
        display those for the currently signed in user.
        """
        qs = super(TermAdmin, self).queryset(request)
-       return qs.select_related('classrooms', 'group')
+       return qs.select_related('group', 'group__course', 'group__course__entity', 'group__teacher', 'group__teacher__user').prefetch_related('classrooms')
+
+    def changelist_view(self, request, extra_context=None):
+        semester = Semester.get_current_semester()
+        if not request.GET.has_key('group__course__semester__id__exact'):
+           q = request.GET.copy()
+           q['group__course__semester__id__exact'] = semester.id
+           request.GET = q
+           request.META['QUERY_STRING'] = request.GET.urlencode()
+            
+        return super(TermAdmin,self).changelist_view(request, extra_context=extra_context)
 
 class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
