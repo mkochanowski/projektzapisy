@@ -83,6 +83,7 @@ class CourseEntityAdmin(admin.ModelAdmin):
         (None,               {'fields': ['name','shortName','type','description'], 'classes': ['long_name']}),
         (None,               {'fields': ['owner', 'status', 'semester', 'requirements']}),
         (None,               {'fields': ['english', 'exam', 'deleted']}),
+        ('USOS',             {'fields': ['usos_kod'], 'classes': ['collapse']}),
 
     ]
     list_filter = ('semester', 'owner', 'status', 'type', )
