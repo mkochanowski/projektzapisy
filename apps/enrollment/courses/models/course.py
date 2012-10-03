@@ -413,6 +413,24 @@ class Course( models.Model ):
 
 def recache(sender, **kwargs):
     mcache.clear()
-    
-signals.post_save.connect(recache)        
-signals.post_delete.connect(recache)	
+#
+#signals.post_save.connect(recache)
+#signals.post_delete.connect(recache)
+"""
+groups = Group.objects.all()
+for g in groups:
+ records = Record.objects.filter(group=g, status=1)
+ nor = 0
+ zam = 0
+ que = 0
+ for r in records:
+  if r.student.is_zamawiany():
+   zam +=1
+
+ queues = Queue.objects.filter(group=g, deleted=False)
+ que = queues.count()
+ g.enrolled = Record.objects.filter(group=g, status=1).count()
+ g.enrolled_zam = zam
+ g.queued = que
+ g.save()" \
+ """

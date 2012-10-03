@@ -3,6 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from django.core.mail import send_mail
+from django.db.models import Q, Sum
 from django.db.models.loading import cache
 from django.template import Context
 from django.template.loader import render_to_string
@@ -306,14 +307,31 @@ class Student(BaseUser):
 
     def get_points(self, semester=None):
         from apps.enrollment.courses.models import Semester
+        from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.get_current_semester
-        courses = Courses.objects.filter(student=self, semester=semester).order_by('course__name')
+        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
+        courses = Courses.objects.filter(student=self, semester=semester, course__in=records).order_by('course__name')
 
         points = 0
         for c in courses: points += c.value
 
         return courses, points
+
+    def get_points_with_course(self, course, semester=None):
+        from apps.enrollment.courses.models import Semester
+        from apps.enrollment.records.models import Record
+        if not semester:
+            semester = Semester.get_current_semester
+
+        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
+        if course.id not in records:
+            records = list(records) + [course.id]
+        points = Courses.objects.\
+                 filter(student=self, semester=semester, course__in=records).\
+                 aggregate(Sum('value'))
+
+        return points['value__sum']
 
 
     def get_schedule(self, semester=None):
@@ -526,7 +544,24 @@ class StudiaZamawianeMaileOpiekunow(models.Model):
     def __unicode__(self):
         return self.email
 
-
+"""
+CREATE OR REPLACE VIEW users_courses AS
+ SELECT cc.semester_id, au.id AS student_id, cc.id AS course_id, COALESCE(
+        CASE
+            WHEN au.numeryczna_l AND cc.numeryczna_l OR au.dyskretna_l AND cc.dyskretna_l THEN ( SELECT cp.value
+               FROM courses_pointsofcourses cp
+              WHERE cp.course_id = cc.id AND cp.program_id = 1)
+            ELSE ( SELECT cp.value
+               FROM courses_pointsofcourses cp
+              WHERE cp.course_id = cc.id AND cp.program_id = au.program_id)
+        END::integer, (( SELECT cpe.value
+           FROM courses_pointsofcourseentities cpe
+          WHERE cpe.entity_id = cc.entity_id))::integer, 0) AS value, ( SELECT count(*) AS count
+           FROM records_record rr
+      LEFT JOIN courses_group cg ON rr.group_id = cg.id
+     WHERE cg.course_id = cc.id AND rr.status::integer = 1 AND rr.student_id = au.id) AS groups
+   FROM users_student au, courses_course cc;
+"""
 class Courses(models.Model):
     semester = models.ForeignKey('courses.Semester')
     student = models.ForeignKey(Student, primary_key = True) #readonly!

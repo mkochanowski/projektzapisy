@@ -1,14 +1,21 @@
 # -*- coding: utf-8 -*-
+import simplejson
 
 
-def divide_queues_by_group(groups, queues):
+def prepare_group_data(course, student):
+    from apps.enrollment.records.models import Queue, Record
+    groups = course.groups.all()
+    queued = Queue.queued.filter(group__course=course, student=student)
+    enrolled_ids = Record.enrolled.filter(group__course=course,
+        student=student).values_list('group__id', flat=True)
+    queued_ids = queued.values_list('group__id', flat=True)
+    pinned_ids = Record.pinned.filter(group__course=course,
+        student=student).values_list('group__id', flat=True)
+    queue_priorities = Queue.queue_priorities_map(queued)
 
-    divide = {}
-
+    data = {}
     for group in groups:
-        divide[group.id] = {'group': group, 'students': []}
-
-    for queue in queues:
-        divide[queue.group_id].students.append(queue)
-
-    return divide
+        data[group.id] = simplejson.dumps(group.serialize_for_ajax(
+            enrolled_ids, queued_ids, pinned_ids,
+            queue_priorities, student))
+    return data

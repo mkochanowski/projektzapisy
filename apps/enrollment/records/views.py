@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
 from django.core.cache import cache as mcache
+from apps.enrollment.courses.utils import prepare_group_data
 from apps.users.decorators import employee_required
 
 from debug_toolbar.panels.timer import TimerDebugPanel
@@ -125,157 +126,52 @@ def set_enrolled(request, method):
     message_context = None if is_ajax else request
 
     if not request.user.is_authenticated():
-        return AjaxFailureMessage.auto_render('NotAuthenticated',
-            'Nie jesteś zalogowany.', message_context)
+        return AjaxFailureMessage.auto_render('NotAuthenticated', 'Nie jesteś zalogowany.', message_context)
 
     try:
         group_id = int(request.POST['group'])
         set_enrolled = request.POST['enroll'] == 'true'
     except MultiValueDictKeyError:
-        return AjaxFailureMessage.auto_render('InvalidRequest',
-            'Nieprawidłowe zapytanie.', message_context)
+        return AjaxFailureMessage.auto_render('InvalidRequest', 'Nieprawidłowe zapytanie.', message_context)
 
     if request.user.student.block:
         return AjaxFailureMessage.auto_render('ScheduleLocked',
-            'Twój plan jest zablokowany.', message_context)
+            u'Twój plan jest zablokowany. Możesz go doblokować w prototypie', message_context)
     student = request.user.student
-
-    logger.info('User %s <id: %s> set himself %s to group with id: %s' % \
-        (request.user.username, request.user.id,
-        ('enrolled' if set_enrolled else 'not enrolled'), group_id))
-
-    def prepare_group_data(course, student):
-        groups = course.groups.all()
-        queued = Queue.queued.filter(group__course=course, student=student)
-        enrolled_ids = Record.enrolled.filter(group__course=course,
-            student=student).values_list('group__id', flat=True)
-        queued_ids = queued.values_list('group__id', flat=True)
-        pinned_ids = Record.pinned.filter(group__course=course,
-            student=student).values_list('group__id', flat=True)
-        queue_priorities = Queue.queue_priorities_map(queued)
-
-        data = {}
-        for group in groups:
-            data[group.id] = simplejson.dumps(group.serialize_for_ajax(
-                enrolled_ids, queued_ids, pinned_ids,
-                queue_priorities, student))
-        return data
 
 
     try:
         group = Group.objects.get(id=group_id)
-        Course.objects.select_for_update().get(id=group.course_id)
+        group.course = Course.objects.select_for_update().get(id=group.course_id)
     except ObjectDoesNotExist:
         transaction.rollback()
         return AjaxFailureMessage.auto_render('NonGroup',
-            'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona już' +\
-            ' nie istnieje.', message_context)
+            'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona nie istnieje.', message_context)
 
-    try:
-        if set_enrolled:
-            moved = Record.is_student_in_course_group_type(
-                user=request.user, slug=group.course_slug(),
-                group_type=group.type) #TODO: omg ale crap
-            connected_records = Record.add_student_to_group(request.user, group)
-            record = connected_records[0]
-            if moved:
-                message = 'Zostałeś przeniesiony do wybranej grupy.'
-            elif len(connected_records) == 1:
-                message = 'Zostałeś zapisany do wybranej grupy.'
-            else:
-                message = 'Zostałeś zapisany do wybranej grupy oraz grup ' + \
-                'powiązanych.'
+    if set_enrolled:
+        result, messages_list = group.enroll_student(student)
+        if not result:
+            transaction.rollback()
+    else:
+        result, messages_list = group.remove_student(student)
+        if result:
+            if group.should_be_rearranged():
+                regroup = group
+                while regroup:
+                    regroup = regroup.rearanged()
         else:
-            record = Record.remove_student_from_group(request.user, group)
-            message = 'Zostałeś wypisany z wybranej grupy.'
-            Queue.try_enroll_next_student(group)
+            transaction.rollback()
 
 
-        if is_ajax:
-            return AjaxSuccessMessage(message,
-                prepare_group_data(group.course, student))
-        else:
+    if is_ajax:
+        message = ', '.join(messages_list)
+        return AjaxSuccessMessage(message, prepare_group_data(group.course, student))
+
+    else:
+        for message in messages_list:
             messages.info(request, message)
-            return redirect('course-page', slug=record.group_slug())
-    except NonStudentException:
-        transaction.rollback()
-        return AjaxFailureMessage.auto_render('NonStudent',
-            'Nie możesz zapisać lub wypisać się z grupy, ponieważ nie jesteś' +\
-            ' studentem.', message_context)
-    except NonGroupException:
-        transaction.rollback()
-        return AjaxFailureMessage.auto_render('NonGroup',
-            'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona już' +\
-            ' nie istnieje.', message_context)
-    except AlreadyAssignedException:
-        message = 'Jesteś już zapisany do tej grupy.'
-        if is_ajax:
-            return AjaxSuccessMessage(message,
-                prepare_group_data(group.course, student))
-        else:
-            messages.info(request, message)
-            return redirect('course-page', slug=Group.objects.\
-                get(id=group_id).course_slug())
-    except AlreadyNotAssignedException:
-        try:
-            Queue.remove_student_from_queue(request.user.id, group_id)
-            message = 'Zostałeś wypisany z kolejki wybranej grupy.'
-        except AlreadyNotAssignedException:
-            message = 'Jesteś już wypisany z tej grupy.'
-        if is_ajax:
-            return AjaxSuccessMessage(message,
-                prepare_group_data(group.course, student))
-        else:
-            messages.info(request, message)
-            return redirect('course-page', slug=Group.objects.\
-                get(id=group_id).course_slug())
-    except OutOfLimitException:
-        try:
-            Queue.add_student_to_queue(request.user.id, group_id)
-            try:
-                Record.unpin_student_from_group(request.user.id, group_id)
-            except AlreadyNotPinnedException:
-                pass
-            message = 'Grupa jest pełna. Zostałeś zapisany do kolejki.'
-            if is_ajax:
-                return AjaxFailureMessage.auto_render('Queued', message,
-                    message_context, prepare_group_data(group.course, student))
-            else:
-                messages.info(request, message)
-                return redirect('course-page', slug=Group.objects.\
-                    get(id=group_id).course_slug())
-        except AlreadyQueuedException:
-            return AjaxFailureMessage.auto_render('AlreadyQueued',
-                'Jesteś już zapisany do kolejki.',
-                message_context)
-    except RecordsNotOpenException:
-        transaction.rollback()
-        if set_enrolled:
-            message = 'Nie możesz się zapisać, ponieważ zapisy na ten ' + \
-                'przedmiot nie są dla Ciebie otwarte.'
-        else:
-            message = 'Nie możesz się wypisać, ponieważ zapisy są już ' + \
-                'zamknięte.'
-        return AjaxFailureMessage.auto_render('RecordsNotOpen', message,
-            message_context)
-    except ECTS_Limit_Exception:
-        if is_ajax:
-            return AjaxFailureMessage.auto_render('ECTSLimit', 'Przekroczyłeś limit ECTS')
-        else:
-            messages.error(request, 'Przekroczony limit 40 ECTS')
-            return redirect('course-page', slug=Group.objects.\
-                    get(id=group_id).course_slug())
-    except InactiveStudentException:
-        message = 'Nie możesz się zapisać, ponieważ nie jesteś aktywnym ' + \
-            'studentem.'
-        if is_ajax:
-            return AjaxFailureMessage.auto_render('InactiveStudent', message,
-                message_context)
-        else:
-            messages.error(request, message)
-            return redirect('course-page', slug=Group.objects.\
-                    get(id=group_id).course_slug())
 
+        return redirect('course-page', slug=group.course_slug())
 
 @require_POST
 def records_set_locked(request, method):

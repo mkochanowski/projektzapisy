@@ -19,7 +19,7 @@
         "fields": {
             "name": "Bazy danych"
         }
-    },
+    }, 
     {
         "pk": 1, 
         "model": "courses.course", 
@@ -62,7 +62,7 @@
         "fields": {
             "name": "Obowiazki.O1"
         }
-    },
+    }, 
     {
         "pk": 1, 
         "model": "courses.group", 
@@ -80,8 +80,7 @@
             "limit": 25, 
             "type": "2", 
             "teacher": 2, 
-            "course": 1,
-            "limit_zamawiane": 2
+            "course": 1
         }
     }, 
     {
