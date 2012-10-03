@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import StringIO
 import csv
 
 from django.contrib import messages
@@ -8,12 +9,14 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.shortcuts import redirect
+from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.utils import simplejson
 from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
 from django.core.cache import cache as mcache
+from xhtml2pdf import pisa
 from apps.users.decorators import employee_required
 
 from debug_toolbar.panels.timer import TimerDebugPanel
@@ -544,3 +547,29 @@ def schedule_prototype(request):
     return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))
 
+@employee_required
+def records_pdf(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    data = {
+        'group': group,
+        'students_in_group': Record.get_students_in_group(group_id),
+        'students_in_queue': Queue.get_students_in_queue(group_id), #TODO: change localization
+        'pagesize': 'A4',
+        'report': True
+    }
+    context = Context(data)
+
+    template = get_template('records/group_pdf.html')
+    html  = template.render(context)
+    result = StringIO.StringIO()
+
+    pdf      = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result, encoding='UTF-8')
+    response = HttpResponse(result.getvalue(), mimetype='application/pdf')
+    import re
+    response['Content-Disposition'] = 'attachment; filename=' + re.sub(r'\s', '', slugify(str(group))) + '_sklad.pdf'
+
+    return response
