@@ -39,7 +39,7 @@ $ python scheduleimport.py
 
 """
 #### TO CHANGE #####
-SCHEDULE_FILE = '/home/gosia/Desktop/plannnnn'
+SCHEDULE_FILE = '/opt/fereol/fereol/dbimport/schedule/PlanPrzedmiotów.txt'
 LIMITS = {'1' : 300, '9' : 300, '2' : 20, '3' : 15 , '5' : 18 , '6' : 15 }
 
 FIRST_YEAR_FRIENDLY = ['logikadlainformatyków','analizamatematyczna','algebra','kursjęzykaansiczelementamic++','wstępdoinformatyki',
@@ -183,16 +183,19 @@ def guess_points(name,t):
     return 6,6
 
 def get_classroom(rooms):
-    try:
-        room = rooms[0] #FIXIT
-        if room.replace(' ','')=='':
-            classroom = Classroom.objects.get_or_create(number='0')[0]
-        else:
-            classroom = Classroom.objects.get_or_create(number=room)[0]
-    except IndexError:
-        classroom = Classroom.objects.get_or_create(number='0')[0]
+    classrooms = []
+    for room in rooms:
+        try:
+            if room.replace(' ','')=='':
+                classroom = None
+            else:
+                classroom = Classroom.objects.get_or_create(number=room)[0]
+        except IndexError:
+            classroom = None
+        if classroom:
+            classrooms.append(classroom)
 
-    return classroom
+    return classrooms
 
 def get_points_values():
     ects = PointTypes.objects.get_or_create(name='ECTS')[0]
@@ -219,7 +222,7 @@ def import_schedule(file, semester):
     COURSE_TYPE = {}
 
     ects, program_lic, program_mgr = get_points_values()
-
+    classroom = Classroom.objects.get_or_create(number=0)[0]
     for t in types:
         td = Type.objects.get_or_create(name=t[0], meta_type=False, defaults = {'short_name':t[1], 'group':None})[0]
         COURSE_TYPE[t[1]] = td
@@ -239,7 +242,7 @@ def import_schedule(file, semester):
                 start_time = time(hour=int(g.group('start_time')))
                 end_time = time(hour=int(g.group('end_time')))
                 rooms = g.group('rooms').replace(' ','').replace('sala','').replace('sale','').replace('\n','').split(',')
-                classroom = get_classroom(rooms)
+                classrooms = get_classroom(rooms)
 
                 group_type = GROUP_TYPES[g.group('type')]
                 teacher = find_teacher(g.group('teacher'))
@@ -284,6 +287,8 @@ def import_schedule(file, semester):
                                            end_time=end_time,
                                            classroom=classroom,
                                            group=group)
+                term.classrooms = classrooms
+                term.save()
                 
             except AttributeError:
                 print 'Error: line`'+line+'\' don\'t match regexp.'
@@ -307,14 +312,16 @@ def import_schedule(file, semester):
             name = len(name)>0 and name[0]+lower_pl(name[1:]) or name
             name = name.replace('(l)','(L)').replace('(m)','(M)').replace('(b)','(B)')
             name = extra+name
-            name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight').replace('ruby','Ruby').replace('rails','Rails')
-            shortName = name[:29]
+            name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight').replace('ruby','Ruby').replace('rails','Rails').replace('coq','Coq').replace('network fundamentals','Network Fundamentals').replace('phone','Phone').replace('android', 'Android').replace('(cuda)', '(CUDA)').replace('Data-mining', 'Data-Mining').replace('General game playing', 'General Game Playing').replace('general game playing', 'General Game Playing').replace('3d', '3D').replace('.net', '.NET').replace('exploration', 'Exploration')
+            shortName = name.decode('utf-8')[:29].encode('utf-8')
             type,short_type,first_year,exam = guess_type(name,COURSE_TYPE)
-            entity = CourseEntity.objects.get_or_create(name=name, defaults = {'shortName':shortName,'type':type})[0]
+            entity, created_entity = CourseEntity.objects.get_or_create(name=name, defaults = {'shortName':shortName,'type':type})
+            if created_entity:
+                print 'Stworzono podstawe przedmiotu o id <%s>' % entity.id
             lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
-            english = '(ang)' in name
-            slug = str(semester.year) + semester.type + '_' + slugify(name)
-            #print slug
+            english = '(ang)' in name or '(ang.)' in name
+            slug = semester.year.replace('/', '_') + semester.type + '_' + slugify(name)
+            print slug
             try:
                 course = Course.objects.create(name=name,
                                                  entity=entity,
@@ -352,7 +359,11 @@ def get_semester():
     type = today.month in [12,1,2,3,4,5] and 'l' or 'z'
     year = today.year
     next_year = (year+1)%100
-    year = str(year)+'/'+str(next_year)
+    prev_year = (year-1)
+    if type=='z':
+        year = str(year)+'/'+str(next_year)
+    else:
+        year = str(prev_year)+'/'+str(year%100)
     semester_beginning = today
     semester_ending = today 
     semester = Semester.objects.get_or_create(type=type,
@@ -360,15 +371,20 @@ def get_semester():
                                               defaults = {
                                                   'visible' : False,
                                                   'semester_beginning' : semester_beginning,
-                                                  'semester_ending' : semester_ending})[0]
+                                                  'semester_ending' : semester_ending,
+                                                  'records_opening': today,
+                                                  'records_closing': today
+                                              })[0]
     return semester
 
 @transaction.commit_on_success
 def scheduleimport(data):
     semester = get_semester()
+    print 'Przenosimy na semestr <%s>' % semester
     file = data
     #file = open(SCHEDULE_FILE)
     import_schedule(file, semester)
 
 #scheduleimport('')
+
 

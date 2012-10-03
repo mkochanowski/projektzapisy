@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import traceback
 from logging import getLogger
 from django.http import HttpResponseNotAllowed
 from django.template import RequestContext, loader
@@ -15,7 +15,8 @@ class ErrorHandlerMiddleware(object):
 		# jeżeli będzie potrzeba pobrania dokładniejszych informacji o wyjątku:
 		# sys.exc_info()
 		# traceback.print_tb()
-		logger.exception('Unhandled exception')
+		tb_text = traceback.format_exc()
+		logger.exception(tb_text)
 
 	def process_response(self, request, response):
 		# obsługiwanie niestandardowych stron błędów

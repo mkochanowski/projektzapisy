@@ -1075,7 +1075,7 @@ def poll_results( request, mode='S', poll_id = None, semester=None ):
         data['polls_by_teacher']            = request.session['polls_by_teacher']
         
     if poll_id:
-        data['pid']       = poll_id
+        data['pid']       = int(poll_id)
         data['link_mode'] = mode
         try:
             poll              = Poll.objects.get( id = poll_id )

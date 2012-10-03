@@ -84,7 +84,7 @@
     		};
 
     	};
-        $(function(){$('.active_poll').parent().parent().parent().find('a').click();});
+        $(function(){$('.active_poll').parent().parent().find('a').click();});
     };
 
     window.onload = sitemapstyler;
@@ -155,13 +155,13 @@
 
                     <ul class="sitemap">
                         {% for poll_list in polls_by_course %}
-                            <li><h6><a class="list-link">{{ poll_list.0 }}</a></h6>
+                           <li><h6><a class="list-link">{{ poll_list.0 }}</a></h6>
 
                                 <ul class="result-groupped-list">
                             {% for poll in poll_list.1 %}
 
-                            <li><a id="grade-fillable-poll-link-{{ poll.id }}"
-                                    {% if  poll.id == pid %} class="active_poll"{% endif %}
+                            <li{% if  poll.id == pid %} class="active_poll"{% endif %}><a id="grade-fillable-poll-link-{{ poll.id }}"
+                                    
                                    href="{% url grade-poll-poll-results-semester semester.id 'S' poll.id %}">{{ poll.group.teacher }} - {{ poll.title }}
 
                             </a></li>

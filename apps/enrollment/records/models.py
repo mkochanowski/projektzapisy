@@ -622,7 +622,7 @@ class Queue(models.Model):
             <id: %s>.', queued.student.user.username, queued.student.user.id, \
             group, group.id)
         except OutOfLimitException:
-            return False
+            return OutOfLimitException
 
         return True
     
