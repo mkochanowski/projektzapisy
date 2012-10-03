@@ -33,41 +33,21 @@
 	<div id="enr-group-view">
 
 
-        {% include "enrollment/courses/course_head.html" %}
+        <h2>{{ group.course }}</h2>
+
+        <h4>{{group.get_type_display}}: {{group.get_teacher_full_name}}</h4>
+        <h6>{% for term in group.term.all %}{{ term }} {% endfor %}</h6>
 
         <hr>
 
-		<h3>Lista osób zapisanych na przedmiot:</h3>
-		{% if group.limit_zamawiane %}
-			<p>Zapisanych w ramach limitu studiów zamawianych:
-				{{ group.get_count_of_enrolled_zamawiane }}
-				/ {{ group.limit_zamawiane }}.
-			</p>
-			<p>Zapisanych w ramach limitu dodatkowego:
-				{{ group.get_count_of_enrolled_non_zamawiane }}
-				/ {{ group.limit_non_zamawiane }}.
-			</p>
-		{% else %}
-			<p>Liczba zapisanych osób: {{students_in_group|length}} /
-			{{group.get_group_limit}}</p>
-		{% endif %}
+		{% include "records/records_list.html" %}
 
-
-        {% if students_in_group %}
-		    {% include "enrollment/records/students_list.html" with students=students_in_group %}
-        <a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do grupy]</a>&nbsp;
-            {% if user.employee %}
-                <a href="{% url records-csv  group.id %}">Wersja CSV</a>{% endif %}
-            {% endif %}
-		<br/>
-		{%if students_in_queue %}
-			<h3>Lista osób oczekujących na zapis:</h3>
-			<p> Liczba osób oczekujących na zapis: {{students_in_queue|length}} </p>
-			<br/>
-
-            {% include "enrollment/records/students_list.html" with students=students_in_queue %}
-
-			<a href="mailto:{% for student in students_in_queue %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do kolejki]</a>
-		{% endif %}
+        {% if request.user.is_staff or request.user.employee %}
+            <ul>
+                <li><a href="{% url records-pdf group.id %}">Ściągnij jako pdf</a></li>
+                <li><a href="{% url records-csv group.id %}">Ściągnij jako csv</a></li>
+            </ul>{% endif %}
 	</div>
+
+
 {% endblock %}

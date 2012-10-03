@@ -12,6 +12,8 @@ urlpatterns = patterns('apps.enrollment.records.views',
         'records', name='records-group'),
     url('^(?P<group_id>[\d]+)/records/csv$',
         'records_csv', name='records-csv'),
+    url('^(?P<group_id>[\d]+)/records/pdf$',
+        'records_pdf', name='records-pdf'),
     url('^set-locked(?P<method>\.json)?$',
         'records_set_locked', name='records-set-locked' ),
 
