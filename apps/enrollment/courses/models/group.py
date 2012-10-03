@@ -29,7 +29,10 @@ GROUP_EXTRA_CHOICES = [('',''),
     (u'grupa 2','grupa 2'),
     (u'grupa 3','grupa 3'),
     (u'grupa 4','grupa 4'),
-    (u'grupa 5','grupa 5'),]
+    (u'grupa 5','grupa 5'),
+    (u'pracownia linuksowa','pracownia linuksowa'),
+    (u'grupa anglojęzyczna','grupa anglojęzyczna'),
+    ]
 
 class Group(models.Model):
     """group for course"""
