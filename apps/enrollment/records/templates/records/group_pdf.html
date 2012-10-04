@@ -9,10 +9,10 @@
 
         html {
             font-family: Helvetica, sans-serif;
-            font-size: 9pt;
+            font-size: 8pt;
             }
 
-        th { font-size: 16px;}
+        th { font-size: 12px;}
         table { border: 1px #000000 solid;}
         a { text-decoration: none; color: #000000;}
         td, th { text-align: left; padding-top: 3px; padding-left: 3px;}
@@ -24,6 +24,52 @@
     <h6>{% for term in group.term.all %}{{ term }} {% endfor %}</h6>
 
         <hr>
-        {% include "records/records_list.html" %}
+    		{% if group.limit_zamawiane %}
+    			<p>Zapisanych w ramach limitu studiów zamawianych:
+    				{{ group.get_count_of_enrolled_zamawiane }}
+    				/ {{ group.limit_zamawiane }}.
+    			</p>
+    			<p>Zapisanych w ramach limitu dodatkowego:
+    				{{ group.get_count_of_enrolled_non_zamawiane }}
+    				/ {{ group.limit_non_zamawiane }}.
+    			</p>
+    		{% else %}
+    			<p>Liczba zapisanych osób: {{students_in_group|length}} /
+    			{{group.get_group_limit}}</p>
+    		{% endif %}
+
+
+            {% if students_in_group %}
+                <table class="zebra-striped">
+                	<thead>
+                		<th style="width:80px;">Imię</th>
+                		<th>Nazwisko</th>
+                		<th style="width:60px;">index</th>
+                		<th>Rodzaj studiów</th>
+                		<th style="width:30px;">Sem.</th>
+                		<th>Uwagi</th>
+                	</thead>
+                	<tbody>
+                		{% for student in students_in_group %}
+                			<tr>
+                				<td><a href="{% url student-profile student.user.id %}" class="person">
+                				    {{student.user.first_name}}</a></td>
+                				<td><a href="{% url student-profile student.user.id %}" class="person">
+                				    {{student.user.last_name}}</a></td>
+                				<td style="width:60px;">{{student.matricula}}</td>
+                				<td style="font-size: 5px;">
+                					{{student.program}}
+                				</td>
+                				<td style="width:30px;">{{student.semestr}}</td>
+                            <td></td>
+                			</tr>
+
+                		{% empty %}
+                			Brak zapisanych osób.
+                		{% endfor %}
+                	</tbody>
+                </table>
+            {% endif %}
+
     </body>
 </html>
