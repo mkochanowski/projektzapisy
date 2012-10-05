@@ -16,7 +16,7 @@ from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
 from django.core.cache import cache as mcache
-from libs.xhtml2pdf import pisa
+from xhtml2pdf import pisa
 from apps.users.decorators import employee_required
 
 from debug_toolbar.panels.timer import TimerDebugPanel
