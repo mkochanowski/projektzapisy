@@ -27,6 +27,7 @@ from apps.enrollment.utils import mail_enrollment_from_queue
 
 STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
+STATUS_REMOVED = '0'
 STATUS_QUEUED = '1'
 RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'przypięty')]
 
@@ -48,6 +49,9 @@ class Record(models.Model):
     group = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='records')
     status = models.CharField(max_length=1, choices=RECORD_STATUS, verbose_name='status')
+
+    created = models.DateTimeField(auto_now_add=True, verbose_name='utworzono')
+    edited  = models.DateTimeField(auto_now=True, verbose_name='zmieniano')
     
     objects = models.Manager()
     enrolled = EnrolledManager()
@@ -55,7 +59,25 @@ class Record(models.Model):
     
     def get_semester_name(self):
         return self.group.course.semester.get_name()
-    
+
+    def student_remove(self, student):
+        self.group.remove_from_enrolled_counter(student)
+
+        self.group.save()
+        self.status=STATUS_REMOVED
+        self.save()
+
+        if self.group.queued > 0:
+            self.group.rearanged()
+
+    @staticmethod
+    def get_student_records_for_course(student, course):
+        return Record.objects.filter(student=student, status=STATUS_ENROLLED, group__course=course).select_related('group')
+
+    @staticmethod
+    def get_student_records_for_group_type(student, group):
+        return Record.get_student_records_for_course(student, group.course).filter(group__type=group.type)
+
     @staticmethod
     def recorded_students(students):
         """ Returns students with information about his/her records """
@@ -97,7 +119,7 @@ class Record(models.Model):
         return Record.enrolled.\
             filter(student=student, group__course__semester=semester).\
             select_related('group', 'group__course', 'group__course__entity',\
-            'group__course__type');
+            'group__course__type')
     
     @staticmethod
     def get_student_enrolled_ids(student, semester):
@@ -351,7 +373,6 @@ class Record(models.Model):
     class Meta:
         verbose_name = 'zapis'
         verbose_name_plural = 'zapisy'
-        unique_together = (('student', 'group'), )
     
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
@@ -370,8 +391,12 @@ def queue_priority(value):
 class Queue(models.Model):
     group   = models.ForeignKey(Group, verbose_name='grupa')
     student = models.ForeignKey(Student, verbose_name='student', related_name='queues')
-    time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki')
+    time = models.DateTimeField(verbose_name='Czas dołączenia do kolejki', auto_now_add=True)
+    edited = models.DateTimeField(verbose_name='Czas ostatniej zmiany', auto_now=True)
     priority = models.PositiveSmallIntegerField(default=1, validators=[queue_priority], verbose_name='priorytet')
+
+    deleted = models.BooleanField(default=False)
+
     objects = models.Manager()
     queued = QueueManager()
       
@@ -396,7 +421,7 @@ class Queue(models.Model):
             student = user.student
             group = Group.objects.get(id = group_id)
             """Pobranie recordu z zapisem studenta do kolejki grupy"""
-            queue = Queue.queued.filter(student=student, group=group)
+            queue = Queue.queued.filter(student=student, group=group, deleted=False)
             if queue:
                 return queue[0].priority
             else:
@@ -413,7 +438,7 @@ class Queue(models.Model):
     def get_students_in_queue(group_id):
         """ Returns state of queue for group ordered by time (FIFO)."""
         try:
-            return Student.objects.filter(queues__group_id=group_id).select_related('user').order_by('queues__time')
+            return Student.objects.filter(queues__group_id=group_id, queues__deleted=False).select_related('user').order_by('queues__time')
         except Group.DoesNotExist:
             logger.warning('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
             raise NonGroupException()
@@ -689,7 +714,6 @@ class Queue(models.Model):
     class Meta:
         verbose_name = 'kolejka'
         verbose_name_plural = 'kolejki'
-        unique_together = (('student', 'group'),)
     
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
@@ -723,10 +747,10 @@ def update_group_counts(sender, instance, **kwargs):
     except ObjectDoesNotExist:
         pass
 
-signals.post_save.connect(log_add_record, sender=Record)                               
-signals.pre_delete.connect(log_delete_record, sender=Record) 
-signals.post_save.connect(update_group_counts, sender=Record)
-signals.post_delete.connect(Record.on_student_remove_from_group, sender=Record)
-signals.post_save.connect(update_group_counts, sender=Queue)
-signals.post_delete.connect(update_group_counts, sender=Queue)
-signals.post_save.connect(add_people_from_queue, sender=Group)
+#signals.post_save.connect(log_add_record, sender=Record)
+#signals.pre_delete.connect(log_delete_record, sender=Record)
+#signals.post_save.connect(update_group_counts, sender=Record)
+#signals.post_delete.connect(Record.on_student_remove_from_group, sender=Record)
+#signals.post_save.connect(update_group_counts, sender=Queue)
+#signals.post_delete.connect(update_group_counts, sender=Queue)
+#signals.post_save.connect(add_people_from_queue, sender=Group)

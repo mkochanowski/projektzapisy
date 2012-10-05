@@ -97,6 +97,7 @@ class CourseEntity(models.Model):
     def __unicode__(self):
         return '%s' % (self.name, )
 
+
     def test_have(self, name):
         if self.__getattribute__(name):
             return  self.__getattribute__(name)
@@ -259,6 +260,13 @@ class Course( models.Model ):
 
         super(Course, self).save(*args, **kwargs)
 
+    def student_is_in_ects_limit(self, student):
+        #TODO: test me!
+        from apps.enrollment.courses.models import Semester
+        semester = Semester.get_current_semester()
+
+        return semester.get_current_limit() < student.get_ects_with_course(semester, self)
+
 
 
     def votes_count(self, semester=None):
@@ -407,6 +415,24 @@ class Course( models.Model ):
 
 def recache(sender, **kwargs):
     mcache.clear()
-    
-signals.post_save.connect(recache)        
-signals.post_delete.connect(recache)	
+#
+#signals.post_save.connect(recache)
+#signals.post_delete.connect(recache)
+"""
+groups = Group.objects.all()
+for g in groups:
+ records = Record.objects.filter(group=g, status=1)
+ nor = 0
+ zam = 0
+ que = 0
+ for r in records:
+  if r.student.is_zamawiany():
+   zam +=1
+
+ queues = Queue.objects.filter(group=g, deleted=False)
+ que = queues.count()
+ g.enrolled = Record.objects.filter(group=g, status=1).count()
+ g.enrolled_zam = zam
+ g.queued = que
+ g.save()" \
+ """

@@ -29,8 +29,6 @@
 
 {% block content %}
 
-{% block messages %}{% endblock %}
-
 <input type="hidden" name="ajax-course-data" value="{{ course_json }}"/>
 <input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}"/>
 <input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}"/>

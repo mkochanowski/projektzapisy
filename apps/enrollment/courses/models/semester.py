@@ -25,7 +25,16 @@ class Semester( models.Model ):
     desiderata_closing = models.DateTimeField(null = True, blank=True, verbose_name='Czas zamknięcia dezyderat')
 
     is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna' )
-    records_ects_limit_abolition = models.DateTimeField(null = True, verbose_name='Czas zniesienia limitu 40 ECTS') 
+    records_ects_limit_abolition = models.DateTimeField(null = True, verbose_name='Czas zniesienia limitu 35 ECTS')
+
+    def get_current_limit(self):
+        import settings
+
+        if datetime.now() < self.records_ects_limit_abolition:
+            return settings.ECTS_LIMIT
+        else:
+            return settings.ECTS_FINAL_LIMIT
+
 
     def get_courses(self):
         """ gets all courses linked to semester """
@@ -84,7 +93,7 @@ class Semester( models.Model ):
                 
     @staticmethod
     def get_current_semester():
-        """ if exist, it returns current semester. otherwise return None """ 
+        """ if exist, it returns current semester. otherwise return None """
         try:
             return Semester.objects.get(semester_beginning__lte =datetime.now().date(), semester_ending__gte= datetime.now().date())
         except Semester.DoesNotExist:

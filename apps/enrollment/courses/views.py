@@ -102,9 +102,7 @@ def course(request, slug):
 
         groups = list(Group.objects.filter(course=course).
             extra({
-                'enrolled': "SELECT COUNT(*) FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s'" % (STATUS_ENROLLED,),
-                'queued': "SELECT COUNT(*) FROM records_queue WHERE courses_group.id=records_queue.group_id",
-                'priority': "SELECT COALESCE((SELECT priority FROM records_queue WHERE courses_group.id=records_queue.group_id AND records_queue.student_id=%s),0)" % (student_id,),
+                'priority': "SELECT COALESCE((SELECT priority FROM records_queue WHERE courses_group.id=records_queue.group_id AND records_queue.student_id=%s AND records_queue.deleted = false),0)" % (student_id,),
                 'signed': "SELECT COALESCE((SELECT id FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s' AND records_record.student_id=%s),0)" % (STATUS_ENROLLED,student_id)}).
             select_related('teacher', 'teacher__user'))
         
@@ -123,16 +121,16 @@ def course(request, slug):
         else:
             enrolled_pinned_queued_ids_sql = """
             SELECT 
-                array(SELECT group_id FROM records_record WHERE status=%s AND records_record.student_id=%s) AS enrolled_ids, 
+                array(SELECT group_id FROM records_record WHERE status=%s AND records_record.student_id=%s) AS enrolled_ids,
                 array(SELECT group_id FROM records_record WHERE status=%s AND records_record.student_id=%s) AS pinned_ids,
-                array(SELECT group_id FROM records_queue WHERE records_queue.student_id=%s) AS queued_ids
+                array(SELECT group_id FROM records_queue WHERE records_queue.student_id=%s AND records_queue.deleted = false) AS queued_ids
             """
             from django.db import connection
             cursor = connection.cursor()
             cursor.execute(enrolled_pinned_queued_ids_sql, [STATUS_ENROLLED, student_id, STATUS_PINNED, student_id, student_id])
             (enrolled_ids, pinned_ids, queued_ids) = cursor.fetchall()[0]
             
-            queued = Queue.queued.filter(group__course=course).values('priority','group_id')
+            queued = Queue.queued.filter(group__course=course, deleted=False).values('priority','group_id')
             queue_priorities = Queue.queue_priorities_map_values(queued)
 
             course.can_enroll_from = course.get_enrollment_opening_time(student)

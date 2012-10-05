@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import signals
 from django.db.models import Count
 from django.core.cache import cache as mcache
+from django.db.models.query import QuerySet
 
 from course import *
 
@@ -47,6 +48,11 @@ class Group(models.Model):
     cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
     cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
     cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
+
+    enrolled     = models.PositiveIntegerField(default=0, editable=False, verbose_name='ilość zapisanych studentów')
+    enrolled_zam = models.PositiveIntegerField(default=0, editable=False, verbose_name='ilość zapisanych studentów zamawianych')
+    queued       = models.PositiveIntegerField(default=0, editable=False, verbose_name='ilość studentów w kolejce')
+
     disable_update_signal = False
 
     usos_nr = models.IntegerField(null=True, blank=True, verbose_name=u'Nr grupy w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
@@ -65,6 +71,193 @@ class Group(models.Model):
     def get_terms_as_string(self):
       return ",".join(map(lambda x: "%s %s-%s" % (x.get_dayOfWeek_display(), x.start_time.hour, x.end_time.hour), self.term.all()))
     get_terms_as_string.short_description = 'Terminy zajęć'
+
+    def remove_from_queued_counter(self, student):
+        self.queued -= 1
+        self.save()
+
+    def add_to_queued_counter(self, student):
+        self.queued += 1
+        self.save()
+
+    def remove_from_enrolled_counter(self, student):
+        self.enrolled -= 1
+        if student.is_zamawiany():
+            self.enrolled_zam -= 1
+
+        self.save()
+
+    def add_to_enrolled_counter(self, student):
+        self.enrolled += 1
+        if student.is_zamawiany():
+            self.enrolled_zam += 1
+
+        self.save()
+
+    def remove_student(self, student):
+        from apps.enrollment.records.models import Record, Queue, STATUS_ENROLLED, STATUS_REMOVED
+
+        result = True
+        if Record.objects.filter(student=student, group=self, status=STATUS_ENROLLED).update(status=STATUS_REMOVED) > 0:
+            message = [u'Student wypisany z grupy']
+
+            if self.type == settings.LETURE_TYPE:
+                result = self._remove_from_all_groups(student)
+                message.append(u'Automatycznie wypisano również z pozostałych grup')
+
+            self.remove_from_enrolled_counter(student)
+
+            return result, message
+
+        if Queue.objects.filter(student=student, group=self, deleted=False).update(deleted=True) > 0:
+            self.remove_from_queued_counter(student)
+            return result, [u'Usunięto z kolejki']
+
+
+        return False, [u'Operacja niemożliwa']
+
+    def _remove_from_other_groups(self, student):
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        result = None
+        for record in Record.get_student_records_for_group_type(student, self):
+            result = record.group
+            record.student_remove(student)
+
+        return result or True
+
+    def _remove_from_all_groups(self, student):
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+
+        records =  Record.get_student_records_for_course(student, self.course)
+        for record in records:
+            record.student_remove(student)
+
+        return records or True
+
+    def _add_to_lecture(self, student):
+        import settings
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
+        result = []
+        for group in groups:
+            __, created = Record.objects.get_or_create(student=student, group=group, status=STATUS_ENROLLED)
+            if created:
+                result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
+
+        return result
+
+    def add_student(self, student, return_group=False, commit=True):
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        import settings
+
+        result = False
+        #REMOVE FROM OTHER GROUP
+        if self.type <> settings.LETURE_TYPE:
+            result = self._remove_from_other_groups(student)
+
+            self._add_to_lecture(student)
+
+        Record.objects.create(student=student, group=self, status=STATUS_ENROLLED)
+        self.add_to_enrolled_counter(student)
+
+        if commit:
+            self.save()
+
+        if return_group:
+            if isinstance(result, QuerySet):
+                return result,  [u'Student dopisany do grupy', u'Wypisano z poprzedniej grupy']
+            else:
+                return result,  [u'Student dopisany do grupy']
+
+        return True, [u'Student dopisany do grupy']
+
+    def enroll_student(self, student):
+        from apps.enrollment.courses.models import Semester
+
+        if not self.student_have_opened_enrollment(student):
+            return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
+
+        semester = Semester.get_current_semester()
+        current_limit = semester.get_current_limit()
+
+        if not student.get_points_with_course(self.course) <= current_limit:
+            return False, [u'Przekroczono limit ' + str(current_limit) + u' punktów. Zapis niemożliwy.' ]
+
+        can_enroll, result = self.student_can_enroll(student)
+
+        if can_enroll:
+            enrolled, messages = self.add_student(student)
+            result.extend(messages)
+            return enrolled, result
+        else:
+            queued, messages = self._add_student_to_queue(student)
+            result.extend(messages)
+            return queued, result
+
+    def student_have_opened_enrollment(self, student):
+        return self.course.is_recording_open_for_student(student)
+
+    def student_can_enroll(self, student):
+
+        if not self.have_free_position_for_student(student):
+            return False, [u'Brak wolnych miejsc w grupie']
+
+        return True, []
+
+
+    def _add_student_to_queue(self, student):
+        from apps.enrollment.records.models import Queue
+        __, created = Queue.objects.get_or_create(group=self, student=student, deleted=False)
+        if created:
+            self.add_to_queued_counter(student)
+            return True, [u"Student został dopisany do kolejki"]
+
+        else:
+            return False, [u"Student znajdował się już w kolejce"]
+
+
+    def rearanged(self):
+        from apps.enrollment.records.models import Queue, STATUS_REMOVED
+        from apps.enrollment.courses.models import Semester
+
+        queued = Queue.objects.filter(deleted=False, group=self).order_by('time').select_related('student')
+        to_removed = []
+        result = None
+        for q in queued:
+            if not self.have_free_position_for_student(q.student):
+                continue
+
+            limit, __ = self.student_can_enroll(q.student)
+
+            if not limit:
+                pass
+            else:
+                semester = Semester.get_current_semester()
+                current_limit = semester.get_current_limit()
+                if q.student.get_points_with_course(self.course) <= current_limit:
+                    result, _  = self.add_student(q.student, return_group=True)
+                    break
+                to_removed.append(q)
+
+        for queue in to_removed:
+            queue.deleted = True
+            self.remove_from_queued_counter(queue.student)
+            queue.save()
+
+        return result
+
+    def have_free_position_for_student(self, student):
+        if student.is_zamawiany():
+            return self.limit > self.enrolled
+
+        else:
+            total_enrolled = self.enrolled - self.enrolled_zam +\
+                             (self.enrolled_zam - self.limit_zamawiane if self.enrolled_zam - self.limit_zamawiane
+                                                                       else 0 )
+            return (self.limit - self.limit_zamawiane) > total_enrolled
+
+    def should_be_rearranged(self):
+        return self.queued > 0
 
     @staticmethod
     def get_groups_by_semester(semester):
@@ -93,33 +286,16 @@ class Group(models.Model):
             dont_use_cache) >= self.limit_non_zamawiane())
 
     def get_count_of_enrolled(self, dont_use_cache=False):
-        from apps.enrollment.records.models import Record
-        if dont_use_cache:
-            return Record.enrolled.filter(group=self).count()
-        self.update_students_counts_if_empty()
-        return self.cache_enrolled
+        return self.enrolled
 
     def get_count_of_enrolled_zamawiane(self, dont_use_cache=False):
-        from apps.enrollment.records.models import Record
-        from apps.users.models import StudiaZamawiane
-        if dont_use_cache:
-            enrolled_zam = Record.enrolled.filter(group=self).values_list(
-                'student', flat=True)
-            return StudiaZamawiane.objects.filter(student__in=\
-                enrolled_zam).count()
-        self.update_students_counts_if_empty()
-        return self.cache_enrolled_zam
+        return self.enrolled_zam
 
     def get_count_of_enrolled_non_zamawiane(self, dont_use_cache=False):
-        return self.get_count_of_enrolled(dont_use_cache=dont_use_cache) - \
-            self.get_count_of_enrolled_zamawiane(dont_use_cache=dont_use_cache)
+        return self.enrolled - self.enrolled_zam
 
     def get_count_of_queued(self, dont_use_cache=False):
-        from apps.enrollment.records.models import Queue
-        if dont_use_cache:
-            return Queue.queued.filter(group=self).count()
-        self.update_students_counts_if_empty()
-        return self.cache_queued
+        return self.queued
 
     def update_students_counts_if_empty(self):
         if (self.cache_enrolled is None) or (self.cache_enrolled_zam is None) \
@@ -241,7 +417,7 @@ def log_delete_group(sender, instance, **kwargs):
     backup_logger.info('[07] group <%s> has been deleted' % instance.id)
     
 signals.pre_save.connect(log_limits_change, sender=Group)        
-signals.post_save.connect(log_add_group, sender=Group)                               
+#signals.post_save.connect(log_add_group, sender=Group)
 signals.post_delete.connect(log_delete_group, sender=Group)
 
 def recache(sender, **kwargs):
@@ -250,5 +426,5 @@ def recache(sender, **kwargs):
     mcache.clear()
 
     
-signals.post_save.connect(recache, sender=Group)        
-signals.post_delete.connect(recache, sender=Group)	
+#signals.post_save.connect(recache, sender=Group)
+#signals.post_delete.connect(recache, sender=Group)
