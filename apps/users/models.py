@@ -407,7 +407,7 @@ class Student(BaseUser):
              return None
 
     def zamawiany(self):
-        return StudiaZamawiane.objects.get(student=self);
+        return StudiaZamawiane.objects.get(student=self)
 
     #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
     is_zamawiany_cache = None

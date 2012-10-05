@@ -61,14 +61,14 @@ class Record(models.Model):
         return self.group.course.semester.get_name()
 
     def student_remove(self, student):
-        self.group.enrolled -= 1
-
-        if student.is_zamawiany():
-            self.group.enrolled_zam -= 1
+        self.group.remove_from_enrolled_counter(student)
 
         self.group.save()
         self.status=STATUS_REMOVED
         self.save()
+
+        if self.group.queued > 0:
+            self.group.rearanged()
 
     @staticmethod
     def get_student_records_for_course(student, course):
@@ -76,7 +76,7 @@ class Record(models.Model):
 
     @staticmethod
     def get_student_records_for_group_type(student, group):
-        return Record.get_student_records_for_course(student, group.course).filter(group=group, group__type=group.type)
+        return Record.get_student_records_for_course(student, group.course).filter(group__type=group.type)
 
     @staticmethod
     def recorded_students(students):

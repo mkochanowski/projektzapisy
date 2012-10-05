@@ -122,6 +122,7 @@ def set_enrolled(request, method):
     """
         Set student assigned (or not) to group.
     """
+    from django.db.models.query import QuerySet
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
 
@@ -152,12 +153,17 @@ def set_enrolled(request, method):
         result, messages_list = group.enroll_student(student)
         if not result:
             transaction.rollback()
+        else:
+            run_rearanged(result)
+
     else:
         result, messages_list = group.remove_student(student)
         if result:
+            run_rearanged(result)
+
             if group.should_be_rearranged():
                 regroup = group
-                while regroup:
+                while isinstance(regroup, Group):
                     regroup = regroup.rearanged()
         else:
             transaction.rollback()

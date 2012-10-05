@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db.models.query import QuerySet
 
 from django.utils import simplejson
 
@@ -7,6 +8,18 @@ from debug_toolbar.panels.timer import TimerDebugPanel
 from apps.enrollment.courses.models import Term
 from apps.enrollment.records.models import *
 from apps.users.models import *
+
+def run_rearanged(result):
+
+    if isinstance(result, QuerySet):
+        for g in result:
+            regroup = g.group
+            while regroup:
+                regroup = regroup.rearanged()
+    elif isinstance(result, Group):
+        regroup = result
+        while regroup:
+            regroup = regroup.rearanged()
 
 def prepare_courses_with_terms(terms, records = None):
     if records is None:
