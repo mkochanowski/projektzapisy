@@ -438,7 +438,12 @@ class Queue(models.Model):
     def get_students_in_queue(group_id):
         """ Returns state of queue for group ordered by time (FIFO)."""
         try:
-            return Student.objects.filter(queues__group_id=group_id, queues__deleted=False).select_related('user').order_by('queues__time')
+            qq = Queue.objects.filter(deleted=False, group_id=group_id).select_related('student', 'student__user').order_by('time')
+            p = []
+            for q in qq:
+                p.append(q.student)
+            return p
+
         except Group.DoesNotExist:
             logger.warning('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
             raise NonGroupException()
