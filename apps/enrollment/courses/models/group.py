@@ -236,6 +236,12 @@ class Group(models.Model):
                 current_limit = semester.get_current_limit()
                 if q.student.get_points_with_course(self.course) <= current_limit:
                     result, _  = self.add_student(q.student, return_group=True)
+
+                    for old in Queue.objects.filter(deleted=False, student = q.student, priority__lte=q.priority):
+                        old.deleted = True
+                        old.group.remove_from_queued_counter(q.student)
+                        old.save()
+
                     break
                 to_removed.append(q)
 
