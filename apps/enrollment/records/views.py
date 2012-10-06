@@ -20,7 +20,6 @@ from xhtml2pdf import pisa
 from apps.enrollment.courses.utils import prepare_group_data
 from apps.users.decorators import employee_required
 
-from debug_toolbar.panels.timer import TimerDebugPanel
 from apps.enrollment.courses.models import *
 from apps.users.models import *
 from apps.enrollment.records.models import *
@@ -353,7 +352,6 @@ def schedule_prototype(request):
         student = None
         student_id = 'None'
 
-    TimerDebugPanel.timer_start('loading_semester', 'Pobieranie semestru')
     default_semester = Semester.get_default_semester()
     if not default_semester:
         messages.info(request, 'Brak aktywnego semestru.')
@@ -365,15 +363,8 @@ def schedule_prototype(request):
         }
         return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
-    TimerDebugPanel.timer_stop('loading_semester')
-
-    TimerDebugPanel.timer_start('preload_cache',
-        'Przygotowywanie cache StudentOptions')
     if student:
         StudentOptions.preload_cache(student, default_semester)
-    TimerDebugPanel.timer_stop('preload_cache')
-#
-    TimerDebugPanel.timer_start('data_prepare', 'Przygotowywanie danych')
     cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
     if cached_courses == 'DoesNotExist':
         logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
@@ -404,10 +395,7 @@ def schedule_prototype(request):
 #    else:
 #        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
                    
-    TimerDebugPanel.timer_stop('data_prepare')
-#
-    TimerDebugPanel.timer_start('json_prepare_1', 'Przygotowywanie JSON - st1')
-    
+
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')   
     if cached_all_groups == 'DoesNotExist':
 
@@ -417,11 +405,8 @@ def schedule_prototype(request):
         cached_all_groups = Group.get_groups_by_semester_opt(default_semester)
         mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)                
         
-    TimerDebugPanel.timer_stop('json_prepare_1')
-    TimerDebugPanel.timer_start('json_prepare_2', 'Przygotowywanie JSON - st2')
     all_groups_json = prepare_groups_json(default_semester, cached_all_groups,
         student=student)
-    TimerDebugPanel.timer_stop('json_prepare_2')
 
     cached_test = mcache.get("test_cache", "DoesNotExist")
 

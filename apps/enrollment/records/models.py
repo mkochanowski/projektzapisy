@@ -94,8 +94,8 @@ class Record(models.Model):
     @staticmethod
     def get_student_records_ids(student, semester):
         records = Record.objects.\
-            filter(student=student, group__course__semester=semester).\
-            values_list('group__pk', 'status');
+            filter(student=student, group__course__semester=semester, status__gte=1).\
+            values_list('group__pk', 'status')
         pinned = []
         enrolled = []
         for record in records:
@@ -106,8 +106,8 @@ class Record(models.Model):
         return {
             'enrolled': enrolled,
             'pinned': pinned,
-            'queued': Queue.queued.filter(student=student,\
-                      group__course__semester=semester).\
+            'queued': Queue.queued.filter(student=student,
+                      group__course__semester=semester, deleted=False).\
                       values_list('group__pk', flat=True)
         }
     
@@ -408,7 +408,7 @@ class Queue(models.Model):
     @staticmethod
     def get_student_queues(student, semester):
         return Queue.queued.filter(student=student,
-            group__course__semester=semester)
+            group__course__semester=semester, deleted=False)
 #        for queue in raw:
 #            queues[queue.id] = queue
 #        return queues
