@@ -203,7 +203,7 @@ class TermAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','dayOfWeek','show_start','show_end', 'group')
     search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
     ordering = ('dayOfWeek', 'start_time')
-
+    raw_id_fields = ('group',)
     def queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
