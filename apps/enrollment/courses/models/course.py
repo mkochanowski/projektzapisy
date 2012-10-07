@@ -409,6 +409,9 @@ class Course( models.Model ):
         app_label = 'courses'
         unique_together = (('name', 'semester'),)
         ordering = ['name']
+        permissions = (
+                    ("view_stats", u"Może widzieć statystyki"),
+                )
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.get_semester_name())

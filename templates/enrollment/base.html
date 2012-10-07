@@ -16,7 +16,7 @@
     </li>{% if user.student or user.employee or user.is_staff %}
     <li{% block enrollment_menu_students %}{% endblock %}><a href="/users/students/">Studenci</a>
     </li>{% endif %}
-    {% if user.is_staff %}
+    {% if perms.courses.view_stats %}
         <li{% block enrollment_statistics %}{% endblock %}>
             <a href="{% url statistics-main %}">Statystyki</a>
         </li>

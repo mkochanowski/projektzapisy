@@ -76,14 +76,26 @@ class Group(models.Model):
     get_terms_as_string.short_description = 'Terminy zajęć'
 
     def remove_from_queued_counter(self, student):
+        # @param student:
+        #           Student object
+        # decrease queued couter, after remove student from queue
+
         self.queued -= 1
         self.save()
 
     def add_to_queued_counter(self, student):
+        # @param student:
+        #           Student object
+        # increade queued couter, after add student to queue
+
         self.queued += 1
         self.save()
 
     def remove_from_enrolled_counter(self, student):
+        # @param student:
+        #           Student object
+        # decrease enrolled couter, after remove student from group
+
         self.enrolled -= 1
         if student.is_zamawiany():
             self.enrolled_zam -= 1
@@ -93,6 +105,10 @@ class Group(models.Model):
         self.save()
 
     def add_to_enrolled_counter(self, student):
+        # @param student:
+        #           Student object
+        # increase enrolled couter, after add student to group
+
         self.enrolled += 1
         if student.is_zamawiany():
             self.enrolled_zam += 1
@@ -102,6 +118,16 @@ class Group(models.Model):
         self.save()
 
     def remove_student(self, student):
+        #  Removes student from this group. If this is Lecture group remove from other too.
+        #  Remove from
+        #  @return (state, messages)
+        #  state:
+        #        Group.QuerySet - when student was removed from other groups too
+        #        True - when everything is ok
+        #        False - something bad e.g. student wasn't in this group
+        #  messages:
+        #        [Text] - text info about actions
+
         from apps.enrollment.records.models import Record, Queue, STATUS_ENROLLED, STATUS_REMOVED
 
         result = True
