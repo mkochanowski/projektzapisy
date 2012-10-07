@@ -17,7 +17,9 @@
 				<td>
 					{{student.program}}
 					{% if student.is_zamawiany %}
-						(zamawiane)
+						(zamawiani2009)
+                    {% elif student.is_zamawiany2012%}
+                        (zamawiani2012)
 					{% endif %}
 				</td>
 				<td>{{student.semestr}}</td>

@@ -171,11 +171,6 @@ def course(request, slug):
         for g in groups:
             g.terms_list = terms_list_get(g.id,[])
 
-            if g.limit_zamawiane > 0 and student and not student.is_zamawiany():
-                g.is_full = (g.get_count_of_enrolled_non_zamawiane() >=
-                    g.limit_non_zamawiane())
-            else:
-                g.is_full = (g.enrolled >= g.limit)
 
             if g.type == '1': #faster in good case, bad case - same
                 lectures.append(g);
