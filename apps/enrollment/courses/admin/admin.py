@@ -7,10 +7,40 @@ from django.forms import ModelForm
 from apps.enrollment.courses.models import *
 from apps.enrollment.records.models import Record
 
+
+class GroupForm(ModelForm):
+    class Meta:
+        model = Group
+
+    def save(self, commit=True):
+        group = super(GroupForm, self).save(commit=False)
+        if group.id:
+            group.course = Course.objects.select_for_update().get(id=group.course_id)
+            old_one = Group.objects.get(id=group.id)
+            while old_one.limit < group.limit:
+                old_one.limit += 1
+                old_one.limit_zamawiane = group.limit_zamawiane
+                old_one.limit_zamawiane2012 = group.limit_zamawiane2012
+                old_one.save()
+                if old_one.queued > 0:
+                    Group.do_rearanged(old_one)
+                group.enrolled         = old_one.enrolled
+                group.enrolled_zam     = old_one.enrolled_zam
+                group.enrolled_zam2012 = old_one.enrolled_zam2012
+                group.queued           = old_one.queued
+                old_one = Group.objects.get(id=group.id)
+
+        if commit:
+            group.save()
+
+        return group
+
+
 class GroupInline(admin.TabularInline):
     model = Group
     extra = 0
     raw_id_fields = ("teacher",)
+    form = GroupForm
 
 class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug' : ('name', 'semester')}
@@ -113,33 +143,6 @@ class RecordInline(admin.TabularInline):
 
 
 
-
-class GroupForm(ModelForm):
-    class Meta:
-        model = Group
-
-    def save(self, commit=True):
-        group = super(GroupForm, self).save(commit=False)
-        if group.id:
-            group.course = Course.objects.select_for_update().get(id=group.course_id)
-            old_one = Group.objects.get(id=group.id)
-            while old_one.limit < group.limit:
-                old_one.limit += 1
-                old_one.limit_zamawiane = group.limit_zamawiane
-                old_one.limit_zamawiane2012 = group.limit_zamawiane2012
-                old_one.save()
-                if old_one.queued > 0:
-                    Group.do_rearanged(old_one)
-                group.enrolled         = old_one.enrolled
-                group.enrolled_zam     = old_one.enrolled_zam
-                group.enrolled_zam2012 = old_one.enrolled_zam2012
-                group.queued           = old_one.queued
-                old_one = Group.objects.get(id=group.id)
-
-        if commit:
-            group.save()
-
-        return group
 
 
 
