@@ -205,7 +205,7 @@ class Group(models.Model):
 
     def student_can_enroll(self, student):
 
-        if self.is_full(student):
+        if self.is_full_for_student(student):
             return False, [u'Brak wolnych miejsc w grupie']
 
         return True, []
@@ -230,7 +230,7 @@ class Group(models.Model):
         to_removed = []
         result = None
         for q in queued:
-            if self.is_full(q.student):
+            if self.is_full_for_student(q.student):
                 continue
 
             limit, __ = self.student_can_enroll(q.student)
@@ -276,13 +276,13 @@ class Group(models.Model):
     def limit_non_zamawiane(self):
         return self.limit - self.limit_zamawiane -self.limit_zamawiane2012
 
-    def is_full(self, student):
+    def is_full_for_student(self, student):
         if student.is_zamawiany():
-            return self.get_limit_for_zamawiane2009() <= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)
+            return self.get_limit_for_zamawiane2009() >= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)
         elif student.is_zamawiany2012():
-            return self.get_limit_for_zamawiane2012() <= self.enrolled - max(0, self.enrolled_zam-self.limit_zamawiane)
+            return self.get_limit_for_zamawiane2012() >= self.enrolled - max(0, self.enrolled_zam-self.limit_zamawiane)
         else:
-            return self.get_limit_for_normal_student() <= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)\
+            return self.get_limit_for_normal_student() >= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)\
                                                                         - max(0, self.enrolled_zam-self.limit_zamawiane)
 
     @staticmethod
