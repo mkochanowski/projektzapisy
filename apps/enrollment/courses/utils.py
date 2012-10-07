@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import simplejson
+from django.utils import simplejson
 
 
 def prepare_group_data(course, student):
