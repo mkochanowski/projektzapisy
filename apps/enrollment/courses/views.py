@@ -170,6 +170,10 @@ def course(request, slug):
         
         for g in groups:
             g.terms_list = terms_list_get(g.id,[])
+            if student:
+                g.is_full = g.is_full_for_student(student)
+            else:
+                g.is_full = False
 
 
             if g.type == '1': #faster in good case, bad case - same
