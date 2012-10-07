@@ -46,6 +46,7 @@ class Group(models.Model):
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
     export_usos = models.BooleanField(default=True, verbose_name='czy eksportować do usos?')
 
+
     cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
     cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
     cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
@@ -279,12 +280,13 @@ class Group(models.Model):
 
     def is_full_for_student(self, student):
         if student.is_zamawiany():
-            return self.get_limit_for_zamawiane2009() >= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)
+            
+            return self.get_limit_for_zamawiane2009() <= self.enrolled - min(self.limit_zamawiane2012, self.enrolled_zam2012)
         elif student.is_zamawiany2012():
-            return self.get_limit_for_zamawiane2012() >= self.enrolled - max(0, self.enrolled_zam-self.limit_zamawiane)
+            return self.get_limit_for_zamawiane2012() <= self.enrolled - min(self.enrolled_zam, self.limit_zamawiane)
         else:
-            return self.get_limit_for_normal_student() >= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)\
-                                                                        - max(0, self.enrolled_zam-self.limit_zamawiane)
+            return self.get_limit_for_normal_student() <= self.enrolled - min(self.enrolled_zam2012,self.limit_zamawiane2012)\
+                                                                        - min(self.enrolled_zam,self.limit_zamawiane)
 
     @staticmethod
     def do_rearanged(group):

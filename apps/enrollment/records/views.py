@@ -229,7 +229,7 @@ def set_queue_priority(request, method):
             return AjaxFailureMessage.auto_render('ScheduleLocked',
                 'Twój plan jest zablokowany.', message_context)
 
-        queue = Queue.objects.select_related('group').get(student=request.user.student, group__id=group_id)
+        queue = Queue.objects.select_related('group').get(student=request.user.student, group__id=group_id, deleted=False)
         #priority = int(priority) WTF? to już jest int
         if priority > settings.QUEUE_PRIORITY_LIMIT or priority < 1:
             return AjaxFailureMessage.auto_render('FatalError',
