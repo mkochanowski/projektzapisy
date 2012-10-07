@@ -278,11 +278,11 @@ class Group(models.Model):
 
     def is_full(self, student):
         if student.is_zamawiany():
-            return self.get_limit_for_zamawiane2009() <= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)
+            return self.get_limit_for_zamawiane2009() >= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)
         elif student.is_zamawiany2012():
-            return self.get_limit_for_zamawiane2012() <= self.enrolled - max(0, self.enrolled_zam-self.limit_zamawiane)
+            return self.get_limit_for_zamawiane2012() >= self.enrolled - max(0, self.enrolled_zam-self.limit_zamawiane)
         else:
-            return self.get_limit_for_normal_student() <= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)\
+            return self.get_limit_for_normal_student() >= self.enrolled - max(0, self.enrolled_zam2012-self.limit_zamawiane2012)\
                                                                         - max(0, self.enrolled_zam-self.limit_zamawiane)
 
     @staticmethod
