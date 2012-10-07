@@ -79,15 +79,19 @@
                             {% endfor %}
                         </td>
                         <td class="number termLimit">
-                            {% if t.limit_zamawiane and not user.student.is_zamawiany %}
-                                {{ t.limit_non_zamawiane }} + {{ t.limit_zamawiane }}
+                            {% if t.limit_zamawiane or t.limit_zamawiane2012 %}
+                                {{ t.limit_non_zamawiane }}
+                                {% if t.limit_zamawiane %} + {{ t.limit_zamawiane }}{% endif %}
+                                {% if t.limit_zamawiane2012 %} + {{ t.limit_zamawiane2012 }}{% endif %}
                             {% else %}
                                 {{ t.limit }}
                             {% endif %}
                         </td>
                         <td class="number termEnrolledCount">
-                            {% if t.limit_zamawiane and not user.student.is_zamawiany %}
-                                {{ t.get_count_of_enrolled_non_zamawiane }} + {{ t.get_count_of_enrolled_zamawiane }}
+                            {% if t.limit_zamawiane or t.limit_zamawiane2012 %}
+                                {{ t.get_count_of_enrolled_non_zamawiane }}
+                                {% if t.limit_zamawiane %} + {{ t.get_count_of_enrolled_zamawiane }}{% endif %}
+                                {% if t.limit_zamawiane2012 %} + {{ t.get_count_of_enrolled_zamawiane2012 }}{% endif %}
                             {% else %}
                                 {{ t.enrolled }}
                             {% endif %}

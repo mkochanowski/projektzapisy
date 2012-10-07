@@ -24,8 +24,10 @@
                 <th><h4>Typ</h4></th>
                 <th><h4>Miejsca</h4></th>
                 <th><h4>Miejsca zamawiane</h4></th>
+                <th><h4>Miejsca zamawiane2012</h4></th>
                 <th><h4>Zapisani</h4></th>
                 <th><h4>Zapisani zamawiani</h4></th>
+                <th><h4>Zapisani zamawiani2012</h4></th>
                 <th><h4>Kolejka</h4></th>
 
             </tr>
@@ -41,8 +43,10 @@
                         <td>{{ group.get_type_display }}</td>
                         <td>{{ group.limit }}</td>
                         <td>{{ group.limit_zamawiane }}</td>
+                        <td>{{ group.limit_zamawiane2012 }}</td>
                         <td>{{ group.cache_enrolled }}</td>
                         <td>{{ group.cache_enrolled_zam }}</td>
+                        <td>{{ group.cache_enrolled_zam2012 }}</td>
                         <td>{{ group.cache_queued }}</td>
                     </tr>
                 {% endfor %}

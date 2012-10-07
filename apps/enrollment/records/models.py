@@ -56,7 +56,7 @@ class Record(models.Model):
     objects = models.Manager()
     enrolled = EnrolledManager()
     pinned = PinnedManager()
-    
+
     def get_semester_name(self):
         return self.group.course.semester.get_name()
 
@@ -66,9 +66,6 @@ class Record(models.Model):
         self.group.save()
         self.status=STATUS_REMOVED
         self.save()
-
-        if self.group.queued > 0:
-            self.group.rearanged()
 
     @staticmethod
     def get_student_records_for_course(student, course):
@@ -273,100 +270,8 @@ class Record(models.Model):
         except Student.DoesNotExist:
             logger.warning('Record.add_student_to_lecture_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, course_id = %d)' % (int(user.id), int(course.id)))
             raise NonStudentException()
-          
-    
-    @staticmethod
-    def add_student_to_group(user, group):
-        """ assignes student to group if his records for course are open. If student is pinned to group, pinned becomes enrolled """
-        try:
-            student = user.student
-            Course.objects.select_for_update().get(id=group.course_id)
-            if not student.is_active():
-                raise InactiveStudentException
-            new_records = []
-            if not group.course.is_recording_open_for_student(student):
-                raise RecordsNotOpenException()
-            # logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised RecordsNotOpenException exception.' % (int(user_id), int(group_id)) )
-            if (group.limit_zamawiane > 0 and not student.is_zamawiany()):
-                group_is_full = group.get_count_of_enrolled_non_zamawiane(dont_use_cache=False) >= group.limit_non_zamawiane()
-            else:
-                group_is_full = group.get_count_of_enrolled(dont_use_cache=False) >= group.limit
-            if not group_is_full:
-                g_id = Record.is_student_in_course_group_type(user=user, slug=group.course_slug(), group_type=group.type)
-                if g_id and group.type != '1':
-                    #logger.warning('Record.add_student_to_group(user_id = %d, group_id = %d) raised AssignedInThisTypeGroupException exception.' % (int(user_id), int(group_id)))
-                    #raise AssignedInThisTypeGroupException() #TODO: distinguish with AlreadyAssignedException
-                    group_rem = Group.objects.filter(id=g_id).select_related('course', 'course__semester').get()
-                    Record.remove_student_from_group(user, group_rem)
-                
-                if Queue.is_ECTS_points_limit_exceeded(user, group) :
-                    raise ECTS_Limit_Exception()
-                if group.type != '1':
-                    new_records.extend(Record.add_student_to_lecture_group(user, group.course))
-                record, created = Record.objects.get_or_create(group=group, student=student)
-    
-                if not created:
-                    if record.status == STATUS_ENROLLED:
-                        raise AlreadyAssignedException()
-                
-                record.status = STATUS_ENROLLED
-                record.save()
-                #backup_logger.info('[01] user <%s> is added to group <%s>' % (user.id, group.id))
-                new_records.append(record)
-                if created:
-                    backup_logger.info('User %s <id: %s> is added to group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
-                else:
-                    backup_logger.info('User %s <id: %s> who has been pinned to group: [%s] <id: %s> is currently added to this group and no longer pinned.' % (user.username, user.id, group, group.id))
-                return new_records
-            else:
-                backup_logger.warning('Record.add_student_to_group() raised OutOfLimitException exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
-                raise OutOfLimitException()
-        except Student.DoesNotExist:
-            backup_logger.warning('Record.add_student_to_group()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
-            raise NonStudentException()
-        except Group.DoesNotExist:
-            backup_logger.warning('Record.add_student_to_group()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
-            raise NonGroupException()
-    
-    @staticmethod
-    def remove_student_from_group(user, group):
-        try:
-            student = user.student
-            if group.type=='1':
-                course = group.course
-                records = Record.enrolled.filter(group__course=course, student=student).exclude(group__type='1')
-                for r in records:
-                    Record.remove_student_from_group(user, r.group)
-            if not group.course.is_recording_open_for_student(student):
-                raise RecordsNotOpenException()
-            record = Record.enrolled.get(group=group, student=student)
-            record.delete()
-            #backup_logger.info('[03] user <%s> is removed from group <%s>' % (user.id, group.id))
-            logger.info('User %s <id: %s> is removed from group: "%s" <id: %s>' % (user.username, user.id, group, group.id))
-            
-            Queue.try_enroll_next_student(group) #TODO: być może zbędne
-            group.update_students_counts()
-            return record
-            
-        except Record.DoesNotExist:
-            logger.warning('Record.remove_student_from_group() throws Record.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
-            raise AlreadyNotAssignedException()
-        except Student.DoesNotExist:
-            logger.warning('Record.remove_student_from_group() throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
-            raise NonStudentException()
-        except Group.DoesNotExist:
-            logger.warning('Record.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user.id), int(group.id)))
-            raise NonGroupException()
 
-    @staticmethod
-    def on_student_remove_from_group(sender, instance, **kwargs):
-        try:
-            group = instance.group
-            Queue.try_enroll_next_student(group)
-            instance.group.update_students_counts()
-        except ObjectDoesNotExist:
-            pass
-    
+
     def group_slug(self):
         return self.group.course_slug()
     
@@ -446,39 +351,6 @@ class Queue(models.Model):
 
         except Group.DoesNotExist:
             logger.warning('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
-            raise NonGroupException()
-    
-    @staticmethod
-    def add_student_to_queue(user_id, group_id,priority=1):
-        """ Assign student to queue"""
-        try:
-            student = Student.objects.select_related('user').get(user__id=user_id)
-            group = Group.objects.select_related('course').get(id=group_id)
-            if not group.course.\
-                is_recording_open_for_student(student):
-                raise RecordsNotOpenException()
-            """ Czy student jest już zapisany na przedmiot"""
-            if Record.enrolled.filter(group=group, student=student).count() > 0 :
-                logger.warning('Queue.add_student_to_queue() throws AlreadyAssignedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
-                raise AlreadyAssignedException()
-            """ Czy student nie jest już w danej kolejce"""
-            if Queue.queued.filter(group=group, student=student).count() > 0 :
-                logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
-                raise AlreadyQueuedException()
-            """ Próba utworzenia wpisu do kolejki"""
-            record, is_created = Queue.objects.get_or_create(group=group, student=student, time=datetime.now(), priority=priority)
-            if is_created == False: # Nie wiem czy ten warunek ma sens z tym powyżej
-                logger.warning('Queue.add_student_to_queue() throws AlreadyQueuedException() exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
-                raise AlreadyQueuedException()
-            record.save()
-            logger.info('User %s <id: %s> is added to queue of group "%s" <id: %s> with priority = %s' % (student.user.username, student.user.id, group, group_id, priority))
-            group.update_students_counts()
-            return record
-        except Student.DoesNotExist:
-            logger.warning('Queue.add_student_to_queue()  throws Student.DoesNotExist exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
-            raise NonStudentException()
-        except Group.DoesNotExist:
-            logger.warning('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d, priority = %d)' % (int(user_id), int(group_id), int(priority)))
             raise NonGroupException()
     
     @staticmethod
@@ -586,76 +458,7 @@ class Queue(models.Model):
       except Student.DoesNotExist:
             logger.warning('Queue.count_ECTS_points(user_id)  throws Student.DoesNotExist exception (parameters: user_id = %d)' % (int(user.id)))
             raise NonStudentException()
-            
-    
-    @staticmethod
-    def remove_first_student_from_queue(group):
-        '''
-            return FIRST student (student's queue record) from queue whose ECTS
-            points limit is not excedeed, remove this student and all students
-            before him from queue
-            
-            ignore students, which not "zamawiany", if there is no space for
-            them (but there is some for "zamawiany")
-            
-            returns None, when there is no space for students left at all
-        '''
-        if (group.get_count_of_enrolled(dont_use_cache=True) >= group.limit):
-            return None
-        only_zamawiany = group.available_only_for_zamawiane()
-        
-        queue = Queue.queued.filter(group=group).order_by('time')
-        for queued in queue:
-            student = queued.student
-            if (only_zamawiany and not student.is_zamawiany()):
-                continue
-                
-            Queue.remove_student_from_queue(student.user.id, group.id)
-            
-            # Sprawdzenie mozliwosci zapisania studenta na zajęcia
-            if Queue.is_ECTS_points_limit_exceeded(student.user, group):
-                # Wyrzucenie studenta z kolejki. Jego limit ECTS nie pozwala
-                # zapisać go do grupy, na którą oczekuje
-                logger.info('User %s <id: %s> is now removed as first from \
-                    queue of group "%s" <id %s> but he exceeded ECTS limit' % \
-                    (student.user.username, student.user.id, group, group.id))
-                continue
-            logger.info('User %s <id: %s> is now removed as first from queue \
-                of group "%s" <id %s>' % \
-                (student.user.username, student.user.id, group, group.id))
-            return queued
-        return None
-    
-    @staticmethod
-    def try_enroll_next_student(group):
 
-        backup_logger.info('[03] i try run queue for <%s>' % ( group.id))
-
-        if not group.enrollment_are_open():
-            backup_logger.info('[03] i fail becouse enrollment_are_open')
-            return False
-
-
-
-        queued = Queue.remove_first_student_from_queue(group)
-        if not queued:
-            backup_logger.info('[03] i fail becouse no queued')
-            return False
-
-        try:
-            Record.add_student_to_group(queued.student.user, group)
-            Queue.remove_student_low_priority_records(queued.student.user.id, \
-                group.id, queued.priority)
-
-            mail_enrollment_from_queue(queued.student, group)
-            backup_logger.info('User %s <id: %s> enrolled from queue in group [%s] \
-            <id: %s>.', queued.student.user.username, queued.student.user.id, \
-            group, group.id)
-        except OutOfLimitException:
-            return OutOfLimitException
-
-        return True
-    
     @staticmethod
     def get_groups_for_student(user):
         """ Return all groups that student is trying to sign to."""
@@ -723,21 +526,6 @@ class Queue(models.Model):
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
 
-def add_people_from_queue(sender, instance, **kwargs):
-    """adding people from queue to group, after limits' change"""
-
-    group = instance
-
-
-    if not group.enrollment_are_open():
-        return
-
-    if Group.disable_update_signal:
-        return
-
-    while (Queue.try_enroll_next_student(group)):
-        continue
-
 def log_add_record(sender, instance, created, **kwargs):
     if instance.status == STATUS_ENROLLED:
         backup_logger.info('[01] user <%s> is added to group <%s>' % (instance.student.user.id, instance.group.id))
@@ -746,16 +534,8 @@ def log_delete_record(sender, instance, **kwargs):
     if instance.status == STATUS_ENROLLED and instance.group:
         backup_logger.info('[03] user <%s> is removed from group <%s>' % (instance.student.user.id, instance.group.id))
 
-def update_group_counts(sender, instance, **kwargs):
-    try:
-        instance.group.update_students_counts()
-    except ObjectDoesNotExist:
-        pass
 
 #signals.post_save.connect(log_add_record, sender=Record)
 #signals.pre_delete.connect(log_delete_record, sender=Record)
-#signals.post_save.connect(update_group_counts, sender=Record)
 #signals.post_delete.connect(Record.on_student_remove_from_group, sender=Record)
-#signals.post_save.connect(update_group_counts, sender=Queue)
-#signals.post_delete.connect(update_group_counts, sender=Queue)
 #signals.post_save.connect(add_people_from_queue, sender=Group)

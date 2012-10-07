@@ -153,23 +153,13 @@ def set_enrolled(request, method):
 
     if set_enrolled:
         result, messages_list = group.enroll_student(student)
-        if not result:
-            transaction.rollback()
-        else:
-            run_rearanged(result)
-
+        if result: run_rearanged(result)
     else:
         result, messages_list = group.remove_student(student)
-        if result:
-            run_rearanged(result)
+        if result: run_rearanged(result, group)
 
-            if group.should_be_rearranged():
-                regroup = group
-                while isinstance(regroup, Group):
-                    regroup = regroup.rearanged()
-        else:
-            transaction.rollback()
-
+    if not result:
+        transaction.rollback()
 
     if is_ajax:
         message = ', '.join(messages_list)

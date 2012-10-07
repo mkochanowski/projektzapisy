@@ -4,7 +4,7 @@ from django.contrib import admin
 from django import forms
 from django.contrib.auth.models import User
 
-from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser, UserProfile
+from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser, UserProfile, StudiaZamawiane2012
 
 class ExtendedUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'is_staff')
@@ -79,6 +79,15 @@ class StudiaZamawianeAdmin(admin.ModelAdmin):
        qs = super(StudiaZamawianeAdmin, self).queryset(request)
        return qs.select_related('student', 'student__user')
 
+class StudiaZamawianeAdmin2012(admin.ModelAdmin):
+    list_display = ('__unicode__','points','comments')
+    search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
+    ordering = ['student__user__last_name','student__user__first_name']
+
+    def queryset(self, request):
+       qs = super(StudiaZamawianeAdmin2012, self).queryset(request)
+       return qs.select_related('student', 'student__user')
+
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
@@ -100,4 +109,5 @@ admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(StudiaZamawiane, StudiaZamawianeAdmin)
+admin.site.register(StudiaZamawiane2012, StudiaZamawianeAdmin2012)
 admin.site.register(StudiaZamawianeMaileOpiekunow)

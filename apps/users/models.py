@@ -409,6 +409,9 @@ class Student(BaseUser):
     def zamawiany(self):
         return StudiaZamawiane.objects.get(student=self)
 
+    def zamawiany2012(self):
+        return StudiaZamawiane2012.objects.get(student=self)
+
     #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
     is_zamawiany_cache = None
     def is_zamawiany(self):
@@ -420,6 +423,17 @@ class Student(BaseUser):
         except StudiaZamawiane.DoesNotExist:
             self.is_zamawiany_cache = False
         return self.is_zamawiany_cache
+
+    is_zamawiany_cache2012 = None
+    def is_zamawiany2012(self):
+        if not (self.is_zamawiany_cache2012 is None):
+            return self.is_zamawiany_cache2012
+        try:
+            self.zamawiany2012()
+            self.is_zamawiany_cache2012 = True
+        except StudiaZamawiane2012.DoesNotExist:
+            self.is_zamawiany_cache2012 = False
+        return self.is_zamawiany_cache2012
 
     def is_first_year_student(self):
         return (self.semestr in [1,2]) and (self.program.id in [0,2])
@@ -451,14 +465,61 @@ class Program( models.Model ):
     def __unicode__(self):
         return self.name
 
-class StudiaZamawiane(models.Model):
-    """
-        Model przechowuje dodatkowe informacje o studentach zamawianych
-    """
-    student = models.OneToOneField(Student, related_name='zamawiane', verbose_name='Student')
+class ZamawianeAbstract(models.Model):
+
+
     points =  models.FloatField(verbose_name='Punkty', null=True, blank=True)
     comments = models.TextField(verbose_name='Uwagi', blank=True, null=True)
     bank_account = models.CharField(max_length=40, null=True, blank=True, verbose_name="Numer konta bankowego")
+
+    class Meta:
+        abstract = True
+
+
+
+    def clean(self):
+        self.bank_account = self.bank_account.upper().replace(' ', '')
+        if not self.bank_account[:2].isalpha():
+            self.bank_account = 'PL' + self.bank_account
+        if not self.check_iban(self.bank_account):
+            raise ValidationError('Podany numer konta nie jest poprawny')
+
+    @staticmethod
+    def _normalize_char(c):
+        if c.isalpha():
+            return str(ord(c.lower()) - ord('a') + 10)
+        return c
+
+    @classmethod
+    def check_iban(cls, number):
+        """Checks if given number is valid IBAN"""
+        number = number.replace(' ', '')
+        if number=='PL' or number=='' or number is None:
+            return True
+        lengths = {'pl': 28}
+        if not number.isalnum():
+            return False
+        country_code = number[:2].lower()
+        if not country_code.isalpha():
+            number = 'pl' + number
+            country_code = 'pl'
+        valid_length = lengths.get(country_code)
+        if valid_length is not None:
+            if len(number) != valid_length:
+                return False
+        code = int(''.join(map(cls._normalize_char, number[4:] + number[:4])))
+        return code % 97 == 1
+
+
+class StudiaZamawiane(ZamawianeAbstract):
+    """
+        Model przechowuje dodatkowe informacje o studentach zamawianych
+    """
+
+    student = models.OneToOneField(Student, related_name='zamawiane', verbose_name='Student')
+
+    def __unicode__(self):
+        return 'Student zamawiany: '+str(self.student).decode('utf-8')
 
     def save(self, *args, **kwargs):
         try:
@@ -479,57 +540,71 @@ class StudiaZamawiane(models.Model):
                 context = Context(c)
                 message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
                 message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context)
-                
+
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
-                
+
                 send_mail(subject, message_user, None, [self.student.user.email])
                 send_mail(subject_employee, message_employee, None ,emails)
                 logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
         except:
-            pass     
+            pass
         if self.bank_account=='':
             self.bank_account = None
         super(StudiaZamawiane, self).save(*args, **kwargs)
 
-    def clean(self):
-        self.bank_account = self.bank_account.upper().replace(' ', '')
-        if not self.bank_account[:2].isalpha():
-            self.bank_account = 'PL' + self.bank_account
-        if not StudiaZamawiane.check_iban(self.bank_account):
-            raise ValidationError('Podany numer konta nie jest poprawny')
 
-    @staticmethod
-    def _normalize_char(c):
-        if c.isalpha():
-            return str(ord(c.lower()) - ord('a') + 10)
-        return c
-
-    @staticmethod
-    def check_iban(number):
-        """Checks if given number is valid IBAN"""
-        number = number.replace(' ', '')
-        if number=='PL' or number=='' or number is None:
-            return True
-        lengths = {'pl': 28}
-        if not number.isalnum():
-            return False
-        country_code = number[:2].lower()
-        if not country_code.isalpha():
-            number = 'pl' + number
-            country_code = 'pl'
-        valid_length = lengths.get(country_code)
-        if valid_length is not None:
-            if len(number) != valid_length:
-                return False
-        code = int(''.join(map(StudiaZamawiane._normalize_char, number[4:] + number[:4])))
-        return code % 97 == 1            
 
     class Meta:
-        verbose_name = 'Studia zamawiane'
-        verbose_name_plural = 'Studia zamawiane'
+        verbose_name = 'Studia zamawiane2009'
+        verbose_name_plural = 'Studia zamawiane2009'
+
+class StudiaZamawiane2012(ZamawianeAbstract):
+    """
+        Model przechowuje dodatkowe informacje o studentach zamawianych
+    """
+
+    student = models.OneToOneField(Student, related_name='zamawiane2012', verbose_name='Student')
 
     def __unicode__(self):
         return 'Student zamawiany: '+str(self.student).decode('utf-8')
+
+    def save(self, *args, **kwargs):
+        try:
+            old_sz = StudiaZamawiane2012.objects.get(id=self.id)
+            if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
+                Site = cache.get_model('sites', 'Site')
+                current_site = Site.objects.get_current()
+                site_name, domain = current_site.name, current_site.domain
+                subject = '[Fereol] Zmiana numeru konta bankowego'
+                subject_employee = 'Zmiana numeru konta %s -> %s' % (self.student.matricula, self.bank_account and self.bank_account or '')
+                c = {
+                    'site_domain': domain,
+                    'site_name': site_name.replace('\n',''),
+                    'student': self.student,
+                    'old_account' : old_sz.bank_account and old_sz.bank_account or '',
+                    'new_account' : self.bank_account and self.bank_account or '',
+                }
+                context = Context(c)
+                message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
+                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context)
+
+                emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
+
+                send_mail(subject, message_user, None, [self.student.user.email])
+                send_mail(subject_employee, message_employee, None ,emails)
+                logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
+        except:
+            pass
+        if self.bank_account=='':
+            self.bank_account = None
+        super(StudiaZamawiane2012, self).save(*args, **kwargs)
+
+
+
+    class Meta:
+        verbose_name = 'Studia zamawiane2012'
+        verbose_name_plural = 'Studia zamawiane2012'
+
 
 class StudiaZamawianeMaileOpiekunow(models.Model):
     """

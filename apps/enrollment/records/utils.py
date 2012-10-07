@@ -8,17 +8,16 @@ from apps.enrollment.courses.models import Term
 from apps.enrollment.records.models import *
 from apps.users.models import *
 
-def run_rearanged(result):
+def run_rearanged(result, group=None):
 
     if isinstance(result, QuerySet):
         for g in result:
-            regroup = g.group
-            while regroup:
-                regroup = regroup.rearanged()
+            Group.do_rearanged(g.group)
     elif isinstance(result, Group):
-        regroup = result
-        while regroup:
-            regroup = regroup.rearanged()
+        Group.do_rearanged(result)
+
+    if group and group.should_be_rearranged():
+        Group.do_rearanged(group)
 
 def prepare_courses_with_terms(terms, records = None):
     if records is None:

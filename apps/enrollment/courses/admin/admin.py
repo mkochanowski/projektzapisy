@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.forms import ModelForm
 
 from apps.enrollment.courses.models import *
 from apps.enrollment.records.models import Record
@@ -110,18 +111,47 @@ class RecordInline(admin.TabularInline):
     extra = 0
     raw_id_fields = ("student",)
 
-#    def queryset(self, request):
-#        queryset = super(RecordInline, self).queryset(request)
-#        return queryset.select_related('user')
+
+
+
+class GroupForm(ModelForm):
+    class Meta:
+        model = Group
+
+    def save(self, commit=True):
+        group = super(GroupForm, self).save(commit=False)
+        if group.id:
+            group.course = Course.objects.select_for_update().get(id=group.course_id)
+            old_one = Group.objects.get(id=group.id)
+            while old_one.limit < group.limit:
+                old_one.limit += 1
+                old_one.limit_zamawiane = group.limit_zamawiane
+                old_one.limit_zamawiane2012 = group.limit_zamawiane2012
+                old_one.save()
+                if old_one.queued > 0:
+                    Group.do_rearanged(old_one)
+                group.enrolled         = old_one.enrolled
+                group.enrolled_zam     = old_one.enrolled_zam
+                group.enrolled_zam2012 = old_one.enrolled_zam2012
+                group.queued           = old_one.queued
+                old_one = Group.objects.get(id=group.id)
+
+        if commit:
+            group.save()
+
+        return group
+
 
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('course', 'teacher','type','limit','limit_zamawiane','get_terms_as_string')
+    list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012','get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
         TermInline,RecordInline
     ]
+
+    form = GroupForm
 
     raw_id_fields = ('course', 'teacher')
 
