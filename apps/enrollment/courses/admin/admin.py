@@ -24,11 +24,12 @@ class GroupForm(ModelForm):
                 old_one.save()
                 if old_one.queued > 0:
                     Group.do_rearanged(old_one)
+                old_one = Group.objects.get(id=group.id)
                 group.enrolled         = old_one.enrolled
                 group.enrolled_zam     = old_one.enrolled_zam
                 group.enrolled_zam2012 = old_one.enrolled_zam2012
                 group.queued           = old_one.queued
-                old_one = Group.objects.get(id=group.id)
+
 
         if commit:
             group.save()
