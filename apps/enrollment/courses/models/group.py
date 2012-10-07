@@ -149,6 +149,7 @@ class Group(models.Model):
             __, created = Record.objects.get_or_create(student=student, group=group, status=STATUS_ENROLLED)
             if created:
                 result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
+            group.add_to_enrolled_counter(student)
 
         return result
 
@@ -175,7 +176,7 @@ class Group(models.Model):
             else:
                 return result,  [u'Student dopisany do grupy']
 
-        return True, [u'Student dopisany do grupy']
+        return result, [u'Student dopisany do grupy']
 
     def enroll_student(self, student):
         from apps.enrollment.courses.models import Semester
