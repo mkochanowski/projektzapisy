@@ -184,7 +184,7 @@ class Group(models.Model):
         from apps.enrollment.records.models import Record, STATUS_ENROLLED
         import settings
 
-        result = False
+        result = True
         #REMOVE FROM OTHER GROUP
         if self.type <> settings.LETURE_TYPE:
             result = self._remove_from_other_groups(student)
@@ -207,7 +207,6 @@ class Group(models.Model):
 
     def enroll_student(self, student):
         from apps.enrollment.courses.models import Semester
-
         if not self.student_have_opened_enrollment(student):
             return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
 
@@ -270,7 +269,6 @@ class Group(models.Model):
                 current_limit = semester.get_current_limit()
                 if q.student.get_points_with_course(self.course) <= current_limit:
                     result, _  = self.add_student(q.student, return_group=True)
-
                     for old in Queue.objects.filter(deleted=False, student = q.student, priority__lte=q.priority, group__course=self.course, group__type=q.group.type):
                         old.deleted = True
                         old.group.remove_from_queued_counter(q.student)
