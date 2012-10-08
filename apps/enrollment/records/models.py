@@ -29,7 +29,7 @@ STATUS_ENROLLED = '1'
 STATUS_PINNED = '2'
 STATUS_REMOVED = '0'
 STATUS_QUEUED = '1'
-RECORD_STATUS = [(STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'przypięty')]
+RECORD_STATUS = [(STATUS_REMOVED, u'usunięty'), (STATUS_ENROLLED, u'zapisany'), (STATUS_PINNED, u'przypięty')]
 
 import logging
 logger = logging.getLogger('project.default')
@@ -56,6 +56,13 @@ class Record(models.Model):
     objects = models.Manager()
     enrolled = EnrolledManager()
     pinned = PinnedManager()
+
+#    def delete(self, using=None):
+#        self.status = STATUS_REMOVED
+#        old = Record.objects.get(id=self.id)
+#        if old.status <> STATUS_REMOVED:
+#            self.group.remove_from_enrolled_counter(self.student)
+#        self.save()
 
     def get_semester_name(self):
         return self.group.course.semester.get_name()
@@ -171,7 +178,7 @@ class Record(models.Model):
     @staticmethod
     def get_students_in_group(group_id):
         try:
-            return Student.objects.filter(records__group_id=group_id, records__status=1).select_related('user')
+            return Student.objects.filter(records__group_id=group_id, records__status=1).select_related('program', 'user', 'zamawiane', 'zamawiane2012')
         except Group.DoesNotExist:
             raise NonGroupException()
     
@@ -304,7 +311,15 @@ class Queue(models.Model):
 
     objects = models.Manager()
     queued = QueueManager()
-      
+
+#    def delete(self, using=None):
+#        self.deleted = True
+#        old = Queue.objects.get(id=self.id)
+#        if not old.deleted:
+#            self.group.remove_from_queued_counter(self.student)
+#        self.save()
+
+
     def set_priority(self, value):
         self.priority = value
         self.save()

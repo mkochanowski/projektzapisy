@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 
 from apps.enrollment.courses.models import *
-from apps.enrollment.records.models import Record
+from apps.enrollment.records.models import Record, STATUS_REMOVED, STATUS_ENROLLED
 
 
 class GroupForm(ModelForm):
@@ -138,15 +138,40 @@ class TermInline(admin.TabularInline):
     model = Term
     extra = 0
 
+class RecordInlineForm(ModelForm):
+    class Meta:
+        model = Record
+
+    def save(self, commit=True):
+
+        record = super(RecordInlineForm, self).save(commit=False)
+
+        if record.id:
+            old = Record.objects.get(id=record.id)
+            if old.status <> record.status:
+                if record.status == STATUS_REMOVED:
+                    record.group.remove_from_enrolled_counter(record.student)
+                    Group.do_rearanged(record.group)
+                elif  record.status == STATUS_ENROLLED:
+                    record.group.add_to_enrolled_counter(record.student)
+
+        else:
+            if record.status == STATUS_REMOVED:
+                pass
+            elif  record.status == STATUS_ENROLLED:
+                record.group.add_to_enrolled_counter(record.student)
+
+        if commit:
+            record.save()
+
+        return record
+
+
 class RecordInline(admin.TabularInline):
     model = Record
     extra = 0
     raw_id_fields = ("student",)
-
-
-
-
-
+    form = RecordInlineForm
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012','get_terms_as_string')
