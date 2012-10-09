@@ -327,7 +327,7 @@ class Student(BaseUser):
         records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
         if course.id not in records:
             records = list(records) + [course.id]
-        points = Courses.objects.\
+        points = CoursePoints.objects.\
                  filter(student=self, semester=semester, course__in=records).\
                  aggregate(Sum('value'))
 
@@ -415,6 +415,8 @@ class Student(BaseUser):
     #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
     is_zamawiany_cache = None
     def is_zamawiany(self):
+#        return self.zamawiane <> None
+
         if not (self.is_zamawiany_cache is None):
             return self.is_zamawiany_cache
         try:
@@ -426,6 +428,8 @@ class Student(BaseUser):
 
     is_zamawiany_cache2012 = None
     def is_zamawiany2012(self):
+
+#        return self.zamawiane2012 <> None
         if not (self.is_zamawiany_cache2012 is None):
             return self.is_zamawiany_cache2012
         try:
@@ -646,7 +650,14 @@ class Courses(models.Model):
     class Meta:
         managed = False
 
+class CoursePoints(models.Model):
+    semester = models.ForeignKey('courses.Semester')
+    student = models.ForeignKey(Student, primary_key = True) #readonly!
+    course  = models.ForeignKey('courses.Course')
+    value   = models.SmallIntegerField()
 
+    class Meta:
+        managed = False
 
 
 # definition of UserProfile from above
