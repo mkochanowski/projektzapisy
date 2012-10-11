@@ -111,14 +111,14 @@ def employee_profile(request, user_id):
             return render_to_response('users/employee_profile_contents.html',
                 data, context_instance=RequestContext(request))
         else:
-            begin = user.last_name[0]
+            begin = user.last_name[0] if user.last_name else 'All'
             employees = Employee.get_list(begin)
             semester = Semester.get_current_semester()
             employees = Group.teacher_in_present(employees, semester)
 
             for e in employees:
-                e.short_new = e.user.first_name[:1] + e.user.last_name[:2]
-                e.short_old = e.user.first_name[:2] + e.user.last_name[:2]
+                e.short_new = e.user.first_name[:1] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
+                e.short_old = e.user.first_name[:2] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
 
             data['employees'] = employees
             data['char'] = begin
