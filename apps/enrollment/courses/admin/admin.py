@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 
 from apps.enrollment.courses.models import *
-from apps.enrollment.records.models import Record, STATUS_REMOVED, STATUS_ENROLLED
+from apps.enrollment.records.models import Record, STATUS_REMOVED, STATUS_ENROLLED, Queue
 
 
 class GroupForm(ModelForm):
@@ -154,12 +154,18 @@ class RecordInlineForm(ModelForm):
                     Group.do_rearanged(record.group)
                 elif  record.status == STATUS_ENROLLED:
                     record.group.add_to_enrolled_counter(record.student)
+                    Queue.objects.filter(group=record.group, student=record.student, deleted=False).update(deleted=True)
+                    record.group.queued = Queue.objects.filter(group=record.group, deleted=False).count()
+                    record.group.save()
 
         else:
             if record.status == STATUS_REMOVED:
                 pass
             elif  record.status == STATUS_ENROLLED:
                 record.group.add_to_enrolled_counter(record.student)
+                Queue.objects.filter(group=record.group, student=record.student, deleted=False).update(deleted=True)
+                record.group.queued = Queue.objects.filter(group=record.group, deleted=False).count()
+                record.group.save()
 
         if commit:
             record.save()
@@ -171,14 +177,46 @@ class RecordInline(admin.TabularInline):
     model = Record
     extra = 0
     raw_id_fields = ("student",)
+    can_delete = False
     form = RecordInlineForm
+
+class QueuedInlineForm(ModelForm):
+    class Meta:
+        model = Queue
+
+    def save(self, commit=True):
+        queue = super(QueuedInlineForm, self).save(commit=False)
+
+
+        if queue.id:
+            old = Queue.objects.get(id=queue.id)
+            if not old.deleted and queue.deleted:
+                queue.group.remove_from_queued_counter(queue.student)
+            elif old.deleted and not queue.deleted:
+                queue.group.add_to_queued_counter(queue.student)
+        else:
+            if not queue.deleted:
+                queue.group.add_to_queued_counter(queue.student)
+
+        if commit:
+            queue.save()
+
+        return queue
+
+class QueuedInline(admin.TabularInline):
+    model = Queue
+    extra = 0
+    raw_id_fields = ("student",)
+
+    can_delete = False
+    form=QueuedInlineForm
 
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012','get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
     inlines = [
-        TermInline,RecordInline
+        TermInline,RecordInline, QueuedInline
     ]
 
     form = GroupForm
