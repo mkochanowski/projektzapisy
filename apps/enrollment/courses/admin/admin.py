@@ -31,6 +31,8 @@ class GroupForm(ModelForm):
                 group.enrolled_zam2012 = old_one.enrolled_zam2012
                 group.queued           = old_one.queued
 
+            Group.do_rearanged(group)
+            
 
         if commit:
             group.save()
