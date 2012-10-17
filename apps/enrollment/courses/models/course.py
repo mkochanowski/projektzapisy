@@ -72,7 +72,6 @@ class CourseEntity(models.Model):
     created = models.DateTimeField(verbose_name='Utworzono', auto_now_add=True)
     edited  = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now=True)
 
-
     in_prefs = models.BooleanField(verbose_name='w preferencjach', default=True)
 
     have_review_lecture = models.NullBooleanField(verbose_name=u'Posiada repetytorium', null=True, blank=True)
@@ -236,6 +235,9 @@ class Course( models.Model ):
     dyskretna_l  = models.BooleanField(default=False)
     numeryczna_l = models.BooleanField(default=False)
 
+    records_start = models.DateTimeField(verbose_name=u'Początek zapisów', null=True, blank=True)
+    records_end = models.DateTimeField(verbose_name=u'Koniec zapisów', null=True, blank=True)
+
     objects = models.Manager()
     visible = VisibleManager()
 
@@ -290,6 +292,9 @@ class Course( models.Model ):
         except StudentOptions.DoesNotExist:
             interval = timedelta(minutes=4320) #TODO: 3 dni -> to powinno chyba wylądować w konfigu
 
+        if self.records_start and self.records_end and self.records_start <= datetime.now() <= self.records_end:
+            return True
+
         if records_opening == None:
             return False
         else:
@@ -321,7 +326,7 @@ class Course( models.Model ):
                 return None
             else:
                 return student_opening + interval
-        
+
     def get_semester_name(self):
         """ returns name of semester course is linked to """
         if self.semester is None:

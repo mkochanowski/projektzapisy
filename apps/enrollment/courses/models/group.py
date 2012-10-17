@@ -253,16 +253,12 @@ class Group(models.Model):
         from apps.enrollment.records.models import Queue, STATUS_REMOVED
         from apps.enrollment.courses.models import Semester
 
-        semester = Semester.get_current_semester()
-
-        if semester.records_closing < datetime.now():
-            return None
 
         queued = Queue.objects.filter(deleted=False, group=self).order_by('time').select_related('student')
         to_removed = []
         result = None
         for q in queued:
-            if self.is_full_for_student(q.student):
+            if self.is_full_for_student(q.student) and not self.student_have_opened_enrollment(q.student):
                 continue
 
             limit, __ = self.student_can_enroll(q.student)

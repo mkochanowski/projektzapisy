@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
+from django.template.response import TemplateResponse
 from django.utils import simplejson
 
 from apps.enrollment.courses.models         import *
@@ -134,7 +135,7 @@ def course(request, slug):
             queue_priorities = Queue.queue_priorities_map_values(queued)
 
             course.can_enroll_from = course.get_enrollment_opening_time(student)
-            course.is_recording_open = not course.can_enroll_from
+            course.is_recording_open = course.is_recording_open_for_student(student)
             if course.can_enroll_from:
                 course.can_enroll_interval = course.can_enroll_from - datetime.now()
             
