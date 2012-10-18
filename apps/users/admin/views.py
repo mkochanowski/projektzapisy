@@ -2,6 +2,7 @@
 
 from traceback import format_tb
 from sys import exc_info, path
+from django.contrib import messages
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.admin.views.decorators import staff_member_required
@@ -39,10 +40,10 @@ def import_zamawiani(request):
                 errormsg = unicode(exc_info()[0]) + ' ' + unicode(exc_info()[1]) + '\n\n'
                 errormsg += u'Traceback:\n'
                 errormsg += u''.join([str for str in format_tb(exc_info()[2])])
-                request.user.message_set.create(message="Błąd!")
+                messages.error(request, u'Błąd')
             else:
                 errormsg = None
-                request.user.message_set.create(message="Plik został zaimportowany.")
+                messages.success(request, "Plik został zaimportowany.")
         
             return render_to_response(
                 'users/import_zamawiani.html',
@@ -82,10 +83,10 @@ def import_new_zamawiani(request):
                 errormsg = unicode(exc_info()[0]) + ' ' + unicode(exc_info()[1]) + '\n\n'
                 errormsg += u'Traceback:\n'
                 errormsg += u''.join([str for str in format_tb(exc_info()[2])])
-                request.user.message_set.create(message="Błąd!")
+                messages.error(request, u'Błąd')
             else:
                 errormsg = None
-                request.user.message_set.create(message="Plik został zaimportowany.")
+                messages.success(request, "Plik został zaimportowany.")
         
             return render_to_response(
                 'users/import_zamawiani.html',
