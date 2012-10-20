@@ -98,7 +98,7 @@ class SingleVote ( models.Model ):
     def add_vote_count(proposals, state):
         return proposals.extra(
             select = {
-              'votes': "SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.state_id = %d" % state.id,
+              'votes': "COALESCE((SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.state_id = %d), 0)" % state.id,
               'voters': "SELECT COUNT(*) FROM vote_singlevote WHERE vote_singlevote.entity_id = courses_courseentity.id AND vote_singlevote.correction > 0 AND vote_singlevote.state_id = %d" % state.id,
             },
         )
