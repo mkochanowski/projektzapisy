@@ -64,6 +64,7 @@ class CourseEntity(models.Model):
     exercises  = models.IntegerField(choices=hours, null=True, blank=True)
     laboratories  = models.IntegerField(choices=hours, null=True, blank=True)
     repetitions = models.IntegerField(choices=hours, null=True, blank=True)
+    seminars = models.IntegerField(choices=hours, null=True, blank=True, verbose_name='seminaria')
 
     deleted = models.BooleanField(verbose_name='ukryty', default=False)
     owner   = models.ForeignKey('users.Employee', verbose_name='prowadzący', blank=True, null=True)
@@ -219,6 +220,7 @@ class Course( models.Model ):
     exercises = models.IntegerField(verbose_name='ćwiczenia', null=True, default=0)
     laboratories = models.IntegerField(verbose_name='pracownia', null=True, default=0)
     exercises_laboratories = models.IntegerField(verbose_name='ćw+prac', null=True, default=0)
+    seminars = models.IntegerField(default=0, null=True, blank=True, verbose_name='seminaria')
     students_options = models.ManyToManyField('users.Student', verbose_name='opcje studentów', through='StudentOptions')
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
