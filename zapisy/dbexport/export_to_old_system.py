@@ -42,11 +42,11 @@ from datetime import time
 if __name__ == '__main__':
     sys.path.append(FEREOL_PATH)
     sys.path.append(FEREOL_PATH + '/fereol')
-    from fereol import settings
+    import settings
     setup_environ(settings)
 
 from apps.enrollment.records.models import Record, STATUS_ENROLLED
-from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities, PointsOfCourses
+from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities
 from apps.users.models import Student, Employee
 
 from django.template.defaultfilters import slugify

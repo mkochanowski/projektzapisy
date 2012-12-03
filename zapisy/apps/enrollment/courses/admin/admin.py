@@ -47,17 +47,15 @@ class GroupInline(admin.TabularInline):
     form = GroupForm
 
 class CourseAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug' : ('name', 'semester')}
-    list_display = ('name', 'semester', 'lectures', 'exercises_laboratories','exercises', 'laboratories','repetitions')
-    list_filter = ('semester','type')
-    search_fields = ('name',)
+    list_display =('semester',)
+    list_filter = ('semester',)
+    search_fields = ('entity__name',)
     fieldsets = [
-        (None,               {'fields': ['entity','name'], 'classes': ['long_name']}),
-        ('Szczegóły', {'fields': ['records_start', 'records_end', 'numeryczna_l', 'dyskretna_l', 'teachers','requirements','description','semester','english','exam','suggested_for_first_year','type','slug','web_page'], 'classes': ['collapse']}),
-        ('Wymiar godzinowy zajęć', {'fields': ['lectures','exercises_laboratories','exercises','laboratories','repetitions'], 'classes': ['collapse']}),
+        (None,               {'fields': ['entity'], 'classes': ['long_name']}),
+        ('Szczegóły', {'fields': ['records_start', 'records_end', 'numeryczna_l', 'dyskretna_l', 'teachers','semester','english','exam','suggested_for_first_year','slug','web_page'], 'classes': ['collapse']}),
     ]
     inlines = [GroupInline, ]
-    filter_horizontal = ['requirements']
+
 
     def changelist_view(self, request, extra_context=None):
 
@@ -130,11 +128,6 @@ class CourseEntityAdmin(admin.ModelAdmin):
        """
        qs = super(CourseEntityAdmin, self).queryset(request)
        return qs.select_related('owner', 'owner__user', 'type')
-
-class PointsOfCoursesAdmin(admin.ModelAdmin):
-    list_display = ('course', 'program','type_of_point','value')
-    search_fields = ('course__name', )
-    list_filter = ('program',)
 
 class TermInline(admin.TabularInline):
     model = Term
@@ -292,19 +285,10 @@ class StudentOptionsAdmin(admin.ModelAdmin):
     search_fields = ('course__name',)
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
-class PointsOfCoursesAdmin(admin.ModelAdmin):
-    list_filter = ('program', 'course__semester' , 'type_of_point', 'value')
-    list_display = ('course', 'program', 'type_of_point', 'value')
-    def queryset(self, request):
-       """
-       Filter the objects displayed in the change_list to only
-       display those for the currently signed in user.
-       """
-       qs = super(PointsOfCoursesAdmin, self).queryset(request)
-       return qs.select_related('course', 'type_of_point', 'program', 'program__type_of_points', 'course__semester', 'course__type')
 
-admin.site.register(Course, CourseAdmin)
-admin.site.register(CourseEntity, CourseEntityAdmin)
+admin.site.register(Course)
+admin.site.register(CourseDescription)
+admin.site.register(CourseEntity)
 admin.site.register(StudentOptions,StudentOptionsAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Classroom, ClassroomAdmin)
@@ -312,5 +296,4 @@ admin.site.register(Term, TermAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(Type, TypeAdmin)
 admin.site.register(PointTypes)
-admin.site.register(PointsOfCourses, PointsOfCoursesAdmin)
 admin.site.register(PointsOfCourseEntities)

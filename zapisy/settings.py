@@ -204,7 +204,7 @@ MIDDLEWARE_CLASSES = (
     'pipeline.middleware.MinifyHTMLMiddleware',
 )
 
-ROOT_URLCONF = 'fereol.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_PATH, 'templates'),
@@ -275,6 +275,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.admindocs',
+
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mailer',

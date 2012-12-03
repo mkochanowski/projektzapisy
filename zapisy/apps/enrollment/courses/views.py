@@ -32,14 +32,14 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
    
     semesters = Semester.objects.filter(visible=True)
     if hasattr(user, "student") and user.student:
-        courses = Course.visible.all().order_by('name')\
+        courses = Course.visible.all().order_by('entity__name')\
             .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
                                          ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
                                          ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
                                          ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
                                                  ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
     else:
-        courses = Course.visible.all().order_by('name')
+        courses = Course.visible.all().order_by('entity__name')
 
 
 

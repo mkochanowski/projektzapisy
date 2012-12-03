@@ -13,7 +13,7 @@ from apps.enrollment.courses.models.points import PointTypes
 from django.core.cache import cache as mcache
 import datetime
 
-from fereol import settings
+import settings
 
 import logging
 logger = logging.getLogger()

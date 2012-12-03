@@ -15,29 +15,78 @@ class PointTypes(models.Model):
         return '%s' % (self.name, )
 
 class PointsOfCourseEntities(models.Model):
+    """
+        Model przechowuje punkty przypisane do :model:`courses.CourseEntity` oraz :model:'courses.PointTypes'
+
+        Pole program jest opcjonalne.
+
+         * Zasada wyznaczenia punktów *
+
+         Student X jest na programie Y. Sprawdzamy ile jest dla niego przedmiot Z.
+         Jeżeli istnieje rekord łączący program z podstawą dostajemy wartość z niego.
+         W przeciwnym wypadku zwracamy wartość z rekordu w którym program == Null, entity==Z, a typ punktów
+         zgadza się z typem przypisanym do osoby.
+         Jeżeli nie istnieje rekord spełniający powyższe przypadki zwracamy zero.
+
+         * Uwaga *
+
+         Przedmioty posiadające wersje L i M mają modyfikatory zmieniające program.
+
+         Czytanie z tej tabeli powinno odbywać się poprzez metody z :model:`courses.CourseEntity`
+         w innym wypadku ryzykujemy otrzymanie nieprawidłowej wartości.
+
+
+    """
     entity = models.ForeignKey('CourseEntity', verbose_name='podstawa przedmiotu')
     type_of_point = models.ForeignKey('PointTypes', verbose_name='rodzaj punktów')
-    value = models.PositiveSmallIntegerField(verbose_name='liczba punktów')
+    program = models.ForeignKey('users.Program', verbose_name='Program Studiów', null=True, blank=True, default=None)
+    value = models.PositiveSmallIntegerField(verbose_name='liczba punktów', default=6)
 
     class Meta:
         verbose_name = 'zależność podstawa przedmiotu-punkty'
         verbose_name_plural = 'zależności podstawy przedmiotu-punkty'
         app_label = 'courses'
-        unique_together = ('entity', 'type_of_point',)
+        unique_together = ('entity', 'type_of_point', 'program')
 
     def __unicode__(self):
         return '%s: %s %s' % (self.entity.name, self.value, self.type_of_point)
-    
-class PointsOfCourses(models.Model):
-    course = models.ForeignKey('Course', verbose_name='przedmiot')
-    type_of_point = models.ForeignKey('PointTypes', verbose_name='rodzaj punktów')
-    program = models.ForeignKey('users.Program', verbose_name='Program Studiów', null=True, blank=True, default=None)
-    value = models.PositiveSmallIntegerField(verbose_name='liczba punktów')
+
+
+    @classmethod
+    def get_course_points(cls, course, type=None):
+        """
+
+        @param course: :model:'courses.Course'
+        @param type: :model:'courses.PointTypes'
+        @return :model:'courses.PointsOfCourseEntities'
+
+        """
+        return 6
+#        return cls.objects.filter(entity=course.entity, type_of_point=type).order_by('-value')[0]
+
+class Points(models.Model):
+    """
+    Widok materialny (patrz migracja)
+    """
+    value    = models.PositiveSmallIntegerField(verbose_name='liczba punktów')
+    enrolled = models.BooleanField()
+    course   = models.ForeignKey('courses.Course', on_delete=models.DO_NOTHING, primary_key=True)
+    entity   = models.ForeignKey('CourseEntity', on_delete=models.DO_NOTHING)
+    student  = models.ForeignKey('users.Student', on_delete=models.DO_NOTHING)
+
 
     class Meta:
-        verbose_name = 'zależność przedmiot-punkty'
-        verbose_name_plural = 'zależności przedmiot-punkty'
-        app_label = 'courses'
+        managed = False
 
-    def __unicode__(self):
-        return '%s: %s %s' % (self.course.name, self.value, self.type_of_point)
+    @classmethod
+    def get_for_student(cls, course, student):
+        """
+
+        Return Points for student
+
+        @param course: :model:'courses.Course'
+        @param student:  :model:'users.Student'
+        @return :model:'courses.Points'
+        """
+        return 6
+#        return cls.objects.get(course=course, student=student)

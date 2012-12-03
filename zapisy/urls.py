@@ -8,7 +8,7 @@ import settings
 
 admin.autodiscover()
 
-from fereol.feeds import LatestNews
+from feeds import LatestNews
 
 
 urlpatterns = patterns('',
@@ -43,6 +43,7 @@ urlpatterns = patterns('',
     (r'^prefs/', include('apps.offer.preferences.urls')),
     (r'^desiderata', include('apps.offer.desiderata.urls')),
     (r'^vote/', include('apps.offer.vote.urls')),
+    (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^fereol_admin/', include(admin.site.urls)),
 
 )

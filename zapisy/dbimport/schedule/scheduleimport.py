@@ -67,7 +67,7 @@ if __name__ == '__main__':
     setup_environ(settings)
 
 from apps.enrollment.records.models import Record, STATUS_ENROLLED
-from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities, PointsOfCourses, PointTypes
+from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities, PointTypes
 from apps.users.models import Student, Employee, Program
 
 from django.template.defaultfilters import slugify
@@ -345,8 +345,8 @@ def import_schedule(file, semester):
                 if not points:
                      PointsOfCourseEntities.objects.create(entity=entity,type_of_point=ects,value=value_mgr)
                     
-                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_lic,value=value_lic)
-                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_mgr,value=value_mgr)
+#                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_lic,value=value_lic)
+#                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_mgr,value=value_mgr)
 
             except Exception, e:
                 print 'Error during creating course:%s. \nError: %s ' % (name, e)

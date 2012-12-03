@@ -412,67 +412,6 @@ class Queue(models.Model):
             logger.warning('Queue.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
     
-    @staticmethod
-    def get_point(program, course, student=None):
-      """
-          TODO: OMFG, to nie powinno być w modelu kolejki
-      """
-      from apps.enrollment.courses.models import PointsOfCourses,\
-                                          PointsOfCourseEntities
-
-      if student and (
-           (student.dyskretna_l and course.dyskretna_l) or
-           (student.numeryczna_l and course.numeryczna_l)
-          ):
-          import settings
-          from apps.users.models import Program
-          program = Program.objects.get(id=settings.M_PROGRAM)
-                                          
-      pos = PointsOfCourses.objects.filter(course=course, program=program).values()
-      if not pos:
-         point = PointsOfCourseEntities.objects.filter(entity = course.entity).values()
-         if point:
-            return point[0]["value"]
-         else:
-            return 0
-      else:
-         return pos[0]["value"]
-    
-    @staticmethod
-    def is_ECTS_points_limit_exceeded(user, group):
-      """
-          check if the sum of ECTS points for every course student is enrolled on, exceeds limit
-          TODO: OMFG, to nie powinno być w modelu kolejki
-      """
-      try:
-            semester = Semester.get_default_semester()
-            student = user.student
-            """ Sprawdzenie, czy obowiązuje jeszcze limit ECTS"""
-            limit_abortion_date = group.course.semester.records_ects_limit_abolition
-            if limit_abortion_date and limit_abortion_date < datetime.now():
-                return False
-            """ Obliczenie sumy punktów ECTS"""
-            groups = map(lambda x: x.group, \
-                Record.objects.filter(student=student, \
-                    group__course__semester__in=[semester], \
-                    status=STATUS_ENROLLED).select_related(\
-                    'group', 'group__course', 'group__course__entity'))
-            courses = set([g.course for g in groups])
-            program = user.student.program
-            points = Queue.get_point(program, group.course, student)
-            ects = sum([Queue.get_point(program,course, student) for course in courses])
-
-            if group.course not in courses:
-                ects += points
-
-    	    """ Porównanie sumy z obowiązującym limitem"""
-            if ects <= ECTS_LIMIT:
-                return False
-            else:
-                return True
-      except Student.DoesNotExist:
-            logger.warning('Queue.count_ECTS_points(user_id)  throws Student.DoesNotExist exception (parameters: user_id = %d)' % (int(user.id)))
-            raise NonStudentException()
 
     @staticmethod
     def get_groups_for_student(user):
