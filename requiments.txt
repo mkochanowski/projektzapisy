@@ -5,11 +5,14 @@ South==0.7.6
 argparse==1.2.1
 django-debug-toolbar==0.9.4
 django-extensions==1.0.1
+django-filter==0.5.4
 django-mailer==0.1.0
 django-pipeline==1.2.21
 django-timedeltafield==0.6.7
 docutils==0.9.1
 html5lib==0.95
+ipdb==0.7
+ipython==0.13.1
 lxml==3.0.1
 paramiko==1.9.0
 psycopg2==2.4.5
