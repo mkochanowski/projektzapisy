@@ -1,0 +1,808 @@
+{% extends "schedule/base.html" %}
+
+{% block schedule_reservation %} class="active"{% endblock %}
+
+{% block bread %}
+    <a href="/">Strona główna</a> &raquo;
+    <a href="/">Sale</a> &raquo;
+    Nowa rezerwacja
+{% endblock %}
+
+{% block js %}{{ block.super }}
+    <style xmlns="http://www.w3.org/1999/html">
+        .hidden {
+            display: none!important;
+        }
+    </style>
+    <script type="text/javascript">
+
+
+    /* Loader Class
+     *
+     *
+     *
+     */
+
+
+    function relMouseCoords(evt) {
+        var rect = this.getBoundingClientRect();
+        return {
+            x:evt.clientX - rect.left,
+            y:evt.clientY - rect.top
+        };
+    }
+    HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+
+    var chosenbutton = new Image();
+    chosenbutton.src = '/site_media/images/choose.png';
+
+    var Loader = function (container) {
+        this.container = container;
+        this.spinner = new Object();
+        {#        this.spinner = new Spinner();#}
+    };
+
+    Loader.prototype.start = function () {
+
+        var that = this,
+                opacity = 1.0,
+                animate = function () {
+                    that.container.style.opacity = opacity;
+                    opacity -= 0.1;
+                    if (opacity > 0.2) {
+                        setTimeout(animate, 100);
+                    }
+                }
+                ;
+
+        setTimeout(animate, 100);
+        this.spinner.spin(this.container);
+    };
+
+    Loader.prototype.stop = function () {
+        this.spinner.stop();
+        this.container.style.opacity = 1.0;
+    };
+
+    var AjaxWrapper = function () {
+        this.makeURL = function (date) {
+            var s = date.split('-');
+            return '/classrooms/terms/' + s[0] + '/' + s[1] + '/' + s[2] + '/';
+        };
+        this.cache = {};
+    };
+
+    AjaxWrapper.prototype.getJson = function (date, callback) {
+
+        if (this.cache.hasOwnProperty(date)) {
+            callback.call(this.cache[date], this.cache[date]);
+            return;
+        }
+
+        var url = this.makeURL(date),
+                that = this;
+        var r = new XMLHttpRequest();
+
+        r.open("GET", url, true);
+        r.onreadystatechange = function () {
+            if (r.readyState != 4 || r.status != 200) return; //error
+            that.cache[date] = JSON.parse(r.responseText);
+            callback.call(that.cache[date], that.cache[date]);
+
+        };
+        r.send('');
+    };
+
+
+    var ReservationView = function () {
+
+        var container = document.getElementById('addTermForm');
+        var canvas = document.getElementById('can');
+
+        var load = new Loader(container);
+        var Ajax = new AjaxWrapper();
+        var rooms = new ClassroomsList();
+
+        var changeType = function () {
+
+            var type = document.getElementById('id_type'),
+                    subject = document.getElementById('form_course'),
+                    visible = document.getElementById('form_visible'),
+                    title = document.getElementById('form_title'),
+                    onchange = function () {
+                        switch (type.value) {
+                            case '0':
+                            case '1':
+                                subject.className = 'row';
+                                visible.className = 'row hidden';
+                                title.className = 'row hidden';
+                                break;
+
+                            case '2':
+                                subject.className = 'row hidden';
+                                visible.className = 'row';
+                                title.className = 'row';
+                                break;
+                        }
+                    }
+                    ;
+            if (type) {
+                type.addEventListener('change', onchange, true);
+                onchange();
+            }
+        };
+
+        var addterm = function () {
+            var addbutton = document.getElementById('addterm'),
+                    form = document.getElementById('addTermForm'),
+                    term = document.getElementById('term'),
+                    from = document.getElementById('begin'),
+                    to = document.getElementById('end'),
+                    onclickAddButton = function (event) {
+                        event.preventDefault();
+
+                        cleanAddTermForm();
+                        form.className = '';
+                        addbutton.disabled = true;
+                    },
+                    onchangeTerm = function (event) {
+                        event.preventDefault();
+
+                        Ajax.getJson(term.value, function (data) {
+                            rooms.load(data);
+                            rooms.draw();
+                        });
+                    },
+                    onchangeHour = function (event) {
+                        event.preventDefault();
+                        rooms.setLines(from.value, to.value);
+                        rooms.draw();
+                    },
+                    onclickCanvas = function (event) {
+                        rooms.click(event, function (item) {
+                            var counter = $('input[name="term_set-TOTAL_FORMS"]').val();
+
+                            var html = $('<tr></tr>').append($('<td>' + item.title + '</td>'))
+                                    .append($('<td>' + from.value + '</td>'))
+                                    .append($('<td>' + to.value + '</td>'))
+                                    .append($('<input type="hidden" name="term_set-' + counter + '-day"  value="' + term.value + '">'))
+                                    .append($('<input type="hidden" name="term_set-' + counter + '-start"  value="' + from.value + '">'))
+                                    .append($('<input type="hidden" name="term_set-' + counter + '-end"  value="' + to.value + '">'))
+                                    .append($('<input type="hidden" name="term_set-' + counter + '-room" value="' + item.id + '">'))
+                                    .append($('<input type="hidden" name="term_set-' + counter + '-place" maxlength="255" value="">'));
+
+
+                            $('input[name="term_set-TOTAL_FORMS"]').val(counter + 1);
+
+                            $('#termstable tbody').append(html);
+                        })
+                    },
+                    onchangePlace = function (event) {
+                        var inside = document.getElementById('inputplacediv'),
+                             outside = document.getElementById('canvasplacediv'),
+                             filter = document.getElementById('rooms_filter');
+
+                        event.preventDefault();
+
+                        switch (this.value) {
+                            case "outside":
+                                inside.className = 'row';
+                                outside.className = 'row hidden';
+                                filter.className = 'span7 hidden';
+                                break;
+
+                            case "inside":
+                                inside.className = 'row hidden';
+                                filter.className = 'span7';
+                                outside.className = 'row';
+                                break;
+
+                            default:
+                                inside.className = 'row hidden';
+                                outside.className = 'row hidden';
+                                filter.className = 'span7 hidden';
+
+                        }
+                    }
+                    ;
+
+
+            addbutton.addEventListener('click', onclickAddButton, true);
+            canvas.addEventListener('click', onclickCanvas, true);
+            from.addEventListener('click', onclickAddButton, true);
+            from.addEventListener('change', onchangeHour, true);
+            to.addEventListener('change', onchangeHour, true);
+
+            term.addEventListener('change', onchangeTerm, true);
+            var radios = document.getElementsByName('selectplace');
+            radios[0].addEventListener('change', onchangePlace, true);
+            radios[1].addEventListener('change', onchangePlace, true);
+
+        };
+
+
+        changeType();
+        addterm();
+
+
+    };
+
+
+    var Classroom = function (ctx, item) {
+                var config = {
+                            width:400,
+                            height:30,
+                            corner:10,
+                            boxheight:100,
+                            x1:120,
+                            y1:30,
+                            y1a:30,
+                            evenHours:['08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                            calculate:function () {
+                                /*
+                                 a******b
+                                 e        g
+                                 *        *
+                                 f        h
+                                 c******d
+
+                                 for example b-g is rounded corner
+                                 a - (x1, y1)
+                                 b - (x2, y1)
+                                 c - (x2, y2)
+                                 d - (x2, y2)
+                                 e - (x1corner, y1corner)
+                                 f - (x1corner, y2corner)
+                                 g - (x2corner, y1corner)
+                                 h - (x2corner, y2corner)
+
+                                 */
+                                this.x2 = this.x1 + this.width;
+                                this.y2 = this.y1 + this.height;
+                                this.x1corner = this.x1 - this.corner;
+                                this.x2corner = this.x2 + this.corner;
+                                this.y1corner = this.y1 + this.corner;
+                                this.y2corner = this.y2 - this.corner;
+                                return this;
+                            },
+                            init:function () {
+                                this.calculate();
+                                delete this.init;
+                                return this;
+                            }
+                        }.init(),
+
+                        cellSize = config.width / (config.evenHours.length - 1),
+
+                        drawButton = function () {
+                            if(is_free()){
+                                ctx.drawImage(chosenbutton, config.x1 - 100, config.y1 + 1);
+                            }
+                        },
+
+                        drawTitle = function () {
+                            ctx.beginPath();
+                            ctx.font = '20px Calibri';
+                            ctx.fillText(item.title, config.x2corner + 10, config.y1 + 3 * config.height / 4);
+                            ctx.stroke();
+
+                        },
+
+                        drawBorder = function () {
+                            /*
+                             Draw borders
+                             */
+                            var c = config;
+                            ctx.beginPath();
+                            ctx.moveTo(c.x1, c.y1);
+                            ctx.lineTo(c.x2, c.y1);
+                            ctx.quadraticCurveTo(c.x2corner, c.y1, c.x2corner, c.y1corner);
+                            ctx.lineTo(c.x2corner, c.y2corner);
+                            ctx.quadraticCurveTo(c.x2corner, c.y2, c.x2, c.y2);
+                            ctx.lineTo(c.x1, c.y2);
+                            ctx.quadraticCurveTo(c.x1corner, c.y2, c.x1corner, c.y2corner);
+                            ctx.lineTo(c.x1corner, c.y1corner);
+                            ctx.quadraticCurveTo(c.x1corner, c.y1, c.x1, c.y1);
+                            ctx.stroke();
+                        },
+
+                        drawHours = function () {
+
+                            ctx.beginPath();
+
+                            ctx.strokeStyle = "#787878";
+                            ctx.textAlign = "left";
+                            ctx.font = '12px Calibri';
+
+                            for (var i = 0; i < config.evenHours.length; ++i) {
+                                var x = config.x1 + i * cellSize;
+                                ctx.moveTo(x, config.y1);
+                                ctx.lineTo(x, config.y2);
+                                ctx.fillText(config.evenHours[i], x - 14, config.y2 + 12);
+
+                            }
+                            ctx.stroke();
+                        },
+
+                        terms = [],
+
+                        drawEvents = function () {
+                            var events = item.terms;
+                            for (var key in events) {
+                                if (events.hasOwnProperty(key)) {
+                                    var event = events[key];
+                                    ctx.beginPath();
+
+                                    begin = getPixel(event.begin);
+                                    end = getPixel(event.end);
+                                    terms.push({'start': begin, 'end':end});
+                                    ctx.fillStyle = "#b0c2f7";
+                                    ctx.globalAlpha = 0.5; // Half opacity
+                                    ctx.fillRect(config.x1 + begin, config.y1, end - begin, config.height);
+                                    ctx.stroke();
+                                }
+                            }
+                        },
+
+                        draw = function (index) {
+
+                            terms = [];
+
+                            config.y1 = config.y1a + index * config.boxheight;
+                            config.calculate();
+                            drawButton();
+                            drawTitle();
+                            drawBorder();
+                            drawHours();
+                            drawEvents();
+                        },
+
+                        getPixel = function (hour) {
+                            /*
+                             Find pixel location for time (clock).
+                             Eg. 8:00 - it's begining of axe, 22:00 - end,
+                             15:00 - it's center.
+                             */
+
+                            var time = hour.split(":"),
+                                    hours = (parseInt(time[0]) - 8) * cellSize / 2,
+                                    minutes = Math.floor(( parseInt(time[1]) / 60 ) * cellSize) / 2;
+                            return hours + minutes;
+                        },
+
+                        click = function (event, cordinates, callback) {
+                            if ((cordinates.x >= config.x1 - 100) && (cordinates.x < config.x1 - 20)
+                                    && (cordinates.y >= config.y1 + 1) && ( cordinates.y < config.y1 + 32)) {
+                                callback.call(item, item);
+                            }
+                        },
+                        lpixel,rpixel,
+                        setLimit = function(left, right){lpixel=left; rpixel=right;},
+
+                        is_free = function(){
+                            if(!rpixel || !lpixel ){
+                                return false;
+                            }
+
+
+                            for(var key in terms){
+                                if(terms.hasOwnProperty(key)){
+                                    var item = terms[key];
+                                    if( (lpixel < item.end && rpixel > item.start) ||
+                                         (item.start < rpixel && item.end > lpixel)   ){
+                                          return false;
+                                    }
+                                }
+                            }
+                            return true;
+                        }
+                        ;
+
+                return {
+                    draw:draw,
+                    getPixel:function (item) {
+                        return getPixel(item) + config.x1;
+                    },
+                    setLimit: setLimit,
+                    click:click
+                }
+            },
+            ClassroomsList = function () {
+
+                var that = this,
+                        init = function () {
+                            that.canvas = document.getElementById("can");
+                            that.ctx = document.getElementById("can").getContext("2d");
+                        },
+
+                        click = function (event, callback) {
+                            var cords = that.canvas.relMouseCoords(event);
+                            var nr = Math.floor(cords.y / 100);
+                            classrooms[ toDraw[nr] ].click(event, cords, callback);
+                        },
+
+                        classrooms = [],
+                        clearClassrooms = function () {
+                            classrooms = [];
+                        },
+                        createClassroom = function (data) {
+                            console.log(data);
+                            for (var classroom in data) {
+
+                                if (data.hasOwnProperty(classroom)) {
+                                    classrooms.push(new Classroom(that.ctx, data[classroom]));
+                                }
+                            }
+                        },
+
+                        lineFrom, lineTo,
+                        setLines = function (from, to) {
+                            lineFrom = from;
+                            lineTo = to;
+                        },
+
+                        redraw = function () {
+
+                        },
+                        toDraw,
+                        draw = function () {
+                            var index = 0
+                                    ;
+
+
+                            toDraw = [];
+
+                            for (var classroom in classrooms) {
+                                if (classrooms.hasOwnProperty(classroom) && shouldBeShow(classroom)) {
+                                    toDraw[index] = classroom;
+                                    index++;
+                                }
+                                that.canvas.height = 100 * (index);
+                            }
+                            index = 0;
+                            var lPixel, rPixel;
+                            for (var c in toDraw) {
+                                if (classrooms.hasOwnProperty(c)) {
+                                    if (index === 0) {
+                                        if (lineFrom) {
+                                            lPixel = classrooms[c].getPixel(lineFrom);
+
+                                        }
+                                        if (lineTo) {
+                                            rPixel = classrooms[c].getPixel(lineTo);
+                                        }
+                                    }
+                                    classrooms[c].setLimit(lPixel, rPixel);
+                                    classrooms[c].draw(index++);
+                                }
+                            }
+
+                            if (lPixel) {
+                                that.ctx.strokeStyle = "red";
+                                that.ctx.beginPath();
+                                that.ctx.moveTo(lPixel, 0);
+                                that.ctx.lineTo(lPixel, that.canvas.height);
+                                that.ctx.stroke();
+                            }
+
+                            if (rPixel) {
+                                that.ctx.strokeStyle = "red";
+                                that.ctx.beginPath();
+                                that.ctx.moveTo(rPixel, 0);
+                                that.ctx.lineTo(rPixel, that.canvas.height);
+                                that.ctx.stroke();
+                            }
+                        },
+
+                        shouldBeShow = function (classroom) {
+                            return true;
+                        },
+                        load = function (data) {
+                            clearClassrooms();
+                            createClassroom(data);
+                        }
+                        ;
+
+                init();
+
+                return {
+                    'draw':draw,
+                    'load':load,
+                    'setLines':setLines,
+                    'redraw':redraw,
+                    'click':click
+                };
+
+            },
+
+
+            cleanAddTermForm = function () {
+            },
+
+
+            init = function () {
+                addterm();
+            };
+
+    window.onload = ReservationView;
+    </script>
+{% endblock %}
+
+{% block content-width %}16{% endblock %}
+
+{% block content %}
+
+    <form method="POST">
+    {% csrf_token %}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {{ form.non_field_errors }}
+    <fieldset>
+
+        <legend>Nowe wydarzenie</legend>
+        {% if user.employee %}
+            <div class="row">
+                <div class="span16">
+                    <div class="row">
+                        <div class="span10 clearfix">
+                            <div class="span2">
+                                <label for="id_type">Rodzaj</label>
+                            </div>
+
+                            <div class="input">
+                                {{ form.type }}
+                            </div>
+                            {{ form.type.errors }}
+                        </div>
+                        <div class="span6 clearfix help-block"><p>Lorem ipsum dolor sit amet, consectetur adipiscing
+                            elit. Sed
+                            mollis sem nec ipsum dapibus semper. Mauris ultricies nisl eu lectus bibendum
+                            ullamcorper. Nam dui ante, ornare a vestibulum et, elementum a elit. Nam vulputate
+                            gravida convallis. Vestibulum feugiat vulputate velit.</p>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+            <div id="form_course" class="row hidden">
+
+                <div class="span16">
+                    <div class="row">
+
+                        <div class="span10 clearfix">
+                            <div class="span2">
+                                <label for="id_course">Przedmiot</label>
+                            </div>
+
+                            <div class="input">
+                                {{ form.course }}
+                                {{ form.course.errors }}
+                            </div>
+                        </div>
+
+                        <div class="span6 clearfix  help-block">
+                            <p>Wybierz przedmiot.</p>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+
+
+            </div>
+
+        {% endif %}
+
+        <div id="form_title" class="row hidden">
+            <div class="span16">
+                <div class="row">
+                    <div class="span10">
+                        <div class="span2">
+                            <label for="id_title">Tytuł</label>
+                        </div>
+                        <div class="input">
+                            {{ form.title }}
+                        </div>
+                        {{ form.title.errors }}
+                    </div>
+                    <div class="span6 help-block">Wstaw sobie tutaj tytuł</div>
+                </div>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="span16">
+                <div class="row">
+                    <div class="span10 clearfix">
+                        <label class="span2" for="id_description">Opis</label>
+
+                        <div class="input">
+                            {{ form.description }}
+                            {{ form.description.errors }}
+                        </div>
+                    </div>
+                    <div class="span6 clearfix help-block"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Sed
+                        mollis sem nec ipsum dapibus semper. Mauris ultricies nisl eu lectus bibendum ullamcorper.
+                        Nam dui ante, ornare a vestibulum et, elementum a elit. Nam vulputate gravida convallis.
+                        Vestibulum feugiat vulputate velit.</p>
+
+                        <p>
+
+                            In hac habitasse platea dictumst. Aliquam erat volutpat. Mauris id tellus sapien.
+                            Vivamus nunc mi, egestas at ultrices eget, hendrerit in magna.</p></div>
+                </div>
+                <hr>
+            </div>
+        </div>
+
+        <div>
+
+
+        </div>
+
+        <div id="form_visible" class="row">
+            <div class="span16">
+                <div class="row">
+                    <div class="span10 clearfix">
+                        <label class="span2" for="id_visible">Wydarzenie publiczne</label>
+
+                        <div class="input">
+                            {{ form.visible }}
+                            {{ form.visible.errors }}
+                        </div>
+                    </div>
+                    <div class="span6 clearfix help-block"><p>Wybierz jeżeli chcesz, aby szczegóły były widoczne dla
+                        wszystkich.</p>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Terminy</legend>
+        {{ formset.management_form }}
+        {{ formset }}
+        <table id="termstable">
+            <thead>
+            <tr>
+                <th>Sala</th>
+                <th>Od</th>
+                <th>Do</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ formset.errors }}
+            {% for form in formset %}
+                {{ form }}
+                <tr>
+                    <td>{{ form.instance.classroom }}</td>
+                    <td>{{ form.instance.begin }}</td>
+                    <td>{{ form.instance.end }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div>
+            <button id="addterm" class="btn">Dodaj termin</button>
+        </div>
+    </fieldset>
+    <hr>
+    <div class="hidden" id="addTermForm">
+
+        <div class="row clearfix">
+            <div class="span16">
+                <div class="row">
+                    <div class="span8">
+
+                    <label for="term">
+                        Data
+                    </label>
+
+                    <div class="input">
+                        <div class="inline-inputs">
+                            <input id="term" type="date" class="term small" placeholder="{% now "Y-m-d" %}"
+                                   min="{% now "Y-m-d" %}">
+                            od
+                            <input id="begin" type="time" class="begin mini" placeholder="np. 8:00">
+                            do
+                            <input id="end" type="time" class="end mini" placeholder="np. 10:00">
+                        </div>
+                    </div>
+                </div>
+                <fieldset id="rooms_filter" class="span7 hidden">
+                    <legend>Filtruj sale</legend>
+                    <div class="input">
+                        <ul class="inputs-list">
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="selectsssplace" value="outside" checked>
+                                    <span>Pokaż zajęte</span>
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" name="selesssctplace" value="inside">
+                                    <span>Minimalna liczba miejsc</span>
+                                </label>
+                            </li>
+
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        </div>
+
+
+        <div class="row clearfix">
+            <div class="span16">
+                <div class="row">
+                    <div class="span10">
+
+                        <div class="input">
+                            <ul class="inputs-list">
+                                <li>
+                                    <label>
+                                        <input type="radio" name="selectplace" value="outside">
+                                        <span>Miejsce zewnętrzne</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label>
+                                        <input type="radio" name="selectplace" value="inside">
+                                        <span>Sala Instytut</span>
+                                    </label>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="span6 help-block">Wybierz <strong>Note:</strong> Labels surround all the options for
+                        much larger click areas and a more usable form.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="inputplacediv" class="row hidden">
+
+            <div class="span16">
+                <div class="row">
+                    <div class="span10">
+                        <div class="span2">
+                            <label for="inputplace">Miejsce</label>
+                        </div>
+                        <div class="input">
+                            <input type="text" id="inputplace" class="span6" placeholder="np. Instytu Matematyczny, Sala HS">
+                        </div>
+                    </div>
+                    <div class="span6 help-block">Musisz samemu zatroszczyć się o rezerwację!</div>
+                </div>
+                <hr>
+            </div>
+        </div>
+
+        <div id="canvasplacediv" class="row hidden">
+            <canvas id="can" width="700">
+                Niestety Twoja przeglądarka nie wspiera HTML5.
+            </canvas>
+        </div>
+    </div>
+    <fieldset>
+        <div>
+            <button class="btn">Zapisz</button>
+        </div>
+    </fieldset>
+    </form>
+
+{% endblock %}
