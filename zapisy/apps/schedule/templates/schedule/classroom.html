@@ -1,0 +1,39 @@
+{% extends 'schedule/classrooms.html' %}
+
+{% block classroomview %}
+    <div class="row">
+        <form method="GET">
+        <div class="span2">
+            <button type="submit" name="prevweek" value="prevweek" class="btn info">Wcześniej</button>
+        </div>
+            <div class="span6" style="margin:0 auto;text-align: center;">
+                <input type="date" name="date" value="{{ date|date:"Y-m-d" }}">
+            </div>
+            <div class="span2" style="text-align: right;">
+                <button type="submit" name="nxtweek" value="nxtweek" class="btn info">Później</button>
+            </div>
+         </form>
+    </div>
+    <div class="row">
+        <div class="span10">
+            {% regroup terms by day as terms_list %}
+            <ul>
+                    {% for term in terms_list %}
+                        <li>
+                            <span><h4>{{ term.grouper|date:"l, d E" }}</h4></span>
+                            <div>
+                                <ul>
+                                {% for t in term.list %}
+                                    <li>{{ t.start }} - {{ t.end }},  {% if t.event.course %}<a href="">{{ t.event.course }}</a>{% else %}{{ t.title }}{% endif %}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li>Brak wyników dla zapytania</li>
+                    {% endfor %}
+
+            </ul>
+        </div>
+    </div>
+{% endblock %}

@@ -4,21 +4,23 @@
 
 {% block enrollment_active %} class="active"{% endblock %}
 
+{% block main-subtitle %}Rezerwacja Sal{% endblock %}
+
 {% block system_menu %}
     <li{% block schedule_list %}{% endblock %}><a
-            href="">Sale</a></li>
-
-    <li{% block scedule_events %}{% endblock %}><a
-            href="">Wydarzenia</a></li>
+            href="{% url events:classrooms %}">Sale</a></li>
+{##}
+{#    <li{% block scedule_events %}{% endblock %}><a#}
+{#            href="">Wydarzenia</a></li>#}
 
     <li{% block schedule_session %}{% endblock %}><a
-            href="">Sesja</a></li>
+            href="{% url events:session %}">Sesja</a></li>
 
     <li{% block schedule_reservation %}{% endblock %}><a
-            href="">Rezerwuj</a></li>
+            href="{% url events:reservation %}">Rezerwuj</a></li>
 
     {% if perms.schedule.perms %}
-    <li><a href="">Zarządzaj</a></li>
+    <li {% block schedule_manage %}{% endblock %}><a href="{% url events:reservations %}">Zarządzaj</a></li>
     {% endif %}
     <li{% block schedule_myreservation %}{% endblock %}><a
             href="{% url events:history %}">Historia</a></li>

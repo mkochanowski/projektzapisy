@@ -1,3 +1,35 @@
 {% extends 'schedule/base.html' %}
 
 {% block schedule_list %} class="active"{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .hidden {dislay:none!important;}
+    </style>
+{% endblock %}
+
+{% block bread %}
+    <a href="/">Strona główna</a> &raquo;
+    <a href="/">Sale</a> &raquo;
+    Moje rezerwacje
+{% endblock %}
+
+{% block content-width %}16{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="span10">
+            {% block classroomview %}Wybierz salę{% endblock %}
+        </div>
+        <div class="span6">
+            <h5>Sale</h5>
+            <ul>
+                {% for room in rooms %}
+                    <li><a href="{% url events:classroom room.id %}">{{ room.number }}</a></li>
+                {% endfor %}
+            </ul>
+
+        </div>
+    </div>
+{% endblock %}

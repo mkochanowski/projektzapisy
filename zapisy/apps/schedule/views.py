@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 from apps.enrollment.courses.models import Classroom, Semester
-from apps.schedule.filters import EventFilter
+from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm
 from apps.schedule.models import Term, Event
 
@@ -15,10 +15,29 @@ __author__ = 'maciek'
 
 
 def classrooms(request):
+    rooms = Classroom.get_in_institute()
     return TemplateResponse(request, 'schedule/classrooms.html', locals())
 
-def classroom(request, slug):
-    return TemplateResponse(request, 'schedule/classrooms.html', locals())
+def classroom(request, id):
+    rooms = Classroom.get_in_institute()
+
+    if request.GET and 'date' in request.GET:
+        year, month, day = request.GET['date'].split('-')
+        date = datetime.date(int(year), int(month), int(day))
+    else:
+        date = datetime.date.today()
+
+    if request.GET and 'nxtweek' in request.GET:
+        date = date + datetime.timedelta(days=7)
+
+    if request.GET and 'prevweek' in request.GET:
+        date = date - datetime.timedelta(days=7)
+
+    date -= datetime.timedelta(days=date.weekday())
+    room = Classroom.get_by_id(id)
+    terms = Term.get_week(room, date)
+
+    return TemplateResponse(request, 'schedule/classroom.html', locals())
 
 @login_required
 def reservation(request, id=None):
@@ -49,14 +68,7 @@ def ajax_get_terms(request, year, month, day):
     return HttpResponse(terms, mimetype="application/json")
 
 def session(request, semester=None):
-    if not semester:
-        semester = Semester.get_current_semester()
-    else:
-        semester = Semester.get_by_id(semester)
-
-    exams = Event.get_in_semester(semester)
-    semesters = Semester.get_list()
-
+    exams = ExamFilter(request.GET, queryset=Term.get_exams())
     return TemplateResponse(request, 'schedule/session.html', locals())
 
 @login_required

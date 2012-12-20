@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from timedelta import TimedeltaField
@@ -24,6 +25,7 @@ class Event(models.Model):
     visible     = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne')
 
     status      = models.CharField(choices=statuses, max_length=1, verbose_name=u'Stan', default='0')
+    message     = models.TextField(null=True, blank=True, verbose_name=u'Wiadomość do moderatora')
     decision    = models.TextField(null=True, blank=True)
 
     course      = models.ForeignKey('courses.Course', null=True, blank=True)
@@ -89,16 +91,16 @@ class Term(models.Model):
         if not self.room and not self.place:
             raise ValidationError(u'Musisz podać salę lub miejsce.')
 
-    def validate_unique(self, *args, **kwargs):
-        from django.core.exceptions import ValidationError
-        super(Term, self).validate_unique(*args, **kwargs)
-
-        qs = self.__class__.objects.filter(
-                    (Q(start__lte=self.end, end__gte=self.end) | Q(end__gte=self.start, end__lte=self.end)), Q(event__status='1')
-                )
-
-        if qs.exists():
-            raise ValidationError(u'Sala w tym terminie jest niedostępna.')
+#    def validate_unique(self, *args, **kwargs):
+#        from django.core.exceptions import ValidationError
+#        super(Term, self).validate_unique(*args, **kwargs)
+#
+#        qs = self.__class__.objects.filter(
+#                    (Q(start__lte=self.end, end__gte=self.end) | Q(end__gte=self.start, end__lte=self.end)), Q(event__status='1')
+#                )
+#
+#        if qs.exists():
+#            raise ValidationError(u'Sala w tym terminie jest niedostępna.')
 
 
     class Meta:
@@ -107,6 +109,15 @@ class Term(models.Model):
         verbose_name = u'termin'
         verbose_name_plural = u'terminy'
 
+
+    @classmethod
+    def get_exams(cls):
+        return cls.objects.filter(event__type='0').order_by('day')
+
+    @classmethod
+    def get_week(cls, room, date):
+        next_week = date + datetime.timedelta(days=6)
+        return cls.objects.filter(room=room, day__range=(date, next_week)).select_related('event', 'event__course')
 
 
 

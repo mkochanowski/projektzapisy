@@ -32,6 +32,7 @@ class EventForm(forms.ModelForm):
         self.fields['type'].widget.attrs.update({'class' : 'span7'})
         self.fields['course'].widget.attrs.update({'class' : 'span7'})
         self.fields['description'].widget.attrs.update({'class' : 'span7', 'required': 'required'})
+        self.fields['message'].widget.attrs.update({'class' : 'span7', })
 
 
 class DecisionForm(forms.ModelForm):

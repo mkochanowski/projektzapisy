@@ -109,17 +109,20 @@
                     subject = document.getElementById('form_course'),
                     visible = document.getElementById('form_visible'),
                     title = document.getElementById('form_title'),
+                    message = document.getElementById('sendmessage_visible'),
                     onchange = function () {
                         switch (type.value) {
                             case '0':
                             case '1':
                                 subject.className = 'row';
+                                message.className = 'row';
                                 visible.className = 'row hidden';
                                 title.className = 'row hidden';
                                 break;
 
                             case '2':
                                 subject.className = 'row hidden';
+                                message.className = 'row hidden';
                                 visible.className = 'row';
                                 title.className = 'row';
                                 break;
@@ -662,11 +665,29 @@
             </div>
 
         </div>
+
+        <div id="sendmessage_visible" class="row hidden">
+            <div class="span16">
+                <div class="row">
+                    <div class="span10 clearfix">
+                        <label class="span2" for="id_message">Wiadomość do zapisanych</label>
+
+                        <div class="input">
+                            {{ form.message }}
+                            {{ form.message.errors }}
+                        </div>
+                    </div>
+                    <div class="span6 clearfix help-block"><p>Informacja o egzaminie zostanie wysłana na maila</p>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
+        </div>
     </fieldset>
     <fieldset>
         <legend>Terminy</legend>
         {{ formset.management_form }}
-        {{ formset }}
         <table id="termstable">
             <thead>
             <tr>
@@ -680,7 +701,7 @@
             <tbody>
             {{ formset.errors }}
             {% for form in formset %}
-                {{ form }}
+                <div class="hidden">{{ form }}</div>
                 <tr>
                     <td>{{ form.instance.classroom }}</td>
                     <td>{{ form.instance.begin }}</td>

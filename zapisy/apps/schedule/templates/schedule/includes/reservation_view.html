@@ -1,16 +1,17 @@
 <h3>{{ event.title }}</h3>
-                    <h6>{{ event.get_type_display }} - {{ event.get_status_display }}</h6>
-                    {% if event.course %}<h7>{{ event.course }}</h7>{% endif %}
-                    <p>{{ event.description }}</p>
-                    <hr>
-                        <h6>Lokalizacja:</h6>
-                        <ul>
-                            {% for term in event.term_set.all %}
-                                <li>{{ term.day }} - {{ term.classroom }} -od: {{ term.begin }} do: {{ term.end }}</li>
-                            {% endfor %}
-                        </ul>
-                    <hr>
-                    <ul>
-                        <li><strong>Zgłaszający: </strong><a href="">{{ event.author }}</a></li>
-                        <li><strong>Data: </strong>{{ event.created }}</li>
-                     </ul>
+<h6>{{ event.get_type_display }} - {{ event.get_status_display }}</h6>
+{% if event.course %}
+    <h7>{{ event.course }}</h7>{% endif %}
+<p>{{ event.description }}</p>
+<hr>
+<h6>Lokalizacja:</h6>
+<ul>
+    {% for term in event.term_set.all %}
+        <li>{{ term.day }} - {{ term.room }} -od: {{ term.begin }} do: {{ term.end }}</li>
+    {% endfor %}
+</ul>
+<hr>
+<ul>
+    <li><strong>Zgłaszający: </strong><a href="">{{ event.author }}</a></li>
+    <li><strong>Data: </strong>{{ event.created }}</li>
+</ul>

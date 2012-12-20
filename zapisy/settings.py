@@ -291,12 +291,15 @@ INSTALLED_APPS = (
     'apps.offer.vote',
     'apps.offer.desiderata',
     'apps.users',
+
+    'apps.schedule',
     #'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
     #'apps.mobile',
     'apps.email_change',
-    'django_extensions'
+    'django_extensions',
+    'django_filters'
 )
 
 AUTHENTICATION_BACKENDS = (
