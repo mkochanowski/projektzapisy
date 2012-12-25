@@ -83,8 +83,8 @@ def decision(request):
 
     return redirect('events:reservations')
 
-def events(request, id=None):
-    pass
+def events(request):
+    return TemplateResponse(request, 'schedule/events.html', locals())
 
 def event(request):
     pass
@@ -96,3 +96,11 @@ class ClassroomTermsAjaxView(FullCalendarView):
     def get_queryset(self):
         queryset = super(ClassroomTermsAjaxView, self).get_queryset()
         return queryset.filter(room__slug=self.kwargs['slug'])
+
+class EventsTermsAjaxView(FullCalendarView):
+    model = Term
+
+    def get_queryset(self):
+        queryset = super(EventsTermsAjaxView, self).get_queryset()
+        queryset = queryset.filter(event__type='2', event__visible=True)
+        return queryset

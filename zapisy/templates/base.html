@@ -52,11 +52,9 @@
                     <li{% block enrollment_active %}{% endblock %}><a href="{% url enrollment-main %}">System
                         Zapisów</a>
                     </li>
-                {% comment %}
-                    <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta
-                        Dydaktyczna</a></li>{% endcomment %}
                     <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
                     <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta</a></li>
+                    <li{% block events_active %}{% endblock %}><a href="{% url events:classrooms %}">Sale</a></li>
 
                 </ul>
                 {% if user.is_authenticated %}

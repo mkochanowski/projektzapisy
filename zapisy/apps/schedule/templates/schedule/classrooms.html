@@ -11,15 +11,28 @@
 
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
-    Sale
 {% endblock %}
 
 {% block content-width %}16{% endblock %}
 
 {% block content %}
     <div class="row">
+        <div class="span16">
+            <h2>{% block classroomtitle %}Sale{% endblock %}</h2>
+        </div>
+    </div>
+    <div class="row">
         <div class="span14">
-            {% block classroomview %}Wybierz salę{% endblock %}
+            {% block classroomview %}
+                <div class="row">
+                <div class="span10">
+                <div class="alert-message warning">
+                        <a class="close" href="#">×</a>
+                        <p>Wybierz salę.</p>
+                      </div>
+                </div>
+                </div>
+            {% endblock %}
         </div>
         <div class="span2">
             <h5>Sale</h5>

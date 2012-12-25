@@ -1,49 +1,13 @@
-{% extends 'schedule/classrooms.html' %}
+{% extends 'schedule/base.html' %}
 
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
-    <a href="{% url events:classrooms %}">Sale</a> &raquo;
 {% endblock %}
+
+{% block scedule_events %} class="active"{% endblock %}
 
 {% block js %}{{ block.super }}
     <link rel='stylesheet' type='text/css' href='/site_media/js/fullcalendar/fullcalendar.css'/>
-    <style>
-
-
-        .tbl-border {
-        	border: 1px solid #d9deeb;
-        }
-
-        .tbl {
-        	font-size: 11px;
-        	color: #333;
-        	background-color: #fff;
-        	padding: 6px;
-        }
-
-        .tbl1 {
-        	font-size: 11px;
-        	color: #333;
-        	background-color: #fff;
-        	padding: 6px;
-        }
-
-        .tbl1 a, .tbl2 a {
-        	font-size: 12px;
-        }
-
-        .tbl1 a.profile-link, .tbl2 a.profile-link {
-        	font-size: 11px;
-        }
-
-        .tbl2 {
-        	font-size: 11px;
-        	color: #333;
-        	background-color: #ECEFF5;
-        	padding: 6px;
-        }
-
-    </style>
     <script type="text/javascript" src="/site_media/js/fullcalendar/fullcalendar.js"></script>
     <script>
 
@@ -102,38 +66,22 @@
                 maxTime:22,
 
                 axisFormat:'HH(:mm)',
-                events: '{% url events:classroom_ajax room.slug %}'
+                events: '{% url events:events_ajax %}'
             });
 
         });
 
     </script>{% endblock %}
 
-{% block classroomtitle %}Sala {{ room.number }}{% endblock %}
-
-{% block classroomview %}
-
-    <div class="row" style="margin-left: -40px;">
-        <div class="span14">
-
-            <table class="span10" cellpadding="0" cellspacing="1" class="tbl-border" style="border: 1px solid #D9DEEB;border-bottom: 0px;">
-            		<tbody><tr>
-            		<td class="tbl2" width="12%"><strong>Piętro</strong></td>
-            		<td class="tbl1" width="*">{{ room.get_floor_display }}</td>
-            		<td class="tbl2" width="12%"><b>Pojemność</b></td>
-            		<td class="tbl1" width="20%">{{ room.capacity }}</td>
-            		</tr>
-            		<tr>
-            <td class="tbl2"><b>Wyposażenie:</b></td>
-            <td colspan="3" class="tbl1">
-            {% if room.equipment %}{{ room.equipment }}{% else %}Brak informacji{% endif %}
-
-            </td></tr></tbody></table>
+{% block content %}
+    <div class="row">
+        <div class="span16">
+            <h2>Wydarzenia</h2>
         </div>
     </div>
     <div class="row">
-        <div class="span14">
-            <div id='calendar'></div>
+        <div class="span16">
+                <div id='calendar'></div>
         </div>
     </div>
 {% endblock %}

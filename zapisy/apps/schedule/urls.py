@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from apps.schedule.views import ClassroomTermsAjaxView
+from apps.schedule.views import ClassroomTermsAjaxView, EventsTermsAjaxView
 
 __author__ = 'maciek'
 
@@ -13,7 +13,8 @@ urlpatterns = patterns('apps.schedule.views',
     url(r'^classrooms/reservations$', 'reservations', name='reservations'),
     url(r'^classrooms/(?P<slug>[0-9]+)$', 'classroom', name='classroom'),
     url(r'^classrooms/ajax/(?P<slug>[0-9]+)$', ClassroomTermsAjaxView.as_view(), name='classroom_ajax'),
-    url(r'^events/(?P<id>[0-9]+)$', 'events', name='event_show'),
+    url(r'^events$', 'events', name='event_show'),
+    url(r'^events/ajax$', EventsTermsAjaxView.as_view(), name='events_ajax'),
     url(r'^events/decision$', 'decision', name='decision'),
     url(r'^events/history$', 'history', name='history'),
     url(r'^session$', 'session', name='session'),
