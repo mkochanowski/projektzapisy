@@ -29,6 +29,7 @@ class Event(models.Model):
     decision    = models.TextField(null=True, blank=True)
 
     course      = models.ForeignKey('courses.Course', null=True, blank=True)
+    group       = models.ForeignKey('courses.Group',  null=True, blank=True)
 
     author      = models.ForeignKey('auth.User', verbose_name=u'Twórca')
     created     = models.DateTimeField(auto_now_add=True)
@@ -43,6 +44,8 @@ class Event(models.Model):
         super(Event, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
+        if self.group:
+            return reverse('records-group', args=[self.group_id])
         return reverse('events:event_show', args=[str(self.id)])
 
 
@@ -65,6 +68,7 @@ class Event(models.Model):
     @classmethod
     def get_for_user(cls, user):
         return cls.objects.filter(author=user).select_related('course', 'author').prefetch_related('term_set')
+
 
 class Term(models.Model):
     """

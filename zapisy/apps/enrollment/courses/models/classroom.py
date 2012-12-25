@@ -1,19 +1,30 @@
 # -*- coding: utf8 -*-
+from django.core.urlresolvers import reverse
 
 from django.db import models
 import json
 from django.db.models import Q
+from autoslug import AutoSlugField
+
+floors = [(0, 'Parter'), (1, 'I piętro'), (2, 'II Piętro'), (3, 'III piętro')]
 
 class Classroom( models.Model ):
     """classroom in institute"""
+    slug =  AutoSlugField(populate_from='number', unique_with='number')
     number = models.CharField( max_length = 20, verbose_name = 'numer sali' )
     building = models.CharField( max_length = 75, verbose_name = 'budynek', blank=True, default='' )
-    capacity = models.PositiveSmallIntegerField(default=0, verbose_name='liczba miejsc')   
+    capacity = models.PositiveSmallIntegerField(default=0, verbose_name='liczba miejsc')
+    floor = models.IntegerField(choices=floors, null=True, blank=True)
+    can_reserve = models.BooleanField(default=False)
+
     
     class Meta:
         verbose_name = 'sala'
         verbose_name_plural = 'sale'
         app_label = 'courses'
+
+    def get_absolute_url(self):
+        return reverse('events:classroom', args=[self.slug])
     
     def __unicode__(self):
         return self.number + ' ('+str(self.capacity)+')'
@@ -25,6 +36,10 @@ class Classroom( models.Model ):
     @classmethod
     def get_by_id(cls, id):
         return cls.objects.get(id=id)
+
+    @classmethod
+    def get_by_slug(cls, slug):
+        return cls.objects.get(slug=slug)
 
 
     @classmethod
@@ -56,5 +71,10 @@ class Classroom( models.Model ):
 
 
     @classmethod
-    def get_in_institute(cls):
-        return cls.objects.all()
+    def get_in_institute(cls, reservation=False):
+        rooms = cls.objects.all()
+
+        if reservation:
+            rooms = rooms.filter(can_reserve=True).order_by('floor', 'number')
+
+        return rooms

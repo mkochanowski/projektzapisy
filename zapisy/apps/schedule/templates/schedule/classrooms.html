@@ -11,22 +11,21 @@
 
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
-    <a href="/">Sale</a> &raquo;
-    Moje rezerwacje
+    Sale
 {% endblock %}
 
 {% block content-width %}16{% endblock %}
 
 {% block content %}
     <div class="row">
-        <div class="span10">
+        <div class="span14">
             {% block classroomview %}Wybierz salę{% endblock %}
         </div>
-        <div class="span6">
+        <div class="span2">
             <h5>Sale</h5>
             <ul>
                 {% for room in rooms %}
-                    <li><a href="{% url events:classroom room.id %}">{{ room.number }}</a></li>
+                    <li><a href="{{ room.get_absolute_url }}">{{ room.number }}</a></li>
                 {% endfor %}
             </ul>
 

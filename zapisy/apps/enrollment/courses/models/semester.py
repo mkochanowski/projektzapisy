@@ -19,6 +19,10 @@ class Semester( models.Model ):
     year = models.CharField(max_length=7, default='0', verbose_name='rok akademicki')
     records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów', help_text='Godzina powinna być ustawiona na 00:00:00, by studenci mieli otwarcie między 10:00 a 22:00.') 
     records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
+
+    lectures_beginning = models.DateField(null=True, blank=True, verbose_name='Dzień rozpoczęcia zajęć')
+    lectures_ending = models.DateField(null=True, blank=True, verbose_name='Dzień zakończenia zajęć')
+
     semester_beginning = models.DateField(null = False, verbose_name='Data rozpoczęcia semestru')
     semester_ending = models.DateField(null = False, verbose_name='Data zakończenia semestru')
     desiderata_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia dezyderat')
@@ -149,3 +153,28 @@ class Semester( models.Model ):
 
     def __unicode__(self):
         return self.get_name()
+
+class Freeday(models.Model):
+    day = models.DateField(verbose_name='dzień wolny')
+
+    def __unicode__(self):
+        return str(self.day)
+
+    class Meta:
+        verbose_name = 'dzień wolny od zajęć'
+        verbose_name_plural = 'dni wolne od zajęć'
+        app_label = 'courses'
+
+DAYS_OF_WEEK = [( '1', 'poniedziałek' ), ( '2', 'wtorek' ), ( '3', 'środa' ), ( '4', 'czwartek'), ( '5', 'piątek'), ( '6', 'sobota'), ( '7', 'niedziela')]
+class ChangedDay(models.Model):
+    day = models.DateField(verbose_name='dzień')
+    weekday = models.CharField(choices=DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
+
+    def __unicode__(self):
+        return str(self.day) + ' -> ' + str(self.get_weekday_display())
+
+    class Meta:
+        verbose_name = 'dzień zmienony na inny'
+        verbose_name_plural = 'dni zmienione na inne'
+        app_label = 'courses'
+

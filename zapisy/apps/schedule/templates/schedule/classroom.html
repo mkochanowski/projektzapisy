@@ -1,39 +1,112 @@
 {% extends 'schedule/classrooms.html' %}
 
+
+
+{% block bread %}
+    <a href="/">Strona główna</a> &raquo;
+    <a href="/">Sale</a> &raquo;
+    {{ room.number }}
+{% endblock %}
+
+{% block js %}{{ block.super }}
+    <link rel='stylesheet' type='text/css' href='/site_media/js/fullcalendar/fullcalendar.css'/>
+    <script type="text/javascript" src="/site_media/js/fullcalendar/fullcalendar.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            $('#calendar').fullCalendar({
+                {#               defaultView: 'BasicWeek',#}
+                header:{
+                    left:'prev,next today',
+                    center:'title',
+                    right:'month,agendaWeek,agendaDay'
+                },
+
+                {##}
+                               defaultView: 'agendaWeek',
+
+                allDayDefault:false,
+                buttonText:{
+                    prev:'&nbsp;&#9668;&nbsp;',
+                    next:'&nbsp;&#9658;&nbsp;',
+                    prevYear:'&nbsp;&lt;&lt;&nbsp;',
+                    nextYear:'&nbsp;&gt;&gt;&nbsp;',
+                    today:'dziś',
+                    month:'miesiąc',
+                    week:'tydzień',
+                    day:'dzień'
+                },
+                monthNames:['Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec', 'Lipiec',
+                    'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'],
+                monthNamesShort:['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip',
+                    'Sie', 'Wrz', 'Paź', 'Lis', 'Gru'],
+                dayNames:['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
+                dayNamesShort:['Ni', 'Pn', 'Wt', 'Śr', 'Cz', 'Pi', 'So'],
+                firstHour:8,
+                firstDay:1,
+                allDaySlot:false,
+
+                // time formats
+                titleFormat:{
+                    month:'MMMM yyyy',
+                    week:"d {'&#8212;' d} MMM[ yyyy]{ [ MMM] yyyy}",
+                    day:'dddd, d MMM, yyyy'
+                },
+
+                columnFormat:{
+                    month:'ddd',
+                    week:'ddd d.M',
+                    day:'dddd d.M'
+                },
+                timeFormat:{ // for event elements
+                    '':'HH(:mm)', // default
+
+                    agenda:'HH:mm{ - HH:mm}'
+                },
+                minTime:8,
+                maxTime:22,
+
+                axisFormat:'HH(:mm)',
+                events: '{% url events:classroom_ajax room.slug %}'
+            });
+
+        });
+
+    </script>{% endblock %}
+
 {% block classroomview %}
+
     <div class="row">
-        <form method="GET">
-        <div class="span2">
-            <button type="submit" name="prevweek" value="prevweek" class="btn info">Wcześniej</button>
+        <div class="span14">
+            <h3>Informacje</h3>
+            <table>
+                <tbody>
+                <tr>
+                    <th style="width:150px">
+                        Sala
+                    </th>
+                    <td>{{ room.number }}</td>
+                </tr>
+                <tr>
+                    <th style="width:150px">
+                        Piętro
+                    </th>
+                    <td>{{ room.get_floor_display }}</td>
+                </tr>
+                <tr>
+                    <th style="width:150px">
+                        Pojemność
+                    </th>
+                    <td>{{ room.capacity }}</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-            <div class="span6" style="margin:0 auto;text-align: center;">
-                <input type="date" name="date" value="{{ date|date:"Y-m-d" }}">
-            </div>
-            <div class="span2" style="text-align: right;">
-                <button type="submit" name="nxtweek" value="nxtweek" class="btn info">Później</button>
-            </div>
-         </form>
     </div>
     <div class="row">
-        <div class="span10">
-            {% regroup terms by day as terms_list %}
-            <ul>
-                    {% for term in terms_list %}
-                        <li>
-                            <span><h4>{{ term.grouper|date:"l, d E" }}</h4></span>
-                            <div>
-                                <ul>
-                                {% for t in term.list %}
-                                    <li>{{ t.start }} - {{ t.end }},  {% if t.event.course %}<a href="">{{ t.event.course }}</a>{% else %}{{ t.title }}{% endif %}</li>
-                                {% endfor %}
-                                </ul>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li>Brak wyników dla zapytania</li>
-                    {% endfor %}
-
-            </ul>
+        <div class="span14">
+            <div id='calendar'></div>
         </div>
     </div>
 {% endblock %}

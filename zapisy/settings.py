@@ -299,7 +299,8 @@ INSTALLED_APPS = (
     #'apps.mobile',
     'apps.email_change',
     'django_extensions',
-    'django_filters'
+    'django_filters',
+    'autoslug'
 )
 
 AUTHENTICATION_BACKENDS = (

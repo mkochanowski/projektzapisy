@@ -101,6 +101,7 @@ class SemesterAdmin(admin.ModelAdmin):
         (None,               {'fields': ['year','type','visible']}),
         ('Ocena', {'fields': ['is_grade_active']}),
         ('Czas trwania semestru', {'fields': ['semester_beginning','semester_ending']}),
+        ('Czas trwania zajęć', {'fields': ['lectures_beginning','lectures_ending']}),
         ('Czas trwania zapisów', {'fields': ['records_opening','records_ects_limit_abolition','records_closing']}),
         ('Czas trwania dezyderat', {'fields': ['desiderata_opening', 'desiderata_closing']}),
     ]
@@ -294,6 +295,8 @@ admin.site.register(Group, GroupAdmin)
 admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Term, TermAdmin)
 admin.site.register(Semester, SemesterAdmin)
+admin.site.register(Freeday)
+admin.site.register(ChangedDay)
 admin.site.register(Type, TypeAdmin)
 admin.site.register(PointTypes)
 admin.site.register(PointsOfCourseEntities)

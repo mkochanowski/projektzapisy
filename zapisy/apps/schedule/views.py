@@ -2,6 +2,7 @@
 import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
@@ -10,32 +11,21 @@ from apps.enrollment.courses.models import Classroom, Semester
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm
 from apps.schedule.models import Term, Event
+from apps.utils.fullcalendar import FullCalendarView
 
 __author__ = 'maciek'
 
 
 def classrooms(request):
-    rooms = Classroom.get_in_institute()
+    rooms = Classroom.get_in_institute(reservation=True)
     return TemplateResponse(request, 'schedule/classrooms.html', locals())
 
-def classroom(request, id):
-    rooms = Classroom.get_in_institute()
-
-    if request.GET and 'date' in request.GET:
-        year, month, day = request.GET['date'].split('-')
-        date = datetime.date(int(year), int(month), int(day))
-    else:
-        date = datetime.date.today()
-
-    if request.GET and 'nxtweek' in request.GET:
-        date = date + datetime.timedelta(days=7)
-
-    if request.GET and 'prevweek' in request.GET:
-        date = date - datetime.timedelta(days=7)
-
-    date -= datetime.timedelta(days=date.weekday())
-    room = Classroom.get_by_id(id)
-    terms = Term.get_week(room, date)
+def classroom(request, slug):
+    rooms = Classroom.get_in_institute(reservation=True)
+    try:
+        room = Classroom.get_by_slug(slug)
+    except ObjectDoesNotExist:
+        raise Http404
 
     return TemplateResponse(request, 'schedule/classroom.html', locals())
 
@@ -99,3 +89,10 @@ def events(request, id=None):
 def event(request):
     pass
 
+
+class ClassroomTermsAjaxView(FullCalendarView):
+    model = Term
+
+    def get_queryset(self):
+        queryset = super(ClassroomTermsAjaxView, self).get_queryset()
+        return queryset.filter(room__slug=self.kwargs['slug'])

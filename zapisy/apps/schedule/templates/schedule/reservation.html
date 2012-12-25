@@ -558,11 +558,7 @@
                             </div>
                             {{ form.type.errors }}
                         </div>
-                        <div class="span6 clearfix help-block"><p>Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit. Sed
-                            mollis sem nec ipsum dapibus semper. Mauris ultricies nisl eu lectus bibendum
-                            ullamcorper. Nam dui ante, ornare a vestibulum et, elementum a elit. Nam vulputate
-                            gravida convallis. Vestibulum feugiat vulputate velit.</p>
+                        <div class="span6 clearfix"><p class=" help-block"><strong>Egzaminy</strong> i <strong>kolokwia</strong> są związane z przedmiotami. Nie wymagają akceptacji przez administratora.</p>
                         </div>
                     </div>
                     <hr>
@@ -584,8 +580,8 @@
                             </div>
                         </div>
 
-                        <div class="span6 clearfix  help-block">
-                            <p>Wybierz przedmiot.</p>
+                        <div class="span6 clearfix">
+                            <p class="help-block">Wybierz przedmiot spośród prowadzonych przez siebie.</p>
                         </div>
                     </div>
                     <hr>
@@ -687,6 +683,14 @@
     </fieldset>
     <fieldset>
         <legend>Terminy</legend>
+
+        {% if formset.errors %}
+            <ul>
+            {% for error in formset.errors %}
+                <li class="error">{{ error }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
         {{ formset.management_form }}
         <table id="termstable">
             <thead>
@@ -699,7 +703,6 @@
             </tr>
             </thead>
             <tbody>
-            {{ formset.errors }}
             {% for form in formset %}
                 <div class="hidden">{{ form }}</div>
                 <tr>
