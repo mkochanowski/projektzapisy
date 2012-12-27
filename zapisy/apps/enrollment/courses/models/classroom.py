@@ -1,10 +1,12 @@
 # -*- coding: utf8 -*-
+from datetime import time
 from django.core.urlresolvers import reverse
 
 from django.db import models
 import json
 from django.db.models import Q
 from autoslug import AutoSlugField
+from apps.schedule.models import Term
 
 floors = [(0, 'Parter'), (1, 'I piętro'), (2, 'II Piętro'), (3, 'III piętro')]
 
@@ -44,9 +46,8 @@ class Classroom( models.Model ):
 
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
-        rooms = cls.objects.filter(Q(event_terms__day__exact=date)|Q(event_terms__isnull=True))\
-            .prefetch_related('event_terms')\
-            .select_related('event_terms__event')
+        rooms = cls.get_in_institute(reservation=True)
+        terms = Term.objects.filter(day=date, room__in=rooms).select_related('room', 'event')
 
         if not ajax:
             return rooms
@@ -62,10 +63,11 @@ class Classroom( models.Model ):
                                        'title': room.number,
                                        'terms': []}
 
-            for term in room.event_terms.all():
-                result[room.number]['terms'].append({'begin': term.start,
-                                             'end': term.end,
-                                             'title': term.event.title})
+        for term in terms:
+            result[term.room.number]['terms'].append({'begin': ':'.join(str(term.start).split(':')[:2]),
+                                         'end': ':'.join(str(term.end).split(':')[:2]),
+                                         'title': term.event.title})
+
 
         return json.dumps(result)
 

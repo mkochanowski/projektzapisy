@@ -1,5 +1,5 @@
 {% extends "schedule/base.html" %}
-
+{% load endless %}
 {% block schedule_manage %} class="active"{% endblock %}
 {% block css %}
     {{ block.super }}
@@ -21,74 +21,74 @@
 
     };
     $(function(){ReservationsView();});
-    </script>
+    </script>    <style>
+
+
+            .tbl-border {
+            	border: 1px solid #d9deeb;
+            }
+
+            .tbl {
+            	font-size: 11px;
+            	color: #333;
+            	background-color: #fff;
+            	padding: 6px;
+            }
+
+            .tbl1 {
+            	font-size: 11px;
+            	color: #333;
+            	background-color: #fff;
+            	padding: 6px;
+            }
+
+            .tbl1 a, .tbl2 a {
+            	font-size: 12px;
+            }
+
+            .tbl1 a.profile-link, .tbl2 a.profile-link {
+            	font-size: 11px;
+            }
+
+            .tbl2 {
+            	font-size: 11px;
+            	color: #333;
+            	background-color: #ECEFF5;
+            	padding: 6px;
+            }
+
+        </style>
 {% endblock %}
 
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
-    <a href="/">Sale</a> &raquo;
-    Rezerwacje
+    <a href="{% url events:classrooms %}">Sale</a> &raquo;
 {% endblock %}
 
 {% block content-width %}16{% endblock %}
 
 {% block content %}
+
+    {% with events.qs as qs %}
+    <div class="row">
+        <div class="span16">
+            <h2>{{ title }}</h2>
+        </div>
+    </div>
+
+
     <div class="row">
     <div class="span10">
-        <ul>
-        {% for event in events %}
-            <li>
+
+            {% paginate qs %}
+
+        {% for event in qs %}
                 <div>
-                    {% include "schedule/includes/reservation_view.html" with event=event %}
-                    {% if event.status == '0' %}
-                    <div class="right">
-                        <a class="showdecisionform">Rozpatrz</a>
-                    </div>
-                    <form action="{% url events:decision %}" class="decisionform hidden" method="POST">
-                    <fieldset>
-                        {% csrf_token %}
-                        <input type="hidden" name="eventid" value="{{ event.id }}">
-
-                        <div class="clearfix">
-                                    <label id="optionsCheckboxes">Decyzja</label>
-                                    <div class="input">
-                                      <ul class="inputs-list">
-                                        <li>
-                                          <label>
-                                            <input type="radio" name="status" value="1">
-                                            <span>Akceptacja</span>
-                                          </label>
-                                        </li>
-                                        <li>
-                                          <label>
-                                            <input type="radio" name="status" value="2">
-                                            <span>Odrzucenie</span>
-                                          </label>
-                                        </li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                        <div class="clearfix">
-                                    <label for="decision">Uzasadnienie</label>
-                                    <div class="input">
-                                         <textarea class="xlarge" name="decision" id="decision" rows="3""></textarea>
-                                    </div>
-                         </div>
-                    </fieldset>
-
-                    <div class="right">
-                        <input type="submit" value="Zapisz" class="btn success">
-                    </div>
-
-                    </form>
-                    {% endif %}
-
+                    {% include "schedule/includes/reservation_view.html" with event=event title=title %}
                 </div>
-            </li>
         {% empty %}
-            <li>Brak wyników dla zapytania</li>
+            Brak wyników dla zapytania
         {% endfor %}
-        </ul>
     </div>
     <div class="span6">
 
@@ -111,4 +111,11 @@
 
     </div>
     </div>
+    <div class="row">
+        <div class="span16">
+
+            {% show_pages %}
+        </div>
+    </div>
+        {% endwith %}
 {% endblock %}

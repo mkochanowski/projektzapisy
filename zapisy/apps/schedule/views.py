@@ -3,14 +3,15 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 from apps.enrollment.courses.models import Classroom, Semester
 from apps.schedule.filters import EventFilter, ExamFilter
-from apps.schedule.forms import EventForm, TermFormSet, DecisionForm
-from apps.schedule.models import Term, Event
+from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, EventModerationMessageForm, EventMessageForm
+from apps.schedule.models import Term, Event, EventModerationMessage, EventMessage
 from apps.utils.fullcalendar import FullCalendarView
 
 __author__ = 'maciek'
@@ -34,7 +35,7 @@ def reservation(request, id=None):
     form = EventForm(data = request.POST or None, user=request.user)
     if form.is_valid():
         event = form.save(commit=False)
-        event.set_user(request.user)
+        event.author = request.user
         formset = TermFormSet(request.POST or None, instance=event)
         if formset.is_valid():
             event.save()
@@ -63,17 +64,19 @@ def session(request, semester=None):
 
 @login_required
 def reservations(request):
-    events = EventFilter(request.GET, queryset=Event.get_from_request())
+    events = EventFilter(request.GET, queryset=Event.get_all())
+    title = u'Zarządzaj rezerwacjami'
     return TemplateResponse(request, 'schedule/reservations.html', locals())
 
 @login_required
 def history(request):
     events = EventFilter(request.GET, queryset=Event.get_for_user(request.user))
+    title = u'Moje rezerwacje'
     return TemplateResponse(request, 'schedule/history.html', locals())
 
 @require_POST
-def decision(request):
-    event = Event.objects.get(id=request.POST['eventid'])
+def decision(request, id):
+    event = Event.get_event_for_moderation_only_or_404(id, request.user)
     form = DecisionForm(request.POST, instance=event)
     if form.is_valid():
         form.save()
@@ -81,13 +84,77 @@ def decision(request):
     else:
         messages.error(request, u'Coś poszło źle')
 
-    return redirect('events:reservations')
+    return redirect(reverse('events:show', args=[str(event.id)]))
 
 def events(request):
     return TemplateResponse(request, 'schedule/events.html', locals())
 
-def event(request):
-    pass
+@login_required
+def event(request, id):
+    event = Event.get_event_or_404(id, request.user)
+    moderation_messages = EventModerationMessage.get_event_messages(event)
+    moderation_form     = EventModerationMessageForm()
+    event_messages            = EventMessage.get_event_messages(event)
+    messages_form       = EventMessageForm()
+    decision_form       = DecisionForm(instance=event)
+
+    return TemplateResponse(request, 'schedule/event.html', locals())
+
+@login_required
+@require_POST
+def moderation_message(request, id):
+    event = Event.get_event_for_moderation_or_404(id, request.user)
+    form  = EventModerationMessageForm(request.POST)
+    if form.is_valid():
+        moderation_message = form.save(commit=False)
+        moderation_message.event   = event
+        moderation_message.author  = request.user
+        moderation_message.save()
+
+        messages.success(request, u"Wiadomość została wysłana")
+        messages.info(request, u"Wiadomość została również wysłana emailem")
+
+        return redirect( reverse('events:show', args=[str(event.id)]) )
+
+    raise Http404
+
+@login_required
+@require_POST
+def message(request, id):
+    event = Event.get_event_for_moderation_or_404(id, request.user)
+    form  = EventMessageForm(request.POST)
+    if form.is_valid():
+        message = form.save(commit=False)
+        message.event   = event
+        message.author  = request.user
+
+        message.save()
+
+        messages.success(request, u"Wiadomość została wysłana")
+        messages.info(request, u"Wiadomość została również wysłana emailem")
+
+        return redirect( reverse('events:show', args=[str(event.id)]) )
+
+    raise Http404
+
+@login_required
+@require_POST
+def change_interested(request, id):
+    event = Event.get_event_or_404(id, request.user)
+    if request.user in event.interested.all():
+        event.interested.remove(request.user)
+        messages.success(request, u'Nie obsereujesz już wydarzenia')
+    else:
+        event.interested.add(request.user)
+        messages.success(request, u'Obserwujesz wydarzenie')
+
+        return redirect( event )
+
+    raise Http404
+
+"""
+AJAX views
+"""
 
 
 class ClassroomTermsAjaxView(FullCalendarView):

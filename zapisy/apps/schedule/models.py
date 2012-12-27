@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from timedelta import TimedeltaField
 import json
 
@@ -25,30 +28,33 @@ class Event(models.Model):
     visible     = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne')
 
     status      = models.CharField(choices=statuses, max_length=1, verbose_name=u'Stan', default='0')
-    message     = models.TextField(null=True, blank=True, verbose_name=u'Wiadomość do moderatora')
-    decision    = models.TextField(null=True, blank=True)
 
     course      = models.ForeignKey('courses.Course', null=True, blank=True)
     group       = models.ForeignKey('courses.Group',  null=True, blank=True)
+
+    interested  = models.ManyToManyField('auth.User', related_name='interested_events')
 
     author      = models.ForeignKey('auth.User', verbose_name=u'Twórca')
     created     = models.DateTimeField(auto_now_add=True)
     edited      = models.DateTimeField(auto_now=True)
 
-    def set_user(self, user):
-        self.author = user
 
     def save(self, *args, **kwargs):
-        if self.author.employee and self.type in ['0','1']:
-            self.status = '1'
+        """
+        Overload save method.
+        If author is employee and try reserve room for exam - accept it
+        If author has perms to manage events - accept it
+        """
+        if not self.pk:
+            if (self.author.employee and self.type in ['0','1']) or \
+                self.author.has_perm('schedule.manage_events'):
+                self.status = '1'
         super(Event, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         if self.group:
             return reverse('records-group', args=[self.group_id])
-        return reverse('events:event_show', args=[str(self.id)])
-
-
+        return reverse('events:show', args=[str(self.id)])
 
     class Meta:
         verbose_name = u'wydarzenie'
@@ -57,17 +63,108 @@ class Event(models.Model):
             ("manage_events", u"Może zarządzać wydarzeniami"),
         )
 
-    @classmethod
-    def get_from_request(cls, request=None):
-        return cls.objects.all().select_related('course', 'author').prefetch_related('term_set')
+    def _user_can_see_or_404(self, user):
+        """
+
+        Private method. Return True if user can see event, otherwise False.
+
+        @param user: auth.User
+        @return: Boolean
+        """
+
+        if not self.author == user and not user.has_perm('schedule.manage_events'):
+            if not self.visible or self.type <> '2' or not self.status <> '1':
+                return False
+
+        return True
 
     @classmethod
-    def get_in_semester(cls, semester):
-        return cls.objects.filter(course__semester=semester, status='1', type='0').select_related('course', 'course__entity')
+    def get_event_or_404(cls, id, user):
+        """
+
+        If events exist and user can see it - return
+        otherwise raise Http404
+
+        @param id: Integer Number
+        @param user:  auth.User
+        @return: Event object
+        """
+        try:
+            event = cls.objects.select_related('group', 'course', 'course__entity', 'author')\
+                                     .prefetch_related('term_set', 'term_set__room').get(pk=id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if event._user_can_see_or_404(user):
+            return event
+        else:
+            raise Http404
+
+    @classmethod
+    def get_event_for_moderation_or_404(cls, id, user):
+        """
+
+        If events exist and user can send moderation message - return it
+        otherwise raise Http404
+
+        @param id: Integer Number
+        @param user:  auth.User
+        @return: Event object
+        """
+        try:
+            event = cls.objects.select_related('group', 'course', 'course__entity', 'author')\
+                                     .prefetch_related('term_set', 'term_set__room').get(pk=id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if event.author == user or user.has_perm('schedule.manage_events'):
+            return event
+        else:
+            raise Http404
+
+    @classmethod
+    def get_event_for_moderation_only_or_404(cls, id, user):
+        """
+
+        If events exist and user can send moderation message - return it
+        otherwise raise Http404
+
+        @param id: Integer Number
+        @param user:  auth.User
+        @return: Event object
+        """
+        try:
+            event = cls.objects.select_related('group', 'course', 'course__entity', 'author')\
+                                     .prefetch_related('term_set', 'term_set__room').get(pk=id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+
+        if user.has_perm('schedule.manage_events'):
+            return event
+        else:
+            raise Http404
+
+    @classmethod
+    def get_all(cls):
+        """
+
+        Return all events with all needed select_related and prefetch_related
+
+        @return: Event QuerySet
+        """
+        return cls.objects.all().select_related('group', 'course', 'course__entity', 'author')\
+                                 .prefetch_related('term_set', 'term_set__room')
 
     @classmethod
     def get_for_user(cls, user):
-        return cls.objects.filter(author=user).select_related('course', 'author').prefetch_related('term_set')
+        """
+        Get list of events, where user is author
+
+        @param user: auth.User object
+        @return: Event QuerySet
+        """
+        return cls.objects.filter(author=user).select_related('course', 'course__entity', 'author').prefetch_related('term_set')
 
 
 class Term(models.Model):
@@ -95,18 +192,6 @@ class Term(models.Model):
         if not self.room and not self.place:
             raise ValidationError(u'Musisz podać salę lub miejsce.')
 
-#    def validate_unique(self, *args, **kwargs):
-#        from django.core.exceptions import ValidationError
-#        super(Term, self).validate_unique(*args, **kwargs)
-#
-#        qs = self.__class__.objects.filter(
-#                    (Q(start__lte=self.end, end__gte=self.end) | Q(end__gte=self.start, end__lte=self.end)), Q(event__status='1')
-#                )
-#
-#        if qs.exists():
-#            raise ValidationError(u'Sala w tym terminie jest niedostępna.')
-
-
     class Meta:
         get_latest_by = 'end'
         ordering = ['start', 'end']
@@ -116,12 +201,73 @@ class Term(models.Model):
 
     @classmethod
     def get_exams(cls):
+        """
+        Get list of events with type 'exam'
+
+        @return: Term QuerySet
+        """
         return cls.objects.filter(event__type='0').order_by('day')
 
+
+class EventModerationMessage(models.Model):
+    author  = models.ForeignKey('auth.User', verbose_name=u'Autor')
+    event   = models.ForeignKey(Event, verbose_name=u'Wydarzenie')
+    message = models.TextField(verbose_name=u'Wiadomość')
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        get_latest_by ='created'
+        ordering = ['created']
+        verbose_name = u'wiadomość wydarzenia'
+        verbose_name_plural = u'wiadomości wydarzenia'
+
+
     @classmethod
-    def get_week(cls, room, date):
-        next_week = date + datetime.timedelta(days=6)
-        return cls.objects.filter(room=room, day__range=(date, next_week)).select_related('event', 'event__course')
+    def get_event_messages(cls, event):
+        """
+
+        Get list of EventMessages for event
+
+        @param event: Event object
+        @return: list of EventModerationMessage
+        """
+
+        return cls.objects.filter(event=event).select_related('author')
 
 
+class Message(models.Model):
+    author  = models.ForeignKey('auth.User', verbose_name=u'Autor')
+    event   = models.ForeignKey(Event, verbose_name=u'Wydarzenie')
+    message = models.TextField(verbose_name=u'Wiadomość')
+    created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        get_latest_by ='created'
+        ordering = ['created']
+        abstract = True
+
+
+    @classmethod
+    def get_event_messages(cls, event):
+        """
+
+        Get list of EventMessages for event
+
+        @param event: Event object
+        @return: list of EventModerationMessage
+        """
+
+        return cls.objects.filter(event=event).select_related('author')
+
+
+class EventModerationMessage(Message):
+
+    class Meta:
+        verbose_name = u'wiadomość moderacji wydarzenia'
+        verbose_name_plural = u'wiadomości moderacji wydarzenia'
+
+class EventMessage(Message):
+
+    class Meta:
+        verbose_name = u'wiadomość wydarzenia'
+        verbose_name_plural = u'wiadomości wydarzenia'

@@ -300,7 +300,8 @@ INSTALLED_APPS = (
     'apps.email_change',
     'django_extensions',
     'django_filters',
-    'autoslug'
+    'autoslug',
+    'endless_pagination',
 )
 
 AUTHENTICATION_BACKENDS = (

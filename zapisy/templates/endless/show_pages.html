@@ -1,0 +1,20 @@
+<div class="pagination">
+    <ul>
+        {% for page in pages %}
+        {% if forloop.first %}
+            <li class="prev{% if page.is_first %} disabled{% endif %}"><a href="{{ page.url }}">&larr; Previous</a></li>
+        {% elif forloop.last %}
+            <li class="next{% if page.last %} disabled{% endif %}"><a href="{{ page.url }}">Next &rarr;</a></li>
+        {% else %}
+        {% if not page %}
+        <li class="disabled"><a href="#">…</a></li>
+        {% else %}
+
+            <li{% if page.is_current %} class="active"{% endif %}><a href="{{ page.url }}">{{ page.label }}</a></li>
+        {% endif %}
+
+        {% endif %}
+        {% endfor %}
+  </ul>
+</div>
+

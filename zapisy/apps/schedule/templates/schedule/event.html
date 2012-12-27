@@ -1,0 +1,334 @@
+{% extends 'schedule/base.html' %}
+
+{% block scedule_events %} class="active"{% endblock %}
+
+
+{% block bread %}
+    <a href="/">Strona główna</a> &raquo;
+    <a href="{% url events:classrooms %}">Sale</a> &raquo;
+    <a href="{% url events:event_show %}">Wydarzenia</a> &raquo;
+{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <style>
+
+
+        .tbl-border {
+            border: 1px solid #d9deeb;
+        }
+
+
+        .tbl1 {
+            font-size: 11px;
+            color: #333;
+            background-color: #fff;
+            padding: 6px;
+        }
+
+        .tbl1 a, .tbl2 a {
+            font-size: 12px;
+        }
+
+        .tbl2 {
+            font-size: 11px;
+            color: #333;
+            background-color: #ECEFF5;
+            padding: 6px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(function () {
+            $('#moderationbutton').click(function () {
+                $('#moderation_messages').toggleClass('hidden');
+            });
+
+            $('#intrestedlistbutton').click(function () {
+                $('#intrestedlist').toggleClass('hidden');
+            });
+
+            $('#decisionbutton').click(function(){
+               $('#decision').toggleClass('hidden');
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content-width %}16{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="span16">
+            <h2>
+                {% if event.type == '2' %}
+                    {{ event.title }}
+                {% elif event.type == '3' %}
+                    {{ event.group }}
+                {% else %}
+                    {{ event.course }} - {{ event.get_type_display }}
+                {% endif %}
+            </h2>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="span16">
+            <table cellpadding="0" cellspacing="1" class="tbl-border"
+                   style="border: 1px solid #D9DEEB;border-bottom: 0px;">
+                <tbody>
+                <tr>
+                    <td class="tbl2" width="12%"><strong>Typ</strong></td>
+                    <td class="tbl1" width="*">{{ event.get_type_display }}</td>
+                    <td class="tbl2" width="12%"><strong>Status</strong></td>
+                    <td class="tbl1" width="20%">{{ event.get_status_display }}</td>
+                </tr>
+                <tr>
+                    <td class="tbl2"><strong>Zgłasza</strong></td>
+                    <td colspan="3" class="tbl1">
+                        <a href="">{{ event.author.get_full_name }}</a>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tbl2"><strong>Opis</strong></td>
+                    <td colspan="3" class="tbl1">
+                        <p class="long">{{ event.description }}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="tbl2"><strong>Lokalizacja</strong></td>
+                    <td colspan="3" class="tbl1">
+                        <ul>
+                            {% for term in event.term_set.all %}
+                                <li>{{ term.day }} - {{ term.room }}, od: {{ term.start }} do: {{ term.end }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <form action="{% url events:interested event.id %}" method="POST">
+        <div class="row" style="
+    border: 1px solid #D9DEEB;
+    padding-left: 0;
+    margin-left: 0;
+    ">
+            <div class="span4" style="
+    background-color: #ECEFF5;
+    text-align: center;
+    min-height: 70px;
+    line-height: 70px;
+    margin-left: 0;
+        ">
+                {% csrf_token %}
+                {% if user in event.interested.all %}
+                    <input type="submit" name="intrestoff" value="Przestań obserwować" class="btn danger span3">
+                {% else %}
+                    <input type="submit" name="intreston" value="Obserwuj" class="btn success span3">
+                {% endif %}
+            </div>
+            <div class="span11">
+                <p style="padding-top: 15px;">Obserwowane wydarzenia pojawią się w Twoim planie. Będziesz otrzymywać
+                    również powiadomienia
+                    o nowych wiadomościach w wydarzeniu.</p>
+            </div>
+        </div>
+    </form>
+    {% if event.author == user or perms.schedule.manage_events %}
+    <div class="row">
+        <div class="span4">
+            <button id="moderationbutton" type="button" class="btn span4">Wiadomości moderatorskie
+                ({{ moderation_messages.count }})
+            </button>
+        </div>
+        <div class="span4">
+            <button id="intrestedlistbutton" type="button" class="btn span4">Pokaż zainteresowanych
+                ({{ event.interested.count }})
+            </button>
+        </div>
+        <div class="span4">
+            {% if event.status == '0' and perms.schedule.manage_events  %}
+            <button id="decisionbutton" type="button" class="btn span4">Decyzja</button>
+            {% endif %}
+        </div>
+        <div class="span4">
+
+            <form action="" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Edytuj" class="btn success span4">
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if event.author == user or perms.schedule.manage_events %}
+    <div id="moderation_messages" class="hidden">
+        <div class="row" style="padding-left: 20px;">
+            <h4>Wiadomości moderatorskie</h4>
+
+            <div class="span16">
+                {% for message in moderation_messages %}
+                    <div class="row">
+                        <div class="span12">
+                            <span><a
+                                    href="">{{ message.author.get_full_name }}</a>, {{ message.created|date:"d-m-Y, H:i" }} napisał(a):</span>
+
+                            <p>{{ message.message }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="alert-message warning">
+                        <a class="close" href="#">×</a>
+
+                        <p><strong>Uwaga!</strong> Brak wiadomości.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="span16">
+                <form action="{% url events:moderation event.id %}" method="POST">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="span10">
+                            <div class="row">
+                                <div class="span2">
+                                    <label for="id_mod_message">Wiadomość</label>
+                                </div>
+                                <div class="input span8">
+                                    <textarea rows="10" name="message" id="id_mod_message" required="required"
+                                              class="span7" cols="40"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span6 help-block">Wiadomość zostanie również wysłana e-mailem</div>
+                    </div>
+                    <div class="actions">
+                        <input type="submit" class="btn success" value="Wyślij">
+                    </div>
+
+                </form>
+                <hr>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if event.author == user or perms.schedule.manage_events %}
+    <div id="intrestedlist" class="row hidden">
+        <div class="span6">
+            <h3>Zainteresowani</h3>
+            {% if event.interested.all %}
+                <ul>
+                    {% for user in event.interested.all %}
+                        <li><a href="">{{ user.get_full_name }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+
+                <div class="alert-message warning">
+                    <a class="close" href="#">×</a>
+
+                    <p>Brak osób obserwujących wydarzenie.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% if event.status == '0' and perms.schedule.manage_events %}
+    <div id="decision" class="row hidden">
+        <form action="{% url events:decision event.id %}" method="POST">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="span10">
+                    <div class="row">
+                        <div class="span2">
+                            <label>Decyzja</label>
+                        </div>
+                        <div class="span8">
+                        <div class="input">
+                          <ul class="inputs-list">
+                            <li>
+                              <label>
+                                <input type="radio" name="status" value="1">
+                                <span>Zaakceptowano</span>
+                              </label>
+                            </li>
+                            <li>
+                              <label>
+                                <input type="radio" name="status" value="2">
+                                <span>Odrzucono</span>
+                              </label>
+                            </li>
+                          </ul>
+                        </div></div>
+                    </div>
+                </div>
+                <div class="span6 help-block">Informacja o decyzji trafi na adres e-mail osoby zgłaszającej.
+                </div>
+            </div>
+            <div class="actions">
+                <input type="submit" class="btn success" value="Wyślij">
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="row" style="padding-left: 20px;">
+        <h4>Wiadomości</h4>
+
+        <div class="span16">
+            {% for message in event_messages %}
+                <div class="row">
+                    <div class="span12">
+                        <span><a href="">{{ message.author.get_full_name }}</a>, {{ message.created|date:"d-m-Y, H:i" }} napisał(a):</span>
+
+                        <p>{{ message.message }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert-message warning">
+                    <a class="close" href="#">×</a>
+
+                    <p><strong>Uwaga!</strong> Brak wiadomości.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% if event.author == user %}
+    <form action="{% url events:message event.id %}" method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="span10">
+                <div class="row">
+                    <div class="span2">
+                        <label for="id_message">Wiadomość</label>
+                    </div>
+                    <div class="input span8">
+                        <textarea rows="10" name="message" id="id_message" required="required" class="span7"
+                                  cols="40"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="span6 help-block">Wiadomość zostanie również wysłana e-mailem do osób obserwujących. W przypadku
+                egzaminu i kolokwium otrzymają ją również osoby zapisane na dany przedmiot.
+            </div>
+        </div>
+        <div class="actions">
+            <input type="submit" class="btn success" value="Wyślij">
+        </div>
+
+    </form>
+    {% endif %}
+{% endblock %}

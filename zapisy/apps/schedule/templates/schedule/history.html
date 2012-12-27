@@ -1,54 +1,5 @@
-{% extends "schedule/base.html" %}
+{% extends 'schedule/reservations.html' %}
 
-{% block schedule_myreservation %} class="active"{% endblock %}
 
-{% block css %}
-    {{ block.super }}
-    <style>
-        .hidden {dislay:none!important;}
-    </style>
-{% endblock %}
-
-{% block bread %}
-    <a href="/">Strona główna</a> &raquo;
-    <a href="/">Sale</a> &raquo;
-    Moje rezerwacje
-{% endblock %}
-
-{% block content-width %}16{% endblock %}
-
-{% block content %}
-    <div class="row">
-        <div class="span10">
-            <ul>
-            {% for event in events %}
-                <li>
-                    <div>
-                        {% include "schedule/includes/reservation_view.html" with event=event %}
-                    </div>
-                </li>
-            {% empty %}
-                <li>Brak wyników dla zapytania</li>
-            {% endfor %}
-            </ul>
-        </div>
-        <div class="span6">
-            <form action="" class="form-stacked">
-                    <fieldset>
-                      <legend>Filtr</legend>
-                      {% for field in events.form %}
-                        <div class="clearfix">
-                            {{ field.label_tag }}
-                        <div class="input">
-                            {{ field }}
-                        </div>
-                      </div><!-- /clearfix -->
-                        {% endfor %}
-
-                    </fieldset>
-                    <input type="submit" value="Filtruj" class="btn success">
-                  </form>
-
-        </div>
-    </div>
-{% endblock %}
+{% block schedule_manage %}{% endblock %}
+{% block schedule_history %} class="active"{% endblock %}

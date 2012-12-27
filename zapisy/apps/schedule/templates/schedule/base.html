@@ -25,7 +25,7 @@
         <li {% block schedule_manage %}{% endblock %}><a href="{% url events:reservations %}">Zarządzaj</a></li>
     {% endif %}
     {% if user.is_authenticated %}
-        <li{% block schedule_myreservation %}{% endblock %}><a
+        <li{% block schedule_history %}{% endblock %}><a
                 href="{% url events:history %}">Historia</a></li>
     {% endif %}
     {# end system_menu #}

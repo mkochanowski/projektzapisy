@@ -2,7 +2,7 @@
 from django                   import forms
 from django.db.models.query import EmptyQuerySet
 from apps.enrollment.courses.models import Course, Semester
-from apps.schedule.models import Event, types_for_student, types_for_teacher, Term
+from apps.schedule.models import Event, types_for_student, types_for_teacher, Term, EventModerationMessage, EventMessage
 
 from django.forms.models import inlineformset_factory
 
@@ -12,7 +12,7 @@ class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        exclude = ('decision', 'status', 'author', 'created', 'edited')
+        exclude = ('status', 'author', 'created', 'edited')
 
     def __init__(self, user, **kwargs):
         super(EventForm, self).__init__(**kwargs)
@@ -32,11 +32,19 @@ class EventForm(forms.ModelForm):
         self.fields['type'].widget.attrs.update({'class' : 'span7'})
         self.fields['course'].widget.attrs.update({'class' : 'span7'})
         self.fields['description'].widget.attrs.update({'class' : 'span7', 'required': 'required'})
-        self.fields['message'].widget.attrs.update({'class' : 'span7', })
 
+class EventModerationMessageForm(forms.ModelForm):
+    class Meta:
+        model = EventModerationMessage
+        fields = ('message', )
+
+class EventMessageForm(forms.ModelForm):
+    class Meta:
+        model = EventMessage
+        fields = ('message', )
 
 class DecisionForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ('decision', 'status')
+        fields = ('status',)
 
