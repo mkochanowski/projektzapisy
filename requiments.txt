@@ -5,6 +5,7 @@ South==0.7.6
 argparse==1.2.1
 django-autoslug==1.6.1
 django-debug-toolbar==0.9.4
+django-endless-pagination==1.1
 django-extensions==1.0.1
 django-filter==0.5.4
 django-mailer==0.1.0
