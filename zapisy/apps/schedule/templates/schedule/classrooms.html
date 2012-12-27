@@ -16,32 +16,44 @@
 {% block content-width %}16{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="span16">
-            <h2>{% block classroomtitle %}Sale{% endblock %}</h2>
-        </div>
-    </div>
+
     <div class="row">
         <div class="span14">
-            {% block classroomview %}
-                <div class="row">
-                <div class="span10">
-                <div class="alert-message warning">
-                        <a class="close" href="#">×</a>
-                        <p>Wybierz salę.</p>
-                      </div>
+            <div class="row">
+                <div class="span14">
+                    <h2>{% block classroomtitle %}Sale{% endblock %}</h2>
                 </div>
+            </div>
+            <div class="row">
+                <div class="span14">
+                    {% block classroomview %}
+                        <div class="row">
+                        <div class="span10">
+                        <div class="alert-message warning">
+                                <a class="close" href="#">×</a>
+                                <p>Wybierz salę.</p>
+                              </div>
+                        </div>
+                        </div>
+                    {% endblock %}
                 </div>
-            {% endblock %}
+            </div>
         </div>
+
         <div class="span2">
-            <h5>Sale</h5>
-            <ul>
-                {% for room in rooms %}
-                    <li><a href="{{ room.get_absolute_url }}">{{ room.number }}</a></li>
+            {% regroup rooms by get_floor_display as floor_list %}
+                {% for floor in floor_list %}
+                    <h6>{{ floor.grouper }}</h6>
+
+                    <ul style="list-style:none;">
+                        {% for r in floor.list %}
+                        <li><a href="{{ r.get_absolute_url }}"><button {% if r == room %}disabled{% endif %} class="btn span2" style="margin-bottom:3px;">{{ r.number }}</button></a></li>
+                        {% endfor %}
+                    </ul>
                 {% endfor %}
-            </ul>
 
         </div>
     </div>
+
+
 {% endblock %}
