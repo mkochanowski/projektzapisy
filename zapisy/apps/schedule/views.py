@@ -32,7 +32,6 @@ def classroom(request, slug):
 
 @login_required
 def reservation(request, id=None):
-    import ipdb;ipdb.set_trace()
     form = EventForm(data = request.POST or None, user=request.user)
 
     if form.is_valid():
