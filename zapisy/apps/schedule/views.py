@@ -32,7 +32,9 @@ def classroom(request, slug):
 
 @login_required
 def reservation(request, id=None):
+    import ipdb;ipdb.set_trace()
     form = EventForm(data = request.POST or None, user=request.user)
+
     if form.is_valid():
         event = form.save(commit=False)
         event.author = request.user
@@ -43,7 +45,7 @@ def reservation(request, id=None):
 
             return redirect(event)
     else:
-        formset = TermFormSet(instance=Event())
+        formset = TermFormSet(data = request.POST or None, instance=Event())
 
 
     return TemplateResponse(request, 'schedule/reservation.html', locals())

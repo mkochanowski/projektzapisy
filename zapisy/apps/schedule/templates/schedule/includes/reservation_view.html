@@ -35,7 +35,7 @@
         <td colspan="3" class="tbl1">
             <ul>
                 {% for term in event.term_set.all %}
-                    <li>{{ term.day }} - {{ term.room }}, od: {{ term.start }} do: {{ term.end }}</li>
+                    <li>{{ term.day }} - {% if term.room %}<a href="{{ term.room.get_absolute_url }}">{{ term.room }}</a>{% else %}{{ term.place }}{% endif %}, {{ term.print_start }} - {{ term.print_end }}</li>
                 {% endfor %}
             </ul>
         </td>

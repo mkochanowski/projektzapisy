@@ -199,6 +199,26 @@ class Term(models.Model):
         verbose_name_plural = u'terminy'
 
 
+    def print_start(self):
+        """
+        Print beautfull time
+
+        @return: string
+        """
+        hours, remainder = divmod(self.start.total_seconds(), 3600)
+        minutes, __ = divmod(remainder, 60)
+        return '%d:%02d' % (hours, minutes)
+
+    def print_end(self):
+        """
+        Print beautfull time
+
+        @return: string
+        """
+        hours, remainder = divmod(self.end.total_seconds(), 3600)
+        minutes, __ = divmod(remainder, 60)
+        return '%d:%02d' % (hours, minutes)
+
     @classmethod
     def get_exams(cls):
         """

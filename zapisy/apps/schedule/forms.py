@@ -1,18 +1,33 @@
 # -*- coding: utf-8 -*-
 from django                   import forms
 from django.db.models.query import EmptyQuerySet
+from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
 from apps.schedule.models import Event, types_for_student, types_for_teacher, Term, EventModerationMessage, EventMessage
 
 from django.forms.models import inlineformset_factory
 
-TermFormSet = inlineformset_factory(Event, Term, extra=0)
+
+class TermForm(forms.ModelForm):
+    class Meta:
+        model = Term
+        widgets = {
+            'event': HiddenInput(),
+            'day': HiddenInput(),
+            'start': HiddenInput(),
+            'end': HiddenInput(),
+            'room': HiddenInput(),
+            'place': HiddenInput()
+
+        }
+
+TermFormSet = inlineformset_factory(Event, Term, extra=0, form=TermForm)
 
 class EventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        exclude = ('status', 'author', 'created', 'edited')
+        exclude = ('status', 'author', 'created', 'edited', 'group', 'interested')
 
     def __init__(self, user, **kwargs):
         super(EventForm, self).__init__(**kwargs)
