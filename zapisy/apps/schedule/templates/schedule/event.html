@@ -103,11 +103,17 @@
                 <tr>
                     <td class="tbl2"><strong>Lokalizacja</strong></td>
                     <td colspan="3" class="tbl1">
-                        <ul>
+                        <table style="font-size:xx-small;">
                             {% for term in event.term_set.all %}
-                                <li>{{ term.day }} - {% if term.room %}<a href="{{ term.room.get_absolute_url }}">{{ term.room }}</a>{% else %}{{ term.place }}{% endif %}, {{ term.print_start }} - {{ term.print_end }}</li>
+                            <tr>
+                                <td style="width:20px">{{ term.print_start }}</td>
+                                <td style="width:5px">-</td>
+                                <td style="width:30px">{{ term.print_end }}</td>
+                                <td style="width:100px; text-align: center">{{ term.day|date:"j E Y" }}</td>
+                                <td>{% if term.room %}<a style="font-size: xx-small" href="{{ term.room.get_absolute_url }}">Sala {{ term.room.number }}</a>{% else %}{{ term.place }}{% endif %}</td>
+                            </tr>
                             {% endfor %}
-                        </ul>
+                        </table>
                     </td>
                 </tr>
                 </tbody>

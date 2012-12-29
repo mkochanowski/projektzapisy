@@ -194,7 +194,7 @@ class Term(models.Model):
 
     class Meta:
         get_latest_by = 'end'
-        ordering = ['start', 'end']
+        ordering = ['day', 'start', 'end']
         verbose_name = u'termin'
         verbose_name_plural = u'terminy'
 
