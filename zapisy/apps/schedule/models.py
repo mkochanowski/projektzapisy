@@ -205,7 +205,8 @@ class Term(models.Model):
 
         @return: string
         """
-        hours, remainder = divmod(self.start.total_seconds(), 3600)
+
+        hours, remainder = divmod(self.start.seconds, 3600)
         minutes, __ = divmod(remainder, 60)
         return '%d:%02d' % (hours, minutes)
 
@@ -215,7 +216,7 @@ class Term(models.Model):
 
         @return: string
         """
-        hours, remainder = divmod(self.end.total_seconds(), 3600)
+        hours, remainder = divmod(self.end.seconds, 3600)
         minutes, __ = divmod(remainder, 60)
         return '%d:%02d' % (hours, minutes)
 
