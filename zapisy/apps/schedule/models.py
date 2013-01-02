@@ -166,6 +166,21 @@ class Event(models.Model):
         """
         return cls.objects.filter(author=user).select_related('course', 'course__entity', 'author').prefetch_related('term_set')
 
+    @classmethod
+    def get_exams(cls):
+        """
+        Return list of all exam
+
+        @return Event QuerySet
+        """
+        return cls.objects.filter(type='0', status='1').order_by('-created')
+
+    @classmethod
+    def get_events(cls):
+        """
+        """
+
+        return cls.objects.filter(status='1', type='0').order_by('-created')
 
 class Term(models.Model):
     """

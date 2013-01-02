@@ -167,8 +167,7 @@
         </div>
         <div class="span4">
 
-            <form action="" method="POST">
-                {% csrf_token %}
+            <form action="{% url events:edit event.id %}" method="GET">
                 <input type="submit" value="Edytuj" class="btn success span4">
             </form>
         </div>

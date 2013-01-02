@@ -50,10 +50,28 @@ def reservation(request, id=None):
     return TemplateResponse(request, 'schedule/reservation.html', locals())
 
 @login_required
+def edit_event(request, id=None):
+    event = Event.get_event_for_moderation_or_404(id, request.user)
+    form = EventForm(data = request.POST or None, instance=event, user=request.user)
+    formset = TermFormSet(request.POST or None, instance=event)
+
+    if form.is_valid() and formset.is_valid():
+        event = form.save(commit=False)
+        event.author = request.user
+        event.save()
+        formset.save()
+
+        messages.success(request, u'Zmieniono zdarzenie')
+
+        return redirect(event)
+
+    return TemplateResponse(request, 'schedule/reservation.html', locals())
+
+@login_required
 def ajax_get_terms(request, year, month, day):
 
-#    if not request.is_ajax():
-#        raise Http404
+    if not request.is_ajax():
+        raise Http404
 
     time  = datetime.date(int(year), int(month), int(day))
     terms = Classroom.get_terms_in_day(time, ajax=True)

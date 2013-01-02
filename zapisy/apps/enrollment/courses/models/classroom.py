@@ -14,6 +14,7 @@ class Classroom( models.Model ):
     """classroom in institute"""
     slug =  AutoSlugField(populate_from='number', unique_with='number')
     number = models.CharField( max_length = 20, verbose_name = 'numer sali' )
+    order = models.IntegerField(null=True, blank=True)
     building = models.CharField( max_length = 75, verbose_name = 'budynek', blank=True, default='' )
     capacity = models.PositiveSmallIntegerField(default=0, verbose_name='liczba miejsc')
     floor = models.IntegerField(choices=floors, null=True, blank=True)
@@ -24,6 +25,7 @@ class Classroom( models.Model ):
         verbose_name = 'sala'
         verbose_name_plural = 'sale'
         app_label = 'courses'
+        ordering = ['order', 'floor', 'number']
 
     def get_absolute_url(self):
         return reverse('events:classroom', args=[self.slug])

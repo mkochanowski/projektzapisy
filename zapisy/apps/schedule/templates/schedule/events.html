@@ -73,10 +73,15 @@
 
     </script>{% endblock %}
 
+{% block content-width %}16{% endblock %}
+
 {% block content %}
     <div class="row">
-        <div class="span16">
+        <div class="span15">
             <h2>Wydarzenia</h2>
+        </div>
+        <div class="span1" style="text-align: right;">
+            <a href="{% url events:events_feed %}"><img src="/site_media/feed-icon.png" alt="RSS"></a>
         </div>
     </div>
     <div class="row">
