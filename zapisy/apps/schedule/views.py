@@ -69,10 +69,6 @@ def edit_event(request, id=None):
 
 @login_required
 def ajax_get_terms(request, year, month, day):
-
-    if not request.is_ajax():
-        raise Http404
-
     time  = datetime.date(int(year), int(month), int(day))
     terms = Classroom.get_terms_in_day(time, ajax=True)
     return HttpResponse(terms, mimetype="application/json")
