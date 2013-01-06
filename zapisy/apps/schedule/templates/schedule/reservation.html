@@ -46,10 +46,17 @@
             color: #d3d3d3;
         }
 
-    .errorlist { list-style: none;}
-    .errorlist > li {  color:red; }
+        .errorlist {
+            list-style: none;
+        }
 
-    *:invalid: { border: 2px solid red;}
+        .errorlist > li {
+            color: red;
+        }
+
+        *:invalid: {
+            border: 2px solid red;
+        }
 
 
     </style>
@@ -57,8 +64,6 @@
     <script type="text/javascript" src="/site_media/js/timepicker/i18n/jquery.ui.timepicker-pl.js"></script>
     <script type="text/javascript" src="/site_media/js/jquery/jquery.smooth-scroll.js"></script>
     <script type="text/javascript">
-
-
 
 
     /* Loader Class
@@ -155,12 +160,12 @@
     };
 
     function check(input) {
-      if (input.value != document.getElementById('email_addr').value) {
-        input.setCustomValidity('The two email addresses must match.');
-      } else {
-        // input is valid -- reset the error message
-        input.setCustomValidity('');
-      }
+        if (input.value != document.getElementById('email_addr').value) {
+            input.setCustomValidity('The two email addresses must match.');
+        } else {
+            // input is valid -- reset the error message
+            input.setCustomValidity('');
+        }
     }
 
     {#    function check(input) {#}
@@ -174,10 +179,10 @@
 
 
     var ReservationView = function () {
-        $('#end').change(function(){
+        $('#end').change(function () {
             var start = $('#begin').val() + ':00',
-                 end  = $(this).val() + ':00';
-            if ( end < start ){
+                    end = $(this).val() + ':00';
+            if (end < start) {
                 this.setCustomValidity('Koniec musi następować po początku');
             } else {
                 this.setCustomValidity('');
@@ -208,17 +213,17 @@
                         switch (type.value) {
                             case '0':
                             case '1':
-                                subject.className = 'row';
-                                visible.className = 'row hidden';
-                                title.className = 'row hidden';
-                                    $('#id_course').attr('required', true);
-                                    $('#id_title').attr('required', false);
+                                $(subject).show();
+                                $(title).hide();
+                                $(visible).hide();
+                                $('#id_course').attr('required', true);
+                                $('#id_title').attr('required', false);
                                 break;
 
                             case '2':
-                                subject.className = 'row hidden';
-                                visible.className = 'row';
-                                title.className = 'row';
+                                $(subject).hide();
+                                $(title).show();
+                                $(visible).show();
                                 $('#id_course').attr('required', false);
                                 $('#id_title').attr('required', true);
                                 break;
@@ -266,9 +271,9 @@
         };
 
 
-        $('#addoutsidelocation').click(function(event){
+        $('#addoutsidelocation').click(function (event) {
             $('#hiddenroom').val("");
-            $('#location').val( $('#inputplace').val() );
+            $('#location').val($('#inputplace').val());
             $.smoothScroll({
                 scrollElement:null,
                 scrollTarget:'#location'
@@ -296,9 +301,9 @@
 
         $('#addtermform').submit(function (event) {
 
-            if( $('#hiddenid').val()){
+            if ($('#hiddenid').val()) {
 
-                var counter = parseInt( $('#hiddenid').val() );
+                var counter = parseInt($('#hiddenid').val());
             } else {
                 var counter = parseInt($('input[name="term_set-TOTAL_FORMS"]').val());
             }
@@ -328,16 +333,16 @@
                     .append($('<input type="hidden" name="term_set-' + counter + '-place" maxlength="255" value="' + $("#location").val() + '">'))
                     .append($('<input type="hidden" name="term_set-' + counter + '-room" value="' + $("#hiddenroom").val() + '">'));
 
-            if( $('#hiddenid').val() && $('#termstable tbody tr').eq(counter).find('input[name$="-id"]').length > 0){
+            if ($('#hiddenid').val() && $('#termstable tbody tr').eq(counter).find('input[name$="-id"]').length > 0) {
                 td.append(
-                        jQuery("<p>").append($('#termstable tbody tr').eq(counter).find('input[name$="-id"]').clone()).html() );
+                        jQuery("<p>").append($('#termstable tbody tr').eq(counter).find('input[name$="-id"]').clone()).html());
             }
 
             $(html).append(td);
             $(html).append($('<td><div class="hidden"><input type="checkbox" name="term_set-' + counter + '-DELETE" id="id_term_set-' + counter + '-DELETE"></div><button style="display:none" class="btn success unremoveterm" formnovalidate>Cofnij usunięcie</button><button class="btn danger removeterm" formnovalidate>Usuń</button></td>'));
             $(html).append($('<td><button class="btn editterm">Edytuj</button></td>'));
 
-            if( $('#hiddenid').val()){
+            if ($('#hiddenid').val()) {
                 $('#termstable tbody tr').eq(counter).after(html);
                 $('#termstable tbody tr').eq(counter).remove();
             } else {
@@ -382,7 +387,7 @@
         };
 
         $('input[name="selectplace"]').change(function () {
-            switch ( $(this).val() ) {
+            switch ($(this).val()) {
                 case 'inside':
                     $('#rooms_filter').show();
                     $('#inputplacediv').hide();
@@ -411,7 +416,7 @@
 
         $('#save_event').click(function (event) {
 
-            if( $('#termstable tbody').find('tr:not(.removed)').length == 0){
+            if ($('#termstable tbody').find('tr:not(.removed)').length == 0) {
                 this.setCustomValidity('Musisz podać przynajmniej jeden termin');
             } else {
                 this.setCustomValidity('');
@@ -419,7 +424,7 @@
             }
         });
 
-        $('#testroomlistform').submit(function(e){
+        $('#testroomlistform').submit(function (e) {
             e.preventDefault();
         })
 
@@ -457,7 +462,7 @@
             }
 
             $('input[name="selectplace"]:checked').each(function () {
-                switch ( $(this).val() ) {
+                switch ($(this).val()) {
                     case 'inside':
                         $('#rooms_filter').show();
                         $('#inputplacediv').hide();
@@ -476,7 +481,7 @@
 
         });
 
-        $('.readonly').keydown(function(event){
+        $('.readonly').keydown(function (event) {
             event.preventDefault();
         })
 
@@ -843,162 +848,132 @@
         <fieldset>
 
             {% if user.employee %}
-                <div class="row">
-                    <div class="span16">
-                        <div class="row">
-                            <div class="span10 clearfix">
-                                <div class="span2">
-                                    <label for="id_type">Rodzaj</label>
-                                </div>
 
-                                <div class="input">
-                                    {{ form.type }}
-                                </div>
-                                {{ form.type.errors }}
+                <div class="clearfix row">
+                    <div class="span10">
+                            <label for="id_type">Rodzaj</label>
+                            <div class="input clearfix">
+                                {{ form.type }}
+
                             </div>
-                            <div class="span6 clearfix"><p class=" help-block"><strong>Egzaminy</strong> i <strong>kolokwia</strong>
-                                są związane z przedmiotami. Nie wymagają akceptacji przez administratora.</p>
                             </div>
-                        </div>
-                        <hr>
+
+                    <div class="span6" style="font-size:12px">
+                        <span><strong>Egzaminy</strong> i <strong>kolokwia</strong>
+                                                        - prowadzący moze zarezerwować salę, rezerwacja nie wymaga potwierdzenia</span>
+                        <br/>
+                        <br/>
+                        <span><strong>Wydarzenia</strong> - każdy zalogowany może zgłosić chęć rezerwacji; rezerwacja zostaje potwierdzona lub odrzucona przez administratora sal.</span>
                     </div>
-                </div>
-                <div id="form_course" class="row hidden">
+                          </div>
 
-                    <div class="span16">
-                        <div class="row">
-
-                            <div class="span10 clearfix">
-                                <div class="span2">
-                                    <label for="id_course">Przedmiot</label>
-                                </div>
-
-                                <div class="input">
-                                    {{ form.course }}
-                                    {{ form.course.errors }}
-                                </div>
-                            </div>
-
-                            <div class="span6 clearfix">
-                                <p class="help-block">Wybierz przedmiot spośród prowadzonych przez siebie.</p>
-                            </div>
-                        </div>
-                        <hr>
+                <div id="form_course" class="row clearfix" style='display:none;'>
+                    <div class="span10">
+                    <label for="id_course">Przedmiot</label>
+                    <div class="input">
+                        {{ form.course }}
                     </div>
+                  </div>
+                  </div>
 
 
-                </div>
 
             {% endif %}
 
-            <div id="form_title" class="row hidden">
-                <div class="span16">
-                    <div class="row">
-                        <div class="span10">
-                            <div class="span2">
-                                <label for="id_title">Tytuł</label>
-                            </div>
-                            <div class="input">
-                                {{ form.title }}
-                            </div>
-                            {{ form.title.errors }}
+            <div id="form_title" class="row clearfix" style="display: none;">
+                <div class="span10">
+                <label for="id_title">Tytuł</label>
+                        <div class="input">
+                            {{ form.title }}
                         </div>
-                        <div class="span6 help-block">Wstaw sobie tutaj tytuł</div>
-                    </div>
-                    <hr>
+                      </div>
+                <div class="span6">
+
+                    <span style="font-size:12px">Tytuł pod jakim widoczne będzie wydarzenie</span>
                 </div>
-            </div>
+                      </div>
 
-            <div class="row">
 
-                <div class="span16">
-                    <div class="row">
-                        <div class="span10 clearfix">
-                            <div class="span2">
-                                <label for="id_description">Opis</label>
-                            </div>
+            <div id="form_visible" class="row clearfix">
+                <label id="optionsCheckboxes">Opcje</label>
+                <div class="input">
+                    <ul class="inputs-list">
+                        <li>
+                            <label>
+                              {{ form.visible }}
+                                <span>Wydarzenie widoczne dla wszystkich użytkowników systemu</span>
+                            </label>
+                        </li>
 
-                            <div class="input">
-                                {{ form.description }}
-                                {{ form.description.errors }}
-                            </div>
+                  </ul>
+                          <span style="font-size:12px;">
+                            <strong>Uwagi:</strong> Wydarzenia niepubliczne widoczne są jedynie dla autorów i osób z uprawnieniami moderatora.
+                          </span>
                         </div>
-                        <div class="span6 help-block"><p></p></div>
-                    </div>
-                    <hr>
+          </div>
+
+            <div class="clearfix row">
+                <div class="span10">
+                        <label for="id_description">Opis</label>
+
+                        <div class="input">
+                            <div style="margin-right:10px">{{ form.description }}</div>
+                            {{ form.description.errors }}&nbsp;
+                        </div>
+                      </div>
+                <div class="span6">
+                    <span style="font-size:12px">
+                        Opis wydarzenia widoczny jest dla wszystkich, jeśli wydarzenie jest publiczne; widoczny tylko dla rezerwującego i administratora sal, gdy wydarzenie jest prywatne.
+                    </span>
                 </div>
-            </div>
-
-
-            <div id="form_visible" class="row">
-                <div class="span16">
-                    <div class="row">
-                        <div class="span10 clearfix">
-                            <div class="span2">
-                                <label for="id_visible">Wydarzenie publiczne</label>
-                            </div>
-                            <div class="span8">
-                                <div class="input">
-                                    {{ form.visible }}
-                                    {{ form.visible.errors }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="span6 clearfix help-block"><p>Wybierz jeżeli chcesz, aby szczegóły były widoczne dla
-                            wszystkich.</p>
-                        </div>
-                    </div>
-                    <hr>
-                </div>
-
             </div>
 
         </fieldset>
 
-            <h3>Terminy</h3>
+        <h3>Terminy</h3>
 
-            {% if formset.errors %}
-                <ul>
-                    {% for error in formset.errors %}
-                        <li class="error">{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            {{ formset.management_form }}
-            <table id="termstable" class="span16">
-                <thead>
-                <tr>
-                    <th class="termtbl1">Dzień</th>
-                    <th class="termtbl2">Od</th>
-                    <th class="termtbl2">Do</th>
-                    <th class="termtbl4">Lokalizacja</th>
-                    <th class="termtbl3" colspan="2">Akcje</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for form in formset %}
-                    <tr>
-                        <td class="termtbl1"><strong>{{ form.instance.day|date:"Y-m-d" }}</strong>{{ form.day }}</td>
-                        <td class="termtbl2"><span>{{ form.instance.print_start }}</span>{{ form.start }}</td>
-                        <td class="termtbl2"><span>{{ form.instance.print_end }}</span>{{ form.end }}{{ form.id }}</td>
-                        <td class="termtbl4"><span>{% if form.instance.room %}Sala
-                            {{ form.instance.room.number }}{% else %}
-                            {{ form.instance.place }}{% endif %}{{ form.room }}{{ form.place }}</span></td>
-                        <td>
-                            <div class="hidden">{{ form.DELETE }}</div>
-                            <button style="display:none" class="btn success unremoveterm" formnovalidate>Cofnij
-                                usunięcie
-                            </button>
-                            <button class="btn danger removeterm" formnovalidate>Usuń</button>
-                        </td>
-                        <td>
-                            <button class="btn editterm" formnovalidate>Edytuj</button>
-                        </td>
-                    </tr>
+        {% if formset.errors %}
+            <ul>
+                {% for error in formset.errors %}
+                    <li class="error">{{ error }}</li>
                 {% endfor %}
+            </ul>
+        {% endif %}
+        {{ formset.management_form }}
+        <table id="termstable" class="span16">
+            <thead>
+            <tr>
+                <th class="termtbl1">Dzień</th>
+                <th class="termtbl2">Od</th>
+                <th class="termtbl2">Do</th>
+                <th class="termtbl4">Lokalizacja</th>
+                <th class="termtbl3" colspan="2">Akcje</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for form in formset %}
+                <tr>
+                    <td class="termtbl1"><strong>{{ form.instance.day|date:"Y-m-d" }}</strong>{{ form.day }}</td>
+                    <td class="termtbl2"><span>{{ form.instance.print_start }}</span>{{ form.start }}</td>
+                    <td class="termtbl2"><span>{{ form.instance.print_end }}</span>{{ form.end }}{{ form.id }}</td>
+                    <td class="termtbl4"><span>{% if form.instance.room %}Sala
+                        {{ form.instance.room.number }}{% else %}
+                        {{ form.instance.place }}{% endif %}{{ form.room }}{{ form.place }}</span></td>
+                    <td>
+                        <div class="hidden">{{ form.DELETE }}</div>
+                        <button style="display:none" class="btn success unremoveterm" formnovalidate>Cofnij
+                            usunięcie
+                        </button>
+                        <button class="btn danger removeterm" formnovalidate>Usuń</button>
+                    </td>
+                    <td>
+                        <button class="btn editterm" formnovalidate>Edytuj</button>
+                    </td>
+                </tr>
+            {% endfor %}
 
-                </tbody>
-            </table>
+            </tbody>
+        </table>
         <input type="submit" style="display:none" name="sendthisform" value="test" id="testmainform">
     </form>
     <form id="addtermform" class="span16">
@@ -1010,17 +985,20 @@
                            min="{% now "Y-m-d" %}" required>
                 </td>
                 <td class="termtbl2">
-                    <input id="begin" type="time" class="begin mini timepicker readonly" placeholder="np. 8:00" required pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$">
+                    <input id="begin" type="time" class="begin mini timepicker readonly" placeholder="np. 8:00" required
+                           pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$">
 
                 </td>
                 <td class="termtbl2">
-                    <input id="end" type="time" class="end mini timepicker readonly" placeholder="np. 10:00" required pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$">
+                    <input id="end" type="time" class="end mini timepicker readonly" placeholder="np. 10:00" required
+                           pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$">
                 </td>
                 <td class="termtbl1">
                     <input type="hidden" id="hiddenroom" value="">
                     <input type="hidden" id="hiddenid" value="">
                     <input type="hidden" id="hiddeneventid" value="">
-                    <input class="xlarge readonly" id="location" autocomplete="off" name="location" placeholder="Miejsce" disabled="true"
+                    <input class="xlarge readonly" id="location" autocomplete="off" name="location"
+                           placeholder="Miejsce" disabled="true"
                            type="text" required>
                 </td>
                 <td colspan="2" class="termtbl3">
@@ -1078,9 +1056,9 @@
 
         <div id="inputplacediv" class="row" style="display: none;">
             <div class="row">
-                    <div class="span1">
-                        <label for="inputplace">Miejsce</label>
-                    </div>
+                <div class="span1">
+                    <label for="inputplace">Miejsce</label>
+                </div>
                 <div class="span11">
                     <div class="input">
                         <div class="inline-inputs">
@@ -1101,9 +1079,9 @@
     </form>
     <div class="row">
         <form id="testroomlistform">
-        <div class="span16 right" style="text-align:right">
-            <input type="submit" id="save_event" class="btn" name="zapisz" value="Zapisz">
-        </div>
+            <div class="span16 right" style="text-align:right">
+                <input type="submit" id="save_event" class="btn" name="zapisz" value="Zapisz">
+            </div>
         </form>
     </div>
 

@@ -12,7 +12,8 @@ from apps.enrollment.courses.models import Classroom, Semester
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, EventModerationMessageForm, EventMessageForm
 from apps.schedule.models import Term, Event, EventModerationMessage, EventMessage
-from apps.utils.fullcalendar import FullCalendarView
+from apps.schedule.utils import EventAdapter
+from apps.utils.fullcalendar import FullCalendarView, FullCalendarAdapter
 
 __author__ = 'maciek'
 
@@ -174,6 +175,7 @@ AJAX views
 
 class ClassroomTermsAjaxView(FullCalendarView):
     model = Term
+    adapter = EventAdapter
 
     def get_queryset(self):
         queryset = super(ClassroomTermsAjaxView, self).get_queryset()
@@ -181,8 +183,10 @@ class ClassroomTermsAjaxView(FullCalendarView):
 
 class EventsTermsAjaxView(FullCalendarView):
     model = Term
+    adapter = EventAdapter
 
     def get_queryset(self):
         queryset = super(EventsTermsAjaxView, self).get_queryset()
         queryset = queryset.filter(event__type='2', event__visible=True)
         return queryset
+

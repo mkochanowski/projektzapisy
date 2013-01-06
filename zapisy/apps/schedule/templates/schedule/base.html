@@ -15,7 +15,7 @@
             href="{% url events:event_show %}">Wydarzenia</a></li>
 
     <li{% block schedule_session %}{% endblock %}><a
-            href="{% url events:session %}">Sesja</a></li>
+            href="{% url events:session %}">Egzaminy</a></li>
 
     {% if user.is_authenticated %}
         <li{% block schedule_reservation %}{% endblock %}><a

@@ -13,7 +13,7 @@ __author__ = 'maciek'
 
 from django.db import models
 
-types = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie'), ('3', u'Zajęcia')]
+types = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie'), ('3', u'Zajęcia'), ('4', u'Inne')]
 types_for_student = [('2', u'Wydarzenie')]
 types_for_teacher = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie')]
 
@@ -49,6 +49,10 @@ class Event(models.Model):
             if (self.author.employee and self.type in ['0','1']) or \
                 self.author.has_perm('schedule.manage_events'):
                 self.status = '1'
+
+            if self.type in ['0','1']:
+                self.visible = True
+
         super(Event, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -71,9 +75,8 @@ class Event(models.Model):
         @param user: auth.User
         @return: Boolean
         """
-
         if not self.author == user and not user.has_perm('schedule.manage_events'):
-            if not self.visible or self.type <> '2' or not self.status <> '1':
+            if not self.visible or not self.type in ['0', '1', '2'] or self.status <> '1':
                 return False
 
         return True
