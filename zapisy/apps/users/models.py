@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, UserManager
 from django.core.mail import send_mail
 from django.db.models import Q, Sum
 from django.db.models.loading import cache
+from django.db.models.query import EmptyQuerySet
 from django.template import Context
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
@@ -308,15 +309,19 @@ class Student(BaseUser):
     def get_points(self, semester=None):
         from apps.enrollment.courses.models import Semester
         from apps.enrollment.records.models import Record
-        if not semester:
-            semester = Semester.get_current_semester
-        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
-        courses = Courses.objects.filter(student=self, semester=semester, course__in=records).order_by('course__entity__name')
+        from apps.enrollment.courses.models import Course
 
-        points = 0
-        for c in courses: points += c.value
-
-        return courses, points
+        return (EmptyQuerySet, 0)
+#
+#        if not semester:
+#            semester = Semester.get_current_semester
+#        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
+#        courses = Course.objects.filter(student=self, semester=semester, course__in=records).order_by('course__entity__name')
+#
+#        points = 0
+#        for c in courses: points += c.value
+#
+#        return courses, points
 
     def get_points_with_course(self, course, semester=None):
         from apps.enrollment.courses.models import Semester
