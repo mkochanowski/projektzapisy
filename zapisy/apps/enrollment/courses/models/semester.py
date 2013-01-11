@@ -94,6 +94,13 @@ class Semester( models.Model ):
     def get_by_id(id):
         return Semester.objects.get(id=id)
 
+
+    @staticmethod
+    def get_by_id_or_default(id=None):
+        if id:
+            return Semester.get_by_id(id)
+
+        return Semester.get_current_semester()
                 
     @staticmethod
     def get_current_semester():

@@ -3,6 +3,7 @@
 from datetime import date
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 
 from django.db import models
 from django.db.models import Q
@@ -24,6 +25,12 @@ class NoRemoved(models.Manager):
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
         return super(NoRemoved, self).get_query_set().filter(deleted=False, owner__isnull=False)
+
+
+class DefaultCourseManager(models.Manager):
+    def get_query_set(self):
+        """ Returns all courses which have marked semester as visible """
+        return super(DefaultCourseManager, self).get_query_set().select_related('entity', 'information')
 
 statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'),(2, u'Poddana pod głosowanie'),)
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
@@ -286,7 +293,7 @@ class Course( models.Model ):
     records_start = models.DateTimeField(verbose_name=u'Początek zapisów', null=True, blank=True)
     records_end = models.DateTimeField(verbose_name=u'Koniec zapisów', null=True, blank=True)
 
-    objects = models.Manager()
+    objects = DefaultCourseManager()
     visible = VisibleManager()
 
     """
@@ -346,6 +353,9 @@ class Course( models.Model ):
             self.slug = slugify('%d %s %s' % (self.pk, self.name))
 
         super(Course, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('course-page', args=[str(self.slug)])
 
     def student_is_in_ects_limit(self, student):
         #TODO: test me!
@@ -456,6 +466,26 @@ class Course( models.Model ):
         }
 
         return data
+
+
+    def has_exam_reservation(self):
+        """
+            Return True if  Course have reservation for exam
+        """
+
+        from apps.schedule.models import Event
+
+        if not self.exam:
+            return False
+
+        if Event.objects.filter(course=self, type='0').exists():
+            return True
+
+        return False
+
+    @staticmethod
+    def get_courses_with_exam(semester):
+        return Course.objects.filter(semester=semester, entity__exam=True)
 
 
     class Meta:

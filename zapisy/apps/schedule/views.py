@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import datetime
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
-from apps.enrollment.courses.models import Classroom, Semester
+from apps.enrollment.courses.models import Classroom, Semester, Course
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, EventModerationMessageForm, EventMessageForm
 from apps.schedule.models import Term, Event, EventModerationMessage, EventMessage
@@ -171,6 +171,17 @@ def change_interested(request, id):
         return redirect( event )
 
     raise Http404
+
+
+@login_required
+@permission_required('schedule.manage_events')
+def statistics(request):
+    semester_id = request.GET.get('semester_id', None)
+    semester    = Semester.get_by_id_or_default(semester_id)
+
+    exams = Course.get_courses_with_exam(semester)
+
+    return TemplateResponse(request, 'schedule/statistics.html', locals())
 
 """
 AJAX views

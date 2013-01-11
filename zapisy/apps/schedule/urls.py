@@ -26,4 +26,5 @@ urlpatterns = patterns('apps.schedule.views',
     url(r'^events/history$', 'history', name='history'),
     url(r'^session$', 'session', name='session'),
     url(r'^session/feed$', LatestExams(), name='session_feed'),
+    url(r'^session/statistics$', 'statistics', name='statistics'),
 )

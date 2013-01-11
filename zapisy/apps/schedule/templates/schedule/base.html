@@ -21,12 +21,16 @@
         <li{% block schedule_reservation %}{% endblock %}><a
                 href="{% url events:reservation %}">Rezerwuj</a></li>
     {% endif %}
-    {% if perms.schedule.perms %}
+    {% if perms.schedule.manage_events %}
         <li {% block schedule_manage %}{% endblock %}><a href="{% url events:reservations %}">Zarządzaj</a></li>
     {% endif %}
     {% if user.is_authenticated %}
         <li{% block schedule_history %}{% endblock %}><a
                 href="{% url events:history %}">Historia</a></li>
+    {% endif %}
+
+    {% if perms.schedule.manage_events %}
+        <li {% block schedule_statistic %}{% endblock %}><a href="{% url events:statistics %}">Statystyki</a></li>
     {% endif %}
     {# end system_menu #}
 {% endblock %}
