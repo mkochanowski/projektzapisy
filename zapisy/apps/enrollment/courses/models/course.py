@@ -405,7 +405,7 @@ class Course( models.Model ):
             vote = SingleVote.objects.get(Q(course=self), Q(student=student), Q(state__semester_winter=self.semester) | Q(state__semester_summer=self.semester) )
             interval = datetime.timedelta(minutes=(-1440)*vote.correction+4320)
         except ObjectDoesNotExist:
-            interval = timedelta(minutes=4320)
+            interval = datetime.timedelta(minutes=4320)
 
         if records_opening == None:
             return False

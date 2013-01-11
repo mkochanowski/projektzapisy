@@ -311,7 +311,7 @@ class Student(BaseUser):
         if not semester:
             semester = Semester.get_current_semester
         records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
-        courses = Courses.objects.filter(student=self, semester=semester, course__in=records).order_by('course__name')
+        courses = Courses.objects.filter(student=self, semester=semester, course__in=records).order_by('course__entity__name')
 
         points = 0
         for c in courses: points += c.value
