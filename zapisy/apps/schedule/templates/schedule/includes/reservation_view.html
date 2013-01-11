@@ -15,10 +15,12 @@
     </tr>{% if title != 'Moje rezerwacje' %}
     <tr>
         <td class="tbl2"><strong>Zgłasza</strong></td>
-        <td colspan="3" class="tbl1">
+        <td class="tbl1" width="*">
                 <a href="">{{ event.author.get_full_name }}</a>
 
         </td>
+        <td class="tbl2" width="12%"><strong>Data</strong></td>
+        <td class="tbl1" width="20%">{{ event.created }}</td>
     </tr>{% endif %}
     {% if event.description %}
     <tr>
@@ -41,6 +43,7 @@
                     <td style="width:30px">{{ term.print_end }}</td>
                     <td style="width:100px; text-align: center">{{ term.day|date:"j E Y" }}</td>
                     <td>{% if term.room %}<a style="font-size: xx-small" href="{{ term.room.get_absolute_url }}">Sala {{ term.room.number }}</a>{% else %}{{ term.place }}{% endif %}</td>
+
                 </tr>
                 {% endfor %}
             </table>

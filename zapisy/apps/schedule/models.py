@@ -3,10 +3,13 @@ import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.db.models.query import EmptyQuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from timedelta import TimedeltaField
 import json
+from mailer.utils import render_and_send_email
+import settings
 
 __author__ = 'maciek'
 
@@ -45,7 +48,10 @@ class Event(models.Model):
         If author is employee and try reserve room for exam - accept it
         If author has perms to manage events - accept it
         """
+        is_new = False
+
         if not self.pk:
+            is_new = True
             if (self.author.employee and self.type in ['0','1']) or \
                 self.author.has_perm('schedule.manage_events'):
                 self.status = '1'
@@ -55,6 +61,14 @@ class Event(models.Model):
 
         super(Event, self).save(*args, **kwargs)
 
+        if is_new and self.type in ['0','1'] and self.course:
+            render_and_send_email(u'Ustalono termin egzaminu',
+                                   u'schedule/emails/new_exam.txt',
+                                   u'schedule/emails/new_exam.html',
+                                   {'event': self},
+                                   self.get_followers()
+            )
+
     def get_absolute_url(self):
         if self.group:
             return reverse('records-group', args=[self.group_id])
@@ -63,9 +77,11 @@ class Event(models.Model):
     class Meta:
         verbose_name = u'wydarzenie'
         verbose_name_plural = u'wydarzenia'
+        ordering = ('-created',)
         permissions = (
             ("manage_events", u"Może zarządzać wydarzeniami"),
         )
+
 
     def _user_can_see_or_404(self, user):
         """
@@ -158,6 +174,15 @@ class Event(models.Model):
         """
         return cls.objects.all().select_related('group', 'course', 'course__entity', 'author')\
                                  .prefetch_related('term_set', 'term_set__room')
+    @classmethod
+    def get_all_without_courses(cls):
+        """
+
+        Return all events with all needed select_related and prefetch_related
+
+        @return: Event QuerySet
+        """
+        return cls.get_all().exclude(type='3')
 
     @classmethod
     def get_for_user(cls, user):
@@ -176,7 +201,7 @@ class Event(models.Model):
 
         @return Event QuerySet
         """
-        return cls.objects.filter(type='0', status='1').order_by('-created')
+        return cls.objects.filter(type='0', status='1').order_by('-created').select_related('course', 'course__entity')
 
     @classmethod
     def get_events(cls):
@@ -184,6 +209,12 @@ class Event(models.Model):
         """
 
         return cls.objects.filter(status='1', type='0').order_by('-created')
+
+    def get_followers(self):
+        if self.type in ['0', '1']:
+            return self.course.get_all_enrolled_emails()
+
+        return self.interested.values_list('email', flat=True)
 
 class Term(models.Model):
     """
@@ -199,6 +230,22 @@ class Term(models.Model):
     room   = models.ForeignKey('courses.Classroom', null=True, blank=True, verbose_name=u'Sala', related_name='event_terms')
     place  = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'Miejsce')
 
+    def validate_unique(self, *args, **kwargs):
+        from django.core.exceptions import ValidationError
+
+        if self.room:
+            terms = Term.objects.filter(Q(room=self.room), Q(day=self.day), Q(event__status='1'),
+                                        Q(start__lt=self.end), Q(end__gt=self.start))\
+                                .select_related('event')
+
+            if self.pk:
+                terms = terms.exclude(pk=self.pk)
+
+            if terms.count():
+                raise ValidationError({'__all__': (u'Ta sala w podanym terminie jest zajęta',)})
+
+        super(Term, self).validate_unique(*args, **kwargs)
+
     def clean(self):
         """
         Overloaded method from models.Model
@@ -210,12 +257,30 @@ class Term(models.Model):
         if not self.room and not self.place:
             raise ValidationError(u'Musisz podać salę lub miejsce.')
 
+
+
+
     class Meta:
         get_latest_by = 'end'
         ordering = ['day', 'start', 'end']
         verbose_name = u'termin'
         verbose_name_plural = u'terminy'
 
+    def get_conflicted(self):
+
+        if not self.room:
+            return EmptyQuerySet()
+
+#        X < B AND A < Y
+
+        terms = Term.objects.filter(Q(room=self.room), Q(day=self.day),
+                                    Q(start__lt=self.end), Q(end__gt=self.start))\
+                            .select_related('event')
+
+        if self.pk:
+            terms = terms.exclude(pk=self.pk)
+
+        return terms
 
     def print_start(self):
         """
@@ -245,7 +310,7 @@ class Term(models.Model):
 
         @return: Term QuerySet
         """
-        return cls.objects.filter(event__type='0').order_by('day')
+        return cls.objects.filter(event__type__in=['0', '1']).order_by('day', 'room').select_related('event', 'room', 'event__course', 'event__course__entity', 'event__course__semester')
 
 
 class EventModerationMessage(models.Model):
@@ -305,8 +370,34 @@ class EventModerationMessage(Message):
         verbose_name = u'wiadomość moderacji wydarzenia'
         verbose_name_plural = u'wiadomości moderacji wydarzenia'
 
+
+    def save(self, *args, **kwargs):
+        super(EventModerationMessage, self).save(*args, **kwargs)
+        if self.author == self.event.author:
+            to = settings.EVENT_MODERATOR_EMAIL
+        else:
+            to = self.author.email
+
+#        render_and_send_email(u'Nowa wiadomość moderatorska w wydarzeniu',
+#                               u'schedule/emails/new_moderation_message.txt',
+#                               u'schedule/emails/new_moderation_message.html',
+#                               {'event': self.event},
+#                               [to]
+#        )
+
 class EventMessage(Message):
 
     class Meta:
         verbose_name = u'wiadomość wydarzenia'
         verbose_name_plural = u'wiadomości wydarzenia'
+
+    def save(self, *args, **kwargs):
+        super(EventMessage, self).save(*args, **kwargs)
+
+#
+#        render_and_send_email(u'Nowa wiadomość w wydarzeniu',
+#                               u'schedule/emails/new_message.txt',
+#                               u'schedule/emails/new_message.html',
+#                               {'event': self.event},
+#                               self.event.get_followers()
+#        )

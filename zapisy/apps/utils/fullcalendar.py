@@ -8,8 +8,9 @@ from django.views.generic import View
 
 class FullCalendarAdapter(object):
 
-    def __init__(self, queryset):
+    def __init__(self, queryset, request):
         self.queryset = queryset
+        self.request = request
 
     def collection_as_json(self):
         result = []
@@ -221,5 +222,5 @@ class FullCalendarView(BaseListView):
                                  **httpresponse_kwargs)
 
     def convert_to_json(self, queryset):
-        return self.adapter(queryset).collection_as_json()
+        return self.adapter(queryset, self.request).collection_as_json()
 

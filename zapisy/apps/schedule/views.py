@@ -68,19 +68,20 @@ def edit_event(request, id=None):
 
     return TemplateResponse(request, 'schedule/reservation.html', locals())
 
-@login_required
-def ajax_get_terms(request, year, month, day):
-    time  = datetime.date(int(year), int(month), int(day))
-    terms = Classroom.get_terms_in_day(time, ajax=True)
-    return HttpResponse(terms, mimetype="application/json")
 
 def session(request, semester=None):
     exams = ExamFilter(request.GET, queryset=Term.get_exams())
+
+    if semester:
+        semester = Semester.get_by_id(semester)
+    else:
+        semester = Semester.get_current_semester()
+
     return TemplateResponse(request, 'schedule/session.html', locals())
 
 @login_required
 def reservations(request):
-    events = EventFilter(request.GET, queryset=Event.get_all())
+    events = EventFilter(request.GET, queryset=Event.get_all_without_courses())
     title = u'Zarządzaj rezerwacjami'
     return TemplateResponse(request, 'schedule/reservations.html', locals())
 
@@ -171,6 +172,14 @@ def change_interested(request, id):
 """
 AJAX views
 """
+
+
+
+@login_required
+def ajax_get_terms(request, year, month, day):
+    time  = datetime.date(int(year), int(month), int(day))
+    terms = Classroom.get_terms_in_day(time, ajax=True)
+    return HttpResponse(terms, mimetype="application/json")
 
 
 class ClassroomTermsAjaxView(FullCalendarView):

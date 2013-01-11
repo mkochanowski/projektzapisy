@@ -17,6 +17,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+EVENT_MODERATOR_EMAIL = 'zapisy@ii.uni.wroc.pl'
+
 """
 DATABASES = {
      'default' : {

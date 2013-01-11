@@ -111,6 +111,7 @@
                                 <td style="width:30px">{{ term.print_end }}</td>
                                 <td style="width:100px; text-align: center">{{ term.day|date:"j E Y" }}</td>
                                 <td>{% if term.room %}<a style="font-size: xx-small" href="{{ term.room.get_absolute_url }}">Sala {{ term.room.number }}</a>{% else %}{{ term.place }}{% endif %}</td>
+                                {% if  perms.schedule.manage_events %}<td>Konflikt: {% for e in term.get_conflicted %}<a href="{{ e.event.get_absolute_url }}">[link]</a> {% empty %}Brak{% endfor %}</td>{% endif %}
                             </tr>
                             {% endfor %}
                         </table>

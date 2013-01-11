@@ -17,7 +17,19 @@
             e.preventDefault();
             $(this).parents('li').find('.decisionform').show();
             $(this).parent().hide();
-        })
+        });
+
+        $('#id_type').change(function(e){
+            if( $(this).val() == '0' ||  $(this).val() == '1' ){
+                $('#id_visible').val('2').attr('disabled', true);
+                $('#id_status').val('1').attr('disabled', true);
+            } else {
+
+                $('#id_visible').attr('disabled', false);
+                $('#id_status').attr('disabled', false);
+            }
+
+        }).trigger('change');
 
     };
     $(function(){ReservationsView();});

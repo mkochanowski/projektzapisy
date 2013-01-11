@@ -880,7 +880,7 @@
 
             {% endif %}
 
-            <div id="form_title" class="row clearfix" style="display: none;">
+            <div id="form_title" class="row clearfix">
                 <div class="span10">
                 <label for="id_title">Tytuł</label>
                         <div class="input">
@@ -931,14 +931,6 @@
         </fieldset>
 
         <h3>Terminy</h3>
-
-        {% if formset.errors %}
-            <ul>
-                {% for error in formset.errors %}
-                    <li class="error">{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
         {{ formset.management_form }}
         <table id="termstable" class="span16">
             <thead>
@@ -958,7 +950,10 @@
                     <td class="termtbl2"><span>{{ form.instance.print_end }}</span>{{ form.end }}{{ form.id }}</td>
                     <td class="termtbl4"><span>{% if form.instance.room %}Sala
                         {{ form.instance.room.number }}{% else %}
-                        {{ form.instance.place }}{% endif %}{{ form.room }}{{ form.place }}</span></td>
+                        {{ form.instance.place }}{% endif %}{{ form.room }}{{ form.place }}</span>
+                        <span>{% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}</span>
+                    </td>
+
                     <td>
                         <div class="hidden">{{ form.DELETE }}</div>
                         <button style="display:none" class="btn success unremoveterm" formnovalidate>Cofnij
@@ -980,29 +975,44 @@
         <table>
             <tbody>
             <tr>
-                <td class="termtbl1">
+                <td class="termtbl1" style="border-bottom: 0">
                     <input id="term" type="date" class="term small" placeholder="{% now "Y-m-d" %}"
                            min="{% now "Y-m-d" %}" required>
                 </td>
-                <td class="termtbl2">
+                <td class="termtbl2" style="border-bottom: 0">
                     <input id="begin" type="time" class="begin mini timepicker readonly" placeholder="np. 8:00" required
                            pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$">
 
                 </td>
-                <td class="termtbl2">
+                <td class="termtbl2" style="border-bottom: 0">
                     <input id="end" type="time" class="end mini timepicker readonly" placeholder="np. 10:00" required
                            pattern="^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$">
                 </td>
-                <td class="termtbl1">
+                <td class="termtbl1" style="border-bottom: 0">
                     <input type="hidden" id="hiddenroom" value="">
                     <input type="hidden" id="hiddenid" value="">
                     <input type="hidden" id="hiddeneventid" value="">
                     <input class="xlarge readonly" id="location" autocomplete="off" name="location"
                            placeholder="Miejsce" disabled="true"
                            type="text" required>
+
+                </td>
+                <td colspan="2" class="termtbl3" style="border-bottom: 0">
+                    <button id="addterm" class="btn success">Dodaj termin</button>
+                </td>
+            </tr>
+            <tr>
+                <td class="termtbl1">
+                    <small style="font-size: 12px">Wybierz termin, by zobaczyć sale wolne w tym czasie</small>
+                </td>
+                <td class="termtbl2">
+                </td>
+                <td class="termtbl2">
+                </td>
+                <td class="termtbl1">
+                    <small style="font-size: 12px">Naciśnij, aby wybrać</small>
                 </td>
                 <td colspan="2" class="termtbl3">
-                    <button id="addterm" class="btn success">Dodaj termin</button>
                 </td>
             </tr>
             </tbody>

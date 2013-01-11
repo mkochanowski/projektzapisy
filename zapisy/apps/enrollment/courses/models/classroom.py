@@ -9,10 +9,15 @@ from autoslug import AutoSlugField
 from apps.schedule.models import Term
 
 floors = [(0, 'Parter'), (1, 'I piętro'), (2, 'II Piętro'), (3, 'III piętro')]
+types = [(0, u'Sala wykładowa'), (1, u'Sala ćwiczeniowa'), (2, u'Pracownia komputerowa - Windows'), (3, u'Pracownia komputerowa - Linux')]
+
+
 
 class Classroom( models.Model ):
     """classroom in institute"""
     slug =  AutoSlugField(populate_from='number', unique_with='number')
+    type = models.IntegerField(choices=types, default=1, verbose_name='typ')
+    description = models.TextField(null=True, blank=True, verbose_name='opis')
     number = models.CharField( max_length = 20, verbose_name = 'numer sali' )
     order = models.IntegerField(null=True, blank=True)
     building = models.CharField( max_length = 75, verbose_name = 'budynek', blank=True, default='' )
@@ -49,7 +54,7 @@ class Classroom( models.Model ):
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
         rooms = cls.get_in_institute(reservation=True)
-        terms = Term.objects.filter(day=date, room__in=rooms).select_related('room', 'event')
+        terms = Term.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
 
         if not ajax:
             return rooms

@@ -19,9 +19,9 @@
 {% block content-width %}16{% endblock %}
 
 {% block content %}
-    <div class="span10" style="margin-left: 0;">
+    <div class="span12" style="margin-left: 0;">
         <div class="row">
-            <div class="span9"><h2>Egzaminy</h2></div>
+            <div class="span11"><h2>Egzaminy</h2></div>
 
             <div class="span1" style="text-align: right;">
                 <a href="{% url events:session_feed %}"><img src="/site_media/feed-icon.png" alt="RSS"></a>
@@ -32,7 +32,7 @@
 
         <div class="row">
 
-            <div class="span10">
+            <div class="span12">
             <div class="alert-message info">
                     <a class="close" href="#">×</a>
                     <p>Kolokwia i egzaminy w wybranym semestrze (Uwaga: wybierz semestr z prawej strony!)</p>
@@ -48,17 +48,20 @@
 
                 {% for exam in terms_list %}
                     <li>
-                        <span><h4>{{ exam.grouper }}</h4></span>
+                        <span><h4>{{ exam.grouper|date:"l, j E Y" }}</h4></span>
 
+                        {% regroup exam.list by event.course as list %}
+                        {% for ll in list %}
                         <div>
+                            <h6>{{ ll.grouper.name }}</h6>
                             <ul>
-                                {% for term in exam.list %}
-                                    <li><p>{{ term.print_start }} - {{ term.print_end }}, {% if term.room %}s. <a href="{{ term.get_absolute_url }}">{{ term.room }}</a>{% else %}{{ term.place }}{% endif %}</p>
-                                        <p><a
-                                            href="{% url events:show term.event.id %}">{{ term.event.course }}</a></p></li>
+                                {% for term in ll.list %}
+                                    <li><p>{{ term.print_start }} - {{ term.print_end }}, {% if term.room %}sala <a href="{{ term.room.get_absolute_url }}">{{ term.room.number }}</a>{% else %}{{ term.place }}{% endif %}</p>
+                                        </li>
                                 {% endfor %}
                             </ul>
                         </div>
+                        {% endfor %}
                     </li>
                 {% empty %}
                     <li>Brak wyników dla zapytania</li>
@@ -66,7 +69,7 @@
             </ul>
         </div>
     </div>
-        <div class="span6">
+        <div class="span4">
             <form method="GET" class="form-stacked">
                 <fieldset>
                     <legend>Filtr</legend>

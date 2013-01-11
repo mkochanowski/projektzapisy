@@ -54,7 +54,7 @@
                     </li>
                     <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
                     <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta</a></li>
-                    <li{% block events_active %}{% endblock %}><a href="{% url events:classrooms %}">Sale</a></li>
+                    <li{% block events_active %}{% endblock %}><a href="{% url events:classrooms %}">Sale <span style="color:red;font-size: 10px">beta</span></a></li>
 
                 </ul>
                 {% if user.is_authenticated %}

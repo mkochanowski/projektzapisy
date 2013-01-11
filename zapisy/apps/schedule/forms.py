@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 from django                   import forms
 from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
@@ -29,8 +30,16 @@ class EventForm(forms.ModelForm):
         model = Event
         exclude = ('status', 'author', 'created', 'edited', 'group', 'interested')
 
-    def __init__(self, user, **kwargs):
-        super(EventForm, self).__init__(**kwargs)
+    def __init__(self, user, data=None, **kwargs):
+
+        if data:
+            data = deepcopy(data)
+            if 'type' not in data:
+                data['type'] = '2'
+
+
+        super(EventForm, self).__init__(data, **kwargs)
+
         self.author = user
         if user.employee:
             self.fields['type'].choices = types_for_teacher

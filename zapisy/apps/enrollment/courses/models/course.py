@@ -355,6 +355,10 @@ class Course( models.Model ):
         return semester.get_current_limit() < student.get_ects_with_course(semester, self)
 
 
+    def get_all_enrolled_emails(self):
+        from apps.enrollment.records.models import Record
+        return Record.objects.filter(group__course=self).values_list('student__user__email', flat=True).distinct()
+
 
     def votes_count(self, semester=None):
         from apps.offer.vote.models import SingleVote

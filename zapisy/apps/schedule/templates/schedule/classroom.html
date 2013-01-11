@@ -124,9 +124,15 @@
             		<td class="tbl1" width="20%">{{ room.capacity }}</td>
             		</tr>
             		<tr>
-            <td class="tbl2"><b>Wyposażenie</b></td>
+            <td class="tbl2"><b>Typ</b></td>
             <td colspan="3" class="tbl1">
-            {% if room.equipment %}{{ room.equipment }}{% else %}Brak informacji{% endif %}
+                {{ room.get_type_display }}
+
+            </td></tr>
+            		<tr>
+            <td class="tbl2"><b>Opis</b></td>
+            <td colspan="3" class="tbl1">
+            {% if room.description %}{{ room.description }}{% else %}Brak{% endif %}
 
             </td></tr></tbody></table>
         </div>

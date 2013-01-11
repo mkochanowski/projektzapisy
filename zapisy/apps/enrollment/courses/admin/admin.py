@@ -47,12 +47,12 @@ class GroupInline(admin.TabularInline):
     form = GroupForm
 
 class CourseAdmin(admin.ModelAdmin):
-    list_display =('semester',)
+    list_display =('entity', 'semester',)
     list_filter = ('semester',)
     search_fields = ('entity__name',)
     fieldsets = [
         (None,               {'fields': ['entity'], 'classes': ['long_name']}),
-        ('Szczegóły', {'fields': ['records_start', 'records_end', 'numeryczna_l', 'dyskretna_l', 'teachers','semester','english','exam','suggested_for_first_year','slug','web_page'], 'classes': ['collapse']}),
+        ('Szczegóły', {'fields': ['records_start', 'records_end', 'teachers','semester','slug','web_page'], 'classes': ['collapse']}),
     ]
     inlines = [GroupInline, ]
 
@@ -287,7 +287,7 @@ class StudentOptionsAdmin(admin.ModelAdmin):
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
 
-admin.site.register(Course)
+admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseDescription)
 admin.site.register(CourseEntity)
 admin.site.register(StudentOptions,StudentOptionsAdmin)
