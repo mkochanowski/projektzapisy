@@ -348,7 +348,7 @@ class Student(BaseUser):
         return Record.objects.filter(status=1, group__course__semester=semester, student=self)\
           .select_related('group', 'group__course', 'group__course__type')\
           .prefetch_related('group__term', 'group__term__classrooms')\
-          .order_by('group__course__name')
+          .order_by('group__course__entity__name')
 
     @staticmethod
     def get_list(begin='All'):
