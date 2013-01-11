@@ -289,7 +289,7 @@ class Student(BaseUser):
         current_semester = Semester.get_default_semester()
         from apps.offer.vote.models.single_vote import SingleVote
         return map(lambda x: x.course, SingleVote.objects.filter(student=self, state__semester_winter=current_semester,
-                                              correction=given_points).select_related('course').order_by('course__name'))
+                                              correction=given_points).select_related('course').order_by('course__entity__name'))
         #return map(lambda x: x.course, StudentOptions.objects.filter(course__semester__id__exact=current_semester.id).filter(student=self, records_opening_bonus_minutes=minutes).order_by('course__name'))
         
     def get_records_history(self,default_semester=None):

@@ -233,7 +233,7 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposal(slug):
-        return CourseEntity.noremoved.prefetch_related('requirements').get(slug=slug)
+        return CourseEntity.noremoved.get(slug=slug)
 
     @staticmethod
     def get_employee_proposals(user):
