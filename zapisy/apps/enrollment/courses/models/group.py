@@ -414,7 +414,7 @@ class Group(models.Model):
     @staticmethod
     def get_all_in_semester(semester):
         return Group.objects.filter(course__semester=semester).\
-                    select_related('course', 'course__semester', 'course__entity', 'teacher', 'teacher__user').order_by('course__name')
+                    select_related('course', 'course__semester', 'course__entity', 'teacher', 'teacher__user').order_by('course__entity__name')
 
     def __unicode__(self):
         return "%s: %s - %s" % (unicode(self.course.entity.get_short_name()),

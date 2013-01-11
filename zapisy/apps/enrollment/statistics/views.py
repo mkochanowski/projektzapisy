@@ -9,5 +9,5 @@ from apps.enrollment.courses.models import Semester, Group
 def students_list(request):
     semester = Semester.get_current_semester()
     students = Student.get_list().order_by('t0').extra(select={'semester_points': 'COALESCE((SELECT SUM(value) FROM users_courses AS uc WHERE uc.student_id = users_student.id AND uc.semester_id = ' + str(semester.id) + '), 0)'})
-    groups   = Group.get_all_in_semester(semester)
+#    groups   = Group.get_all_in_semester(semester)
     return TemplateResponse(request, 'statistics/students_list.html', locals())
