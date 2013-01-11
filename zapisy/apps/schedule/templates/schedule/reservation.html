@@ -835,7 +835,7 @@
 {% block content %}
     <div class="row">
         <div class="span16">
-            <h2>Nowa rezerwacja</h2>
+            <h2>{% if is_edit %}Zmień rezerwacje{% else %}Nowa rezerwacja{% endif %}</h2>
         </div>
     </div>
 

@@ -41,6 +41,7 @@ class EventForm(forms.ModelForm):
         super(EventForm, self).__init__(data, **kwargs)
 
         self.author = user
+
         if user.employee:
             self.fields['type'].choices = types_for_teacher
         else:
@@ -48,9 +49,14 @@ class EventForm(forms.ModelForm):
 
         if not user.employee:
             self.fields['course'].queryset = EmptyQuerySet()
+
         else:
             semester = Semester.get_current_semester()
-            self.fields['course'].queryset = Course.objects.filter(teachers=user.employee, semester=semester)
+            qs  = Course.objects.filter(semester=semester)
+            if not user.has_perm('schedule.manage_events'):
+                qs = qs.filter(teachers=user.employee)
+
+            self.fields['course'].queryset = qs
 
         self.fields['title'].widget.attrs.update({'class' : 'span7'})
         self.fields['type'].widget.attrs.update({'class' : 'span7'})
