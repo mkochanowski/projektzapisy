@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.db.models import signals
 from django.core.cache import cache as mcache
+from django.utils.encoding import smart_unicode
 
 from apps.enrollment.courses.models.points import PointsOfCourseEntities
 from apps.offer.proposal.exceptions import NotOwnerException
@@ -531,6 +532,11 @@ class CourseDescription(models.Model):
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     exam = models.BooleanField(verbose_name='egzamin')
 
+    created = models.DateTimeField(auto_now_add=True, auto_now=True)
+
+
+    def __unicode__(self):
+        return smart_unicode(self.created) + ' ' + smart_unicode(self.entity)
 
     class Meta:
         verbose_name = 'opis przedmiotu'

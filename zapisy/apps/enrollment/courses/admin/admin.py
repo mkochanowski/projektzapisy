@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.db.models.query import EmptyQuerySet
 from django.forms import ModelForm
 
 from apps.enrollment.courses.models import *
@@ -46,15 +47,45 @@ class GroupInline(admin.TabularInline):
     raw_id_fields = ("teacher",)
     form = GroupForm
 
+
+class CourseForm(ModelForm):
+
+    class Meta:
+        model = Course
+
+    def __init__(self, *args, **kwargs):
+        super(CourseForm, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs:
+            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance'].entity).select_related('entity')
+        else:
+            self.fields['information'].queryset = EmptyQuerySet()
+
+
+class CourseEntityForm(ModelForm):
+
+    class Meta:
+        model = CourseEntity
+
+    def __init__(self, *args, **kwargs):
+        super(CourseEntityForm, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs:
+            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance']).select_related('entity')
+        else:
+            self.fields['information'].queryset = EmptyQuerySet()
+
+
 class CourseAdmin(admin.ModelAdmin):
     list_display =('entity', 'semester',)
     list_filter = ('semester',)
     search_fields = ('entity__name',)
     fieldsets = [
         (None,               {'fields': ['entity'], 'classes': ['long_name']}),
+        (None, {'fields': ['information']}),
         ('Szczegóły', {'fields': ['records_start', 'records_end', 'teachers','semester','slug','web_page'], 'classes': ['collapse']}),
     ]
     inlines = [GroupInline, ]
+
+    form = CourseForm
 
 
     def changelist_view(self, request, extra_context=None):
@@ -114,13 +145,14 @@ class CourseEntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'shortName', 'owner')
     search_fields = ('name', 'shortName', 'owner__user__first_name', 'owner__user__last_name' )
     fieldsets = [
-        (None,               {'fields': ['name','shortName','type','description'], 'classes': ['long_name']}),
-        (None,               {'fields': ['owner', 'status', 'semester', 'requirements']}),
+        (None,               {'fields': ['name','shortName','type', 'information'], 'classes': ['long_name']}),
+        (None,               {'fields': ['owner', 'status', 'semester']}),
         (None,               {'fields': ['english', 'exam', 'deleted']}),
         ('USOS',             {'fields': ['usos_kod'], 'classes': ['collapse']}),
 
     ]
     list_filter = ('semester', 'owner', 'status', 'type', )
+    form = CourseEntityForm
 
     def queryset(self, request):
        """
@@ -207,6 +239,8 @@ class QueuedInline(admin.TabularInline):
     can_delete = False
     form=QueuedInlineForm
 
+
+
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012','get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
@@ -287,9 +321,25 @@ class StudentOptionsAdmin(admin.ModelAdmin):
     search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
 
 
+
+
+class CourseDescriptionAdmin(admin.ModelAdmin):
+    list_display = ('entity','created', 'author',)
+    search_fields = ('entity__name',)
+    list_filter = ('entity__type',)
+
+    save_as = True
+
+    def save_model(self, request, obj, form, change):
+        obj.author = request.user.employee
+        obj.save()
+        entity = obj.entity
+        entity.information = obj
+        entity.save()
+
 admin.site.register(Course, CourseAdmin)
-admin.site.register(CourseDescription)
-admin.site.register(CourseEntity)
+admin.site.register(CourseDescription, CourseDescriptionAdmin)
+admin.site.register(CourseEntity, CourseEntityAdmin)
 admin.site.register(StudentOptions,StudentOptionsAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Classroom, ClassroomAdmin)
