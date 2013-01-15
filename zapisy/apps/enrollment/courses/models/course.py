@@ -133,6 +133,11 @@ class CourseEntity(models.Model):
             return self.shortName
 
 
+    @property
+    def description(self):
+        return self.information.description
+
+
 
     @property
     def have_review_lecture(self):
