@@ -96,6 +96,8 @@ class CourseEntity(models.Model):
 
     usos_kod = models.CharField(max_length=20, null=True, blank=True, default='', verbose_name=u'Kod przedmiotu w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
 
+    ue = models.BooleanField(default=False, verbose_name=u'Przedmiot prowadzony przy pomocy środków pochodzących z Unii Europejskiej')
+
     objects   = WithInformation()
     noremoved = NoRemoved()
 

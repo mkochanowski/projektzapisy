@@ -171,6 +171,13 @@
         </div>
     {% endif %}{% endfor %}
 
-
+    {% if course.entity.ue %}
+    <div class="row">
+        <h6>Przedmiot współfinansowany ze środków Unii Europejskiej w ramach Europejskiego Funduszu Społecznego</h6>
+        <div class="span14">
+            <img style="width:640px" src="https://zamawiane.ii.uni.wroc.pl/loga_www.png">
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

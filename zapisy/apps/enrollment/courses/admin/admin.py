@@ -149,7 +149,7 @@ class CourseEntityAdmin(admin.ModelAdmin):
         (None,               {'fields': ['owner', 'status', 'semester']}),
         (u'Godziny', {'fields': ['lectures', 'exercises', 'laboratories', 'repetitions', 'seminars', 'exercises_laboratiories']}),
         (u'Zmiana sposobu liczenia punktów',               {'fields': ['algorytmy_l', 'dyskretna_l', 'numeryczna_l', 'programowanie_l']}),
-        (None,               {'fields': ['english', 'exam', 'suggested_for_first_year', 'deleted']}),
+        (None,               {'fields': ['ue', 'english', 'exam', 'suggested_for_first_year', 'deleted']}),
         ('USOS',             {'fields': ['usos_kod'], 'classes': ['collapse']}),
 
     ]
