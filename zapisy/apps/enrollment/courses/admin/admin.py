@@ -147,7 +147,9 @@ class CourseEntityAdmin(admin.ModelAdmin):
     fieldsets = [
         (None,               {'fields': ['name','shortName','type', 'information'], 'classes': ['long_name']}),
         (None,               {'fields': ['owner', 'status', 'semester']}),
-        (None,               {'fields': ['english', 'exam', 'deleted']}),
+        (u'Godziny', {'fields': ['lectures', 'exercises', 'laboratories', 'repetitions', 'seminars', 'exercises_laboratiories']}),
+        (u'Zmiana sposobu liczenia punktów',               {'fields': ['algorytmy_l', 'dyskretna_l', 'numeryczna_l', 'programowanie_l']}),
+        (None,               {'fields': ['english', 'exam', 'suggested_for_first_year', 'deleted']}),
         ('USOS',             {'fields': ['usos_kod'], 'classes': ['collapse']}),
 
     ]

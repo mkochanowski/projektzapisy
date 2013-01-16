@@ -20,7 +20,14 @@ import logging
 from timedelta.fields import TimedeltaField
 logger = logging.getLogger()
 
-class NoRemoved(models.Manager):
+
+class WithInformation(models.Manager):
+    """ Manager for course objects with visible semester """
+    def get_query_set(self):
+        """ Returns all courses which have marked semester as visible """
+        return super(WithInformation, self).get_query_set().select_related('information')
+
+class NoRemoved(WithInformation):
     """ Manager for course objects with visible semester """
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
@@ -65,12 +72,12 @@ class CourseEntity(models.Model):
 
     web_page     = models.URLField(verbose_name='strona www', null=True, blank=True)
     ects         = models.IntegerField(null=True, blank=True)
-    lectures = models.IntegerField(null=True, blank=True)
-    exercises  = models.IntegerField(null=True, blank=True)
-    laboratories  = models.IntegerField(null=True, blank=True)
-    repetitions = models.IntegerField(null=True, blank=True)
-    seminars = models.IntegerField( null=True, blank=True, verbose_name='seminaria')
-    exercises_laboratiories = models.IntegerField(null=True, blank=True, verbose_name='ćwiczenio-pracownie')
+    lectures = models.IntegerField(null=True, blank=True, verbose_name=u'godzin wykładu')
+    exercises  = models.IntegerField(null=True, blank=True, verbose_name=u'godzin ćwiczeń')
+    laboratories  = models.IntegerField(null=True, blank=True, verbose_name=u'godzin pracowni')
+    repetitions = models.IntegerField(null=True, blank=True, verbose_name=u'godzin repetytorium')
+    seminars = models.IntegerField( null=True, blank=True, verbose_name=u'godzin seminariów')
+    exercises_laboratiories = models.IntegerField(null=True, blank=True, verbose_name=u'godzin ćwiczenio-pracowni')
 
     deleted = models.BooleanField(verbose_name='ukryty', default=False)
     owner   = models.ForeignKey('users.Employee', verbose_name='opiekun', blank=True, null=True)
@@ -82,16 +89,36 @@ class CourseEntity(models.Model):
     in_prefs = models.BooleanField(verbose_name='w preferencjach', default=True)
 
 
-    dyskretna_l     = models.BooleanField(default=False)
-    numeryczna_l    = models.BooleanField(default=False)
-    algorytmy_l     = models.BooleanField(default=False)
-    programowanie_l = models.BooleanField(default=False)
+    dyskretna_l     = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Dyskretna (L)')
+    numeryczna_l    = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Numeryczna (L)')
+    algorytmy_l     = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Algorytmy (L)')
+    programowanie_l = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Programowanie (L)')
 
     usos_kod = models.CharField(max_length=20, null=True, blank=True, default='', verbose_name=u'Kod przedmiotu w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
 
-    objects   = models.Manager()
+    objects   = WithInformation()
     noremoved = NoRemoved()
 
+
+
+    def get_lectures(self):
+        return self.lectures + self.information.lectures
+
+    def get_exercises(self):
+        return self.lectures + self.information.lectures
+
+    def get_laboratories(self):
+        return self.laboratories + self.information.laboratories
+
+    def get_repetitions(self):
+        return self.repetitions + self.information.repetitions
+
+    def get_seminars(self):
+        return self.seminars + self.information.seminars
+
+    def get_exercises_laboratiories(self):
+        return self.exercises_laboratiories + self.information.exercises_laboratories
+#
 
     def save(self, *args, **kwargs):
         """
@@ -534,12 +561,14 @@ class CourseDescription(models.Model):
 
     description = models.TextField(verbose_name='opis', blank=True, default='')
 
-    lectures     = TimedeltaField(verbose_name='wykład', blank=True, null=True, default=datetime.timedelta(hours=0))
-    repetitions  = TimedeltaField(verbose_name='Repetytorium', blank=True,null=True, default=datetime.timedelta(hours=0))
-    exercises    = TimedeltaField(verbose_name='ćwiczenia', blank=True, null=True, default=datetime.timedelta(hours=0))
-    laboratories = TimedeltaField(verbose_name='pracownia', blank=True, null=True, default=datetime.timedelta(hours=0))
-    seminars     = TimedeltaField(default=datetime.timedelta(hours=0), null=True, blank=True, verbose_name='seminaria')
-    exercises_laboratories = TimedeltaField(verbose_name='ćw+prac', blank=True, null=True, default=datetime.timedelta(hours=0))
+    lectures     = models.IntegerField(verbose_name=u'różnica w godzinach wykładu', blank=True, null=True, default=0)
+    repetitions  = models.IntegerField(verbose_name=u'różnica w godzinach repetytoriów', blank=True,null=True, default=0)
+    exercises    = models.IntegerField(verbose_name=u'różnica w godzinach ćwiczeń', blank=True, null=True, default=0)
+    laboratories = models.IntegerField(verbose_name=u'różnica w godzinach pracowni', blank=True, null=True, default=0)
+    seminars     = models.IntegerField(default=0, null=True, blank=True, verbose_name=u'różnica w godzinach seminariów')
+    exercises_laboratories = models.IntegerField(verbose_name=u'różnica w godzinach ćw+prac', blank=True, null=True, default=0)
+
+
 
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     exam = models.BooleanField(verbose_name='egzamin')
@@ -554,24 +583,3 @@ class CourseDescription(models.Model):
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
         app_label = 'courses'
-
-
-
-"""
-CREATE OR REPLACE VIEW courses_points AS
- SELECT cc.semester_id, au.id AS student_id, cc.id AS course_id, COALESCE(
-        CASE
-            WHEN au.numeryczna_l AND cc.numeryczna_l OR au.dyskretna_l AND cc.dyskretna_l THEN ( SELECT cp.value
-               FROM courses_pointsofcourses cp
-              WHERE cp.course_id = cc.id AND cp.program_id = 1)
-            ELSE ( SELECT cp.value
-               FROM courses_pointsofcourses cp
-              WHERE cp.course_id = cc.id AND cp.program_id = au.program_id)
-        END::integer, (( SELECT cpe.value
-           FROM courses_pointsofcourseentities cpe
-          WHERE cpe.entity_id = cc.entity_id))::integer, 0) AS value, ( SELECT count(*) AS count
-           FROM records_record rr
-      LEFT JOIN courses_group cg ON rr.group_id = cg.id
-     WHERE cg.course_id = cc.id AND rr.status::integer = 1 AND rr.student_id = au.id) AS groups
-   FROM users_student au, courses_course cc;
-"""
