@@ -129,7 +129,7 @@ class CourseEntity(models.Model):
                 pass
         try:
             return PointsOfCourseEntities.objects.filter(entity=self, program__isnull=True)[0]
-        except ObjectDoesNotExist, IndexError:
+        except (ObjectDoesNotExist, IndexError) as e:
             return None
 
 
