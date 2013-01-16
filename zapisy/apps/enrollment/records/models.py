@@ -139,7 +139,7 @@ class Record(models.Model):
         records = Record.enrolled.filter(student=student).\
             select_related('group', 'group__course', 'group__teacher',
                 'group__teacher__user', 'group__term').\
-                order_by('group__course__name')
+                order_by('group__course__entity__name')
         groups = [record.group for record in records]
         for group in groups:
             group.terms_ = group.get_all_terms() # za dużo zapytań

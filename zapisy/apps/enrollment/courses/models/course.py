@@ -370,7 +370,7 @@ class Course( models.Model ):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify('%d %s %s' % (self.pk, self.name))
+            self.slug = slugify('%d %s %s' % (self.pk, self.entity.name))
 
         super(Course, self).save(*args, **kwargs)
 

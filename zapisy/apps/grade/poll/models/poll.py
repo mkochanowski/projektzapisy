@@ -36,7 +36,7 @@ class Poll( models.Model ):
         verbose_name        = 'ankieta' 
         verbose_name_plural = 'ankiety'
         app_label           = 'poll'
-        ordering            = ['group__course__name', 'group__teacher']
+        ordering            = ['group__course__entity__name', 'group__teacher']
         
     def __unicode__( self ):
         res = unicode( self.title )

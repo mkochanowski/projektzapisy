@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 from django.db import models
+from django.db.models import Sum
 from apps.users.models import Student
 
 class PointTypes(models.Model):
@@ -53,47 +54,6 @@ class PointsOfCourseEntities(models.Model):
         return '%s: %s %s' % (self.entity.name, self.value, self.type_of_point)
 
 
-    @classmethod
-    def get_course_points(cls, course, type=None):
-        """
-
-        @param course: :model:'courses.Course'
-        @param type: :model:'courses.PointTypes'
-        @return :model:'courses.PointsOfCourseEntities'
-
-        """
-        return 6
-#        return cls.objects.filter(entity=course.entity, type_of_point=type).order_by('-value')[0]
-
-class Points(models.Model):
-    """
-    Widok materialny (patrz migracja)
-    """
-    value    = models.PositiveSmallIntegerField(verbose_name='liczba punktów')
-    enrolled = models.BooleanField()
-    course   = models.ForeignKey('courses.Course', on_delete=models.DO_NOTHING, primary_key=True)
-    entity   = models.ForeignKey('CourseEntity', on_delete=models.DO_NOTHING)
-    student  = models.ForeignKey('users.Student', on_delete=models.DO_NOTHING)
-
-
-    class Meta:
-        managed = False
-        app_label = 'courses'
-
-    @classmethod
-    def get_for_student(cls, course, student):
-        """
-
-        Return Points for student
-
-        @param course: :model:'courses.Course'
-        @param student:  :model:'users.Student'
-        @return :model:'courses.Points'
-        """
-        return 6
-#        return cls.objects.get(course=course, student=student)
-
-
 class StudentPointsView(models.Model):
     value   = models.SmallIntegerField()
     student = models.ForeignKey(Student, primary_key=True)
@@ -105,4 +65,38 @@ class StudentPointsView(models.Model):
     class Meta:
         managed = False
         app_label = 'courses'
+
+
+    @classmethod
+    def get_student_points_in_semester(cls, student, semester):
+        """
+
+        Return sum of points in certain semester
+
+        @param student: users.Student object
+        @param semester: coruses.Semester object
+        @return: Integer
+        """
+        from apps.enrollment.records.models import Record
+
+        records = Record.enrolled.filter(student=student, group__course__semester=semester).values_list('group__course__entity_id', flat=True).distinct()
+
+        return cls.get_points_for_entities(student, records)
+
+    @classmethod
+    def get_points_for_entities(cls, student, entities):
+        """
+
+        Return sum of student points for records
+
+        @param student:
+        @param records: Entity Id's list
+        @return:
+        """
+        points = cls.objects.\
+                 filter(student=student, entity__in=entities).\
+                 aggregate(Sum('value'))
+        return points['value__sum']
+
+
 

@@ -24,7 +24,7 @@ class SingleVote ( models.Model ):
 
     entity = models.ForeignKey(CourseEntity, verbose_name='podstawa')
 
-    course   = models.ForeignKey(Course, null=True, blank=True)
+    course   = models.ForeignKey(Course, null=True, blank=True, on_delete=models.SET_NULL)
 
 
     state = models.ForeignKey('vote.SystemState',

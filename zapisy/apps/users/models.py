@@ -325,7 +325,7 @@ class Student(BaseUser):
 #        return courses, points
 
     def get_points_with_course(self, course, semester=None):
-        from apps.enrollment.courses.models import Semester
+        from apps.enrollment.courses.models import Semester, StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.get_current_semester
@@ -333,11 +333,8 @@ class Student(BaseUser):
         records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
         if course.id not in records:
             records = list(records) + [course.id]
-        points = CoursePoints.objects.\
-                 filter(student=self, semester=semester, course__in=records).\
-                 aggregate(Sum('value'))
 
-        return points['value__sum']
+        return StudentPointsView.get_points_for_entities(self, records)
 
 
     def get_schedule(self, semester=None):
@@ -647,26 +644,6 @@ CREATE OR REPLACE VIEW users_courses AS
      WHERE cg.course_id = cc.id AND rr.status::integer = 1 AND rr.student_id = au.id) AS groups
    FROM users_student au, courses_course cc;
 """
-
-
-
-class Courses(models.Model):
-    semester = models.ForeignKey('courses.Semester')
-    student = models.ForeignKey(Student, primary_key = True) #readonly!
-    course  = models.ForeignKey('courses.Course')
-    value   = models.SmallIntegerField()
-
-    class Meta:
-        managed = False
-
-class CoursePoints(models.Model):
-    semester = models.ForeignKey('courses.Semester')
-    student = models.ForeignKey(Student, primary_key = True) #readonly!
-    course  = models.ForeignKey('courses.Course')
-    value   = models.SmallIntegerField()
-
-    class Meta:
-        managed = False
 
 
 # definition of UserProfile from above
