@@ -10,7 +10,6 @@ from django.template import Context
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
-from apps.enrollment.courses.models.points import PointTypes
 from django.core.cache import cache as mcache
 import datetime
 
@@ -240,6 +239,8 @@ class Student(BaseUser):
 
     dyskretna_l  = models.BooleanField(default=False)
     numeryczna_l = models.BooleanField(default=False)
+    algorytmy_l = models.BooleanField(default=False)
+    programowanie_l = models.BooleanField(default=False)
 
 
 
@@ -465,7 +466,7 @@ class Program( models.Model ):
         Program of student studies
     """
     name = models.CharField(max_length=50, unique=True, verbose_name="Program")
-    type_of_points = models.ForeignKey(PointTypes, verbose_name='rodzaj punktów')
+    type_of_points = models.ForeignKey('courses.PointTypes', verbose_name='rodzaj punktów')
 
     class Meta:
         verbose_name = 'Program studiów'
@@ -646,6 +647,9 @@ CREATE OR REPLACE VIEW users_courses AS
      WHERE cg.course_id = cc.id AND rr.status::integer = 1 AND rr.student_id = au.id) AS groups
    FROM users_student au, courses_course cc;
 """
+
+
+
 class Courses(models.Model):
     semester = models.ForeignKey('courses.Semester')
     student = models.ForeignKey(Student, primary_key = True) #readonly!
@@ -673,3 +677,9 @@ def create_user_profile(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance)
 
 #post_save.connect(create_user_profile, sender=User)
+
+
+
+
+
+

@@ -1,7 +1,8 @@
 # -*- coding: utf8 -*-
 
 from django.db import models
-     
+from apps.users.models import Student
+
 class PointTypes(models.Model):
     """types of points"""
     name = models.CharField(max_length=30, verbose_name='rodzaj punktów', default="", unique=False)
@@ -77,6 +78,7 @@ class Points(models.Model):
 
     class Meta:
         managed = False
+        app_label = 'courses'
 
     @classmethod
     def get_for_student(cls, course, student):
@@ -90,3 +92,17 @@ class Points(models.Model):
         """
         return 6
 #        return cls.objects.get(course=course, student=student)
+
+
+class StudentPointsView(models.Model):
+    value   = models.SmallIntegerField()
+    student = models.ForeignKey(Student, primary_key=True)
+    entity  = models.ForeignKey('courses.CourseEntity')
+
+    def save(self, **kwargs):
+        raise NotImplementedError()
+
+    class Meta:
+        managed = False
+        app_label = 'courses'
+

@@ -12,7 +12,6 @@ from django.db.models import signals
 from django.core.cache import cache as mcache
 from django.utils.encoding import smart_unicode
 
-from apps.enrollment.courses.models.points import PointsOfCourseEntities
 from apps.offer.proposal.exceptions import NotOwnerException
 import settings
 from student_options import StudentOptions
@@ -117,6 +116,21 @@ class CourseEntity(models.Model):
         verbose_name_plural = 'Podstawy przedmiotów'
         app_label = 'courses'
         ordering = ['name']
+
+
+    def get_points(self, student=None):
+        from apps.enrollment.courses.models import StudentPointsView, PointsOfCourseEntities
+
+        if student:
+            try:
+                points = StudentPointsView.objects.get(student=student, entity=self)
+                return points
+            except ObjectDoesNotExist:
+                pass
+        try:
+            return PointsOfCourseEntities.objects.filter(entity=self, program__isnull=True)[0]
+        except ObjectDoesNotExist, IndexError:
+            return None
 
 
 
@@ -267,7 +281,7 @@ class Related(models.Manager):
         """ Returns all courses which have marked semester as visible """
         return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom')
 
-class VisibleManager(models.Manager):
+class VisibleManager(DefaultCourseManager):
     """ Manager for course objects with visible semester """
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
@@ -447,14 +461,7 @@ class Course( models.Model ):
             @return :model:'courses.Points' or :model:'courses.PointsOfCourseEntities' both have the same interface
         """
 
-        from apps.enrollment.courses.models.points import Points
-        if student:
-            try:
-                return Points.get_for_student(student=student,course=self)
-            except ObjectDoesNotExist:
-                return None
-
-        return PointsOfCourseEntities.get_course_points(self)
+        return self.entity.get_points(student)
 
 
 

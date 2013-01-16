@@ -244,7 +244,7 @@ class QueuedInline(admin.TabularInline):
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012','get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
-    search_fields = ('teacher__user__first_name','teacher__user__last_name','course__name')
+    search_fields = ('teacher__user__first_name','teacher__user__last_name','course__entity__name')
     inlines = [
         TermInline,RecordInline, QueuedInline
     ]
@@ -294,7 +294,7 @@ class TermAdmin(admin.ModelAdmin):
     ]
     list_filter = ('dayOfWeek', 'classrooms', 'group__course__semester')
     list_display = ('__unicode__','dayOfWeek','show_start','show_end', 'group')
-    search_fields = ('group__course__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
+    search_fields = ('group__course__entity__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
     ordering = ('dayOfWeek', 'start_time')
     raw_id_fields = ('group',)
     def queryset(self, request):
@@ -317,8 +317,7 @@ class TermAdmin(admin.ModelAdmin):
 
 class StudentOptionsAdmin(admin.ModelAdmin):
     list_display = ('__unicode__','records_opening_bonus_minutes')
-    search_fields = ('course__name',)
-    search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__name')
+    search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__entity__name')
 
 
 
