@@ -240,7 +240,7 @@ class SingleVote ( models.Model ):
     @staticmethod
     def sum_old_votes( student, state ):
         return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
-        .extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(state.semester_summer_id) +') > 0'])\
+        .extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(state.semester_winter_id) +') > 0'])\
         .aggregate(votes=Sum('value'))
 
 
