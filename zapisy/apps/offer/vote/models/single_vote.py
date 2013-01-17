@@ -150,7 +150,7 @@ class SingleVote ( models.Model ):
         pass
 
     @staticmethod
-    def make_votes( student, year=None, state=None, tag='winter' ):
+    def make_votes( student, year=None, state=None, tag='summer' ):
         """
             Makes 'zero' vote for student - only for proposal without
             vote
@@ -158,6 +158,7 @@ class SingleVote ( models.Model ):
         from apps.offer.proposal.models.proposal import Proposal
 
         correction = state.is_correction_active()
+
         semester = None
         if tag == 'winter':
             semester = state.semester_winter
@@ -227,13 +228,11 @@ class SingleVote ( models.Model ):
 
 
 
-    @staticmethod
-    def sum_votes( student, state ):
-        return SingleVote.objects.filter(student=student, state=state).aggregate(votes=Sum('value'))
+
 
     @staticmethod
     def sum_votes( student, state ):
-        return SingleVote.objects.filter(student=student, state=state).aggregate(votes=Sum('value'))
+        return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False).aggregate(votes=Sum('value'))
 
 
     def get_vote(self):

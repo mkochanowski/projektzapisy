@@ -16,15 +16,22 @@ from django.core.urlresolvers import reverse
 
 import settings
 
-class VoteFormset():
+class VoteFormset(object):
     """
         Class
+
+        które do poprawki? te które mają
+
     """
+
+
+
     def __init__(self, post, *args, **kwargs):
         from django.forms.models import modelformset_factory
         tag             = kwargs.pop('tag',        None)
         student         = kwargs.pop('student',    None)
         state           = kwargs.pop('state',    None)
+        semester_id     = None
         self.correction = kwargs.pop('correction', None)
 
         query = {}
@@ -33,13 +40,17 @@ class VoteFormset():
 
         if tag == 'winter':
             query['semester'] = 'z'
+            semester_id = state.semester_winter_id
         elif tag == 'summer':
             query['semester'] = 'l'
+            semester_id = state.semester_summer_id
         else:
             tag = 'unknown'
             query['semester'] = 'u'
 
         proposals  = CourseEntity.objects.filter(**query)
+        if self.correction:
+            proposals = proposals.extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(semester_id) +') > 0'])
         votes = SingleVote.get_votes_for_proposal(student, proposals)
         counter = votes.exclude(entity__type__free_in_vote=True).aggregate(Sum('value'))
         self.old_votes = counter['value__sum']
@@ -113,41 +124,42 @@ class VoteFormsets():
         self.winter = None
         self.unknown = None
         if state.is_correction_active():
-            correction        = True
             votes             = SingleVote.sum_votes(student, state)
-            self.points_limit = 0
+            self.points_limit = votes['votes']
             if state.is_summer_correction_active():
                 self.summer  = VoteFormset(post,
                                            student    = student,
                                            tag        = 'summer',
-                                           correction = correction)
+                                           state      = state,
+                                           correction = True)
 
-                self.points_limit += self.summer.old_votes
 
             if state.is_winter_correction_active():
                 self.winter  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'winter',
-                                       correction = correction)
-                self.points_limit += self.winter.old_votes
+                                      state      = state,
+                                       correction = True)
 
             self.errors = []
 
         else:
-            correction        = False
             self.points_limit = state.max_points
 
             self.summer  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'summer',
-                                       correction = correction)
+                                        state      = state,
+                                       correction = False)
             self.winter  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'winter',
-                                       correction = correction)
+                                       state      = state,
+                                       correction = False)
             self.unknown = VoteFormset(post,
                                        student    = student,
-                                       correction = correction)
+                                       state      = state,
+                                       correction = False)
             self.errors = []
 
 
