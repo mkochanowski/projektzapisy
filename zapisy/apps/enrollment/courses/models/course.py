@@ -99,6 +99,7 @@ class CourseEntity(models.Model):
     ue = models.BooleanField(default=False, verbose_name=u'Przedmiot prowadzony przy pomocy środków pochodzących z Unii Europejskiej')
 
     objects   = WithInformation()
+    simple    = models.Manager()
     noremoved = NoRemoved()
 
 

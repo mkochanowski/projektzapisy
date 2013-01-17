@@ -47,16 +47,14 @@ class VoteFormset(object):
         else:
             tag = 'unknown'
             query['semester'] = 'u'
-
-        proposals  = CourseEntity.objects.filter(**query)
-        if self.correction:
-            proposals = proposals.extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(semester_id) +') > 0'])
+        proposals  = CourseEntity.simple.filter(**query)
         votes = SingleVote.get_votes_for_proposal(student, proposals)
-        counter = votes.exclude(entity__type__free_in_vote=True).aggregate(Sum('value'))
-        self.old_votes = counter['value__sum']
-
         if self.correction:
-            votes = votes.filter(course__isnull=False)
+            votes = votes.extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(semester_id) +') > 0'])
+        counter = votes.exclude(entity__type__free_in_vote=True).aggregate(Sum('value'))
+
+#        if self.correction:
+#            votes = votes.filter(course__isnull=False)
 
 
         fields = ('correction',) if self.correction else ('value',)
@@ -83,6 +81,7 @@ class VoteFormset(object):
         return counter
 
     def is_valid(self):
+
         if self.formset.is_valid():
             sum_points = 0
             if self.correction:
@@ -91,10 +90,6 @@ class VoteFormset(object):
                     if form.instance.value > form.cleaned_data['correction']:
                         self.errors.append( u'Nie można zmniejszyć głosu!' )
                         return False
-
-                if sum_points > self.old_votes:
-                    self.errors.append(u'Przekroczono limit głosów o: ' + str(sum_points - self.old_votes))
-                    return False
 
             return True
 
@@ -125,7 +120,8 @@ class VoteFormsets():
         self.unknown = None
         if state.is_correction_active():
             votes             = SingleVote.sum_votes(student, state)
-            self.points_limit = votes['votes']
+            old_votes         = SingleVote.sum_old_votes(student, state)
+            self.points_limit = votes['votes'] - old_votes['votes']
             if state.is_summer_correction_active():
                 self.summer  = VoteFormset(post,
                                            student    = student,
@@ -176,18 +172,19 @@ class VoteFormsets():
     
     def is_valid(self):
 
+
+
+
+        is_valid = (not self.summer or self.summer.is_valid()) and\
+                   (not self.winter or self.winter.is_valid()) and\
+                   (not self.unknown or self.unknown.is_valid())
+
         if self.summer:
             self.errors = self.errors + self.summer.errors
         if self.winter:
             self.errors = self.errors + self.winter.errors
         if self.unknown:
             self.errors = self.errors + self.unknown.errors
-
-        is_valid = (not self.summer or self.summer.is_valid()) and\
-                   (not self.winter or self.winter.is_valid()) and\
-                   (not self.unknown or self.unknown.is_valid())
-
-
 
         if not is_valid:
             return False

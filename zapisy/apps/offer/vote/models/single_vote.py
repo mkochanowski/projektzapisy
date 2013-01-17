@@ -203,7 +203,7 @@ class SingleVote ( models.Model ):
             year = date.today().year
         current_state = SystemState.get_state(year)
 
-        return SingleVote.objects.filter(student=voter, entity__in=proposals, state=current_state)\
+        return SingleVote.objects.filter(student=voter, state=current_state)\
                     .select_related('entity',
                                     'entity__owner',
                                     'entity__owner__user',
@@ -233,6 +233,16 @@ class SingleVote ( models.Model ):
     @staticmethod
     def sum_votes( student, state ):
         return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False).aggregate(votes=Sum('value'))
+
+
+
+
+    @staticmethod
+    def sum_old_votes( student, state ):
+        return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
+        .extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(state.semester_summer_id) +') > 0'])\
+        .aggregate(votes=Sum('value'))
+
 
 
     def get_vote(self):
