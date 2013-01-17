@@ -67,6 +67,8 @@ class Classroom( models.Model ):
                 result[room.number] = {'id'       : room.id,
                                        'number'  : room.number,
                                        'capacity': room.capacity,
+                                       'type': room.get_type_display(),
+                                       'description': room.description,
                                        'title': room.number,
                                        'terms': []}
 

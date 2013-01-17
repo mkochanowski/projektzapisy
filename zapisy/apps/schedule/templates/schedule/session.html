@@ -49,7 +49,6 @@
                 {% for exam in terms_list %}
                     <li>
                         <span><h4>{{ exam.grouper|date:"l, j E Y" }}</h4></span>
-
                         {% regroup exam.list by event.course as list %}
                         {% for ll in list %}
                         <div>
