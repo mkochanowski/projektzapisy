@@ -25,7 +25,7 @@
     </div>
 	<div id="enr-schedule-scheduleContainer">
 	</div>
-    {% cache 500 own-schedyle request.user %}
+    {% cache 3600 own-schedyle request.user %}
 	{% if user.student %}
         <h3>Zajęcia, na które jesteś zapisany</h3>
 	{% else %}
@@ -42,37 +42,33 @@
                 {% endif %}
 			</tr>
 		</thead>
-		<tfoot>
-			<tr>
-			{% if user.student %}
-				<td>Suma punktów ECTS:</td>
-				<td class="ects">{{ sum_points }}</td>
-            {% else %}
-                <td>Liczba godzin:</td>
-                <td class="ects">{{ hours_sum }}</td>    
-            {% endif %}
-			</tr>
-		</tfoot>
+{#		<tfoot>#}
+{#			<tr>#}
+{#			{% if user.student %}#}
+{#				<td>Suma punktów ECTS:</td>#}
+{#				<td class="ects">{{ sum_points }}</td>#}
+{#            {% else %}#}
+{#                <td>Liczba godzin:</td>#}
+{#                <td class="ects">{{ hours_sum }}</td>    #}
+{#            {% endif %}#}
+{#			</tr>#}
+{#		</tfoot>#}
 		<tbody>
-            {% regroup schedule by group.course as courses %}
-            {% for course in courses; point in points %}
+            {% regroup groups by group.course as courses %}
+            {% for course in courses %}
             <tr class="courseHeader">
                 <td class="name">
                     <a href="{% url course-page course.grouper.slug %}">
                         {{ course.grouper.name }}
                     </a>
+
                 </td>
                 <td rowspan="2" class="ects">
-                    {{ point.value }}
+                    {{ course.list.0.points }}
                 </td>
             </tr>
             <tr class="courseDetails">
                 <td>
-                    <input type="hidden" name="id" value="{{ course.grouper.id }}" />
-                    <input type="hidden" name="name" value="{{ course.grouper.name }}" />
-                    <input type="hidden" name="type" value="{{ course.grouper.type }}" />
-                    <input type="hidden" name="short" value="{{ course.grouper.short }}" />
-                    <input type="hidden" name="url" value="{% url course-page course.grouper.slug %}" />
                     <ul>
                         {% for item in course.list %}
                         {% with item.group as group %}

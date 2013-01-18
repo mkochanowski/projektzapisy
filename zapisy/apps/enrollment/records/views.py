@@ -252,6 +252,7 @@ def own(request):
     student  = None
     if request.user.student:
         student = request.user.student
+        groups = Course.get_student_courses_in_semester(student, default_semester)
     elif request.user.employee:
         messages.info(request, 'Plan pracownika chwilowo wyłączony.')
         return render_to_response('common/error.html',

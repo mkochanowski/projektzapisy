@@ -530,6 +530,12 @@ class Course( models.Model ):
     def get_courses_with_exam(semester):
         return Course.objects.filter(semester=semester, entity__exam=True)
 
+    @staticmethod
+    def get_student_courses_in_semester(student, semester):
+        from apps.enrollment.records.models import Record
+        return Record.objects.select_related('group', 'group__teacher', 'group__course', 'group__course__entity').prefetch_related('group__term', 'group__term__classrooms').filter(status='1', student=student, group__course__semester=semester).\
+                    extra(select={'points': 'SELECT value FROM courses_studentpointsview WHERE student_id='
+                            + str(student.id) + ' AND entity_id=courses_course.entity_id' })
 
     class Meta:
         verbose_name = 'przedmiot'
