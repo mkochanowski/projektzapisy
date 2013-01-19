@@ -232,7 +232,7 @@ class SingleVote ( models.Model ):
 
     @staticmethod
     def sum_votes( student, state ):
-        return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False).aggregate(votes=Sum('value'))
+        return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False).aggregate(votes=Sum('correction'))
 
 
 
