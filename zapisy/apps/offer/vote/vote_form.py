@@ -6,6 +6,7 @@
 
 from django                   import forms
 from django.core.exceptions   import ObjectDoesNotExist
+from django.db import connection
 from django.db.models import Sum
 from django.utils.safestring  import SafeUnicode
 from apps.enrollment.courses.models.course import CourseEntity
@@ -119,9 +120,7 @@ class VoteFormsets():
         self.winter = None
         self.unknown = None
         if state.is_correction_active():
-            votes             = SingleVote.sum_votes(student, state)
-            old_votes         = SingleVote.sum_old_votes(student, state)
-            self.points_limit = votes['votes'] - old_votes['votes']
+            self.points_limit = SingleVote.limit_in_summer_correction(student, state)
             if state.is_summer_correction_active():
                 self.summer  = VoteFormset(post,
                                            student    = student,

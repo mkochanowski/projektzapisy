@@ -90,7 +90,7 @@ class SingleVote ( models.Model ):
         if not year:
             year = date.today().year
         current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( student=voter, state=current_state,correction__gte=1)\
+        votes = SingleVote.objects.filter( student=voter, state=current_state, value__gte=1)\
                                   .select_related('student','student__user', 'entity')
         return votes
 
@@ -232,18 +232,29 @@ class SingleVote ( models.Model ):
 
     @staticmethod
     def sum_votes( student, state ):
-        return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False).aggregate(votes=Sum('correction'))
-
-
-
+        return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False).aggregate(votes=Sum('value'))
 
     @staticmethod
     def sum_old_votes( student, state ):
         return SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
-        .extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(state.semester_winter_id) +') > 0'])\
+        .extra(where=['(SELECT COUNT(*) FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id AND cc.semester_id = '+ str(state.semester_summer_id) +') = 0'])\
+        .aggregate(votes=Sum('correction'))
+
+    @staticmethod
+    def limit_in_summer_correction(student, state):
+        all =  SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
+                .extra(where=['vote_singlevote.entity_id IN (SELECT entity_id FROM courses_course cc WHERE cc.semester_id = '+ str(state.semester_summer_id) +')'])\
+                .aggregate(votes=Sum('value'))
+
+        free = SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
+        .extra(where=['vote_singlevote.entity_id NOT IN (SELECT entity_id FROM courses_course cc WHERE cc.semester_id = '+ str(state.semester_summer_id) +' OR cc.semester_id = '+ str(state.semester_winter_id) +' )'])\
         .aggregate(votes=Sum('value'))
 
+        used = SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
+                .extra(where=['vote_singlevote.entity_id IN (SELECT entity_id FROM courses_course cc WHERE cc.semester_id = '+ str(state.semester_winter_id) +')'])\
+                .aggregate(correction=Sum('correction'), votes=Sum('value'))
 
+        return all['votes'] + free['votes'] - used['correction'] + used['votes']
 
     def get_vote(self):
         return self.correction
