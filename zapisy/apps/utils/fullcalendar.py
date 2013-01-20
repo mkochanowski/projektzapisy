@@ -205,8 +205,8 @@ class FullCalendarView(BaseListView):
     adapter = FullCalendarAdapter
 
     def get_queryset(self):
-        start = datetime.fromtimestamp( int(self.request.GET.get('start', None)) )
-        end   = datetime.fromtimestamp( int(self.request.GET.get('end', None)) )
+        start = datetime.fromtimestamp( int(self.request.GET.get('start', datetime.now())) )
+        end   = datetime.fromtimestamp( int(self.request.GET.get('end', datetime.now())) )
 
         if not self.queryset:
             self.queryset = super(FullCalendarView, self).get_queryset()
