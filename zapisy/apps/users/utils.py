@@ -6,7 +6,7 @@ def prepare_ajax_students_list(students):
     return map(lambda s:
            {'id':       s.user.id,
             'album':    s.matricula,
-            'recorded': s.recorded,
+            'recorded': True,
             'email':    s.user.email,
             'name':     u'%s %s' % (s.user.first_name, s.user.last_name),
             'link':     reverse('student-profile', args=[s.user.id])}, students)
