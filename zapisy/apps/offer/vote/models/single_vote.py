@@ -83,16 +83,22 @@ class SingleVote ( models.Model ):
 
 
     @staticmethod
-    def get_votes( voter, year=None ):
+    def get_votes( voter, year=None, state = None,  ):
         """
             Gets user votes in specified year
         """
-        if not year:
-            year = date.today().year
-        current_state = SystemState.get_state(year)
-        votes = SingleVote.objects.filter( student=voter, state=current_state, correction__gte=1)\
-                                  .select_related('student','student__user', 'entity')
-        return votes
+        if not state:
+            if not year:
+                year = date.today().year
+            state = SystemState.get_state(year)
+
+        return SingleVote.objects.filter( student=voter, state=state, correction__gte=1)\
+                                  .select_related('student','student__user', 'entity').extra(
+                                  select = {
+                                      'in_semester': "SELECT COUNT(*) > 0 FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id"
+                                                     " AND cc.semester_id IN (%(winter)d, %(summer)d)" % {'winter': state.semester_winter_id, 'summer': state.semester_summer_id}
+                                  }
+                    ).order_by('entity__semester', 'entity__name')
 
     @staticmethod
     def add_vote_count(proposals, state):

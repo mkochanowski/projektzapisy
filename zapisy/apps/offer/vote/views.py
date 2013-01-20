@@ -12,6 +12,7 @@ from django.http                    import HttpResponseRedirect, Http404
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.shortcuts               import redirect
+from django.template.response import TemplateResponse
 from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.offer.vote.models                   import SingleVote, SystemState
@@ -73,24 +74,8 @@ def vote_view( request ):
         View of once given vote
     """
     votes = SingleVote.get_votes( request.user.student )
-    summer_votes  = []
-    winter_votes  = []
-    unknown_votes = []
-    vote_sum      = 0
-    for vote in votes:
-        vote_sum = vote_sum + vote.correction
-        if   vote.entity.is_summer():
-            summer_votes.append(vote)
-        elif vote.entity.is_winter():
-            winter_votes.append(vote)
-        else:
-            unknown_votes.append(vote)
-            
-    data = {  'summer_votes'  : summer_votes,
-              'winter_votes'  : winter_votes,
-              'unknown_votes' : unknown_votes,
-              'vote_sum'      : vote_sum}
-    return render_to_response ('offer/vote/view.html', data, context_instance = RequestContext( request ))
+
+    return TemplateResponse(request, 'offer/vote/view.html', locals())
 
 
 def vote_summary( request ):
