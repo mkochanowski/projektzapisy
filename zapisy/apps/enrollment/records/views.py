@@ -262,25 +262,7 @@ def own(request):
         return render_to_response('common/error.html',
             context_instance=RequestContext(request))
 
-#    if student:
-#        courses = prepare_schedule_courses(request, for_student=student)
-#    else: #musi isnieć na mocy if kilka linii wyżej
-#        courses = prepare_schedule_courses(request, for_employee=employee)
 
-
-
-#    if student:
-#        course_objects = map(lambda course: course['object'], courses)
-#        points = Course.get_points_for_courses(course_objects, student.program)
-#        points_sum = reduce(lambda sum, k: sum + points[k].value, points, 0)
-#        points_type = student.program.type_of_points
-#        data.update({
-#            'points': points,
-#            'points_type': points_type,
-#            'points_sum': points_sum
-#        })
-
-    schedule           = student.get_schedule()
     points, sum_points = student.get_points()
 
 
