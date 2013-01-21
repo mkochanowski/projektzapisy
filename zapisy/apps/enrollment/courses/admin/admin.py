@@ -141,6 +141,11 @@ class SemesterAdmin(admin.ModelAdmin):
 class CourseInline(admin.TabularInline):
     model = Course
 
+
+class PointsInline(admin.TabularInline):
+    model = PointsOfCourseEntities
+    extra = 0
+
 class CourseEntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'shortName', 'owner')
     search_fields = ('name', 'shortName', 'owner__user__first_name', 'owner__user__last_name' )
@@ -155,6 +160,8 @@ class CourseEntityAdmin(admin.ModelAdmin):
     ]
     list_filter = ('semester', 'owner', 'status', 'type', )
     form = CourseEntityForm
+
+    inlines = [PointsInline, ]
 
     def queryset(self, request):
        """
