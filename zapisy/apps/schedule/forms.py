@@ -10,6 +10,7 @@ from django.forms.models import inlineformset_factory
 
 
 class TermForm(forms.ModelForm):
+
     class Meta:
         model = Term
         widgets = {
@@ -52,7 +53,7 @@ class EventForm(forms.ModelForm):
 
         else:
             semester = Semester.get_current_semester()
-            qs  = Course.objects.filter(semester=semester)
+            qs  = Course.objects.filter(semester=semester).select_related('semester', 'entity')
             if not user.has_perm('schedule.manage_events'):
                 qs = qs.filter(teachers=user.employee)
 

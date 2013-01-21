@@ -310,7 +310,8 @@ class Term(models.Model):
 
         @return: Term QuerySet
         """
-        return cls.objects.filter(event__type__in=['0', '1']).order_by('day', 'room').select_related('event', 'room', 'event__course', 'event__course__entity', 'event__course__semester')
+        return cls.objects.filter(event__type__in=['0', '1']).order_by('day', 'event__course__entity__name', 'room')\
+        .select_related('event', 'room', 'event__course', 'event__course__entity', 'event__course__semester')
 
 
 class EventModerationMessage(models.Model):
