@@ -28,8 +28,13 @@ class UsedTicketStampAdmin( admin.ModelAdmin ):
                      'student__user__last_name',
                      'student__matricula',)
 
+class PrivateKeyAdmin( admin.ModelAdmin ):
+
+    list_display = ('poll', )
+    search_fields = ('poll__title',)
+
 admin.site.register( PublicKey )
-admin.site.register( PrivateKey )
+admin.site.register( PrivateKey, PrivateKeyAdmin )
 admin.site.register( UsedTicketStamp, UsedTicketStampAdmin )
 admin.site.register( StudentGraded, StudentGradedAdmin )
 

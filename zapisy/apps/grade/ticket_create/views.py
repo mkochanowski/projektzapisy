@@ -86,6 +86,7 @@ def ajax_get_rsa_keys_step2( request ):
 
 @student_required
 def connections_choice( request ):
+
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     students_polls = Poll.get_all_polls_for_student( request.user.student )
     if students_polls:

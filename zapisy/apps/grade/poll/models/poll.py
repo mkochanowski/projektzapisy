@@ -36,7 +36,6 @@ class Poll( models.Model ):
         verbose_name        = 'ankieta' 
         verbose_name_plural = 'ankiety'
         app_label           = 'poll'
-        ordering            = ['group__course__entity__name', 'group__teacher']
         
     def __unicode__( self ):
         res = unicode( self.title )
@@ -157,9 +156,7 @@ class Poll( models.Model ):
             where.append( count )
 
         return Poll.objects.filter(deleted=False, semester=semester  )\
-                    .select_related('semester', 'group', 'group__course',
-                                    'studies_type', 'group__teacher',
-                                    'group__teacher__user')\
+                    .select_related('semester', 'studies_type')\
                     .extra(where=where)
 
 
@@ -173,11 +170,11 @@ class Poll( models.Model ):
         return Poll.objects.filter( semester = semester, deleted=False ).exclude( pk__in = polls_with_keys)
 
     @staticmethod
-    def get_polls_without_keys():
+    def get_polls_without_keys(semester=None):
         from apps.grade.ticket_create.models.public_key import PublicKey
 
-        polls_with_keys = PublicKey.objects.all()
-        return Poll.objects.filter( deleted=False ).exclude( pk__in = polls_with_keys)
+        polls_with_keys = PublicKey.objects.filter(poll__semester=Semester)
+        return Poll.objects.filter( semester=semester, deleted=False ).exclude( pk__in = polls_with_keys)
 
     @staticmethod
     def get_current_semester_polls_without_keys():

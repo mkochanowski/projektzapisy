@@ -148,6 +148,7 @@ def generate_rsa_key():
     
 def save_public_keys(polls_public_keys):
     for (poll, key) in polls_public_keys:
+        print poll
         pkey = PublicKey(   poll = poll,
                             public_key = key)
         pkey.save()
@@ -159,19 +160,20 @@ def save_private_keys(polls_private_keys):
         pkey.save()
 
 def generate_keys_for_polls():
-    poll_list = Poll.get_polls_without_keys()
+    from apps.enrollment.courses.models import Semester
+    semester = Semester.get_current_semester()
+    poll_list = Poll.get_polls_without_keys(semester)
     pub_list  = []
     priv_list = []
-    cache.set('generated-keys', '0')
     i = 1
     for el in poll_list:
         (pub, priv) = generate_rsa_key()
         pub_list.append(pub)
         priv_list.append(priv)
-        cache.set('generated-keys', str(i))
         i = i + 1
     save_public_keys(zip(poll_list, pub_list))
     save_private_keys(zip(poll_list, priv_list))
+    print i - 1
     return 
     
 def group_polls_by_course( poll_list ):

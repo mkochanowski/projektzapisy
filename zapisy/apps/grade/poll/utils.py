@@ -213,7 +213,7 @@ def getGroups(request, template):
         kwargs['type'] = template['type']
 
     if 'exam' in template and template['exam']:
-        kwargs['course__exam'] = True
+        kwargs['course__entity__exam'] = True
 
     return Group.objects.filter(**kwargs)
 

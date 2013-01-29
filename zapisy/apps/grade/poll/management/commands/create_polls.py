@@ -19,8 +19,11 @@ class Command(BaseCommand):
         else:
             semester = Semester.get_current_semester()
         print semester
+
         templates = Template.objects.filter(in_grade=True)
-        prych     = Employee.objects.get(user__pk=43)
+        print templates
+        prych     = Employee.objects.get(user__pk=19) # nowym PRychem Przemka
+        print prych
         for template in templates:
             t = dict(
                     type           = None if template.group_type == '--' else template.group_type,

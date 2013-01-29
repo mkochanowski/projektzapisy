@@ -33,9 +33,9 @@ class PollAdmin(admin.ModelAdmin):
     search_fields = ('title', )
     form = PollAdminForm
 
-    def queryset(self, request):
-       qs = super(PollAdmin, self).queryset(request)
-       return qs.select_related('author', 'author__user', 'group', 'group__course', 'group__teacher', 'group__teacher__user')
+#    def queryset(self, request):
+#       qs = super(PollAdmin, self).queryset(request)
+#       return qs.select_related('author', 'author__user', 'group', 'group__course', 'group__teacher', 'group__teacher__user')
 
 class TemplateAdmin(admin.ModelAdmin):
 
