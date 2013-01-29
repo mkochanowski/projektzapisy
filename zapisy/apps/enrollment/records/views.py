@@ -98,7 +98,7 @@ def set_enrolled(request, method):
 
     try:
         group = Group.objects.get(id=group_id)
-        group.course = Course.objects.select_for_update().get(id=group.course_id)
+        group.course = Course.simple.select_for_update().get(id=group.course_id)
     except ObjectDoesNotExist:
         transaction.rollback()
         return AjaxFailureMessage.auto_render('NonGroup',

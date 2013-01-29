@@ -344,6 +344,7 @@ class Course( models.Model ):
     records_end = models.DateTimeField(verbose_name=u'Koniec zapisów', null=True, blank=True)
 
     objects = DefaultCourseManager()
+    simple = models.Manager()
     visible = VisibleManager()
 
     """
