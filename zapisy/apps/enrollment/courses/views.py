@@ -12,7 +12,7 @@ from apps.enrollment.courses.models         import *
 from apps.enrollment.records.models          import *
 
 from apps.enrollment.courses.exceptions import NonCourseException
-from apps.users.models import BaseUser
+from apps.users.models import BaseUser, OpeningTimesView
 
 import logging
 from django.conf import settings
@@ -89,12 +89,18 @@ def course(request, slug):
             if hasattr(user, 'student') and user.student:
                 student = user.student
                 student_id = student.id
+
             else:
                 student = None
                 student_id = 0
         
         data, course = prepare_courses_list_to_render_and_return_course(request, default_semester=default_semester, user=user, student=student, course_slug=slug)
-        
+        if student:
+            try:
+                t0 = OpeningTimesView.objects.get(student=student, course=course, semester=default_semester)
+            except ObjectDoesNotExist:
+                t0 = None
+
         #course = list(Course.visible.filter(slug=slug).select_related('semester','entity'))
         if not course:
             raise Course.DoesNotExist
@@ -254,7 +260,8 @@ def course(request, slug):
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
-            'requirements' : requirements
+            'requirements' : requirements,
+            't0': t0
         })
 
         return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )

@@ -77,12 +77,12 @@
                 <td> {{ course.votes_count }} <a href="{% url course-votes course.slug %}">lista</a></td>
             </tr>
         {% endif %}
-        {% if course.can_enroll_from %}
+        {% if t0 %}
             <tr>
                 <th>Możesz zapisać się od</th>
                 <td>
-                {{ course.can_enroll_from|date:'Y.m.d H:i' }}
-                ({{ course.can_enroll_interval|timedelta }})</td>
+                {{ t0.opening_time }}
+                </td>
             </tr>
         {% endif %}
     </table>
