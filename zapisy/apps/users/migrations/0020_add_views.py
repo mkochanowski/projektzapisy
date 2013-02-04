@@ -22,7 +22,7 @@ class Migration(DataMigration):
            cc.id as course_id,
            users_student.id as student_id,
            cc.semester_id as semester_id,
-           cs.records_opening - ((v.minutes + COALESCE( (SELECT DISTINCT sv.correction FROM vote_singlevote sv WHERE sv.entity_id = cc.entity_id AND sv.state_id IN
+           cs.records_opening - ((v.minutes + COALESCE( (SELECT DISTINCT sv.correction FROM vote_singlevote sv WHERE sv.student_id = users_student.id AND sv.correction > 0 AND sv.entity_id = cc.entity_id AND sv.state_id IN
                   (SELECT id FROM vote_systemstate vs WHERE vs.semester_summer_id = cc.semester_id OR vs.semester_winter_id = cc.semester_id) LIMIT 1),
                   0
            )*1440)::TEXT || ' MINUTES')::INTERVAL as opening_time

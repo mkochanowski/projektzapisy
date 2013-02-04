@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
 from django.core.cache import cache as mcache
 import datetime
-from apps.users.managers import GettersManager
+from apps.users.managers import GettersManager, T0Manager
 
 import settings
 
@@ -667,6 +667,8 @@ class OpeningTimesView(models.Model):
     course   = models.ForeignKey('courses.Course')
     semester = models.ForeignKey('courses.Semester')
     opening_time = models.DateTimeField()
+
+    objects = T0Manager()
 
     class Meta:
         app_label = 'users'

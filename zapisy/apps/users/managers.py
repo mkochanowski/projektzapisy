@@ -30,3 +30,8 @@ class GettersManager(models.Manager):
             return self.filter_with_t0(status=0,user__last_name__range=(begin, end)).\
                     select_related().order_by('user__last_name', 'user__first_name')
 
+
+class T0Manager(models.Manager):
+
+    def get_courses(self, student, semester):
+        return self.filter(student=student, semester=semester).select_related('course', 'course__entity').order_by('opening_time', 'course__entity__name')

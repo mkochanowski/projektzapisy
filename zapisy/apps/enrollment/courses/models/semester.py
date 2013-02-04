@@ -2,11 +2,19 @@
 
 from django.db import models
 from course import Course
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from apps.enrollment.courses.exceptions import *
 from django.db.models import Q
 
 from datetime import datetime
+
+class GetterManager(models.Manager):
+
+    def get_next(self):
+        try:
+            return self.get(records_closing__gte=datetime.now())
+        except (ObjectDoesNotExist, MultipleObjectsReturned):
+            return None
 
 class Semester( models.Model ):
     """semester in academic year"""
@@ -35,6 +43,8 @@ class Semester( models.Model ):
 
     first_grade_semester  = models.ForeignKey('self', verbose_name='Pierwszy semestr oceny', null=True, blank=True, related_name='fgrade')
     second_grade_semester = models.ForeignKey('self', verbose_name='Drugi semester oceny', null=True, blank=True, related_name='sgrade')
+
+    objects = GetterManager()
 
     def get_current_limit(self):
         import settings
