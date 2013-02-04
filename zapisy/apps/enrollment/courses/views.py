@@ -97,7 +97,7 @@ def course(request, slug):
         data, course = prepare_courses_list_to_render_and_return_course(request, default_semester=default_semester, user=user, student=student, course_slug=slug)
         if student:
             try:
-                t0 = OpeningTimesView.objects.get(student=student, course=course, semester=default_semester)
+                t0 = OpeningTimesView.objects.get(student=student, course=course)
             except ObjectDoesNotExist:
                 t0 = None
         else:
