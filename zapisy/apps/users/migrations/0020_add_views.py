@@ -7,9 +7,7 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-        db.execute("""﻿CREATE OR REPLACE view users_minutes_bonus_view as
+        db.execute("""CREATE OR REPLACE view users_minutes_bonus_view as
         SELECT
            us.id as student_id,
            cs.id as semester_id,
