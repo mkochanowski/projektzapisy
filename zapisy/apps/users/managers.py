@@ -8,7 +8,8 @@ from django.db.models.aggregates import Min
 class GettersManager(models.Manager):
 
     def filter_with_t0(self, *args, **kwargs):
-        return self.get_query_set().filter(*args, **kwargs).annotate(t0_min=Min('opening_times__opening_time'))
+        return self.get_query_set().filter(*args, **kwargs).only('user__first_name',
+                             'user__last_name', 'matricula', 'ects').annotate(t0_min=Min('opening_times__opening_time'))
 
 
     def get_list_full_info(self, begin='All'):

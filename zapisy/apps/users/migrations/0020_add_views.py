@@ -16,7 +16,8 @@ class Migration(DataMigration):
            ((SELECT COUNT(*) FROM ticket_create_studentgraded WHERE semester_id IN ( cs.first_grade_semester_id,  cs.second_grade_semester_id)) * 1440
              + us.ects * 5 + (us.ects * 5 /720)::integer * 720 + us.records_opening_bonus_minutes + 120 )::integer as minutes
 
-        FROM users_student us, courses_semester cs;
+        FROM users_student us, courses_semester cs
+        WHERE cs.records_closing > now();
 
 
         CREATE OR REPLACE view users_openingtimesview_unmaterialized as SELECT
