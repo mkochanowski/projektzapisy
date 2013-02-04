@@ -8,6 +8,7 @@ from apps.enrollment.courses.models import Semester, Group
 @permission_required('courses.view_stats')
 def students_list(request):
     semester = Semester.get_current_semester()
-    students = Student.get_list().order_by('t0').extra(select={'semester_points': 'COALESCE((SELECT SUM(value) FROM users_courses AS uc WHERE uc.student_id = users_student.id AND uc.semester_id = ' + str(semester.id) + '), 0)'})
+    students = Student.objects.get_list_full_info().order_by('t0_min').only('t0_min', 'user__first_name',
+                     'user__last_name', 'matricula', 'ects')
 #    groups   = Group.get_all_in_semester(semester)
     return TemplateResponse(request, 'statistics/students_list.html', locals())

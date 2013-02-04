@@ -126,11 +126,12 @@ class ClassroomAdmin(admin.ModelAdmin):
     list_filter = ('building','capacity')
 
 class SemesterAdmin(admin.ModelAdmin):
+
     list_display = ('get_name', 'visible')
     list_filter = ('visible','year','type')
     fieldsets = [
         (None,               {'fields': ['year','type','visible']}),
-        ('Ocena', {'fields': ['is_grade_active']}),
+        ('Ocena', {'fields': ['is_grade_active', 'first_grade_semester', 'second_grade_semester']}),
         ('Czas trwania semestru', {'fields': ['semester_beginning','semester_ending']}),
         ('Czas trwania zajęć', {'fields': ['lectures_beginning','lectures_ending']}),
         ('Czas trwania zapisów', {'fields': ['records_opening','records_ects_limit_abolition','records_closing']}),

@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
 from django.core.cache import cache as mcache
 import datetime
+from apps.users.managers import GettersManager
 
 import settings
 
@@ -241,6 +242,8 @@ class Student(BaseUser):
     numeryczna_l = models.BooleanField(default=False)
     algorytmy_l = models.BooleanField(default=False)
     programowanie_l = models.BooleanField(default=False)
+
+    objects = GettersManager()
 
 
 
@@ -659,4 +662,12 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 
+class OpeningTimesView(models.Model):
+    student  = models.ForeignKey(Student, primary_key=True, related_name='opening_times')
+    course   = models.ForeignKey('courses.Course')
+    semester = models.ForeignKey('courses.Semester')
+    opening_time = models.DateTimeField()
+
+    class Meta:
+        app_label = 'users'
 

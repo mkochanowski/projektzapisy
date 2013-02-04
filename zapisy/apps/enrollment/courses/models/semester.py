@@ -17,8 +17,8 @@ class Semester( models.Model ):
     visible = models.BooleanField(verbose_name='widoczny')
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.CharField(max_length=7, default='0', verbose_name='rok akademicki')
-    records_opening = models.DateTimeField(null = True, verbose_name='Czas otwarcia zapisów', help_text='Godzina powinna być ustawiona na 00:00:00, by studenci mieli otwarcie między 10:00 a 22:00.') 
-    records_closing = models.DateTimeField(null = True, verbose_name='Czas zamkniecia zapisów')
+    records_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia zapisów', help_text='Godzina powinna być ustawiona na 00:00:00, by studenci mieli otwarcie między 10:00 a 22:00.')
+    records_closing = models.DateTimeField(null = True, blank=True, verbose_name='Czas zamkniecia zapisów')
 
     lectures_beginning = models.DateField(null=True, blank=True, verbose_name='Dzień rozpoczęcia zajęć')
     lectures_ending = models.DateField(null=True, blank=True, verbose_name='Dzień zakończenia zajęć')
@@ -30,6 +30,11 @@ class Semester( models.Model ):
 
     is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna' )
     records_ects_limit_abolition = models.DateTimeField(null = True, verbose_name='Czas zniesienia limitu 35 ECTS')
+
+    t0_are_ready = models.BooleanField( verbose_name= u'T0 zostały ustalone', default=False)
+
+    first_grade_semester  = models.ForeignKey('self', verbose_name='Pierwszy semestr oceny', null=True, blank=True, related_name='fgrade')
+    second_grade_semester = models.ForeignKey('self', verbose_name='Drugi semester oceny', null=True, blank=True, related_name='sgrade')
 
     def get_current_limit(self):
         import settings

@@ -76,6 +76,8 @@ DATABASES = {
 #EMAIL_HOST_USER = ''
 #EMAIL_HOST_PASSWORD = ''
 
+MASS_MAIL_FROM = 'zapisy@ii.uni.wroc.pl'
+
 EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing space
 
 #loggin settings:
@@ -278,6 +280,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'apps.users',
 
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -292,7 +295,6 @@ INSTALLED_APPS = (
     'apps.offer.proposal',
     'apps.offer.vote',
     'apps.offer.desiderata',
-    'apps.users',
 
     'apps.schedule',
     #'debug_toolbar',
