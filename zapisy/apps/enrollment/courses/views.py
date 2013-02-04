@@ -100,6 +100,8 @@ def course(request, slug):
                 t0 = OpeningTimesView.objects.get(student=student, course=course, semester=default_semester)
             except ObjectDoesNotExist:
                 t0 = None
+        else:
+            t0 = None
 
         #course = list(Course.visible.filter(slug=slug).select_related('semester','entity'))
         if not course:
