@@ -11,7 +11,7 @@ class Migration(DataMigration):
         SELECT
            us.id as student_id,
            cs.id as semester_id,
-           ((SELECT COUNT(*) FROM ticket_create_studentgraded WHERE semester_id IN ( cs.first_grade_semester_id,  cs.second_grade_semester_id)) * 1440
+           ((SELECT COUNT(*) FROM ticket_create_studentgraded WHERE semester_id IN ( cs.first_grade_semester_id,  cs.second_grade_semester_id) AND ticket_create_studentgraded.student_id = us.id ) * 1440
              + us.ects * 5 + (us.ects * 5 /720)::integer * 720 + us.records_opening_bonus_minutes + 120 )::integer as minutes
 
         FROM users_student us, courses_semester cs
