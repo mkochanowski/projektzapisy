@@ -107,24 +107,24 @@ def finish_import_schedule(request):
     semester = Semester.objects.get_next()
     for course in courses:
         obj = json.loads(course)
-        c = Course.objects.get(id=obj.course)
+        c = Course.objects.get(id=obj['course'])
 
-        for g in obj.groups:
+        for g in obj['groups']:
             gr = Group()
             gr.course = c
-            gr.teacher_id = g.teacher
-            gr.type = g.type
+            gr.teacher_id = g['teacher']
+            gr.type = g['type']
             gr.limit = 0
             gr.save()
 
             t = Term()
-            t.dayOfWeek = g.day
-            t.start_time = datetime.time(int(g.start), 0)
-            t.end_time = datetime.time(int(g.end), 0)
+            t.dayOfWeek = g['day']
+            t.start_time = datetime.time(int(g['start']), 0)
+            t.end_time = datetime.time(int(g['end']), 0)
             t.group = gr
             t.save()
 
-            for r in g.rooms:
+            for r in g['rooms']:
                 try:
                     t.classrooms.add( Classroom.objects.get(number=r) )
                 except:
