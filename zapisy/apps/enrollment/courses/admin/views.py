@@ -93,7 +93,7 @@ def import_schedule(request):
             except ObjectDoesNotExist:
                 item['course'] = ''
 
-            to_print.append(json.dump(item))
+            to_print.append(json.dumps(item))
 
 
         return TemplateResponse(request, 'enrollment/courses/admin/import_schedule_step2.html', locals())
