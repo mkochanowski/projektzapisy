@@ -103,7 +103,7 @@ def finish_import_schedule(request):
     courses = request.POST.getlist('courses')
     semester = Semester.objects.get_next()
     for course in courses:
-        obj = json.load(smart_unicode(course))
+        obj = smart_unicode(course)
         c = Course.objects.get(entity__name__iexact=obj.name, semester=semester)
 
         for g in obj.groups:
