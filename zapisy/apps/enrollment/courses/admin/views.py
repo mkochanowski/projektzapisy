@@ -106,8 +106,8 @@ def finish_import_schedule(request):
     courses = request.POST.getlist('courses')
     semester = Semester.objects.get_next()
     for course in courses:
-        obj = smart_unicode(course)
-        c = Course.objects.get(id=course.course)
+        obj = json.loads(course)
+        c = Course.objects.get(id=obj.course)
 
         for g in obj.groups:
             gr = Group()
