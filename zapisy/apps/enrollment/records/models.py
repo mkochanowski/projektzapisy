@@ -397,7 +397,7 @@ class Queue(models.Model):
 
             record = Queue.queued.select_related('group').get(group__id=group_id, student=student)
             group = record.group
-            if not group.course.is_recording_open_for_student(student):
+            if False: #not group.course.is_recording_open_for_student(student):
                 raise RecordsNotOpenException()
             record.delete()
             logger.info('User %s <id: %s> is now removed from queue of group "%s" <id: %s>' % (student.user.username, student.user.id, group, group.id))

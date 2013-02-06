@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+{% load i18n adminmedia %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/fereol_admin/">
+{% trans "Home" %}</a> > <a href="/fereol_admin/courses/">Courses</a> > Import planu semestru</div>{% endblock %}
+
+{% block title %}Import planu semestru{% endblock %}
+
+{% block content %}
+<div id="content-main">
+<form action="/fereol_admin/courses/finish_schedule_import" method="POST">
+<ul>
+    {% for course in result %}
+        <li>{{ course.name }} - {{ course.course }}
+            <p><texarea name="course[]">{{ course }}</texarea></p>
+        </li>
+    {% endfor %}
+</ul>
+</form>
+</div>
+{% endblock %}

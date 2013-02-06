@@ -104,24 +104,24 @@ def set_enrolled(request, method):
         return AjaxFailureMessage.auto_render('NonGroup',
             'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona nie istnieje.', message_context)
 
-
-    if set_enrolled:
-        result, messages_list = group.enroll_student(student)
-        if result: run_rearanged(result)
-    else:
-        result, messages_list = group.remove_student(student)
-        if result: run_rearanged(result, group)
-
-    if not result:
-        transaction.rollback()
+#
+#    if set_enrolled:
+#        result, messages_list = group.enroll_student(student)
+#        if result: run_rearanged(result)
+#    else:
+#        result, messages_list = group.remove_student(student)
+#        if result: run_rearanged(result, group)
+#
+#    if not result:
+#        transaction.rollback()
 
     if is_ajax:
-        message = ', '.join(messages_list)
-        return AjaxSuccessMessage(message, prepare_group_data(group.course, student))
+#        message = ', '.join(messages_list)
+        return AjaxSuccessMessage('', prepare_group_data(group.course, student))
 
     else:
-        for message in messages_list:
-            messages.info(request, message)
+#        for message in messages_list:
+#            messages.info(request, message)
 
         return redirect('course-page', slug=group.course_slug())
 
@@ -306,8 +306,7 @@ def schedule_prototype(request):
                 })
                 jsons.append({'json': simplejson.dumps(term['info'])})
             course['info'].update({
-                'is_recording_open': course['object'].\
-                    is_recording_open_for_student(student),
+                'is_recording_open': False,
                 #TODO: kod w prepare_courses_list_to_render moim zdaniem nie
                 #      zadziała
                 'was_enrolled': 'False',
