@@ -88,9 +88,9 @@ def import_schedule(request):
         semester = Semester.objects.get_next()
         for item in result:
             try:
-                item['course'] = Course.objects.get(entity__name__iexact=item['name'], semester=semester)
+                item['course'] = Course.objects.get(entity__name__iexact=item['name'], semester=semester).id
             except ObjectDoesNotExist:
-                item['course'] = None
+                item['course'] = ''
 
 
         return TemplateResponse(request, 'enrollment/courses/admin/import_schedule_step2.html', locals())
@@ -104,7 +104,7 @@ def finish_import_schedule(request):
     semester = Semester.objects.get_next()
     for course in courses:
         obj = smart_unicode(course)
-        c = Course.objects.get(entity__name__iexact=obj.name, semester=semester)
+        c = Course.objects.get(id=course.course)
 
         for g in obj.groups:
             gr = Group()
