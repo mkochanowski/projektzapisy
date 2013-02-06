@@ -17,6 +17,7 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import smart_unicode
 from apps.enrollment.courses.models import Course, Semester, Group, Classroom
 from apps.enrollment.courses.models.term import Term
+from apps.users.models import Employee
 from importschedule import import_semester_schedule
 from apps.enrollment.courses.forms import Parser
 import os
@@ -112,7 +113,7 @@ def finish_import_schedule(request):
         for g in obj['groups']:
             gr = Group()
             gr.course = c
-            gr.teacher_id = g['teacher']
+            gr.teacher_id = Employee.objects.get(user__id=g['teacher']).id
             gr.type = g['type']
             gr.limit = 0
             gr.save()
