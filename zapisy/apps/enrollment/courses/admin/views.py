@@ -14,6 +14,7 @@ from django import forms
 from django.http import HttpResponse, Http404
 from tempfile import NamedTemporaryFile
 from django.template.response import TemplateResponse
+from django.utils.encoding import smart_unicode
 from apps.enrollment.courses.models import Course, Semester, Group, Classroom
 from apps.enrollment.courses.models.term import Term
 from importschedule import import_semester_schedule
@@ -102,7 +103,7 @@ def finish_import_schedule(request):
     courses = request.POST.getlist('courses')
     semester = Semester.objects.get_next()
     for course in courses:
-        obj = json.load(course)
+        obj = json.load(smart_unicode(course))
         c = Course.objects.get(entity__name__iexact=obj.name, semester=semester)
 
         for g in obj.groups:
