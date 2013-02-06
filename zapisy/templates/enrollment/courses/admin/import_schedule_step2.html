@@ -10,7 +10,7 @@
 <div id="content-main">
 <form action="/fereol_admin/courses/finish_schedule_import" method="POST">{% csrf_token %}
 <ul>
-    {% for course in result %}
+    {% for course in to_print %}
         <li>{{ course.name }} - {{ course.course }}
             <p><textarea name="courses">{{ course }}</textarea></p>
         </li>

@@ -86,11 +86,14 @@ def import_schedule(request):
 
         result = Parser(request.FILES['file']).get_result()
         semester = Semester.objects.get_next()
+        to_print = []
         for item in result:
             try:
                 item['course'] = Course.objects.get(entity__name__iexact=item['name'], semester=semester).id
             except ObjectDoesNotExist:
                 item['course'] = ''
+
+            to_print.append(json.dump(item))
 
 
         return TemplateResponse(request, 'enrollment/courses/admin/import_schedule_step2.html', locals())
