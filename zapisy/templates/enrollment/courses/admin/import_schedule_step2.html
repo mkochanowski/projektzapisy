@@ -12,7 +12,7 @@
 <ul>
     {% for course in result %}
         <li>{{ course.name }} - {{ course.course }}
-            <p><texarea name="course[]">{{ course }}</texarea></p>
+            <p><textarea name="courses">{{ course }}</textarea></p>
         </li>
     {% endfor %}
 </ul>

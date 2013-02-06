@@ -99,8 +99,7 @@ def import_schedule(request):
 
 @staff_member_required
 def finish_import_schedule(request):
-
-    courses = request.POST.getlist('courses[]')
+    courses = request.POST.getlist('courses')
     semester = Semester.objects.get_next()
     for course in courses:
         obj = json.load(course)
