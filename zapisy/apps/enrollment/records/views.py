@@ -279,7 +279,7 @@ def schedule_prototype(request):
         student = None
         student_id = 'None'
 
-    default_semester = Semester.get_default_semester()
+    default_semester = Semester.objects.get_next()
     if not default_semester:
         messages.info(request, 'Brak aktywnego semestru.')
         data = {
