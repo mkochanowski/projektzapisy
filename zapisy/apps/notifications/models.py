@@ -79,6 +79,7 @@ class NotificationPreferences(models.Model):
 
     class Meta:
         ordering = ['id']
-        verbose_name = u''
+        verbose_name = u'Ustawienie Notyfikacji'
+        verbose_name_plural = u'Ustawienia Notyfikacji'
 
 
