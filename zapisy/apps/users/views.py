@@ -9,7 +9,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from django.http import QueryDict, HttpResponse 
+from django.http import QueryDict, HttpResponse
+from django.template.response import TemplateResponse
 from django.utils import simplejson
 from django.db.models import Q
 
@@ -38,6 +39,8 @@ import datetime
 import logging
 
 from django.core.cache import cache as mcache
+from apps.notifications.forms import NotificationFormset
+from apps.notifications.models import NotificationPreferences
 logger = logging.getLogger()
 import vobject
 
@@ -203,11 +206,12 @@ def password_change_done(request):
 @login_required  
 def my_profile(request):
     """profile site"""
-    logger.info('User %s <id: %s> is logged in ' % (request.user.username, request.user.id))
-    current_semester = Semester.objects.get_next()
+    semester = Semester.objects.get_next()
     zamawiany = Student.get_zamawiany(request.user.id)
     comments = zamawiany and zamawiany.comments or ''
     points = zamawiany and zamawiany.points or 0
+
+    notifications = NotificationFormset(queryset=NotificationPreferences.objects.create_and_get(request.user))
 
     if hasattr(request.user, 'employee') and request.user.employee:
         consultations = request.user.employee.consultations
@@ -222,11 +226,11 @@ def my_profile(request):
 
     grade = {}
 
-    if current_semester and request.user.student:
+    if semester and request.user.student:
 
         try:
             student = request.user.student
-            courses = OpeningTimesView.objects.get_courses(student, current_semester)
+            courses = OpeningTimesView.objects.get_courses(student, semester)
             grade = [x.semester for x in StudentGraded.objects.filter(student=student).select_related('semester')]
 
         except (KeyError, Student.DoesNotExist):
@@ -237,20 +241,9 @@ def my_profile(request):
     else:
         grade = None
         courses = None
-    
-    data = {
-        'zamawiany' : zamawiany,
-        'comments' : comments,
-        'points' : points,
-        'consultations' : consultations,
-        'room' : room,
-        'homepage' : homepage,
-        'grade' : grade,
-        'courses': courses,
-        'semester': current_semester
-    }
 
-    return render_to_response('users/my_profile.html', data, context_instance = RequestContext( request ))
+
+    return TemplateResponse(request, 'users/my_profile.html', locals())
 
 def employees_list(request, begin = 'All', query=None):
 

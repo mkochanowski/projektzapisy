@@ -3,6 +3,10 @@
 
 {% block styles %}
     {% compressed_css 'main' %}
+    <style>
+        .notifications ul {list-style-type: none;}
+        .notifications label {float:none;}
+    </style>
 {% endblock %}
 
 
@@ -56,7 +60,7 @@
 <a href="{% url consultations-change %}">zmień inne dane</a>
 {% endif %}
 
-{% if user.employee %}
+{% if user.employee and consultations %}
 <h4>Konsultacje</h4>
     {% if consultations %}
 {{ consultations }}
@@ -142,4 +146,27 @@
         </tr>
 </table>
 {% endif %}
+
+<h4>Ustawienie powiadomień</h4>
+
+<form method="POST" action="{% url notifications:save %}">
+    {% csrf_token %}
+    {{ notifications.management_form }}
+    <table class="notifications">
+    {% for form in notifications %}
+        <tr>
+            <td>{{ form.instance.get_type_display }}</td>
+            <td>{{ form.value }}
+                {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+                {% endfor %}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <strong>Uwaga: potwierdzenia oceny i głosowania zostaną podpisane i będą stanowić jedyną podstawę reklamacji.</strong>
+    <button type="submit" class="btn success right">
+        Zapisz
+    </button>
+</form>
+
 {% endblock %}
