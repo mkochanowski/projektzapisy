@@ -7,8 +7,22 @@
         .notifications ul {list-style-type: none;}
         .notifications label {float:none;}
     </style>
+
+
 {% endblock %}
 
+{% block js %}{{ block.super }}
+
+
+<script>
+$(function(){
+$('.acceptall').live('click', function(){
+    $('.notifications').find('input[value="True"]').click();
+})
+});
+</script>
+
+{% endblock %}
 
 {% block bread %}
 	<a href="{% url main-page %}">Strona główna</a> &raquo;
@@ -151,6 +165,9 @@
 
 <form method="POST" action="{% url notifications:save %}">
     {% csrf_token %}
+    <button type="button" class="btn info acceptall">
+        Wybierz wszystkie
+    </button>
     {{ notifications.management_form }}
     <table class="notifications">
     {% for form in notifications %}
