@@ -21,12 +21,18 @@
 
 <script>
 $(function(){
-$('.acceptall').live('click', function(){
-
+$('.checkall').live('click', function(){
     var cls = $(this).parent().parent().attr('class');
+    if( $(this).attr('checked')){
+        $('tr[class="'+ cls +'"]').find('input[type="checkbox"]').attr('checked', true);
+    } else {
+        $('tr[class="'+ cls +'"]').find('input[type="checkbox"]').attr('checked', false);
+    }
 
 
-    $('tr[class="'+ cls +'"]').find('input[type="checkbox"]').click();
+
+
+
 })
 });
 </script>
@@ -186,7 +192,7 @@ $('.acceptall').live('click', function(){
             <th>
                 {{ group.grouper }}
             </th>
-            <th><button type="button" class="btn small info acceptall">Wszystkie</button></th>
+            <th><input type="checkbox" class="checkall"></th>
         </tr>
         {% for form in group.list %}
         <tr class="catgroup{{ forloop.parentloop.counter }}">
