@@ -186,7 +186,7 @@ $('.acceptall').live('click', function(){
             <th>
                 {{ group.grouper }}
             </th>
-            <th><button class="btn small info acceptall">Wszystkie</button></th>
+            <th><button type="button" class="btn small info acceptall">Wszystkie</button></th>
         </tr>
         {% for form in group.list %}
         <tr class="catgroup{{ forloop.parentloop.counter }}">
