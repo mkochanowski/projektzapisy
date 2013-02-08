@@ -176,7 +176,7 @@ $('.acceptall').live('click', function(){
     {% csrf_token %}
     {{ notifications.management_form }}
 
-    {% regroup notifications by category as categories_list %}
+    {% regroup notifications|dictsort:"category" by category as categories_list %}
 
 
 
