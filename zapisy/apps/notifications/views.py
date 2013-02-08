@@ -16,7 +16,7 @@ def save(request):
 
     if formset.is_valid():
         formset.save()
-        messages.success(request, u'Zamieniono ustawienie powiadomień')
+        messages.success(request, u'Zmieniono ustawienia powiadomień')
 
     else:
         messages.error(request, u'Wystąpił błąd przy zapisie zmian ustawień')

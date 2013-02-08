@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.forms.models import modelformset_factory
-from apps.notifications.models import NotificationPreferences
+from apps.notifications.models import NotificationPreferences, get_category
 
 __author__ = 'maciek'
 
-BOOL_CHOICES = ((True, 'Tak'), (False, 'Nie'))
 
 class NotificationForm(forms.ModelForm):
+
+    def category(self):
+        return get_category(self.instance.type)
 
     class Meta:
         fields = ('value',)
         model = NotificationPreferences
-        widgets = {
-                    'value': forms.RadioSelect(choices=BOOL_CHOICES)
-                }
-
 
 NotificationFormset = modelformset_factory(NotificationPreferences, form=NotificationForm, extra=0, can_delete=False)

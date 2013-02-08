@@ -5,7 +5,12 @@
     {% compressed_css 'main' %}
     <style>
         .notifications ul {list-style-type: none;}
-        .notifications label {float:none;}
+        .notifications tr td:nth-child(2),
+        .notifications tr th:nth-child(2) { text-align: center; }
+
+        .notifications th { background-color: #F9F9F9;
+        border-top-width: 1px;
+        border-bottom-width: 1px;}
     </style>
 
 
@@ -17,7 +22,11 @@
 <script>
 $(function(){
 $('.acceptall').live('click', function(){
-    $('.notifications').find('input[value="True"]').click();
+
+    var cls = $(this).parent().parent().attr('class');
+
+
+    $('tr[class="'+ cls +'"]').find('input[type="checkbox"]').click();
 })
 });
 </script>
@@ -165,22 +174,34 @@ $('.acceptall').live('click', function(){
 
 <form method="POST" action="{% url notifications:save %}">
     {% csrf_token %}
-    <button type="button" class="btn info acceptall">
-        Wybierz wszystkie
-    </button>
     {{ notifications.management_form }}
+
+    {% regroup notifications by category as categories_list %}
+
+
+
     <table class="notifications">
-    {% for form in notifications %}
-        <tr>
+    {% for group in categories_list %}
+        <tr class="catgroup{{ forloop.counter }}">
+            <th>
+                {{ group.grouper }}
+            </th>
+            <th><button class="btn small info acceptall">Wszystkie</button></th>
+        </tr>
+        {% for form in group.list %}
+        <tr class="catgroup{{ forloop.parentloop.counter }}">
             <td>{{ form.instance.get_type_display }}</td>
             <td>{{ form.value }}
                 {% for hidden in form.hidden_fields %}
                 {{ hidden }}
                 {% endfor %}</td>
         </tr>
+        {% endfor %}
     {% endfor %}
     </table>
-    <strong>Uwaga: potwierdzenia oceny i głosowania zostaną podpisane i będą stanowić jedyną podstawę reklamacji.</strong>
+    <p>
+        <strong>Uwaga</strong>: potwierdzenia oceny i głosowania zostaną podpisane i będą stanowić <strong>jedyną</strong> podstawę reklamacji.
+    </p>
     <button type="submit" class="btn success right">
         Zapisz
     </button>
