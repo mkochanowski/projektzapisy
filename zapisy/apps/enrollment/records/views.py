@@ -104,16 +104,17 @@ def set_enrolled(request, method):
         return AjaxFailureMessage.auto_render('NonGroup',
             'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona nie istnieje.', message_context)
 
-#
-#    if set_enrolled:
-#        result, messages_list = group.enroll_student(student)
-#        if result: run_rearanged(result)
-#    else:
-#        result, messages_list = group.remove_student(student)
-#        if result: run_rearanged(result, group)
-#
-#    if not result:
-#        transaction.rollback()
+    if set_enrolled:
+        result, messages_list = group.enroll_student(student)
+        if result:
+            run_rearanged(result)
+    else:
+        result, messages_list = group.remove_student(student)
+        if result:
+            run_rearanged(result, group)
+
+    if not result:
+        transaction.rollback()
 
     if is_ajax:
 #        message = ', '.join(messages_list)

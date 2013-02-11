@@ -34,6 +34,11 @@ class NoRemoved(WithInformation):
         return super(NoRemoved, self).get_query_set().filter(deleted=False, owner__isnull=False)
 
 
+class SimpleManager(models.Manager):
+
+    def get_with_opening(self, student):
+        return self.ex
+
 class DefaultCourseManager(models.Manager):
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
@@ -146,6 +151,18 @@ class CourseEntity(models.Model):
         verbose_name_plural = 'Podstawy przedmiotów'
         app_label = 'courses'
         ordering = ['name']
+
+
+    def get_opening_time(self, student):
+        """
+
+        @param student:
+        @return:
+        """
+
+        from apps.users.models import OpeningTimesView
+
+        return OpeningTimesView.objects.get(student=student, course=self)
 
 
     def get_points(self, student=None):

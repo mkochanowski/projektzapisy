@@ -186,7 +186,7 @@ class Group(models.Model):
 
         result = True
         #REMOVE FROM OTHER GROUP
-        if self.type <> settings.LETURE_TYPE:
+        if self.type != settings.LETURE_TYPE:
             result = self._remove_from_other_groups(student)
 
             self._add_to_lecture(student)
@@ -228,7 +228,7 @@ class Group(models.Model):
             return queued, result
 
     def student_have_opened_enrollment(self, student):
-        return self.course.is_recording_open_for_student(student)
+        return self.course.get_opening_time(student).opening_time < datetime.datetime.now()
 
     def student_can_enroll(self, student):
 

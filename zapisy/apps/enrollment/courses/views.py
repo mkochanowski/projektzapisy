@@ -143,7 +143,7 @@ def course(request, slug):
             queue_priorities = Queue.queue_priorities_map_values(queued)
 
             course.can_enroll_from = course.get_enrollment_opening_time(student)
-            course.is_recording_open = False #course.is_recording_open_for_student(student)
+            course.is_recording_open = course.is_recording_open_for_student(student)
             if course.can_enroll_from:
                 course.can_enroll_interval = course.can_enroll_from - datetime.now()
             
