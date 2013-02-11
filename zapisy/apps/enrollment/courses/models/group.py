@@ -188,13 +188,14 @@ class Group(models.Model):
         #REMOVE FROM OTHER GROUP
 
 
-        Record.objects.create(student=student, group=self, status=STATUS_ENROLLED)
 
         if self.type != settings.LETURE_TYPE:
             result = self._remove_from_other_groups(student)
 
             self._add_to_lecture(student)
 
+
+        Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
         self.add_to_enrolled_counter(student)
 
         if commit:
