@@ -96,7 +96,7 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None, s
         raise RuntimeError('Nie można wygenerować jednocześnie dla studenta' + \
             ' i pracownika')
 
-    default_semester = semester or Semester.get_default_semester()
+    default_semester = semester or Semester.objects.get_next()
 
     if not for_employee is None:
         terms = Term.get_all_in_semester(default_semester, employee=for_employee)

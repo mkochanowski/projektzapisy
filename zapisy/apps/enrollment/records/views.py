@@ -245,7 +245,7 @@ def records_csv(request, group_id):
 def own(request):
     """ own schedule view """
 
-    default_semester = Semester.get_default_semester()
+    default_semester = Semester.objects.get_next()
     if not default_semester:
         raise RuntimeError('Brak aktywnego semestru')
 
