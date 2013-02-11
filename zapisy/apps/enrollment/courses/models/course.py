@@ -368,6 +368,18 @@ class Course( models.Model ):
     getters
     """
 
+
+    def get_opening_time(self, student):
+        """
+
+        @param student:
+        @return:
+        """
+
+        from apps.users.models import OpeningTimesView
+
+        return OpeningTimesView.objects.get(student=student, course=self)
+
     @property
     def exam(self):
         return self.entity.exam
@@ -453,26 +465,14 @@ class Course( models.Model ):
 
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
-        try:
-            stud_opt = StudentOptions.get_cached(student, self)
-            interval = stud_opt.get_opening_delay_timedelta()
-        except StudentOptions.DoesNotExist:
-            interval = datetime.timedelta(minutes=4320) #TODO: 3 dni -> to powinno chyba wylądować w konfigu
 
         if self.records_start and self.records_end and self.records_start <= datetime.datetime.now() <= self.records_end:
             return True
 
-        if records_opening == None:
-            return False
-        else:
-            student_opening = records_opening - student.get_t0_interval()
-            if student_opening + interval < datetime.datetime.now():
-                if records_closing == None:
-                    return True
-                else:
-                    return datetime.datetime.now() < records_closing
-            else:
-                return False
+        if records_opening and self.get_opening_time(student).opening_time < datetime.datetime.now() < records_closing:
+            return True
+
+        return False
 
     def get_enrollment_opening_time(self, student):
         """ returns course opening time as datetime object or None if course is opened / was opened """
