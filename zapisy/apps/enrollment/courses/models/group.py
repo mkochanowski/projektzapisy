@@ -176,7 +176,7 @@ class Group(models.Model):
             __, created = Record.objects.get_or_create(student=student, group=group, status=STATUS_ENROLLED)
             if created:
                 result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
-            group.add_to_enrolled_counter(student)
+                group.add_to_enrolled_counter(student)
 
         return result
 
@@ -186,12 +186,15 @@ class Group(models.Model):
 
         result = True
         #REMOVE FROM OTHER GROUP
+
+
+        Record.objects.create(student=student, group=self, status=STATUS_ENROLLED)
+
         if self.type != settings.LETURE_TYPE:
             result = self._remove_from_other_groups(student)
 
             self._add_to_lecture(student)
 
-        Record.objects.create(student=student, group=self, status=STATUS_ENROLLED)
         self.add_to_enrolled_counter(student)
 
         if commit:
@@ -210,7 +213,7 @@ class Group(models.Model):
         if not self.student_have_opened_enrollment(student):
             return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
 
-        semester = Semester.get_current_semester()
+        semester = Semester.objects.get_next()
         current_limit = semester.get_current_limit()
 
         if not student.get_points_with_course(self.course) <= current_limit:

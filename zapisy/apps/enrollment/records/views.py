@@ -108,6 +108,7 @@ def set_enrolled(request, method):
         result, messages_list = group.enroll_student(student)
         if result:
             run_rearanged(result)
+
     else:
         result, messages_list = group.remove_student(student)
         if result:
@@ -117,12 +118,12 @@ def set_enrolled(request, method):
         transaction.rollback()
 
     if is_ajax:
-#        message = ', '.join(messages_list)
-        return AjaxSuccessMessage('', prepare_group_data(group.course, student))
+        message = ', '.join(messages_list)
+        return AjaxSuccessMessage(message, prepare_group_data(group.course, student))
 
     else:
-#        for message in messages_list:
-#            messages.info(request, message)
+        for message in messages_list:
+            messages.info(request, message)
 
         return redirect('course-page', slug=group.course_slug())
 
