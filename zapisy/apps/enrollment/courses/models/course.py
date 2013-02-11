@@ -402,27 +402,85 @@ class Course( models.Model ):
 
     @property
     def lectures(self):
-        return self.entity.lectures + self.information.lectures
+        if self.entity.lectures:
+            hours = self.entity.lectures
+        else:
+            hours = 0
+        if self.information.lectures:
+            delta = self.information.lectures
+        else:
+            delta = 0
+
+        return hours + delta
+
 
     @property
     def repetitions(self):
-        return self.entity.repetitions + self.information.repetitions
+        if self.entity.repetitions:
+            hours = self.entity.repetitions
+        else:
+            hours = 0
+
+        if self.information.repetitions:
+            delta = self.information.repetitions
+        else:
+            delta = 0
+
+        return hours + delta
 
     @property
     def exercises(self):
-        return self.entity.exercises + self.information.exercises
+        if self.entity.exercises:
+            hours = self.entity.exercises
+        else:
+            hours = 0
+        if self.information.exercises:
+            delta = self.information.exercises
+        else:
+            delta = 0
+
+        return hours + delta
 
     @property
     def exercises_laboratories(self):
-        return self.entity.exercises_laboratiories + self.information.exercises_laboratories
+        if self.entity.exercises_laboratiories:
+            hours = self.entity.exercises_laboratiories
+        else:
+            hours = 0
+        if self.information.exercises_laboratiories:
+            delta = self.information.exercises_laboratiories
+        else:
+            delta = 0
+
+        return hours + delta
+
 
     @property
     def laboratories(self):
-        return self.entity.laboratories + self.information.laboratories
+        if self.entity.laboratories:
+            hours = self.entity.laboratories
+        else:
+            hours = 0
+        if self.information.laboratories:
+            delta = self.information.laboratories
+        else:
+            delta = 0
+
+        return hours + delta
+
 
     @property
     def seminars(self):
-        return self.entity.seminars + self.information.seminars
+        if self.entity.seminars:
+            hours = self.entity.seminars
+        else:
+            hours = 0
+        if self.information.seminars:
+            delta = self.information.seminars
+        else:
+            delta = 0
+
+        return hours + delta
 
     @property
     def requirements(self):

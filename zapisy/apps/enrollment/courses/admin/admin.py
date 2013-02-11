@@ -80,7 +80,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ('entity__name',)
     fieldsets = [
         (None,               {'fields': ['entity'], 'classes': ['long_name']}),
-        (None, {'fields': ['information']}),
+        (None, {'fields': ['information', 'english']}),
         ('Szczegóły', {'fields': ['records_start', 'records_end', 'teachers','semester','slug','web_page'], 'classes': ['collapse']}),
     ]
     inlines = [GroupInline, ]
