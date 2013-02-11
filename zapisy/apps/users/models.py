@@ -331,7 +331,7 @@ class Student(BaseUser):
         from apps.enrollment.courses.models import Semester, StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
-            semester = Semester.get_current_semester
+            semester = Semester.objects.get_next()
 
         records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
         if course.id not in records:
