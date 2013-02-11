@@ -456,6 +456,11 @@ class Course( models.Model ):
                  .filter(Q(course=self), Q(state__semester_summer=self.semester) | Q(state__semester_winter=self.semester))\
                  .count()
 
+    def is_opened(self, student):
+        try:
+            return self.get_opening_time(student).opening_time < datetime.datetime.now()
+        except:
+            return False
 
     def is_recording_open_for_student(self, student=None):
         """ gives the answer to question: is course opened for apps.enrollment for student at the very moment? """
@@ -469,7 +474,7 @@ class Course( models.Model ):
         if self.records_start and self.records_end and self.records_start <= datetime.datetime.now() <= self.records_end:
             return True
 
-        if records_opening and self.get_opening_time(student).opening_time < datetime.datetime.now() < records_closing:
+        if records_opening and self.is_opened(student) and datetime.datetime.now() < records_closing:
             return True
 
         return False
