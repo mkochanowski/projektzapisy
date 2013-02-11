@@ -25,7 +25,6 @@
     </div>
 	<div id="enr-schedule-scheduleContainer">
 	</div>
-    {% cache 3600 own-schedyle request.user %}
 	{% if user.student %}
         <h3>Zajęcia, na które jesteś zapisany</h3>
 	{% else %}
@@ -95,5 +94,4 @@
             {% endfor %}
 		</tbody>
 	</table>
-    {% endcache %}
 {% endblock %}
