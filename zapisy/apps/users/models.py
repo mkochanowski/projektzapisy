@@ -333,9 +333,9 @@ class Student(BaseUser):
         if not semester:
             semester = Semester.objects.get_next()
 
-        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
-        if course.id not in records:
-            records = list(records) + [course.id]
+        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course__entity_id', flat=True).distinct()
+        if course.entity_id not in records:
+            records = list(records) + [course.entity_id]
 
         return StudentPointsView.get_points_for_entities(self, records)
 
