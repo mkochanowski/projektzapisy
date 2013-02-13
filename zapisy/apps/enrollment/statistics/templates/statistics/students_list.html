@@ -38,7 +38,7 @@
                 <th colspan="7">{{ course.grouper }}</th>
                 </tr>
                 {% for group in course.list|dictsort:'type' %}
-                    <tr{% if group.limit < group.cache_enrolled %} class="overlimit"{% elif group.limit == group.cache_enrolled %} class="fulllimit"{% endif %}>
+                    <tr{% if group.limit < group.enrolled %} class="overlimit"{% elif group.limit == group.enrolled %} class="fulllimit"{% endif %}>
                         <td>{{ group.teacher }}</td>
                         <td>{{ group.get_type_display }}</td>
                         <td>{{ group.limit }}</td>
