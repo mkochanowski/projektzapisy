@@ -195,7 +195,7 @@ class Group(models.Model):
         r, created = Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
         if created:
             self.add_to_enrolled_counter(student)
-            
+
         if commit:
             self.save()
 
@@ -209,6 +209,11 @@ class Group(models.Model):
 
     def enroll_student(self, student):
         from apps.enrollment.courses.models import Semester
+        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+
+        if Record.objects.filter(group=self, student=student, status=STATUS_ENROLLED).count() > 0:
+            return False, [u"Jesteś już w tej grupie"]
+
         if not self.student_have_opened_enrollment(student):
             return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
 
