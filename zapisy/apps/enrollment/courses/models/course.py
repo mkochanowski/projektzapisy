@@ -447,8 +447,8 @@ class Course( models.Model ):
             hours = self.entity.exercises_laboratiories
         else:
             hours = 0
-        if self.information.exercises_laboratiories:
-            delta = self.information.exercises_laboratiories
+        if self.information.exercises_laboratories:
+            delta = self.information.exercises_laboratories
         else:
             delta = 0
 
