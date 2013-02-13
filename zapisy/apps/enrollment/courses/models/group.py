@@ -161,7 +161,7 @@ class Group(models.Model):
     def _remove_from_all_groups(self, student):
         from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
 
-        records =  Record.get_student_records_for_course(student, self.course)
+        records = Record.get_student_records_for_course(student, self.course)
         for record in records:
             record.student_remove(student)
 
@@ -187,17 +187,15 @@ class Group(models.Model):
         result = True
         #REMOVE FROM OTHER GROUP
 
-
-
         if self.type != settings.LETURE_TYPE:
             result = self._remove_from_other_groups(student)
 
             self._add_to_lecture(student)
 
-
-        Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
-        self.add_to_enrolled_counter(student)
-
+        r, created = Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
+        if created:
+            self.add_to_enrolled_counter(student)
+            
         if commit:
             self.save()
 
