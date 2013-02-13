@@ -9,5 +9,5 @@ from apps.enrollment.courses.models import Semester, Group
 def students_list(request):
     semester = Semester.objects.get_next()
     students = Student.objects.get_list_full_info().order_by('t0_min')
-    groups   = Group.objects.filter(course__semester=semester).select_related('course')
+    groups   = Group.objects.filter(course__semester=semester).select_related('course').order_by('course')
     return TemplateResponse(request, 'statistics/students_list.html', locals())
