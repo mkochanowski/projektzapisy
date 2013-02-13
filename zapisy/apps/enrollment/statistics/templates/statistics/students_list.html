@@ -23,23 +23,24 @@
                 <th><h4>Prowadzący</h4></th>
                 <th><h4>Typ</h4></th>
                 <th><h4>Miejsca</h4></th>
-                <th><h4>Miejsca zamawiane</h4></th>
-                <th><h4>Miejsca zamawiane2012</h4></th>
+                <th><h4>zamawiane</h4></th>
+                <th><h4>zamawiane2012</h4></th>
                 <th><h4>Zapisani</h4></th>
-                <th><h4>Zapisani zamawiani</h4></th>
-                <th><h4>Zapisani zamawiani2012</h4></th>
+                <th><h4>zamawiani</h4></th>
+                <th><h4>zamawiani2012</h4></th>
                 <th><h4>Kolejka</h4></th>
+                <th><h4>Przypięci</h4></th>
 
             </tr>
         </thead>
         <tbody>
             {% for course in courses_list %}
                 <tr>
-                <th colspan="7">{{ course.grouper }}</th>
+                <th colspan="10">{{ course.grouper.name }}</th>
                 </tr>
                 {% for group in course.list|dictsort:'type' %}
                     <tr{% if group.limit < group.enrolled %} class="overlimit"{% elif group.limit == group.enrolled %} class="fulllimit"{% endif %}>
-                        <td>{{ group.teacher }}</td>
+                        <td>{{ group.teacher.user.get_full_name }}</td>
                         <td>{{ group.get_type_display }}</td>
                         <td>{{ group.limit }}</td>
                         <td>{{ group.limit_zamawiane }}</td>
@@ -48,6 +49,7 @@
                         <td>{{ group.enrolled_zam }}</td>
                         <td>{{ group.enrolled_zam2012 }}</td>
                         <td>{{ group.queued }}</td>
+                        <td>{{ group.pinned }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}

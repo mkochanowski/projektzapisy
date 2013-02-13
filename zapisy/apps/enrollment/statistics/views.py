@@ -9,5 +9,10 @@ from apps.enrollment.courses.models import Semester, Group
 def students_list(request):
     semester = Semester.objects.get_next()
     students = Student.objects.get_list_full_info().order_by('t0_min')
-    groups   = Group.objects.filter(course__semester=semester).select_related('course').order_by('course')
+    groups = Group.objects.filter(course__semester=semester)\
+        .select_related('course', 'teacher', 'teacher__user', 'course__entity').order_by('course')\
+        .extra(select={
+           'queued': "SELECT COUNT(*) FROM records_queue rq WHERE rq.deleted = False AND rq.group_id = courses_group.id",
+           'pinned': "SELECT COUNT(*) FROM records_record rr "
+            "WHERE rr.status='2' AND rr.group_id = courses_group.id"})
     return TemplateResponse(request, 'statistics/students_list.html', locals())
