@@ -7,7 +7,7 @@ from apps.enrollment.courses.models import Semester, Group
 
 @permission_required('courses.view_stats')
 def students_list(request):
-    semester = Semester.get_current_semester()
+    semester = Semester.objects.get_next()
     students = Student.objects.get_list_full_info().order_by('t0_min')
-#    groups   = Group.get_all_in_semester(semester)
+    groups   = Group.objects.filter(course__semester=semester).select_related('course')
     return TemplateResponse(request, 'statistics/students_list.html', locals())
