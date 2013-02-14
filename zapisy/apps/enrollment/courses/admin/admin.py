@@ -16,7 +16,7 @@ class GroupForm(ModelForm):
     def save(self, commit=True):
         group = super(GroupForm, self).save(commit=False)
         if group.id:
-            group.course = Course.objects.select_for_update().get(id=group.course_id)
+            group.course = Course.simple.select_for_update().get(id=group.course_id)
             old_one = Group.objects.select_for_update().get(id=group.id)
             while old_one.limit < group.limit:
                 old_one.limit += 1
