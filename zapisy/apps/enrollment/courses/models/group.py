@@ -273,7 +273,7 @@ class Group(models.Model):
             if not limit:
                 pass
             else:
-                semester = Semester.get_current_semester()
+                semester = Semester.objects.get_next()
                 current_limit = semester.get_current_limit()
                 if q.student.get_points_with_course(self.course) <= current_limit:
                     result, _  = self.add_student(q.student, return_group=True)
@@ -282,7 +282,7 @@ class Group(models.Model):
                         old.group.remove_from_queued_counter(q.student)
                         old.save()
 
-                    break
+                    continue
                 to_removed.append(q)
 
         for queue in to_removed:
