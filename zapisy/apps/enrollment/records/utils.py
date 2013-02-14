@@ -129,7 +129,7 @@ def prepare_schedule_data(request, courses, semester=None):
             employee = None
     except Employee.DoesNotExist:
         employee = None
-    default_semester = semester or Semester.get_default_semester()
+    default_semester = semester or Semester.objects.get_next()
 
     terms_by_days = [None for i in range(8)] # dni numerowane od 1
     for course in courses:
