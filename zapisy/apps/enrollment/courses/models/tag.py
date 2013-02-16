@@ -11,3 +11,7 @@ class Tag(models.Model):
         verbose_name = u'Tag'
         verbose_name_plural = u'Tagi'
         app_label = 'courses'
+
+    def __unicode__(self):
+        return str(self.short_name) + ' (' + str(self.full_name) + ')'
+
