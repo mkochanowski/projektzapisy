@@ -417,6 +417,13 @@ class Course( models.Model ):
 
         return hours + delta
 
+    @property
+    def tags(self):
+        if not hasattr(self, '_tagscache'):
+            self._tagscache = TagCourseEntity.objects.filter(courseentity=self.entity)
+
+        return self._tagscache
+
 
     @property
     def repetitions(self):

@@ -19,6 +19,33 @@
     <link rel="apple-touch-icon" sizes="72x72" href="{% static 'images/apple-touch-icon-72x72.png'%}">
     <link rel="apple-touch-icon" sizes="114x114" href="{% static 'images/apple-touch-icon-114x114.png'%}">
     <!-- Le styles -->
+    <style>
+        .label {
+          padding: 1px 3px 2px;
+          font-size: 9.75px;
+          font-weight: bold;
+          color: #ffffff;
+          text-transform: uppercase;
+          white-space: nowrap;
+          background-color: #bfbfbf;
+          -webkit-border-radius: 3px;
+          -moz-border-radius: 3px;
+          border-radius: 3px;
+        }
+        .label.important {
+          background-color: #c43c35;
+        }
+        .label.warning {
+          background-color: #f89406;
+        }
+        .label.success {
+          background-color: #46a546;
+        }
+        .label.notice {
+          background-color: #62cffc;
+        }
+
+    </style>
     {% block styles %}
         {% compressed_css 'main' %}
     {% endblock %}
