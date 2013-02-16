@@ -11,6 +11,7 @@ from django.template.defaultfilters import slugify
 from django.db.models import signals
 from django.core.cache import cache as mcache
 from django.utils.encoding import smart_unicode
+from apps.enrollment.courses.models.tag import Tag
 
 from apps.offer.proposal.exceptions import NotOwnerException
 import settings
@@ -102,6 +103,9 @@ class CourseEntity(models.Model):
     usos_kod = models.CharField(max_length=20, null=True, blank=True, default='', verbose_name=u'Kod przedmiotu w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
 
     ue = models.BooleanField(default=False, verbose_name=u'Przedmiot prowadzony przy pomocy środków pochodzących z Unii Europejskiej')
+
+
+    tags = models.ManyToManyField(Tag, through='TagCourseEntity')
 
     objects   = WithInformation()
     simple    = models.Manager()
@@ -672,4 +676,13 @@ class CourseDescription(models.Model):
     class Meta:
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
+        app_label = 'courses'
+
+
+class TagCourseEntity(models.Model):
+    tag = models.ForeignKey(Tag)
+    courseentity = models.ForeignKey(CourseEntity)
+    weight = models.IntegerField(verbose_name=u'Waga')
+
+    class Meta:
         app_label = 'courses'
