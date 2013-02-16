@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from django.db import models
+from django.utils.encoding import smart_unicode
 
 
 class Tag(models.Model):
@@ -13,5 +14,5 @@ class Tag(models.Model):
         app_label = 'courses'
 
     def __unicode__(self):
-        return str(self.short_name) + ' (' + str(self.full_name) + ')'
+        return smart_unicode(self.short_name) + u' (' + smart_unicode(self.full_name) + u')'
 
