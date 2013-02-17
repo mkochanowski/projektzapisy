@@ -355,7 +355,13 @@ class Group(models.Model):
         return self.enrolled_zam2012
 
     def get_count_of_enrolled_non_zamawiane(self, dont_use_cache=False):
-        return self.enrolled - self.enrolled_zam - self.enrolled_zam2012
+        result = self.enrolled
+        if self.limit_zamawiane and self.limit_zamawiane > 0:
+            result -= self.enrolled_zam
+        elif self.limit_zamawiane2012 and self.limit_zamawiane2012 > 0:
+            result -= self.enrolled_zam2012
+
+        return result
 
     def get_count_of_queued(self, dont_use_cache=False):
         return self.queued
