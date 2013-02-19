@@ -306,7 +306,7 @@ class GroupAdmin(admin.ModelAdmin):
             ev.type = '3'
             ev.visible = True
             ev.status = '1'
-            ev.author_id = obj.teacher
+            ev.author_id = obj.teacher.user
             ev.save()
 
             for room in t.classrooms.all():
