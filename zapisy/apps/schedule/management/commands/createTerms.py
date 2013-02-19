@@ -11,7 +11,7 @@ from apps.schedule.models import Term, Event
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        semester = Semester.get_current_semester()
+        semester = Semester.objects.get_next()
 
         freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
                                           Q(day__lte=semester.lectures_ending))\
