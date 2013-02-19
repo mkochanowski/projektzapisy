@@ -27,15 +27,12 @@ class GroupForm(ModelForm):
                     Group.do_rearanged(old_one)
 
                 old_one = Group.objects.select_for_update().get(id=group.id)
-                group.enrolled         = old_one.enrolled
-                group.enrolled_zam     = old_one.enrolled_zam
+                group.enrolled = old_one.enrolled
+                group.enrolled_zam = old_one.enrolled_zam
                 group.enrolled_zam2012 = old_one.enrolled_zam2012
-                group.queued           = old_one.queued
+                group.queued = old_one.queued
 
-            Group.do_rearanged(group)
-
-        if commit:
-            group.save()
+        group.save()
 
         return group
 
@@ -55,7 +52,8 @@ class CourseForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
         if 'instance' in kwargs:
-            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance'].entity).select_related('entity')
+            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance'].entity)\
+                .select_related('entity')
         else:
             self.fields['information'].queryset = EmptyQuerySet()
 
@@ -265,6 +263,67 @@ class GroupAdmin(admin.ModelAdmin):
     form = GroupForm
 
     raw_id_fields = ('course', 'teacher')
+
+    def save_model(self, request, obj, form, change):
+        from apps.enrollment.courses.models import Term as T
+        from apps.schedule.models import Event, Term
+
+        obj.save()
+        Event.objects.filter(group=obj, type='3').delete()
+        semester = obj.course.semester
+
+        freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
+                                          Q(day__lte=semester.lectures_ending))\
+                          .values_list('day', flat=True)
+        changed = ChangedDay.objects.filter(Q(day__gte=semester.lectures_beginning), Q(day__lte=semester.lectures_ending)).values_list('day', 'weekday')
+        terms = T.objects.filter(group=obj).select_related('group', 'group__course', 'group__course__courseentity')
+        days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
+
+        day = semester.lectures_beginning
+
+        while day <= semester.lectures_ending:
+
+            if day in freedays:
+                day = day + timedelta(days=1)
+                continue
+
+            weekday = day.weekday()
+
+            for d in changed:
+                if d[0] == day:
+                    weekday = int(d[1]) - 1
+                    break
+
+            days[weekday].append(day)
+
+            day = day + timedelta(days=1)
+
+        for t in terms:
+            ev = Event()
+            ev.group = t.group
+            ev.course = t.group.course
+            ev.title = ev.course.entity.get_short_name()
+            ev.type = '3'
+            ev.visible = True
+            ev.status = '1'
+            ev.author_id = obj.teacher
+            ev.save()
+
+            for room in t.classrooms.all():
+                for day in days[int(t.dayOfWeek) - 1]:
+                    newTerm = Term()
+                    newTerm.event = ev
+                    newTerm.day = day
+                    newTerm.start = timedelta(hours=t.start_time.hour, minutes=t.start_time.minute)
+                    newTerm.end = timedelta(hours=t.end_time.hour, minutes=t.end_time.minute)
+                    newTerm.room = room
+                    newTerm.save()
+
+
+
+
+
+
 
     def changelist_view(self, request, extra_context=None):
 
