@@ -13,28 +13,29 @@ class GroupForm(ModelForm):
     class Meta:
         model = Group
 
-    def save(self, commit=True):
-        group = super(GroupForm, self).save(commit=False)
-        if group.id:
-            group.course = Course.simple.select_for_update().get(id=group.course_id)
-            old_one = Group.objects.select_for_update().get(id=group.id)
-            while old_one.limit < group.limit:
-                old_one.limit += 1
-                old_one.limit_zamawiane = group.limit_zamawiane
-                old_one.limit_zamawiane2012 = group.limit_zamawiane2012
-                old_one.save()
-                if old_one.queued > 0:
-                    Group.do_rearanged(old_one)
-
-                old_one = Group.objects.select_for_update().get(id=group.id)
-                group.enrolled = old_one.enrolled
-                group.enrolled_zam = old_one.enrolled_zam
-                group.enrolled_zam2012 = old_one.enrolled_zam2012
-                group.queued = old_one.queued
-
-        group.save()
-
-        return group
+    # def save(self, commit=True):
+    #     import ipdb;ipdb.set_trace()
+    #     group = super(GroupForm, self).save(commit=False)
+    #     if group.id:
+    #         group.course = Course.simple.select_for_update().get(id=group.course_id)
+    #         old_one = Group.objects.select_for_update().get(id=group.id)
+    #         while old_one.limit < group.limit:
+    #             old_one.limit += 1
+    #             old_one.limit_zamawiane = group.limit_zamawiane
+    #             old_one.limit_zamawiane2012 = group.limit_zamawiane2012
+    #             old_one.save()
+    #             if old_one.queued > 0:
+    #                 Group.do_rearanged(old_one)
+    #
+    #             old_one = Group.objects.select_for_update().get(id=group.id)
+    #             group.enrolled = old_one.enrolled
+    #             group.enrolled_zam = old_one.enrolled_zam
+    #             group.enrolled_zam2012 = old_one.enrolled_zam2012
+    #             group.queued = old_one.queued
+    #
+    #     group.save()
+    #
+    #     return group
 
 
 class GroupInline(admin.TabularInline):
@@ -181,35 +182,35 @@ class RecordInlineForm(ModelForm):
     class Meta:
         model = Record
 
-    def save(self, commit=True):
-
-        record = super(RecordInlineForm, self).save(commit=False)
-
-        if record.id:
-            old = Record.objects.get(id=record.id)
-            if old.status <> record.status:
-                if record.status == STATUS_REMOVED:
-                    record.group.remove_from_enrolled_counter(record.student)
-                    Group.do_rearanged(record.group)
-                elif  record.status == STATUS_ENROLLED:
-                    record.group.add_to_enrolled_counter(record.student)
-                    Queue.objects.filter(group=record.group, student=record.student, deleted=False).update(deleted=True)
-                    record.group.queued = Queue.objects.filter(group=record.group, deleted=False).count()
-                    record.group.save()
-
-        else:
-            if record.status == STATUS_REMOVED:
-                pass
-            elif  record.status == STATUS_ENROLLED:
-                record.group.add_to_enrolled_counter(record.student)
-                Queue.objects.filter(group=record.group, student=record.student, deleted=False).update(deleted=True)
-                record.group.queued = Queue.objects.filter(group=record.group, deleted=False).count()
-                record.group.save()
-
-        if commit:
-            record.save()
-
-        return record
+    # def save(self, commit=True):
+    #
+    #     record = super(RecordInlineForm, self).save(commit=False)
+    #
+    #     if record.id:
+    #         old = Record.objects.get(id=record.id)
+    #         if old.status <> record.status:
+    #             if record.status == STATUS_REMOVED:
+    #                 record.group.remove_from_enrolled_counter(record.student)
+    #                 Group.do_rearanged(record.group)
+    #             elif  record.status == STATUS_ENROLLED:
+    #                 record.group.add_to_enrolled_counter(record.student)
+    #                 Queue.objects.filter(group=record.group, student=record.student, deleted=False).update(deleted=True)
+    #                 record.group.queued = Queue.objects.filter(group=record.group, deleted=False).count()
+    #                 record.group.save()
+    #
+    #     else:
+    #         if record.status == STATUS_REMOVED:
+    #             pass
+    #         elif  record.status == STATUS_ENROLLED:
+    #             record.group.add_to_enrolled_counter(record.student)
+    #             Queue.objects.filter(group=record.group, student=record.student, deleted=False).update(deleted=True)
+    #             record.group.queued = Queue.objects.filter(group=record.group, deleted=False).count()
+    #             record.group.save()
+    #
+    #     if commit:
+    #         record.save()
+    #
+    #     return record
 
 
 class RecordInline(admin.TabularInline):
@@ -223,24 +224,24 @@ class QueuedInlineForm(ModelForm):
     class Meta:
         model = Queue
 
-    def save(self, commit=True):
-        queue = super(QueuedInlineForm, self).save(commit=False)
-
-
-        if queue.id:
-            old = Queue.objects.get(id=queue.id)
-            if not old.deleted and queue.deleted:
-                queue.group.remove_from_queued_counter(queue.student)
-            elif old.deleted and not queue.deleted:
-                queue.group.add_to_queued_counter(queue.student)
-        else:
-            if not queue.deleted:
-                queue.group.add_to_queued_counter(queue.student)
-
-        if commit:
-            queue.save()
-
-        return queue
+    # def save(self, commit=True):
+    #     queue = super(QueuedInlineForm, self).save(commit=False)
+    #
+    #
+    #     if queue.id:
+    #         old = Queue.objects.get(id=queue.id)
+    #         if not old.deleted and queue.deleted:
+    #             queue.group.remove_from_queued_counter(queue.student)
+    #         elif old.deleted and not queue.deleted:
+    #             queue.group.add_to_queued_counter(queue.student)
+    #     else:
+    #         if not queue.deleted:
+    #             queue.group.add_to_queued_counter(queue.student)
+    #
+    #     if commit:
+    #         queue.save()
+    #
+    #     return queue
 
 class QueuedInline(admin.TabularInline):
     model = Queue
@@ -267,6 +268,13 @@ class GroupAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         from apps.enrollment.courses.models import Term as T
         from apps.schedule.models import Event, Term
+
+
+        if obj.id:
+            obj.course = Course.simple.select_for_update().get(id=obj.course_id)
+            obj.save()
+            while obj.enrolled < obj.limit and obj.queued:
+                Group.do_rearanged(obj)
 
         obj.save()
         Event.objects.filter(group=obj, type='3').delete()

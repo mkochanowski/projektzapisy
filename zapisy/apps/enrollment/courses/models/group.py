@@ -282,7 +282,7 @@ class Group(models.Model):
                         old.group.remove_from_queued_counter(q.student)
                         old.save()
 
-                    continue
+                    break
                 to_removed.append(q)
 
         for queue in to_removed:
