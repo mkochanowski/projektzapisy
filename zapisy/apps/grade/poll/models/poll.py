@@ -149,7 +149,7 @@ class Poll( models.Model ):
     
     @staticmethod
     def get_current_polls(student=None):
-        semester = Semester.get_current_semester()
+        semester = Semester.objects.get(is_grade_active=True)
         where = ['((SELECT COUNT(*) FROM ticket_create_publickey WHERE poll_id = poll_poll.id GROUP BY poll_id) > 0)']
         if student:
             count = '((SELECT COUNT(*) FROM ticket_create_usedticketstamp WHERE poll_id = poll_poll.id AND student_id = %d) = 0)' % student.id
