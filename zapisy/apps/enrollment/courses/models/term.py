@@ -103,6 +103,9 @@ class Term(models.Model):
                                     WHERE courses_term.id=courses_term_classrooms.term_id),',')"""}))
 
     def numbers(self):
+        if not self.id:
+            return ''
+
         if hasattr(self, 'classrooms_as_string'):
             return self.classrooms_as_string
         classrooms = self.classrooms.all()
