@@ -269,11 +269,12 @@ class GroupAdmin(admin.ModelAdmin):
         from apps.enrollment.courses.models import Term as T
         from apps.schedule.models import Event, Term
 
-
         if obj.id:
             obj.course = Course.simple.select_for_update().get(id=obj.course_id)
             obj.save()
-            while obj.enrolled < obj.limit and obj.queued:
+            last = -1
+            while obj.queued and obj.limit > obj.enrolled > last:
+                last = obj.enrolled
                 Group.do_rearanged(obj)
 
         obj.save()
