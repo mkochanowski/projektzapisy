@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.db.models.query import EmptyQuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import smart_unicode
 from timedelta import TimedeltaField
 import json
 from mailer.utils import render_and_send_email
@@ -21,6 +22,8 @@ types_for_student = [('2', u'Wydarzenie')]
 types_for_teacher = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie')]
 
 statuses = [('0', u'Do rozpatrzenia'), ('1', u'Zaakceptowane'), ('2', u'Odrzucone')]
+
+
 class Event(models.Model):
     """
     Model of Event
@@ -34,12 +37,28 @@ class Event(models.Model):
 
     course      = models.ForeignKey('courses.Course', null=True, blank=True)
     group       = models.ForeignKey('courses.Group',  null=True, blank=True)
+    reservation = models.ForeignKey('schedule.SpecialReservation',  null=True, blank=True)
 
     interested  = models.ManyToManyField('auth.User', related_name='interested_events')
 
     author      = models.ForeignKey('auth.User', verbose_name=u'Twórca')
     created     = models.DateTimeField(auto_now_add=True)
     edited      = models.DateTimeField(auto_now=True)
+
+
+
+    def get_absolute_url(self):
+        if self.group:
+            return reverse('records-group', args=[self.group_id])
+        return reverse('events:show', args=[str(self.id)])
+
+    class Meta:
+        verbose_name = u'wydarzenie'
+        verbose_name_plural = u'wydarzenia'
+        ordering = ('-created',)
+        permissions = (
+            ("manage_events", u"Może zarządzać wydarzeniami"),
+        )
 
 
     def save(self, *args, **kwargs):
@@ -59,8 +78,9 @@ class Event(models.Model):
             if self.type in ['0','1']:
                 self.visible = True
 
-        super(Event, self).save(*args, **kwargs)
 
+        super(self.__class__, self).save()
+    
         if is_new and self.type in ['0','1'] and self.course:
             render_and_send_email(u'Ustalono termin egzaminu',
                                    u'schedule/emails/new_exam.txt',
@@ -68,20 +88,6 @@ class Event(models.Model):
                                    {'event': self},
                                    self.get_followers()
             )
-
-    def get_absolute_url(self):
-        if self.group:
-            return reverse('records-group', args=[self.group_id])
-        return reverse('events:show', args=[str(self.id)])
-
-    class Meta:
-        verbose_name = u'wydarzenie'
-        verbose_name_plural = u'wydarzenia'
-        ordering = ('-created',)
-        permissions = (
-            ("manage_events", u"Może zarządzać wydarzeniami"),
-        )
-
 
     def _user_can_see_or_404(self, user):
         """
@@ -402,3 +408,76 @@ class EventMessage(Message):
 #                               {'event': self.event},
 #                               self.event.get_followers()
 #        )
+
+
+class SpecialReservation(models.Model):
+    from apps.enrollment.courses.models import Semester, DAYS_OF_WEEK, Classroom
+
+    semester = models.ForeignKey(Semester)
+    title = models.CharField(max_length=255)
+    classroom = models.ForeignKey(Classroom)
+    dayOfWeek = models.CharField(max_length=1,
+                                 choices=DAYS_OF_WEEK,
+                                 verbose_name='dzień tygodnia')
+    start_time = models.TimeField(verbose_name='rozpoczęcie')
+    end_time = models.TimeField(verbose_name='zakończenie')
+
+    class Meta:
+        verbose_name = u'rezerwacja stała'
+        verbose_name_plural = u'rezerwacje stałe'
+
+    def __unicode__(self):
+        return smart_unicode(self.semester) + ': ' + smart_unicode(self.title) + ' - ' + smart_unicode(self.get_dayOfWeek_display()) +\
+                  ' ' + smart_unicode(self.start_time) + ' - ' + smart_unicode(self.end_time)
+
+    def save(self, *args, **kwargs):
+        from apps.enrollment.courses.models import Freeday, ChangedDay, Classroom
+
+        super(SpecialReservation, self).save(*args, **kwargs)
+
+        Event.objects.filter(reservation=self).delete()
+
+        semester = self.semester
+
+        freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
+                                          Q(day__lte=semester.lectures_ending))\
+                          .values_list('day', flat=True)
+
+        changed = ChangedDay.objects.filter(Q(day__gte=semester.lectures_beginning), Q(day__lte=semester.lectures_ending)).values_list('day', 'weekday')
+        days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
+
+        day = semester.lectures_beginning
+
+        while day <= semester.lectures_ending:
+
+            if day in freedays:
+                day = day + datetime.timedelta(days=1)
+                continue
+
+            weekday = day.weekday()
+
+            for d in changed:
+                if d[0] == day:
+                    weekday = int(d[1]) - 1
+                    break
+
+            days[weekday].append(day)
+            day = day + datetime.timedelta(days=1)
+
+        ev = Event()
+        ev.title  = self.title
+        ev.reservation = self
+        ev.type   = '4'
+        ev.visible = True
+        ev.status  = '1'
+        ev.author_id = 1
+        ev.save()
+
+        for day in days[int(self.dayOfWeek) - 1]:
+            newTerm = Term()
+            newTerm.event = ev
+            newTerm.day = day
+            newTerm.start = datetime.timedelta(hours=self.start_time.hour, minutes=self.start_time.minute)
+            newTerm.end   = datetime.timedelta(hours=self.end_time.hour, minutes=self.end_time.minute)
+            newTerm.room = self.classroom
+            newTerm.save()

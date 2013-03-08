@@ -204,6 +204,7 @@ class ClassroomTermsAjaxView(FullCalendarView):
         queryset = super(ClassroomTermsAjaxView, self).get_queryset()
         return queryset.filter(room__slug=self.kwargs['slug'])
 
+
 class EventsTermsAjaxView(FullCalendarView):
     model = Term
     adapter = EventAdapter
