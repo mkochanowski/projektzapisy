@@ -14,7 +14,7 @@ class GetterManager(models.Manager):
         try:
             return self.get(records_closing__gte=datetime.now())
         except (ObjectDoesNotExist, MultipleObjectsReturned):
-            return None
+            return self.filter(visible=True).order_by('-records_closing')[0]
 
 class Semester( models.Model ):
     """semester in academic year"""
