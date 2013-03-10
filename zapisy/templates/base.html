@@ -112,7 +112,7 @@
                         {% csrf_token %}
                         <div class="inline-inputs">
                             {% if request.path == '/' %}
-                                <input type="hidden" name="next" value="{% url schedule-prototype %}"/>
+                                <input type="hidden" name="next" value="{% url schedule-own %}"/>
                             {% else %}
                                 <input type="hidden" name="next" value="{{request.path}}"/>
                             {% endif %}
