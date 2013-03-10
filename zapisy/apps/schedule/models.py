@@ -46,11 +46,11 @@ class Event(models.Model):
     edited      = models.DateTimeField(auto_now=True)
 
 
-
     def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
         if self.group:
-            return reverse('records-group', args=[self.group_id])
-        return reverse('events:show', args=[str(self.id)])
+            return reverse('records-group', args=[str(self.group_id)])
+        return reverse('events:show', args=[str(self.pk)])
 
     class Meta:
         verbose_name = u'wydarzenie'
@@ -80,7 +80,7 @@ class Event(models.Model):
 
 
         super(self.__class__, self).save()
-    
+
         if is_new and self.type in ['0','1'] and self.course:
             render_and_send_email(u'Ustalono termin egzaminu',
                                    u'schedule/emails/new_exam.txt',

@@ -4,10 +4,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
+import operator
 from apps.enrollment.courses.models import Classroom, Semester, Course
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, EventModerationMessageForm, EventMessageForm
@@ -213,4 +215,27 @@ class EventsTermsAjaxView(FullCalendarView):
         queryset = super(EventsTermsAjaxView, self).get_queryset()
         queryset = queryset.filter(event__type='2', event__visible=True)
         return queryset
+
+
+class MyScheduleAjaxView(FullCalendarView):
+    model = Term
+    adapter = EventAdapter
+
+    def get_queryset(self):
+        from apps.enrollment.courses.models import Group
+
+        query = []
+
+        if self.request.user.student:
+            query.append(Q(record__student=self.request.user.student))
+
+        if self.request.user.employee:
+            query.append(Q(teacher=self.request.user.employee))
+
+        queryset = super(MyScheduleAjaxView, self).get_queryset()
+        groups = Group.objects.filter(reduce(operator.or_, query))
+
+        return queryset.filter(Q(event__group__in=groups) |
+                               Q(event__interested=self.request.user) |
+                               Q(event__author=self.request.user)).select_related('event', 'event__group', 'event__group__teacher')
 

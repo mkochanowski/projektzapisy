@@ -257,17 +257,15 @@ def own(request):
     if request.user.student:
         student = request.user.student
         groups = Course.get_student_courses_in_semester(student, default_semester)
-    elif request.user.employee:
-        messages.info(request, 'Plan pracownika chwilowo wyłączony.')
-        return render_to_response('common/error.html',
-            context_instance=RequestContext(request))
-    if student is None and employee is None:
+        points, sum_points = student.get_points()
+
+
+    if student is None and request.user.employee is None:
         messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
         return render_to_response('common/error.html',
             context_instance=RequestContext(request))
 
 
-    points, sum_points = student.get_points()
 
 
     return TemplateResponse(request, 'enrollment/records/schedule.html', locals())

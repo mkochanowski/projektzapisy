@@ -3,6 +3,7 @@ from datetime import datetime, time as dtime
 import json
 from django import http
 from django.db.models import Q
+from django.http import Http404
 from django.views.generic.list import MultipleObjectMixin, BaseListView
 from django.views.generic import View
 
@@ -197,7 +198,6 @@ class FullCalendarAdapter(object):
         Sets an event's text color just like the calendar-wide eventTextColor option.
         """
         return None
-    
 
 
 class FullCalendarView(BaseListView):
@@ -205,8 +205,12 @@ class FullCalendarView(BaseListView):
     adapter = FullCalendarAdapter
 
     def get_queryset(self):
-        start = datetime.fromtimestamp( int(self.request.GET.get('start', datetime.now())) )
-        end   = datetime.fromtimestamp( int(self.request.GET.get('end', datetime.now())) )
+
+        if not 'start' in self.request.GET or not 'end' in self.request.GET:
+            raise Http404
+
+        start = datetime.fromtimestamp(int(self.request.GET.get('start')))
+        end   = datetime.fromtimestamp(int(self.request.GET.get('end')))
 
         if not self.queryset:
             self.queryset = super(FullCalendarView, self).get_queryset()
@@ -216,10 +220,10 @@ class FullCalendarView(BaseListView):
     def render_to_response(self, context):
         return self.get_json_response(self.convert_to_json(context['object_list']))
 
-    def get_json_response(self, content, **httpresponse_kwargs):
+    def get_json_response(self, content, **kwargs):
         return http.HttpResponse(content,
                                  content_type='application/json',
-                                 **httpresponse_kwargs)
+                                 **kwargs)
 
     def convert_to_json(self, queryset):
         return self.adapter(queryset, self.request).collection_as_json()

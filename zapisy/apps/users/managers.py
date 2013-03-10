@@ -21,14 +21,19 @@ class GettersManager(models.Manager):
 
         if begin == 'Z':
             return self.filter_with_t0(status=0,user__last_name__gte=begin).\
-                    select_related().order_by('user__last_name', 'user__first_name')
+                    select_related('user').order_by('user__last_name', 'user__first_name')
         elif begin == 'All':
             return self.filter_with_t0(status=0).\
-                    select_related().order_by('user__last_name', 'user__first_name')
+                    select_related('user').order_by('user__last_name', 'user__first_name')
         else:
             end = next_char(begin)
             return self.filter_with_t0(status=0,user__last_name__range=(begin, end)).\
-                    select_related().order_by('user__last_name', 'user__first_name')
+                    select_related('user').order_by('user__last_name', 'user__first_name')
+
+
+    def get_statistics(self, semester):
+
+        return self.get_list_full_info().extra(select={})
 
 
 class T0Manager(models.Manager):

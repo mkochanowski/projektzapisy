@@ -249,7 +249,7 @@ class QueuedInline(admin.TabularInline):
     raw_id_fields = ("student",)
 
     can_delete = False
-    form=QueuedInlineForm
+    form = QueuedInlineForm
 
 
 
@@ -266,8 +266,6 @@ class GroupAdmin(admin.ModelAdmin):
     raw_id_fields = ('course', 'teacher')
 
     def save_model(self, request, obj, form, change):
-        from apps.enrollment.courses.models import Term as T
-        from apps.schedule.models import Event, Term
 
         if obj.id:
             obj.course = Course.simple.select_for_update().get(id=obj.course_id)
@@ -279,64 +277,65 @@ class GroupAdmin(admin.ModelAdmin):
 
         obj.save()
 
-        
-        # Event.objects.filter(group=obj, type='3').delete()
-        # semester = obj.course.semester
-        #
-        # freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
-        #                                   Q(day__lte=semester.lectures_ending))\
-        #                   .values_list('day', flat=True)
-        # changed = ChangedDay.objects.filter(Q(day__gte=semester.lectures_beginning), Q(day__lte=semester.lectures_ending)).values_list('day', 'weekday')
-        # terms = T.objects.filter(group=obj).select_related('group', 'group__course', 'group__course__courseentity')
-        # days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
-        #
-        # day = semester.lectures_beginning
-        #
-        # while day <= semester.lectures_ending:
-        #
-        #     if day in freedays:
-        #         day = day + timedelta(days=1)
-        #         continue
-        #
-        #     weekday = day.weekday()
-        #
-        #     for d in changed:
-        #         if d[0] == day:
-        #             weekday = int(d[1]) - 1
-        #             break
-        #
-        #     days[weekday].append(day)
-        #
-        #     day = day + timedelta(days=1)
-        #
-        # for t in terms:
-        #     ev = Event()
-        #     ev.group = t.group
-        #     ev.course = t.group.course
-        #     ev.title = ev.course.entity.get_short_name()
-        #     ev.type = '3'
-        #     ev.visible = True
-        #     ev.status = '1'
-        #     if obj.teacher:
-        #         ev.author_id = obj.teacher.user.id
-        #     else:
-        #         ev.author_id = 1
-        #     ev.save()
-        #
-        #     for room in t.classrooms.all():
-        #         for day in days[int(t.dayOfWeek) - 1]:
-        #             newTerm = Term()
-        #             newTerm.event = ev
-        #             newTerm.day = day
-        #             newTerm.start = timedelta(hours=t.start_time.hour, minutes=t.start_time.minute)
-        #             newTerm.end = timedelta(hours=t.end_time.hour, minutes=t.end_time.minute)
-        #             newTerm.room = room
-        #             newTerm.save()
+    def response_add(self, request, obj, post_url_continue='../%s/'):
+        from apps.enrollment.courses.models import Term as T
+        from apps.schedule.models import Event, Term
+        # Perform extra operation after all inlines are saved
 
+        Event.objects.filter(group=obj, type='3').delete()
+        semester = obj.course.semester
 
+        freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
+                                          Q(day__lte=semester.lectures_ending))\
+                          .values_list('day', flat=True)
+        changed = ChangedDay.objects.filter(Q(day__gte=semester.lectures_beginning), Q(day__lte=semester.lectures_ending)).values_list('day', 'weekday')
+        terms = T.objects.filter(group=obj).select_related('group', 'group__course', 'group__course__courseentity')
+        days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
 
+        day = semester.lectures_beginning
 
+        while day <= semester.lectures_ending:
 
+            if day in freedays:
+                day = day + timedelta(days=1)
+                continue
+
+            weekday = day.weekday()
+
+            for d in changed:
+                if d[0] == day:
+                    weekday = int(d[1]) - 1
+                    break
+
+            days[weekday].append(day)
+
+            day = day + timedelta(days=1)
+
+        for t in terms:
+            ev = Event()
+            ev.group = obj
+            ev.course = t.group.course
+            ev.title = ev.course.entity.get_short_name()
+            ev.type = '3'
+            ev.visible = True
+            ev.status = '1'
+            if obj.teacher:
+                ev.author_id = obj.teacher.user.id
+            else:
+                ev.author_id = 1
+            ev.save()
+
+            for room in t.classrooms.all():
+                for day in days[int(t.dayOfWeek) - 1]:
+                    newTerm = Term()
+                    newTerm.event = ev
+                    newTerm.day = day
+                    newTerm.start = timedelta(hours=t.start_time.hour, minutes=t.start_time.minute)
+                    newTerm.end = timedelta(hours=t.end_time.hour, minutes=t.end_time.minute)
+                    newTerm.room = room
+                    newTerm.save()
+
+        return super(GroupAdmin, self).response_add(request, obj, post_url_continue)
 
 
     def changelist_view(self, request, extra_context=None):
@@ -365,46 +364,6 @@ class TypeAdmin(admin.ModelAdmin):
     list_filter = ('group','meta_type')
 
 
-class TermAdmin(admin.ModelAdmin):
-
-    def show_start(self, obj):
-        return obj.start_time.strftime('%H:%M')
-
-    def show_end(self, obj):
-        return obj.end_time.strftime('%H:%M')
-
-    fieldsets = [
-        (None,               {'fields': ['group']}),
-        ('Termin', {'fields': ['dayOfWeek','start_time','end_time']}),
-        ('Miejsce', {'fields': ['classrooms',]}),
-    ]
-    list_filter = ('dayOfWeek', 'classrooms', 'group__course__semester')
-    list_display = ('__unicode__','dayOfWeek','show_start','show_end', 'group')
-    search_fields = ('group__course__entity__name','group__teacher__user__first_name','group__teacher__user__last_name','dayOfWeek')
-    ordering = ('dayOfWeek', 'start_time')
-    raw_id_fields = ('group',)
-    def queryset(self, request):
-       """
-       Filter the objects displayed in the change_list to only
-       display those for the currently signed in user.
-       """
-       qs = super(TermAdmin, self).queryset(request)
-       return qs.select_related('group', 'group__course', 'group__course__entity', 'group__teacher', 'group__teacher__user').prefetch_related('classrooms')
-
-    def changelist_view(self, request, extra_context=None):
-        semester = Semester.get_current_semester()
-        if not request.GET.has_key('group__course__semester__id__exact'):
-           q = request.GET.copy()
-           q['group__course__semester__id__exact'] = semester.id
-           request.GET = q
-           request.META['QUERY_STRING'] = request.GET.urlencode()
-            
-        return super(TermAdmin,self).changelist_view(request, extra_context=extra_context)
-
-class StudentOptionsAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__','records_opening_bonus_minutes')
-    search_fields = ('student__matricula','student__user__first_name','student__user__last_name','course__entity__name')
-
 
 
 
@@ -425,11 +384,9 @@ class CourseDescriptionAdmin(admin.ModelAdmin):
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseDescription, CourseDescriptionAdmin)
 admin.site.register(CourseEntity, CourseEntityAdmin)
-admin.site.register(StudentOptions,StudentOptionsAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Tag)
-admin.site.register(Classroom, ClassroomAdmin)
-admin.site.register(Term, TermAdmin)
+# admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(Freeday)
 admin.site.register(ChangedDay)

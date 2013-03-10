@@ -23,11 +23,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-
-from django.contrib import admin
-from django.db.models.loading import cache
-
-class EmailChangeRequestAdmin(admin.ModelAdmin):
-    raw_id_fields = ('user',)
-
-admin.site.register(cache.get_model('email_change', 'EmailChangeRequest'), EmailChangeRequestAdmin)
+#
+# from django.contrib import admin
+# from django.db.models.loading import cache
+#
+# class EmailChangeRequestAdmin(admin.ModelAdmin):
+#     raw_id_fields = ('user',)
+#
+# admin.site.register(cache.get_model('email_change', 'EmailChangeRequest'), EmailChangeRequestAdmin)

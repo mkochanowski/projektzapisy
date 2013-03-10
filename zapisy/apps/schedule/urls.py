@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from apps.schedule.feeds import LatestEvents, LatestExams
-from apps.schedule.views import ClassroomTermsAjaxView, EventsTermsAjaxView
+from apps.schedule.views import ClassroomTermsAjaxView, EventsTermsAjaxView, MyScheduleAjaxView
 
 __author__ = 'maciek'
 
@@ -22,6 +22,7 @@ urlpatterns = patterns('apps.schedule.views',
     url(r'^events/feed$', LatestEvents(), name='events_feed'),
     url(r'^events$', 'events', name='event_show'),
     url(r'^events/ajax$', EventsTermsAjaxView.as_view(), name='events_ajax'),
+    url(r'^events/myschedule$', MyScheduleAjaxView.as_view(), name='my_schedule_ajax'),
     url(r'^events/(?P<id>[0-9]+)/decision$', 'decision', name='decision'),
     url(r'^events/history$', 'history', name='history'),
     url(r'^session$', 'session', name='session'),

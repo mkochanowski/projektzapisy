@@ -58,7 +58,7 @@ class Term(models.Model):
             
         return filtered.select_related('classroom', 'classrooms', 'group', 'group__course', \
             'group__course__semester', 'group__course__entity',
-            'group__course__type', \
+            'group__course__entity__type', \
             'group__teacher', 'group__teacher__user').\
             order_by('dayOfWeek', 'start_time').all()
 
