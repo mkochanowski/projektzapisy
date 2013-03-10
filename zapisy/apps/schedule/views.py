@@ -227,7 +227,7 @@ class MyScheduleAjaxView(FullCalendarView):
         query = []
 
         if self.request.user.student:
-            query.append(Q(record__student=self.request.user.student))
+            query.append(Q(record__student=self.request.user.student) & Q(record__status='1'))
 
         if self.request.user.employee:
             query.append(Q(teacher=self.request.user.employee))
