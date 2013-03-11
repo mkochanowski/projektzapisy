@@ -271,7 +271,7 @@ class GroupAdmin(admin.ModelAdmin):
             obj.course = Course.simple.select_for_update().get(id=obj.course_id)
             obj.save()
             last = -1
-            while obj.queued and obj.limit > obj.enrolled > last:
+            while obj.course.enrollments_are_open() and obj.queued and obj.limit > obj.enrolled > last:
                 last = obj.enrolled
                 Group.do_rearanged(obj)
 
@@ -337,7 +337,6 @@ class GroupAdmin(admin.ModelAdmin):
 
         return super(GroupAdmin, self).response_add(request, obj, post_url_continue)
 
-
     def changelist_view(self, request, extra_context=None):
 
         if not request.GET.has_key('course__semester__id__exact'):
@@ -348,8 +347,6 @@ class GroupAdmin(admin.ModelAdmin):
             request.GET = q
             request.META['QUERY_STRING'] = request.GET.urlencode()
         return super(GroupAdmin,self).changelist_view(request, extra_context=extra_context)
-
-
 
     def queryset(self, request):
        """

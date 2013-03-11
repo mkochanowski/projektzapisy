@@ -372,6 +372,15 @@ class Course( models.Model ):
     getters
     """
 
+    def enrollments_are_open(self):
+        if self.records_end and self.records_start and self.records_start <= datetime.datetime.now() <= self.records_end:
+            return True
+
+        if datetime.datetime.now() <= self.semester.records_closing:
+            return True
+
+        return False
+
 
     def get_opening_time(self, student):
         """
