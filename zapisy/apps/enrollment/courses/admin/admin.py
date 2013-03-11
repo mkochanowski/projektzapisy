@@ -277,7 +277,15 @@ class GroupAdmin(admin.ModelAdmin):
 
         obj.save()
 
-    def response_add(self, request, obj, post_url_continue='../%s/'):
+    def response_add(self, request, new_object, post_url_continue='../%s/'):
+        obj = self.after_saving_model_and_related_inlines(new_object)
+        return super(GroupAdmin, self).response_add(request, obj, post_url_continue)
+
+    def response_change(self, request, obj):
+        obj = self.after_saving_model_and_related_inlines(obj)
+        return super(GroupAdmin, self).response_change(request, obj)
+
+    def after_saving_model_and_related_inlines(self, obj):
         from apps.enrollment.courses.models import Term as T
         from apps.schedule.models import Event, Term
         # Perform extra operation after all inlines are saved
@@ -335,7 +343,7 @@ class GroupAdmin(admin.ModelAdmin):
                     newTerm.room = room
                     newTerm.save()
 
-        return super(GroupAdmin, self).response_add(request, obj, post_url_continue)
+        return obj
 
     def changelist_view(self, request, extra_context=None):
 

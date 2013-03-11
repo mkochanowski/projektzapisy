@@ -222,6 +222,7 @@ class Event(models.Model):
 
         return self.interested.values_list('email', flat=True)
 
+
 class Term(models.Model):
     """
     Term representation
@@ -233,15 +234,17 @@ class Term(models.Model):
     start = TimedeltaField(verbose_name=u'Początek')
     end   = TimedeltaField(verbose_name=u'Koniec')
 
-    room   = models.ForeignKey('courses.Classroom', null=True, blank=True, verbose_name=u'Sala', related_name='event_terms')
-    place  = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'Miejsce')
+    room  = models.ForeignKey('courses.Classroom', null=True, blank=True, verbose_name=u'Sala', related_name='event_terms')
+    place = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'Miejsce')
 
     def validate_unique(self, *args, **kwargs):
         from django.core.exceptions import ValidationError
+        from django.db.models import Q
 
+        import ipdb;ipdb.set_trace()
         if self.room:
-            terms = Term.objects.filter(Q(room=self.room), Q(day=self.day), Q(event__status='1'),
-                                        Q(start__lt=self.end), Q(end__gt=self.start))\
+            terms = self.__class__.objects.filter(Q(room=self.room), Q(day=self.day), Q(event__status='1'),
+            Q(start__lt=self.end))\
                                 .select_related('event')
 
             if self.pk:
