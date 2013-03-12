@@ -235,7 +235,8 @@ class Group(models.Model):
             return queued, result
 
     def student_have_opened_enrollment(self, student):
-        return self.course.get_opening_time(student).opening_time < datetime.datetime.now()
+        opening = self.course.get_opening_time(student).opening_time
+        return opening and opening < datetime.datetime.now()
 
     def student_can_enroll(self, student):
 
