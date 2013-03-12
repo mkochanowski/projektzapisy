@@ -236,7 +236,7 @@ def records_csv(request, group_id):
 
         writer = UnicodeWriter(response)
         for s in students_in_group:
-            writer.writerow([s.user.first_name, s.user.last_name, s.matricula])
+            writer.writerow([s.user.first_name, s.user.last_name, s.matricula, s.user.email])
 
         return response
 
