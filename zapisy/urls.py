@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     (r'^help/', include('apps.help.urls')),
     #Z
     #url('^enrollment/$', 'apps.enrollment.courses.views.main', name='enrollment-main'),
+    url('^gdzie_ma_rimmon/$', 'apps.users.views.rimmon', name='rimmon'), #easter egg
     (r'^courses/', include('apps.enrollment.courses.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),
     (r'^statistics/', include('apps.enrollment.statistics.urls')),
