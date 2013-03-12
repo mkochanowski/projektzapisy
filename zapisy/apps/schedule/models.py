@@ -241,7 +241,6 @@ class Term(models.Model):
         from django.core.exceptions import ValidationError
         from django.db.models import Q
 
-        import ipdb;ipdb.set_trace()
         if self.room:
             terms = self.__class__.objects.filter(Q(room=self.room), Q(day=self.day), Q(event__status='1'),
             Q(start__lt=self.end))\
