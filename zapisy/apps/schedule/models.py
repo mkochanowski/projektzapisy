@@ -252,7 +252,7 @@ class Term(models.Model):
             if terms.count():
                 raise ValidationError({'__all__': (u'Ta sala w podanym terminie jest zajęta',)})
 
-        super(Term, self).validate_unique(*args, **kwargs)
+        super(self.__class__, self).validate_unique(*args, **kwargs)
 
     def clean(self):
         """
