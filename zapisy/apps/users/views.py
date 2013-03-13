@@ -386,7 +386,7 @@ def rimmon(request):
     """
     student = Student.objects.select_related('user').get(user__first_name='Marek', user__last_name='Rybak')
     courses = prepare_schedule_courses(request, for_student=student)
-    student.user.last_name = ''
+    student.user.last_name = '-<-@'
     student.user.first_name = 'Rimmon'
 
     data = prepare_schedule_data(request, courses)
