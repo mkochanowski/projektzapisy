@@ -388,6 +388,7 @@ def rimmon(request):
     courses = prepare_schedule_courses(request, for_student=student)
     student.user.last_name = '-<-@'
     student.user.first_name = 'Rimmon'
+    student.program = 'Imperial Academy'
 
     data = prepare_schedule_data(request, courses)
     data.update({
