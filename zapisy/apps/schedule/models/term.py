@@ -28,7 +28,7 @@ class Term(models.Model):
 
         if self.room:
             terms = self.__class__.objects.filter(Q(room=self.room), Q(day=self.day), Q(event__status='1'),
-                                                  Q(start__lt=self.end)).select_related('event')
+                                                  Q(start__lt=self.end), Q(end__gt=self.start)).select_related('event')
 
             if self.pk:
                 terms = terms.exclude(pk=self.pk)
