@@ -69,13 +69,13 @@ class Event(models.Model):
 
         super(self.__class__, self).save()
 
-        if is_new and self.type in ['0', '1'] and self.course:
-            render_and_send_email(u'Ustalono termin egzaminu',
-                                  u'schedule/emails/new_exam.txt',
-                                  u'schedule/emails/new_exam.html',
-                                  {'event': self},
-                                  self.get_followers()
-            )
+#        if is_new and self.type in ['0', '1'] and self.course:
+#            render_and_send_email(u'Ustalono termin egzaminu',
+#                                  u'schedule/emails/new_exam.txt',
+#                                  u'schedule/emails/new_exam.html',
+#                                  {'event': self},
+#                                  self.get_followers()
+#            )
 
     def _user_can_see_or_404(self, user):
         """
