@@ -25,13 +25,13 @@ class Related(models.Manager):
     def get_query_set(self):
         return super(Related, self).get_query_set().select_related('user')
 
-class ExtendedUser(User):    
+class ExtendedUser(User):
     is_student = models.BooleanField(default = False, verbose_name="czy student?")
     is_employee = models.BooleanField(default = False, verbose_name="czy pracownik?")
     is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
 
     objects = UserManager()
-    
+
     class Meta:
         verbose_name = 'użutkownik'
         verbose_name_plural = 'użytkownicy'
@@ -42,6 +42,12 @@ class UserProfile(models.Model):
     is_student   = models.BooleanField(default = False, verbose_name="czy student?")
     is_employee  = models.BooleanField(default = False, verbose_name="czy pracownik?")
     is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
+    preferred_language = models.CharField(
+        max_length=5,
+        choices=settings.LANGUAGES,
+        default=settings.LANGUAGES[0][0],
+        verbose_name="preferowany język Systemu Zapisów")
+
 
 class BaseUser(models.Model):
     '''
@@ -49,16 +55,16 @@ class BaseUser(models.Model):
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
     receive_mass_mail_enrollment = models.BooleanField(
-        default = True, 
+        default = True,
         verbose_name="otrzymuje mailem ogłoszenia Zapisów")
     receive_mass_mail_offer = models.BooleanField(
-        default = True, 
+        default = True,
         verbose_name="otrzymuje mailem ogłoszenia OD")
     receive_mass_mail_grade = models.BooleanField(
-        default = True, 
+        default = True,
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
     last_news_view = models.DateTimeField(default=datetime.datetime.now())
-    
+
     objects = Related()
 
     def get_full_name(self):
@@ -91,7 +97,7 @@ class BaseUser(models.Model):
 
     def __unicode__(self):
         return self.get_full_name
-    
+
     class Meta:
         abstract = True
 
@@ -120,7 +126,7 @@ class Employee(BaseUser):
 
     def has_privileges_for_group(self, group_id):
         """
-        Method used to verify whether user is allowed to create a poll for certain group 
+        Method used to verify whether user is allowed to create a poll for certain group
         (== he is an admin, a teacher for this course or a teacher for this group)
         """
         from apps.enrollment.courses.models import Group
@@ -194,7 +200,7 @@ class Employee(BaseUser):
              logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
         return groups
-    
+
 #    @staticmethod
 #    def get_schedule(user_id):
 #        user = User.objects.get(id=user_id)
@@ -215,12 +221,12 @@ class Employee(BaseUser):
         verbose_name_plural = 'Pracownicy'
         app_label = 'users'
         ordering = ['user__last_name', 'user__first_name']
-      
+
     def __unicode__(self):
         return unicode(self.user.get_full_name())
 
 class Student(BaseUser):
-    ''' 
+    '''
     Student.
     '''
 
@@ -253,7 +259,7 @@ class Student(BaseUser):
         if not semester:
             semester = Semester.get_current_semester()
         self.t0 = semester.records_opening - self.get_t0_interval()
-    
+
     def is_active(self):
         return self.status == 0
 
@@ -281,7 +287,7 @@ class Student(BaseUser):
         base =  self.ects * settings.ECTS_BONUS
         points_for_one_day = 720 # =12h*60m
         points_for_one_night = 720
-        number_of_nights_to_add = base / points_for_one_day 
+        number_of_nights_to_add = base / points_for_one_day
         minutes = base + number_of_nights_to_add * points_for_one_night
         minutes += self.records_opening_bonus_minutes
         grade = self.participated_in_last_grades() * 1440
@@ -296,7 +302,7 @@ class Student(BaseUser):
         return map(lambda x: x.course, SingleVote.objects.filter(student=self, state__semester_winter=current_semester,
                                               correction=given_points).select_related('course').order_by('course__entity__name'))
         #return map(lambda x: x.course, StudentOptions.objects.filter(course__semester__id__exact=current_semester.id).filter(student=self, records_opening_bonus_minutes=minutes).order_by('course__name'))
-        
+
     def get_records_history(self,default_semester=None):
         '''
         Returns list of ids of course s that student was enrolled for.
@@ -381,7 +387,7 @@ class Student(BaseUser):
              'throws Student.DoesNotExist exception.' % student.pk )
              raise NonStudentException()
         return groups
-    
+
 #    @staticmethod
 #    def get_schedule(student):
 #        from apps.enrollment.courses.models import Semester
@@ -397,7 +403,7 @@ class Student(BaseUser):
 #        except Student.DoesNotExist:
 #             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % student )
 #             raise NonStudentException()
-    
+
     def records_set_locked(self, locked):
         self.block = locked
         self.save()
@@ -456,7 +462,7 @@ class Student(BaseUser):
         verbose_name_plural = 'studenci'
         app_label = 'users'
         ordering = ['user__last_name', 'user__first_name']
-    
+
     def __unicode__(self):
         return unicode(self.user.get_full_name())
 
@@ -621,11 +627,11 @@ class StudiaZamawianeMaileOpiekunow(models.Model):
         Model przechowuje maile, na które są wysyłane maile o zmianie numeru konta bankowego studentów zamawianych
     """
     email = models.CharField(max_length=100)
-    
+
     class Meta:
         verbose_name = 'Studia zamawiane - opiekunowie'
         verbose_name_plural = 'Studia zamawiane - opiekunowie'
-        
+
     def __unicode__(self):
         return self.email
 

@@ -9,6 +9,7 @@ django-endless-pagination==1.1
 django-extensions==1.0.1
 django-filter==0.5.4
 django-mailer==0.1.0
+django-modeltranslation==0.6.1
 django-pipeline==1.2.21
 django-timedeltafield==0.6.7
 docutils==0.9.1
