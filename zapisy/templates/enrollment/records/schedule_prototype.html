@@ -1,7 +1,8 @@
 {% extends "enrollment/base.html" %}
 {% load compressed %}
+{% load i18n %}
 
-{% block main-subtitle %}Prototyp planu zajęć{% endblock %}
+{% block main-subtitle %}{# Translators: podtytuł #}{% trans "Prototyp planu zajęć" %}{% endblock %}
 
 {% block styles %}
     {% compressed_css 'prototype' %}
@@ -14,22 +15,22 @@
 {% block enrollment_menu_prototype %} class="active"{% endblock %}
 
 {% block bread %}
-	<a href="{% url main-page %}">Strona główna</a> &raquo;
-	<a href="{% url enrollment-main %}">Zapisy</a> &raquo;
-	Prototyp planu
+	<a href="{% url main-page %}">{% trans "Strona główna" %}</a> &raquo;
+	<a href="{% url enrollment-main %}">{% trans "Zapisy" %}</a> &raquo;
+	{% trans "Prototyp planu" %}
 {% endblock %}
 
 {% block filter %}
 	<div id="enr-schedulePrototype-top-bar" class="main-top-bar" style="display: none">
 		<fieldset>
-			<legend><span>Filtrowanie</span></legend>
+			<legend><span>{# Translators: tytuł okienka filtrowania #}{% trans "Filtrowanie" %}</span></legend>
 			<div class="main-filter-input">
 				<input class="text filter-phrase" type="text" />
 				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
 			</div>
 		</fieldset>
 		<fieldset class="course-type-filter">
-			<legend><span>Rodzaj przedmiotu</span></legend>
+			<legend><span>{# Translators: Filtrowanie -> tytuł kawałka z checkboxami #}{% trans "Rodzaj przedmiotu" %}</span></legend>
 			{% for type in types_list %}
 				<span class="checkbox">
 					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
@@ -39,11 +40,11 @@
 			{% endfor %}
 		</fieldset>
 		<fieldset id="enr-schedulePrototype-other">
-			<legend><span>Inne</span></legend>
-			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">Pokaż przedmioty prowadzone w j.angielskim</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">Pokaż przedmioty kończące się egzaminem</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear"  style="color:red;">Pokaż tylko przedmioty zalecane dla 1 roku</label></span>
+			<legend><span>{# Translators: Filtrowanie -> tytuł kawałka z opcjami #}{% trans "Inne" %}</span></legend>
+			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">{% trans "Pokaż przedmioty prowadzone w j.angielskim" %}</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">{% trans "Pokaż przedmioty kończące się egzaminem" %}</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear"  style="color:red;">{% trans "Pokaż tylko przedmioty zalecane dla 1 roku" %}</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -68,8 +69,7 @@
 	{% block messages %}{% endblock %}{% include 'common/messages.html' %}
 
 	<div id="enr-schedulePrototype-scheduleContainer">
-		<p>Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu
-			planu nie może bez niej działać.</p>
+		<p>{% trans "Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.</p>
 		<input type="hidden" name="courses" value="{{ courses_json }}" />
 		<input type="hidden" name="groups" value="{{ groups_json }}" />
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
@@ -79,25 +79,25 @@
 	</div>
     <ul id="schedule-legend">
         <li>
-            <div class="legend-box enrolled"></div> - jesteś zapisany do tej grupy
+            <div class="legend-box enrolled"></div> - {% trans "jesteś zapisany do tej grupy" %}
         </li>
         <li>
-            <div class="legend-box queued"></div> - jesteś w kolejce do tej grupy
+            <div class="legend-box queued"></div> - {% trans "jesteś w kolejce do tej grupy" %}
         </li>
         <li>
-            <div class="legend-box pinned"></div> - grupa przypięta do prototypu
+            <div class="legend-box pinned"></div> - {% trans "grupa przypięta do prototypu" %}
         </li>
         <li>
-            <div class="legend-box icons pinIn"></div> - przypnij do prototypu. Widoczność grupy w prototypie zostaje zapamiętana. Przycisk <strong>NIE</strong> zapisuje na zajęcia.
+            <div class="legend-box icons pinIn"></div> - {% trans "przypnij do prototypu. Widoczność grupy w prototypie zostaje zapamiętana. Przycisk <strong>NIE</strong> zapisuje na zajęcia" %}.
         </li>
         <li>
-            <div class="legend-box icons pinOut"></div> - odepnij od prototypu. Przywraca domyślną widoczność grupy w prototypie. Przycisk <strong>NIE</strong> wypisuje z zajęć.
+            <div class="legend-box icons pinOut"></div> - {% trans "odepnij od prototypu. Przywraca domyślną widoczność grupy w prototypie. Przycisk <strong>NIE</strong> wypisuje z zajęć" %}.
         </li>
         <li>
-            <div class="legend-box icons signIn"></div> - zapisz do grupy. Następuje próba zapisu studenta do grupy. Jeżeli przedmiot posiada również wykład, zostaniemy zapisanie na niego automatycznie.
+            <div class="legend-box icons signIn"></div> - {% trans "zapisz do grupy. Następuje próba zapisu studenta do grupy. Jeżeli przedmiot posiada również wykład, zostaniemy zapisanie na niego automatycznie" %}.
         </li>
         <li>
-            <div class="legend-box icons signOut"></div> - wypisz z grupy. Następuje wypisanie z grupy. Wypisanie z wykładu skutkuje wypisaniem się z pozostałych grup przedmiotu.
+            <div class="legend-box icons signOut"></div> - {% trans "wypisz z grupy. Następuje wypisanie z grupy. Wypisanie z wykładu skutkuje wypisaniem się z pozostałych grup przedmiotu" %}.
         </li>
     </ul>
 {% endblock %}
@@ -105,7 +105,8 @@
 {% block sidebar-width %}4{% endblock %}
 {% block sidebar %}
 	<div id="main-sidebar" class="prototype-sidebar">
-		<h3>Semestr {{ semester }}</h3>
+		{# Translators: tytuł nad sidebarem #}
+		<h3>{% trans "Semestr" %} {{ semester }}</h3>
         <hr>
 		<ul id="enr-schedulePrototype-course-list">
 			{% for course in courses %}

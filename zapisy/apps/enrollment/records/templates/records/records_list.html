@@ -1,32 +1,34 @@
-<h3>Lista osób zapisanych na przedmiot:</h3>
+<h3>{% trans "Lista osób zapisanych na przedmiot" %}:</h3>
 		{% if group.limit_zamawiane %}
-			<p>Zapisanych w ramach limitu studiów zamawianych:
+			<p>{% trans "Zapisanych w ramach limitu studiów zamawianych" %}:
 				{{ group.get_count_of_enrolled_zamawiane }}
 				/ {{ group.limit_zamawiane }}.
 			</p>
-			<p>Zapisanych w ramach limitu dodatkowego:
+			{# Translators: limit dodatkowy to ten poza limitem dla zamawianych #}
+			<p>{% trans "Zapisanych w ramach limitu dodatkowego" %}:
 				{{ group.get_count_of_enrolled_non_zamawiane }}
 				/ {{ group.limit_non_zamawiane }}.
 			</p>
 		{% else %}
-			<p>Liczba zapisanych osób: {{students_in_group|length}} /
+			<p>{% trans "Liczba zapisanych osób" %}: {{students_in_group|length}} /
 			{{group.get_group_limit}}</p>
 		{% endif %}
 
 
         {% if students_in_group %}
 		    {% include "enrollment/records/students_list.html" with students=students_in_group %}
-        <a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do grupy]</a>&nbsp;
+		    {# Translators: tekst przy linku mailto #}
+        	<a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[{% trans "Wyślij wiadomość do grupy" %}]</a>&nbsp;
             {% if user.employee %}
-                <a href="{% url records-csv  group.id %}">Wersja CSV</a>{% endif %}
+                <a href="{% url records-csv  group.id %}">{% trans "Wersja CSV" %}</a>{% endif %}
             {% endif %}
 		<br/>
 		{%if students_in_queue %}
-			<h3>Lista osób oczekujących na zapis:</h3>
-			<p> Liczba osób oczekujących na zapis: {{students_in_queue|length}} </p>
+			<h3>{% trans "Lista osób oczekujących na zapis" %}:</h3>
+			<p> {% trans "Liczba osób oczekujących na zapis" %}: {{students_in_queue|length}} </p>
 			<br/>
 
             {% include "enrollment/records/students_list.html" with students=students_in_queue %}
-
-			<a href="mailto:{% for student in students_in_queue %},{{ student.user.email }}{% endfor %}">[Wyślij wiadomość do kolejki]</a>
+            {# Translators: tekst przy linku mailto #}
+			<a href="mailto:{% for student in students_in_queue %},{{ student.user.email }}{% endfor %}">[{% trans "Wyślij wiadomość do kolejki" %}]</a>
 		{% endif %}

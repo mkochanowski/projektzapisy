@@ -11,5 +11,5 @@ class LocalePrefMiddleware(object):
                 try:
                     account = UserProfile.objects.get(user=request.user)
                     request.session['django_language'] = account.preferred_language
-                    except UserProfile.DoesNotExist:
-                        pass
+                except UserProfile.DoesNotExist:
+                    pass

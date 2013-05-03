@@ -1,10 +1,10 @@
 <table class="zebra-striped">
 	<thead>
-		<th>Imię</th>
-		<th>Nazwisko</th>
-		<th>Nr indeksu</th>
-		<th>Rodzaj studiów</th>
-		<th>Semestr</th>
+		<th>{% trans "Imię" %}</th>
+		<th>{% trans "Nazwisko" %}</th>
+		<th>{% trans "Nr indeksu" %}</th>
+		<th>{% trans "Rodzaj studiów" %}</th>
+		<th>{% trans "Semestr" %}</th>
 	</thead>
 	<tbody>
 		{% for student in students %}
@@ -26,7 +26,7 @@
 			</tr>
 
 		{% empty %}
-			Brak zapisanych osób.
+			{% trans "Brak zapisanych osób" %}.
 		{% endfor %}
 	</tbody>
 </table>
