@@ -686,9 +686,6 @@ class CourseDescription(models.Model):
     created = models.DateTimeField(auto_now_add=True, auto_now=True)
 
 
-    def __unicode__(self):
-        return smart_unicode(self.created) + ' ' + smart_unicode(self.entity)
-
     class Meta:
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'

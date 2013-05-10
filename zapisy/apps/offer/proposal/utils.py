@@ -15,7 +15,6 @@ def proposal_for_offer(slug):
     return None
 
 
-
 def employee_proposal(user, slug):
     if slug:
         try:
