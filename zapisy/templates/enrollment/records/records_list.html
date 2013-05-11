@@ -38,7 +38,7 @@
         <h2>{{ group.course }}</h2>
 
         <h4>{{group.get_type_display}}: {{group.get_teacher_full_name}}</h4>
-        <h6>{% for term in group.term.all %}{{ term }} {% endfor %}</h6>
+        <h6>{% for term in group.term.all %}{{ term }}{% endfor %}</h6>
 
         <hr>
 

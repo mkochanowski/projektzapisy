@@ -1,15 +1,16 @@
 {% load fereol_common %}
+{% load i18n %}
 
 <h2>{{ course.name }}</h2>
 <div class="details course-details{% if details_hidden %} hidden{% endif %}">
     <table class="table-info">
         <tr>
-            <th>Rodzaj</th>
+            <th>{% trans "Rodzaj" context "rodzaj kursu" %}</th>
             <td>{{ course.type }}</td>
         </tr>
         {% if course.teachers_list %}
             <tr>
-                <th>Prowadzący</th>
+                <th>{% trans "Prowadzący" %}</th>
                 <td>
                     {% for teacher in course.teachers_list %}
                         <a href="{% url employee-profile teacher.user.id %}"
@@ -19,13 +20,13 @@
         {% endif %}
         {% if points %}
             <tr>
-                <th>Punkty ECTS</th>
+                <th>{% trans "Punkty ECTS" %}</th>
                 <td>{{ points.value }}</td>
             </tr>
         {% endif %}
         {% if course.lectures or course.exercises or course.laboratories or course.repetitions %}
             <tr>
-                <th>Liczba godzin</th>
+                <th>{% trans "Liczba godzin" %}</th>
                 <td>{% if course.lectures %}{{ course.lectures }}
                     (wyk) {% if course.exercises or course.laboratories or course.repetitions or course.exercises_laboratories %}
                         +{% endif %}{% endif %}
@@ -41,7 +42,7 @@
         {% endif %}
         {% if course.tags %}
             <tr>
-                <th>Tagi</th>
+                <th>{% trans "Tagi" context "tagi przedmiotu" %}</th>
                 <td>
                     <ul style="list-style: none;">
                     {% for tag in course.tags %}
@@ -53,45 +54,45 @@
         {% endif %}
         {% if course.english %}
             <tr>
-                <th>Przedmiot prowadzony w j.angielskim</th>
-                <td>Tak</td>
+                <th>{% trans "Przedmiot prowadzony w j.angielskim" %}</th>
+                <td>{% trans "Tak" %}</td>
             </tr>
         {% endif %}
 
         {% if course.suggested_for_first_year %}
             <tr>
-                <th>Przedmiot przyjazny dla I roku</th>
-                <td>Tak</td>
+                <th>{% trans "Przedmiot przyjazny dla I roku" %}</th>
+                <td>{% trans "Tak" %}</td>
             </tr>
         {% endif %}
             <tr>
-                <th>Egzamin</th>
-                <td>{% if course.exam %}Tak{% else %}Nie{% endif %}</td>
+                <th>{% trans "Egzamin" %}</th>
+                <td>{% if course.exam %}{% trans "Tak" %}{% else %}Nie{% endif %}</td>
             </tr>
     {% if course.web_page %}
             <tr>
-                <th>Strona WWW</th>
+                <th>{% trans "Strona WWW" %}</th>
                 <td><a href="{{ course.web_page }}">{{ course.web_page }}</a></td>
             </tr>{% endif %}
         {% if requirements %}
             <tr>
-                <th>Wymagane</th>
+                <th>{% trans "Wymagane" context "zależności przedmiotu" %}</th>
                 <td>{{ requirements|join:", " }}</td>
             </tr>
         {% endif %}
         {% if False %}
             <tr>
-                <th>Konsultacje</th>
-                <td><a href="{% url course-consiltations-page course.slug %}">link</a></td>
+                <th>{% trans "Konsultacje" %}</th>
+                <td><a href="{% url course-consiltations-page course.slug %}">{% trans "link" %}</a></td>
             </tr>
             <tr>
-                <th>Oddane głosy</th>
-                <td> {{ course.votes_count }} <a href="{% url course-votes course.slug %}">lista</a></td>
+                <th>{% trans "Oddane głosy" %}</th>
+                <td> {{ course.votes_count }} <a href="{% url course-votes course.slug %}">{% trans "lista" %}</a></td>
             </tr>
         {% endif %}
         {% if t0 %}
             <tr>
-                <th>Możesz zapisać się od</th>
+                <th>{% trans "Możesz zapisać się od" context "czas zapisów" %}</th>
                 <td>
                 {{ t0.opening_time }}
                 </td>
@@ -101,11 +102,11 @@
 
     <div class="description">
         
-        <h5>Opis przedmiotu:</h5>
+        <h5>{% trans "Opis przedmiotu" %}:</h5>
         {% if course.description %}
         <p>{{ course.description|safe }}</p>
         {% else %}
-            <p>Brak</p>
+            <p>{% trans "Brak" %}</p>
         {% endif %}
     </div>
 

@@ -1,8 +1,9 @@
 {% extends "enrollment/courses/base.html" %}
+{% load i18n %}
 
 {% load fereol_common %}
 
-{% block main-subtitle %}{{ course.name }} - Głosy{% endblock %}
+{% block main-subtitle %}{% blocktrans %}{{ course.name }} - Głosy{% endblocktrans %}{% endblock %}
 
 {% block styles %}
     {{ block.super }}
@@ -20,11 +21,11 @@
 {% endblock %}
 
 {% block bread %}
-    <a href="/">Strona główna</a> &raquo;
-    <a href="/">System Zapisów</a> &raquo;
-    <a href="/">Przedmioty</a> &raquo;
+    <a href="/">{% trans "Strona główna" %}</a> &raquo;
+    <a href="/">{% trans "System Zapisów" %}</a> &raquo;
+    <a href="/">{% trans "Przedmioty" %}</a> &raquo;
     <a href="{% url course-page course.slug %}">{{ course.name }}</a> &raquo;
-    Głosy
+    {% trans "Głosy" %}
     {# end bread #}
 {% endblock %}
 
@@ -41,14 +42,14 @@
     {% include "enrollment/courses/course_head.html" %}
     <hr>
 
-    <h3>Lista osób głosujących na przedmiot:</h3>
+    <h3>{% trans "Lista osób głosujących na przedmiot" %}:</h3>
 
 
     {% if voters %}
         <small class="right">Osób: {{ voters_count }}</small>
         {% include "enrollment/records/students_list.html" with students=voters %}
     {% else %}
-        Nikt nie oddał głosu.
+        {% trans "Nikt nie oddał głosu" %}.
     {% endif %}
 
 </div>

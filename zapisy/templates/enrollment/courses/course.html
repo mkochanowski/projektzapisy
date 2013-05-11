@@ -2,6 +2,7 @@
 
 {% load fereol_common %}
 {% load compressed %}
+{% load i18n %}
 
 {% block main-subtitle %}{{ course.name }}{% endblock %}
 
@@ -15,12 +16,12 @@
 {% endblock %}
 
 {% block bread %}
-    <a href="/">Strona główna</a> &raquo;
-    <a href="/">System Zapisów</a> &raquo;
-    <a href="/">Przedmioty</a> &raquo;
+    <a href="/">{% trans "Strona główna" %}</a> &raquo;
+    <a href="/">{% trans "System Zapisów" %}</a> &raquo;
+    <a href="/">{% trans "Przedmioty" %}</a> &raquo;
     {{ course.name }}
     {% if user.is_staff %}
-        <a href="{% url admin:courses_course_change course.pk %}">Edycja</a>
+        <a href="{% url admin:courses_course_change course.pk %}">{% trans "Edycja" %}</a>
     {% endif %}
     {# end bread #}
 {% endblock %}
@@ -42,19 +43,21 @@
     {% for tutorial in tutorials %}{% if tutorial.groups %}
         <div class="tutorial">
             <h2>{{ tutorial.name }} {% if user.is_staff %}&nbsp;&nbsp; 
-            <small class='right'>(Studenci w grupach: {{tutorial.statistics.in_group}}, studenci bez grupy: {{tutorial.statistics.in_queue}})</small>{% endif %}</h2>
+                <small class='right'>({% blocktrans %}Studenci w grupach: {{tutorial.statistics.in_group}}, studenci bez grupy: {{tutorial.statistics.in_queue}}{% endblocktrans %})</small>
+            {% endif %}</h2>
             <input type="hidden" name="tutorial-type" value="{{ tutorial.type }}"/>
             <table class="zebra-striped">
                 <thead>
                 <tr>
-                    <th>Prowadzący</th>
-                    <th class="term">Termin zajęć</th>
-                    <th title="Maksymalna liczba osób, które mogą zapisać się na przedmiot" class="number">Limit</th>
-                    <th title="Liczba aktualnie zapisanych osób" class="number termEnrolledHeader">Zapisani</th>
-                    <th title="Liczba osób oczekujących na zapis" class="number termQueuedHeader">Kolejka</th>
+                    {# Translators: nagłówek tabeli #}
+                    <th>{% trans "Prowadzący" %}</th>
+                    <th class="term">{% trans "Termin zajęć" %}</th>
+                    <th title="Maksymalna liczba osób, które mogą zapisać się na przedmiot" class="number">{% trans "Limit" %}</th>
+                    <th title="Liczba aktualnie zapisanych osób" class="number termEnrolledHeader">{% trans "Zapisani" %}</th>
+                    <th title="Liczba osób oczekujących na zapis" class="number termQueuedHeader">{% trans "Kolejka" %}</th>
                     <th class="controls"></th>
                     {% if course.is_recording_open and user.student.is_active %}
-                        <th class="priority">Priorytet</th>
+                        <th class="priority">{% trans "Priorytet" %}</th>
                     {% endif %}
                 </tr>
                 </thead>
@@ -67,7 +70,7 @@
                                     {{ t.teacher.user.get_full_name }}
                                 </a>
                             {% else %}
-                                (nieznany prowadzący)
+                                {% trans "(nieznany prowadzący)" %}
                             {% endif %}
                             {% if t.extra %}
                                 <br/><span class="small">{{ t.extra }}</span>
@@ -108,22 +111,22 @@
                                         <input type="hidden" name="group" value="{{ t.id }}"/>
                                         {% if t.signed %}
                                             <input type="hidden" name="enroll" value="false"/>
-                                            <button type="submit" class="btn small danger setEnrolledButton">wypisz
+                                            <button type="submit" class="btn small danger setEnrolledButton">{% trans "wypisz" %}
                                             </button>
                                             {% else %}{% if not t.is_full %}
                                                 <input type="hidden" name="enroll" value="true"/>
                                                 <button type="submit"
                                                         class="btn small success setEnrolledButton">{% if t.is_in_diff %}
-                                                    przenieś{% else %}zapisz{% endif %}</button>
+                                                    przenieś{% else %}{% trans "zapisz" %}{% endif %}</button>
                                                 {% else %}{% if t.priority %}
                                                     <input type="hidden" name="enroll" value="false"/>
                                                     <button type="submit" class="btn small danger setEnrolledButton">
-                                                        wypisz z kolejki
+                                                        {% trans "wypisz z kolejki" %}
                                                     </button>
                                                 {% else %}
                                                     <input type="hidden" name="enroll" value="true"/>
                                                     <button type="submit" class="btn small success setEnrolledButton">
-                                                        zapisz do kolejki
+                                                        {% trans "zapisz do kolejki" %}
                                                     </button>
                                                 {% endif %}{% endif %}{% endif %}
                                     </div></form>
@@ -131,14 +134,14 @@
 
                                 {% if t.signed %}<form>
                                     <div>
-                                        <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">wypisz
+                                        <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
                                         </button>
                                     </div>
                                     </form>
                                 {% endif %}
                             {% endif %}
                             {% if user.student or user.employee or user.is_staff %}
-                                <a href="{% url records-group t.id %}">lista</a>
+                                <a href="{% url records-group t.id %}">{% trans "lista" %}</a>
                             {% endif %}
                         </td>
                         {% if course.is_recording_open and user.student.is_active %}
@@ -173,7 +176,7 @@
 
     {% if course.entity.ue %}
     <div class="row">
-        <h6>Przedmiot współfinansowany ze środków Unii Europejskiej w ramach Europejskiego Funduszu Społecznego</h6>
+        <h6>{% trans "Przedmiot współfinansowany ze środków Unii Europejskiej w ramach Europejskiego Funduszu Społecznego" %}</h6>
         <div class="span14">
             <img style="width:640px" src="https://zamawiane.ii.uni.wroc.pl/loga_www.png">
         </div>

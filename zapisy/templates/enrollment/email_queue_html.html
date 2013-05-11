@@ -1,4 +1,5 @@
 {% load fereol_common %}
+{% load i18n %]}
 <p><em>{{ student.get_full_name }},</em></p>
-<p>Zostałaś/eś przepisana/y z kolejki do grupy: {{ group }}</p>
+<p>{% trans "Zostałaś/eś przepisana/y z kolejki do grupy" %}: {{ group }}</p>
 

@@ -1,25 +1,26 @@
 {% extends "base.html" %}
 
+{% load i18n %}
 {% load news_extras %}
 
 {% block enrollment_active %} class="active"{% endblock %}
 
 {% block system_menu %}
     <li{% block enrollment_menu_courses %}{% endblock %}><a
-            href="/courses/">Przedmioty</a></li>
-     {% if user.student or user.employee %}
-    <li{% block enrollment_menu_schedule %}{% endblock %}><a href="/records/schedule/">Plan
-        zajęć</a></li>{% endif %}
+            href="/courses/">{# Translators: Poziome menu na górze #}{% trans "Przedmioty" %}</a></li>
+    {% if user.student or user.employee %}
+    <li{% block enrollment_menu_schedule %}{% endblock %}><a href="/records/schedule/">{% trans "Plan zajęć" %}</a></li>
+    {% endif %}
     <li{% block enrollment_menu_prototype %}{% endblock %}><a
-            href="/records/schedule/prototype/">Prototyp planu</a></li>
-    <li{% block enrollment_menu_employees %}{% endblock %}><a href="/users/employees/">Pracownicy</a>
+            href="/records/schedule/prototype/">{% trans "Prototyp planu" %}</a></li>
+    <li{% block enrollment_menu_employees %}{% endblock %}><a href="/users/employees/">{% trans "Pracownicy" %}</a>
     </li>{% if user.student or user.employee or user.is_staff %}
-    <li{% block enrollment_menu_students %}{% endblock %}><a href="/users/students/">Studenci</a>
+    <li{% block enrollment_menu_students %}{% endblock %}><a href="/users/students/">{% trans "Studenci" %}</a>
     </li>{% endif %}
 
     {% if perms.courses.view_stats %}
         <li{% block enrollment_statistics %}{% endblock %}>
-            <a href="{% url statistics-main %}">Statystyki</a>
+            <a href="{% url statistics-main %}">{% trans "Statystyki" %}</a>
         </li>
     {% endif %}
     {# end system_menu #}

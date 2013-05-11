@@ -1,11 +1,12 @@
 {% extends "enrollment/courses/base.html" %}
+{% load i18n %}
 
-{% block main-subtitle %}Przedmioty{% endblock %}
+{% block main-subtitle %}{% trans "Przedmioty" %}{% endblock %}
 
 {% block bread %}
-<a href="/">Strona główna</a> &raquo;
-<a href="/">System Zapisów</a> &raquo;
-Przedmioty
+<a href="/">{% trans "Strona główna" %}</a> &raquo;
+<a href="/">{% trans "System Zapisów" %}</a> &raquo;
+{% trans "Przedmioty" %}
     {# end bread #}
 {% endblock %}
 
@@ -14,7 +15,7 @@ Przedmioty
 {% block content %}
     <div class="alert-message info">
         <a href="#" class="close">×</a>
-        <p>Wybierz przedmiot z listy</p>
+        <p>{% trans "Wybierz przedmiot z listy" %}</p>
     </div>
     {# end content#}
 {% endblock %}

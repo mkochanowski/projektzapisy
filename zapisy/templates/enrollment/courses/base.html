@@ -1,6 +1,7 @@
 {% extends "enrollment/base.html" %}
 {% load compressed %}
 {% load cache %}
+{% load i18n %}
 {% block js %}
     {% compressed_js 'courses' %}
 {% endblock %}
@@ -13,14 +14,14 @@
 {% block filter %}
 	<div id="enr-coursesList-top-bar" class="main-top-bar" style="display: none">
 		<fieldset>
-			<legend><span>Filtrowanie</span></legend>
+			<legend><span>{% trans "Filtrowanie" %}</span></legend>
 			<div class="main-filter-input">
 				<input class="text filter-phrase" type="text" />
 				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
 			</div>
 		</fieldset>
 		<fieldset class="course-type-filter">
-			<legend><span>Rodzaj przedmiotu</span></legend>
+			<legend><span>{% trans "Rodzaj przedmiotu" %}</span></legend>
 			{% for type in types_list %}
 				<span class="checkbox">
 					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
@@ -30,24 +31,24 @@
 			{% endfor %}
 		</fieldset>
 		<fieldset id="enr-coursesList-other">
-			<legend><span>Inne</span></legend>
+			<legend><span>{% trans "Inne" %}</span></legend>
 			<span class="selectbox" style="display:block; float:none;">
-				<label for="enr-courseFilter-semester">Semestr:</label>
+				<label for="enr-courseFilter-semester">{% trans "Semestr" %}:</label>
 				<select id="enr-courseFilter-semester">
-					<option value="0">dowolny</option>
+					<option value="0">{# Translators: filtr przedmiotów - wybór semestru #}{% trans "dowolny" %}</option>
 					{% for semester in semester_courses %}
 						<option value="{{ semester.id }}" {% if semester.id == default_semester.id %} selected="selected" {% endif %}>{{ semester.year }} {{ semester.get_type_display }}{% if semester.id == default_semester.id %} (bieżący){% endif %}</option>
 					{% endfor %}
 				</select>
 			</span>
 			{% if user.student %}
-                                <span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+                                <span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label></span>
                         {% else %}
-                                <span class="checkbox" style="display: none;"><input type="checkbox" id="enr-hidesigned"/><label for="enr-hidesigned">Schowaj przedmioty, na które byłem zapisany</label></span>
+                                <span class="checkbox" style="display: none;"><input type="checkbox" id="enr-hidesigned"/><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label></span>
 		        {% endif %}
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">Pokaż przedmioty prowadzone w j.angielskim</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">Pokaż przedmioty kończące się egzaminem</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">Pokaż tylko przedmioty zalecane dla 1 roku</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">{% trans "Pokaż przedmioty prowadzone w j.angielskim" %}</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">{% trans "Pokaż przedmioty kończące się egzaminem" %}</label></span>
+                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">{% trans "Pokaż tylko przedmioty zalecane dla 1 roku" %}</label></span>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -59,7 +60,8 @@
 		<div id="course-list">
 			{% for semester in semester_courses %}
 				<div class="semester">
-					<h3>Semestr <span>{{ semester.year }} {{ semester.get_type_display }}</span></h3>
+					{# Translators: Tytuł nad sidebarem  #}
+					<h3>{% trans "Semestr" %} <span>{{ semester.year }} {{ semester.get_type_display }}</span></h3>
 					<input type="hidden" name="semester-id" value="{{ semester.id }}" />
 					<ul class="courses-list">
 						{% for course in courses %}
