@@ -52,7 +52,6 @@ def proposal(request, slug=None):
     try:
         proposals = CourseEntity.get_employee_proposals(request.user)
         proposal  = employee_proposal(request.user, slug)
-        proposal.information = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
     except NotOwnerException:
         return redirect('offer-page', slug=slug)
     except Http404:
