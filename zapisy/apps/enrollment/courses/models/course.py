@@ -311,7 +311,14 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposal(slug):
-        return CourseEntity.noremoved.get(slug=slug)
+        proposal = CourseEntity.noremoved.get(slug=slug)
+        try:
+            information = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
+        except IndexError:
+            information = None
+
+        proposal.information = information
+        return proposal
 
     @staticmethod
     def get_employee_proposals(user):
