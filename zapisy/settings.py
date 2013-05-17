@@ -149,8 +149,8 @@ LANGUAGE_CODE = 'pl-pl'
 # Available languages for using the service. The first one is the default.
 ugettext = lambda s: s
 LANGUAGES = (
-    ('en', ugettext('English')),
     ('pl', ugettext('Polish')),
+    ('en', ugettext('English')),
 )
 
 SITE_ID = 1
