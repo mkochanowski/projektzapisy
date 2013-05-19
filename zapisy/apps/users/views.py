@@ -12,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.http import QueryDict, HttpResponse
 from django.template.response import TemplateResponse
 from django.utils import simplejson
+from django.utils.translation import check_for_language
 from django.db.models import Q
 
 from django.conf import settings
@@ -134,7 +135,38 @@ def employee_profile(request, user_id):
         logger.error('Function employee_profile throws MoreThanOneCurrentSemesterException.' )
         messages.error(request, "Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
         return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
-    
+
+@login_required
+def set_language(request):
+    """ 
+    Redirect to a given url while setting the chosen language in the
+    session or cookie. The url and the language code need to be
+    specified in the request parameters.
+
+    Since this view changes how the user will see the rest of the site, it must
+    only be accessed as a POST request. If called as a GET request, it will
+    redirect to the page in the request (the 'next' parameter) without changing
+    any state.
+    """
+    next = request.REQUEST.get('next', None)
+    if not next:
+        next = request.META.get('HTTP_REFERER', None)
+    if not next:
+        next = '/' 
+    response = HttpResponseRedirect(next)
+    if request.method == 'POST':
+        lang_code = request.POST.get('language', None)
+        if lang_code and check_for_language(lang_code):
+            account = UserProfile.objects.get(user=request.user)
+            account.preferred_language = lang_code
+            account.save()
+            if hasattr(request, 'session'):
+                request.session['django_language'] = lang_code
+            else:
+                response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
+    return response
+
+
 @login_required
 def email_change(request):
     """function that enables mail changing"""

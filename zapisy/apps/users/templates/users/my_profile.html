@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load compressed %}
+{% load i18n %}
 
 {% block styles %}
     {% compressed_css 'main' %}
@@ -175,6 +176,30 @@ $('.checkall').live('click', function(){
         </tr>
 </table>
 {% endif %}
+
+<h4>Ustawienie preferencji językowych</h4>
+{% get_available_languages as LANGUAGES %}
+<form method="post" action="{% url setlang %}">
+    {% csrf_token %}
+    <table class="table-striped">
+        <tr>
+            <th>Select language</th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>
+                <select name="language">
+                    {% for lang in LANGUAGES %}
+                    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td>
+                <button class="btn primary" type="submit">Ustaw</button>
+            </td>
+        </tr>
+    </table>
+</form>
 
 <h4>Ustawienie powiadomień</h4>
 
