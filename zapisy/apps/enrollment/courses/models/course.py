@@ -45,7 +45,8 @@ class DefaultCourseManager(models.Manager):
         """ Returns all courses which have marked semester as visible """
         return super(DefaultCourseManager, self).get_query_set().select_related('entity', 'information')
 
-statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'),(2, u'Poddana pod głosowanie'),)
+statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
+            (3, u'Poddana pod głosowanie 2013'), (4, u'Wycofany z oferty'),)
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
 ectslist = [(x, str(x)) for x in range(1, 16) ]
 
