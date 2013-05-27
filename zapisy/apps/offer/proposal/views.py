@@ -97,6 +97,7 @@ def proposal_edit(request, slug=None):
 
         desp.id = None
         desp.save()
+        desp.save_m2m()
         messages.success(request, u'Propozycja zapisana')
 
         return redirect('my-proposal-show', slug=proposal.slug)
