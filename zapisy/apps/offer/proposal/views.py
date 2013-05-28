@@ -91,13 +91,13 @@ def proposal_edit(request, slug=None):
         proposal.save()
 
         desp.author = request.user.employee
+        desp.id = None
 
         if not desp.entity_id:
             desp.entity_id = proposal.id
 
-        desp.id = None
-        desp.save()
-        desp.save_m2m()
+        desp.save(force_insert=True)
+        desc.save_m2m()
         messages.success(request, u'Propozycja zapisana')
 
         return redirect('my-proposal-show', slug=proposal.slug)
