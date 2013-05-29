@@ -6,7 +6,8 @@
 				<ul class="proposal-list">
 					{% for course in courses %}
 						<li  class="
-						{% if course.status == 1 %}
+						{% if course.status == 0 %}work
+						{% elif course.status == 1 %}
 						    offer
 						{% elif course.status == 2 %}
 						    vote
@@ -39,6 +40,10 @@
                        <li>
                            <div class="legend-box nooffer"></div> - przedmiot wycofany z oferty
                        </li>
+
+                        <li>
+                            <div class="legend-box work"></div> - przedmiot w wersji roboczej
+                        </li>
                    </ul>
 			</div>
 	</div>

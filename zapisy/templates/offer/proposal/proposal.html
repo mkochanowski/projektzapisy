@@ -32,33 +32,3 @@
         {% include 'offer/proposal.html' with course=proposal %}
     {% endif %}
 {% endblock %}
-
-
-{% block sidebar %}
-	<div id="main-sidebar">
-		<div id="course-list">
-				<div class="semester">
-					<h3>Moje propozycje</h3>
-					<ul class="courses-list">
-						{% for course in proposals %}
-							<li class="{% if course.status == 0 %}work{% elif course.status == 1 %}offer{% else %}vote{% endif %}">
-								<a href="{% url my-proposal-show course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
-							</li>
-						{% endfor %}
-					</ul>
-                    <ul id="proposal-legend">
-                        <li>
-                            <div class="legend-box vote"></div> - przedmiot poddany pod głosowanie
-                        </li>
-                        <li>
-                            <div class="legend-box offer"></div> - przedmiot w ofercie
-                        </li>
-                        <li>
-                            <div class="legend-box work"></div> - przedmiot w wersji roboczej
-                        </li>
-                    </ul>
-                    <a href="{% url proposal-form %}"><button class="btn btn-primary">Dodaj</button></a>
-				</div>
-		</div>
-	</div>
-{% endblock %}

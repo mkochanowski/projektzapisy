@@ -36,7 +36,7 @@ class VoteFormset(object):
         self.correction = kwargs.pop('correction', None)
 
         query = {}
-        query['status'] = 2
+        query['status'] = 3
         query['deleted'] = False
 
         if tag == 'winter':
