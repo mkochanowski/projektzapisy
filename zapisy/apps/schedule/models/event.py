@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.http import Http404
 
 types = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie'), ('3', u'Zajęcia'), ('4', u'Inne')]
 types_for_student = [('2', u'Wydarzenie')]

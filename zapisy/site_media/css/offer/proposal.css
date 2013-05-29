@@ -13,15 +13,15 @@
 
 
 li.work, li.work a { color:#ff4500;}
-li.offer,li.offer a { color: #35d6ce;}
-li.nooffer,li.nooffer a { color: #d9d9d9;}
-li.vote, li.vote a { color: greenyellow !important;}
-li.vote2013, li.vote2013 a { color:green!important;}
+li.offer,li.offer a { color: #0069d6;}
+li.nooffer,li.nooffer a { color: #c5c5c5;}
+li.vote, li.vote a { color: green !important;}
+li.vote2013, li.vote2013 a { color:green!important; font-weight: bold;}
 
 #proposal-legend .work { background-color: #ff4500;}
-#proposal-legend .offer { background-color: #35d6ce;}
-#proposal-legend .nooffer { background-color: #d9d9d9;}
-#proposal-legend .vote { background-color: greenyellow;}
-#proposal-legend .vote2013 { background-color: green;}
+#proposal-legend .offer { background-color: #0069d6;}
+#proposal-legend .nooffer { background-color: #c5c5c5;}
+#proposal-legend .vote { background-color: green;}
+#proposal-legend .vote2013 { background-color: green; font-weight: bold;}
 
 .preferences-form label { margin-right: 20px;}
