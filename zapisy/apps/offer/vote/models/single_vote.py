@@ -93,12 +93,7 @@ class SingleVote ( models.Model ):
             state = SystemState.get_state(year)
 
         return SingleVote.objects.filter( student=voter, state=state, correction__gte=1)\
-                                  .select_related('student','student__user', 'entity').extra(
-                                  select = {
-                                      'in_semester': "SELECT COUNT(*) > 0 FROM courses_course cc WHERE cc.entity_id = vote_singlevote.entity_id"
-                                                     " AND cc.semester_id IN (%(winter)d, %(summer)d)" % {'winter': state.semester_winter_id, 'summer': state.semester_summer_id}
-                                  }
-                    ).order_by('entity__semester', 'entity__name')
+                                  .select_related('student','student__user', 'entity').order_by('entity__semester', 'entity__name')
 
     @staticmethod
     def add_vote_count(proposals, state):
@@ -156,7 +151,7 @@ class SingleVote ( models.Model ):
         pass
 
     @staticmethod
-    def make_votes( student, year=None, state=None, tag='summer' ):
+    def make_votes( student, year=None, state=None, tag='summer'):
         """
             Makes 'zero' vote for student - only for proposal without
             vote
@@ -184,13 +179,10 @@ class SingleVote ( models.Model ):
         new_votes = []
         for proposal in proposals:
             if proposal.id not in old_votes:
-                kwargs = {}
-                kwargs['student'] = student
-                kwargs['entity']  = proposal
-                kwargs['state']   = current_state
+                kwargs = {'student': student, 'entity': proposal, 'state': current_state}
                 if correction:
                     try:
-                        kwargs['course'] = Course.objects.get(semester=semester, entity = proposal)
+                        kwargs['course'] = Course.objects.get(semester=semester, entity=proposal)
                     except ObjectDoesNotExist:
                         pass
                 new_votes.append(SingleVote(**kwargs))
@@ -201,7 +193,7 @@ class SingleVote ( models.Model ):
 
 
     @staticmethod
-    def get_votes_for_proposal( voter, proposals, year=None ):
+    def get_votes_for_proposal( voter, proposals, year=None):
 #        """
 #            Gets user votes in specified year for proposal set
 #        """
@@ -209,7 +201,7 @@ class SingleVote ( models.Model ):
             year = date.today().year
         current_state = SystemState.get_state(year)
 
-        return SingleVote.objects.filter(student=voter, state=current_state)\
+        return SingleVote.objects.filter(student=voter, state=current_state, entity__in=proposals)\
                     .select_related('entity',
                                     'entity__owner',
                                     'entity__owner__user',

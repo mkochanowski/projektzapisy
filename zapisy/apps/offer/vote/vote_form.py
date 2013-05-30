@@ -25,15 +25,13 @@ class VoteFormset(object):
 
     """
 
-
-
     def __init__(self, post, *args, **kwargs):
         from django.forms.models import modelformset_factory
         tag             = kwargs.pop('tag',        None)
         student         = kwargs.pop('student',    None)
         state           = kwargs.pop('state',    None)
         semester_id     = None
-        self.correction = kwargs.pop('correction', None)
+        self.correction = kwargs.pop('correction', False)
 
         query = {}
         query['status'] = 3
@@ -144,17 +142,14 @@ class VoteFormsets():
             self.summer  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'summer',
-                                        state      = state,
-                                       correction = False)
+                                       state      = state)
             self.winter  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'winter',
-                                       state      = state,
-                                       correction = False)
+                                       state      = state)
             self.unknown = VoteFormset(post,
                                        student    = student,
-                                       state      = state,
-                                       correction = False)
+                                       state      = state)
             self.errors = []
 
 

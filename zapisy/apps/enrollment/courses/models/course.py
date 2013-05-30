@@ -293,7 +293,7 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_vote():
-        return CourseEntity.noremoved.filter(status=2)
+        return CourseEntity.noremoved.filter(status=3)
 
     @staticmethod
     def get_voters():
