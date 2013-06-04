@@ -1,17 +1,8 @@
-{% extends "enrollment/base.html" %}
+{% extends "statistics/base.html" %}
 
-{% block enrollment_statistics %} class="active"{% endblock %}
 
-{% block styles %}{{ block.super }}
-<style>
-    .overlimit td { color:red; }
-    .fulllimit td { color:green; }
-</style>
-{% endblock %}
+{% block groups_active %} class="active"{% endblock %}
 
-{% block main-subtitle %}Statystyki{% endblock %}
-
-{% block content-width %}16{% endblock %}
 
 {% block content %}
 
@@ -52,33 +43,6 @@
                         <td>{{ group.pinned }}</td>
                     </tr>
                 {% endfor %}
-            {% endfor %}
-        </tbody>
-    </table>
-
-
-    <hr>
-    <table>
-        <thead>
-            <tr>
-                <th>Imię</th>
-                <th>Nazwisko</th>
-                <th>Index</th>
-                <th>ECTS</th>
-                <th>Punkty w semestrze</th>
-                <th>T0</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in students %}
-                <tr>
-                    <td>{{ student.user.first_name }}</td>
-                    <td>{{ student.user.last_name }}</td>
-                    <td>{{ student.matricula }}</td>
-                    <td>{{ student.ects }}</td>
-                    <td>{{ student.semester_points }}</td>
-                    <td>{{ student.t0_min|date:"d E Y, G:i" }}</td>
-                </tr>
             {% endfor %}
         </tbody>
     </table>

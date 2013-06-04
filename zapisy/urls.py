@@ -21,7 +21,7 @@ urlpatterns = patterns('',
     url('^gdzie_ma_rimmon/$', 'apps.users.views.rimmon', name='rimmon'), #easter egg
     (r'^courses/', include('apps.enrollment.courses.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),
-    (r'^statistics/', include('apps.enrollment.statistics.urls')),
+    (r'^statistics/', include('apps.statistics.urls', namespace='statistics')),
     url(r'^consultations/$', 'apps.users.views.consultations_list', name="consultations-list"),
 
     (r'^news/', include('apps.news.urls')),

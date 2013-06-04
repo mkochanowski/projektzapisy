@@ -1,0 +1,35 @@
+{% extends "statistics/base.html" %}
+
+
+{% block vote_active %} class="active"{% endblock %}
+
+{% block content %}
+
+    <table>
+        <thead>
+            <tr>
+                <th><h4>Tytuł</h4></th>
+                <th><h4>Proponujący</h4></th>
+                <th><h4>Typ</h4></th>
+                <th><h4>Ang.</h4></th>
+                <th><h4>Semestr</h4></th>
+                <th><h4>Głosów</h4></th>
+                <th><h4>(za 3)</h4></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in proposals %}
+                    <tr>
+                        <td>{{ course.name }}</td>
+                        <td>{{ course.owner.user.get_full_name }}</td>
+                        <td>{{ course.type }}</td>
+                        <td>{{ course.english }}</td>
+                        <td>{{ course.get_semester_display }}</td>
+                        <td>{{ course.voters }}</td>
+                        <td>{{ course.maxpoints_voters }}</td>
+                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
