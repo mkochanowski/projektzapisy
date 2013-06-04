@@ -35,6 +35,25 @@ GROUP_EXTRA_CHOICES = [('',''),
     (u'grupa anglojęzyczna','grupa anglojęzyczna'),
     ]
 
+
+class StatisticManager(models.Manager):
+    """
+    Return all groups in semester with additional statistic information
+
+    @param {Semester} semester
+    @return Queryset of Group
+    """
+    def in_semester(self, semester):
+        return self.get_query_set().filter(course__semester=semester)\
+            .select_related('course', 'teacher', 'teacher__user', 'course__entity')\
+            .order_by('course')\
+            .extra(select={
+               'queued': "SELECT COUNT(*) FROM records_queue rq WHERE"
+                         " rq.deleted = False AND rq.group_id = courses_group.id",
+               'pinned': "SELECT COUNT(*) FROM records_record rr "
+                "WHERE rr.status='2' AND rr.group_id = courses_group.id"})
+
+
 class Group(models.Model):
     """group for course"""
     course = models.ForeignKey('Course', verbose_name='przedmiot', related_name='groups')
@@ -59,6 +78,9 @@ class Group(models.Model):
     disable_update_signal = False
 
     usos_nr = models.IntegerField(null=True, blank=True, verbose_name=u'Nr grupy w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
+
+    objects = models.Manager()
+    statistics = StatisticManager()
 
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
