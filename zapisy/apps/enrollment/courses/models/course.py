@@ -69,12 +69,12 @@ class StatisticsManager(models.Manager):
                               "AND vote_singlevote.correction > 0 "
                               "AND vote_singlevote.state_id = %d" % state.id,
                     'maxpoints_votes': "COALESCE((SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE"
-                              " vote_singlevote.correction = 2 "
+                              " vote_singlevote.correction = 3 "
                              " AND vote_singlevote.entity_id = courses_courseentity.id"
                              " AND vote_singlevote.state_id = %d), 0)" % state.id,
                     'maxpoints_voters': "SELECT COUNT(*) FROM vote_singlevote WHERE"
                               " vote_singlevote.entity_id = courses_courseentity.id "
-                              "AND vote_singlevote.correction = 2 "
+                              "AND vote_singlevote.correction = 3 "
                               "AND vote_singlevote.state_id = %d" % state.id
                 }
             )
