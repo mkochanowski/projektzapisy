@@ -25,6 +25,8 @@ from django.views.decorators.http import require_POST
 import logging
 from libs.ajax_messages import AjaxSuccessMessage, AjaxFailureMessage
 
+from django.http import HttpResponse
+
 logger = logging.getLogger()
 
 @employee_required
@@ -35,7 +37,6 @@ def view(request):
 
     prefs     = employee.get_preferences()
     formset   = PreferenceFormset(queryset=prefs)
-    proposals = CourseEntity.get_proposals()
 
     return render_to_response(
         'offer/preferences/base.html',
@@ -64,9 +65,9 @@ def save(request):
     form = PreferenceForm(request.POST, instance=pref)
     if form.is_valid():
         form.save()
-        return AjaxSuccessMessage(u'Preferencje zapisane')
+        return HttpResponse('<tr><td>Udało się {}</td></tr>'.format(str(request.POST)))
 
-    return AjaxFailureMessage('InvalidRequest', u'Coś poszło źle')
+    return HttpResponse('<tr><td>{}</td></tr>'.format(form.errors))
 
 
 @require_POST

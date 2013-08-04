@@ -2,6 +2,7 @@
 
 {% load preferences_extras %}
 {% load compressed %}
+{% load i18n %}
 
 {% block main-subtitle %}Preferencje{% endblock %}
 
@@ -16,273 +17,81 @@
 {% block js %}
     {% compressed_js 'preferences' %}
     <script>
-
-    $(function(){
-        $('.hidehidden').bind('click', function(event){
-            event.preventDefault();
-            $('.hidden').hide();
-            $('.hidehidden').hide();
-            $('.showall').show();
-        });
-
-        $('.showall').bind('click', function(event){
-           event.preventDefault();
-            $('.hidden').show();
-            $('.hidehidden').show();
-            $('.showall').hide();
-        });
-
-        $('.showprop').bind('click', function(event){
-            event.preventDefault();
-            var preference = $(this).parent().parent(),
-                id = preference.find('.prefid').val(),
-                data = {prefid: id,
-                       csrfmiddletoken: $('input[name="csrfmiddlewaretoken"]').val()};
-
-            $.post('{% url preference-show %}', data,
-
-                function(data){
-
-                    var result = AjaxMessage.fromJSON(data);
-                    if( result.isSuccess() ){
-
-                        preference.removeClass('hidden')
-                                .find('.ishidden')
-                                .children()
-                                .attr('checked', false);
-
-                        preference.find('.showprop').hide();
-                        preference.find('.hideprop').show();
-
-                        $('#course'+id).removeClass('hidden');
-
-                    } else {
-                        var error     = preference.find('.alert-message.error'),
-                            hideerror = function(){
-                                         error.hide(300);
-                                      };
-                        error.find('p').html('<strong>Błąd</strong> ' + result.message);
-                        error.show();
-                        setTimeout(hideerror, 3000);
-                    }
-
-            }, 'json');
-        });
-
-        $('.hideprop').bind('click', function(event){
-            event.preventDefault();
-
-            var preference = $(this).parent().parent(),
-                id = preference.find('.prefid').val();
-
-            $.post('{% url preference-hide %}', {prefid: id,
-                csrfmiddletoken: $('input[name="csrfmiddlewaretoken"]').val()}, function(data){
-
-                var result = AjaxMessage.fromJSON(data);
-
-                if( result.isSuccess() ){
-                    preference.addClass('hidden')
-                            .find('.ishidden')
-                            .children()
-                            .attr('checked', true);
-
-                    preference.find('.showprop').show();
-                    preference.find('.hideprop').hide();
-                    $('#course'+id).addClass('hidden');
-
-                } else {
-                    var error = preference.find('.alert-message.error'),
-                                                hideerror = function(){
-                                                    error.hide(300);
-                                                };
-                    error.find('p').html('<strong>Błąd</strong> ' + result.message);
-                    error.show();
-                    setTimeout(hideerror, 3000);
+    $(document).ready(function(){
+        var showhidden = false;
+        function getRow(elem) {
+            return row = $(elem).closest("tr");
+        };
+        function getPrefId(row) {
+            return id = $(row).children('.pref-id').eq(0).val();
+        };
+        function processFormChange(elem) {
+            var row = getRow(elem);
+            $(row).css('background', 'red')
+            var data = {
+                prefid: getPrefId(row),
+                csrfmiddletoken: '{{ csrf_token }}',
+            };
+            var changedselname = $(elem).attr('name').split('-')[2];
+            data[changedselname] = $(elem).val();
+            $.post('{% url preference-save %}', data, 
+                function(newRow){
+                    row.replaceWith(newRow);
                 }
+            );
+            $('.hiddenrow').toggle(showhidden);
+        };
+        $("tr input").change(function(){
+            processFormChange(this);
+        })
+        $("tr select").change(function(){
+            processFormChange(this);
+        })
 
-            }, 'json');
-
-        });
-        $('.saveprop').bind('click', function(event){
-            event.preventDefault();
-
-            var getval = function(object, name){
-                        var item = $(object).find('select[name$="'+ name +'"]');
-
-                        if( item.size() == 1 ){
-                            return item.val();
-                        } else {
-                            return 0;
-                        }
-
-                    }, preference = $(this).parent().parent(),
-		      id = preference.find('.prefid').val(),
-                    prefsdata = {prefid: id,
-                            lecture: getval(preference, 'lecture'),
-                            lab: getval(preference, 'lab'),
-                            review: getval(preference, 'review'),
-                            tutorial: getval(preference, 'tutorial'),
-                            tutlab: getval(preference, 'tutlab'),
-                            seminar: getval(preference, 'seminar'),
-                            csrfmiddletoken: $('input[name="csrfmiddlewaretoken"]').val()};
-
-    	    $.post('{% url preference-save %}', prefsdata, function(data){
-                var result = AjaxMessage.fromJSON(data);
-                    if (result.isSuccess()) {
-                        var save = preference.find('.alert-message.success'),
-                            hidesave = function(){
-                                save.hide(300);
-                            };
-                           save.show();
-                        setTimeout(hidesave, 3000);
-
-                    }
-                    else{
-                        var error = preference.find('.alert-message.error'),
-                            hideerror = function(){
-                                error.hide(300);
-                            };
-                        error.find('p').html('<strong>Błąd</strong> ' + result.message);
-                        error.show();
-                        setTimeout(hideerror, 3000);
-
-    	                            } }, 'json');
-
-        });
     });
     </script>
     <style>.hidden { display: none;}</style>
 {% endblock %}
 
 {% block scripts %}
-	<script src="/site_media/js/components/sidebar.js" type="text/javascript"></script>
-	<script src="/site_media/js/components/topBarFilter.js" type="text/javascript"></script>
-
-	<script src="/site_media/js/common/listFilter.js" type="text/javascript"></script>
-	<script src="/site_media/js/common/listFilter-courseType.js" type="text/javascript"></script>
-	<script src="/site_media/js/offer/prefs.js" type="text/javascript"></script>
 {% endblock %}
 
 
 {% block top-bar %}
-	<div id="od-prefs-top-bar" class="main-top-bar" style="display: none">
-		<fieldset id="od-prefs-filter">
-			<legend><span>Filtrowanie</span></legend>
-			<div class="main-filter-input">
-				<input class="text filter-phrase" type="text" />
-				<input class="reset filter-phrase-reset" type="reset" value="X" style="display:none;" />
-			</div>
-		</fieldset>
-		<fieldset class="course-type-filter">
-			<legend><span>Rodzaj przedmiotu</span></legend>
-			{% for type in proposalTypes %}
-				<span class="checkbox">
-					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
-					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
-					<label for="filter-course-type-{{ type.id }}">{{ type.name }}</label>
-				</span>
-			{% endfor %}
-		</fieldset>
-		<fieldset id="od-prefs-other">
-			<legend><span>Inne</span></legend>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-hidden" /><label for="od-prefs-hidden">Pokaż ukryte przedmioty</label></span>
-			<span class="checkbox"><input type="checkbox" id="od-prefs-only-new" /><label for="od-prefs-only-new">Pokaż tylko nowe przedmioty</label></span>
-		</fieldset>
-	</div>
 {% endblock %}
 
+{% block content-width %}16{% endblock %}
 {% block content %}
-    <form class="preferences-form" action="{% url preference-save-all %}" method="POST">{% csrf_token %}
-        {{ formset.management_form }}
-        <button type="submit" class="btn success">Zapisz wszystkie</button>&nbsp;
-        <button type="submit" class="btn info showall">Pokaż ukryte</button>&nbsp;
-        <button style="display: none;" type="submit" class="btn info hidehidden">Ukryj ukryte</button>&nbsp;
-    {% for form in formset %}
-        <div{% if form.instance.hidden %} class="hidden"{% endif %}><a name="preference{{ form.instance.id}}"></a>
-            <h3><a href="{% url offer-page form.instance.proposal.slug %}">{{ form.instance.proposal }}</a></h3>
-            {% for hidden in form.hidden_fields %}
-            {{ hidden }}
-            {% endfor %}
-            <div style="display: none;" class="ishidden">
-                {{ form.hidden }}
-            </div>
-            <div class="alert-message success" style="display: none;">
-                    <a href="#" class="close">×</a>
-                    <p><strong>Sukces!</strong> Zmiany zostały zapisane</p>
-            </div>
-            <div class="alert-message error" style="display: none;">
-                    <a href="#" class="close">×</a>
-                    <p></p>
-            </div>
-
-            <div style="margin-left: 50px;">
-		<input type="hidden" class="prefid" value="{{form.instance.id}}">
-            {% if form.instance.proposal.test_have_lecture %}
-                <p>{{ form.lecture.label_tag }} {{ form.lecture }}</p>
-            {% endif %}
-
-            {% if form.instance.proposal.test_have_review_lecture %}
-                <p>{{ form.review_lecture.label_tag }} {{ form.review_lecture }}</p>
-            {% endif %}
-
-            {% if form.instance.proposal.test_have_tutorial %}
-                <p>{{ form.tutorial.label_tag }} {{ form.tutorial }}</p>
-            {% endif %}
-
-            {% if form.instance.proposal.test_have_lab %}
-                <p>{{ form.lab.label_tag }} {{ form.lab }}</p>
-            {% endif %}
-
-            {% if form.instance.proposal.test_have_tutorial_lab %}
-                <p>{{ form.tutorial_lab.label_tag }} {{ form.tutorial_lab }}</p>
-            {% endif %}
-
-            {% if form.instance.proposal.test_have_seminar %}
-                <p>{{ form.seminar.label_tag }} {{ form.seminar }}</p>
-            {% endif %}
-
-            {% if form.instance.proposal.test_have_project %}
-                <p>{{ form.project.label_tag }} {{ form.project }}</p>
-            {% endif %}
-            </div>
-            <div style="text-align: right;">
-                <button type="button" class="btn success saveprop">Zapisz</button>&nbsp;
-                <button {% if form.instance.hidden %}style="display: none;" {% endif %}type="button" class="btn danger hideprop">Ukryj</button>
-                <button {% if not form.instance.hidden %}style="display: none;" {% endif %}type="button" class="btn danger showprop">Pokaż</button>
-            </div>
-            <hr style="margin-top: 5px;">
-        </div>
-    {% endfor %}
-        <button type="submit" class="btn success">Zapisz wszystkie</button>&nbsp;
-        <button type="submit" class="btn info showall">Pokaż ukryte</button>&nbsp;
-        <button style="display: none;" type="submit" class="btn info hidehidden">Ukryj ukryte</button>&nbsp;
-    </form>
+    <button type="submit" class="btn info showall">Pokaż ukryte</button>&nbsp;
+    <button style="display: none;" type="submit" class="btn info hidehidden">Ukryj ukryte</button>&nbsp;
+    <table class="zebra-striped">
+        <thead>
+            <tr>
+                <th>{% trans "Przedmiot" %}</th>
+                <th>{% trans "Wykład" %}/{% trans "Seminarium" %}</th>
+                <th>{% trans "Ćwiczenia" %}</th>
+                <th>{% trans "Pracownia" %}/{% trans "Ćwiczenio-Pracownia" %}</th>
+                <th>{% trans "Repetytorium" %}</th>
+                <th>{% trans "Ukryte" %}
+            </tr>
+        </thead>
+        {% for form in formset %}
+        <tr{% if form.instance.hidden %} class="hiddenrow"{% endif %}>
+            <input type="hidden" class="pref-id" name="pref-id" value="{{ form.instance.id }}">
+            <td><a href="{% url offer-page form.instance.proposal.slug %}">{{ form.instance.proposal }}</a></td>
+            <td>{% if form.instance.proposal.have_lecture %}{{ form.lecture }}{% elif form.instance.proposal.have_seminar %}{{ form.seminar }}{% endif %}</td>
+            <td>{% if form.instance.proposal.have_tutorial %}{{ form.tutorial }}{% endif %}</td>
+            <td>{% if form.instance.proposal.have_lab %}{{ form.lab }}{% elif form.instance.proposal.have_tutorial_lab %}{{ form.tutorial_lab }}{% endif %}</td>
+            <td>{% if form.instance.proposal.have_review_lecture %}{{ form.review_lecture }}{% endif %}</td>
+            <td>{{ form.hidden }}</td>
+        </tr>
+        {% endfor %}
+        
+    </table>
+    <button type="submit" class="btn info showall">Pokaż ukryte</button>&nbsp;
+    <button style="display: none;" type="submit" class="btn info hidehidden">Ukryj ukryte</button>&nbsp;
 {% endblock %}
 
+{% block sidebar-width %}0{% endblock %}
 {% block sidebar %}
-    <div id="main-sidebar">
-    	<div id="proposal-list">
-    			<div class="semester">
-    				<h3>Przedmioty w ofercie</h3>
-    				<ul class="proposal-list">
-    					{% for form in formset %}
-                            {% with course=form.instance.proposal %}
-    						<li id="course{{ form.instance.id }}" {% if form.instance.hidden %}class="hidden"{% endif %}>
-    							<a href="#preference{{ form.instance.id }}" id="proposal-{{ course.id }}">{{ course.name }}</a>
-    						</li>
-                            {% endwith %}
-    					{% endfor %}
-    				</ul>
-
-                       <ul id="proposal-legend">
-                           <li>
-                               <div class="legend-box vote"></div> - przedmiot poddany pod głosowanie
-                           </li>
-                           <li>
-                               <div class="legend-box offer"></div> - przedmiot w ofercie
-                           </li>
-                       </ul>
-    			</div>
-    	</div>
-    </div>
 {% endblock %}
