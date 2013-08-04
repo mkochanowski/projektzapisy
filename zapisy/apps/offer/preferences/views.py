@@ -25,8 +25,6 @@ from django.views.decorators.http import require_POST
 import logging
 from libs.ajax_messages import AjaxSuccessMessage, AjaxFailureMessage
 
-from django.http import HttpResponse
-
 logger = logging.getLogger()
 
 @employee_required
@@ -62,8 +60,6 @@ def save(request):
     if not pref.employee == request.user.employee:
         return AjaxFailureMessage('InvalidRequest', u'Nie możesz edytować nie swoich preferencji')
 
-    available_fields = Preference._meta.get_all_field_names()
-    changed_fields = tuple(set(available_fields) & set(request.POST.keys()))
     form = PreferenceForm(data=request.POST, instance=pref)
     if form.is_valid:
         available_fields = Preference._meta.get_all_field_names()
@@ -75,38 +71,3 @@ def save(request):
         form = PreferenceForm(instance=pref)
         return render_to_response('offer/preferences/form_row.html', {'form': form, })
     return AjaxFailureMessage('InvalidRequest', u'Coś poszło źle')
-
-
-@require_POST
-@employee_required
-def hide(request, status):
-    """
-    Hides preference for employee.
-    """
-    return set_hidden(request, status)
-
-
-
-@employee_required
-def save_all_prefs(request):
-    """ Saves all preferences. """
-    if request.method == 'POST':
-
-        prefs     = request.user.employee.get_preferences()
-        formset   = PreferenceFormset(request.POST, queryset=prefs)
-
-        if formset.is_valid():
-            formset.save()
-            messages.success(request, u'Preferencje zostały zapisane')
-            return redirect('prefs-default-view')
-
-        else:
-            proposals = CourseEntity.get_proposals()
-
-            return render_to_response(
-                'offer/preferences/base.html',
-                locals(),
-                context_instance = RequestContext(request))
-
-    return redirect('prefs-default-view')
-
