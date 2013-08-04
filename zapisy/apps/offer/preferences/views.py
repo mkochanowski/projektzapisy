@@ -65,9 +65,9 @@ def save(request):
     form = PreferenceForm(request.POST, instance=pref)
     if form.is_valid():
         form.save()
-        return HttpResponse('<tr><td>Udało się {}</td></tr>'.format(str(request.POST)))
+        return render_to_response('offer/preferences/form_row.html', {'form': form, })
 
-    return HttpResponse('<tr><td>{}</td></tr>'.format(form.errors))
+    return AjaxFailureMessage('InvalidRequest', u'Coś poszło źle')
 
 
 @require_POST

@@ -39,7 +39,7 @@
                     row.replaceWith(newRow);
                 }
             );
-            $('.hiddenrow').toggle(showhidden);
+            $('.hidden').toggle(showhidden);
         };
         $("tr input").change(function(){
             processFormChange(this);
@@ -76,15 +76,7 @@
             </tr>
         </thead>
         {% for form in formset %}
-        <tr{% if form.instance.hidden %} class="hiddenrow"{% endif %}>
-            <input type="hidden" class="pref-id" name="pref-id" value="{{ form.instance.id }}">
-            <td><a href="{% url offer-page form.instance.proposal.slug %}">{{ form.instance.proposal }}</a></td>
-            <td>{% if form.instance.proposal.have_lecture %}{{ form.lecture }}{% elif form.instance.proposal.have_seminar %}{{ form.seminar }}{% endif %}</td>
-            <td>{% if form.instance.proposal.have_tutorial %}{{ form.tutorial }}{% endif %}</td>
-            <td>{% if form.instance.proposal.have_lab %}{{ form.lab }}{% elif form.instance.proposal.have_tutorial_lab %}{{ form.tutorial_lab }}{% endif %}</td>
-            <td>{% if form.instance.proposal.have_review_lecture %}{{ form.review_lecture }}{% endif %}</td>
-            <td>{{ form.hidden }}</td>
-        </tr>
+            {% include "offer/preferences/form_row.html" %}
         {% endfor %}
         
     </table>
