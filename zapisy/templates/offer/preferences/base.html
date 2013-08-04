@@ -19,38 +19,45 @@
     <script>
     $(document).ready(function(){
         var showhidden = false;
+        $('.hiddenrow').toggle(showhidden);
         function getRow(elem) {
             return row = $(elem).closest("tr");
         };
         function getPrefId(row) {
             return id = $(row).children('.pref-id').eq(0).val();
         };
-        function processFormChange(elem) {
+        function processFormChange(elem, val) {
             var row = getRow(elem);
             $(row).css('background', 'red')
             var data = {
                 prefid: getPrefId(row),
                 csrfmiddletoken: '{{ csrf_token }}',
             };
-            var changedselname = $(elem).attr('name').split('-')[2];
-            data[changedselname] = $(elem).val();
+            var changedselname = $(elem).attr('name').split('-').slice(-1)[0];
+            data[changedselname] = val;
             $.post('{% url preference-save %}', data, 
                 function(newRow){
                     row.replaceWith(newRow);
+                    $('.hiddenrow').toggle(showhidden);
                 }
             );
-            $('.hidden').toggle(showhidden);
         };
-        $("tr input").change(function(){
-            processFormChange(this);
-        })
-        $("tr select").change(function(){
-            processFormChange(this);
-        })
+        $("tr input").live('change', function(){
+            var val = $(this).is(':checked')
+            processFormChange(this, val);
+        });
+        $("tr select").live('change', function(){
+            var val = $(this).val()
+            processFormChange(this, val);
+        });
+        $(".toghidden").click(function(){
+            showhidden = !showhidden;
+            $('.hiddenrow').toggle(showhidden);
+            $('.toghidden').toggle();
+        });
 
     });
     </script>
-    <style>.hidden { display: none;}</style>
 {% endblock %}
 
 {% block scripts %}
@@ -62,8 +69,8 @@
 
 {% block content-width %}16{% endblock %}
 {% block content %}
-    <button type="submit" class="btn info showall">Pokaż ukryte</button>&nbsp;
-    <button style="display: none;" type="submit" class="btn info hidehidden">Ukryj ukryte</button>&nbsp;
+    <button type="submit" class="btn info toghidden">Pokaż ukryte</button>&nbsp;
+    <button style="display: none;" type="submit" class="btn info toghidden">Ukryj ukryte</button>&nbsp;
     <table class="zebra-striped">
         <thead>
             <tr>
@@ -80,8 +87,8 @@
         {% endfor %}
         
     </table>
-    <button type="submit" class="btn info showall">Pokaż ukryte</button>&nbsp;
-    <button style="display: none;" type="submit" class="btn info hidehidden">Ukryj ukryte</button>&nbsp;
+    <button type="submit" class="btn info toghidden">Pokaż ukryte</button>&nbsp;
+    <button style="display: none;" type="submit" class="btn info toghidden">Ukryj ukryte</button>&nbsp;
 {% endblock %}
 
 {% block sidebar-width %}0{% endblock %}

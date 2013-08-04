@@ -1,4 +1,4 @@
-		<tr{% if form.instance.hidden %} class="hidden"{% endif %}>
+		<tr{% if form.instance.hidden %} class="hiddenrow"{% endif %}>
             <input type="hidden" class="pref-id" name="pref-id" value="{{ form.instance.id }}">
             <td><a href="{% url offer-page form.instance.proposal.slug %}">{{ form.instance.proposal }}</a></td>
             <td>{% if form.instance.proposal.have_lecture %}{{ form.lecture }}{% elif form.instance.proposal.have_seminar %}{{ form.seminar }}{% endif %}</td>

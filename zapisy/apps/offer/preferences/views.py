@@ -62,11 +62,18 @@ def save(request):
     if not pref.employee == request.user.employee:
         return AjaxFailureMessage('InvalidRequest', u'Nie możesz edytować nie swoich preferencji')
 
-    form = PreferenceForm(request.POST, instance=pref)
-    if form.is_valid():
-        form.save()
+    available_fields = Preference._meta.get_all_field_names()
+    changed_fields = tuple(set(available_fields) & set(request.POST.keys()))
+    form = PreferenceForm(data=request.POST, instance=pref)
+    if form.is_valid:
+        available_fields = Preference._meta.get_all_field_names()
+        changed_fields = list(set(available_fields) & set(request.POST.keys()))
+        a = ''
+        for field in changed_fields:
+            setattr(pref, field, form[field].value())
+        pref.save()
+        form = PreferenceForm(instance=pref)
         return render_to_response('offer/preferences/form_row.html', {'form': form, })
-
     return AjaxFailureMessage('InvalidRequest', u'Coś poszło źle')
 
 
