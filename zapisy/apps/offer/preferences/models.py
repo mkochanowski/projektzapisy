@@ -85,8 +85,6 @@ class Preference(models.Model):
                                      verbose_name='ćwiczenio-pracownia')
     seminar        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
                                      verbose_name='seminarium')
-    project        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
-                                     verbose_name='projekt')
 
     
     class Meta:
