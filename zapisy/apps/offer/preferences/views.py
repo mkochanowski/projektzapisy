@@ -1,25 +1,14 @@
 # -*- coding:utf-8 -*-
 
-import types
-from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.utils import simplejson
-from apps.enrollment.courses.models.course import CourseEntity
 
-from apps.offer.preferences.exceptions import *
 from apps.offer.preferences.forms import PreferenceFormset, PreferenceForm
 from apps.offer.preferences.models import Preference
-from apps.offer.preferences.utils import *
-from apps.offer.proposal.models import Proposal
-from apps.enrollment.courses.models import Type
 from apps.users.decorators import employee_required
 
-from apps.offer.preferences.models import PREFERENCE_CHOICES
-
-from django.core.urlresolvers     import reverse
 from django.views.decorators.http import require_POST
 
 import logging
