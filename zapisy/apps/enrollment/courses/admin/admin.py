@@ -254,7 +254,7 @@ class QueuedInline(admin.TabularInline):
 
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012','get_terms_as_string')
+    list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012', 'limit_isim', 'get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__entity__name')
     inlines = [

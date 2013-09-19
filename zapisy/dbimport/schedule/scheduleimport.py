@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-DZIAŁANIE
+DZIA\xa3ANIE
 =========
-Importuje plan zajęć do nowo stworzonego semestru z pliku .txt z sekretariatu.
+Importuje plan zajeć do nowo stworzonego semestru z pliku .txt z sekretariatu.
 
 
 CO NALEŻY WIEDZIEĆ
 ==================
 - semestr powstaje z daty dzisiejszej; jeżeli w systemie już taki semestr jest, należy usunąć (wraz z przedmiotami)
 - pusta linia na początku pliku powinna być
-- jeżeli typy źle się importują (np. nie ma tych w O1), to:
+- jeżeli typy źle sie importują (np. nie ma tych w O1), to:
     . skopiuj plik do justpaste.it
-    . kliknij udostępniany link 
+    . kliknij udostepniany link 
     . skopiuj z przeglądarki z powrotem do pliku nowego
-    . spróbuj zimportować ten plik, mi pomogło
+    . spróbuj zimportować ten plik, mi pomog\xa3o
 
 CO POPRAWIAĆ PO IMPORCIE
 ========================
-- przedmioty, które potencjalnie mają zły typ, są w Informatyczny 2
+- przedmioty, które potencjalnie mają z\xa3y typ, są w Informatyczny 2
 - punkty dla przedmiotów L/M
 - niepolskie nazwiska
-- wykłady posiadające dwa terminy trzeba zmergować
+- wyk\xa3ady posiadające dwa terminy trzeba zmergować
 
 URUCHAMIANIE
 ============
 Z panelu admina:
-wejdź w /fereol_admin/courses i kliknij importowanie planu zajęć z sekretariatu.
+wejdź w /fereol_admin/courses i kliknij importowanie planu zajeć z sekretariatu.
 
 Jeżeli chcesz importować z konsoli, a nie z panelu admina, odkomentuj:
 #scheduleimport('')
@@ -39,19 +39,141 @@ $ python scheduleimport.py
 
 """
 #### TO CHANGE #####
-SCHEDULE_FILE = '/opt/fereol/fereol/dbimport/schedule/PlanPrzedmiotów.txt'
+SCHEDULE_FILE = 'plan.txt'
 LIMITS = {'1' : 300, '9' : 300, '2' : 20, '3' : 15 , '5' : 18 , '6' : 15 }
 
-FIRST_YEAR_FRIENDLY = ['logikadlainformatyków','analizamatematyczna','algebra','kursjęzykaansiczelementamic++','wstępdoinformatyki',
-                       'wstępdoprogramowania','programowanie','programowanieobiektowe','kursjęzykapascal',
+FIRST_YEAR_FRIENDLY = ['logikadlainformatyków','analizamatematyczna','algebra','kursjezykaansiczelementamic++','wstepdoinformatyki',
+                       'wstepdoprogramowania','programowanie','programowanieobiektowe','kursjezykapascal',
                        'architekturysystemówkomputerowych', 'architekturasystemówkomputerowych']
 O1 = ['analizamatematyczna','algebra','logikadlainformatyków','elementyrachunkuprawdopodobieństwa','metodyprobabilistyczneistatystyka']
 O2 = ['matematykadyskretna','programowanie','analizanumeryczna','algorytmyistrukturydanych']
-O3 = ['językiformalneizłożonośćobliczeniowa']
+O3 = ['jezykiformalneiz\xa3ożonosćobliczeniowa']
 Oinz = ['fizykadlainformatyków','podstawyelektroniki,elektrotechnikiimiernictwa']
-I1 = ['wstępdoinformatyki','architekturasystemówkomputerowych','architekturysystemówkomputerowych','bazydanych','systemyoperacyjne','siecikomputerowe','inżynieriaoprogramowania']
-Iinz = ['systemywbudowane','podstawygrafikikomputerowej','sztucznainteligencja','komunikacjaczłowiek-komputer']
+I1 = ['wstepdoinformatyki','architekturasystemówkomputerowych','architekturysystemówkomputerowych','bazydanych','systemyoperacyjne','siecikomputerowe','inżynieriaoprogramowania']
+Iinz = ['systemywbudowane','podstawygrafikikomputerowej','sztucznainteligencja','komunikacjacz\xa3owiek-komputer']
 FEREOL_PATH = '../../..'
+
+SEMESTERID = 329
+
+przedmioty = { "ALGORYTMY EWOLUCYJNE": 3176,
+ "ALGORYTMY FUNKCJONALNE I TRWAlE STRUKTURY DANYCH": 3177,
+ "ALGORYTMY INTERNETU": 3179,
+ "ANALIZA MATEMATYCZNA": 3182,
+ "ANALIZA NUMERYCZNA (L)": 3183,
+ "ANALIZA NUMERYCZNA (M)": 3184,
+ "COMPILER CONSTRUCTION": 3191,
+ "INTEGRACJA INFORMACJI": 3196,
+ "INzYNIERIA OPROGRAMOWANIA": 3197,
+ "KOMUNIKACJA CZlOWIEK-KOMPUTER": 3200,
+ "KULTURA BEZPIECZEnSTWA KOMPUTEROWEGO": 3202,
+ "KURS JeZYKA JAVA": 3205,
+ "KURS: PROCESORY GRAFICZNE W OBLICZENIACH RoWNOLEGlYCH (CUDA)": 3215,
+ "KURS PROGRAMOWANIA APLIKACJI BAZODANOWYCH": 3208,
+ "KURS PROJEKTOWANIA APLIKACJI ASP.NET I SILVERLIGHT": 3211,
+ "KURS ROZSZERZONY JeZYKA PYTHON": 3212,
+ "KURS: RUBY ON RAILS": 3217,
+ "KURS WWW": 3213,
+ "LOGIKA DLA INFORMATYKoW": 3219,
+ "MATEMATYKA DYSKRETNA (L)": 3221,
+ "MATEMATYKA DYSKRETNA (M)": 3222,
+ "METODY OPTYMALIZACJI": 3224,
+ "MODELOWANIE ZJAWISK PRZYRODNICZYCH": 3225,
+ "PODSTAWY ELEKTRONIKI, ELEKTROTECHNIKI I MIERNICTWA": 3228,
+ "PODSTAWY GRAFIKI KOMPUTEROWEJ": 3229,
+ "PROGRAMOWANIE FUNKCYJNE": 3230,
+ "PROJEKT ZESPOlOWY": 3233,
+ "RACHUNEK PRAWDOPODOBIEnSTWA DLA INFORMATYKoW": 3235,
+ "SEMANTYKA JeZYKoW PROGRAMOWANIA": 3238,
+ "SEMINARIUM ALGORYTMICZNE 2014": 3239,
+ "SEMINARIUM: ALGORYTMY PROBABILISTYCZNE": 3224,
+ "SEMINARIUM APROKSYMACYJNO-OPTYMALIZACYJNO-KOMBINATORYCZNE 2013/2014": 3240,
+ "SEMINARIUM: BEZPIECZEnSTWO I OCHRONA INFORMACJI": 3244,
+ "SEMINARIUM: DATA-MINING - KLASYFIKACJA I GRUPOWANIE DANYCH": 3245,
+ "SEMINARIUM: LOGIKI NIEKLASYCZNE: TEORIA I ZASTOSOWANIA": 3249,
+ "SEMINARIUM: TEXT MINING": 3253,
+ "SEMINARIUM: ZAAWANSOWANE PROGRAMOWANIE FUNKCYJNE": 3254,
+ "SEMINARIUM: ZAAWANSOWANE TECHNIKI PROGRAMOWANIA .NET": 3255,
+ "SEMINARIUM: ZAGADKI TEORETYCZNYCH PODSTAW BAZ DANYCH": 3256,
+ "SYSTEMY OPERACYJNE": 3260,
+ "SYSTEMY WBUDOWANE": 3262,
+ "ZlOzONOsc OBLICZENIOWA": 3268,
+ "CCNA EXPLORATION 1 (ZIMA)": 3189,
+ "ELEMENTY RACHUNKU PRAWDOPODOBIEnSTWA (ANG.)": 3193,
+ "INzYNIERIA OPROGRAMOWANIA (ANG.)": 3198,
+ "KURS JeZYKA JAVA (ANG.)": 3206,
+ "KURS: WSTeP DO PROGRAMOWANIA W JeZYKU C": 3269,
+ "KURS: WSTeP DO PROGRAMOWANIA W JeZYKU PYTHON": 3270,
+ "METODY SZTUCZNEJ INTELIGENCJI W ZARZADZANIU I STEROWANIU PRODUKCJA": 3244,
+ "SEMINARIUM: ARCHITEKTURY SYSTEMoW KOMPUTEROWYCH (ANG.)": 3243,
+ "SEMINARIUM: METODY IMPLEMENTACJI ALGORYTMoW": 3250,
+ "SIECI NEURONOWE": 3258,
+ "SZTUCZNA INTELIGENCJA (ANG.)": 3265,
+ "WSTeP DO INFORMATYKI": 3267}
+
+
+TECH = { "KRYSTIAN BAClAWSKI": 96,
+ "MAlGORZATA BIERNACKA":  73,
+ "DARIUSZ BIERNACKI":  70,
+ "MARCIN BIEnKOWSKI":  11,
+ "SZYMON BONIECKI":  73,
+ "JAROSlAW BYRKA":  102,
+ "WITOLD CHARATONIK":  54,
+ "JAN CHOROWSKI":  456,
+ "HANS DENIVELLE":  66,
+ "KRZYSZTOF DeBICKI":  69,
+ "PATRYK FILIPIAK":  107,
+ "INSTYTUT FIZYKI DOsWIADCZALNEJ":  178,
+ "PRZEMYSlAW GOSPODARCZYK":  449,
+ "LESZEK GROCHOLSKI":  13,
+ "TOMASZ JURDZInSKI":  16,
+ "ADAM KACZMAREK": 457,
+ "PRZEMYSlAWA KANAREK": 18,
+ "WITOLD KARCZEWSKI": 19,
+ "EMANUEL KIEROnSKI": 22,
+ "WOJCIECH KLESZOWSKI": 116,
+ "JAKUB KOWALSKI": 109,
+ "ANTONI KOsCIELSKI": 24,
+ "JURIJ KRYAKIN": 26,
+ "ANDRZEJ KRZYWDA":  120,
+ "ILONA KRoLAK":  28,
+ "STANISlAW LEWANOWICZ":  29,
+ "KRZYSZTOF LORYs":  30,
+ "JERZY MARCINKOWSKI": 31,
+ "MAREK MATERZOK": 92,
+ "MARCIN MlOTKOWSKI": 34,
+ "RAFAl NOWAK": 35,
+ "LESZEK PACHOLSKI":  36,
+ "KATARZYNA PALUCH":  37,
+ "MACIEJ PALUSZYnSKI": 65,
+ "WITOLD PALUSZYnSKI": 38,
+ "KRZYSZTOF PIECUCH": 460,
+ "MAREK PIOTRoW": 39,
+ "lUKASZ PIWOWAR": 40,
+ "ZDZISlAW PlOSKI": 41,
+ "PAWEl RAJBA": 53,
+ "PAWEl RYCHLIKOWSKI": 42,
+ "PAWEl RZECHONEK":  43,
+ "MICHAl RozAnSKI": 458,
+ "KATARZYNA SERAFInSKA": 461,
+ "KRZYSZTOF SORNAT": 459,
+ "PAWEl SOlTYSIAK": 91,
+ "ZDZISlAW SPlAWSKI": 3,
+ "GRZEGORZ STACHOWIAK": 44,
+ "MACIEJ M. SYSlO": 114,
+ "ADAM SZUSTALEWICZ": 82,
+ "MAREK SZYKUlA": 90,
+ "KRZYSZTOF TABISZ": 86,
+ "PIOTR WIECZOREK": 48,
+ "TOMASZ WIERZBICKI": 49,
+ "PIOTR WITKOWSKI": 5,
+ "PIOTR WNUK-LIPInSKI":  50,
+ "MIECZYSlAW WODECKI": 51,
+ "PAWEl WOzNY": 52,
+ "WIKTOR ZYCHLA": 7,
+ "ANDRZEJ lUKASZEWSKI": 8}
+
+
+
 
 ####  #####
 
@@ -60,15 +182,11 @@ import os
 from django.core.management import setup_environ
 from datetime import time
 
-if __name__ == '__main__':
-    sys.path.append(FEREOL_PATH)
-    sys.path.append(FEREOL_PATH + '/fereol')
-    from fereol import settings
-    setup_environ(settings)
 
-from apps.enrollment.records.models import Record, STATUS_ENROLLED
-from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities, PointTypes
-from apps.users.models import Student, Employee, Program
+from zapisy.apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, PointsOfCourseEntities, PointTypes
+from zapisy.apps.users.models import Student, Employee, Program
+
+from apps.enrollment.courses.models import Classroom
 
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
@@ -80,107 +198,19 @@ import logging
 logger = logging.getLogger()
 
 
-regex = re.compile('\s+(?P<day>pn|wt|śr|czw|pi|so|ni)\s+(?P<start_time>\d{1,2})-(?P<end_time>\d{1,2})\s+\((?P<type>wykład|repetytorium|ćwiczenia|pracownia|ćwicz\+pracownia|seminarium)\)\s+(?P<teacher>[^,]*),\s+(?P<rooms>.*)')
+regex = re.compile('\s+(?P<day>pn|wt|sr|czw|pi|so|ni)\s+(?P<start_time>\d{1,2})-(?P<end_time>\d{1,2})\s+\((?P<type>wyklad|repetytorium|cwiczenia|pracownia|cwicz\+pracownia|seminarium)\)\s+(?P<teacher>[^,]*),\s+(?P<rooms>.*)')
 
-GROUP_TYPES = { 'wykład' : '1', 'repetytorium' : '9', 'ćwiczenia' : '2', 'pracownia' : '3' ,'ćwicz+pracownia' : '5' ,'seminarium' : '6' }
+GROUP_TYPES = { 'wyklad' : '1', 'repetytorium' : '9', 'cwiczenia' : '2', 'pracownia' : '3' ,'cwicz+pracownia' : '5' ,'seminarium' : '6' }
 
-DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'śr' : '3', 'czw' : '4', 'pi' : '5' , 'so' : '6', 'ni' : '7'}
+DAYS_OF_WEEK = { 'pn' : '1', 'wt' : '2', 'sr' : '3', 'czw' : '4', 'pi' : '5' , 'so' : '6', 'ni' : '7'}
 
-def lower_pl(s):
-    return s.lower().replace('Ą','ą').replace('Ć','ć').replace('Ę','ę').replace('Ł','ł').replace('Ń','ń').replace('Ó','ó').replace('Ś','ś').replace('Ż','ż').replace('Ź','ź')
-
-def upper_pl(s):
-    return s.upper().replace('ą','Ą').replace('ć','Ć').replace('ę','Ę').replace('ł','Ł').replace('ń','Ń').replace('ó','Ó').replace('ś','Ś').replace('ż','Ż').replace('ź','Ź')
-
-
-def guess_type(name,COURSE_TYPE):
-    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)','').replace('(ang)',''))
-    if name in FIRST_YEAR_FRIENDLY:
-        first_year = True
-    else:
-        first_year = False
-    if name in O1:
-        return COURSE_TYPE['O1'],'O1', first_year, True
-    elif name in O2:
-        return COURSE_TYPE['O2'],'O2', first_year, True
-    elif name in O3:
-        return COURSE_TYPE['O3'],'O3', first_year, True
-    elif name in Oinz:
-        return COURSE_TYPE['Oinż'],'Oinż', first_year, True
-    elif name in I1:
-        return COURSE_TYPE['I1'],'I1', first_year, True
-    elif name in Iinz:
-        return COURSE_TYPE['Iinż'],'Iinż', first_year, True
-    elif 'kurs' in name:
-        return COURSE_TYPE['K'],'K', first_year, False
-    elif 'seminarium' in name:
-        return COURSE_TYPE['S'],'S', first_year, False
-    elif 'projekt' in name and 'projektowanie' not in name:
-        return COURSE_TYPE['P'],'P', first_year, False
-    return COURSE_TYPE['I2'],'I2', first_year, True
 
 def find_teacher(t):
-    teacher_full_name = map(lambda x: len(x)>0 and x[0]+lower_pl(x[1:]) or x,t.split(' '))
-    if len(teacher_full_name)==1:
-        teacher_name = ''
-        teacher_surname = teacher_full_name[0]
-    if len(teacher_full_name)==2:
-        teacher_name = teacher_full_name[0]
-        teacher_surname = teacher_full_name[1] 
-    if len(teacher_full_name)==3:
-        teacher_name = teacher_full_name[0]+' '+teacher_full_name[1]
-        teacher_surname = teacher_full_name[2]
-    teachers = Employee.objects.filter(user__first_name=teacher_name, user__last_name=teacher_surname)
-
-    if len(teachers)==0:
-        username = teacher_name+teacher_surname
-        teacher_surname = teacher_surname
-        user = User.objects.get_or_create(first_name=teacher_name.decode('utf-8'), last_name=teacher_surname.decode('utf-8'), username=username.decode('utf-8'))[0]
-        teacher = Employee.objects.create(user=user, consultations="")
-    elif len(teachers)>1:
-        print 'Error: more then one teacher of name: %s, and surname: %s.' % (teacher_name,teacher_surname)
+    id = TECH.get(t, None)
+    if id:
+        return Employee.objects.get(id=id)
     else:
-        teacher = teachers[0]
-    return teacher
-
-def guess_points(name,t):
-    name = lower_pl(name.replace(' ','').replace('(L)','').replace('(M)','').replace('(B)',''))
-    if t=='O1':
-        if name=='analizamatematyczna':
-            return 10,10
-        elif name in ['algebra','logikadlainformatyków']:
-            return 7,7
-        elif name=='elementyrachunkuprawdopodobieństwa':
-            return 3,3
-        elif name=='metodyprobabilistyczneistatystyka':
-            return 6,6
-    elif t=='O2':
-        if name=='matematykadyskretna':
-            return 6,9
-        elif name=='programowanie':
-            return 9,12
-        elif name=='analizanumeryczna':
-            return 8,12
-        elif name=='algorytmyistrukturydanych':
-            return 9,13
-    elif t=='O3':
-        return 9,9
-    elif t=='Oinż':
-        if name=='fizykadlainformatyków':
-            return 6,6
-        elif name=='podstawyelektroniki,elektrotechnikiimiernictwa':
-            return 4,4
-    elif t=='I1':
-        return 6,6
-    elif t=='Iinż':
-        return 6,6
-    elif t=='K':
-        return 5,5
-    elif t=='S':
-        return 3,3
-    elif t=='P':
-        return 4,4
-    return 6,6
+        return None
 
 def get_classroom(rooms):
     classrooms = []
@@ -197,11 +227,6 @@ def get_classroom(rooms):
 
     return classrooms
 
-def get_points_values():
-    ects = PointTypes.objects.get_or_create(name='ECTS')[0]
-    program_lic = Program.objects.get_or_create(name='', type_of_points=ects)[0]
-    program_mgr = Program.objects.get_or_create(name='', type_of_points=ects)[0]
-    return ects, program_lic, program_mgr
 
 def import_schedule(file, semester):
     types = [('Informatyczny 1','I1'),
@@ -220,15 +245,12 @@ def import_schedule(file, semester):
             ('Inne','?')]
 
     COURSE_TYPE = {}
-
-    ects, program_lic, program_mgr = get_points_values()
     classroom = Classroom.objects.get_or_create(number=0)[0]
     for t in types:
         td = Type.objects.get_or_create(name=t[0], meta_type=False, defaults = {'short_name':t[1], 'group':None})[0]
         COURSE_TYPE[t[1]] = td
 
     course = None
-    lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
     while True:
         line = file.readline()
         if not line:
@@ -247,30 +269,8 @@ def import_schedule(file, semester):
                 group_type = GROUP_TYPES[g.group('type')]
                 teacher = find_teacher(g.group('teacher'))
                 limit = LIMITS[group_type]
-                if 'CCNA' in course.name or 'ccna' in course.name:
-                    limit = 18
                 
                 t = 15*(int(g.group('end_time'))-int(g.group('start_time')))
-                if group_type=='1':
-                    lectures += t
-                    if course:
-                        course.teachers.add(teacher)
-                        course.save()
-                elif group_type=='9':
-                    repetitions += t
-                elif group_type=='2':
-                    exercises = exercises and exercises or t
-                elif group_type=='3':
-                    laboratories = laboratories and laboratories or t
-                    if course and course.type and course.type.name=='Projekt':
-                        course.teachers.add(teacher)
-                        course.save()
-                elif group_type=='5':
-                    exercises_laboratories = exercises_laboratories and exercises_laboratories or t
-                elif group_type=='6':
-                    if course:
-                        course.teachers.add(teacher)
-                        course.save()
                     
                 if group_type=='1':    
                     group = Group.objects.get_or_create(course=course,
@@ -297,57 +297,9 @@ def import_schedule(file, semester):
             if line==' \n':
                 continue
             
-            if course:
-                course.lectures, course.exercises, course.laboratories, course.repetitions, course.exercises_laboratories = lectures, exercises, laboratories, repetitions, exercises_laboratories
-                course.save()
-            name = line[1:-1]
-            if name.startswith('SEMINARIUM: '):
-                extra = 'Seminarium: '
-                name = name.replace('SEMINARIUM: ','')
-            elif name.startswith('PROJEKT: '):
-                extra = 'Projekt: '
-                name = name.replace('PROJEKT: ','')
-            else:
-                extra = ''
-            name = len(name)>0 and name[0]+lower_pl(name[1:]) or name
-            name = name.replace('(l)','(L)').replace('(m)','(M)').replace('(b)','(B)')
-            name = extra+name
-            name = name.replace('python','Python').replace('java','Java').replace('linux','Linux').replace('ansi c','ANSI C').replace('Ccna','CCNA').replace('www','WWW').replace('c++','C++').replace('asp.net','ASP.NET').replace('silverlight','Silverlight').replace('ruby','Ruby').replace('rails','Rails').replace('coq','Coq').replace('network fundamentals','Network Fundamentals').replace('phone','Phone').replace('android', 'Android').replace('(cuda)', '(CUDA)').replace('Data-mining', 'Data-Mining').replace('General game playing', 'General Game Playing').replace('general game playing', 'General Game Playing').replace('3d', '3D').replace('.net', '.NET').replace('exploration', 'Exploration')
-            shortName = name.decode('utf-8')[:29].encode('utf-8')
-            type,short_type,first_year,exam = guess_type(name,COURSE_TYPE)
-            entity, created_entity = CourseEntity.objects.get_or_create(name=name, defaults = {'shortName':shortName,'type':type})
-            if created_entity:
-                print 'Stworzono podstawe przedmiotu o id <%s>' % entity.id
-            lectures, exercises, laboratories, repetitions, exercises_laboratories = 0,0,0,0,0
-            english = '(ang)' in name or '(ang.)' in name
-            slug = semester.year.replace('/', '_') + semester.type + '_' + slugify(name)
-            print slug
+            name = line[1:-2]
             try:
-                course = Course.objects.create(name=name,
-                                                 entity=entity,
-                                                 semester=semester,
-                                                 slug = slug,
-                                                 type=type,
-                                                 english=english,
-                                                 suggested_for_first_year=first_year,
-                                                 exam=exam
-                                                 )
-                logger.info('[Scheduleimport] Created course %s' % name)
-                points = PointsOfCourseEntities.objects.filter(entity=entity)
-                '''
-                for p in points:
-                    type_of_point = p.type_of_point
-                    value = p.value
-                    poc = PointsOfCourses.objects.create(course=course, type_of_point=type_of_point, value=value)
-                '''
-                value_lic, value_mgr = guess_points(name,short_type)
-                
-                if not points:
-                     PointsOfCourseEntities.objects.create(entity=entity,type_of_point=ects,value=value_mgr)
-                    
-#                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_lic,value=value_lic)
-#                PointsOfCourses.objects.create(course=course,type_of_point=ects,program=program_mgr,value=value_mgr)
-
+                course = get_course(name)
             except Exception, e:
                 print 'Error during creating course:%s. \nError: %s ' % (name, e)
 
@@ -355,36 +307,24 @@ def import_schedule(file, semester):
             continue
 
 def get_semester():
-    today = datetime.today()
-    type = today.month in [12,1,2,3,4,5] and 'l' or 'z'
-    year = today.year
-    next_year = (year+1)%100
-    prev_year = (year-1)
-    if type=='z':
-        year = str(year)+'/'+str(next_year)
-    else:
-        year = str(prev_year)+'/'+str(year%100)
-    semester_beginning = today
-    semester_ending = today 
-    semester = Semester.objects.get_or_create(type=type,
-                                              year=year,
-                                              defaults = {
-                                                  'visible' : False,
-                                                  'semester_beginning' : semester_beginning,
-                                                  'semester_ending' : semester_ending,
-                                                  'records_opening': today,
-                                                  'records_closing': today
-                                              })[0]
-    return semester
+    return Semester.objects.get(id=SEMESTERID)
+
+def get_course(name):
+    return Course.objects.get(id=przedmioty[name])
 
 @transaction.commit_on_success
 def scheduleimport(data):
     semester = get_semester()
     print 'Przenosimy na semestr <%s>' % semester
-    file = data
-    #file = open(SCHEDULE_FILE)
+    file = open(SCHEDULE_FILE)
     import_schedule(file, semester)
 
 #scheduleimport('')
 
+if __name__ == '__main__':
+    sys.path.append(FEREOL_PATH)
+    sys.path.append(FEREOL_PATH + '/zapisy')
+    from zapisy import settings
+    setup_environ(settings)
+    scheduleimport()    
 
