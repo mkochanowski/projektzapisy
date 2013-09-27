@@ -5,6 +5,7 @@ from django.db.models import signals
 from django.db.models import Count
 from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
+from django.conf import settings
 
 from course import *
 
@@ -33,6 +34,7 @@ GROUP_EXTRA_CHOICES = [('',''),
     (u'grupa 5','grupa 5'),
     (u'pracownia linuksowa','pracownia linuksowa'),
     (u'grupa anglojęzyczna','grupa anglojęzyczna'),
+    (u'I rok', 'I rok'), (u'II rok', 'II rok'), (u'ISIM', 'ISIM')
     ]
 
 

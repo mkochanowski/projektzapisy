@@ -4,7 +4,7 @@ from datetime import date
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-
+from django.utils.encoding import smart_unicode
 from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
@@ -755,6 +755,11 @@ class CourseDescription(models.Model):
         verbose_name_plural = 'opisy przedmiotu'
         app_label = 'courses'
 
+    def __unicode__(self):
+        title = smart_unicode(self.created) + " - "
+        if self.author:
+            title = title + smart_unicode(self.author)
+        return title
 
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)

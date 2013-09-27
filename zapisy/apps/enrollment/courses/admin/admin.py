@@ -266,7 +266,7 @@ class GroupAdmin(admin.ModelAdmin):
     raw_id_fields = ('course', 'teacher')
 
     def save_model(self, request, obj, form, change):
-
+        return super(GroupAdmin, self).save_model(request, obj, form, change)
         if obj.id:
             obj.course = Course.simple.select_for_update().get(id=obj.course_id)
             obj.save()
@@ -391,7 +391,7 @@ admin.site.register(CourseDescription, CourseDescriptionAdmin)
 admin.site.register(CourseEntity, CourseEntityAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Tag)
-# admin.site.register(Classroom, ClassroomAdmin)
+admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(Freeday)
 admin.site.register(ChangedDay)
