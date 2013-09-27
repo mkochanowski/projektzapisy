@@ -236,6 +236,8 @@ class Student(BaseUser):
 
     t0 = models.DateTimeField(null=True, blank=True)
 
+    isim = models.BooleanField(default=False)
+
     ects_in_semester = models.SmallIntegerField(default=0)
 
     dyskretna_l  = models.BooleanField(default=False)

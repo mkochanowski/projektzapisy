@@ -76,6 +76,7 @@ class Group(models.Model):
     enrolled     = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów')
     enrolled_zam = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów zamawianych')
     enrolled_zam2012 = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów zamawianych')
+    enrolled_isim = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów ISIM')
     queued       = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba studentów w kolejce')
 
     disable_update_signal = False
@@ -126,6 +127,8 @@ class Group(models.Model):
             self.enrolled_zam -= 1
         if student.is_zamawiany2012():
             self.enrolled_zam2012 -= 1
+        if student.isim:
+            self.enrolled_isim -= 1
 
         self.save()
 
@@ -139,6 +142,8 @@ class Group(models.Model):
             self.enrolled_zam += 1
         if student.is_zamawiany2012():
             self.enrolled_zam2012 += 1
+        if student.isim:
+            self.enrolled_isim += 1
 
         self.save()
 
@@ -336,7 +341,16 @@ class Group(models.Model):
     def limit_non_zamawiane(self):
         return self.limit - self.limit_zamawiane -self.limit_zamawiane2012
 
+    def limit_non_isim(self):
+        return self.limit - self.limit_isim
+
     def is_full_for_student(self, student):
+        if self.limit_isim > 0:
+            if student.isim:
+                return self.limit <= self.enrolled
+            else:
+                return self.limit - self.limit_isim <= self.enrolled - min(self.enrolled_isim, self.limit_isim)
+
         if student.is_zamawiany():
             
             return self.get_limit_for_zamawiane2009() <= self.enrolled - min(self.limit_zamawiane2012, self.enrolled_zam2012)
@@ -388,6 +402,9 @@ class Group(models.Model):
             result -= self.enrolled_zam2012
 
         return result
+
+    def get_count_of_enrolled_non_isim(self, dont_use_cache=False):
+        return self.enrolled - self.enrolled_isim
 
     def get_count_of_queued(self, dont_use_cache=False):
         return self.queued
