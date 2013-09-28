@@ -13,29 +13,28 @@ class GroupForm(ModelForm):
     class Meta:
         model = Group
 
-    # def save(self, commit=True):
-    #     import ipdb;ipdb.set_trace()
-    #     group = super(GroupForm, self).save(commit=False)
-    #     if group.id:
-    #         group.course = Course.simple.select_for_update().get(id=group.course_id)
-    #         old_one = Group.objects.select_for_update().get(id=group.id)
-    #         while old_one.limit < group.limit:
-    #             old_one.limit += 1
-    #             old_one.limit_zamawiane = group.limit_zamawiane
-    #             old_one.limit_zamawiane2012 = group.limit_zamawiane2012
-    #             old_one.save()
-    #             if old_one.queued > 0:
-    #                 Group.do_rearanged(old_one)
-    #
-    #             old_one = Group.objects.select_for_update().get(id=group.id)
-    #             group.enrolled = old_one.enrolled
-    #             group.enrolled_zam = old_one.enrolled_zam
-    #             group.enrolled_zam2012 = old_one.enrolled_zam2012
-    #             group.queued = old_one.queued
-    #
-    #     group.save()
-    #
-    #     return group
+    def save(self, commit=True):
+         group = super(GroupForm, self).save(commit=False)
+         if group.id:
+             group.course = Course.simple.select_for_update().get(id=group.course_id)
+             old_one = Group.objects.select_for_update().get(id=group.id)
+             while old_one.limit < group.limit:
+                 old_one.limit += 1
+                 old_one.limit_zamawiane = group.limit_zamawiane
+                 old_one.limit_zamawiane2012 = group.limit_zamawiane2012
+                 old_one.save()
+                 if old_one.queued > 0:
+                     Group.do_rearanged(old_one)
+
+                 old_one = Group.objects.select_for_update().get(id=group.id)
+                 group.enrolled = old_one.enrolled
+                 group.enrolled_zam = old_one.enrolled_zam
+                 group.enrolled_zam2012 = old_one.enrolled_zam2012
+                 group.queued = old_one.queued
+
+         group.save()
+
+         return group
 
 
 class GroupInline(admin.TabularInline):

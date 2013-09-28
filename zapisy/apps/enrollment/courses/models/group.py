@@ -6,6 +6,7 @@ from django.db.models import Count
 from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
 from django.conf import settings
+from apps.notifications.models import Notification
 
 from course import *
 
@@ -307,11 +308,22 @@ class Group(models.Model):
                 semester = Semester.objects.get_next()
                 current_limit = semester.get_current_limit()
                 if q.student.get_points_with_course(self.course) <= current_limit:
-                    result, _  = self.add_student(q.student, return_group=True)
+                    result, messages  = self.add_student(q.student, return_group=True)
+                    total_queues = 0
                     for old in Queue.objects.filter(deleted=False, student = q.student, priority__lte=q.priority, group__course=self.course, group__type=q.group.type):
                         old.deleted = True
                         old.group.remove_from_queued_counter(q.student)
                         old.save()
+                        total_queues += 1
+                    if isinstance(result, Group):
+                        Notification.send_notification(q.student.user, 'enrolled-again', {'group': self,
+                                                                                     'old_group': result,
+                                                                                     'messages': messages,
+                                                                                     'another_queues': total_queues-1})
+                    else:
+                        Notification.send_notification(q.student.user, 'enrolled', {'group': self,
+                                                                               'messages': messages,
+                                                                               'another_queues': total_queues-1})
 
                     break
                 to_removed.append(q)
@@ -320,6 +332,7 @@ class Group(models.Model):
             queue.deleted = True
             self.remove_from_queued_counter(queue.student)
             queue.save()
+            Notification.send_notification(queue.student.user, 'queue-remove', {'group': self, 'reason': u'Zapis spowodowałby przekroczenie limitu ECTS'})
 
         return result
 
@@ -477,6 +490,13 @@ class Group(models.Model):
                                 unicode(self.get_type_display()), 
                                 unicode(self.get_teacher_full_name()))
 
+    def long_print(self):
+        return "%s: %s - %s" % (unicode(self.course.entity.name),
+                                unicode(self.get_type_display()),
+                                unicode(self.get_teacher_full_name()))
+
+    def get_absolute_url(self):
+        return reverse('records-group', args=[self.id])
 
 def log_add_group(sender, instance, created, **kwargs):
     if Group.disable_update_signal:

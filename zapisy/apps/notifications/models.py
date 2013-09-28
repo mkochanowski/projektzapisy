@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.db import models
+from django.template.loader import render_to_string
 
 
 NOTIFICATION_TYPES = (
@@ -130,9 +131,7 @@ class NotificationManager(models.Manager):
 
     def create_and_get(self, user):
         types = types_list(not user.student is None, not user.employee is None)
-
         used = self.filter(user=user).distinct().values_list('type', flat=True)
-
         new_objects = []
 
         for t in types:
@@ -142,6 +141,13 @@ class NotificationManager(models.Manager):
         self.bulk_create(new_objects)
 
         return self.filter(user=user)
+
+    def user_has_notification_on(self, user, notification):
+        try:
+            preference = self.get_query_set().get(user=user, type=notification)
+            return preference.value and preference
+        except:
+            return False
 
 
 class NotificationPreferences(models.Model):
@@ -155,3 +161,15 @@ class NotificationPreferences(models.Model):
         ordering = ['id']
         verbose_name = u'Ustawienie Notyfikacji'
         verbose_name_plural = u'Ustawienia Notyfikacji'
+
+
+class Notification(object):
+
+    @classmethod
+    def send_notification(cls, user, notification, context):
+        from mailer.models import Message
+
+        preference =  NotificationPreferences.objects.user_has_notification_on(user, notification)
+        if user.email and preference:
+            body = render_to_string('notifications/' + notification + '.html', context)
+            Message.objects.create(to_address=user.email, subject=preference.get_type_display(), message_body=body)
