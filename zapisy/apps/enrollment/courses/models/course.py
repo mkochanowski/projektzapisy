@@ -379,7 +379,7 @@ class Related(models.Manager):
 
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
-        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom')
+        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom', 'entity')
 
 
 class VisibleManager(Related):
