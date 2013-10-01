@@ -147,13 +147,13 @@ class NotificationManager(models.Manager):
             preference = self.get_query_set().get(user=user, type=notification)
             return preference.value and preference
         except:
-            return False
+            return True
 
 
 class NotificationPreferences(models.Model):
     user = models.ForeignKey(User, verbose_name=u'użytkownik')
     type = models.CharField(choices=types_list(True, True), max_length=50, verbose_name=u'typ')
-    value = models.BooleanField(default=False, verbose_name=u'wartość')
+    value = models.BooleanField(default=True, verbose_name=u'wartość')
 
     objects = NotificationManager()
 

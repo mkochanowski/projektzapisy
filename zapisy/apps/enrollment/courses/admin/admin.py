@@ -22,6 +22,7 @@ class GroupForm(ModelForm):
                  old_one.limit += 1
                  old_one.limit_zamawiane = group.limit_zamawiane
                  old_one.limit_zamawiane2012 = group.limit_zamawiane2012
+                 old_one.limit_isim = group.limit_isim
                  old_one.save()
                  if old_one.queued > 0:
                      Group.do_rearanged(old_one)
