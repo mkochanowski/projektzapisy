@@ -144,10 +144,10 @@ class NotificationManager(models.Manager):
 
     def user_has_notification_on(self, user, notification):
         try:
-            preference = self.get_query_set().get(user=user, type=notification)
+            preference = self.get_query_set().get_or_create(user=user, type=notification)
             return preference.value and preference
         except:
-            return True
+            return False
 
 
 class NotificationPreferences(models.Model):
