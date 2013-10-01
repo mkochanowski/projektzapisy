@@ -45,40 +45,45 @@ def votes(request):
 @permission_required('courses.view_stats')
 def swap(request):
     semester = Semester.objects.get_next()
-    courses = Course.objects.filter(semester=semester)
+    courses = Course.objects.filter(semester=semester).select_related('entity')
 
     types = [ ('2', 'ćwiczenia'), ('3', 'pracownia'),
         ('5', 'ćwiczenio-pracownia'),
         ('6', 'seminarium'), ('10', 'projekt')]
 
-    for course in Course.objects.filter(semester=semester):
+    for course in courses:
         course.groups_items = []
 
         for type in types:
-            groups = Group.objects.filter(course=course, type=type[0])
+            groups = Group.objects.filter(course=course, type=type[0]).select_related('course', 'course__entity', 'teacher')
+            queues = {}
             students = {}
             lists = {}
             used = []
 
             for g in groups:
                 lists[g.id] = []
+                queues[g.id] = []
                 for r in Record.objects.filter(group=g, status=1).select_related('student', 'student__user'):
-                    lists[g.id].append(r)
+                    lists[g.id].append(r.student)
                     students[r.student_id] = g
+                for q in Queue.objects.filter(group=g, deleted=False).select_related('student', 'student__user'):
+                    queues[g.id].append(q.student)
 
             for group in groups:
                 group.swaps = []
-                queue = Queue.objects.filter(group=group, deleted=False).select_related('student', 'student__user')
+                queue = queues[group.id]
                 for s in queue:
-                    for sp in lists[group.id]:
-                        if students[sp.student_id] == group and sp.student_id not in used:
-                            used.append(sp.student_id)
-                            group.swaps.append({
-                                'student_in_queue': sp.student,
-                                'student_in_group': s.student,
-                                'to': students[sp.student_id]
-                            })
-
+                    if s.id in students:
+                        for sp in lists[group.id]:
+                            if students[sp.id] == group and sp.id not in used and sp in queues[students[s.id].id]:
+                                used.append(sp.id)
+                                group.swaps.append({
+                                    'student_in_queue': s,
+                                    'student_in_group': sp,
+                                    'to': students[s.id]
+                                })
+                                break
                 course.groups_items.append(group)
 
     return TemplateResponse(request, 'statistics/swap.html', locals())

@@ -19,21 +19,23 @@
                 {% for group in course.groups_items|dictsort:'type' %}
                     {% if group.swaps %}
                     <tr>
-                        <td>{{ group.teacher.user.get_full_name }}</td>
+                        <td><a href="{% url records-group group.id %}">{{ group.teacher.user.get_full_name }}</a></td>
                         <td>{{ group.get_type_display }}</td>
-                        <td><ul>
-                            {% for swap in group.swaps %}
-                                <li>
-                                    <table>
-                                        <tr>
-                                            <td>{{ swap.student_in_queue }}</td>
-                                            <td>{{ swap.student_in_group }}</td>
-                                            <td>{{ swap.to }}</td>
-                                        </tr>
-                                    </table>
-                                </li>
-                            {% endfor %}
-                            </ul>
+                        <td>
+                            <table>
+                                <thead>
+                                    <th>Osoba w kolejce</th>
+                                    <th>Do zamiany z</th>
+                                    <th>z grupy</th>
+                                </thead>
+                                {% for swap in group.swaps %}
+                                            <tr>
+                                                <td>{{ swap.student_in_queue }}</td>
+                                                <td>{{ swap.student_in_group }}</td>
+                                                <td><a href="{% url records-group swap.to.id %}">{{ swap.to }}</a></td>
+                                            </tr>
+                                {% endfor %}
+                            </table>
                         </td>
                     </tr>
                     {% endif %}
