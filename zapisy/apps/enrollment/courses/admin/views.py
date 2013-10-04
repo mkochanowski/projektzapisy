@@ -7,11 +7,13 @@ from sys import exc_info, path
 import codecs
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.admin.views.decorators import staff_member_required
 from django import forms
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from tempfile import NamedTemporaryFile
 from django.template.response import TemplateResponse
 from django.utils.encoding import smart_unicode
@@ -25,6 +27,33 @@ import os
 FEREOL_PATH = os.getcwd()
 path.append(FEREOL_PATH + '/dbimport/schedule')
 from scheduleimport import scheduleimport
+
+@staff_member_required
+@transaction.commit_on_success
+def change_group_limit(request):
+    group_id = request.POST.get('group_id', None)
+    limit = int(request.POST.get('limit', -1))
+
+    if not group_id or limit < 0:
+        raise Http404
+
+    try:
+        course = Course.objects.select_for_update().filter(groups=group_id)
+        group = Group.objects.get(id=group_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    if limit < group.limit:
+        group.limit = limit
+        group.save()
+    else:
+        while group.limit < limit:
+            group.limit += 1
+            group.save()
+            Group.do_rearanged(group)
+
+    url = reverse('admin:%s_%s_change' %(group._meta.app_label,  group._meta.module_name),  args=[group.id])
+    return HttpResponseRedirect(url)
 
 
 
