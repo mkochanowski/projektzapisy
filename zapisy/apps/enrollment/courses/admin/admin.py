@@ -186,9 +186,8 @@ class RecordInlineForm(ModelForm):
 class RecordInline(admin.TabularInline):
     model = Record
     extra = 0
-    raw_id_fields = ("student",)
+    readonly_fields = ('id', 'student', 'status')
     can_delete = False
-    form = RecordInlineForm
 
 class QueuedInlineForm(ModelForm):
     class Meta:
@@ -323,6 +322,9 @@ class GroupAdmin(admin.ModelAdmin):
        return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type').prefetch_related('term')
 
     class Media:
+        css = {
+            "all": ("css/admin/group.css",)
+        }
         js = ("js/admin/group.js",)
 
 

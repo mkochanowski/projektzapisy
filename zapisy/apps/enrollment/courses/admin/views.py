@@ -19,7 +19,9 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import smart_unicode
 from apps.enrollment.courses.models import Course, Semester, Group, Classroom
 from apps.enrollment.courses.models.term import Term
-from apps.users.models import Employee
+from apps.enrollment.records.models import Record
+from apps.enrollment.records.utils import run_rearanged
+from apps.users.models import Employee, Student
 from importschedule import import_semester_schedule
 from apps.enrollment.courses.forms import Parser
 import os
@@ -27,6 +29,53 @@ import os
 FEREOL_PATH = os.getcwd()
 path.append(FEREOL_PATH + '/dbimport/schedule')
 from scheduleimport import scheduleimport
+
+@staff_member_required
+@transaction.commit_on_success
+def add_student(request):
+    group_id = request.POST.get('group_id', None)
+    student_id = int(request.POST.get('student', -1))
+
+    if not group_id or student_id < 0:
+        raise Http404
+
+    try:
+        course = Course.objects.select_for_update().filter(groups=group_id)
+        group = Group.objects.get(id=group_id)
+        student = Student.objects.get(id=student_id)
+    except ObjectDoesNotExist:
+        raise Http404
+
+    result, __ = group.add_student(student)
+    if result:
+        run_rearanged(result, group)
+
+    url = reverse('admin:%s_%s_change' %(group._meta.app_label,  group._meta.module_name),  args=[group.id])
+    return HttpResponseRedirect(url)
+
+
+@staff_member_required
+@transaction.commit_on_success
+def remove_student(request):
+    group_id = request.POST.get('group_id', None)
+    recordid = int(request.POST.get('recordid', -1))
+
+    if not group_id or recordid < 0:
+        raise Http404
+
+    try:
+        course = Course.objects.select_for_update().filter(groups=group_id)
+        group = Group.objects.get(id=group_id)
+        student = Record.objects.get(id=recordid).student
+    except ObjectDoesNotExist:
+        raise Http404
+
+    result, messages_list = group.remove_student(student)
+    if result:
+        run_rearanged(result, group)
+
+    url = reverse('admin:%s_%s_change' %(group._meta.app_label,  group._meta.module_name),  args=[group.id])
+    return HttpResponseRedirect(url)
 
 @staff_member_required
 @transaction.commit_on_success
