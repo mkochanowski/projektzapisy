@@ -11,9 +11,10 @@ from apps.users.models import *
 
 def run_rearanged(result, group=None):
     def test_course(group):
+        import datetime
         course = group.course
         semester = course.semester
-        now = datetime.now()
+        now = datetime.datetime.now()
 
         if semester.records_closing < now or not (course.records_start and course.records_end
                                                   and course.records_start <= now < course.records_end):
