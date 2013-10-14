@@ -605,10 +605,15 @@ class Course(models.Model):
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
 
-        if self.records_start and self.records_end and self.records_start <= datetime.datetime.now() <= self.records_end:
+        now = datetime.datetime.now()
+
+        if self.records_start and self.records_end and self.records_start <= now <= self.records_end:
             return True
 
-        if records_opening and self.is_opened(student) and datetime.datetime.now() < records_closing:
+        if records_opening and self.is_opened(student) and now < records_closing:
+            return True
+
+        if self.records_start and self.records_end and self.records_start <= now < self.records_end:
             return True
 
         return False
