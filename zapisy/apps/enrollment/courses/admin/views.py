@@ -99,7 +99,7 @@ def change_group_limit(request):
         while group.limit < limit:
             group.limit += 1
             group.save()
-            Group.do_rearanged(group)
+            run_rearanged(None, group)
 
     url = reverse('admin:%s_%s_change' %(group._meta.app_label,  group._meta.module_name),  args=[group.id])
     return HttpResponseRedirect(url)

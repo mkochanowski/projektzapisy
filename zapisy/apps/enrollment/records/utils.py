@@ -8,15 +8,28 @@ from apps.enrollment.courses.models import Term
 from apps.enrollment.records.models import *
 from apps.users.models import *
 
-def run_rearanged(result, group=None):
 
-    if isinstance(result, QuerySet):
+def run_rearanged(result, group=None):
+    def test_course(group):
+        course = group.course
+        semester = course.semester
+        now = datetime.now()
+
+        if semester.records_closing < now or not (course.records_start and course.records_end
+                                                  and course.records_start <= now < course.records_end):
+            return False
+
+        return True
+
+
+    if isinstance(result, QuerySet) and test_course(result[0]):
         for g in result:
             Group.do_rearanged(g.group)
-    elif isinstance(result, Group):
+
+    elif isinstance(result, Group) and test_course(result):
         Group.do_rearanged(result)
 
-    if group and group.should_be_rearranged():
+    if group and group.should_be_rearranged() and test_course(group):
         Group.do_rearanged(group)
 
 def prepare_courses_with_terms(terms, records = None):
