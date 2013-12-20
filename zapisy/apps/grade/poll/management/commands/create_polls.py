@@ -1,5 +1,4 @@
 from django.core.management.base import BaseCommand, CommandError
-from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.origin import Origin
 from apps.grade.poll.models.poll import Poll
 from apps.grade.poll.models.section import SectionOrdering
@@ -14,6 +13,8 @@ class Command(BaseCommand):
     help = 'Tworzy ankiety dla semestru. W przypadku braku argumentu bierze aktualny.'
 
     def handle(self, *args, **options):
+	from apps.enrollment.courses.models.semester import Semester
+
         if len(args) > 0:
             semester  = Semester.objects.get(id=args[0])
         else:

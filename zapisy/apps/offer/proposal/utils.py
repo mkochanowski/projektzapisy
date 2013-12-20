@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from apps.enrollment.courses.models.course import CourseEntity
+from apps.enrollment.courses.models.course import CourseEntity, CourseDescription
 from apps.offer.proposal.models.proposal import Proposal
 
 
@@ -15,12 +15,12 @@ def proposal_for_offer(slug):
     return None
 
 
-
 def employee_proposal(user, slug):
     if slug:
         try:
             proposal = CourseEntity.get_employee_proposal(user, slug)
-        except ObjectDoesNotExist:
+            proposal.information = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
+        except (ObjectDoesNotExist, IndexError) as e:
             raise Http404
     else:
         proposal = None

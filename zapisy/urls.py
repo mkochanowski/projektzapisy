@@ -21,7 +21,7 @@ urlpatterns = patterns('',
     url('^gdzie_ma_rimmon/$', 'apps.users.views.rimmon', name='rimmon'), #easter egg
     (r'^courses/', include('apps.enrollment.courses.urls')),
     (r'^records/', include('apps.enrollment.records.urls')),
-    (r'^statistics/', include('apps.enrollment.statistics.urls')),
+    (r'^statistics/', include('apps.statistics.urls', namespace='statistics')),
     url(r'^consultations/$', 'apps.users.views.consultations_list', name="consultations-list"),
 
     (r'^news/', include('apps.news.urls')),
@@ -37,6 +37,9 @@ urlpatterns = patterns('',
 
     (r'^fereol_admin/courses/import_semester', 'apps.enrollment.courses.admin.views.import_semester'),
     (r'^fereol_admin/courses/import_schedule', 'apps.enrollment.courses.admin.views.import_schedule'),
+    url(r'^fereol_admin/courses/group/change_limit', 'apps.enrollment.courses.admin.views.change_group_limit', name='change-group-limit'),
+    (r'^fereol_admin/courses/group/remove_student', 'apps.enrollment.courses.admin.views.remove_student'),
+    (r'^fereol_admin/courses/group/add_student', 'apps.enrollment.courses.admin.views.add_student'),
     (r'^fereol_admin/courses/finish_schedule_import', 'apps.enrollment.courses.admin.views.finish_import_schedule'),
     (r'^fereol_admin/users/export_zamawiani', 'apps.users.admin.views.export_zamawiani'),
     (r'^fereol_admin/users/import_zamawiani', 'apps.users.admin.views.import_zamawiani'),

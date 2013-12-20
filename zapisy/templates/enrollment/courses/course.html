@@ -86,15 +86,19 @@
                                 {{ t.limit_non_zamawiane }}
                                 {% if t.limit_zamawiane %} + {{ t.limit_zamawiane }}{% endif %}
                                 {% if t.limit_zamawiane2012 %} + {{ t.limit_zamawiane2012 }}{% endif %}
+                            {% elif t.limit_isim  %}
+                                {{ t.limit_non_isim }}
+                                {% if t.limit_isim %} + {{ t.limit_isim }}{% endif %}
                             {% else %}
                                 {{ t.limit }}
                             {% endif %}
                         </td>
                         <td class="number termEnrolledCount">
-                            {% if t.limit_zamawiane or t.limit_zamawiane2012 %}
+                            {% if t.limit_zamawiane or t.limit_zamawiane2012 or t.limit_isim %}
                                 {{ t.get_count_of_enrolled_non_zamawiane }}
                                 {% if t.limit_zamawiane %} + {{ t.get_count_of_enrolled_zamawiane }}{% endif %}
                                 {% if t.limit_zamawiane2012 %} + {{ t.get_count_of_enrolled_zamawiane2012 }}{% endif %}
+                                {% if t.limit_isim %} + {{ t.enrolled_isim }}{% endif %}
                             {% else %}
                                 {{ t.enrolled }}
                             {% endif %}

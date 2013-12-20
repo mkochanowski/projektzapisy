@@ -25,18 +25,16 @@ class VoteFormset(object):
 
     """
 
-
-
     def __init__(self, post, *args, **kwargs):
         from django.forms.models import modelformset_factory
         tag             = kwargs.pop('tag',        None)
         student         = kwargs.pop('student',    None)
         state           = kwargs.pop('state',    None)
         semester_id     = None
-        self.correction = kwargs.pop('correction', None)
+        self.correction = kwargs.pop('correction', False)
 
         query = {}
-        query['status'] = 2
+        query['status'] = 3
         query['deleted'] = False
 
         if tag == 'winter':
@@ -120,16 +118,18 @@ class VoteFormsets():
         self.winter = None
         self.unknown = None
         if state.is_correction_active():
-            self.points_limit = SingleVote.limit_in_summer_correction(student, state)
+            self.points_limit = 0
+
             if state.is_summer_correction_active():
+                self.points_limit += SingleVote.limit_in_summer_correction(student, state)
                 self.summer  = VoteFormset(post,
                                            student    = student,
                                            tag        = 'summer',
                                            state      = state,
                                            correction = True)
 
-
             if state.is_winter_correction_active():
+                self.points_limit += SingleVote.limit_in_winter_correction(student, state)
                 self.winter  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'winter',
@@ -144,17 +144,14 @@ class VoteFormsets():
             self.summer  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'summer',
-                                        state      = state,
-                                       correction = False)
+                                       state      = state)
             self.winter  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'winter',
-                                       state      = state,
-                                       correction = False)
+                                       state      = state)
             self.unknown = VoteFormset(post,
                                        student    = student,
-                                       state      = state,
-                                       correction = False)
+                                       state      = state)
             self.errors = []
 
 
@@ -170,10 +167,6 @@ class VoteFormsets():
         return points
     
     def is_valid(self):
-
-
-
-
         is_valid = (not self.summer or self.summer.is_valid()) and\
                    (not self.winter or self.winter.is_valid()) and\
                    (not self.unknown or self.unknown.is_valid())

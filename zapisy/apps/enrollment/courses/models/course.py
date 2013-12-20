@@ -4,50 +4,87 @@ from datetime import date
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-
+from django.utils.encoding import smart_unicode
 from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
-from django.db.models import signals
 from django.core.cache import cache as mcache
-from django.utils.encoding import smart_unicode
 from apps.enrollment.courses.models.tag import Tag
 
 from apps.offer.proposal.exceptions import NotOwnerException
-import settings
-from student_options import StudentOptions
 
 import logging
-from timedelta.fields import TimedeltaField
+
 logger = logging.getLogger()
 
 
 class WithInformation(models.Manager):
     """ Manager for course objects with visible semester """
+
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
         return super(WithInformation, self).get_query_set().select_related('information')
 
+
 class NoRemoved(WithInformation):
     """ Manager for course objects with visible semester """
+
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
         return super(NoRemoved, self).get_query_set().filter(deleted=False, owner__isnull=False)
 
 
 class SimpleManager(models.Manager):
-
     def get_with_opening(self, student):
         return self.ex
+
 
 class DefaultCourseManager(models.Manager):
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
         return super(DefaultCourseManager, self).get_query_set().select_related('entity', 'information')
 
-statuses = ((0, u'Wersja robocza'),(1, u'W ofercie'),(2, u'Poddana pod głosowanie'),)
+
+class StatisticsManager(models.Manager):
+    def in_year(self, year=None):
+        from apps.offer.vote.models import SystemState
+
+        if not year:
+            year = date.today().year
+
+        state = SystemState.get_state(year)
+
+        #TODO: po przeniesieniu wszystkich metod do managerów filtrowanie na
+        #  status powinno byc  z dziedziczenia
+        return self.get_query_set().filter(status=3)\
+            .select_related('type', 'owner', 'owner__user')\
+            .order_by('name')\
+            .extra(
+                select={
+                    'votes': "COALESCE((SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE"
+                             " vote_singlevote.entity_id = courses_courseentity.id"
+                             " AND vote_singlevote.state_id = %d), 0)" % state.id,
+                    'voters': "SELECT COUNT(*) FROM vote_singlevote WHERE"
+                              " vote_singlevote.entity_id = courses_courseentity.id "
+                              "AND vote_singlevote.correction > 0 "
+                              "AND vote_singlevote.state_id = %d" % state.id,
+                    'maxpoints_votes': "COALESCE((SELECT SUM(vote_singlevote.correction) FROM vote_singlevote WHERE"
+                              " vote_singlevote.correction = 3 "
+                             " AND vote_singlevote.entity_id = courses_courseentity.id"
+                             " AND vote_singlevote.state_id = %d), 0)" % state.id,
+                    'maxpoints_voters': "SELECT COUNT(*) FROM vote_singlevote WHERE"
+                              " vote_singlevote.entity_id = courses_courseentity.id "
+                              "AND vote_singlevote.correction = 3 "
+                              "AND vote_singlevote.state_id = %d" % state.id
+                }
+            )
+
+
+statuses = ((0, u'Wersja robocza'), (1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
+            (3, u'Poddana pod głosowanie 2013'), (4, u'Wycofany z oferty'),)
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
-ectslist = [(x, str(x)) for x in range(1, 16) ]
+ectslist = [(x, str(x)) for x in range(1, 16)]
+
 
 class CourseEntity(models.Model):
     """entity of particular course title"""
@@ -55,62 +92,64 @@ class CourseEntity(models.Model):
     information = models.ForeignKey('CourseDescription', null=True, blank=True)
 
     #Test name
-    name         = models.CharField(max_length=100,
-                              verbose_name='nazwa')
-    shortName    = models.CharField(max_length=30,
-                              verbose_name='skrócona nazwa',
-                              null=True, blank=True,
-                              help_text=u'Opcjonalna skrócona nazwa, używana na np. planie. Przykłady: JFiZO, AiSD')
-    status   = models.IntegerField(choices=statuses, default=1, help_text=u'Wersja robocza widoczna jest jedynie dla jej autora')
+    name = models.CharField(max_length=100,
+                            verbose_name='nazwa')
+    shortName = models.CharField(max_length=30,
+                                 verbose_name='skrócona nazwa',
+                                 null=True, blank=True,
+                                 help_text=u'Opcjonalna skrócona nazwa, używana na np. planie. Przykłady: JFiZO, AiSD')
+    status = models.IntegerField(choices=statuses, default=1,
+                                 help_text=u'Wersja robocza widoczna jest jedynie dla jej autora')
 
     semester = models.CharField(max_length=1, choices=semesters, default='u', verbose_name='semestr')
 
-    type         = models.ForeignKey('Type',
-                              verbose_name='rodzaj',
-                              null=True)
-    english      = models.BooleanField(default=False,
-                                verbose_name='przedmiot prowadzony w j.angielskim')
-    exam         = models.BooleanField(verbose_name='egzamin',
-                                default=True)
+    type = models.ForeignKey('Type',
+                             verbose_name='rodzaj',
+                             null=True)
+    english = models.BooleanField(default=False,
+                                  verbose_name='przedmiot prowadzony w j.angielskim')
+    exam = models.BooleanField(verbose_name='egzamin',
+                               default=True)
 
     suggested_for_first_year = models.BooleanField(verbose_name='polecany dla pierwszego roku')
 
-
-    web_page     = models.URLField(verbose_name='strona www', null=True, blank=True)
-    ects         = models.IntegerField(null=True, blank=True)
+    web_page = models.URLField(verbose_name='strona www', null=True, blank=True)
+    ects = models.IntegerField(null=True, blank=True)
     lectures = models.IntegerField(null=True, blank=True, verbose_name=u'godzin wykładu')
-    exercises  = models.IntegerField(null=True, blank=True, verbose_name=u'godzin ćwiczeń')
-    laboratories  = models.IntegerField(null=True, blank=True, verbose_name=u'godzin pracowni')
+    exercises = models.IntegerField(null=True, blank=True, verbose_name=u'godzin ćwiczeń')
+    laboratories = models.IntegerField(null=True, blank=True, verbose_name=u'godzin pracowni')
     repetitions = models.IntegerField(null=True, blank=True, verbose_name=u'godzin repetytorium')
-    seminars = models.IntegerField( null=True, blank=True, verbose_name=u'godzin seminariów')
+    seminars = models.IntegerField(null=True, blank=True, verbose_name=u'godzin seminariów')
     exercises_laboratiories = models.IntegerField(null=True, blank=True, verbose_name=u'godzin ćwiczenio-pracowni')
 
     deleted = models.BooleanField(verbose_name='ukryty', default=False)
-    owner   = models.ForeignKey('users.Employee', verbose_name='opiekun', blank=True, null=True)
-    slug    = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik (nazwa pojawiająca się w urlach)', null=True)
+    owner = models.ForeignKey('users.Employee', verbose_name='opiekun', blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik (nazwa pojawiająca się w urlach)',
+                            null=True)
 
     created = models.DateTimeField(verbose_name='Utworzono', auto_now_add=True)
-    edited  = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now=True)
+    edited = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now=True)
 
     in_prefs = models.BooleanField(verbose_name='w preferencjach', default=True)
 
+    dyskretna_l = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Dyskretna (L)')
+    numeryczna_l = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Numeryczna (L)')
+    algorytmy_l = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Algorytmy (L)')
+    programowanie_l = models.BooleanField(default=False,
+                                          verbose_name=u'Przedmiot posiada również wersje: Programowanie (L)')
 
-    dyskretna_l     = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Dyskretna (L)')
-    numeryczna_l    = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Numeryczna (L)')
-    algorytmy_l     = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Algorytmy (L)')
-    programowanie_l = models.BooleanField(default=False, verbose_name=u'Przedmiot posiada również wersje: Programowanie (L)')
+    usos_kod = models.CharField(max_length=20, null=True, blank=True, default='', verbose_name=u'Kod przedmiotu w usos',
+                                help_text='UWAGA! Nie edytuj tego pola sam!')
 
-    usos_kod = models.CharField(max_length=20, null=True, blank=True, default='', verbose_name=u'Kod przedmiotu w usos', help_text='UWAGA! Nie edytuj tego pola sam!')
-
-    ue = models.BooleanField(default=False, verbose_name=u'Przedmiot prowadzony przy pomocy środków pochodzących z Unii Europejskiej')
-
+    ue = models.BooleanField(default=False,
+                             verbose_name=u'Przedmiot prowadzony przy pomocy środków pochodzących z Unii Europejskiej')
 
     tags = models.ManyToManyField(Tag, through='TagCourseEntity')
 
-    objects   = WithInformation()
-    simple    = models.Manager()
+    objects = WithInformation()
+    simple = models.Manager()
     noremoved = NoRemoved()
-
+    statistics = StatisticsManager()
 
 
     def get_lectures(self):
@@ -130,7 +169,8 @@ class CourseEntity(models.Model):
 
     def get_exercises_laboratiories(self):
         return self.exercises_laboratiories + self.information.exercises_laboratories
-#
+
+    #
 
     def save(self, *args, **kwargs):
         """
@@ -184,7 +224,6 @@ class CourseEntity(models.Model):
             return None
 
 
-
     def get_short_name(self):
         """
         If entity have shortName (e.g. JFiZO for Języki Formalne i Złożoność Obliczeniowa) return it.
@@ -201,7 +240,6 @@ class CourseEntity(models.Model):
     @property
     def description(self):
         return self.information.description
-
 
 
     @property
@@ -286,13 +324,15 @@ class CourseEntity(models.Model):
             year = date.today().year
         current_state = SystemState.get_state(year)
 
-        votes = SingleVote.objects.filter(value__gte=1, state=current_state, entity=self).select_related('student', 'student__user').order_by('student__matricula')
+        votes = SingleVote.objects.filter(value__gte=1, state=current_state, entity=self).select_related('student',
+                                                                                                         'student__user').order_by(
+            'student__matricula')
 
         return [vote.student for vote in votes]
 
     @staticmethod
     def get_vote():
-        return CourseEntity.noremoved.filter(status=2)
+        return CourseEntity.noremoved.filter(status=3)
 
     @staticmethod
     def get_voters():
@@ -306,12 +346,19 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposals():
-        return CourseEntity.noremoved.filter(status__gte=1)\
-                .select_related('type', 'owner', 'owner__user')
+        return CourseEntity.noremoved.filter(status__gte=1) \
+            .select_related('type', 'owner', 'owner__user')
 
     @staticmethod
     def get_proposal(slug):
-        return CourseEntity.noremoved.get(slug=slug)
+        proposal = CourseEntity.noremoved.get(slug=slug)
+        try:
+            information = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
+        except IndexError:
+            information = None
+
+        proposal.information = information
+        return proposal
 
     @staticmethod
     def get_employee_proposals(user):
@@ -326,34 +373,39 @@ class CourseEntity(models.Model):
         else:
             raise NotOwnerException
 
+
 class Related(models.Manager):
     """ Manager for course objects with visible semester """
+
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
-        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom')
+        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom', 'entity')
+
 
 class VisibleManager(Related):
     """ Manager for course objects with visible semester """
+
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
         return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
 
-class Course( models.Model ):
+
+class Course(models.Model):
     """
     Instacja Przedmiotu w danym przedmiocie
     """
-    entity      = models.ForeignKey(CourseEntity, verbose_name='podstawa przedmiotu')
+    entity = models.ForeignKey(CourseEntity, verbose_name='podstawa przedmiotu')
     information = models.ForeignKey('CourseDescription', verbose_name='opis', null=True, blank=True)
 
     slug = models.SlugField(max_length=255, unique=True, verbose_name='odnośnik', null=True)
     semester = models.ForeignKey('Semester', null=True, verbose_name='semestr')
     teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący', blank=True)
 
-    notes    = models.TextField(null=True, blank=True, verbose_name='uwagi do tej edyci przedmiotu')
-    web_page = models.URLField( verbose_name = 'Strona WWW przedmiotu',
-                                verify_exists= True,
-								blank        = True,
-                                null         = True )
+    notes = models.TextField(null=True, blank=True, verbose_name='uwagi do tej edyci przedmiotu')
+    web_page = models.URLField(verbose_name='Strona WWW przedmiotu',
+                               verify_exists=True,
+                               blank=True,
+                               null=True)
 
     english = models.BooleanField(default=False, verbose_name='przedmiot prowadzony w j.angielskim')
     #chceck this!
@@ -518,6 +570,7 @@ class Course( models.Model ):
     def student_is_in_ects_limit(self, student):
         #TODO: test me!
         from apps.enrollment.courses.models import Semester
+
         semester = Semester.get_current_semester()
 
         return semester.get_current_limit() < student.get_ects_with_course(semester, self)
@@ -525,14 +578,17 @@ class Course( models.Model ):
 
     def get_all_enrolled_emails(self):
         from apps.enrollment.records.models import Record
-        return Record.objects.filter(group__course=self, status='1').values_list('student__user__email', flat=True).distinct()
+
+        return Record.objects.filter(group__course=self, status='1').values_list('student__user__email',
+                                                                                 flat=True).distinct()
 
 
     def votes_count(self, semester=None):
         from apps.offer.vote.models import SingleVote
-        return SingleVote.objects\
-                 .filter(Q(course=self), Q(state__semester_summer=self.semester) | Q(state__semester_winter=self.semester))\
-                 .count()
+
+        return SingleVote.objects \
+            .filter(Q(course=self), Q(state__semester_summer=self.semester) | Q(state__semester_winter=self.semester)) \
+            .count()
 
     def is_opened(self, student):
         try:
@@ -549,10 +605,15 @@ class Course( models.Model ):
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
 
-        if self.records_start and self.records_end and self.records_start <= datetime.datetime.now() <= self.records_end:
+        now = datetime.datetime.now()
+
+        if self.records_start and self.records_end and self.records_start <= now <= self.records_end:
             return True
 
-        if records_opening and self.is_opened(student) and datetime.datetime.now() < records_closing:
+        if records_opening and self.is_opened(student) and now < records_closing:
+            return True
+
+        if self.records_start and self.records_end and self.records_start <= now < self.records_end:
             return True
 
         return False
@@ -563,8 +624,10 @@ class Course( models.Model ):
         from apps.offer.vote.models.single_vote import SingleVote
 
         try:
-            vote = SingleVote.objects.get(Q(course=self), Q(student=student), Q(state__semester_winter=self.semester) | Q(state__semester_summer=self.semester) )
-            interval = datetime.timedelta(minutes=(-1440)*vote.correction+4320)
+            vote = SingleVote.objects.get(Q(course=self), Q(student=student),
+                                          Q(state__semester_winter=self.semester) | Q(
+                                              state__semester_summer=self.semester))
+            interval = datetime.timedelta(minutes=(-1440) * vote.correction + 4320)
         except ObjectDoesNotExist:
             interval = datetime.timedelta(minutes=4320)
 
@@ -595,10 +658,9 @@ class Course( models.Model ):
         return self.entity.get_points(student)
 
 
-
-    def serialize_for_ajax(self, student = None, is_recording_open = None):
+    def serialize_for_ajax(self, student=None, is_recording_open=None):
         from django.core.urlresolvers import reverse
-        
+
         data = {
             'id': self.pk,
             'name': self.name,
@@ -606,7 +668,8 @@ class Course( models.Model ):
             'type': self.type.id and self.type.id or 1,
             'url': reverse('course-page', args=[self.slug]),
             'is_recording_open': is_recording_open is not None and is_recording_open or (False if (student is None) else \
-                self.is_recording_open_for_student(student))
+                                                                                             self.is_recording_open_for_student(
+                                                                                                 student))
         }
 
         return data
@@ -634,9 +697,14 @@ class Course( models.Model ):
     @staticmethod
     def get_student_courses_in_semester(student, semester):
         from apps.enrollment.records.models import Record
-        return Record.objects.select_related('group', 'group__teacher', 'group__course', 'group__course__entity').prefetch_related('group__term', 'group__term__classrooms').filter(status='1', student=student, group__course__semester=semester).\
-                    extra(select={'points': 'SELECT value FROM courses_studentpointsview WHERE student_id='
-                            + str(student.id) + ' AND entity_id=courses_course.entity_id' }).order_by('group__course__entity__name')
+
+        return Record.objects.select_related('group', 'group__teacher', 'group__course',
+                                             'group__course__entity').prefetch_related('group__term',
+                                                                                       'group__term__classrooms').filter(
+            status='1', student=student, group__course__semester=semester). \
+            extra(select={'points': 'SELECT value FROM courses_studentpointsview WHERE student_id='
+                                    + str(student.id) + ' AND entity_id=courses_course.entity_id'}).order_by(
+            'group__course__entity__name')
 
     class Meta:
         verbose_name = 'przedmiot'
@@ -644,21 +712,22 @@ class Course( models.Model ):
         app_label = 'courses'
         ordering = ['entity__name']
         permissions = (
-                    ("view_stats", u"Może widzieć statystyki"),
-                )
-    
+            ("view_stats", u"Może widzieć statystyki"),
+        )
+
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.get_semester_name())
 
+
 def recache(sender, **kwargs):
     mcache.clear()
+
 #
 #signals.post_save.connect(recache)
 #signals.post_delete.connect(recache)
 
 
 class CourseDescription(models.Model):
-
     """
     Przechowuje rewizję informacji o przedmiocie.
     Powiązania: :model:'course.CourseEntity'
@@ -671,14 +740,14 @@ class CourseDescription(models.Model):
 
     description = models.TextField(verbose_name='opis', blank=True, default='')
 
-    lectures     = models.IntegerField(verbose_name=u'różnica w godzinach wykładu', blank=True, null=True, default=0)
-    repetitions  = models.IntegerField(verbose_name=u'różnica w godzinach repetytoriów', blank=True,null=True, default=0)
-    exercises    = models.IntegerField(verbose_name=u'różnica w godzinach ćwiczeń', blank=True, null=True, default=0)
+    lectures = models.IntegerField(verbose_name=u'różnica w godzinach wykładu', blank=True, null=True, default=0)
+    repetitions = models.IntegerField(verbose_name=u'różnica w godzinach repetytoriów', blank=True, null=True,
+                                      default=0)
+    exercises = models.IntegerField(verbose_name=u'różnica w godzinach ćwiczeń', blank=True, null=True, default=0)
     laboratories = models.IntegerField(verbose_name=u'różnica w godzinach pracowni', blank=True, null=True, default=0)
-    seminars     = models.IntegerField(default=0, null=True, blank=True, verbose_name=u'różnica w godzinach seminariów')
-    exercises_laboratories = models.IntegerField(verbose_name=u'różnica w godzinach ćw+prac', blank=True, null=True, default=0)
-
-
+    seminars = models.IntegerField(default=0, null=True, blank=True, verbose_name=u'różnica w godzinach seminariów')
+    exercises_laboratories = models.IntegerField(verbose_name=u'różnica w godzinach ćw+prac', blank=True, null=True,
+                                                 default=0)
 
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     exam = models.BooleanField(verbose_name='egzamin')
@@ -686,14 +755,16 @@ class CourseDescription(models.Model):
     created = models.DateTimeField(auto_now_add=True, auto_now=True)
 
 
-    def __unicode__(self):
-        return smart_unicode(self.created) + ' ' + smart_unicode(self.entity)
-
     class Meta:
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
         app_label = 'courses'
 
+    def __unicode__(self):
+        title = smart_unicode(self.created) + " - "
+        if self.author:
+            title = title + smart_unicode(self.author)
+        return title
 
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)

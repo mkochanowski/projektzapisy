@@ -22,14 +22,14 @@
                         <table>
                     	    <thead><tr>
                                 <th style="width:400px;">Przedmiot</th>
-                                <th>Prowadzony w tym roku?</th>
+{#                                <th>Prowadzony w tym roku?</th>#}
                                 <th>Punkty w głosowaniu</th>
                                 <th>Punkty w korekcie</th>
                     	    </tr></thead>
                     		{% for vote in semester.list %}
                                 <tr>
                                     <td style="width:400px;"><a href="{% url offer-page vote.entity.slug %}">{{ vote.entity.name }}</a> </td>
-                                    <td>{{ vote.in_semester|yesno:"Tak,Nie,Nie wiadomo" }}</td>
+{#                                    <td>{{ vote.in_semester|yesno:"Tak,Nie,Nie wiadomo" }}</td>#}
                                     <td>{{ vote.value }}</td>
                                     <td>{% if vote.in_semester %}{{ vote.correction }}{% else %}--{% endif %}</td>
                                 </tr>

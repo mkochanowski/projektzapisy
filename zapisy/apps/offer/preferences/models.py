@@ -8,7 +8,6 @@ from django.db import models
 from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.users.models import Employee
-from apps.offer.proposal.models import Proposal
 from apps.offer.preferences.exceptions import *
 
 PREFERENCE_CHOICES = (
@@ -85,8 +84,6 @@ class Preference(models.Model):
                                      verbose_name='ćwiczenio-pracownia')
     seminar        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
                                      verbose_name='seminarium')
-    project        = models.IntegerField(choices=PREFERENCE_CHOICES, null=True, blank=True,
-                                     verbose_name='projekt')
 
     
     class Meta:

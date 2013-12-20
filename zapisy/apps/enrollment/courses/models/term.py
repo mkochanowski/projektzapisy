@@ -124,6 +124,7 @@ class Term(models.Model):
         return "%s %s-%s%s" % (self.get_dayOfWeek_display_short(), self.start_time.strftime("%H:%M"), self.end_time.strftime("%H:%M"), classrooms)
 
 def log_edit_term(sender, instance, **kwargs):
+    return
     try:
         term = instance
         old_term = Term.objects.get(id=term.id)
@@ -144,6 +145,7 @@ def log_edit_term(sender, instance, **kwargs):
         pass
 
 def log_add_term(sender, instance, created, **kwargs):
+    return
     term = instance
     if term.classroom and hasattr(term.classroom, "number"):
         number = term.classroom.number
@@ -155,6 +157,7 @@ def log_add_term(sender, instance, created, **kwargs):
         backup_logger.info(message)
         
 def log_delete_term(sender, instance, **kwargs):
+    return
     term = instance
     words = [term.dayOfWeek,str(term.start_time),str(term.end_time)]
     if term.classroom:

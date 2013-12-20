@@ -81,6 +81,7 @@
                     </li>
                     <li{% block grade_active %}{% endblock %}><a href="{% url grade-main %}">Ocena Zajęć</a></li>
                     <li{% block offer_active %}{% endblock %}><a href="{% url offer-main %}">Oferta</a></li>
+                    {% if perms.courses.view_stats %}<li{% block statistics_active %}{% endblock %}><a href="{% url statistics:main %}">Statystyki</a></li>{% endif %}
                     <li{% block events_active %}{% endblock %}><a href="{% url events:classrooms %}">Sale <span style="color:red;font-size: 10px">beta</span></a></li>
 
                 </ul>

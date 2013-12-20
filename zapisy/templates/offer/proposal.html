@@ -69,7 +69,7 @@
             </tr>{% endif %}
             <tr>
                 <th>Wymagania</th>
-                <td>{% if course.requirements.all %}{{ course.requirements.all|join:", " }}{% else %}Brak{% endif %}</td>
+                <td>{% if course.information.requirements.all %}{{ course.information.requirements.all|join:", " }}{% else %}Brak{% endif %}</td>
             </tr>
         {% if course.created %}
             <tr>
