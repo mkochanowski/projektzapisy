@@ -10,7 +10,7 @@ from django.db.models import Q
 from apps.offer.preferences.models import Preference
 
 class PreferenceAdmin(admin.ModelAdmin):
-    list_display =  ('employee', 'proposal', 'lecture', 'review_lecture','tutorial','lab','tutorial_lab','seminar','project',)
+    list_display =  ('employee', 'proposal', 'lecture', 'review_lecture','tutorial','lab','tutorial_lab','seminar',)
     list_filter = ('employee', 'proposal',)
     search_fields = ('employee__user__first_name','employee__user__last_name', 'proposal__name')
 
@@ -22,7 +22,7 @@ class PreferenceAdmin(admin.ModelAdmin):
        qs = super(PreferenceAdmin, self).queryset(request)
        return qs.filter(Q(lecture__isnull=False)|Q(review_lecture__isnull=False)
                         |Q(tutorial__isnull=False)|Q(lab__isnull=False)|Q(tutorial_lab__isnull=False)
-                        |Q(seminar__isnull=False)|Q(project__isnull=False))
+                        |Q(seminar__isnull=False))
 
 
 #    list_display = ('course', 'teacher','type','limit','limit_zamawiane','get_terms_as_string')
