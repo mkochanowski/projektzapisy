@@ -6,7 +6,6 @@ from django.db import models
 import json
 from django.db.models import Q
 from autoslug import AutoSlugField
-from apps.schedule.models import Term
 
 floors = [(0, 'Parter'), (1, 'I piętro'), (2, 'II Piętro'), (3, 'III piętro')]
 types = [(0, u'Sala wykładowa'), (1, u'Sala ćwiczeniowa'), (2, u'Pracownia komputerowa - Windows'), (3, u'Pracownia komputerowa - Linux')]
@@ -53,6 +52,8 @@ class Classroom( models.Model ):
 
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
+        from apps.schedule.models import Term
+
         rooms = cls.get_in_institute(reservation=True)
         terms = Term.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
 

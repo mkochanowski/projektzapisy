@@ -118,16 +118,18 @@ class VoteFormsets():
         self.winter = None
         self.unknown = None
         if state.is_correction_active():
-            self.points_limit = SingleVote.limit_in_summer_correction(student, state)
+            self.points_limit = 0
+
             if state.is_summer_correction_active():
+                self.points_limit += SingleVote.limit_in_summer_correction(student, state)
                 self.summer  = VoteFormset(post,
                                            student    = student,
                                            tag        = 'summer',
                                            state      = state,
                                            correction = True)
 
-
             if state.is_winter_correction_active():
+                self.points_limit += SingleVote.limit_in_winter_correction(student, state)
                 self.winter  = VoteFormset(post,
                                        student    = student,
                                        tag        = 'winter',
@@ -165,10 +167,6 @@ class VoteFormsets():
         return points
     
     def is_valid(self):
-
-
-
-
         is_valid = (not self.summer or self.summer.is_valid()) and\
                    (not self.winter or self.winter.is_valid()) and\
                    (not self.unknown or self.unknown.is_valid())

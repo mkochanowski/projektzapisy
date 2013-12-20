@@ -187,7 +187,7 @@ class Freeday(models.Model):
         verbose_name_plural = 'dni wolne od zajęć'
         app_label = 'courses'
 
-DAYS_OF_WEEK = [( '1', 'poniedziałek' ), ( '2', 'wtorek' ), ( '3', 'środa' ), ( '4', 'czwartek'), ( '5', 'piątek'), ( '6', 'sobota'), ( '7', 'niedziela')]
+DAYS_OF_WEEK = [( '1', u'poniedzalek' ), ( '2', u'wtorek' ), ( '3', u'sroda' ), ( '4', u'czwartek'), ( '5', u'piatek'), ( '6', u'sobota'), ( '7', u'niedziela')]
 class ChangedDay(models.Model):
     day = models.DateField(verbose_name='dzień')
     weekday = models.CharField(choices=DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')

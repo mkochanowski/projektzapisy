@@ -8,6 +8,16 @@
 				{{ group.get_count_of_enrolled_non_zamawiane }}
 				/ {{ group.limit_non_zamawiane }}.
 			</p>
+        {% elif group.limit_isim > 0 %}
+			<p>Zapisanych w ramach limitu ISIM:
+				{{ group.enrolled_isim }}
+				/ {{ group.limit_isim }}.
+			</p>
+			<p>Zapisanych w ramach limitu dodatkowego:
+				{{ group.get_count_of_enrolled_non_isim }}
+				/ {{ group.limit_non_isim }}.
+			</p>
+
 		{% else %}
 			<p>Liczba zapisanych osób: {{students_in_group|length}} /
 			{{group.get_group_limit}}</p>

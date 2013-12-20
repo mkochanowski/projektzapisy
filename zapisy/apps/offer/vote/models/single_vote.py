@@ -254,5 +254,13 @@ class SingleVote ( models.Model ):
 
         return all['votes'] + free['votes'] - used['correction'] + used['votes']
 
+    @staticmethod
+    def limit_in_winter_correction(student, state):
+        all =  SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
+                .extra(where=["vote_singlevote.entity_id IN (SELECT id FROM courses_courseentity WHERE semester = 'z')"])\
+                .aggregate(votes=Sum('value'))
+
+        return all['votes']
+
     def get_vote(self):
         return self.correction

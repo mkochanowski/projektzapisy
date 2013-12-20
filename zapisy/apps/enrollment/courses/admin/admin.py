@@ -9,40 +9,10 @@ from apps.enrollment.courses.models import *
 from apps.enrollment.records.models import Record, STATUS_REMOVED, STATUS_ENROLLED, Queue
 
 
-class GroupForm(ModelForm):
-    class Meta:
-        model = Group
-
-    # def save(self, commit=True):
-    #     import ipdb;ipdb.set_trace()
-    #     group = super(GroupForm, self).save(commit=False)
-    #     if group.id:
-    #         group.course = Course.simple.select_for_update().get(id=group.course_id)
-    #         old_one = Group.objects.select_for_update().get(id=group.id)
-    #         while old_one.limit < group.limit:
-    #             old_one.limit += 1
-    #             old_one.limit_zamawiane = group.limit_zamawiane
-    #             old_one.limit_zamawiane2012 = group.limit_zamawiane2012
-    #             old_one.save()
-    #             if old_one.queued > 0:
-    #                 Group.do_rearanged(old_one)
-    #
-    #             old_one = Group.objects.select_for_update().get(id=group.id)
-    #             group.enrolled = old_one.enrolled
-    #             group.enrolled_zam = old_one.enrolled_zam
-    #             group.enrolled_zam2012 = old_one.enrolled_zam2012
-    #             group.queued = old_one.queued
-    #
-    #     group.save()
-    #
-    #     return group
-
-
 class GroupInline(admin.TabularInline):
     model = Group
     extra = 0
     raw_id_fields = ("teacher",)
-    form = GroupForm
 
 
 class CourseForm(ModelForm):
@@ -216,9 +186,8 @@ class RecordInlineForm(ModelForm):
 class RecordInline(admin.TabularInline):
     model = Record
     extra = 0
-    raw_id_fields = ("student",)
+    readonly_fields = ('id', 'student', 'status')
     can_delete = False
-    form = RecordInlineForm
 
 class QueuedInlineForm(ModelForm):
     class Meta:
@@ -254,28 +223,16 @@ class QueuedInline(admin.TabularInline):
 
 
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012','get_terms_as_string')
+    readonly_fields = ('limit', 'id')
+    list_display = ('id', 'course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012', 'limit_isim', 'get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__entity__name')
     inlines = [
         TermInline,RecordInline, QueuedInline
     ]
 
-    form = GroupForm
 
     raw_id_fields = ('course', 'teacher')
-
-    def save_model(self, request, obj, form, change):
-
-        if obj.id:
-            obj.course = Course.simple.select_for_update().get(id=obj.course_id)
-            obj.save()
-            last = -1
-            while obj.course.enrollments_are_open() and obj.queued and obj.limit > obj.enrolled > last:
-                last = obj.enrolled
-                Group.do_rearanged(obj)
-
-        obj.save()
 
     def response_add(self, request, new_object, post_url_continue='../%s/'):
         obj = self.after_saving_model_and_related_inlines(new_object)
@@ -364,6 +321,13 @@ class GroupAdmin(admin.ModelAdmin):
        qs = super(GroupAdmin, self).queryset(request)
        return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type').prefetch_related('term')
 
+    class Media:
+        css = {
+            "all": ("css/admin/group.css",)
+        }
+        js = ("js/admin/group.js",)
+
+
 class TypeAdmin(admin.ModelAdmin):
     list_display = ('name','group','meta_type')
     list_filter = ('group','meta_type')
@@ -391,7 +355,7 @@ admin.site.register(CourseDescription, CourseDescriptionAdmin)
 admin.site.register(CourseEntity, CourseEntityAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Tag)
-# admin.site.register(Classroom, ClassroomAdmin)
+admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(Freeday)
 admin.site.register(ChangedDay)

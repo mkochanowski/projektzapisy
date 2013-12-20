@@ -5,6 +5,8 @@ from django.db.models import signals
 from django.db.models import Count
 from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
+from django.conf import settings
+from apps.notifications.models import Notification
 
 from course import *
 
@@ -33,6 +35,7 @@ GROUP_EXTRA_CHOICES = [('',''),
     (u'grupa 5','grupa 5'),
     (u'pracownia linuksowa','pracownia linuksowa'),
     (u'grupa anglojęzyczna','grupa anglojęzyczna'),
+    (u'I rok', 'I rok'), (u'II rok', 'II rok'), (u'ISIM', 'ISIM')
     ]
 
 
@@ -62,6 +65,7 @@ class Group(models.Model):
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych 2009', help_text='miejsca gwarantowane dla studentów zamawianych 2009')
     limit_zamawiane2012 = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych 2012', help_text='miejsca gwarantowane dla studentów zamawianych 2012')
+    limit_isim = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych 2012', help_text='miejsca gwarantowane dla studentów isim')
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
     export_usos = models.BooleanField(default=True, verbose_name='czy eksportować do usos?')
 
@@ -73,6 +77,7 @@ class Group(models.Model):
     enrolled     = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów')
     enrolled_zam = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów zamawianych')
     enrolled_zam2012 = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów zamawianych')
+    enrolled_isim = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów ISIM')
     queued       = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba studentów w kolejce')
 
     disable_update_signal = False
@@ -123,6 +128,8 @@ class Group(models.Model):
             self.enrolled_zam -= 1
         if student.is_zamawiany2012():
             self.enrolled_zam2012 -= 1
+        if student.isim:
+            self.enrolled_isim -= 1
 
         self.save()
 
@@ -136,6 +143,8 @@ class Group(models.Model):
             self.enrolled_zam += 1
         if student.is_zamawiany2012():
             self.enrolled_zam2012 += 1
+        if student.isim:
+            self.enrolled_isim += 1
 
         self.save()
 
@@ -299,11 +308,22 @@ class Group(models.Model):
                 semester = Semester.objects.get_next()
                 current_limit = semester.get_current_limit()
                 if q.student.get_points_with_course(self.course) <= current_limit:
-                    result, _  = self.add_student(q.student, return_group=True)
+                    result, messages  = self.add_student(q.student, return_group=True)
+                    total_queues = 0
                     for old in Queue.objects.filter(deleted=False, student = q.student, priority__lte=q.priority, group__course=self.course, group__type=q.group.type):
                         old.deleted = True
                         old.group.remove_from_queued_counter(q.student)
                         old.save()
+                        total_queues += 1
+                    if isinstance(result, Group):
+                        Notification.send_notification(q.student.user, 'enrolled-again', {'group': self,
+                                                                                     'old_group': result,
+                                                                                     'messages': messages,
+                                                                                     'another_queues': total_queues-1})
+                    else:
+                        Notification.send_notification(q.student.user, 'enrolled', {'group': self,
+                                                                               'messages': messages,
+                                                                               'another_queues': total_queues-1})
 
                     break
                 to_removed.append(q)
@@ -312,6 +332,7 @@ class Group(models.Model):
             queue.deleted = True
             self.remove_from_queued_counter(queue.student)
             queue.save()
+            Notification.send_notification(queue.student.user, 'queue-remove', {'group': self, 'reason': u'Zapis spowodowałby przekroczenie limitu ECTS'})
 
         return result
 
@@ -333,7 +354,16 @@ class Group(models.Model):
     def limit_non_zamawiane(self):
         return self.limit - self.limit_zamawiane -self.limit_zamawiane2012
 
+    def limit_non_isim(self):
+        return self.limit - self.limit_isim
+
     def is_full_for_student(self, student):
+        if self.limit_isim > 0:
+            if student.isim:
+                return self.limit <= self.enrolled
+            else:
+                return self.limit - self.limit_isim <= self.enrolled - min(self.enrolled_isim, self.limit_isim)
+
         if student.is_zamawiany():
             
             return self.get_limit_for_zamawiane2009() <= self.enrolled - min(self.limit_zamawiane2012, self.enrolled_zam2012)
@@ -385,6 +415,9 @@ class Group(models.Model):
             result -= self.enrolled_zam2012
 
         return result
+
+    def get_count_of_enrolled_non_isim(self, dont_use_cache=False):
+        return self.enrolled - self.enrolled_isim
 
     def get_count_of_queued(self, dont_use_cache=False):
         return self.queued
@@ -457,6 +490,13 @@ class Group(models.Model):
                                 unicode(self.get_type_display()), 
                                 unicode(self.get_teacher_full_name()))
 
+    def long_print(self):
+        return "%s: %s - %s" % (unicode(self.course.entity.name),
+                                unicode(self.get_type_display()),
+                                unicode(self.get_teacher_full_name()))
+
+    def get_absolute_url(self):
+        return reverse('records-group', args=[self.id])
 
 def log_add_group(sender, instance, created, **kwargs):
     if Group.disable_update_signal:

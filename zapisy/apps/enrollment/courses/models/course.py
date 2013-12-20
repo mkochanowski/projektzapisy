@@ -4,7 +4,7 @@ from datetime import date
 import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-
+from django.utils.encoding import smart_unicode
 from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
@@ -379,7 +379,7 @@ class Related(models.Manager):
 
     def get_query_set(self):
         """ Returns all courses which have marked semester as visible """
-        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom')
+        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom', 'entity')
 
 
 class VisibleManager(Related):
@@ -605,10 +605,15 @@ class Course(models.Model):
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
 
-        if self.records_start and self.records_end and self.records_start <= datetime.datetime.now() <= self.records_end:
+        now = datetime.datetime.now()
+
+        if self.records_start and self.records_end and self.records_start <= now <= self.records_end:
             return True
 
-        if records_opening and self.is_opened(student) and datetime.datetime.now() < records_closing:
+        if records_opening and self.is_opened(student) and now < records_closing:
+            return True
+
+        if self.records_start and self.records_end and self.records_start <= now < self.records_end:
             return True
 
         return False
@@ -755,6 +760,11 @@ class CourseDescription(models.Model):
         verbose_name_plural = 'opisy przedmiotu'
         app_label = 'courses'
 
+    def __unicode__(self):
+        title = smart_unicode(self.created) + " - "
+        if self.author:
+            title = title + smart_unicode(self.author)
+        return title
 
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)
