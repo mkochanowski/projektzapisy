@@ -240,23 +240,15 @@ class SingleVote ( models.Model ):
 
     @staticmethod
     def limit_in_summer_correction(student, state):
-        all =  SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
-                .extra(where=['vote_singlevote.entity_id IN (SELECT entity_id FROM courses_course cc WHERE cc.semester_id = '+ str(state.semester_summer_id) +')'])\
+        all = SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
+                .extra(where=["vote_singlevote.entity_id IN (SELECT id FROM courses_courseentity WHERE semester = 'l')"])\
                 .aggregate(votes=Sum('value'))
 
-        free = SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
-        .extra(where=['vote_singlevote.entity_id NOT IN (SELECT entity_id FROM courses_course cc WHERE cc.semester_id = '+ str(state.semester_summer_id) +' OR cc.semester_id = '+ str(state.semester_winter_id) +' )'])\
-        .aggregate(votes=Sum('value'))
-
-        used = SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
-                .extra(where=['vote_singlevote.entity_id IN (SELECT entity_id FROM courses_course cc WHERE cc.semester_id = '+ str(state.semester_winter_id) +')'])\
-                .aggregate(correction=Sum('correction'), votes=Sum('value'))
-
-        return all['votes'] + free['votes'] - used['correction'] + used['votes']
+        return all['votes']
 
     @staticmethod
     def limit_in_winter_correction(student, state):
-        all =  SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
+        all = SingleVote.objects.filter(student=student, state=state, entity__type__free_in_vote=False)\
                 .extra(where=["vote_singlevote.entity_id IN (SELECT id FROM courses_courseentity WHERE semester = 'z')"])\
                 .aggregate(votes=Sum('value'))
 
