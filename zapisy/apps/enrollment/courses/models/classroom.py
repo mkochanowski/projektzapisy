@@ -14,7 +14,6 @@ types = [(0, u'Sala wykładowa'), (1, u'Sala ćwiczeniowa'), (2, u'Pracownia kom
 
 class Classroom( models.Model ):
     """classroom in institute"""
-    slug =  AutoSlugField(populate_from='number', unique_with='number')
     type = models.IntegerField(choices=types, default=1, verbose_name='typ')
     description = models.TextField(null=True, blank=True, verbose_name='opis')
     number = models.CharField( max_length = 20, verbose_name = 'numer sali' )
@@ -23,6 +22,7 @@ class Classroom( models.Model ):
     capacity = models.PositiveSmallIntegerField(default=0, verbose_name='liczba miejsc')
     floor = models.IntegerField(choices=floors, null=True, blank=True)
     can_reserve = models.BooleanField(default=False)
+    slug =  AutoSlugField(populate_from='number', unique_with='number')
 
     
     class Meta:
