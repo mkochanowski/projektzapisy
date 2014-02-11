@@ -2,7 +2,7 @@ from modeltranslation.translator import translator, TranslationOptions
 from apps.enrollment.courses.models import CourseEntity, CourseDescription
 
 class CourseEntityTranslationOptions(TranslationOptions):
-	fields = ('name', 'shortName',)
+	fields = ('name', )
 
 translator.register(CourseEntity, CourseEntityTranslationOptions)
 

@@ -28,7 +28,6 @@ import os
 
 FEREOL_PATH = os.getcwd()
 path.append(FEREOL_PATH + '/dbimport/schedule')
-from scheduleimport import scheduleimport
 
 @staff_member_required
 @transaction.commit_on_success

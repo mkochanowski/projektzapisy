@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db.models.query import EmptyQuerySet
 from django.forms import ModelForm
+from modeltranslation.admin import TranslationAdmin
 
 from apps.enrollment.courses.models import *
 from apps.enrollment.records.models import Record, STATUS_REMOVED, STATUS_ENROLLED, Queue
@@ -119,7 +120,7 @@ class TagsInline(admin.TabularInline):
     model = TagCourseEntity
     extra=0
 
-class CourseEntityAdmin(admin.ModelAdmin):
+class CourseEntityAdmin(TranslationAdmin):
     list_display = ('name', 'shortName', 'owner')
     search_fields = ('name', 'shortName', 'owner__user__first_name', 'owner__user__last_name' )
     fieldsets = [
@@ -336,7 +337,7 @@ class TypeAdmin(admin.ModelAdmin):
 
 
 
-class CourseDescriptionAdmin(admin.ModelAdmin):
+class CourseDescriptionAdmin(TranslationAdmin):
     list_display = ('entity','created', 'author',)
     search_fields = ('entity__name',)
     list_filter = ('entity__type',)

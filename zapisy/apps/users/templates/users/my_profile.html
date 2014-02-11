@@ -176,21 +176,21 @@ $('.checkall').live('click', function(){
         </tr>
 </table>
 {% endif %}
-
-<h4>Ustawienie preferencji językowych</h4>
+{% if user.is_staff %}
+<h4>{%  trans "Ustawienie preferencji językowych" %}</h4>
 {% get_available_languages as LANGUAGES %}
 <form method="post" action="{% url setlang %}">
     {% csrf_token %}
     <table class="table-striped">
         <tr>
-            <th>Select language</th>
+            <th>{%  trans "Select language" %}</th>
             <th></th>
         </tr>
         <tr>
             <td>
                 <select name="language">
                     {% for lang in LANGUAGES %}
-                    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+                    <option value="{{ lang.0 }}"{% if request.session.django_language == lang.0 %}selected="selected"{% endif %}>{{ lang.1 }}</option>
                     {% endfor %}
                 </select>
             </td>
@@ -200,7 +200,7 @@ $('.checkall').live('click', function(){
         </tr>
     </table>
 </form>
-
+{% endif %}
 <h4>Ustawienie powiadomień</h4>
 
 <form method="POST" action="{% url notifications:save %}">
