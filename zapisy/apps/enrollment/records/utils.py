@@ -12,7 +12,11 @@ from apps.users.models import *
 def run_rearanged(result, group=None):
     def test_course(group):
         import datetime
-        course = group.course
+        if isinstance(Record, group):
+            course = group.group.course
+        elif isinstance(Group, group):
+            course = group.course
+
         semester = course.semester
         now = datetime.datetime.now()
 
