@@ -12,9 +12,9 @@ from apps.users.models import *
 def run_rearanged(result, group=None):
     def test_course(group):
         import datetime
-        if isinstance(Record, group):
+        if isinstance(group, Record):
             course = group.group.course
-        elif isinstance(Group, group):
+        elif isinstance(group, Group):
             course = group.course
 
         semester = course.semester
