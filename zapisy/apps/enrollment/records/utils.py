@@ -34,7 +34,7 @@ def run_rearanged(result, group=None):
     elif isinstance(result, Group) and test_course(result):
         Group.do_rearanged(result)
 
-    if group and group.should_be_rearranged() and test_course(group):
+    if group and group.should_be_rearranged():
         Group.do_rearanged(group)
 
 def prepare_courses_with_terms(terms, records = None):
