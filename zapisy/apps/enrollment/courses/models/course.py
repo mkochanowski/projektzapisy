@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.core.cache import cache as mcache
+from apps.enrollment.courses.models.effects import Effects
 from apps.enrollment.courses.models.tag import Tag
 
 from apps.offer.proposal.exceptions import NotOwnerException
@@ -145,6 +146,7 @@ class CourseEntity(models.Model):
                              verbose_name=u'Przedmiot prowadzony przy pomocy środków pochodzących z Unii Europejskiej')
 
     tags = models.ManyToManyField(Tag, through='TagCourseEntity')
+    effects = models.ManyToManyField(Effects, verbose_name=u'Grupa efektów kształcenia')
 
     objects = WithInformation()
     simple = models.Manager()

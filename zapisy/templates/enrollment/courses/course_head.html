@@ -52,6 +52,18 @@
                 </td>
             </tr>
         {% endif %}
+        {% if course.entity.effects.all %}
+            <tr>
+                <th>{% trans "Grupa efektów kształcenia" context "Grupa efektów kształcenia" %}</th>
+                <td>
+                    <ul style="list-style: none;">
+                    {% for effect in course.entity.effects.all %}
+                        <li><span class="label success">{{ effect }}</span></li>
+                    {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% endif %}
         {% if course.english %}
             <tr>
                 <th>{% trans "Przedmiot prowadzony w j.angielskim" %}</th>

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
 from django.core.exceptions import ValidationError
 from django.db.models.query import EmptyQuerySet
 from django.forms import ModelForm
@@ -120,19 +121,37 @@ class TagsInline(admin.TabularInline):
     model = TagCourseEntity
     extra=0
 
+
+class EffectsListFilter(SimpleListFilter):
+    title = u'Grupa efektów kształcenia'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'effects'
+
+    def lookups(self, request, model_admin):
+        result = []
+        for effect in Effects.objects.all():
+            result.append((str(effect.id), effect))
+
+        return result
+
+    def queryset(self, request, queryset):
+        return queryset.filter(effects=self.value())
+
+
 class CourseEntityAdmin(TranslationAdmin):
     list_display = ('name', 'shortName', 'owner')
     search_fields = ('name', 'shortName', 'owner__user__first_name', 'owner__user__last_name' )
     fieldsets = [
         (None,               {'fields': ['name','shortName','type', 'information'], 'classes': ['long_name']}),
-        (None,               {'fields': ['owner', 'status', 'semester']}),
+        (None,               {'fields': ['owner', 'status', 'semester', 'effects']}),
         (u'Godziny', {'fields': ['lectures', 'exercises', 'laboratories', 'repetitions', 'seminars', 'exercises_laboratiories']}),
         (u'Zmiana sposobu liczenia punktów',               {'fields': ['algorytmy_l', 'dyskretna_l', 'numeryczna_l', 'programowanie_l']}),
         (None,               {'fields': ['ue', 'english', 'exam', 'suggested_for_first_year', 'deleted']}),
         ('USOS',             {'fields': ['usos_kod'], 'classes': ['collapse']}),
 
     ]
-    list_filter = ('semester', 'owner', 'status', 'type', )
+    list_filter = ('semester',  'status', 'type', EffectsListFilter, 'owner')
     form = CourseEntityForm
 
     inlines = [PointsInline, TagsInline]
@@ -351,11 +370,13 @@ class CourseDescriptionAdmin(TranslationAdmin):
         entity.information = obj
         entity.save()
 
+
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseDescription, CourseDescriptionAdmin)
 admin.site.register(CourseEntity, CourseEntityAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Tag)
+admin.site.register(Effects)
 admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Semester, SemesterAdmin)
 admin.site.register(Freeday)
