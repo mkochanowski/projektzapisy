@@ -5,7 +5,7 @@ from django.utils.encoding import smart_unicode
 
 class Effects(models.Model):
     group_name = models.CharField(max_length=250, verbose_name=u'grupa efektów')
-    description = models.TextField(verbose_name=u'opis')
+    description = models.TextField(verbose_name=u'opis', null=True, blank=True)
 
     class Meta:
         verbose_name = u'Grupa Efektów'
