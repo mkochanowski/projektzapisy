@@ -146,7 +146,7 @@ class CourseEntity(models.Model):
                              verbose_name=u'Przedmiot prowadzony przy pomocy środków pochodzących z Unii Europejskiej')
 
     tags = models.ManyToManyField(Tag, through='TagCourseEntity')
-    effects = models.ManyToManyField(Effects, verbose_name=u'Grupa efektów kształcenia')
+    effects = models.ManyToManyField(Effects, verbose_name=u'Grupa efektów kształcenia', null=True, blank=True)
 
     objects = WithInformation()
     simple = models.Manager()

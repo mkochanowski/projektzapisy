@@ -136,7 +136,10 @@ class EffectsListFilter(SimpleListFilter):
         return result
 
     def queryset(self, request, queryset):
-        return queryset.filter(effects=self.value())
+        if self.value():
+            return queryset.filter(effects=self.value())
+        else:
+            return queryset
 
 
 class CourseEntityAdmin(TranslationAdmin):
