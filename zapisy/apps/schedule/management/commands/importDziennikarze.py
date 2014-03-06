@@ -77,20 +77,21 @@ class Command(BaseCommand):
         for d in days[4]: #piatek
             ev = create_event('Dziennikarze')
 
-            create_term(ev, d, 14, 22, s4)
-            create_term(ev, d, 14, 22, s5)
-            create_term(ev, d, 14, 22, s104)
-            create_term(ev, d, 14, 22, s103)
-            create_term(ev, d, 14, 22, s139)
-            create_term(ev, d, 14, 22, s140)
-            create_term(ev, d, 14, 22, s141)
+            create_term(ev, d, 15, 22, s4)
+            create_term(ev, d, 15, 22, s5)
+            create_term(ev, d, 15, 22, s104)
+            create_term(ev, d, 15, 22, s103)
+            create_term(ev, d, 15, 22, s139)
+            create_term(ev, d, 15, 22, s140)
+            create_term(ev, d, 15, 22, s141)
 
-            wf = create_event('WF', visible=False)
-
-            create_term(wf, d, 19, 22, s119)
 
             sem = create_event('Seminarium ZJP')
             create_term(sem, d, 14, 16, s105)
+
+            kol = create_event('Inst. Matematyczny')
+            create_term(sem, d, 12, 14, s25)
+
             kol = create_event('Kolokwia')
             create_term(sem, d, 14, 16, s25)
 
@@ -119,27 +120,19 @@ class Command(BaseCommand):
 
         for d in days[0]: #poniedzialke
             ev = create_event('Dziennikarze')
-            create_term(ev, d, 12, 14, s104)
-            create_term(ev, d, 8, 12, s4)
+            create_term(ev, d, 10, 14, s4)
+            create_term(ev, d, 15, 20, s110)
 
             ang = create_event('Jezyk Angielski')
             create_term(ang, d, 8, 12, s5)
 
 
-            grupa = create_event('MATEMATYKA: WSTEP DO INFORMATYKI I PROGRAMOWANIA (wyklad) RAFAL NOWAK')
-            create_term(grupa, d, 14, 16, s25)
-            
         for d in days[1]: #wtorek
-            ev = create_event('Dziennikarze')
-            create_term(ev, d, 8, 10, s4)
-            create_term(ev, d, 12, 16, s4)
-
-            rada = create_event('Rada Instytutu')
-            create_term(rada, d, 12, 14, s310)
-
-
             radaw = create_event('Rada Wydzialu')
-            create_term(radaw, d, 12, 16, s119)
+            create_term(radaw, d, 12, 14, s119)
+
+            net = create_event('grupa .NET')
+            create_term(net, d, 18, 20, s119)
 
 
             sem = create_event('Seminarium ZMN')
@@ -147,35 +140,33 @@ class Command(BaseCommand):
             create_term(sem, d, 14, 16, s237)
 
 
+            sem = create_event('Seminarium PIO')
+            create_term(sem, d, 16, 18, s103)
+
+
+            sem = create_event('kolokwium AiSD')
+            create_term(sem, d, 14, 15, s25)
+            create_term(sem, d, 14, 15, s119)
+
+
         for d in days[2]: #sroda
-            ev = create_event('Dziennikarze')
-            create_term(ev, d, 14, 18, s4)
-
-            grupa = create_event('Grupa Wroclaw JUG')
-            create_term(grupa, d, 18, 20, s119, minutes_start=30, minutes_end=30)
-
-            grupa = create_event('MATEMATYKA: WSTEP DO INFORMATYKI I PROGRAMOWANIA (pracownia) WOJCIECH JEDYNAK')
-            create_term(grupa, d, 16, 18, s108)
-
-            grupa = create_event('MATEMATYKA: WSTEP DO INFORMATYKI I PROGRAMOWANIA (pracownia) RAFAL NOWAK')
-            create_term(grupa, d, 16, 18, s110)
+            ev = create_event('seminarium PGK')
+            create_term(ev, d, 12, 14, s105)
 
 
         for d in days[3]: #czwartek
             ev = create_event('Dziennikarze')
-            create_term(ev, d, 12, 13, s4, minutes_end=15)
+            create_term(ev, d, 12, 14, s5)
 
-            ang = create_event('Jezyk Angielski')
-            create_term(ang, d, 16, 20, s5)
 
             sem = create_event('Seminarium Insytutowe')
             create_term(sem, d, 14, 16, s119)
 
             sem = create_event('Seminarium ZZOiA')
-            create_term(sem, d, 12, 14, s141)
+            create_term(sem, d, 12, 14, s103)
 
             sem = create_event('Seminarium ZOK')
             create_term(sem, d, 12, 14, s310)
 
-            sem = create_event('Seminarium PIO')
-            create_term(sem, d, 14, 16, s104)
+            ksi = create_event('KSI')
+            create_term(ksi, d, 20, 22, s119)
