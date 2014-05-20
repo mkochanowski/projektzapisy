@@ -2,6 +2,9 @@
 	<div id="proposal-list">
 			<div class="semester">
 				<h3>Przedmioty w ofercie</h3>
+                {%  if request.user.employee %}
+                    <a href="{% url proposal-form %}" class="btn btn-success">Dodaj nową</a>
+                {% endif %}
 				<input type="hidden" name="semester-id" value="{{ semester.id }}" />
 				<ul class="proposal-list">
 					{% for course in courses %}
@@ -11,8 +14,6 @@
 						    offer
 						{% elif course.status == 2 %}
 						    vote
-						{% elif course.status == 3 %}
-						    vote2013
 						{% elif course.status == 4 %}
 						    nooffer
 						{% endif %}">
@@ -30,9 +31,6 @@
                    <ul id="proposal-legend">
                        <li>
                            <div class="legend-box vote"></div> - przedmiot poddany pod głosowanie
-                       </li>
-                       <li>
-                           <div class="legend-box vote2013"></div> - przedmiot poddany pod głosowanie w 2013
                        </li>
                        <li>
                            <div class="legend-box offer"></div> - przedmiot w ofercie
