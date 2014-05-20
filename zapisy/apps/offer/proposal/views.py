@@ -76,7 +76,7 @@ def proposal_edit(request, slug=None):
         except ObjectDoesNotExist:
             raise Http404
     else:
-        description = CourseDescription()
+        description = None
 
     form = ProposalForm(data=request.POST or None,
                         instance=proposal, prefix='entity')

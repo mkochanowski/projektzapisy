@@ -82,7 +82,7 @@ class StatisticsManager(models.Manager):
 
 
 statuses = ((0, u'Wersja robocza'), (1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
-            (3, u'Poddana pod głosowanie 2013'), (4, u'Wycofany z oferty'),)
+            (4, u'Wycofany z oferty'),)
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
 ectslist = [(x, str(x)) for x in range(1, 16)]
 
@@ -764,7 +764,7 @@ class CourseDescription(models.Model):
 
     def __unicode__(self):
         title = smart_unicode(self.created) + " - "
-        if self.author:
+        if self and self.author:
             title = title + smart_unicode(self.author)
         return title
 
