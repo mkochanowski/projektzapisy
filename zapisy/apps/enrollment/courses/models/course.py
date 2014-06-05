@@ -394,7 +394,7 @@ class VisibleManager(Related):
 
 class Course(models.Model):
     """
-    Instacja Przedmiotu w danym przedmiocie
+    Instacja Przedmiotu w danym semestrze
     """
     entity = models.ForeignKey(CourseEntity, verbose_name='podstawa przedmiotu')
     information = models.ForeignKey('CourseDescription', verbose_name='opis', null=True, blank=True)
