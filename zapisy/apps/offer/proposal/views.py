@@ -19,7 +19,7 @@ from apps.offer.proposal.exceptions      import  NotOwnerException
 
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal
-from apps.users.decorators import employee_required
+from apps.users.decorators import employee_required, offer_manager_required
 from apps.users.models import Employee
 
 logger = logging.getLogger("")
@@ -110,10 +110,12 @@ def proposal_edit(request, slug=None):
         "desc": description_form
         })
 
+@offer_manager_required
 def manage(request):
     proposals  = CourseEntity.noremoved.filter(status=0).all()
     return TemplateResponse(request, 'offer/proposal/manage.html', locals())
 
+@offer_manager_required
 def proposal_accept(request, slug=None):
     proposal = proposal_for_offer(slug)
     proposal.status = 1
