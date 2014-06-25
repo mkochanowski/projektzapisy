@@ -469,3 +469,18 @@ input[type=checkbox].partialCheck
 	margin: 5px;
 }
 /*** WIDOK PROFILU UŻYTKOWNIKA  - koniec ***/
+
+
+.modal.proposal-details .modal-body {
+	max-height: 400px;
+	overflow-y: scroll;
+}
+
+.modal-header .my-close {
+    color: #999999;
+    font-size: 18px;
+    line-height: 10px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}

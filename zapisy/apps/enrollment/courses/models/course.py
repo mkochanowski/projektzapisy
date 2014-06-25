@@ -177,6 +177,9 @@ class CourseEntity(models.Model):
     def get_status(self):
         return self.status
 
+    def effects_count(self):
+        return self.effects.count()
+
     def save(self, *args, **kwargs):
         """
         Overloaded save method - during save autocreate slug field

@@ -1,12 +1,55 @@
-{% extends "offer/base.html" %}
+{% extends "base.html" %}
 {% block sidebar %}{% endblock %}
+{% block content-width %}16{% endblock %}
 {% block content %}
+<script type="text/javascript" src="/static/js/common/bootstrap-modal.js" charset="utf-8"></script>
+
 <h1>Zarządzaj propozycjami</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nazwa</th>
+      <th>Zgłaszający</th>
+      <th># Efektów</th>
+      <th>Egzamin</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for proposal in proposals %}
+      <tr>
+        <td><a href="#" data-controls-modal="modal{{forloop.counter}}" data-backdrop="true">{{ proposal.name}}</a></td>
+        <td>{{proposal.owner}}</td>
+        <td>{{proposal.effects_count}}</td>
+        {% if proposal.exam %}
+          <td>TAK</td>
+        {% else %}
+          <td>NIE</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 {% for proposal in proposals %}
-  <li>
-    <a href={{proposal.slug}}>{{ proposal.name}}</a>
-    <span> --- </span>
-    <a href=/offer/{{proposal.slug}}/accept>  <strong>Zaakceptuj</strong></a>
-  </li>
+<div id="modal{{forloop.counter}}" class="modal hide proposal-details"  style="display:none">
+  <div class="modal-header">
+    <a class="my-close" href="#">×</a>
+    <h3>{{proposal.name}}</h3>
+  </div>
+  <div class="modal-body">
+    {% include 'offer/proposal_info.html' with course=proposal %}
+  </div>
+  <div class="modal-footer">
+    <a class="btn primary" href="/offer/{{proposal.slug}}/accept">Zaakceptuj</a>
+  </div>
+</div>
 {% endfor %}
+
+
+<script>
+  $(".modal .my-close").click(function(e) {
+    $(this).parent().parent().modal('hide');
+  });
+</script>
 {% endblock %}
