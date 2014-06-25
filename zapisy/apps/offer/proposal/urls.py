@@ -7,6 +7,7 @@ urlpatterns = patterns( 'apps.offer.proposal.views',
     url( '^/add$', 'proposal_edit', name='proposal-form' ),
     url( '^/manage$', 'manage', name='manage' ),
     url('^/(?P<slug>[\w\-_]+)/accept', 'proposal_accept', name='proposal-accept'),
+    url('^/(?P<slug>[\w\-_]+)/review', 'proposal_for_review', name='proposal-review'),
     url('^/(?P<slug>[\w\-_]+)/edit', 'proposal_edit', name='proposal-edit'),
     url('^/(?P<slug>[\w\-_]+)', 'offer', name='offer-page'),
 )

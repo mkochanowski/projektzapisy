@@ -82,7 +82,7 @@ class StatisticsManager(models.Manager):
 
 
 statuses = ((0, u'Propozycja'), (1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
-            (3, u'Poddana pod głosowanie 2013'), (4, u'Wycofany z oferty'),)
+            (3, u'Poddana pod głosowanie 2013'), (4, u'Wycofany z oferty'), (5, 'Do poprawienia'), )
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
 ectslist = [(x, str(x)) for x in range(1, 16)]
 
@@ -179,6 +179,15 @@ class CourseEntity(models.Model):
 
     def effects_count(self):
         return self.effects.count()
+
+    def mark_as_accepted(self):
+        self.status = 1
+
+    def mark_for_review(self):
+        self.status = 5
+
+    def is_proposal(self):
+        return (self.status == 0) or (self.status == 5)
 
     def save(self, *args, **kwargs):
         """

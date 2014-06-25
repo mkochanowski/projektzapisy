@@ -51,6 +51,7 @@ def proposal(request, slug=None):
     """
     try:
         proposals = CourseEntity.get_employee_proposals(request.user)
+        for_review = filter((lambda course: course.get_status() == 5), proposals)
         not_accepted = filter((lambda course: course.get_status() == 0), proposals)
         in_offer = filter((lambda course: 1 <= course.get_status() <= 3), proposals)
         removed = filter((lambda course: course.get_status() == 4), proposals)
@@ -59,8 +60,11 @@ def proposal(request, slug=None):
         return redirect('offer-page', slug=slug)
     except Http404:
         raise Http404
-    return TemplateResponse(request, 'offer/proposal/proposal.html', locals())
 
+    if proposal:
+        return TemplateResponse(request, 'offer/proposal/proposal.html', locals())
+    else:
+        return TemplateResponse(request, 'offer/proposal/employee_proposals.html', locals())
 
 @login_required
 @employee_required
@@ -88,12 +92,14 @@ def proposal_edit(request, slug=None):
         description = description_form.save(commit=False)
         if not proposal.owner:
             proposal.owner = request.user.employee
+        if proposal.status == 5:
+            proposal.status = 0
         proposal.save()
 
         description.author = request.user.employee
         description.entity_id = proposal.id
 
-        if(proposal.status == 0):
+        if proposal.is_proposal():
             description.save()
         else:
             description.save_as_copy()
@@ -119,7 +125,15 @@ def manage(request):
 @offer_manager_required
 def proposal_accept(request, slug=None):
     proposal = proposal_for_offer(slug)
-    proposal.status = 1
+    proposal.mark_as_accepted()
     proposal.save()
-    messages.success(request, u'Zaakceptowano przedmiot '+proposal.name)    
+    messages.success(request, u'Zaakceptowano przedmiot '+proposal.name)
+    return redirect('manage')
+
+@offer_manager_required
+def proposal_for_review(request, slug=None):
+    proposal = proposal_for_offer(slug)
+    proposal.mark_for_review()
+    proposal.save()
+    print proposal.status
     return redirect('manage')

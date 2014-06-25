@@ -476,6 +476,10 @@ input[type=checkbox].partialCheck
 	overflow-y: scroll;
 }
 
+.modal.proposal-details form {
+	display: inline-block;
+}
+
 .modal-header .my-close {
     color: #999999;
     font-size: 18px;

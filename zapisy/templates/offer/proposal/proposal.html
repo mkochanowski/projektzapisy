@@ -29,28 +29,6 @@
 {% endblock %}
 
 {% block content %}
-    {% if proposal %}
-        {% include 'offer/proposal.html' with course=proposal %}
-    {% else %}
-        <a href="/offer/add" class="btn">Zgłoś propozycję</a>
-        <h2>Niezaakceptowane</h2>
-        <ul>
-        {% for proposal in not_accepted %}
-            <li><a href={{proposal.slug}}>{{ proposal.name}}</a></li>
-        {% endfor %}
-        </ul>
-        <h2>W ofercie</h2>
-        <ul>
-        {% for proposal in in_offer %}
-            <li><a href={{proposal.slug}}>{{ proposal.name}}</a></li>
-        {% endfor %}
-        </ul>
-        <h2>Wycofane z oferty</h2>
-        <ul>
-        {% for proposal in removed%}
-            <li><a href={{proposal.slug}}>{{ proposal.name}}</a></li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+    {% include 'offer/proposal.html' with course=proposal %}
 {% endblock %}
 
