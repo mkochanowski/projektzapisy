@@ -770,6 +770,9 @@ class CourseDescription(models.Model):
             title = title + smart_unicode(self.author)
         return title
 
+    def save_as_copy(self):
+        self.id = None
+        self.save(force_insert=True)        
 
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)

@@ -91,12 +91,12 @@ def proposal_edit(request, slug=None):
         proposal.save()
 
         description.author = request.user.employee
-        description.id = None
+        description.entity_id = proposal.id
 
-        if not description.entity_id:
-            description.entity_id = proposal.id
-
-        description.save(force_insert=True)
+        if(proposal.status == 0):
+            description.save()
+        else:
+            description.save_as_copy()
 
         description_form.save_m2m()
         proposal_form.save_m2m()
@@ -107,7 +107,8 @@ def proposal_edit(request, slug=None):
 
     return TemplateResponse(request, 'offer/proposal/form.html', {
         "form": proposal_form,
-        "desc": description_form
+        "desc": description_form,
+        "proposal": proposal
         })
 
 @offer_manager_required
