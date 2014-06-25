@@ -71,6 +71,10 @@
                 <th>Wymagania</th>
                 <td>{% if course.information.requirements.all %}{{ course.information.requirements.all|join:", " }}{% else %}Brak{% endif %}</td>
             </tr>
+            <tr>
+                <th>Efekty kształcenia</th>
+                <td>{% if course.effects.all %}{{ course.effects.all|join:", " }}{% else %}Brak{% endif %}</td>
+            </tr>
         {% if course.created %}
             <tr>
                 <th>Utworzono</th>

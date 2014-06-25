@@ -81,8 +81,8 @@ class StatisticsManager(models.Manager):
             )
 
 
-statuses = ((0, u'Wersja robocza'), (1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
-            (4, u'Wycofany z oferty'),)
+statuses = ((0, u'Propozycja'), (1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
+            (3, u'Poddana pod głosowanie 2013'), (4, u'Wycofany z oferty'),)
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
 ectslist = [(x, str(x)) for x in range(1, 16)]
 
@@ -99,8 +99,8 @@ class CourseEntity(models.Model):
                                  verbose_name='skrócona nazwa',
                                  null=True, blank=True,
                                  help_text=u'Opcjonalna skrócona nazwa, używana na np. planie. Przykłady: JFiZO, AiSD')
-    status = models.IntegerField(choices=statuses, default=1,
-                                 help_text=u'Wersja robocza widoczna jest jedynie dla jej autora')
+
+    status = models.IntegerField(choices=statuses, default=0)
 
     semester = models.CharField(max_length=1, choices=semesters, default='u', verbose_name='semestr')
 
@@ -173,6 +173,9 @@ class CourseEntity(models.Model):
         return self.exercises_laboratiories + self.information.exercises_laboratories
 
     #
+
+    def get_status(self):
+        return self.status
 
     def save(self, *args, **kwargs):
         """
@@ -756,7 +759,6 @@ class CourseDescription(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, auto_now=True)
 
-
     class Meta:
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
@@ -767,6 +769,7 @@ class CourseDescription(models.Model):
         if self and self.author:
             title = title + smart_unicode(self.author)
         return title
+
 
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)

@@ -1,0 +1,12 @@
+{% extends "offer/base.html" %}
+{% block sidebar %}{% endblock %}
+{% block content %}
+<h1>Zarządzaj propozycjami</h1>
+{% for proposal in proposals %}
+  <li>
+    <a href={{proposal.slug}}>{{ proposal.name}}</a>
+    <span> --- </span>
+    <a href=/offer/{{proposal.slug}}/accept>  <strong>Zaakceptuj</strong></a>
+  </li>
+{% endfor %}
+{% endblock %}

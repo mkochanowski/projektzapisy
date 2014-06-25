@@ -51,21 +51,21 @@ def proposal(request, slug=None):
     """
     try:
         proposals = CourseEntity.get_employee_proposals(request.user)
+        not_accepted = filter((lambda course: course.get_status() == 0), proposals)
+        in_offer = filter((lambda course: 1 <= course.get_status() <= 3), proposals)
+        removed = filter((lambda course: course.get_status() == 4), proposals)
         proposal  = employee_proposal(request.user, slug)
     except NotOwnerException:
         return redirect('offer-page', slug=slug)
     except Http404:
         raise Http404
-
     return TemplateResponse(request, 'offer/proposal/proposal.html', locals())
 
 
 @login_required
 @employee_required
 def proposal_edit(request, slug=None):
-
     proposal = None
-    proposals = CourseEntity.get_employee_proposals(request.user)
 
     if slug:
         try:
@@ -78,28 +78,45 @@ def proposal_edit(request, slug=None):
     else:
         description = None
 
-    form = ProposalForm(data=request.POST or None,
-                        instance=proposal, prefix='entity')
-    desc = ProposalDescriptionForm(data=request.POST or None,
-                                   instance=description, prefix='description')
+    proposal_form      = ProposalForm(data=request.POST or None,
+                                    instance=proposal, prefix='entity')
+    description_form = ProposalDescriptionForm(data=request.POST or None,
+                                               instance=description, prefix='description')
 
-    if form.is_valid() and desc.is_valid():
-        proposal = form.save(commit=False)
-        desp = desc.save(commit=False)
+    if proposal_form.is_valid() and description_form.is_valid():
+        proposal = proposal_form.save(commit=False)
+        description = description_form.save(commit=False)
         if not proposal.owner:
             proposal.owner = request.user.employee
         proposal.save()
 
-        desp.author = request.user.employee
-        desp.id = None
+        description.author = request.user.employee
+        description.id = None
 
-        if not desp.entity_id:
-            desp.entity_id = proposal.id
+        if not description.entity_id:
+            description.entity_id = proposal.id
 
-        desp.save(force_insert=True)
-        desc.save_m2m()
+        description.save(force_insert=True)
+
+        description_form.save_m2m()
+        proposal_form.save_m2m()
+
         messages.success(request, u'Propozycja zapisana')
 
         return redirect('my-proposal-show', slug=proposal.slug)
 
-    return TemplateResponse(request, 'offer/proposal/form.html', locals())
+    return TemplateResponse(request, 'offer/proposal/form.html', {
+        "form": proposal_form,
+        "desc": description_form
+        })
+
+def manage(request):
+    proposals  = CourseEntity.noremoved.filter(status=0).all()
+    return TemplateResponse(request, 'offer/proposal/manage.html', locals())
+
+def proposal_accept(request, slug=None):
+    proposal = proposal_for_offer(slug)
+    proposal.status = 1
+    proposal.save()
+    messages.success(request, u'Zaakceptowano przedmiot '+proposal.name)    
+    return redirect('manage')
