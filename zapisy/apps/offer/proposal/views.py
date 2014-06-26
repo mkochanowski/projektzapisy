@@ -44,12 +44,13 @@ def select_for_voting(request):
     courses = filter((lambda course: 1 <= course.get_status() <= 3), courses)
     if request.method == 'POST':
         for course in courses:
-            ids_for_voting = map(int, request.POST.getlist('for_voting'))
-            if course.id in ids_for_voting:
+            ids_for_voting = set(map(int, request.POST.getlist('for_voting')))
+            if not course.is_in_voting() and course.id in ids_for_voting:
                 course.mark_for_voting()
-            else:
+                course.save()
+            elif course.is_in_voting() and course.id not in ids_for_voting:
                 course.status = 1
-            course.save()
+                course.save()
         return redirect('/offer/manage/select_for_voting')
     else:
         return TemplateResponse(request, 'offer/manage/select_for_voting.html', {'courses': courses})

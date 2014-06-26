@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block sidebar %}{% endblock %}
+{% block content-width %}16{% endblock %}
+{% block content %}
+<h1>Wybierz przedmioty pod głosowanie</h1>
+
+<form id="courses-in-voting" action="/offer/manage/select_for_voting" method="POST">
+  {% csrf_token %}
+  <input type="submit" value="Zapisz" class="btn primary" />
+  <select name="for_voting" multiple="multiple">
+    {% for course in courses %}
+      {% if course.is_in_voting %}
+        <option value="{{course.id}}" selected="selected">{{course.name}}</option>
+      {% else %}
+        <option value="{{course.id}}">{{course.name}}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
+  <div id="test"></div>
+  <input type="submit" value="Zapisz" class="btn primary" />
+</for>
+
+{% endblock %}
