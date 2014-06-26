@@ -494,3 +494,8 @@ form#courses-in-voting select
 	display: block;
 	height:300px;
 }
+
+.bootstrap-duallistbox-container .box1, .bootstrap-duallistbox-container .box2 {
+	display: inline-block;
+	margin-right:50px;
+}
