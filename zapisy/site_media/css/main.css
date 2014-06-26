@@ -499,3 +499,7 @@ form#courses-in-voting select
 	display: inline-block;
 	margin-right:50px;
 }
+
+.topbar {
+	z-index: 999;
+}
