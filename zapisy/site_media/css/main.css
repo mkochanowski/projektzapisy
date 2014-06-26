@@ -481,10 +481,16 @@ input[type=checkbox].partialCheck
 }
 
 .modal-header .my-close {
-    color: #999999;
-    font-size: 18px;
-    line-height: 10px;
-    position: absolute;
-    right: 10px;
-    top: 10px;
+  color: #999999;
+  font-size: 18px;
+  line-height: 10px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+form#courses-in-voting select
+{
+	display: block;
+	height:300px;
 }

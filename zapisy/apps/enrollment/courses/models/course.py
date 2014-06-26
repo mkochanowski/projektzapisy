@@ -186,6 +186,9 @@ class CourseEntity(models.Model):
     def mark_for_review(self):
         self.status = 5
 
+    def mark_for_voting(self):
+        self.status = 3
+
     def is_proposal(self):
         return (self.status == 0) or (self.status == 5)
 
@@ -332,6 +335,9 @@ class CourseEntity(models.Model):
         @return Boolean
         """
         return self.semester == 'z'
+
+    def is_in_voting(self):
+        return self.status == 3
 
     def get_all_voters(self, year=None):
         from apps.offer.vote.models.single_vote import SingleVote

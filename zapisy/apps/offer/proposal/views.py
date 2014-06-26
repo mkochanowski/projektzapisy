@@ -24,7 +24,6 @@ from apps.users.models import Employee
 
 logger = logging.getLogger("")
 
-
 def main(request):
     return TemplateResponse(request, 'offer/main.html', {} )
 
@@ -40,8 +39,20 @@ def offer(request, slug=None):
 
     return TemplateResponse(request, 'offer/offer.html', locals())
 
-
-
+def select_for_voting(request):
+    courses = CourseEntity.noremoved.all()
+    courses = filter((lambda course: 1 <= course.get_status() <= 3), courses)
+    if request.method == 'POST':
+        for course in courses:
+            ids_for_voting = map(int, request.POST.getlist('for_voting'))
+            if course.id in ids_for_voting:
+                course.mark_for_voting()
+            else:
+                course.status = 1
+            course.save()
+        return redirect('/offer/manage/select_for_voting')
+    else:
+        return TemplateResponse(request, 'offer/manage/select_for_voting.html', {'courses': courses})
 
 @login_required
 @employee_required
