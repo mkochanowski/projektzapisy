@@ -10,7 +10,9 @@ from django.http                    import Http404
 from django.shortcuts               import redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.http   import require_POST
-from apps.enrollment.courses.models.course import CourseEntity, CourseDescription
+from apps.enrollment.courses.models.course import CourseEntity, CourseDescription, Course
+from apps.enrollment.courses.models.semester import Semester
+from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.course_type import Type
 
 from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm
@@ -24,8 +26,6 @@ from apps.users.models import Employee
 
 logger = logging.getLogger("")
 
-def main(request):
-    return TemplateResponse(request, 'offer/main.html', {} )
 
 def offer(request, slug=None):
     """
@@ -54,6 +54,61 @@ def select_for_voting(request):
         return redirect('/offer/manage/select_for_voting')
     else:
         return TemplateResponse(request, 'offer/manage/select_for_voting.html', {'courses': courses})
+
+def all_groups(request):
+    semester = Semester.get_current_semester()
+    courses = Course.objects.filter(semester=semester).all()
+    return TemplateResponse(request, 'offer/manage/courses.html', {'courses': courses})
+
+def course_groups(request, slug):
+    if request.method == 'GET':
+        teachers_by_preference_tutorial = {-1:[], 0:[], 1:[], 2:[], 3: []}
+        course = Course.objects.select_related('groups').get(slug=slug)
+        teachers = Employee.objects.all()
+
+        for teacher in teachers:
+            prefs = teacher.get_preferences().filter(proposal=course.entity).all()
+            pref = None
+            if len(prefs) > 0:
+                pref = prefs[len(prefs)-1].tutorial
+
+            if pref == None:
+                teachers_by_preference_tutorial[-1].append(teacher)
+            else:
+                teachers_by_preference_tutorial[pref].append(teacher)
+
+        teachers_by_preference_tutorial = [
+            ('Chętnie', teachers_by_preference_tutorial[3]),
+            ('Być może', teachers_by_preference_tutorial[2]),
+            ('Raczej nie', teachers_by_preference_tutorial[1]),
+            ('Nie', teachers_by_preference_tutorial[0]),
+            ('Bez preferencji', teachers_by_preference_tutorial[-1]),
+        ]
+
+        groups_with_teachers = []
+        for group in course.groups.order_by('id').all():
+            if group.type == '2':
+                groups_with_teachers.append((group, teachers_by_preference_tutorial))
+            else:
+                groups_with_teachers.append((group, None))
+
+        return TemplateResponse(request, 'offer/manage/groups.html',
+            {'course': course, 'teachers': teachers, 
+            'groups_with_teachers': groups_with_teachers, 'path': request.path})
+    elif request.method == 'POST':
+        for group_id, teacher_id in request.POST.iteritems():
+            if group_id[:6] != "group_":
+                continue
+            group_id = group_id[6:]
+            group = Group.objects.get(pk=group_id)
+            teacher = Employee.objects.get(pk=teacher_id)
+            if group.teacher != teacher:
+                group.teacher = teacher
+                group.save()
+        return redirect(request.path)
+
+def main(request):
+    return TemplateResponse(request, 'offer/main.html', {} )
 
 @login_required
 @employee_required
@@ -147,5 +202,4 @@ def proposal_for_review(request, slug=None):
     proposal = proposal_for_offer(slug)
     proposal.mark_for_review()
     proposal.save()
-    print proposal.status
     return redirect('manage')
