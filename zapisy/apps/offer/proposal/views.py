@@ -132,7 +132,7 @@ def proposal_edit(request, slug=None):
 @offer_manager_required
 def manage(request):
     proposals = CourseEntity.noremoved.filter(status=0).all()
-    return TemplateResponse(request, 'offer/proposal/manage.html', locals())
+    return TemplateResponse(request, 'offer/manage/proposals.html', locals())
 
 @offer_manager_required
 def proposal_accept(request, slug=None):
