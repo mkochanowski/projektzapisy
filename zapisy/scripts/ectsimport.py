@@ -29,7 +29,7 @@ def refresh(matricula, ects):
         print ects_sum
         print ""
         student.ects = max(student.ects, ects_sum)
-        #student.save()
+        student.save()
 
 def import_ects(file):
     for line  in file:
