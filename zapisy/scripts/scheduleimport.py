@@ -215,6 +215,7 @@ def import_schedule(file, semester):
     course = None
     while True:
         line = file.readline()
+        print line
         if not line:
             return
         if line.startswith('  '):
