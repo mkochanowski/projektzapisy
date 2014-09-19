@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.core.exceptions import ObjectDoesNotExist
 from zapisy.apps.users.models import Student
 
 ECTS_FILE = 'ects.txt'
@@ -17,7 +18,12 @@ def process(line):
 def refresh(matricula, ects):
     ects_sum = ects['I'] + max(0, ects['II'])
     if ects_sum > 0:
-        student = Student.objects.get(matricula=matricula)
+        try:
+            student = Student.objects.get(matricula=matricula)
+        except ObjectDoesNotExist:
+            print "***" + str(matricula) + " brak"
+            return
+
         print student
         print student.ects
         print ects_sum
