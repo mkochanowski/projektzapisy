@@ -1,0 +1,37 @@
+# -*- coding: utf-8 -*-
+
+from zapisy.apps.users.models import Student
+
+ECTS_FILE = 'ects.txt'
+students = {}
+
+def process(line):
+    matricula, ects, main, stopien, smieci = line.split()
+
+    student = students.setdefault(matricula, {"I": 0, "II": -1, "III": -1})
+    student[stopien] = max( int(ects), student[stopien])
+    if stopien == 'II':
+        student['I'] = max(180, student['I'])
+    students[matricula] = student
+
+def refresh(matricula, ects):
+    ects_sum = ects['I'] + max(0, ects['II'])
+    if ects_sum > 0:
+        student = Student.objects.get(matricula=matricula)
+        print student
+        print student.ects
+        print ects_sum
+        print ""
+        student.ects = max(student.ects, ects_sum)
+        #student.save()
+
+def import_ects(file):
+    for line  in file:
+        process(line)
+
+    for key, value in students.items():
+        refresh(key, value)
+
+def run():
+    file = open(ECTS_FILE)
+    import_ects(file)
