@@ -19,7 +19,7 @@ def refresh(matricula, ects):
     ects_sum = ects['I'] + max(0, ects['II'])
     if ects_sum > 0:
         try:
-            student = Student.objects.get(matricula=matricula)
+            student = Student.objects.get(matricula=matricula, status=0)
         except ObjectDoesNotExist:
             print "***" + str(matricula) + " brak"
             return

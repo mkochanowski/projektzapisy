@@ -5,7 +5,6 @@
 150899	0	N	II stopnia
 150901	0	N	II stopnia
 150901	0	T	III stopnia
-150944	0	T	II stopnia
 159092	4	T	I magisterskie
 159104	57	N	II stopnia
 159130	0	T	II stopnia
@@ -70,9 +69,7 @@
 200016	105	N	I stopnia
 200016	115	N	I stopnia
 200023	95	T	II stopnia
-200023	253	N	I magisterskie
 200023	6	N	I stopnia
-200029	217	N	I magisterskie
 200029	81	T	II stopnia
 200029	0	N	I stopnia
 200031	101	N	II stopnia
