@@ -8,6 +8,7 @@
             <tr>
                 <th>Imię</th>
                 <th>Nazwisko</th>
+                <th>Ostatnio</th>
                 <th>Index</th>
                 <th>ECTS</th>
                 <th>Punkty w semestrze</th>
@@ -19,6 +20,7 @@
                 <tr>
                     <td>{{ student.user.first_name }}</td>
                     <td>{{ student.user.last_name }}</td>
+                    <td>{{ student.user.last_login }}</td>
                     <td>{{ student.matricula }}</td>
                     <td>{{ student.ects }}</td>
                     <td>{{ student.semester_points }}</td>
