@@ -53,7 +53,7 @@
 
 {% block content-width %}12{% endblock %}
 {% block content %}
-	<form action="{% url records-set-locked %}" method="post" id="enr-schedulePrototype-setLocked"><div>
+	<form action="{% url records-set-locked %}" method="post" id="enr-schedulePrototype-setLocked"><div>{% csrf_token %}
 		<input type="hidden" name="ajax-url" value="{% url records-set-locked '.json' %}" />
         {% if request.user.student %}
             {% if user.student.block %}
