@@ -1,3 +1,4 @@
+
 150864	0	T	II stopnia
 150864	0	N	I stopnia
 150873	0	T	II stopnia
@@ -8,15 +9,12 @@
 150901	0	T	III stopnia
 150944	0	T	II stopnia
 155778	0	T	III stopnia
-159092	4	T	jednolite
 159104	57	N	II stopnia
 159118	115	T	I stopnia
 159118	0	N	I stopnia
-159118	9	N	jednolite
 159130	0	N	I stopnia
 159130	0	T	II stopnia
 159190	105	T	I stopnia
-159190	0	N	jednolite
 164485	0	N	I stopnia
 164566	0	N	I stopnia
 167875	0	N	I stopnia
@@ -29,27 +27,20 @@
 169795	0	T	II stopnia
 169797	0	T	II stopnia
 169797	0	N	I stopnia
-169805	28	N	jednolite
 169805	0	T	III stopnia
 169825	0	T	II stopnia
 169825	0	N	I stopnia
 169837	0	T	III stopnia
 169841	0	T	II stopnia
 169841	0	N	I stopnia
-169842	67	N	jednolite
 169842	0	N	I stopnia
 169842	79	T	II stopnia
-169844	167	T	jednolite
-170668	513	T	jednolite
-170674	500	N	jednolite
 170697	83	T	II stopnia
 173479	26	T	I stopnia
 175545	113	T	I stopnia
 175545	123	N	I stopnia
 175559	257	T	I stopnia
 175561	0	N	I stopnia
-175596	0	N	jednolite
-175693	177	N	jednolite
 175693	116	T	II stopnia
 175714	34	N	I stopnia
 176737	68	N	I stopnia
@@ -58,29 +49,20 @@
 177107	0	T	III stopnia
 178878	65	T	I stopnia
 178878	33	N	I stopnia
-186755	96	T	jednolite
 186759	129	T	I stopnia
 186759	0	N	I stopnia
 186767	123	T	I stopnia
-186767	0	N	jednolite
-186772	139	N	jednolite
 186772	109	T	II stopnia
 186776	0	N	I stopnia
 186779	126	T	II stopnia
 186779	0	N	I stopnia
-186780	453	N	jednolite
 186796	0	T	II stopnia
 186796	0	N	I stopnia
 186799	103	T	II stopnia
 186806	0	N	I stopnia
 186806	0	T	II stopnia
-186812	50	N	jednolite
 186812	0	T	III stopnia
-186820	573	N	jednolite
-186835	499.5	N	jednolite
-186841	144	N	jednolite
 186846	0	T	III stopnia
-186846	196	N	jednolite
 186848	0	N	I stopnia
 186848	0	T	II stopnia
 186852	0	T	II stopnia
@@ -88,13 +70,10 @@
 186855	0	N	I stopnia
 186857	112	T	I stopnia
 186857	0	N	I stopnia
-186861	484	T	jednolite
-186866	513	T	jednolite
 186874	23	T	I stopnia
 186887	0	T	I stopnia
 186899	0	N	I stopnia
 186899	0	T	II stopnia
-189364	64	N	jednolite
 189364	101	N	II stopnia
 189364	101	T	II stopnia
 189364	230	N	I stopnia
@@ -114,30 +93,20 @@
 200016	115	T	I stopnia
 200016	65	N	I stopnia
 200023	95	T	II stopnia
-200023	260	N	jednolite
 200023	6	N	I stopnia
-200028	0	N	jednolite
 200028	0	T	I stopnia
-200029	226	N	jednolite
 200029	81	T	II stopnia
 200029	0	N	I stopnia
 200031	101	N	II stopnia
 200031	230	N	I stopnia
 200031	101	T	II stopnia
-200031	64	N	jednolite
-200032	0	N	jednolite
 200032	0	T	II stopnia
 200035	0	N	I stopnia
-200035	198	N	jednolite
 200035	61	T	II stopnia
 200040	54	T	I stopnia
-200040	0	N	jednolite
-200051	165	N	jednolite
 200051	104	T	II stopnia
 200054	449	T	I stopnia
-200054	444	N	jednolite
 200058	102	T	II stopnia
-200058	157	N	jednolite
 200063	97	T	II stopnia
 200063	97	N	II stopnia
 200066	68	T	I stopnia
@@ -150,20 +119,17 @@
 200093	92	T	II stopnia
 200093	0	N	I stopnia
 200093	92	N	II stopnia
-200096	198	T	jednolite
 200097	66	N	I stopnia
 200097	166	T	I stopnia
 200097	0	N	I stopnia
 200103	160	T	I stopnia
 200103	0	N	I stopnia
-200105	638	T	jednolite
 200110	127	T	I stopnia
 200110	0	N	I stopnia
 200110	65	N	I stopnia
 200110	127	N	I stopnia
 200113	107	N	I stopnia
 200119	112	T	II stopnia
-200121	635	T	jednolite
 200124	34	N	I stopnia
 200130	0	N	I stopnia
 200162	124	N	I stopnia
@@ -371,7 +337,6 @@
 209192	37	N	I stopnia
 210728	64	T	I stopnia
 215750	0	T	I stopnia
-215750	0	N	jednolite
 218865	0	N	I stopnia
 218865	92	T	II stopnia
 218865	92	N	II stopnia
@@ -2171,12 +2136,8 @@
 4998	0	T	III stopnia
 5018	34	N	I stopnia
 5369	0	T	III stopnia
-5369	28	N	jednolite
-5379	0	N	jednolite
 5727	0	T	III stopnia
-5728	196	N	jednolite
 5728	0	T	III stopnia
-5729	50	N	jednolite
 5729	0	T	III stopnia
 5743	0	T	III stopnia
 5867	0	T	III stopnia
