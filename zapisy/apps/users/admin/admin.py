@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import csv
+import unicodecsv
 from django.http import HttpResponse
 from django.contrib import admin
 from django import forms
@@ -35,7 +35,7 @@ def export_as_csv(modeladmin, request, queryset):
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=%s.csv' % unicode(opts).replace('.', '_')
 
-    writer = csv.writer(response)
+    writer = unicodecsv.writer(response, encoding='utf-8')
     for record in records:
         writer.writerow([record.student.matricula, record.student.user.first_name, record.student.user.last_name, record.group.course.name, record.group.type, record.group.get_terms_as_string()])
     return response
