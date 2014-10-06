@@ -28,7 +28,7 @@ def export_as_csv(modeladmin, request, queryset):
 
     semester = Semester.get_current_semester()
 
-    records = Record.objects.filter(student__in=queryset, group__course__semester=semester)
+    records = Record.objects.filter(student__in=queryset, group__course__semester=semester, status=1).select_related('student', 'student__user', 'group', 'group__course')
 
     opts = modeladmin.model._meta
 
