@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
-
+import csv
+from django.http import HttpResponse
 from django.contrib import admin
 from django import forms
 from django.contrib.auth.models import User
 
 from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser, UserProfile, StudiaZamawiane2012
+from zapisy.apps.enrollment.courses.models import Semester
+from zapisy.apps.enrollment.records.models import Record
+
 
 class ExtendedUserAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'is_staff')
@@ -19,6 +23,28 @@ class ExtendedUserAdmin(admin.ModelAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_student', 'is_employee', 'is_zamawiany')
     search_fields = ('username', 'first_name', 'last_name', 'email')
 
+
+def export_as_csv(modeladmin, request, queryset):
+
+    semester = Semester.get_current_semester()
+
+    records = Record.objects.filter(student__in=queryset, group__course__semester=semester)
+
+    opts = modeladmin.model._meta
+
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=%s.csv' % unicode(opts).replace('.', '_')
+
+    writer = csv.writer(response)
+    for record in records:
+        writer.writerow([unicode(obj) for obj in [record.student.matricula, record.student.user.first_name, record.student.user.last_name, record.group.course.name, record.group.type, record.group.get_terms_as_string()]])
+    return response
+
+
+export_as_csv.short_description = "Export jako CSV"
+
+
+
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('matricula','get_full_name','ects','get_type_of_studies')
     fieldsets = [
@@ -31,6 +57,8 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = ('program','status','semestr', 'isim')
     ordering = ['user__last_name','user__first_name']
     list_display_links = ('get_full_name',)
+
+    actions = [export_as_csv]
 
     def queryset(self, request):
        qs = super(StudentAdmin, self).queryset(request)
