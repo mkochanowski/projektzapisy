@@ -57,6 +57,7 @@ class StudentAdmin(admin.ModelAdmin):
     list_filter = ('program','status','semestr', 'isim')
     ordering = ['user__last_name','user__first_name']
     list_display_links = ('get_full_name',)
+    list_max_show_all = 9999
 
     actions = [export_as_csv]
 
