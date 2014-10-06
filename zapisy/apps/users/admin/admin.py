@@ -37,7 +37,7 @@ def export_as_csv(modeladmin, request, queryset):
 
     writer = unicodecsv.writer(response, encoding='utf-8')
     for record in records:
-        writer.writerow([record.student.matricula, record.student.user.first_name, record.student.user.last_name, record.group.course.name, record.group.type, record.group.get_terms_as_string()])
+        writer.writerow([record.student.matricula, record.student.user.first_name, record.student.user.last_name, record.group.course.name, record.group.get_type_display(), record.group.get_terms_as_string()])
     return response
 
 
