@@ -37,7 +37,7 @@
 
 
  SEMINARIUM: ALGORYTMY NUMERYCZNE
-  czw 10-12  (seminarium) PAWEl WOŹNY, sala 325
+  czw 10-12  (seminarium) PAWEl WOzNY, sala 325
 
 
 
@@ -69,8 +69,8 @@
 
 
  PEWNE ALGORYTMY SYMBOLICZNE
-  wt  8-10   (wyklad) PAWEl WOŹNY, sala 105
-  wt  10-12  (cwicz+pracownia) PAWEl WOŹNY, sale 139,110
+  wt  8-10   (wyklad) PAWEl WOzNY, sala 105
+  wt  10-12  (cwicz+pracownia) PAWEl WOzNY, sale 139,110
 
 
 
