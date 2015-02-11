@@ -519,23 +519,6 @@
 
 
 
-
- ASK+SO
-  sr  14-16  (wyklad) KRYSTIAN BAClAWSKI, sala 103
-  sr  16-18  (pracownia) KRYSTIAN BAClAWSKI, sala 7
-
-
-
-
-
-
- KURS: ZAAWANSOWANE TECHNOLOGIE JAVY
-  sr  8-10   (wyklad) PAWEl RZECHONEK, sala 141
-  sr  10-12  (pracownia) PAWEl RZECHONEK, sala 108
-
-
-
-
  METODY PROGRAMOWANIA
   pn  14-17  (wyklad) TOMASZ WIERZBICKI, sala 119
   pn  17-19  (cwiczenia) PIOTR POLESIUK, sala 105
@@ -576,24 +559,6 @@
  TEORIA PROGRAMOWANIA LINIOWEGO I CAlKOWITOLICZBOWEGO
   sr  12-14  (wyklad) JAROSlAW BYRKA, sala 140
   sr  14-16  (cwiczenia) JAROSlAW BYRKA, sala 140
-
-
-
-
- TUTORING: KSZTAlTOWANIE sCIEzKI AKADEMICKO-ZAWODOWEJ(LATO)
-  pn  15-16  (cwiczenia) PAWEl LASKOs-GRABOWSKI, sala 5
-  wt  13-14  (cwiczenia) PAWEl RYCHLIKOWSKI, sala 5
-  sr  10-11  (cwiczenia) PIOTR WITKOWSKI, sala
-  sr  14-15  (cwiczenia) EMANUEL KIEROnSKI, sala
-  czw 9-10   (cwiczenia) KRZYSZTOF PIECUCH, sala 5
-  czw 14-15  (cwiczenia) PRZEMYSlAWA KANAREK, sala 5
-
-
-
-
-
- PRAKTYCZNE ASPEKTY ROZWOJU OPROGRAMOWANIA
-  sr  16-19  (wyklad) NOKIA, sale 119,108
 
 
 
