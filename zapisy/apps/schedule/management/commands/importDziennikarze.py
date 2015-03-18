@@ -75,8 +75,11 @@ class Command(BaseCommand):
 
 
         for d in days[4]: #piatek
-            ev = create_event('ANALIZA MATEMATYCZNA/LOGIKA (kolokwia)')
+            ev = create_event('Kolokwia')
             create_term(ev, d, 14, 16, s25)
+
+            ev = create_event('Jezyk Angielski')
+            create_term(ev, d, 12, 15, s4)
 
             ev = create_event('INSTYTUT DZIENNIKARSTWA')
             create_term(ev, d, 15, 20, s141)
@@ -84,111 +87,71 @@ class Command(BaseCommand):
             create_term(ev, d, 15, 20, s139)
             create_term(ev, d, 15, 20, s103)
             create_term(ev, d, 15, 20, s104)
+            create_term(ev, d, 15, 20, s4)
+            create_term(ev, d, 15, 20, s5)
 
             ev = create_event('SEMINARIUM ZJP')
-            create_term(ev, d, 14, 16, s105)
-
-            ev = create_event('Jezyk Angielski')
-            create_term(ev, d, 12, 16, s5)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
-            create_term(ev, d, 16, 20, s5)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
-            create_term(ev, d, 15, 20, s4)
+            create_term(ev, d, 13, 15, s105)
 
         for d in days[5]: #sobota
 
-            ev = create_event('STUDIA PODYPLOMOWE')
-            create_term(ev, d, 9, 13, s119)
-
             ev = create_event('INSTYTUT DZIENNIKARSTWA')
             create_term(ev, d, 9, 18, s141)
             create_term(ev, d, 9, 18, s140)
             create_term(ev, d, 9, 18, s139)
             create_term(ev, d, 9, 18, s103)
             create_term(ev, d, 9, 18, s104)
-
-            ev = create_event('STUDIA PODYPLOMOWE')
-            create_term(ev, d, 9, 18, s105)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
             create_term(ev, d, 9, 18, s5)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
             create_term(ev, d, 9, 18, s4)
-
-            ev = create_event('STUDIA PODYPLOMOWE')
-            create_term(ev, d, 14, 18, s108)
 
         for d in days[6]: #niedziela
 
-            ev = create_event('STUDIA PODYPLOMOWE')
-
-            create_term(ev, d, 9, 13, s119)
-
             ev = create_event('INSTYTUT DZIENNIKARSTWA')
             create_term(ev, d, 9, 18, s141)
             create_term(ev, d, 9, 18, s140)
             create_term(ev, d, 9, 18, s139)
             create_term(ev, d, 9, 18, s103)
             create_term(ev, d, 9, 18, s104)
-
-            ev = create_event('STUDIA PODYPLOMOWE')
-            create_term(ev, d, 9, 18, s105)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
             create_term(ev, d, 9, 18, s5)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
             create_term(ev, d, 9, 18, s4)
-
-            ev = create_event('STUDIA PODYPLOMOWE')
-            create_term(ev, d, 14, 16, s108)
 
         for d in days[0]: #poniedzialke
 
             ev = create_event('Jezyk Angielski')
-            create_term(ev, d, 8, 12, s5)
+            create_term(ev, d, 8, 12, s4)
 
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
-            create_term(ev, d, 12, 14, s5)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
-            create_term(ev, d, 10, 15, s4)
+            ev = create_event('INSTYTUT MATEMATYCZNY')
+            create_term(ev, d, 10, 12, s104)
 
         for d in days[1]: #wtorek
             ev = create_event('JUG')
             create_term(ev, d, 18, 21, s25, minutes_start=30)
 
-            ev = create_event('RADA WYDZIALU/INSTYTUTU')
-
-            create_term(ev, d, 12, 14, s119)
-
-            ev = create_event('SEMINARIUM PIO')
-            create_term(ev, d, 16, 18, s103)
-
             ev = create_event('SEMINARIUM ZMN')
             create_term(ev, d, 14, 16, s104)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
-            create_term(ev, d, 12, 17, s5)
-
-            ev = create_event('WDI (mat)')
-            create_term(ev, d, 12, 14, s4)
-
-            ev = create_event('SEMINARIUM ZMN')
             create_term(ev, d, 14, 16, s237)
 
-            ev = create_event('SEMINARIUM ZOK')
-            create_term(ev, d, 10, 12, s310)
+            ev = create_event('INSTYTUT DZIENNIKARSTWA')
+            create_term(ev, d, 12, 14, s4)
+
+            ev = create_event('JUG')
+            create_term(ev, d, 18, 21, s25, 30)
+
+            ev = create_event('Grupa .NET')
+            create_term(ev, d, 18, 20, s119)
 
         for d in days[2]: #sroda
 
             ev = create_event('SEMINARIUM PGK')
             create_term(ev, d, 12, 14, s105)
 
+            ev = create_event('INSTYTUT DZIENNIKARSTWA')
+            create_term(ev, d, 10, 12, s4)
+
         for d in days[3]: #czwartek
+
+            ev = create_event('SEMINARIUM PIO')
+            create_term(ev, d, 16, 18, s237)
 
             ev = create_event('SEMINARIUM ZZOIA')
             create_term(ev, d, 12, 14, s119)
@@ -197,10 +160,9 @@ class Command(BaseCommand):
             create_term(ev, d, 14, 16, s119)
 
             ev = create_event('INSTYTUT DZIENNIKARSTWA')
-            create_term(ev, d, 10, 14, s5)
-
-            ev = create_event('INSTYTUT DZIENNIKARSTWA')
-            create_term(ev, d, 10, 14, s4)
+            create_term(ev, d, 8, 10, s4)
+            create_term(ev, d, 12, 14, s4)
+            create_term(ev, d, 16, 20, s5)
 
 
 
