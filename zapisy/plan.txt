@@ -1,30 +1,4 @@
- TEORETYCZNE PODSTAWY JeZYKoW PROGRAMOWANIA
-  wt  10-12  (wyklad) ZDZISlAW SPlAWSKI, sala 139
-  wt  12-14  (cwiczenia) ZDZISlAW SPlAWSKI, sala 139
-  
-
-
-
- TESTOWANIE OPROGRAMOWANIA
-  sr  16-18  (cwicz+pracownia) LESZEK GROCHOLSKI, sale 5,7
-  czw 8-10   (wyklad) LESZEK GROCHOLSKI, sala 141
-  czw 10-12  (cwicz+pracownia) LESZEK GROCHOLSKI, sale 139,110
-  
-
-
-
- THEOREM PROVING
-  sr  12-14  (wyklad) HANS DENIVELLE, sala 139
-  sr  14-16  (cwiczenia) HANS DENIVELLE, sala 139
-  
-
-  
-
-  
-
-
-
- ZAJ CIA Z KRYTYCZNEGO MYsLENIA
+ ZAJeCIA Z KRYTYCZNEGO MYsLENIA
   pn  12-14  (wyklad) ANDRZEJ KISIELEWICZ, sala 141
   czw 14-16  (cwiczenia) ANDRZEJ KISIELEWICZ, sala 4
   
