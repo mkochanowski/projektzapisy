@@ -1,575 +1,601 @@
- BAZY DANYCH
-  pn  14-16  (wyklad) PRZEMYSlAWA KANAREK, sala 25
-  pn  16-18  (cwicz+pracownia) PAWEl LASKOs-GRABOWSKI, sale 5,7
-  pn  16-18  (cwicz+pracownia) MAlGORZATA BIERNACKA, sale 104,107
-  pn  16-18  (cwicz+pracownia) PRZEMYSlAWA KANAREK, sala 108
-  sr  14-16  (cwicz+pracownia) MICHAl KARPInSKI, sale 104,7
-  sr  14-16  (cwicz+pracownia) PAWEl LASKOs-GRABOWSKI, sale 105,107
-  sr  14-16  (cwicz+pracownia) WITOLD CHARATONIK, sala 108
+
+
+ ALGEBRA
+  wt  9-12   (wyklad) ARTUR JEz, sala 25
+  wt  12-14  (cwiczenia) ANTONI KOsCIELSKI, sala 103
+  wt  14-16  (cwiczenia) ANTONI KOsCIELSKI, sala 103
+  wt  14-16  (cwiczenia) EMANUEL KIEROnSKI, sala 4
+  sr  8-10   (cwiczenia) PAWEl LASKOs-GRABOWSKI, sala 103
+  czw 8-10   (repetytorium) EMANUEL KIEROnSKI, sala 119
+  czw 10-12  (cwiczenia) KATARZYNA PALUCH, sala 5
+  czw 16-18  (cwiczenia) PAWEl LASKOs-GRABOWSKI, sala 5
+  
 
 
 
+ ALGORYTMICZNA TEORIA GIER
+  pn  12-14  (wyklad) JAROSlAW BYRKA, sala 4
+  pn  14-16  (cwiczenia) JAROSlAW BYRKA, sala 4
+  
+
+
+
+ ALGORYTMY EWOLUCYJNE
+  czw 12-14  (cwicz+pracownia) PIOTR WNUK-LIPInSKI, sala 110
+  czw 14-16  (wyklad) PIOTR WNUK-LIPInSKI, sala 141
+  
+
+  
+
+
+
+ ALGORYTMY I STRUKTURY DANYCH (M)
+  pn  14-16  (wyklad) KRZYSZTOF LORYs, sala 25
+  wt  14-16  (wyklad) KRZYSZTOF LORYs, sala 25
+  sr  10-12  (cwiczenia) KRZYSZTOF PIECUCH, sala 5
+  sr  10-12  (cwiczenia) MAREK SZYKUlA, sala 140
+  sr  10-12  (cwiczenia) ADAM KUNYSZ, sala 105
+  sr  10-12  (cwiczenia) KRZYSZTOF LORYs, sala 139
+  sr  10-12  (cwiczenia) PRZEMYSlAWA KANAREK, sala 104
+  sr  10-12  (cwiczenia) PAWEl RZECHONEK, sala 141
+  sr  10-12  (cwiczenia) lUKASZ JEz, sala 103
+  czw 8-9    (repetytorium) RAFAl NOWAK, sala 25
+  czw 9-10   (repetytorium) lUKASZ JEz, sala 25
+  
+
+  
+
+
+
+ ALGORYTMY ROZPROSZONE
+  pn  14-16  (cwiczenia) MAREK PIOTRoW, sala 104
+  sr  12-14  (wyklad) MAREK PIOTRoW, sala 140
+  czw 10-12  (cwiczenia) lUKASZ JEz, sala 140
+  
+
+
+
+ ANALIZA DANYCH I WARIANCJI
+  sr  16-18  (wyklad) WITOLD KARCZEWSKI, sala 140
+  sr  18-20  (cwiczenia) WITOLD KARCZEWSKI, sala 140
+  
+
+  
+
+  
+
+  
 
 
 
  ARCHITEKTURY SYSTEMoW KOMPUTEROWYCH
-  pn  16-18  (cwiczenia) KRYSTIAN BAClAWSKI, sala 103a
-  wt  14-16  (cwiczenia) PIOTR POLESIUK, sala 139
-  sr  8-10   (wyklad) EMANUEL KIEROnSKI, sala 25
-  sr  12-14  (cwiczenia) EMANUEL KIEROnSKI, sala 139
-  czw 8-10   (cwiczenia) NN, sala 105
-  czw 14-16  (cwiczenia) EMANUEL KIEROnSKI, sala 104
-  pi  10-12  (cwiczenia) PIOTR WITKOWSKI, sala 104
+  pn  16-18  (cwiczenia) TOMASZ WIERZBICKI, sala 103
+  wt  10-12  (cwiczenia) PIOTR POLESIUK, sala 103
+  sr  12-14  (cwiczenia) EMANUEL KIEROnSKI, sala 104
+  sr  14-16  (cwiczenia) EMANUEL KIEROnSKI, sala 104
+  czw 14-16  (cwiczenia) KRYSTIAN BAClAWSKI, sala 103
+  czw 16-18  (wyklad) KRYSTIAN BAClAWSKI, sala 25
+  pi  8-10   (cwiczenia) NN, sala 5
+  
 
 
 
+ BAZY DANYCH
+  pn  12-14  (wyklad) PRZEMYSlAWA KANAREK, sala 25
+  wt  12-14  (cwicz+pracownia) MICHAl KARPInSKI, sale 104,110
+  wt  12-14  (cwicz+pracownia) JAKUB MICHALISZYN, sale 105,107
+  wt  12-14  (cwicz+pracownia) NN, sale 140,137
+  sr  14-16  (cwicz+pracownia) WITOLD CHARATONIK, sale 5,7
+  sr  14-16  (cwicz+pracownia) PRZEMYSlAWA KANAREK, sala 108
+  
 
- SIECI KOMPUTEROWE
-  wt  12-14  (cwicz+pracownia) ADRIAN lAnCUCKI, sala 109
-  wt  16-18  (cwicz+pracownia) TOMASZ WIERZBICKI, sala 109
-  sr  14-16  (cwicz+pracownia) MACIEJ PACUT, sala 109
-  pi  8-10   (cwicz+pracownia) ADAM KACZMAREK, sala 109
-  pi  10-12  (wyklad) MARCIN BIEnKOWSKI, sala 119
+  
 
+  
 
+  
 
+  
 
 
 
- SEMINARIUM: ALGORYTMY NUMERYCZNE
-  czw 10-12  (seminarium) PAWEl WOzNY, sala 325
+ DIGITIZING THE REAL WORLD
+  pn  16-18  (wyklad) FRANCISCO MELENDEZ, sala 105
+  czw 12-14  (cwicz+pracownia) FRANCISCO MELENDEZ, sale 5,7
+  
 
+  
 
+  
 
 
- SEMINARIUM: TESTOWANIE OPROGRAMOWANIA
-  sr  8-10   (seminarium) LESZEK GROCHOLSKI, sala 104
 
+ FIZYKA DLA INFORMATYKoW
+  sr  16-19  (pracownia) JACEK BRONA, sala dodatek1
+  czw 16-18  (wyklad) MAREK NOWICKI, sala dodatek1
+  czw 18-20  (cwiczenia) BARBARA PIECZYRAK, sala dodatek2
+  czw 18-20  (cwiczenia) JACEK BRONA, sala dodatek1
+  pi  8-11   (pracownia) MICHAl JURCZYSZYN, sala dodatek3
+  pi  11-14  (pracownia) ANDRZEJ SZCZEPKOWICZ, sala dodatek2
+  
 
 
 
- SEMINARIUM: SIECI NEURONOWE I STATYSTYKA
-  sr  10-12  (seminarium) JAN CHOROWSKI, sala 141
+ GEOMETRIA OBLICZENIOWA
+  pi  8-10   (wyklad) TOMASZ JURDZInSKI, sala 103
+  pi  10-12  (cwiczenia) KRZYSZTOF NOWICKI, sala 103
+  
 
 
 
+ HURTOWNIE DANYCH I DATA MINING
+  wt  16-17  (cwicz+pracownia) LESZEK GROCHOLSKI, sale ,
+  wt  17-18  (cwicz+pracownia) PIOTR WNUK-LIPInSKI, sale 5,110
+  sr  10-11  (wyklad) PIOTR WNUK-LIPInSKI, sala 119
+  sr  11-12  (wyklad) LESZEK GROCHOLSKI, sala 119
+  sr  12-13  (cwicz+pracownia) LESZEK GROCHOLSKI, sale ,
+  sr  13-14  (cwicz+pracownia) PIOTR WNUK-LIPInSKI, sale 5,110
+  
 
- PODSTAWY EKONOMII
-  wt  12-14  (wyklad) GABRIELA PRZESlAWSKA, sala 25
+  
 
-
-
-
- KURS: PROGRAMOWANIE W C++
-  wt  16-18  (wyklad) HANS DENIVELLE, sala 141
-  wt  18-20  (pracownia) HANS DENIVELLE, sala 7
-  pi  10-12  (pracownia) MAREK SZYKUlA, sala 7
-
-
-
-
- PEWNE ALGORYTMY SYMBOLICZNE
-  wt  8-10   (wyklad) PAWEl WOzNY, sala 105
-  wt  10-12  (cwicz+pracownia) PAWEl WOzNY, sale 139,110
-
-
-
-
-
-
-
-
- PROGRAMOWANIE OBIEKTOWE
-  pn  12-14  (cwicz+pracownia) MAlGORZATA BIERNACKA, sala 7
-  pn  12-14  (cwicz+pracownia) NN, sala 107
-  wt  12-14  (cwicz+pracownia) MAlGORZATA BIERNACKA, sala 7
-  sr  8-10   (cwicz+pracownia) PIOTR WITKOWSKI, sala 107
-  sr  10-12  (wyklad) MARCIN MlOTKOWSKI, sala 25
-  czw 12-14  (cwicz+pracownia) MARCIN MlOTKOWSKI, sala 107
-  czw 12-14  (cwicz+pracownia) PIOTR WITKOWSKI, sala 7
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- KURS J ZYKA C++
-  wt  16-18  (pracownia) PATRYK FILIPIAK, sala 107
-  sr  12-14  (pracownia) KRZYSZTOF SORNAT, sala 107
-  sr  18-20  (wyklad) PAWEl RZECHONEK, sala 25
-  czw 10-12  (pracownia) PAWEl RZECHONEK, sala 7
-  czw 10-12  (pracownia) PIOTR WITKOWSKI, sala 107
-
-
-
-
-
-
-
-
-
-
-
-
- METODY BIOMETRYCZNE
-  wt  12-14  (wyklad) RAFAl NOWAK, sala 140
-  wt  14-16  (cwicz+pracownia) RAFAl NOWAK, sale 5,107
-
-
-
-
-
-
-
-
- METODY SZTUCZNEJ INTELIGENCJI W ZARZaDZANIU I STEROWANIU PRODUKCJa
-  wt  8-10   (wyklad) MIECZYSlAW WODECKI, sala 141
-  wt  10-12  (cwicz+pracownia) MIECZYSlAW WODECKI, sale 104,107
-  sr  8-10   (cwicz+pracownia) MIECZYSlAW WODECKI, sale 139,108
-
-
-
-
-
-
-
-
-
-
- LICENCJACKI PROJEKT PROGRAMISTYCZNY
-  pn  14-16  (pracownia) MACIEJ M. SYSlO, sala 7
-  wt  10-12  (pracownia) LESZEK GROCHOLSKI, sala 7
-  wt  14-16  (pracownia) HANS DENIVELLE, sala 7
-  czw 8-10   (pracownia) ZDZISlAW PlOSKI, sala 110
-  czw 10-12  (pracownia) ZDZISlAW PlOSKI, sala 110
-  czw 12-14  (pracownia) RAFAl NOWAK, sala 108
-
-
-
-
-
-
-
-
-
-
- RACHUNEK PRAWDOPODOBIEnSTWA I STATYSTYKA
-  pn  14-16  (cwiczenia) ANTONI KOsCIELSKI, sala 103
-  pn  16-18  (wyklad) WITOLD KARCZEWSKI, sala 25
-  pn  18-20  (cwiczenia) WITOLD KARCZEWSKI, sala 104
-  sr  12-14  (cwiczenia) ANTONI KOsCIELSKI, sala 104
-
-
-
-
-
-
-
-
-
-
- SEMINARIUM: INzYNIERIA OPROGRAMOWANIA
-  sr  10-12  (seminarium) LESZEK GROCHOLSKI, sala 139
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- TESTOWANIE OPROGRAMOWANIA
-  czw 12-14  (wyklad) LESZEK GROCHOLSKI, sala 141
-  czw 14-16  (cwicz+pracownia) LESZEK GROCHOLSKI, sale 4,7
-  czw 16-18  (cwicz+pracownia) LESZEK GROCHOLSKI, sale 104,7
-
-
-
-
-
-
-
-
- SEMINARIUM Z SYSTEMoW
-  czw 12-14  (seminarium) ZDZISlAW PlOSKI, sala 105
-
-
-
-
- SZTUCZNA INTELIGENCJA
-  wt  10-12  (cwicz+pracownia) ADRIAN lAnCUCKI, sale 105,108
-  wt  14-16  (cwicz+pracownia) PAWEl RYCHLIKOWSKI, sale 4,108
-  wt  16-18  (wyklad) WITOLD PALUSZYnSKI, sala 119
-  wt  18-20  (cwicz+pracownia) WITOLD PALUSZYnSKI, sale 103,108
-  sr  8-10   (cwicz+pracownia) JAN CHOROWSKI, sale 105,7
-
-
-
-
-
-
- WERYFIKACJA WSPOMAGANA KOMPUTEROWO
-  czw 12-13  (wyklad) MAlGORZATA BIERNACKA, sala 139
-  czw 13-14  (wyklad) WITOLD CHARATONIK, sala 139
-  czw 14-15  (cwiczenia) WITOLD CHARATONIK, sala
-  czw 15-16  (cwiczenia) MAlGORZATA BIERNACKA, sala 139
-
-
-
-
-
-
-
-
-
-
- TEORIA GRAFoW
-  pn  12-14  (wyklad) ANDRZEJ KISIELEWICZ, sala 104
-  sr  12-14  (cwiczenia) ANDRZEJ KISIELEWICZ, sala 4
-
-
-
-
-
-
- SEMINARIUM: ZAGADKI TEORETYCZNYCH PODSTAW BAZ DANYCH
-  czw 12-14  (cwiczenia) PIOTR WIECZOREK, sala 140
-
-
-
-
- PROJEKTOWANIE OBIEKTOWE OPROGRAMOWANIA
-  wt  8-10   (wyklad) WIKTOR ZYCHLA, sala 119
-  wt  12-14  (cwicz+pracownia) LESZEK GROCHOLSKI, sale 105,110
-  wt  12-14  (cwicz+pracownia) WIKTOR ZYCHLA, sale 103,137
-  czw 8-10   (cwicz+pracownia) -00, sale 140,107
-  czw 8-10   (cwicz+pracownia) MARCIN MlOTKOWSKI, sale 139,108
-
-
-
-
-
-
- KURS: NOWOCZESNE J ZYKI PRZETWARZANIA DANYCH: PYTHON, R I MATLAB
-  sr  18-20  (pracownia) PIOTR WNUK-LIPInSKI, sala 107
-  czw 8-10   (pracownia) JAN CHOROWSKI, sala 137
-  czw 10-12  (wyklad) JAN CHOROWSKI, sala 119
-
-
-
-
-
-
- KURS PROGRAMOWANIA POD WINDOWS W TECHNOLOGII .NET
-  wt  14-16  (wyklad) WIKTOR ZYCHLA, sala 119
-  wt  16-18  (pracownia) WIKTOR ZYCHLA, sala 7
-  sr  14-16  (pracownia) PRZEMYSlAW GOSPODARCZYK, sala 110
-  czw 8-10   (pracownia) MAREK SZYKUlA, sala 7
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- ALGEBRA
-  pn  12-14  (cwiczenia) ANTONI KOsCIELSKI, sala 103
-  wt  9-12   (wyklad) ARTUR JEz, sala 25
-  wt  14-16  (cwiczenia) EMANUEL KIEROnSKI, sala 105
-  sr  8-10   (cwiczenia) ARTUR JEz, sala 103
-  sr  16-18  (cwiczenia) PAWEl LASKOs-GRABOWSKI, sala 103
-  czw 8-10   (repetytorium) EMANUEL KIEROnSKI, sala 25
-  czw 10-12  (cwiczenia) KATARZYNA PALUCH, sala 140
-  czw 12-14  (cwiczenia) EMANUEL KIEROnSKI, sala 104
-  czw 14-16  (cwiczenia) KATARZYNA PALUCH, sala 105
-
-
-
-
-
-
- ALGORYTMY PROBABILISTYCZNE
-  wt  8-10   (wyklad) MAREK PIOTRoW, sala 103
-  wt  10-12  (cwiczenia) MAREK PIOTRoW, sala 103
-
-
-
-
-
-
- ALGORYTMY APROKSYMACYJNE
-  wt  12-14  (wyklad) KATARZYNA PALUCH, sala 141
-  wt  14-16  (cwiczenia) KATARZYNA PALUCH, sala 140
-  czw 8-10   (cwiczenia) PATIK GHOSAL, sala 103
-
-
-
-
- KOMPRESJA DANYCH
-  pn  12-14  (wyklad) TOMASZ JURDZInSKI, sala 141
-  pn  14-16  (cwiczenia) MICHAl RozAnSKI, sala 104
-  sr  10-12  (cwiczenia) TOMASZ JURDZInSKI, sala 5
-
-
-
-
-
-
-
-
- KURS PRACY W SYSTEMIE LINUX
-  pn  12-14  (pracownia) -01, sala 137
-  sr  14-16  (wyklad) WITOLD PALUSZYnSKI, sala 25
-  sr  16-18  (pracownia) WITOLD PALUSZYnSKI, sala 137
-  czw 10-12  (pracownia) ANDRZEJ lUKASZEWSKI, sala 137
-  czw 12-14  (pracownia) ANDRZEJ lUKASZEWSKI, sala 137
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- PRZETWARZANIE OBRAZoW
-  pn  14-16  (wyklad) ANDRZEJ lUKASZEWSKI, sala 141
-  pn  16-18  (pracownia) ANDRZEJ lUKASZEWSKI, sala 110
-  sr  14-16  (pracownia) ANDRZEJ lUKASZEWSKI, sala 137
-
-
-
-
-
-
-
-
-
-
- SEMINARIUM: ZAAWANSOWANE PROGRAMOWANIE FUNKCYJNE
-  sr  14-16  (seminarium) DARIUSZ BIERNACKI, sala 5
-
-
-
-
-
-
-
-
-
-
-
-
- WNIOSKOWANIE STATYSTYCZNE
-  sr  16-18  (wyklad) WITOLD KARCZEWSKI, sala 140
-  sr  18-20  (cwicz+pracownia) WITOLD KARCZEWSKI, sale 105,110
-
-
-
-
- WST P DO RACHUNKU LAMBDA
-  pi  8-10   (wyklad) ANTONI KOsCIELSKI, sala 140
-  pi  10-12  (cwiczenia) ANTONI KOsCIELSKI, sala 140
-
-
-
-
- ZASTOSOWANIE TEORII KATEGORII DO KONSTRUOWANIA PROGRAMoW
-  sr  16-18  (wyklad) TOMASZ WIERZBICKI, sala 104
-  sr  18-20  (cwiczenia) TOMASZ WIERZBICKI, sala 104
-
-
-
-
-
-
- XML I BAZY DANYCH
-  sr  10-12  (wyklad) PIOTR WIECZOREK, sala 140
-  sr  12-14  (cwicz+pracownia) PIOTR WIECZOREK, sale 5,7
-  pi  10-12  (cwicz+pracownia) PIOTR WIECZOREK, sale 139,110
-
-
-
-
-
-
-
-
-
-
-
-
- KURS MODELOWANIA 3D I WIZUALIZACJI W PROGRAMIE SKETCHUP
-  wt  12-14  (pracownia) lUKASZ PIWOWAR, sala 107
-  pi  8-10   (pracownia) lUKASZ PIWOWAR, sala 107
-  pi  10-12  (wyklad) lUKASZ PIWOWAR, sala 141
-
-
-
-
-
-
-
+  
 
 
 
  J ZYKI FORMALNE I ZlOzONOsc OBLICZENIOWA
   wt  10-12  (wyklad) JERZY MARCINKOWSKI, sala 119
-  sr  10-12  (cwiczenia) JERZY MARCINKOWSKI, sala 105
-  sr  10-12  (cwiczenia) ANTONI KOsCIELSKI, sala 104
-  sr  10-12  (cwiczenia) ARTUR JEz, sala 103
-  sr  12-14  (wyklad) JERZY MARCINKOWSKI, sala 119
-  czw 12-14  (repetytorium) LESZEK PACHOLSKI, sala 25
+  sr  8-10   (repetytorium) JAKUB MICHALISZYN, sala 25
+  czw 12-14  (cwiczenia) JERZY MARCINKOWSKI, sala 139
+  czw 12-14  (cwiczenia) JAKUB MICHALISZYN, sala 140
+  czw 12-14  (cwiczenia) ANTONI KOsCIELSKI, sala 104
+  czw 12-14  (cwiczenia) LESZEK PACHOLSKI, sala 141
+  czw 14-16  (wyklad) JERZY MARCINKOWSKI, sala 119
+  
 
+  
 
-
-
- ALGORYTMY I STRUKTURY DANYCH (M)
-  pn  12-14  (wyklad) KRZYSZTOF LORYs, sala 25
-  wt  14-16  (wyklad) KRZYSZTOF LORYs, sala 25
-  czw 10-12  (cwiczenia) PRZEMYSlAWA KANAREK, sala 103
-  czw 10-12  (cwiczenia) KRZYSZTOF LORYs, sala 104
-  czw 10-12  (cwiczenia) MAREK PIOTRoW, sala 5
-  czw 10-12  (cwiczenia) MAREK SZYKUlA, sala 4
-  czw 10-12  (cwiczenia) RAFAl NOWAK, sala 105
-  czw 10-12  (cwiczenia) KRZYSZTOF PIECUCH, sala 141
-  czw 14-16  (repetytorium) JAROSlAW BYRKA, sala 25
-  pi  8-10   (pracownia) MARCIN BIEnKOWSKI, sala dodatek1
-
-
-
-
-
-
-
-
-
-
-
-
- FIZYKA DLA INFORMATYKoW
-  pn  16-18  (pracownia) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek3
-  sr  17-19  (pracownia) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek2
-  czw 16-18  (wyklad) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek1
-  czw 18-20  (cwiczenia) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek1
-  czw 18-20  (cwiczenia) -01, sala dodatek3
-  czw 18-20  (cwiczenia) -03, sala dodatek2
-  pi  8-10   (pracownia) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek3
-  pi  11-13  (pracownia) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek2
-  pi  13-15  (pracownia) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek1
-  pi  16-18  (pracownia) INSTYTUT FIZYKI DOsWIADCZALNEJ, sala dodatek1
-
-
-
-
-
-
-
-
-
-
- ANALIZA MATEMATYCZNA 2
-  pn  16-18  (wyklad) JURIJ KRYAKIN, sala 139
-  pn  18-20  (cwiczenia) JURIJ KRYAKIN, sala 139
-
-
-
-
-
-
- KURS PROJEKTOWANIA APLIKACJI Z BAZAMI DANYCH
-  sr  16-18  (pracownia) PIOTR WNUK-LIPInSKI, sala 107
-  czw 14-16  (pracownia) PIOTR WNUK-LIPInSKI, sala 107
-  czw 16-18  (wyklad) PAWEl RAJBA, sala 119
-  czw 18-20  (pracownia) PAWEl RAJBA, sala 7
-  pi  10-12  (pracownia) ADAM KACZMAREK, sala 107
-
-
-
-
- METODY PROGRAMOWANIA
-  pn  14-17  (wyklad) TOMASZ WIERZBICKI, sala 119
-  pn  17-19  (cwiczenia) PIOTR POLESIUK, sala 105
-  pn  17-19  (cwiczenia) TOMASZ WIERZBICKI, sala 140
-  wt  12-13  (pracownia) PIOTR POLESIUK, sala 108
-  wt  13-14  (pracownia) PIOTR POLESIUK, sala
-  wt  14-16  (cwiczenia) TOMASZ WIERZBICKI, sala 141
-  wt  14-16  (cwiczenia) MAlGORZATA BIERNACKA, sala 103
-  wt  18-19  (pracownia) TOMASZ WIERZBICKI, sala
-  sr  12-14  (cwiczenia) PIOTR WITKOWSKI, sala 103
-  czw 10-11  (pracownia) DARIUSZ BIERNACKI, sala 108
-  czw 10-12  (cwiczenia) LESZEK PACHOLSKI, sala 139
-  czw 11-12  (pracownia) DARIUSZ BIERNACKI, sala
-  czw 12-14  (cwiczenia) DARIUSZ BIERNACKI, sala 103
-  czw 16-18  (repetytorium) MAREK PIOTRoW, sala 25
-  pi  8-9    (pracownia) PIOTR WITKOWSKI, sala 7
-  pi  9-10   (pracownia) PIOTR WITKOWSKI, sala
-
-
-
-
- PROGRAMOWANIE LOGICZNE
-  pn  16-18  (wyklad) PAWEl RYCHLIKOWSKI, sala 141
-  pn  16-18  (wyklad) PAWEl RYCHLIKOWSKI, sala 141
-  pn  18-20  (cwicz+pracownia) PAWEl RYCHLIKOWSKI, sale 5,7
-  sr  16-18  (cwicz+pracownia) DARIUSZ BIERNACKI, sale 139,110
-  pi  10-12  (cwicz+pracownia) NN, sale 105,108
-
-
-
-
- SEMINARIUM ALGORYTMICZNE 2014
-  czw 16-18  (seminarium) JAROSlAW BYRKA, sala 103
-
-
-
-
- TEORIA PROGRAMOWANIA LINIOWEGO I CAlKOWITOLICZBOWEGO
-  sr  12-14  (wyklad) JAROSlAW BYRKA, sala 140
-  sr  14-16  (cwiczenia) JAROSlAW BYRKA, sala 140
-
+  
 
 
 
  KRYPTOGRAFIA
-  sr  16-18  (wyklad) GRZEGORZ STACHOWIAK, sala 141
-  sr  18-20  (cwiczenia) GRZEGORZ STACHOWIAK, sala 141
+  wt  16-18  (wyklad) GRZEGORZ STACHOWIAK, sala 140
+  wt  18-20  (cwiczenia) GRZEGORZ STACHOWIAK, sala 140
+  pi  10-12  (cwiczenia) -01, sala 140
+  
+
+  
 
 
 
+ KURS J ZYKA C++
+  pn  18-20  (pracownia) PAWEl RZECHONEK, sala 7
+  wt  16-18  (pracownia) PATRYK FILIPIAK, sala 7
+  sr  8-10   (wyklad) PAWEl RZECHONEK, sala 119
+  czw 10-12  (pracownia) lUKASZ PIWOWAR, sala 107
+  
+
+  
 
 
 
+ KURS MODELOWANIA 3D I WIZUALIZACJI W PROGRAMIE SKETCHUP
+  pn  12-14  (wyklad) lUKASZ PIWOWAR, sala 119
+  pn  14-16  (pracownia) lUKASZ PIWOWAR, sala 7
+  
 
+
+
+ KURS PRACY W SYSTEMIE LINUX
+  pn  16-18  (pracownia) MAREK MATERZOK, sala 7
+  wt  14-16  (pracownia) MAREK MATERZOK, sala 107
+  sr  16-18  (wyklad) WITOLD PALUSZYnSKI, sala 25
+  sr  18-20  (pracownia) WITOLD PALUSZYnSKI, sala 7
+  czw 10-12  (pracownia) ANDRZEJ lUKASZEWSKI, sala 137
+  czw 12-14  (pracownia) ANDRZEJ lUKASZEWSKI, sala 137
+  
+
+
+
+ KURS PROGRAMOWANIA POD WINDOWS W TECHNOLOGII .NET
+  wt  12-14  (pracownia) WIKTOR ZYCHLA, sala 7
+  wt  14-16  (wyklad) WIKTOR ZYCHLA, sala 119
+  sr  10-12  (pracownia) PATRYK FILIPIAK, sala 108
+  czw 12-14  (pracownia) lUKASZ PIWOWAR, sala 107
+  
+
+  
+
+
+
+ KURS PROJEKTOWANIA APLIKACJI Z BAZAMI DANYCH
+  wt  16-18  (pracownia) MAREK MATERZOK, sala 107
+  sr  16-18  (wyklad) PAWEl RAJBA, sala 141
+  sr  18-20  (pracownia) PAWEl RAJBA, sala 107
+  
+
+  
+
+  
+
+
+
+ KURS XML
+  sr  8-10   (wyklad) PIOTR WIECZOREK, sala 105
+  sr  10-12  (pracownia) PIOTR WIECZOREK, sala 107
+  
+
+  
+
+
+
+ KURS: NOWOCZESNE J ZYKI PRZETWARZANIA DANYCH: PYTHON, R I MATLAB
+  wt  14-16  (pracownia) PIOTR WNUK-LIPInSKI, sala 137
+  sr  16-18  (pracownia) JAN CHOROWSKI, sala 137
+  czw 12-14  (wyklad) JAN CHOROWSKI, sala 25
+  
+
+  
+
+
+
+ KURS: PRACTICAL C# ENTERPRISE SOFTWARE DEVELOPMENT
+  pi  8-10   (wyklad) -00, sala 119
+  pi  10-12  (pracownia) -00, sala 110
+  
+
+
+
+ KURS: PRAKTYCZNE ASPEKTY ROZWOJU OPROGRAMOWANIA
+  sr  16-17  (wyklad) NOKIA, sale 119,110
+  sr  17-19  (pracownia) NOKIA, sale 119,110
+  
+
+
+
+ KURS: PROGRAMOWANIE W C++
+  wt  12-14  (pracownia) MAREK SZYKUlA, sala 108
+  wt  14-16  (pracownia) MAREK SZYKUlA, sala 108
+  wt  16-18  (wyklad) HANS DENIVELLE, sala 25
+  wt  18-20  (pracownia) HANS DENIVELLE, sala 137
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+ MATEMATYCZNE METODY GRAFIKI KOMPUTEROWEJ
+  wt  12-14  (cwiczenia) PRZEMYSlAW GOSPODARCZYK, sala 4
+  czw 10-12  (wyklad) PAWEl WOŹNY, sala 141
+  
+
+  
+
+  
+
+
+
+ METODY OPTYMALIZACJI
+  pn  12-14  (wyklad) MIECZYSlAW WODECKI, sala 139
+  pn  14-16  (cwicz+pracownia) MIECZYSlAW WODECKI, sale 139,107
+  
+
+
+
+ METODY PROGRAMOWANIA
+  pn  12-15  (cwicz+pracownia) JAN OTOP, sala 5
+  pn  12-15  (cwicz+pracownia) MAREK MATERZOK, sala 105
+  pn  12-15  (cwicz+pracownia) MAlGORZATA BIERNACKA, sala 103
+  pn  12-15  (cwicz+pracownia) KLARA ZIELInSKA, sala 140
+  pn  16-18  (repetytorium) MAREK PIOTRoW, sala 25
+  sr  12-15  (wyklad) TOMASZ WIERZBICKI, sala 119
+  czw 10-13  (cwicz+pracownia) PIOTR POLESIUK, sala 105
+  czw 10-13  (cwicz+pracownia) DARIUSZ BIERNACKI, sala 103
+  czw 10-13  (cwicz+pracownia) TOMASZ WIERZBICKI, sala 4
+  
+
+
+
+ METODY SZTUCZNEJ INTELIGENCJI W ZARZaDZANIU I STEROWANIU PRODUKCJ•
+  sr  14-16  (wyklad) MIECZYSlAW WODECKI, sala 141
+  sr  16-18  (cwicz+pracownia) MIECZYSlAW WODECKI, sale 103,107
+  
+
+
+
+ MODELOWANIE ZJAWISK PRZYRODNICZYCH
+  sr  10-12  (cwicz+pracownia) RAFAl NOWAK, sala 110
+  sr  12-14  (wyklad) RAFAl NOWAK, sala 141
+  czw 10-12  (cwicz+pracownia) RAFAl NOWAK, sale 104,108
+  
+
+  
+
+
+
+ OPTYMALIZACJA KOMBINATORYCZNA
+  wt  12-14  (wyklad) KATARZYNA PALUCH, sala 5
+  wt  14-16  (cwiczenia) KATARZYNA PALUCH, sala 5
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+ PRAWO I PODATKI W BIZNESIE
+  sr  14-16  (wyklad) RAFAl LIPNIEWICZ, sala 25
+  
+
+  
+
+  
+
+
+
+ PROGRAMOWANIE OBIEKTOWE
+  wt  14-16  (cwicz+pracownia) MICHAl KARPInSKI, sale 105,110
+  sr  10-12  (cwicz+pracownia) MAlGORZATA BIERNACKA, sale 4,7
+  sr  14-16  (cwicz+pracownia) MAlGORZATA BIERNACKA, sale 105,110
+  czw 14-16  (wyklad) MARCIN MlOTKOWSKI, sala 25
+  czw 16-18  (cwicz+pracownia) MARCIN MlOTKOWSKI, sala 107
+  pi  10-12  (cwicz+pracownia) JAN OTOP, sale 105,107
+  pi  10-12  (cwicz+pracownia) MARCIN MlOTKOWSKI, sala 137
+  
+
+  
+
+
+
+ PROJEKTOWANIE OBIEKTOWE OPROGRAMOWANIA
+  wt  8-10   (wyklad) WIKTOR ZYCHLA, sala 119
+  wt  10-12  (cwicz+pracownia) WIKTOR ZYCHLA, sala 7
+  pi  8-10   (cwicz+pracownia) PATRYK FILIPIAK, sala 7
+  pi  8-10   (cwicz+pracownia) MARCIN MlOTKOWSKI, sala 107
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+ RACHUNEK PRAWDOPODOBIEnSTWA I STATYSTYKA
+  pn  16-18  (wyklad) WITOLD KARCZEWSKI, sala 119
+  pn  18-20  (cwiczenia) WITOLD KARCZEWSKI, sala 103
+  czw 14-16  (cwiczenia) ANTONI KOsCIELSKI, sala 104
+  czw 16-18  (cwiczenia) ANTONI KOsCIELSKI, sala 104
+  
+
+
+
+ REALISTYCZNA GRAFIKA KOMPUTEROWA
+  pn  14-16  (wyklad) ANDRZEJ lUKASZEWSKI, sala 119
+  pn  16-18  (pracownia) ANDRZEJ lUKASZEWSKI, sala 110
+  czw 14-16  (pracownia) FRANCISCO MELENDEZ, sala 137
+  
+
+  
+
+  
+
+  
+
+
+
+ SEMINARIUM ALGORYTMICZNE 2016
+  czw 14-15  (seminarium) MARCIN BIEnKOWSKI, sala 140
+  czw 15-16  (seminarium) JAROSlAW BYRKA, sala 140
+  
+
+  
+
+
+
+ SEMINARIUM Z SYSTEMoW
+  sr  8-10   (seminarium) ZDZISlAW PlOSKI, sala 104
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+ SEMINARIUM: ALGORYTMY W KOMUNIKACJI BEZPRZEWODOWEJ
+  pi  10-12  (seminarium) TOMASZ JURDZInSKI, sala 141
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+ SEMINARIUM: GRAFIKA KOMPUTEROWA 2016
+  sr  14-16  (seminarium) ANDRZEJ lUKASZEWSKI, sala 4
+  
+
+  
+
+  
+
+  
+
+
+
+ SEMINARIUM: INzYNIERIA OPROGRAMOWANIA
+  wt  14-16  (seminarium) LESZEK GROCHOLSKI, sala 139
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+ SEMINARIUM: SIECI NEURONOWE I STATYSTYKA
+  czw 14-16  (seminarium) JAN CHOROWSKI, sala 139
+  
+
+  
+
+
+
+ SEMINARIUM: TESTOWANIE OPROGRAMOWANIA
+  sr  14-16  (seminarium) LESZEK GROCHOLSKI, sala 140
+  
+
+  
+
+
+
+ SEMINARIUM: ZAAWANSOWANE PROGRAMOWANIE FUNKCYJNE
+  czw 14-16  (seminarium) DARIUSZ BIERNACKI, sala 105
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+ SIECI KOMPUTEROWE
+  pn  16-18  (pracownia) MACIEJ PACUT, sala 109
+  pn  18-20  (pracownia) TOMASZ WIERZBICKI, sala 109
+  sr  12-14  (pracownia) MICHAl RozAnSKI, sala 109
+  sr  16-18  (pracownia) TOMASZ WIERZBICKI, sala 109
+  czw 10-12  (wyklad) MARCIN BIEnKOWSKI, sala 119
+  pi  10-12  (pracownia) PAWEl GARNCAREK, sala 109
+  
+
+  
+
+
+
+ SYNTEZA MOWY
+  pn  16-18  (wyklad) PAWEl RYCHLIKOWSKI, sala 141
+  pn  18-20  (pracownia) PAWEl RYCHLIKOWSKI, sala 107
+  czw 18-20  (pracownia) ADAM KACZMAREK, sala 7
+  
+
+  
+
+  
+
+
+
+ SYSTEMY ROZPROSZONE
+  pi  8-10   (wyklad) ZDZISlAW PlOSKI, sala 104
+  pi  10-12  (cwiczenia) ZDZISlAW PlOSKI, sala 104
+  
+
+  
+
+
+
+ SZTUCZNA INTELIGENCJA
+  wt  16-18  (wyklad) WITOLD PALUSZYnSKI, sala 141
+  wt  18-20  (cwicz+pracownia) PATRYK FILIPIAK, sale 104,107
+  wt  18-20  (cwicz+pracownia) WITOLD PALUSZYnSKI, sale 103,108
+  pi  10-12  (cwicz+pracownia) PATRYK FILIPIAK, sale 4,7
+  
+
+  
+
+
+
+ TEORETYCZNE PODSTAWY J ZYKoW PROGRAMOWANIA
+  wt  10-12  (wyklad) ZDZISlAW SPlAWSKI, sala 139
+  wt  12-14  (cwiczenia) ZDZISlAW SPlAWSKI, sala 139
+  
+
+
+
+ TESTOWANIE OPROGRAMOWANIA
+  sr  16-18  (cwicz+pracownia) LESZEK GROCHOLSKI, sale 5,7
+  czw 8-10   (wyklad) LESZEK GROCHOLSKI, sala 141
+  czw 10-12  (cwicz+pracownia) LESZEK GROCHOLSKI, sale 139,110
+  
+
+
+
+ THEOREM PROVING
+  sr  12-14  (wyklad) HANS DENIVELLE, sala 139
+  sr  14-16  (cwiczenia) HANS DENIVELLE, sala 139
+  
+
+  
+
+  
+
+
+
+ ZAJ CIA Z KRYTYCZNEGO MYsLENIA
+  pn  12-14  (wyklad) ANDRZEJ KISIELEWICZ, sala 141
+  czw 14-16  (cwiczenia) ANDRZEJ KISIELEWICZ, sala 4
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+
+
+ SYSTEMY KOMPUTEROWE
+  sr  12-14  (wyklad) KRYSTIAN BAClAWSKI, sala 25
+  sr  14-16  (cwicz+pracownia) KRYSTIAN BAClAWSKI, sale 103,107
+  
