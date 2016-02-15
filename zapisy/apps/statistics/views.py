@@ -24,7 +24,7 @@ def students(request):
 FROM courses_course LEFT JOIN courses_group ON (courses_group.course_id = courses_course.id) \
 INNER JOIN records_record ON(records_record.group_id = courses_group.id) \
 LEFT JOIN courses_studentpointsview ON (courses_studentpointsview.entity_id = courses_course.entity_id) \
-WHERE courses_course.semester_id=332 AND courses_studentpointsview.student_id = users_student.id AND records_record.student_id = courses_studentpointsview.student_id AND records_record.status = '1' \
+WHERE courses_course.semester_id=333 AND courses_studentpointsview.student_id = users_student.id AND records_record.student_id = courses_studentpointsview.student_id AND records_record.status = '1' \
 GROUP BY courses_course.id, courses_studentpointsview.value) as foo"}).\
         order_by('t0_min')
     return TemplateResponse(request, 'statistics/students_list.html', locals())
