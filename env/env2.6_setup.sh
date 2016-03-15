@@ -38,7 +38,7 @@ source env2.6/bin/activate
 
 # get requirements
 
-pip install -r /vagrant/env/requirements-2.6-1.4.2.txt
+pip install --no-binary django -r /vagrant/env/requirements-2.6-1.4.2.txt
 
 pip install setuptools
 
