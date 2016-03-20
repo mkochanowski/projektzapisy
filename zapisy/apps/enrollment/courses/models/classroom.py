@@ -52,11 +52,15 @@ class Classroom( models.Model ):
 
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
-        from apps.schedule.models import Term
+        from apps.schedule.models import Term, SpecialReservation
+        from apps.enrollment.courses.models import Semester, DAYS_OF_WEEK
 
         rooms = cls.get_in_institute(reservation=True)
         terms = Term.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
-
+        special_reservations = SpecialReservation.objects.filter(semester=Semester.get_current_semester(),
+                                                                 dayOfWeek=str(date.weekday()+1),
+                                                                 classroom__in=rooms).select_related('classroom')
+        print "This is a test string ", len(special_reservations)
         if not ajax:
             return rooms
 
@@ -64,7 +68,7 @@ class Classroom( models.Model ):
 
         for room in rooms:
 
-            if not room.number in result:
+            if room.number not in result:
                 result[room.number] = {'id'       : room.id,
                                        'number'  : room.number,
                                        'capacity': room.capacity,
@@ -77,6 +81,14 @@ class Classroom( models.Model ):
             result[term.room.number]['terms'].append({'begin': ':'.join(str(term.start).split(':')[:2]),
                                          'end': ':'.join(str(term.end).split(':')[:2]),
                                          'title': term.event.title})
+
+        for reservation in special_reservations:
+            result[reservation.classroom.number]['terms'].append(
+                {'begin': ':'.join(str(reservation.start_time).split(':')[:2]),
+                 'end': ':'.join(str(reservation.end_time).split(':')[:2]),
+                 'title': reservation.title
+                 })
+
 
 
         return json.dumps(result)
