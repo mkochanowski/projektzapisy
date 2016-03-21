@@ -52,15 +52,24 @@ class Classroom( models.Model ):
 
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
-        from apps.schedule.models import Term, SpecialReservation
-        from apps.enrollment.courses.models import Semester, DAYS_OF_WEEK
+        from apps.schedule.models import Term as EventTerm, SpecialReservation
+        from apps.enrollment.courses.models import Semester, DAYS_OF_WEEK, Term, Group, Classroom
 
         rooms = cls.get_in_institute(reservation=True)
-        terms = Term.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
+        terms = EventTerm.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
         special_reservations = SpecialReservation.objects.filter(semester=Semester.get_current_semester(),
                                                                  dayOfWeek=str(date.weekday()+1),
                                                                  classroom__in=rooms).select_related('classroom')
-        print "This is a test string ", len(special_reservations)
+
+        #TODO: fix courses not showing on reservation form.
+        #Note 1: why most classrooms have copies with diffrent values on can_reserve flag?
+        #Note 2: code below: classroom field is None.
+        #Note 3: term has a many-to-many relation on classrooms, classroom field is legacy code?
+
+        course_terms = Term.objects.filter(dayOfWeek=str(date.weekday()+1),
+                                           group__course__semester=Semester.get_current_semester()
+                                           ).select_related('classroom', 'group')
+
         if not ajax:
             return rooms
 
@@ -88,8 +97,6 @@ class Classroom( models.Model ):
                  'end': ':'.join(str(reservation.end_time).split(':')[:2]),
                  'title': reservation.title
                  })
-
-
 
         return json.dumps(result)
 
