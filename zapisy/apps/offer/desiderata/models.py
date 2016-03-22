@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from apps.enrollment.courses.models import DAYS_OF_WEEK, Course, Semester
+from apps.enrollment.courses.models import Term, Course, Semester
 
 
 class Desiderata(models.Model):
     employee = models.ForeignKey('users.Employee', verbose_name='prowadzący')
     semester = models.ForeignKey(Semester, verbose_name='semestr')
-    day = models.CharField(max_length=1, choices=DAYS_OF_WEEK, verbose_name='dzień tygodnia')
+    day = models.CharField(max_length=1, choices=Term.DAYS_OF_WEEK, verbose_name='dzień tygodnia')
     hour = models.IntegerField(verbose_name='godzina')
 
     @staticmethod

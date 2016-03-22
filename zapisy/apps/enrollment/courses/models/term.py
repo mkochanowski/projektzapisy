@@ -10,12 +10,29 @@ import logging
 
 backup_logger = logging.getLogger('project.backup')
 
-DAYS_OF_WEEK = [( '1', 'poniedziałek' ), ( '2', 'wtorek' ), ( '3', 'środa' ), ( '4', 'czwartek'), ( '5', 'piątek'), ( '6', 'sobota'), ( '7', 'niedziela')]
+HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)]
 
-HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)] 
-  
+
 class Term(models.Model):
     """terms of groups"""
+
+    MONDAY = '1'
+    TUESDAY = '2'
+    WEDNESDAY = '3'
+    THURSDAY = '4'
+    FRIDAY = '5'
+    SATURDAY = '6'
+    SUNDAY = '7'
+
+    DAYS_OF_WEEK_ENUM = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
+    DAYS_OF_WEEK = [(MONDAY, 'poniedziałek'),
+                    (TUESDAY, 'wtorek'),
+                    (WEDNESDAY, 'środa'),
+                    (THURSDAY, 'czwartek'),
+                    (FRIDAY, 'piątek'),
+                    (SATURDAY, 'sobota'),
+                    (SUNDAY, 'niedziela')]
+
     dayOfWeek  = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia')
     start_time = models.TimeField(verbose_name = 'rozpoczęcie')
     end_time   = models.TimeField(verbose_name = 'zakończenie')

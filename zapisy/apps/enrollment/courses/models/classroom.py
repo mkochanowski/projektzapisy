@@ -53,12 +53,12 @@ class Classroom( models.Model ):
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
         from apps.schedule.models import Term as EventTerm, SpecialReservation
-        from apps.enrollment.courses.models import Semester, DAYS_OF_WEEK, Term, Group, Classroom
+        from apps.enrollment.courses.models import Semester, Term, Group, Classroom
 
         rooms = cls.get_in_institute(reservation=True)
         terms = EventTerm.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
         special_reservations = SpecialReservation.objects.filter(semester=Semester.get_current_semester(),
-                                                                 dayOfWeek=str(date.weekday()+1),
+                                                                 dayOfWeek=Term.DAYS_OF_WEEK_ENUM[date.weekday()],
                                                                  classroom__in=rooms).select_related('classroom')
 
         #TODO: fix courses not showing on reservation form.

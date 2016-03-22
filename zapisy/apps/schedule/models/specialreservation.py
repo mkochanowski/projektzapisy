@@ -4,13 +4,13 @@ from django.utils.encoding import smart_unicode
 
 
 class SpecialReservation(models.Model):
-    from apps.enrollment.courses.models import Semester, DAYS_OF_WEEK, Classroom
+    from apps.enrollment.courses.models import Semester, Term, Classroom
 
     semester = models.ForeignKey(Semester)
     title = models.CharField(max_length=255)
     classroom = models.ForeignKey(Classroom)
     dayOfWeek = models.CharField(max_length=1,
-                                 choices=DAYS_OF_WEEK,
+                                 choices=Term.DAYS_OF_WEEK,
                                  verbose_name='dzień tygodnia')
     start_time = models.TimeField(verbose_name='rozpoczęcie')
     end_time = models.TimeField(verbose_name='zakończenie')
