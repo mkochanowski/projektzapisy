@@ -3,26 +3,46 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.http import Http404
 
-types = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie'), ('3', u'Zajęcia'), ('4', u'Inne')]
-types_for_student = [('2', u'Wydarzenie')]
-types_for_teacher = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie')]
-
-statuses = [('0', u'Do rozpatrzenia'), ('1', u'Zaakceptowane'), ('2', u'Odrzucone')]
-
 
 class Event(models.Model):
     """
     Model of Event
     """
+    TYPE_EXAM = '0'
+    TYPE_TEST = '1'
+    TYPE_EVENT = '2'
+    TYPE_CLASS = '3'
+    TYPE_OTHER = '4'
+
+    STATUS_PENDING = '0'
+    STATUS_ACCEPTED = '1'
+    STATUS_REJECTED = '2'
+
+    STATUSES = [(STATUS_PENDING, u'Do rozpatrzenia'),
+                (STATUS_ACCEPTED, u'Zaakceptowane'),
+                (STATUS_REJECTED, u'Odrzucone')]
+
+    TYPES = [(TYPE_EXAM, u'Egzamin'),
+             (TYPE_TEST, u'Kolokwium'),
+             (TYPE_EVENT, u'Wydarzenie'),
+             (TYPE_CLASS, u'Zajęcia'),
+             (TYPE_OTHER, u'Inne')]
+
+    TYPES_FOR_STUDENT = [(TYPE_EVENT, u'Wydarzenie')]
+
+    TYPES_FOR_TEACHER = [(TYPE_EXAM, u'Egzamin'),
+                         (TYPE_TEST, u'Kolokwium'),
+                         (TYPE_EVENT, u'Wydarzenie')]
+
     from apps.enrollment.courses.models import Course, Group
     from django.contrib.auth.models import User
 
     title = models.CharField(max_length=255, verbose_name=u'Tytuł', null=True, blank=True)
     description = models.TextField(verbose_name=u'Opis')
-    type = models.CharField(choices=types, max_length=1, verbose_name=u'Typ')
+    type = models.CharField(choices=TYPES, max_length=1, verbose_name=u'Typ')
     visible = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne')
 
-    status = models.CharField(choices=statuses, max_length=1, verbose_name=u'Stan', default='0')
+    status = models.CharField(choices=STATUSES, max_length=1, verbose_name=u'Stan', default='0')
 
     course = models.ForeignKey(Course, null=True, blank=True)
     group = models.ForeignKey(Group, null=True, blank=True)
@@ -33,7 +53,6 @@ class Event(models.Model):
     author = models.ForeignKey(User, verbose_name=u'Twórca')
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
-
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
@@ -50,7 +69,6 @@ class Event(models.Model):
         permissions = (
             ("manage_events", u"Może zarządzać wydarzeniami"),
         )
-
 
     def save(self, *args, **kwargs):
         """
@@ -71,13 +89,13 @@ class Event(models.Model):
 
         super(self.__class__, self).save()
 
-#        if is_new and self.type in ['0', '1'] and self.course:
-#            render_and_send_email(u'Ustalono termin egzaminu',
-#                                  u'schedule/emails/new_exam.txt',
-#                                  u'schedule/emails/new_exam.html',
-#                                  {'event': self},
-#                                  self.get_followers()
-#            )
+    #        if is_new and self.type in ['0', '1'] and self.course:
+    #            render_and_send_email(u'Ustalono termin egzaminu',
+    #                                  u'schedule/emails/new_exam.txt',
+    #                                  u'schedule/emails/new_exam.html',
+    #                                  {'event': self},
+    #                                  self.get_followers()
+    #            )
 
     def _user_can_see_or_404(self, user):
         """
