@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils.encoding import smart_unicode
-
+from django.core.validators import ValidationError
 
 # this breaks the app - why?
 # from apps.enrollment.courses.models import Semester, Term, Classroom
@@ -54,10 +54,32 @@ class SpecialReservation(models.Model):
     dayOfWeek = models.CharField(max_length=1,
                                  choices=Term.DAYS_OF_WEEK,
                                  verbose_name='dzień tygodnia')
-    start_time = models.TimeField(verbose_name='rozpoczęcie')
-    end_time = models.TimeField(verbose_name='zakończenie')
+    start_time = models.TimeField(verbose_name='rozpoczęcie', blank=False)
+    end_time = models.TimeField(verbose_name='zakończenie', blank=False)
 
     objects = SpecialReservationManager()
+
+    def validate_unique(self, *args, **kwargs):
+        super(SpecialReservation, self).validate_unique(*args, **kwargs)
+
+        overlaps = SpecialReservation.objects.\
+            filter(dayOfWeek=self.dayOfWeek).\
+            filter(start_time__lte=self.end_time).\
+            filter(classroom=self.classroom).\
+            filter(end_time__gte=self.start_time)
+
+        if not self._state.adding and self.pk is not None:
+            overlaps = overlaps.exclude(pk=self.pk)
+
+        if overlaps:
+            raise ValidationError({
+                'classroom': [
+                    ValidationError(
+                        message='This classroom has an overlapping special reservation: ' + overlaps[0].title,
+                        code='overlap_special',
+                    )
+                ]
+            })
 
     class Meta:
         app_label = 'schedule'
