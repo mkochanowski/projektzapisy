@@ -6,7 +6,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from apps.enrollment.courses.exceptions import *
 from django.db.models import Q
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .term import Term
 
@@ -131,6 +131,37 @@ class Semester( models.Model ):
             # TODO: should this throw exceptions?
             return None
 
+    def get_all_days_of_week(self, day_of_week):
+        date = self.semester_beginning
+        python_weekday = Term.get_python_day_of_week(day_of_week)
+
+        # ensure first date in while loop is a candidate
+        if date.weekday() < python_weekday:
+            date += datetime.timedelta(days=python_weekday - date.weekday())
+        elif date.weekday() == python_weekday:
+            pass
+        else:
+            date += timedelta(days = 7 - date.weekday() + python_weekday)
+
+        dates = []
+        while date <= self.semester_ending:
+            # if its not a free day
+            if not Freeday.is_free(date):
+                # if it wasnt changed
+                if ChangedDay.get_day_of_week(date) == day_of_week:
+                    dates.append(date)
+            date += timedelta(days=7)
+
+        dates.append(self.get_all_added_days_of_week(day_of_week))
+
+        return dates
+
+    def get_all_added_days_of_week(self, day_of_week):
+        """Gets dates of all weekdays changed from another weekday to specvified weekday in this semester"""
+        added_days = ChangedDay.get_added_days_of_week(self.semester_beginning,
+                                                       self.semester_ending,
+                                                       day_of_week)
+        return map(lambda x: x.date, added_days)
 
     @staticmethod
     def get_current_semester():
@@ -224,6 +255,14 @@ class ChangedDay(models.Model):
             return changes[0].day
         else:
             return Term.get_day_of_week(date)
+
+    @staticmethod
+    def get_added_days_of_week(start_date, end_date, day_of_week=None):
+        added_days = ChangedDay.objects.filter(day__gte=start_date, day__lte=end_date)
+        if day_of_week is None:
+            return added_days
+        else:
+            return added_days.filter(weekday=day_of_week)
 
     def __unicode__(self):
         return str(self.day) + ' -> ' + str(self.get_weekday_display())

@@ -2,10 +2,12 @@
 from django.db import models
 from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
+from .term import Term
 
 # this breaks the app - why?
 # from apps.enrollment.courses.models import Semester, Term, Classroom
 
+from apps.enrollment.courses.models import Semester
 
 class SpecialReservationQuerySet(models.query.QuerySet):
     def on_day_of_week(self, day_of_week):
@@ -23,6 +25,12 @@ class SpecialReservationQuerySet(models.query.QuerySet):
 
     def in_classrooms(self, classrooms):
         return self.filter(classroom__in=classrooms)
+
+
+class FixedValidationError(ValidationError):
+    def __init__(self, message, code=None, params=None):
+        super(FixedValidationError, self).__init__(message, code, params)
+        self.message_dict = dict()
 
 
 class SpecialReservationManager(models.Manager):
@@ -63,23 +71,27 @@ class SpecialReservation(models.Model):
         super(SpecialReservation, self).validate_unique(*args, **kwargs)
 
         overlaps = SpecialReservation.objects.\
-            filter(dayOfWeek=self.dayOfWeek).\
+            on_day_of_week(self.dayOfWeek).\
+            in_classroom(self.classroom).\
             filter(start_time__lte=self.end_time).\
-            filter(classroom=self.classroom).\
             filter(end_time__gte=self.start_time)
 
         if not self._state.adding and self.pk is not None:
             overlaps = overlaps.exclude(pk=self.pk)
 
         if overlaps:
-            raise ValidationError({
-                'classroom': [
-                    ValidationError(
-                        message='This classroom has an overlapping special reservation: ' + overlaps[0].title,
-                        code='overlap_special',
-                    )
-                ]
-            })
+            raise ValidationError(message={'classroom': ['Overlaps with another reservation: ' + smart_unicode(overlaps[0])]},
+                                  code='overlap_special')
+
+        # TODO: Learn to validate models
+
+        # anything here breaks validation
+        # candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek)
+        # overlaps = Term.get_conflicted(candidate_days, self.start_time, self.end_time)
+        # if overlaps:
+        #    print "ITS HAPPENING"
+        #    raise ValidationError(message={'semester': ['Overlaps with event terms']},
+        #                         code='overlap_event')
 
     class Meta:
         app_label = 'schedule'

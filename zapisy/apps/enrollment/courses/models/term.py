@@ -25,13 +25,15 @@ class Term(models.Model):
     SUNDAY = '7'
 
     DAYS_OF_WEEK_ENUM = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
-    DAYS_OF_WEEK = [(MONDAY, 'poniedziałek'),
-                    (TUESDAY, 'wtorek'),
-                    (WEDNESDAY, 'środa'),
-                    (THURSDAY, 'czwartek'),
-                    (FRIDAY, 'piątek'),
-                    (SATURDAY, 'sobota'),
-                    (SUNDAY, 'niedziela')]
+
+    #TODO: Why 'ś' in 'środa' breaks admin forms
+    DAYS_OF_WEEK = [(MONDAY, u'poniedzialek'),
+                    (TUESDAY, u'wtorek'),
+                    (WEDNESDAY, u'sroda'),
+                    (THURSDAY, u'czwartek'),
+                    (FRIDAY, u'piatek'),
+                    (SATURDAY, u'sobota'),
+                    (SUNDAY, u'niedziela')]
 
     dayOfWeek  = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia')
     start_time = models.TimeField(verbose_name = 'rozpoczęcie')
@@ -110,6 +112,10 @@ class Term(models.Model):
     @staticmethod
     def get_day_of_week(date):
         return Term.DAYS_OF_WEEK_ENUM[date.weekday()]
+
+    @staticmethod
+    def get_python_day_of_week(day_of_week):
+        return Term.DAYS_OF_WEEK_ENUM.index(day_of_week)
 
     @staticmethod
     def get_groups_terms(groups_ids):
