@@ -4,7 +4,7 @@ from django                   import forms
 from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
-from apps.schedule.models import Event, types_for_student, types_for_teacher, Term, EventModerationMessage, EventMessage
+from apps.schedule.models import Event, Term, EventModerationMessage, EventMessage
 
 from django.forms.models import inlineformset_factory
 
@@ -44,9 +44,9 @@ class EventForm(forms.ModelForm):
         self.author = user
 
         if user.employee:
-            self.fields['type'].choices = types_for_teacher
+            self.fields['type'].choices = Event.TYPES_FOR_TEACHER
         else:
-            self.fields['type'].choices = types_for_student
+            self.fields['type'].choices = Event.TYPES_FOR_STUDENT
 
         if not user.employee:
             self.fields['course'].queryset = EmptyQuerySet()

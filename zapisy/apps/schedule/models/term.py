@@ -62,7 +62,7 @@ class Term(models.Model):
         if not self.room:
             return EmptyQuerySet()
 
-        #        X < B AND A < Y
+        # X < B AND A < Y
 
         terms = Term.objects.filter(Q(room=self.room), Q(day=self.day),
                                     Q(start__lt=self.end), Q(end__gt=self.start)) \

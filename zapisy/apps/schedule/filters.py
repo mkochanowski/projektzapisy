@@ -2,10 +2,10 @@
 
 import django_filters
 from apps.enrollment.courses.models import Semester
-from apps.schedule.models import Event, Term, types, statuses
+from apps.schedule.models import Event, Term
 
-FILTER_TYPE_CHOICES = [('', u'---------')] + types
-FILTER_STATUS_CHOICES = [('', u'---------')] + statuses
+FILTER_TYPE_CHOICES = [('', u'---------')] + Event.TYPES
+FILTER_STATUS_CHOICES = [('', u'---------')] + Event.STATUSES
 class EventFilter(django_filters.FilterSet):
     type = django_filters.ChoiceFilter(choices=FILTER_TYPE_CHOICES, label='Typ')
     status = django_filters.ChoiceFilter(choices=FILTER_STATUS_CHOICES, label='Status')
