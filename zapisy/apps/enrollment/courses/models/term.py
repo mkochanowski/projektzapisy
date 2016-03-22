@@ -106,7 +106,11 @@ class Term(models.Model):
         
     def get_dayOfWeek_display_short(self):
         return { '1': 'pn', '2': 'wt', '3': 'śr', '4': 'cz', '5': 'pt', '6': 'so', '7': 'nd'}[self.dayOfWeek].decode('utf8')
-    
+
+    @staticmethod
+    def get_day_of_week(date):
+        return Term.DAYS_OF_WEEK_ENUM[date.weekday()]
+
     @staticmethod
     def get_groups_terms(groups_ids):
         """

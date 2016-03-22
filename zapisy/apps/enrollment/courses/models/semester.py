@@ -120,7 +120,18 @@ class Semester( models.Model ):
             return Semester.get_by_id(id)
 
         return Semester.get_current_semester()
-                
+
+    @staticmethod
+    def get_semester(date):
+        semester = Semester.objects.filter(semester_beginning__lte=date,
+                                           semester_ending__gte=date)
+        if semester and len(semester) == 1:
+            return semester[0]
+        else:
+            # TODO: should this throw exceptions?
+            return None
+
+
     @staticmethod
     def get_current_semester():
         """ if exist, it returns current semester. otherwise return None """
@@ -183,6 +194,15 @@ class Semester( models.Model ):
 class Freeday(models.Model):
     day = models.DateField(verbose_name='dzień wolny')
 
+    @classmethod
+    def is_free(cls, date):
+        """Returns true if date is a free day"""
+        free = cls.objects.filter(day=date)
+        if free:
+            return True
+        else:
+            return False
+
     def __unicode__(self):
         return str(self.day)
 
@@ -195,6 +215,15 @@ class Freeday(models.Model):
 class ChangedDay(models.Model):
     day = models.DateField(verbose_name='dzień')
     weekday = models.CharField(choices=Term.DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
+
+    @classmethod
+    def get_day_of_week(cls, date):
+        """Returns actual schedule day, with respect to ChangedDays"""
+        changes = ChangedDay.objects.filter(day=date)
+        if changes:
+            return changes[0].day
+        else:
+            return Term.get_day_of_week(date)
 
     def __unicode__(self):
         return str(self.day) + ' -> ' + str(self.get_weekday_display())

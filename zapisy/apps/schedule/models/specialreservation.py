@@ -3,6 +3,48 @@ from django.db import models
 from django.utils.encoding import smart_unicode
 
 
+# this breaks the app - why?
+# from apps.enrollment.courses.models import Semester, Term, Classroom
+
+
+class SpecialReservationQuerySet(models.query.QuerySet):
+    def on_day_of_week(self, day_of_week):
+        return self.filter(dayOfWeek=day_of_week)
+
+    def this_semester(self):
+        from apps.enrollment.courses.models import Semester
+        return self.filter(semester=Semester.get_current_semester())
+
+    def any_semester(self, semester):
+        return self.filter(semester=semester)
+
+    def in_classroom(self, classroom):
+        return self.filter(classroom=classroom)
+
+    def in_classrooms(self, classrooms):
+        return self.filter(classroom__in=classrooms)
+
+
+class SpecialReservationManager(models.Manager):
+    def get_query_set(self):
+        return SpecialReservationQuerySet(self.model, using=self._db)
+
+    def on_day_of_week(self, day_of_week):
+        return self.get_query_set().on_day_of_week(day_of_week)
+
+    def this_semester(self):
+        return self.get_query_set().this_semester()
+
+    def any_semester(self, semester):
+        return self.get_query_set().any_semester(semester)
+
+    def in_classroom(self, classroom):
+        return self.get_query_set().in_classroom(classroom)
+
+    def in_classrooms(self, classrooms):
+        return self.get_query_set().in_classrooms(classrooms)
+
+
 class SpecialReservation(models.Model):
     from apps.enrollment.courses.models import Semester, Term, Classroom
 
@@ -14,6 +56,8 @@ class SpecialReservation(models.Model):
                                  verbose_name='dzień tygodnia')
     start_time = models.TimeField(verbose_name='rozpoczęcie')
     end_time = models.TimeField(verbose_name='zakończenie')
+
+    objects = SpecialReservationManager()
 
     class Meta:
         app_label = 'schedule'

@@ -53,25 +53,14 @@ class Classroom( models.Model ):
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
         from apps.schedule.models import Term as EventTerm, SpecialReservation
-        from apps.enrollment.courses.models import Semester, Term, Group, Classroom
+        from apps.enrollment.courses.models import Semester, Term, Freeday, ChangedDay
 
         rooms = cls.get_in_institute(reservation=True)
-        terms = EventTerm.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
-        special_reservations = SpecialReservation.objects.filter(semester=Semester.get_current_semester(),
-                                                                 dayOfWeek=Term.DAYS_OF_WEEK_ENUM[date.weekday()],
-                                                                 classroom__in=rooms).select_related('classroom')
-
-        #TODO: fix courses not showing on reservation form.
-        #Note 1: why most classrooms have copies with diffrent values on can_reserve flag?
-        #Note 2: code below: classroom field is None.
-        #Note 3: term has a many-to-many relation on classrooms, classroom field is legacy code?
-
-        course_terms = Term.objects.filter(dayOfWeek=str(date.weekday()+1),
-                                           group__course__semester=Semester.get_current_semester()
-                                           ).select_related('classroom', 'group')
 
         if not ajax:
             return rooms
+
+        # build a dictionary
 
         result = {}
 
@@ -86,17 +75,55 @@ class Classroom( models.Model ):
                                        'title': room.number,
                                        'terms': []}
 
+        # fill event terms
+
+        terms = EventTerm.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
+
         for term in terms:
             result[term.room.number]['terms'].append({'begin': ':'.join(str(term.start).split(':')[:2]),
                                          'end': ':'.join(str(term.end).split(':')[:2]),
                                          'title': term.event.title})
 
-        for reservation in special_reservations:
-            result[reservation.classroom.number]['terms'].append(
-                {'begin': ':'.join(str(reservation.start_time).split(':')[:2]),
-                 'end': ':'.join(str(reservation.end_time).split(':')[:2]),
-                 'title': reservation.title
-                 })
+        # if day isnt free fill cyclical reservations
+
+        if not Freeday.is_free(date):
+
+            # get weekday and semester
+
+            weekday = ChangedDay.get_day_of_week(date)
+            selected_semester = Semester.get_semester(date)
+
+            if selected_semester is None:
+                return
+
+            # get special reservations data
+
+            special_reservations = SpecialReservation.objects.\
+                any_semester(selected_semester).\
+                on_day_of_week(weekday).\
+                in_classrooms(rooms).select_related('classroom')
+
+            # fill special reservations data
+
+            for reservation in special_reservations:
+                result[reservation.classroom.number]['terms'].append(
+                    {'begin': ':'.join(str(reservation.start_time).split(':')[:2]),
+                     'end': ':'.join(str(reservation.end_time).split(':')[:2]),
+                     'title': reservation.title
+                     })
+
+            # get courses data
+
+            #TODO: fix courses not showing on reservation form, get courses data
+            #Note 1: why most classrooms have copies with diffrent values on can_reserve flag?
+            #Note 2: code below: classroom field is None.
+            #Note 3: term has a many-to-many relation on classrooms, classroom field is legacy code?
+
+            course_terms = Term.objects.filter(dayOfWeek=str(date.weekday()+1),
+                                               group__course__semester=Semester.get_current_semester()
+                                               ).select_related('classroom', 'group')
+
+            #TODO: fill courses data
 
         return json.dumps(result)
 
