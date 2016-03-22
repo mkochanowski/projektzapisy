@@ -8,6 +8,9 @@ from django.db.models import Q
 
 from datetime import datetime
 
+from .term import Term
+
+
 class GetterManager(models.Manager):
 
     def get_next(self):
@@ -15,6 +18,7 @@ class GetterManager(models.Manager):
             return self.get(records_closing__gte=datetime.now())
         except (ObjectDoesNotExist, MultipleObjectsReturned):
             return self.filter(visible=True).order_by('-records_closing')[0]
+
 
 class Semester( models.Model ):
     """semester in academic year"""
@@ -187,10 +191,10 @@ class Freeday(models.Model):
         verbose_name_plural = 'dni wolne od zajęć'
         app_label = 'courses'
 
-DAYS_OF_WEEK = [( '1', u'poniedzalek' ), ( '2', u'wtorek' ), ( '3', u'sroda' ), ( '4', u'czwartek'), ( '5', u'piatek'), ( '6', u'sobota'), ( '7', u'niedziela')]
+
 class ChangedDay(models.Model):
     day = models.DateField(verbose_name='dzień')
-    weekday = models.CharField(choices=DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
+    weekday = models.CharField(choices=Term.DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
 
     def __unicode__(self):
         return str(self.day) + ' -> ' + str(self.get_weekday_display())
