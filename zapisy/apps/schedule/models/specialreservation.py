@@ -2,19 +2,15 @@
 from django.db import models
 from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
-from .term import Term
-
-# this breaks the app - why?
-# from apps.enrollment.courses.models import Semester, Term, Classroom
 
 from apps.enrollment.courses.models import Semester
+
 
 class SpecialReservationQuerySet(models.query.QuerySet):
     def on_day_of_week(self, day_of_week):
         return self.filter(dayOfWeek=day_of_week)
 
     def this_semester(self):
-        from apps.enrollment.courses.models import Semester
         return self.filter(semester=Semester.get_current_semester())
 
     def any_semester(self, semester):
@@ -25,12 +21,6 @@ class SpecialReservationQuerySet(models.query.QuerySet):
 
     def in_classrooms(self, classrooms):
         return self.filter(classroom__in=classrooms)
-
-
-class FixedValidationError(ValidationError):
-    def __init__(self, message, code=None, params=None):
-        super(FixedValidationError, self).__init__(message, code, params)
-        self.message_dict = dict()
 
 
 class SpecialReservationManager(models.Manager):
@@ -67,14 +57,27 @@ class SpecialReservation(models.Model):
 
     objects = SpecialReservationManager()
 
-    def validate_unique(self, *args, **kwargs):
+    @classmethod
+    def get_reservations_for_semester(cls, semester=None, day_of_week=None):
+        """Gets special reservations for a semester and day of the week"""
+
+        if semester is None:
+            semester = Semester.get_current_semester()
+
+        query = cls.objects.any_semester(semester)
+        if day_of_week is None:
+            return query
+        else:
+            return query.on_day_of_week(day_of_week)
+
+    def clean(self, *args, **kwargs):
         super(SpecialReservation, self).validate_unique(*args, **kwargs)
 
         overlaps = SpecialReservation.objects.\
             on_day_of_week(self.dayOfWeek).\
             in_classroom(self.classroom).\
-            filter(start_time__lte=self.end_time).\
-            filter(end_time__gte=self.start_time)
+            filter(start_time__lt=self.end_time).\
+            filter(end_time__gt=self.start_time)
 
         if not self._state.adding and self.pk is not None:
             overlaps = overlaps.exclude(pk=self.pk)
