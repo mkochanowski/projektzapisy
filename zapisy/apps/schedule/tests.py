@@ -1,19 +1,16 @@
 from django.test import TestCase
-from .models import SpecialReservation
+from .models import SpecialReservation, Event, Term as EventTerm
 from apps.enrollment.courses.models import Semester, Classroom, Term
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, date
 from django.core.serializers import serialize
 from django.core.validators import ValidationError
-
+from django.contrib.auth.models import User
+from apps.enrollment.courses.objectmothers import SemesterObjectMother
 
 class SpecialReservationTestCase(TestCase):
 
     def setUp(self):
-        semester = Semester(type=Semester.TYPE_SUMMER,
-                            visible=True,
-                            year='2016/17',
-                            semester_beginning=datetime(2016, 1, 1),
-                            semester_ending=datetime(2016, 6, 30))
+        semester = SemesterObjectMother.summer_semester_2015_16()
         semester.save()
         room110 = Classroom(number=110,
                             can_reserve=True)
@@ -41,19 +38,22 @@ class SpecialReservationTestCase(TestCase):
             serialize('json', objects, stream=out)
 
     def test_created_reservation_is_present(self):
-        reservations = SpecialReservation.get_reservations_for_semester()
+        semester = Semester.get_semester(date(2016, 5, 12))
+        reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertTrue(reservations)
 
     def test_no_reservations_on_not_reserved_day(self):
-        reservations = SpecialReservation.get_reservations_for_semester(day_of_week=Term.FRIDAY)
+        semester = Semester.get_semester(date(2016, 5, 12))
+        reservations = SpecialReservation.get_reservations_for_semester(semester,day_of_week=Term.FRIDAY)
         self.assertFalse(reservations)
 
     def test_number_of_reservations(self):
-        reservations = SpecialReservation.get_reservations_for_semester()
+        semester = Semester.get_semester(date(2016, 5, 12))
+        reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 2)
 
     def test_try_clean_on_overlapping_reservation(self):
-        semester = Semester.get_current_semester()
+        semester = Semester.get_semester(date(2016, 5, 12))
         room = Classroom.get_by_number('110')
         reservation = SpecialReservation(
             semester=semester,
@@ -66,7 +66,7 @@ class SpecialReservationTestCase(TestCase):
         self.assertRaises(ValidationError, reservation.clean)
 
     def test_try_clean_on_non_overlapping_reservation(self):
-        semester = Semester.get_current_semester()
+        semester = Semester.get_semester(date(2016, 5, 12))
         room = Classroom.get_by_number('110')
         reservation = SpecialReservation(
             semester=semester,

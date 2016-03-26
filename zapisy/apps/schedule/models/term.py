@@ -105,7 +105,7 @@ class Term(models.Model):
             .select_related('event', 'room', 'event__course', 'event__course__entity', 'event__course__semester')
 
     @classmethod
-    def get_conflicted(cls, dates, start_time, end_time):
+    def get_conflicts_on_dates(cls, dates, start_time, end_time):
         return cls.objects.filter(day__in=dates,
                                   start_time__lt=end_time,
                                   end_time__gt=start_time)

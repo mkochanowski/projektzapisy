@@ -4,7 +4,7 @@ from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
 
 from apps.enrollment.courses.models import Semester
-
+from .term import Term
 
 class SpecialReservationQuerySet(models.query.QuerySet):
     def on_day_of_week(self, day_of_week):
@@ -70,8 +70,8 @@ class SpecialReservation(models.Model):
         else:
             return query.on_day_of_week(day_of_week)
 
+    # This method is called by django when adding data through forms
     def clean(self, *args, **kwargs):
-        super(SpecialReservation, self).validate_unique(*args, **kwargs)
 
         overlaps = SpecialReservation.objects.\
             on_day_of_week(self.dayOfWeek).\
