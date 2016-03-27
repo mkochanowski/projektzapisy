@@ -3,13 +3,12 @@ from django.db import models
 from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
 
-from apps.enrollment.courses.models import Semester
+from apps.enrollment.courses.models import Semester, Term as CourseTerm
 
 from .event import Event
 
 
 class SpecialReservationQuerySet(models.query.QuerySet):
-
     def on_day_of_week(self, day_of_week):
         return self.filter(dayOfWeek=day_of_week)
 
@@ -90,6 +89,8 @@ class SpecialReservation(models.Model):
 
         """
 
+        # Fetch conflicting SpecialReservations
+
         overlaps = SpecialReservation.objects. \
             on_day_of_week(self.dayOfWeek). \
             in_classroom(self.classroom). \
@@ -103,6 +104,8 @@ class SpecialReservation(models.Model):
                 message={'__all__': ['Overlaps with another reservation: ' + smart_unicode(overlaps[0])]},
                 code='overlap_special')
 
+        # Fetch conflicting Events
+
         candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek)
         overlaps = Event.get_events_for_dates(dates=candidate_days,
                                               classroom=self.classroom,
@@ -111,6 +114,22 @@ class SpecialReservation(models.Model):
         if overlaps:
             raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + overlaps[0].title]},
                                   code='overlap_event')
+
+        # Fetch conflicting Course Terms
+        # TODO: Test this part
+
+        overlaps = CourseTerm.objects.filter(dayOfWeek=self.dayOfWeek,
+                                             group__course__semester=self.semester,
+                                             classrooms=self.classroom,
+                                             start_time__lt=self.end_time,
+                                             end_time__gt=self.start_time).select_related('group__course')
+
+        if overlaps:
+            raise ValidationError(
+                message={'__all__': ['Overlaps with a group term for course ' + overlaps[0].group.course.name +
+                                     ' ' + unicode(overlaps[0])]},
+                code='overlap_course'
+            )
 
         super(SpecialReservation, self).clean()
 
