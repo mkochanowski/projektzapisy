@@ -49,7 +49,6 @@ class Classroom( models.Model ):
     def get_by_slug(cls, slug):
         return cls.objects.get(slug=slug)
 
-
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
         from apps.schedule.models import Term as EventTerm, SpecialReservation
@@ -78,11 +77,13 @@ class Classroom( models.Model ):
         # fill event terms
 
         terms = EventTerm.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
+        def make_dict(start_time,end_time,title):
+            return {'begin': ':'.join(str(start_time).split(':')[:2]),
+                    'end': ':'.join(str(end_time).split(':')[:2]),
+                    'title': title}
 
         for term in terms:
-            result[term.room.number]['terms'].append({'begin': ':'.join(str(term.start).split(':')[:2]),
-                                         'end': ':'.join(str(term.end).split(':')[:2]),
-                                         'title': term.event.title})
+            result[term.room.number]['terms'].append(make_dict(term.start, term.end, term.event.title))
 
         # if day isnt free fill cyclical reservations
 
@@ -106,25 +107,33 @@ class Classroom( models.Model ):
             # fill special reservations data
 
             for reservation in special_reservations:
-                result[reservation.classroom.number]['terms'].append(
-                    {'begin': ':'.join(str(reservation.start_time).split(':')[:2]),
-                     'end': ':'.join(str(reservation.end_time).split(':')[:2]),
-                     'title': reservation.title
-                     })
+                result[reservation.classroom.number]['terms'].append(make_dict(reservation.start_time,
+                                                                               reservation.end_time,
+                                                                               reservation.title))
 
             # get courses data
 
-            #TODO: fix courses not showing on reservation form, get courses data
-            #Note 1: why most classrooms have copies with diffrent values on can_reserve flag?
-            #Note 2: code below: classroom field is None.
-            #Note 3: term has a many-to-many relation on classrooms, classroom field is legacy code?
+            course_terms = Term.objects.filter(dayOfWeek=weekday,
+                                               group__course__semester=selected_semester)\
+                .select_related('classroom', 'group').prefetch_related('classrooms')
 
-            course_terms = Term.objects.filter(dayOfWeek=str(date.weekday()+1),
-                                               group__course__semester=Semester.get_current_semester()
-                                               ).select_related('classroom', 'group')
+            # TODO: This might be costly. Needs tests.
+            # note: classroom field in Term model is deprecated, use .classrooms.all() to get classrooms
 
-            #TODO: fill courses data
+            # fill courses data
 
+            for course_term in course_terms:
+                for classroom in course_term.classrooms.all():
+                    if classroom not in rooms:
+                        continue
+                    result[classroom.number]['terms'].append(make_dict(course_term.start_time,
+                                                                       course_term.end_time,
+                                                                       course_term.group.course.name))
+                if course_term.classroom is None:
+                    continue
+                result[course_term.classroom.number]['terms'].append(make_dict(course_term.start_time,
+                                                                               course_term.end_time,
+                                                                               course_term.group.course.name))
         return json.dumps(result)
 
 
