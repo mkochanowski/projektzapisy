@@ -1,4 +1,4 @@
-from .models import Semester
+from .models import Semester, Classroom
 from datetime import datetime
 
 
@@ -35,3 +35,32 @@ class SemesterObjectMother():
             semester_ending=datetime(2016, 9, 10)
         )
         return semester
+
+
+class ClassroomObjectMother():
+
+    @staticmethod
+    def room110():
+        room = Classroom(
+            type=3,
+            description='Pracownia z najszybszymi komputerami w instytucie',
+            number=110,
+            building='Instytut Informatyki',
+            capacity=20,
+            floor=1,
+            can_reserve=True
+        )
+        return room
+
+    @staticmethod
+    def room104():
+        room = Classroom(
+            type=1,
+            description='Sala cwiczeniowa',
+            number=104,
+            building='Instytut Informatyki',
+            capacity=32,
+            floor=1,
+            can_reserve=True
+        )
+        return room
