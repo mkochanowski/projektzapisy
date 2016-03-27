@@ -6,15 +6,25 @@ from django.core.serializers import serialize
 from django.core.validators import ValidationError
 from django.contrib.auth.models import User
 from apps.enrollment.courses.objectmothers import SemesterObjectMother
+from apps.users.objectmothers import UserObjectMother
 
 class SpecialReservationTestCase(TestCase):
 
     def setUp(self):
         semester = SemesterObjectMother.summer_semester_2015_16()
         semester.save()
+
+        semester_2 = SemesterObjectMother.winter_semester_2015_16()
+        semester_2.save()
+
         room110 = Classroom(number=110,
                             can_reserve=True)
         room110.save()
+
+        room104 = Classroom(number=104,
+                            can_reserve=True)
+        room104.save()
+
         reservation = SpecialReservation(semester=semester,
                                          title="A reservation",
                                          classroom=room110,
@@ -23,16 +33,26 @@ class SpecialReservationTestCase(TestCase):
                                          end_time=time(16))
         reservation.save()
 
-        reservation2 = SpecialReservation(semester=semester,
+        reservation_2 = SpecialReservation(semester=semester,
                                           title='Anoter reservation',
                                           classroom=room110,
                                           dayOfWeek=Term.THURSDAY,
                                           start_time=time(15),
                                           end_time=time(16))
 
-        reservation2.save()
+        reservation_2.save()
 
-        objects = [semester, room110, reservation, reservation2]
+        reservation_3 = SpecialReservation(semester=semester_2,
+                                           title='Reserve whole monday',
+                                           classroom=room110,
+                                           dayOfWeek=Term.MONDAY,
+                                           start_time=time(8),
+                                           end_time=time(21))
+        reservation_3.save()
+
+
+
+        objects = [semester, semester_2, room110, room104, reservation, reservation_2, reservation_3]
 
         with open('./apps/schedule/fixtures/fixture__1.json', 'w') as out:
             serialize('json', objects, stream=out)
@@ -77,3 +97,77 @@ class SpecialReservationTestCase(TestCase):
             end_time=time(15)
         )
         reservation.clean()
+
+    def test_save_overlapping_reservation(self):
+        semester = Semester.get_semester(date(2015, 12, 5))
+        room = Classroom.get_by_number('110')
+        reservation = SpecialReservation(
+            semester=semester,
+            title='overlapping reservation',
+            classroom=room,
+            dayOfWeek=Term.MONDAY,
+            start_time=time(15),
+            end_time=time(16)
+        )
+        self.assertRaises(ValidationError,reservation.save)
+
+    def test_save_non_overlapping_reservation(self):
+        semester =Semester.get_semester(date(2015,12,5))
+        room =  Classroom.get_by_number('104')
+        reservation = SpecialReservation(
+            semester=semester,
+            title='overlap with room110',
+            classroom=room,
+            dayOfWeek=Term.MONDAY,
+            start_time=time(15),
+            end_time=time(16)
+        )
+        reservation.save()
+
+
+class EventTestCase(TestCase):
+    def setUp(self):
+        teacher = UserObjectMother.user_jan_kowalski()
+        teacher.save()
+        profile = UserObjectMother.teacher_profile(teacher)
+        profile.save()
+        employee = UserObjectMother.employee(teacher)
+        employee.save()
+
+        room110 = Classroom(number=110)
+        room110.save()
+
+
+        event = Event(
+            title='an event',
+            description='an event',
+            type=Event.TYPE_EVENT,
+            author=teacher,
+        )
+        event.save()
+
+        term_1 = EventTerm(
+            event=event,
+            day=date(2016, 5, 20),
+            start=time(15),
+            end=time(16),
+            room=room110
+        )
+        term_1.save()
+
+        term_2 = EventTerm(
+            event=event,
+            day=term_1.day,
+            start=time(16),
+            end=time(17),
+            room=room110
+        )
+
+        term_2.save()
+
+    def test_event_is_present(self):
+        room = Classroom.get_by_number('110')
+        events = Event.get_events_for_dates(dates=[date(2016, 5, 20)],
+                                            classroom=room)
+        self.assertTrue(events)
+

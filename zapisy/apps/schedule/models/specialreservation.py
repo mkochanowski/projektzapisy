@@ -5,6 +5,7 @@ from django.core.validators import ValidationError
 
 from apps.enrollment.courses.models import Semester
 from .term import Term
+from .event import Event
 
 class SpecialReservationQuerySet(models.query.QuerySet):
     def on_day_of_week(self, day_of_week):
@@ -71,7 +72,7 @@ class SpecialReservation(models.Model):
             return query.on_day_of_week(day_of_week)
 
     # This method is called by django when adding data through forms
-    def clean(self, *args, **kwargs):
+    def clean(self):
 
         overlaps = SpecialReservation.objects.\
             on_day_of_week(self.dayOfWeek).\
@@ -83,18 +84,23 @@ class SpecialReservation(models.Model):
             overlaps = overlaps.exclude(pk=self.pk)
 
         if overlaps:
-            raise ValidationError(message={'classroom': ['Overlaps with another reservation: ' + smart_unicode(overlaps[0])]},
+            raise ValidationError(message={'__all__': ['Overlaps with another reservation: ' + smart_unicode(overlaps[0])]},
                                   code='overlap_special')
 
-        # TODO: Learn to validate models
+        candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek)
+        overlaps = Event.get_events_for_dates(dates=candidate_days,
+                                               classroom=self.classroom,
+                                               start_time=self.start_time,
+                                               end_time=self.end_time)
+        if overlaps:
+            raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + overlaps[0].title]},
+                                  code='overlap_event')
 
-        # anything here breaks validation
-        # candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek)
-        # overlaps = Term.get_conflicted(candidate_days, self.start_time, self.end_time)
-        # if overlaps:
-        #    print "ITS HAPPENING"
-        #    raise ValidationError(message={'semester': ['Overlaps with event terms']},
-        #                         code='overlap_event')
+        super(SpecialReservation, self).clean()
+
+    def save(self):
+        self.full_clean()
+        super(SpecialReservation, self).save()
 
     class Meta:
         app_label = 'schedule'
