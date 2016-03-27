@@ -4,6 +4,7 @@ from django.db import models
 from django.http import Http404
 from datetime import time
 
+
 class Event(models.Model):
     """
     Model of Event
@@ -107,7 +108,7 @@ class Event(models.Model):
         @return: Boolean
         """
         if not self.author == user and not user.has_perm('schedule.manage_events'):
-            if not self.visible or not self.type in ['0', '1', '2'] or self.status <> '1':
+            if not self.visible or self.type not in ['0', '1', '2'] or self.status != '1':
                 return False
 
         return True
@@ -234,6 +235,14 @@ class Event(models.Model):
 
     @classmethod
     def get_events_for_dates(cls, dates, classroom, start_time=None, end_time=None):
+        """
+        Gets events with therms in specified classroom on specified days
+
+        :param end_time: datetime.time
+        :param start_time: datetime.time
+        :param classroom: enrollment.courses.models.Classroom
+        :param dates: datetime.date list
+        """
         if start_time is None:
             start_time = time(8)
         if end_time is None:
@@ -244,4 +253,5 @@ class Event(models.Model):
                                     start__lt=end_time,
                                     end__gt=start_time,
                                     room=classroom)
+
         return cls.objects.filter(term__in=terms)

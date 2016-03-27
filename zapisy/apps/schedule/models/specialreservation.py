@@ -4,10 +4,12 @@ from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
 
 from apps.enrollment.courses.models import Semester
-from .term import Term
+
 from .event import Event
 
+
 class SpecialReservationQuerySet(models.query.QuerySet):
+
     def on_day_of_week(self, day_of_week):
         return self.filter(dayOfWeek=day_of_week)
 
@@ -22,6 +24,9 @@ class SpecialReservationQuerySet(models.query.QuerySet):
 
     def in_classrooms(self, classrooms):
         return self.filter(classroom__in=classrooms)
+
+    def between_hours(self, start_time, end_time):
+        return self.filter(start_time__lt=end_time, end_time__gt=start_time)
 
 
 class SpecialReservationManager(models.Manager):
@@ -43,6 +48,9 @@ class SpecialReservationManager(models.Manager):
     def in_classrooms(self, classrooms):
         return self.get_query_set().in_classrooms(classrooms)
 
+    def between_hours(self, start_time, end_time):
+        return self.get_query_set().between_hours(start_time, end_time)
+
 
 class SpecialReservation(models.Model):
     from apps.enrollment.courses.models import Semester, Term, Classroom
@@ -60,7 +68,11 @@ class SpecialReservation(models.Model):
 
     @classmethod
     def get_reservations_for_semester(cls, semester=None, day_of_week=None):
-        """Gets special reservations for a semester and day of the week"""
+        """Gets special reservations for a semester and day of the week
+
+        :param semester: enrollment.courses.model.Semester
+        :param day_of_week: Term.DAYS_OF_WEEK
+        """
 
         if semester is None:
             semester = Semester.get_current_semester()
@@ -71,36 +83,41 @@ class SpecialReservation(models.Model):
         else:
             return query.on_day_of_week(day_of_week)
 
-    # This method is called by django when adding data through forms
     def clean(self):
+        """
+        Overloaded clean method. Checks for any conflicts between this SpecialReservation
+        and other SpecialReservations, Terms of Events and Terms of Course Groups
 
-        overlaps = SpecialReservation.objects.\
-            on_day_of_week(self.dayOfWeek).\
-            in_classroom(self.classroom).\
-            filter(start_time__lt=self.end_time).\
-            filter(end_time__gt=self.start_time)
+        """
+
+        overlaps = SpecialReservation.objects. \
+            on_day_of_week(self.dayOfWeek). \
+            in_classroom(self.classroom). \
+            between_hours(self.start_time, self.end_time)
 
         if not self._state.adding and self.pk is not None:
             overlaps = overlaps.exclude(pk=self.pk)
 
         if overlaps:
-            raise ValidationError(message={'__all__': ['Overlaps with another reservation: ' + smart_unicode(overlaps[0])]},
-                                  code='overlap_special')
+            raise ValidationError(
+                message={'__all__': ['Overlaps with another reservation: ' + smart_unicode(overlaps[0])]},
+                code='overlap_special')
 
         candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek)
         overlaps = Event.get_events_for_dates(dates=candidate_days,
-                                               classroom=self.classroom,
-                                               start_time=self.start_time,
-                                               end_time=self.end_time)
+                                              classroom=self.classroom,
+                                              start_time=self.start_time,
+                                              end_time=self.end_time)
         if overlaps:
             raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + overlaps[0].title]},
                                   code='overlap_event')
 
         super(SpecialReservation, self).clean()
 
-    def save(self):
+    def save(self, **kwargs):
+        """Validate model before saving"""
         self.full_clean()
-        super(SpecialReservation, self).save()
+        super(SpecialReservation, self).save(kwargs)
 
     class Meta:
         app_label = 'schedule'
