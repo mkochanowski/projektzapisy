@@ -2,7 +2,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.http import Http404
-
+from datetime import time
 
 class Event(models.Model):
     """
@@ -70,6 +70,7 @@ class Event(models.Model):
             ("manage_events", u"Może zarządzać wydarzeniami"),
         )
 
+    # This code should be in clean() method
     def save(self, *args, **kwargs):
         """
         Overload save method.
@@ -230,3 +231,17 @@ class Event(models.Model):
             return self.course.get_all_enrolled_emails()
 
         return self.interested.values_list('email', flat=True)
+
+    @classmethod
+    def get_events_for_dates(cls, dates, classroom, start_time=None, end_time=None):
+        if start_time is None:
+            start_time = time(8)
+        if end_time is None:
+            end_time = time(21)
+
+        from .term import Term
+        terms = Term.objects.filter(day__in=dates,
+                                    start__lt=end_time,
+                                    end__gt=start_time,
+                                    room=classroom)
+        return cls.objects.filter(term__in=terms)

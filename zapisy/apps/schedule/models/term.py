@@ -104,8 +104,3 @@ class Term(models.Model):
         return cls.objects.filter(event__type__in=['0', '1']).order_by('day', 'event__course__entity__name', 'room') \
             .select_related('event', 'room', 'event__course', 'event__course__entity', 'event__course__semester')
 
-    @classmethod
-    def get_conflicts_on_dates(cls, dates, start_time, end_time):
-        return cls.objects.filter(day__in=dates,
-                                  start_time__lt=end_time,
-                                  end_time__gt=start_time)
