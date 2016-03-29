@@ -78,9 +78,9 @@
      */
 
     var CleanTermForm = function () {
-        $('#term').attr('value', '');
-        $('#begin').attr('value', '');
-        $('#end').attr('value', '');
+        //$('#term').attr('value', '');
+        //$('#begin').attr('value', '');
+        //$('#end').attr('value', '');
         $('#hiddenroom').attr('value', '');
         $('#location').attr('value', '');
         $('input[name="selectplace"]').each(function () {
@@ -92,6 +92,7 @@
         $('#canvasplacediv').hide();
         $('#addterm').text('Dodaj termin');
         $('#location').parent().css('border-bottom', '1px solid #DDD');
+        $('#location').attr('disabled', false);
     }
 
 
