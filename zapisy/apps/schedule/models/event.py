@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.http import Http404
 from datetime import time
+from django.utils.encoding import smart_unicode
 
 
 class Event(models.Model):
@@ -254,4 +255,8 @@ class Event(models.Model):
                                     end__gt=start_time,
                                     room=classroom)
 
-        return cls.objects.filter(term__in=terms)
+        return cls.objects.filter(term__in=terms, status=Event.STATUS_ACCEPTED)
+
+    def __unicode__(self):
+        return '{0:s} ({1:s})'.format(smart_unicode(self.title),
+                                      smart_unicode(self.description))

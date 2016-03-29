@@ -89,6 +89,12 @@ class SpecialReservation(models.Model):
 
         """
 
+        if not self.classroom.can_reserve:
+            raise ValidationError(
+                message={'classroom': ['This classroom is not available for reservation']},
+                code='invalid'
+            )
+
         # Fetch conflicting SpecialReservations
 
         overlaps = SpecialReservation.objects. \
@@ -112,7 +118,7 @@ class SpecialReservation(models.Model):
                                               start_time=self.start_time,
                                               end_time=self.end_time)
         if overlaps:
-            raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + overlaps[0].title]},
+            raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + unicode(overlaps[0])]},
                                   code='overlap_event')
 
         # Fetch conflicting Course Terms

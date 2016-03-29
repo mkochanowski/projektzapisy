@@ -133,7 +133,12 @@ class Semester( models.Model ):
             return None
 
     def get_all_days_of_week(self, day_of_week):
-        date = self.semester_beginning
+        """
+        Get all dates when the specifies day of week schedule is valid
+
+        :param day_of_week: Term.DAYS_OF_WEEK
+        """
+        date = self.lectures_beginning
         python_weekday = Term.get_python_day_of_week(day_of_week)
 
         # ensure first date in while loop is a candidate
@@ -147,7 +152,7 @@ class Semester( models.Model ):
         assert(Term.get_day_of_week(date) == day_of_week)
 
         dates = []
-        while date <= self.semester_ending:
+        while date <= self.lectures_ending:
             # if its not a free day
             if not Freeday.is_free(date):
                 # if it wasnt changed
@@ -162,7 +167,11 @@ class Semester( models.Model ):
         return dates
 
     def get_all_added_days_of_week(self, day_of_week):
-        """Gets dates of all weekdays changed from another weekday to specvified weekday in this semester"""
+        """
+        Gets dates of all weekdays changed from another weekday to specvified weekday in this semester
+
+        :param day_of_week: Term.DAYS_OF_WEEK
+        """
         added_days = ChangedDay.get_added_days_of_week(self.semester_beginning,
                                                        self.semester_ending,
                                                        day_of_week)
@@ -232,7 +241,11 @@ class Freeday(models.Model):
 
     @classmethod
     def is_free(cls, date):
-        """Returns true if date is a free day"""
+        """
+        Returns true if date is a free day
+
+        :param date: datetime.date
+        """
         free = cls.objects.filter(day=date)
         if free:
             return True
@@ -259,7 +272,11 @@ class ChangedDay(models.Model):
 
     @classmethod
     def get_day_of_week(cls, date):
-        """Returns actual schedule day, with respect to ChangedDays"""
+        """
+        Returns actual schedule day, with respect to ChangedDays
+
+        :param date:
+        """
         changes = ChangedDay.objects.filter(day=date)
         if changes:
             return changes[0].day
