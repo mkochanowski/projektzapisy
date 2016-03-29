@@ -137,11 +137,11 @@ class EventTestCase(TestCase):
         room110 = Classroom(number=110)
         room110.save()
 
-
         event = Event(
             title='an event',
             description='an event',
             type=Event.TYPE_EVENT,
+            status=Event.STATUS_ACCEPTED,
             author=teacher,
         )
         event.save()

@@ -3,13 +3,15 @@ from django.db.models import Q
 from django.db import models
 from django.db.models.query import EmptyQuerySet
 from timedelta import TimedeltaField
+from datetime import time
+from .event import Event
 
+from django.utils.encoding import smart_unicode
 
 class Term(models.Model):
     """
     Term representation
     """
-    from apps.schedule.models import Event
 
     event = models.ForeignKey(Event, verbose_name=u'Wydarzenie')
 
@@ -104,3 +106,30 @@ class Term(models.Model):
         return cls.objects.filter(event__type__in=['0', '1']).order_by('day', 'event__course__entity__name', 'room') \
             .select_related('event', 'room', 'event__course', 'event__course__entity', 'event__course__semester')
 
+    @classmethod
+    def get_terms_for_dates(cls, dates, classroom, start_time=None, end_time=None):
+        """
+        Gets terms in specified classroom on specified days
+
+        :param end_time: datetime.time
+        :param start_time: datetime.time
+        :param classroom: enrollment.courses.models.Classroom
+        :param dates: datetime.date list
+        """
+        if start_time is None:
+            start_time = time(8)
+        if end_time is None:
+            end_time = time(21)
+
+        terms = Term.objects.filter(day__in=dates,
+                                    start__lt=end_time,
+                                    end__gt=start_time,
+                                    room=classroom,
+                                    event__status=Event.STATUS_ACCEPTED).select_related('event')
+
+        return terms
+
+    def __unicode__(self):
+        return '{0:s}: {1:s} - {2:s}'.format(smart_unicode(self.day),
+                                             smart_unicode(self.start),
+                                             smart_unicode(self.end))

@@ -124,13 +124,19 @@ class Semester( models.Model ):
 
     @staticmethod
     def get_semester(date):
-        semester = Semester.objects.filter(semester_beginning__lte=date,
-                                           semester_ending__gte=date)
-        if semester and len(semester) == 1:
-            return semester[0]
-        else:
-            # TODO: should this throw exceptions?
+        """
+        Get semester for a specified date. More versatile than get_current_semester
+
+        :param date: datetime.date
+        :return: Semester or None
+        """
+        try:
+            return Semester.objects.get(semester_beginning__lte=date,
+                                        semester_ending__gte=date)
+        except Semester.DoesNotExist:
             return None
+        except MultipleObjectsReturned:
+            raise MoreThanOneCurrentSemesterException()
 
     def get_all_days_of_week(self, day_of_week):
         """

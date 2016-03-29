@@ -5,7 +5,7 @@ from django.core.validators import ValidationError
 
 from apps.enrollment.courses.models import Semester, Term as CourseTerm
 
-from .event import Event
+from .term import Term
 
 
 class SpecialReservationQuerySet(models.query.QuerySet):
@@ -100,25 +100,28 @@ class SpecialReservation(models.Model):
         overlaps = SpecialReservation.objects. \
             on_day_of_week(self.dayOfWeek). \
             in_classroom(self.classroom). \
-            between_hours(self.start_time, self.end_time)
+            between_hours(self.start_time, self.end_time).\
+            any_semester(self.semester)
 
         if not self._state.adding and self.pk is not None:
             overlaps = overlaps.exclude(pk=self.pk)
 
         if overlaps:
             raise ValidationError(
-                message={'__all__': ['Overlaps with another reservation: ' + smart_unicode(overlaps[0])]},
+                message={'__all__': ['Overlaps with another reservation: ' + unicode(overlaps[0])]},
                 code='overlap_special')
 
         # Fetch conflicting Events
 
         candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek)
-        overlaps = Event.get_events_for_dates(dates=candidate_days,
-                                              classroom=self.classroom,
-                                              start_time=self.start_time,
-                                              end_time=self.end_time)
+        overlaps = Term.get_terms_for_dates(dates=candidate_days,
+                                            classroom=self.classroom,
+                                            start_time=self.start_time,
+                                            end_time=self.end_time)
+
         if overlaps:
-            raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + unicode(overlaps[0])]},
+            raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + unicode(overlaps[0].event) +
+                                                       ' ' + unicode(overlaps[0])]},
                                   code='overlap_event')
 
         # Fetch conflicting Course Terms
