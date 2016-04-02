@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, time, date
 from django.core.serializers import serialize
 from django.core.validators import ValidationError
 from django.contrib.auth.models import User
-from apps.enrollment.courses.objectmothers import SemesterObjectMother
+from apps.enrollment.courses.objectmothers import SemesterObjectMother, ClassroomObjectMother
 from apps.users.objectmothers import UserObjectMother
 
 class SpecialReservationTestCase(TestCase):
@@ -17,12 +17,10 @@ class SpecialReservationTestCase(TestCase):
         semester_2 = SemesterObjectMother.winter_semester_2015_16()
         semester_2.save()
 
-        room110 = Classroom(number=110,
-                            can_reserve=True)
+        room110 = ClassroomObjectMother.room110()
         room110.save()
 
-        room104 = Classroom(number=104,
-                            can_reserve=True)
+        room104 = ClassroomObjectMother.room104()
         room104.save()
 
         reservation = SpecialReservation(semester=semester,
@@ -31,6 +29,7 @@ class SpecialReservationTestCase(TestCase):
                                          dayOfWeek=Term.WEDNESDAY,
                                          start_time=time(15),
                                          end_time=time(16))
+        reservation.full_clean()
         reservation.save()
 
         reservation_2 = SpecialReservation(semester=semester,
@@ -39,7 +38,7 @@ class SpecialReservationTestCase(TestCase):
                                           dayOfWeek=Term.THURSDAY,
                                           start_time=time(15),
                                           end_time=time(16))
-
+        reservation_2.full_clean()
         reservation_2.save()
 
         reservation_3 = SpecialReservation(semester=semester_2,
@@ -48,9 +47,8 @@ class SpecialReservationTestCase(TestCase):
                                            dayOfWeek=Term.MONDAY,
                                            start_time=time(8),
                                            end_time=time(21))
+        reservation_3.full_clean()
         reservation_3.save()
-
-
 
         objects = [semester, semester_2, room110, room104, reservation, reservation_2, reservation_3]
 
@@ -83,7 +81,7 @@ class SpecialReservationTestCase(TestCase):
             start_time=time(14),
             end_time=time(17)
         )
-        self.assertRaises(ValidationError, reservation.clean)
+        self.assertRaises(ValidationError, reservation.full_clean)
 
     def test_try_clean_on_non_overlapping_reservation(self):
         semester = Semester.get_semester(date(2016, 5, 12))
@@ -96,7 +94,7 @@ class SpecialReservationTestCase(TestCase):
             start_time=time(14),
             end_time=time(15)
         )
-        reservation.clean()
+        reservation.full_clean()
 
     def test_save_overlapping_reservation(self):
         semester = Semester.get_semester(date(2015, 12, 5))
@@ -134,7 +132,7 @@ class EventTestCase(TestCase):
         employee = UserObjectMother.employee(teacher)
         employee.save()
 
-        room110 = Classroom(number=110)
+        room110 = ClassroomObjectMother.room110()
         room110.save()
 
         event = Event(
@@ -144,6 +142,7 @@ class EventTestCase(TestCase):
             status=Event.STATUS_ACCEPTED,
             author=teacher,
         )
+        event.full_clean()
         event.save()
 
         term_1 = EventTerm(
@@ -153,6 +152,7 @@ class EventTestCase(TestCase):
             end=time(16),
             room=room110
         )
+        term_1.full_clean()
         term_1.save()
 
         term_2 = EventTerm(
@@ -162,7 +162,7 @@ class EventTestCase(TestCase):
             end=time(17),
             room=room110
         )
-
+        term_2.full_clean()
         term_2.save()
 
     def test_event_is_present(self):

@@ -87,7 +87,7 @@ class Event(models.Model):
 
             # if author is an employee, accept any exam and test events
 
-            if (self.author.employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
+            if (self.author.get_profile().is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
                 self.status = '1'
 
@@ -98,7 +98,7 @@ class Event(models.Model):
 
             # students can only add generic events that have to be accepted first
 
-            if self.author.student and not self.author.has_perm('schedule.manage_events'):
+            if self.author.get_profile().is_student and not self.author.has_perm('schedule.manage_events'):
                 if self.type != Event.TYPE_GENERIC:
                     raise ValidationError(
                         message={'type': [u'Nie masz uprawnień aby dodawać wydarzenia tego typu']},
@@ -106,8 +106,8 @@ class Event(models.Model):
 
                 if self.status != Event.STATUS_PENDING:
                     raise ValidationError(
-                        message={'status':[u'Nie masz uprawnień aby dodawać zaakceptowane wydarzenia']}
-                    )
+                        message={'status': [u'Nie masz uprawnień aby dodawać zaakceptowane wydarzenia']},
+                        code='permission')
 
         super(Event, self).clean()
 

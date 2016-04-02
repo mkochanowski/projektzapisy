@@ -17,7 +17,9 @@ class SemesterObjectMother():
             lectures_ending=datetime(2016, 2, 3),
             semester_beginning=datetime(2015, 10, 1),
             semester_ending=datetime(2016, 2, 21),
+            records_ects_limit_abolition=datetime(2015, 10, 1)
         )
+        semester.full_clean()
         return semester
 
     @staticmethod
@@ -32,8 +34,10 @@ class SemesterObjectMother():
             lectures_beginning=datetime(2016, 2, 22),
             lectures_ending=datetime(2016, 6, 16),
             semester_beginning=datetime(2016, 2, 22),
-            semester_ending=datetime(2016, 9, 10)
+            semester_ending=datetime(2016, 9, 10),
+            records_ects_limit_abolition=datetime(2016, 3, 1)
         )
+        semester.full_clean()
         return semester
 
 
@@ -44,12 +48,13 @@ class ClassroomObjectMother():
         room = Classroom(
             type=3,
             description='Pracownia z najszybszymi komputerami w instytucie',
-            number=110,
+            number='110',
             building='Instytut Informatyki',
             capacity=20,
             floor=1,
             can_reserve=True
         )
+        room.full_clean()
         return room
 
     @staticmethod
@@ -57,10 +62,11 @@ class ClassroomObjectMother():
         room = Classroom(
             type=1,
             description='Sala cwiczeniowa',
-            number=104,
+            number='104',
             building='Instytut Informatyki',
             capacity=32,
             floor=1,
             can_reserve=True
         )
+        room.full_clean()
         return room
