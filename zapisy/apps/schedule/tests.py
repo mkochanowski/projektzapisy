@@ -64,7 +64,7 @@ class SpecialReservationTestCase(TestCase):
 
     def test_no_reservations_on_not_reserved_day(self):
         semester = Semester.get_semester(date(2016, 5, 12))
-        reservations = SpecialReservation.get_reservations_for_semester(semester,day_of_week=Term.FRIDAY)
+        reservations = SpecialReservation.get_reservations_for_semester(semester, day=Term.FRIDAY)
         self.assertFalse(reservations)
 
     def test_number_of_reservations(self):
@@ -109,7 +109,7 @@ class SpecialReservationTestCase(TestCase):
             start_time=time(15),
             end_time=time(16)
         )
-        self.assertRaises(ValidationError,reservation.save)
+        reservation.save()
 
     def test_save_non_overlapping_reservation(self):
         semester =Semester.get_semester(date(2015,12,5))
@@ -140,7 +140,7 @@ class EventTestCase(TestCase):
         event = Event(
             title='an event',
             description='an event',
-            type=Event.TYPE_EVENT,
+            type=Event.TYPE_GENERIC,
             status=Event.STATUS_ACCEPTED,
             author=teacher,
         )
@@ -167,7 +167,7 @@ class EventTestCase(TestCase):
 
     def test_event_is_present(self):
         room = Classroom.get_by_number('110')
-        events = Event.get_events_for_dates(dates=[date(2016, 5, 20)],
-                                            classroom=room)
-        self.assertTrue(events)
+        terms = EventTerm.get_terms_for_dates(dates=[date(2016, 5, 20)],
+                                              classroom=room)
+        self.assertTrue(terms)
 

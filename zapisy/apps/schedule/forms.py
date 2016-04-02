@@ -8,6 +8,8 @@ from apps.schedule.models import Event, Term, EventModerationMessage, EventMessa
 
 from django.forms.models import inlineformset_factory
 
+from datetime import timedelta, datetime
+
 
 class TermForm(forms.ModelForm):
 
@@ -41,7 +43,7 @@ class EventForm(forms.ModelForm):
 
         super(EventForm, self).__init__(data, **kwargs)
 
-        self.author = user
+        self.instance.author = user
 
         if user.employee:
             self.fields['type'].choices = Event.TYPES_FOR_TEACHER
@@ -53,7 +55,13 @@ class EventForm(forms.ModelForm):
 
         else:
             semester = Semester.get_current_semester()
-            qs  = Course.objects.filter(semester=semester).select_related('semester', 'entity')
+
+            # might also be the same semester
+            previous_semester = Semester.get_semester(datetime.now().date() - timedelta(days=30))
+
+            qs  = Course.objects.filter(semester__in=[semester, previous_semester]). \
+                select_related('semester', 'entity'). \
+                order_by('semester')
             if not user.has_perm('schedule.manage_events'):
                 qs = qs.filter(teachers=user.employee)
 

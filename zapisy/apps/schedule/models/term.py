@@ -2,11 +2,16 @@
 from django.db.models import Q
 from django.db import models
 from django.db.models.query import EmptyQuerySet
+from django.core.exceptions import ValidationError
 from timedelta import TimedeltaField
 from datetime import time
 from .event import Event
+from .specialreservation import SpecialReservation
 
 from django.utils.encoding import smart_unicode
+
+from apps.enrollment.courses.models import Classroom, Term as CourseTerm, Semester
+
 
 class Term(models.Model):
     """
@@ -20,37 +25,77 @@ class Term(models.Model):
     start = TimedeltaField(verbose_name=u'Początek')
     end = TimedeltaField(verbose_name=u'Koniec')
 
-    room = models.ForeignKey('courses.Classroom', null=True, blank=True, verbose_name=u'Sala',
+    room = models.ForeignKey(to=Classroom, null=True, blank=True, verbose_name=u'Sala',
                              related_name='event_terms')
     place = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'Miejsce')
-
-    def validate_unique(self, *args, **kwargs):
-        from django.core.exceptions import ValidationError
-        from django.db.models import Q
-
-        if self.room:
-            terms = self.__class__.objects.filter(Q(room=self.room), Q(day=self.day), Q(event__status='1'),
-                                                  Q(start__lt=self.end), Q(end__gt=self.start)).select_related('event')
-
-            if self.pk:
-                terms = terms.exclude(pk=self.pk)
-
-            if terms.count():
-                raise ValidationError({'__all__': (u'Ta sala w podanym terminie jest zajęta',)})
-
-        super(self.__class__, self).validate_unique(*args, **kwargs)
 
     def clean(self):
         """
         Overloaded method from models.Model
         """
-        from django.core.exceptions import ValidationError
-
         if self.start >= self.end:
-            raise ValidationError(u'Koniec musi następować po początku.')
+            raise ValidationError(
+                message={'end': [u'Koniec musi następować po początku']},
+                code='overlap')
 
         if not self.room and not self.place:
-            raise ValidationError(u'Musisz podać salę lub miejsce.')
+            raise ValidationError(
+                message={'room': [u'Musisz wybrać salę lub miejsce zewnętrzne'],
+                         'place': [u'Musisz wybrać salę lub miejsce zewnętrzne']},
+                code='invalid'
+            )
+
+        if self.room:
+            if not self.room.can_reserve:
+                raise ValidationError(
+                    message={'classroom': [u'Ta sala nie jest przeznaczona do rezerwacji']},
+                    code='invalid'
+                )
+
+            terms = Term.get_terms_for_dates(dates=[self.day],
+                                             classroom=self.room,
+                                             start_time=self.start,
+                                             end_time=self.end)
+
+            if self.pk:
+                terms = terms.exclude(pk=self.pk)
+
+            if terms:
+                raise ValidationError(
+                    message={'__all__': [u'W tym samym czasie ta sala jest zarezerwowana: ' +
+                                         unicode(terms[0].event) + ' (wydarzenie)']},
+                    code='overlap')
+
+            semester = Semester.get_semester(self.day)
+
+            special_reservations = \
+                SpecialReservation.get_reservations_for_semester(semester=semester,
+                                                                 day=self.day,
+                                                                 classrooms=[self.room],
+                                                                 start_time=self.start,
+                                                                 end_time=self.end)
+
+            if special_reservations:
+                raise ValidationError(
+                    message={'__all__': [u'W tym samym czasie ta sala jest zarezerwowana: ' +
+                                         unicode(special_reservations[0]) + u'(rezerwacja cykliczna)']},
+                    code='overlap'
+                )
+
+            overlaps = CourseTerm.get_terms_for_semester(semester=semester,
+                                                         day=self.day,
+                                                         classrooms=[self.room],
+                                                         start_time=self.start,
+                                                         end_time=self.end)
+
+            if overlaps:
+                raise ValidationError(
+                    message={'__all__': [u'W tym samym czasie w tej sali odbywają się zajęcia: ' +
+                                         overlaps[0].group.course.name + ' ' + unicode(overlaps[0])]},
+                    code='overlap'
+                )
+
+        super(Term, self).clean()
 
     class Meta:
         app_label = 'schedule'
@@ -121,11 +166,11 @@ class Term(models.Model):
         if end_time is None:
             end_time = time(21)
 
-        terms = Term.objects.filter(day__in=dates,
-                                    start__lt=end_time,
-                                    end__gt=start_time,
-                                    room=classroom,
-                                    event__status=Event.STATUS_ACCEPTED).select_related('event')
+        terms = cls.objects.filter(day__in=dates,
+                                   start__lt=end_time,
+                                   end__gt=start_time,
+                                   room=classroom,
+                                   event__status=Event.STATUS_ACCEPTED).select_related('event')
 
         return terms
 

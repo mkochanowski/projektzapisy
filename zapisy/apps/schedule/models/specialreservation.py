@@ -2,10 +2,11 @@
 from django.db import models
 from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
+from datetime import date, datetime
+
 
 from apps.enrollment.courses.models import Semester, Term as CourseTerm
 
-from .term import Term
 
 
 class SpecialReservationQuerySet(models.query.QuerySet):
@@ -66,21 +67,34 @@ class SpecialReservation(models.Model):
     objects = SpecialReservationManager()
 
     @classmethod
-    def get_reservations_for_semester(cls, semester=None, day_of_week=None):
-        """Gets special reservations for a semester and day of the week
+    def get_reservations_for_semester(cls, semester=None, day=None, classrooms=None, start_time=None, end_time=None):
+        """
+        A versatile function returning SpecialReservations. day is either datetime.date or string
 
         :param semester: enrollment.courses.model.Semester
-        :param day_of_week: Term.DAYS_OF_WEEK
+        :param day: Term.DAYS_OF_WEEK or datetime.date
         """
-
         if semester is None:
             semester = Semester.get_current_semester()
 
         query = cls.objects.any_semester(semester)
-        if day_of_week is None:
-            return query
+
+        if day is None:
+            pass
         else:
-            return query.on_day_of_week(day_of_week)
+            if isinstance(day, date):
+                day_of_week = CourseTerm.get_day_of_week(day)
+            else:
+                day_of_week = day
+            query = query.on_day_of_week(day_of_week)
+
+        if classrooms:
+            query = query.in_classrooms(classrooms)
+
+        if start_time and end_time:
+            query = query.between_hours(start_time, end_time)
+
+        return query
 
     def clean(self):
         """
@@ -88,64 +102,66 @@ class SpecialReservation(models.Model):
         and other SpecialReservations, Terms of Events and Terms of Course Groups
 
         """
+        if self.end_time <= self.start_time:
+            raise ValidationError(
+                message={'end_time': [u'Koniec rezerwacji musi natępować po początku']},
+                code='invalid'
+            )
 
         if not self.classroom.can_reserve:
             raise ValidationError(
-                message={'classroom': ['This classroom is not available for reservation']},
+                message={'classroom': [u'Ta sala nie jest przeznaczona do rezerwacji']},
                 code='invalid'
             )
 
         # Fetch conflicting SpecialReservations
 
-        overlaps = SpecialReservation.objects. \
-            on_day_of_week(self.dayOfWeek). \
-            in_classroom(self.classroom). \
-            between_hours(self.start_time, self.end_time).\
-            any_semester(self.semester)
+        overlaps = SpecialReservation.get_reservations_for_semester(semester=self.semester,
+                                                                    day=self.dayOfWeek,
+                                                                    classrooms=[self.classroom],
+                                                                    start_time=self.start_time,
+                                                                    end_time=self.end_time)
 
         if not self._state.adding and self.pk is not None:
             overlaps = overlaps.exclude(pk=self.pk)
 
         if overlaps:
             raise ValidationError(
-                message={'__all__': ['Overlaps with another reservation: ' + unicode(overlaps[0])]},
-                code='overlap_special')
+                message={'__all__': [u'W tym czasie ta sala jest zarezerowowana (wydarzenie cykliczne): ' + unicode(overlaps[0])]},
+                code='overlap')
 
         # Fetch conflicting Events
 
-        candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek)
+        from .term import Term
+
+        candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek, start_date=datetime.now().date())
         overlaps = Term.get_terms_for_dates(dates=candidate_days,
                                             classroom=self.classroom,
                                             start_time=self.start_time,
                                             end_time=self.end_time)
 
         if overlaps:
-            raise ValidationError(message={'__all__': ['Overlaps with a term for event ' + unicode(overlaps[0].event) +
+            raise ValidationError(message={'__all__': [u'W tym czasie ta sala jest zarezerwowana (wydarzenie) : ' + unicode(overlaps[0].event) +
                                                        ' ' + unicode(overlaps[0])]},
-                                  code='overlap_event')
+                                  code='overlap')
 
         # Fetch conflicting Course Terms
         # TODO: Test this part
 
-        overlaps = CourseTerm.objects.filter(dayOfWeek=self.dayOfWeek,
-                                             group__course__semester=self.semester,
-                                             classrooms=self.classroom,
-                                             start_time__lt=self.end_time,
-                                             end_time__gt=self.start_time).select_related('group__course')
+        overlaps = CourseTerm.get_terms_for_semester(semester=self.semester,
+                                                     day=self.dayOfWeek,
+                                                     classrooms=[self.classroom],
+                                                     start_time=self.start_time,
+                                                     end_time=self.end_time)
 
         if overlaps:
             raise ValidationError(
-                message={'__all__': ['Overlaps with a group term for course ' + overlaps[0].group.course.name +
+                message={'__all__': [u'W tym samym czasie w tej sali odbywają się zajęcia: ' + overlaps[0].group.course.name +
                                      ' ' + unicode(overlaps[0])]},
-                code='overlap_course'
+                code='overlap'
             )
 
         super(SpecialReservation, self).clean()
-
-    def save(self, **kwargs):
-        """Validate model before saving"""
-        self.full_clean()
-        super(SpecialReservation, self).save(kwargs)
 
     class Meta:
         app_label = 'schedule'
@@ -158,3 +174,4 @@ class SpecialReservation(models.Model):
                                                            smart_unicode(self.get_dayOfWeek_display()),
                                                            smart_unicode(self.start_time),
                                                            smart_unicode(self.end_time))
+

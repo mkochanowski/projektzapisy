@@ -5,6 +5,8 @@ from django.http import Http404
 from datetime import time
 from django.utils.encoding import smart_unicode
 
+from django.core.validators import ValidationError
+
 
 class Event(models.Model):
     """
@@ -12,7 +14,7 @@ class Event(models.Model):
     """
     TYPE_EXAM = '0'
     TYPE_TEST = '1'
-    TYPE_EVENT = '2'
+    TYPE_GENERIC = '2'
     TYPE_CLASS = '3'
     TYPE_OTHER = '4'
 
@@ -26,15 +28,15 @@ class Event(models.Model):
 
     TYPES = [(TYPE_EXAM, u'Egzamin'),
              (TYPE_TEST, u'Kolokwium'),
-             (TYPE_EVENT, u'Wydarzenie'),
+             (TYPE_GENERIC, u'Wydarzenie'),
              (TYPE_CLASS, u'Zajęcia'),
              (TYPE_OTHER, u'Inne')]
 
-    TYPES_FOR_STUDENT = [(TYPE_EVENT, u'Wydarzenie')]
+    TYPES_FOR_STUDENT = [(TYPE_GENERIC, u'Wydarzenie')]
 
     TYPES_FOR_TEACHER = [(TYPE_EXAM, u'Egzamin'),
                          (TYPE_TEST, u'Kolokwium'),
-                         (TYPE_EVENT, u'Wydarzenie')]
+                         (TYPE_GENERIC, u'Wydarzenie')]
 
     from apps.enrollment.courses.models import Course, Group
     from django.contrib.auth.models import User
@@ -72,33 +74,42 @@ class Event(models.Model):
             ("manage_events", u"Może zarządzać wydarzeniami"),
         )
 
-    # This code should be in clean() method
-    def save(self, *args, **kwargs):
+    def clean(self, *args, **kwargs):
         """
-        Overload save method.
+        Overload clean method.
         If author is employee and try reserve room for exam - accept it
         If author has perms to manage events - accept it
         """
-        is_new = False
+
+        # if this is a new item
 
         if not self.pk:
-            is_new = True
-            if (self.author.employee and self.type in ['0', '1']) or \
+
+            # if author is an employee, accept any exam and test events
+
+            if (self.author.employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
                 self.status = '1'
 
-            if self.type in ['0', '1']:
+            # all exams and tests should be public
+
+            if self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]:
                 self.visible = True
 
-        super(self.__class__, self).save()
+            # students can only add generic events that have to be accepted first
 
-    #        if is_new and self.type in ['0', '1'] and self.course:
-    #            render_and_send_email(u'Ustalono termin egzaminu',
-    #                                  u'schedule/emails/new_exam.txt',
-    #                                  u'schedule/emails/new_exam.html',
-    #                                  {'event': self},
-    #                                  self.get_followers()
-    #            )
+            if self.author.student and not self.author.has_perm('schedule.manage_events'):
+                if self.type != Event.TYPE_GENERIC:
+                    raise ValidationError(
+                        message={'type': [u'Nie masz uprawnień aby dodawać wydarzenia tego typu']},
+                        code='permission')
+
+                if self.status != Event.STATUS_PENDING:
+                    raise ValidationError(
+                        message={'status':[u'Nie masz uprawnień aby dodawać zaakceptowane wydarzenia']}
+                    )
+
+        super(Event, self).clean()
 
     def _user_can_see_or_404(self, user):
         """
@@ -233,29 +244,6 @@ class Event(models.Model):
             return self.course.get_all_enrolled_emails()
 
         return self.interested.values_list('email', flat=True)
-
-    @classmethod
-    def get_events_for_dates(cls, dates, classroom, start_time=None, end_time=None):
-        """
-        Gets events with therms in specified classroom on specified days
-
-        :param end_time: datetime.time
-        :param start_time: datetime.time
-        :param classroom: enrollment.courses.models.Classroom
-        :param dates: datetime.date list
-        """
-        if start_time is None:
-            start_time = time(8)
-        if end_time is None:
-            end_time = time(21)
-
-        from .term import Term
-        terms = Term.objects.filter(day__in=dates,
-                                    start__lt=end_time,
-                                    end__gt=start_time,
-                                    room=classroom)
-
-        return cls.objects.filter(term__in=terms, status=Event.STATUS_ACCEPTED)
 
     def __unicode__(self):
         return '{0:s} ({1:s})'.format(smart_unicode(self.title),
