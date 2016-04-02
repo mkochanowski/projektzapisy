@@ -138,13 +138,16 @@ class Semester( models.Model ):
         except MultipleObjectsReturned:
             raise MoreThanOneCurrentSemesterException()
 
-    def get_all_days_of_week(self, day_of_week):
+    def get_all_days_of_week(self, day_of_week, start_date=None):
         """
         Get all dates when the specifies day of week schedule is valid
 
         :param day_of_week: Term.DAYS_OF_WEEK
+        :param start_date: datetime.date
         """
         date = self.lectures_beginning
+        if start_date:
+            date = start_date
         python_weekday = Term.get_python_day_of_week(day_of_week)
 
         # ensure first date in while loop is a candidate
@@ -168,18 +171,24 @@ class Semester( models.Model ):
             # move date to next week
             date += timedelta(days=7)
 
-        dates.extend(self.get_all_added_days_of_week(day_of_week))
+        dates.extend(self.get_all_added_days_of_week(day_of_week, start_date))
 
         return dates
 
-    def get_all_added_days_of_week(self, day_of_week):
+    def get_all_added_days_of_week(self, day_of_week, start_date=None):
         """
-        Gets dates of all weekdays changed from another weekday to specvified weekday in this semester
+        Gets dates of all weekdays changed from another weekday to specvified weekday in this semester, starting from
+        the specified date or the beggining of the semester
 
         :param day_of_week: Term.DAYS_OF_WEEK
+        :param start_date: datetime.date
         """
-        added_days = ChangedDay.get_added_days_of_week(self.semester_beginning,
-                                                       self.semester_ending,
+        from_date = self.lectures_beginning
+        if start_date:
+            from_date = start_date
+
+        added_days = ChangedDay.get_added_days_of_week(from_date,
+                                                       self.lectures_ending,
                                                        day_of_week)
         return map(lambda x: x.day, added_days)
 

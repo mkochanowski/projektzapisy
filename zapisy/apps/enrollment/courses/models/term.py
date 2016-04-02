@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time
+from datetime import time, date
 
 from django.db import models
 from django.db.models import signals
@@ -142,6 +142,38 @@ class Term(models.Model):
             classrooms = ''
 
         return classrooms
+
+    @classmethod
+    def get_terms_for_semester(cls, semester=None, day=None, classrooms=None, start_time=None, end_time=None):
+        """
+        A versatile function returning Terms. day is either datetime.date or string
+
+        :param semester: enrollment.courses.model.Semester
+        :param day: Term.DAYS_OF_WEEK or datetime.date
+        """
+        from .semester import Semester
+
+        if semester is None:
+            semester = Semester.get_current_semester()
+
+        query = cls.objects.filter(group__course__semester=semester)
+
+        if day is None:
+            pass
+        else:
+            if isinstance(day, date):
+                day_of_week = Term.get_day_of_week(day)
+            else:
+                day_of_week = day
+            query = query.filter(dayOfWeek=day_of_week)
+
+        if classrooms:
+            query = query.filter(classrooms__in=classrooms)
+
+        if start_time and end_time:
+            query = query.filter(start_time__lt=end_time, end_time__gt=start_time)
+
+        return query.select_related('group__course')
 
     def __unicode__(self):
         """
