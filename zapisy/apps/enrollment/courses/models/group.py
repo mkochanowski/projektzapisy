@@ -199,19 +199,24 @@ class Group(models.Model):
 
     def _remove_from_other_groups(self, student):
         from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.utils import run_rearanged
+
         result = None
         for record in Record.get_student_records_for_group_type(student, self):
             result = record.group
             record.student_remove(student)
+            run_rearanged(None, result)
 
         return result or True
 
     def _remove_from_all_groups(self, student):
         from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.utils import run_rearanged
 
         records = Record.get_student_records_for_course(student, self.course)
         for record in records:
             record.student_remove(student)
+            run_rearanged(None, record.group)
 
         return records or True
 
