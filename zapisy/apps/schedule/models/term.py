@@ -29,6 +29,57 @@ class Term(models.Model):
                              related_name='event_terms')
     place = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'Miejsce')
 
+    def validate_against_event_terms(self):
+        assert(self.room is not None)
+        terms = Term.get_terms_for_dates(dates=[self.day],
+                                         classroom=self.room,
+                                         start_time=self.start,
+                                         end_time=self.end)
+
+        if self.pk:
+            terms = terms.exclude(pk=self.pk)
+
+        if terms:
+            raise ValidationError(
+                message={'__all__': [u'W tym samym czasie ta sala jest zarezerwowana: ' +
+                                     unicode(terms[0].event) + ' (wydarzenie)']},
+                code='overlap')
+
+    def validate_against_special_reservations(self):
+        assert(self.room is not None)
+        semester = Semester.get_semester(self.day)
+
+        special_reservations = \
+            SpecialReservation.get_reservations_for_semester(semester=semester,
+                                                             day=self.day,
+                                                             classrooms=[self.room],
+                                                             start_time=self.start,
+                                                             end_time=self.end)
+
+        if special_reservations:
+            raise ValidationError(
+                message={'__all__': [u'W tym samym czasie ta sala jest zarezerwowana: ' +
+                                     unicode(special_reservations[0]) + u'(rezerwacja cykliczna)']},
+                code='overlap'
+            )
+
+    def validate_against_course_terms(self):
+        assert(self.room is not None)
+        semester = Semester.get_semester(self.day)
+
+        course_terms = CourseTerm.get_terms_for_semester(semester=semester,
+                                                         day=self.day,
+                                                         classrooms=[self.room],
+                                                         start_time=self.start,
+                                                         end_time=self.end)
+
+        if course_terms:
+            raise ValidationError(
+                message={'__all__': [u'W tym samym czasie w tej sali odbywają się zajęcia: ' +
+                                     course_terms[0].group.course.name + ' ' + unicode(course_terms[0])]},
+                code='overlap'
+            )
+
     def clean(self):
         """
         Overloaded method from models.Model
@@ -52,48 +103,11 @@ class Term(models.Model):
                     code='invalid'
                 )
 
-            terms = Term.get_terms_for_dates(dates=[self.day],
-                                             classroom=self.room,
-                                             start_time=self.start,
-                                             end_time=self.end)
+            self.validate_against_event_terms()
 
-            if self.pk:
-                terms = terms.exclude(pk=self.pk)
+            self.validate_against_special_reservations()
 
-            if terms:
-                raise ValidationError(
-                    message={'__all__': [u'W tym samym czasie ta sala jest zarezerwowana: ' +
-                                         unicode(terms[0].event) + ' (wydarzenie)']},
-                    code='overlap')
-
-            semester = Semester.get_semester(self.day)
-
-            special_reservations = \
-                SpecialReservation.get_reservations_for_semester(semester=semester,
-                                                                 day=self.day,
-                                                                 classrooms=[self.room],
-                                                                 start_time=self.start,
-                                                                 end_time=self.end)
-
-            if special_reservations:
-                raise ValidationError(
-                    message={'__all__': [u'W tym samym czasie ta sala jest zarezerwowana: ' +
-                                         unicode(special_reservations[0]) + u'(rezerwacja cykliczna)']},
-                    code='overlap'
-                )
-
-            overlaps = CourseTerm.get_terms_for_semester(semester=semester,
-                                                         day=self.day,
-                                                         classrooms=[self.room],
-                                                         start_time=self.start,
-                                                         end_time=self.end)
-
-            if overlaps:
-                raise ValidationError(
-                    message={'__all__': [u'W tym samym czasie w tej sali odbywają się zajęcia: ' +
-                                         overlaps[0].group.course.name + ' ' + unicode(overlaps[0])]},
-                    code='overlap'
-                )
+            self.validate_against_course_terms()
 
         super(Term, self).clean()
 

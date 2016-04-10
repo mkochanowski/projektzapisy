@@ -282,7 +282,7 @@ class ChangedDay(models.Model):
 
     def clean(self):
         if Term.get_day_of_week(self.day) == self.weekday:
-            raise ValidationError(message={'weekday': ['Cant change to the same weekday']},
+            raise ValidationError(message={'weekday': [u'To już jest ' + Term.DAYS_OF_WEEK[self.day.weekday()][1]]},
                                   code='invalid')
 
     @classmethod
