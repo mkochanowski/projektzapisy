@@ -56,7 +56,6 @@ class EventForm(forms.ModelForm):
         else:
             semester = Semester.get_current_semester()
 
-            # might also be the same semester
             previous_semester = Semester.get_semester(datetime.now().date() - timedelta(days=30))
 
             qs  = Course.objects.filter(semester__in=[semester, previous_semester]). \

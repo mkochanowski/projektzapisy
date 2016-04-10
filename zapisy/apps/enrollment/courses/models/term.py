@@ -144,17 +144,13 @@ class Term(models.Model):
         return classrooms
 
     @classmethod
-    def get_terms_for_semester(cls, semester=None, day=None, classrooms=None, start_time=None, end_time=None):
+    def get_terms_for_semester(cls, semester, day=None, classrooms=None, start_time=None, end_time=None):
         """
         A versatile function returning Terms. day is either datetime.date or string
 
         :param semester: enrollment.courses.model.Semester
         :param day: Term.DAYS_OF_WEEK or datetime.date
         """
-        from .semester import Semester
-
-        if semester is None:
-            semester = Semester.get_current_semester()
 
         query = cls.objects.filter(group__course__semester=semester)
 
