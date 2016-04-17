@@ -162,7 +162,7 @@
             </button>
         </div>
         <div class="span4">
-            {% if event.status == '0' and perms.schedule.manage_events  %}
+            {% if perms.schedule.manage_events  %}
             <button id="decisionbutton" type="button" class="btn span4">Decyzja</button>
             {% endif %}
         </div>
@@ -250,7 +250,7 @@
         </div>
     </div>
     {% endif %}
-    {% if event.status == '0' and perms.schedule.manage_events %}
+    {% if perms.schedule.manage_events %}
     <div id="decision" class="row hidden">
         <form action="{% url events:decision event.id %}" method="POST">
             {% csrf_token %}
