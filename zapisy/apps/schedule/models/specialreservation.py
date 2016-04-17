@@ -2,6 +2,8 @@
 from django.db import models
 from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from datetime import date, datetime
 
 
@@ -175,3 +177,40 @@ class SpecialReservation(models.Model):
                                                            smart_unicode(self.start_time),
                                                            smart_unicode(self.end_time))
 
+
+@receiver(post_save, sender=SpecialReservation, dispatch_uid='sr_create_or_update_event')
+def create_event(sender, instance, **kwargs):
+    from .term import Term
+    from .event import Event
+
+    Event.objects.filter(reservation=instance).delete()
+
+    semester = instance.semester
+
+    ev = Event()
+    ev.title = instance.title
+    ev.description = u'Rezerwacja cykliczna - ' + instance.title
+    ev.reservation = instance
+    ev.type = Event.TYPE_GENERIC
+    ev.visible = True
+    ev.status = Event.STATUS_ACCEPTED
+    ev.author_id = 1
+    ev.save()
+
+    term_days = semester.get_all_days_of_week(day_of_week=instance.dayOfWeek, start_date=datetime.now().date())
+
+    for day in term_days:
+        term = Term()
+        term.event = ev
+        term.day = day
+        term.start = instance.start_time
+        term.end = instance.end_time
+        term.room = instance.classroom
+        term.save()
+
+
+@receiver(post_delete, sender=SpecialReservation, dispatch_uid='sr_delete_event')
+def remove_event(sender, instance, **kwargs):
+    from .event import Event
+
+    Event.objects.filter(reservation=instance).delete()
