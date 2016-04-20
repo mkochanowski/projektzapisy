@@ -137,6 +137,7 @@ def proposal(request, slug=None):
 @employee_required
 def proposal_edit(request, slug=None):
     proposal = None
+    description = None
 
     if slug:
         try:
@@ -146,8 +147,6 @@ def proposal_edit(request, slug=None):
             raise Http404
         except ObjectDoesNotExist:
             raise Http404
-    else:
-        description = None
 
     proposal_form      = ProposalForm(data=request.POST or None,
                                     instance=proposal, prefix='entity')
