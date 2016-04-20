@@ -173,6 +173,9 @@ def proposal_edit(request, slug=None):
         description_form.save_m2m()
         proposal_form.save_m2m()
 
+        proposal = proposal_for_offer(proposal.slug)
+        proposal.save()
+
         messages.success(request, u'Propozycja zapisana')
 
         return redirect('my-proposal-show', slug=proposal.slug)
