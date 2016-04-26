@@ -24,9 +24,6 @@ class Term(models.Model):
     SATURDAY = '6'
     SUNDAY = '7'
 
-    DAYS_OF_WEEK_ENUM = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY]
-
-    #TODO: Why 'ś' in 'środa' breaks admin forms
     DAYS_OF_WEEK = [(MONDAY, u'poniedzialek'),
                     (TUESDAY, u'wtorek'),
                     (WEDNESDAY, u'sroda'),
@@ -111,11 +108,11 @@ class Term(models.Model):
 
     @staticmethod
     def get_day_of_week(date):
-        return Term.DAYS_OF_WEEK_ENUM[date.weekday()]
+        return Term.DAYS_OF_WEEK[date.weekday()][0]
 
     @staticmethod
     def get_python_day_of_week(day_of_week):
-        return Term.DAYS_OF_WEEK_ENUM.index(day_of_week)
+        return [x[0] for x in Term.DAYS_OF_WEEK].index(day_of_week)
 
     @staticmethod
     def get_groups_terms(groups_ids):

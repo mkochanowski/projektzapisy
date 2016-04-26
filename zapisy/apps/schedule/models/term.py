@@ -45,24 +45,6 @@ class Term(models.Model):
                                      unicode(terms[0].event) + ' (wydarzenie)']},
                 code='overlap')
 
-    def validate_against_special_reservations(self):
-        assert(self.room is not None)
-        semester = Semester.get_semester(self.day)
-
-        special_reservations = \
-            SpecialReservation.get_reservations_for_semester(semester=semester,
-                                                             day=self.day,
-                                                             classrooms=[self.room],
-                                                             start_time=self.start,
-                                                             end_time=self.end)
-
-        if special_reservations:
-            raise ValidationError(
-                message={'__all__': [u'W tym samym czasie ta sala jest zarezerwowana: ' +
-                                     unicode(special_reservations[0]) + u'(rezerwacja cykliczna)']},
-                code='overlap'
-            )
-
     def validate_against_course_terms(self):
         assert(self.room is not None)
         semester = Semester.get_semester(self.day)
@@ -104,8 +86,6 @@ class Term(models.Model):
                 )
 
             self.validate_against_event_terms()
-
-            self.validate_against_special_reservations()
 
             self.validate_against_course_terms()
 

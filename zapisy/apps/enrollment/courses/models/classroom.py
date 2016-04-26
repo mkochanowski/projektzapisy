@@ -85,8 +85,6 @@ class Classroom( models.Model ):
         for term in terms:
             result[term.room.number]['terms'].append(make_dict(term.start, term.end, term.event.title))
 
-        # if day isnt free fill cyclical reservations
-
         if not Freeday.is_free(date):
 
             # get weekday and semester
@@ -97,28 +95,11 @@ class Classroom( models.Model ):
             if selected_semester is None:
                 return
 
-            # get special reservations data
-
-            special_reservations = SpecialReservation.objects.\
-                any_semester(selected_semester).\
-                on_day_of_week(weekday).\
-                in_classrooms(rooms).select_related('classroom')
-
-            # fill special reservations data
-
-            for reservation in special_reservations:
-                result[reservation.classroom.number]['terms'].append(make_dict(reservation.start_time,
-                                                                               reservation.end_time,
-                                                                               reservation.title))
-
             # get courses data
 
             course_terms = Term.objects.filter(dayOfWeek=weekday,
                                                group__course__semester=selected_semester)\
                 .select_related('classroom', 'group').prefetch_related('classrooms')
-
-            # TODO: This might be costly. Needs tests.
-            # note: classroom field in Term model is deprecated, use .classrooms.all() to get classrooms
 
             # fill courses data
 

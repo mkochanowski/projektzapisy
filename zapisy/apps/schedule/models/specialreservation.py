@@ -109,22 +109,6 @@ class SpecialReservation(models.Model):
                 code='overlap'
             )
 
-    def validate_against_special_reservations(self):
-        special_reservations = SpecialReservation.get_reservations_for_semester(semester=self.semester,
-                                                                                day=self.dayOfWeek,
-                                                                                classrooms=[self.classroom],
-                                                                                start_time=self.start_time,
-                                                                                end_time=self.end_time)
-
-        if self.pk:
-            special_reservations = special_reservations.exclude(pk=self.pk)
-
-        if special_reservations:
-            raise ValidationError(
-                message={'__all__': [u'W tym czasie ta sala jest zarezerowowana (wydarzenie cykliczne): ' +
-                                     unicode(special_reservations[0])]},
-                code='overlap')
-
     def validate_against_event_terms(self):
         from .term import Term
 
@@ -156,8 +140,6 @@ class SpecialReservation(models.Model):
                 message={'classroom': [u'Ta sala nie jest przeznaczona do rezerwacji']},
                 code='invalid'
             )
-
-        self.validate_against_special_reservations()
 
         self.validate_against_event_terms()
 
@@ -207,10 +189,3 @@ def create_event(sender, instance, **kwargs):
         term.end = instance.end_time
         term.room = instance.classroom
         term.save()
-
-
-@receiver(post_delete, sender=SpecialReservation, dispatch_uid='sr_delete_event')
-def remove_event(sender, instance, **kwargs):
-    from .event import Event
-
-    Event.objects.filter(reservation=instance).delete()
