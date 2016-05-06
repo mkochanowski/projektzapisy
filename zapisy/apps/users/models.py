@@ -360,6 +360,10 @@ class Student(BaseUser):
           .order_by('group__course__entity__name')
 
     @staticmethod
+    def get_active_students():
+        return Student.objects.filter(status=0)
+
+    @staticmethod
     def get_list(begin='All'):
         def next_char(begin):
             try:
