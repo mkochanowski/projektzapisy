@@ -9,86 +9,87 @@ NOTIFICATION_TYPES = (
     ('News', {
         'all': [
             ('send-news', u'Dodano nowy news'),
-            ('send-dev-news', u'Dodano nowy news developerski'),
+            #('send-dev-news', u'Dodano nowy news developerski'),
         ],
         'student': [
-            ('send-user_change', u'Nastąpiła automatyczna zmiana Twoich danych w systemie')
+            #('send-user_change', u'Nastąpiła automatyczna zmiana Twoich danych w systemie')
         ],
         'employee': []
     }),
     ('Przedmioty', {
         'all': [
-            ('course-new_semester', u'Pojawiły się przedmioty na przyszły semestr'),
-            ('courses-new_schedule', u'Pojawił się plan na następny semestr'),
-            ('course-message', u'Wykładowca napisał nową wiadomość do zapisanych'),
+            #('course-new_semester', u'Pojawiły się przedmioty na przyszły semestr'),
+            #('courses-new_schedule', u'Pojawił się plan na następny semestr'),
+            #('course-message', u'Wykładowca napisał nową wiadomość do zapisanych'),
         ],
         'student': [
-            ('change-group-time', u'Zmieniono termin grupy, do której jesteś zapisany/a'),
-            ('change-group-time-q', u'Zmieniono termin grupy, do której jesteś w kolejce'),
-            ('change-course', u'Zmieniono opis przedmiotu na który jesteś zapisany/a'),
-            ('change-course-q', u'Zmieniono opis przedmiotu, do którego stoisz w kolejce'),
-            ('change-course-p', u'Zmieniono opis przedmiotu przypiętego przez Ciebie do planu'),
-            ('group-message', u'Prowadzący napisał nową wiadomość do grupy'),
+            #('change-group-time', u'Zmieniono termin grupy, do której jesteś zapisany/a'),
+            #('change-group-time-q', u'Zmieniono termin grupy, do której jesteś w kolejce'),
+            #('change-course', u'Zmieniono opis przedmiotu na który jesteś zapisany/a'),
+            #('change-course-q', u'Zmieniono opis przedmiotu, do którego stoisz w kolejce'),
+            #('change-course-p', u'Zmieniono opis przedmiotu przypiętego przez Ciebie do planu'),
+            #('group-message', u'Prowadzący napisał nową wiadomość do grupy'),
         ],
         'employee': [
-            ('change-course-teacher', u'Zmieniono opis przedmiotu z którego prowadzisz zajęcia'),
+            #('change-course-teacher', u'Zmieniono opis przedmiotu z którego prowadzisz zajęcia'),
         ]
     }),
     ('Zapisy', {
         'all': [
         ],
         'student': [
-            ('enrollment-t0', u'Ustalono Twój czas otwarcia zapisów'),
-            ('enrolled', u'Nastąpiło zapisanie do grupy'),
-            ('enrolled-again', u'Nastąpiło przepisanie do grupy'),
-            ('enrolled-remove', u'Nastąpiło wypisanie z grupy'),
-            ('queue-remove', u'Nastąpiło wypisanie z kolejki'),
-            ('enrollment-finish', u'Pozostały 24 godziny do końca zapisów'),
-            ('enrollment-finish-dir', u'Pozostały 24 godziny do końca wypisów dyrektorskich'),
-            ('enrollment-started', u'Twoje zapisy się rozpoczęły'),
+            #('enrollment-t0', u'Ustalono Twój czas otwarcia zapisów'),
+            #('enrolled', u'Nastąpiło zapisanie do grupy'),
+            #('enrolled-again', u'Nastąpiło przepisanie do grupy'),
+            #('enrolled-remove', u'Nastąpiło wypisanie z grupy'),
+            #('queue-remove', u'Nastąpiło wypisanie z kolejki'),
+            #('enrollment-finish', u'Pozostały 24 godziny do końca zapisów'),
+            #('enrollment-finish-dir', u'Pozostały 24 godziny do końca wypisów dyrektorskich'),
+            #('enrollment-started', u'Twoje zapisy się rozpoczęły'),
             ('enrollment-limit', u'Podniesiono limit ECTS'),
         ],
         'employee': [
-            ('student-enrolled', u'Po pierwszym tygodniu do grupy dołączył nowy student'),
-            ('student-removed', u'Po pierwszym tygodniu z grupy wypisał się student')
+            #('student-enrolled', u'Po pierwszym tygodniu do grupy dołączył nowy student'),
+            #('student-removed', u'Po pierwszym tygodniu z grupy wypisał się student')
         ]
     }),
     ('Oferta', {
         'all': [
-            ('desiderata', u'Przypomnienie o wypełnieniu dezyderaty'),
-            ('preferences', u'Przypomnienie o aktualizacji preferencji'),
-            ('offer', u'Przypomnienie o aktualizacji oferty')
+            #('desiderata', u'Przypomnienie o wypełnieniu dezyderaty'),
+            #('preferences', u'Przypomnienie o aktualizacji preferencji'),
+            #('offer', u'Przypomnienie o aktualizacji oferty')
         ],
         'student': [
             ('vote-start', u'Rozpoczęło się głosowanie'),
-            ('vote-finish', u'Zostało 24 godziny do końca głosowania'),
+            #('vote-finish', u'Zostało 24 godziny do końca głosowania'),
             ('vote-correction', u'Rozpoczęła się korekta głosowania'),
-            ('vote-correction-finish', u'Zostało 24 godziny do końca korekty'),
-            ('vote-summary', u'Wyślij podsumowanie oddanego głosu'),
-            ('grade-start', u'Rozpoczęła się ocena'),
-            ('grade-finish', u'Pozostało 24 godzin do końca oceny'),
-            ('grade-info', u'Wyślij potwierdzenie wygenerowania kluczy')],
+            #('vote-correction-finish', u'Zostało 24 godziny do końca korekty'),
+            #('vote-summary', u'Wyślij podsumowanie oddanego głosu'),
+            ('grade-start', u'Rozpoczęła się ocena')
+            #('grade-finish', u'Pozostało 24 godzin do końca oceny'),
+            #('grade-info', u'Wyślij potwierdzenie wygenerowania kluczy')
+        ],
         'employee': []
     }),
     ('Wydarzenia', {
         'all': [
-            ('new-event', u'Dodano nowe wydarzenie w Instytucie'),
-            ('new-cancell', u'Interesujące Cię wydarzenie zostało odwołane'),
-            ('new-finish', u'Interesujące Cię wydarzenie odbędzie się jutro'),
-            ('message-in-event', u'Organizator wydarzenia napisał nową wiadomość'),
-            ('new-zosia', u'Wyślij informacje o rozpoczęciu zapisów na nową ZOSIę')
+            #('new-event', u'Dodano nowe wydarzenie w Instytucie'),
+            #('new-cancell', u'Interesujące Cię wydarzenie zostało odwołane'),
+            #('new-finish', u'Interesujące Cię wydarzenie odbędzie się jutro'),
+            #('message-in-event', u'Organizator wydarzenia napisał nową wiadomość'),
+            #('new-zosia', u'Wyślij informacje o rozpoczęciu zapisów na nową ZOSIę')
         ],
         'student': [
-            ('exam-info', u'Ustalono termin egzaminu lub kolokwium z przedmiotu na który jesteś zapisany/a'),
+            #('exam-info', u'Ustalono termin egzaminu lub kolokwium z przedmiotu na który jesteś zapisany/a'),
         ],
         'employee': [
-            ('exam-info-e', u'Ustalono termin egzaminu lub kolokwium z przedmiotu do którego prowadzisz zajęcia'),
+            #('exam-info-e', u'Ustalono termin egzaminu lub kolokwium z przedmiotu do którego prowadzisz zajęcia'),
         ]
     }),
     ('Wnioski', {
         'all': [
-            ('petition-accepted', u'Twój wniosek został zaakceptowany'),
-            ('petition-deny', u'Twój wniosek został odrzucony')
+            #('petition-accepted', u'Twój wniosek został zaakceptowany'),
+            #('petition-deny', u'Twój wniosek został odrzucony')
         ],
         'student': [],
         'employee': []
@@ -160,6 +161,8 @@ class NotificationPreferences(models.Model):
     objects = NotificationManager()
 
     class Meta:
+        unique_together = ('user', 'type')
+
         ordering = ['id']
         verbose_name = u'Ustawienie Notyfikacji'
         verbose_name_plural = u'Ustawienia Notyfikacji'
