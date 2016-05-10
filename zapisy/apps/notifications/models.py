@@ -172,6 +172,7 @@ class Notification(object):
 
     @classmethod
     def send_notification(cls, user, notification, context):
+        context['user'] = user
         preference = NotificationManager.user_has_notification_on(user, notification)
         if user.email and preference:
             body = render_to_string('notifications/' + notification + '.html', context)
@@ -193,7 +194,6 @@ class Notification(object):
         students = Student.get_active_students()
         employees = Employee.get_actives()
 
-        body = render_to_string('notifications/%s.html' % notification, context)
         subject = _find_notification_name(notification)
 
         for employee in employees:
@@ -201,6 +201,8 @@ class Notification(object):
             address = employee.user.email
 
             if address and preference:
+                context['user'] = employee.user
+                body = render_to_string('notifications/%s.html' % notification, context)
                 Message.objects.create(to_address=address, subject=subject, message_body=body)
 
         for student in students:
@@ -208,4 +210,7 @@ class Notification(object):
             address = student.user.email
 
             if address and preference:
+                context['user'] = student.user
+                body = render_to_string('notifications/%s.html' % notification, context)
+
                 Message.objects.create(to_address=address, subject=subject, message_body=body)
