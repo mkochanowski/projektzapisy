@@ -62,7 +62,7 @@ NOTIFICATION_TYPES = (
         'student': [
             ('vote-start', u'Rozpoczęło się głosowanie'),
             #('vote-finish', u'Zostało 24 godziny do końca głosowania'),
-            ('vote-correction', u'Rozpoczęła się korekta głosowania'),
+            #('vote-correction', u'Rozpoczęła się korekta głosowania'),
             #('vote-correction-finish', u'Zostało 24 godziny do końca korekty'),
             #('vote-summary', u'Wyślij podsumowanie oddanego głosu'),
             ('grade-start', u'Rozpoczęła się ocena')
@@ -179,7 +179,7 @@ class Notification(object):
             Message.objects.create(to_address=user.email, subject=preference.get_type_display(), message_body=body)
 
     @classmethod
-    def send_notifications(cls, notification, context):
+    def send_notifications(cls, notification, context={}):
         """
         Sends given notification to all subscribed users.
         """

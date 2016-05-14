@@ -75,7 +75,7 @@ class News(models.Model):
         super(News, self).save(*args, **kwargs)
 
         if self.is_published() and (old and not old.is_published() or not old):
-            Notification.send_notifications('send-news', {})
+            Notification.send_notifications('send-news')
 
     def is_published(self):
         return self.category != '-'
