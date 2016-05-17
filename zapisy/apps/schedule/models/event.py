@@ -109,6 +109,18 @@ class Event(models.Model):
                         message={'status': [u'Nie masz uprawnień aby dodawać zaakceptowane wydarzenia']},
                         code='permission')
 
+        else:
+            old = Event.objects.get(pk=self.pk)
+
+            # if status is changed
+            if old.status != self.status:
+
+                # if status changes to accepted, validate all term objects
+                if self.status == Event.STATUS_ACCEPTED:
+                    from .term import Term
+                    for term in Term.objects.filter(event=self):
+                        term.clean()
+
         super(Event, self).clean()
 
     def _user_can_see_or_404(self, user):

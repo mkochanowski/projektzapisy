@@ -105,7 +105,7 @@ class Term(models.Model):
 
         # X < B AND A < Y
 
-        terms = Term.objects.filter(Q(room=self.room), Q(day=self.day),
+        terms = Term.objects.filter(Q(room=self.room), Q(day=self.day), Q(event__status=Event.STATUS_ACCEPTED),
                                     Q(start__lt=self.end), Q(end__gt=self.start)) \
             .select_related('event')
 

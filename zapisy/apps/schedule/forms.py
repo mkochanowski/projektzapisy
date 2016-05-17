@@ -43,7 +43,8 @@ class EventForm(forms.ModelForm):
 
         super(EventForm, self).__init__(data, **kwargs)
 
-        self.instance.author = user
+        if not self.instance.pk:
+            self.instance.author = user
 
         if user.employee:
             self.fields['type'].choices = Event.TYPES_FOR_TEACHER

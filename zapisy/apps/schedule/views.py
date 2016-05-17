@@ -69,11 +69,13 @@ def edit_event(request, event_id=None):
     event = Event.get_event_for_moderation_or_404(event_id, request.user)
     form = EventForm(data=request.POST or None, instance=event, user=request.user)
     formset = TermFormSet(request.POST or None, instance=event)
+    reservation = event.reservation
 
     if form.is_valid() and formset.is_valid():
         event = form.save(commit=False)
         if not event.id:
             event.author = request.user
+        event.reservation = reservation
         event.save()
         formset.save()
 
