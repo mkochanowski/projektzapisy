@@ -204,8 +204,7 @@ class CourseEntity(models.Model):
 
         if not self.slug:
             self.slug = slugify('%d_%s' % (self.pk, self.name,))
-
-        super(CourseEntity, self).save(*args, **kwargs)
+            self.save()
 
     def __unicode__(self):
         return '%s' % (self.name, )
@@ -582,10 +581,11 @@ class Course(models.Model):
         return self.information.requirements
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify('%d %s %s' % (self.pk, self.entity.name))
-
         super(Course, self).save(*args, **kwargs)
+
+        if not self.slug:
+            self.slug = slugify('%d %s' % (self.pk, self.entity.name))
+            self.save()
 
     def get_absolute_url(self):
         return reverse('course-page', args=[str(self.slug)])
