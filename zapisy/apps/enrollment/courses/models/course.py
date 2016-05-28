@@ -57,7 +57,7 @@ class StatisticsManager(models.Manager):
 
         #TODO: po przeniesieniu wszystkich metod do managerów filtrowanie na
         #  status powinno byc  z dziedziczenia
-        return self.get_query_set().filter(status=3)\
+        return self.get_query_set().filter(status=2)\
             .select_related('type', 'owner', 'owner__user')\
             .order_by('name')\
             .extra(
@@ -355,7 +355,7 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_vote():
-        return CourseEntity.noremoved.filter(status=3)
+        return CourseEntity.noremoved.filter(status=2)
 
     @staticmethod
     def get_voters():
