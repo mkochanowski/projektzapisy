@@ -359,9 +359,9 @@ class Student(BaseUser):
           .prefetch_related('group__term', 'group__term__classrooms')\
           .order_by('group__course__entity__name')
 
-    @staticmethod
-    def get_active_students():
-        return Student.objects.filter(status=0)
+    @classmethod
+    def get_active_students(cls):
+        return cls.objects.filter(status=0)
 
     @staticmethod
     def get_list(begin='All'):
