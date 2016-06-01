@@ -158,7 +158,7 @@ class CourseEntity(models.Model):
         return self.lectures + self.information.lectures
 
     def get_exercises(self):
-        return self.lectures + self.information.lectures
+        return self.exercises + self.information.exercises
 
     def get_laboratories(self):
         return self.laboratories + self.information.laboratories
