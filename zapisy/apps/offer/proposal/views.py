@@ -21,7 +21,7 @@ from apps.offer.proposal.exceptions      import  NotOwnerException
 
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal
-from apps.users.decorators import employee_required, offer_manager_required
+from apps.users.decorators import employee_required
 from apps.users.models import Employee
 
 logger = logging.getLogger("")
@@ -39,6 +39,7 @@ def offer(request, slug=None):
 
     return TemplateResponse(request, 'offer/offer.html', locals())
 
+@permission_required('proposal.can_create_offer')
 def select_for_voting(request):
     courses = CourseEntity.noremoved.all()
     courses = filter((lambda course: 1 <= course.get_status() <= 3), courses)
@@ -186,12 +187,12 @@ def proposal_edit(request, slug=None):
         "proposal": proposal
         })
 
-@offer_manager_required
+@permission_required('proposal.can_create_offer')
 def manage(request):
     proposals = CourseEntity.noremoved.filter(status=0).all()
     return TemplateResponse(request, 'offer/manage/proposals.html', locals())
 
-@offer_manager_required
+@permission_required('proposal.can_create_offer')
 def proposal_accept(request, slug=None):
     proposal = proposal_for_offer(slug)
     proposal.mark_as_accepted()
@@ -199,7 +200,7 @@ def proposal_accept(request, slug=None):
     messages.success(request, u'Zaakceptowano przedmiot '+proposal.name)
     return redirect('manage')
 
-@offer_manager_required
+@permission_required('proposal.can_create_offer')
 def proposal_for_review(request, slug=None):
     proposal = proposal_for_offer(slug)
     proposal.mark_for_review()
