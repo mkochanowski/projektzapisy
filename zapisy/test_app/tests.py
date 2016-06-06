@@ -13,24 +13,30 @@ from selenium.webdriver.common.by import By
 
 from django.contrib.auth.models import User
 from apps.users.models import Employee, Student
-from apps.enrollment.courses.models import Semester, CourseEntity, Course, Type
+from apps.enrollment.courses.models import Semester, CourseEntity, Course, Type, Group, Term, Classroom
 from apps.offer.vote.models import SystemState
 
-from datetime import datetime, date
+import os
+from datetime import datetime, date, time
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
+from django.db import connection
+
+from settings import PROJECT_PATH
+from scripts.scheduleimport import run_test as scheduleimport_run_test
+from scripts.ectsimport import run_test as ectsimport_run_test
 
 
 class SeleniumTestCase(LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.selenium = WebDriver()
+        cls.driver = WebDriver()
         super(SeleniumTestCase, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        cls.selenium.quit()
+        cls.driver.quit()
         super(SeleniumTestCase, cls).tearDownClass()
 
 
@@ -38,12 +44,22 @@ class NewSemesterTests(SeleniumTestCase):
 
     def setUp(self):
         self.password = '11111'
-        self.admin = User.objects.create_superuser(username='przemka', 
+        self.admin = User.objects.create_superuser(username='przemka',
                                               password=self.password,
                                               email='admin@admin.com')
         self.admin.first_name = 'przemka'
         self.admin.save()
         self.employee = Employee.objects.create(user=self.admin)
+
+        self.employees = []
+        for i in range(1, 5):
+            user = User.objects.create_user(username=('employee%s' % i), password=self.password)
+            user.first_name = 'Employee'
+            user.last_name = str(i)
+            user.save()
+            employee = Employee.objects.create(user=user)
+            self.employees.append(employee)
+
         user_student1 = User.objects.create_user(username='student1', password=self.password)
         user_student2 = User.objects.create_user(username='student2', password=self.password)
         user_student3 = User.objects.create_user(username='student3', password=self.password)
@@ -101,7 +117,8 @@ class NewSemesterTests(SeleniumTestCase):
             year='1',                               
             semester_beginning=date.today(),
             semester_ending=date.today() + relativedelta(months=3),
-            records_ects_limit_abolition=date.today() + relativedelta(days=10)
+            records_ects_limit_abolition=date.today() + relativedelta(days=10),
+            visible=True
         )
 
 
@@ -110,7 +127,8 @@ class NewSemesterTests(SeleniumTestCase):
             year='2',
             semester_beginning=self.current_semester.semester_ending + relativedelta(days=1),
             semester_ending=self.current_semester.semester_ending + relativedelta(days=1, months=3),
-            records_ects_limit_abolition=self.current_semester.semester_ending + relativedelta(days=11)
+            records_ects_limit_abolition=self.current_semester.semester_ending + relativedelta(days=11),
+            visible=True
         )
 
         self.next_summer_semester = Semester.objects.create(
@@ -118,7 +136,8 @@ class NewSemesterTests(SeleniumTestCase):
             year='3',
             semester_beginning=self.next_winter_semester.semester_ending + relativedelta(days=1),
             semester_ending=self.next_winter_semester.semester_ending + relativedelta(days=1, months=3),
-            records_ects_limit_abolition=self.next_winter_semester.semester_ending + relativedelta(days=11)
+            records_ects_limit_abolition=self.next_winter_semester.semester_ending + relativedelta(days=11),
+            visible=True
         )
 
         self.system_state = SystemState.objects.create(
@@ -134,36 +153,42 @@ class NewSemesterTests(SeleniumTestCase):
         self.perform_voting()
         self.create_offer_for_winter_semester()
         self.perform_winter_correction()
+        self.import_winter_schedule()
+        self.start_winter_semester()
+        self.add_new_students()
+        self.import_ects()
+        self.open_records()
+        self.generate_t0()
 
-        self.selenium.get_screenshot_as_file("screenshot.png")
+        self.driver.get_screenshot_as_file("screenshot.png")
 
     def prepare_course_entities_for_voting(self):
-        self.selenium.get('%s%s' % (self.live_server_url, '//'))
-        self.selenium.find_element_by_id('id_login').send_keys(self.admin.username)
-        self.selenium.find_element_by_id('id_password').send_keys(self.password)
-        self.selenium.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
-        self.selenium.find_element_by_link_text('Oferta').click()
-        self.selenium.get('%s%s' % (self.selenium.current_url, '/manage/proposals'))
-        self.selenium.find_element_by_link_text('Głosowanie').click()
+        self.driver.get('%s%s' % (self.live_server_url, '//'))
+        self.driver.find_element_by_id('id_login').send_keys(self.admin.username)
+        self.driver.find_element_by_id('id_password').send_keys(self.password)
+        self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
+        self.driver.find_element_by_link_text('Oferta').click()
+        self.driver.get('%s%s' % (self.driver.current_url, '/manage/proposals'))
+        self.driver.find_element_by_link_text('Głosowanie').click()
 
         nonselected_select = Select(
-            WebDriverWait(self.selenium, 1).until(EC.element_to_be_clickable((By.ID, 'bootstrap-duallistbox-nonselected-list_for_voting')))
+            WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.ID, 'bootstrap-duallistbox-nonselected-list_for_voting')))
         )
-        # nonselected_select = Select(self.selenium.find_element_by_id('bootstrap-duallistbox-nonselected-list_for_voting'))
-        selected_select = Select(self.selenium.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting'))
+        # nonselected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-nonselected-list_for_voting'))
+        selected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting'))
         self.assertEqual(CourseEntity.objects.filter(status=1).count(), len(nonselected_select.options))
-        self.assertEqual(CourseEntity.objects.filter(status=3).count(), len(selected_select.options))
+        self.assertEqual(CourseEntity.objects.filter(status=2).count(), len(selected_select.options))
 
         for ce in CourseEntity.objects.filter(status=1):
             if ce.name != 'Course 100' and ce.name != 'Course 101':
                 nonselected_select.select_by_visible_text(ce.name)
 
-        self.selenium.find_element_by_xpath('//input[@value="Zapisz"]').click()
+        self.driver.find_element_by_xpath('//input[@value="Zapisz"]').click()
 
-        nonselected_select = Select(self.selenium.find_element_by_id('bootstrap-duallistbox-nonselected-list_for_voting'))
-        selected_select = Select(self.selenium.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting'))
+        nonselected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-nonselected-list_for_voting'))
+        selected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting'))
         self.assertEqual(CourseEntity.objects.filter(status=1).count(), len(nonselected_select.options))
-        self.assertEqual(CourseEntity.objects.filter(status=3).count(), len(selected_select.options))
+        self.assertEqual(CourseEntity.objects.filter(status=2).count(), len(selected_select.options))
 
     def perform_voting(self):
         # voting starts
@@ -201,9 +226,9 @@ class NewSemesterTests(SeleniumTestCase):
         )
 
         # check voting results
-        self.selenium.find_element_by_link_text('Głosowanie').click()
-        self.selenium.find_element_by_link_text('Podsumowanie głosowania').click()
-        rows = self.selenium.find_elements_by_xpath('//table/tbody/tr')
+        self.driver.find_element_by_link_text('Głosowanie').click()
+        WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Podsumowanie głosowania'))).click()
+        rows = self.driver.find_elements_by_xpath('//table/tbody/tr')
         for row in rows:
             cells = row.find_elements_by_tag_name('td')
             self.assertEqual(self.results_points[cells[0].text], int(cells[1].text))
@@ -216,31 +241,30 @@ class NewSemesterTests(SeleniumTestCase):
 
 
     def vote(self, student, points):
-        self.selenium.get('%s%s' % (self.live_server_url, '/users/logout/'))
-        self.selenium.get('%s%s' % (self.live_server_url, '//'))
-        self.selenium.find_element_by_id('id_login').send_keys(student.user.username)
-        self.selenium.find_element_by_id('id_password').send_keys(self.password)
-        self.selenium.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
-        self.selenium.find_element_by_link_text('Oferta').click()
-        self.selenium.find_element_by_link_text('Głosowanie').click()
-        WebDriverWait(self.selenium, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click()
-        # self.selenium.find_element_by_link_text('Głosuj').click()
+        self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
+        self.driver.get('%s%s' % (self.live_server_url, '//'))
+        self.driver.find_element_by_id('id_login').send_keys(student.user.username)
+        self.driver.find_element_by_id('id_password').send_keys(self.password)
+        self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
+        self.driver.find_element_by_link_text('Oferta').click()
+        self.driver.find_element_by_link_text('Głosowanie').click()
+        WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click()
 
         sum_points = sum(points.itervalues())
 
         for course_name, value in points.iteritems():
-            select = Select(self.selenium.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name))
+            select = Select(self.driver.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name))
             select.select_by_value(str(value))
             if sum_points <= self.system_state.max_points:
                 self.results_points[course_name] += value
                 self.results_votes[course_name] += 1
 
-        self.selenium.find_element_by_xpath('//input[@value="Głosuj"]').click()
+        self.driver.find_element_by_xpath('//input[@value="Głosuj"]').click()
 
         if sum_points <= self.system_state.max_points:
-            self.assertEqual(len(self.selenium.find_elements_by_xpath('//div[contains(text(), "Oddano poprawny głos")]')), 1)
+            self.assertEqual(len(self.driver.find_elements_by_xpath('//div[contains(text(), "Oddano poprawny głos")]')), 1)
         else:
-            self.assertEqual(len(self.selenium.find_elements_by_xpath('//div[contains(text(), "Nie udało się oddać głosu")]')), 1)
+            self.assertEqual(len(self.driver.find_elements_by_xpath('//div[contains(text(), "Nie udało się oddać głosu")]')), 1)
         
     def create_offer_for_winter_semester(self):
         for course in self.winter_courses:
@@ -279,20 +303,139 @@ class NewSemesterTests(SeleniumTestCase):
 
 
     def correction(self, student, points):
-        self.selenium.get('%s%s' % (self.live_server_url, '/users/logout/'))
-        self.selenium.get('%s%s' % (self.live_server_url, '//'))
-        self.selenium.find_element_by_id('id_login').send_keys(student.user.username)
-        self.selenium.find_element_by_id('id_password').send_keys(self.password)
-        self.selenium.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
-        self.selenium.find_element_by_link_text('Oferta').click()
-        self.selenium.find_element_by_link_text('Głosowanie').click()
-        WebDriverWait(self.selenium, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click()
-        # self.selenium.find_element_by_link_text('Głosuj').click()
+        self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
+        self.driver.get('%s%s' % (self.live_server_url, '//'))
+        self.driver.find_element_by_id('id_login').send_keys(student.user.username)
+        self.driver.find_element_by_id('id_password').send_keys(self.password)
+        self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
+        self.driver.find_element_by_link_text('Oferta').click()
+        self.driver.find_element_by_link_text('Głosowanie').click()
+        WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click()
 
         for course_name, value in points.iteritems():
-            select = Select(self.selenium.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name))
+            select = Select(self.driver.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name))
             select.select_by_value(str(value))
 
-        self.selenium.find_element_by_xpath('//input[@value="Głosuj"]').click()
+        self.driver.find_element_by_xpath('//input[@value="Głosuj"]').click()
+
+    def import_winter_schedule(self):
+        courses = {}
+        for course in Course.objects.filter(semester=self.next_winter_semester):
+            courses[course.entity.name] = course.id
+
+        employees = {}
+        for empl in self.employees:
+            employees['%s %s' % (empl.user.first_name, empl.user.last_name)] = empl.id
+
+        Classroom.objects.create(number=5, type=1)
+        Classroom.objects.create(number=7, type=3)
+        Classroom.objects.create(number=25, type=0)
+        Classroom.objects.create(number=103, type=1)
+        Classroom.objects.create(number=104, type=1)
+        Classroom.objects.create(number=105, type=1)
+        Classroom.objects.create(number=108, type=3)
+        Classroom.objects.create(number=119, type=0)
+        Classroom.objects.create(number=139, type=1)
+
+        test_schedule = '''
+
+ Course 1
+  pn  16-18  (cwiczenia) Employee 4, sala 103
+  wt  14-16  (cwiczenia) Employee 2, sala 139
+  sr  8-10   (wyklad) Employee 1, sala 25
+  sr  12-14  (cwiczenia) Employee 1, sala 139
+  czw 8-10   (cwiczenia) Employee 3, sala 105
+  czw 14-16  (repetytorium) Employee 2, sala 104
+
+ Course 2
+  pn  10-12  (cwicz+pracownia) Employee 5, sale 105,108
+  wt  14-16  (cwicz+pracownia) Employee 3, sale 5,108
+  wt  16-18  (wyklad) Employee 2, sala 119
+  czw 16-18  (cwicz+pracownia) Employee 5, sale 5,7
+
+ Course 3
+  czw 12-14  (seminarium) Employee 4, sala 119
+
+'''
+
+        test_schedule_path = PROJECT_PATH + '/test_schedule.txt'
+        with open(test_schedule_path, 'w') as file:
+            file.write(test_schedule)
+        print employees
+        scheduleimport_run_test(test_schedule_path, courses, employees, self.next_winter_semester.id)
+
+        os.remove(test_schedule_path)
+
+        groups = Group.objects.all()
+        self.assertEqual(groups.filter(course__entity__name='Course 1').count(), 6)
+        self.assertEqual(groups.filter(course__entity__name='Course 2').count(), 4)
+        self.assertEqual(groups.filter(course__entity__name='Course 3').count(), 1)
+
+        terms = Term.objects.select_related('group').all()
+        self.assertEqual(
+            terms.filter(
+                group__course__entity__name='Course 1',
+                group__teacher__user__first_name='Employee',
+                group__teacher__user__last_name='4',
+                group__type=2,
+                classrooms__number__in=[103],
+                dayOfWeek=1,
+                start_time=time(hour=16),
+                end_time=time(hour=18)).count(),
+            1)
 
 
+    def start_winter_semester(self):
+        self.current_semester.semester_beginning = date.today() - relativedelta(days=3)
+        self.current_semester.records_ects_limit_abolition = date.today() - relativedelta(days=2)
+        self.current_semester.semester_ending = date.today() - relativedelta(days=1)
+        self.current_semester.save()
+
+        self.next_winter_semester.semester_beginning = date.today()
+        self.next_winter_semester.records_ects_limit_abolition = date.today() + relativedelta(days=11)
+        self.next_winter_semester.semester_ending = date.today() + relativedelta(months=3)
+        self.next_winter_semester.save()        
+
+    def add_new_students(self):
+        number_of_students = Student.objects.all().count()
+        self.new_students = []
+        for i in range(1, 6):
+            user = User.objects.create_user(username='student%d' % (i + number_of_students), password=self.password)
+            student = Student.objects.create(user=user, matricula=str(i + number_of_students))
+            self.new_students.append(student)
+
+    def import_ects(self):
+        students_ects = {
+            self.student1: {'I': 179},
+            self.student2: {'I': 185, 'II': 55},
+            self.student3: {'I': 64},
+            self.student4: {'I': 190, 'II': 80}
+        }
+
+        test_ectsimport = ''
+        for student, points in students_ects.iteritems():
+            for deg, ects in points.iteritems():
+                test_ectsimport += '%s %d T %s stopnia\n' % (student.matricula, ects, deg)
+
+        test_ectsimport_path = PROJECT_PATH + '/test_ectsimport.txt'
+        with open(test_ectsimport_path, 'w') as file:
+            file.write(test_ectsimport)
+
+        ectsimport_run_test(test_ectsimport_path)
+
+        os.remove(test_ectsimport_path)
+
+        for student in Student.objects.all():
+            if student in students_ects:
+                ects_sum = sum(students_ects[student].values())
+                self.assertEqual(ects_sum, student.ects)
+
+    def open_records(self):
+        self.next_winter_semester.records_opening = datetime.today().replace(hour=00, minute=00)
+        self.next_winter_semester.records_closing = self.next_winter_semester.records_opening + relativedelta(days=10)
+        self.next_winter_semester.save()
+
+    def generate_t0(self):
+        #cursor = connection.cursor()
+        #cursor.execute("SELECT users_openingtimesview_refresh_for_semester(%s)", [self.next_winter_semester.id])
+        pass
