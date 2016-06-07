@@ -123,10 +123,10 @@ def decision(request, event_id):
     from .models.message import EventModerationMessage
 
     event = Event.get_event_for_moderation_only_or_404(event_id, request.user)
-    event_status = event.status
+
     form = DecisionForm(request.POST, instance=event)
     if form.is_valid():
-        if event_status == form.cleaned_data['status']:
+        if event.status == form.cleaned_data['status']:
             messages.error(request, u'Status wydarzenia nie został zmieniony')
         else:
             event_obj = form.save()

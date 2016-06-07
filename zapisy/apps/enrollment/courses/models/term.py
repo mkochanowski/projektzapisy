@@ -5,7 +5,7 @@ from datetime import time, date
 from django.db import models
 from django.db.models import signals
 from django.core.cache import cache as mcache
-
+import zapisy.common as common
 import logging
 
 backup_logger = logging.getLogger('project.backup')
@@ -16,23 +16,7 @@ HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)]
 class Term(models.Model):
     """terms of groups"""
 
-    MONDAY = '1'
-    TUESDAY = '2'
-    WEDNESDAY = '3'
-    THURSDAY = '4'
-    FRIDAY = '5'
-    SATURDAY = '6'
-    SUNDAY = '7'
-
-    DAYS_OF_WEEK = [(MONDAY, u'poniedzialek'),
-                    (TUESDAY, u'wtorek'),
-                    (WEDNESDAY, u'sroda'),
-                    (THURSDAY, u'czwartek'),
-                    (FRIDAY, u'piatek'),
-                    (SATURDAY, u'sobota'),
-                    (SUNDAY, u'niedziela')]
-
-    dayOfWeek  = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia')
+    dayOfWeek  = models.CharField( max_length = 1, choices = common.DAYS_OF_WEEK, verbose_name = 'dzień tygodnia')
     start_time = models.TimeField(verbose_name = 'rozpoczęcie')
     end_time   = models.TimeField(verbose_name = 'zakończenie')
     classroom  = models.ForeignKey('Classroom', verbose_name='sala', null=True, blank=True)
@@ -108,11 +92,11 @@ class Term(models.Model):
 
     @staticmethod
     def get_day_of_week(date):
-        return Term.DAYS_OF_WEEK[date.weekday()][0]
+        return common.DAYS_OF_WEEK[date.weekday()][0]
 
     @staticmethod
     def get_python_day_of_week(day_of_week):
-        return [x[0] for x in Term.DAYS_OF_WEEK].index(day_of_week)
+        return [x[0] for x in common.DAYS_OF_WEEK].index(day_of_week)
 
     @staticmethod
     def get_groups_terms(groups_ids):
@@ -146,7 +130,7 @@ class Term(models.Model):
         A versatile function returning Terms. day is either datetime.date or string
 
         :param semester: enrollment.courses.model.Semester
-        :param day: Term.DAYS_OF_WEEK or datetime.date
+        :param day: common.DAYS_OF_WEEK or datetime.date
         """
 
         query = cls.objects.filter(group__course__semester=semester)

@@ -1,4 +1,4 @@
-from .models import User, UserProfile, ExtendedUser, Student, Employee
+from zapisy.apps.users.models import User, UserProfile, ExtendedUser, Student, Employee
 
 
 class UserObjectMother():

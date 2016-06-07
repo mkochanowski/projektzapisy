@@ -1,4 +1,4 @@
-from .models import Semester, Classroom
+from zapisy.apps.enrollment.courses.models import Semester, Classroom
 from datetime import datetime
 
 

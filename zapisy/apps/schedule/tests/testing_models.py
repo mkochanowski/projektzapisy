@@ -1,12 +1,14 @@
 from django.test import TestCase
-from .models import SpecialReservation, Event, Term as EventTerm
+from zapisy.apps.schedule.models import SpecialReservation, Event, Term as EventTerm
 from apps.enrollment.courses.models import Semester, Classroom, Term
 from datetime import datetime, timedelta, time, date
 from django.core.serializers import serialize
 from django.core.validators import ValidationError
 from django.contrib.auth.models import User
-from apps.enrollment.courses.objectmothers import SemesterObjectMother, ClassroomObjectMother
-from apps.users.objectmothers import UserObjectMother
+from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
+from apps.users.tests.objectmothers import UserObjectMother
+
+import zapisy.common as common
 
 class SpecialReservationTestCase(TestCase):
 
@@ -26,7 +28,7 @@ class SpecialReservationTestCase(TestCase):
         reservation = SpecialReservation(semester=semester,
                                          title="A reservation",
                                          classroom=room110,
-                                         dayOfWeek=Term.WEDNESDAY,
+                                         dayOfWeek=common.WEDNESDAY,
                                          start_time=time(15),
                                          end_time=time(16))
         reservation.full_clean()
@@ -35,7 +37,7 @@ class SpecialReservationTestCase(TestCase):
         reservation_2 = SpecialReservation(semester=semester,
                                           title='Anoter reservation',
                                           classroom=room110,
-                                          dayOfWeek=Term.THURSDAY,
+                                          dayOfWeek=common.THURSDAY,
                                           start_time=time(15),
                                           end_time=time(16))
         reservation_2.full_clean()
@@ -44,7 +46,7 @@ class SpecialReservationTestCase(TestCase):
         reservation_3 = SpecialReservation(semester=semester_2,
                                            title='Reserve whole monday',
                                            classroom=room110,
-                                           dayOfWeek=Term.MONDAY,
+                                           dayOfWeek=common.MONDAY,
                                            start_time=time(8),
                                            end_time=time(21))
         reservation_3.full_clean()
@@ -62,7 +64,7 @@ class SpecialReservationTestCase(TestCase):
 
     def test_no_reservations_on_not_reserved_day(self):
         semester = Semester.get_semester(date(2016, 5, 12))
-        reservations = SpecialReservation.get_reservations_for_semester(semester, day=Term.FRIDAY)
+        reservations = SpecialReservation.get_reservations_for_semester(semester, day=common.FRIDAY)
         self.assertFalse(reservations)
 
     def test_number_of_reservations(self):
@@ -77,7 +79,7 @@ class SpecialReservationTestCase(TestCase):
             semester=semester,
             title='overlapping reservation',
             classroom=room,
-            dayOfWeek=Term.THURSDAY,
+            dayOfWeek=common.THURSDAY,
             start_time=time(14),
             end_time=time(17)
         )
@@ -90,40 +92,15 @@ class SpecialReservationTestCase(TestCase):
             semester=semester,
             title='non-overlapping reservation',
             classroom=room,
-            dayOfWeek=Term.THURSDAY,
+            dayOfWeek=common.THURSDAY,
             start_time=time(14),
             end_time=time(15)
         )
         reservation.full_clean()
 
-    def test_save_overlapping_reservation(self):
-        semester = Semester.get_semester(date(2015, 12, 5))
-        room = Classroom.get_by_number('110')
-        reservation = SpecialReservation(
-            semester=semester,
-            title='overlapping reservation',
-            classroom=room,
-            dayOfWeek=Term.MONDAY,
-            start_time=time(15),
-            end_time=time(16)
-        )
-        reservation.save()
-
-    def test_save_non_overlapping_reservation(self):
-        semester =Semester.get_semester(date(2015,12,5))
-        room =  Classroom.get_by_number('104')
-        reservation = SpecialReservation(
-            semester=semester,
-            title='overlap with room110',
-            classroom=room,
-            dayOfWeek=Term.MONDAY,
-            start_time=time(15),
-            end_time=time(16)
-        )
-        reservation.save()
-
 
 class EventTestCase(TestCase):
+
     def setUp(self):
         teacher = UserObjectMother.user_jan_kowalski()
         teacher.save()
@@ -135,6 +112,7 @@ class EventTestCase(TestCase):
         room110 = ClassroomObjectMother.room110()
         room110.save()
 
+        teacher = User.objects.all()[0]
         event = Event(
             title='an event',
             description='an event',
@@ -144,6 +122,9 @@ class EventTestCase(TestCase):
         )
         event.full_clean()
         event.save()
+
+        room110 = Classroom.get_by_number('110')
+        event = Event.objects.all()[0]
 
         term_1 = EventTerm(
             event=event,
@@ -171,3 +152,20 @@ class EventTestCase(TestCase):
                                               classroom=room)
         self.assertTrue(terms)
 
+    def test_clean_overlapping_term(self):
+        event = Event.objects.all()[0]
+        room110 = Classroom.get_by_number('110')
+        term = EventTerm(
+            event=event,
+            day=date(2016, 5, 20),
+            start=time(15),
+            end=time(17),
+            room=room110
+        )
+        self.assertRaises(ValidationError, term.full_clean)
+
+    def test_remove_event_and_terms(self):
+        event = Event.objects.all()[0]
+        event.delete()
+        terms = EventTerm.objects.all()
+        self.assertFalse(terms)

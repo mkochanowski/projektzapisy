@@ -6,8 +6,10 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from datetime import date, datetime
 
+import zapisy.common as common
 
 from apps.enrollment.courses.models import Semester, Term as CourseTerm
+
 
 
 class SpecialReservationQuerySet(models.query.QuerySet):
@@ -60,7 +62,7 @@ class SpecialReservation(models.Model):
     title = models.CharField(max_length=255)
     classroom = models.ForeignKey(Classroom)
     dayOfWeek = models.CharField(max_length=1,
-                                 choices=Term.DAYS_OF_WEEK,
+                                 choices=common.DAYS_OF_WEEK,
                                  verbose_name='dzień tygodnia')
     start_time = models.TimeField(verbose_name='rozpoczęcie', blank=False)
     end_time = models.TimeField(verbose_name='zakończenie', blank=False)
@@ -73,7 +75,7 @@ class SpecialReservation(models.Model):
         A versatile function returning SpecialReservations. day is either datetime.date or string
 
         :param semester: enrollment.courses.model.Semester
-        :param day: Term.DAYS_OF_WEEK or datetime.date
+        :param day: common.DAYS_OF_WEEK or datetime.date
         """
 
         query = cls.objects.any_semester(semester)
