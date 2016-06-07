@@ -98,6 +98,10 @@ class SpecialReservationTestCase(TestCase):
         )
         reservation.full_clean()
 
+    def test_find_child_events(self):
+        events = Event.objects.all()
+        self.assertTrue(events)
+
 
 class EventTestCase(TestCase):
 

@@ -80,9 +80,7 @@ class SpecialReservation(models.Model):
 
         query = cls.objects.any_semester(semester)
 
-        if day is None:
-            pass
-        else:
+        if day is not None:
             if isinstance(day, date):
                 day_of_week = CourseTerm.get_day_of_week(day)
             else:
@@ -154,40 +152,42 @@ class SpecialReservation(models.Model):
         verbose_name = u'rezerwacja stała'
         verbose_name_plural = u'rezerwacje stałe'
 
+    def create_event(self):
+        from .term import Term
+        from .event import Event
+
+        Event.objects.filter(reservation=self).delete()
+
+        semester = self.semester
+
+        ev = Event()
+        ev.title = self.title
+        ev.description = u'Rezerwacja cykliczna - ' + self.title
+        ev.reservation = self
+        ev.type = Event.TYPE_GENERIC
+        ev.visible = True
+        ev.status = Event.STATUS_ACCEPTED
+        ev.author_id = 1
+        ev.save()
+
+        term_days = semester.get_all_days_of_week(day_of_week=self.dayOfWeek, start_date=datetime.now().date())
+
+        for day in term_days:
+            term = Term()
+            term.event = ev
+            term.day = day
+            term.start = self.start_time
+            term.end = self.end_time
+            term.room = self.classroom
+            term.save()
+
+    def save(self, *args, **kwargs):
+        super(SpecialReservation, self).save(*args, **kwargs)
+        self.create_event()
+
     def __unicode__(self):
         return '{0:s}: {1:s} - {2:s} {3:s} - {4:s}'.format(smart_unicode(self.semester),
                                                            smart_unicode(self.title),
                                                            smart_unicode(self.get_dayOfWeek_display()),
                                                            smart_unicode(self.start_time),
                                                            smart_unicode(self.end_time))
-
-
-@receiver(post_save, sender=SpecialReservation, dispatch_uid='sr_create_or_update_event')
-def create_event(sender, instance, **kwargs):
-    from .term import Term
-    from .event import Event
-
-    Event.objects.filter(reservation=instance).delete()
-
-    semester = instance.semester
-
-    ev = Event()
-    ev.title = instance.title
-    ev.description = u'Rezerwacja cykliczna - ' + instance.title
-    ev.reservation = instance
-    ev.type = Event.TYPE_GENERIC
-    ev.visible = True
-    ev.status = Event.STATUS_ACCEPTED
-    ev.author_id = 1
-    ev.save()
-
-    term_days = semester.get_all_days_of_week(day_of_week=instance.dayOfWeek, start_date=datetime.now().date())
-
-    for day in term_days:
-        term = Term()
-        term.event = ev
-        term.day = day
-        term.start = instance.start_time
-        term.end = instance.end_time
-        term.room = instance.classroom
-        term.save()
