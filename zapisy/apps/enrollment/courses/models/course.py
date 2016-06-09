@@ -57,7 +57,7 @@ class StatisticsManager(models.Manager):
 
         #TODO: po przeniesieniu wszystkich metod do managerów filtrowanie na
         #  status powinno byc  z dziedziczenia
-        return self.get_query_set().filter(status=3)\
+        return self.get_query_set().filter(status=2)\
             .select_related('type', 'owner', 'owner__user')\
             .order_by('name')\
             .extra(
@@ -82,7 +82,7 @@ class StatisticsManager(models.Manager):
 
 
 statuses = ((0, u'Propozycja'), (1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
-            (3, u'Poddana pod głosowanie 2013'), (4, u'Wycofany z oferty'), (5, 'Do poprawienia'), )
+            (4, u'Wycofany z oferty'), (5, 'Do poprawienia'), )
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
 ectslist = [(x, str(x)) for x in range(1, 16)]
 
@@ -187,7 +187,7 @@ class CourseEntity(models.Model):
         self.status = 5
 
     def mark_for_voting(self):
-        self.status = 3
+        self.status = 2
 
     def is_proposal(self):
         return (self.status == 0) or (self.status == 5)
@@ -337,7 +337,7 @@ class CourseEntity(models.Model):
         return self.semester == 'z'
 
     def is_in_voting(self):
-        return self.status == 3
+        return self.status == 2
 
     def get_all_voters(self, year=None):
         from apps.offer.vote.models.single_vote import SingleVote
@@ -355,7 +355,7 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_vote():
-        return CourseEntity.noremoved.filter(status=3)
+        return CourseEntity.noremoved.filter(status=2)
 
     @staticmethod
     def get_voters():
