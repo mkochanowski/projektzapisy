@@ -322,7 +322,9 @@ INSTALLED_APPS = (
     'django_filters',
     'autoslug',
     'endless_pagination',
-    'apps.notifications'
+    'apps.notifications',
+
+    'test_app'
 )
 
 AUTHENTICATION_BACKENDS = (
