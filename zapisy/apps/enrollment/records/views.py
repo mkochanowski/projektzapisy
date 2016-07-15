@@ -212,6 +212,15 @@ def records(request, group_id):
         Group records view - list of all students enrolled and queued to group.
     """
     try:
+        def mailto_bcc(students):
+            """Helper method to create mailto links"""
+            result = ''
+            if students:
+                result += students[0].user.email
+            if len(students) > 1:
+                return result + '?bcc=' + ','.join([student.user.email for student in students[1:]])
+            return result
+
         group = Group.objects.get(id=group_id)
         students_in_group = Record.get_students_in_group(group_id)
         students_in_queue = Queue.get_students_in_queue(group_id)
@@ -222,6 +231,8 @@ def records(request, group_id):
             'students_in_group' : students_in_group,
             'students_in_queue' : students_in_queue,
             'group' : group,
+            'mailto_group' : mailto_bcc(students_in_group),
+            'mailto_queue' : mailto_bcc(students_in_queue)
         })
         return render_to_response('enrollment/records/records_list.html', data,
             context_instance=RequestContext(request))

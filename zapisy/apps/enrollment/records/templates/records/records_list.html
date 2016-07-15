@@ -30,7 +30,7 @@
         {% if students_in_group %}
 		    {% include "enrollment/records/students_list.html" with students=students_in_group %}
 		    {# Translators: tekst przy linku mailto #}
-        	<a href="mailto:{% for student in students_in_group %},{{ student.user.email }}{% endfor %}">[{% trans "Wyślij wiadomość do grupy" %}]</a>&nbsp;
+        	<a href="mailto:{{ mailto_group }}">[{% trans "Wyślij wiadomość do grupy" %}]</a>&nbsp;
             {% if user.is_staff or user.employee %}
                 <ul>
                     <li><a href="{% url group-pdf group.id %}">{% trans "Ściągnij jako pdf" %}</a></li>
@@ -46,7 +46,7 @@
 
             {% include "enrollment/records/students_list.html" with students=students_in_queue %}
             {# Translators: tekst przy linku mailto #}
-			<a href="mailto:{% for student in students_in_queue %},{{ student.user.email }}{% endfor %}">[{% trans "Wyślij wiadomość do kolejki" %}]</a>
+			<a href="mailto:{{ mailto_queue }}">[{% trans "Wyślij wiadomość do kolejki" %}]</a>
 
             {% if request.user.is_staff or request.user.employee %}
                 <ul>
