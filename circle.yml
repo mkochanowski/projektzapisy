@@ -13,5 +13,6 @@ dependencies:
 
 test:
   override:
+    - mkdir logs
     - python manage.py test test_app
     - python manage.py test news
