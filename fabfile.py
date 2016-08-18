@@ -12,7 +12,9 @@ def production():
     env.releases_path = "%(domain_path)s/releases" % { 'domain_path':env.domain_path }
     env.shared_path = "%(domain_path)s/shared" % { 'domain_path':env.domain_path }
     env.git_clone = "git@github.com:example/app.git"
-    env.env_file = "deploy/production.txt"
+    env.git_branch = "master"
+    env.max_releases = 3
+    # env.env_file = "deploy/production.txt"
 
 def staging():
     """Defines staging environment"""
@@ -22,10 +24,12 @@ def staging():
     env.app_name = "projektzapisy"
     env.domain_name = "zapisyuwr.swistak35.com"
     env.domain_path = "%(base_dir)s/%(app_name)s" % { 'base_dir': env.base_dir, 'app_name': env.app_name }
-    env.current_path = "%(domain_path)s/current" % { 'domain_path':env.domain_path }
-    env.releases_path = "%(domain_path)s/releases" % { 'domain_path':env.domain_path }
-    env.shared_path = "%(domain_path)s/shared" % { 'domain_path':env.domain_path }
+    env.current_path = "%(domain_path)s/current" % { 'domain_path': env.domain_path }
+    env.releases_path = "%(domain_path)s/releases" % { 'domain_path': env.domain_path }
+    env.shared_path = "%(domain_path)s/shared" % { 'domain_path': env.domain_path }
     env.git_clone = "git@github.com:swistak35/projektzapisy.git"
+    env.git_branch = "master-dev"
+    env.max_releases = 3
     # env.env_file = "deploy/production.txt"
 
 def releases():
@@ -33,10 +37,10 @@ def releases():
     env.releases = sorted(run('ls -x %(releases_path)s' % { 'releases_path': env.releases_path }).split())
     if len(env.releases) >= 1:
         env.current_revision = env.releases[-1]
-        env.current_release = "%(releases_path)s/%(current_revision)s" % { 'releases_path':env.releases_path, 'current_revision':env.current_revision }
+        env.current_release = "%(releases_path)s/%(current_revision)s" % { 'releases_path': env.releases_path, 'current_revision': env.current_revision }
     if len(env.releases) > 1:
         env.previous_revision = env.releases[-2]
-        env.previous_release = "%(releases_path)s/%(previous_revision)s" % { 'releases_path':env.releases_path, 'previous_revision':env.previous_revision }
+        env.previous_release = "%(releases_path)s/%(previous_revision)s" % { 'releases_path': env.releases_path, 'previous_revision': env.previous_revision }
 
 def start():
     """Start the application servers"""
@@ -57,15 +61,15 @@ def stop():
 
 def setup():
     """Prepares one or more servers for deployment"""
-    run("mkdir -p %(domain_path)s/{releases,shared}" % { 'domain_path':env.domain_path })
-    run("mkdir -p %(shared_path)s/{system,log,index}" % { 'shared_path':env.shared_path })
+    run("mkdir -p %(domain_path)s/{releases,shared}" % { 'domain_path': env.domain_path })
+    run("mkdir -p %(shared_path)s/{logs,system}" % { 'shared_path': env.shared_path })
     # permissions()
 
 def checkout():
     """Checkout code to the remote servers"""
     from time import time
-    env.current_release = "%(releases_path)s/%(time).0f" % { 'releases_path':env.releases_path, 'time':time() }
-    run("cd %(releases_path)s; git clone -q -o deploy --depth 1 %(git_clone)s %(current_release)s" % { 'releases_path':env.releases_path, 'git_clone':env.git_clone, 'current_release':env.current_release })
+    env.current_release = "%(releases_path)s/%(time).0f" % { 'releases_path': env.releases_path, 'time': time() }
+    run("cd %(releases_path)s; git clone -q -o deploy --depth 1 -b %(git_branch)s %(git_clone)s %(current_release)s" % { 'releases_path': env.releases_path, 'git_clone': env.git_clone, 'current_release': env.current_release, 'git_branch': env.git_branch })
 
 def update():
     """Copies your project and updates environment and symlink"""
@@ -83,11 +87,9 @@ def symlink():
     """Updates the symlink to the most recently deployed version"""
     if not env.has_key('current_release'):
         releases()
-    run("ln -nfs %(current_release)s %(current_path)s" % { 'current_release':env.current_release, 'current_path':env.current_path })
-    run("ln -nfs %(shared_path)s/log %(current_release)s/log" % { 'shared_path':env.shared_path, 'current_release':env.current_release })
-    # run("ln -nfs %(shared_path)s/index %(current_release)s/index" % { 'shared_path':env.shared_path, 'current_release':env.current_release })
-    # run("ln -nfs %(shared_path)s/cdlm.db %(current_release)s/cdlm.db" % { 'shared_path':env.shared_path, 'current_release':env.current_release })
-    # run("ln -nfs %(shared_path)s/system/local.py %(current_release)s/%(app_name)s/local.py" % { 'shared_path':env.shared_path, 'current_release':env.current_release, 'app_name':env.app_name })
+    run("ln -nfs %(current_release)s %(current_path)s" % { 'current_release': env.current_release, 'current_path': env.current_path })
+    run("ln -nfs %(shared_path)s/logs %(current_release)s/zapisy/logs" % { 'shared_path': env.shared_path, 'current_release': env.current_release })
+    run("ln -nfs %(shared_path)s/system/settings_local.py %(current_release)s/zapisy/settings_local.py" % { 'shared_path': env.shared_path, 'current_release': env.current_release })
     # run("ln -nfs %(current_release)s/env/src/django/django/contrib/admin/media %(current_release)s/%(app_name)s/media/admin" % { 'current_release':env.current_release, 'app_name':env.app_name })
 
 def update_env():
@@ -116,11 +118,11 @@ def cleanup():
     """Clean up old releases"""
     if not env.has_key('releases'):
         releases()
-    if len(env.releases) > 3:
+    if len(env.releases) > env.max_releases:
         directories = env.releases
         directories.reverse()
-        del directories[:3]
-        env.directories = ' '.join([ "%(releases_path)s/%(release)s" % { 'releases_path':env.releases_path, 'release':release } for release in directories ])
+        del directories[:env.max_releases]
+        env.directories = ' '.join([ "%(releases_path)s/%(release)s" % { 'releases_path': env.releases_path, 'release': release } for release in directories ])
         run("rm -rf %(directories)s" % { 'directories':env.directories })
 
 # def enable():
