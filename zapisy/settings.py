@@ -83,13 +83,13 @@ EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing spa
 #loggin settings:
 
 #LOG_FILE = os.path.join(PROJECT_PATH, "logs/log.log")
-#LOG_LEVEL = logging.NOTSET 
+#LOG_LEVEL = logging.NOTSET
 #INTERNAL_IPS = ('127.0.0.1',)
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,    
+    'disable_existing_loggers': True,
     'formatters': {
         'simple': {
             'format': '%(asctime)s | %(message)s'
@@ -119,7 +119,7 @@ LOGGING = {
         }
      },
     'loggers': {
-      
+
         'project.default': {
             'handlers': ['standard_file', 'mail_admins'],
             'level': 'ERROR'
@@ -219,6 +219,7 @@ MIDDLEWARE_CLASSES = (
     #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 )
 
 ROOT_URLCONF = 'urls'
@@ -265,7 +266,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler',
         }
      },
-    
+
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins',],
