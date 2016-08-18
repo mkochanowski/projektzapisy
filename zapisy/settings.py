@@ -86,53 +86,41 @@ EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing spa
 #LOG_LEVEL = logging.NOTSET
 #INTERNAL_IPS = ('127.0.0.1',)
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
-
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': True,
-    'formatters': {
-        'simple': {
-            'format': '%(asctime)s | %(message)s'
+        'version': 1,
+        'disable_existing_loggers': False, # keep Django's default loggers
+        'formatters': {
+                'timestampthread': {
+                        'format': "%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s] [%(name)-20.20s]  %(message)s",
+                },
         },
-    },
-    'handlers': {
-        'standard_file': {
-            'class' : 'logging.handlers.RotatingFileHandler',
-            'level': 'INFO',
-            'filename': os.path.join(PROJECT_PATH, 'logs/log.log'),
-            'maxBytes': 104857600,
-            'backupCount': 5,
-            'formatter': 'simple'
+        'handlers': {
+                'logfile': {
+                        # optionally raise to INFO to not fill the log file too quickly
+                        'level': 'DEBUG', # DEBUG or higher goes to the log file
+                        'class':'logging.handlers.RotatingFileHandler',
+                        # IMPORTANT: replace with your desired logfile name!
+                        'filename': 'logs/djangoproject.log',
+                        'maxBytes': 50 * 10**6, # will 50 MB do?
+                        'backupCount': 3, # keep this many extra historical files
+                        'formatter': 'timestampthread'
+                },
         },
-        'backup_file': {
-            'class' : 'logging.handlers.RotatingFileHandler',
-            'level': 'INFO',
-
-            'filename': os.path.join(PROJECT_PATH, 'logs/backup.log'),
-            'maxBytes': 104857600,
-            'backupCount': 5,
-            'formatter': 'simple'
+        'loggers': {
+                'django': { # configure all of Django's loggers
+                        'handlers': ['logfile'],
+                        'level': 'DEBUG', # set to debug to see e.g. database queries
+                },
+                'apps': {
+                        'handlers': ['logfile'],
+                        'level': 'DEBUG',
+                },
         },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
+        'root': {
+                'handlers': ['logfile'],
+                'level': 'DEBUG'
         }
-     },
-    'loggers': {
-
-        'project.default': {
-            'handlers': ['standard_file', 'mail_admins'],
-            'level': 'ERROR'
-        },
-        'project.backup': {
-            'handlers': ['backup_file'],
-            'level': 'INFO'
-
-        }
-    }
 }
-
-
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -227,65 +215,6 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_PATH, 'templates'),
 )
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '%(asctime)s | %(message)s'
-        },
-    },
-    'handlers': {
-        'standard_file': {
-            'class' : 'logging.handlers.RotatingFileHandler',
-            'level': 'INFO',
-            'filename': os.path.join(PROJECT_PATH, 'logs/log.log'),
-            'maxBytes': 104857600,
-            'backupCount': 5,
-            'formatter': 'simple'
-        },
-        'root': {
-            'class' : 'logging.handlers.RotatingFileHandler',
-            'level': 'DEBUG',
-            'filename': os.path.join(PROJECT_PATH, 'logs/root.log'),
-            'maxBytes': 104857600,
-            'backupCount': 5,
-            'formatter': 'simple'
-        },
-        'backup_file': {
-            'class' : 'logging.handlers.RotatingFileHandler',
-            'level': 'INFO',
-
-            'filename': os.path.join(PROJECT_PATH, 'logs/backup.log'),
-            'maxBytes': 104857600,
-            'backupCount': 5,
-            'formatter': 'simple'
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
-        }
-     },
-
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins',],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'project.default': {
-            'handlers': ['standard_file', 'mail_admins'],
-            'level': 'ERROR',
-            'propagate': True
-        },
-        'project.backup': {
-            'handlers': ['backup_file'],
-            'level': 'INFO'
-
-        }
-    }
-}
-
 
 INSTALLED_APPS = (
     'django.contrib.auth',
