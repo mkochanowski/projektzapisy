@@ -27,7 +27,7 @@ def staging():
     env.current_path = "%(domain_path)s/current" % { 'domain_path': env.domain_path }
     env.releases_path = "%(domain_path)s/releases" % { 'domain_path': env.domain_path }
     env.shared_path = "%(domain_path)s/shared" % { 'domain_path': env.domain_path }
-    env.git_clone = "git@github.com:swistak35/projektzapisy.git"
+    env.git_clone = "git@github.com:lewymati/projektzapisy.git"
     env.git_branch = "master-dev"
     env.max_releases = 3
     # env.env_file = "deploy/production.txt"
@@ -45,6 +45,10 @@ def releases():
 def start():
     """Start the application servers"""
     run("service zapisy start")
+
+def reload():
+    """Reloads your application"""
+    run("pkill -HUP -F %(shared_path)s/gunicorn.pid" % { 'shared_path': env.shared_path })
 
 def restart():
     """Restarts your application"""
@@ -112,7 +116,7 @@ def migrations():
     update_env()
     migrate()
     symlink()
-    restart()
+    reload()
 
 def cleanup():
     """Clean up old releases"""
@@ -164,15 +168,9 @@ def rollback_code():
 def rollback():
     """Rolls back to a previous version and restarts"""
     rollback_code()
-    restart()
-
-def cold():
-    """Deploys and starts a `cold' application"""
-    update()
-    migrate()
-    start()
+    reload()
 
 def deploy():
     """Deploys your project. This calls both `update' and `restart'"""
     update()
-    restart()
+    reload()
