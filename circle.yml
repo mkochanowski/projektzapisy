@@ -8,7 +8,6 @@ machine:
 dependencies:
   override:
     - pip install -r requirements.test.txt
-    - cd /home/ubuntu && wget -q https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/django-endless-pagination/django-endless-pagination-1.1.tar.gz && tar -zxf django-endless-pagination-1.1.tar.gz && cd django-endless-pagination-1.1 && python setup.py build && python setup.py install
 
 test:
   override:
