@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time
+from datetime import time, date
 
 from django.db import models
 from django.db.models import signals
 from django.core.cache import cache as mcache
-
+import zapisy.common as common
 import logging
 
 backup_logger = logging.getLogger('project.backup')
 
-DAYS_OF_WEEK = [( '1', 'poniedziałek' ), ( '2', 'wtorek' ), ( '3', 'środa' ), ( '4', 'czwartek'), ( '5', 'piątek'), ( '6', 'sobota'), ( '7', 'niedziela')]
+HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)]
 
-HOURS = [(str(hour), "%s.00" % hour) for hour in range(8, 23)] 
-  
+
 class Term(models.Model):
     """terms of groups"""
-    dayOfWeek  = models.CharField( max_length = 1, choices = DAYS_OF_WEEK, verbose_name = 'dzień tygodnia')
+
+    dayOfWeek  = models.CharField( max_length = 1, choices = common.DAYS_OF_WEEK, verbose_name = 'dzień tygodnia')
     start_time = models.TimeField(verbose_name = 'rozpoczęcie')
     end_time   = models.TimeField(verbose_name = 'zakończenie')
     classroom  = models.ForeignKey('Classroom', verbose_name='sala', null=True, blank=True)
@@ -89,7 +89,15 @@ class Term(models.Model):
         
     def get_dayOfWeek_display_short(self):
         return { '1': 'pn', '2': 'wt', '3': 'śr', '4': 'cz', '5': 'pt', '6': 'so', '7': 'nd'}[self.dayOfWeek].decode('utf8')
-    
+
+    @staticmethod
+    def get_day_of_week(date):
+        return common.DAYS_OF_WEEK[date.weekday()][0]
+
+    @staticmethod
+    def get_python_day_of_week(day_of_week):
+        return [x[0] for x in common.DAYS_OF_WEEK].index(day_of_week)
+
     @staticmethod
     def get_groups_terms(groups_ids):
         """
@@ -115,6 +123,34 @@ class Term(models.Model):
             classrooms = ''
 
         return classrooms
+
+    @classmethod
+    def get_terms_for_semester(cls, semester, day=None, classrooms=None, start_time=None, end_time=None):
+        """
+        A versatile function returning Terms. day is either datetime.date or string
+
+        :param semester: enrollment.courses.model.Semester
+        :param day: common.DAYS_OF_WEEK or datetime.date
+        """
+
+        query = cls.objects.filter(group__course__semester=semester)
+
+        if day is None:
+            pass
+        else:
+            if isinstance(day, date):
+                day_of_week = Term.get_day_of_week(day)
+            else:
+                day_of_week = day
+            query = query.filter(dayOfWeek=day_of_week)
+
+        if classrooms:
+            query = query.filter(classrooms__in=classrooms)
+
+        if start_time and end_time:
+            query = query.filter(start_time__lt=end_time, end_time__gt=start_time)
+
+        return query.select_related('group__course')
 
     def __unicode__(self):
         """

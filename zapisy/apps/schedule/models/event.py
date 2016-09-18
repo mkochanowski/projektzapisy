@@ -2,27 +2,51 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.http import Http404
+from datetime import time
+from django.utils.encoding import smart_unicode
 
-types = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie'), ('3', u'Zajęcia'), ('4', u'Inne')]
-types_for_student = [('2', u'Wydarzenie')]
-types_for_teacher = [('0', u'Egzamin'), ('1', u'Kolokwium'), ('2', u'Wydarzenie')]
-
-statuses = [('0', u'Do rozpatrzenia'), ('1', u'Zaakceptowane'), ('2', u'Odrzucone')]
+from django.core.validators import ValidationError
 
 
 class Event(models.Model):
     """
     Model of Event
     """
+    TYPE_EXAM = '0'
+    TYPE_TEST = '1'
+    TYPE_GENERIC = '2'
+    TYPE_CLASS = '3'
+    TYPE_OTHER = '4'
+
+    STATUS_PENDING = '0'
+    STATUS_ACCEPTED = '1'
+    STATUS_REJECTED = '2'
+
+    STATUSES = [(STATUS_PENDING, u'Do rozpatrzenia'),
+                (STATUS_ACCEPTED, u'Zaakceptowane'),
+                (STATUS_REJECTED, u'Odrzucone')]
+
+    TYPES = [(TYPE_EXAM, u'Egzamin'),
+             (TYPE_TEST, u'Kolokwium'),
+             (TYPE_GENERIC, u'Wydarzenie'),
+             (TYPE_CLASS, u'Zajęcia'),
+             (TYPE_OTHER, u'Inne')]
+
+    TYPES_FOR_STUDENT = [(TYPE_GENERIC, u'Wydarzenie')]
+
+    TYPES_FOR_TEACHER = [(TYPE_EXAM, u'Egzamin'),
+                         (TYPE_TEST, u'Kolokwium'),
+                         (TYPE_GENERIC, u'Wydarzenie')]
+
     from apps.enrollment.courses.models import Course, Group
     from django.contrib.auth.models import User
 
     title = models.CharField(max_length=255, verbose_name=u'Tytuł', null=True, blank=True)
     description = models.TextField(verbose_name=u'Opis')
-    type = models.CharField(choices=types, max_length=1, verbose_name=u'Typ')
+    type = models.CharField(choices=TYPES, max_length=1, verbose_name=u'Typ')
     visible = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne')
 
-    status = models.CharField(choices=statuses, max_length=1, verbose_name=u'Stan', default='0')
+    status = models.CharField(choices=STATUSES, max_length=1, verbose_name=u'Stan', default='0')
 
     course = models.ForeignKey(Course, null=True, blank=True)
     group = models.ForeignKey(Group, null=True, blank=True)
@@ -33,7 +57,6 @@ class Event(models.Model):
     author = models.ForeignKey(User, verbose_name=u'Twórca')
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)
-
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
@@ -51,33 +74,54 @@ class Event(models.Model):
             ("manage_events", u"Może zarządzać wydarzeniami"),
         )
 
-
-    def save(self, *args, **kwargs):
+    def clean(self, *args, **kwargs):
         """
-        Overload save method.
+        Overload clean method.
         If author is employee and try reserve room for exam - accept it
         If author has perms to manage events - accept it
         """
-        is_new = False
+
+        # if this is a new item
 
         if not self.pk:
-            is_new = True
-            if (self.author.employee and self.type in ['0', '1']) or \
+
+            # if author is an employee, accept any exam and test events
+
+            if (self.author.get_profile().is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
                 self.status = '1'
 
-            if self.type in ['0', '1']:
+            # all exams and tests should be public
+
+            if self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]:
                 self.visible = True
 
-        super(self.__class__, self).save()
+            # students can only add generic events that have to be accepted first
 
-#        if is_new and self.type in ['0', '1'] and self.course:
-#            render_and_send_email(u'Ustalono termin egzaminu',
-#                                  u'schedule/emails/new_exam.txt',
-#                                  u'schedule/emails/new_exam.html',
-#                                  {'event': self},
-#                                  self.get_followers()
-#            )
+            if self.author.get_profile().is_student and not self.author.has_perm('schedule.manage_events'):
+                if self.type != Event.TYPE_GENERIC:
+                    raise ValidationError(
+                        message={'type': [u'Nie masz uprawnień aby dodawać wydarzenia tego typu']},
+                        code='permission')
+
+                if self.status != Event.STATUS_PENDING:
+                    raise ValidationError(
+                        message={'status': [u'Nie masz uprawnień aby dodawać zaakceptowane wydarzenia']},
+                        code='permission')
+
+        else:
+            old = Event.objects.get(pk=self.pk)
+
+            # if status is changed
+            if old.status != self.status:
+
+                # if status changes to accepted, validate all term objects
+                if self.status == Event.STATUS_ACCEPTED:
+                    from .term import Term
+                    for term in Term.objects.filter(event=self):
+                        term.clean()
+
+        super(Event, self).clean()
 
     def _user_can_see_or_404(self, user):
         """
@@ -88,7 +132,7 @@ class Event(models.Model):
         @return: Boolean
         """
         if not self.author == user and not user.has_perm('schedule.manage_events'):
-            if not self.visible or not self.type in ['0', '1', '2'] or self.status <> '1':
+            if not self.visible or self.type not in ['0', '1', '2'] or self.status != '1':
                 return False
 
         return True
@@ -212,3 +256,7 @@ class Event(models.Model):
             return self.course.get_all_enrolled_emails()
 
         return self.interested.values_list('email', flat=True)
+
+    def __unicode__(self):
+        return '{0:s} ({1:s})'.format(smart_unicode(self.title),
+                                      smart_unicode(self.description))

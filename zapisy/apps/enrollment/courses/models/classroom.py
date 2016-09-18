@@ -49,22 +49,23 @@ class Classroom( models.Model ):
     def get_by_slug(cls, slug):
         return cls.objects.get(slug=slug)
 
-
     @classmethod
     def get_terms_in_day(cls, date, ajax=False):
-        from apps.schedule.models import Term
+        from apps.schedule.models import Term as EventTerm, SpecialReservation
+        from apps.enrollment.courses.models import Semester, Term, Freeday, ChangedDay
 
         rooms = cls.get_in_institute(reservation=True)
-        terms = Term.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
 
         if not ajax:
             return rooms
+
+        # build a dictionary
 
         result = {}
 
         for room in rooms:
 
-            if not room.number in result:
+            if room.number not in result:
                 result[room.number] = {'id'       : room.id,
                                        'number'  : room.number,
                                        'capacity': room.capacity,
@@ -73,12 +74,47 @@ class Classroom( models.Model ):
                                        'title': room.number,
                                        'terms': []}
 
+        # fill event terms
+
+        terms = EventTerm.objects.filter(day=date, room__in=rooms, event__status='1').select_related('room', 'event')
+        def make_dict(start_time,end_time,title):
+            return {'begin': ':'.join(str(start_time).split(':')[:2]),
+                    'end': ':'.join(str(end_time).split(':')[:2]),
+                    'title': title}
+
         for term in terms:
-            result[term.room.number]['terms'].append({'begin': ':'.join(str(term.start).split(':')[:2]),
-                                         'end': ':'.join(str(term.end).split(':')[:2]),
-                                         'title': term.event.title})
+            result[term.room.number]['terms'].append(make_dict(term.start, term.end, term.event.title))
 
+        if not Freeday.is_free(date):
 
+            # get weekday and semester
+
+            weekday = ChangedDay.get_day_of_week(date)
+            selected_semester = Semester.get_semester(date)
+
+            if selected_semester is None:
+                return
+
+            # get courses data
+
+            course_terms = Term.objects.filter(dayOfWeek=weekday,
+                                               group__course__semester=selected_semester)\
+                .select_related('classroom', 'group').prefetch_related('classrooms')
+
+            # fill courses data
+
+            for course_term in course_terms:
+                for classroom in course_term.classrooms.all():
+                    if classroom not in rooms:
+                        continue
+                    result[classroom.number]['terms'].append(make_dict(course_term.start_time,
+                                                                       course_term.end_time,
+                                                                       course_term.group.course.name))
+                if course_term.classroom is None:
+                    continue
+                result[course_term.classroom.number]['terms'].append(make_dict(course_term.start_time,
+                                                                               course_term.end_time,
+                                                                               course_term.group.course.name))
         return json.dumps(result)
 
 

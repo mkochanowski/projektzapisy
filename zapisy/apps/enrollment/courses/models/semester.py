@@ -5,8 +5,13 @@ from course import Course
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from apps.enrollment.courses.exceptions import *
 from django.db.models import Q
+from django.core.validators import ValidationError
+from datetime import datetime, timedelta
 
-from datetime import datetime
+import zapisy.common as common
+
+from .term import Term
+
 
 class GetterManager(models.Manager):
 
@@ -15,6 +20,7 @@ class GetterManager(models.Manager):
             return self.get(records_closing__gte=datetime.now())
         except (ObjectDoesNotExist, MultipleObjectsReturned):
             return self.filter(visible=True).order_by('-records_closing')[0]
+
 
 class Semester( models.Model ):
     """semester in academic year"""
@@ -58,7 +64,7 @@ class Semester( models.Model ):
     def get_courses(self):
         """ gets all courses linked to semester """
         return Course.objects.filter(semester=self.pk)
-		
+
     def get_name(self):
         """ returns name of semester """
         #TODO: wymuszanie formatu roku "XXXX/YY" zamiast "XXXX"
@@ -67,7 +73,7 @@ class Semester( models.Model ):
         return '%s %s' % (self.year, self.get_type_display())
 
     def is_current_semester(self):
-        """ Answers to question: is semester current semester""" 
+        """ Answers to question: is semester current semester"""
         if self.semester_beginning == None or self.semester_ending == None:
             return False
         return (self.semester_beginning <= datetime.now().date() and self.semester_ending >= datetime.now().date())
@@ -116,7 +122,77 @@ class Semester( models.Model ):
             return Semester.get_by_id(id)
 
         return Semester.get_current_semester()
-                
+
+    @staticmethod
+    def get_semester(date):
+        """
+        Get semester for a specified date. More versatile than get_current_semester
+
+        :param date: datetime.date
+        :return: Semester or None
+        """
+        try:
+            return Semester.objects.get(semester_beginning__lte=date,
+                                        semester_ending__gte=date)
+        except Semester.DoesNotExist:
+            return None
+        except MultipleObjectsReturned:
+            raise MoreThanOneCurrentSemesterException()
+
+    def get_all_days_of_week(self, day_of_week, start_date=None):
+        """
+        Get all dates when the specifies day of week schedule is valid
+
+        :param day_of_week: common.DAYS_OF_WEEK
+        :param start_date: datetime.date
+        """
+        date = self.lectures_beginning
+        if start_date:
+            date = start_date
+        python_weekday = Term.get_python_day_of_week(day_of_week)
+
+        # ensure first date in while loop is a candidate
+        if date.weekday() < python_weekday:
+            date += timedelta(days=python_weekday - date.weekday())
+        elif date.weekday() == python_weekday:
+            pass
+        else:
+            date += timedelta(days=7 - date.weekday() + python_weekday)
+
+        assert(Term.get_day_of_week(date) == day_of_week)
+
+        dates = []
+        while date <= self.lectures_ending:
+            # if its not a free day
+            if not Freeday.is_free(date):
+                # if it wasnt changed
+                if ChangedDay.get_day_of_week(date) == day_of_week:
+                    # add to list
+                    dates.append(date)
+            # move date to next week
+            date += timedelta(days=7)
+
+        dates.extend(self.get_all_added_days_of_week(day_of_week, start_date))
+
+        return dates
+
+    def get_all_added_days_of_week(self, day_of_week, start_date=None):
+        """
+        Gets dates of all weekdays changed from another weekday to specvified weekday in this semester, starting from
+        the specified date or the beggining of the semester
+
+        :param day_of_week: common.DAYS_OF_WEEK
+        :param start_date: datetime.date
+        """
+        from_date = self.lectures_beginning
+        if start_date:
+            from_date = start_date
+
+        added_days = ChangedDay.get_added_days_of_week(from_date,
+                                                       self.lectures_ending,
+                                                       day_of_week)
+        return map(lambda x: x.day, added_days)
+
     @staticmethod
     def get_current_semester():
         """ if exist, it returns current semester. otherwise return None """
@@ -125,16 +201,16 @@ class Semester( models.Model ):
         except Semester.DoesNotExist:
             return None
         except MultipleObjectsReturned:
-            raise MoreThanOneCurrentSemesterException()  
+            raise MoreThanOneCurrentSemesterException()
 
     @staticmethod
     def get_default_semester():
-        """Jeżeli istnieje semestr na który zapisy są otwarte, zwracany jest ten semestr, jeżeli taki nie istnieje zwracany jest semestr, który obecnie trwa. W przypadku gdy nie trwa żaden semestr, zwracany jest najbliższy semestr na który będzie można się zapisać lub None w przypadku braku takiego semestru """ 
+        """Jeżeli istnieje semestr na który zapisy są otwarte, zwracany jest ten semestr, jeżeli taki nie istnieje zwracany jest semestr, który obecnie trwa. W przypadku gdy nie trwa żaden semestr, zwracany jest najbliższy semestr na który będzie można się zapisać lub None w przypadku braku takiego semestru """
         now = datetime.now()
         now_date = now.date()
         semesters = list(Semester.objects.filter(
-            Q(semester_beginning__lte=now_date, semester_ending__gte= now_date) 
-            | 
+            Q(semester_beginning__lte=now_date, semester_ending__gte= now_date)
+            |
             Q(records_opening__lte=now, records_closing__gte=now)))
 
         if len(semesters)>1:
@@ -142,7 +218,7 @@ class Semester( models.Model ):
             if len(semesters_with_open_records)==1:
                 return semesters_with_open_records[0]
             else:
-                raise MoreThanOneSemesterWithOpenRecordsException() 
+                raise MoreThanOneSemesterWithOpenRecordsException()
         elif len(semesters)==1:
             return semesters[0]
         else:
@@ -163,7 +239,7 @@ class Semester( models.Model ):
     def is_visible(id):
         """ Answers if course is sat as visible (displayed on course lists) """
         param = id
-        return Semester.objects.get(id = param).visible 
+        return Semester.objects.get(id = param).visible
 
 
     class Meta:
@@ -179,6 +255,19 @@ class Semester( models.Model ):
 class Freeday(models.Model):
     day = models.DateField(verbose_name='dzień wolny')
 
+    @classmethod
+    def is_free(cls, date):
+        """
+        Returns true if date is a free day
+
+        :param date: datetime.date
+        """
+        free = cls.objects.filter(day=date)
+        if free:
+            return True
+        else:
+            return False
+
     def __unicode__(self):
         return str(self.day)
 
@@ -187,10 +276,36 @@ class Freeday(models.Model):
         verbose_name_plural = 'dni wolne od zajęć'
         app_label = 'courses'
 
-DAYS_OF_WEEK = [( '1', u'poniedzalek' ), ( '2', u'wtorek' ), ( '3', u'sroda' ), ( '4', u'czwartek'), ( '5', u'piatek'), ( '6', u'sobota'), ( '7', u'niedziela')]
+
 class ChangedDay(models.Model):
     day = models.DateField(verbose_name='dzień')
-    weekday = models.CharField(choices=DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
+    weekday = models.CharField(choices=common.DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
+
+    def clean(self):
+        if Term.get_day_of_week(self.day) == self.weekday:
+            raise ValidationError(message={'weekday': [u'To już jest ' + common.DAYS_OF_WEEK[self.day.weekday()][1]]},
+                                  code='invalid')
+
+    @classmethod
+    def get_day_of_week(cls, date):
+        """
+        Returns actual schedule day, with respect to ChangedDays
+
+        :param date:
+        """
+        changes = ChangedDay.objects.filter(day=date)
+        if changes:
+            return changes[0].day
+        else:
+            return Term.get_day_of_week(date)
+
+    @staticmethod
+    def get_added_days_of_week(start_date, end_date, day_of_week=None):
+        added_days = ChangedDay.objects.filter(day__gte=start_date, day__lte=end_date)
+        if day_of_week is None:
+            return added_days
+        else:
+            return added_days.filter(weekday=day_of_week)
 
     def __unicode__(self):
         return str(self.day) + ' -> ' + str(self.get_weekday_display())

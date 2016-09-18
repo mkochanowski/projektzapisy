@@ -69,11 +69,13 @@ def edit_event(request, event_id=None):
     event = Event.get_event_for_moderation_or_404(event_id, request.user)
     form = EventForm(data=request.POST or None, instance=event, user=request.user)
     formset = TermFormSet(request.POST or None, instance=event)
+    reservation = event.reservation
 
     if form.is_valid() and formset.is_valid():
         event = form.save(commit=False)
         if not event.id:
             event.author = request.user
+        event.reservation = reservation
         event.save()
         formset.save()
 
@@ -118,14 +120,22 @@ def history(request):
 @require_POST
 def decision(request, event_id):
     from apps.schedule.models import Event
+    from .models.message import EventModerationMessage
 
     event = Event.get_event_for_moderation_only_or_404(event_id, request.user)
+
     form = DecisionForm(request.POST, instance=event)
     if form.is_valid():
-        form.save()
-        messages.success(request, u'Status wydarzenia został zmieniony')
-    else:
-        messages.error(request, u'Coś poszło źle')
+        if event.status == form.cleaned_data['status']:
+            messages.error(request, u'Status wydarzenia nie został zmieniony')
+        else:
+            event_obj = form.save()
+            msg = EventModerationMessage()
+            msg.author = request.user
+            msg.message = u'Status wydarzenia został zmieniony na ' + unicode(event_obj.get_status_display())
+            msg.event = event_obj
+            msg.save()
+            messages.success(request, u'Status wydarzenia został zmieniony')
 
     return redirect(reverse('events:show', args=[str(event.id)]))
 

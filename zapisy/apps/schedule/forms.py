@@ -4,9 +4,11 @@ from django                   import forms
 from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
-from apps.schedule.models import Event, types_for_student, types_for_teacher, Term, EventModerationMessage, EventMessage
+from apps.schedule.models import Event, Term, EventModerationMessage, EventMessage
 
 from django.forms.models import inlineformset_factory
+
+from datetime import timedelta, datetime
 
 
 class TermForm(forms.ModelForm):
@@ -41,19 +43,25 @@ class EventForm(forms.ModelForm):
 
         super(EventForm, self).__init__(data, **kwargs)
 
-        self.author = user
+        if not self.instance.pk:
+            self.instance.author = user
 
         if user.employee:
-            self.fields['type'].choices = types_for_teacher
+            self.fields['type'].choices = Event.TYPES_FOR_TEACHER
         else:
-            self.fields['type'].choices = types_for_student
+            self.fields['type'].choices = Event.TYPES_FOR_STUDENT
 
         if not user.employee:
             self.fields['course'].queryset = EmptyQuerySet()
 
         else:
             semester = Semester.get_current_semester()
-            qs  = Course.objects.filter(semester=semester).select_related('semester', 'entity')
+
+            previous_semester = Semester.get_semester(datetime.now().date() - timedelta(days=30))
+
+            qs  = Course.objects.filter(semester__in=[semester, previous_semester]). \
+                select_related('semester', 'entity'). \
+                order_by('semester')
             if not user.has_perm('schedule.manage_events'):
                 qs = qs.filter(teachers=user.employee)
 
