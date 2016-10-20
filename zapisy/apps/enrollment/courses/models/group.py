@@ -492,11 +492,6 @@ class Group(models.Model):
         
         return data
 
-    def enrollment_are_open(self):
-        semester = self.course.semester
-
-        return True
-
     class Meta:
         verbose_name = 'grupa'
         verbose_name_plural = 'grupy'
