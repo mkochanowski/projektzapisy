@@ -216,7 +216,7 @@ def records(request, group_id):
             """Helper method to create mailto links"""
             result = author.email
             if students:
-                return result + ('?bcc=' if bcc else '') + ','.join([student.user.email for student in students])
+                return result + ('?bcc=' if bcc else ',') + ','.join([student.user.email for student in students])
             return result
 
         group = Group.objects.get(id=group_id)
