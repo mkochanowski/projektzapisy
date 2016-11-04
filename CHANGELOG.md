@@ -2,6 +2,8 @@
 
 # Current version
 
+# Version 16.11.04
+
 * Fixed an issue with dev env
 * Added working tests to CI
 * Fixed decision form for good
