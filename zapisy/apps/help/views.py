@@ -5,7 +5,7 @@
 """
 
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect 
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -34,6 +34,9 @@ def export( request ):
 
 def offer( request ):
     return render_to_response('help/offer.html', {}, context_instance = RequestContext(request))
+
+def errorpage( request ):
+    raise Exception('Example exception')
 
 @staff_member_required
 def admin( request ):
