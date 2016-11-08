@@ -74,6 +74,7 @@ def vote_view( request ):
         View of once given vote
     """
     votes = SingleVote.get_votes( request.user.student )
+    is_voting_active = SystemState.get_state(date.today().year).is_system_active()
 
     return TemplateResponse(request, 'offer/vote/view.html', locals())
 
@@ -82,12 +83,9 @@ def vote_summary( request ):
     """
         summary for vote
     """
-
-
     summer = []
     winter = []
     unknown = []
-
 
     year = date.today().year
     state = SystemState.get_state(year)
@@ -104,12 +102,16 @@ def vote_summary( request ):
             summer.append( (sub['votes'], sub['voters'], sub) )
         else:
             unknown.append( (sub['votes'], sub['voters'], sub) )
-            
+
     data = { 'winter'  : winter,
              'summer'  : summer,
              'unknown' : unknown, }
-            
-    return render_to_response('offer/vote/summary.html', data, context_instance = RequestContext( request ))
+
+    return render_to_response(
+        'offer/vote/summary.html',
+        data,
+        context_instance=RequestContext(request, {'is_voting_active': state.is_system_active()})
+    )
 
 
 @login_required
