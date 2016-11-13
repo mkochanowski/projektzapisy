@@ -65,6 +65,7 @@ class DummyTest(TestCase):
     def createExerciseGroup(self, course, teacher):
         group = Group(
             type=2,
+            limit=10,
             course = course,
             teacher = teacher)
         group.save()
@@ -73,6 +74,7 @@ class DummyTest(TestCase):
     def createLectureGroup(self, course, teacher):
         group = Group(
             type=1,
+            limit=100,
             course = course,
             teacher = teacher)
         group.save()
@@ -168,4 +170,5 @@ class DummyTest(TestCase):
 
         result, messages_list = lecture_group.enroll_student(student.student)
         run_rearanged(result)
-
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
