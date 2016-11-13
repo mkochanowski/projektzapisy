@@ -4,6 +4,7 @@ from django.test import TestCase
 
 from django.contrib.auth.models import User
 from apps.enrollment.courses.models import Group, Course, CourseEntity, Semester
+from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
 
@@ -154,14 +155,6 @@ class DummyTest(TestCase):
         self.assertTrue(True)
 
     def testAddStudentToLectureGroupOnly(self):
-        # self.user = User.objects.get(id=5)
-        # self.exercise_group = Group.objects.get(id=1)
-        # self.lecture_group = Group.objects.get(id=3)
-        # self.lecture_group2 = Group.objects.get(id=5)
-        # self.assertEqual(Record.objects.count(), 0)
-        # records = Record.add_student_to_group(self.user, self.lecture_group)
-        # self.assertEqual(records[0].group, self.lecture_group)
-
         self.initialize_triggers()
         student = self.createStudentUser()
         teacherUser, teacher = self.createTeacher()
@@ -173,8 +166,6 @@ class DummyTest(TestCase):
 
         self.refresh_opening_times(semester)
 
-        lecture_group.enroll_student(student.student)
-        # result, messages_list = group.enroll_student(student)
-        # if result:
-        #     run_rearanged(result)
+        result, messages_list = lecture_group.enroll_student(student.student)
+        run_rearanged(result)
 
