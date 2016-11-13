@@ -2,6 +2,8 @@
 
 # Current version
 
+* Voting link is now not visible when voting is closed + added tests
+
 # Version 16.11.04
 
 * Fixed an issue with dev env
