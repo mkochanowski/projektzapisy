@@ -118,6 +118,16 @@ class DummyTest(TestCase):
                 end
                 $$;
         """
+
+        sql_calls = [
+                """
+                CREATE TABLE courses_studentpointsview (
+                    value smallint,
+                    student_id integer,
+                    entity_id integer
+                );
+                """
+                ]
         cursor = connection.cursor()
         cursor.execute(sql_minutes_view)
         connection.commit()
@@ -129,6 +139,11 @@ class DummyTest(TestCase):
         cursor = connection.cursor()
         cursor.execute(sql_function)
         connection.commit()
+
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
 
     def refresh_opening_times(self, semester):
         cursor = connection.cursor()
