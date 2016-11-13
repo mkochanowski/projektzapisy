@@ -1,39 +1,39 @@
 ##########################################################
-# download and compile python v2.6.9
+# download and compile python v2.7.10
 ##########################################################
 
-SRC=$HOME/src
+SRC=$HOME/src27
 
 # get python itself
 cd $HOME
 mkdir pythons
-mkdir src
+mkdir src27
 cd $SRC
-wget -q https://www.python.org/ftp/python/2.6.9/Python-2.6.9.tgz
-tar -zxf Python-2.6.9.tgz
-rm Python-2.6.9.tgz
-cd Python-2.6.9
+wget -q https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
+tar -zxf Python-2.7.10.tgz
+rm Python-2.7.10.tgz
+cd Python-2.7.10
 #make distclean
 export LDFLAGS="-L/usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)"
-./configure --prefix=$HOME/pythons/Python-2.6.9
+./configure --prefix=$HOME/pythons/Python-2.7.10
 make --silent
 make install
-$HOME/pythons/Python-2.6.9/bin/python setup.py install
+$HOME/pythons/Python-2.7.10/bin/python setup.py install
 unset LDFLAGS
 #########################################################
 # get pip
 cd $SRC
 wget -q https://bootstrap.pypa.io/get-pip.py
-$HOME/pythons/Python-2.6.9/bin/python get-pip.py
+$HOME/pythons/Python-2.7.10/bin/python get-pip.py
 #########################################################
 # get virtualenv
-$HOME/pythons/Python-2.6.9/bin/pip install virtualenv
+$HOME/pythons/Python-2.7.10/bin/pip install virtualenv
 #########################################################
 
 # set up virtualenv
 cd $HOME
-$HOME/pythons/Python-2.6.9/bin/virtualenv env2.6
-source env2.6/bin/activate
+$HOME/pythons/Python-2.7.10/bin/virtualenv env2.7
+source env2.7/bin/activate
 #####################
 
 # get requirements
@@ -102,4 +102,4 @@ python setup.py install
 
 pip install rollbar
 
-echo "Python-2.6 environment set up."
+echo "Python-2.7 environment set up."

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.test import TestCase
 from zapisy.apps.schedule.models import SpecialReservation, Event, Term as EventTerm
 from apps.enrollment.courses.models import Semester, Classroom, Term
@@ -35,7 +36,7 @@ class SpecialReservationTestCase(TestCase):
         reservation.save()
 
         reservation_2 = SpecialReservation(semester=semester,
-                                          title='Anoter reservation',
+                                          title=u'ąęłżóćśśń',
                                           classroom=room110,
                                           dayOfWeek=common.THURSDAY,
                                           start_time=time(15),
@@ -52,11 +53,6 @@ class SpecialReservationTestCase(TestCase):
         reservation_3.full_clean()
         reservation_3.save()
 
-        objects = [semester, semester_2, room110, room104, reservation, reservation_2, reservation_3]
-
-        with open('./apps/schedule/fixtures/fixture__1.json', 'w') as out:
-            serialize('json', objects, stream=out)
-
     def test_created_reservation_is_present(self):
         semester = Semester.get_semester(date(2016, 5, 12))
         reservations = SpecialReservation.get_reservations_for_semester(semester)
@@ -71,20 +67,7 @@ class SpecialReservationTestCase(TestCase):
         semester = Semester.get_semester(date(2016, 5, 12))
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 2)
-
-    def test_try_clean_on_overlapping_reservation(self):
-        semester = Semester.get_semester(date(2016, 5, 12))
-        room = Classroom.get_by_number('110')
-        reservation = SpecialReservation(
-            semester=semester,
-            title='overlapping reservation',
-            classroom=room,
-            dayOfWeek=common.THURSDAY,
-            start_time=time(14),
-            end_time=time(17)
-        )
-        self.assertRaises(ValidationError, reservation.full_clean)
-
+        
     def test_try_clean_on_non_overlapping_reservation(self):
         semester = Semester.get_semester(date(2016, 5, 12))
         room = Classroom.get_by_number('110')
@@ -102,6 +85,11 @@ class SpecialReservationTestCase(TestCase):
         events = Event.objects.all()
         self.assertTrue(events)
 
+    def test_special_reservation_unicode_method(self):
+        reservations = SpecialReservation.objects.all()
+        for reservation in reservations:
+            unicode(reservation)
+
 
 class EventTestCase(TestCase):
 
@@ -118,8 +106,8 @@ class EventTestCase(TestCase):
 
         teacher = User.objects.all()[0]
         event = Event(
-            title='an event',
-            description='an event',
+            title='Żółta żaba żarła żur',
+            description='ąęńółść',
             type=Event.TYPE_GENERIC,
             status=Event.STATUS_ACCEPTED,
             author=teacher,
@@ -173,3 +161,8 @@ class EventTestCase(TestCase):
         event.delete()
         terms = EventTerm.objects.all()
         self.assertFalse(terms)
+
+    def test_event_unicode_method(self):
+        events = Event.objects.all()
+        for event in events:
+            unicode(event)
