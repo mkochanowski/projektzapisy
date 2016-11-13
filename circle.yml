@@ -11,7 +11,7 @@ dependencies:
 
 test:
   pre:
-    - cp ../env/settings_local.py settings_local.py
+    - cp ../env/settings_local_test.py settings_local.py
   override:
     - mkdir logs
     - python manage.py test test_app
