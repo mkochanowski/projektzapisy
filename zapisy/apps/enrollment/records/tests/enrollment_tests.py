@@ -9,6 +9,7 @@ from apps.users.models import Student, Employee
 from django.db import connection
 
 from datetime import datetime
+from random import seed, randint, choice
 
 class DummyTest(TestCase):
     def createSemester(self):
@@ -65,7 +66,7 @@ class DummyTest(TestCase):
     def createExerciseGroup(self, course, teacher):
         group = Group(
             type=2,
-            limit=10,
+            limit=5,
             course = course,
             teacher = teacher)
         group.save()
@@ -172,3 +173,47 @@ class DummyTest(TestCase):
         run_rearanged(result)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+
+
+class QueueTests(DummyTest):
+
+    def randomString(length):
+        e = ""
+        for i in range(length):
+            e += choice("ab")
+        return e
+
+    def createRandomStudent(self, _username, _seed):
+        seed(_seed)
+        user = User(
+            username=_username,
+            first_name=randomString(10),
+            last_name=randomString(10),
+            is_active=True)
+        user.save()
+        student = Student(
+            matricula=str(randint(200000, 300000)),
+            user=user)
+        student.save()
+        return user
+
+    def create_course_for_queue_test(self):
+        self.initialize_triggers()
+        teacherUser, teacher = self.createTeacher()
+        semester = self.createSemester()
+        course = self.createCourse(semester)
+        exercise_group_1 = self.createExerciseGroup(course, teacher)
+        exercise_group_2 = self.createExerciseGroup(course, teacher)
+        return (exercise_group_1, exercise_group_2)
+
+    def testAddStudentToQueue(self):
+        exercise_group_1, exercise_group_2 = self.create_course_for_queue_test()
+        students = {}
+        for username, seed in [("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5), ("f", 6), ("g", 7)]:
+            students[username] = createRandomStudent(username, seed)
+        self.refresh_opening_times(semester)
+        for username in ["a", "b", "c", "d", "e"]:
+            result, messages_list = exercise_group_1.enroll_student(students["a"].student)
+            run_rearanged(result)
+            self.assertTrue(result)
+            self.assertEqual(messages_list, [u'Student dopisany do grupy'])
