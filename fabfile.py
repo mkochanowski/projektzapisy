@@ -109,15 +109,8 @@ def migrate():
     """Run the migrate task"""
     if not env.has_key('current_release'):
         releases()
+    run("source /home/zapisy/env26/bin/activate; cd %(current_release)s/zapisy; python manage.py migrate" % { 'current_release':env.current_release })
     # run("source %(current_release)s/env/bin/activate; cd %(current_release)s; python %(app_name)s/manage.py migrate" % { 'current_release':env.current_release, 'app_name':env.app_name })
-
-def migrations():
-    """Deploy and run pending migrations"""
-    update_code()
-    update_env()
-    migrate()
-    symlink()
-    reload()
 
 def cleanup():
     """Clean up old releases"""
