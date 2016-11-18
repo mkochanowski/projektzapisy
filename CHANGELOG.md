@@ -2,6 +2,8 @@
 
 # Current version
 
+# Version 16.11.18
+
 * Reworked sending emails to group and queues
 * Voting link is now not visible when voting is closed + added tests
 
