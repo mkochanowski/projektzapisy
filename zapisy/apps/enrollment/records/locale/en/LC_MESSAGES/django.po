@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-19 01:48+0200\n"
+"POT-Creation-Date: 2016-10-25 22:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,489 +19,368 @@ msgstr ""
 
 #: templates/records/group_pdf.html:29 templates/records/records_list.html:5
 msgid "Zapisanych w ramach limitu studiów zamawianych"
-msgstr "Enrolled according to limits related to &ldquo;Studia Zamawiane&rdquo; programme"
+msgstr ""
+"Enrolled according to limits related to &ldquo;Studia Zamawiane&rdquo; "
+"programme"
 
 #. Translators: limit dodatkowy to ten poza limitem dla zamawianych
 #: templates/records/group_pdf.html:33 templates/records/records_list.html:10
 msgid "Zapisanych w ramach limitu dodatkowego"
 msgstr "Enrolled according to an additional limit"
 
-#: templates/records/group_pdf.html:38 templates/records/records_list.html:15
+#: templates/records/group_pdf.html:38 templates/records/records_list.html:25
 msgid "Liczba zapisanych osób"
 msgstr "Number of students enrolled"
 
-#: templates/records/group_pdf.html:46
-#: templates/templ_dir/records/students_list.html:5
+#: templates/records/group_pdf.html:46 templates/records/queue_pdf.html:33
 msgid "Imię"
 msgstr "Forename"
 
-#: templates/records/group_pdf.html:47
-#: templates/templ_dir/records/students_list.html:6
+#: templates/records/group_pdf.html:47 templates/records/queue_pdf.html:34
 msgid "Nazwisko"
 msgstr "Surname"
 
 #. Translators: numer albumu
-#: templates/records/group_pdf.html:49
+#: templates/records/group_pdf.html:49 templates/records/queue_pdf.html:36
 msgid "index"
 msgstr "album number"
 
-#: templates/records/group_pdf.html:50
-#: templates/templ_dir/records/students_list.html:8
+#: templates/records/group_pdf.html:50 templates/records/queue_pdf.html:37
 msgid "Rodzaj studiów"
 msgstr "Type of studies"
 
 #. Translators: numer semestru
-#: templates/records/group_pdf.html:52
+#: templates/records/group_pdf.html:52 templates/records/queue_pdf.html:39
 msgid "Sem."
 msgstr "Sem."
 
-#: templates/records/group_pdf.html:53
+#: templates/records/group_pdf.html:53 templates/records/queue_pdf.html:40
 msgid "Uwagi"
 msgstr "Comments"
 
 #. Translators: jeśli grupa pusta
-#: templates/records/group_pdf.html:72
-#: templates/templ_dir/records/students_list.html:31
+#. Translators: jeśli kolejka pusta
+#: templates/records/group_pdf.html:72 templates/records/queue_pdf.html:59
 msgid "Brak zapisanych osób"
 msgstr "No one enrolled"
+
+#: templates/records/queue_pdf.html:28 templates/records/records_list.html:51
+msgid "Liczba osób oczekujących na zapis"
+msgstr "Number of people awaiting enrollment"
 
 #: templates/records/records_list.html:3
 msgid "Lista osób zapisanych na przedmiot"
 msgstr "List of people enrolled for the course"
 
 #. Translators: tekst przy linku mailto
-#: templates/records/records_list.html:23
+#: templates/records/records_list.html:32
 msgid "Wyślij wiadomość do grupy"
 msgstr "Send a message to the group"
 
-#: templates/records/records_list.html:25
-msgid "Wersja CSV"
-msgstr "CSV version"
+#: templates/records/records_list.html:34
+#: templates/records/records_list.html:57
+msgid "udostępniając adresy mailowe studentów"
+msgstr "sharing e-mail addresses of students"
 
-#: templates/records/records_list.html:29
+#: templates/records/records_list.html:35
+#: templates/records/records_list.html:58
+msgid "ukrywając adresy mailowe studentów"
+msgstr "hiding e-mail addresses of students"
+
+#: templates/records/records_list.html:39
+msgid "Ściągnij listę studentów z grupy jako"
+msgstr "Download list of students from group as"
+
+#: templates/records/records_list.html:50
 msgid "Lista osób oczekujących na zapis"
 msgstr "List of people awaiting enrollment"
 
-#: templates/records/records_list.html:30
-msgid "Liczba osób oczekujących na zapis"
-msgstr "Number of people awaiting enrollment"
-
 #. Translators: tekst przy linku mailto
-#: templates/records/records_list.html:35
+#: templates/records/records_list.html:55
 msgid "Wyślij wiadomość do kolejki"
 msgstr "Send a message to the queue"
 
-#: templates/templ_dir/base.html:12
-#: templates/templ_dir/records/schedule.html:98
-msgid "Plan zajęć"
-msgstr "Timetable"
-
-#: templates/templ_dir/base.html:15
-#: templates/templ_dir/records/schedule_prototype.html:20
-msgid "Prototyp planu"
-msgstr "Schedule prototype"
-
-#: templates/templ_dir/base.html:16
-msgid "Pracownicy"
-msgstr "Employees"
-
-#: templates/templ_dir/base.html:18
-msgid "Studenci"
-msgstr "Students"
-
-#: templates/templ_dir/base.html:23
-msgid "Statystyki"
-msgstr "Statistics"
-
-#: templates/templ_dir/email_queue_html.html:4
-#: templates/templ_dir/email_queue_plaintext.html:4
-msgid "Zostałaś/eś przepisana/y z kolejki do grupy"
-msgstr "You have been reassigned from a queue to a group"
-
-#: templates/templ_dir/main.html:11 templates/templ_dir/courses/course.html:19
-#: templates/templ_dir/courses/course_consultations.html:10
-#: templates/templ_dir/courses/courses_list.html:7
-#: templates/templ_dir/courses/voters.html:24
-#: templates/templ_dir/records/records_list.html:18
-#: templates/templ_dir/records/schedule.html:87
-#: templates/templ_dir/records/schedule_prototype.html:18
-msgid "Strona główna"
-msgstr "Main page"
-
-#: templates/templ_dir/main.html:12
-#: templates/templ_dir/courses/course_consultations.html:11
-#: templates/templ_dir/records/records_list.html:19
-#: templates/templ_dir/records/schedule.html:88
-#: templates/templ_dir/records/schedule_prototype.html:19
-msgid "Zapisy"
-msgstr "Enrollment"
-
-#: templates/templ_dir/main.html:18
-msgid "System zapisów"
-msgstr "Enrollment system"
-
-#: templates/templ_dir/main.html:19
-msgid ""
-"System zapisów na zajęcia w Instytucie Informatyki Uniwersytetu Wrocławskiego"
-msgstr "Enrollment system for courses in the Institute of Computer Science, University of Wrocław"
-
-#: templates/templ_dir/courses/base.html:17
-msgid "Filtrowanie"
-msgstr "Filter"
-
-#: templates/templ_dir/courses/base.html:24
-msgid "Rodzaj przedmiotu"
-msgstr "Type of course"
-
-#: templates/templ_dir/courses/base.html:34
-msgid "Inne"
-msgstr "Other"
-
-#. Translators: Tytuł nad sidebarem
-#. Translators: tytuł nad sidebarem
-#: templates/templ_dir/courses/base.html:36
-#: templates/templ_dir/courses/base.html:64
-#: templates/templ_dir/records/schedule_prototype.html:109
-#: templates/templ_dir/records/students_list.html:9
-msgid "Semestr"
-msgstr "Semester"
-
-#. Translators: Filtrowanie -> tytuł kawałka z opcjami gettext('Inne') XXXXXXXXXXXXXXXX
-#: templates/templ_dir/courses/base.html:45
-#: templates/templ_dir/courses/base.html:47
-#: templates/templ_dir/records/schedule_prototype.html:44
-msgid "Schowaj przedmioty, na które byłem zapisany"
-msgstr "Hide courses, I had attended"
-
-#: templates/templ_dir/courses/base.html:49
-#: templates/templ_dir/records/schedule_prototype.html:45
-msgid "Pokaż przedmioty prowadzone w j.angielskim"
-msgstr "Show courses taught in English"
-
-#: templates/templ_dir/courses/base.html:50
-#: templates/templ_dir/records/schedule_prototype.html:46
-msgid "Pokaż przedmioty kończące się egzaminem"
-msgstr "Show courses concluding with an exam"
-
-#: templates/templ_dir/courses/base.html:51
-#: templates/templ_dir/records/schedule_prototype.html:47
-msgid "Pokaż tylko przedmioty zalecane dla 1 roku"
-msgstr "Only show courses suggested for first-years"
-
-#: templates/templ_dir/courses/course.html:20
-#: templates/templ_dir/courses/courses_list.html:8
-#: templates/templ_dir/courses/voters.html:25
-msgid "System Zapisów"
-msgstr "Enrollment system"
-
-#: templates/templ_dir/courses/course.html:21
-#: templates/templ_dir/courses/course_consultations.html:12
-#: templates/templ_dir/courses/courses_list.html:4
-#: templates/templ_dir/courses/courses_list.html:9
-#: templates/templ_dir/courses/voters.html:26
-#: templates/templ_dir/records/records_list.html:20
-msgid "Przedmioty"
-msgstr "Courses"
-
-#. Translators: chodzi o zmianę, nie o odsłonę
-#: templates/templ_dir/courses/course.html:24
-#: templates/templ_dir/records/records_list.html:28
-msgid "Edycja"
-msgstr "Edit"
-
-#: templates/templ_dir/courses/course.html:46
-#, python-format
-msgid ""
-"Studenci w grupach: %(tutorial.statistics.in_group)s, studenci bez grupy: "
-"%(tutorial.statistics.in_queue)s"
-msgstr "Students in groups: %(tutorial.statistics.in_group)s, students "
-"without a group: %(tutorial.statistics.in_queue)s"
-
-#. Translators: nagłówek tabeli
-#: templates/templ_dir/courses/course.html:53
-#: templates/templ_dir/courses/course_consultations.html:34
-#: templates/templ_dir/courses/course_head.html:13
-msgid "Prowadzący"
-msgstr "Instructor"
-
-#: templates/templ_dir/courses/course.html:54
-msgid "Termin zajęć"
-msgstr "course time"
-
-#: templates/templ_dir/courses/course.html:55
-msgid "Limit"
-msgstr "Limit"
-
-#: templates/templ_dir/courses/course.html:56
-msgid "Zapisani"
-msgstr "Enrolled"
-
-#: templates/templ_dir/courses/course.html:57
-msgid "Kolejka"
-msgstr "Queue"
-
-#: templates/templ_dir/courses/course.html:60
-msgid "Priorytet"
-msgstr "Priority"
-
-#: templates/templ_dir/courses/course.html:73
-msgid "(nieznany prowadzący)"
-msgstr "(unknown instructor)"
-
-#: templates/templ_dir/courses/course.html:114
-#: templates/templ_dir/courses/course.html:137
-msgid "wypisz"
-msgstr "withdraw"
-
-#: templates/templ_dir/courses/course.html:120
-msgid "zapisz"
-msgstr "enroll"
-
-#: templates/templ_dir/courses/course.html:124
-msgid "wypisz z kolejki"
-msgstr "leave the queue"
-
-#: templates/templ_dir/courses/course.html:129
-msgid "zapisz do kolejki"
-msgstr "queue up"
-
-#: templates/templ_dir/courses/course.html:144
-#: templates/templ_dir/courses/course_head.html:90
-msgid "lista"
-msgstr "list"
-
-#: templates/templ_dir/courses/course.html:179
-msgid ""
-"Przedmiot współfinansowany ze środków Unii Europejskiej w ramach "
-"Europejskiego Funduszu Społecznego"
-msgstr "The course is co-funded by European Union under the "
-"European Social Fund"
-
-#: templates/templ_dir/courses/course_consultations.html:6
-#: templates/templ_dir/courses/course_consultations.html:16
-#: templates/templ_dir/courses/course_consultations.html:68
-#: templates/templ_dir/courses/course_consultations.html:88
-#: templates/templ_dir/courses/course_head.html:85
-msgid "Konsultacje"
-msgstr "Office hours"
-
-#: templates/templ_dir/courses/course_consultations.html:29
-msgctxt "typ kursu"
-msgid "Rodzaj"
-msgstr "Type"
-
-#: templates/templ_dir/courses/course_consultations.html:42
-#, python-format
-msgid "Punkty %(points.type_of_point.name)s"
-msgstr "%(points.type_of_point.name)s points"
-
-#: templates/templ_dir/courses/course_consultations.html:48
-#: templates/templ_dir/courses/course_head.html:29
-msgid "Liczba godzin"
-msgstr "Number of hours"
-
-#: templates/templ_dir/courses/course_consultations.html:49
-msgid "(wyk)"
-msgstr "(lec)"
-
-#: templates/templ_dir/courses/course_consultations.html:50
-msgid "(rep)"
-msgstr "(rep)"
-
-#: templates/templ_dir/courses/course_consultations.html:51
-msgid "(ćw)"
-msgstr "(ex)"
-
-#: templates/templ_dir/courses/course_consultations.html:52
-msgid "(prac)"
-msgstr "(labo)"
-
-#: templates/templ_dir/courses/course_consultations.html:57
-msgid "Strona www"
-msgstr "Webpage"
-
-#: templates/templ_dir/courses/course_consultations.html:63
-#: templates/templ_dir/courses/course_head.html:79
-msgctxt "zależności przedmiotu"
-msgid "Wymagane"
-msgstr "Required"
-
-#: templates/templ_dir/courses/course_consultations.html:69
-#: templates/templ_dir/courses/course_head.html:86
-msgid "link"
-msgstr "link"
-
-#: templates/templ_dir/courses/course_consultations.html:79
-msgid "Konsultacje prowadzących"
-msgstr "Instructors' office hours"
-
-#: templates/templ_dir/courses/course_consultations.html:86
-msgid "Imię i nazwisko"
-msgstr "Name"
-
-#: templates/templ_dir/courses/course_consultations.html:87
-msgid "Pokój"
-msgstr "Room"
-
-#: templates/templ_dir/courses/course_consultations.html:102
-msgid "Brak prowadzących"
-msgstr "No instructors"
-
-#: templates/templ_dir/courses/course_head.html:8
-msgctxt "rodzaj kursu"
-msgid "Rodzaj"
-msgstr "Type"
-
-#: templates/templ_dir/courses/course_head.html:23
-msgid "Punkty ECTS"
-msgstr "ECTS points"
-
-#: templates/templ_dir/courses/course_head.html:45
-msgctxt "tagi przedmiotu"
-msgid "Tagi"
-msgstr "Tags"
-
-#: templates/templ_dir/courses/course_head.html:57
-msgid "Przedmiot prowadzony w j.angielskim"
-msgstr "Course taught in English"
-
-#: templates/templ_dir/courses/course_head.html:58
-#: templates/templ_dir/courses/course_head.html:65
-#: templates/templ_dir/courses/course_head.html:70
-msgid "Tak"
-msgstr "Yes"
-
-#: templates/templ_dir/courses/course_head.html:64
-msgid "Przedmiot przyjazny dla I roku"
-msgstr "freshmen-friendly course"
-
-#: templates/templ_dir/courses/course_head.html:69
-msgid "Egzamin"
-msgstr "Exam"
-
-#: templates/templ_dir/courses/course_head.html:74
-msgid "Strona WWW"
-msgstr "Webpage"
-
-#: templates/templ_dir/courses/course_head.html:89
-msgid "Oddane głosy"
-msgstr "Votes"
-
-#: templates/templ_dir/courses/course_head.html:95
-msgctxt "czas zapisów"
-msgid "Możesz zapisać się od"
-msgstr "You may enroll since"
-
-#: templates/templ_dir/courses/course_head.html:105
-msgid "Opis przedmiotu"
-msgstr "Course description"
-
-#: templates/templ_dir/courses/course_head.html:109
-msgid "Brak"
-msgstr "None"
-
-#: templates/templ_dir/courses/courses_list.html:18
-msgid "Wybierz przedmiot z listy"
-msgstr "Choose a course from the list"
-
-#: templates/templ_dir/courses/voters.html:6
-#, python-format
-msgid "%(course.name)s - Głosy"
-msgstr "%(course.name)s - votes"
-
-#: templates/templ_dir/courses/voters.html:28
-msgid "Głosy"
-msgstr "Votes"
-
-#: templates/templ_dir/courses/voters.html:45
-msgid "Lista osób głosujących na przedmiot"
-msgstr "List of people voting for this course"
-
-#: templates/templ_dir/courses/voters.html:52
-msgid "Nikt nie oddał głosu"
-msgstr "No one voted"
-
-#: templates/templ_dir/courses/admin/import_schedule.html:5
-#: templates/templ_dir/courses/admin/import_schedule_step2.html:5
-#: templates/templ_dir/courses/admin/import_semester.html:5
-msgid "Home"
-msgstr "Home"
-
-#: templates/templ_dir/records/records_list.html:49
-msgid "Ściągnij jako pdf"
-msgstr "Download as pdf"
-
-#: templates/templ_dir/records/records_list.html:50
-msgid "Ściągnij jako csv"
-msgstr "Download as csv"
-
-#: templates/templ_dir/records/schedule.html:108
-msgid "Zajęcia, na które jesteś zapisany"
-msgstr "Courses, you are signed up for"
-
-#. Translators: Tytuł kolumny w tabelce
-#: templates/templ_dir/records/schedule.html:113
-msgid "Przedmiot"
-msgstr "Course"
-
-#. Translators: Tytuł kolumny w tabelce
-#: templates/templ_dir/records/schedule.html:116
-msgid "ECTS"
-msgstr "ECTS"
-
-#. Translators: Tytuł kolumny w tabelce
-#: templates/templ_dir/records/schedule.html:119
-msgid "Godziny"
-msgstr "Hours"
-
-#: templates/templ_dir/records/schedule_prototype.html:72
-msgid ""
-"Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu planu nie "
-"może bez niej działać"
-msgstr "You don't have javascript enabled &ndash; "
-"schedule prototype won't work without it"
-
-#: templates/templ_dir/records/schedule_prototype.html:82
-msgid "jesteś zapisany do tej grupy"
-msgstr "you are in this group"
-
-#: templates/templ_dir/records/schedule_prototype.html:85
-msgid "jesteś w kolejce do tej grupy"
-msgstr "you are queued for this group"
-
-#: templates/templ_dir/records/schedule_prototype.html:88
-msgid "grupa przypięta do prototypu"
-msgstr "group pinned to the prototype"
-
-#: templates/templ_dir/records/schedule_prototype.html:91
-msgid ""
-"przypnij do prototypu. Widoczność grupy w prototypie zostaje zapamiętana. "
-"Przycisk <strong>NIE</strong> zapisuje na zajęcia"
-msgstr "pin on to the prototype. Visibility of group in prototype will be maintained. "
-"The button <strong>DOES NOT</strong> enroll for a class"
-
-#: templates/templ_dir/records/schedule_prototype.html:94
-msgid ""
-"odepnij od prototypu. Przywraca domyślną widoczność grupy w prototypie. "
-"Przycisk <strong>NIE</strong> wypisuje z zajęć"
-msgstr "unpin from the prototype. Restores default visibility of the group in prototype. "
-"The button <strong>DOES NOT</strong> disenroll from class"
-
-#: templates/templ_dir/records/schedule_prototype.html:97
-msgid ""
-"zapisz do grupy. Następuje próba zapisu studenta do grupy. Jeżeli przedmiot "
-"posiada również wykład, zostaniemy zapisanie na niego automatycznie"
-msgstr "sign up for a group. An attempt to enroll student to the group will follow. "
-"If a lecture is given as well, one will be enrolled for it automatically"
-
-#: templates/templ_dir/records/schedule_prototype.html:100
-msgid ""
-"wypisz z grupy. Następuje wypisanie z grupy. Wypisanie z wykładu skutkuje "
-"wypisaniem się z pozostałych grup przedmiotu"
-msgstr "leave a group. A withdrawal from the group will follow. "
-"Leaving a lecture will result with disenrolling from other groups "
-"for the course as well"
-
-#: templates/templ_dir/records/students_list.html:7
-msgid "Nr indeksu"
-msgstr "Album number"
+#: templates/records/records_list.html:62
+msgid "Ściągnij listę studentów z kolejki jako"
+msgstr "Download list of students from queue as"
+
+#~ msgid "Plan zajęć"
+#~ msgstr "Timetable"
+
+#~ msgid "Prototyp planu"
+#~ msgstr "Schedule prototype"
+
+#~ msgid "Pracownicy"
+#~ msgstr "Employees"
+
+#~ msgid "Studenci"
+#~ msgstr "Students"
+
+#~ msgid "Statystyki"
+#~ msgstr "Statistics"
+
+#~ msgid "Zostałaś/eś przepisana/y z kolejki do grupy"
+#~ msgstr "You have been reassigned from a queue to a group"
+
+#~ msgid "Strona główna"
+#~ msgstr "Main page"
+
+#~ msgid "Zapisy"
+#~ msgstr "Enrollment"
+
+#~ msgid "System zapisów"
+#~ msgstr "Enrollment system"
+
+#~ msgid ""
+#~ "System zapisów na zajęcia w Instytucie Informatyki Uniwersytetu "
+#~ "Wrocławskiego"
+#~ msgstr ""
+#~ "Enrollment system for courses in the Institute of Computer Science, "
+#~ "University of Wrocław"
+
+#~ msgid "Filtrowanie"
+#~ msgstr "Filter"
+
+#~ msgid "Rodzaj przedmiotu"
+#~ msgstr "Type of course"
+
+#~ msgid "Inne"
+#~ msgstr "Other"
+
+#~ msgid "Semestr"
+#~ msgstr "Semester"
+
+#~ msgid "Schowaj przedmioty, na które byłem zapisany"
+#~ msgstr "Hide courses, I had attended"
+
+#~ msgid "Pokaż przedmioty prowadzone w j.angielskim"
+#~ msgstr "Show courses taught in English"
+
+#~ msgid "Pokaż przedmioty kończące się egzaminem"
+#~ msgstr "Show courses concluding with an exam"
+
+#~ msgid "Pokaż tylko przedmioty zalecane dla 1 roku"
+#~ msgstr "Only show courses suggested for first-years"
+
+#~ msgid "System Zapisów"
+#~ msgstr "Enrollment system"
+
+#~ msgid "Przedmioty"
+#~ msgstr "Courses"
+
+#~ msgid "Edycja"
+#~ msgstr "Edit"
+
+#~ msgid ""
+#~ "Studenci w grupach: %(tutorial.statistics.in_group)s, studenci bez grupy: "
+#~ "%(tutorial.statistics.in_queue)s"
+#~ msgstr ""
+#~ "Students in groups: %(tutorial.statistics.in_group)s, students without a "
+#~ "group: %(tutorial.statistics.in_queue)s"
+
+#~ msgid "Prowadzący"
+#~ msgstr "Instructor"
+
+#~ msgid "Termin zajęć"
+#~ msgstr "course time"
+
+#~ msgid "Limit"
+#~ msgstr "Limit"
+
+#~ msgid "Zapisani"
+#~ msgstr "Enrolled"
+
+#~ msgid "Kolejka"
+#~ msgstr "Queue"
+
+#~ msgid "Priorytet"
+#~ msgstr "Priority"
+
+#~ msgid "(nieznany prowadzący)"
+#~ msgstr "(unknown instructor)"
+
+#~ msgid "wypisz"
+#~ msgstr "withdraw"
+
+#~ msgid "zapisz"
+#~ msgstr "enroll"
+
+#~ msgid "wypisz z kolejki"
+#~ msgstr "leave the queue"
+
+#~ msgid "zapisz do kolejki"
+#~ msgstr "queue up"
+
+#~ msgid "lista"
+#~ msgstr "list"
+
+#~ msgid ""
+#~ "Przedmiot współfinansowany ze środków Unii Europejskiej w ramach "
+#~ "Europejskiego Funduszu Społecznego"
+#~ msgstr ""
+#~ "The course is co-funded by European Union under the European Social Fund"
+
+#~ msgid "Konsultacje"
+#~ msgstr "Office hours"
+
+#~ msgctxt "typ kursu"
+#~ msgid "Rodzaj"
+#~ msgstr "Type"
+
+#~ msgid "Punkty %(points.type_of_point.name)s"
+#~ msgstr "%(points.type_of_point.name)s points"
+
+#~ msgid "Liczba godzin"
+#~ msgstr "Number of hours"
+
+#~ msgid "(wyk)"
+#~ msgstr "(lec)"
+
+#~ msgid "(rep)"
+#~ msgstr "(rep)"
+
+#~ msgid "(ćw)"
+#~ msgstr "(ex)"
+
+#~ msgid "(prac)"
+#~ msgstr "(labo)"
+
+#~ msgid "Strona www"
+#~ msgstr "Webpage"
+
+#~ msgctxt "zależności przedmiotu"
+#~ msgid "Wymagane"
+#~ msgstr "Required"
+
+#~ msgid "link"
+#~ msgstr "link"
+
+#~ msgid "Konsultacje prowadzących"
+#~ msgstr "Instructors' office hours"
+
+#~ msgid "Imię i nazwisko"
+#~ msgstr "Name"
+
+#~ msgid "Pokój"
+#~ msgstr "Room"
+
+#~ msgid "Brak prowadzących"
+#~ msgstr "No instructors"
+
+#~ msgctxt "rodzaj kursu"
+#~ msgid "Rodzaj"
+#~ msgstr "Type"
+
+#~ msgid "Punkty ECTS"
+#~ msgstr "ECTS points"
+
+#~ msgctxt "tagi przedmiotu"
+#~ msgid "Tagi"
+#~ msgstr "Tags"
+
+#~ msgid "Przedmiot prowadzony w j.angielskim"
+#~ msgstr "Course taught in English"
+
+#~ msgid "Tak"
+#~ msgstr "Yes"
+
+#~ msgid "Przedmiot przyjazny dla I roku"
+#~ msgstr "freshmen-friendly course"
+
+#~ msgid "Egzamin"
+#~ msgstr "Exam"
+
+#~ msgid "Strona WWW"
+#~ msgstr "Webpage"
+
+#~ msgid "Oddane głosy"
+#~ msgstr "Votes"
+
+#~ msgctxt "czas zapisów"
+#~ msgid "Możesz zapisać się od"
+#~ msgstr "You may enroll since"
+
+#~ msgid "Opis przedmiotu"
+#~ msgstr "Course description"
+
+#~ msgid "Brak"
+#~ msgstr "None"
+
+#~ msgid "Wybierz przedmiot z listy"
+#~ msgstr "Choose a course from the list"
+
+#~ msgid "%(course.name)s - Głosy"
+#~ msgstr "%(course.name)s - votes"
+
+#~ msgid "Głosy"
+#~ msgstr "Votes"
+
+#~ msgid "Lista osób głosujących na przedmiot"
+#~ msgstr "List of people voting for this course"
+
+#~ msgid "Nikt nie oddał głosu"
+#~ msgstr "No one voted"
+
+#~ msgid "Home"
+#~ msgstr "Home"
+
+#~ msgid "Zajęcia, na które jesteś zapisany"
+#~ msgstr "Courses, you are signed up for"
+
+#~ msgid "Przedmiot"
+#~ msgstr "Course"
+
+#~ msgid "ECTS"
+#~ msgstr "ECTS"
+
+#~ msgid "Godziny"
+#~ msgstr "Hours"
+
+#~ msgid ""
+#~ "Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu planu "
+#~ "nie może bez niej działać"
+#~ msgstr ""
+#~ "You don't have javascript enabled &ndash; schedule prototype won't work "
+#~ "without it"
+
+#~ msgid "jesteś zapisany do tej grupy"
+#~ msgstr "you are in this group"
+
+#~ msgid "jesteś w kolejce do tej grupy"
+#~ msgstr "you are queued for this group"
+
+#~ msgid "grupa przypięta do prototypu"
+#~ msgstr "group pinned to the prototype"
+
+#~ msgid ""
+#~ "przypnij do prototypu. Widoczność grupy w prototypie zostaje zapamiętana. "
+#~ "Przycisk <strong>NIE</strong> zapisuje na zajęcia"
+#~ msgstr ""
+#~ "pin on to the prototype. Visibility of group in prototype will be "
+#~ "maintained. The button <strong>DOES NOT</strong> enroll for a class"
+
+#~ msgid ""
+#~ "odepnij od prototypu. Przywraca domyślną widoczność grupy w prototypie. "
+#~ "Przycisk <strong>NIE</strong> wypisuje z zajęć"
+#~ msgstr ""
+#~ "unpin from the prototype. Restores default visibility of the group in "
+#~ "prototype. The button <strong>DOES NOT</strong> disenroll from class"
+
+#~ msgid ""
+#~ "zapisz do grupy. Następuje próba zapisu studenta do grupy. Jeżeli "
+#~ "przedmiot posiada również wykład, zostaniemy zapisanie na niego "
+#~ "automatycznie"
+#~ msgstr ""
+#~ "sign up for a group. An attempt to enroll student to the group will "
+#~ "follow. If a lecture is given as well, one will be enrolled for it "
+#~ "automatically"
+
+#~ msgid ""
+#~ "wypisz z grupy. Następuje wypisanie z grupy. Wypisanie z wykładu skutkuje "
+#~ "wypisaniem się z pozostałych grup przedmiotu"
+#~ msgstr ""
+#~ "leave a group. A withdrawal from the group will follow. Leaving a lecture "
+#~ "will result with disenrolling from other groups for the course as well"
+
+#~ msgid "Nr indeksu"
+#~ msgstr "Album number"

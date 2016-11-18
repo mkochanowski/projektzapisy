@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="span15" style="margin-bottom: 30px;"><h2>Mój głos (<a href="{% url vote %}">głosuj</a>)</h2></div>
+    <div class="span15" style="margin-bottom: 30px;"><h2>Mój głos {% if is_voting_active %}(<a href="{% url vote %}">głosuj</a>){% endif %}</h2></div>
 
 
 		{% if votes %}
