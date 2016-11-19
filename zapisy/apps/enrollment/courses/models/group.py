@@ -222,8 +222,9 @@ class Group(models.Model):
 
     def _add_to_lecture(self, student):
         import settings
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        from ...records.models import Record, STATUS_ENROLLED, Queue
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
+        Queue.remove_student_from_queue(student.id, self.id)
         result = []
         for group in groups:
             __, created = Record.objects.get_or_create(student=student, group=group, status=STATUS_ENROLLED)
