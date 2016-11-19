@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.http import Http404
-from datetime import time
-from django.utils.encoding import smart_unicode
 
 from django.core.validators import ValidationError
 

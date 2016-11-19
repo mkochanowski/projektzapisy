@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+
 from django.test import TestCase
 from zapisy.apps.schedule.models import SpecialReservation, Event, Term as EventTerm
-from apps.enrollment.courses.models import Semester, Classroom, Term
-from datetime import datetime, timedelta, time, date
-from django.core.serializers import serialize
+from apps.enrollment.courses.models import Semester, Classroom
+from datetime import time, date
 from django.core.validators import ValidationError
 from django.contrib.auth.models import User
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
@@ -11,8 +11,8 @@ from apps.users.tests.objectmothers import UserObjectMother
 
 import zapisy.common as common
 
-class SpecialReservationTestCase(TestCase):
 
+class SpecialReservationTestCase(TestCase):
     def setUp(self):
         semester = SemesterObjectMother.summer_semester_2015_16()
         semester.save()
@@ -36,11 +36,11 @@ class SpecialReservationTestCase(TestCase):
         reservation.save()
 
         reservation_2 = SpecialReservation(semester=semester,
-                                          title=u'ąęłżóćśśń',
-                                          classroom=room110,
-                                          dayOfWeek=common.THURSDAY,
-                                          start_time=time(15),
-                                          end_time=time(16))
+                                           title=u'ąęłżóćśśń',
+                                           classroom=room110,
+                                           dayOfWeek=common.THURSDAY,
+                                           start_time=time(15),
+                                           end_time=time(16))
         reservation_2.full_clean()
         reservation_2.save()
 
@@ -67,7 +67,7 @@ class SpecialReservationTestCase(TestCase):
         semester = Semester.get_semester(date(2016, 5, 12))
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 2)
-        
+
     def test_try_clean_on_non_overlapping_reservation(self):
         semester = Semester.get_semester(date(2016, 5, 12))
         room = Classroom.get_by_number('110')
