@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
-from zapisy.apps.schedule.models import SpecialReservation, Event, Term as EventTerm
-from apps.enrollment.courses.models import Semester, Classroom
 from datetime import time, date
+
+from django.test import TestCase
 from django.core.validators import ValidationError
 from django.contrib.auth.models import User
-from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
-from apps.users.tests.objectmothers import UserObjectMother
 
-import zapisy.common as common
+from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
+from apps.enrollment.courses.models import Semester, Classroom
+from apps.users.tests.objectmothers import UserObjectMother
+from apps.schedule.models import SpecialReservation, Event, Term as EventTerm
+from factories import EventCourseFactory
+import common
 
 
 class SpecialReservationTestCase(TestCase):
@@ -92,7 +94,6 @@ class SpecialReservationTestCase(TestCase):
 
 
 class EventTestCase(TestCase):
-
     def setUp(self):
         teacher = UserObjectMother.user_jan_kowalski()
         teacher.save()
@@ -165,4 +166,12 @@ class EventTestCase(TestCase):
     def test_event_unicode_method(self):
         events = Event.objects.all()
         for event in events:
-            unicode(event)
+            self.assertEquals(unicode(event), u'%s %s' % (event.title, event.description))
+
+    def test_get_absolute_url_no_group(self):
+        event = Event.objects.all()[0]
+        self.assertEquals(event.get_absolute_url(), '/events/%d' % event.pk)
+
+    def test_get_absolute_url_group(self):
+        event = EventCourseFactory.create()
+        self.assertEquals(event.get_absolute_url(), '/records/%s/records' % event.group_id)
