@@ -139,7 +139,7 @@ class Term(models.Model):
             pass
         else:
             if isinstance(day, date):
-                day_of_week = ChangedDay.get_day_of_week(date)
+                day_of_week = ChangedDay.get_day_of_week(day)
             else:
                 day_of_week = day
             query = query.filter(dayOfWeek=day_of_week)
