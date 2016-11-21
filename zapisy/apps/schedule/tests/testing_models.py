@@ -10,7 +10,7 @@ from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, Cl
 from apps.enrollment.courses.models import Semester, Classroom
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.schedule.models import SpecialReservation, Event, Term as EventTerm
-from factories import EventCourseFactory
+from factories import EventCourseFactory, ChangedDayFactory
 import common
 
 
@@ -175,3 +175,19 @@ class EventTestCase(TestCase):
     def test_get_absolute_url_group(self):
         event = EventCourseFactory.create()
         self.assertEquals(event.get_absolute_url(), '/records/%s/records' % event.group_id)
+
+    def test_add_event_on_changed_day_success(self):
+        # 1. Stworzyć jakiś event w przyszłości w jakiejś sali
+        # 2. Zamienić dzień tego eventu na inny
+        # 3. Spróbować w ten zmieniony dzień dodać jakiś event w czasie tego
+        #    zdefiniowanego wcześniej
+        # 4. Powinno się dać, bo jest wtedy "inny" dzień
+        changed_day = ChangedDayFactory.create()
+
+    def test_add_event_on_changed_day_fail(self):
+        # 1. Stworzyć jakiś event w przyszłości w jakiejś sali.
+        # 2. Podmienić jakiś dzień z dniem, w którym jest ten event.
+        # 3. Spróbować w dniu, który został podmieniony dodac jakiś event
+        #    w czasie, gdy odbywa się ten wczesniej zdefiniowany.
+        # 4. Powinno się wysypać
+        pass
