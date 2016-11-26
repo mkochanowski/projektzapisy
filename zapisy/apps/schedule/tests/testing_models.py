@@ -95,12 +95,6 @@ class SpecialReservationTestCase(TestCase):
 
 
 class EventTestCase(TestCase):
-    def find_closest_thursday(self):
-        today = date.today()
-        while today.weekday() != 3:
-            today += timedelta(days=1)
-        return today
-
     def setUp(self):
         teacher = UserObjectMother.user_jan_kowalski()
         teacher.save()
