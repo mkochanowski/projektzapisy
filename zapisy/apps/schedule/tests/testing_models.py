@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time, date
+from datetime import time, date, timedelta
 
 from django.test import TestCase
 from django.core.validators import ValidationError
 from django.contrib.auth.models import User
 
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
-from apps.enrollment.courses.models import Semester, Classroom
+from apps.enrollment.courses.models import Semester, Classroom, ChangedDay
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.schedule.models import SpecialReservation, Event, Term as EventTerm
-from factories import EventCourseFactory, ChangedDayFactory
+from factories import EventCourseFactory, ChangedDayForFridayFactory, TermFactory, ClassroomFactory, \
+    SepcialReservationFactory
 import common
 
 
@@ -94,6 +95,12 @@ class SpecialReservationTestCase(TestCase):
 
 
 class EventTestCase(TestCase):
+    def find_closest_thursday(self):
+        today = date.today()
+        while today.weekday() != 3:
+            today += timedelta(days=1)
+        return today
+
     def setUp(self):
         teacher = UserObjectMother.user_jan_kowalski()
         teacher.save()
@@ -176,18 +183,38 @@ class EventTestCase(TestCase):
         event = EventCourseFactory.create()
         self.assertEquals(event.get_absolute_url(), '/records/%s/records' % event.group_id)
 
-    def test_add_event_on_changed_day_success(self):
-        # 1. Stworzyć jakiś event w przyszłości w jakiejś sali
-        # 2. Zamienić dzień tego eventu na inny
-        # 3. Spróbować w ten zmieniony dzień dodać jakiś event w czasie tego
-        #    zdefiniowanego wcześniej
-        # 4. Powinno się dać, bo jest wtedy "inny" dzień
-        changed_day = ChangedDayFactory.create()
 
-    def test_add_event_on_changed_day_fail(self):
-        # 1. Stworzyć jakiś event w przyszłości w jakiejś sali.
-        # 2. Podmienić jakiś dzień z dniem, w którym jest ten event.
-        # 3. Spróbować w dniu, który został podmieniony dodac jakiś event
-        #    w czasie, gdy odbywa się ten wczesniej zdefiniowany.
-        # 4. Powinno się wysypać
-        pass
+class EventsOnChangedDayTestCase(TestCase):
+    def find_closest_day_of_week_to_date(self, date, day_of_week):
+        date += timedelta(days=1)
+        while date.weekday() != day_of_week:
+            date += timedelta(days=1)
+        return date
+
+    def test_add_event_on_changed_day(self):
+        # Rezerwujemy zajęcia w piątki od 10:15 do 12
+        reservation = SepcialReservationFactory()
+        thursday = self.find_closest_day_of_week_to_date(reservation.semester.semester_beginning, 3)
+        # Zamieniamy czwartek na piątek
+        ChangedDayForFridayFactory(
+            day=thursday
+        )
+        # Chcemy dodać event w czwartek od 10:15 do 12 w tej samej sali co zajęcia powyżej.
+        # Nie powinno się udać, bo tak na prawdę jest piątek, a w tej same godzinie są w
+        # piątek zajęcia.
+        TermFactory(
+            day=thursday,
+            start=reservation.start_time,
+            end=reservation.end_time,
+            room=reservation.classroom
+        )
+        friday = thursday + timedelta(days=1)
+        # A jednak udaje się dodac event w czwartek... Dlaczego?
+        self.assertEqual(
+            EventTerm.get_terms_for_dates(
+                [thursday], reservation.classroom, reservation.start_time, reservation.end_time
+            )[0].event,
+            EventTerm.get_terms_for_dates(
+                [friday], reservation.classroom, reservation.start_time, reservation.end_time
+            )[0].event
+        )
