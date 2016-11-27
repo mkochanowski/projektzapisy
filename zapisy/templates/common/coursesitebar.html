@@ -35,10 +35,11 @@
                        <li>
                            <div class="legend-box offer"></div> - przedmiot w ofercie
                        </li>
+											 {% if user.is_authenticated %}
                        <li>
                            <div class="legend-box nooffer"></div> - przedmiot wycofany z oferty
                        </li>
-
+											 {% endif %}
                         <li>
                             <div class="legend-box work"></div> - przedmiot w wersji roboczej
                         </li>
