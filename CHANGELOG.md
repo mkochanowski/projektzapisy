@@ -2,6 +2,7 @@
 
 # Current version
 
+* Courses describtions are now sorted by time of creation
 * Reworked sending emails to group and queues
 * Voting link is now not visible when voting is closed + added tests
 
