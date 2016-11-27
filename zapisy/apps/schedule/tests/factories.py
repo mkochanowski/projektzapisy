@@ -20,6 +20,9 @@ class UserFactory(DjangoModelFactory):
         model = User
 
     username = factory.Sequence(lambda n: 'user%d' % n)
+    password = username
+    is_staff = False
+    is_superuser = False
 
 
 class StudentFactory(DjangoModelFactory):
@@ -27,6 +30,7 @@ class StudentFactory(DjangoModelFactory):
         model = Student
 
     user = factory.SubFactory(UserFactory)
+    matricula = factory.Sequence(lambda n: ('%06d' % n))
 
 
 class CourseEntityFactory(DjangoModelFactory):
@@ -72,6 +76,14 @@ class EventFactory(DjangoModelFactory):
     status = Event.STATUS_ACCEPTED
     author = factory.SubFactory(UserFactory)
     title = factory.Sequence(lambda n: 'wydarzenie%d' % n)
+    description = title
+
+
+class ExamEventFactory(EventFactory):
+    class Meta:
+        model = Event
+
+    type = Event.TYPE_EXAM
 
 
 class ClassroomFactory(DjangoModelFactory):
@@ -90,6 +102,9 @@ class TermFactory(DjangoModelFactory):
 
     event = factory.SubFactory(EventFactory)
     room = factory.SubFactory(ClassroomFactory)
+    day = factory.Faker('date_time_this_year', after_now=True)
+    start = time(10)
+    end = time(12)
 
 
 class SummerSemesterFactory(DjangoModelFactory):

@@ -10,8 +10,7 @@ from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, Cl
 from apps.enrollment.courses.models import Semester, Classroom, ChangedDay
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.schedule.models import SpecialReservation, Event, Term as EventTerm
-from factories import EventCourseFactory, ChangedDayForFridayFactory, TermFactory, ClassroomFactory, \
-    SepcialReservationFactory
+import factories
 import common
 
 
@@ -96,17 +95,18 @@ class SpecialReservationTestCase(TestCase):
 
 class EventTestCase(TestCase):
     def setUp(self):
-        teacher = UserObjectMother.user_jan_kowalski()
-        teacher.save()
-        profile = UserObjectMother.teacher_profile(teacher)
-        profile.save()
+        teacher = factories.UserFactory()
+        teacher.full_clean()
+
+        teacher_profile = UserObjectMother.teacher_profile(teacher)
+        teacher_profile.save()
+
         employee = UserObjectMother.employee(teacher)
         employee.save()
 
-        room110 = ClassroomObjectMother.room110()
-        room110.save()
+        room110 = factories.ClassroomFactory(number='110')
+        room110.full_clean()
 
-        teacher = User.objects.all()[0]
         event = Event(
             title='Żółta żaba żarła żur',
             description='ąęńółść',
@@ -174,41 +174,22 @@ class EventTestCase(TestCase):
         self.assertEquals(event.get_absolute_url(), '/events/%d' % event.pk)
 
     def test_get_absolute_url_group(self):
-        event = EventCourseFactory.create()
+        event = factories.EventCourseFactory.create()
         self.assertEquals(event.get_absolute_url(), '/records/%s/records' % event.group_id)
 
+    def test_clean_employee_add_exam(self):
+        room110 = Classroom.get_by_number('110')
+        teacher = User.objects.get()
+        event = factories.EventFactory(type=Event.TYPE_EXAM, author=teacher, title='exam')
+        term = factories.TermFactory(event=event, room=room110, day=date(2017, 1, 10), start=time(15),
+                                     end=time(16))
+        term.full_clean()
 
-class EventsOnChangedDayTestCase(TestCase):
-    def find_closest_day_of_week_to_date(self, date, day_of_week):
-        date += timedelta(days=1)
-        while date.weekday() != day_of_week:
-            date += timedelta(days=1)
-        return date
-
-    def test_add_event_on_changed_day(self):
-        # Rezerwujemy zajęcia w piątki od 10:15 do 12
-        reservation = SepcialReservationFactory()
-        thursday = self.find_closest_day_of_week_to_date(reservation.semester.semester_beginning, 3)
-        # Zamieniamy czwartek na piątek
-        ChangedDayForFridayFactory(
-            day=thursday
-        )
-        # Chcemy dodać event w czwartek od 10:15 do 12 w tej samej sali co zajęcia powyżej.
-        # Nie powinno się udać, bo tak na prawdę jest piątek, a w tej same godzinie są w
-        # piątek zajęcia.
-        TermFactory(
-            day=thursday,
-            start=reservation.start_time,
-            end=reservation.end_time,
-            room=reservation.classroom
-        )
-        friday = thursday + timedelta(days=1)
-        # A jednak udaje się dodac event w czwartek... Dlaczego?
-        self.assertEqual(
-            EventTerm.get_terms_for_dates(
-                [thursday], reservation.classroom, reservation.start_time, reservation.end_time
-            )[0].event,
-            EventTerm.get_terms_for_dates(
-                [friday], reservation.classroom, reservation.start_time, reservation.end_time
-            )[0].event
-        )
+    def test_clean_student_add_exam(self):
+        u = factories.UserFactory()
+        u.full_clean()
+        student = UserObjectMother.student_profile(u)
+        student.save()
+        self.assertTrue(u.get_profile().is_student)
+        event = factories.ExamEventFactory.build(author=u)
+        self.assertRaises(ValidationError, event.full_clean)
