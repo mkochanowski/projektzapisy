@@ -174,7 +174,7 @@ class DummyTest(TestCase):
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
 
-
+"""
 class QueueTests(DummyTest):
 
     def randomString(length):
@@ -217,3 +217,4 @@ class QueueTests(DummyTest):
             run_rearanged(result)
             self.assertTrue(result)
             self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+"""
