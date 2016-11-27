@@ -367,9 +367,14 @@ class CourseEntity(models.Model):
         return SingleVote.objects.distinct('student').filter(state=current_state)
 
     @staticmethod
-    def get_proposals():
-        return CourseEntity.noremoved.filter(status__gte=1) \
-            .select_related('type', 'owner', 'owner__user')
+    def get_proposals(is_authenticated=False):
+        print(is_authenticated)
+        if is_authenticated:
+            return CourseEntity.noremoved.filter(status__gte=1) \
+                .select_related('type', 'owner', 'owner__user')
+        else:
+            return CourseEntity.noremoved.filter(status__gte=1).exclude(status=4) \
+                .select_related('type', 'owner', 'owner__user')
 
     @staticmethod
     def get_proposal(slug):
