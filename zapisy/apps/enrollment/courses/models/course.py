@@ -781,6 +781,7 @@ class CourseDescription(models.Model):
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
         app_label = 'courses'
+        ordering = ['-created']
 
     def __unicode__(self):
         title = smart_unicode(self.created) + " - "
@@ -790,7 +791,7 @@ class CourseDescription(models.Model):
 
     def save_as_copy(self):
         self.id = None
-        self.save(force_insert=True)        
+        self.save(force_insert=True)
 
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)
