@@ -368,7 +368,6 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposals(is_authenticated=False):
-        print(is_authenticated)
         if is_authenticated:
             return CourseEntity.noremoved.filter(status__gte=1) \
                 .select_related('type', 'owner', 'owner__user')
