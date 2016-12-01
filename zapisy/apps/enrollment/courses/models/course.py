@@ -786,7 +786,6 @@ class CourseDescription(models.Model):
         verbose_name = 'opis przedmiotu'
         verbose_name_plural = 'opisy przedmiotu'
         app_label = 'courses'
-        ordering = ['-created']
 
     def __unicode__(self):
         title = smart_unicode(self.created) + " - "
