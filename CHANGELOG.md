@@ -4,6 +4,7 @@
 
 * Courses in review are no longer visible at all
 * Courses not in offer are no longer visible for not authenticated users
+* Courses descriptions are now sorted by time of creation
 * Reworked sending emails to group and queues
 * Voting link is now not visible when voting is closed + added tests
 
