@@ -132,13 +132,15 @@ class Term(models.Model):
         :param semester: enrollment.courses.model.Semester
         :param day: common.DAYS_OF_WEEK or datetime.date
         """
-        from .semester import ChangedDay
+        from .semester import ChangedDay, Freeday
         query = cls.objects.filter(group__course__semester=semester)
 
         if day is None:
             pass
         else:
             if isinstance(day, date):
+                if Freeday.is_free(day):
+                    return cls.objects.none()
                 day_of_week = ChangedDay.get_day_of_week(day)
             else:
                 day_of_week = day
