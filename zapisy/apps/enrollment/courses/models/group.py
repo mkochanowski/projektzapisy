@@ -8,6 +8,8 @@ from django.db.models.query import QuerySet
 from django.conf import settings
 from apps.notifications.models import Notification
 
+from ...records.exceptions import *
+
 from course import *
 
 import logging
@@ -224,7 +226,17 @@ class Group(models.Model):
         import settings
         from ...records.models import Record, STATUS_ENROLLED, Queue
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
-        Queue.remove_student_from_queue(student.id, self.id)
+
+        for group in groups:
+            try:
+                Queue.remove_student_from_queue(student.user.id, group.id)
+            except AlreadyNotAssignedException:
+                # student wasnt in queue
+                pass
+            except (NonGroupException, NonStudentException):
+                # shouldnt happen
+                return [u'Wystąpił błąd przy zapisie na wykład. Skontaktuj się z administratorem serwisu.']
+
         result = []
         for group in groups:
             __, created = Record.objects.get_or_create(student=student, group=group, status=STATUS_ENROLLED)
@@ -241,12 +253,13 @@ class Group(models.Model):
         result = True
         #REMOVE FROM OTHER GROUP
 
+        lecture_result = []
         if self.type != settings.LETURE_TYPE:
             result = self._remove_from_other_groups(student)
 
-            self._add_to_lecture(student)
+            lecture_result = self._add_to_lecture(student)
 
-        r, created = Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
+        __, created = Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
         if created:
             self.add_to_enrolled_counter(student)
 
@@ -255,11 +268,11 @@ class Group(models.Model):
 
         if return_group:
             if isinstance(result, QuerySet):
-                return result,  [u'Student dopisany do grupy', u'Wypisano z poprzedniej grupy']
+                return result,  [u'Student dopisany do grupy', u'Wypisano z poprzedniej grupy'] + lecture_result
             else:
-                return result,  [u'Student dopisany do grupy']
+                return result,  [u'Student dopisany do grupy'] + lecture_result
 
-        return result, [u'Student dopisany do grupy']
+        return result, [u'Student dopisany do grupy'] + lecture_result
 
     def enroll_student(self, student):
         from apps.enrollment.courses.models import Semester
