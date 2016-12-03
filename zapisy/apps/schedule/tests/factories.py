@@ -112,11 +112,13 @@ class SummerSemesterFactory(DjangoModelFactory):
         model = Semester
 
     visible = True
-    type = Semester.TYPE_WINTER
+    type = Semester.TYPE_SUMMER
     semester_beginning = date(datetime.now().year + 1, 2, 15)
     semester_ending = date(datetime.now().year + 1, 6, 30)
     lectures_beginning = semester_beginning
     lectures_ending = semester_ending
+    records_ects_limit_abolition = datetime(datetime.now().year + 1, 2, 10)
+    year = str(semester_beginning.year - 1) + "/" + str(semester_beginning.year % 100)
 
 
 class SepcialReservationFactory(DjangoModelFactory):

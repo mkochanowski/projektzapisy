@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time, date, timedelta
+from datetime import time, date, timedelta, datetime
 
 from django.test import TestCase
 from django.core.validators import ValidationError
@@ -12,8 +12,6 @@ from apps.users.tests.objectmothers import UserObjectMother
 from apps.schedule.models import SpecialReservation, Event, Term as EventTerm
 import factories
 import common
-import zapisy.common as common
-import zapisy.factories as factories
 
 
 class SpecialReservationTestCase(TestCase):
@@ -36,13 +34,13 @@ class SpecialReservationTestCase(TestCase):
                                          end_time=time(16))
         reservation.full_clean()
         reservation.save()
-        
+
         reservation_2 = SpecialReservation(semester=semester,
-                                          title=u'ąęłżóćśśń',
-                                          classroom=room110,
-                                          dayOfWeek=common.THURSDAY,
-                                          start_time=time(15),
-                                          end_time=time(16))
+                                           title=u'ąęłżóćśśń',
+                                           classroom=room110,
+                                           dayOfWeek=common.THURSDAY,
+                                           start_time=time(15),
+                                           end_time=time(16))
         reservation_2.full_clean()
         reservation_2.save()
 
@@ -54,8 +52,8 @@ class SpecialReservationTestCase(TestCase):
                                            end_time=time(21))
         reservation_3.full_clean()
         reservation_3.save()
-        
-        reservation_4 = SpecialReservation(semester=semester, 
+
+        reservation_4 = SpecialReservation(semester=semester,
                                            title='Reserve just after reservation 2',
                                            classroom=room110,
                                            dayOfWeek=common.THURSDAY,
@@ -63,12 +61,11 @@ class SpecialReservationTestCase(TestCase):
                                            end_time=time(18))
         reservation_4.full_clean()
         reservation_4.save()
-        
-	def factory_noroom104test(self):
-		reservation_5 = factories.SpecialReservationFactory.create()
-		reservation_5.full_clean()
-		reservation_5.save()
-        
+
+    def factory_noroom104test(self):
+        reservation_5 = factories.SpecialReservationFactory.create()
+        reservation_5.full_clean()
+
     def test_created_reservation_is_present(self):
         semester = Semester.get_semester(date(2016, 5, 12))
         reservations = SpecialReservation.get_reservations_for_semester(semester)
@@ -83,7 +80,7 @@ class SpecialReservationTestCase(TestCase):
         semester = Semester.get_semester(date(2016, 5, 12))
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 3)
-        
+
     def test_try_clean_on_non_overlapping_reservation(self):
         semester = Semester.get_semester(date(2016, 5, 12))
         room = Classroom.get_by_number('110')
@@ -96,10 +93,10 @@ class SpecialReservationTestCase(TestCase):
             end_time=time(15)
         )
         reservation.full_clean()
-	
-	def test_try_clean_on_overlapping_reservation(self):
-		semester = Semester.get_semester(date(2016, 5, 12))
-		room = Classroom.get_by_number('110')
+
+    def test_try_clean_on_overlapping_reservation(self):
+        semester = Semester.get_semester(date(2016, 5, 12))
+        room = Classroom.get_by_number('110')
         reservation = SpecialReservation(
             semester=semester,
             title='overlapping',
@@ -131,7 +128,6 @@ class SpecialReservationTestCase(TestCase):
         reservations = SpecialReservation.objects.all()
         for reservation in reservations:
             unicode(reservation)
-
 
 
 class EventTestCase(TestCase):
@@ -222,8 +218,8 @@ class EventTestCase(TestCase):
         room110 = Classroom.get_by_number('110')
         teacher = User.objects.get()
         event = factories.EventFactory(type=Event.TYPE_EXAM, author=teacher, title='exam')
-        term = factories.TermFactory(event=event, room=room110, day=date(2017, 1, 10), start=time(15),
-                                     end=time(16))
+        term = factories.TermFactory(event=event, room=room110, day=date(2017, 1, 10), 
+                                     start=time(15), end=time(16))
         term.full_clean()
 
     def test_clean_student_add_exam(self):
@@ -234,3 +230,41 @@ class EventTestCase(TestCase):
         self.assertTrue(u.get_profile().is_student)
         event = factories.ExamEventFactory.build(author=u)
         self.assertRaises(ValidationError, event.full_clean)
+
+
+class EventsOnChangedDayTestCase(TestCase):
+    def find_closest_day_of_week_to_date(self, date, day_of_week):
+        date += timedelta(days=1)
+        while date.weekday() != day_of_week:
+            date += timedelta(days=1)
+        return date
+
+    def test_add_event_on_changed_day(self):
+        semester_beginning = factories.SummerSemesterFactory.semester_beginning
+        summer_semester = factories.SummerSemesterFactory()
+        summer_semester.full_clean()
+
+        thursday = self.find_closest_day_of_week_to_date(semester_beginning, 3)
+        changed_day = factories.ChangedDayForFridayFactory(
+            day=thursday
+        )
+        changed_day.full_clean()
+
+        classroom = factories.ClassroomFactory()
+
+        reservation = factories.SepcialReservationFactory.build(
+            semester=summer_semester,
+            classroom=classroom
+        )
+        reservation.full_clean()
+        reservation.save()
+
+        self.assertRaises(
+            ValidationError,
+            factories.TermFactory(
+                day=thursday,
+                start=reservation.start_time,
+                end=reservation.end_time,
+                room=classroom
+            ).full_clean
+        )
