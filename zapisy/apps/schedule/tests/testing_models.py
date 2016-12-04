@@ -10,6 +10,7 @@ from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, Cl
 from apps.enrollment.courses.models import Semester, Classroom, ChangedDay
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.schedule.models import SpecialReservation, Event, Term as EventTerm
+from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
 import factories
 import common
 
@@ -218,7 +219,7 @@ class EventTestCase(TestCase):
         room110 = Classroom.get_by_number('110')
         teacher = User.objects.get()
         event = factories.EventFactory(type=Event.TYPE_EXAM, author=teacher, title='exam')
-        term = factories.TermFactory(event=event, room=room110, day=date(2017, 1, 10), 
+        term = factories.TermFactory(event=event, room=room110, day=date(2017, 1, 10),
                                      start=time(15), end=time(16))
         term.full_clean()
 
@@ -245,7 +246,7 @@ class EventsOnChangedDayTestCase(TestCase):
         summer_semester.full_clean()
 
         thursday = self.find_closest_day_of_week_to_date(semester_beginning, 3)
-        changed_day = factories.ChangedDayForFridayFactory(
+        changed_day = ChangedDayForFridayFactory(
             day=thursday
         )
         changed_day.full_clean()
