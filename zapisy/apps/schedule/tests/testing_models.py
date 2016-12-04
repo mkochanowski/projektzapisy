@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time, date, timedelta, datetime
+from datetime import time, date, timedelta
 
 from django.test import TestCase
 from django.core.validators import ValidationError
 from django.contrib.auth.models import User
 
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
-from apps.enrollment.courses.models import Semester, Classroom, ChangedDay
+from apps.enrollment.courses.models import Semester, Classroom
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.schedule.models import SpecialReservation, Event, Term as EventTerm
 from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
