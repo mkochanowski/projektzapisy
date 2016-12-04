@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time, date
+from datetime import time, date, datetime
 import string
 
 import factory
@@ -56,7 +56,7 @@ class TermThisYearFactory(DjangoModelFactory):
 
     event = factory.SubFactory(EventFactory)
     room = factory.SubFactory(ClassroomFactory)
-    day = factory.Faker('date_time_this_year', after_now=True)
+    day = factory.fuzzy.FuzzyNaiveDateTime(datetime.now(), force_year=datetime.now().year)
     start = time(10)
     end = time(12)
 
