@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from datetime import time
+from datetime import time, date
+import string
 
 import factory
+import factory.fuzzy
 from factory.django import DjangoModelFactory
 
 from apps.users.tests.factories import UserFactory
@@ -28,18 +30,27 @@ class EventFactory(DjangoModelFactory):
     visible = True
     status = Event.STATUS_ACCEPTED
     author = factory.SubFactory(UserFactory)
-    title = factory.Sequence(lambda n: 'wydarzenie%d' % n)
-    description = title
+    title = factory.fuzzy.FuzzyText(length=50, chars=string.letters)
+    description = factory.fuzzy.FuzzyText(length=120, chars=string.letters)
+
+
+class EventPendingFactory(EventFactory):
+    status = Event.STATUS_PENDING
 
 
 class ExamEventFactory(EventFactory):
-    class Meta:
-        model = Event
-
     type = Event.TYPE_EXAM
 
 
-class TermFactory(DjangoModelFactory):
+class EventTestFactory(EventFactory):
+    type = Event.TYPE_TEST
+
+
+class EventInvisibleFactory(EventFactory):
+    visible = False
+
+
+class TermThisYearFactory(DjangoModelFactory):
     class Meta:
         model = Term
 
@@ -48,6 +59,16 @@ class TermFactory(DjangoModelFactory):
     day = factory.Faker('date_time_this_year', after_now=True)
     start = time(10)
     end = time(12)
+
+
+class TermFixedDayFactory(DjangoModelFactory):
+    class Meta:
+        model = Term
+
+    event = factory.SubFactory(EventFactory)
+    day = date(2016, 5, 20)
+    start = time(15)
+    end = time(16)
 
 
 class SepcialReservationFactory(DjangoModelFactory):

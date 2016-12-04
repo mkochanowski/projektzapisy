@@ -1,4 +1,6 @@
-from zapisy.apps.users.models import User, UserProfile, ExtendedUser, Student, Employee
+# -*- coding: utf-8 -*-
+
+from zapisy.apps.users.models import User, UserProfile, Employee
 
 
 class UserObjectMother():

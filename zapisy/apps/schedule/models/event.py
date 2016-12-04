@@ -88,7 +88,7 @@ class Event(models.Model):
 
             if (self.author.get_profile().is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
-                self.status = '1'
+                self.status = self.STATUS_ACCEPTED
 
             # all exams and tests should be public
 
@@ -131,7 +131,9 @@ class Event(models.Model):
         @return: Boolean
         """
         if not self.author == user and not user.has_perm('schedule.manage_events'):
-            if not self.visible or self.type not in ['0', '1', '2'] or self.status != '1':
+            if(not self.visible or
+               self.type not in [self.TYPE_EXAM, self.TYPE_TEST, self.TYPE_GENERIC] or
+               self.status != self.STATUS_ACCEPTED):
                 return False
 
         return True
