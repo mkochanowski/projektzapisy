@@ -8,22 +8,24 @@ from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
 
-from datetime import datetime
+from datetime import datetime, timedelta
+import time
 from random import seed, randint, choice
 
 class DummyTest(TestCase):
     def createSemester(self):
+        today = datetime.now()
         semester = Semester(
             visible=True,
             type=Semester.TYPE_WINTER,
             year='2016/17',
-            records_opening=datetime(2016, 9, 20),
-            records_closing=datetime(2016, 11, 14),
-            lectures_beginning=datetime(2016, 11, 10),
-            lectures_ending=datetime(2017, 2, 3),
-            semester_beginning=datetime(2016, 11, 10),
-            semester_ending=datetime(2017, 2, 21),
-            records_ects_limit_abolition=datetime(2015, 10, 1))
+            records_opening=(today + timedelta(days=-1)),
+            records_closing=today + timedelta(days=6),
+            lectures_beginning=today + timedelta(days=4),
+            lectures_ending=today + timedelta(days = 120),
+            semester_beginning=today,
+            semester_ending=today + timedelta(days = 130),
+            records_ects_limit_abolition=(today + timedelta(days=1)))
         semester.save()
         return semester
 
@@ -168,6 +170,8 @@ class DummyTest(TestCase):
         lecture_group = self.createLectureGroup(course, teacher)
 
         self.refresh_opening_times(semester)
+
+        time.sleep(1)
 
         result, messages_list = lecture_group.enroll_student(student.student)
         run_rearanged(result)
