@@ -84,67 +84,55 @@ class DummyTest(TestCase):
         return group
 
     def initialize_triggers(self):
-        sql_minutes_view = """
-            CREATE VIEW users_minutes_bonus_view AS
-            SELECT us.id AS student_id,
-                cs.id AS semester_id,
-                ((((((( SELECT count(*) AS count
-                    FROM ticket_create_studentgraded
-                    WHERE ((ticket_create_studentgraded.semester_id = ANY (ARRAY[cs.first_grade_semester_id, cs.second_grade_semester_id])) AND (ticket_create_studentgraded.student_id = us.id))) * 1440) + (us.ects * 5)) + (((us.ects * 5) / 720) * 720)) + us.records_opening_bonus_minutes) + 120))::integer AS minutes
-            FROM users_student us,
-                courses_semester cs
-            WHERE (cs.records_closing > now());
-        """
-        sql_view = """
-            CREATE VIEW users_openingtimesview_unmaterialized AS
-            SELECT cc.id AS course_id,
-                users_student.id AS student_id,
-                cc.semester_id,
-                GREATEST(cc.records_start, (cs.records_opening - ((((v.minutes + (COALESCE(( SELECT DISTINCT sv.correction
-                    FROM vote_singlevote sv
-                    WHERE ((sv.student_id = users_student.id) AND (sv.correction > 0) AND (sv.entity_id = cc.entity_id) AND (sv.state_id IN ( SELECT vs.id
-                            FROM vote_systemstate vs
-                            WHERE ((vs.semester_summer_id = cc.semester_id) OR (vs.semester_winter_id = cc.semester_id)))))
-                    LIMIT 1), 0) * 1440)))::text || ' MINUTES'::text))::interval)) AS opening_time
-            FROM courses_course cc,
-                users_student,
-                (courses_semester cs
-                LEFT JOIN users_minutes_bonus_view v ON ((v.semester_id = cs.id)))
-            WHERE ((users_student.status = 0) AND ((v.student_id IS NULL) OR (v.student_id = users_student.id)) AND (cs.records_opening IS NOT NULL) AND (cc.semester_id = cs.id) AND ((cs.records_closing > now()) OR ((cc.records_start IS NOT NULL) AND (cc.records_end IS NOT NULL) AND (cc.records_end > now()))));
-        """
-        sql_function = """
-            CREATE FUNCTION users_openingtimesview_refresh_for_semester(id integer) RETURNS void
-            LANGUAGE plpgsql SECURITY DEFINER
-            AS $$
-                begin
-                delete from users_openingtimesview csp where csp.semester_id = id;
-                insert into users_openingtimesview
-                SELECT * FROM users_openingtimesview_unmaterialized scp
-                    WHERE scp.semester_id = id;
-                end
-                $$;
-        """
-
         sql_calls = [
-                """
+            """
+                CREATE VIEW users_minutes_bonus_view AS
+                SELECT us.id AS student_id,
+                    cs.id AS semester_id,
+                    ((((((( SELECT count(*) AS count
+                        FROM ticket_create_studentgraded
+                        WHERE ((ticket_create_studentgraded.semester_id = ANY (ARRAY[cs.first_grade_semester_id, cs.second_grade_semester_id])) AND (ticket_create_studentgraded.student_id = us.id))) * 1440) + (us.ects * 5)) + (((us.ects * 5) / 720) * 720)) + us.records_opening_bonus_minutes) + 120))::integer AS minutes
+                FROM users_student us,
+                    courses_semester cs
+                WHERE (cs.records_closing > now());
+            """,
+            """
+                CREATE VIEW users_openingtimesview_unmaterialized AS
+                SELECT cc.id AS course_id,
+                    users_student.id AS student_id,
+                    cc.semester_id,
+                    GREATEST(cc.records_start, (cs.records_opening - ((((v.minutes + (COALESCE(( SELECT DISTINCT sv.correction
+                        FROM vote_singlevote sv
+                        WHERE ((sv.student_id = users_student.id) AND (sv.correction > 0) AND (sv.entity_id = cc.entity_id) AND (sv.state_id IN ( SELECT vs.id
+                                FROM vote_systemstate vs
+                                WHERE ((vs.semester_summer_id = cc.semester_id) OR (vs.semester_winter_id = cc.semester_id)))))
+                        LIMIT 1), 0) * 1440)))::text || ' MINUTES'::text))::interval)) AS opening_time
+                FROM courses_course cc,
+                    users_student,
+                    (courses_semester cs
+                    LEFT JOIN users_minutes_bonus_view v ON ((v.semester_id = cs.id)))
+                WHERE ((users_student.status = 0) AND ((v.student_id IS NULL) OR (v.student_id = users_student.id)) AND (cs.records_opening IS NOT NULL) AND (cc.semester_id = cs.id) AND ((cs.records_closing > now()) OR ((cc.records_start IS NOT NULL) AND (cc.records_end IS NOT NULL) AND (cc.records_end > now()))));
+            """,
+            """
+                CREATE FUNCTION users_openingtimesview_refresh_for_semester(id integer) RETURNS void
+                LANGUAGE plpgsql SECURITY DEFINER
+                AS $$
+                    begin
+                    delete from users_openingtimesview csp where csp.semester_id = id;
+                    insert into users_openingtimesview
+                    SELECT * FROM users_openingtimesview_unmaterialized scp
+                        WHERE scp.semester_id = id;
+                    end
+                    $$;
+            """,
+            """
                 CREATE TABLE courses_studentpointsview (
                     value smallint,
                     student_id integer,
                     entity_id integer
                 );
-                """
-                ]
-        cursor = connection.cursor()
-        cursor.execute(sql_minutes_view)
-        connection.commit()
-
-        cursor = connection.cursor()
-        cursor.execute(sql_view)
-        connection.commit()
-
-        cursor = connection.cursor()
-        cursor.execute(sql_function)
-        connection.commit()
+            """
+            ]
 
         for sql_call in sql_calls:
             cursor = connection.cursor()
