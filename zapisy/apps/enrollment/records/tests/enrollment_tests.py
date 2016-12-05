@@ -159,8 +159,6 @@ class DummyTest(TestCase):
 
         self.refresh_opening_times(semester)
 
-        time.sleep(1)
-
         result, messages_list = lecture_group.enroll_student(student.student)
         run_rearanged(result)
         self.assertTrue(result)
