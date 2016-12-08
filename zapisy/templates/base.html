@@ -58,8 +58,8 @@
     {% block rss %}{% endblock %}
     {% block head_extra %}{% endblock %}
 
-    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
-    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/cookieconsent.min.css' %}" />
+    <script src="{% static 'js/cookieconsent.min.js' %}"></script>
     <script>
     window.addEventListener("load", function(){
     window.cookieconsent.initialise({
