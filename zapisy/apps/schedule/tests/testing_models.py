@@ -2,7 +2,7 @@
 
 from datetime import time, date, timedelta
 
-from django.test import TestCase, SimpleTestCase
+from django.test import TestCase
 from django.core.validators import ValidationError
 
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
