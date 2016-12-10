@@ -11,7 +11,7 @@ class UserFactory(DjangoModelFactory):
         model = User
 
     username = factory.Sequence(lambda n: 'user%d' % n)
-    password = username
+    password = factory.LazyAttribute(lambda o: o.username)
     is_staff = False
     is_superuser = False
 

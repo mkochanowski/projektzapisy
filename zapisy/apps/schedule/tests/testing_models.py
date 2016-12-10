@@ -166,18 +166,6 @@ class EventTestCase(TestCase):
                                               classroom=room)
         self.assertTrue(terms)
 
-    def test_clean_overlapping_term(self):
-        event = Event.objects.all()[0]
-        room110 = Classroom.get_by_number('110')
-        term = EventTerm(
-            event=event,
-            day=date(2016, 5, 20),
-            start=time(15),
-            end=time(17),
-            room=room110
-        )
-        self.assertRaises(ValidationError, term.full_clean)
-
     def test_remove_event_and_terms(self):
         event = Event.objects.all()[0]
         event.delete()
@@ -189,64 +177,72 @@ class EventTestCase(TestCase):
         for event in events:
             self.assertEquals(unicode(event), u'%s %s' % (event.title, event.description))
 
-    def test_get_absolute_url_no_group(self):
+    def test_get_absolute_url__no_group(self):
         event = Event.objects.all()[0]
         self.assertEquals(event.get_absolute_url(), '/events/%d' % event.pk)
 
-    def test_get_absolute_url_group(self):
+    def test_get_absolute_url__group(self):
         event = factories.EventCourseFactory.create()
         self.assertEquals(event.get_absolute_url(), '/records/%s/records' % event.group_id)
 
-    def test_clean_employee_add_exam(self):
+    def test_clean__overlapping_term(self):
+        event = Event.objects.all()[0]
         room110 = Classroom.get_by_number('110')
-        teacher = UserProfile.objects.get(is_employee=True).user
-        event = factories.EventFactory(type=Event.TYPE_EXAM, author=teacher, title='exam')
-        term = factories.TermThisYearFactory(event=event, room=room110, day=date(2017, 1, 10),
-                                             start=time(15), end=time(16))
-        term.full_clean()
+        term = EventTerm(
+            event=event,
+            day=date(2016, 5, 20),
+            start=time(15),
+            end=time(17),
+            room=room110
+        )
+        self.assertRaises(ValidationError, term.full_clean)
 
-    def test_student_cant_add_exam(self):
+    def test_clean__student_cant_add_exam(self):
         student = UserProfile.objects.get(is_student=True).user
         event = factories.ExamEventFactory.build(author=student)
         self.assertRaises(ValidationError, event.full_clean)
 
-    def test_student_cant_add_test(self):
+    def test_clean__student_cant_add_test(self):
         student = UserProfile.objects.get(is_student=True).user
         event = factories.EventTestFactory.build(author=student)
         self.assertRaises(ValidationError, event.full_clean)
 
-    def test_employee_can_add_exam(self):
+    def test_clean__employee_can_add_exam(self):
         employee = UserProfile.objects.get(is_employee=True).user
         event = factories.ExamEventFactory.build(author=employee)
         event.full_clean()
 
-    def test_employee_can_add_test(self):
+    def test_clean__employee_can_add_test(self):
         employee = UserProfile.objects.get(is_employee=True).user
         event = factories.EventTestFactory.build(author=employee)
         event.full_clean()
 
-    def test_student_cant_add_accepted_event(self):
+    def test_clean__student_cant_add_accepted_event(self):
         user = UserProfile.objects.get(is_student=True).user
         event = factories.EventFactory.build(author=user)
         self.assertRaises(ValidationError, event.full_clean)
 
-    def test_employee_can_add_accepted_event(self):
+    def test_clean__employee_can_add_accepted_event(self):
         employee = UserProfile.objects.get(is_employee=True).user
         event = factories.EventFactory.build(author=employee)
         event.full_clean()
 
-    def test_normal_user_cant_see_invisible_event(self):
-        user = UserFactory()
-        user.full_clean()
-        author = UserFactory.build()
-        author.full_clean()
-        event = factories.EventInvisibleFactory.build(author=author)
-        self.assertFalse(event._user_can_see_or_404(user))
-
-    def test_author_without_perm_cant_see_own_event(self):
+    def test_exam_after_clean_is_public(self):
         pass
 
-    def test_author_with_perm_can_see_own_event(self):
+    def test_after_clean_test_is_public(self):
+        pass
+
+    def test_normal_user_cant_see_invisible_event(self):
+        user = UserFactory()
+        event = factories.EventInvisibleFactory.build()
+        self.assertFalse(event._user_can_see_or_404(user))
+
+    def test_author_can_see_own_invisible_event(self):
+        event = factories.EventInvisibleFactory.build()
+        self.assertTrue(event._user_can_see_or_404(event.author))
+
+    def test_user_with_manage_perm_can_see_invisible_event(self):
         pass
 
     def test_user_cant_see_pending_event(self):

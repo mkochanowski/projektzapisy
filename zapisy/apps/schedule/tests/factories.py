@@ -61,11 +61,10 @@ class TermThisYearFactory(DjangoModelFactory):
     end = time(12)
 
 
-class TermFixedDayFactory(DjangoModelFactory):
+class TermFixedDayFactory(TermThisYearFactory):
     class Meta:
         model = Term
 
-    event = factory.SubFactory(EventFactory)
     day = date(2016, 5, 20)
     start = time(15)
     end = time(16)
