@@ -34,6 +34,14 @@ class EventFactory(DjangoModelFactory):
     description = factory.fuzzy.FuzzyText(length=120, chars=string.letters)
 
 
+class PendingEventFactory(EventFactory):
+    status = Event.STATUS_PENDING
+
+
+class RejectedEventFactory(EventFactory):
+    status = Event.STATUS_REJECTED
+
+
 class EventPendingFactory(EventFactory):
     status = Event.STATUS_PENDING
 
@@ -44,6 +52,14 @@ class ExamEventFactory(EventFactory):
 
 class EventTestFactory(EventFactory):
     type = Event.TYPE_TEST
+
+
+class EventClassFactory(EventFactory):
+    type = Event.TYPE_CLASS
+
+
+class EventOtherFactory(EventFactory):
+    type = Event.TYPE_OTHER
 
 
 class EventInvisibleFactory(EventFactory):

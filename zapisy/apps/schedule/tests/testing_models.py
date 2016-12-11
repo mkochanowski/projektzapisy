@@ -4,11 +4,13 @@ from datetime import time, date, timedelta
 
 from django.test import TestCase
 from django.core.validators import ValidationError
+from django.contrib.auth.models import Permission
 
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
 from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
 from apps.users.tests.objectmothers import UserObjectMother
-from apps.users.tests.factories import UserFactory
+from apps.users.tests.factories import UserFactory, EmployeeProfileFactory, StudentProfileFactory, \
+    UserProfileFactory
 from apps.enrollment.courses.models import Semester, Classroom
 from apps.users.models import UserProfile
 from ..models import SpecialReservation, Event, Term as EventTerm
@@ -227,11 +229,19 @@ class EventTestCase(TestCase):
         event = factories.EventFactory.build(author=employee)
         event.full_clean()
 
-    def test_exam_after_clean_is_public(self):
-        pass
+    def test_new_exam_after_clean_is_public(self):
+        exam = factories.ExamEventFactory()
+        user_profile = EmployeeProfileFactory(user=exam.author)
+        user_profile.full_clean()
+        exam.full_clean()
+        self.assertTrue(exam.visible)
 
-    def test_after_clean_test_is_public(self):
-        pass
+    def test_after_clean_new_test_is_public(self):
+        test = factories.EventTestFactory()
+        user_profile = EmployeeProfileFactory(user=test.author)
+        user_profile.full_clean()
+        test.full_clean()
+        self.assertTrue(test.visible)
 
     def test_normal_user_cant_see_invisible_event(self):
         user = UserFactory()
@@ -243,16 +253,37 @@ class EventTestCase(TestCase):
         self.assertTrue(event._user_can_see_or_404(event.author))
 
     def test_user_with_manage_perm_can_see_invisible_event(self):
-        pass
+        user = UserFactory()
+        user.full_clean()
+        permission = Permission.objects.get(codename='manage_events')
+        user.user_permissions.add(permission)
+        event = factories.EventFactory(visible=False)
+        self.assertTrue(event._user_can_see_or_404(user))
 
-    def test_user_cant_see_pending_event(self):
-        pass
+    def test_student_cant_see_pending_event(self):
+        user = UserFactory()
+        user.full_clean()
+        event = factories.PendingEventFactory.build()
+        self.assertFalse(event._user_can_see_or_404(user))
 
     def test_user_cant_see_rejected_event(self):
-        pass
+        user = UserFactory()
+        user.full_clean()
+        event = factories.RejectedEventFactory.build()
+        self.assertFalse(event._user_can_see_or_404(user))
 
-    def test_user_cant_see_certain_types_of_events(self):
-        pass
+    # Dlaczego user nie może widzieć zajęć ani innych?
+    def test_user_cant_see_class_event(self):
+        user = UserFactory()
+        user.full_clean()
+        event = factories.EventClassFactory.build()
+        self.assertFalse(event._user_can_see_or_404(user))
+
+    def test_user_cant_see_other_event(self):
+        user = UserFactory()
+        user.full_clean()
+        event = factories.EventOtherFactory.build()
+        self.assertFalse(event._user_can_see_or_404(user))
 
 
 class EventsOnChangedDayTestCase(TestCase):
