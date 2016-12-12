@@ -160,6 +160,10 @@ class SpecialReservationTestCase(TestCase):
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 3)
 
+class MessageTestCase(TestCase):
+    def setUp(self):
+        message_1 = factories.MessageFactory()
+
 
 class EventTestCase(TestCase):
     def setUp(self):
