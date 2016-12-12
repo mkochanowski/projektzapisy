@@ -162,8 +162,13 @@ class SpecialReservationTestCase(TestCase):
 
 class MessageTestCase(TestCase):
     def setUp(self):
-        message_1 = factories.MessageFactory()
+        event = factories.Event()
+        message_1 = factories.MessageFactory(event=event)
 
+    def show_event_message(self):
+        message_2 = factories.MessageFactory(event=event)
+        message_3 = message_1
+        self.assertTrue(message_1.get_event_messages(event))
 
 class EventTestCase(TestCase):
     def setUp(self):
@@ -171,6 +176,7 @@ class EventTestCase(TestCase):
         teacher.full_clean()
         teacher_profile = UserObjectMother.teacher_profile(teacher)
         teacher_profile.save()
+
         employee = UserObjectMother.employee(teacher)
         employee.save()
 

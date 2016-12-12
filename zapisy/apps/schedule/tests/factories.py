@@ -38,8 +38,8 @@ class MessageFactory(DjangoModelFactory):
 
     author = factory.SubFactory(UserFactory)
     event = factory.SubFactory(EventFactory)
-    created = datetime.now()
     message = factory.Sequence(lambda n: 'Wiadomość %d' % n)
+    created = datetime.now()
 
 class PendingEventFactory(EventFactory):
     status = Event.STATUS_PENDING
