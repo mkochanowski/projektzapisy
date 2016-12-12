@@ -27,7 +27,10 @@ class SpecialReservationTestCase(TestCase):
 
         semester_2 = SemesterObjectMother.winter_semester_2015_16()
         semester_2.save()
-
+        
+        room = ClassroomObjectMother.room110()
+        room.save()
+		
         room110 = ClassroomObjectMother.room110()
         room110.save()
 
@@ -39,13 +42,13 @@ class SpecialReservationTestCase(TestCase):
                                          end_time=time(16))
         reservation.full_clean()
         reservation.save()
-
+        
         reservation_2 = SpecialReservation(semester=semester,
-                                           title=u'ąęłżóćśśń',
-                                           classroom=room110,
-                                           dayOfWeek=common.THURSDAY,
-                                           start_time=time(15),
-                                           end_time=time(16))
+                                          title=u'ąęłżóćśśń',
+                                          classroom=room110,
+                                          dayOfWeek=common.THURSDAY,
+                                          start_time=time(15),
+                                          end_time=time(16))
         reservation_2.full_clean()
         reservation_2.save()
 
@@ -57,8 +60,8 @@ class SpecialReservationTestCase(TestCase):
                                            end_time=time(21))
         reservation_3.full_clean()
         reservation_3.save()
-
-        reservation_4 = SpecialReservation(semester=semester,
+        
+        reservation_4 = SpecialReservation(semester=semester, 
                                            title='Reserve just after reservation 2',
                                            classroom=room110,
                                            dayOfWeek=common.THURSDAY,
@@ -66,11 +69,90 @@ class SpecialReservationTestCase(TestCase):
                                            end_time=time(18))
         reservation_4.full_clean()
         reservation_4.save()
+        
+	def test_try_clean_on_overlapping_reservation(self):
+		semester = Semester.get_semester(date(2016, 5, 12))
+		room = room110
+        reservation_3 = SpecialReservation(
+            semester=semester,
+            title='overlapping',
+            classroom=room,
+            dayOfWeek=common.THURSDAY,
+            start_time=time(14),
+            end_time=time(16)
+        )
+        #dlaczego to przechodzi?
+        reservation_3.full_clean()
+        reservation_3.save()
+        reservation_2 = SpecialReservation(
+            semester=semester,
+            title='overlapping2',
+            classroom=room,
+            dayOfWeek=common.THURSDAY,
+            start_time=time(14),
+            end_time=time(16)
+        )
+        reservation_2.full_clean()
+        reservation_2.save()
+        #self.assertRaises(ValidationError, reservation_2.full_clean) #probably one of reservation should be in setup
+        
+	def test_try_clean_on_overlapping_reservationwhenfirstisinsetup(self):
+		semester = Semester.get_semester(date(2016, 5, 12)) #summer20152016
+		room = room110
+        reservation_2 = SpecialReservation(
+            semester=semester,
+            title='overlapping',
+            classroom=room,
+            dayOfWeek=common.WEDNESDAY,
+            start_time=time(8),
+            end_time=time(20)
+        )
+        reservation_2.full_clean()
+        reservation_2.save()
+        self.assertRaises(ValidationError, reservation_2.full_clean) #noerror
+    
+	def test_try_clean_on_overlapping_reservationwherebotharesame(self):
+		semester = Semester.get_semester(date(2016, 5, 12)) #summer20152016
+		room = room110
+        reservation = SpecialReservation(
+            semester=semester,
+            title='overlapping',
+            classroom=room,
+            dayOfWeek=common.WEDNESDAY,
+            start_time=time(15),
+            end_time=time(16)
+        )
+        
+        self.assertRaises(ValidationError, reservation.full_clean)
+    
+    def test_find_child_events(self):
+        events = Event.objects.all()
+        self.assertTrue(events)
 
-    def factory_noroom104test(self):
-        reservation_5 = factories.SpecialReservationFactory.create()
-        reservation_5.full_clean()
+    def test_special_reservation_unicode_method(self):
+        reservations = SpecialReservation.objects.all()
+        for reservation in reservations:
+            unicode(reservation)
+            
+    def test_try_clean_on_non_overlapping_reservation(self):
+        semester = Semester.get_semester(date(2016, 5, 12))
+        room = room110
+        reservation = SpecialReservation(
+            semester=semester,
+            title='non-overlapping reservation',
+            classroom=room,
+            dayOfWeek=common.THURSDAY,
+            start_time=time(14),
+            end_time=time(15)
+        )
+        reservation.full_clean()
+        reservation.save()
 
+	def factory_noroom104test(self):
+		reservation_5 = factories.SpecialReservationFactory.create()
+		reservation_5.full_clean()
+		reservation_5.save()
+        
     def test_created_reservation_is_present(self):
         semester = Semester.get_semester(date(2016, 5, 12))
         reservations = SpecialReservation.get_reservations_for_semester(semester)
@@ -86,53 +168,8 @@ class SpecialReservationTestCase(TestCase):
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 3)
 
-    def test_try_clean_on_non_overlapping_reservation(self):
-        semester = Semester.get_semester(date(2016, 5, 12))
-        room = Classroom.get_by_number('110')
-        reservation = SpecialReservation(
-            semester=semester,
-            title='non-overlapping reservation',
-            classroom=room,
-            dayOfWeek=common.THURSDAY,
-            start_time=time(14),
-            end_time=time(15)
-        )
-        reservation.full_clean()
 
-    def test_try_clean_on_overlapping_reservation(self):
-        semester = Semester.get_semester(date(2016, 5, 12))
-        room = Classroom.get_by_number('110')
-        reservation = SpecialReservation(
-            semester=semester,
-            title='overlapping',
-            classroom=room,
-            dayOfWeek=common.THURSDAY,
-            start_time=time(14),
-            end_time=time(16)
-        )
-        #dlaczego to przechodzi?
-        reservation.full_clean()
-        reservation.save()
-        reservation2 = SpecialReservation(
-            semester=semester,
-            title='overlapping2',
-            classroom=room,
-            dayOfWeek=common.THURSDAY,
-            start_time=time(14),
-            end_time=time(16)
-        )
-        reservation2.full_clean()
-        reservation2.save()
-        #self.assertRaises(ValidationError, reservation.full_clean()) i want to use that one
 
-    def test_find_child_events(self):
-        events = Event.objects.all()
-        self.assertTrue(events)
-
-    def test_special_reservation_unicode_method(self):
-        reservations = SpecialReservation.objects.all()
-        for reservation in reservations:
-            unicode(reservation)
 
 
 class EventTestCase(TestCase):
