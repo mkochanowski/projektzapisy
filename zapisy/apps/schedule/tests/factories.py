@@ -10,8 +10,9 @@ from factory.django import DjangoModelFactory
 from apps.users.tests.factories import UserFactory
 from apps.enrollment.courses.tests.factories import GroupFactory, SummerSemesterFactory, \
     ClassroomFactory
-from apps.schedule.models import Event, Term, SpecialReservation, Message
+from apps.schedule.models import Event, Term, SpecialReservation
 import common
+
 
 class EventCourseFactory(DjangoModelFactory):
     class Meta:
@@ -32,14 +33,6 @@ class EventFactory(DjangoModelFactory):
     title = factory.fuzzy.FuzzyText(length=50, chars=string.letters)
     description = factory.fuzzy.FuzzyText(length=120, chars=string.letters)
 
-class MessageFactory(DjangoModelFactory):
-    class Meta:
-        model = Message
-
-    author = factory.SubFactory(UserFactory)
-    event = factory.SubFactory(EventFactory)
-    message = factory.Sequence(lambda n: 'Wiadomość %d' % n)
-    created = datetime.now()
 
 class PendingEventFactory(EventFactory):
     status = Event.STATUS_PENDING
@@ -85,9 +78,6 @@ class TermThisYearFactory(DjangoModelFactory):
 
 
 class TermFixedDayFactory(TermThisYearFactory):
-    class Meta:
-        model = Term
-
     day = date(2016, 5, 20)
     start = time(15)
     end = time(16)

@@ -9,8 +9,7 @@ from django.contrib.auth.models import Permission
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
 from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
 from apps.users.tests.objectmothers import UserObjectMother
-from apps.users.tests.factories import UserFactory, EmployeeProfileFactory, StudentProfileFactory, \
-    UserProfileFactory
+from apps.users.tests.factories import UserFactory, EmployeeProfileFactory
 from apps.enrollment.courses.models import Semester, Classroom
 from apps.users.models import UserProfile
 from ..models import SpecialReservation, Event, Term as EventTerm
@@ -67,10 +66,33 @@ class SpecialReservationTestCase(TestCase):
         reservation_4.full_clean()
         reservation_4.save()
 
+    def test_reservation_created_terms(self):
+        terms = EventTerm.get_terms_for_dates(
+            [date(2016, 5, 12)],
+            Classroom.get_by_number('110'),
+            time(15),
+            time(16)
+        )
+        '''
+        Powinno przechodzić, bo SpecialReservation tworzy Term dla każdego dnia w semestrze,
+        w którym dana rezerwacja występuje po wykonaniu metody save. To jednak nie
+        przechodzi. Dlaczego?
+
+        Rozwiązanie zagadki: My tutaj operujemy na przeszłych semestrach, a podczas tworzenia
+        SpecialReservation, gdy tworzone są eventy i termsy robione są rezerwacje od teraz,
+        czyli datetime.now().date(). Zatem nic nie zostanie zarezerwowane, jeśli operujemy na
+        przeszłych datach. Teraz są 2 rozwiązania. Albo zmodyfikować kod tworzący termsy,
+        żeby brał pod uwagę daty z przeszłości (ale jak ktoś zrobi rezerwację w środku semestru 
+        to mu stworzy niepotrzebnie wydarzenia od samego początku), albo 
+        tworzyć testy operujące na datach w teraźniejszości, lub przyszłości. Trzeba to wszystko
+        zrefactorować na fabryki.
+        '''
+        # self.assertTrue(terms)
+
     def test_try_clean_on_overlapping_reservation(self):
         semester = Semester.get_semester(date(2016, 5, 12))
         room = Classroom.get_by_number('110')
-        reservation_3 = SpecialReservation(
+        reservation = SpecialReservation(
             semester=semester,
             title='overlapping',
             classroom=room,
@@ -78,38 +100,12 @@ class SpecialReservationTestCase(TestCase):
             start_time=time(14),
             end_time=time(16)
         )
-        #dlaczego to przechodzi?
-        reservation_3.full_clean()
-        reservation_3.save()
-        reservation_2 = SpecialReservation(
-            semester=semester,
-            title='overlapping2',
-            classroom=room,
-            dayOfWeek=common.THURSDAY,
-            start_time=time(14),
-            end_time=time(16)
-        )
-        reservation_2.full_clean()
-        reservation_2.save()
-        #self.assertRaises(ValidationError, reservation_2.full_clean) #probably one of reservation should be in setup
+        # Powinno rzucać wyjątek, bo w setUp została stworzona rezerwacja, która
+        # nakłąda się na godziny tej.
+        # self.assertRaises(ValidationError, reservation.full_clean)
 
-    def test_try_clean_on_overlapping_reservationwhenfirstisinsetup(self):
-        semester = Semester.get_semester(date(2016, 5, 12)) #summer20152016
-        room = room = Classroom.get_by_number('110')
-        reservation_2 = SpecialReservation(
-            semester=semester,
-            title='overlapping',
-            classroom=room,
-            dayOfWeek=common.WEDNESDAY,
-            start_time=time(8),
-            end_time=time(20)
-        )
-        reservation_2.full_clean()
-        reservation_2.save()
-        #self.assertRaises(ValidationError, reservation_2.full_clean) #noerror
-
-    def test_try_clean_on_overlapping_reservationwherebotharesame(self):
-        semester = Semester.get_semester(date(2016, 5, 12)) #summer20152016
+    def test_clean_on_overlapping_reservation_where_both_are_same(self):
+        semester = Semester.get_semester(date(2016, 5, 12))  # summer20152016
         room = Classroom.get_by_number('110')
         reservation = SpecialReservation(
             semester=semester,
@@ -119,6 +115,8 @@ class SpecialReservationTestCase(TestCase):
             start_time=time(15),
             end_time=time(16)
         )
+        # To powinno rzucić ValidationError, bo taka rezerwacja
+        # została już stworzona i zapisana do bazy w setUp.
         #self.assertRaises(ValidationError, reservation.full_clean)
 
     def test_special_reservation_unicode_method(self):
@@ -138,12 +136,6 @@ class SpecialReservationTestCase(TestCase):
             end_time=time(15)
         )
         reservation.full_clean()
-        reservation.save()
-
-    def factory_noroom104test(self):
-        reservation_5 = factories.SpecialReservationFactory.create()
-        reservation_5.full_clean()
-        reservation_5.save()
 
     def test_created_reservation_is_present(self):
         semester = Semester.get_semester(date(2016, 5, 12))
@@ -160,15 +152,6 @@ class SpecialReservationTestCase(TestCase):
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 3)
 
-class MessageTestCase(TestCase):
-    def setUp(self):
-        event = factories.Event()
-        message_1 = factories.MessageFactory(event=event)
-
-    def show_event_message(self):
-        message_2 = factories.MessageFactory(event=event)
-        message_3 = message_1
-        self.assertTrue(message_1.get_event_messages(event))
 
 class EventTestCase(TestCase):
     def setUp(self):
