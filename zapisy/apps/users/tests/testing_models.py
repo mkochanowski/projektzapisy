@@ -6,12 +6,15 @@ from datetime import datetime, timedelta, date
 
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+
 
 from apps.enrollment.records.models import Record
 from apps.enrollment.courses.models import Course, Term, Group
 from apps.users.models import Employee, Student, StudiaZamawiane
 from apps.users.exceptions import NonEmployeeException, NonStudentException
-        
+from django.contrib.auth.models import Permission
+
 class EmployeeGroupsTest(TestCase):
     fixtures =  ['fixtures__users', 'fixtures__courses']
 
@@ -153,3 +156,25 @@ class IBANTest(TestCase):
     def testWithValidGreece(self):	
         self.assert_(StudiaZamawiane.check_iban(self.valid_greece))
 
+class MailsToStudentsLinkTestCase(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.MSG_HEADER = '<p id="mailto_all_students">'
+        regular_user = User.objects.create_user('regular_user', 'user@user.com', 'password')
+        Student.objects.create(user=regular_user)
+        cls.regular_user = regular_user
+
+        permission = Permission.objects.get(codename='mailto_all_students')
+        dean_user = User.objects.create_user('dean_user', 'user@user.com', 'password')
+        dean_user.user_permissions.add(permission)
+        cls.dean_user = dean_user
+
+    def test_mailto_link_not_exists_regular_user(self):
+        self.client.login(username='regular_user', password='password')
+        response = self.client.get(reverse('students-list'))
+        self.assertNotContains(response, self.MSG_HEADER, status_code=200)
+
+    def test_mailto_link_exists_dean_user(self):
+        self.client.login(username='dean_user', password='password')
+        response = self.client.get(reverse('students-list'))
+        self.assertContains(response, self.MSG_HEADER, status_code=200)

@@ -28,6 +28,7 @@ from apps.users.utils import prepare_ajax_students_list,\
 from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
+from apps.enrollment.utils import mailto
 
 from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm
 
@@ -322,7 +323,9 @@ def students_list(request, begin = 'All', query=None):
         data = { 
             "students" : students, 
             "char": begin,
-            "query": query
+            "query": query,
+            'mailto_group': mailto(request.user, students),
+            'mailto_group_bcc': mailto(request.user, students, True)
         }
         return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
