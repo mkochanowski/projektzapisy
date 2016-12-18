@@ -5,6 +5,7 @@ from datetime import time, date, timedelta
 from django.test import TestCase
 from django.core.validators import ValidationError
 from django.contrib.auth.models import Permission
+from django.http import Http404
 
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
 from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
@@ -305,6 +306,30 @@ class EventTestCase(TestCase):
         user.full_clean()
         event = factories.EventOtherFactory.build()
         self.assertFalse(event._user_can_see_or_404(user))
+
+    def test_get_event_or_404_raises_error404_if_event_doesnt_exist(self):
+        user = UserFactory.build()
+        user.full_clean()
+        self.assertRaises(Http404, Event.get_event_or_404, 0, user)
+
+    def test_get_event_or_404_returns_event_if_exists_and_user_can_see(self):
+        # Czy bawić się w taką walidację i rozbijanie na build, clean, save?
+        employee = UserProfile.objects.get(is_employee=True).user
+        event = factories.EventFactory.build(author=employee)
+        event.full_clean()
+        event.save()
+        ret = Event.get_event_or_404(event.id, employee)
+        self.assertEquals(event, ret)
+
+    def test_get_event_or_404_raises_error404_if_user_cant_see_event(self):
+        user = UserFactory.build()
+        user.full_clean()
+        user.save()
+        employee = UserProfile.objects.get(is_employee=True).user
+        event = factories.EventInvisibleFactory.build(author=employee)
+        event.full_clean()
+        event.save()
+        self.assertRaises(Http404, Event.get_event_or_404, event.id, user)
 
 
 class EventsOnChangedDayTestCase(TestCase):
