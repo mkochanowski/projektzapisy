@@ -292,7 +292,8 @@ class EventTestCase(TestCase):
         self.assertFalse(event._user_can_see_or_404(user))
 
     # Jeśli user nie jest autorem eventu, ani nie ma praw do zarządzania, to
-    # nie może widzieć wydarzeń typu zajęcia i inne. Dlaczego?
+    # nie może widzieć wydarzeń typu zajęcia(TYPE_CLASS) i inne(TYPE_OTHER). Dlaczego?
+    # TYPE_CLASS i TYPE_OTHER nie są nigdzie w kodzie użyte. Do czego one są?
     def test_user_cant_see_class_event(self):
         user = UserFactory()
         user.full_clean()

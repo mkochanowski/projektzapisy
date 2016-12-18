@@ -42,10 +42,6 @@ class RejectedEventFactory(EventFactory):
     status = Event.STATUS_REJECTED
 
 
-class EventPendingFactory(EventFactory):
-    status = Event.STATUS_PENDING
-
-
 class ExamEventFactory(EventFactory):
     type = Event.TYPE_EXAM
 
