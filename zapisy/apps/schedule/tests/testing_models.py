@@ -13,7 +13,7 @@ from apps.users.tests.objectmothers import UserObjectMother
 from apps.users.tests.factories import UserFactory, EmployeeProfileFactory
 from apps.enrollment.courses.models import Semester, Classroom
 from apps.users.models import UserProfile
-from ..models import SpecialReservation, EventModerationMessage, Event, Term as EventTerm
+from ..models import SpecialReservation, EventModerationMessage, EventMessage, Event, Term as EventTerm
 from django.utils.crypto import get_random_string
 
 import factories
@@ -156,14 +156,47 @@ class SpecialReservationTestCase(TestCase):
 
 class MessageTestCase(TestCase):
     def test_simpliest_message_autotimenow(self): #there are two classes of name EventModerationMessage but it works
-        author = factories.UserFactory()
         event = factories.EventFactory()
         message = get_random_string(length=32)
         emm = EventModerationMessage(
-            author = author,
+            author = factories.UserFactory(),
             event = event,
             message = message
         )
+        emm.save()
+        emm2 = EventModerationMessage(
+            author = factories.UserFactory(),
+            event = event,
+            message = message
+        )
+        emm2.save()
+        #event message should not be counted
+        em = EventMessage(
+            author = factories.UserFactory(),
+            event = event,
+            message = message
+        )
+        em.save()        
+
+        messages = EventModerationMessage.get_event_messages(event)
+        self.assertEqual(len(messages), 2) #the results should be 2 because em is not event moderation message
+    def test_simpliest_eventmessage_autotimenow(self): #this classes are the same almost
+        event = factories.EventFactory()
+        message = get_random_string(length=32)
+        em = EventMessage(
+            author = factories.UserFactory(),
+            event = event,
+            message = message
+        )
+        em.save()
+        em2 = EventMessage(
+            author = factories.UserFactory(),
+            event = event,
+            message = message
+        )
+        em2.save()        
+        messages = EventMessage.get_event_messages(event)
+        self.assertEqual(len(messages), 2) 
 
 class EventTestCase(TestCase):
     def setUp(self):
