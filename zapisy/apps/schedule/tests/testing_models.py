@@ -13,7 +13,8 @@ from apps.users.tests.objectmothers import UserObjectMother
 from apps.users.tests.factories import UserFactory, EmployeeProfileFactory
 from apps.enrollment.courses.models import Semester, Classroom
 from apps.users.models import UserProfile
-from ..models import SpecialReservation, Event, Term as EventTerm
+from ..models import SpecialReservation, EventModerationMessage, Event, Term as EventTerm
+from django.utils.crypto import get_random_string
 
 import factories
 import common
@@ -153,6 +154,16 @@ class SpecialReservationTestCase(TestCase):
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 3)
 
+class MessageTestCase(TestCase):
+    def test_simpliest_message_autotimenow(self):
+        author = factories.UserFactory()
+        event = factories.EventFactory()
+        message = get_random_string(length=32)
+        emm = EventModerationMessage(
+            author = author,
+            event = event,
+            message = message
+        )
 
 class EventTestCase(TestCase):
     def setUp(self):
