@@ -155,7 +155,7 @@ class SpecialReservationTestCase(TestCase):
         self.assertEqual(len(reservations), 3)
 
 class MessageTestCase(TestCase):
-    def test_simpliest_message_autotimenow(self):
+    def test_simpliest_message_autotimenow(self): #there are two classes of name EventModerationMessage but it works
         author = factories.UserFactory()
         event = factories.EventFactory()
         message = get_random_string(length=32)
