@@ -109,7 +109,6 @@ class BaseUser(models.Model):
         abstract = True
 
 
-
 class Employee(BaseUser):
     '''
     Employee.
@@ -228,6 +227,9 @@ class Employee(BaseUser):
         verbose_name_plural = 'Pracownicy'
         app_label = 'users'
         ordering = ['user__last_name', 'user__first_name']
+        permissions = (
+            ("mailto_all_students", u"Może wysyłać maile do wszystkich studentów"),
+        )
 
     def __unicode__(self):
         return unicode(self.user.get_full_name())

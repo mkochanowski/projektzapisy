@@ -2,6 +2,14 @@
 
 # Current version
 
+# Version 16.12.19
+
+* Added cookie law info
+* Added tracker for bugs at tracker-zapisy.ii.uni.wroc.pl
+* Changed email from zapisy@ii.uni.wroc.pl to zapisy@cs.uni.wroc.pl
+* Added feature to email all students
+* Fix for bug with unrolling from last lecture
+
 # Version 16.12.03
 
 * Courses in review are no longer visible at all

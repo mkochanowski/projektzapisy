@@ -35,7 +35,7 @@ class Classroom( models.Model ):
         return reverse('events:classroom', args=[self.slug])
     
     def __unicode__(self):
-        return self.number + ' ('+str(self.capacity)+')'
+        return str(self.number) + ' ('+str(self.capacity)+')'
 
     @classmethod
     def get_by_number(cls, number):

@@ -1,5 +1,6 @@
 {% extends "enrollment/base.html" %}
 {% load compressed %}
+{% load i18n %}
 {% block styles %}
     {% compressed_css 'userslist' %}
 {% endblock %}
@@ -15,10 +16,13 @@
 	<a href="{% url enrollment-main %}">Zapisy</a> &raquo;
 	Studenci
 {% endblock %}
+
+
+
 {% block enrollment_menu_students %} class="active"{% endblock %}
 
-
 {% block filter %}
+
 	<div id="enr-StudentsList-top-bar" class="main-top-bar" style="display: none">
 		<fieldset>
 			<legend><span>Filtrowanie</span></legend>

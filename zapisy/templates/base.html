@@ -1,6 +1,7 @@
 {% load fereol_common %}
 {% load compressed %}
 {% load staticfiles %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -57,6 +58,30 @@
     {% block js %}{% compressed_js 'main' %}{% endblock %}
     {% block rss %}{% endblock %}
     {% block head_extra %}{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/cookieconsent.min.css' %}" />
+    <script src="{% static 'js/cookieconsent.min.js' %}"></script>
+    <script>
+    window.addEventListener("load", function(){
+        window.cookieconsent.initialise({
+          "palette": {
+            "popup": {
+              "background": "#222222"
+            },
+            "button": {
+              "background": "#00709e"
+            }
+          },
+          "showLink": false,
+          "theme": "classic",
+          "position": "bottom",
+          "content": {
+            "message": "{% trans 'System zapisów wykorzystuje pliki cookies. Korzystanie z witryny oznacza zgodę na ich zapis lub odczyt według ustawień przeglądarki.' %}",
+            "dismiss": "OK"
+          }
+        })
+    });
+    </script>
+
 </head>
 
 <body>
@@ -204,7 +229,7 @@
     <footer>
         <p>
             {# <a href="{% url on-mobile %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
-            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>{% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@ii.uni.wroc.pl">zapisy@ii.uni.wroc.pl</a>{% endif %} | Błędy i uwagi: <a href="https://bitbucket.org/jablonski/zapisy-uwagi/issues?status=new&status=open">[link]</a> Wygenerowano: {% now "H:i:s" %}</p>
+            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>{% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@cs.uni.wroc.pl">zapisy@cs.uni.wroc.pl</a>{% endif %} | Błędy i uwagi: <a href="https://tracker-zapisy.ii.uni.wroc.pl/">[link]</a> Wygenerowano: {% now "H:i:s" %}</p>
 
     </footer>
 
