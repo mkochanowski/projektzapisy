@@ -159,7 +159,7 @@ class IBANTest(TestCase):
 class MailsToStudentsLinkTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.MSG_HEADER = '<p id="mailto_all_students">'
+        cls.MSG_HEADER = 'Wyślij wiadomość do studentów'
         regular_user = User.objects.create_user('regular_user', 'user@user.com', 'password')
         Student.objects.create(user=regular_user)
         cls.regular_user = regular_user
@@ -171,10 +171,10 @@ class MailsToStudentsLinkTestCase(TestCase):
 
     def test_mailto_link_not_exists_regular_user(self):
         self.client.login(username='regular_user', password='password')
-        response = self.client.get(reverse('students-list'))
+        response = self.client.get(reverse('my-profile'))
         self.assertNotContains(response, self.MSG_HEADER, status_code=200)
 
     def test_mailto_link_exists_dean_user(self):
         self.client.login(username='dean_user', password='password')
-        response = self.client.get(reverse('students-list'))
+        response = self.client.get(reverse('my-profile'))
         self.assertContains(response, self.MSG_HEADER, status_code=200)

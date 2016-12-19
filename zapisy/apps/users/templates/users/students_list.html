@@ -22,16 +22,7 @@
 {% block enrollment_menu_students %} class="active"{% endblock %}
 
 {% block filter %}
-    {# Translators: tekst przy linku mailto #}
-    {% if perms.users.mailto_all_students %}
-        <hr>
-        <p id="mailto_all_students"><strong>{% trans "Wyślij wiadomość do wszystkich aktywnych studentów" %}</strong>:
-        <ul>
-            <li><a href="mailto:{{ mailto_group }}">{% trans "udostępniając adresy mailowe studentów" %}</a></li>
-            <li><a href="mailto:{{ mailto_group_bcc }}">{% trans "ukrywając adresy mailowe studentów" %}</a></li>
-        </ul>
-        </p>
-    {% endif %}
+
 	<div id="enr-StudentsList-top-bar" class="main-top-bar" style="display: none">
 		<fieldset>
 			<legend><span>Filtrowanie</span></legend>
