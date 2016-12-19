@@ -2,6 +2,8 @@
 
 # Current version
 
+* Added cookie law info
+
 # Version 16.12.03
 
 * Courses in review are no longer visible at all
