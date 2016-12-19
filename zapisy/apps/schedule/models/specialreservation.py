@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.utils.encoding import smart_unicode
 from django.core.validators import ValidationError
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 from datetime import date, datetime
 
 import zapisy.common as common
 
 from apps.enrollment.courses.models import Semester, Term as CourseTerm
-
 
 
 class SpecialReservationQuerySet(models.query.QuerySet):
