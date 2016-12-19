@@ -17,7 +17,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-EVENT_MODERATOR_EMAIL = 'zapisy@ii.uni.wroc.pl'
+EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
 """
 DATABASES = {
@@ -76,7 +76,7 @@ DATABASES = {
 #EMAIL_HOST_USER = ''
 #EMAIL_HOST_PASSWORD = ''
 
-MASS_MAIL_FROM = 'zapisy@ii.uni.wroc.pl'
+MASS_MAIL_FROM = 'zapisy@cs.uni.wroc.pl'
 
 EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing space
 
