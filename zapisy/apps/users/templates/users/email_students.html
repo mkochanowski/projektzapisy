@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block bread %}
+    <a href="/">Strona główna</a> &raquo;
+<a href="{% url my-profile %}">Moje konto</a> &raquo;
+Wyślij wiadomość do studentów
+{% endblock %}
+
+{% block content %}
+
+<form action='' method="POST">{% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" class="btn success" value="Wyślij"/>
+</form>
+<hr>
+<p id="mailto_all_students"><strong>{% trans "Wyślij wiadomość do wszystkich aktywnych studentów" %}</strong>:
+<ul>
+    <li><a href="mailto:{{ mailto_group }}">{% trans "udostępniając adresy mailowe studentów" %}</a></li>
+    <li><a href="mailto:{{ mailto_group_bcc }}">{% trans "ukrywając adresy mailowe studentów" %}</a></li>
+</ul>
+</p>
+{% endblock %}
+
