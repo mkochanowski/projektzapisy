@@ -11,13 +11,11 @@ Wyślij wiadomość do studentów
 <form action='' method="POST">{% csrf_token %}
     {{form.as_p}}
     <input type="submit" class="btn success" value="Wyślij"/>
+    Uwaga: wiadomości zostaną dostarczone w przeciągu kilku minut (nie natychmiastowo).
 </form>
 <hr>
-<p id="mailto_all_students"><strong>{% trans "Wyślij wiadomość do wszystkich aktywnych studentów" %}</strong>:
-<ul>
-    <li><a href="mailto:{{ mailto_group }}">{% trans "udostępniając adresy mailowe studentów" %}</a></li>
-    <li><a href="mailto:{{ mailto_group_bcc }}">{% trans "ukrywając adresy mailowe studentów" %}</a></li>
-</ul>
-</p>
+<p id="mailto_all_students"><strong>{% trans "Lista adresów wszystkich aktywnych studentów" %}</strong></p>:
+<textarea readonly cols=80 rows=20>{{students_mails}}</textarea>
+
 {% endblock %}
 

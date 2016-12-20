@@ -420,9 +420,13 @@ def create_ical_file(request):
 def email_students(request):
     """function that enables mailing all students"""
     students = Student.get_list('All')
+    if students:
+        studentsmails = ','.join([student.user.email for student in students])
+
     if request.POST:
         data = request.POST.copy()
         form = EmailToAllStudentsForm(data)
+        form.fields['sender'].widget.attrs['readonly'] = True
         if form.is_valid():
             counter = 0
             body = form.cleaned_data['message']
@@ -433,13 +437,14 @@ def email_students(request):
                     counter += 1
                     Message.objects.create(to_address=address, from_address=form.cleaned_data['sender'], subject=subject, message_body=body)
             if form.cleaned_data['cc_myself'] == True:
-                Message.objects.create(to_address=form.cleaned_data['sender'], from_address=form.cleaned_data['sender'], subject=subject, message_body=body)
+                Message.objects.create(to_address=request.user.email, from_address=form.cleaned_data['sender'], subject=subject, message_body=body)
             messages.success(request, u'Wysłano wiadomość do %d studentów' % counter)
             return HttpResponseRedirect(reverse('my-profile'))
         else:
             messages.error(request, u'Wystąpił błąd przy wysyłaniu wiadomości')
     else:
-        form = EmailToAllStudentsForm(initial={'sender': request.user.email})
-    return render_to_response('users/email_students.html', {'form':form, 'mailto_group': mailto(request.user, students), 'mailto_group_bcc': mailto(request.user, students, True)}, context_instance=RequestContext(request))
+        form = EmailToAllStudentsForm(initial={'sender': 'zapisy@cs.uni.wroc.pl'})
+        form.fields['sender'].widget.attrs['readonly'] = True
+    return render_to_response('users/email_students.html', {'form':form, 'students_mails': studentsmails}, context_instance=RequestContext(request))
 
 
