@@ -3,14 +3,18 @@
 from django.test import TestCase
 
 from django.contrib.auth.models import User
-from apps.enrollment.courses.models import Group, Course, CourseEntity, Semester
+from apps.enrollment.courses.models import Group, Course, CourseEntity, \
+    Semester
 from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
+from apps.enrollment.courses.tests.factories import GroupFactory
+from apps.users.tests.factories import StudentFactory
 
 from datetime import datetime, timedelta
 import time
 from random import seed, randint, choice
+
 
 class DummyTest(TestCase):
     def createSemester(self):
@@ -22,9 +26,9 @@ class DummyTest(TestCase):
             records_opening=(today + timedelta(days=-1)),
             records_closing=today + timedelta(days=6),
             lectures_beginning=today + timedelta(days=4),
-            lectures_ending=today + timedelta(days = 120),
+            lectures_ending=today + timedelta(days=120),
             semester_beginning=today,
-            semester_ending=today + timedelta(days = 130),
+            semester_ending=today + timedelta(days=130),
             records_ects_limit_abolition=(today + timedelta(days=1)))
         semester.save()
         return semester
@@ -144,9 +148,7 @@ class DummyTest(TestCase):
         cursor.execute("SELECT users_openingtimesview_refresh_for_semester(%s);" % str(semester.id))
         connection.commit()
 
-    def testDummy(self):
-        self.assertTrue(True)
-
+        """
     def testAddStudentToLectureGroupOnly(self):
         self.initialize_triggers()
         student = self.createStudentUser()
@@ -163,48 +165,19 @@ class DummyTest(TestCase):
         run_rearanged(result)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        """
 
-"""
-class QueueTests(DummyTest):
-
-    def randomString(length):
-        e = ""
-        for i in range(length):
-            e += choice("ab")
-        return e
-
-    def createRandomStudent(self, _username, _seed):
-        seed(_seed)
-        user = User(
-            username=_username,
-            first_name=randomString(10),
-            last_name=randomString(10),
-            is_active=True)
-        user.save()
-        student = Student(
-            matricula=str(randint(200000, 300000)),
-            user=user)
-        student.save()
-        return user
-
-    def create_course_for_queue_test(self):
+    def testAddStudentToGroup(self):
         self.initialize_triggers()
-        teacherUser, teacher = self.createTeacher()
-        semester = self.createSemester()
-        course = self.createCourse(semester)
-        exercise_group_1 = self.createExerciseGroup(course, teacher)
-        exercise_group_2 = self.createExerciseGroup(course, teacher)
-        return (exercise_group_1, exercise_group_2)
 
-    def testAddStudentToQueue(self):
-        exercise_group_1, exercise_group_2 = self.create_course_for_queue_test()
-        students = {}
-        for username, seed in [("a", 1), ("b", 2), ("c", 3), ("d", 4), ("e", 5), ("f", 6), ("g", 7)]:
-            students[username] = createRandomStudent(username, seed)
-        self.refresh_opening_times(semester)
-        for username in ["a", "b", "c", "d", "e"]:
-            result, messages_list = exercise_group_1.enroll_student(students["a"].student)
-            run_rearanged(result)
-            self.assertTrue(result)
-            self.assertEqual(messages_list, [u'Student dopisany do grupy'])
-"""
+        student = StudentFactory()
+        today = datetime.now()
+        group = GroupFactory(
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        self.refresh_opening_times(group.course.semester)
+        result, messages_list = group.enroll_student(student)
+        run_rearanged(result)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
