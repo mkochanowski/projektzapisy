@@ -9,7 +9,7 @@ from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
 from apps.enrollment.courses.tests.factories import GroupFactory
-from apps.users.tests.factories import StudentFactory, EmployeeFactory
+from apps.users.tests.factories import StudentFactory
 
 from datetime import datetime, timedelta
 import time
@@ -17,6 +17,9 @@ from random import seed, randint, choice
 
 
 class DummyTest(TestCase):
+    reset_sequences = True
+
+
     def createSemester(self):
         today = datetime.now()
         semester = Semester(
@@ -87,7 +90,7 @@ class DummyTest(TestCase):
         group.save()
         return group
 
-    def initialize_triggers(self):
+    def setUp(self):
         sql_calls = [
             """
                 CREATE VIEW users_minutes_bonus_view AS
@@ -143,6 +146,19 @@ class DummyTest(TestCase):
             cursor.execute(sql_call)
             connection.commit()
 
+    def tearDown(self):
+        sql_calls = [
+            "DROP VIEW users_openingtimesview_unmaterialized;",
+            "DROP VIEW users_minutes_bonus_view;",
+            "DROP FUNCTION users_openingtimesview_refresh_for_semester(integer);",
+            "DROP TABLE courses_studentpointsview;",
+        ]
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
+
+
     def refresh_opening_times(self, semester):
         cursor = connection.cursor()
         cursor.execute("SELECT users_openingtimesview_refresh_for_semester(%s);" % str(semester.id))
@@ -168,7 +184,6 @@ class DummyTest(TestCase):
         """
 
     def testAddStudentToGroup(self):
-        self.initialize_triggers()
 
         today = datetime.now()
         group = GroupFactory(
@@ -181,3 +196,17 @@ class DummyTest(TestCase):
         run_rearanged(result)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+
+    def testAddStudentToQueue(self):
+        today = datetime.now()
+        group = GroupFactory(
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        students = StudentFactory.create_batch(11)
+        self.refresh_opening_times(group.course.semester)
+        for student in students:
+            result, messages_list = group.enroll_student(student)
+            run_rearanged(result)
+            self.assertTrue(result)
+            self.assertEqual(messages_list, [u'Student dopisany do grupy'])
