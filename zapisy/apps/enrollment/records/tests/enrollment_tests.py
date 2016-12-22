@@ -9,7 +9,7 @@ from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
 from apps.enrollment.courses.tests.factories import GroupFactory
-from apps.users.tests.factories import StudentFactory
+from apps.users.tests.factories import StudentFactory, EmployeeFactory
 
 from datetime import datetime, timedelta
 import time
@@ -170,12 +170,12 @@ class DummyTest(TestCase):
     def testAddStudentToGroup(self):
         self.initialize_triggers()
 
-        student = StudentFactory()
         today = datetime.now()
         group = GroupFactory(
             course__semester__records_opening=today+timedelta(days=-1),
             course__semester__records_closing=today+timedelta(days=6)
         )
+        student = StudentFactory()
         self.refresh_opening_times(group.course.semester)
         result, messages_list = group.enroll_student(student)
         run_rearanged(result)
