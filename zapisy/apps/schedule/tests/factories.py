@@ -26,7 +26,9 @@ class EventFactory(DjangoModelFactory):
     class Meta:
         model = Event
 
-    type = Event.TYPE_GENERIC
+    type = factory.Iterator([
+        Event.TYPE_GENERIC, Event.TYPE_CLASS, Event.TYPE_TEST, Event.TYPE_CLASS, Event.TYPE_OTHER
+    ])
     visible = True
     status = Event.STATUS_ACCEPTED
     author = factory.SubFactory(UserFactory)
@@ -40,22 +42,6 @@ class PendingEventFactory(EventFactory):
 
 class RejectedEventFactory(EventFactory):
     status = Event.STATUS_REJECTED
-
-
-class ExamEventFactory(EventFactory):
-    type = Event.TYPE_EXAM
-
-
-class EventTestFactory(EventFactory):
-    type = Event.TYPE_TEST
-
-
-class EventClassFactory(EventFactory):
-    type = Event.TYPE_CLASS
-
-
-class EventOtherFactory(EventFactory):
-    type = Event.TYPE_OTHER
 
 
 class EventInvisibleFactory(EventFactory):

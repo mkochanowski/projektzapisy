@@ -265,22 +265,22 @@ class EventTestCase(TestCase):
 
     def test_clean__student_cant_add_exam(self):
         student = UserProfile.objects.get(is_student=True).user
-        event = factories.ExamEventFactory.build(author=student)
+        event = factories.EventFactory.build(author=student, type=Event.TYPE_EXAM)
         self.assertRaises(ValidationError, event.full_clean)
 
     def test_clean__student_cant_add_test(self):
         student = UserProfile.objects.get(is_student=True).user
-        event = factories.EventTestFactory.build(author=student)
+        event = factories.EventFactory.build(author=student, type=Event.TYPE_TEST)
         self.assertRaises(ValidationError, event.full_clean)
 
     def test_clean__employee_can_add_exam(self):
         employee = UserProfile.objects.get(is_employee=True).user
-        event = factories.ExamEventFactory.build(author=employee)
+        event = factories.EventFactory.build(author=employee, type=Event.TYPE_EXAM)
         event.full_clean()
 
     def test_clean__employee_can_add_test(self):
         employee = UserProfile.objects.get(is_employee=True).user
-        event = factories.EventTestFactory.build(author=employee)
+        event = factories.EventFactory.build(author=employee, type=Event.TYPE_TEST)
         event.full_clean()
 
     def test_clean__student_cant_add_accepted_event(self):
@@ -294,14 +294,14 @@ class EventTestCase(TestCase):
         event.full_clean()
 
     def test_new_exam_after_clean_is_public(self):
-        exam = factories.ExamEventFactory()
+        exam = factories.EventFactory(type=Event.TYPE_EXAM)
         user_profile = EmployeeProfileFactory(user=exam.author)
         user_profile.full_clean()
         exam.full_clean()
         self.assertTrue(exam.visible)
 
     def test_after_clean_new_test_is_public(self):
-        test = factories.EventTestFactory()
+        test = factories.EventFactory(type=Event.TYPE_TEST)
         user_profile = EmployeeProfileFactory(user=test.author)
         user_profile.full_clean()
         test.full_clean()
@@ -336,19 +336,16 @@ class EventTestCase(TestCase):
         event = factories.RejectedEventFactory.build()
         self.assertFalse(event._user_can_see_or_404(user))
 
-    # Jeśli user nie jest autorem eventu, ani nie ma praw do zarządzania, to
-    # nie może widzieć wydarzeń typu zajęcia(TYPE_CLASS) i inne(TYPE_OTHER). Dlaczego?
-    # TYPE_CLASS i TYPE_OTHER nie są nigdzie w kodzie użyte. Do czego one są?
-    def test_user_cant_see_class_event(self):
+    def test_user_cant_see_type_class_event(self):
         user = UserFactory()
         user.full_clean()
-        event = factories.EventClassFactory.build()
+        event = factories.EventFactory.build(type=Event.TYPE_CLASS)
         self.assertFalse(event._user_can_see_or_404(user))
 
-    def test_user_cant_see_other_event(self):
+    def test_user_cant_see_type_other_event(self):
         user = UserFactory()
         user.full_clean()
-        event = factories.EventOtherFactory.build()
+        event = factories.EventFactory.build(type=Event.TYPE_OTHER)
         self.assertFalse(event._user_can_see_or_404(user))
 
     def test_get_event_or_404_raises_error404_if_event_doesnt_exist(self):
@@ -357,23 +354,39 @@ class EventTestCase(TestCase):
         self.assertRaises(Http404, Event.get_event_or_404, 0, user)
 
     def test_get_event_or_404_returns_event_if_exists_and_user_can_see(self):
-        # Czy bawić się w taką walidację i rozbijanie na build, clean, save?
         employee = UserProfile.objects.get(is_employee=True).user
-        event = factories.EventFactory.build(author=employee)
-        event.full_clean()
-        event.save()
+        event = factories.EventFactory(author=employee)
         ret = Event.get_event_or_404(event.id, employee)
         self.assertEquals(event, ret)
 
     def test_get_event_or_404_raises_error404_if_user_cant_see_event(self):
-        user = UserFactory.build()
-        user.full_clean()
-        user.save()
+        user = UserFactory()
         employee = UserProfile.objects.get(is_employee=True).user
-        event = factories.EventInvisibleFactory.build(author=employee)
-        event.full_clean()
-        event.save()
+        event = factories.EventInvisibleFactory(author=employee)
         self.assertRaises(Http404, Event.get_event_or_404, event.id, user)
+
+    def test_get_event_for_moderation_returns_event_if_it_exists_and_user_is_the_author(self):
+        user = UserFactory()
+        event = factories.EventFactory(author=user)
+        ret = Event.get_event_for_moderation_or_404(event.id, user)
+        self.assertEquals(event, ret)
+
+    def test_get_event_for_moderation_returns_event_if_it_exists_and_user_has_perms(self):
+        event = factories.EventFactory()
+        user_w_perms = UserFactory()
+        permission = Permission.objects.get(codename='manage_events')
+        user_w_perms.user_permissions.add(permission)
+        ret = Event.get_event_for_moderation_or_404(event.id, user_w_perms)
+        self.assertEquals(event, ret)
+
+    def test_get_event_for_moderation_throws_Http404_if_event_doesnt_exist(self):
+        user = UserFactory.build()
+        self.assertRaises(Http404, Event.get_event_for_moderation_or_404, 0, user)
+
+    def test_get_event_for_moderation_throws_Http404_if_user_not_author_and_wo_perms(self):
+        event = factories.EventFactory()
+        user = UserFactory()
+        self.assertRaises(Http404, Event.get_event_for_moderation_or_404, event.id, user)
 
 
 class EventsOnChangedDayTestCase(TestCase):
