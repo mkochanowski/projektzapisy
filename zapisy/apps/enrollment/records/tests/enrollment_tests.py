@@ -4,12 +4,16 @@ from django.test import TestCase
 
 from django.contrib.auth.models import User
 from apps.enrollment.courses.models import Group, Course, CourseEntity, \
-    Semester
+    Semester, StudentPointsView
 from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
 from apps.enrollment.courses.tests.factories import GroupFactory
 from apps.users.tests.factories import StudentFactory
+from apps.users.models import OpeningTimesView
+from apps.enrollment.records.models import Record, Queue, \
+    STATUS_ENROLLED, STATUS_REMOVED
+
 
 from datetime import datetime, timedelta
 import time
@@ -93,46 +97,6 @@ class DummyTest(TestCase):
     def setUp(self):
         sql_calls = [
             """
-                CREATE VIEW users_minutes_bonus_view AS
-                SELECT us.id AS student_id,
-                    cs.id AS semester_id,
-                    ((((((( SELECT count(*) AS count
-                        FROM ticket_create_studentgraded
-                        WHERE ((ticket_create_studentgraded.semester_id = ANY (ARRAY[cs.first_grade_semester_id, cs.second_grade_semester_id])) AND (ticket_create_studentgraded.student_id = us.id))) * 1440) + (us.ects * 5)) + (((us.ects * 5) / 720) * 720)) + us.records_opening_bonus_minutes) + 120))::integer AS minutes
-                FROM users_student us,
-                    courses_semester cs
-                WHERE (cs.records_closing > now());
-            """,
-            """
-                CREATE VIEW users_openingtimesview_unmaterialized AS
-                SELECT cc.id AS course_id,
-                    users_student.id AS student_id,
-                    cc.semester_id,
-                    GREATEST(cc.records_start, (cs.records_opening - ((((v.minutes + (COALESCE(( SELECT DISTINCT sv.correction
-                        FROM vote_singlevote sv
-                        WHERE ((sv.student_id = users_student.id) AND (sv.correction > 0) AND (sv.entity_id = cc.entity_id) AND (sv.state_id IN ( SELECT vs.id
-                                FROM vote_systemstate vs
-                                WHERE ((vs.semester_summer_id = cc.semester_id) OR (vs.semester_winter_id = cc.semester_id)))))
-                        LIMIT 1), 0) * 1440)))::text || ' MINUTES'::text))::interval)) AS opening_time
-                FROM courses_course cc,
-                    users_student,
-                    (courses_semester cs
-                    LEFT JOIN users_minutes_bonus_view v ON ((v.semester_id = cs.id)))
-                WHERE ((users_student.status = 0) AND ((v.student_id IS NULL) OR (v.student_id = users_student.id)) AND (cs.records_opening IS NOT NULL) AND (cc.semester_id = cs.id) AND ((cs.records_closing > now()) OR ((cc.records_start IS NOT NULL) AND (cc.records_end IS NOT NULL) AND (cc.records_end > now()))));
-            """,
-            """
-                CREATE FUNCTION users_openingtimesview_refresh_for_semester(id integer) RETURNS void
-                LANGUAGE plpgsql SECURITY DEFINER
-                AS $$
-                    begin
-                    delete from users_openingtimesview csp where csp.semester_id = id;
-                    insert into users_openingtimesview
-                    SELECT * FROM users_openingtimesview_unmaterialized scp
-                        WHERE scp.semester_id = id;
-                    end
-                    $$;
-            """,
-            """
                 CREATE TABLE courses_studentpointsview (
                     value smallint,
                     student_id integer,
@@ -148,9 +112,6 @@ class DummyTest(TestCase):
 
     def tearDown(self):
         sql_calls = [
-            "DROP VIEW users_openingtimesview_unmaterialized;",
-            "DROP VIEW users_minutes_bonus_view;",
-            "DROP FUNCTION users_openingtimesview_refresh_for_semester(integer);",
             "DROP TABLE courses_studentpointsview;",
         ]
         for sql_call in sql_calls:
@@ -184,14 +145,15 @@ class DummyTest(TestCase):
         """
 
     def testAddStudentToGroup(self):
-
         today = datetime.now()
         group = GroupFactory(
             course__semester__records_opening=today+timedelta(days=-1),
             course__semester__records_closing=today+timedelta(days=6)
         )
         student = StudentFactory()
-        self.refresh_opening_times(group.course.semester)
+        OpeningTimesView.objects.create(
+            student=student, course=group.course,
+            semester=group.course.semester, opening_time=today)
         result, messages_list = group.enroll_student(student)
         run_rearanged(result)
         self.assertTrue(result)
@@ -201,12 +163,26 @@ class DummyTest(TestCase):
         today = datetime.now()
         group = GroupFactory(
             course__semester__records_opening=today+timedelta(days=-1),
-            course__semester__records_closing=today+timedelta(days=6)
+            course__semester__records_closing=today+timedelta(days=6),
         )
-        students = StudentFactory.create_batch(11)
-        self.refresh_opening_times(group.course.semester)
+        students = StudentFactory.create_batch(15)
         for student in students:
+            OpeningTimesView.objects.create(
+                student=student, course=group.course,
+                semester=group.course.semester, opening_time=today)
+        for student in students[:10]:
             result, messages_list = group.enroll_student(student)
             run_rearanged(result)
             self.assertTrue(result)
             self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+            # what the hell
+            group.enrolled += 1
+        for student in students[10:]:
+            result, messages_list = group.enroll_student(student)
+            run_rearanged(result)
+            self.assertTrue(result)
+            self.assertEqual(messages_list, [
+                u'Brak wolnych miejsc w grupie',
+                u'Student został dopisany do kolejki'])
+        self.assertEqual(group.enrolled, 10)
+        self.assertEqual(group.queued, 5)
