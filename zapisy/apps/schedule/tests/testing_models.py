@@ -198,6 +198,14 @@ class MessageTestCase(TestCase):
         messages = EventMessage.get_event_messages(event)
         self.assertEqual(len(messages), 2) 
 
+class TermTestCase(TestCase):
+    #def setUp(self):
+    def test_simplest_term(self):
+        term1 = factories.TermFactory()
+        term1.full_clean()
+        term1.save()
+        self.assertTrue(term1)
+
 class EventTestCase(TestCase):
     def setUp(self):
         teacher = factories.UserFactory()

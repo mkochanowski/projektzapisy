@@ -58,12 +58,20 @@ class TermThisYearFactory(DjangoModelFactory):
     start = time(10)
     end = time(12)
 
+class TermFactory(DjangoModelFactory):
+    class Meta:
+        model = Term
+
+    event = factory.SubFactory(EventFactory)
+    room = factory.SubFactory(ClassroomFactory)
+    day = factory.fuzzy.FuzzyNaiveDateTime(datetime.now(), force_year=datetime.now().year)
+    start = time(10)
+    end = time(12)
 
 class TermFixedDayFactory(TermThisYearFactory):
     day = date(2016, 5, 20)
     start = time(15)
     end = time(16)
-
 
 class SepcialReservationFactory(DjangoModelFactory):
     class Meta:
