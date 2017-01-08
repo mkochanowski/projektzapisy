@@ -152,8 +152,6 @@ class DummyTest(TestCase):
             run_rearanged(result)
             self.assertTrue(result)
             self.assertEqual(messages_list, [u'Student dopisany do grupy'])
-            # what the hell
-            group.enrolled += 1
         for student in students[10:]:
             result, messages_list = group.enroll_student(student)
             run_rearanged(result)
@@ -178,11 +176,9 @@ class DummyTest(TestCase):
             run_rearanged(result, group)
             self.assertTrue(result)
             self.assertEqual(messages_list, [u'Student dopisany do grupy'])
-            # what the hell
-            group.enrolled += 1
         for student in students[10:]:
             result, messages_list = group.enroll_student(student)
-            run_rearanged(result, group)
+            run_rearanged(result)
             self.assertTrue(result)
             self.assertEqual(messages_list, [
                 u'Brak wolnych miejsc w grupie',
@@ -193,9 +189,15 @@ class DummyTest(TestCase):
         run_rearanged(result, group)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student wypisany z grupy'])
-        enrolled = [x.student for x in Record.objects.filter(group=group)]
+        enrolled = [x.student for x in Record.objects.filter(group=group,
+                                                             status=1)]
+        removed = [x.student for x in Record.objects.filter(group=group,
+                                                            status=0)]
         should_be_enrolled = students[0:8] + students[9:11]
+        should_be_queued = students[11:]
         for student in should_be_enrolled:
             self.assertTrue(student in enrolled)
-        #self.assertEqual(group.enrolled, 10)
-        #self.assertEqual(group.queued, 4)
+        self.assertFalse(students[8] in enrolled)
+        self.assertTrue(students[8] in removed)
+        self.assertEqual(group.enrolled, 10)
+        self.assertEqual(group.queued, 4)

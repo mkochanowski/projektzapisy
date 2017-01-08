@@ -22,7 +22,7 @@ class SemesterFactory(DjangoModelFactory):
 
     visible = True
     type = factory.Iterator([Semester.TYPE_WINTER, Semester.TYPE_SUMMER])
-    whole_year = factory.fuzzy.FuzzyInteger(2018, 2020)
+    whole_year = factory.fuzzy.FuzzyInteger(2017, 2030)
     year = \
         factory.LazyAttribute(lambda x: ("%s/%s" % (x.whole_year,
                                                     x.whole_year % 100 + 1)))
@@ -66,7 +66,7 @@ class CourseEntityFactory(DjangoModelFactory):
     name = factory.Sequence(lambda n: 'course_entity_{0}'.format(n))
 
 
-class CourseFactory(factory.django.DjangoModelFactory):
+class CourseFactory(DjangoModelFactory):
 
     class Meta:
         model = Course
@@ -86,7 +86,7 @@ class GroupFactory(DjangoModelFactory):
         model = Group
 
     course = factory.SubFactory(CourseFactory)
-    type = 1
+    type = 2
     limit = 10
     teacher = factory.SubFactory(EmployeeFactory)
 
