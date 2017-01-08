@@ -20,12 +20,12 @@ import time
 from random import seed, randint, choice
 
 
-def open_course_for_student(student, course):
+def open_course_for_student(student, course, opening_time = datetime.now()):
     OpeningTimesView.objects.create(
         student=student,
         course=course,
         semester=course.semester,
-        opening_time=datetime.now())
+        opening_time=opening_time)
 
 class DummyTest(TransactionTestCase):
     reset_sequences = True
@@ -178,6 +178,21 @@ class DummyTest(TransactionTestCase):
 
         self.assertFalse(result)
         self.assertEqual(messages_list, [u'Jesteś już w tej grupie'])
+
+    def testEnrollmentFailsIfEnrollmentNotYetStarted(self):
+        today = datetime.now()
+        exercises_group = GroupFactory(
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        student = StudentFactory()
+        open_course_for_student(student, exercises_group.course, opening_time = today + timedelta(days = 1))
+
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+
+        self.assertFalse(result)
+        self.assertEqual(messages_list, [u'Zapisy na ten przedmiot są dla Ciebie zamknięte'])
 
     def testAddStudentToQueue(self):
         today = datetime.now()
