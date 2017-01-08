@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 from django.contrib.auth.models import User
 from apps.enrollment.courses.models import Group, Course, CourseEntity, \
@@ -26,9 +26,8 @@ def open_group_for_student(student, group):
         semester=group.course.semester, opening_time=datetime.now())
 
 
-class DummyTest(TestCase):
+class DummyTest(TransactionTestCase):
     reset_sequences = True
-
 
     def createSemester(self):
         today = datetime.now()
