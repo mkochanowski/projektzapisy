@@ -161,6 +161,24 @@ class DummyTest(TransactionTestCase):
         self.assertTrue(Record.objects.filter(group_id = lecture_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
         self.assertTrue(Record.objects.filter(group_id = exercises_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
 
+    def testAddingStudentToSameGroupAgainFails(self):
+        today = datetime.now()
+        exercises_group = GroupFactory(
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        student = StudentFactory()
+        open_course_for_student(student, exercises_group.course)
+
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+
+        self.assertFalse(result)
+        self.assertEqual(messages_list, [u'Jesteś już w tej grupie'])
+
     def testAddStudentToQueue(self):
         today = datetime.now()
         group = GroupFactory(
