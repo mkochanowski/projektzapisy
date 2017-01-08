@@ -8,7 +8,7 @@ from apps.enrollment.courses.models import Group, Course, CourseEntity, \
 from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
-from apps.enrollment.courses.tests.factories import GroupFactory
+from apps.enrollment.courses.tests.factories import GroupFactory, CourseFactory
 from apps.users.tests.factories import StudentFactory
 from apps.users.models import OpeningTimesView
 from apps.enrollment.records.models import Record, Queue, \
@@ -136,6 +136,29 @@ class DummyTest(TransactionTestCase):
         run_rearanged(result)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+
+    def testAddingStudentToExercisesShouldAddItToLecture(self):
+        today = datetime.now()
+        course = CourseFactory()
+        exercises_group = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        lecture_group = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6),
+            type = 1
+        )
+        student = StudentFactory()
+        open_group_for_student(student, exercises_group)
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        self.assertTrue(Record.objects.filter(group_id = lecture_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
+        self.assertTrue(Record.objects.filter(group_id = exercises_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
 
     def testAddStudentToQueue(self):
         today = datetime.now()
