@@ -199,13 +199,23 @@ class MessageTestCase(TestCase):
         self.assertEqual(len(messages), 2) 
 
 class TermTestCase(TestCase):
-    #def setUp(self):
     def test_simplest_term(self):
         term1 = factories.TermFactory()
         term1.full_clean()
         term1.save()
         self.assertTrue(term1)
-
+    def test_get_terms_for_dates(self):
+        term2 = factories.TermFactory()
+        term2.full_clean()
+        term2.save()
+        termsoftheday = term2.get_terms_for_dates([term2.get_day()],term2.get_room())
+        self.assertEqual(len(termsoftheday), 1)
+    def test_validation_on_overlapping(self):
+        term2 = factories.TermThisYearFactory()
+        term2.full_clean()
+        term2.save()
+        term3 = factories.TermThisYearFactory(room = term2.get_room())
+        self.assertRaises(ValidationError, term3.full_clean)
 class EventTestCase(TestCase):
     def setUp(self):
         teacher = factories.UserFactory()
