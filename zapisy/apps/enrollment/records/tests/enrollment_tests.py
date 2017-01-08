@@ -20,11 +20,12 @@ import time
 from random import seed, randint, choice
 
 
-def open_group_for_student(student, group):
+def open_course_for_student(student, course):
     OpeningTimesView.objects.create(
-        student=student, course=group.course,
-        semester=group.course.semester, opening_time=datetime.now())
-
+        student=student,
+        course=course,
+        semester=course.semester,
+        opening_time=datetime.now())
 
 class DummyTest(TransactionTestCase):
     reset_sequences = True
@@ -131,7 +132,7 @@ class DummyTest(TransactionTestCase):
             course__semester__records_closing=today+timedelta(days=6)
         )
         student = StudentFactory()
-        open_group_for_student(student, group)
+        open_course_for_student(student, group.course)
         result, messages_list = group.enroll_student(student)
         run_rearanged(result)
         self.assertTrue(result)
@@ -152,7 +153,7 @@ class DummyTest(TransactionTestCase):
             type = 1
         )
         student = StudentFactory()
-        open_group_for_student(student, exercises_group)
+        open_course_for_student(student, course)
         result, messages_list = exercises_group.enroll_student(student)
         run_rearanged(result)
         self.assertTrue(result)
@@ -168,7 +169,7 @@ class DummyTest(TransactionTestCase):
         )
         students = StudentFactory.create_batch(15)
         for student in students:
-            open_group_for_student(student, group)
+            open_course_for_student(student, group.course)
         for student in students[:10]:
             result, messages_list = group.enroll_student(student)
             run_rearanged(result)
@@ -192,7 +193,7 @@ class DummyTest(TransactionTestCase):
         )
         students = StudentFactory.create_batch(15)
         for student in students:
-            open_group_for_student(student, group)
+            open_course_for_student(student, group.course)
         for student in students[:10]:
             result, messages_list = group.enroll_student(student)
             run_rearanged(result, group)
