@@ -179,6 +179,35 @@ class DummyTest(TransactionTestCase):
         self.assertFalse(result)
         self.assertEqual(messages_list, [u'Jesteś już w tej grupie'])
 
+    def testAddingStudentToSameGroupAgainFails(self):
+        today = datetime.now()
+        course = CourseFactory()
+        exercises_group1 = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        exercises_group2 = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        student = StudentFactory()
+        open_course_for_student(student, course)
+
+        result, messages_list = exercises_group1.enroll_student(student)
+        run_rearanged(result)
+
+        result, messages_list = exercises_group2.enroll_student(student)
+        run_rearanged(result)
+
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        record_for_group1 = Record.objects.filter(student_id = student.id, group_id = exercises_group1.id)[0]
+        record_for_group2 = Record.objects.filter(student_id = student.id, group_id = exercises_group2.id)[0]
+        self.assertEqual(record_for_group1.status, STATUS_REMOVED)
+        self.assertEqual(record_for_group2.status, STATUS_ENROLLED)
+
     def testEnrollmentFailsIfEnrollmentNotYetStarted(self):
         today = datetime.now()
         exercises_group = GroupFactory(
