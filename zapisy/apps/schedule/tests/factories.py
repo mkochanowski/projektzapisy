@@ -12,6 +12,7 @@ from apps.enrollment.courses.tests.factories import GroupFactory, SummerSemester
     ClassroomFactory
 from apps.schedule.models import Event, Term, SpecialReservation
 import common
+import random
 
 
 class EventCourseFactory(DjangoModelFactory):
@@ -65,8 +66,10 @@ class TermFactory(DjangoModelFactory):
     event = factory.SubFactory(EventFactory)
     room = factory.SubFactory(ClassroomFactory)
     day = factory.fuzzy.FuzzyNaiveDateTime(datetime.now(), force_year=datetime.now().year)
-    start = time(10)
-    end = time(12)
+    start = random.randint(9,15)
+    end = random.randint(16,19)
+    start = time(start)
+    end = time(end)
 
 class TermFixedDayFactory(TermThisYearFactory):
     day = date(2016, 5, 20)
