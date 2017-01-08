@@ -20,6 +20,12 @@ import time
 from random import seed, randint, choice
 
 
+def open_group_for_student(student, group):
+    OpeningTimesView.objects.create(
+        student=student, course=group.course,
+        semester=group.course.semester, opening_time=datetime.now())
+
+
 class DummyTest(TestCase):
     reset_sequences = True
 
@@ -119,31 +125,6 @@ class DummyTest(TestCase):
             cursor.execute(sql_call)
             connection.commit()
 
-
-    def refresh_opening_times(self, semester):
-        cursor = connection.cursor()
-        cursor.execute("SELECT users_openingtimesview_refresh_for_semester(%s);" % str(semester.id))
-        connection.commit()
-
-        """
-    def testAddStudentToLectureGroupOnly(self):
-        self.initialize_triggers()
-        student = self.createStudentUser()
-        teacherUser, teacher = self.createTeacher()
-
-        semester = self.createSemester()
-        course = self.createCourse(semester)
-        exercise_group = self.createExerciseGroup(course, teacher)
-        lecture_group = self.createLectureGroup(course, teacher)
-
-        self.refresh_opening_times(semester)
-
-        result, messages_list = lecture_group.enroll_student(student.student)
-        run_rearanged(result)
-        self.assertTrue(result)
-        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
-        """
-
     def testAddStudentToGroup(self):
         today = datetime.now()
         group = GroupFactory(
@@ -151,9 +132,7 @@ class DummyTest(TestCase):
             course__semester__records_closing=today+timedelta(days=6)
         )
         student = StudentFactory()
-        OpeningTimesView.objects.create(
-            student=student, course=group.course,
-            semester=group.course.semester, opening_time=today)
+        open_group_for_student(student, group)
         result, messages_list = group.enroll_student(student)
         run_rearanged(result)
         self.assertTrue(result)
@@ -167,9 +146,7 @@ class DummyTest(TestCase):
         )
         students = StudentFactory.create_batch(15)
         for student in students:
-            OpeningTimesView.objects.create(
-                student=student, course=group.course,
-                semester=group.course.semester, opening_time=today)
+            open_group_for_student(student, group)
         for student in students[:10]:
             result, messages_list = group.enroll_student(student)
             run_rearanged(result)
@@ -186,3 +163,39 @@ class DummyTest(TestCase):
                 u'Student został dopisany do kolejki'])
         self.assertEqual(group.enrolled, 10)
         self.assertEqual(group.queued, 5)
+
+    def testIsQueueWorking(self):
+        today = datetime.now()
+        group = GroupFactory(
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6),
+        )
+        students = StudentFactory.create_batch(15)
+        for student in students:
+            open_group_for_student(student, group)
+        for student in students[:10]:
+            result, messages_list = group.enroll_student(student)
+            run_rearanged(result, group)
+            self.assertTrue(result)
+            self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+            # what the hell
+            group.enrolled += 1
+        for student in students[10:]:
+            result, messages_list = group.enroll_student(student)
+            run_rearanged(result, group)
+            self.assertTrue(result)
+            self.assertEqual(messages_list, [
+                u'Brak wolnych miejsc w grupie',
+                u'Student został dopisany do kolejki'])
+        self.assertEqual(group.enrolled, 10)
+        self.assertEqual(group.queued, 5)
+        result, messages_list = group.remove_student(students[8])
+        run_rearanged(result, group)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student wypisany z grupy'])
+        enrolled = [x.student for x in Record.objects.filter(group=group)]
+        should_be_enrolled = students[0:8] + students[9:11]
+        for student in should_be_enrolled:
+            self.assertTrue(student in enrolled)
+        #self.assertEqual(group.enrolled, 10)
+        #self.assertEqual(group.queued, 4)
