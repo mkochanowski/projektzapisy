@@ -22,7 +22,7 @@ class UserFactory(DjangoModelFactory):
     pref_username = factory.Sequence(lambda n: 'testuser_{0}'.format(n))
     suff_username = ""
     username = factory.LazyAttribute(lambda o: o.pref_username+o.suff_username)
-    password = factory.PostGenerationMethodCall('set_password',username)
+    password = factory.PostGenerationMethodCall('set_password','pass')
     is_staff = False
     is_superuser = False
 

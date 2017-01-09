@@ -46,7 +46,7 @@ class VoteLinkTestCase(TestCase):
         # s2 = Student.objects.create(user=cls.user2,matricula='111111')
         # s2.status = 1
         cls.s1 = StudentFactory()
-        cls.s2 = StudentFactory()
+        cls.s2 = StudentFactory(status=1)
         sql_calls = [
             """
                 CREATE TABLE courses_studentpointsview (
@@ -74,9 +74,6 @@ class VoteLinkTestCase(TestCase):
             cursor.execute(sql_call)
             connection.commit()
 
-    def setUp(self):
-        self.client.login(username=self.s1.user.username, password=self.s1.user.username)
-
     def generic_voting_active_view_test_case(self, urlname):
         create_active_system_state()
         response = self.client.get(reverse(urlname))
@@ -97,19 +94,31 @@ class VoteLinkTestCase(TestCase):
         self._generic_voting_inactive_view_test_case(urlname)
 
     def test_vote_link_in_vote_view_when_system_is_active(self):
+        self.client.login(username=self.s1.user.username, password='pass')
         self.generic_voting_active_view_test_case('vote-view')
 
+    def test_vote_link_in_vote_view_when_system_is_active_baduser(self):
+        self.client.login(username=self.s2.user.username, password='pass')
+        create_active_system_state()
+        response = self.client.get(reverse('vote-view'), follow=True)
+        self.assertNotContains(response, self.VOTE_LINK, html=True)
+        
     def test_vote_link_in_vote_view_when_system_is_inactive_in_past(self):
+        self.client.login(username=self.s1.user.username, password='pass')
         self.generic_voting_inactive_view_past_test_case('vote-view')
 
     def test_vote_link_in_vote_view_when_system_is_inactive_in_future(self):
+        self.client.login(username=self.s1.user.username, password='pass')
         self.generic_voting_inactive_view_future_test_case('vote-view')
 
     def test_vote_link_in_vote_summary_when_system_is_active(self):
+        self.client.login(username=self.s1.user.username, password='pass')
         self.generic_voting_active_view_test_case('vote-summary')
 
     def test_vote_link_in_vote_summary_when_system_is_inactive_in_past(self):
+        self.client.login(username=self.s1.user.username, password='pass')
         self.generic_voting_inactive_view_past_test_case('vote-summary')
 
     def test_vote_link_in_vote_summary_when_system_is_inactive_in_future(self):
+        self.client.login(username=self.s1.user.username, password='pass')
         self.generic_voting_inactive_view_future_test_case('vote-summary')
