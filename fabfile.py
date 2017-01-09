@@ -109,6 +109,8 @@ def update_env():
     if not env.has_key('current_release'):
         releases()
     run("source %(venv_path)s/bin/activate; pip install -r %(current_release)s/zapisy/requirements.production.txt" % { 'current_release': env.current_release, 'venv_path': env.venv_path })
+    run("source %(venv_path)s/bin/activate; pip uninstall -y django" % { 'venv_path': env.venv_path })
+    run("source %(venv_path)s/bin/activate; pip install --no-binary django django==1.4.2" % { 'venv_path': env.venv_path })
 
 def migrate():
     """Run the migrate task"""
