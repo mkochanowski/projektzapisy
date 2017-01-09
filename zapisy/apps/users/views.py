@@ -3,8 +3,10 @@
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
+from django.views.decorators.http import require_POST
 from django.contrib.auth.views import login
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -28,14 +30,16 @@ from apps.users.utils import prepare_ajax_students_list,\
 from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
+from apps.enrollment.utils import mailto
 
-from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm
+from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
 
 from apps.enrollment.records.utils import *
 
 from datetime import timedelta
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
 import datetime
+from mailer.models import Message
 
 import logging
 
@@ -274,7 +278,6 @@ def my_profile(request):
         grade = None
         courses = None
 
-
     return TemplateResponse(request, 'users/my_profile.html', locals())
 
 def employees_list(request, begin = 'All', query=None):
@@ -322,7 +325,9 @@ def students_list(request, begin = 'All', query=None):
         data = { 
             "students" : students, 
             "char": begin,
-            "query": query
+            "query": query,
+            'mailto_group': mailto(request.user, students),
+            'mailto_group_bcc': mailto(request.user, students, True)
         }
         return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
@@ -410,3 +415,36 @@ def create_ical_file(request):
     response = HttpResponse(cal_str, content_type='application/calendar')
     response['Content-Disposition'] = 'attachment; filename=schedule.ical'
     return response    
+
+@permission_required('users.mailto_all_students')
+def email_students(request):
+    """function that enables mailing all students"""
+    students = Student.get_list('All')
+    if students:
+        studentsmails = ','.join([student.user.email for student in students])
+
+    if request.POST:
+        data = request.POST.copy()
+        form = EmailToAllStudentsForm(data)
+        form.fields['sender'].widget.attrs['readonly'] = True
+        if form.is_valid():
+            counter = 0
+            body = form.cleaned_data['message']
+            subject = form.cleaned_data['subject']
+            for student in students:
+                address = student.user.email
+                if address:
+                    counter += 1
+                    Message.objects.create(to_address=address, from_address=form.cleaned_data['sender'], subject=subject, message_body=body)
+            if form.cleaned_data['cc_myself'] == True:
+                Message.objects.create(to_address=request.user.email, from_address=form.cleaned_data['sender'], subject=subject, message_body=body)
+            messages.success(request, u'Wysłano wiadomość do %d studentów' % counter)
+            return HttpResponseRedirect(reverse('my-profile'))
+        else:
+            messages.error(request, u'Wystąpił błąd przy wysyłaniu wiadomości')
+    else:
+        form = EmailToAllStudentsForm(initial={'sender': 'zapisy@cs.uni.wroc.pl'})
+        form.fields['sender'].widget.attrs['readonly'] = True
+    return render_to_response('users/email_students.html', {'form':form, 'students_mails': studentsmails}, context_instance=RequestContext(request))
+
+

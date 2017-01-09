@@ -46,7 +46,7 @@ def random_pass():
 def send_email(address):
     body = "Witaj,\n\nkonto zostało utworzone.\nlogin: nr indeksu\n\nHasło można uzyskać poprzez formularz:\nhttps://zapisy.ii.uni.wroc.pl/users/password-change/\n\nZespół zapisy.ii.uni.wroc.pl\n"
     subject = '[Zapisy] Nowe konto'
-    Message.objects.create(to_address=address, from_address='zapisy@ii.uni.wroc.pl', subject=subject, message_body=body)
+    Message.objects.create(to_address=address, from_address='zapisy@cs.uni.wroc.pl', subject=subject, message_body=body)
 
 def process(line):
     line = line.strip()

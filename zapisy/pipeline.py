@@ -4,7 +4,8 @@ PIPELINE_CSS = {
         'source_filenames': (
             'css/bootstrap-1.2.0.css',
             'css/main.css',
-            'css/fereol.css'
+            'css/fereol.css',
+            'css/cookieconsent.min.css'
         ),
         'output_filename': 'css/main.min.css',
         'extra_context': {
@@ -202,6 +203,7 @@ PIPELINE_JS = {
             'js/jquery/jquery.cookies.2.2.0.min.js',
             'js/jquery/baseExtensions.js',
             'js/main.js',
+            'js/cookieconsent.min.js'
             ),
             'output_filename': 'js/main.min.js',
         },

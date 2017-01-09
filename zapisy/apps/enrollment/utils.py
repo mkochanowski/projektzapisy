@@ -9,7 +9,7 @@ from django.template import Context, RequestContext
 from django.template.loader import get_template
 import codecs
 
-MASS_MAIL_FROM = 'zapisy@ii.uni.wroc.pl'
+MASS_MAIL_FROM = 'zapisy@cs.uni.wroc.pl'
 
 def render_email_enrollment_from_queue(student, group):
     """
@@ -43,3 +43,10 @@ def mail_enrollment_from_queue(student, group):
     Mail about enrollment from queue.
     """
     send_mail(render_email_enrollment_from_queue(student, group), student)
+
+def mailto(author, students, bcc=False):
+    """Helper method to create mailto links"""
+    result = author.email
+    if students:
+        return result + ('?bcc=' if bcc else ',') + ','.join([student.user.email for student in students])
+    return result

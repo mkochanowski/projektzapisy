@@ -1,4 +1,4 @@
-# -*- coding: utf-8-*-
+# -*- coding: utf-8 -*-
 
 # Run this tests with 'xvfb-run python manage.py test test_app' command
 
