@@ -73,16 +73,10 @@ def stop():
     """Stop the application servers"""
     run("service zapisy stop")
 
-# def permissions():
-    # """Make the release group-writable"""
-    # sudo("chmod -R g+w %(domain_path)s" % { 'domain_path':env.domain_path })
-    # sudo("chown -R www-data:www-data %(domain_path)s" % { 'domain_path':env.domain_path })
-
 def setup():
     """Prepares one or more servers for deployment"""
     run("mkdir -p %(domain_path)s/{releases,shared}" % { 'domain_path': env.domain_path })
     run("mkdir -p %(shared_path)s/{logs,system}" % { 'shared_path': env.shared_path })
-    # permissions()
 
 def checkout():
     """Checkout code to the remote servers"""
@@ -95,12 +89,10 @@ def update():
     update_code()
     update_env()
     symlink()
-    # permissions()
 
 def update_code():
     """Copies your project to the remote servers"""
     checkout()
-    # permissions()
 
 def symlink():
     """Updates the symlink to the most recently deployed version"""
@@ -110,23 +102,18 @@ def symlink():
     run("ln -nfs %(shared_path)s/logs %(current_release)s/zapisy/logs" % { 'shared_path': env.shared_path, 'current_release': env.current_release })
     run("ln -nfs %(shared_path)s/system/settings_local.py %(current_release)s/zapisy/settings_local.py" % { 'shared_path': env.shared_path, 'current_release': env.current_release })
     run("ln -nfs /home/zapisy/env26/lib/python2.6/site-packages/django/contrib/admin/static/admin %(current_release)s/zapisy/site_media/admin" % { 'current_release': env.current_release })
-    # run("ln -nfs %(current_release)s/env/src/django/django/contrib/admin/media %(current_release)s/%(app_name)s/media/admin" % { 'current_release':env.current_release, 'app_name':env.app_name })
 
 def update_env():
     """Update servers environment on the remote servers"""
     if not env.has_key('current_release'):
         releases()
     run("source /home/zapisy/env27/bin/activate; pip install -r %(current_release)s/zapisy/requirements.production.txt" % { 'current_release':env.current_release })
-    # run("cd %(current_release)s; virtualenv --no-site-packages --unzip-setuptools env" % { 'current_release':env.current_release })
-    # run("pip -q install -E %(current_release)s/env -r %(current_release)s/%(env_file)s" % { 'current_release':env.current_release, 'env_file':env.env_file })
-    # permissions()
 
 def migrate():
     """Run the migrate task"""
     if not env.has_key('current_release'):
         releases()
     run("source /home/zapisy/env26/bin/activate; cd %(current_release)s/zapisy; python manage.py migrate" % { 'current_release':env.current_release })
-    # run("source %(current_release)s/env/bin/activate; cd %(current_release)s; python %(app_name)s/manage.py migrate" % { 'current_release':env.current_release, 'app_name':env.app_name })
 
 def cleanup():
     """Clean up old releases"""
@@ -138,31 +125,6 @@ def cleanup():
         del directories[:env.max_releases]
         env.directories = ' '.join([ "%(releases_path)s/%(release)s" % { 'releases_path': env.releases_path, 'release': release } for release in directories ])
         run("rm -rf %(directories)s" % { 'directories':env.directories })
-
-# def enable():
-#     """Makes the application web-accessible again"""
-#     run("rm %(shared_path)s/system/maintenance.html" % { 'shared_path':env.shared_path })
-
-# def disable(**kwargs):
-#     """Present a maintenance page to visitors"""
-#     import os, datetime
-#     from django.conf import settings
-#     try:
-#         settings.configure(
-#             DEBUG=False, TEMPLATE_DEBUG=False,
-#             TEMPLATE_DIRS=(os.path.join(os.getcwd(), 'templates/'),)
-#         )
-#     except EnvironmentError:
-#         pass
-#     from django.template.loader import render_to_string
-#     env.deadline = kwargs.get('deadline', None)
-#     env.reason = kwargs.get('reason', None)
-#     open("maintenance.html", "w").write(
-#         render_to_string("maintenance.html", { 'now':datetime.datetime.now(), 'deadline':env.deadline, 'reason':env.reason
-# }).encode('utf-8')
-#     )
-#     put('maintenance.html', '%(shared_path)s/system/maintenance.html' % { 'shared_path':env.shared_path })
-#     local("rm maintenance.html")
 
 def rollback_code():
     """Rolls back to the previously deployed version"""
