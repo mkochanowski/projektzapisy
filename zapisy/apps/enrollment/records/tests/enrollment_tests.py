@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 from django.contrib.auth.models import User
 from apps.enrollment.courses.models import Group, Course, CourseEntity, \
@@ -8,7 +8,7 @@ from apps.enrollment.courses.models import Group, Course, CourseEntity, \
 from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
-from apps.enrollment.courses.tests.factories import GroupFactory
+from apps.enrollment.courses.tests.factories import GroupFactory, CourseFactory
 from apps.users.tests.factories import StudentFactory
 from apps.users.models import OpeningTimesView
 from apps.enrollment.records.models import Record, Queue, \
@@ -20,15 +20,15 @@ import time
 from random import seed, randint, choice
 
 
-def open_group_for_student(student, group):
+def open_course_for_student(student, course, opening_time = datetime.now()):
     OpeningTimesView.objects.create(
-        student=student, course=group.course,
-        semester=group.course.semester, opening_time=datetime.now())
+        student=student,
+        course=course,
+        semester=course.semester,
+        opening_time=opening_time)
 
-
-class DummyTest(TestCase):
+class DummyTest(TransactionTestCase):
     reset_sequences = True
-
 
     def createSemester(self):
         today = datetime.now()
@@ -132,11 +132,96 @@ class DummyTest(TestCase):
             course__semester__records_closing=today+timedelta(days=6)
         )
         student = StudentFactory()
-        open_group_for_student(student, group)
+        open_course_for_student(student, group.course)
         result, messages_list = group.enroll_student(student)
         run_rearanged(result)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+
+    def testAddingStudentToExercisesShouldAddItToLecture(self):
+        today = datetime.now()
+        course = CourseFactory()
+        exercises_group = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        lecture_group = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6),
+            type = 1
+        )
+        student = StudentFactory()
+        open_course_for_student(student, course)
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        self.assertTrue(Record.objects.filter(group_id = lecture_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
+        self.assertTrue(Record.objects.filter(group_id = exercises_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
+
+    def testAddingStudentToSameGroupAgainFails(self):
+        today = datetime.now()
+        exercises_group = GroupFactory(
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        student = StudentFactory()
+        open_course_for_student(student, exercises_group.course)
+
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+
+        self.assertFalse(result)
+        self.assertEqual(messages_list, [u'Jesteś już w tej grupie'])
+
+    def testAddingStudentToSameGroupAgainFails(self):
+        today = datetime.now()
+        course = CourseFactory()
+        exercises_group1 = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        exercises_group2 = GroupFactory(
+            course = course,
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        student = StudentFactory()
+        open_course_for_student(student, course)
+
+        result, messages_list = exercises_group1.enroll_student(student)
+        run_rearanged(result)
+
+        result, messages_list = exercises_group2.enroll_student(student)
+        run_rearanged(result)
+
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        record_for_group1 = Record.objects.filter(student_id = student.id, group_id = exercises_group1.id)[0]
+        record_for_group2 = Record.objects.filter(student_id = student.id, group_id = exercises_group2.id)[0]
+        self.assertEqual(record_for_group1.status, STATUS_REMOVED)
+        self.assertEqual(record_for_group2.status, STATUS_ENROLLED)
+
+    def testEnrollmentFailsIfEnrollmentNotYetStarted(self):
+        today = datetime.now()
+        exercises_group = GroupFactory(
+            course__semester__records_opening=today+timedelta(days=-1),
+            course__semester__records_closing=today+timedelta(days=6)
+        )
+        student = StudentFactory()
+        open_course_for_student(student, exercises_group.course, opening_time = today + timedelta(days = 1))
+
+        result, messages_list = exercises_group.enroll_student(student)
+        run_rearanged(result)
+
+        self.assertFalse(result)
+        self.assertEqual(messages_list, [u'Zapisy na ten przedmiot są dla Ciebie zamknięte'])
 
     def testAddStudentToQueue(self):
         today = datetime.now()
@@ -146,7 +231,7 @@ class DummyTest(TestCase):
         )
         students = StudentFactory.create_batch(15)
         for student in students:
-            open_group_for_student(student, group)
+            open_course_for_student(student, group.course)
         for student in students[:10]:
             result, messages_list = group.enroll_student(student)
             run_rearanged(result)
@@ -170,7 +255,7 @@ class DummyTest(TestCase):
         )
         students = StudentFactory.create_batch(15)
         for student in students:
-            open_group_for_student(student, group)
+            open_course_for_student(student, group.course)
         for student in students[:10]:
             result, messages_list = group.enroll_student(student)
             run_rearanged(result, group)
@@ -189,12 +274,10 @@ class DummyTest(TestCase):
         run_rearanged(result, group)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student wypisany z grupy'])
-        enrolled = [x.student for x in
-                    Record.objects.filter(group=group,
-                                          status=STATUS_ENROLLED)]
-        removed = [x.student for x in
-                   Record.objects.filter(group=group,
-                                         status=STATUS_REMOVED)]
+        enrolled = [x.student for x in Record.objects.filter(group=group,
+                                                             status=1)]
+        removed = [x.student for x in Record.objects.filter(group=group,
+                                                            status=0)]
         queued = [x.student for x in
                   Queue.objects.filter(group=group)]
         should_be_enrolled = students[0:8] + students[9:11]
