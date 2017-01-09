@@ -15,12 +15,16 @@ langs = [x[0] for x in settings.LANGUAGES]
 class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
+        # factory is pretty stupid, and will not remember if
+        # user was created for other factory
+        exclude = ("pref_username", "suff_username", )
 
-    username = factory.Sequence(lambda n: 'user%d' % n)
-    password = factory.LazyAttribute(lambda o: o.username)
+    pref_username = factory.Sequence(lambda n: 'testuser_{0}'.format(n))
+    suff_username = ""
+    username = factory.LazyAttribute(lambda o: o.pref_username+o.suff_username)
+    password = factory.PostGenerationMethodCall('set_password',username)
     is_staff = False
     is_superuser = False
-
 
 class StudentFactory(DjangoModelFactory):
     class Meta:
