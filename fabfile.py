@@ -116,6 +116,7 @@ def update_env():
     """Update servers environment on the remote servers"""
     if not env.has_key('current_release'):
         releases()
+    run("source /home/zapisy/env27/bin/activate; pip install -r %(current_release)s/zapisy/requirements.production.txt" % { 'current_release':env.current_release })
     # run("cd %(current_release)s; virtualenv --no-site-packages --unzip-setuptools env" % { 'current_release':env.current_release })
     # run("pip -q install -E %(current_release)s/env -r %(current_release)s/%(env_file)s" % { 'current_release':env.current_release, 'env_file':env.env_file })
     # permissions()
