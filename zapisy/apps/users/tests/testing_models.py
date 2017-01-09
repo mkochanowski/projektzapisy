@@ -8,7 +8,6 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from apps.enrollment.courses.tests.factories import SummerSemesterFactory
 from apps.enrollment.records.models import Record
 from apps.enrollment.courses.models import Course, Term, Group
 from apps.users.models import Employee, Student, StudiaZamawiane
@@ -16,6 +15,7 @@ from apps.users.exceptions import NonEmployeeException, NonStudentException
 from django.contrib.auth.models import Permission
 
 from apps.users.tests.factories import UserFactory
+from apps.enrollment.courses.models import Semester
 
 # class EmployeeGroupsTest(TestCase):
 #     fixtures =  ['fixtures__users', 'fixtures__courses']
@@ -171,7 +171,8 @@ class MailsToStudentsLinkTestCase(TestCase):
         dean_user.user_permissions.add(permission)
         cls.dean_user = dean_user
 
-        summer_semester = SummerSemesterFactory()
+        from apps.enrollment.courses.tests.factories import SemesterFactory
+        summer_semester = SemesterFactory(type=Semester.TYPE_SUMMER)
         summer_semester.full_clean()
 
     def test_mailto_link_not_exists_regular_user(self):

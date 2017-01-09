@@ -10,7 +10,7 @@ from ..models.course import Course, CourseEntity
 from ..models.group import Group
 from ..models.semester import ChangedDay, Semester
 from ..models.classroom import Classroom
-from zapisy.apps.users.tests.factories import EmployeeFactory
+from apps.users.tests.factories import EmployeeFactory
 import common
 
 

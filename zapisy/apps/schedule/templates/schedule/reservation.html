@@ -695,8 +695,8 @@
                             for (var key in config.terms) {
                                 if (config.terms.hasOwnProperty(key)) {
                                     var pitem = config.terms[key];
-                                    if ((lpixel - pitem.end <= 1 && rpixel - pitem.begin >= -1) ||
-                                            (pitem.begin - rpixel <= 1 && pitem.end - lpixel >= -1)) {
+                                    if ((lpixel - pitem.end < 1 && rpixel - pitem.begin > -1) ||
+                                            (pitem.begin - rpixel < 1 && pitem.end - lpixel > -1)) {
                                         return false;
                                     }
                                 }
