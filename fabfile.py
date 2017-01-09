@@ -40,6 +40,7 @@ def testing3():
     env.app_name = "projektzapisy"
     env.domain_name = "ec2-35-165-223-171.us-west-2.compute.amazonaws.com"
     env.domain_path = "%(base_dir)s/%(app_name)s" % { 'base_dir': env.base_dir, 'app_name': env.app_name }
+    env.venv_path = "%(base_dir)s/env27" % { 'base_dir': env.base_dir }
     env.current_path = "%(domain_path)s/current" % { 'domain_path': env.domain_path }
     env.releases_path = "%(domain_path)s/releases" % { 'domain_path': env.domain_path }
     env.shared_path = "%(domain_path)s/shared" % { 'domain_path': env.domain_path }
@@ -107,13 +108,13 @@ def update_env():
     """Update servers environment on the remote servers"""
     if not env.has_key('current_release'):
         releases()
-    run("source /home/zapisy/env27/bin/activate; pip install -r %(current_release)s/zapisy/requirements.production.txt" % { 'current_release':env.current_release })
+    run("source %(venv_path)s/bin/activate; pip install -r %(current_release)s/zapisy/requirements.production.txt" % { 'current_release': env.current_release, 'venv_path': env.venv_path })
 
 def migrate():
     """Run the migrate task"""
     if not env.has_key('current_release'):
         releases()
-    run("source /home/zapisy/env26/bin/activate; cd %(current_release)s/zapisy; python manage.py migrate" % { 'current_release':env.current_release })
+    run("source %(venv_path)s/bin/activate; cd %(current_release)s/zapisy; python manage.py migrate" % { 'current_release':env.current_release, 'venv_path': env.venv_path })
 
 def cleanup():
     """Clean up old releases"""
