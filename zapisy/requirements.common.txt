@@ -26,7 +26,7 @@ django-paranoid-sessions==0.2.0
 newrelic==2.68.0.50
 https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/django-endless-pagination/django-endless-pagination-1.1.tar.gz
 
-python-rq==0.7.1
+rq==0.7.1
 
 # Requested by lewymati, it makes shell_plus work reasonably as REPL
 readline==6.2.4.1
