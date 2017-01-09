@@ -2,6 +2,8 @@
 
 # Current version
 
+* Updated max points for vote information
+
 # Version 16.12.19
 
 * Added cookie law info
