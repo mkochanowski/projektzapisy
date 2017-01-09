@@ -109,7 +109,6 @@ class BaseUser(models.Model):
         abstract = True
 
 
-
 class Employee(BaseUser):
     '''
     Employee.
@@ -691,4 +690,3 @@ class OpeningTimesView(models.Model):
 
     class Meta:
         app_label = 'users'
-
