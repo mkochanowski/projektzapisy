@@ -30,6 +30,7 @@ from apps.enrollment.records.models import *
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.courses.views import prepare_courses_list_to_render
 from apps.enrollment.records.utils import *
+from apps.enrollment.utils import mailto
 
 from libs.ajax_messages import *
 
@@ -212,25 +213,20 @@ def records(request, group_id):
         Group records view - list of all students enrolled and queued to group.
     """
     try:
-        def mailto_bcc(author, students):
-            """Helper method to create mailto links"""
-            result = author.email
-            if students:
-                return result + '?bcc=' + ','.join([student.user.email for student in students])
-            return result
-
         group = Group.objects.get(id=group_id)
         students_in_group = Record.get_students_in_group(group_id)
         students_in_queue = Queue.get_students_in_queue(group_id)
         all_students = Student.objects.all()
         data = prepare_courses_list_to_render(request)
         data.update({
-            'all_students' : all_students,
-            'students_in_group' : students_in_group,
-            'students_in_queue' : students_in_queue,
-            'group' : group,
-            'mailto_group' : mailto_bcc(request.user, students_in_group),
-            'mailto_queue' : mailto_bcc(request.user, students_in_queue)
+            'all_students': all_students,
+            'students_in_group': students_in_group,
+            'students_in_queue': students_in_queue,
+            'group': group,
+            'mailto_group': mailto(request.user, students_in_group),
+            'mailto_queue': mailto(request.user, students_in_queue),
+            'mailto_group_bcc': mailto(request.user, students_in_group, True),
+            'mailto_queue_bcc': mailto(request.user, students_in_queue, True),
         })
         return render_to_response('enrollment/records/records_list.html', data,
             context_instance=RequestContext(request))
@@ -353,17 +349,17 @@ def schedule_prototype(request):
         mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
 #    else:
 #        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
-                   
 
-    cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')   
+
+    cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
     if cached_all_groups == 'DoesNotExist':
 
 #        logger.debug('Cache miss with semester id: %s' % \
 #                default_semester.id)
         mcache.delete("schedule_prototype_courses_json_%s" % student_id)
         cached_all_groups = Group.get_groups_by_semester_opt(default_semester)
-        mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)                
-        
+        mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)
+
     all_groups_json = prepare_groups_json(default_semester, cached_all_groups,
         student=student)
 
@@ -381,7 +377,7 @@ def schedule_prototype(request):
         mcache.set("schedule_prototype_courses_json_%s" % student_id, cached_courses_json)
 #    else:
 #        logger.debug("in cache schedule_prototype_courses_json_%s" % student.id)
-        
+
     data = {
         'courses_json': cached_courses_json,
         'groups_json': all_groups_json,

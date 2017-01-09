@@ -237,5 +237,7 @@ $('.checkall').live('click', function(){
         Zapisz
     </button>
 </form>
-
+{% if perms.users.mailto_all_students %}
+    <a href="{% url email-students %}">Wyślij wiadomość do studentów</a>
+{% endif %}
 {% endblock %}

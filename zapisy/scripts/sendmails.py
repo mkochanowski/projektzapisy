@@ -15,5 +15,5 @@ def run():
 			body = "Witaj, \n\ninformujemy, że jutro kończy się ocena zajęć. Przypominamy, że udział w ocenie zajęć daje bonus 24h do otwarcia zapisów w następnym roku akademickim.\n\nZespół zapisy.ii.uni.wroc.pl\n\n---\nWiadomość została wygenerowana automatycznie, prosimy na nią nie odpowiadać."
 			subject = '[Zapisy] Przypomnienie o ocenie zajęć'
 			counter += 1
-			Message.objects.create(to_address=address, from_address='zapisy@ii.uni.wroc.pl', subject=subject, message_body=body)
+			Message.objects.create(to_address=address, from_address='zapisy@cs.uni.wroc.pl', subject=subject, message_body=body)
 	print counter

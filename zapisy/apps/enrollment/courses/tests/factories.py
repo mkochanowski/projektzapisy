@@ -81,7 +81,6 @@ class CourseFactory(DjangoModelFactory):
 
 
 class GroupFactory(DjangoModelFactory):
-
     class Meta:
         model = Group
 
@@ -92,15 +91,28 @@ class GroupFactory(DjangoModelFactory):
 
 
 class ChangedDayForFridayFactory(DjangoModelFactory):
-
     class Meta:
         model = ChangedDay
 
     weekday = common.FRIDAY
 
 
-class ClassroomFactory(DjangoModelFactory):
+# to be removed, please use SemesterFactory
+class SummerSemesterFactory(DjangoModelFactory):
+    class Meta:
+        model = Semester
 
+    visible = True
+    type = Semester.TYPE_SUMMER
+    semester_beginning = date(datetime.now().year + 1, 2, 15)
+    semester_ending = date(datetime.now().year + 1, 6, 30)
+    lectures_beginning = semester_beginning
+    lectures_ending = semester_ending
+    records_ects_limit_abolition = datetime(datetime.now().year + 1, 2, 10)
+    year = str(semester_beginning.year - 1) + "/" + str(semester_beginning.year % 100)
+
+
+class ClassroomFactory(DjangoModelFactory):
     class Meta:
         model = Classroom
 

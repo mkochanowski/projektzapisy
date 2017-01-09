@@ -314,4 +314,3 @@ class ChangedDay(models.Model):
         verbose_name = 'dzień zmienony na inny'
         verbose_name_plural = 'dni zmienione na inne'
         app_label = 'courses'
-

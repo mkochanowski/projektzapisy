@@ -109,6 +109,10 @@ class SemesterAdmin(admin.ModelAdmin):
     ]
     list_editable = ('visible',)
 
+class FreedayAdmin(admin.ModelAdmin):
+    # todo: add filter with academic_year with newer django
+    ordering = ('-day',)
+
 class CourseInline(admin.TabularInline):
     model = Course
 
@@ -396,7 +400,7 @@ admin.site.register(Tag)
 admin.site.register(Effects)
 admin.site.register(Classroom, ClassroomAdmin)
 admin.site.register(Semester, SemesterAdmin)
-admin.site.register(Freeday)
+admin.site.register(Freeday, FreedayAdmin)
 admin.site.register(ChangedDay)
 admin.site.register(Type, TypeAdmin)
 admin.site.register(PointTypes)

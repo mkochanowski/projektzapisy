@@ -33,7 +33,7 @@ def offer(request, slug=None):
     else show proposal page
     """
     proposal   = proposal_for_offer(slug)
-    proposals  = CourseEntity.get_proposals()
+    proposals  = CourseEntity.get_proposals(request.user.is_authenticated())
     types_list = Type.get_all_for_jsfilter()
     teachers   = Employee.get_actives()
 
@@ -94,7 +94,7 @@ def course_groups(request, slug):
                 groups_with_teachers.append((group, None))
 
         return TemplateResponse(request, 'offer/manage/groups.html',
-            {'course': course, 'teachers': teachers, 
+            {'course': course, 'teachers': teachers,
             'groups_with_teachers': groups_with_teachers, 'path': request.path})
     elif request.method == 'POST':
         for group_id, teacher_id in request.POST.iteritems():
