@@ -32,6 +32,21 @@ def staging():
     env.max_releases = 3
     # env.env_file = "deploy/production.txt"
 
+def testing3():
+    """Defines staging environment"""
+    env.user = "zapisy"
+    env.hosts = [ '35.165.223.171' ]
+    env.base_dir = "/home/zapisy"
+    env.app_name = "projektzapisy"
+    env.domain_name = "ec2-35-165-223-171.us-west-2.compute.amazonaws.com"
+    env.domain_path = "%(base_dir)s/%(app_name)s" % { 'base_dir': env.base_dir, 'app_name': env.app_name }
+    env.current_path = "%(domain_path)s/current" % { 'domain_path': env.domain_path }
+    env.releases_path = "%(domain_path)s/releases" % { 'domain_path': env.domain_path }
+    env.shared_path = "%(domain_path)s/shared" % { 'domain_path': env.domain_path }
+    env.git_clone = "git@github.com:swistak35/projektzapisy.git"
+    env.git_branch = "master-dev"
+    env.max_releases = 3
+
 def releases():
     """List a releases made"""
     env.releases = sorted(run('ls -x %(releases_path)s' % { 'releases_path': env.releases_path }).split())
