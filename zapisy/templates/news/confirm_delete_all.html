@@ -8,7 +8,7 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona główna</a></li>
-    <li><a href="{% url news-all %}">Aktualności</a></li>
+    <li><a href="{% url 'news-all' %}">Aktualności</a></li>
 	<li>Usuń ogłoszenie</li>
 {% endblock %}
 
@@ -31,7 +31,7 @@
   </div>
 </div>
 
-<form action="{% url news-all-delete news.id %}" method="POST">
+<form action="{% url 'news-all-delete' news.id %}" method="POST">
   <input type="hidden" name="object_id" value="{{ news.id }}" />
   <p style="text-align:center;">
     <input type="submit" name="sumbit" value="Tak, chcę usunąć to ogłoszenie." />

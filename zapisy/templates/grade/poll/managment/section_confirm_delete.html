@@ -2,12 +2,12 @@
 
 {% block poll-managment %}
     Czy na pewno chcesz usunąć poniższe sekcje?
-    <form action="{% url grade-poll-delete_section %}" method="POST">
+    <form action="{% url 'grade-poll-delete_section' %}" method="POST">
         <ul>
             {% for section in sections %}
                 <li>
                     <input type="hidden" name="sections[]" value="{{ section.pk }}">
-                    <a href="{% url grade-poll-show_section section.pk %}">{{section}}</a>
+                    <a href="{% url 'grade-poll-show_section' section.pk %}">{{section}}</a>
                 </li>
             {% endfor %}
         </ul>

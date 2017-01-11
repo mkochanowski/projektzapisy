@@ -2,8 +2,8 @@
 {% load compressed %}
 {% block js %}
     <script type="text/javascript">
-        var url_generate = "{% url grade-ticket-keys-generator %}";
-        var url_progress = "{% url grade-ticket-keys-progress %}";
+        var url_generate = "{% url 'grade-ticket-keys-generator' %}";
+        var url_progress = "{% url 'grade-ticket-keys-progress' %}";
     </script>
     {% compressed_js 'keysgenerate' %}
 {% endblock %}

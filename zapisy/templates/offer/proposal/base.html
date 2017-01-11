@@ -25,18 +25,18 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
-	<li><a href="{% url offer-main %}">Oferta</a></li>
+	<li><a href="{% url 'offer-main' %}">Oferta</a></li>
 	{% if proposal and proposal.pk %}
-		<li><a href="{% url proposal-list %}">Propozycje</a></li>
+		<li><a href="{% url 'proposal-list' %}">Propozycje</a></li>
 		{% if editMode %}
-			<li><a href="{% url proposal-page slug=proposal.slug %}">{{proposal.name}}</a></li>
+			<li><a href="{% url 'proposal-page' slug=proposal.slug %}">{{proposal.name}}</a></li>
 			<li>Edycja</li>
 		{% else %}
 			<li>{{proposal.name}}</li>
 		{% endif %}
 	{% else %}
 		{% if editForm %}
-			<li><a href="{% url proposal-list %}">Propozycje</a></li>
+			<li><a href="{% url 'proposal-list' %}">Propozycje</a></li>
 			<li>Dodaj nową</li>
 		{% else %}
 			<li>Propozycje</li>
@@ -85,7 +85,7 @@
 		<ul id="od-proposal-proposallist" class="proposals-list">
 			{% for sub in proposals %}
 				<li {% ifequal proposal.id sub.id %}class="active"{% endifequal %}>
-					<a id="proposal-{{ sub.id }}" href="{% url proposal-page slug=sub.slug %}">{{sub.name}}</a>
+					<a id="proposal-{{ sub.id }}" href="{% url 'proposal-page' slug=sub.slug %}">{{sub.name}}</a>
                     <input type="hidden" name="student" value="{{ sub.student }}">
 				</li>
 			{% endfor %}

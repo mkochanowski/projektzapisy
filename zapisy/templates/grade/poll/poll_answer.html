@@ -6,8 +6,8 @@
 
 {% block main-navigation %}
 	<li><a href="/">Strona główna</a></li>
-	<li><a href="{% url grade-main %}">Ocena zajęć</a></li>
-	<li><a href="{% url grade-poll-polls-for-user slug %}">Twoje ankiety</a></li>
+	<li><a href="{% url 'grade-main' %}">Ocena zajęć</a></li>
+	<li><a href="{% url 'grade-poll-polls-for-user' slug %}">Twoje ankiety</a></li>
     <li>{{ link_name }}</li>
 {% endblock %}
 

@@ -41,7 +41,7 @@ $('.checkall').live('click', function(){
 {% endblock %}
 
 {% block bread %}
-	<a href="{% url main-page %}">Strona główna</a> &raquo;
+	<a href="{% url 'main-page' %}">Strona główna</a> &raquo;
 	Moje konto
 {% endblock %}
 
@@ -78,16 +78,16 @@ $('.checkall').live('click', function(){
     {%endif%}
     </table>
 
-    <a class="change_profile" href="{% url password-change %}">zmień hasło</a>
+    <a class="change_profile" href="{% url 'password-change' %}">zmień hasło</a>
 &nbsp;
-<a href="{% url email_change %}">zmień adres email</a>
+<a href="{% url 'email_change' %}">zmień adres email</a>
 {%if zamawiany%}
 &nbsp;
-<a class="change_bank_account" href="{% url bank-account-change %}">zmień numer konta bankowego</a>
+<a class="change_bank_account" href="{% url 'bank-account-change' %}">zmień numer konta bankowego</a>
 {%endif%}
 {% if user.employee %}
 &nbsp;
-<a href="{% url consultations-change %}">zmień inne dane</a>
+<a href="{% url 'consultations-change' %}">zmień inne dane</a>
 {% endif %}
 
 {% if user.employee and consultations %}
@@ -179,7 +179,7 @@ $('.checkall').live('click', function(){
 {% if user.is_staff %}
 <h4>{%  trans "Ustawienie preferencji językowych" %}</h4>
 {% get_available_languages as LANGUAGES %}
-<form method="post" action="{% url setlang %}">
+<form method="post" action="{% url 'setlang' %}">
     {% csrf_token %}
     <table class="table-striped">
         <tr>
@@ -203,7 +203,7 @@ $('.checkall').live('click', function(){
 {% endif %}
 <h4>Ustawienie powiadomień</h4>
 
-<form method="POST" action="{% url notifications:save %}">
+<form method="POST" action="{% url 'notifications:save' %}">
     {% csrf_token %}
     {{ notifications.management_form }}
 
@@ -238,6 +238,6 @@ $('.checkall').live('click', function(){
     </button>
 </form>
 {% if perms.users.mailto_all_students %}
-    <a href="{% url email-students %}">Wyślij wiadomość do studentów</a>
+    <a href="{% url 'email-students' %}">Wyślij wiadomość do studentów</a>
 {% endif %}
 {% endblock %}

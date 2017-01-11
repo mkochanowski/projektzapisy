@@ -26,7 +26,7 @@
             <tbody>
                 {% for semester in semesters %}
                     <tr>
-                    <form action="{% if semester.is_grade_active %}{% url grade-disable-grade %}{% else %}{% url grade-enable-grade %}{% endif %}" method="POST">
+                    <form action="{% if semester.is_grade_active %}{% url 'grade-disable-grade' %}{% else %}{% url 'grade-enable-grade' %}{% endif %}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="semester_id" value="{{ semester.id }}">
                         <td>{{ semester }}</td>

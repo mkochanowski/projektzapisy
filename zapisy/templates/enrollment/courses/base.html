@@ -67,7 +67,7 @@
 						{% for course in courses %}
                             {% if course.semester_id == semester.id %}
 							<li>
-								<a href="{% url course-page course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
+								<a href="{% url 'course-page' course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
 								<input type="hidden" name="type" value="{{ course.type.id }}" />
 								<input type="hidden" name="wasEnrolled" value="{% if course.in_history and course.in_history > 0 %}True{% else %}False{% endif %}" />
 								<input type="hidden" name="english" value="{{ course.english }}" />

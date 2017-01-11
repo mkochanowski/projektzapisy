@@ -107,7 +107,7 @@
 {% endblock %}
 
 {% block poll-managment %}
-    <form method="POST" action="{% url grade-poll-poll_actions %}">
+    <form method="POST" action="{% url 'grade-poll-poll_actions' %}">
                 <div class="well poll-list-actions">
                     <fieldset>
                         <div class="clearfix left">
@@ -150,7 +150,7 @@
                                    disabled {% endif %}>
                         </td>
                         <td>
-                            <a href="{% url grade-poll-show_poll poll.id %}" class='poll_list_a'>{{ poll }}</a>
+                            <a href="{% url 'grade-poll-show_poll' poll.id %}" class='poll_list_a'>{{ poll }}</a>
                         </td>
                     </tr>
                 {% endfor %}

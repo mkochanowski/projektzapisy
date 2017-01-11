@@ -9,14 +9,14 @@
         </th>
     </tr>
     <tr>
-        <td style="width:25%"><a href="{% url employee-schedule-delta owner.username left %}">
+        <td style="width:25%"><a href="{% url 'employee-schedule-delta' owner.username left %}">
             <h3>wstecz</h3>
         </a>
         </td>
         <td style="width:50%">
             <h2>{{ weekday_name }}</h2>
             </td>
-        <td style="width:25%"><a href="{% url employee-schedule-delta owner.username right %}">
+        <td style="width:25%"><a href="{% url 'employee-schedule-delta' owner.username right %}">
             <h3>dalej</h3>
         </a></td>
     </tr>

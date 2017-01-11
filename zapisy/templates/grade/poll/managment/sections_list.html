@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block poll-managment %}
-    <form method="POST" action="{% url grade-poll-section_actions %}">
+    <form method="POST" action="{% url 'grade-poll-section_actions' %}">
         <div class="well poll-list-actions">
             <fieldset>
                 <div class="clearfix left">
@@ -62,7 +62,7 @@
                                class="action-select" {% if not user.is_staff %} disabled {% endif %}>
                     </td>
                     <td>
-                        <a href="{% url grade-poll-show_section section.id %}" class='section_list_a'>{{ section }}</a>
+                        <a href="{% url 'grade-poll-show_section' section.id %}" class='section_list_a'>{{ section }}</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -109,7 +109,7 @@
             <h3>Nowa sekcja</h3>
         </div>
         <div class="modal-body">
-            <form action="{% url grade-poll-questionset-create %}" id="questionset"  method="POST">{% csrf_token %}
+            <form action="{% url 'grade-poll-questionset-create' %}" id="questionset"  method="POST">{% csrf_token %}
 
                 <fieldset>
                     <div class="clearfix">
