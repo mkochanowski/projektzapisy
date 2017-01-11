@@ -33,7 +33,7 @@ def validate_url(str):
 	from StringIO import StringIO
 	import traceback
 	import string
-	validate = URLValidator(verify_exists=False)
+	validate = URLValidator()
 	try:
 		validate(str)
 	except ValidationError:
