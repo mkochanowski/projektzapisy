@@ -334,12 +334,11 @@ class Group(models.Model):
                     total_queues = 0
                     for old in Queue.objects.filter(deleted=False, student = q.student, priority__lte=q.priority, group__course=self.course, group__type=q.group.type):
                         old.deleted = True
+                        old.save()
                         if old.group != self:
                             old.group.remove_from_queued_counter(q.student)
-                            old.save()
                         else:
                             self.remove_from_queued_counter(q.student)
-                            self.save()
                         total_queues += 1
                     if isinstance(result, Group):
                         Notification.send_notification(q.student.user, 'enrolled-again', {'group': self,
