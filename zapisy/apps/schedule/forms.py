@@ -73,7 +73,8 @@ class EventForm(forms.ModelForm):
         self.fields['title'].widget.attrs.update({'class' : 'span7'})
         self.fields['type'].widget.attrs.update({'class' : 'span7'})
         self.fields['course'].widget.attrs.update({'class' : 'span7'})
-        self.fields['description'].widget.attrs.update({'class' : 'span7', 'required': 'required'})
+        self.fields['description'].widget.attrs.update({'class' : 'span7'})
+        self.fields['visible'].widget.attrs.update({'checked': ''})
 
 class EventModerationMessageForm(forms.ModelForm):
     class Meta:
