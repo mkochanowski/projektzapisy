@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from django                   import forms
+from django import forms
 from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
@@ -38,7 +38,7 @@ class EventForm(forms.ModelForm):
         if data:
             data = deepcopy(data)
             if 'type' not in data:
-                data['type'] = '2'
+                data['type'] = Event.TYPE_GENERIC
 
 
         super(EventForm, self).__init__(data, **kwargs)
