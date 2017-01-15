@@ -245,13 +245,6 @@ class Event(models.Model):
         """
         return cls.objects.filter(type='0', status='1').order_by('-created').select_related('course', 'course__entity')
 
-    @classmethod
-    def get_events(cls):
-        """
-        """
-
-        return cls.objects.filter(status='1', type='0').order_by('-created')
-
     def get_followers(self):
         if self.type in ['0', '1']:
             return self.course.get_all_enrolled_emails()

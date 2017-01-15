@@ -154,6 +154,7 @@ class SpecialReservationTestCase(TestCase):
         reservations = SpecialReservation.get_reservations_for_semester(semester)
         self.assertEqual(len(reservations), 3)
 
+
 class MessageTestCase(TestCase):
     def test_simpliest_message_autotimenow(self): #there are two classes of name EventModerationMessage but it works
         event = factories.EventFactory()
@@ -180,6 +181,7 @@ class MessageTestCase(TestCase):
 
         messages = EventModerationMessage.get_event_messages(event)
         self.assertEqual(len(messages), 2) #the results should be 2 because em is not event moderation message
+
     def test_simpliest_eventmessage_autotimenow(self): #this classes are the same almost
         event = factories.EventFactory()
         message = get_random_string(length=32)
@@ -197,6 +199,7 @@ class MessageTestCase(TestCase):
         em2.save()        
         messages = EventMessage.get_event_messages(event)
         self.assertEqual(len(messages), 2) 
+
 
 class TermTestCase(TestCase):
     def test_simplest_term(self):
@@ -216,6 +219,8 @@ class TermTestCase(TestCase):
         term2.save()
         term3 = factories.Term(room = term2.get_room())
         self.assertRaises(ValidationError, term3.full_clean)
+
+
 class EventTestCase(TestCase):
     def setUp(self):
         teacher = factories.UserFactory()
@@ -405,6 +410,35 @@ class EventTestCase(TestCase):
         event = factories.EventFactory()
         user = UserFactory()
         self.assertRaises(Http404, Event.get_event_for_moderation_or_404, event.id, user)
+
+    def test_get_for_moderation_only_returns_event_if_user_has_perms(self):
+        ev = factories.EventFactory()
+        perm = Permission.objects.get(codename='manage_events')
+        user = UserFactory()
+        user.user_permissions.add(perm)
+        self.assertEquals(Event.get_event_for_moderation_only_or_404(ev.id, user), ev)
+
+    def test_get_for_moderation_only_raises_404_if_user_doesnt_have_perms(self):
+        ev = factories.EventFactory()
+        self.assertRaises(Http404, Event.get_event_for_moderation_only_or_404, ev.id, ev.author)
+
+    def test_get_all(self):
+        pass
+
+    def test_get_all_wo_courses(self):
+        pass
+
+    def test_get_for_user(self):
+        pass
+
+    def test_get_exams(self):
+        pass
+
+    def test_get_followers(self):
+        pass
+
+    def test_unicode(self):
+        pass
 
 
 class EventsOnChangedDayTestCase(TestCase):
