@@ -46,14 +46,13 @@ class EventForm(forms.ModelForm):
         if not self.instance.pk:
             self.instance.author = user
 
-        if user.employee:
+        if user.get_profile().is_employee:
             self.fields['type'].choices = Event.TYPES_FOR_TEACHER
         else:
             self.fields['type'].choices = Event.TYPES_FOR_STUDENT
 
-        if not user.employee:
+        if not user.get_profile().is_employee:
             self.fields['course'].queryset = EmptyQuerySet()
-
         else:
             semester = Semester.get_current_semester()
 

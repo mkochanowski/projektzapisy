@@ -3,8 +3,7 @@
 from django.test import TestCase
 
 from ..forms import EventForm
-from apps.users.tests.factories import EmployeeFactory, StudentFactory, UserProfileFactory
-from ..models.event import Event
+from apps.users.tests.factories import UserProfileFactory, UserFactory, EmployeeFactory
 
 
 class EventFormTestCase(TestCase):
@@ -16,8 +15,8 @@ class EventFormTestCase(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_event_form_accepts_blank_description_when_user_is_student(self):
-        pass
-        # s = StudentFactory()
-        # UserProfileFactory(user=s.user, is_student=True)
-        # s.user.employee = None
-        # event_form = EventForm(s.user)
+        user = UserFactory()
+        UserProfileFactory(user=user, is_student=True, is_employee=False)
+        data = {'description': ''}
+        form = EventForm(user, data)
+        self.assertTrue(form.is_valid())
