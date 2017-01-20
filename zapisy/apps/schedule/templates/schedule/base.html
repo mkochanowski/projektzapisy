@@ -32,5 +32,9 @@
     {% if perms.schedule.manage_events %}
         <li {% block schedule_statistic %}{% endblock %}><a href="{% url events:statistics %}">Statystyki</a></li>
     {% endif %}
+
+    {% if perms.schedule.manage_events %}
+        <li {% block events_raport %}{% endblock %}><a href="{% url events:events_raport %}">Raport</a></li>
+    {% endif %}
     {# end system_menu #}
 {% endblock %}

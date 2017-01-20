@@ -90,3 +90,9 @@ class DecisionForm(forms.ModelForm):
         model = Event
         fields = ('status',)
 
+class ReportForm(forms.Form):
+    from apps.enrollment.courses.models import Classroom
+    rooms_choices = [(x.pk, x.number) for x in Classroom.get_in_institute(reservation=True)]
+    beg_date = forms.DateField()
+    end_date = forms.DateField()
+    rooms = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=rooms_choices)

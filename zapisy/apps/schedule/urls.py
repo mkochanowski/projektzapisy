@@ -29,4 +29,5 @@ urlpatterns = patterns('apps.schedule.views',
     url(r'^session$', 'session', name='session'),
     url(r'^session/feed$', LatestExams(), name='session_feed'),
     url(r'^session/statistics$', 'statistics', name='statistics'),
+    url(r'^events/raport$', 'events_raport', name='events_raport'),
 )
