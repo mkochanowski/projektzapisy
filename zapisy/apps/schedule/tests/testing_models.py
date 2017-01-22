@@ -12,9 +12,12 @@ from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.users.tests.factories import UserFactory, EmployeeProfileFactory
 from apps.enrollment.courses.models import Semester, Classroom
+from datetime import date, datetime
 from apps.users.models import UserProfile
 from ..models import SpecialReservation, EventModerationMessage, EventMessage, Event, Term as EventTerm
 from django.utils.crypto import get_random_string
+from apps.enrollment.courses.tests.factories import GroupFactory, WinterSemesterFactory, SummerSemesterFactory, \
+    ClassroomFactory
 
 import factories
 import common
@@ -219,6 +222,76 @@ class TermTestCase(TestCase):
         term2.save()
         term3 = factories.Term(room = term2.get_room())
         self.assertRaises(ValidationError, term3.full_clean)
+    def test_different_semester_reservation(self):
+        semester = WinterSemesterFactory()
+        semester.save()
+        semester.full_clean()
+
+        room25 = ClassroomFactory()
+        room25.save()
+        room25.full_clean()
+        today = date.today().strftime("%A")
+        reservation = SpecialReservation(semester=semester,
+                                         title="A reservation",
+                                         classroom=room25,
+                                         dayOfWeek=common.MONDAY,
+                                         start_time=time(8),
+                                         end_time=time(16))
+        reservation.full_clean()
+        reservation.save()
+        reservation2 = SpecialReservation(semester=semester,
+                                         title="A reservation",
+                                         classroom=room25,
+                                         dayOfWeek=common.TUESDAY,
+                                         start_time=time(8),
+                                         end_time=time(16))
+        reservation2.full_clean()
+        reservation2.save()
+        reservation3 = SpecialReservation(semester=semester,
+                                         title="A reservation",
+                                         classroom=room25,
+                                         dayOfWeek=common.WEDNESDAY,
+                                         start_time=time(8),
+                                         end_time=time(16))
+        reservation3.full_clean()
+        reservation3.save()
+        reservation4 = SpecialReservation(semester=semester,
+                                         title="A reservation",
+                                         classroom=room25,
+                                         dayOfWeek=common.THURSDAY,
+                                         start_time=time(8),
+                                         end_time=time(16))
+        reservation4.full_clean()
+        reservation4.save()
+        reservation5 = SpecialReservation(semester=semester,
+                                         title="A reservation",
+                                         classroom=room25,
+                                         dayOfWeek=common.FRIDAY,
+                                         start_time=time(8),
+                                         end_time=time(16))
+        reservation5.full_clean()
+        reservation5.save()
+        reservation6 = SpecialReservation(semester=semester,
+                                         title="A reservation",
+                                         classroom=room25,
+                                         dayOfWeek=common.SATURDAY,
+                                         start_time=time(8),
+                                         end_time=time(16))
+        reservation6.full_clean()
+        reservation6.save()
+        reservation7= SpecialReservation(semester=semester,
+                                         title="A reservation",
+                                         classroom=room25,
+                                         dayOfWeek=common.SUNDAY,
+                                         start_time=time(8),
+                                         end_time=time(16))
+        reservation7.full_clean()
+        reservation7.save()
+        term = factories.TermFactory(room = room25, day = semester.lectures_beginning, start = 8, end=16) #musza do walidacji zaczynac sie o tej samej porze?
+        term.full_clean()
+        term.save()
+        self.assertEquals(semester.semester_beginning,term.day)
+        self.assertEquals(reservation.classroom,term.room)
 
 
 class EventTestCase(TestCase):
