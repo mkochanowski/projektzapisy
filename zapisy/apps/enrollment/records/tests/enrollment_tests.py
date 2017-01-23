@@ -287,10 +287,12 @@ class DummyTest(TransactionTestCase):
         run_rearanged(result, group)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student wypisany z grupy'])
-        enrolled = [x.student for x in Record.objects.filter(group=group,
-                                                             status=1)]
-        removed = [x.student for x in Record.objects.filter(group=group,
-                                                            status=0)]
+        enrolled = [x.student for x in Record.objects.filter(
+            group=group,
+            status=STATUS_ENROLLED)]
+        removed = [x.student for x in Record.objects.filter(
+            group=group,
+            status=STATUS_REMOVED)]
         queued = [x.student for x in
                   Queue.objects.filter(group=group)]
         should_be_enrolled = students[0:8] + students[9:11]
@@ -365,3 +367,86 @@ class DummyTest(TransactionTestCase):
         run_rearanged(result)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+
+
+    def testQueuesWithECTSLimit(self):
+        today = datetime.now()
+        semester = SemesterFactory(
+            records_opening=today+timedelta(days=-3),
+            records_closing=today+timedelta(days=6),
+            records_ects_limit_abolition=today+timedelta(days=1),
+        )
+        groups = GroupFactory.create_batch(
+            3,
+            course__entity__ects=15,
+            course__semester=semester,
+            limit=5)
+        students = StudentFactory.create_batch(7)
+        for student in students:
+            for group in groups:
+                add_points_for_course(student, group.course)
+        for student in students[2:]:
+            for group in groups[:2]:
+                open_course_for_student(student, group.course)
+                result, messages_list = group.enroll_student(student)
+                run_rearanged(result)
+                self.assertTrue(result)
+                self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        open_course_for_student(students[0], groups[2].course)
+        result, messages_list = groups[2].enroll_student(students[0])
+        run_rearanged(result)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        for group in groups[:2]:
+            for student in students[:2]:
+                open_course_for_student(student, group.course)
+                result, messages_list = group.enroll_student(student)
+                run_rearanged(result)
+                self.assertTrue(result)
+                self.assertEqual(messages_list, [
+                    u'Brak wolnych miejsc w grupie',
+                    u'Student został dopisany do kolejki'])
+        result, messages_list = groups[0].remove_student(students[2])
+        run_rearanged(result, groups[0])
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student wypisany z grupy'])
+        self.assertEqual(groups[0].enrolled, 5)
+        self.assertEqual(groups[0].queued, 1)
+        enrolled = [x.student for x in Record.objects.filter(
+            group=groups[0],
+            status=STATUS_ENROLLED)]
+        removed = [x.student for x in Record.objects.filter(
+            group=groups[0],
+            status=STATUS_REMOVED)]
+        queued = [x.student for x in
+                  Queue.objects.filter(group=groups[0])]
+        should_be_enrolled = [students[0]] + students[3:]
+        should_be_queued = [students[1]]
+        should_be_removed = [students[2]]
+        for student in should_be_enrolled:
+            self.assertTrue(student in enrolled)
+        for student in should_be_queued:
+            self.assertTrue(student in queued)
+        for student in should_be_removed:
+            self.assertTrue(student in removed)
+        result, messages_list = groups[1].remove_student(students[2])
+        run_rearanged(result, groups[1])
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student wypisany z grupy'])
+        self.assertEqual(groups[1].enrolled, 5)
+        self.assertEqual(groups[1].queued, 0)
+        enrolled = [x.student for x in Record.objects.filter(
+            group=groups[1],
+            status=STATUS_ENROLLED)]
+        removed = [x.student for x in Record.objects.filter(
+            group=groups[1],
+            status=STATUS_REMOVED)]
+        queued = [x.student for x in
+                  Queue.objects.filter(group=groups[1])]
+        # self.assertEqual(len(queued), 0) is equal to 2
+        should_be_enrolled = [students[1]] + students[3:]
+        should_be_removed = [students[2]]
+        for student in should_be_enrolled:
+            self.assertTrue(student in enrolled)
+        for student in should_be_removed:
+            self.assertTrue(student in removed)
