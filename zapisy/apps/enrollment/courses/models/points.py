@@ -59,8 +59,9 @@ class StudentPointsView(models.Model):
     student = models.ForeignKey(Student, primary_key=True)
     entity  = models.ForeignKey('courses.CourseEntity')
 
-    def save(self, **kwargs):
-        raise NotImplementedError()
+    # just for testing
+    #def save(self, **kwargs):
+    #    raise NotImplementedError()
 
     class Meta:
         managed = False
@@ -97,6 +98,3 @@ class StudentPointsView(models.Model):
                  filter(student=student, entity__in=entities).\
                  aggregate(Sum('value'))
         return points['value__sum']
-
-
-

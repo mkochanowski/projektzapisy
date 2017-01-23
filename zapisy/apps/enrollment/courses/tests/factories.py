@@ -64,6 +64,7 @@ class CourseEntityFactory(DjangoModelFactory):
         model = CourseEntity
 
     name = factory.Sequence(lambda n: 'course_entity_{0}'.format(n))
+    ects = 5
 
 
 class CourseFactory(DjangoModelFactory):

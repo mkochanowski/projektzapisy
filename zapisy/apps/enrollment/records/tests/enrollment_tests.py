@@ -8,7 +8,8 @@ from apps.enrollment.courses.models import Group, Course, CourseEntity, \
 from apps.enrollment.records.utils import run_rearanged
 from apps.users.models import Student, Employee
 from django.db import connection
-from apps.enrollment.courses.tests.factories import GroupFactory, CourseFactory
+from apps.enrollment.courses.tests.factories import GroupFactory, \
+    CourseFactory, SemesterFactory
 from apps.users.tests.factories import StudentFactory
 from apps.users.models import OpeningTimesView
 from apps.enrollment.records.models import Record, Queue, \
@@ -21,11 +22,23 @@ from random import seed, randint, choice
 
 
 def open_course_for_student(student, course, opening_time = datetime.now()):
+    # OpeningTimesView has student as pk
+    # so we cannot have more than one course opened at the moment
+    otvs = OpeningTimesView.objects.filter(student=student)
+    for otv in otvs:
+        otv.delete()
     OpeningTimesView.objects.create(
         student=student,
         course=course,
         semester=course.semester,
         opening_time=opening_time)
+
+
+def add_points_for_course(student, course):
+    StudentPointsView.objects.create(student=student,
+                                     value=course.entity.ects,
+                                     entity=course.entity)
+
 
 class DummyTest(TransactionTestCase):
     reset_sequences = True
@@ -291,3 +304,64 @@ class DummyTest(TransactionTestCase):
         for student in should_be_queued:
             self.assertTrue(student in queued)
         self.assertFalse(students[8] in queued)
+
+    def testECTSLimit(self):
+        today = datetime.now()
+        semester = SemesterFactory(
+            records_opening=today+timedelta(days=-1),
+            records_closing=today+timedelta(days=6),
+            records_ects_limit_abolition=today+timedelta(days=3),
+        )
+        groups = GroupFactory.create_batch(
+            2,
+            course__entity__ects=30,
+            course__semester=semester)
+        student = StudentFactory()
+        for group in groups:
+            add_points_for_course(student, group.course)
+        open_course_for_student(student, groups[0].course)
+        result, messages_list = groups[0].enroll_student(student)
+        run_rearanged(result)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        open_course_for_student(student, groups[1].course)
+        result, messages_list = groups[1].enroll_student(student)
+        run_rearanged(result)
+        self.assertFalse(result)
+        self.assertEqual(messages_list,
+                         [u'Przekroczono limit 35 punktów. Zapis niemożliwy.'])
+
+    def testECTSLimitAfterAbolition(self):
+        today = datetime.now()
+        semester = SemesterFactory(
+            records_opening=today+timedelta(days=-3),
+            records_closing=today+timedelta(days=6),
+            records_ects_limit_abolition=today+timedelta(days=-1),
+        )
+        largeGroups = GroupFactory.create_batch(
+            2,
+            course__entity__ects=30,
+            course__semester=semester)
+        littleGroup = GroupFactory(
+            course__entity__ects=15,
+            course__semester=semester
+        )
+        student = StudentFactory()
+        for group in largeGroups + [littleGroup]:
+            add_points_for_course(student, group.course)
+        open_course_for_student(student, largeGroups[0].course)
+        result, messages_list = largeGroups[0].enroll_student(student)
+        run_rearanged(result)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
+        open_course_for_student(student, largeGroups[1].course)
+        result, messages_list = largeGroups[1].enroll_student(student)
+        run_rearanged(result)
+        self.assertFalse(result)
+        self.assertEqual(messages_list,
+                         [u'Przekroczono limit 45 punktów. Zapis niemożliwy.'])
+        open_course_for_student(student, littleGroup.course)
+        result, messages_list = littleGroup.enroll_student(student)
+        run_rearanged(result)
+        self.assertTrue(result)
+        self.assertEqual(messages_list, [u'Student dopisany do grupy'])
