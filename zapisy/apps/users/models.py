@@ -684,7 +684,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class OpeningTimesView(models.Model):
-    student  = models.ForeignKey(Student, related_name='opening_times')
+    student  = models.ForeignKey(Student, primary_key=True,
+                                 related_name='opening_times')
     course   = models.ForeignKey('courses.Course')
     semester = models.ForeignKey('courses.Semester')
     opening_time = models.DateTimeField()
