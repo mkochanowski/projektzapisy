@@ -294,17 +294,17 @@ class DummyTest(TransactionTestCase):
             group=group,
             status=STATUS_REMOVED)]
         queued = [x.student for x in
-                  Queue.objects.filter(group=group)]
+                  Queue.objects.filter(group=group, deleted=False)]
         should_be_enrolled = students[0:8] + students[9:11]
         should_be_queued = students[11:]
-        for student in should_be_enrolled:
-            self.assertTrue(student in enrolled)
+        should_be_removed = [students[8]]
+        self.assertEqual(set(enrolled), set(should_be_enrolled))
+        self.assertEqual(set(queued), set(should_be_queued))
+        self.assertEqual(set(removed), set(should_be_removed))
         self.assertFalse(students[8] in enrolled)
         self.assertTrue(students[8] in removed)
         self.assertEqual(group.enrolled, 10)
         self.assertEqual(group.queued, 4)
-        for student in should_be_queued:
-            self.assertTrue(student in queued)
         self.assertFalse(students[8] in queued)
 
     def testECTSLimit(self):
@@ -419,16 +419,13 @@ class DummyTest(TransactionTestCase):
             group=groups[0],
             status=STATUS_REMOVED)]
         queued = [x.student for x in
-                  Queue.objects.filter(group=groups[0])]
+                  Queue.objects.filter(group=groups[0], deleted=False)]
         should_be_enrolled = [students[0]] + students[3:]
         should_be_queued = [students[1]]
         should_be_removed = [students[2]]
-        for student in should_be_enrolled:
-            self.assertTrue(student in enrolled)
-        for student in should_be_queued:
-            self.assertTrue(student in queued)
-        for student in should_be_removed:
-            self.assertTrue(student in removed)
+        self.assertEqual(set(enrolled), set(should_be_enrolled))
+        self.assertEqual(set(queued), set(should_be_queued))
+        self.assertEqual(set(removed), set(should_be_removed))
         result, messages_list = groups[1].remove_student(students[2])
         run_rearanged(result, groups[1])
         self.assertTrue(result)
@@ -442,11 +439,10 @@ class DummyTest(TransactionTestCase):
             group=groups[1],
             status=STATUS_REMOVED)]
         queued = [x.student for x in
-                  Queue.objects.filter(group=groups[1])]
-        # self.assertEqual(len(queued), 0) is equal to 2
+                  Queue.objects.filter(group=groups[1], deleted=False)]
         should_be_enrolled = [students[1]] + students[3:]
+        should_be_queued = []
         should_be_removed = [students[2]]
-        for student in should_be_enrolled:
-            self.assertTrue(student in enrolled)
-        for student in should_be_removed:
-            self.assertTrue(student in removed)
+        self.assertEqual(set(enrolled), set(should_be_enrolled))
+        self.assertEqual(set(queued), set(should_be_queued))
+        self.assertEqual(set(removed), set(should_be_removed))
