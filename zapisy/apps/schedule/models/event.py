@@ -41,7 +41,7 @@ class Event(models.Model):
     from django.contrib.auth.models import User
 
     title = models.CharField(max_length=255, verbose_name=u'Tytuł', null=True, blank=True)
-    description = models.TextField(verbose_name=u'Opis')
+    description = models.TextField(verbose_name=u'Opis', blank=True)
     type = models.CharField(choices=TYPES, max_length=1, verbose_name=u'Typ')
     visible = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne')
 

@@ -41,30 +41,21 @@ class SystemState( models.Model ):
                     verbose_name = 'Rok akademicki',
                     default      = date.today().year)
 
-    max_points = models.IntegerField( 
+    max_points = models.IntegerField(
                     verbose_name = 'Maksimum punktów na przedmioty',
                     default      = DEFAULT_MAX_POINTS )
-                    
+
     max_vote   = models.IntegerField(
                     verbose_name = 'Maksymalna wartość głosu',
                     default      =  DEFAULT_MAX_VOTE)
-                    
+
     vote_beg   = models.DateField(
                     verbose_name = 'Początek głosowania',
                     default      = DEFAULT_VOTE_BEG )
-    
+
     vote_end   = models.DateField(
                     verbose_name = 'Koniec głosowania',
                     default      = DEFAULT_VOTE_END)
-
-    correction_beg   = models.DateField(
-                    verbose_name = 'Początek korekty',
-                    default      = DEFAULT_CORRECTION_BEG )
-
-    correction_end   = models.DateField(
-                    verbose_name = 'Koniec korekty',
-                    default      = DEFAULT_CORRECTION_END)
-
 
     winter_correction_beg   = models.DateField(
                     verbose_name = 'Początek korekty zimowej',
@@ -87,10 +78,10 @@ class SystemState( models.Model ):
         verbose_name        = 'ustawienia głosowania'
         verbose_name_plural = 'ustawienia głosowań'
         app_label           = 'vote'
-        
+
     def __unicode__( self ):
         return "Ustawienia systemu na rok " + str(self.year)
-    
+
     @staticmethod
     def get_state(year = None):
         """
@@ -103,7 +94,7 @@ class SystemState( models.Model ):
             return SystemState.objects.get(year=year)
         except ObjectDoesNotExist:
             return SystemState.create_default_state(year)
-    
+
     @staticmethod
     def create_default_state(year = None):
         """
@@ -116,8 +107,6 @@ class SystemState( models.Model ):
         new_state.max_points = DEFAULT_MAX_POINTS
         new_state.vote_beg   = date(year, 6, 10)
         new_state.vote_end   = date(year, 7, 10)
-        new_state.correction_beg   = date(year, 9, 10)
-        new_state.correction_end   = date(year, 9, 20)
         new_state.save()
         return new_state
 
@@ -130,7 +119,7 @@ class SystemState( models.Model ):
             Checks if vote is active
         """
         today = date.today()
-        
+
         return self.vote_beg <= today <= self.vote_end
 
 
