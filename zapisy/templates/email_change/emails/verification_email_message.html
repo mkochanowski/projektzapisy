@@ -1,3 +1,4 @@
+{% load url from future %}
 {% autoescape off %}
 Witaj {% firstof user.get_full_name user.username %},
 
