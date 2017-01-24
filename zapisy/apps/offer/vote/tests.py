@@ -94,31 +94,31 @@ class VoteLinkTestCase(TestCase):
         self._generic_voting_inactive_view_test_case(urlname)
 
     def test_vote_link_in_vote_view_when_system_is_active(self):
-        self.client.login(username=self.s1.user.username, password='pass')
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_active_view_test_case('vote-view')
 
     def test_vote_link_in_vote_view_when_system_is_active_baduser(self):
-        self.client.login(username=self.s2.user.username, password='pass')
+        self.client.login(username=self.s2.user.username, password='test')
         create_active_system_state()
         response = self.client.get(reverse('vote-view'), follow=True)
         self.assertNotContains(response, self.VOTE_LINK, html=True)
         
     def test_vote_link_in_vote_view_when_system_is_inactive_in_past(self):
-        self.client.login(username=self.s1.user.username, password='pass')
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_past_test_case('vote-view')
 
     def test_vote_link_in_vote_view_when_system_is_inactive_in_future(self):
-        self.client.login(username=self.s1.user.username, password='pass')
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_future_test_case('vote-view')
 
     def test_vote_link_in_vote_summary_when_system_is_active(self):
-        self.client.login(username=self.s1.user.username, password='pass')
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_active_view_test_case('vote-summary')
 
     def test_vote_link_in_vote_summary_when_system_is_inactive_in_past(self):
-        self.client.login(username=self.s1.user.username, password='pass')
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_past_test_case('vote-summary')
 
     def test_vote_link_in_vote_summary_when_system_is_inactive_in_future(self):
-        self.client.login(username=self.s1.user.username, password='pass')
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_future_test_case('vote-summary')
