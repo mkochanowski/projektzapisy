@@ -3,10 +3,11 @@ general:
 
 machine:
   python:
-    version: 2.6.8
+    version: 2.7.10
 
 dependencies:
   override:
+    - pip install --upgrade pip
     - pip install -r requirements.test.txt
 
 test:
