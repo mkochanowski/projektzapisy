@@ -6,10 +6,10 @@ import factory
 import factory.fuzzy
 from factory.django import DjangoModelFactory
 
-from ..models import User, Student, UserProfile
-import settings
+from ..models import User, Student, UserProfile, Employee
+from settings import LANGUAGES
 
-langs = [x[0] for x in settings.LANGUAGES]
+langs = [x[0] for x in LANGUAGES]
 
 
 class UserFactory(DjangoModelFactory):
@@ -21,8 +21,8 @@ class UserFactory(DjangoModelFactory):
 
     pref_username = factory.Sequence(lambda n: 'testuser_{0}'.format(n))
     suff_username = ""
-    username = factory.LazyAttribute(lambda o: o.pref_username+o.suff_username)
-    password = factory.PostGenerationMethodCall('set_password','pass')
+    username = factory.LazyAttribute(lambda o: o.pref_username + o.suff_username)
+    password = factory.PostGenerationMethodCall('set_password', 'test')
     is_staff = False
     is_superuser = False
 
@@ -30,8 +30,8 @@ class StudentFactory(DjangoModelFactory):
     class Meta:
         model = Student
 
-    user = factory.SubFactory(UserFactory)
-    matricula = factory.Sequence(lambda n: ('%06d' % n))
+    user = factory.SubFactory(UserFactory, suff_username="_s")
+    matricula = factory.Sequence(lambda n: ('9%05d' % n))
 
 
 class UserProfileFactory(DjangoModelFactory):
@@ -59,3 +59,9 @@ class EmployeeProfileFactory(UserProfileFactory):
 class OrderedStudentProfileFactory(UserProfileFactory):
     is_zamawiany = True
     is_employee = False
+
+class EmployeeFactory(DjangoModelFactory):
+    class Meta:
+        model = Employee
+
+    user = factory.SubFactory(UserFactory, suff_username="_e")
