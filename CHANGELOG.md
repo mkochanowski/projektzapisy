@@ -2,6 +2,7 @@
 
 # Current version
 
+* Updated max points for vote information
 * Adding new event doesn't require description and event is visible for all users by default
 
 # Version 16.12.19

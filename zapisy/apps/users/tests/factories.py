@@ -26,7 +26,6 @@ class UserFactory(DjangoModelFactory):
     is_staff = False
     is_superuser = False
 
-
 class StudentFactory(DjangoModelFactory):
     class Meta:
         model = Student

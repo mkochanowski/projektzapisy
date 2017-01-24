@@ -17,7 +17,7 @@ def student_required(function=None,
     def test_f(user):
         try:
             sth = user.student
-            if sth:
+            if sth and sth.status == 0:
                 return True
             else:
                 return False
