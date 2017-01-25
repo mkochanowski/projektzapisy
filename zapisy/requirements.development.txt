@@ -1,1 +1,5 @@
 -r requirements.common.txt
+
+# Additional test dependencies
+selenium==2.53.6
+factory_boy==2.5.0

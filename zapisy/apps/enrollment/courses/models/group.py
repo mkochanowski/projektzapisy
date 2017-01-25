@@ -70,10 +70,10 @@ class Group(models.Model):
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
     export_usos = models.BooleanField(default=True, verbose_name='czy eksportować do usos?')
 
-
-    cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
-    cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
-    cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
+    # we are not using these
+    #cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
+    #cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
+    #cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
 
     enrolled     = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów')
     enrolled_zam = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów zamawianych')
@@ -94,9 +94,9 @@ class Group(models.Model):
             return u'(nieznany prowadzący)'
         else:
             return self.teacher.user.get_full_name()
-    
+
     def get_all_terms(self):
-        """return all terms of current group""" 
+        """return all terms of current group"""
         return self.term.all()
 
     def human_readable_type(self):
@@ -110,7 +110,7 @@ class Group(models.Model):
             '6':  'Seminarium',
             '7':  'Lektorat',
             '8':  'Zajęcia sportowe',
-           ' 10': 'Projekt', 
+           ' 10': 'Projekt',
         }
         return types[self.type]
 
@@ -123,7 +123,6 @@ class Group(models.Model):
         # @param student:
         #           Student object
         # decrease queued couter, after remove student from queue
-
         self.queued -= 1
         self.save()
 
@@ -153,7 +152,7 @@ class Group(models.Model):
     def add_to_enrolled_counter(self, student):
         # @param student:
         #           Student object
-        # increase enrolled couter, after add student to group
+        # increase enrolled counter, after adding student to group
 
         self.enrolled += 1
         if student.is_zamawiany():
@@ -162,7 +161,6 @@ class Group(models.Model):
             self.enrolled_zam2012 += 1
         if student.isim:
             self.enrolled_isim += 1
-
         self.save()
 
     def remove_student(self, student):
@@ -336,8 +334,11 @@ class Group(models.Model):
                     total_queues = 0
                     for old in Queue.objects.filter(deleted=False, student = q.student, priority__lte=q.priority, group__course=self.course, group__type=q.group.type):
                         old.deleted = True
-                        old.group.remove_from_queued_counter(q.student)
                         old.save()
+                        if old.group != self:
+                            old.group.remove_from_queued_counter(q.student)
+                        else:
+                            self.remove_from_queued_counter(q.student)
                         total_queues += 1
                     if isinstance(result, Group):
                         Notification.send_notification(q.student.user, 'enrolled-again', {'group': self,
@@ -389,7 +390,7 @@ class Group(models.Model):
                 return self.limit - self.limit_isim <= self.enrolled - min(self.enrolled_isim, self.limit_isim)
 
         if student.is_zamawiany():
-            
+
             return self.get_limit_for_zamawiane2009() <= self.enrolled - min(self.limit_zamawiane2012, self.enrolled_zam2012)
         elif student.is_zamawiany2012():
             return self.get_limit_for_zamawiane2012() <= self.enrolled - min(self.enrolled_zam, self.limit_zamawiane)
@@ -420,7 +421,7 @@ class Group(models.Model):
     def get_group_limit(self):
         """return maximal amount of participants"""
         return self.limit
-    
+
 
     def get_count_of_enrolled(self, dont_use_cache=False):
         return self.enrolled
@@ -491,7 +492,7 @@ class Group(models.Model):
             'queued_count': self.get_count_of_queued(),
             'queue_priority': queue_priorities.get(self.pk,-1)
         }
-        
+
         return data
 
     class Meta:
@@ -506,7 +507,7 @@ class Group(models.Model):
 
     def __unicode__(self):
         return "%s: %s - %s" % (unicode(self.course.entity.get_short_name()),
-                                unicode(self.get_type_display()), 
+                                unicode(self.get_type_display()),
                                 unicode(self.get_teacher_full_name()))
 
     def long_print(self):
@@ -526,7 +527,7 @@ def log_add_group(sender, instance, created, **kwargs):
         '4': 'C', '5': 'r',
         '6': 's', '7': 'l', '8': 'l',
         '9': 'w', '10': 'p'}
-        kod_grupy = group.id 
+        kod_grupy = group.id
         kod_przed_sem = group.course.id
         teacher_name_array = (group.teacher and group.teacher.user.get_full_name() or u"Nieznany prowadzący").split(" ")
 	kod_uz = teacher_name_array[0]
@@ -544,17 +545,17 @@ def log_limits_change(sender, instance, **kwargs):
     try:
         group = instance
         old_group = Group.objects.get(id=group.id)
-        
+
         if group.limit != old_group.limit:
             backup_logger.info('[04] limit of group <%s> has changed from <%s> to <%s>' % (group.id, old_group.limit, group.limit))
         if group.limit_zamawiane != old_group.limit_zamawiane:
             backup_logger.info('[05] limit-zamawiane of group <%s> has changed from <%s> to <%s>' % (group.id, old_group.limit_zamawiane, group.limit_zamawiane))
     except Group.DoesNotExist:
         pass
-        
+
 def log_delete_group(sender, instance, **kwargs):
     backup_logger.info('[07] group <%s> has been deleted' % instance.id)
-    
+
 #signals.pre_save.connect(log_limits_change, sender=Group)
 #signals.post_save.connect(log_add_group, sender=Group)
 #signals.post_delete.connect(log_delete_group, sender=Group)
@@ -564,6 +565,6 @@ def recache(sender, **kwargs):
         return
     mcache.clear()
 
-    
+
 #signals.post_save.connect(recache, sender=Group)
 #signals.post_delete.connect(recache, sender=Group)
