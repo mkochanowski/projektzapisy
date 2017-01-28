@@ -1,3 +1,4 @@
+{% load url from future %}
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -20,7 +21,7 @@
     
         <div id="main-header" >
             <a href="/"><img src="/site_media/images/logo_mobile.gif" id="logo" title="Fereol mobile - strona główna" alt="System Zapisów II UWr"/></a>
-             <a href = {% url user-mobile-logout %}>
+             <a href = {% url 'user-mobile-logout' %}>
                 {% if user.is_authenticated %}
                      <div id="navbar">
                            Wyloguj {{ user.username }}
@@ -37,7 +38,7 @@
     <div style="clear:both"></div>
         
         <div id="main-footer">
-                <a href="{% url no-mobile %}"> przejdź do pełnej wersji</a>
+                <a href="{% url 'no-mobile' %}"> przejdź do pełnej wersji</a>
                 <div class="version-info"></div>
         </div>
     </div>

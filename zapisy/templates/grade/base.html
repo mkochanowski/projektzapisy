@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 
 {% load news_extras %}
 {% load compressed %}
@@ -20,27 +21,27 @@
 
 {% block system_menu %}
     <li{% block grade-info %}{% endblock %}>
-        <a href="{% url grade-main %}">Zasady</a></li>
+        <a href="{% url 'grade-main' %}">Zasady</a></li>
     {% if not grade and user.employee or not grade and user.is_superuser %}
-           <li{% if tab == "template_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-templates %}">Lista szablonów</a></li>
-           <li{% if tab == "poll_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-list %}">Lista ankiet</a></li>
-           <li{% if tab == "section_list" %} class="active_tab"{% endif %}><a href="{% url grade-poll-sections-list %}">Lista sekcji</a></li>
-           <li{% if tab == "group_without" %} class="active_tab"{% endif %}><a href="{% url grade-poll-groups_without_polls %}">Grupy bez ankiet</a></li>
+           <li{% if tab == "template_list" %} class="active_tab"{% endif %}><a href="{% url 'grade-poll-templates' %}">Lista szablonów</a></li>
+           <li{% if tab == "poll_list" %} class="active_tab"{% endif %}><a href="{% url 'grade-poll-list' %}">Lista ankiet</a></li>
+           <li{% if tab == "section_list" %} class="active_tab"{% endif %}><a href="{% url 'grade-poll-sections-list' %}">Lista sekcji</a></li>
+           <li{% if tab == "group_without" %} class="active_tab"{% endif %}><a href="{% url 'grade-poll-groups_without_polls' %}">Grupy bez ankiet</a></li>
     {% endif %}
     {%if user.student and grade %}
-        <li{% block connection-choice %}{% endblock %}><a href="{% url grade-ticket-connections-choice %}">Pobierz klucze</a></li>
+        <li{% block connection-choice %}{% endblock %}><a href="{% url 'grade-ticket-connections-choice' %}">Pobierz klucze</a></li>
     {% endif %}
     {% if grade %}
-        <li><a href="{% url grade-poll-tickets-enter%}">Oceń zajęcia</a></li>    
+        <li><a href="{% url 'grade-poll-tickets-enter' %}">Oceń zajęcia</a></li>    
     {% endif %}
     {% if user.is_superuser %}
-        <li><a href="{% url grade-enable-grade %}">Otwórz ocenę</a></li>
+        <li><a href="{% url 'grade-enable-grade' %}">Otwórz ocenę</a></li>
     {% endif %}
     {% if user.is_superuser %}
-        <li><a href="{% url grade-ticket-keys-generate %}">Wygeneruj klucze</a></li>
+        <li><a href="{% url 'grade-ticket-keys-generate' %}">Wygeneruj klucze</a></li>
     {% endif %}
     {% if user.is_superuser or user.employee %}
-        <li{% block grade_result %}{% endblock %}><a href="{% url grade-poll-poll-results 'S' %}">Wyniki oceny</a></li>
+        <li{% block grade_result %}{% endblock %}><a href="{% url 'grade-poll-poll-results' 'S' %}">Wyniki oceny</a></li>
     {% endif %}
 {#    #}
 {% endblock %}
