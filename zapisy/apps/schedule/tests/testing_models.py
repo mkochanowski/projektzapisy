@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import time, date, timedelta
+from django.core.urlresolvers import reverse
 
+from django.contrib.syndication.views import Feed
 from django.test import TestCase
 from django.core.validators import ValidationError
 from django.contrib.auth.models import Permission
@@ -12,6 +14,7 @@ from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.users.tests.factories import UserFactory, EmployeeProfileFactory
 from apps.enrollment.courses.models import Semester, Classroom
+from apps.schedule import feeds
 from datetime import date, datetime
 from apps.users.models import UserProfile
 from ..models import SpecialReservation, EventModerationMessage, EventMessage, Event, Term as EventTerm
@@ -21,6 +24,7 @@ from apps.enrollment.courses.tests.factories import GroupFactory, WinterSemester
 
 import factories
 import common
+
 
 
 class SpecialReservationTestCase(TestCase):
@@ -293,6 +297,12 @@ class TermTestCase(TestCase):
         self.assertEquals(semester.semester_beginning,term.day)
         self.assertEquals(reservation.classroom,term.room)
 
+class FeedstestCase(TestCase):
+    def test_feed(self):
+        event = factories.EventFactory()
+        latest = feeds.Latest()
+        item_title = feeds.Latest.item_title(latest,event)
+        self.assertTrue(item_title)
 
 class EventTestCase(TestCase):
     def setUp(self):
