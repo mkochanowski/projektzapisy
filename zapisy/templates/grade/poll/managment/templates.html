@@ -1,5 +1,4 @@
 {% extends "grade/poll/managment/base.html" %}
-{% load url from future %}
 
 {% block js %}
     {{ block.super }}
@@ -16,7 +15,7 @@
 {% endblock %}
 
 {% block poll-managment %}
-<form method="POST" action="{% url 'grade-poll-template-action' %}">{% csrf_token %}
+<form method="POST" action="{% url grade-poll-template-action %}">{% csrf_token %}
 <div class="actions">
 	<label>Akcja:
 		<select name="action">
@@ -51,7 +50,7 @@
                 <input type="checkbox" class="_selected_action" name="_selected_action" value="{{template.pk}}" class="action-select" {% if not user.is_staff %} disabled {% endif %}>
             </td>
             <td>
-                <a class="show_template" href="{% url 'grade-poll-show_template' template.id %}">{{template}}</a>
+                <a class="show_template" href="{% url grade-poll-show_template template.id %}">{{template}}</a>
             </td>
         </tr>
     	{% endfor %}
@@ -92,7 +91,7 @@
 <p>{{templates.paginator.count}} {{template_word}}</p>
 
     <div style="position: absolute;z-index: 99999;" class="modal">
-        <form method="POST" id="poll-create" action="{% url 'grade-poll-create-template' %}">
+        <form method="POST" id="poll-create" action="{% url grade-poll-create-template %}">
         <div class="modal-header">
             <a class="close" href="#">×</a>
 

@@ -1,4 +1,3 @@
-{% load url from future %}
 {% autoescape off %}
 Witaj {% firstof user.get_full_name user.username %},
 
@@ -6,7 +5,7 @@ Wyraziłeś chęć zmiany adresu email.
 Przed zmianą niezbędna jest weryfikacja nowego adresu email.
 
 By ukończyć zmianę adresu email, wejdź w poniższy link:
-{{ protocol }}://{{ site_domain }}{% url 'email_verify' verification_key %}
+{{ protocol }}://{{ site_domain }}{% url email_verify verification_key %}
 
 Dziękujemy,
 Zespół {{ site_name }}

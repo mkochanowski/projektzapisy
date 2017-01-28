@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 
 {% load compressed %}
 
@@ -24,19 +23,19 @@
         <h2>System Zapisów</h2>
         <p>System zapisów na zajęcia w Instytucie Informatyki
 				Uniwersytetu Wrocławskiego.</p>
-        <p><a class="btn" href="{% url 'enrollment-main' %}">Przejdź &raquo;</a></p>
+        <p><a class="btn" href="{% url enrollment-main %}">Przejdź &raquo;</a></p>
       </div>
       <div class="span-one-third">
         <h2>Oferta Dydaktyczna</h2>
          <p>System kształtowania oferty dydaktycznej w Instytucie
 				Informatyki.</p>
-        <p><a class="btn" href="{% url 'offer-main' %}">Przejdź &raquo;</a></p>
+        <p><a class="btn" href="{% url offer-main %}">Przejdź &raquo;</a></p>
      </div>
       <div class="span-one-third">
         <h2>Ocena zajęć</h2>
         <p>System oceny zajęć w Instytucie
 				Informatyki Uniwersytetu Wrocławskiego.</p>
-        <p><a class="btn" href="{% url 'grade-main' %}">Przejdź &raquo;</a></p>
+        <p><a class="btn" href="{% url grade-main %}">Przejdź &raquo;</a></p>
       </div>
     </div>
 {% endblock %}

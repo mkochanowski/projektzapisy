@@ -446,6 +446,7 @@ class Course(models.Model):
 
     notes = models.TextField(null=True, blank=True, verbose_name='uwagi do tej edyci przedmiotu')
     web_page = models.URLField(verbose_name='Strona WWW przedmiotu',
+                               verify_exists=True,
                                blank=True,
                                null=True)
 

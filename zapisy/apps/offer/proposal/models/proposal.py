@@ -121,6 +121,7 @@ class Proposal( models.Model ):
 #    english      = models.BooleanField(default=False,
 #                                       verbose_name=u'możliwe zajęcia po angielsku')
 #    web_page     = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+#                                verify_exists= True,
 #								blank        = True,
 #                                null         = True )
 #    course_type         = models.ForeignKey('courses.Type',
@@ -186,7 +187,7 @@ class Proposal( models.Model ):
         except Student.DoesNotExist:
             return False
         except Employee.DoesNotExist:
-            return False
+            return False            
 
     def add_user_to_group(self, user, group):
         """
@@ -236,26 +237,26 @@ class Proposal( models.Model ):
         except Student.DoesNotExist:
             raise NonStudentException()
         except Employee.DoesNotExist:
-            raise NonEmployeeException()
-
+            raise NonEmployeeException()            
+                
     def fans_count(self):
         """
             Count fans
         """
         return self.fans.all().count()
-
+        
     def teachers_count(self):
         """
             Count teachers
         """
         return self.teachers.all().count()
-
+        
     def helpers_count(self):
         """
             Count helpers
         """
         return self.helpers.all().count()
-
+    
     def __unicode__(self):
         return self.name
 
@@ -264,13 +265,13 @@ class Proposal( models.Model ):
             Checks if course is in offer
         """
         return self.status > 0
-
+    
     def in_summer( self ):
         """
             Checks if course is in summer semester
         """
         return self.semester == 's'
-
+        
     def in_winter( self ):
         """
             Checks if course is in winter semester

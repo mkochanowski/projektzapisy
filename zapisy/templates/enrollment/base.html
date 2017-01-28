@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 
 {% load i18n %}
 {% load news_extras %}
@@ -21,7 +20,7 @@
 
     {% if perms.courses.view_stats %}
         <li{% block enrollment_statistics %}{% endblock %}>
-            <a href="{% url 'statistics:main' %}">{% trans "Statystyki" %}</a>
+            <a href="{% url statistics:main %}">{% trans "Statystyki" %}</a>
         </li>
     {% endif %}
     {# end system_menu #}

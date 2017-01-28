@@ -1,4 +1,3 @@
-{% load url from future %}
 <h3>{{ label }}</h3>
 
 <table>
@@ -13,10 +12,10 @@
 <tbody>
 {% for row in semester %}
 <tr>
-<td><a href="{% url 'offer-page' row.2.slug  %}">{{ row.2.name }}</a></td>
+<td><a href="{% url offer-page row.2.slug  %}">{{ row.2.name }}</a></td>
 <td class="number">{{ row.0 }}</td>
 <td class="number">{{ row.1 }}</td>
-<td class="controls"><a href="{% url 'proposal-vote-summary' slug=row.2.slug %}">lista</a></td>
+<td class="controls"><a href="{% url proposal-vote-summary slug=row.2.slug %}">lista</a></td>
 </tr>
 {% endfor %}
 

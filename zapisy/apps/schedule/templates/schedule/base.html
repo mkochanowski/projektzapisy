@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 
 {% load news_extras %}
 
@@ -10,28 +9,28 @@
 
 {% block system_menu %}
     <li{% block schedule_list %}{% endblock %}><a
-            href="{% url 'events:classrooms' %}">Sale</a></li>
+            href="{% url events:classrooms %}">Sale</a></li>
 
     <li{% block scedule_events %}{% endblock %}><a
-            href="{% url 'events:event_show' %}">Wydarzenia</a></li>
+            href="{% url events:event_show %}">Wydarzenia</a></li>
 
     <li{% block schedule_session %}{% endblock %}><a
-            href="{% url 'events:session' %}">Egzaminy</a></li>
+            href="{% url events:session %}">Egzaminy</a></li>
 
     {% if user.is_authenticated %}
         <li{% block schedule_reservation %}{% endblock %}><a
-                href="{% url 'events:reservation' %}">Rezerwuj</a></li>
+                href="{% url events:reservation %}">Rezerwuj</a></li>
     {% endif %}
     {% if perms.schedule.manage_events %}
-        <li {% block schedule_manage %}{% endblock %}><a href="{% url 'events:reservations' %}">Zarządzaj</a></li>
+        <li {% block schedule_manage %}{% endblock %}><a href="{% url events:reservations %}">Zarządzaj</a></li>
     {% endif %}
     {% if user.is_authenticated %}
         <li{% block schedule_history %}{% endblock %}><a
-                href="{% url 'events:history' %}">Historia</a></li>
+                href="{% url events:history %}">Historia</a></li>
     {% endif %}
 
     {% if perms.schedule.manage_events %}
-        <li {% block schedule_statistic %}{% endblock %}><a href="{% url 'events:statistics' %}">Statystyki</a></li>
+        <li {% block schedule_statistic %}{% endblock %}><a href="{% url events:statistics %}">Statystyki</a></li>
     {% endif %}
     {# end system_menu #}
 {% endblock %}

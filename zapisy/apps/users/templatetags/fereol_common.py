@@ -33,7 +33,7 @@ def validate_url(str):
 	from StringIO import StringIO
 	import traceback
 	import string
-	validate = URLValidator()
+	validate = URLValidator(verify_exists=False)
 	try:
 		validate(str)
 	except ValidationError:
@@ -59,7 +59,7 @@ def do_captureas(parser, token):
         Parameter: variable name
 
         Example use:
-        {% captureas examplevar %}{% url 'exampleurl' %}{% endcaptureas %}
+        {% captureas examplevar %}{% url exampleurl %}{% endcaptureas %}
         URL: {{ examplevar }}
 
         Source: http://djangosnippets.org/snippets/545/

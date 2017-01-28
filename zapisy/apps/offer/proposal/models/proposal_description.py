@@ -34,6 +34,7 @@ class ProposalDescription(models.Model):
 #    english      = models.BooleanField(default=False,
 #                                       verbose_name=u'możliwe zajęcia po angielsku')
 #    web_page     = models.URLField( verbose_name = 'Strona WWW przedmiotu',
+#                                verify_exists= True,
 #								blank        = True,
 #                                null         = True )
 #    type         = models.ForeignKey('courses.Type',      related_name = 'descriptionstypes')
@@ -47,7 +48,7 @@ class ProposalDescription(models.Model):
         app_label = 'proposal'
 
     def __unicode__(self):
-        return '[' + self.author.__unicode__() + ']' + self.proposal.name
+        return '[' + self.author.__unicode__() + ']' + self.proposal.name 
 
     def get_newer(self):
         try:
