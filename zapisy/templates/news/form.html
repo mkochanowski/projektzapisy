@@ -1,5 +1,4 @@
 {% extends "offer/base.html" %}
-{% load url from future %}
 
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/news.css" type="text/css" />
@@ -11,7 +10,7 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona główna</a></li>
-    <li><a href="{% url 'latest_news' category %}">
+    <li><a href="{% url latest_news category %}">
 		{% ifequal category "enrollment" %}Zapisy{% endifequal %}
         {% ifequal category "offer" %}Oferta{% endifequal %}
         {% ifequal category "grade" %}Ocena zajęć{% endifequal %}

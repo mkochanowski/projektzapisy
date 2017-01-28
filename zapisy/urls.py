@@ -9,7 +9,6 @@ import settings
 admin.autodiscover()
 
 from feeds import LatestNews
-from django.views.generic import TemplateView
 
 
 urlpatterns = patterns('',
@@ -25,7 +24,7 @@ urlpatterns = patterns('',
     url(r'^consultations/$', 'apps.users.views.consultations_list', name="consultations-list"),
 
     (r'^news/', include('apps.news.urls')),
-    (r'^jstests/', TemplateView.as_view(template_name="jstests/tests.html")),
+    (r'^jstests/', 'django.views.generic.simple.direct_to_template', {'template': 'jstests/tests.html'}),
     (r'^users/', include('apps.users.urls')),
     ('accounts/', include('apps.email_change.urls')),
 

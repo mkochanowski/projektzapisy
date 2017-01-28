@@ -1,5 +1,4 @@
 {% extends "offer/base.html" %}
-{% load url from future %}
 
 {% load fereol_common %}
 
@@ -9,7 +8,7 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona główna</a></li>
-    <li><a href="{% url 'latest_news' category %}">
+    <li><a href="{% url latest_news category %}">
 		{% ifequal category "enrollment" %}Zapisy{% endifequal %}
         {% ifequal category "offer" %}Oferta{% endifequal %}
         {% ifequal category "grade" %}Ocena zajęć{% endifequal %}
@@ -37,7 +36,7 @@
   </div>
 </div>
 
-<form action="{% url 'news-delete' news.id %}" method="POST">
+<form action="{% url news-delete news.id %}" method="POST">
   <input type="hidden" name="object_id" value="{{ news.id }}" />
   <p style="text-align:center;">
     <input type="submit" name="sumbit" value="Tak, chcę usunąć to ogłoszenie." />

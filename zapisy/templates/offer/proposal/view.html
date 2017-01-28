@@ -1,5 +1,4 @@
 {% extends "offer/proposal/base.html" %}
-{% load url from future %}
 
 {% load fereol_common %}
 
@@ -16,21 +15,21 @@
 				Wersja archiwalna!
 
 					{% if can_edit %}
-                         <form action="{% url 'proposal-restore' descid=proposal.desc.id %}" method="POST" class="force-js">{% csrf_token %}
+                         <form action="{% url proposal-restore descid=proposal.desc.id %}" method="POST" class="force-js">{% csrf_token %}
                              <input type="submit" class="without-js" value="przywróc">
-						     <a class="with-js courserestore" href="{% url 'proposal-restore' descid=proposal.desc.id %}">Przywróć</a>
+						     <a class="with-js courserestore" href="{% url proposal-restore descid=proposal.desc.id %}">Przywróć</a>
                         </form>
 					 lub{% endif %}
-				<a href="{% url 'proposal-page' slug=proposal.slug %}">przejdź do bieżącej</a>.
+				<a href="{% url proposal-page slug=proposal.slug %}">przejdź do bieżącej</a>.
 			</div>
 		{% endif %}
 		{% if can_edit %}
-		<a id="od-proposal-view-editBtn" href="{% url 'proposal-edit' slug=proposal.slug %}">Edytuj</a>
+		<a id="od-proposal-view-editBtn" href="{% url proposal-edit slug=proposal.slug %}">Edytuj</a>
 		{% endif %}
 		<h2>{{proposal.name}}</h2>
 
 		<ul class="infoBox">
-		   {% if proposal.owner %} <li>Właściciel: <a href="{% url 'employee-profile' proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
+		   {% if proposal.owner %} <li>Właściciel: <a href="{% url employee-profile proposal.owner.id  %}">{{ proposal.owner.first_name }} {{ proposal.owner.last_name }}</a></li>{% endif %}
 			<li>Sugerowany rodzaj: <span>{{ proposal.desc.type }}</span></li>
 
 			<li>Egzamin: {% if proposal.desc.is_exam %}Tak{% else %}Nie{% endif %}</li>
@@ -72,14 +71,14 @@
 			<li>
 				{% if user.student %}
 					{% if isFan %}
-                        <form action="{% url 'proposal-StopFan' slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
+                        <form action="{% url proposal-StopFan slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Nie pójdę na to">
-						    <a class="with-js befan" href="{% url 'proposal-StopFan' slug=proposal.slug %}">Nie pójdę na to</a>
+						    <a class="with-js befan" href="{% url proposal-StopFan slug=proposal.slug %}">Nie pójdę na to</a>
                         </form>
 					{% else %}
-                        <form action="{% url 'proposal-beFan' slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
+                        <form action="{% url proposal-beFan slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Pójdę na to">
-						    <a class="with-js befan" href="{% url 'proposal-beFan' slug=proposal.slug %}">Pójdę na to</a>
+						    <a class="with-js befan" href="{% url proposal-beFan slug=proposal.slug %}">Pójdę na to</a>
                         </form>
 					{% endif %}
 					(chętnych: {{fans}})
@@ -90,14 +89,14 @@
 			<li>
 				{% if user.employee %}
 					{% if isTeacher %}
-                        <form action="{% url 'proposal-StopTeacher' slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
+                        <form action="{% url proposal-StopTeacher slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Nie mogę poprowadzi">
-						    <a class="with-js befan" href="{% url 'proposal-StopTeacher' slug=proposal.slug %}">Nie mogę poprowadzić</a>
+						    <a class="with-js befan" href="{% url proposal-StopTeacher slug=proposal.slug %}">Nie mogę poprowadzić</a>
                         </form>
 					{% else %}
-                        <form action="{% url 'proposal-beTeacher' slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
+                        <form action="{% url proposal-beTeacher slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Mogę prowadzić wykład">
-						    <a class="with-js befan" href="{% url 'proposal-beTeacher' slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
+						    <a class="with-js befan" href="{% url proposal-beTeacher slug=proposal.slug %}" title="Poprowadzę wykład">Mogę prowadzić wykład</a>
                         </form>
 					{% endif %}
 					(chętnych: {{teachers}})
@@ -108,14 +107,14 @@
 			<li>
 				{% if user.employee %}
 					{% if isHelper %}
-                        <form action="{% url 'proposal-StopHelper' slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
+                        <form action="{% url proposal-StopHelper slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Nie pomogę poprowadzić">
-						    <a class="with-js befan" href="{% url 'proposal-StopHelper' slug=proposal.slug %}">Nie pomogę poprowadzić</a>
+						    <a class="with-js befan" href="{% url proposal-StopHelper slug=proposal.slug %}">Nie pomogę poprowadzić</a>
                         </form>
 					{% else %}
-                        <form action="{% url 'proposal-beHelper' slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
+                        <form action="{% url proposal-beHelper slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                             <input type="submit" class="without-js" value="Pomogę poprowadzić">
-						    <a class="with-js befan" href="{% url 'proposal-beHelper' slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
+						    <a class="with-js befan" href="{% url proposal-beHelper slug=proposal.slug %}" title="Poprowadzę ćwiczenia, pracownię lub repetytorium">Pomogę poprowadzić</a>
                         </form>
 					{% endif %}
 					(chętnych: {{helpers}})
@@ -131,30 +130,30 @@
 					Wersja:
 
 					{% if prev %}
-						<a href="{% url 'proposal-page-archival' slug=proposal.slug descid=prev.id  %}">starsza</a>
+						<a href="{% url proposal-page-archival slug=proposal.slug descid=prev.id  %}">starsza</a>
 					{% endif %}
 
 					{% if next %}
-						<a href="{% url 'proposal-page-archival' slug=proposal.slug descid=next.id  %}">nowsza</a>
+						<a href="{% url proposal-page-archival slug=proposal.slug descid=next.id  %}">nowsza</a>
 					{% endif %}
 				</p>
 			{% endif %}
 
 			<p>
-				<a href="{% url 'proposal-history' slug=proposal.slug %}">historia</a>
-				{% if can_edit %}<a href="{% url 'proposal-edit' slug=proposal.slug %}">edytuj</a>{% endif %}
+				<a href="{% url proposal-history slug=proposal.slug %}">historia</a>
+				{% if can_edit %}<a href="{% url proposal-edit slug=proposal.slug %}">edytuj</a>{% endif %}
 			</p>
 			{% if perms.can_delete_proposal %}
 			<p>
-                <form action="{% url 'proposal-delete' slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
+                <form action="{% url proposal-delete slug=proposal.slug %}" method="POST" class="force-js">{% csrf_token %}
                     <input type="submit" class="without-js" value="Usuń tę propozycję">
-				    <a class="with-js proposal-delete" href="{% url 'proposal-delete' slug=proposal.slug %}">Usuń tę propozycję</a>
+				    <a class="with-js proposal-delete" href="{% url proposal-delete slug=proposal.slug %}">Usuń tę propozycję</a>
                 </form>
 			</p>
 			<p>
-                <form action="{% url 'proposal-description-delete' pid=proposal.desc.id %}" method="POST" class="force-js">{% csrf_token %}
+                <form action="{% url proposal-description-delete pid=proposal.desc.id %}" method="POST" class="force-js">{% csrf_token %}
                     <input type="submit" class="without-js" value="Usuń tę wersję">
-                    <a class="with-js proposal-delete" href="{% url 'proposal-description-delete' pid=proposal.desc.id %}">Usuń tę wersję</a>
+                    <a class="with-js proposal-delete" href="{% url proposal-description-delete pid=proposal.desc.id %}">Usuń tę wersję</a>
                 </form>
 			</p>
 			{% endif %}

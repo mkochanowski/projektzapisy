@@ -1,5 +1,4 @@
 {% extends "grade/base.html" %}
-{% load url from future %}
 {% load compressed %}
 {% block styles %}
     {% compressed_css 'ticketssave' %}
@@ -7,7 +6,7 @@
 
 {% block main-navigation %}
 	<a href="/">Strona Główna</a> &raquo;
-	<a href="{% url 'grade-main' %}">Ocena zajęć</a> &raquo;
+	<a href="{% url grade-main %}">Ocena zajęć</a> &raquo;
 	Pobieranie biletów
 {% endblock %}
 

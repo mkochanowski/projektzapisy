@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 from django.contrib.auth.views import login, password_change, password_change_done, password_reset, password_reset_confirm, password_reset_complete, password_reset_done
+from django.views.generic.simple import direct_to_template
 
 urlpatterns = patterns('apps.users.views',
     url('^login/$', 'login_plus_remember_me', {'template_name': 'users/login.html'}, 'user-login'),

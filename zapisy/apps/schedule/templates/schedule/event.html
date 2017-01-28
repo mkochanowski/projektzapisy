@@ -1,13 +1,12 @@
 {% extends 'schedule/base.html' %}
-{% load url from future %}
 
 {% block scedule_events %} class="active"{% endblock %}
 
 
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
-    <a href="{% url 'events:classrooms' %}">Sale</a> &raquo;
-    <a href="{% url 'events:event_show' %}">Wydarzenia</a> &raquo;
+    <a href="{% url events:classrooms %}">Sale</a> &raquo;
+    <a href="{% url events:event_show %}">Wydarzenia</a> &raquo;
 {% endblock %}
 
 {% block styles %}
@@ -123,7 +122,7 @@
         </div>
     </div>
 
-    <form action="{% url 'events:interested' event.id %}" method="POST">
+    <form action="{% url events:interested event.id %}" method="POST">
         <div class="row" style="
     border: 1px solid #D9DEEB;
     padding-left: 0;
@@ -169,7 +168,7 @@
         </div>
         <div class="span4">
 
-            <form action="{% url 'events:edit' event.id %}" method="GET">
+            <form action="{% url events:edit event.id %}" method="GET">
                 <input type="submit" value="Edytuj" class="btn success span4">
             </form>
         </div>
@@ -202,7 +201,7 @@
         </div>
         <div class="row">
             <div class="span16">
-                <form action="{% url 'events:moderation' event.id %}" method="POST">
+                <form action="{% url events:moderation event.id %}" method="POST">
                     {% csrf_token %}
 
                     <div class="row">
@@ -253,7 +252,7 @@
     {% endif %}
     {% if perms.schedule.manage_events %}
     <div id="decision" class="row hidden">
-        <form action="{% url 'events:decision' event.id %}" method="POST">
+        <form action="{% url events:decision event.id %}" method="POST">
             {% csrf_token %}
 
             <div class="row">
@@ -313,7 +312,7 @@
         </div>
     </div>
     {% if event.author == user %}
-    <form action="{% url 'events:message' event.id %}" method="POST">
+    <form action="{% url events:message event.id %}" method="POST">
         {% csrf_token %}
 
         <div class="row">

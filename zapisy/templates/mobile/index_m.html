@@ -1,5 +1,4 @@
 ﻿{% extends "mobile/base_m.html" %}
-{% load url from future %}
 
 {% block styles %}
     <!--custom stylesheet-->
@@ -9,10 +8,10 @@
 <a href="/records/schedule">
     <div class="box round">Mój plan</div>
 </a>
-<a href="{% url 'latest_news' 'enrollment' %}">
+<a href="{% url latest_news 'enrollment' %}">
     <div class="box round">Zapisy</div>
 </a>
-<a href="{% url 'students-list' %}"> 
+<a href="{% url students-list %}"> 
     <div class="box round">Terminarze innych</div>
 </a>
 {% endblock %}

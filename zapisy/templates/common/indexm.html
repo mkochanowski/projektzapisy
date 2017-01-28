@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/common/mainPage.css" type="text/css" />
@@ -8,12 +7,12 @@
 {% block content %}
 	<div id="mainPage-container">
 		<div>
-			<a href="{% url 'latest_news' 'enrollment' %}">System zapisów - wersja mobilna</a>
+			<a href="{% url latest_news 'enrollment' %}">System zapisów - wersja mobilna</a>
 			<span>System zapisów na zajęcia w Instytucie Informatyki
 				Uniwersytetu Wrocławskiego.</span>
 		</div>
 		<div>
-			<a href="{% url 'latest_news' 'offer' %}">Kształtowanie oferty dydaktycznej</a>
+			<a href="{% url latest_news 'offer' %}">Kształtowanie oferty dydaktycznej</a>
 			<span>System kształtowania oferty dydaktycznej w Instytucie
 				Informatyki Uniwersytetu Wrocławskiego.</span>
 		</div>

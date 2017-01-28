@@ -1,5 +1,4 @@
 {% extends "common/index.html" %}
-{% load url from future %}
 
 {% block styles %}
 	<link rel="stylesheet" href="/site_media/css/news.css" type="text/css" />
@@ -11,7 +10,7 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona główna</a></li>
-    <li><a href="{% url 'news-all' %}">Aktualności</a></li>
+    <li><a href="{% url news-all %}">Aktualności</a></li>
 	{% if adding %}
 		<li>Dodaj ogłoszenie</li>
 	{% else %}

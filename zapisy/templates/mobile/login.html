@@ -1,5 +1,4 @@
 {% extends "mobile/base_m.html" %}
-{% load url from future %}
 
 
 {% block styles %}
@@ -12,7 +11,7 @@
         <div id="login-message" class="main-message">Podany identyfikator i hasło się nie zgadzają. <br/> Spróbuj ponownie.</div>
     {% endif %}
 
-    <form class="high-res-cent" method="post" action="{% url 'django.contrib.auth.views.login' %}" >
+    <form class="high-res-cent" method="post" action="{% url django.contrib.auth.views.login %}" >
         <div>
             {{ form.username.label_tag }}:<br/>
              {{ form.username }}

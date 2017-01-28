@@ -1,5 +1,4 @@
 {% extends "offer/manage/base.html" %}
-{% load url from future %}
 {% block proposals_active %}active{% endblock %}
 
 {% block content %}
@@ -42,11 +41,11 @@
     {% include 'offer/proposal_info.html' with course=proposal %}
   </div>
   <div class="modal-footer">
-    <form action = "{% url 'proposal-accept' proposal.slug %}" method = "post">
+    <form action = "{% url proposal-accept proposal.slug %}" method = "post">
       {% csrf_token %}
       <input type="submit" class="btn primary" value="Zaakceptuj" />
     </form>
-    <form action = "{% url 'proposal-review' proposal.slug %}" method = "post">
+    <form action = "{% url proposal-review proposal.slug %}" method = "post">
       {% csrf_token %}
       <input type="submit" class="btn danger" value="Do poprawienia" />
     </form>
