@@ -1,4 +1,5 @@
 {% extends "offer/base.html" %}
+{% load url from future %}
 
 {% block offer_menu_offer %} class="active"{% endblock %}
 
@@ -79,7 +80,7 @@
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
     {% if proposal %}
-    <a href="{% url offer-main %}">Oferta dydaktyczna</a> &raquo;
+    <a href="{% url 'offer-main' %}">Oferta dydaktyczna</a> &raquo;
         {{ proposal.name }}
     {% else %}
     Oferta dydaktyczna

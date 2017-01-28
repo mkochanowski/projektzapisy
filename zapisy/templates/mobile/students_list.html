@@ -1,7 +1,8 @@
 {% extends "mobile/base_m.html" %}
+{% load url from future %}
 
 {% block content %}
-    <a href="{% url employees-list %}"> 
+    <a href="{% url 'employees-list' %}"> 
         <div class="box round">Zmień na: plany pracowników </div>
     </a>
     <a href="/students/"> 
@@ -15,7 +16,7 @@
             <hr>
             {% for s in students %}
                 <div class="listpos" >
-                    <a href="{% url student-schedule-owner s.user.username %}" style="float:left">{{s.get_full_name}}</a><br/>
+                    <a href="{% url 'student-schedule-owner' s.user.username %}" style="float:left">{{s.get_full_name}}</a><br/>
                     <hr>
                 </div>
             {% endfor %}

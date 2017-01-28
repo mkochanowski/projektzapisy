@@ -1,3 +1,4 @@
+{% load url from future %}
 <div id="employee-profile">
 	<h2>{{employee.get_full_name}}</h2>
 
@@ -45,9 +46,9 @@
 	<div id="user-schedule-scheduleContainer">
 		<input type="hidden" name="courses" value="{{ courses_json }}" />
 		<input type="hidden" name="groups" value="{{ groups_json }}" />
-		<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}" />
-		<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}" />
-		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}" />
+		<input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}" />
+		<input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}" />
+		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
 
 		<div class="byWeekDays">
