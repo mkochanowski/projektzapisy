@@ -297,12 +297,21 @@ class TermTestCase(TestCase):
         self.assertEquals(semester.semester_beginning,term.day)
         self.assertEquals(reservation.classroom,term.room)
 
-class FeedstestCase(TestCase):
-    def test_feed(self):
+class FeedsTestCase(TestCase):
+    def test_item_title(self):
         event = factories.EventFactory()
+        event2 = factories.EventFactory()
         latest = feeds.Latest()
-        item_title = feeds.Latest.item_title(latest,event)
-        self.assertTrue(item_title)
+        item_title = [feeds.Latest.item_title(latest,event),feeds.Latest.item_title(latest,event2)]
+        item_author = [feeds.Latest.item_author_name(latest,event),feeds.Latest.item_author_name(latest,event)]
+        item_pub= [feeds.Latest.item_pubdate(latest,event),feeds.Latest.item_pubdate(latest,event)]
+        item_desc = [feeds.Latest.item_description(latest,event),feeds.Latest.item_description(latest,event)]
+        item_auth_mail = [feeds.Latest.item_author_email(latest,event),feeds.Latest.item_author_email(latest,event)]
+        self.assertEquals(len(item_title),2)
+        self.assertEquals(len(item_author),2)
+        self.assertEquals(len(item_pub),2)
+        self.assertEquals(len(item_desc),2)
+        self.assertEquals(len(item_auth_mail),2)
 
 class EventTestCase(TestCase):
     def setUp(self):
