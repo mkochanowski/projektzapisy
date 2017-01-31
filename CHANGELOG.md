@@ -2,6 +2,11 @@
 
 # Current version
 
+# Version 17.01.31
+
+* fixed cyclical reservation starts no earlier than semester beginning
+* fixed open only SMTP one connection while sending emails
+
 # Version 17.01.25
 
 * Updated max points for vote information

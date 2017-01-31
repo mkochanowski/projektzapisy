@@ -116,7 +116,7 @@ class Employee(BaseUser):
 
     user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='employee')
     consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
-    homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="", null=True, blank=True)
+    homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
     status = models.PositiveIntegerField(default=0, choices=EMPLOYEE_STATUS_CHOICES, verbose_name="Status")
 

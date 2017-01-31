@@ -1,5 +1,6 @@
+{% load url from future %}
 {% for section in sections %}
-<form method="Post" id="questionset" action="{% url grade-poll-questionset-create %}">{% csrf_token %}
+<form method="Post" id="questionset" action="{% url 'grade-poll-questionset-create' %}">{% csrf_token %}
 
     <input type="hidden" name="old_id" value="{{ section.pk }}">
     <input type="text"   value="{{section.title}}" name="poll[title]" id="section-title" class="required only-edit">
