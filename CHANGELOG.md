@@ -2,6 +2,8 @@
 
 # Current version
 
+# fixed cyclical reservation starts no earlier than semester beginning
+
 # Version 17.01.25
 
 * Updated max points for vote information
