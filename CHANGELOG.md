@@ -2,7 +2,10 @@
 
 # Current version
 
-# fixed cyclical reservation starts no earlier than semester beginning
+# Version 17.01.31
+
+* fixed cyclical reservation starts no earlier than semester beginning
+* fixed open only SMTP one connection while sending emails
 
 # Version 17.01.25
 
