@@ -136,7 +136,7 @@
                                     </div></form>
                             {% else %}
 
-                                {% if t.signed %}<form>
+                                {% if t.signed and can_remove_record %}<form>
                                     <div>
                                         <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
                                         </button>

@@ -263,7 +263,8 @@ def course(request, slug):
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
             'requirements' : requirements,
-            't0': t0
+            't0': t0,
+            'can_remove_record': default_semester.can_remove_record()
         })
 
         return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )

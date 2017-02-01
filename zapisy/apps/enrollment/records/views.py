@@ -116,7 +116,7 @@ def set_enrolled(request, method):
         if result:
             run_rearanged(result)
 
-    else:
+    elif Semester.get_default_semester().can_remove_record():
         result, messages_list = group.remove_student(student)
         if result:
             run_rearanged(result, group)
