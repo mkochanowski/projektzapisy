@@ -114,9 +114,14 @@
                                     <div>
                                         <input type="hidden" name="group" value="{{ t.id }}"/>
                                         {% if t.signed %}
+                                            {% if can_remove_record %}
                                             <input type="hidden" name="enroll" value="false"/>
                                             <button type="submit" class="btn small danger setEnrolledButton">{% trans "wypisz" %}
                                             </button>
+                                            {% else %}
+                                                <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
+                                                </button>
+                                            {% endif %}
                                             {% else %}{% if not t.is_full %}
                                                 <input type="hidden" name="enroll" value="true"/>
                                                 <button type="submit"
@@ -136,7 +141,7 @@
                                     </div></form>
                             {% else %}
 
-                                {% if t.signed and can_remove_record %}<form>
+                                {% if t.signed %}<form>
                                     <div>
                                         <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
                                         </button>
