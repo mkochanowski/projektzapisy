@@ -104,7 +104,7 @@ class SemesterAdmin(admin.ModelAdmin):
         ('Ocena', {'fields': ['is_grade_active', 'first_grade_semester', 'second_grade_semester']}),
         ('Czas trwania semestru', {'fields': ['semester_beginning','semester_ending']}),
         ('Czas trwania zajęć', {'fields': ['lectures_beginning','lectures_ending']}),
-        ('Czas trwania zapisów', {'fields': ['records_opening','records_ects_limit_abolition','records_closing']}),
+        ('Czas trwania zapisów', {'fields': ['records_opening','records_ects_limit_abolition','records_ending','records_closing']}),
         ('Czas trwania dezyderat', {'fields': ['desiderata_opening', 'desiderata_closing']}),
     ]
     list_editable = ('visible',)
