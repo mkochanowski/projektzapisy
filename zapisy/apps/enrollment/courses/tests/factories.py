@@ -50,6 +50,7 @@ class SummerSemesterFactory(DjangoModelFactory):
     lectures_ending = semester_ending
     records_ects_limit_abolition = datetime(datetime.now().year + 1, 2, 10)
     year = str(semester_beginning.year - 1) + "/" + str(semester_beginning.year % 100)
+
 class WinterSemesterFactory(DjangoModelFactory):
     class Meta:
         model = Semester

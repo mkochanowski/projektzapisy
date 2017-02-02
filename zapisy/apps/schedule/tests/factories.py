@@ -2,6 +2,8 @@
 
 from datetime import time, date, datetime
 import string
+import common
+import random
 
 import factory
 import factory.fuzzy
@@ -11,8 +13,6 @@ from apps.users.tests.factories import UserFactory
 from apps.enrollment.courses.tests.factories import GroupFactory, SummerSemesterFactory, \
     ClassroomFactory
 from apps.schedule.models import Event, Term, SpecialReservation
-import common
-import random
 
 
 class EventCourseFactory(DjangoModelFactory):
@@ -28,13 +28,23 @@ class EventFactory(DjangoModelFactory):
         model = Event
 
     type = factory.Iterator([
-        Event.TYPE_GENERIC, Event.TYPE_CLASS, Event.TYPE_TEST, Event.TYPE_CLASS, Event.TYPE_OTHER
+        Event.TYPE_GENERIC, Event.TYPE_CLASS, Event.TYPE_TEST, Event.TYPE_EXAM, Event.TYPE_CLASS,
+        Event.TYPE_OTHER
     ])
     visible = True
     status = Event.STATUS_ACCEPTED
     author = factory.SubFactory(UserFactory)
     title = factory.fuzzy.FuzzyText(length=50, chars=string.letters)
     description = factory.fuzzy.FuzzyText(length=120, chars=string.letters)
+
+    @factory.post_generation
+    def interested(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for user in extracted:
+                self.interested.add(user)
 
 
 class PendingEventFactory(EventFactory):

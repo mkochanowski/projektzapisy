@@ -1,34 +1,31 @@
 # -*- coding: utf-8 -*-
 
 from datetime import time, date, timedelta
-from django.core.urlresolvers import reverse
+import random
 
-from django.contrib.syndication.views import Feed
 from django.test import TestCase
 from django.core.validators import ValidationError
 from django.contrib.auth.models import Permission
 from django.http import Http404
 
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
-from apps.enrollment.courses.tests.factories import ChangedDayForFridayFactory
 from apps.users.tests.objectmothers import UserObjectMother
-from apps.users.tests.factories import UserFactory, EmployeeProfileFactory
+from apps.users.tests.factories import UserFactory, EmployeeProfileFactory, StudentFactory
 from apps.enrollment.courses.models import Semester, Classroom
 from apps.schedule import feeds
-from datetime import date, datetime
 from apps.users.models import UserProfile
-from ..models import SpecialReservation, EventModerationMessage, EventMessage, Event, Term as EventTerm
+from ..models import SpecialReservation, EventModerationMessage, EventMessage, Event,\
+    Term as EventTerm
 from django.utils.crypto import get_random_string
-from apps.enrollment.courses.tests.factories import GroupFactory, WinterSemesterFactory, SummerSemesterFactory, \
-    ClassroomFactory
-
+from apps.enrollment.courses.tests.factories import WinterSemesterFactory, ClassroomFactory,\
+    GroupFactory, ChangedDayForFridayFactory
+from apps.enrollment.records.tests.factories import RecordFactory
+from apps.enrollment.records.models import Record, STATUS_ENROLLED
 import factories
 import common
 
 
-
 class SpecialReservationTestCase(TestCase):
-
     def setUp(self):
         semester = SemesterObjectMother.summer_semester_2015_16()
         semester.save()
@@ -82,6 +79,7 @@ class SpecialReservationTestCase(TestCase):
             time(15),
             time(16)
         )
+        
         '''
         Powinno przechodzić, bo SpecialReservation tworzy Term dla każdego dnia w semestrze,
         w którym dana rezerwacja występuje po wykonaniu metody save. To jednak nie
@@ -90,12 +88,12 @@ class SpecialReservationTestCase(TestCase):
         Rozwiązanie zagadki: My tutaj operujemy na przeszłych semestrach, a podczas tworzenia
         SpecialReservation, gdy tworzone są eventy i termsy robione są rezerwacje od teraz,
         czyli datetime.now().date(). Zatem nic nie zostanie zarezerwowane, jeśli operujemy na
-        przeszłych datach. Teraz są 2 rozwiązania. Albo zmodyfikować kod tworzący termsy,
-        żeby brał pod uwagę daty z przeszłości (ale jak ktoś zrobi rezerwację w środku semestru 
-        to mu stworzy niepotrzebnie wydarzenia od samego początku), albo 
-        tworzyć testy operujące na datach w teraźniejszości, lub przyszłości. Trzeba to wszystko
-        zrefactorować na fabryki.
+        przeszłych datach. 
+
+        Należy tworzyć testy operujące na datach w teraźniejszości, lub przyszłości. 
+        Trzeba to wszystko zrefactorować na fabryki.
         '''
+
         # self.assertTrue(terms)
 
     def test_try_clean_on_overlapping_reservation(self):
@@ -214,18 +212,21 @@ class TermTestCase(TestCase):
         term1.full_clean()
         term1.save()
         self.assertTrue(term1)
+
     def test_get_terms_for_dates(self):
         term2 = factories.TermFactory()
         term2.full_clean()
         term2.save()
         termsoftheday = EventTerm.get_terms_for_dates([term2.get_day()],term2.get_room())
         self.assertEqual(len(termsoftheday), 1)
+
     def test_validation_on_overlapping(self):
         term2 = factories.TermFactory()
         term2.full_clean()
         term2.save()
         term3 = factories.Term(room = term2.get_room())
         self.assertRaises(ValidationError, term3.full_clean)
+
     def test_different_semester_reservation(self):
         semester = WinterSemesterFactory()
         semester.save()
@@ -297,6 +298,7 @@ class TermTestCase(TestCase):
         self.assertEquals(semester.semester_beginning,term.day)
         self.assertEquals(reservation.classroom,term.room)
 
+
 class FeedsTestCase(TestCase):
     def test_item_title(self):
         event = factories.EventFactory()
@@ -313,6 +315,7 @@ class FeedsTestCase(TestCase):
         self.assertEquals(len(item_desc),2)
         self.assertEquals(len(item_auth_mail),2)
 
+
 class EventTestCase(TestCase):
     def setUp(self):
         teacher = factories.UserFactory()
@@ -323,16 +326,16 @@ class EventTestCase(TestCase):
         employee = UserObjectMother.employee(teacher)
         employee.save()
 
-        event = factories.EventFactory(author=teacher)
-        event.full_clean()
+        self.event = factories.EventFactory(author=teacher)
+        self.event.full_clean()
 
         room110 = factories.ClassroomFactory(number='110')
         room110.full_clean()
 
-        term_1 = factories.TermFixedDayFactory(event=event, room=room110)
+        term_1 = factories.TermFixedDayFactory(event=self.event, room=room110)
         term_1.full_clean()
 
-        term_2 = factories.TermFixedDayFactory(event=event, start=time(16), end=time(17),
+        term_2 = factories.TermFixedDayFactory(event=self.event, start=time(16), end=time(17),
                                                room=room110)
         term_2.full_clean()
 
@@ -340,6 +343,8 @@ class EventTestCase(TestCase):
         u.full_clean()
         student = UserObjectMother.student_profile(u)
         student.save()
+
+        self.users = [u, teacher]
 
     def test_event_is_present(self):
         room = Classroom.get_by_number('110')
@@ -515,22 +520,80 @@ class EventTestCase(TestCase):
         self.assertRaises(Http404, Event.get_event_for_moderation_only_or_404, ev.id, ev.author)
 
     def test_get_all(self):
-        pass
+        events = factories.EventFactory.create_batch(random.randint(50, 100))
+        events.append(self.event)
+        get_all_res = Event.get_all()
+        self.assertEqual(len(events), len(get_all_res))
+        get_all_res_pk = [x.pk for x in get_all_res]
+        for i in range(0, len(events)):
+            self.assertTrue(events[i].pk in get_all_res_pk)
 
-    def test_get_all_wo_courses(self):
-        pass
+    def test_get_all_without_courses(self):
+        events = factories.EventFactory.create_batch(random.randint(50, 100))
+        events.append(self.event)
+        get_all_wo_courses_res = Event.get_all_without_courses()
+        events_wo_courses = filter(lambda x: x.type != Event.TYPE_CLASS, events)
+        self.assertEqual(len(events_wo_courses), len(get_all_wo_courses_res))
+        get_all_res_pk = [x.pk for x in get_all_wo_courses_res]
+        for i in range(0, len(events_wo_courses)):
+            self.assertTrue(events_wo_courses[i].pk in get_all_res_pk)
 
     def test_get_for_user(self):
-        pass
+        users = UserFactory.create_batch(8)
+        users += self.users
+        events = factories.EventFactory.create_batch(random.randint(50, 100),
+                                                     author=random.choice(users))
+        events.append(self.event)
+        user = random.choice(users)
+        events_for_user = Event.get_for_user(user)
+        filtered_events = filter(lambda x: x.author == user, events)
+        self.assertEqual(len(filtered_events), len(events_for_user))
+        filtered_pk = [x.pk for x in filtered_events]
+        for i in range(0, len(events_for_user)):
+            self.assertTrue(events_for_user[i].pk in filtered_pk)
 
     def test_get_exams(self):
+        events = factories.EventFactory.create_batch(random.randint(50, 100))
+        events.append(self.event)
+        get_exams_res = Event.get_exams()
+        filtered_events = filter(lambda x: x.type == Event.TYPE_EXAM, events)
+        self.assertEqual(len(get_exams_res), len(filtered_events))
+        get_exams_pk = [x.pk for x in get_exams_res]
+        for i in range(0, len(filtered_events)):
+            self.assertTrue(filtered_events[i].pk in get_exams_pk)
+
+    def test_get_followers_when_type_exam_or_test(self):
+        # Nie przechodzi :(
+
+        # students = StudentFactory.create_batch(random.randint(10, 20))
+        # group = GroupFactory()
+        # for student in students:
+        #     RecordFactory(student=student, group=group, status=STATUS_ENROLLED)
+        # users = [student.user for student in students]
+        # event = factories.EventFactory(type=random.choice([Event.TYPE_EXAM, Event.TYPE_TEST]),
+        #                                interested=users, course=group.course)
+        # followers = event.get_followers()
+        # users_emails = [user.email for user in users]
+        # self.assertEqual(len(users_emails), len(followers))
+        # for email in users_emails:
+        #     self.assertTrue(email in followers)
         pass
 
-    def test_get_followers(self):
-        pass
+    def test_get_followers_when_type_other_than_exam_or_test(self):
+        users = UserFactory.create_batch(random.randint(10, 20))
+        event = factories.EventFactory(
+            type=random.choice([Event.TYPE_GENERIC, Event.TYPE_CLASS, Event.TYPE_OTHER]),
+            interested=users
+        )
+        followers = event.get_followers()
+        users_emails = [user.email for user in users]
+        self.assertEqual(len(users_emails), len(followers))
+        for email in users_emails:
+            self.assertTrue(email in followers)
 
     def test_unicode(self):
-        pass
+        event = factories.EventFactory()
+        self.assertEqual(u'{0} {1}'.format(event.title, event.description), str(event))
 
 
 class EventsOnChangedDayTestCase(TestCase):
