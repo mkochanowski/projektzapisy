@@ -1,4 +1,5 @@
 {% extends "grade/poll/poll_results.html" %}
+{% load url from future %}
 
 {% block results %}
     {% if results %}
@@ -82,7 +83,7 @@
             </div>
         {% endfor %}
         <span class="result-details">
-            <a href="{% url grade-poll-poll-results-detailed-semester semester.id link_mode pid %}">Szczegółowe wyniki</a>
+            <a href="{% url 'grade-poll-poll-results-detailed-semester' semester.id link_mode pid %}">Szczegółowe wyniki</a>
         </span>
     {% else %}
         Wybierz ankietę z menu po prawej

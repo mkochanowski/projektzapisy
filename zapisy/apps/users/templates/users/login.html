@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load compressed %}
 
 
@@ -12,7 +13,7 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-        <p class="main-message">Jesteś już zalogowany. Możesz się <a href="{% url user-logout %}">wylogować</a>.</p>
+        <p class="main-message">Jesteś już zalogowany. Możesz się <a href="{% url 'user-logout' %}">wylogować</a>.</p>
     {% else %}
         {% if form.errors %}
             <p class="main-message">Podany identyfikator i hasło się nie zgadzają. Spróbuj ponownie.</p>
@@ -25,7 +26,7 @@
 <div class="container space">
 <div class="row show-grid">
     <div class="span5 columns loginbox">
-<form class="form-stacked" action="{% url apps.users.views.login_plus_remember_me %}" method="POST">
+<form class="form-stacked" action="{% url 'apps.users.views.login_plus_remember_me' %}" method="POST">
         {% csrf_token %}
         <fieldset>
           <div class="clearfix">
@@ -64,7 +65,7 @@
 Hasło dostaje każdy student po spotkaniu z dyrekcją Instytutu Informatyki UWr.
 </p>
 <p><h3>Nie pamiętasz hasła?</h3>
-Skorzystaj z naszego <a href="{% url password-reset %}">formularza</a>. Jeżeli to nie pomoże skontaktuj się z
+Skorzystaj z naszego <a href="{% url 'password-reset' %}">formularza</a>. Jeżeli to nie pomoże skontaktuj się z
 dziekanatem.
 </p>
 </div>

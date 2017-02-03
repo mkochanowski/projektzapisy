@@ -8,7 +8,7 @@ from django.template import Context
 from django.template.loader import get_template
 
 
-MASS_MAIL_FROM = 'zapisy@ii.uni.wroc.pl'
+MASS_MAIL_FROM = 'zapisy@cs.uni.wroc.pl'
 
 def render_and_send_email(subject, template, template_html, data, recipient_list, from_email=MASS_MAIL_FROM):
 

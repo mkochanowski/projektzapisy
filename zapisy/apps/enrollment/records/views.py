@@ -30,6 +30,7 @@ from apps.enrollment.records.models import *
 from apps.enrollment.records.exceptions import *
 from apps.enrollment.courses.views import prepare_courses_list_to_render
 from apps.enrollment.records.utils import *
+from apps.enrollment.utils import mailto
 
 from libs.ajax_messages import *
 
@@ -212,13 +213,6 @@ def records(request, group_id):
         Group records view - list of all students enrolled and queued to group.
     """
     try:
-        def mailto(author, students, bcc=False):
-            """Helper method to create mailto links"""
-            result = author.email
-            if students:
-                return result + ('?bcc=' if bcc else ',') + ','.join([student.user.email for student in students])
-            return result
-
         group = Group.objects.get(id=group_id)
         students_in_group = Record.get_students_in_group(group_id)
         students_in_queue = Queue.get_students_in_queue(group_id)

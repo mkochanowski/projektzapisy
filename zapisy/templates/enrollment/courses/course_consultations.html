@@ -1,4 +1,5 @@
 {% extends "enrollment/courses/base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% block main-subtitle %}
@@ -7,10 +8,10 @@
 {% endblock %}
 
 {% block bread %}
-	<a href="{% url main-page %}">{% trans "Strona główna" %}</a> &raquo;
-	<a href="{% url enrollment-main %}">{% trans "Zapisy" %}</a> &raquo;
-	<a href="{% url course-list %}">{% trans "Przedmioty" %}</a> &raquo;
-	<a href="{% url course-page course.slug %}"
+	<a href="{% url 'main-page' %}">{% trans "Strona główna" %}</a> &raquo;
+	<a href="{% url 'enrollment-main' %}">{% trans "Zapisy" %}</a> &raquo;
+	<a href="{% url 'course-list' %}">{% trans "Przedmioty" %}</a> &raquo;
+	<a href="{% url 'course-page' course.slug %}"
 			>{{course.name}}</a> &raquo;
 
 	<h3>{% trans "Konsultacje" %}</h3>
@@ -33,7 +34,7 @@
                     <li>
                         <span>{% trans "Prowadzący" %}:</span>
                         {% for teacher in course.teachers.all %}
-                            <a href="{% url employee-profile teacher.user.id %}" class="person">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
+                            <a href="{% url 'employee-profile' teacher.user.id %}" class="person">{{teacher.user.get_full_name}}</a>{%if not forloop.last %}, {% endif %}
                         {% endfor %}
                     </li>
                 {% endif %}
@@ -66,7 +67,7 @@
                     {% endif %}
                 <li>
                     <span>{% trans "Konsultacje" %}:</span>
-                    <a href="{% url course-consiltations-page course.slug %}">{% trans "link" %}</a>
+                    <a href="{% url 'course-consiltations-page' course.slug %}">{% trans "link" %}</a>
                 </li>
             </ul>
 
@@ -90,7 +91,7 @@
 			<tbody>
 				{% for employee in employees %}
 					<tr>
-						<td><a href="{% url employee-profile employee.user.id %}" class="person">
+						<td><a href="{% url 'employee-profile' employee.user.id %}" class="person">
 						    {{employee.user.get_full_name}}</a></td>
 						<td>{% if employee.room %}{{employee.room}}{% endif %}</td>
 						<td>{{employee.consultations}}</td>

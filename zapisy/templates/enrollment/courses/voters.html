@@ -1,4 +1,5 @@
 {% extends "enrollment/courses/base.html" %}
+{% load url from future %}
 {% load i18n %}
 
 {% load fereol_common %}
@@ -24,7 +25,7 @@
     <a href="/">{% trans "Strona główna" %}</a> &raquo;
     <a href="/">{% trans "System Zapisów" %}</a> &raquo;
     <a href="/">{% trans "Przedmioty" %}</a> &raquo;
-    <a href="{% url course-page course.slug %}">{{ course.name }}</a> &raquo;
+    <a href="{% url 'course-page' course.slug %}">{{ course.name }}</a> &raquo;
     {% trans "Głosy" %}
     {# end bread #}
 {% endblock %}

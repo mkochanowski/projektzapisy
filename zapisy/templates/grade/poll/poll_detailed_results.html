@@ -1,4 +1,5 @@
 {% extends "grade/poll/poll_results.html" %}
+{% load url from future %}
 
 {% block results %}
     {% if form %}
@@ -19,15 +20,15 @@
         
         <div class="pages">
             <span class="beglink">
-                <a href="{% url grade-poll-poll-results-detailed-semester semester.id link_mode pid first %}">Pierwsza odpowiedź</a>
+                <a href="{% url 'grade-poll-poll-results-detailed-semester' semester.id link_mode pid first %}">Pierwsza odpowiedź</a>
             </span>
             {% for pg in pages %}
                 <span class="page-link {% if pg.0 == page %}active{%endif%}">
-                    <a href="{% url grade-poll-poll-results-detailed-semester semester.id link_mode pid pg.1 %}">{{ pg.0 }}</a>
+                    <a href="{% url 'grade-poll-poll-results-detailed-semester' semester.id link_mode pid pg.1 %}">{{ pg.0 }}</a>
                 </span>
             {% endfor %}
             <span class="endlink">
-                <a href="{% url grade-poll-poll-results-detailed-semester semester.id link_mode pid last %}">Ostatnia odpowiedź</a>
+                <a href="{% url 'grade-poll-poll-results-detailed-semester' semester.id link_mode pid last %}">Ostatnia odpowiedź</a>
             </span>
         </div>
     {% endif %}

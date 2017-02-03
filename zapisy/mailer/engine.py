@@ -9,6 +9,7 @@ from mailer.models import Message, DontSendEntry, MessageLog
 from django.conf import settings
 from django.core.mail import send_mail as core_send_mail
 from django.core.mail import EmailMultiAlternatives
+from django.core import mail
 
 logger = logging.getLogger('mailer.engine')
 
@@ -64,6 +65,8 @@ def send_all():
     sent = 0
     
     try:
+        connection = mail.get_connection()
+        connection.open()
         for message in prioritize():
             subject = EMAIL_SUBJECT_TEMPLATE % message.subject
             if DontSendEntry.objects.has_address(message.to_address):
@@ -75,9 +78,9 @@ def send_all():
                 try:
                     logger.info("sending message '%s' to %s" % (subject.encode("utf-8"), message.to_address.encode("utf-8")))
                     if not message.message_body_html:
-                        core_send_mail(subject, message.message_body, message.from_address, [message.to_address])
+                        core_send_mail(subject, message.message_body, message.from_address, [message.to_address], connection = connection)
                     else:
-                        email = EmailMultiAlternatives(subject, message.message_body, message.from_address, [message.to_address])
+                        email = EmailMultiAlternatives(subject, message.message_body, message.from_address, [message.to_address], connection = connection)
                         email.attach_alternative(message.message_body_html, "text/html")
                         email.send()
                     MessageLog.objects.log(message, 1) # @@@ avoid using literal result code
@@ -88,6 +91,7 @@ def send_all():
                     logger.info("message deferred due to failure: %s" % err)
                     MessageLog.objects.log(message, 3, log_message=str(err)) # @@@ avoid using literal result code
                     deferred += 1
+        connection.close()
     finally:
         logger.debug("releasing lock...")
         lock.release()

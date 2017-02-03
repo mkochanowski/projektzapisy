@@ -1,4 +1,5 @@
 ﻿{% extends "grade/base.html" %}
+{% load url from future %}
 {% load staticfiles %}
 {% load compressed %}
 
@@ -120,7 +121,7 @@
 
 {% block main-navigation %}
     <li><a href="/">Strona Główna</a></li>
-    <li><a href="{% url grade-main %}">Ocena zajęć</a></li>
+    <li><a href="{% url 'grade-main' %}">Ocena zajęć</a></li>
     <li>Wyniki oceny</li>
 {% endblock %}
 
@@ -134,7 +135,7 @@
 
         <div id="results-poll-menu">
 
-                <form action="{% url poll-change-semester %}" method="POST" class="form-stacked">
+                <form action="{% url 'poll-change-semester' %}" method="POST" class="form-stacked">
                     {% csrf_token %}
                     <div class="clearfix">
                         <label for="semester_change">Semestr</label>
@@ -162,7 +163,7 @@
 
                             <li{% if  poll.id == pid %} class="active_poll"{% endif %}><a id="grade-fillable-poll-link-{{ poll.id }}"
                                     
-                                   href="{% url grade-poll-poll-results-semester semester.id 'S' poll.id %}">{{ poll.group.teacher }} - {{ poll.title }}
+                                   href="{% url 'grade-poll-poll-results-semester' semester.id 'S' poll.id %}">{{ poll.group.teacher }} - {{ poll.title }}
 
                             </a></li>
                             {% endfor %}
@@ -178,7 +179,7 @@
                             {% for poll in poll_list.1 %}
                             <li><a id="results-by-teacher-{{ poll.id }}"
                                    class="result-poll-link"
-                                   href="{% url grade-poll-poll-results-semester semester.id 'T' poll.id %}">{% if poll.group %}{{ poll.group.course.name }} - {% endif %}{{ poll.title }}
+                                   href="{% url 'grade-poll-poll-results-semester' semester.id 'T' poll.id %}">{% if poll.group %}{{ poll.group.course.name }} - {% endif %}{{ poll.title }}
                             </a></li>
                             {% endfor %}
                         </ul></li>

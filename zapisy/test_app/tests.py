@@ -1,4 +1,4 @@
-# -*- coding: utf-8-*-
+# -*- coding: utf-8 -*-
 
 # Run this tests with 'xvfb-run python manage.py test test_app' command
 
@@ -32,6 +32,7 @@ class SeleniumTestCase(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         cls.driver = WebDriver()
+        cls.driver.set_window_size(1024, 1024)
         super(SeleniumTestCase, cls).setUpClass()
 
     @classmethod
@@ -114,7 +115,7 @@ class NewSemesterTests(SeleniumTestCase):
 
         self.current_semester = Semester.objects.create(
             type=Semester.TYPE_SUMMER,
-            year='1',                               
+            year='1',
             semester_beginning=date.today(),
             semester_ending=date.today() + relativedelta(months=3),
             records_ects_limit_abolition=date.today() + relativedelta(days=10),
@@ -199,23 +200,23 @@ class NewSemesterTests(SeleniumTestCase):
         self.results_points = defaultdict(int)
         self.results_votes = defaultdict(int)
         self.vote(
-            self.student1, 
-            {'Course 1': 3, 'Course 2': 3, 'Course 3': 3, 'Course 4': 3, 
+            self.student1,
+            {'Course 1': 3, 'Course 2': 3, 'Course 3': 3, 'Course 4': 3,
              'Course 5': 3, 'Course 6': 3, 'Course 7': 3, 'Course 8': 3,
              'Course 9': 3, 'Course 10': 3}
         )
         self.vote(
-            self.student1, 
+            self.student1,
             {'Course 1': 1, 'Course 2': 2, 'Course 4': 3, 'Course 5': 2,
              'Course 6': 2, 'Course 7': 1 ,'Course 8': 1}
         )
         self.vote(
-            self.student2, 
+            self.student2,
             {'Course 1': 2, 'Course 2': 1, 'Course 3': 3, 'Course 4': 2,
              'Course 8': 1, 'Course 9': 1, 'Course 10': 2}
         )
         self.vote(
-            self.student3, 
+            self.student3,
             {'Course 1': 3, 'Course 3': 1, 'Course 4': 2, 'Course 6': 2,
              'Course 8': 2, 'Course 10': 2}
         )
@@ -265,7 +266,7 @@ class NewSemesterTests(SeleniumTestCase):
             self.assertEqual(len(self.driver.find_elements_by_xpath('//div[contains(text(), "Oddano poprawny głos")]')), 1)
         else:
             self.assertEqual(len(self.driver.find_elements_by_xpath('//div[contains(text(), "Nie udało się oddać głosu")]')), 1)
-        
+
     def create_offer_for_winter_semester(self):
         for course in self.winter_courses:
             Course.objects.create(
@@ -280,15 +281,15 @@ class NewSemesterTests(SeleniumTestCase):
         self.system_state.save()
 
         self.correction(
-            self.student1, 
+            self.student1,
             {'Course 1': 3, 'Course 3': 3}
         )
         self.correction(
-            self.student2, 
+            self.student2,
             {'Course 2': 3}
         )
         self.correction(
-            self.student3, 
+            self.student3,
             {'Course 2': 2}
         )
         self.correction(
@@ -394,7 +395,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.next_winter_semester.semester_beginning = date.today()
         self.next_winter_semester.records_ects_limit_abolition = date.today() + relativedelta(days=11)
         self.next_winter_semester.semester_ending = date.today() + relativedelta(months=3)
-        self.next_winter_semester.save()        
+        self.next_winter_semester.save()
 
     def add_new_students(self):
         number_of_students = Student.objects.all().count()

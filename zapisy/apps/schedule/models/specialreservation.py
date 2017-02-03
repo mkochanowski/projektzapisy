@@ -108,7 +108,8 @@ class SpecialReservation(models.Model):
     def validate_against_event_terms(self):
         from .term import Term
 
-        candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek, start_date=datetime.now().date())
+        candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek, start_date=max(datetime.now().date(), self.semester.lectures_beginning))
+
         terms = Term.get_terms_for_dates(dates=candidate_days,
                                          classroom=self.classroom,
                                          start_time=self.start_time,
@@ -166,7 +167,7 @@ class SpecialReservation(models.Model):
         ev.author_id = 1
         ev.save()
 
-        term_days = semester.get_all_days_of_week(day_of_week=self.dayOfWeek, start_date=datetime.now().date())
+        term_days = semester.get_all_days_of_week(day_of_week=self.dayOfWeek, start_date=max(datetime.now().date(), semester.lectures_beginning))
 
         for day in term_days:
             term = Term()

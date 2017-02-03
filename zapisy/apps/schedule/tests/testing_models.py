@@ -563,20 +563,18 @@ class EventTestCase(TestCase):
             self.assertTrue(filtered_events[i].pk in get_exams_pk)
 
     def test_get_followers_when_type_exam_or_test(self):
-        # Nie przechodzi :(
-
-        # students = StudentFactory.create_batch(random.randint(10, 20))
-        # group = GroupFactory()
-        # for student in students:
-        #     RecordFactory(student=student, group=group, status=STATUS_ENROLLED)
-        # users = [student.user for student in students]
-        # event = factories.EventFactory(type=random.choice([Event.TYPE_EXAM, Event.TYPE_TEST]),
-        #                                interested=users, course=group.course)
-        # followers = event.get_followers()
-        # users_emails = [user.email for user in users]
-        # self.assertEqual(len(users_emails), len(followers))
-        # for email in users_emails:
-        #     self.assertTrue(email in followers)
+        students = StudentFactory.create_batch(random.randint(10, 20))
+        group = GroupFactory()
+        for student in students:
+            RecordFactory(student=student, group=group, status=STATUS_ENROLLED)
+        users = [student.user for student in students]
+        event = factories.EventFactory(type=random.choice([Event.TYPE_EXAM, Event.TYPE_TEST]),
+                                       interested=users, course=group.course)
+        followers = event.get_followers()
+        users_emails = [user.email for user in users]
+        self.assertEqual(len(users_emails), len(followers))
+        for email in users_emails:
+            self.assertTrue(email in followers)
         pass
 
     def test_get_followers_when_type_other_than_exam_or_test(self):
