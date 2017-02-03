@@ -3,6 +3,16 @@
 
 from django.core.exceptions import ObjectDoesNotExist
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 SCHEDULE_FILE = 'plan2017lato.txt'
 LIMITS = {'1' : 300, '9' : 300, '2' : 20, '3' : 15 , '5' : 18 , '6' : 15 }
 
@@ -485,11 +495,13 @@ def get_classroom(rooms):
     classrooms = []
     for room in rooms:
         try:
-            if room.replace(' ','')=='':
-                classroom = None
-            else:
-                classroom = Classroom.objects.get(number=room)
+            room = int(room)
+            classroom = Classroom.objects.get(number=room)
         except ObjectDoesNotExist:
+            print bcolors.WARNING + room + ' <-wrong' + bcolors.ENDC
+            classroom = None
+        except ValueError:
+            print bcolors.WARNING + room + ' <-wrong' + bcolors.ENDC
             classroom = None
         if classroom:
             classrooms.append(classroom)
@@ -538,7 +550,7 @@ def import_schedule(file, semester):
                 limit = LIMITS[group_type]
                 
                 t = 15*(int(g.group('end_time'))-int(g.group('start_time')))
-                    
+                print classrooms                    
                 if group_type=='1':    
                     group = Group.objects.get_or_create(course=course,
                                                         teacher=teacher,
