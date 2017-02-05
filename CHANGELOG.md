@@ -2,6 +2,19 @@
 
 # Current version
 
+# Version 17.01.31
+
+* fixed cyclical reservation starts no earlier than semester beginning
+* fixed open only SMTP one connection while sending emails
+
+# Version 17.01.25
+
+* Updated max points for vote information
+* Disabled voting for crossed out students
+* Adding new event doesn't require description and event is visible for all users by default
+* Added python-rq
+* Added some schedule/enrollment/vote tests
+
 # Version 16.12.19
 
 * Added cookie law info

@@ -1,9 +1,10 @@
 {% extends "mobile/base_m.html" %}
+{% load url from future %}
 
 {% block content %}
 
 <div id="center-container">
-    <a href = {% url student-enrollment %}>
+    <a href = {% url 'student-enrollment' %}>
         <div class="box round">Powrót</div>
     </a>    
     <div>

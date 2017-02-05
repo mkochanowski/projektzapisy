@@ -168,3 +168,6 @@ apt-get -y install firefox
 apt-get -y install zlib1g-dev
 cd /lib
 ln -s x86_64-linux-gnu/libz.so.1 libz.so
+
+# Install redis
+apt-get -y install redis-server

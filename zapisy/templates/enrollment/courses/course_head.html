@@ -1,3 +1,4 @@
+{% load url from future %}
 {% load fereol_common %}
 {% load i18n %}
 
@@ -13,7 +14,7 @@
                 <th>{% trans "Prowadzący" %}</th>
                 <td>
                     {% for teacher in course.teachers_list %}
-                        <a href="{% url employee-profile teacher.user.id %}"
+                        <a href="{% url 'employee-profile' teacher.user.id %}"
                            class="person">{{ teacher.user.get_full_name }}</a>{% if not forloop.last %}, {% endif %}
                     {% endfor %}</td>
             </tr>
@@ -95,11 +96,11 @@
         {% if False %}
             <tr>
                 <th>{% trans "Konsultacje" %}</th>
-                <td><a href="{% url course-consiltations-page course.slug %}">{% trans "link" %}</a></td>
+                <td><a href="{% url 'course-consiltations-page' course.slug %}">{% trans "link" %}</a></td>
             </tr>
             <tr>
                 <th>{% trans "Oddane głosy" %}</th>
-                <td> {{ course.votes_count }} <a href="{% url course-votes course.slug %}">{% trans "lista" %}</a></td>
+                <td> {{ course.votes_count }} <a href="{% url 'course-votes' course.slug %}">{% trans "lista" %}</a></td>
             </tr>
         {% endif %}
         {% if t0 %}

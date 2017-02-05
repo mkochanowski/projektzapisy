@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from django                   import forms
+from django import forms
 from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
@@ -38,7 +38,7 @@ class EventForm(forms.ModelForm):
         if data:
             data = deepcopy(data)
             if 'type' not in data:
-                data['type'] = '2'
+                data['type'] = Event.TYPE_GENERIC
 
 
         super(EventForm, self).__init__(data, **kwargs)
@@ -46,14 +46,13 @@ class EventForm(forms.ModelForm):
         if not self.instance.pk:
             self.instance.author = user
 
-        if user.employee:
+        if user.get_profile().is_employee:
             self.fields['type'].choices = Event.TYPES_FOR_TEACHER
         else:
             self.fields['type'].choices = Event.TYPES_FOR_STUDENT
 
-        if not user.employee:
+        if not user.get_profile().is_employee:
             self.fields['course'].queryset = EmptyQuerySet()
-
         else:
             semester = Semester.get_current_semester()
 
@@ -73,7 +72,8 @@ class EventForm(forms.ModelForm):
         self.fields['title'].widget.attrs.update({'class' : 'span7'})
         self.fields['type'].widget.attrs.update({'class' : 'span7'})
         self.fields['course'].widget.attrs.update({'class' : 'span7'})
-        self.fields['description'].widget.attrs.update({'class' : 'span7', 'required': 'required'})
+        self.fields['description'].widget.attrs.update({'class' : 'span7'})
+        self.fields['visible'].widget.attrs.update({'checked': ''})
 
 class EventModerationMessageForm(forms.ModelForm):
     class Meta:
