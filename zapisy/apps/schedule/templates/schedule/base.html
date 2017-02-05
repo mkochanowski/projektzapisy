@@ -35,7 +35,7 @@
     {% endif %}
 
     {% if perms.schedule.manage_events %}
-        <li {% block events_raport %}{% endblock %}><a href="{% url events:events_raport %}">Raport</a></li>
+        <li {% block events_report %}{% endblock %}><a href="{% url 'events:events_report' %}">Raport</a></li>
     {% endif %}
     {# end system_menu #}
 {% endblock %}

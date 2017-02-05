@@ -7,10 +7,14 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.template import Context
+from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 import operator
 
+from apps.enrollment.courses.models import Classroom
+from apps.schedule.models import Term
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, \
     EventModerationMessageForm, EventMessageForm
@@ -300,44 +304,54 @@ class MyScheduleAjaxView(FullCalendarView):
 
 @login_required
 @permission_required('schedule.manage_events')
-def events_raport(request):
+def events_report(request):
     from .forms import ReportForm
     if request.method == 'POST':
         form = ReportForm(request.POST)
         if form.is_valid():
-            beg_date = form.fields["beg_date"]
-            end_date = form.fields["end_date"]
-            rooms = []
+            beg_date = form.cleaned_data["beg_date"]
+            end_date = form.cleaned_data["end_date"]
+            rooms = form.cleaned_data["rooms"]
             return events_raport_pdf(request, beg_date, end_date, rooms)
     else:
         form = ReportForm()
-    return TemplateResponse(request, 'schedule/events_raport.html', locals())
+    return TemplateResponse(request, 'schedule/events_report.html', locals())
 
 
-'''
+
 @login_required
 @permission_required('schedule.manage_events')
 def events_raport_pdf(request, beg_date, end_date, rooms):
+
+    events = {}
     for room in rooms:
         try:
-            group = Group.objects.get(id=group_id)
-        except ObjectDoesNotExist:
-            raise Http404
+            cr = Classroom.objects.get(id=room)
+            events[cr] = Term.objects.filter(
+                day__gte=beg_date,
+                day__lte=end_date,
+                room=room
+                ).order_by('day', 'start')
+        except:
+            # we should log that room doesn't exist
+            pass
 
     data = {
-        'rooms': rooms,
+        'beg_date': beg_date,
+        'end_date': end_date,
+        'events': events,
         'pagesize': 'A4',
         'report': True
     }
     context = Context(data)
 
-    template = get_template('schedule/events_raport_pdf.html')
-    html  = template.render(context)
+    template = get_template('schedule/events_report_pdf.html')
+    html = template.render(context)
     result = StringIO.StringIO()
 
-    pdf      = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result, encoding='UTF-8')
+    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result,
+                            encoding='UTF-8')
     response = HttpResponse(result.getvalue(), mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=raport.pdf'
+    response['Content-Disposition'] = 'attachment; filename=report.pdf'
 
     return response
-'''

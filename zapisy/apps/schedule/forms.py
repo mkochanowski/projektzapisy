@@ -95,4 +95,4 @@ class ReportForm(forms.Form):
     rooms_choices = [(x.pk, x.number) for x in Classroom.get_in_institute(reservation=True)]
     beg_date = forms.DateField()
     end_date = forms.DateField()
-    rooms = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=rooms_choices)
+    rooms = forms.MultipleChoiceField(choices=rooms_choices, widget=forms.CheckboxSelectMultiple)
