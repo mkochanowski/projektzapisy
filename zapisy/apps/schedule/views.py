@@ -352,6 +352,6 @@ def events_raport_pdf(request, beg_date, end_date, rooms):
     pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result,
                             encoding='UTF-8')
     response = HttpResponse(result.getvalue(), mimetype='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=report.pdf'
+    response['Content-Disposition'] = 'attachment; filename=raport.pdf'
 
     return response

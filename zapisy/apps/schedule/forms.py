@@ -5,6 +5,7 @@ from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
 from apps.schedule.models import Event, Term, EventModerationMessage, EventMessage
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from django.forms.models import inlineformset_factory
 
@@ -95,4 +96,4 @@ class ReportForm(forms.Form):
     rooms_choices = [(x.pk, x.number) for x in Classroom.get_in_institute(reservation=True)]
     beg_date = forms.DateField()
     end_date = forms.DateField()
-    rooms = forms.MultipleChoiceField(choices=rooms_choices, widget=forms.CheckboxSelectMultiple)
+    rooms = forms.MultipleChoiceField(choices=rooms_choices, widget=FilteredSelectMultiple("sale", is_stacked=False))

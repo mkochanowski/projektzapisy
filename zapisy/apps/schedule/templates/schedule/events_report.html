@@ -1,6 +1,14 @@
 {% extends 'schedule/base.html' %}
 
 {% load url from future %}
+{% load compressed %}
+{% block js %}
+    <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
+    <script type="text/javascript">window.__admin_media_prefix__ = "/static/admin/";</script>
+    <script type="text/javascript" src="/fereol_admin/jsi18n/"></script>
+    {% compressed_js 'proposal_edit' %}
+    <style>label { width: 50px;}</style>
+{% endblock %}
 
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
@@ -20,6 +28,7 @@
     <div class="row">
         <div class="span16">
           <form action="{% url 'events:events_report' %}" method="post">
+
           <table>
           {% csrf_token %}
           {{ form.non_field_errors }}
@@ -27,25 +36,24 @@
               {{ hidden }}
           {% endfor %}
           <tr>
-            <td><label for="{{ form.rooms.id_for_label }}">Rooms:</label></td>
+            <td><label for="{{ form.rooms.id_for_label }}">Sale:</label></td>
             <td>
               {{ form.rooms }}
             </td>
-
             <td>{{ form.rooms.errors }}</td>
           </tr>
           <tr>
-            <td><label for="{{ form.beg_date.id_for_label }}">Beginning date:</label></td>
+            <td><label for="{{ form.beg_date.id_for_label }}">Początek zapytania:</label></td>
             <td class="termtbl1"><strong>{{ form.beg_date|date:"Y-m-d" }}</strong>{{ form.beg_date }}</td>
             <td>{{ form.beg_date.errors }}</td>
           </tr>
           <tr>
-            <td><label for="{{ form.end_date.id_for_label }}">Ending date:</label></td>
+            <td><label for="{{ form.end_date.id_for_label }}">Koniec zapytania:</label></td>
             <td class="termtbl1 "><strong>{{ form.end_date|date:"Y-m-d" }}</strong>{{ form.end_date }}</td>
             <td>{{ form.beg_date.errors }}</td>
           </tr>
         </table>
-          <input class="btn" type="submit" value="Generate report" />
+          <input class="btn" type="submit" value="Generuj raport" />
           </form>
         </div>
     </div>
