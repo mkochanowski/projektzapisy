@@ -44,12 +44,12 @@
           </tr>
           <tr>
             <td><label for="{{ form.beg_date.id_for_label }}">Początek zapytania:</label></td>
-            <td class="termtbl1"><strong>{{ form.beg_date|date:"Y-m-d" }}</strong>{{ form.beg_date }}</td>
+            <td>{{ form.beg_date }}</td>
             <td>{{ form.beg_date.errors }}</td>
           </tr>
           <tr>
             <td><label for="{{ form.end_date.id_for_label }}">Koniec zapytania:</label></td>
-            <td class="termtbl1 "><strong>{{ form.end_date|date:"Y-m-d" }}</strong>{{ form.end_date }}</td>
+            <td>{{ form.end_date }}</td>
             <td>{{ form.beg_date.errors }}</td>
           </tr>
         </table>

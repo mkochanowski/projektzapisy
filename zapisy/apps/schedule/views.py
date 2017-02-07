@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 import operator
 
 from apps.enrollment.courses.models import Classroom
-from apps.schedule.models import Term
+from apps.schedule.models import Event, Term
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, \
     EventModerationMessageForm, EventMessageForm
@@ -323,23 +323,25 @@ def events_report(request):
 @permission_required('schedule.manage_events')
 def events_raport_pdf(request, beg_date, end_date, rooms):
 
-    events = {}
+    events = []
+    # we are using this function for sorting
     for room in rooms:
         try:
             cr = Classroom.objects.get(id=room)
-            events[cr] = Term.objects.filter(
-                day__gte=beg_date,
-                day__lte=end_date,
-                room=room
-                ).order_by('day', 'start')
-        except:
-            # we should log that room doesn't exist
-            pass
+        except ObjectDoesNotExist:
+            raise Http404
+        # probably not safe
+        events.append((cr, Term.objects.filter(
+            day__gte=beg_date,
+            day__lte=end_date,
+            room=room,
+            event__status=Event.STATUS_ACCEPTED,
+            ).order_by('day', 'start')))
 
     data = {
         'beg_date': beg_date,
         'end_date': end_date,
-        'events': events,
+        'events': sorted(events),
         'pagesize': 'A4',
         'report': True
     }
