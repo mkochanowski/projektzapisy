@@ -223,7 +223,7 @@ class Event(models.Model):
 
         @return: Event QuerySet
         """
-        return cls.get_all().exclude(type='3')
+        return cls.get_all().exclude(type=Event.TYPE_CLASS)
 
     @classmethod
     def get_for_user(cls, user):
@@ -233,8 +233,8 @@ class Event(models.Model):
         @param user: auth.User object
         @return: Event QuerySet
         """
-        return cls.objects.filter(author=user).select_related('course', 'course__entity', 'author').prefetch_related(
-            'term_set')
+        return cls.objects.filter(author=user).select_related('course', 'course__entity', 'author')\
+            .prefetch_related('term_set')
 
     @classmethod
     def get_exams(cls):
@@ -243,17 +243,11 @@ class Event(models.Model):
 
         @return Event QuerySet
         """
-        return cls.objects.filter(type='0', status='1').order_by('-created').select_related('course', 'course__entity')
-
-    @classmethod
-    def get_events(cls):
-        """
-        """
-
-        return cls.objects.filter(status='1', type='0').order_by('-created')
+        return cls.objects.filter(type=Event.TYPE_EXAM, status=Event.STATUS_ACCEPTED)\
+            .order_by('-created').select_related('course', 'course__entity')
 
     def get_followers(self):
-        if self.type in ['0', '1']:
+        if self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]:
             return self.course.get_all_enrolled_emails()
 
         return self.interested.values_list('email', flat=True)
