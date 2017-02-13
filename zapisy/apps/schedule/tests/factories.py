@@ -2,6 +2,8 @@
 
 from datetime import time, date, datetime
 import string
+import common
+import random
 
 import factory
 import factory.fuzzy
@@ -11,7 +13,6 @@ from apps.users.tests.factories import UserFactory
 from apps.enrollment.courses.tests.factories import GroupFactory, SummerSemesterFactory, \
     ClassroomFactory
 from apps.schedule.models import Event, Term, SpecialReservation
-import common
 
 
 class EventCourseFactory(DjangoModelFactory):
@@ -26,12 +27,24 @@ class EventFactory(DjangoModelFactory):
     class Meta:
         model = Event
 
-    type = Event.TYPE_GENERIC
+    type = factory.Iterator([
+        Event.TYPE_GENERIC, Event.TYPE_CLASS, Event.TYPE_TEST, Event.TYPE_EXAM, Event.TYPE_CLASS,
+        Event.TYPE_OTHER
+    ])
     visible = True
     status = Event.STATUS_ACCEPTED
     author = factory.SubFactory(UserFactory)
     title = factory.fuzzy.FuzzyText(length=50, chars=string.letters)
     description = factory.fuzzy.FuzzyText(length=120, chars=string.letters)
+
+    @factory.post_generation
+    def interested(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        if extracted:
+            for user in extracted:
+                self.interested.add(user)
 
 
 class PendingEventFactory(EventFactory):
@@ -40,22 +53,6 @@ class PendingEventFactory(EventFactory):
 
 class RejectedEventFactory(EventFactory):
     status = Event.STATUS_REJECTED
-
-
-class ExamEventFactory(EventFactory):
-    type = Event.TYPE_EXAM
-
-
-class EventTestFactory(EventFactory):
-    type = Event.TYPE_TEST
-
-
-class EventClassFactory(EventFactory):
-    type = Event.TYPE_CLASS
-
-
-class EventOtherFactory(EventFactory):
-    type = Event.TYPE_OTHER
 
 
 class EventInvisibleFactory(EventFactory):
@@ -72,12 +69,22 @@ class TermThisYearFactory(DjangoModelFactory):
     start = time(10)
     end = time(12)
 
+class TermFactory(DjangoModelFactory):
+    class Meta:
+        model = Term
+
+    event = factory.SubFactory(EventFactory)
+    room = factory.SubFactory(ClassroomFactory)
+    day = factory.fuzzy.FuzzyNaiveDateTime(datetime.now(), force_year=datetime.now().year)
+    start = random.randint(9,15)
+    end = random.randint(16,19)
+    start = time(start)
+    end = time(end)
 
 class TermFixedDayFactory(TermThisYearFactory):
     day = date(2016, 5, 20)
     start = time(15)
     end = time(16)
-
 
 class SepcialReservationFactory(DjangoModelFactory):
     class Meta:

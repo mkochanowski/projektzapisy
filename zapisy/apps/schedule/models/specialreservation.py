@@ -2,6 +2,7 @@
 from django.db import models
 from django.core.validators import ValidationError
 from datetime import date, datetime
+from apps.schedule.models import Event
 
 import zapisy.common as common
 
@@ -62,6 +63,7 @@ class SpecialReservation(models.Model):
                                  verbose_name='dzień tygodnia')
     start_time = models.TimeField(verbose_name='rozpoczęcie', blank=False)
     end_time = models.TimeField(verbose_name='zakończenie', blank=False)
+    ignore_conflicts = False
 
     objects = SpecialReservationManager()
 
@@ -91,34 +93,34 @@ class SpecialReservation(models.Model):
 
         return query
 
-    def validate_against_course_terms(self):
+    def validate_against_all_terms(self):
+
         course_terms = CourseTerm.get_terms_for_semester(semester=self.semester,
                                                          day=self.dayOfWeek,
                                                          classrooms=[self.classroom],
                                                          start_time=self.start_time,
                                                          end_time=self.end_time)
 
-        if course_terms:
-            raise ValidationError(
-                message={'__all__': [u'W tym samym czasie w tej sali odbywają się zajęcia: ' +
-                                     course_terms[0].group.course.name + ' ' + unicode(course_terms[0])]},
-                code='overlap'
-            )
-
-    def validate_against_event_terms(self):
         from .term import Term
-
         candidate_days = self.semester.get_all_days_of_week(self.dayOfWeek, start_date=max(datetime.now().date(), self.semester.lectures_beginning))
 
         terms = Term.get_terms_for_dates(dates=candidate_days,
                                          classroom=self.classroom,
                                          start_time=self.start_time,
                                          end_time=self.end_time)
+        msg_list = []
+
+        if course_terms:
+            for t in course_terms:
+                msg_list.append(u'W tym samym czasie w tej sali odbywają się zajęcia: ' + t.group.course.name + ' ' + unicode(t))
 
         if terms:
-            raise ValidationError(message={'__all__': [u'W tym czasie ta sala jest zarezerwowana (wydarzenie) : ' +
-                                                       unicode(terms[0].event) + ' ' + unicode(terms[0])]},
-                                  code='overlap')
+            for t in terms:
+                if t.event.reservation != self and t.event.type != Event.TYPE_CLASS:
+                    msg_list.append( u'W tym samym czasie ta sala jest zarezerwowana (wydarzenie): ' + unicode(t.event) + ' ' + unicode(t))
+
+        if len(msg_list)>0:
+            raise ValidationError(message={'__all__': msg_list}, code='overlap')
 
     def clean(self):
         """
@@ -138,9 +140,8 @@ class SpecialReservation(models.Model):
                 code='invalid'
             )
 
-        self.validate_against_event_terms()
-
-        self.validate_against_course_terms()
+        if not self.ignore_conflicts:
+            self.validate_against_all_terms()
 
         super(SpecialReservation, self).clean()
 

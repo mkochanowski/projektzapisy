@@ -1,6 +1,9 @@
 # projektzapisy Changelog
 
-# Current version
+# Version 17.02.13
+
+* Cyclic reservations can now be added with conflicts
+* Fixed tight time bounds for reservations
 
 # Version 17.01.31
 

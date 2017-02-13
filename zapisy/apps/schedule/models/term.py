@@ -136,6 +136,12 @@ class Term(models.Model):
         minutes, __ = divmod(remainder, 60)
         return '%d:%02d' % (hours, minutes)
 
+    def get_room(self):
+        return self.room
+
+    def get_day(self):
+        return self.day
+
     @classmethod
     def get_exams(cls):
         """
