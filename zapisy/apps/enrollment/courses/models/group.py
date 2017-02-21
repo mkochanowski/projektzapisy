@@ -97,7 +97,8 @@ class Group(models.Model):
 
     def get_all_terms(self):
         """return all terms of current group"""
-        return self.term.all()
+        from apps.schedule.models import Term
+        return Term.objects.filter(event__group=self)
 
     def human_readable_type(self):
         types = {
