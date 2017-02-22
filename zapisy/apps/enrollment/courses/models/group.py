@@ -37,6 +37,7 @@ GROUP_EXTRA_CHOICES = [('',''),
     (u'grupa 5','grupa 5'),
     (u'pracownia linuksowa','pracownia linuksowa'),
     (u'grupa anglojęzyczna','grupa anglojęzyczna'),
+    (u'I rok', 'I rok'), (u'II rok', 'II rok'), (u'ISIM', 'ISIM')
     ]
 
 
