@@ -124,45 +124,45 @@ class Group(models.Model):
         # @param student:
         #           Student object
         # decrease queued couter, after remove student from queue
-        self.queued = F('queued') - 1
-        self.save()
+        self.update(queued=F('queued') - 1)
 
     def add_to_queued_counter(self, student):
         # @param student:
         #           Student object
         # increade queued couter, after add student to queue
-
-        self.queued = F('queued') + 1
-        self.save()
+        self.update(queued=F('queued') + 1)
 
     def remove_from_enrolled_counter(self, student):
         # @param student:
         #           Student object
         # decrease enrolled couter, after remove student from group
 
+        kwargs = {}
+        kwargs['enrolled'] = F('enrolled') - 1
         self.enrolled = F('enrolled') - 1
         if student.is_zamawiany():
-            self.enrolled_zam = F('enrolled_zam') - 1
+            kwargs['enrolled_zam'] = F('enrolled_zam') - 1
         if student.is_zamawiany2012():
-            self.enrolled_zam2012 = F('enrolled_zam2012') - 1
+            kwargs['enrolled_zam2012'] = F('enrolled_zam2012') - 1
         if student.isim:
-            self.enrolled_isim = F('enrolled_isim') - 1
+            kwargs['enrolled_isim'] = F('enrolled_isim') - 1
 
-        self.save()
+        self.update(kwargs)
 
     def add_to_enrolled_counter(self, student):
         # @param student:
         #           Student object
         # increase enrolled counter, after adding student to group
-
-        self.enrolled = F('enrolled') + 1
+        kwargs = {}
+        kwargs['enrolled'] = F('enrolled') + 1
         if student.is_zamawiany():
-            self.enrolled_zam = F('enrolled_zam') + 1
+            kwargs['enrolled_zam'] = F('enrolled_zam') + 1
         if student.is_zamawiany2012():
-            self.enrolled_zam2012 = F('enrolled_zam2012') + 1
+            kwargs['senrolled_zam2012'] = F('enrolled_zam2012') + 1
         if student.isim:
-            self.enrolled_isim = F('enrolled_isim') + 1
-        self.save()
+            kwargs['enrolled_isim'] = F('enrolled_isim') + 1
+
+        self.update(kwargs)
 
     def remove_student(self, student):
         #  Removes student from this group. If this is Lecture group remove from other too.
