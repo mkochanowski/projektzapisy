@@ -245,7 +245,7 @@ class Group(models.Model):
 
             self._add_to_lecture(student)
 
-        r, created = Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
+        r, created = Record.objects.get_or_create(student=student, group=self, status=Record.STATUS_ENROLLED)
         if created:
             self.add_to_enrolled_counter(student)
 
