@@ -95,6 +95,6 @@ class DecisionForm(forms.ModelForm):
 
 class ReportForm(forms.Form):
     rooms_choices = [(x.pk, x.number) for x in Classroom.get_in_institute(reservation=True)]
-    beg_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd'}))
-    end_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd'}))
+    beg_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
+    end_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
     rooms = forms.MultipleChoiceField(choices=rooms_choices, widget=FilteredSelectMultiple("sale", is_stacked=False))
