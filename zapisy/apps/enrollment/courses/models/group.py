@@ -5,7 +5,6 @@ from django.db.models import signals
 from django.db.models import Count
 from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
-from django.db.models import F
 from django.conf import settings
 from apps.notifications.models import Notification
 
@@ -124,45 +123,45 @@ class Group(models.Model):
         # @param student:
         #           Student object
         # decrease queued couter, after remove student from queue
-        self.update(queued=F('queued') - 1)
+        self.queued -= 1
+        self.save()
 
     def add_to_queued_counter(self, student):
         # @param student:
         #           Student object
         # increade queued couter, after add student to queue
-        self.update(queued=F('queued') + 1)
+
+        self.queued += 1
+        self.save()
 
     def remove_from_enrolled_counter(self, student):
         # @param student:
         #           Student object
         # decrease enrolled couter, after remove student from group
 
-        kwargs = {}
-        kwargs['enrolled'] = F('enrolled') - 1
-        self.enrolled = F('enrolled') - 1
+        self.enrolled -= 1
         if student.is_zamawiany():
-            kwargs['enrolled_zam'] = F('enrolled_zam') - 1
+            self.enrolled_zam -= 1
         if student.is_zamawiany2012():
-            kwargs['enrolled_zam2012'] = F('enrolled_zam2012') - 1
+            self.enrolled_zam2012 -= 1
         if student.isim:
-            kwargs['enrolled_isim'] = F('enrolled_isim') - 1
+            self.enrolled_isim -= 1
 
-        self.update(kwargs)
+        self.save()
 
     def add_to_enrolled_counter(self, student):
         # @param student:
         #           Student object
         # increase enrolled counter, after adding student to group
-        kwargs = {}
-        kwargs['enrolled'] = F('enrolled') + 1
-        if student.is_zamawiany():
-            kwargs['enrolled_zam'] = F('enrolled_zam') + 1
-        if student.is_zamawiany2012():
-            kwargs['senrolled_zam2012'] = F('enrolled_zam2012') + 1
-        if student.isim:
-            kwargs['enrolled_isim'] = F('enrolled_isim') + 1
 
-        self.update(kwargs)
+        self.enrolled += 1
+        if student.is_zamawiany():
+            self.enrolled_zam += 1
+        if student.is_zamawiany2012():
+            self.enrolled_zam2012 += 1
+        if student.isim:
+            self.enrolled_isim += 1
+        self.save()
 
     def remove_student(self, student):
         #  Removes student from this group. If this is Lecture group remove from other too.
@@ -261,15 +260,7 @@ class Group(models.Model):
 
         return result, [u'Student dopisany do grupy']
 
-    def update_counters_from_db(self):
-        db_self = Group.objects.get(pk=self.pk)
-        self.enrolled = db_self.enrolled
-        self.enrolled_isim = db_self.enrolled_isim
-        self.enrolled_zam = db_self.enrolled_zam
-        self.enrolled_zam2012 = db_self.enrolled_zam2012
-
     def enroll_student(self, student):
-        self.update_counters_from_db()
         from apps.enrollment.courses.models import Semester
         from apps.enrollment.records.models import Record
 
