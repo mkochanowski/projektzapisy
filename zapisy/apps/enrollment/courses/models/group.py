@@ -261,7 +261,15 @@ class Group(models.Model):
 
         return result, [u'Student dopisany do grupy']
 
+    def update_counters_from_db(self):
+        db_self = Group.objects.get(pk=self.pk)
+        self.enrolled = db_self.enrolled
+        self.enrolled_isim = db_self.enrolled_isim
+        self.enrolled_zam = db_self.enrolled_zam
+        self.enrolled_zam2012 = db_self.enrolled_zam2012
+
     def enroll_student(self, student):
+        self.update_counters_from_db()
         from apps.enrollment.courses.models import Semester
         from apps.enrollment.records.models import Record
 
