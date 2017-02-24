@@ -308,6 +308,8 @@ def events_report(request):
     from .forms import ReportForm
     if request.method == 'POST':
         form = ReportForm(request.POST)
+        form.fields["rooms"].choices = [(x.pk, x.number)
+            for x in Classroom.get_in_institute(reservation=True)]
         if form.is_valid():
             beg_date = form.cleaned_data["beg_date"]
             end_date = form.cleaned_data["end_date"]
@@ -315,8 +317,9 @@ def events_report(request):
             return events_raport_pdf(request, beg_date, end_date, rooms)
     else:
         form = ReportForm()
+        form.fields["rooms"].choices = [(x.pk, x.number)
+            for x in Classroom.get_in_institute(reservation=True)]
     return TemplateResponse(request, 'schedule/events_report.html', locals())
-
 
 
 @login_required
