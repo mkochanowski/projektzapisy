@@ -15,10 +15,4 @@ test:
     - cp ../env/settings_local_test.py settings_local.py
   override:
     - mkdir logs
-    - python manage.py test test_app
-    - python manage.py test news
-    - python manage.py test schedule
-    - python manage.py test courses
-    - python manage.py test records
-    - python manage.py test vote
-    - python manage.py test users
+    - python manage.py test
