@@ -381,7 +381,7 @@ def create_ical_file(request):
     groups = groups_employee + groups_student
     for group in groups:
         course_name = group.course.name
-        group_type = group.human_readable_type().decode('utf-8')
+        group_type = group.human_readable_type().decode('utf-8').lower()
         try:
             terms = group.get_all_terms()
         except IndexError:
