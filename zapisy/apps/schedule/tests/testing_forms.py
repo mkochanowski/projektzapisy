@@ -2,17 +2,11 @@
 
 from django.test import TestCase
 
-from ..forms import EventForm
-from apps.enrollment.courses.tests.objectmothers import ClassroomObjectMother
+from apps.schedule.forms import EventForm
 from apps.users.tests.factories import UserProfileFactory, UserFactory, EmployeeFactory
-from apps.enrollment.courses.models import Classroom
 
 
 class EventFormTestCase(TestCase):
-    def setUp(self):
-        room110 = ClassroomObjectMother.room110()
-        room110.save()
-
     def test_event_form_accepts_blank_description_when_user_is_employee(self):
         e = EmployeeFactory()
         UserProfileFactory(user=e.user, is_employee=True)
