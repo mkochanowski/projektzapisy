@@ -7,15 +7,23 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.template import Context
+from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 import operator
 
-
+from apps.enrollment.courses.models import Classroom
+from apps.schedule.models import Event, Term
 from apps.schedule.filters import EventFilter, ExamFilter
-from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, EventModerationMessageForm, EventMessageForm
+from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, \
+    EventModerationMessageForm, EventMessageForm
 from apps.schedule.utils import EventAdapter
 from apps.utils.fullcalendar import FullCalendarView
+
+from xhtml2pdf import pisa
+import StringIO
+
 
 __author__ = 'maciek'
 
@@ -292,3 +300,63 @@ class MyScheduleAjaxView(FullCalendarView):
                                Q(event__interested=self.request.user) |
                                Q(event__author=self.request.user)).select_related('event', 'event__group',
                                                                                   'event__group__teacher')
+
+
+@login_required
+@permission_required('schedule.manage_events')
+def events_report(request):
+    from .forms import ReportForm
+    if request.method == 'POST':
+        form = ReportForm(request.POST)
+        form.fields["rooms"].choices = [(x.pk, x.number)
+            for x in Classroom.get_in_institute(reservation=True)]
+        if form.is_valid():
+            beg_date = form.cleaned_data["beg_date"]
+            end_date = form.cleaned_data["end_date"]
+            rooms = form.cleaned_data["rooms"]
+            return events_raport_pdf(request, beg_date, end_date, rooms)
+    else:
+        form = ReportForm()
+        form.fields["rooms"].choices = [(x.pk, x.number)
+            for x in Classroom.get_in_institute(reservation=True)]
+    return TemplateResponse(request, 'schedule/events_report.html', locals())
+
+
+@login_required
+@permission_required('schedule.manage_events')
+def events_raport_pdf(request, beg_date, end_date, rooms):
+
+    events = []
+    # we are using this function for sorting
+    for room in rooms:
+        try:
+            cr = Classroom.objects.get(id=room)
+        except ObjectDoesNotExist:
+            raise Http404
+        # probably not safe
+        events.append((cr, Term.objects.filter(
+            day__gte=beg_date,
+            day__lte=end_date,
+            room=room,
+            event__status=Event.STATUS_ACCEPTED,
+            ).order_by('day', 'start')))
+
+    data = {
+        'beg_date': beg_date,
+        'end_date': end_date,
+        'events': sorted(events),
+        'pagesize': 'A4',
+        'report': True
+    }
+    context = Context(data)
+
+    template = get_template('schedule/events_report_pdf.html')
+    html = template.render(context)
+    result = StringIO.StringIO()
+
+    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result,
+                            encoding='UTF-8')
+    response = HttpResponse(result.getvalue(), mimetype='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=raport.pdf'
+
+    return response
