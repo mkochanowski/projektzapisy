@@ -383,7 +383,7 @@ def create_ical_file(request):
         course_name = group.course.name
         group_type = group.human_readable_type().decode('utf-8').lower()
         try:
-            terms = group.get_all_terms()
+            terms = group.get_all_terms_for_export()
         except IndexError:
             continue
         for term in terms:

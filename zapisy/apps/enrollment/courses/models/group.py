@@ -97,6 +97,10 @@ class Group(models.Model):
 
     def get_all_terms(self):
         """return all terms of current group"""
+        return self.term.all()
+
+    def get_all_terms_for_export(self):
+        """return all terms of current group"""
         from apps.schedule.models import Term
         return Term.objects.filter(event__group=self)
 
