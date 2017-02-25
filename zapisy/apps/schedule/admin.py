@@ -3,7 +3,7 @@
 from django.contrib import admin
 from django.db import models
 from django import forms
-from .models import SpecialReservation
+from .models import SpecialReservation, Term
 from django.core.validators import ValidationError
 import sys
 
@@ -31,4 +31,12 @@ class SpecialReservationForm(forms.ModelForm):
 class SpecialReservationAdmin(admin.ModelAdmin):
 	form = SpecialReservationForm
 
+
+class TermAdmin(admin.ModelAdmin):
+	list_display = ('event', 'day', 'start', 'end', 'room', 'place')
+	list_filter = ('room',)
+	search_fields = ('event__title',)
+	ordering = ('-day', 'start', 'end')
+
+admin.site.register(Term, TermAdmin)
 admin.site.register(SpecialReservation, SpecialReservationAdmin)
