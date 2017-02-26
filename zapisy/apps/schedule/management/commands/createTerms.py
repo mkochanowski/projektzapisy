@@ -52,9 +52,12 @@ class Command(BaseCommand):
 
             for room in t.classrooms.all():
                 for day in days[int(t.dayOfWeek)-1]:
+                    minute = t.start_time.minute
+                    if minute == 0:
+                        minute = 15
                     Term.objects.get_or_create(
                         event = ev,
                         day = day,
-                        start = timedelta(hours=t.start_time.hour, minutes=t.start_time.minute),
+                        start = timedelta(hours=t.start_time.hour, minutes=minute),
                         end = timedelta(hours=t.end_time.hour, minutes=t.end_time.minute),
                         room = room)

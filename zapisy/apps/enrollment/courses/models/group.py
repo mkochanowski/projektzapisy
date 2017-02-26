@@ -99,6 +99,11 @@ class Group(models.Model):
         """return all terms of current group"""
         return self.term.all()
 
+    def get_all_terms_for_export(self):
+        """return all terms of current group"""
+        from apps.schedule.models import Term
+        return Term.objects.filter(event__group=self)
+
     def human_readable_type(self):
         types = {
             '1':  'Wykład',
@@ -436,9 +441,10 @@ class Group(models.Model):
         result = self.enrolled
         if self.limit_zamawiane and self.limit_zamawiane > 0:
             result -= self.enrolled_zam
-        elif self.limit_zamawiane2012 and self.limit_zamawiane2012 > 0:
+        if self.limit_zamawiane2012 and self.limit_zamawiane2012 > 0:
             result -= self.enrolled_zam2012
-
+        if self.limit_isim and self.limit_isim > 0:
+            result -= self.enrolled_isim
         return result
 
     def get_count_of_enrolled_non_isim(self, dont_use_cache=False):
