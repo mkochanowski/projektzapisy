@@ -1,5 +1,12 @@
 # projektzapisy Changelog
 
+# Version 17.02.26
+
+* added rooms reports
+* fixed polish fonts in pdfs
+* export to ical
+* fixed display enrollment number (with isim students)
+
 # Version 17.02.13
 
 * Cyclic reservations can now be added with conflicts
