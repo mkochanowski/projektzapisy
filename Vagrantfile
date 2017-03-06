@@ -6,11 +6,8 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-  config.vm.box = "bento/ubuntu-16.04"
-  config.vm.box_url = "https://atlas.hashicorp.com/bento/boxes/ubuntu-16.04"
-
-
-
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.box_url = "https://atlas.hashicorp.com/ubuntu/boxes/trusty64"
   config.vm.provision :shell, path: "env/bootstrap.sh"
   config.vm.provision :shell, path: "env/bash_setup.sh", privileged: false
   config.vm.provision :shell, path: "env/env2.7_setup.sh", privileged: false

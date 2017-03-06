@@ -145,7 +145,7 @@ print_db_usage
 # get tools and dev libs
 
 apt-get -y install git
-apt-get -y install python2.7 python-dev python-pip virtualenv
+apt-get -y install python2.7 python-dev python-pip python-virtualenv
 apt-get -y install libpq-dev
 apt-get -y install unzip
 apt-get -y install libxml2-dev libxslt1-dev
@@ -171,3 +171,7 @@ apt-get -y install zlib1g-dev
 
 # Install redis
 apt-get -y install redis-server
+
+# This can be removed after upgrading Ubuntu.
+pip install --upgrade pip
+pip install --upgrade virtualenv
