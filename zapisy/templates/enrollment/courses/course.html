@@ -119,7 +119,8 @@
                                             <button type="submit" class="btn small danger setEnrolledButton">{% trans "wypisz" %}
                                             </button>
                                             {% else %}
-                                                <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
+                                                <button disabled="disabled" title="{% trans "Wypisy zostały zamknięte, nie możesz wypisać się z grupy." %}"
+                                                type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
                                                 </button>
                                             {% endif %}
                                             {% else %}{% if not t.is_full %}

@@ -116,10 +116,15 @@ def set_enrolled(request, method):
         if result:
             run_rearanged(result)
 
-    elif Semester.get_default_semester().can_remove_record():
-        result, messages_list = group.remove_student(student)
-        if result:
-            run_rearanged(result, group)
+    else:
+        if Semester.get_default_semester().can_remove_record():
+            result, messages_list = group.remove_student(student)
+            if result:
+                run_rearanged(result, group)
+                
+        else:
+            return AjaxFailureMessage.auto_render('PastRecordsEndTime',
+                u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.', message_context)
 
     if not result:
         transaction.rollback()

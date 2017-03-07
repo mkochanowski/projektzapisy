@@ -19,7 +19,7 @@ MANAGERS = ADMINS
 
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
-"""
+
 DATABASES = {
      'default' : {
         'ENGINE' : 'postgresql_psycopg2',
@@ -43,9 +43,9 @@ DATABASES = {
  	    'USE_UNICODE' : True,
         }
  }
+
+
 """
-
-
 DATABASES = {
      'default' : {
         'ENGINE' : 'django.db.backends.sqlite3',
@@ -58,7 +58,7 @@ DATABASES = {
  	    'USE_UNICODE' : True,
         }
 }
-
+"""
 
 # mass-mail account
 # You can test sending with:
