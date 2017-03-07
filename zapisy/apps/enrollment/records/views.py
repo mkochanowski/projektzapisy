@@ -312,6 +312,8 @@ def schedule_prototype(request):
     else:
         student = None
         student_id = 'None'
+        
+    should_allow_leave = Semester.get_default_semester().can_remove_record()
 
     default_semester = Semester.objects.get_next()
     if not default_semester:
@@ -320,7 +322,8 @@ def schedule_prototype(request):
             'student_records': [],
             'courses' : [],
             'semester' : 'nieokreślony',
-            'types_list' : []
+            'types_list' : [],
+            'allow_leave_course' : should_allow_leave,
         }
         return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
@@ -389,7 +392,8 @@ def schedule_prototype(request):
         'courses' : cached_courses,
         'semester' : default_semester,
         'types_list' : Type.get_all_for_jsfilter(),
-        'priority_limit': settings.QUEUE_PRIORITY_LIMIT
+        'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
+        'allow_leave_course' : should_allow_leave,
     }
     return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))
