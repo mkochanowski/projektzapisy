@@ -140,15 +140,7 @@
                                                     </button>
                                                 {% endif %}{% endif %}{% endif %}
                                     </div></form>
-                            {% else %}
-
-                                {% if t.signed %}<form>
-                                    <div>
-                                        <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
-                                        </button>
-                                    </div>
-                                    </form>
-                                {% endif %}
+                            
                             {% endif %}
                             {% if user.student or user.employee or user.is_staff %}
                                 <a href="{% url 'records-group' t.id %}">{% trans "lista" %}</a>

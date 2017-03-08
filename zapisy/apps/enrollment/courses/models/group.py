@@ -459,6 +459,10 @@ class Group(models.Model):
             employee.teacher = employee.pk in teachers
 
         return employees
+    
+    def has_student_in_queue(self, student):
+        from apps.enrollment.records.models import Queue
+        return Queue.objects.filter(student=student, group=self).count() != 0
 
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
         student=None, employee=None, user=None):
@@ -517,6 +521,10 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse('records-group', args=[self.id])
+    
+    
+    
+    
 
 def log_add_group(sender, instance, created, **kwargs):
     if Group.disable_update_signal:

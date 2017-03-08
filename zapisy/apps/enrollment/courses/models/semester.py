@@ -70,6 +70,9 @@ class Semester( models.Model ):
 
     def can_remove_record(self):
         return self.records_ending is None or self.records_opening <= datetime.now() <= self.records_ending
+    
+    def is_closed(self):
+        return self.records_closing is not None and self.records_closing <= datetime.now()
 
 
     def get_current_limit(self):

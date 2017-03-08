@@ -94,6 +94,14 @@ def set_enrolled(request, method):
         set_enrolled = request.POST['enroll'] == 'true'
     except MultiValueDictKeyError:
         return AjaxFailureMessage.auto_render('InvalidRequest', 'Nieprawidłowe zapytanie.', message_context)
+    
+    cur_semester = Semester.get_current_semester()
+    
+    if cur_semester is None:
+        return AjaxFailureMessage.auto_render('NoOpenSemesters', u'W tej chwili nie trwa żaden semestr.', message_context)
+    
+    elif cur_semester.is_closed():
+        return AjaxFailureMessage.auto_render('SemesterIsLocked', u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.', message_context)
 
     if request.user.student.block:
         return AjaxFailureMessage.auto_render('ScheduleLocked',
@@ -117,7 +125,7 @@ def set_enrolled(request, method):
             run_rearanged(result)
 
     else:
-        if Semester.get_default_semester().can_remove_record():
+        if cur_semester.can_remove_record() or group.has_student_in_queue(student):
             result, messages_list = group.remove_student(student)
             if result:
                 run_rearanged(result, group)
