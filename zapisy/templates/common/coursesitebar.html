@@ -1,9 +1,10 @@
+{% load url from future %}
 <div id="main-sidebar">
 	<div id="proposal-list">
 			<div class="semester">
 				<h3>Przedmioty w ofercie</h3>
                 {%  if request.user.employee %}
-                    <a href="{% url proposal-form %}" class="btn btn-success">Dodaj nową</a>
+                    <a href="{% url 'proposal-form' %}" class="btn btn-success">Dodaj nową</a>
                 {% endif %}
 				<input type="hidden" name="semester-id" value="{{ semester.id }}" />
 				<ul class="proposal-list">
@@ -17,7 +18,7 @@
 						{% elif course.status == 4 %}
 						    nooffer
 						{% endif %}">
-							<a href="{% url offer-page course.slug %}" id="proposal-{{ course.id }}">{{ course.name }}</a>
+							<a href="{% url 'offer-page' course.slug %}" id="proposal-{{ course.id }}">{{ course.name }}</a>
 							<input type="hidden" name="type" value="{% if course.type %}{{ course.type.id }}{% endif %}" />
 							<input type="hidden" name="wasEnrolled" value="false" />
 							<input type="hidden" name="english" value="{{ course.english }}" />
@@ -35,10 +36,11 @@
                        <li>
                            <div class="legend-box offer"></div> - przedmiot w ofercie
                        </li>
+											 {% if user.is_authenticated %}
                        <li>
                            <div class="legend-box nooffer"></div> - przedmiot wycofany z oferty
                        </li>
-
+											 {% endif %}
                         <li>
                             <div class="legend-box work"></div> - przedmiot w wersji roboczej
                         </li>

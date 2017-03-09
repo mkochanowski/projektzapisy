@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 from django.contrib.auth.views import login, password_change, password_change_done, password_reset, password_reset_confirm, password_reset_complete, password_reset_done
-from django.views.generic.simple import direct_to_template
 
 urlpatterns = patterns('apps.users.views',
     url('^login/$', 'login_plus_remember_me', {'template_name': 'users/login.html'}, 'user-login'),
@@ -23,5 +22,6 @@ urlpatterns = patterns('apps.users.views',
     url('^students/$', 'students_list', name='students-list'),
     url('^students/(?P<begin>[A-Z]|(All))/$', 'students_list', name='students-char-list'),
     url('^employees/(?P<begin>[A-Z]|(All))/$', 'employees_list', name='employees-char-list'),
-    url('^ical/$', 'create_ical_file', name='ical')
+    url('^ical/$', 'create_ical_file', name='ical'),
+    url('^email-students/$', 'email_students', name='email-students')
 )

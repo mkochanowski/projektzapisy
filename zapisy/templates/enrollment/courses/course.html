@@ -1,4 +1,5 @@
 {% extends "enrollment/courses/base.html" %}
+{% load url from future %}
 
 {% load fereol_common %}
 {% load compressed %}
@@ -21,7 +22,7 @@
     <a href="/">{% trans "Przedmioty" %}</a> &raquo;
     {{ course.name }}
     {% if user.is_staff %}
-        <a href="{% url admin:courses_course_change course.pk %}">{% trans "Edycja" %}</a>
+        <a href="{% url 'admin:courses_course_change' course.pk %}">{% trans "Edycja" %}</a>
     {% endif %}
     {# end bread #}
 {% endblock %}
@@ -31,9 +32,9 @@
 {% block content %}
 
 <input type="hidden" name="ajax-course-data" value="{{ course_json }}"/>
-<input type="hidden" name="ajax-set-enrolled-url" value="{% url records-set-enrolled '.json' %}"/>
-<input type="hidden" name="ajax-set-pinned-url" value="{% url schedule-prototype-set-pinned %}"/>
-<input type="hidden" name="ajax-set-queue-priority-url" value="{% url records-set-queue-priority '.json' %}"/>
+<input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}"/>
+<input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}"/>
+<input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}"/>
 <input type="hidden" name="priority-limit" value="{{ priority_limit }}"/>
 
 <div id="enr-course-view">
@@ -65,7 +66,7 @@
                     <tr {% if t.signed %} class="signed" {% endif %} >
                         <td>
                             {% if t.teacher %}
-                                <a href="{% url employee-profile t.teacher.user.id %}" class="person">
+                                <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">
                                     {{ t.teacher.user.get_full_name }}
                                 </a>
                             {% else %}
@@ -109,13 +110,19 @@
                             <input type="hidden" name="is-signed-in"
                                    value="{% if t.signed %}true{% else %}false{% endif %}"/>
                             {% if course.is_recording_open and user.student.is_active %}
-                                <form action="{% url records-set-enrolled %}" method="post" class="setEnrolled">{% csrf_token %}
+                                <form action="{% url 'records-set-enrolled' %}" method="post" class="setEnrolled">{% csrf_token %}
                                     <div>
                                         <input type="hidden" name="group" value="{{ t.id }}"/>
                                         {% if t.signed %}
+                                            {% if can_remove_record %}
                                             <input type="hidden" name="enroll" value="false"/>
                                             <button type="submit" class="btn small danger setEnrolledButton">{% trans "wypisz" %}
                                             </button>
+                                            {% else %}
+                                                <button disabled="disabled" title="{% trans "Wypisy zostały zamknięte, nie możesz wypisać się z grupy." %}"
+                                                type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
+                                                </button>
+                                            {% endif %}
                                             {% else %}{% if not t.is_full %}
                                                 <input type="hidden" name="enroll" value="true"/>
                                                 <button type="submit"
@@ -133,24 +140,16 @@
                                                     </button>
                                                 {% endif %}{% endif %}{% endif %}
                                     </div></form>
-                            {% else %}
-
-                                {% if t.signed %}<form>
-                                    <div>
-                                        <button disabled="disabled" type="submit" class="btn small disabled setEnrolledButton">{% trans "wypisz" %}
-                                        </button>
-                                    </div>
-                                    </form>
-                                {% endif %}
+                            
                             {% endif %}
                             {% if user.student or user.employee or user.is_staff %}
-                                <a href="{% url records-group t.id %}">{% trans "lista" %}</a>
+                                <a href="{% url 'records-group' t.id %}">{% trans "lista" %}</a>
                             {% endif %}
                         </td>
                         {% if course.is_recording_open and user.student.is_active %}
                             <td class="priority">
                                 {% if t.priority %}
-                                    <form action="{% url records-set-queue-priority %}" method="post">{% csrf_token %}
+                                    <form action="{% url 'records-set-queue-priority' %}" method="post">{% csrf_token %}
                                         <div>
                                             <input type="hidden" name="id" value="{{ t.id }}"/>
                                             <input type="hidden" name="priority" value="{{ t.priority|add:-1}}"/>
@@ -159,7 +158,7 @@
                                         </div>
                                     </form>
                                     <span>{{ t.priority }}</span>
-                                    <form action="{% url records-set-queue-priority %}" method="post">{% csrf_token %}
+                                    <form action="{% url 'records-set-queue-priority' %}" method="post">{% csrf_token %}
                                         <div>
                                             <input type="hidden" name="id" value="{{ t.id }}"/>
                                             <input type="hidden" name="priority" value="{{ t.priority|add:1}}"/>

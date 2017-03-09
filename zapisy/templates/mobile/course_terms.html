@@ -1,10 +1,11 @@
 {% extends "mobile/base_m.html" %}
+{% load url from future %}
 
 {% block content %}
 
     {% for message in messages %} <p class="main-message">{{ message }}</p> {% endfor %}
 
-    <a href="{% url student-enrollment %}">
+    <a href="{% url 'student-enrollment' %}">
         <div class="box round">Powrót</div>
     </a>
     

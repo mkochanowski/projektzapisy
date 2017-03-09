@@ -34,7 +34,7 @@ class VoteFormset(object):
         self.correction = kwargs.pop('correction', False)
 
         query = {}
-        query['status'] = 2
+        query['status'] = CourseEntity.STATUS_TO_VOTE
         query['deleted'] = False
 
         if tag == 'winter':

@@ -5,8 +5,12 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
+from django.db import connection
+
 from apps.offer.vote.models.system_state import SystemState
 from apps.users.models import Student
+
+from apps.users.tests.factories import StudentFactory
 
 
 def create_active_system_state():
@@ -34,11 +38,41 @@ class VoteLinkTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.VOTE_LINK = '<a href="%s">głosuj</a>' % reverse('vote')
-        user = User.objects.create_user('user', 'user@user.com', 'password')
-        Student.objects.create(user=user)
+        # cls.user = User.objects.create_user('user', 'user@user.com', 'password')
+        # s1 = Student.objects.create(user=cls.user)
+        # s1.status = 0
 
-    def setUp(self):
-        self.client.login(username='user', password='password')
+        # cls.user2 = User.objects.create_user('user2', 'user2@user.com', 'password')
+        # s2 = Student.objects.create(user=cls.user2,matricula='111111')
+        # s2.status = 1
+        cls.s1 = StudentFactory()
+        cls.s2 = StudentFactory(status=1)
+        sql_calls = [
+            """
+                CREATE TABLE courses_studentpointsview (
+                    value smallint,
+                    student_id integer,
+                    entity_id integer
+                );
+            """
+            ]
+
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.s1.delete()
+        cls.s2.delete()
+        sql_calls = [
+            "DROP TABLE courses_studentpointsview;",
+        ]
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
 
     def generic_voting_active_view_test_case(self, urlname):
         create_active_system_state()
@@ -60,19 +94,31 @@ class VoteLinkTestCase(TestCase):
         self._generic_voting_inactive_view_test_case(urlname)
 
     def test_vote_link_in_vote_view_when_system_is_active(self):
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_active_view_test_case('vote-view')
 
+    def test_vote_link_in_vote_view_when_system_is_active_baduser(self):
+        self.client.login(username=self.s2.user.username, password='test')
+        create_active_system_state()
+        response = self.client.get(reverse('vote-view'), follow=True)
+        self.assertNotContains(response, self.VOTE_LINK, html=True)
+        
     def test_vote_link_in_vote_view_when_system_is_inactive_in_past(self):
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_past_test_case('vote-view')
 
     def test_vote_link_in_vote_view_when_system_is_inactive_in_future(self):
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_future_test_case('vote-view')
 
     def test_vote_link_in_vote_summary_when_system_is_active(self):
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_active_view_test_case('vote-summary')
 
     def test_vote_link_in_vote_summary_when_system_is_inactive_in_past(self):
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_past_test_case('vote-summary')
 
     def test_vote_link_in_vote_summary_when_system_is_inactive_in_future(self):
+        self.client.login(username=self.s1.user.username, password='test')
         self.generic_voting_inactive_view_future_test_case('vote-summary')

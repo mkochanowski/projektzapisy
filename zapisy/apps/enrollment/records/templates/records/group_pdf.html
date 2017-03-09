@@ -1,3 +1,4 @@
+{% load url from future %}
 {% load i18n %}
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//PL">
 
@@ -6,7 +7,7 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     </head>
     <style>
-        @font-face { font-family: Helvetica; src: url("/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf");}
+        @font-face { font-family: Helvetica; src: url("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf");}
 
         html {
             font-family: Helvetica, sans-serif;
@@ -55,9 +56,9 @@
                 	<tbody>
                 		{% for student in students_in_group %}
                 			<tr>
-                				<td><a href="{% url student-profile student.user.id %}" class="person">
+                				<td><a href="{% url 'student-profile' student.user.id %}" class="person">
                 				    {{student.user.first_name}}</a></td>
-                				<td><a href="{% url student-profile student.user.id %}" class="person">
+                				<td><a href="{% url 'student-profile' student.user.id %}" class="person">
                 				    {{student.user.last_name}}</a></td>
                 				<td style="width:60px;">{{student.matricula}}</td>
                 				<td style="font-size: 5px;">

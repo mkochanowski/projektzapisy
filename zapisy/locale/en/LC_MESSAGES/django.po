@@ -1,0 +1,657 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-09 11:27+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: settings.py:140
+msgid "Polish"
+msgstr ""
+
+#: settings.py:141
+msgid "English"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/group_pdf.html:29
+#: apps/enrollment/records/templates/records/records_list.html:5
+msgid "Zapisanych w ramach limitu studiów zamawianych"
+msgstr ""
+
+#. Translators: limit dodatkowy to ten poza limitem dla zamawianych
+#: apps/enrollment/records/templates/records/group_pdf.html:33
+#: apps/enrollment/records/templates/records/records_list.html:10
+msgid "Zapisanych w ramach limitu dodatkowego"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/group_pdf.html:38
+#: apps/enrollment/records/templates/records/records_list.html:25
+msgid "Liczba zapisanych osób"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/group_pdf.html:46
+#: apps/enrollment/records/templates/records/queue_pdf.html:33
+#: templates/enrollment/records/students_list.html:5
+msgid "Imię"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/group_pdf.html:47
+#: apps/enrollment/records/templates/records/queue_pdf.html:34
+#: templates/enrollment/records/students_list.html:6
+msgid "Nazwisko"
+msgstr ""
+
+#. Translators: numer albumu
+#: apps/enrollment/records/templates/records/group_pdf.html:49
+#: apps/enrollment/records/templates/records/queue_pdf.html:36
+msgid "index"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/group_pdf.html:50
+#: apps/enrollment/records/templates/records/queue_pdf.html:37
+#: templates/enrollment/records/students_list.html:8
+msgid "Rodzaj studiów"
+msgstr ""
+
+#. Translators: numer semestru
+#: apps/enrollment/records/templates/records/group_pdf.html:52
+#: apps/enrollment/records/templates/records/queue_pdf.html:39
+msgid "Sem."
+msgstr ""
+
+#: apps/enrollment/records/templates/records/group_pdf.html:53
+#: apps/enrollment/records/templates/records/queue_pdf.html:40
+msgid "Uwagi"
+msgstr ""
+
+#. Translators: jeśli grupa pusta
+#. Translators: jeśli kolejka pusta
+#: apps/enrollment/records/templates/records/group_pdf.html:72
+#: apps/enrollment/records/templates/records/queue_pdf.html:59
+#: templates/enrollment/records/students_list.html:31
+msgid "Brak zapisanych osób"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/queue_pdf.html:28
+#: apps/enrollment/records/templates/records/records_list.html:51
+msgid "Liczba osób oczekujących na zapis"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/records_list.html:3
+msgid "Lista osób zapisanych na przedmiot"
+msgstr ""
+
+#. Translators: tekst przy linku mailto
+#: apps/enrollment/records/templates/records/records_list.html:32
+msgid "Wyślij wiadomość do grupy"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/records_list.html:34
+#: apps/enrollment/records/templates/records/records_list.html:57
+msgid "udostępniając adresy mailowe studentów"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/records_list.html:35
+#: apps/enrollment/records/templates/records/records_list.html:58
+msgid "ukrywając adresy mailowe studentów"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/records_list.html:39
+msgid "Ściągnij listę studentów z grupy jako"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/records_list.html:50
+msgid "Lista osób oczekujących na zapis"
+msgstr ""
+
+#. Translators: tekst przy linku mailto
+#: apps/enrollment/records/templates/records/records_list.html:55
+msgid "Wyślij wiadomość do kolejki"
+msgstr ""
+
+#: apps/enrollment/records/templates/records/records_list.html:62
+msgid "Ściągnij listę studentów z kolejki jako"
+msgstr ""
+
+#: apps/users/templates/users/import_zamawiani.html:5
+#: templates/enrollment/courses/admin/import_schedule.html:5
+#: templates/enrollment/courses/admin/import_schedule_step2.html:5
+#: templates/enrollment/courses/admin/import_semester.html:5
+msgid "Home"
+msgstr ""
+
+#: apps/users/templates/users/my_profile.html:180
+msgid "Ustawienie preferencji językowych"
+msgstr ""
+
+#: apps/users/templates/users/my_profile.html:186
+msgid "Select language"
+msgstr ""
+
+#: templates/base.html:78
+msgid ""
+"System zapisów wykorzystuje pliki cookies. Korzystanie z witryny oznacza "
+"zgodę na ich zapis lub odczyt według ustawień przeglądarki."
+msgstr ""
+"The Enrollment System makes use of cookies. Using this website means "
+"that you accept storing and reading cookies on your device by your "
+"web browser."
+
+#: templates/admin/base_site.html:4
+msgid "Fereol site admin"
+msgstr ""
+
+#: templates/admin/index.html:24
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr ""
+
+#: templates/admin/index.html:25
+#, python-format
+msgid "%(name)s"
+msgstr ""
+
+#: templates/admin/index.html:35
+msgid "Add"
+msgstr ""
+
+#: templates/admin/index.html:41
+msgid "Change"
+msgstr ""
+
+#: templates/admin/index.html:99
+msgid "You don't have permission to edit anything."
+msgstr ""
+
+#: templates/admin/index.html:107
+msgid "Recent Actions"
+msgstr ""
+
+#: templates/admin/index.html:108
+msgid "My Actions"
+msgstr ""
+
+#: templates/admin/index.html:112
+msgid "None available"
+msgstr ""
+
+#: templates/admin/index.html:126
+msgid "Unknown content"
+msgstr ""
+
+#: templates/admin/edit_inline/tabular.html:15
+msgid "Delete?"
+msgstr ""
+
+#: templates/admin/edit_inline/tabular.html:109
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+#: templates/admin/edit_inline/tabular.html:112
+msgid "Remove"
+msgstr ""
+
+#: templates/email_change/email_verify.html:4
+msgid "Email confirmation"
+msgstr ""
+
+#: templates/email_change/email_verify.html:7
+msgid "Notice"
+msgstr ""
+
+#: templates/email_change/email_verify.html:13
+msgid "Email confirmation failed"
+msgstr ""
+
+#: templates/email_change/email_verify.html:18
+msgid "This confirmation code has either expired or is invalid."
+msgstr ""
+
+#: templates/email_change/email_verify.html:19
+msgid "The requested email address change has failed."
+msgstr ""
+
+#: templates/email_change/email_verify.html:20
+msgid "Please, try to change it again in your account settings."
+msgstr ""
+
+#: templates/enrollment/base.html:12
+#: templates/enrollment/records/schedule.html:98
+msgid "Plan zajęć"
+msgstr ""
+
+#: templates/enrollment/base.html:15
+#: templates/enrollment/records/schedule_prototype.html:20
+msgid "Prototyp planu"
+msgstr ""
+
+#: templates/enrollment/base.html:16
+msgid "Pracownicy"
+msgstr ""
+
+#: templates/enrollment/base.html:18
+msgid "Studenci"
+msgstr ""
+
+#: templates/enrollment/base.html:23
+msgid "Statystyki"
+msgstr ""
+
+#: templates/enrollment/email_queue_html.html:4
+#: templates/enrollment/email_queue_plaintext.html:4
+msgid "Zostałaś/eś przepisana/y z kolejki do grupy"
+msgstr ""
+
+#: templates/enrollment/main.html:11
+#: templates/enrollment/courses/course.html:19
+#: templates/enrollment/courses/course_consultations.html:10
+#: templates/enrollment/courses/courses_list.html:7
+#: templates/enrollment/courses/voters.html:24
+#: templates/enrollment/records/records_list.html:18
+#: templates/enrollment/records/schedule.html:87
+#: templates/enrollment/records/schedule_prototype.html:18
+msgid "Strona główna"
+msgstr ""
+
+#: templates/enrollment/main.html:12
+#: templates/enrollment/courses/course_consultations.html:11
+#: templates/enrollment/records/records_list.html:19
+#: templates/enrollment/records/schedule.html:88
+#: templates/enrollment/records/schedule_prototype.html:19
+msgid "Zapisy"
+msgstr ""
+
+#: templates/enrollment/main.html:18
+msgid "System zapisów"
+msgstr ""
+
+#: templates/enrollment/main.html:19
+msgid ""
+"System zapisów na zajęcia w Instytucie Informatyki Uniwersytetu Wrocławskiego"
+msgstr ""
+
+#: templates/enrollment/courses/base.html:17
+msgid "Filtrowanie"
+msgstr ""
+
+#: templates/enrollment/courses/base.html:24
+msgid "Rodzaj przedmiotu"
+msgstr ""
+
+#: templates/enrollment/courses/base.html:34
+msgid "Inne"
+msgstr ""
+
+#. Translators: Tytuł nad sidebarem
+#. Translators: tytuł nad sidebarem
+#: templates/enrollment/courses/base.html:36
+#: templates/enrollment/courses/base.html:64
+#: templates/enrollment/records/schedule_prototype.html:109
+#: templates/enrollment/records/students_list.html:9
+msgid "Semestr"
+msgstr ""
+
+#. Translators: Filtrowanie -> tytuł kawałka z opcjami gettext('Inne') XXXXXXXXXXXXXXXX
+#: templates/enrollment/courses/base.html:45
+#: templates/enrollment/courses/base.html:47
+#: templates/enrollment/records/schedule_prototype.html:44
+msgid "Schowaj przedmioty, na które byłem zapisany"
+msgstr ""
+
+#: templates/enrollment/courses/base.html:49
+#: templates/enrollment/records/schedule_prototype.html:45
+msgid "Pokaż przedmioty prowadzone w j.angielskim"
+msgstr ""
+
+#: templates/enrollment/courses/base.html:50
+#: templates/enrollment/records/schedule_prototype.html:46
+msgid "Pokaż przedmioty kończące się egzaminem"
+msgstr ""
+
+#: templates/enrollment/courses/base.html:51
+#: templates/enrollment/records/schedule_prototype.html:47
+msgid "Pokaż tylko przedmioty zalecane dla 1 roku"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:20
+#: templates/enrollment/courses/courses_list.html:8
+#: templates/enrollment/courses/voters.html:25
+msgid "System Zapisów"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:21
+#: templates/enrollment/courses/course_consultations.html:12
+#: templates/enrollment/courses/courses_list.html:4
+#: templates/enrollment/courses/courses_list.html:9
+#: templates/enrollment/courses/voters.html:26
+#: templates/enrollment/records/records_list.html:20
+msgid "Przedmioty"
+msgstr ""
+
+#. Translators: chodzi o zmianę, nie o odsłonę
+#: templates/enrollment/courses/course.html:24
+#: templates/enrollment/records/records_list.html:28
+msgid "Edycja"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:45
+#, python-format
+msgid ""
+"Studenci w grupach: %(tutorial.statistics.in_group)s, studenci bez grupy: "
+"%(tutorial.statistics.in_queue)s"
+msgstr ""
+
+#. Translators: nagłówek tabeli
+#: templates/enrollment/courses/course.html:52
+#: templates/enrollment/courses/course_consultations.html:34
+#: templates/enrollment/courses/course_head.html:13
+msgid "Prowadzący"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:53
+msgid "Termin zajęć"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:54
+msgid "Limit"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:55
+msgid "Zapisani"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:56
+msgid "Kolejka"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:59
+msgid "Priorytet"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:72
+msgid "(nieznany prowadzący)"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:117
+#: templates/enrollment/courses/course.html:140
+msgid "wypisz"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:123
+msgid "zapisz"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:127
+msgid "wypisz z kolejki"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:132
+msgid "zapisz do kolejki"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:147
+#: templates/enrollment/courses/course_head.html:102
+msgid "lista"
+msgstr ""
+
+#: templates/enrollment/courses/course.html:185
+msgid ""
+"Przedmiot współfinansowany ze środków Unii Europejskiej w ramach "
+"Europejskiego Funduszu Społecznego"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:6
+#: templates/enrollment/courses/course_consultations.html:16
+#: templates/enrollment/courses/course_consultations.html:68
+#: templates/enrollment/courses/course_consultations.html:88
+#: templates/enrollment/courses/course_head.html:97
+msgid "Konsultacje"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:29
+msgctxt "typ kursu"
+msgid "Rodzaj"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:42
+#, python-format
+msgid "Punkty %(points.type_of_point.name)s"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:48
+#: templates/enrollment/courses/course_head.html:29
+msgid "Liczba godzin"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:49
+msgid "(wyk)"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:50
+msgid "(rep)"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:51
+msgid "(ćw)"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:52
+msgid "(prac)"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:57
+msgid "Strona www"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:63
+#: templates/enrollment/courses/course_head.html:91
+msgctxt "zależności przedmiotu"
+msgid "Wymagane"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:69
+#: templates/enrollment/courses/course_head.html:98
+msgid "link"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:79
+msgid "Konsultacje prowadzących"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:86
+msgid "Imię i nazwisko"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:87
+msgid "Pokój"
+msgstr ""
+
+#: templates/enrollment/courses/course_consultations.html:102
+msgid "Brak prowadzących"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:8
+msgctxt "rodzaj kursu"
+msgid "Rodzaj"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:23
+msgid "Punkty ECTS"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:45
+msgctxt "tagi przedmiotu"
+msgid "Tagi"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:57
+msgctxt "Grupa efektów kształcenia"
+msgid "Grupa efektów kształcenia"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:69
+msgid "Przedmiot prowadzony w j.angielskim"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:70
+#: templates/enrollment/courses/course_head.html:77
+#: templates/enrollment/courses/course_head.html:82
+msgid "Tak"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:76
+msgid "Przedmiot przyjazny dla I roku"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:81
+msgid "Egzamin"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:86
+msgid "Strona WWW"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:101
+msgid "Oddane głosy"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:107
+msgctxt "czas zapisów"
+msgid "Możesz zapisać się od"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:117
+msgid "Opis przedmiotu"
+msgstr ""
+
+#: templates/enrollment/courses/course_head.html:121
+msgid "Brak"
+msgstr ""
+
+#: templates/enrollment/courses/courses_list.html:18
+msgid "Wybierz przedmiot z listy"
+msgstr ""
+
+#: templates/enrollment/courses/voters.html:6
+#, python-format
+msgid "%(course.name)s - Głosy"
+msgstr ""
+
+#: templates/enrollment/courses/voters.html:28
+msgid "Głosy"
+msgstr ""
+
+#: templates/enrollment/courses/voters.html:45
+msgid "Lista osób głosujących na przedmiot"
+msgstr ""
+
+#: templates/enrollment/courses/voters.html:52
+msgid "Nikt nie oddał głosu"
+msgstr ""
+
+#: templates/enrollment/records/schedule.html:108
+msgid "Zajęcia, na które jesteś zapisany"
+msgstr ""
+
+#. Translators: Tytuł kolumny w tabelce
+#: templates/enrollment/records/schedule.html:113
+#: templates/offer/preferences/base.html:76
+msgid "Przedmiot"
+msgstr ""
+
+#. Translators: Tytuł kolumny w tabelce
+#: templates/enrollment/records/schedule.html:116
+msgid "ECTS"
+msgstr ""
+
+#. Translators: Tytuł kolumny w tabelce
+#: templates/enrollment/records/schedule.html:119
+msgid "Godziny"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:72
+msgid ""
+"Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu planu nie "
+"może bez niej działać"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:82
+msgid "jesteś zapisany do tej grupy"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:85
+msgid "jesteś w kolejce do tej grupy"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:88
+msgid "grupa przypięta do prototypu"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:91
+msgid ""
+"przypnij do prototypu. Widoczność grupy w prototypie zostaje zapamiętana. "
+"Przycisk <strong>NIE</strong> zapisuje na zajęcia"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:94
+msgid ""
+"odepnij od prototypu. Przywraca domyślną widoczność grupy w prototypie. "
+"Przycisk <strong>NIE</strong> wypisuje z zajęć"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:97
+msgid ""
+"zapisz do grupy. Następuje próba zapisu studenta do grupy. Jeżeli przedmiot "
+"posiada również wykład, zostaniemy zapisanie na niego automatycznie"
+msgstr ""
+
+#: templates/enrollment/records/schedule_prototype.html:100
+msgid ""
+"wypisz z grupy. Następuje wypisanie z grupy. Wypisanie z wykładu skutkuje "
+"wypisaniem się z pozostałych grup przedmiotu"
+msgstr ""
+
+#: templates/enrollment/records/students_list.html:7
+msgid "Nr indeksu"
+msgstr ""
+
+#: templates/offer/preferences/base.html:77
+msgid "Wykład"
+msgstr ""
+
+#: templates/offer/preferences/base.html:77
+msgid "Seminarium"
+msgstr ""
+
+#: templates/offer/preferences/base.html:78
+msgid "Ćwiczenia"
+msgstr ""
+
+#: templates/offer/preferences/base.html:79
+msgid "Pracownia"
+msgstr ""
+
+#: templates/offer/preferences/base.html:79
+msgid "Ćwiczenio-Pracownia"
+msgstr ""
+
+#: templates/offer/preferences/base.html:80
+msgid "Repetytorium"
+msgstr ""
+
+#: templates/offer/preferences/base.html:81
+msgid "Ukryte"
+msgstr ""

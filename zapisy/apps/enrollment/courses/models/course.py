@@ -81,8 +81,6 @@ class StatisticsManager(models.Manager):
             )
 
 
-statuses = ((0, u'Propozycja'), (1, u'W ofercie'), (2, u'Poddana pod głosowanie'),
-            (4, u'Wycofany z oferty'), (5, 'Do poprawienia'), )
 semesters = (('u', 'nieoznaczony'), ('z', 'zimowy'), ('l', 'letni'))
 ectslist = [(x, str(x)) for x in range(1, 16)]
 
@@ -100,7 +98,20 @@ class CourseEntity(models.Model):
                                  null=True, blank=True,
                                  help_text=u'Opcjonalna skrócona nazwa, używana na np. planie. Przykłady: JFiZO, AiSD')
 
-    status = models.IntegerField(choices=statuses, default=0)
+    STATUS_PROPOSITION = 0
+    STATUS_IN_OFFER = 1
+    STATUS_TO_VOTE = 2
+    STATUS_WITHDRAWN = 4
+    STATUS_FOR_REVIEW = 5
+
+    STATUS_CHOICES = [(STATUS_PROPOSITION, u'Propozycja'),
+                      (STATUS_IN_OFFER, u'W ofercie'),
+                      (STATUS_TO_VOTE, u'Poddana pod głosowanie'),
+                      (STATUS_WITHDRAWN, u'Wycofany z oferty'),
+                      (STATUS_FOR_REVIEW, u'Do poprawienia')]
+
+    status = models.IntegerField(choices=STATUS_CHOICES,
+                                 default=STATUS_PROPOSITION)
 
     semester = models.CharField(max_length=1, choices=semesters, default='u', verbose_name='semestr')
 
@@ -181,16 +192,17 @@ class CourseEntity(models.Model):
         return self.effects.count()
 
     def mark_as_accepted(self):
-        self.status = 1
+        self.status = CourseEntity.STATUS_IN_OFFER
 
     def mark_for_review(self):
-        self.status = 5
+        self.status = CourseEntity.STATUS_FOR_REVIEW
 
     def mark_for_voting(self):
-        self.status = 2
+        self.status = CourseEntity.STATUS_TO_VOTE
 
     def is_proposal(self):
-        return (self.status == 0) or (self.status == 5)
+        return (self.status == CourseEntity.STATUS_PROPOSITION) \
+            or (self.status == CourseEntity.STATUS_FOR_REVIEW)
 
     def save(self, *args, **kwargs):
         """
@@ -336,7 +348,7 @@ class CourseEntity(models.Model):
         return self.semester == 'z'
 
     def is_in_voting(self):
-        return self.status == 2
+        return self.status == CourseEntity.STATUS_TO_VOTE
 
     def get_all_voters(self, year=None):
         from apps.offer.vote.models.single_vote import SingleVote
@@ -354,7 +366,7 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_vote():
-        return CourseEntity.noremoved.filter(status=2)
+        return CourseEntity.noremoved.filter(status=CourseEntity.STATUS_TO_VOTE)
 
     @staticmethod
     def get_voters():
@@ -367,9 +379,18 @@ class CourseEntity(models.Model):
         return SingleVote.objects.distinct('student').filter(state=current_state)
 
     @staticmethod
-    def get_proposals():
-        return CourseEntity.noremoved.filter(status__gte=1) \
-            .select_related('type', 'owner', 'owner__user')
+    def get_proposals(is_authenticated=False):
+        if is_authenticated:
+            return CourseEntity.noremoved \
+                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
+                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
+                .select_related('type', 'owner', 'owner__user')
+        else:
+            return CourseEntity.noremoved \
+                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
+                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
+                .exclude(status=CourseEntity.STATUS_WITHDRAWN) \
+                .select_related('type', 'owner', 'owner__user')
 
     @staticmethod
     def get_proposal(slug):
@@ -425,7 +446,6 @@ class Course(models.Model):
 
     notes = models.TextField(null=True, blank=True, verbose_name='uwagi do tej edyci przedmiotu')
     web_page = models.URLField(verbose_name='Strona WWW przedmiotu',
-                               verify_exists=True,
                                blank=True,
                                null=True)
 
@@ -602,8 +622,8 @@ class Course(models.Model):
     def get_all_enrolled_emails(self):
         from apps.enrollment.records.models import Record
 
-        return Record.objects.filter(group__course=self, status='1').values_list('student__user__email',
-                                                                                 flat=True).distinct()
+        return Record.objects.filter(group__course=self, status=Record.STATUS_ENROLLED)\
+            .values_list('student__user__email', flat=True).distinct()
 
 
     def votes_count(self, semester=None):
@@ -790,7 +810,7 @@ class CourseDescription(models.Model):
 
     def save_as_copy(self):
         self.id = None
-        self.save(force_insert=True)        
+        self.save(force_insert=True)
 
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)

@@ -109,7 +109,6 @@ class BaseUser(models.Model):
         abstract = True
 
 
-
 class Employee(BaseUser):
     '''
     Employee.
@@ -117,7 +116,7 @@ class Employee(BaseUser):
 
     user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='employee')
     consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
-    homepage = models.URLField(verify_exists=True, verbose_name='strona domowa', default="", null=True, blank=True)
+    homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
     status = models.PositiveIntegerField(default=0, choices=EMPLOYEE_STATUS_CHOICES, verbose_name="Status")
 
@@ -228,6 +227,9 @@ class Employee(BaseUser):
         verbose_name_plural = 'Pracownicy'
         app_label = 'users'
         ordering = ['user__last_name', 'user__first_name']
+        permissions = (
+            ("mailto_all_students", u"Może wysyłać maile do wszystkich studentów"),
+        )
 
     def __unicode__(self):
         return unicode(self.user.get_full_name())
@@ -682,7 +684,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class OpeningTimesView(models.Model):
-    student  = models.ForeignKey(Student, primary_key=True, related_name='opening_times')
+    student  = models.ForeignKey(Student, primary_key=True,
+                                 related_name='opening_times')
     course   = models.ForeignKey('courses.Course')
     semester = models.ForeignKey('courses.Semester')
     opening_time = models.DateTimeField()
@@ -691,4 +694,3 @@ class OpeningTimesView(models.Model):
 
     class Meta:
         app_label = 'users'
-

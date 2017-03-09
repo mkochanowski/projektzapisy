@@ -145,12 +145,12 @@ print_db_usage
 # get tools and dev libs
 
 apt-get -y install git
-apt-get -y install python-dev
+apt-get -y install python2.7 python-dev python-pip python-virtualenv
 apt-get -y install libpq-dev
 apt-get -y install unzip
 apt-get -y install libxml2-dev libxslt1-dev
 apt-get -y install build-essential
-apt-get -y install libncursesw5-dev
+apt-get -y install libncursesw5-dev libncurses5-dev
 apt-get -y install libreadline5-dev
 apt-get -y install libssl-dev
 apt-get -y install libgdbm-dev
@@ -166,5 +166,12 @@ apt-get -y install firefox
 
 # download and hack broken zlib
 apt-get -y install zlib1g-dev
-cd /lib
-ln -s x86_64-linux-gnu/libz.so.1 libz.so
+# cd /lib
+# ln -s x86_64-linux-gnu/libz.so.1 libz.so
+
+# Install redis
+apt-get -y install redis-server
+
+# This can be removed after upgrading Ubuntu.
+pip install --upgrade pip
+pip install --upgrade virtualenv

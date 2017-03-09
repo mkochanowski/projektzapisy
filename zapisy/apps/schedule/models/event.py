@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.http import Http404
-from datetime import time
-from django.utils.encoding import smart_unicode
 
 from django.core.validators import ValidationError
 
@@ -42,7 +41,7 @@ class Event(models.Model):
     from django.contrib.auth.models import User
 
     title = models.CharField(max_length=255, verbose_name=u'Tytuł', null=True, blank=True)
-    description = models.TextField(verbose_name=u'Opis')
+    description = models.TextField(verbose_name=u'Opis', blank=True)
     type = models.CharField(choices=TYPES, max_length=1, verbose_name=u'Typ')
     visible = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne')
 
@@ -89,7 +88,7 @@ class Event(models.Model):
 
             if (self.author.get_profile().is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
-                self.status = '1'
+                self.status = self.STATUS_ACCEPTED
 
             # all exams and tests should be public
 
@@ -132,7 +131,9 @@ class Event(models.Model):
         @return: Boolean
         """
         if not self.author == user and not user.has_perm('schedule.manage_events'):
-            if not self.visible or self.type not in ['0', '1', '2'] or self.status != '1':
+            if(not self.visible or
+               self.type not in [self.TYPE_EXAM, self.TYPE_TEST, self.TYPE_GENERIC] or
+               self.status != self.STATUS_ACCEPTED):
                 return False
 
         return True
@@ -222,7 +223,7 @@ class Event(models.Model):
 
         @return: Event QuerySet
         """
-        return cls.get_all().exclude(type='3')
+        return cls.get_all().exclude(type=Event.TYPE_CLASS)
 
     @classmethod
     def get_for_user(cls, user):
@@ -232,8 +233,8 @@ class Event(models.Model):
         @param user: auth.User object
         @return: Event QuerySet
         """
-        return cls.objects.filter(author=user).select_related('course', 'course__entity', 'author').prefetch_related(
-            'term_set')
+        return cls.objects.filter(author=user).select_related('course', 'course__entity', 'author')\
+            .prefetch_related('term_set')
 
     @classmethod
     def get_exams(cls):
@@ -242,17 +243,11 @@ class Event(models.Model):
 
         @return Event QuerySet
         """
-        return cls.objects.filter(type='0', status='1').order_by('-created').select_related('course', 'course__entity')
-
-    @classmethod
-    def get_events(cls):
-        """
-        """
-
-        return cls.objects.filter(status='1', type='0').order_by('-created')
+        return cls.objects.filter(type=Event.TYPE_EXAM, status=Event.STATUS_ACCEPTED)\
+            .order_by('-created').select_related('course', 'course__entity')
 
     def get_followers(self):
-        if self.type in ['0', '1']:
+        if self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]:
             return self.course.get_all_enrolled_emails()
 
         return self.interested.values_list('email', flat=True)

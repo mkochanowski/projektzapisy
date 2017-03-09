@@ -3,8 +3,10 @@
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
+from django.views.decorators.http import require_POST
 from django.contrib.auth.views import login
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -21,21 +23,23 @@ from apps.offer.vote.models.single_vote import SingleVote
 
 from apps.users.exceptions import NonUserException, NonEmployeeException,\
                                  NonStudentException
-from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException                                 
+from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException
 from apps.users.utils import prepare_ajax_students_list,\
                              prepare_ajax_employee_list
 
 from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
+from apps.enrollment.utils import mailto
 
-from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm
+from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
 
 from apps.enrollment.records.utils import *
 
 from datetime import timedelta
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
 import datetime
+from mailer.models import Message
 
 import logging
 
@@ -110,7 +114,7 @@ def employee_profile(request, user_id):
             'courses': courses,
             'employee': employee
         })
-        
+
         if request.is_ajax():
             return render_to_response('users/employee_profile_contents.html',
                 data, context_instance=RequestContext(request))
@@ -126,9 +130,9 @@ def employee_profile(request, user_id):
 
             data['employees'] = employees
             data['char'] = begin
-              
+
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
-        
+
 
     except MoreThanOneCurrentSemesterException:
         data = {'employee' : employee}
@@ -138,7 +142,7 @@ def employee_profile(request, user_id):
 
 @login_required
 def set_language(request):
-    """ 
+    """
     Redirect to a given url while setting the chosen language in the
     session or cookie. The url and the language code need to be
     specified in the request parameters.
@@ -152,7 +156,7 @@ def set_language(request):
     if not next:
         next = request.META.get('HTTP_REFERER', None)
     if not next:
-        next = '/' 
+        next = '/'
     response = HttpResponseRedirect(next)
     if request.method == 'POST':
         lang_code = request.POST.get('language', None)
@@ -211,7 +215,7 @@ def bank_account_change(request):
 def consultations_change(request):
     """function that enables consultations changing"""
     try:
-        employee = request.user.employee     
+        employee = request.user.employee
         if request.POST:
             data = request.POST.copy()
             form = ConsultationsChangeForm(data, instance=employee)
@@ -228,14 +232,14 @@ def consultations_change(request):
         return render_to_response('common/error.html',
                 context_instance=RequestContext(request))
 
-@login_required  
+@login_required
 def password_change_done(request):
     """informs if password were changed"""
     logger.info('User (%s) changed password' % request.user.get_full_name())
     messages.success(request, "Twoje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
 
-@login_required  
+@login_required
 def my_profile(request):
     """profile site"""
     semester = Semester.objects.get_next()
@@ -274,7 +278,6 @@ def my_profile(request):
         grade = None
         courses = None
 
-
     return TemplateResponse(request, 'users/my_profile.html', locals())
 
 def employees_list(request, begin = 'All', query=None):
@@ -289,8 +292,8 @@ def employees_list(request, begin = 'All', query=None):
             "employees" : employees,
             "char": begin,
             "query": query
-            }  
-    
+            }
+
     return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
 
 def consultations_list(request, begin='A'):
@@ -306,7 +309,7 @@ def consultations_list(request, begin='A'):
         data = {
             "employees" : employees,
             "char": begin
-            }          
+            }
         return render_to_response('users/consultations_list.html', data, context_instance=RequestContext(request))
 
 
@@ -319,17 +322,19 @@ def students_list(request, begin = 'All', query=None):
         students = prepare_ajax_students_list(students)
         return AjaxSuccessMessage(message="ok", data=students)
     else:
-        data = { 
-            "students" : students, 
+        data = {
+            "students" : students,
             "char": begin,
-            "query": query
+            "query": query,
+            'mailto_group': mailto(request.user, students),
+            'mailto_group_bcc': mailto(request.user, students, True)
         }
         return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
 
 @login_required
 def logout(request):
     """logout"""
-    logger.info('User %s <id: %s> is logged out ' % (request.user.username, request.user.id))    
+    logger.info('User %s <id: %s> is logged out ' % (request.user.username, request.user.id))
     auth.logout(request)
     return HttpResponseRedirect('/')
 
@@ -348,18 +353,13 @@ def login_plus_remember_me(request, *args, **kwargs):
         else:
             request.session.set_expiry(0) # on browser close
     return login(request, *args, **kwargs)
-    
+
 @login_required
 def create_ical_file(request):
     user = request.user
     user_full_name = user.get_full_name()
     semester = Semester.get_default_semester()
-    semester_beginning = semester.semester_beginning
-    semester_beginning_weekday = semester_beginning.weekday() + 1
-    semester_ending = semester.semester_ending
-    until = semester_ending.strftime("%Y%m%dT235959Z")
-    
-    
+
     cal = vobject.iCalendar()
     cal.add('x-wr-timezone').value = 'Europe/Warsaw'
     cal.add('version').value = '2.0'
@@ -381,32 +381,63 @@ def create_ical_file(request):
     groups = groups_employee + groups_student
     for group in groups:
         course_name = group.course.name
-        group_type = GTC[group.type]
+        group_type = group.human_readable_type().decode('utf-8').lower()
         try:
-            terms = group.get_all_terms()
+            terms = group.get_all_terms_for_export()
         except IndexError:
             continue
         for term in terms:
-            start_time = term.start_time
-            end_time = term.end_time
-            weekday = int(term.dayOfWeek)
-            classroom_number = term.classroom.number if term.classroom else 'Nieznana'
-    
-            diff = semester_beginning_weekday - weekday
-            if diff<0:
-                diff += 7
-            diff = 7 - diff
-            start_date = semester_beginning + datetime.timedelta(days=diff)
-            start_datetime = datetime.datetime.combine(start_date, start_time)
-            end_datetime = datetime.datetime.combine(start_date, end_time)
-    
+            start_time = term.start
+            end_time = term.end
+            date = term.day
+            dt = datetime.datetime.combine(date, datetime.time(0, 0))
+            start_datetime = dt + start_time
+            end_datetime = dt + end_time
+
             event = cal.add('vevent')
-            event.add('summary').value = '%s, %s, s.%s' % (course_name,group_type,classroom_number)
-            event.add('dtstart').value  = start_datetime
+            event.add('summary').value = '%s - %s' % (course_name, group_type)
+            if term.room:
+                event.add('location').value = 'sala '+term.room.number \
+                    + u', Instytut Informatyki Uniwersytetu Wrocławskiego'
+
+            event.add('description').value = u'prowadzący: ' \
+                + group.get_teacher_full_name()
+            event.add('dtstart').value = start_datetime
             event.add('dtend').value = end_datetime
-            event.add('rrule').value = "FREQ=WEEKLY;UNTIL=%s" % (until,)
 
     cal_str = cal.serialize()
     response = HttpResponse(cal_str, content_type='application/calendar')
     response['Content-Disposition'] = 'attachment; filename=schedule.ical'
-    return response    
+    return response
+
+
+@permission_required('users.mailto_all_students')
+def email_students(request):
+    """function that enables mailing all students"""
+    students = Student.get_list('All')
+    if students:
+        studentsmails = ','.join([student.user.email for student in students])
+
+    if request.POST:
+        data = request.POST.copy()
+        form = EmailToAllStudentsForm(data)
+        form.fields['sender'].widget.attrs['readonly'] = True
+        if form.is_valid():
+            counter = 0
+            body = form.cleaned_data['message']
+            subject = form.cleaned_data['subject']
+            for student in students:
+                address = student.user.email
+                if address:
+                    counter += 1
+                    Message.objects.create(to_address=address, from_address=form.cleaned_data['sender'], subject=subject, message_body=body)
+            if form.cleaned_data['cc_myself'] == True:
+                Message.objects.create(to_address=request.user.email, from_address=form.cleaned_data['sender'], subject=subject, message_body=body)
+            messages.success(request, u'Wysłano wiadomość do %d studentów' % counter)
+            return HttpResponseRedirect(reverse('my-profile'))
+        else:
+            messages.error(request, u'Wystąpił błąd przy wysyłaniu wiadomości')
+    else:
+        form = EmailToAllStudentsForm(initial={'sender': 'zapisy@cs.uni.wroc.pl'})
+        form.fields['sender'].widget.attrs['readonly'] = True
+    return render_to_response('users/email_students.html', {'form':form, 'students_mails': studentsmails}, context_instance=RequestContext(request))

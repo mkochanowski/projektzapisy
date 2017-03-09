@@ -1,4 +1,5 @@
 {% extends "enrollment/base.html" %}
+{% load url from future %}
 
 {% load i18n %}
 
@@ -15,7 +16,7 @@
 {% block content %}
     <div id="mainPage-container">
         <div>
-            <a href="{% url enrollment-main %}">{% trans "System zapisów" %}</a>
+            <a href="{% url 'enrollment-main' %}">{% trans "System zapisów" %}</a>
             <span>{% trans "System zapisów na zajęcia w Instytucie Informatyki Uniwersytetu Wrocławskiego" %}.</span>
         </div>
     </div>

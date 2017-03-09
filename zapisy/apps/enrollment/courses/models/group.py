@@ -72,10 +72,10 @@ class Group(models.Model):
     extra = models.CharField(max_length=20, choices=GROUP_EXTRA_CHOICES, verbose_name='dodatkowe informacje', default='', blank=True)
     export_usos = models.BooleanField(default=True, verbose_name='czy eksportować do usos?')
 
-
-    cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
-    cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
-    cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
+    # we are not using these
+    #cache_enrolled     = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów')
+    #cache_enrolled_zam = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość zapisanych studentów zamawianych')
+    #cache_queued       = models.PositiveIntegerField(null=True, blank=True, editable=False, verbose_name='Cache: ilość studentów w kolejce')
 
     enrolled     = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów')
     enrolled_zam = models.PositiveIntegerField(default=0, editable=False, verbose_name='liczba zapisanych studentów zamawianych')
@@ -96,10 +96,15 @@ class Group(models.Model):
             return u'(nieznany prowadzący)'
         else:
             return self.teacher.user.get_full_name()
-    
+
     def get_all_terms(self):
-        """return all terms of current group""" 
+        """return all terms of current group"""
         return self.term.all()
+
+    def get_all_terms_for_export(self):
+        """return all terms of current group"""
+        from apps.schedule.models import Term
+        return Term.objects.filter(event__group=self)
 
     def human_readable_type(self):
         types = {
@@ -112,7 +117,7 @@ class Group(models.Model):
             '6':  'Seminarium',
             '7':  'Lektorat',
             '8':  'Zajęcia sportowe',
-           ' 10': 'Projekt', 
+           ' 10': 'Projekt',
         }
         return types[self.type]
 
@@ -125,7 +130,6 @@ class Group(models.Model):
         # @param student:
         #           Student object
         # decrease queued couter, after remove student from queue
-
         self.queued -= 1
         self.save()
 
@@ -155,7 +159,7 @@ class Group(models.Model):
     def add_to_enrolled_counter(self, student):
         # @param student:
         #           Student object
-        # increase enrolled couter, after add student to group
+        # increase enrolled counter, after adding student to group
 
         self.enrolled += 1
         if student.is_zamawiany():
@@ -164,7 +168,6 @@ class Group(models.Model):
             self.enrolled_zam2012 += 1
         if student.isim:
             self.enrolled_isim += 1
-
         self.save()
 
     def remove_student(self, student):
@@ -178,13 +181,15 @@ class Group(models.Model):
         #  messages:
         #        [Text] - text info about actions
 
-        from apps.enrollment.records.models import Record, Queue, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.models import Record, Queue
 
         result = True
-        if Record.objects.filter(student=student, group=self, status=STATUS_ENROLLED).update(status=STATUS_REMOVED) > 0:
+        if Record.objects.filter(student=student, group=self, status=Record.STATUS_ENROLLED).update(status=Record.STATUS_REMOVED) > 0:
             message = [u'Student wypisany z grupy']
 
-            if self.type == settings.LETURE_TYPE:
+            lecture_records = Record.objects.filter(student=student, status=Record.STATUS_ENROLLED, group__course=self.course,
+                                                    group__type=settings.LETURE_TYPE)
+            if self.type == settings.LETURE_TYPE and len(lecture_records) == 0:
                 result = self._remove_from_all_groups(student)
                 message.append(u'Automatycznie wypisano również z pozostałych grup')
 
@@ -200,7 +205,7 @@ class Group(models.Model):
         return False, [u'Operacja niemożliwa']
 
     def _remove_from_other_groups(self, student):
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.models import Record
         from apps.enrollment.records.utils import run_rearanged
 
         result = None
@@ -212,7 +217,7 @@ class Group(models.Model):
         return result or True
 
     def _remove_from_all_groups(self, student):
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.models import Record
         from apps.enrollment.records.utils import run_rearanged
 
         records = Record.get_student_records_for_course(student, self.course)
@@ -224,7 +229,7 @@ class Group(models.Model):
 
     def _add_to_lecture(self, student):
         import settings
-        from ...records.models import Record, STATUS_ENROLLED, Queue
+        from apps.enrollment.records.models import Record
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
 
         for group in groups:
@@ -239,7 +244,7 @@ class Group(models.Model):
 
         result = []
         for group in groups:
-            __, created = Record.objects.get_or_create(student=student, group=group, status=STATUS_ENROLLED)
+            __, created = Record.objects.get_or_create(student=student, group=group, status=Record.STATUS_ENROLLED)
             if created:
                 result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
                 group.add_to_enrolled_counter(student)
@@ -247,7 +252,7 @@ class Group(models.Model):
         return result
 
     def add_student(self, student, return_group=False, commit=True):
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        from apps.enrollment.records.models import Record
         import settings
 
         result = True
@@ -259,7 +264,7 @@ class Group(models.Model):
 
             lecture_result = self._add_to_lecture(student)
 
-        __, created = Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
+        __, created = Record.objects.get_or_create(student=student, group=self, status=Record.STATUS_ENROLLED)
         if created:
             self.add_to_enrolled_counter(student)
 
@@ -276,9 +281,9 @@ class Group(models.Model):
 
     def enroll_student(self, student):
         from apps.enrollment.courses.models import Semester
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        from apps.enrollment.records.models import Record
 
-        if Record.objects.filter(group=self, student=student, status=STATUS_ENROLLED).count() > 0:
+        if Record.objects.filter(group=self, student=student, status=Record.STATUS_ENROLLED).count() > 0:
             return False, [u"Jesteś już w tej grupie"]
 
         if not self.student_have_opened_enrollment(student):
@@ -325,7 +330,7 @@ class Group(models.Model):
 
 
     def rearanged(self):
-        from apps.enrollment.records.models import Queue, STATUS_REMOVED
+        from apps.enrollment.records.models import Queue
         from apps.enrollment.courses.models import Semester
 
 
@@ -348,8 +353,11 @@ class Group(models.Model):
                     total_queues = 0
                     for old in Queue.objects.filter(deleted=False, student = q.student, priority__lte=q.priority, group__course=self.course, group__type=q.group.type):
                         old.deleted = True
-                        old.group.remove_from_queued_counter(q.student)
                         old.save()
+                        if old.group != self:
+                            old.group.remove_from_queued_counter(q.student)
+                        else:
+                            self.remove_from_queued_counter(q.student)
                         total_queues += 1
                     if isinstance(result, Group):
                         Notification.send_notification(q.student.user, 'enrolled-again', {'group': self,
@@ -401,7 +409,7 @@ class Group(models.Model):
                 return self.limit - self.limit_isim <= self.enrolled - min(self.enrolled_isim, self.limit_isim)
 
         if student.is_zamawiany():
-            
+
             return self.get_limit_for_zamawiane2009() <= self.enrolled - min(self.limit_zamawiane2012, self.enrolled_zam2012)
         elif student.is_zamawiany2012():
             return self.get_limit_for_zamawiane2012() <= self.enrolled - min(self.enrolled_zam, self.limit_zamawiane)
@@ -432,7 +440,7 @@ class Group(models.Model):
     def get_group_limit(self):
         """return maximal amount of participants"""
         return self.limit
-    
+
 
     def get_count_of_enrolled(self, dont_use_cache=False):
         return self.enrolled
@@ -447,9 +455,10 @@ class Group(models.Model):
         result = self.enrolled
         if self.limit_zamawiane and self.limit_zamawiane > 0:
             result -= self.enrolled_zam
-        elif self.limit_zamawiane2012 and self.limit_zamawiane2012 > 0:
+        if self.limit_zamawiane2012 and self.limit_zamawiane2012 > 0:
             result -= self.enrolled_zam2012
-
+        if self.limit_isim and self.limit_isim > 0:
+            result -= self.enrolled_isim
         return result
 
     def get_count_of_enrolled_non_isim(self, dont_use_cache=False):
@@ -470,6 +479,10 @@ class Group(models.Model):
             employee.teacher = employee.pk in teachers
 
         return employees
+    
+    def has_student_in_queue(self, student):
+        from apps.enrollment.records.models import Queue
+        return Queue.objects.filter(student=student, group=self).count() != 0
 
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
         student=None, employee=None, user=None):
@@ -503,7 +516,7 @@ class Group(models.Model):
             'queued_count': self.get_count_of_queued(),
             'queue_priority': queue_priorities.get(self.pk,-1)
         }
-        
+
         return data
 
     class Meta:
@@ -518,7 +531,7 @@ class Group(models.Model):
 
     def __unicode__(self):
         return "%s: %s - %s" % (unicode(self.course.entity.get_short_name()),
-                                unicode(self.get_type_display()), 
+                                unicode(self.get_type_display()),
                                 unicode(self.get_teacher_full_name()))
 
     def long_print(self):
@@ -528,6 +541,10 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse('records-group', args=[self.id])
+    
+    
+    
+    
 
 def log_add_group(sender, instance, created, **kwargs):
     if Group.disable_update_signal:
@@ -538,7 +555,7 @@ def log_add_group(sender, instance, created, **kwargs):
         '4': 'C', '5': 'r',
         '6': 's', '7': 'l', '8': 'l',
         '9': 'w', '10': 'p'}
-        kod_grupy = group.id 
+        kod_grupy = group.id
         kod_przed_sem = group.course.id
         teacher_name_array = (group.teacher and group.teacher.user.get_full_name() or u"Nieznany prowadzący").split(" ")
 	kod_uz = teacher_name_array[0]
@@ -556,17 +573,17 @@ def log_limits_change(sender, instance, **kwargs):
     try:
         group = instance
         old_group = Group.objects.get(id=group.id)
-        
+
         if group.limit != old_group.limit:
             backup_logger.info('[04] limit of group <%s> has changed from <%s> to <%s>' % (group.id, old_group.limit, group.limit))
         if group.limit_zamawiane != old_group.limit_zamawiane:
             backup_logger.info('[05] limit-zamawiane of group <%s> has changed from <%s> to <%s>' % (group.id, old_group.limit_zamawiane, group.limit_zamawiane))
     except Group.DoesNotExist:
         pass
-        
+
 def log_delete_group(sender, instance, **kwargs):
     backup_logger.info('[07] group <%s> has been deleted' % instance.id)
-    
+
 #signals.pre_save.connect(log_limits_change, sender=Group)
 #signals.post_save.connect(log_add_group, sender=Group)
 #signals.post_delete.connect(log_delete_group, sender=Group)
@@ -576,6 +593,6 @@ def recache(sender, **kwargs):
         return
     mcache.clear()
 
-    
+
 #signals.post_save.connect(recache, sender=Group)
 #signals.post_delete.connect(recache, sender=Group)
