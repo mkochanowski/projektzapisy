@@ -179,13 +179,13 @@ class Group(models.Model):
         #  messages:
         #        [Text] - text info about actions
 
-        from apps.enrollment.records.models import Record, Queue, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.models import Record, Queue
 
         result = True
-        if Record.objects.filter(student=student, group=self, status=STATUS_ENROLLED).update(status=STATUS_REMOVED) > 0:
+        if Record.objects.filter(student=student, group=self, status=Record.STATUS_ENROLLED).update(status=Record.STATUS_REMOVED) > 0:
             message = [u'Student wypisany z grupy']
 
-            lecture_records = Record.objects.filter(student=student, status=STATUS_ENROLLED, group__course=self.course,
+            lecture_records = Record.objects.filter(student=student, status=Record.STATUS_ENROLLED, group__course=self.course,
                                                     group__type=settings.LETURE_TYPE)
             if self.type == settings.LETURE_TYPE and len(lecture_records) == 0:
                 result = self._remove_from_all_groups(student)
@@ -203,7 +203,7 @@ class Group(models.Model):
         return False, [u'Operacja niemożliwa']
 
     def _remove_from_other_groups(self, student):
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.models import Record
         from apps.enrollment.records.utils import run_rearanged
 
         result = None
@@ -215,7 +215,7 @@ class Group(models.Model):
         return result or True
 
     def _remove_from_all_groups(self, student):
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.records.models import Record
         from apps.enrollment.records.utils import run_rearanged
 
         records = Record.get_student_records_for_course(student, self.course)
@@ -227,11 +227,11 @@ class Group(models.Model):
 
     def _add_to_lecture(self, student):
         import settings
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        from apps.enrollment.records.models import Record
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
         result = []
         for group in groups:
-            __, created = Record.objects.get_or_create(student=student, group=group, status=STATUS_ENROLLED)
+            __, created = Record.objects.get_or_create(student=student, group=group, status=Record.STATUS_ENROLLED)
             if created:
                 result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
                 group.add_to_enrolled_counter(student)
@@ -239,7 +239,7 @@ class Group(models.Model):
         return result
 
     def add_student(self, student, return_group=False, commit=True):
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        from apps.enrollment.records.models import Record
         import settings
 
         result = True
@@ -250,7 +250,7 @@ class Group(models.Model):
 
             self._add_to_lecture(student)
 
-        r, created = Record.objects.get_or_create(student=student, group=self, status=STATUS_ENROLLED)
+        r, created = Record.objects.get_or_create(student=student, group=self, status=Record.STATUS_ENROLLED)
         if created:
             self.add_to_enrolled_counter(student)
 
@@ -267,9 +267,9 @@ class Group(models.Model):
 
     def enroll_student(self, student):
         from apps.enrollment.courses.models import Semester
-        from apps.enrollment.records.models import Record, STATUS_ENROLLED
+        from apps.enrollment.records.models import Record
 
-        if Record.objects.filter(group=self, student=student, status=STATUS_ENROLLED).count() > 0:
+        if Record.objects.filter(group=self, student=student, status=Record.STATUS_ENROLLED).count() > 0:
             return False, [u"Jesteś już w tej grupie"]
 
         if not self.student_have_opened_enrollment(student):
@@ -316,7 +316,7 @@ class Group(models.Model):
 
 
     def rearanged(self):
-        from apps.enrollment.records.models import Queue, STATUS_REMOVED
+        from apps.enrollment.records.models import Queue
         from apps.enrollment.courses.models import Semester
 
 
