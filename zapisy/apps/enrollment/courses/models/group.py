@@ -229,7 +229,7 @@ class Group(models.Model):
 
     def _add_to_lecture(self, student):
         import settings
-        from apps.enrollment.records.models import Record
+        from apps.enrollment.records.models import Record, Queue
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
 
         for group in groups:
