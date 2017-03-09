@@ -33,6 +33,7 @@ class Semester( models.Model ):
     year = models.CharField(max_length=7, default='0', verbose_name='rok akademicki')
     records_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia zapisów', help_text='Godzina powinna być ustawiona na 00:00:00, by studenci mieli otwarcie między 10:00 a 22:00.')
     records_closing = models.DateTimeField(null = True, blank=True, verbose_name='Czas zamkniecia zapisów')
+    records_ending = models.DateTimeField(null=True, blank=True, verbose_name='Czas zamknięcia wypisów')
 
     lectures_beginning = models.DateField(null=True, blank=True, verbose_name='Dzień rozpoczęcia zajęć')
     lectures_ending = models.DateField(null=True, blank=True, verbose_name='Dzień zakończenia zajęć')
@@ -51,6 +52,28 @@ class Semester( models.Model ):
     second_grade_semester = models.ForeignKey('self', verbose_name='Drugi semester oceny', null=True, blank=True, related_name='sgrade')
 
     objects = GetterManager()
+
+
+    def clean(self):
+        """
+        Overloaded clean method. Checks for any conflicts between this SpecialReservation
+        and other SpecialReservations, Terms of Events and Terms of Course Groups
+
+        """
+        if self.records_ending and not (self.records_opening <= self.records_ending <= self.records_closing):
+            raise ValidationError(
+                message={
+                    'records_ending': [u'Koniec wypisów musi byćw przedziale <otwarcie zapisów, zamknięcie zapisów>']
+                },
+                code='invalid'
+            )
+
+    def can_remove_record(self):
+        return self.records_ending is None or self.records_opening <= datetime.now() <= self.records_ending
+    
+    def is_closed(self):
+        return self.records_closing is not None and self.records_closing <= datetime.now()
+
 
     def get_current_limit(self):
         import settings

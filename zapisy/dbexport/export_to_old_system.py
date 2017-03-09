@@ -45,7 +45,7 @@ if __name__ == '__main__':
     import settings
     setup_environ(settings)
 
-from apps.enrollment.records.models import Record, STATUS_ENROLLED
+from apps.enrollment.records.models import Record
 from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom, PointsOfCourseEntities
 from apps.users.models import Student, Employee
 

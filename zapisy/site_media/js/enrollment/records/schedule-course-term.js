@@ -108,6 +108,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 				appendTo(this._controlsBox);
 			this._signInOutButton = $.create('span', { className: 'signInOut'}).
 				appendTo(this._controlsBox);
+            
 			this._loadingIndicator =
 				$.create('div', { className: 'loadingIndicator'}).
 				appendTo(this._controlsBox).css('display', 'none');
@@ -143,6 +144,8 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 	this.container.toggleClass('queued', this.group.isQueued);
 	this.container.toggleClass('full', this.group.isFull() &&
 		!this.group.isEnrolledOrQueued());
+    
+    this._signInOutButton.toggleClass("enrolledSignOutButton", this.group.isEnrolled);
 
 	var shouldBeVisible = (this.group.isPinned || this.isPrototyped ||
 		this.group.isEnrolledOrQueued() || this.group.isTeacher);

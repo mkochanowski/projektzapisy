@@ -7,6 +7,15 @@
 
 {% block styles %}
     {% compressed_css 'prototype' %}
+    
+    {% if not allow_leave_course%}
+        <style type="text/css">
+            .enrolledSignOutButton
+            {
+                display: none !important;
+            }
+        </style>
+    {% endif %}
 {% endblock %}
 
 {% block js %}

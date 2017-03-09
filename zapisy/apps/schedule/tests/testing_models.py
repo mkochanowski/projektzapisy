@@ -20,7 +20,7 @@ from django.utils.crypto import get_random_string
 from apps.enrollment.courses.tests.factories import WinterSemesterFactory, ClassroomFactory,\
     GroupFactory, ChangedDayForFridayFactory
 from apps.enrollment.records.tests.factories import RecordFactory
-from apps.enrollment.records.models import Record, STATUS_ENROLLED
+from apps.enrollment.records.models import Record
 import factories
 import common
 
@@ -566,7 +566,7 @@ class EventTestCase(TestCase):
         students = StudentFactory.create_batch(random.randint(10, 20))
         group = GroupFactory()
         for student in students:
-            RecordFactory(student=student, group=group, status=STATUS_ENROLLED)
+            RecordFactory(student=student, group=group, status=Record.STATUS_ENROLLED)
         users = [student.user for student in students]
         event = factories.EventFactory(type=random.choice([Event.TYPE_EXAM, Event.TYPE_TEST]),
                                        interested=users, course=group.course)

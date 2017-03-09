@@ -94,6 +94,14 @@ def set_enrolled(request, method):
         set_enrolled = request.POST['enroll'] == 'true'
     except MultiValueDictKeyError:
         return AjaxFailureMessage.auto_render('InvalidRequest', 'Nieprawidłowe zapytanie.', message_context)
+    
+    cur_semester = Semester.get_current_semester()
+    
+    if cur_semester is None:
+        return AjaxFailureMessage.auto_render('NoOpenSemesters', u'W tej chwili nie trwa żaden semestr.', message_context)
+    
+    elif cur_semester.is_closed():
+        return AjaxFailureMessage.auto_render('SemesterIsLocked', u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.', message_context)
 
     if request.user.student.block:
         return AjaxFailureMessage.auto_render('ScheduleLocked',
@@ -117,9 +125,14 @@ def set_enrolled(request, method):
             run_rearanged(result)
 
     else:
-        result, messages_list = group.remove_student(student)
-        if result:
-            run_rearanged(result, group)
+        if cur_semester.can_remove_record() or group.has_student_in_queue(student):
+            result, messages_list = group.remove_student(student)
+            if result:
+                run_rearanged(result, group)
+                
+        else:
+            return AjaxFailureMessage.auto_render('PastRecordsEndTime',
+                u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.', message_context)
 
     if not result:
         transaction.rollback()
@@ -307,6 +320,8 @@ def schedule_prototype(request):
     else:
         student = None
         student_id = 'None'
+        
+    should_allow_leave = Semester.get_default_semester().can_remove_record()
 
     default_semester = Semester.objects.get_next()
     if not default_semester:
@@ -315,7 +330,8 @@ def schedule_prototype(request):
             'student_records': [],
             'courses' : [],
             'semester' : 'nieokreślony',
-            'types_list' : []
+            'types_list' : [],
+            'allow_leave_course' : should_allow_leave,
         }
         return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
@@ -384,7 +400,8 @@ def schedule_prototype(request):
         'courses' : cached_courses,
         'semester' : default_semester,
         'types_list' : Type.get_all_for_jsfilter(),
-        'priority_limit': settings.QUEUE_PRIORITY_LIMIT
+        'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
+        'allow_leave_course' : should_allow_leave,
     }
     return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))
