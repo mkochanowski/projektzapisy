@@ -19,46 +19,46 @@ MANAGERS = ADMINS
 
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
-
+"""
 DATABASES = {
      'default' : {
         'ENGINE' : 'postgresql_psycopg2',
- 	    'NAME' : 'fereol',
- 	    'PORT' : '',
- 	    'USER' : 'fereol',
-	    'PASSWORD' : 'fereol',
- 	    'HOST' : '',
- 	    'CHARSET' : 'utf8',
- 	    'USE_UNICODE' : True,
+        'NAME' : 'fereol',
+        'PORT' : '',
+        'USER' : 'fereol',
+        'PASSWORD' : 'fereol',
+        'HOST' : '',
+        'CHARSET' : 'utf8',
+        'USE_UNICODE' : True,
         },
 
      'fereol2012' : {
         'ENGINE' : 'postgresql_psycopg2',
- 	    'NAME' : 'fereol2012',
- 	    'PORT' : '',
- 	    'USER' : 'fereol',
-	    'PASSWORD' : 'fereol',
- 	    'HOST' : '',
- 	    'CHARSET' : 'utf8',
- 	    'USE_UNICODE' : True,
+        'NAME' : 'fereol2012',
+        'PORT' : '',
+        'USER' : 'fereol',
+        'PASSWORD' : 'fereol',
+        'HOST' : '',
+        'CHARSET' : 'utf8',
+        'USE_UNICODE' : True,
         }
  }
-
-
 """
+
+
 DATABASES = {
      'default' : {
         'ENGINE' : 'django.db.backends.sqlite3',
- 	    'NAME' : os.path.join(PROJECT_PATH, 'database/db.sqlite3'),
- 	    'PORT' : '',
- 	    'USER' : '',
-	    'PASSWORD' : '',
- 	    'HOST' : '',
- 	    'CHARSET' : 'utf8',
- 	    'USE_UNICODE' : True,
+        'NAME' : os.path.join(PROJECT_PATH, 'database/db.sqlite3'),
+        'PORT' : '',
+        'USER' : '',
+        'PASSWORD' : '',
+        'HOST' : '',
+        'CHARSET' : 'utf8',
+        'USE_UNICODE' : True,
         }
 }
-"""
+
 
 # mass-mail account
 # You can test sending with:
@@ -297,7 +297,7 @@ SESSION_COOKIE_PATH = '/;HttpOnly'
 #DEBUG = False
 #TEMPLATE_DEBUG = DEBUG
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE	= True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 DEBUG_TOOLBAR_ALLOWED_USERS = [
     "209067", # Tomasz Wasilczyk
