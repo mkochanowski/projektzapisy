@@ -50,8 +50,14 @@ class Command(BaseCommand):
             if not test:
                 group.enrolled = enrolled_cnt
                 group.save()
+                if old_enrolled_cnt > enrolled_cnt:
+                    from ...records.utils import run_rearanged
+                    for _ in range(old_enrolled_cnt - enrolled_cnt):
+                        run_rearanged(None, group)
             print "enrolled counter error for group:", group
             print "previous value: ", old_enrolled_cnt, ", new value: ", enrolled_cnt
+            if old_enrolled_cnt > enrolled_cnt:
+                print "(runned rearanged ",old_enrolled_cnt - enrolled_cnt," times)"
             error_cnt += 1
 
         enrolled_zam_cnt = len([x for x in records if x.student.is_zamawiany()])
