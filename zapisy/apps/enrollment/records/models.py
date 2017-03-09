@@ -6,7 +6,7 @@ from apps.enrollment.records.exceptions import InactiveStudentException
 
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group  import Group
-from apps.enrollment.courses.models.semester  import Semester
+from apps.enrollment.courses.models.semester import Semester
 
 from django.contrib.auth.models import User
 from django.db import models
