@@ -38,7 +38,8 @@ class NewsManager(models.Manager):
         """
             Get a number of page by news
         """
-        for index, item in enumerate(self.exclude(category='-').values_list('id').order_by('-id')):
+	ids = enumerate(self.exclude(category='-').values_list('id').order_by('-id'))
+        for index, item in ids:
             if item[0] == news_id:
                 return (int(index/15)) + 1
         return 1
