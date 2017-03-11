@@ -8,6 +8,7 @@ from django.db                  import models
 from django.contrib.auth.models import User
 
 from datetime import datetime, timedelta
+from apps.notifications.models import Notification
 
 class NewsManager(models.Manager):
     """
@@ -33,7 +34,14 @@ class NewsManager(models.Manager):
             Get a number of news
         """
         return self.category(category)[beginwith:(beginwith+quantity)]
-
+    def get_page_number_by_news_id(self, news_id):
+        """
+            Get a number of page by news
+        """
+        for index, item in enumerate(self.exclude(category='-').values_list('id').order_by('-id')):
+            if item[0] == news_id:
+                return (int(index/15)) + 1
+        return 1
     def category(self, category):
         """
             Return news tagged with a given tag.
@@ -66,7 +74,6 @@ class News(models.Model):
     objects = NewsManager()
 
     def save(self, *args, **kwargs):
-        from apps.notifications.models import Notification
         try:
             old = News.objects.get(pk=self.pk)
         except News.DoesNotExist:
