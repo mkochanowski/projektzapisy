@@ -48,7 +48,7 @@ class NewsManagerTest(TestCase):
         for n in ns:
             n.delete()
     def test_get_page_number_by_news_id(self):
-        (news, old, ns) = generate_random_news('1', 42, 0)
+	(news, old, ns) = generate_random_news('1', 42, 0)
 	ids = [x.id for x in ns]
 	range_min, range_max = min(ids), max(ids)
 	self.assertEquals(News.objects.get_page_number_by_news_id(range_max), 1)
@@ -56,11 +56,10 @@ class NewsManagerTest(TestCase):
 	self.assertEquals(News.objects.get_page_number_by_news_id(range_min+20), 2)
 	self.assertEquals(News.objects.get_page_number_by_news_id(range_min+15), 2)
 	self.assertEquals(News.objects.get_page_number_by_news_id(range_min), 3)
-
 	self.assertEquals(News.objects.get_page_number_by_news_id(-1024), 1)
 	self.assertEquals(News.objects.get_page_number_by_news_id(2137), 1)
-        for n in ns:
-            n.delete()
+	for n in ns:
+	    n.delete()
 
     def test_count_new_categories(self):
         (new1, old1, ns1) = generate_random_news('1')
