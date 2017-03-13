@@ -3,16 +3,16 @@
 """
     News views
 """
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.conf.settings       import NEWS_PER_PAGE
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse
-from django.shortcuts import render_to_response, redirect
-from django.template import RequestContext
-from django.utils import simplejson
-from apps.news.models import News
-from apps.news.utils import prepare_data_all
+from django.core.exceptions     import ObjectDoesNotExist
+from django.core.paginator      import Paginator, PageNotAnInteger, EmptyPage
+from django.conf                import settings
+from django.core.urlresolvers   import reverse
+from django.http                import HttpResponse
+from django.shortcuts           import render_to_response, redirect
+from django.template            import RequestContext
+from django.utils               import simplejson
+from apps.news.models           import News
+from apps.news.utils            import prepare_data_all
 import datetime
 
 # NOWA WERSJA AKTUALNOŚCI ZE ZMERGOWANYMI SYSTEMAMI PONIZEJ
@@ -33,7 +33,7 @@ def all_news(request):
         employee.save()
 
     items = News.objects.exclude(category='-')
-    paginator = Paginator(items, NEWS_PER_PAGE)
+    paginator = Paginator(items, settings.NEWS_PER_PAGE)
     page = request.GET.get('page')
     try:
         news = paginator.page(page)

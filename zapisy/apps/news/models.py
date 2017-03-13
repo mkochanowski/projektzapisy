@@ -4,7 +4,7 @@
     News models
 """
 
-from django.conf.settings       import NEWS_PER_PAGE
+from django.conf                import settings
 from django.contrib.auth.models import User
 from django.db                  import models
 
@@ -42,7 +42,7 @@ class NewsManager(models.Manager):
 	ids = enumerate(self.exclude(category='-').values_list('id').order_by('-id'))
         for index, item in ids:
             if item[0] == news_id:
-                return (int(index/NEWS_PER_PAGE)) + 1
+                return (int(index/settings.NEWS_PER_PAGE)) + 1
         return 1
     def category(self, category):
         """
