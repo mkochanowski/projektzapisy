@@ -5,6 +5,7 @@
 """
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf.settings       import NEWS_PER_PAGE
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
@@ -32,7 +33,7 @@ def all_news(request):
         employee.save()
 
     items = News.objects.exclude(category='-')
-    paginator = Paginator(items, 15)
+    paginator = Paginator(items, NEWS_PER_PAGE)
     page = request.GET.get('page')
     try:
         news = paginator.page(page)

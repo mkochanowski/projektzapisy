@@ -193,8 +193,6 @@ class Notification(object):
             return ''
 
         def _send_to_users(users, notification, subject, context):
-            print context
-            from django.core.mail import send_mail
             for u in users:
                 preference = NotificationManager.user_has_notification_on(u.user, notification)
                 address = u.user.email

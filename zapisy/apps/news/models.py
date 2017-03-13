@@ -4,8 +4,9 @@
     News models
 """
 
-from django.db                  import models
+from django.conf.settings       import NEWS_PER_PAGE
 from django.contrib.auth.models import User
+from django.db                  import models
 
 from datetime import datetime, timedelta
 from apps.notifications.models import Notification
@@ -41,7 +42,7 @@ class NewsManager(models.Manager):
 	ids = enumerate(self.exclude(category='-').values_list('id').order_by('-id'))
         for index, item in ids:
             if item[0] == news_id:
-                return (int(index/15)) + 1
+                return (int(index/NEWS_PER_PAGE)) + 1
         return 1
     def category(self, category):
         """
