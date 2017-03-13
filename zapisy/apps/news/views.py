@@ -7,6 +7,7 @@ from django.core.exceptions     import ObjectDoesNotExist
 from django.core.paginator      import Paginator, PageNotAnInteger, EmptyPage
 from django.conf                import settings
 from django.core.urlresolvers   import reverse
+from django.db.models           import Q
 from django.http                import HttpResponse
 from django.shortcuts           import render_to_response, redirect
 from django.template            import RequestContext
@@ -19,9 +20,8 @@ import datetime
 
 def all_news(request):
     """
-        Latest news
+        Latest news, result of query search or given page with focused news
     """
-
     if hasattr(request.user, 'student') and request.user.student:
         student = request.user.student
         student.last_news_view = datetime.datetime.now()
@@ -32,7 +32,13 @@ def all_news(request):
         employee.last_news_view = datetime.datetime.now()
         employee.save()
 
-    items = News.objects.exclude(category='-')
+    query = request.GET.get('q')
+    if query:
+        query = query.strip()
+        items = News.objects.exclude(category='-').filter(Q(title__icontains=query) | Q(body__icontains=query))
+    else:
+        items = News.objects.exclude(category='-')
+
     paginator = Paginator(items, settings.NEWS_PER_PAGE)
     page = request.GET.get('page')
     try:
@@ -40,7 +46,7 @@ def all_news(request):
     except (PageNotAnInteger, EmptyPage):
         news = paginator.page(1)
 
-    data  = {'items': news, 'page_range': paginator.page_range}
+    data  = {'items': news, 'page_range': paginator.page_range, 'query': query}
 
     return render_to_response('news/list_all.html', data, context_instance = RequestContext(request))
 
