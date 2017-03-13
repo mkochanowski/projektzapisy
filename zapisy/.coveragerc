@@ -1,3 +1,3 @@
 [run]
 source=apps
-omit=*test*.py, __init__.py, */migrations/*
+omit=*test*.py, *__init__*, */migrations/*
