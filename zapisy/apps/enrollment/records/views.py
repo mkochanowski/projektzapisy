@@ -95,17 +95,9 @@ def set_enrolled(request, method):
     except MultiValueDictKeyError:
         return AjaxFailureMessage.auto_render('InvalidRequest', 'Nieprawidłowe zapytanie.', message_context)
     
-    cur_semester = Semester.get_current_semester()
-    
-    if cur_semester is None:
-        return AjaxFailureMessage.auto_render('NoOpenSemesters', u'W tej chwili nie trwa żaden semestr.', message_context)
-    
-    elif cur_semester.is_closed():
-        return AjaxFailureMessage.auto_render('SemesterIsLocked', u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.', message_context)
-
     if request.user.student.block:
         return AjaxFailureMessage.auto_render('ScheduleLocked',
-            u'Twój plan jest zablokowany. Możesz go doblokować w prototypie', message_context)
+            u'Twój plan jest zablokowany. Możesz go odblokować w prototypie', message_context)
     student = request.user.student
 
 
@@ -121,25 +113,24 @@ def set_enrolled(request, method):
 
     if set_enrolled:
         result, messages_list = group.enroll_student(student)
-        if result:
-            run_rearanged(result)
 
     else:
-        if cur_semester.can_remove_record() or group.has_student_in_queue(student):
-            result, messages_list = group.remove_student(student)
-            if result:
-                run_rearanged(result, group)
-                
-        else:
-            return AjaxFailureMessage.auto_render('PastRecordsEndTime',
-                u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.', message_context)
-
-    if not result:
+        result, messages_list = group.remove_student(student)
+        
+    if result:
+        run_rearanged(result, group)
+    else:
         transaction.rollback()
 
     if is_ajax:
         message = ', '.join(messages_list)
-        return AjaxSuccessMessage(message, prepare_group_data(group.course, student))
+        
+        if result:
+            return AjaxSuccessMessage(message, prepare_group_data(group.course, student))
+        
+        else:
+            return AjaxFailureMessage.auto_render('SetEnrolledFailed',
+                message, message_context)
 
     else:
         for message in messages_list:

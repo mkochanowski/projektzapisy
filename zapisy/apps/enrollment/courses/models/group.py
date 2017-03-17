@@ -175,6 +175,15 @@ class Group(models.Model):
         #        [Text] - text info about actions
 
         from apps.enrollment.records.models import Record, Queue, STATUS_ENROLLED, STATUS_REMOVED
+        from apps.enrollment.courses.models import Semester
+        
+        semester = Semester.objects.get_next()
+      
+        if semester.is_closed():
+            return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
+        
+        elif not semester.can_remove_record() and not self.has_student_in_queue(student):
+            return False, [u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.']
 
         result = True
         if Record.objects.filter(student=student, group=self, status=STATUS_ENROLLED).update(status=STATUS_REMOVED) > 0:
@@ -271,6 +280,10 @@ class Group(models.Model):
             return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
 
         semester = Semester.objects.get_next()
+      
+        if semester.is_closed():
+            return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
+        
         current_limit = semester.get_current_limit()
 
         if not student.get_points_with_course(self.course) <= current_limit:
