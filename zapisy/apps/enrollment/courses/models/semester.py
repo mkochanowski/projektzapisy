@@ -275,8 +275,13 @@ class Semester( models.Model ):
     def __unicode__(self):
         return self.get_name()
 
+
 class Freeday(models.Model):
     day = models.DateField(verbose_name='dzień wolny')
+    
+    def clean(self):
+        if Freeday.objects.filter(day=self.day).exists():
+            raise ValidationError(message={'day': u'To już jest'}, code='invalid')
 
     @classmethod
     def is_free(cls, date):
