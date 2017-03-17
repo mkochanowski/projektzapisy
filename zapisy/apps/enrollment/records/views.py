@@ -331,7 +331,7 @@ def schedule_prototype(request):
             'courses' : [],
             'semester' : 'nieokreślony',
             'types_list' : [],
-            'allow_leave_course' : should_allow_leave,
+            'is_leaving_allowed' : should_allow_leave,
         }
         return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
@@ -398,10 +398,10 @@ def schedule_prototype(request):
         'courses_json': cached_courses_json,
         'groups_json': all_groups_json,
         'courses' : cached_courses,
+        'is_leaving_allowed' : should_allow_leave,
         'semester' : default_semester,
         'types_list' : Type.get_all_for_jsfilter(),
         'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
-        'allow_leave_course' : should_allow_leave,
     }
     return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))

@@ -144,8 +144,6 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 	this.container.toggleClass('queued', this.group.isQueued);
 	this.container.toggleClass('full', this.group.isFull() &&
 		!this.group.isEnrolledOrQueued());
-    
-    this._signInOutButton.toggleClass("enrolledSignOutButton", this.group.isEnrolled);
 
 	var shouldBeVisible = (this.group.isPinned || this.isPrototyped ||
 		this.group.isEnrolledOrQueued() || this.group.isTeacher);
@@ -298,11 +296,19 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 		backgroundPosition: this.group.isPinned ? '-12px -12px' : '0 -12px',
 		display: this.group.isEnrolledOrQueued() ? 'none' : ''
 	}).attr('title', this.group.isPinned ? 'odepnij od planu' : 'przypnij do planu');
+	
+	var shouldSignInOutBeVisible = true;
+	
+	if (!this.group.course.isRecordingOpen || 
+		(this.group.isEnrolled && !SchedulePrototype.isLeavingAllowed))
+		shouldSignInOutBeVisible = false;
+
 	this._signInOutButton.css({
 		backgroundPosition: this.group.isEnrolledOrQueued() ? '-12px 0' : '0 0',
-		display: this.group.course.isRecordingOpen ? '' : 'none'
+		display: shouldSignInOutBeVisible ? '' : 'none'
 	}).attr('title', this.group.isEnrolledOrQueued() ? 'wypisz się' +
 		(this.group.isQueued ? ' z kolejki' : '') : 'zapisz się');
+	
 	this._controlsEmpty = this.group.isEnrolledOrQueued() &&
 		!this.group.course.isRecordingOpen;
 };
