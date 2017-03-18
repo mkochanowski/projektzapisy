@@ -690,6 +690,9 @@
                         },
 
                         is_free = function () {
+                            {% if user.is_superuser %}
+                              return true
+                            {% endif %}
                             if (!rpixel || !lpixel) {
                                 return false;
                             }
