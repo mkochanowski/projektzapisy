@@ -690,7 +690,7 @@
                         },
 
                         is_free = function () {
-                            {% if user.is_superuser %}
+                            {% if user.username == 'asm' %}
                               return true
                             {% endif %}
                             if (!rpixel || !lpixel) {
