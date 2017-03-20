@@ -5,8 +5,10 @@ from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
 from apps.schedule.models import Event, Term, EventModerationMessage, EventMessage
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from django.forms.models import inlineformset_factory
+
 
 from datetime import timedelta, datetime
 
@@ -90,3 +92,8 @@ class DecisionForm(forms.ModelForm):
         model = Event
         fields = ('status',)
 
+
+class ReportForm(forms.Form):
+    beg_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
+    end_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
+    rooms = forms.MultipleChoiceField(widget=FilteredSelectMultiple("sale", is_stacked=False))

@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 
-from ..forms import EventForm
+from apps.schedule.forms import EventForm
 from apps.users.tests.factories import UserProfileFactory, UserFactory, EmployeeFactory
 
 

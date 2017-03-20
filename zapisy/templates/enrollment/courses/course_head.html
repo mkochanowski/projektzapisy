@@ -3,6 +3,12 @@
 {% load i18n %}
 
 <h2>{{ course.name }}</h2>
+{% if ects_limit_would_be_exceeded %}
+<div class="main-message">Nie możesz zapisać się na ten przedmiot, gdyż przekroczony zostałby limit {{ max_ects }} punktów ECTS
+(masz już {{ current_ects }} na ten semestr).
+Zrezygnuj z innych przedmiotów, aby zapisać się na ten.
+</div>
+{% endif %}
 <div class="details course-details{% if details_hidden %} hidden{% endif %}">
     <table class="table-info">
         <tr>

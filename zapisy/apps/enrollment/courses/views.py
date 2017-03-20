@@ -112,7 +112,7 @@ def course(request, slug):
         groups = list(Group.objects.filter(course=course).
             extra({
                 'priority': "SELECT COALESCE((SELECT priority FROM records_queue WHERE courses_group.id=records_queue.group_id AND records_queue.student_id=%s AND records_queue.deleted = false),0)" % (student_id,),
-                'signed': "SELECT COALESCE((SELECT id FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s' AND records_record.student_id=%s),0)" % (STATUS_ENROLLED,student_id)}).
+                'signed': "SELECT COALESCE((SELECT id FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s' AND records_record.student_id=%s),0)" % (Record.STATUS_ENROLLED,student_id)}).
             select_related('teacher', 'teacher__user'))
         
         ## TODO: zrobić sortowanie groups w pythonie po terminach
@@ -136,7 +136,7 @@ def course(request, slug):
             """
             from django.db import connection
             cursor = connection.cursor()
-            cursor.execute(enrolled_pinned_queued_ids_sql, [STATUS_ENROLLED, student_id, STATUS_PINNED, student_id, student_id])
+            cursor.execute(enrolled_pinned_queued_ids_sql, [Record.STATUS_ENROLLED, student_id, Record.STATUS_PINNED, student_id, student_id])
             (enrolled_ids, pinned_ids, queued_ids) = cursor.fetchall()[0]
             
             queued = Queue.queued.filter(group__course=course, deleted=False).values('priority','group_id')
@@ -255,6 +255,13 @@ def course(request, slug):
 
         courseView_details_hidden = request.COOKIES.get('CourseView-details-hidden', False) == 'true'
         
+        ectsLimitExceeded = False
+        maxEcts = default_semester.get_current_limit()
+        currentEcts = student.get_points()
+        
+        if student and student.get_points_with_course(course) > maxEcts:
+            ectsLimitExceeded = True
+        
         data.update({
             'details_hidden': courseView_details_hidden,
             'course' : course,
@@ -264,7 +271,10 @@ def course(request, slug):
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
             'requirements' : requirements,
             't0': t0,
-            'can_remove_record': default_semester.can_remove_record()
+            'can_remove_record': default_semester.can_remove_record(),
+            'ects_limit_would_be_exceeded' : ectsLimitExceeded,
+            'max_ects' : maxEcts,
+            'current_ects' : currentEcts
         })
 
         return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )

@@ -1,11 +1,25 @@
 # projektzapisy Changelog
 
-# Current version
+# Version 17.03.09
+
+* Added new date for records: end of unenrolling
+
+# Version 17.02.26
+
+* Added rooms reports
+* Fixed polish fonts in pdfs
+* Fixed export to ical
+* Fixed display enrollment number (with isim students)
+
+# Version 17.02.13
+
+* Cyclic reservations can now be added with conflicts
+* Fixed tight time bounds for reservations
 
 # Version 17.01.31
 
-* fixed cyclical reservation starts no earlier than semester beginning
-* fixed open only SMTP one connection while sending emails
+* Fixed cyclical reservation starts no earlier than semester beginning
+* Fixed open only SMTP one connection while sending emails
 
 # Version 17.01.25
 

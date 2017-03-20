@@ -8,7 +8,7 @@ from django.forms import ModelForm
 from modeltranslation.admin import TranslationAdmin
 
 from apps.enrollment.courses.models import *
-from apps.enrollment.records.models import Record, STATUS_REMOVED, STATUS_ENROLLED, Queue
+from apps.enrollment.records.models import Record, Queue
 
 
 class GroupInline(admin.TabularInline):

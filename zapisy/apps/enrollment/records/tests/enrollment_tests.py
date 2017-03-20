@@ -12,8 +12,7 @@ from apps.enrollment.courses.tests.factories import GroupFactory, \
     CourseFactory, SemesterFactory
 from apps.users.tests.factories import StudentFactory
 from apps.users.models import OpeningTimesView
-from apps.enrollment.records.models import Record, Queue, \
-    STATUS_ENROLLED, STATUS_REMOVED
+from apps.enrollment.records.models import Record, Queue
 
 
 from datetime import datetime, timedelta
@@ -171,8 +170,8 @@ class DummyTest(TransactionTestCase):
         run_rearanged(result)
         self.assertTrue(result)
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
-        self.assertTrue(Record.objects.filter(group_id = lecture_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
-        self.assertTrue(Record.objects.filter(group_id = exercises_group.id, student_id = student.id, status = STATUS_ENROLLED).exists())
+        self.assertTrue(Record.objects.filter(group_id = lecture_group.id, student_id = student.id, status = Record.STATUS_ENROLLED).exists())
+        self.assertTrue(Record.objects.filter(group_id = exercises_group.id, student_id = student.id, status = Record.STATUS_ENROLLED).exists())
 
     def testAddingStudentToSameGroupAgainFails(self):
         today = datetime.now()
@@ -218,8 +217,8 @@ class DummyTest(TransactionTestCase):
         self.assertEqual(messages_list, [u'Student dopisany do grupy'])
         record_for_group1 = Record.objects.filter(student_id = student.id, group_id = exercises_group1.id)[0]
         record_for_group2 = Record.objects.filter(student_id = student.id, group_id = exercises_group2.id)[0]
-        self.assertEqual(record_for_group1.status, STATUS_REMOVED)
-        self.assertEqual(record_for_group2.status, STATUS_ENROLLED)
+        self.assertEqual(record_for_group1.status, Record.STATUS_REMOVED)
+        self.assertEqual(record_for_group2.status, Record.STATUS_ENROLLED)
 
     def testEnrollmentFailsIfEnrollmentNotYetStarted(self):
         today = datetime.now()
@@ -354,10 +353,10 @@ class DummyTest(TransactionTestCase):
         self.assertEqual(messages_list, [u'Student wypisany z grupy'])
         enrolled = [x.student for x in Record.objects.filter(
             group=group,
-            status=STATUS_ENROLLED)]
+            status=Record.STATUS_ENROLLED)]
         removed = [x.student for x in Record.objects.filter(
             group=group,
-            status=STATUS_REMOVED)]
+            status=Record.STATUS_REMOVED)]
         queued = [x.student for x in
                   Queue.objects.filter(group=group, deleted=False)]
         should_be_enrolled = students[0:8] + students[9:11]
@@ -479,10 +478,10 @@ class DummyTest(TransactionTestCase):
         self.assertEqual(groups[0].queued, 1)
         enrolled = [x.student for x in Record.objects.filter(
             group=groups[0],
-            status=STATUS_ENROLLED)]
+            status=Record.STATUS_ENROLLED)]
         removed = [x.student for x in Record.objects.filter(
             group=groups[0],
-            status=STATUS_REMOVED)]
+            status=Record.STATUS_REMOVED)]
         queued = [x.student for x in
                   Queue.objects.filter(group=groups[0], deleted=False)]
         should_be_enrolled = [students[0]] + students[3:]
@@ -499,10 +498,10 @@ class DummyTest(TransactionTestCase):
         self.assertEqual(groups[1].queued, 0)
         enrolled = [x.student for x in Record.objects.filter(
             group=groups[1],
-            status=STATUS_ENROLLED)]
+            status=Record.STATUS_ENROLLED)]
         removed = [x.student for x in Record.objects.filter(
             group=groups[1],
-            status=STATUS_REMOVED)]
+            status=Record.STATUS_REMOVED)]
         queued = [x.student for x in
                   Queue.objects.filter(group=groups[1], deleted=False)]
         should_be_enrolled = [students[1]] + students[3:]

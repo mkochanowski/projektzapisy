@@ -22,7 +22,7 @@ if __name__ == '__main__':
 import psycopg2 as pg
 import psycopg2.extensions
 
-from apps.enrollment.records.models import Record, STATUS_ENROLLED
+from apps.enrollment.records.models import Record
 from apps.enrollment.courses.models import Course, Semester, CourseEntity, Type, Group, Term, Classroom
 from apps.users.models import Student, Employee
 
@@ -159,7 +159,7 @@ def import_records(conn, gr_id, group):
         try:
             Record.objects.create(group=group,
                                   student=student,
-                                  status=STATUS_ENROLLED
+                                  status=Record.STATUS_ENROLLED
                                   )
         except:
             print '[ERROR] User kod_uz =', student_id, 'and kod_grupy =', gr_id, 'probably exists in Records'
