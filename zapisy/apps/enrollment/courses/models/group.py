@@ -179,8 +179,7 @@ class Group(models.Model):
         #  messages:
         #        [Text] - text info about actions
 
-        from apps.enrollment.records.models import Record, Queue, STATUS_ENROLLED, STATUS_REMOVED
-        from apps.enrollment.courses.models import Semester
+        from apps.enrollment.records.models import Record, Queue
         
         semester = Semester.objects.get_next()
       
