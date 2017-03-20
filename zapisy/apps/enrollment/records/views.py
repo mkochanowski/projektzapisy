@@ -297,7 +297,7 @@ def own(request):
     if request.user.student:
         student = request.user.student
         groups = Course.get_student_courses_in_semester(student, default_semester)
-        points, sum_points = student.get_points()
+        sum_points = student.get_points()
 
 
     if student is None and request.user.employee is None:
