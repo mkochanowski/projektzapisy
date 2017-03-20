@@ -145,7 +145,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 	this.container.toggleClass('full', this.group.isFull() &&
 		!this.group.isEnrolledOrQueued());
     
-    this._signInOutButton.toggleClass("enrolledSignOutButton", this.group.isEnrolled);
+//    this._signInOutButton.toggleClass("enrolledSignOutButton", this.group.isEnrolled);
 
 	var shouldBeVisible = (this.group.isPinned || this.isPrototyped ||
 		this.group.isEnrolledOrQueued() || this.group.isTeacher);
