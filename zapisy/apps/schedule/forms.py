@@ -3,7 +3,6 @@ from copy import deepcopy
 from django import forms
 from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
-from django.forms.models import BaseInlineFormSet
 from apps.enrollment.courses.models import Course, Semester
 from apps.schedule.models import Event, Term, EventModerationMessage, EventMessage
 from django.contrib.admin.widgets import FilteredSelectMultiple

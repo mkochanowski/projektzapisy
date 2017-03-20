@@ -426,9 +426,7 @@
         $('#ignore_all_conflicts').change(function () {
           var checkboxes =  $('.ignore_conflicts > input');
           for (var i=0; i<checkboxes.length; i++) {
-            console.log("ZMIANA", +checkboxes[i].value);
             checkboxes[i].value = (+checkboxes[i].value+1)%2;
-            console.log("ZMIANA", +checkboxes[i].value);
           }
         })
 
