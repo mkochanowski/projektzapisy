@@ -704,9 +704,6 @@ class Course(models.Model):
     def serialize_for_ajax(self, student=None, is_recording_open=None):
         from django.core.urlresolvers import reverse
         
-        import sys
-        print("Serializing " + sys._getframe().f_back.f_code.co_name);
-
         data = {
             'id': self.pk,
             'name': self.name,
