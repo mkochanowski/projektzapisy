@@ -3,6 +3,7 @@ from copy import deepcopy
 from django import forms
 from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
+from django.forms.models import BaseInlineFormSet
 from apps.enrollment.courses.models import Course, Semester
 from apps.schedule.models import Event, Term, EventModerationMessage, EventMessage
 from django.contrib.admin.widgets import FilteredSelectMultiple
@@ -14,6 +15,13 @@ from datetime import timedelta, datetime
 
 
 class TermForm(forms.ModelForm):
+    ignore_conflicts = forms.BooleanField(required=False, label="", widget=forms.HiddenInput())
+    
+    def clean(self):
+        cleaned_data = super(TermForm, self).clean()
+        self.instance.ignore_conflicts = cleaned_data.get('ignore_conflicts')
+        print self.instance.ignore_conflicts
+        return cleaned_data
 
     class Meta:
         model = Term
@@ -28,7 +36,6 @@ class TermForm(forms.ModelForm):
         }
 
 TermFormSet = inlineformset_factory(Event, Term, extra=0, form=TermForm)
-
 class EventForm(forms.ModelForm):
 
     class Meta:
@@ -44,10 +51,8 @@ class EventForm(forms.ModelForm):
 
 
         super(EventForm, self).__init__(data, **kwargs)
-
         if not self.instance.pk:
             self.instance.author = user
-
         if user.get_profile().is_employee:
             self.fields['type'].choices = Event.TYPES_FOR_TEACHER
         else:

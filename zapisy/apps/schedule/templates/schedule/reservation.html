@@ -423,6 +423,15 @@
 
         });
 
+        $('#ignore_all_conflicts').change(function () {
+          var checkboxes =  $('.ignore_conflicts > input');
+          for (var i=0; i<checkboxes.length; i++) {
+            console.log("ZMIANA", +checkboxes[i].value);
+            checkboxes[i].value = (+checkboxes[i].value+1)%2;
+            console.log("ZMIANA", +checkboxes[i].value);
+          }
+        })
+
         $('#save_event').click(function (event) {
 
             if ($('#termstable tbody').find('tr:not(.removed)').length == 0) {
@@ -689,8 +698,8 @@
                             rpixel = right;
                         },
 
-                        is_free = function () {
-                            {% if user.username == 'asm' %}
+                        is_free = function (force) {
+                            {% if perms.schedule.manage_events %}
                               return true
                             {% endif %}
                             if (!rpixel || !lpixel) {
@@ -716,7 +725,7 @@
                     },
                     shouldBeShow:function (l, r) {
                         setLimit(getPixel(l) + config.x1, getPixel(r) + config.x1);
-                        return is_free();
+                        return is_free(true);
                     },
                     setLimit:setLimit,
                     click:click
@@ -968,6 +977,7 @@
 
                     <td>
                         <div class="hidden">{{ form.DELETE }}</div>
+                        <div class="hidden ignore_conflicts">{{ form.ignore_conflicts }}</div>
                         <button style="display:none" class="btn success unremoveterm" formnovalidate>Cofnij
                             usunięcie
                         </button>
@@ -1101,6 +1111,11 @@
     </form>
     <div class="row">
         <form id="testroomlistform">
+          {% if errors and perms.schedule.manage_events %}
+            <div class="span16 left">
+              <input type="checkbox" id="ignore_all_conflicts">Zignoruj konflikty</input>
+            </div>
+            {% endif %}
             <div class="span16 right" style="text-align:right">
                 <input type="submit" id="save_event" class="btn" name="zapisz" value="Zapisz">
             </div>
