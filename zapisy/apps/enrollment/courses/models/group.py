@@ -168,7 +168,7 @@ class Group(models.Model):
             self.enrolled_isim += 1
         self.save()
 
-    def remove_student(self, student):
+    def remove_student(self, student, is_admin=False):
         #  Removes student from this group. If this is Lecture group remove from other too.
         #  Remove from
         #  @return (state, messages)
@@ -182,13 +182,15 @@ class Group(models.Model):
         from apps.enrollment.records.models import Record, Queue
         from apps.enrollment.courses.models import Semester
         
-        semester = Semester.objects.get_next()
-      
-        if semester.is_closed():
-            return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
+        # admins are always allowed to remove students
+        if not is_admin:
+            semester = Semester.objects.get_next()
         
-        elif not semester.can_remove_record() and not self.has_student_in_queue(student):
-            return False, [u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.']
+            if semester.is_closed():
+                return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
+            
+            elif not semester.can_remove_record() and not self.has_student_in_queue(student):
+                return False, [u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.']
 
         result = True
         if Record.objects.filter(student=student, group=self, status=Record.STATUS_ENROLLED).update(status=Record.STATUS_REMOVED) > 0:

@@ -297,15 +297,17 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 		display: this.group.isEnrolledOrQueued() ? 'none' : ''
 	}).attr('title', this.group.isPinned ? 'odepnij od planu' : 'przypnij do planu');
 	
-	var shouldSignInOutBeVisible = true;
-	
-	if (!this.group.course.isRecordingOpen || 
-		(this.group.isEnrolled && !SchedulePrototype.isLeavingAllowed))
-		shouldSignInOutBeVisible = false;
+    // students are not allowed to leave the group 
+    // (i.e. should not see the sign out button) if one of the following holds:
+    // * recording is not open
+    // * they're enrolled (not in queue) and leaving is not allowed (records ended)
+    const displaySignInOutButton = 
+        this.group.course.isRecordingOpen && 
+        (!this.group.isEnrolled || SchedulePrototype.isLeavingAllowed);
 
 	this._signInOutButton.css({
 		backgroundPosition: this.group.isEnrolledOrQueued() ? '-12px 0' : '0 0',
-		display: shouldSignInOutBeVisible ? '' : 'none'
+		display: displaySignInOutButton ? '' : 'none'
 	}).attr('title', this.group.isEnrolledOrQueued() ? 'wypisz się' +
 		(this.group.isQueued ? ' z kolejki' : '') : 'zapisz się');
 	
