@@ -4,9 +4,9 @@
     News models
 """
 
-from django.conf                import settings
+from django.conf import settings
 from django.contrib.auth.models import User
-from django.db                  import models
+from django.db import models
 
 from datetime import datetime, timedelta
 from apps.notifications.models import Notification
@@ -39,17 +39,20 @@ class NewsManager(models.Manager):
         """
             Get a number of page by news
         """
-	ids = enumerate(self.exclude(category='-').values_list('id').order_by('-id'))
-        for index, item in ids:
-            if item[0] == news_id:
-                return (int(index/settings.NEWS_PER_PAGE)) + 1
-        return 1
+	ids = self.get_published().values_list('id').filter(pk__gte=news_id).order_by('-id')
+        if not ids.filter(pk=news_id).exists():
+            return 1
+        return ((ids.count()-1)/settings.NEWS_PER_PAGE) + 1
+    def get_published(self):
+        """
+            Returns only published
+        """
+        return self.exclude(category='-')
     def category(self, category):
         """
             Return news tagged with a given tag.
         """
         return self.filter(category = category)
-
 # suggested news items categories - not enforced
 CATEGORIES = (
     ('-', 'Hidden'),

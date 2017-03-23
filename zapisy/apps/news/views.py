@@ -3,17 +3,17 @@
 """
     News views
 """
-from django.core.exceptions     import ObjectDoesNotExist
-from django.core.paginator      import Paginator, PageNotAnInteger, EmptyPage
-from django.conf                import settings
-from django.core.urlresolvers   import reverse
-from django.db.models           import Q
-from django.http                import HttpResponse
-from django.shortcuts           import render_to_response, redirect
-from django.template            import RequestContext
-from django.utils               import simplejson
-from apps.news.models           import News
-from apps.news.utils            import prepare_data_all
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.db.models   import Q
+from django.http import HttpResponse
+from django.shortcuts import render_to_response, redirect
+from django.template import RequestContext
+from django.utils import simplejson
+from apps.news.models import News
+from apps.news.utils import prepare_data_all
 import datetime
 
 # NOWA WERSJA AKTUALNOŚCI ZE ZMERGOWANYMI SYSTEMAMI PONIZEJ
@@ -35,7 +35,7 @@ def all_news(request):
     query = request.GET.get('q')
     if query:
         query = query.strip()
-        items = News.objects.exclude(category='-').filter(Q(title__icontains=query) | Q(body__icontains=query))
+        items = News.objects.get_published().filter(Q(title__icontains=query) | Q(body__icontains=query))
     else:
         items = News.objects.exclude(category='-')
 

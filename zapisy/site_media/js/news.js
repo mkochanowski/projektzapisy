@@ -6,13 +6,13 @@ News = Object();
 
 News.init = function()
 {
-	$('#od-news-search-reset').click(function()
-	{
-	  $('#od-news-search-form').val('')
+  $('#od-news-search-reset').click(function()
+  {
+    $('#od-news-search-form').val('')
   })
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function() {
   News.init()
 })
 
