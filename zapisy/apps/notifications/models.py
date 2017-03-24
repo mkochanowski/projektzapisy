@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.template.loader import render_to_string
 from mailer.models import Message
-from apps.users.models import Employee, Student
+from apps.users.models import Employee, Student, BaseUser
 
 NOTIFICATION_TYPES = (
     ('News', {
@@ -132,7 +132,7 @@ def types_list(student=False, employee=False):
 class NotificationManager(models.Manager):
 
     def create_and_get(self, user):
-        types = types_list(not user.student is None, not user.employee is None)
+        types = types_list(BaseUser.is_student(user), BaseUser.is_employee(user))
         used = self.filter(user=user).distinct().values_list('type', flat=True)
         new_objects = []
 

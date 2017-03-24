@@ -20,6 +20,7 @@ from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, \
     EventModerationMessageForm, EventMessageForm
 from apps.schedule.utils import EventAdapter
 from apps.utils.fullcalendar import FullCalendarView
+from apps.users.models import BaseUser
 
 from xhtml2pdf import pisa
 import StringIO
@@ -287,10 +288,10 @@ class MyScheduleAjaxView(FullCalendarView):
 
         query = []
 
-        if self.request.user.student:
+        if BaseUser.is_student(self.request.user):
             query.append(Q(record__student=self.request.user.student) & Q(record__status='1'))
 
-        if self.request.user.employee:
+        if BaseUser.is_employee(self.request.user):
             query.append(Q(teacher=self.request.user.employee))
 
         queryset = super(MyScheduleAjaxView, self).get_queryset()

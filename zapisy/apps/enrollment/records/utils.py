@@ -122,7 +122,7 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None, s
         terms = Term.get_all_in_semester(default_semester, student=for_student)
 
     try:
-        if hasattr(request.user, 'student') and request.user.student:
+        if BaseUser.is_student(request.user):
             records = Record.get_student_enrolled_objects(request.user.student,\
                 default_semester)
         else:
@@ -134,7 +134,7 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None, s
 
 def prepare_schedule_data(request, courses, semester=None):
     try:
-        if hasattr(request.user, 'student') and request.user.student:
+        if BaseUser.is_student(request.user):
             student = request.user.student
         else:
             student = None

@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.utils import simplejson
 from apps.news.models import News
 from apps.news.utils import prepare_data_all
+from apps.users.models import BaseUser
 import datetime
 
 # NOWA WERSJA AKTUALNOŚCI ZE ZMERGOWANYMI SYSTEMAMI PONIZEJ
@@ -20,12 +21,12 @@ def all_news(request):
         Latest news
     """
 
-    if hasattr(request.user, 'student') and request.user.student:
+    if BaseUser.is_student(request.user):
         student = request.user.student
         student.last_news_view = datetime.datetime.now()
         student.save()
 
-    elif hasattr(request.user, 'employee')  and request.user.employee:
+    elif BaseUser.is_employee(request.user):
         employee = request.user.employee
         employee.last_news_view = datetime.datetime.now()
         employee.save()
@@ -52,4 +53,3 @@ def main_page( request ):
         news = None
 
     return render_to_response('common/index.html', {'news': news}, context_instance = RequestContext(request))
-
