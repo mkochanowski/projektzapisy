@@ -134,17 +134,11 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None, s
 
 def prepare_schedule_data(request, courses, semester=None):
     try:
-        if BaseUser.is_student(request.user):
-            student = request.user.student
-        else:
-            student = None
+        student = request.user.student
     except Student.DoesNotExist:
         student = None
     try:
-        if hasattr(request.user, 'employee') and request.user.employee:
-            employee = request.user.employee
-        else:
-            employee = None
+        employee = request.user.employee
     except Employee.DoesNotExist:
         employee = None
     default_semester = semester or Semester.objects.get_next()

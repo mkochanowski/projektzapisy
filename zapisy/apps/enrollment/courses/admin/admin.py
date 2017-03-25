@@ -385,6 +385,11 @@ class CourseDescriptionAdmin(TranslationAdmin):
     save_as = True
 
     def save_model(self, request, obj, form, change):
+        """Saves the course description.
+
+        Raises:
+            Employee.DoesNotExist: If the user is not an employee.
+        """
         obj.author = request.user.employee
         obj.save()
         entity = obj.entity
