@@ -125,9 +125,20 @@
                                             {% endif %}
                                             {% else %}{% if not t.is_full %}
                                                 <input type="hidden" name="enroll" value="true"/>
-                                                <button type="submit"
-                                                        class="btn small success setEnrolledButton">{% if t.is_in_diff %}
-                                                    przenieś{% else %}{% trans "zapisz" %}{% endif %}</button>
+                                                
+                                                {% if ects_limit_would_be_exceeded %}
+                                                    <button type="submit" disabled="disabled"
+                                                    title="Przekroczono limit {{ max_ects }} punktów ECTS, zapis niemożliwy"
+                                                    class="btn small disabled setEnrolledButton">
+                                                    {% if t.is_in_diff %}przenieś{% else %}{% trans "zapisz" %}{% endif %}
+                                                    </button>
+                                                {% else %}
+                                                    <button type="submit"
+                                                    class="btn small success setEnrolledButton">
+                                                    {% if t.is_in_diff %}przenieś{% else %}{% trans "zapisz" %}{% endif %}
+                                                </button>
+                                                {% endif %}
+                                                    
                                                 {% else %}{% if t.priority %}
                                                     <input type="hidden" name="enroll" value="false"/>
                                                     <button type="submit" class="btn small danger setEnrolledButton">
@@ -135,10 +146,20 @@
                                                     </button>
                                                 {% else %}
                                                     <input type="hidden" name="enroll" value="true"/>
-                                                    <button type="submit" class="btn small success setEnrolledButton">
-                                                        {% trans "zapisz do kolejki" %}
-                                                    </button>
-                                                {% endif %}{% endif %}{% endif %}
+                                                    
+                                                    {% if ects_limit_would_be_exceeded %}
+                                                        <button type="submit" class="btn small disabled setEnrolledButton" disabled="disabled" 
+                                                        title="Przekroczono limit {{ max_ects }} punktów ECTS, zapis niemożliwy">
+                                                            {% trans "zapisz do kolejki" %}
+                                                        </button>
+                                                    {% else %}
+                                                        <button type="submit" class="btn small success setEnrolledButton">
+                                                            {% trans "zapisz do kolejki" %}
+                                                        </button>
+                                                    {% endif %}
+                                                    
+                                                {% endif %}
+                                                {% endif %}{% endif %}
                                     </div></form>
                             
                             {% endif %}
