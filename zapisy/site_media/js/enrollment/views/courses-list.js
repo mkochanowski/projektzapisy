@@ -56,6 +56,29 @@ CoursesList.initCourseLists = function()
 				assertOne().attr('value').castToBool();
 			course.suggested_for_first_year = courseContainer.children('input[name=suggested_for_first_year]').
 				assertOne().attr('value').castToBool();
+            
+            var courseEffectsStr = courseContainer.children('input[name=effects]').
+                assertOne().attr('value').trim();
+            if (courseEffectsStr.length > 0)
+            {
+                course.effects = courseEffectsStr.split(',').map(function(num) { return parseInt(num); });
+            }
+            else
+            {
+                course.effects = [];
+            }
+            
+            var courseTagsStr = courseContainer.children('input[name=tags]').
+                assertOne().attr('value').trim();
+            if (courseTagsStr.length > 0)
+            {
+                course.tags = courseTagsStr.split(',').map(function(num) { return parseInt(num); });
+            }
+            else
+            {
+                course.tags = [];
+            }
+            
 			semester.addCourse(course);
 			CoursesList.courses[course.id] = course;
 		});
@@ -106,7 +129,7 @@ CoursesList.initFilter = function()
 
 	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
 		'semester', '#enr-courseFilter-semester', function(element, option)
-	{
+	{        
 		if (!option || option == 0)
 			return true;
 		var course = element.data;
@@ -151,6 +174,63 @@ CoursesList.initFilter = function()
 	{
 		var course = element.data;
 		return (course.type == courseType);
+	}));
+    
+    CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
+		'effects', '#enr-courseFilter-effects', function(element, option)
+	{
+        if (!option || !$("#effectsSearchEnabled").is(':checked'))
+        {
+            return true;
+        }
+        
+        var course = element.data;
+        var courseEffectsArray =  [].concat(course.effects);
+        var selectedEffectsArray = [].concat(option).map(function(num) { return parseInt(num); });
+        
+        // if no filters in place, match all courses
+        // (this happens if the checkbox is checked but the user hasn't selected
+        // anything yet)
+        if (!selectedEffectsArray.length)
+        {
+            return true;
+        }
+        
+        // TODO: which should it be? true or false?
+        if (!courseEffectsArray.length)
+        {
+            //return true;
+            return false;
+        }
+        
+        return findOne(courseEffectsArray, selectedEffectsArray);
+	}));
+    
+    CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
+		'tags', '#enr-courseFilter-tags', function(element, option)
+	{
+        if (!option || !$("#tagsSearchEnabled").is(':checked'))
+        {
+            return true;
+        }
+        
+        var course = element.data;
+        var courseTagsArray = [].concat(course.tags);
+        var selectedTagsArray = [].concat(option).map(function(num) { return parseInt(num); });
+        
+        if (!selectedTagsArray.length)
+        {
+            return true;
+        }
+        
+        // see above
+        if (!courseTagsArray.length)
+        {
+            //return true;
+            return false;
+        }
+        
+        return findOne(courseTagsArray, selectedTagsArray);
 	}));
 
 	for (var course in CoursesList.courses)

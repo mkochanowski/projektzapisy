@@ -41,13 +41,19 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
     else:
         courses = Course.visible.all().order_by('entity__name')
 
-
+    """
+    for course in courses:
+        course.__dict__["effects"] = "1, 2"
+        course.__dict__["tags"] = "3, 5"
+    """
 
     return {
         'courses': courses,
         'semester_courses': semesters,
         'types_list' : Type.get_all_for_jsfilter(),
-        'default_semester': default_semester
+        'default_semester': default_semester,
+        'effects' : Effects.objects.all(),
+        'tags' : Tag.objects.all(),
     }
 
 def prepare_courses_list_to_render_and_return_course(request,default_semester=None,user=None, student=None, course_slug=None):
@@ -257,9 +263,10 @@ def course(request, slug):
         
         ectsLimitExceeded = False
         maxEcts = default_semester.get_current_limit()
-        currentEcts = student.get_points()
+        currentEcts = 0
         
         if student and student.get_points_with_course(course) > maxEcts:
+            currentEcts = student.get_points()
             ectsLimitExceeded = True
         
         data.update({

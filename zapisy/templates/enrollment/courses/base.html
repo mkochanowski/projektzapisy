@@ -3,8 +3,13 @@
 {% load compressed %}
 {% load cache %}
 {% load i18n %}
+{% load static %}
+
 {% block js %}
     {% compressed_js 'courses' %}
+    
+    <script src="{% static "js/enrollment/views/courses-list-filters-ui.js" %}"></script>
+    <script src="{% static "js/common/utils.js" %}"></script>
 {% endblock %}
 
 {% block styles %}
@@ -20,16 +25,69 @@
 				<input class="text filter-phrase" type="text" />
 				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
 			</div>
+			
+			<div id="tagsEffectsFilters" style="display: none">
+                <br>
+                <hr>
+                <br>
+                
+                <legend><span>{% trans "Efekty kształcenia" %}</span></legend>
+                <div>
+                    <label style="font-size: 11px"><input id="effectsSearchEnabled" type="checkbox" onclick="onEffectsFilterToggled();">&nbsp;Włącz filtrowanie po efektach kształcenia</label>
+                    <select disabled="disabled" id="enr-courseFilter-effects" class="courseListMultipleSelect" multiple>
+                        {% for effect in effects %}
+                            <option value="{{ effect.id }}">{{ effect.group_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <br>
+                <hr>
+                <br>
+                
+                <legend><span>{% trans "Tagi" %}</span></legend>
+                <div>
+                    <label style="font-size: 11px"><input id="tagsSearchEnabled" type="checkbox" onclick="onTagsFilterToggled();">&nbsp;Włącz filtrowanie po tagach</label>
+                    <select disabled="disabled" id="enr-courseFilter-tags" class="courseListMultipleSelect" multiple>
+                        {% for tag in tags %}
+                            <option value="{{ tag.id }}">{{ tag.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <br>
+                <hr>
+                <p class="tagsEffectsFilterHint">
+                    {% trans "Możesz zaznaczyć wiele tagów/efektów naraz &dash; użyj klawisza Ctrl (Command na Mac OS). Wyświetlone zostaną wówczas wszystkie przedmioty, które zaliczają co najmniej jeden z wybranych tagów/efektów." %}
+                </p>
+            </div>
+            <div class="showMoreFiltersContainer">
+                <a id="tagsEffectsFiltersToggle" href="javascript: void(0)" onclick="effectsTagsFiltersToggled();">
+                    pokaż filtry efektów/tagów
+                </a>
+            </div>
 		</fieldset>
 		<fieldset class="course-type-filter">
 			<legend><span>{% trans "Rodzaj przedmiotu" %}</span></legend>
+			
+			<ol class="filterList">
 			{% for type in types_list %}
-				<span class="checkbox">
+				<li class="checkbox">
 					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
 					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
-					<label for="filter-course-type-{{ type.id }}">{{ type.name }}</label>
+					<label for="filter-course-type-{{ type.id }}">&nbsp;{{ type.name }}</label>
 				</span>
 			{% endfor %}
+			
+			<li class="checkbox" style=""><input checked="checked" class="filter-course-type-meta" id="filter-course-type-0" value="0" type="checkbox">
+			<input class="group-id" value="" type="hidden"><label for="filter-course-type-0" style="-moz-user-select: none;">&nbsp;Inne</label></li>
+			</ol>
+			
+			<div class="showMoreFiltersContainer">
+                <a id="extraCourseTypeFiltersToggle" href="javascript: void(0)">
+                    pokaż więcej filtrów
+                </a>
+            </div>
 		</fieldset>
 		<fieldset id="enr-coursesList-other">
 			<legend><span>{% trans "Inne" %}</span></legend>
@@ -74,6 +132,8 @@
 								<input type="hidden" name="english" value="{{ course.english }}" />
 								<input type="hidden" name="exam" value="{{ course.exam }}" />
 								<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />
+								<input type="hidden" name="effects" value="{% for effect in course.entity.effects.all %}{{ effect.id }}{% if not forloop.last %},{% endif %}{% endfor %}" />
+								<input type="hidden" name="tags" value="{% for tag in course.tags %}{{ tag.tag.id }}{% if not forloop.last %},{% endif %}{% endfor %}" />
 							</li>
                             {% endif %}
 						{% endfor %}
