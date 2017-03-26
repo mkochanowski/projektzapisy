@@ -275,9 +275,10 @@ class Semester( models.Model ):
     def __unicode__(self):
         return self.get_name()
 
-class Freeday(models.Model):
-    day = models.DateField(verbose_name='dzień wolny')
 
+class Freeday(models.Model):
+    day = models.DateField(verbose_name='dzień wolny', unique=True)
+    
     @classmethod
     def is_free(cls, date):
         """
