@@ -24,30 +24,35 @@ class NewsManager(models.Manager):
             return self.category(category).filter(date__gte=begin)
         else:
             return self.get_successive_news(category, 0, 3)
+
     def count_new(self, category):
         """
             Returns number of news marked as new
         """
         begin = datetime.now() - timedelta(days=7)
         return self.category(category).filter(date__gte=begin).count()
+
     def get_successive_news(self, category, beginwith, quantity=1):
         """
             Get a number of news
         """
         return self.category(category)[beginwith:(beginwith+quantity)]
+
     def get_page_number_by_news_id(self, news_id):
         """
-            Get a number of page by news
+            If news doesn\'t exist the first page is returned
         """
 	ids = self.get_published().values_list('id').filter(pk__gte=news_id).order_by('-id')
         if not ids.filter(pk=news_id).exists():
             return 1
         return ((ids.count()-1)/settings.NEWS_PER_PAGE) + 1
+
     def get_published(self):
         """
             Returns only published
         """
         return self.exclude(category='-')
+
     def category(self, category):
         """
             Return news tagged with a given tag.
@@ -86,9 +91,8 @@ class News(models.Model):
 
         super(News, self).save(*args, **kwargs)
 
-        # replace ó - https://code.djangoproject.com/ticket/10449
         if self.is_published() and (old and not old.is_published() or not old):
-            Notification.send_notifications('send-news', {'news_id': self.pk, 'include_direct_link': True, 'subject': self.title, 'body': str(self.body).replace('&oacute;', u'ó')})
+            Notification.send_notifications('send-news', {'news_id': self.pk, 'include_direct_link': True, 'subject': self.title, 'body': str(self.body)})
 
     def is_published(self):
         return self.category != '-'
