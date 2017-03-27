@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import datetime
+import datetime, timedelta
+from collections import OrderedDict
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template import Context
@@ -18,7 +19,7 @@ from apps.schedule.models import Event, Term
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, \
     EventModerationMessageForm, EventMessageForm
-from apps.schedule.utils import EventAdapter
+from apps.schedule.utils import EventAdapter, get_week_range_by_date
 from apps.utils.fullcalendar import FullCalendarView
 
 from xhtml2pdf import pisa
@@ -115,6 +116,39 @@ def reservations(request):
     title = u'Zarządzaj rezerwacjami'
     return TemplateResponse(request, 'schedule/reservations.html', locals())
 
+@login_required
+def conflicts(request):
+    from apps.schedule.models import Term
+    from_date = request.GET.get('from_date')
+    to_date = request.GET.get('to_date')
+    if from_date is not None and to_date is not None:
+        from_date = datetime.datetime.strptime(from_date, '%m-%d-%Y')
+        to_date = datetime.datetime.strptime(to_date, '%m-%d-%Y')
+    else:
+        from_date, to_date = get_week_range_by_date(datetime.datetime.today())
+
+    terms_candidates = Term.objects.filter(day__gte=from_date, day__lte=to_date).order_by('day', 'room', 'start', 'end').select_related('room', 'event')
+    it = None
+    terms = OrderedDict()
+    temp = dict()
+    for t in terms_candidates:
+        if (it is not None and (t.day != it.day or t.room != it.room)) or it is None:
+            if temp and temp['conflicted']:
+                if it.day not in terms:
+                    terms[it.day] = dict()
+                if it.room not in terms[it.day]:
+                    terms[it.day][it.room] = dict()
+                    terms[it.day][it.room][it.pk] = dict()
+                terms[it.day][it.room][it.pk] = temp
+            it = t
+            temp = {}
+            temp['base'] = it
+            temp['conflicted'] = list()
+        elif it.end >= t.end and t.start >= it.start:
+            temp['conflicted'].append(t)
+
+    title = u'Konflikty'
+    return TemplateResponse(request, 'schedule/conflicts.html', locals())
 
 @login_required
 def history(request):

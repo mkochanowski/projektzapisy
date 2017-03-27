@@ -100,7 +100,6 @@ class Term(models.Model):
         verbose_name_plural = u'terminy'
 
     def get_conflicted(self):
-
         if not self.room:
             return EmptyQuerySet()
 
@@ -112,7 +111,6 @@ class Term(models.Model):
 
         if self.pk:
             terms = terms.exclude(pk=self.pk)
-
         return terms
 
     def print_start(self):
@@ -135,6 +133,16 @@ class Term(models.Model):
         hours, remainder = divmod(self.end.seconds, 3600)
         minutes, __ = divmod(remainder, 60)
         return '%d:%02d' % (hours, minutes)
+    
+    def pretty_print(self):
+        """
+        Verbose html info about term
+        Format: {start} - {end} {title_with_url} (author)
+
+        @return: string
+        """
+        return '%s - %s <a href="%s">%s</a> (%s)' % (self.print_start(), self.print_end(), self.event.get_absolute_url(), self.event.title, self.event.author)
+        return '%s - %s <a href=%s></a>' % (self.print_start(), self.print_end(), self.event.get_absolute_url(), self.event.title())
 
     def get_room(self):
         return self.room

@@ -1,0 +1,83 @@
+{% extends "schedule/base.html" %}
+{% load url from future %}
+
+{% block conflicts_manage %} class="active"{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <link href="/site_media/css/jquery-ui-1.8.14.custom.css" rel="stylesheet" type="text/css"
+          media="screen,projection"/>
+    <link href="/site_media/js/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"
+          media="screen,projection"/>
+<style>
+  #days-list { list-style: none; }
+  .rooms-list { list-style: disc; }
+  .base-list { list-style: circle; }
+  .conflicts-list { list-style: none !important; margin-left:0; }
+
+</style>
+{% endblock %}
+
+
+{% block js %}
+  {{ block.super }}
+  <script>
+  $(document).ready(function() {
+    $('input[name="from_date"]').datepicker()
+    $('input[name="to_date"]').datepicker()
+    $('#time-range-form').submit(function(e) {
+      e.preventDefault()
+      location = location.origin+location.pathname+'?'+$(this).serialize().replace(/%2F/g, '-') 
+      return false
+    })
+  })
+
+  </script>
+{% endblock %}
+
+{% block bread %}
+<a href="/">Strona główna</a> &raquo;
+<a href="{% url 'events:classrooms' %}">Sale</a> &raquo;
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="span16">
+    <h2>{{ title }}</h2>
+  </div>
+  <form id="time-range-form" method="GET" class="form-stacked">
+    <fieldset>
+      Od: <input name="from_date" type="date" value={% if from_date %} {{ from_date|date:"m/d/Y" }} {% endif %}/>
+      Do: <input name="to_date" type="date" value={% if to_date %} {{ to_date|date:"m/d/Y" }} {% endif %}/>
+    </fieldset>
+    <input type="submit" value="Szukaj" class="btn success">
+  </form>
+  <ul id="days-list">
+    {% for day, rooms_data in terms.items %}
+    <li><span><h4>{{ day|date:"l, j E Y" }}</h4></span>
+      <ul class="rooms-list">
+        {% for room, data in rooms_data.items %}
+        <li>
+          <a href={{ room.get_absolute_url }}>Sala {{ room.number }}</a>
+          <ul class="base-list">    
+          {% for _, conflict_data in data.items %}
+            <li>{{ conflict_data.base.pretty_print|safe }}</br>
+            <span><i>konflikt z:</i></span>
+            <ul class="conflicts-list">
+              {% for conflict in conflict_data.conflicted %}
+              <li> {{ conflict.pretty_print|safe }} </li>
+              {% endfor %}
+          </li>
+          </ul>
+        </li>
+        {% endfor %}
+          </ul>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}
+
