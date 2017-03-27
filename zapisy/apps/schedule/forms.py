@@ -19,7 +19,6 @@ class TermForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(TermForm, self).clean()
         self.instance.ignore_conflicts = cleaned_data.get('ignore_conflicts')
-        print self.instance.ignore_conflicts
         return cleaned_data
 
     class Meta:
