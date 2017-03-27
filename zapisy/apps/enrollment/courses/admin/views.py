@@ -69,7 +69,7 @@ def remove_student(request):
     except ObjectDoesNotExist:
         raise Http404
 
-    result, messages_list = group.remove_student(student)
+    result, messages_list = group.remove_student(student, is_admin=True)
     if result:
         run_rearanged(result, group)
 
