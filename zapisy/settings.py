@@ -17,6 +17,9 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# With DEBUG = False Django will refuse to serve requests to hosts different
+# than this one.
+ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl']
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
 """
