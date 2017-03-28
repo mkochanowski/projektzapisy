@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django.db.models.query import QuerySet
-
-from django.utils import simplejson
-
 
 from apps.enrollment.courses.models import Term
 from apps.enrollment.records.models import *
@@ -101,13 +100,13 @@ def prepare_groups_json(semester, groups, student=None, employee=None):
             record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
             queue_priorities, student=student, employee=employee
         ))
-    return simplejson.dumps(groups_json)
+    return json.dumps(groups_json)
 
 def prepare_courses_json(groups, student):
     courses_json = []
     for group in groups:
         courses_json.append(group.course.serialize_for_ajax(student))
-    return simplejson.dumps(courses_json)
+    return json.dumps(courses_json)
 
 def prepare_schedule_courses(request, for_student = None, for_employee = None, semester=None):
     if not (for_student is None) and not (for_employee is None):
@@ -155,7 +154,7 @@ def prepare_schedule_data(request, courses, semester=None):
                 }
             terms_by_days[day]['terms'].append(term)
             term.update({ # TODO: do szablonu
-                'json': simplejson.dumps(term['info'])
+                'json': json.dumps(term['info'])
             })
     terms_by_days = filter(lambda term: term, terms_by_days)
 

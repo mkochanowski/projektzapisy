@@ -13,7 +13,6 @@ from django.core.urlresolvers import reverse
 
 from django.http import QueryDict, HttpResponse
 from django.template.response import TemplateResponse
-from django.utils import simplejson
 from django.utils.translation import check_for_language
 from django.db.models import Q
 

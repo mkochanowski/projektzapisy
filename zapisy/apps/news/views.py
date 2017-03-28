@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.utils import simplejson
+
 from apps.news.models import News
 from apps.news.utils import prepare_data_all
 from apps.users.models import BaseUser

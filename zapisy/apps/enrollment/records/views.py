@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import StringIO
 import csv
+import json
 import re
+import StringIO
 
 from django.conf import settings
-
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -15,7 +14,6 @@ from django.template import RequestContext
 from django.shortcuts import redirect
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
-from django.utils import simplejson
 from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
@@ -353,9 +351,9 @@ def schedule_prototype(request):
             jsons = []
             for term in course['terms']:
                 term.update({ # TODO: do szablonu
-                    'json': simplejson.dumps(term['info'])
+                    'json': json.dumps(term['info'])
                 })
-                jsons.append({'json': simplejson.dumps(term['info'])})
+                jsons.append({'json': json.dumps(term['info'])})
             course['info'].update({
                 'is_recording_open': False,
                 #TODO: kod w prepare_courses_list_to_render moim zdaniem nie

@@ -1,9 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
+import json
+
 from django.contrib                      import messages
 from django.http                         import HttpResponse, HttpResponseRedirect
 from django.shortcuts                    import render_to_response
 from django.template                     import RequestContext
-from django.utils                        import simplejson
 from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.users.decorators             import student_required, employee_required
 from apps.users.models import BaseUser
@@ -59,7 +60,7 @@ def ajax_get_rsa_keys_step1( request ):
                 connected_groups = connect_groups( groupped_polls, form )
                 tickets = map( lambda gs: generate_keys( gs ),
                                       connected_groups )
-                message = simplejson.dumps(tickets)
+                message = json.dumps(tickets)
     return HttpResponse(message)
 
 @student_required
@@ -72,7 +73,7 @@ def ajax_get_rsa_keys_step2( request ):
             form = PollCombineForm( request.POST,
                                     polls = groupped_polls )
             if form.is_valid():
-                ts               = simplejson.loads( request.POST.get('ts') )
+                ts               = json.loads(request.POST.get('ts'))
                 connected_groups = connect_groups( groupped_polls, form )
                 groups           = reduce(list.__add__, connected_groups )
                 tickets          = zip( groups, ts)
@@ -82,7 +83,7 @@ def ajax_get_rsa_keys_step2( request ):
                 unblinds = map ( lambda ( g, t, st ):
                                 (unicode(t), unblind( g, st ) ),
                              signed )
-                message = simplejson.dumps(unblinds)
+                message = json.dumps(unblinds)
     return HttpResponse(message)
 
 @student_required
@@ -102,9 +103,9 @@ def connections_choice( request ):
             form = PollCombineForm( request.POST,
                                     polls = groupped_polls )
             if form.is_valid():
-                unblindst = simplejson.loads( request.POST.get('unblindst', '') )
-                unblindt  = simplejson.loads( request.POST.get('unblindt', '') )
-                ts        = simplejson.loads( request.POST.get('ts', '') )
+                unblindst = json.loads(request.POST.get('unblindst', ''))
+                unblindt  = json.loads(request.POST.get('unblindt', ''))
+                ts        = json.loads(request.POST.get('ts', ''))
                 connected_groups = connect_groups( groupped_polls, form)
                 if connected_groups:
                     groups           = reduce(list.__add__, connected_groups )
