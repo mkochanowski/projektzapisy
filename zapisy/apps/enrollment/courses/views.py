@@ -40,12 +40,22 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
                                                  ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
     else:
         courses = Course.visible.all().order_by('entity__name')
-
-    """
+        
+        
+    print(len(courses))
+    
+    import datetime
+    start = datetime.datetime.now()
+    
     for course in courses:
-        course.__dict__["effects"] = "1, 2"
-        course.__dict__["tags"] = "3, 5"
-    """
+        course.effects2 = []
+        course.tags2 = []
+        #course.effects2 = [effect.id for effect in course.entity.effects.all()]
+        #course.tags2 = [tag.tag.id for tag in course.tags]
+        
+        
+    delta = datetime.datetime.now() - start
+    print(delta)
 
     return {
         'courses': courses,

@@ -78,6 +78,10 @@ select[multiple] {
     margin: auto;
 }
 
+hr.filterListDivider {
+    margin: 15px 0px;
+}
+
 .tagsEffectsFilterHint {
     font-size: 11px;
 }

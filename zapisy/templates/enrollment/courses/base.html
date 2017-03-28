@@ -27,9 +27,7 @@
 			</div>
 			
 			<div id="tagsEffectsFilters" style="display: none">
-                <br>
-                <hr>
-                <br>
+                <hr class="filterListDivider">
                 
                 <legend><span>{% trans "Efekty kształcenia" %}</span></legend>
                 <div>
@@ -41,11 +39,9 @@
                     </select>
                 </div>
                 
-                <br>
-                <hr>
-                <br>
+                <hr class="filterListDivider">
                 
-                <legend><span>{% trans "Tagi" %}</span></legend>
+                <span>{% trans "Tagi" %}</span>
                 <div>
                     <label style="font-size: 11px"><input id="tagsSearchEnabled" type="checkbox" onclick="onTagsFilterToggled();">&nbsp;Włącz filtrowanie po tagach</label>
                     <select disabled="disabled" id="enr-courseFilter-tags" class="courseListMultipleSelect" multiple>
@@ -54,9 +50,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                
-                <br>
-                <hr>
+                <hr class="filterListDivider">
                 <p class="tagsEffectsFilterHint">
                     {% trans "Możesz zaznaczyć wiele tagów/efektów naraz &dash; użyj klawisza Ctrl (Command na Mac OS). Wyświetlone zostaną wówczas wszystkie przedmioty, które zaliczają co najmniej jeden z wybranych tagów/efektów." %}
                 </p>
@@ -92,7 +86,7 @@
 		<fieldset id="enr-coursesList-other">
 			<legend><span>{% trans "Inne" %}</span></legend>
 			<span class="selectbox" style="display:block; float:none;">
-				<label for="enr-courseFilter-semester">{% trans "Semestr" %}:</label>
+				<label for="enr-courseFilter-semester">{% trans "Semestr" %}: </label>
 				<select id="enr-courseFilter-semester">
 					<option value="0">{# Translators: filtr przedmiotów - wybór semestru #}{% trans "dowolny" %}</option>
 					{% for semester in semester_courses %}
@@ -100,14 +94,22 @@
 					{% endfor %}
 				</select>
 			</span>
-			{% if user.student %}
-                                <span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label></span>
-                        {% else %}
-                                <span class="checkbox" style="display: none;"><input type="checkbox" id="enr-hidesigned"/><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label></span>
-		        {% endif %}
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">{% trans "Pokaż przedmioty prowadzone w j.angielskim" %}</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">{% trans "Pokaż przedmioty kończące się egzaminem" %}</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">{% trans "Pokaż tylko przedmioty zalecane dla 1 roku" %}</label></span>
+			<hr class="filterListDivider">
+			<ol class="filterList">
+                {% if user.student %}
+                    <li class="checkbox">
+                    <input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label>
+                    </li>
+                {% else %}
+                    <li class="checkbox" style="display: none;">
+                    <input type="checkbox" id="enr-hidesigned"/><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label>
+                    </li>
+                {% endif %}
+                
+                <li class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">{% trans "Pokaż przedmioty prowadzone w j.angielskim" %}</label></li>
+                <li class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">{% trans "Pokaż przedmioty kończące się egzaminem" %}</label></li>
+                <li class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">{% trans "Pokaż tylko przedmioty zalecane dla 1 roku" %}</label></li>
+            </ol>
 		</fieldset>
 	</div>
 {% endblock %}
@@ -132,8 +134,8 @@
 								<input type="hidden" name="english" value="{{ course.english }}" />
 								<input type="hidden" name="exam" value="{{ course.exam }}" />
 								<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />
-								<input type="hidden" name="effects" value="{% for effect in course.entity.effects.all %}{{ effect.id }}{% if not forloop.last %},{% endif %}{% endfor %}" />
-								<input type="hidden" name="tags" value="{% for tag in course.tags %}{{ tag.tag.id }}{% if not forloop.last %},{% endif %}{% endfor %}" />
+								<input type="hidden" name="effects" value="{% for effect in course.effects2 %}{{ effect }}{% if not forloop.last %},{% endif %}{% endfor %}" />
+								<input type="hidden" name="tags" value="{% for tag in course.tags2 %}{{ tag }}{% if not forloop.last %},{% endif %}{% endfor %}" />
 							</li>
                             {% endif %}
 						{% endfor %}
