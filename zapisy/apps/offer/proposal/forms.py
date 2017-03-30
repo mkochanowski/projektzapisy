@@ -7,6 +7,7 @@ from apps.offer.proposal.models import Syllabus, StudentWork
 
 
 class ProposalForm(ModelForm):
+    ects = forms.IntegerField(label='ECTS')
     class Meta:
         fields = ('name', 'type', 'exam', 'english', 'semester', 'web_page','effects', 'repetitions', 'lectures', 'exercises', 'laboratories', 'exercises_laboratiories', 'seminars')
         model = CourseEntity

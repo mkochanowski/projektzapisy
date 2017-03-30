@@ -12,7 +12,7 @@ from django.template.response import TemplateResponse
 from django.views.decorators.http   import require_POST
 from django.forms.models import inlineformset_factory
 from apps.enrollment.courses.models.course import CourseEntity, CourseDescription, Course
-from apps.enrollment.courses.models.points import PointsOfCourseEntities
+from apps.enrollment.courses.models.points import PointsOfCourseEntities, PointTypes
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.course_type import Type
@@ -142,60 +142,84 @@ def proposal(request, slug=None):
 def proposal_edit(request, slug=None):
     proposal = None
     description = None
+    syllabus = None
+    ects_field = None
+    ects = 6
     types = Type.objects.all
+    pt = PointTypes.objects.get(name='ECTS')
+
     if slug:
         try:
             proposal = CourseEntity.get_employee_proposal(request.user, slug)
             description = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
-            syllabus = CourseEntity.syllabus
+            syllabus, _ = Syllabus.objects.get_or_create(entity=proposal)
+            ects_field, _ = PointsOfCourseEntities.objects.get_or_create(entity=proposal, type_of_point=pt, program__isnull=True)
+            ects = ects_field.value
         except NotOwnerException:
             raise Http404
         except ObjectDoesNotExist:
             raise Http404
+        if (not request.user.is_staff) and (proposal.owner != request.user.employee):
+            raise Http404
 
     proposal_form      = ProposalForm(data=request.POST or None,
-                                    instance=proposal, prefix='entity')
+                                    instance=proposal, prefix='entity', initial={'ects': ects})
     description_form = ProposalDescriptionForm(data=request.POST or None,
                                                instance=description, prefix='description')
 
     syllabus_form = SyllabusForm(data=request.POST or None,
-                                               instance=None, prefix='syllabus')
-    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork)
-    student_work_formset = StudentWorkFormset(instance = None)
+                                               instance=syllabus, prefix='syllabus')
+    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork,extra=1)
+    student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
     proposal_form.fields['lectures'].widget.attrs['readonly'] = True
     proposal_form.fields['repetitions'].widget.attrs['readonly'] = True
     proposal_form.fields['exercises'].widget.attrs['readonly'] = True
     proposal_form.fields['laboratories'].widget.attrs['readonly'] = True
     proposal_form.fields['exercises_laboratiories'].widget.attrs['readonly'] = True
     proposal_form.fields['seminars'].widget.attrs['readonly'] = True
-    ects = PointsOfCourseEntities.objects.filter(entity=proposal, program__isnull=True)[0]
+    proposal_form.fields['ects'].widget.attrs['readonly'] = True
 
-    if proposal_form.is_valid() and description_form.is_valid():
-        proposal = proposal_form.save(commit=False)
-        description = description_form.save(commit=False)
-        if not proposal.owner:
-            proposal.owner = request.user.employee
-        if proposal.status == 5:
-            proposal.status = 0
-        proposal.save()
+    if request.method == "POST":
+        if proposal_form.is_valid() and description_form.is_valid() and syllabus_form.is_valid() and student_work_formset.is_valid():
+            proposal = proposal_form.save(commit=False)
+            description = description_form.save(commit=False)
+            syllabus = syllabus_form.save(commit=False)
+            student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
 
-        description.author = request.user.employee
-        description.entity_id = proposal.id
+            if not proposal.owner:
+                proposal.owner = request.user.employee
+            if proposal.status == 5:
+                proposal.status = 0
+            proposal.save()
 
-        if proposal.is_proposal():
-            description.save()
+            description.author = request.user.employee
+            description.entity_id = proposal.id
+
+            if proposal.is_proposal():
+                description.save()
+            else:
+                description.save_as_copy()
+
+            syllabus.entity_id = proposal.id
+            syllabus.save()
+            syllabus_form.save_m2m()
+            student_work_formset.save()
+
+            if not ects_field:
+                ects_field, _ = PointsOfCourseEntities.objects.get_or_create(entity=proposal, type_of_point=pt, program__isnull=True)
+            ects_field.value = proposal_form.cleaned_data['ects'];
+            ects_field.save()
+            description_form.save_m2m()
+            proposal_form.save_m2m()
+
+            proposal = proposal_for_offer(proposal.slug)
+            proposal.save()
+
+            messages.success(request, u'Propozycja zapisana')
+
+            return redirect('my-proposal-show', slug=proposal.slug)
         else:
-            description.save_as_copy()
-
-        description_form.save_m2m()
-        proposal_form.save_m2m()
-
-        proposal = proposal_for_offer(proposal.slug)
-        proposal.save()
-
-        messages.success(request, u'Propozycja zapisana')
-
-        return redirect('my-proposal-show', slug=proposal.slug)
+            messages.error(request, u'Popraw błędy w formularzu')
 
     return TemplateResponse(request, 'offer/proposal/form.html', {
         "form": proposal_form,
@@ -203,8 +227,7 @@ def proposal_edit(request, slug=None):
         "syllabus": syllabus_form,
         "student_work_formset": student_work_formset,
         "proposal": proposal,
-        "types_data": Type.get_types_for_syllabus(),
-        "ects": ects.value
+        "types_data": Type.get_types_for_syllabus()
         })
 
 @permission_required('proposal.can_create_offer')

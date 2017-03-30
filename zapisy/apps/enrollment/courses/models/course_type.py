@@ -19,6 +19,7 @@ class Type(models.Model):
     have_seminar = models.BooleanField(verbose_name=u'Posiada seminarium', default=False)
     have_project = models.BooleanField(verbose_name=u'Posiada projekt', default=False)
 
+    default_ects = models.IntegerField(verbose_name=u'Punkty ECTS', default=6)
 
 	#TODO: dodać unique na parę (meta_type, name)
     
@@ -62,6 +63,7 @@ class Type(models.Model):
                 'repetitions': t.have_review_lecture,
                 'laboratories': t.have_lab,
                 'exercises_laboratiories': t.have_tutorial_lab,
-                'seminars': t.have_seminar
+                'seminars': t.have_seminar,
+                'default_ects': t.default_ects
             }
         return json.dumps(types_dict)

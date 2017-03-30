@@ -11,6 +11,7 @@
     <style>
         label { width: 150px; }
         textarea {width: 100%; }
+        tr.haserrors {background-color: #ffd1d1;}
     </style>
     <script type="text/javascript">
         types_data = {{ types_data|safe }};
@@ -48,14 +49,24 @@
         {% csrf_token %}
         <table>
             {% for field in form %}
-                {% if not field.name in 'lectures,exercises,repetitions,laboratories,exercises_laboratiories,seminars'|slice:',' %}
+                {% if not field.name in 'lectures,exercises,repetitions,laboratories,exercises_laboratiories,seminars,ects'|slice:',' %}
                 <tr>
-                    <th>{{field.errors}}
-                    {{field.label_tag}}</th>
+                    <th>
+                    {{field.label_tag}}
+                    </th>
+                    {% if field.errors %}
                     <td>{{field}}</td>
+                    <td>
+                        {{field.errors}}
+                    </td>
+                    {% else %}
+                    <td colspan="2">{{field}}</td>
+                    {% endif %}
                 </tr>
                 {% endif %}
             {% endfor %}
+        </table>
+        <table>
             {{ desc }}
             {{ syllabus }}
         </table>
@@ -104,9 +115,10 @@
         </tr>
         {% for form in student_work_formset.forms %}
         <tr class="dynamic-formset">
-            <th></th>
+            <th>{{ form.name.errors }}{{ form.hours.errors }}</th>
             <th>
               {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+              {{ form.id }}
               {{ form.name }}
             </th>
             <td>{{ form.hours }}</td>
@@ -123,14 +135,14 @@
         <tr>
             <th>Powinno być (z dokładnością do 20h)</th>
             <td></td>
-            <td id="hours_should_be">{% widthratio ects 1 25 %}</td>
+            <td id="hours_should_be">{% widthratio form.ects.value 1 25 %}</td>
         </tr>
 
         <tr>
         </tr>
             <th>ECTS</th>
             <td></td>
-            <td>{{ects}}</td>
+            <td>{{ form.ects }}</td>
         </table>
         <button type="submit" class="btn btn-success">Zapisz</button>
     </form>

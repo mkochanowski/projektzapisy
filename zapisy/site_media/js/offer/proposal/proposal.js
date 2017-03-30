@@ -24,10 +24,17 @@ $(function() {
 
 	$('select#id_entity-type').change(function() {
 		for (var key in data[$(this).val()]) {
-			if (data[$(this).val()][key]) {
-				$('#id_entity-'+key).val(30);
-			} else {
-				$('#id_entity-'+key).val('');
+			if (key=='default_ects') {
+				new_ects = data[$(this).val()][key];
+				$('#id_entity-ects').val(new_ects);
+				$('#hours_should_be').html(new_ects*25)
+			} else
+			{
+				if (data[$(this).val()][key]) {
+					$('#id_entity-'+key).val(30);
+				} else {
+					$('#id_entity-'+key).val('');
+				}
 			}
 		}
 		recompute();
@@ -39,6 +46,8 @@ $(function() {
 	$('table#hours-table input').live('change', function() {
 		recompute();
 	});
+
+	$("tr:has(ul.errorlist)").addClass("haserrors");
 
 	recompute();
 })
