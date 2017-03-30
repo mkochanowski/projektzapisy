@@ -455,6 +455,7 @@ PIPELINE_JS = {
         'admin/js/SelectFilter2.js',
         'js/tinymce/tinymce.min.js',
         'js/textareas.js',
+        'js/jquery/jquery.formset.js',
         'js/offer/proposal/proposal.js'
 
         ),

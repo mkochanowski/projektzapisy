@@ -263,10 +263,6 @@ AUTHENTICATION_BACKENDS = (
 
 AUTH_PROFILE_MODULE = 'users.UserProfile'
 
-FIXTURE_DIRS = (
-    os.path.join(PROJECT_PATH, 'offer/proposal/fixtures'),
-)
-
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
 

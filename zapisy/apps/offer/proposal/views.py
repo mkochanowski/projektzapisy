@@ -10,12 +10,15 @@ from django.http                    import Http404
 from django.shortcuts               import redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.http   import require_POST
+from django.forms.models import inlineformset_factory
 from apps.enrollment.courses.models.course import CourseEntity, CourseDescription, Course
+from apps.enrollment.courses.models.points import PointsOfCourseEntities
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.course_type import Type
 
-from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm
+from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm, SyllabusForm
+from apps.offer.proposal.models import Syllabus, StudentWork
 from apps.offer.proposal.exceptions      import  NotOwnerException
 
 
@@ -139,11 +142,12 @@ def proposal(request, slug=None):
 def proposal_edit(request, slug=None):
     proposal = None
     description = None
-
+    types = Type.objects.all
     if slug:
         try:
             proposal = CourseEntity.get_employee_proposal(request.user, slug)
             description = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
+            syllabus = CourseEntity.syllabus
         except NotOwnerException:
             raise Http404
         except ObjectDoesNotExist:
@@ -153,6 +157,18 @@ def proposal_edit(request, slug=None):
                                     instance=proposal, prefix='entity')
     description_form = ProposalDescriptionForm(data=request.POST or None,
                                                instance=description, prefix='description')
+
+    syllabus_form = SyllabusForm(data=request.POST or None,
+                                               instance=None, prefix='syllabus')
+    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork)
+    student_work_formset = StudentWorkFormset(instance = None)
+    proposal_form.fields['lectures'].widget.attrs['readonly'] = True
+    proposal_form.fields['repetitions'].widget.attrs['readonly'] = True
+    proposal_form.fields['exercises'].widget.attrs['readonly'] = True
+    proposal_form.fields['laboratories'].widget.attrs['readonly'] = True
+    proposal_form.fields['exercises_laboratiories'].widget.attrs['readonly'] = True
+    proposal_form.fields['seminars'].widget.attrs['readonly'] = True
+    ects = PointsOfCourseEntities.objects.filter(entity=proposal, program__isnull=True)[0]
 
     if proposal_form.is_valid() and description_form.is_valid():
         proposal = proposal_form.save(commit=False)
@@ -184,7 +200,11 @@ def proposal_edit(request, slug=None):
     return TemplateResponse(request, 'offer/proposal/form.html', {
         "form": proposal_form,
         "desc": description_form,
-        "proposal": proposal
+        "syllabus": syllabus_form,
+        "student_work_formset": student_work_formset,
+        "proposal": proposal,
+        "types_data": Type.get_types_for_syllabus(),
+        "ects": ects.value
         })
 
 @permission_required('proposal.can_create_offer')

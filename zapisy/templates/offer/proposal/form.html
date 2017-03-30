@@ -5,8 +5,17 @@
     <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
     <script type="text/javascript">window.__admin_media_prefix__ = "/static/admin/";</script>
     <script type="text/javascript" src="/fereol_admin/jsi18n/"></script>
+    <!-- <script src="//cloud.tinymce.com/stable/tinymce.min.js"></script> -->
+    <!-- <script>tinymce.init({ selector:'textarea' });</script> -->
     {% compressed_js 'proposal_edit' %}
-    <style>label { width: 50px;}</style>
+    <style>
+        label { width: 150px; }
+        textarea {width: 100%; }
+    </style>
+    <script type="text/javascript">
+        types_data = {{ types_data|safe }};
+        proposal_init(types_data);
+    </script>
 {% endblock %}
 
 
@@ -38,8 +47,84 @@
     {% endif %}
         {% csrf_token %}
         <table>
-        {{ form }}
-        {{ desc }}
+            {% for field in form %}
+                {% if not field.name in 'lectures,exercises,repetitions,laboratories,exercises_laboratiories,seminars'|slice:',' %}
+                <tr>
+                    <th>{{field.errors}}
+                    {{field.label_tag}}</th>
+                    <td>{{field}}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            {{ desc }}
+            {{ syllabus }}
+        </table>
+        <table id="hours-table">
+        <h3>Nakład pracy studenta</h3>
+        <tr>
+            <th></th>
+            <th>Forma aktywności studenta</th>
+            <th>Liczba godzin</th>
+        </tr>
+        <tr>
+            <th><label>Godziny zajęć</label></th>
+            <th></th>
+            <th></th>
+        </tr>
+
+        <tr>
+            <th></th>
+            <th>repetytorium</th>
+            <td>{{ form.repetitions }}</td>
+        <tr>
+            <th></th>
+            <th>wykład</th>
+            <td>{{ form.lectures }}</td>
+        <tr>
+            <th></th>
+            <th>ćwiczenia</th>
+            <td>{{ form.exercises }}</td>
+        <tr>
+            <th></th>
+            <th>pracownię</th>
+            <td>{{ form.laboratories }}</td>
+        <tr>
+            <th></th>
+            <th>ćwiczenio-pracownię</th>
+            <td>{{ form.exercises_laboratiories }}</td>
+        <tr>
+            <th></th>
+            <th>seminarium</th>
+            <td>{{ form.seminars }}</td>
+
+        <tr>
+            <th><label>Praca własna studenta</label></th>
+            <th></th>
+            <th></th>
+        </tr>
+        {% for form in student_work_formset.forms %}
+        <tr class="dynamic-formset">
+            <th></th>
+            <th>
+              {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+              {{ form.name }}
+            </th>
+            <td>{{ form.hours }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+        {{ student_work_formset.management_form }}
+        <table>
+        <tr>
+            <th>Suma</th>
+            <td></td>
+            <td id="target_sum"></td>
+        </tr>
+        <tr>
+        </tr>
+            <th>ECTS</th>
+            <td></td>
+            <td>{{ects}}</td>
         </table>
         <button type="submit" class="btn btn-success">Zapisz</button>
     </form>

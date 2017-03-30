@@ -2,8 +2,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from apps.enrollment.courses.models.course import CourseEntity, CourseDescription
-from apps.offer.proposal.models.proposal import Proposal
-
 
 def proposal_for_offer(slug):
     if slug:
