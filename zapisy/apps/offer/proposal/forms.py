@@ -27,3 +27,6 @@ class SyllabusForm(ModelForm):
     class Meta:
         fields = ('requirements', 'studies_type', 'year', 'requirements', 'objectives', 'effects_txt', 'contents', 'learning_methods', 'literature', 'passing_form')
         model = Syllabus
+        widgets = {
+            'learning_methods': FilteredSelectMultiple(u"Metody kształcenia", is_stacked=False)
+        }

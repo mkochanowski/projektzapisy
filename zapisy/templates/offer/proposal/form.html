@@ -116,10 +116,16 @@
         {{ student_work_formset.management_form }}
         <table>
         <tr>
-            <th>Suma</th>
+            <th>Suma godzin</th>
             <td></td>
             <td id="target_sum"></td>
         </tr>
+        <tr>
+            <th>Powinno być (z dokładnością do 20h)</th>
+            <td></td>
+            <td id="hours_should_be">{% widthratio ects 1 25 %}</td>
+        </tr>
+
         <tr>
         </tr>
             <th>ECTS</th>

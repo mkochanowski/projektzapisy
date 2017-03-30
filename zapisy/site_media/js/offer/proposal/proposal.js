@@ -7,7 +7,12 @@ function recompute() {
 	        if (!isNaN(val))
 	        	sum += val;
 	});
-	$('#target_sum').html(sum);
+	shouldbe = parseInt($('#hours_should_be').html(),10);
+	color = '#00FF00';
+	if (Math.abs(shouldbe-sum)>20) {
+		color = '#FF0000';
+	}
+	$('#target_sum').html('<span style="color:'+color+'">'+sum+'</span>');
 }
 
 $(function() {
@@ -26,13 +31,18 @@ $(function() {
 			}
 		}
 		recompute();
+		$('html, body').animate({
+		        scrollTop: $("#hours-table").offset().top
+		    }, 1000);
 	});
 
 	$('table#hours-table input').live('change', function() {
 		recompute();
 	});
+
+	recompute();
 })
 
 function proposal_init(types_data) {
-	data = types_data
+	data = types_data;
 }
