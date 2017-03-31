@@ -1,5 +1,5 @@
 # Packages from our development environment
-Django==1.4.2 --no-binary django
+Django==1.5.12 --no-binary django
 Fabric==1.5.1
 South==0.7.6
 argparse==1.2.1
@@ -39,7 +39,7 @@ reportlab==2.6
 
 # Packages which have version in both environments
 #   I am choosing to install versions from production environment.
-#   Development: 
+#   Development:
 # unicodecsv==0.14.1
 # html5lib==0.95
 #   Production:
@@ -69,4 +69,3 @@ Pillow==1.1
 
 # On production, but one would need to find suitable version.
 xhtml2pdf==0.0.5
-
