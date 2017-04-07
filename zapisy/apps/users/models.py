@@ -328,21 +328,14 @@ class Student(BaseUser):
         return list(frozenset(records_list))
 
     def get_points(self, semester=None):
-        from apps.enrollment.courses.models import Semester
+        from apps.enrollment.courses.models import Semester, StudentPointsView
         from apps.enrollment.records.models import Record
-        from apps.enrollment.courses.models import Course
+        if not semester:
+            semester = Semester.objects.get_next()
 
-        return (EmptyQuerySet, 0)
-#
-#        if not semester:
-#            semester = Semester.get_current_semester
-#        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course_id', flat=True).distinct()
-#        courses = Course.objects.filter(student=self, semester=semester, course__in=records).order_by('course__entity__name')
-#
-#        points = 0
-#        for c in courses: points += c.value
-#
-#        return courses, points
+        records = Record.objects.filter(student=self, group__course__semester=semester, status=1).values_list('group__course__entity_id', flat=True).distinct()
+
+        return StudentPointsView.get_points_for_entities(self, records)
 
     def get_points_with_course(self, course, semester=None):
         from apps.enrollment.courses.models import Semester, StudentPointsView

@@ -7,15 +7,6 @@
 
 {% block styles %}
     {% compressed_css 'prototype' %}
-    
-    {% if not allow_leave_course%}
-        <style type="text/css">
-            .enrolledSignOutButton
-            {
-                display: none !important;
-            }
-        </style>
-    {% endif %}
 {% endblock %}
 
 {% block js %}
@@ -82,6 +73,7 @@
 		<p>{% trans "Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.</p>
 		<input type="hidden" name="courses" value="{{ courses_json }}" />
 		<input type="hidden" name="groups" value="{{ groups_json }}" />
+		<input type="hidden" name="isLeavingAllowed" value="{{ is_leaving_allowed }}" />
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}" />
 		<input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}" />
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}" />

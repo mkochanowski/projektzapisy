@@ -255,6 +255,14 @@ def course(request, slug):
 
         courseView_details_hidden = request.COOKIES.get('CourseView-details-hidden', False) == 'true'
         
+        ectsLimitExceeded = False
+        maxEcts = default_semester.get_current_limit()
+        currentEcts = 0
+        
+        if student and student.get_points_with_course(course) > maxEcts:
+            currentEcts = student.get_points()
+            ectsLimitExceeded = True
+        
         data.update({
             'details_hidden': courseView_details_hidden,
             'course' : course,
@@ -264,7 +272,10 @@ def course(request, slug):
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
             'requirements' : requirements,
             't0': t0,
-            'can_remove_record': default_semester.can_remove_record()
+            'can_remove_record': default_semester.can_remove_record(),
+            'ects_limit_would_be_exceeded' : ectsLimitExceeded,
+            'max_ects' : maxEcts,
+            'current_ects' : currentEcts
         })
 
         return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )
