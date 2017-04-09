@@ -703,6 +703,11 @@ class Course(models.Model):
 
     def serialize_for_ajax(self, student=None, is_recording_open=None):
         from django.core.urlresolvers import reverse
+        
+        if is_recording_open is None:
+            is_recording_open = False
+        if student is not None:
+            is_recording_open = self.is_recording_open_for_student(student)
 
         data = {
             'id': self.pk,
@@ -710,9 +715,12 @@ class Course(models.Model):
             'short_name': self.entity.get_short_name(),
             'type': self.type.id and self.type.id or 1,
             'url': reverse('course-page', args=[self.slug]),
-            'is_recording_open': is_recording_open is not None and is_recording_open or (False if (student is None) else \
-                                                                                             self.is_recording_open_for_student(
-                                                                                                 student))
+            'is_recording_open': is_recording_open,
+            'english' : self.english,
+            'exam' : self.exam,
+            'suggested_for_first_year' : self.suggested_for_first_year,
+            'was_enrolled' : if course.in_history and course.in_history > 0,
+            
         }
 
         return data
