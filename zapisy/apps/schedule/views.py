@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime, timedelta
-from collections import OrderedDict
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -122,35 +121,10 @@ def reservations(request):
 @permission_required('schedule.manage_events')
 def conflicts(request):
     """
-    Finds conflicts in given daterange.
+    Finds conflicts in given daterange and pass into template.
     Implemented as 3D dictionary (ordered by day,classroom,hour).
     Works better than naive regroup in template (O(nlog(n)) vs O(n^2)).
     """
-    def prepare_conflict_dict(terms_candidates):
-        """
-        Head is top term for which next terms (if conflicted in terms of time) will be considered as conflicts.
-        current_result stores conflicts for given current head
-        @return OrderedDict[day][room][head|conflicted]
-        """
-        conflicts = OrderedDict()
-        current_result = dict()
-        head = None
-        for term in terms_candidates:
-            if (head is not None and (term.day != head.day or term.room != head.room)) or head is None:
-                if current_result and current_result['conflicted']:
-                    if head.day not in conflicts:
-                        conflicts[head.day] = dict()
-                    if head.room not in conflicts[head.day]:
-                        conflicts[head.day][head.room] = dict()
-                        conflicts[head.day][head.room][head.pk] = dict()
-                    conflicts[head.day][head.room][head.pk] = current_result
-                head = term
-                current_result = {}
-                current_result['head'] = head
-                current_result['conflicted'] = list()
-            elif head.end >= term.end and term.start >= head.start: # conflict
-                current_result['conflicted'].append(term)
-        return conflicts
 
     form = ConflictsForm(request.GET)
     if form.is_valid():
@@ -159,9 +133,7 @@ def conflicts(request):
     else:
         beg_date, end_date = get_week_range_by_date(datetime.datetime.today())
 
-    candidates = Term.objects.filter(day__gte=beg_date, day__lte=end_date).order_by('day', 'room', 'start', 'end').select_related('room', 'event')
-
-    terms = prepare_conflict_dict(candidates)
+    terms = Term.prepare_conflict_dict(beg_date, end_date)
     title = u'Konflikty'
     return TemplateResponse(request, 'schedule/conflicts.html', locals())
 
