@@ -10,7 +10,10 @@ SchedulePrototype = new Object();
 SchedulePrototype.init = function()
 {
 	var scheduleContainer = $('#enr-schedulePrototype-scheduleContainer').assertOne();
-
+	
+	var leavingAllowedStr = $(
+		'#enr-schedulePrototype-scheduleContainer input[name=isLeavingAllowed]').val();
+	SchedulePrototype.isLeavingAllowed = (leavingAllowedStr.toLowerCase() === 'true');
 
 	SchedulePrototype.initGroups();
 

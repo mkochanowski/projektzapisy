@@ -29,6 +29,7 @@ class Term(models.Model):
     room = models.ForeignKey(to=Classroom, null=True, blank=True, verbose_name=u'Sala',
                              related_name='event_terms')
     place = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'Miejsce')
+    ignore_conflicts = False
 
     def validate_against_event_terms(self):
         assert(self.room is not None)
@@ -87,11 +88,12 @@ class Term(models.Model):
                     code='invalid'
                 )
 
-            self.validate_against_event_terms()
-
-            self.validate_against_course_terms()
+            if not self.ignore_conflicts:
+                self.validate_against_event_terms()
+                self.validate_against_course_terms()
 
         super(Term, self).clean()
+
 
     class Meta:
         app_label = 'schedule'

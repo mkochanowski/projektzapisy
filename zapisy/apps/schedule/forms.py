@@ -15,6 +15,12 @@ from datetime import timedelta, datetime
 
 
 class TermForm(forms.ModelForm):
+    ignore_conflicts = forms.BooleanField(required=False, label="", widget=forms.HiddenInput())
+    
+    def clean(self):
+        cleaned_data = super(TermForm, self).clean()
+        self.instance.ignore_conflicts = cleaned_data.get('ignore_conflicts')
+        return cleaned_data
 
     class Meta:
         model = Term
@@ -29,7 +35,6 @@ class TermForm(forms.ModelForm):
         }
 
 TermFormSet = inlineformset_factory(Event, Term, extra=0, form=TermForm)
-
 class EventForm(forms.ModelForm):
 
     class Meta:
@@ -45,10 +50,8 @@ class EventForm(forms.ModelForm):
 
 
         super(EventForm, self).__init__(data, **kwargs)
-
         if not self.instance.pk:
             self.instance.author = user
-
         if BaseUser.is_employee(user):
             self.fields['type'].choices = Event.TYPES_FOR_TEACHER
         else:

@@ -258,9 +258,9 @@ def course(request, slug):
 
         ectsLimitExceeded = False
         maxEcts = default_semester.get_current_limit()
-        currentEcts = student.get_points()
-
+        currentEcts = 0
         if student and student.get_points_with_course(course) > maxEcts:
+            currentEcts = student.get_points()
             ectsLimitExceeded = True
 
         data.update({

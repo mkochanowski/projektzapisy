@@ -63,6 +63,7 @@ def reservation(request, event_id=None):
             formset.save()
 
             return redirect(event)
+        errors = True
     else:
         formset = TermFormSet(data=request.POST or None, instance=Event())
 
@@ -80,17 +81,18 @@ def edit_event(request, event_id=None):
     formset = TermFormSet(request.POST or None, instance=event)
     reservation = event.reservation
 
-    if form.is_valid() and formset.is_valid():
+    if form.is_valid():
         event = form.save(commit=False)
         if not event.id:
             event.author = request.user
         event.reservation = reservation
-        event.save()
-        formset.save()
+        if formset.is_valid():
+            event.save()
+            formset.save()
 
-        messages.success(request, u'Zmieniono zdarzenie')
+            messages.success(request, u'Zmieniono zdarzenie')
 
-        return redirect(event)
+            return redirect(event)
 
     return TemplateResponse(request, 'schedule/reservation.html', locals())
 

@@ -5,8 +5,11 @@
 """
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.db.models   import Q
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 
 from apps.news.models import News
@@ -18,9 +21,8 @@ import datetime
 
 def all_news(request):
     """
-        Latest news
+        Latest news, result of query search or given page with focused news
     """
-
     if BaseUser.is_student(request.user):
         student = request.user.student
         student.last_news_view = datetime.datetime.now()
@@ -31,17 +33,30 @@ def all_news(request):
         employee.last_news_view = datetime.datetime.now()
         employee.save()
 
-    items = News.objects.exclude(category='-')
-    paginator = Paginator(items, 15)
+    query = request.GET.get('q')
+    if query:
+        query = query.strip()
+        items = News.objects.get_published().filter(Q(title__icontains=query) | Q(body__icontains=query))
+    else:
+        items = News.objects.exclude(category='-')
+
+    paginator = Paginator(items, settings.NEWS_PER_PAGE)
     page = request.GET.get('page')
     try:
         news = paginator.page(page)
     except (PageNotAnInteger, EmptyPage):
         news = paginator.page(1)
 
-    data  = {'items': news, 'page_range': paginator.page_range}
+    data  = {'items': news, 'page_range': paginator.page_range, 'query': query}
 
     return render_to_response('news/list_all.html', data, context_instance = RequestContext(request))
+
+def all_news_focus_one(request, news_id):
+    """
+      Return page with focus on element with news_id (default: all_news)
+    """
+    page = News.objects.get_page_number_by_news_id(int(news_id))
+    return redirect('{0}?page={1}#od-news-{2}'.format(reverse('news-all'), page, news_id))
 
 def main_page( request ):
     """
