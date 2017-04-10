@@ -17,8 +17,7 @@ from apps.users.models import UserProfile
 from ..models import SpecialReservation, EventModerationMessage, EventMessage, Event,\
     Term as EventTerm
 from django.utils.crypto import get_random_string
-from apps.enrollment.courses.tests.factories import WinterSemesterFactory, ClassroomFactory,\
-    GroupFactory, ChangedDayForFridayFactory
+import apps.enrollment.courses.tests.factories as enrollment_factories
 from apps.enrollment.records.tests.factories import RecordFactory
 from apps.enrollment.records.models import Record
 import factories
@@ -79,7 +78,7 @@ class SpecialReservationTestCase(TestCase):
             time(15),
             time(16)
         )
-        
+
         '''
         Powinno przechodzić, bo SpecialReservation tworzy Term dla każdego dnia w semestrze,
         w którym dana rezerwacja występuje po wykonaniu metody save. To jednak nie
@@ -88,9 +87,9 @@ class SpecialReservationTestCase(TestCase):
         Rozwiązanie zagadki: My tutaj operujemy na przeszłych semestrach, a podczas tworzenia
         SpecialReservation, gdy tworzone są eventy i termsy robione są rezerwacje od teraz,
         czyli datetime.now().date(). Zatem nic nie zostanie zarezerwowane, jeśli operujemy na
-        przeszłych datach. 
+        przeszłych datach.
 
-        Należy tworzyć testy operujące na datach w teraźniejszości, lub przyszłości. 
+        Należy tworzyć testy operujące na datach w teraźniejszości, lub przyszłości.
         Trzeba to wszystko zrefactorować na fabryki.
         '''
 
@@ -182,7 +181,7 @@ class MessageTestCase(TestCase):
             event = event,
             message = message
         )
-        em.save()        
+        em.save()
 
         messages = EventModerationMessage.get_event_messages(event)
         self.assertEqual(len(messages), 2) #the results should be 2 because em is not event moderation message
@@ -201,9 +200,9 @@ class MessageTestCase(TestCase):
             event = event,
             message = message
         )
-        em2.save()        
+        em2.save()
         messages = EventMessage.get_event_messages(event)
-        self.assertEqual(len(messages), 2) 
+        self.assertEqual(len(messages), 2)
 
 
 class TermTestCase(TestCase):
@@ -228,11 +227,14 @@ class TermTestCase(TestCase):
         self.assertRaises(ValidationError, term3.full_clean)
 
     def test_different_semester_reservation(self):
-        semester = WinterSemesterFactory()
+        semester = enrollment_factories.WinterSemesterFactory()
         semester.save()
         semester.full_clean()
+        other_semester = enrollment_factories.SummerSemesterFactory()
+        other_semester.save()
+        other_semester.full_clean()
 
-        room25 = ClassroomFactory()
+        room25 = enrollment_factories.ClassroomFactory()
         room25.save()
         room25.full_clean()
         today = date.today().strftime("%A")
@@ -292,10 +294,14 @@ class TermTestCase(TestCase):
                                          end_time=time(16))
         reservation7.full_clean()
         reservation7.save()
-        term = factories.TermFactory(room = room25, day = semester.lectures_beginning, start = 8, end=16) #musza do walidacji zaczynac sie o tej samej porze?
+
+        # It would fail, was this term in the same semester as the reservations.
+        term = factories.TermFactory(room=room25,
+                                     day=other_semester.lectures_beginning,
+                                     start=time(9), end=time(17))
         term.full_clean()
         term.save()
-        self.assertEquals(semester.semester_beginning,term.day)
+        self.assertEquals(other_semester.semester_beginning,term.day)
         self.assertEquals(reservation.classroom,term.room)
 
 
@@ -329,7 +335,7 @@ class EventTestCase(TestCase):
         self.event = factories.EventFactory(author=teacher)
         self.event.full_clean()
 
-        room110 = factories.ClassroomFactory(number='110')
+        room110 = enrollment_factories.ClassroomFactory(number='110')
         room110.full_clean()
 
         term_1 = factories.TermFixedDayFactory(event=self.event, room=room110)
@@ -564,7 +570,7 @@ class EventTestCase(TestCase):
 
     def test_get_followers_when_type_exam_or_test(self):
         students = StudentFactory.create_batch(random.randint(10, 20))
-        group = GroupFactory()
+        group = enrollment_factories.GroupFactory()
         for student in students:
             RecordFactory(student=student, group=group, status=Record.STATUS_ENROLLED)
         users = [student.user for student in students]
@@ -607,12 +613,12 @@ class EventsOnChangedDayTestCase(TestCase):
         summer_semester.full_clean()
 
         self.thursday = self.find_closest_day_of_week_to_date(semester_beginning, 3)
-        changed_day = ChangedDayForFridayFactory(
+        changed_day = enrollment_factories.ChangedDayForFridayFactory(
             day=self.thursday
         )
         changed_day.full_clean()
 
-        classroom = factories.ClassroomFactory()
+        classroom = enrollment_factories.ClassroomFactory()
 
         reservation = factories.SepcialReservationFactory.build(
             semester=summer_semester,

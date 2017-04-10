@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
+import datetime
+
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.db import models
 from django.db.models.query import EmptyQuerySet
-from django.core.exceptions import ValidationError
-from timedelta import TimedeltaField
-from datetime import time
-from .event import Event
-from .specialreservation import SpecialReservation
-
 from django.utils.encoding import smart_unicode
 
+from .event import Event
+from .specialreservation import SpecialReservation
 from apps.enrollment.courses.models import Classroom, Term as CourseTerm, Semester
+
+
 
 
 class Term(models.Model):
@@ -22,8 +23,8 @@ class Term(models.Model):
 
     day = models.DateField(verbose_name=u'Dzień')
 
-    start = TimedeltaField(verbose_name=u'Początek')
-    end = TimedeltaField(verbose_name=u'Koniec')
+    start = models.TimeField(verbose_name=u'Początek')
+    end = models.TimeField(verbose_name=u'Koniec')
 
     room = models.ForeignKey(to=Classroom, null=True, blank=True, verbose_name=u'Sala',
                              related_name='event_terms')
@@ -163,9 +164,9 @@ class Term(models.Model):
         :param dates: datetime.date list
         """
         if start_time is None:
-            start_time = time(8)
+            start_time = datetime.time(8)
         if end_time is None:
-            end_time = time(21)
+            end_time = datetime.time(21)
 
         terms = cls.objects.filter(day__in=dates,
                                    start__lt=end_time,

@@ -10,7 +10,7 @@ django-filter==0.5.4
 django-mailer==0.1.0
 django-modeltranslation==0.6.1
 django-pipeline==1.2.21
-django-timedeltafield==0.6.7
+django-timedeltafield==0.6.7  # Can be removed
 docutils==0.9.1
 ipdb==0.7
 ipython==0.13.1
