@@ -11,9 +11,38 @@ CoursesList.init = function()
 {
 	CoursesList.initCourseLists();
 	CoursesList.initFilter();
+    
+    $("#enr-courseFilter-semester").change(CoursesList.onNewSemesterChosen);
 };
 
 $(CoursesList.init);
+
+CoursesList.onNewSemesterChosen = function()
+{
+    var newId = parseInt($("#enr-courseFilter-semester").find(":selected").val());
+    CoursesList.userChosenSemester = newId;
+    
+    $.get(
+        "/courses/get_semester_info/" + newId,
+        CoursesList.onSemesterInfoReceived)
+        .fail(CoursesList.onSemesterInfoReceiveFailed);
+}
+
+CoursesList.onSemesterInfoReceiveFailed = function()
+{
+    alert("oops");
+}
+
+CoursesList.onSemesterInfoReceived = function(data, status)
+{
+//   alert("Status is " + status);
+//    alert("Data is " + data);
+    
+    CoursesList.courses = data.courseList;
+    CoursesList.currentSemester = data.semesterInfo;
+    
+    CoursesList.updateUiFromData();
+}
 
 /**
  * Inicjuje listy przedmiotów i semestrów (model).
@@ -28,6 +57,7 @@ CoursesList.initCourseLists = function()
     
     CoursesList.courses = coursesListObject.courseList;
     CoursesList.currentSemester = coursesListObject.semesterInfo;
+    CoursesList.userChosenSemester = coursesListObject.semesterInfo.id;
     
     CoursesList.updateUiFromData();
 };
@@ -96,15 +126,6 @@ CoursesList.initFilter = function()
 	{
 		var course = element.data;
 		return (course.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-	}));
-
-	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
-		'semester', '#enr-courseFilter-semester', function(element, option)
-	{        
-		if (!option || option == 0)
-			return true;
-		var course = element.data;
-		return (course.semester.id == option);
 	}));
 
 	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(

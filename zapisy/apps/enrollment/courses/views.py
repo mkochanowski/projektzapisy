@@ -2,7 +2,7 @@
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.response import TemplateResponse
@@ -22,23 +22,17 @@ logger = logging.getLogger()
 def main(request):
     return render_to_response( 'enrollment/main.html', {}, context_instance = RequestContext( request ))
 
-def prepare_courses_list_to_render(request, default_semester=None, user=None, student=None):
-    ''' generates template data for filtering and list of courses '''
-    if not default_semester:
-        default_semester = Semester.get_default_semester()
-    if not user:
-        user = request.user
-    
-    courses = Course.visible.filter(semester = default_semester).order_by('entity__name')
-    semesters = Semester.objects.filter(visible=True)
 
-    print("We have " + str(len(courses)) + " courses")
-    print("JSON len is " + str(len(simplejson.dumps([c.serialize_for_json() for c in courses]))))
+def get_course_list_info_json_for_semester(semester):
+    courses = Course.visible.filter(semester = semester).order_by('entity__name')
+    
+    print("We have %d courses" % len(courses))
     
     courses_list_for_json = [c.serialize_for_json() for c in courses]
     semester_for_json = {
-        "year" : default_semester.year,
-        "type" : default_semester.get_type_display()
+        "id" : semester.pk,
+        "year" : semester.year,
+        "type" : semester.get_type_display()
     }
     
     courses_list_info = {
@@ -46,8 +40,20 @@ def prepare_courses_list_to_render(request, default_semester=None, user=None, st
         "semesterInfo" : semester_for_json
     }
 
+    return simplejson.dumps(courses_list_info)
+
+def prepare_courses_list_to_render(request, default_semester=None, user=None, student=None):
+    ''' generates template data for filtering and list of courses '''
+    if not default_semester:
+        default_semester = Semester.get_default_semester()
+    if not user:
+        user = request.user
+    
+    semesters = Semester.objects.filter(visible=True)
+    courses_list_json = get_course_list_info_json_for_semester(default_semester)
+
     return {
-        'courses_list_json': simplejson.dumps(courses_list_info),
+        'courses_list_json': courses_list_json,
         'semester_courses': semesters,
         'types_list' : Type.get_all_for_jsfilter(),
         'default_semester': default_semester,
@@ -80,6 +86,16 @@ def votes(request, slug):
     data['voters_count'] = len(data['voters'])
 
     return render_to_response('enrollment/courses/voters.html', data, context_instance=RequestContext(request))
+
+def get_semester_info(request, semester_id):
+    try:
+        semesterObj = Semester.objects.get(Q(pk = semester_id) & Q(visible = True))
+        jsonString = get_course_list_info_json_for_semester(semesterObj)
+        
+        return HttpResponse(jsonString, content_type = 'application/json')
+    except Semester.DoesNotExist:
+        raise Http404
+                        
 
 def course(request, slug):
     try:
