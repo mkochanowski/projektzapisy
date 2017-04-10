@@ -9,8 +9,10 @@ function recompute() {
 	});
 	shouldbe = parseInt($('#hours_should_be').html(),10);
 	color = '#00FF00';
+	$(':button[type="submit"]').removeAttr("disabled");
 	if (Math.abs(shouldbe-sum)>20) {
 		color = '#FF0000';
+ 		$(':button[type="submit"]').attr("disabled", true);
 	}
 	$('#target_sum').html('<span style="color:'+color+'">'+sum+'</span>');
 }
