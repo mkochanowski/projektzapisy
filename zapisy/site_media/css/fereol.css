@@ -53,7 +53,7 @@ div.space2 { margin-top: 50px; }
 #enr-StudentsList-top-bar label,
 #enr-coursesList-top-bar label { float:none; }
 
-.courses-list li { margin-bottom:5px; }
+#courses-list li { margin-bottom:5px; }
 .employees li { margin-bottom:5px; }
 .students li { margin-bottom:5px; }
 

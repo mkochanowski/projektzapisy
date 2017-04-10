@@ -470,7 +470,7 @@ class Group(models.Model):
         from apps.enrollment.records.models import Queue
         return Queue.objects.filter(student=student, group=self).count() != 0
 
-    def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
+    def serialize_for_json(self, enrolled, queued, pinned, queue_priorities,
         student=None, employee=None, user=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.core.urlresolvers import reverse

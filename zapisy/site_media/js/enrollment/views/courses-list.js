@@ -21,69 +21,40 @@ $(CoursesList.init);
 CoursesList.initCourseLists = function()
 {
 	CoursesList.courses = new Object();
-	CoursesList.semesters = new Object();
-
-	$('#course-list').assertOne().children('div.semester').
-		each(function(i, semesterContainer)
-	{
-		semesterContainer = $(semesterContainer);
-
-		var semester = new CoursesList.Semester();
-		semester.id = semesterContainer.children('input[name=semester-id]').
-			assertOne().attr('value').castToInt();
-		semester.name = semesterContainer.children('h3').assertOne().
-			children('span').assertOne().text();
-		semester.container = semesterContainer;
-		CoursesList.semesters[semester.id] = semester;
-
-		semesterContainer.children('ul').assertOne().children('li').
-			each(function(i, courseContainer)
-		{
-			courseContainer = $(courseContainer);
-			var link = courseContainer.children('a').assertOne();
-
-			var course = new CoursesList.Course();
-			course.id = link.attr('id').removePrefix('course-').castToInt();
-			course.name = link.text().trim();
-			course.type = courseContainer.children('input[name=type]').
-				assertOne().attr('value').castToInt();
-			course.container = courseContainer;
-			course.wasEnrolled = courseContainer.children('input[name=wasEnrolled]').
-				assertOne().attr('value').castToBool();
-			course.english = courseContainer.children('input[name=english]').
-				assertOne().attr('value').castToBool();
-			course.exam = courseContainer.children('input[name=exam]').
-				assertOne().attr('value').castToBool();
-			course.suggested_for_first_year = courseContainer.children('input[name=suggested_for_first_year]').
-				assertOne().attr('value').castToBool();
-            
-            var courseEffectsStr = courseContainer.children('input[name=effects]').
-                assertOne().attr('value').trim();
-            if (courseEffectsStr.length > 0)
-            {
-                course.effects = courseEffectsStr.split(',').map(function(num) { return parseInt(num); });
-            }
-            else
-            {
-                course.effects = [];
-            }
-            
-            var courseTagsStr = courseContainer.children('input[name=tags]').
-                assertOne().attr('value').trim();
-            if (courseTagsStr.length > 0)
-            {
-                course.tags = courseTagsStr.split(',').map(function(num) { return parseInt(num); });
-            }
-            else
-            {
-                course.tags = [];
-            }
-            
-			semester.addCourse(course);
-			CoursesList.courses[course.id] = course;
-		});
-	});
+    CoursesList.currentSemester = new Object();
+    
+    var jsonString = $("#courses_list_json").assertOne().val();
+    var coursesListObject = JSON.parse(jsonString);
+    
+    CoursesList.courses = coursesListObject.courseList;
+    CoursesList.currentSemester = coursesListObject.semesterInfo;
+    
+    CoursesList.updateUiFromData();
 };
+
+CoursesList.updateUiFromData = function()
+{
+    $("#current_semester_year").text(CoursesList.currentSemester.year);
+    $("#current_semester_type").text(CoursesList.currentSemester.type);
+    
+    $("#courses-list").empty();
+    CoursesList.courses.forEach(function(course)
+    {
+        var courseLink = $("<a/>", {
+                "href" : course.url,
+                "text" : course.name
+            });
+        course["htmlNode"] = $("<li/>");
+        courseLink.appendTo(course["htmlNode"]);
+        course["htmlNode"].appendTo($("#courses-list"));
+    });
+};
+
+CoursesList.setCourseVisible = function(course, visible)
+{
+    course.visible = visible;
+    course.htmlNode.css("display", visible ? "" : "none");
+}
 
 /**
  * Inicjuje filtrowanie.
@@ -233,107 +204,15 @@ CoursesList.initFilter = function()
         return findOne(courseTagsArray, selectedTagsArray);
 	}));
 
-	for (var course in CoursesList.courses)
+	CoursesList.courses.forEach(function(course)
 	{
-		course = CoursesList.courses[course];
 		CoursesList.courseFilter.addElement(new ListFilter.Element(course, function(visible)
 		{
-			var course = this.data;
-			course.setVisible(visible);
+			var courseToSet = this.data;
+			CoursesList.setCourseVisible(courseToSet, visible);
 		}));
-	};
+	});
 
 	CoursesList.courseFilter.runThread();
 	$('#enr-coursesList-top-bar').find('label').disableDragging();
-};
-
-
-/*******************************************************************************
- * Klasa semestru.
- ******************************************************************************/
-
-/**
- * Konstruktor modelu semestru.
- */
-CoursesList.Semester = function()
-{
-	this.id = null;
-	this.name = null;
-	this.type = null;
-	this.courses = new Object();
-	this.container = null;
-	this.visibleCourses = 0;
-	this.visible = true;
-};
-
-/**
- * Dodaje przedmiot do listy przedmiotów w danym semestrze.
- */
-CoursesList.Semester.prototype.addCourse = function(course)
-{
-	if (!course.id)
-		throw new Error('Nie ustawiono ID przedmiotu');
-
-	course.semester = this;
-	this.courses[course.id] = course;
-	this.visibleCourses++;
-};
-
-/**
- * Odświeża widoczność semestru na podstawie widoczności jego przedmiotów.
- * Semestr jest wyświetlany wtedy i tylko wtedy, gdy zawiera przynajmniej jeden
- * wyświetlany przedmiot.
- */
-CoursesList.Semester.prototype.updateVisibility = function()
-{
-	if (this.visibleCourses < 0)
-		throw new Error('Nieprawidłowy stan licznika widocznych przedmiotów');
-	var visible = (this.visibleCourses > 0);
-
-	if (visible == this.visible)
-		return;
-	this.visible = visible;
-
-	this.container.css('display', visible?'':'none');
-};
-
-/*******************************************************************************
- * Klasa przedmiotu.
- ******************************************************************************/
-
-/**
- * Konstruktor modelu przedmiotu.
- */
-CoursesList.Course = function()
-{
-	this.id = null;
-	this.name = null;
-	this.semester = null;
-	this.container = null;
-	this.visible = true;
-	this.type = null;
-	this.wasEnrolled = null; // czy aktualny student był zapisany
-	this.english = null;
-	this.exam = null;
-	this.suggested_for_first_year = null;
-};
-
-/**
- * Ustawia widoczność przedmiotu na liście.
- *
- * @param visible true, jeżeli przedmiot ma być widoczny
- */
-CoursesList.Course.prototype.setVisible = function(visible)
-{
-	if (visible == this.visible)
-		return;
-	this.visible = visible;
-
-	if (visible)
-		this.semester.visibleCourses++;
-	else
-		this.semester.visibleCourses--;
-	this.semester.updateVisibility();
-
-	this.container.css('display', visible?'':'none');
 };

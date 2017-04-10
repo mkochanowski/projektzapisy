@@ -15,7 +15,7 @@ def prepare_group_data(course, student):
 
     data = {}
     for group in groups:
-        data[group.id] = simplejson.dumps(group.serialize_for_ajax(
+        data[group.id] = simplejson.dumps(group.serialize_for_json(
             enrolled_ids, queued_ids, pinned_ids,
             queue_priorities, student))
     return data

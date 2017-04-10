@@ -97,7 +97,7 @@ def prepare_groups_json(semester, groups, student=None, employee=None):
         queue_priorities = {}
     groups_json = []
     for group in groups:
-        groups_json.append(group.serialize_for_ajax(
+        groups_json.append(group.serialize_for_json(
             record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
             queue_priorities, student=student, employee=employee
         ))
@@ -106,7 +106,7 @@ def prepare_groups_json(semester, groups, student=None, employee=None):
 def prepare_courses_json(groups, student):
     courses_json = []
     for group in groups:
-        courses_json.append(group.course.serialize_for_ajax(student))
+        courses_json.append(group.course.serialize_for_json(student))
     return simplejson.dumps(courses_json)
 
 def prepare_schedule_courses(request, for_student = None, for_employee = None, semester=None):

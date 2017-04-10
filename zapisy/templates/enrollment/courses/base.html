@@ -119,29 +119,15 @@
     {% cache 3600 courses_list request.user %}
 	<div id="main-sidebar">
 		<div id="course-list">
-			{% for semester in semester_courses %}
-				<div class="semester">
-					{# Translators: Tytuł nad sidebarem  #}
-					<h3>{% trans "Semestr" %} <span>{{ semester.year }} {{ semester.get_type_display }}</span></h3>
-					<input type="hidden" name="semester-id" value="{{ semester.id }}" />
-					<ul class="courses-list">
-						{% for course in courses %}
-                            {% if course.semester_id == semester.id %}
-							<li>
-								<a href="{% url 'course-page' course.slug %}" id="course-{{ course.id }}">{{ course.name }}</a>
-								<input type="hidden" name="type" value="{{ course.type.id }}" />
-								<input type="hidden" name="wasEnrolled" value="{% if course.in_history and course.in_history > 0 %}True{% else %}False{% endif %}" />
-								<input type="hidden" name="english" value="{{ course.english }}" />
-								<input type="hidden" name="exam" value="{{ course.exam }}" />
-								<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />
-								<input type="hidden" name="effects" value="{% for effect in course.effects2 %}{{ effect }}{% if not forloop.last %},{% endif %}{% endfor %}" />
-								<input type="hidden" name="tags" value="{% for tag in course.tags2 %}{{ tag }}{% if not forloop.last %},{% endif %}{% endfor %}" />
-							</li>
-                            {% endif %}
-						{% endfor %}
-					</ul>
-				</div>
-			{% endfor %}
+			<div class="semester">
+				{# Translators: Tytuł nad sidebarem  #}
+				<h3>{% trans "Semestr" %} <span id="current_semester_year">{{ default_semester.year }}</span>&nbsp;<span id="current_semester_type">{{ default_semester.get_type_display }}</span></h3>
+				<input type="hidden" id="semester_id" value="{{ default_semester.id }}" />
+				<input type="hidden" id="courses_list_json" value='{{ courses_list_json|safe }}'>
+				
+				<ul id="courses-list">
+				</ul>
+            </div>
 		</div>
 	</div>
     {% endcache %}

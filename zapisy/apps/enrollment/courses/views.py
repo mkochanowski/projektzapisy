@@ -3,13 +3,13 @@ from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts               import render_to_response
-from django.template                import RequestContext
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.utils import simplejson
 
-from apps.enrollment.courses.models         import *
-from apps.enrollment.records.models          import *
+from apps.enrollment.courses.models import *
+from apps.enrollment.records.models import *
 
 from apps.enrollment.courses.exceptions import NonCourseException
 from apps.users.models import BaseUser, OpeningTimesView
@@ -22,44 +22,32 @@ logger = logging.getLogger()
 def main(request):
     return render_to_response( 'enrollment/main.html', {}, context_instance = RequestContext( request ))
 
-def prepare_courses_list_to_render(request,default_semester=None,user=None, student=None):
+def prepare_courses_list_to_render(request, default_semester=None, user=None, student=None):
     ''' generates template data for filtering and list of courses '''
     if not default_semester:
         default_semester = Semester.get_default_semester()
     if not user:
         user = request.user
     
-    print(default_semester)
-   
+    courses = Course.visible.filter(semester = default_semester).order_by('entity__name')
     semesters = Semester.objects.filter(visible=True)
-    if False: #hasattr(user, "student") and user.student:
-        courses = Course.visible.all().order_by('entity__name')\
-            .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
-                                         ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
-                                         ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
-                                         ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
-                                                 ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
-    else:
-        courses = Course.visible.filter(semester = default_semester).order_by('entity__name')
-        
-        
-    print(len(courses))
+
+    print("We have " + str(len(courses)) + " courses")
+    print("JSON len is " + str(len(simplejson.dumps([c.serialize_for_json() for c in courses]))))
     
-    import datetime
-    start = datetime.datetime.now()
+    courses_list_for_json = [c.serialize_for_json() for c in courses]
+    semester_for_json = {
+        "year" : default_semester.year,
+        "type" : default_semester.get_type_display()
+    }
     
-    for course in courses:
-        course.effects2 = []
-        course.tags2 = []
-        #course.effects2 = [effect.id for effect in course.entity.effects.all()]
-        #course.tags2 = [tag.tag.id for tag in course.tags]
-        
-        
-    delta = datetime.datetime.now() - start
-    print(delta)
+    courses_list_info = {
+        "courseList" : courses_list_for_json,
+        "semesterInfo" : semester_for_json
+    }
 
     return {
-        'courses': courses,
+        'courses_list_json': simplejson.dumps(courses_list_info),
         'semester_courses': semesters,
         'types_list' : Type.get_all_for_jsfilter(),
         'default_semester': default_semester,
@@ -167,7 +155,7 @@ def course(request, slug):
             for g in groups:
                 # TODO to poniżej
                 #g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
-                g.serialized = simplejson.dumps(g.serialize_for_ajax(
+                g.serialized = simplejson.dumps(g.serialize_for_json(
                     enrolled_ids, queued_ids, pinned_ids,
                     queue_priorities, student, user=user
                 ))
@@ -279,11 +267,13 @@ def course(request, slug):
         if student and student.get_points_with_course(course) > maxEcts:
             currentEcts = student.get_points()
             ectsLimitExceeded = True
+            
+        print("course json: " + simplejson.dumps(course.serialize_for_json(student, is_recording_open=course.is_recording_open)));
         
         data.update({
             'details_hidden': courseView_details_hidden,
             'course' : course,
-            'course_json': simplejson.dumps(course.serialize_for_ajax(student, is_recording_open=course.is_recording_open)),
+            'course_json': simplejson.dumps(course.serialize_for_json(student, is_recording_open=course.is_recording_open)),
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,

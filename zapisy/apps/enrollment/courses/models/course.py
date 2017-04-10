@@ -699,9 +699,15 @@ class Course(models.Model):
         """
 
         return self.entity.get_points(student)
+    
+    def get_effects_list(self):
+        return [effect for effect in self.entity.effects.all()]
+    
+    def get_tags_list(self):
+        return self.tags
 
 
-    def serialize_for_ajax(self, student=None, is_recording_open=None):
+    def serialize_for_json(self, student=None, is_recording_open=None):
         from django.core.urlresolvers import reverse
         
         if is_recording_open is None:
@@ -716,11 +722,12 @@ class Course(models.Model):
             'type': self.type.id and self.type.id or 1,
             'url': reverse('course-page', args=[self.slug]),
             'is_recording_open': is_recording_open,
-            'english' : self.english,
-            'exam' : self.exam,
-            'suggested_for_first_year' : self.suggested_for_first_year,
-            'was_enrolled' : if course.in_history and course.in_history > 0,
-            
+            'english': self.english,
+            'exam': self.exam,
+            'suggested_for_first_year': self.suggested_for_first_year,
+            'was_enrolled': False,
+            'effects': [effect.pk for effect in self.get_effects_list()],
+            'tags': [tag.tag.pk for tag in self.get_tags_list()],
         }
 
         return data
