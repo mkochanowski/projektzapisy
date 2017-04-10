@@ -703,7 +703,7 @@ class Course(models.Model):
 
     def serialize_for_ajax(self, student=None, is_recording_open=None):
         from django.core.urlresolvers import reverse
-
+        
         data = {
             'id': self.pk,
             'name': self.name,
