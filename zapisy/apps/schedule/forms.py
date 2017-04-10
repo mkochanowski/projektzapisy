@@ -100,3 +100,8 @@ class ReportForm(forms.Form):
     beg_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
     end_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
     rooms = forms.MultipleChoiceField(widget=FilteredSelectMultiple("sale", is_stacked=False))
+
+class ConflictsForm(forms.Form):
+    beg_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
+    end_date = forms.DateField(widget=forms.TextInput(attrs={'placeholder': 'yyyy-mm-dd', 'class':'datepicker'}))
+

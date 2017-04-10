@@ -18,7 +18,7 @@ from apps.enrollment.courses.models import Classroom
 from apps.schedule.models import Event, Term
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, \
-    EventModerationMessageForm, EventMessageForm
+    EventModerationMessageForm, EventMessageForm, ConflictsForm
 from apps.schedule.utils import EventAdapter, get_week_range_by_date
 from apps.utils.fullcalendar import FullCalendarView
 
@@ -119,36 +119,49 @@ def reservations(request):
     return TemplateResponse(request, 'schedule/reservations.html', locals())
 
 @login_required
+@permission_required('schedule.manage_events')
 def conflicts(request):
-    from apps.schedule.models import Term
-    from_date = request.GET.get('from_date')
-    to_date = request.GET.get('to_date')
-    if from_date is not None and to_date is not None:
-        from_date = datetime.datetime.strptime(from_date, '%m-%d-%Y')
-        to_date = datetime.datetime.strptime(to_date, '%m-%d-%Y')
+    """
+    Finds conflicts in given daterange.
+    Implemented as 3D dictionary (ordered by day,classroom,hour).
+    Works better than naive regroup in template (O(nlog(n)) vs O(n^2)).
+    """
+    def prepare_conflict_dict(terms_candidates):
+        """
+        Head is top term for which next terms (if conflicted in terms of time) will be considered as conflicts.
+        current_result stores conflicts for given current head
+        @return OrderedDict[day][room][head|conflicted]
+        """
+        conflicts = OrderedDict()
+        current_result = dict()
+        head = None
+        for term in terms_candidates:
+            if (head is not None and (term.day != head.day or term.room != head.room)) or head is None:
+                if current_result and current_result['conflicted']:
+                    if head.day not in conflicts:
+                        conflicts[head.day] = dict()
+                    if head.room not in conflicts[head.day]:
+                        conflicts[head.day][head.room] = dict()
+                        conflicts[head.day][head.room][head.pk] = dict()
+                    conflicts[head.day][head.room][head.pk] = current_result
+                head = term
+                current_result = {}
+                current_result['head'] = head
+                current_result['conflicted'] = list()
+            elif head.end >= term.end and term.start >= head.start: # conflict
+                current_result['conflicted'].append(term)
+        return conflicts
+
+    form = ConflictsForm(request.GET)
+    if form.is_valid():
+        beg_date = form.cleaned_data['beg_date']
+        end_date = form.cleaned_data['end_date']
     else:
-        from_date, to_date = get_week_range_by_date(datetime.datetime.today())
+        beg_date, end_date = get_week_range_by_date(datetime.datetime.today())
 
-    terms_candidates = Term.objects.filter(day__gte=from_date, day__lte=to_date).order_by('day', 'room', 'start', 'end').select_related('room', 'event')
-    it = None
-    terms = OrderedDict()
-    temp = dict()
-    for t in terms_candidates:
-        if (it is not None and (t.day != it.day or t.room != it.room)) or it is None:
-            if temp and temp['conflicted']:
-                if it.day not in terms:
-                    terms[it.day] = dict()
-                if it.room not in terms[it.day]:
-                    terms[it.day][it.room] = dict()
-                    terms[it.day][it.room][it.pk] = dict()
-                terms[it.day][it.room][it.pk] = temp
-            it = t
-            temp = {}
-            temp['base'] = it
-            temp['conflicted'] = list()
-        elif it.end >= t.end and t.start >= it.start:
-            temp['conflicted'].append(t)
+    candidates = Term.objects.filter(day__gte=beg_date, day__lte=end_date).order_by('day', 'room', 'start', 'end').select_related('room', 'event')
 
+    terms = prepare_conflict_dict(candidates)
     title = u'Konflikty'
     return TemplateResponse(request, 'schedule/conflicts.html', locals())
 

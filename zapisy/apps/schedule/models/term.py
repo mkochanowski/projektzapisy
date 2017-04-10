@@ -144,7 +144,6 @@ class Term(models.Model):
         @return: string
         """
         return '%s - %s <a href="%s">%s</a> (%s)' % (self.print_start(), self.print_end(), self.event.get_absolute_url(), self.event.title, self.event.author)
-        return '%s - %s <a href=%s></a>' % (self.print_start(), self.print_end(), self.event.get_absolute_url(), self.event.title())
 
     def get_room(self):
         return self.room

@@ -12,7 +12,7 @@
 <style>
   #days-list { list-style: none; }
   .rooms-list { list-style: disc; }
-  .base-list { list-style: circle; }
+  .head-list { list-style: circle; }
   .conflicts-list { list-style: none !important; margin-left:0; }
 
 </style>
@@ -21,16 +21,17 @@
 
 {% block js %}
   {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
+  <script type="text/javascript">window.__admin_media_prefix__ = "/static/admin/";</script>
+  <script type="text/javascript" src="/fereol_admin/jsi18n/"></script>
+  <script type="text/javascript" src="/site_media/js/timepicker/jquery.ui.timepicker.js"></script>
+  <script type="text/javascript" src="/site_media/js/timepicker/i18n/jquery.ui.timepicker-pl.js"></script>
+  <script type="text/javascript" src="/site_media/js/jquery/jquery.smooth-scroll.js"></script>
   <script>
-  $(document).ready(function() {
-    $('input[name="from_date"]').datepicker()
-    $('input[name="to_date"]').datepicker()
-    $('#time-range-form').submit(function(e) {
-      e.preventDefault()
-      location = location.origin+location.pathname+'?'+$(this).serialize().replace(/%2F/g, '-') 
-      return false
-    })
-  })
+  var LoadPickers = function () {
+      $(".datepicker").datepicker({dateFormat: 'yy-mm-dd'});
+    }
+  window.onload = LoadPickers;
 
   </script>
 {% endblock %}
@@ -45,11 +46,14 @@
   <div class="span16">
     <h2>{{ title }}</h2>
   </div>
-  <form id="time-range-form" method="GET" class="form-stacked">
-    <fieldset>
-      Od: <input name="from_date" type="date" value={% if from_date %} {{ from_date|date:"m/d/Y" }} {% endif %}/>
-      Do: <input name="to_date" type="date" value={% if to_date %} {{ to_date|date:"m/d/Y" }} {% endif %}/>
-    </fieldset>
+  <form action="{% url 'events:conflicts' %}" method="GET" class="form-stacked">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+    {% endfor %}
+    Od: {{ form.beg_date }}
+    Do: {{ form.end_date }}
     <input type="submit" value="Szukaj" class="btn success">
   </form>
   <ul id="days-list">
@@ -59,9 +63,9 @@
         {% for room, data in rooms_data.items %}
         <li>
           <a href={{ room.get_absolute_url }}>Sala {{ room.number }}</a>
-          <ul class="base-list">    
+          <ul class="head-list">
           {% for _, conflict_data in data.items %}
-            <li>{{ conflict_data.base.pretty_print|safe }}</br>
+            <li>{{ conflict_data.head.pretty_print|safe }}</br>
             <span><i>konflikt z:</i></span>
             <ul class="conflicts-list">
               {% for conflict in conflict_data.conflicted %}
