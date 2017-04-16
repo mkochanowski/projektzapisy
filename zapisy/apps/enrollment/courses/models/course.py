@@ -228,18 +228,6 @@ class CourseEntity(models.Model):
         ordering = ['name']
 
 
-    def get_opening_time(self, student):
-        """
-
-        @param student:
-        @return:
-        """
-
-        from apps.users.models import OpeningTimesView
-
-        return OpeningTimesView.objects.get(student=student, course=self)
-
-
     def get_points(self, student=None):
         from apps.enrollment.courses.models import StudentPointsView, PointsOfCourseEntities
 
@@ -485,7 +473,10 @@ class Course(models.Model):
 
         from apps.users.models import OpeningTimesView
 
-        return OpeningTimesView.objects.get(student=student, course=self)
+        try:
+            return OpeningTimesView.objects.get(student=student, course=self).opening_time
+        except ObjectDoesNotExist:
+            return None
 
     @property
     def exam(self):
@@ -633,11 +624,13 @@ class Course(models.Model):
             .filter(Q(course=self), Q(state__semester_summer=self.semester) | Q(state__semester_winter=self.semester)) \
             .count()
 
-    def is_opened(self, student):
-        try:
-            return self.get_opening_time(student).opening_time < datetime.datetime.now()
-        except:
+    def is_opened_for_student(self, student):
+        opening_time = self.get_opening_time(student)
+        if not opening_time:
             return False
+        
+        return opening_time < datetime.datetime.now()
+        
 
     def is_recording_open_for_student(self, student=None):
         """ gives the answer to question: is course opened for apps.enrollment for student at the very moment? """
@@ -653,7 +646,7 @@ class Course(models.Model):
         if self.records_start and self.records_end and self.records_start <= now <= self.records_end:
             return True
 
-        if records_opening and self.is_opened(student) and now < records_closing:
+        if records_opening and self.is_opened_for_student(student) and now < records_closing:
             return True
 
         if self.records_start and self.records_end and self.records_start <= now < self.records_end:
