@@ -710,10 +710,10 @@ class Course(models.Model):
     def serialize_for_json(self, student=None, is_recording_open=None):
         from django.core.urlresolvers import reverse
         
-        if is_recording_open is None:
-            is_recording_open = False
         if student is not None:
             is_recording_open = self.is_recording_open_for_student(student)
+        elif is_recording_open is None:
+            is_recording_open = False
 
         data = {
             'id': self.pk,

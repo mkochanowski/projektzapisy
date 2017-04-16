@@ -52,7 +52,7 @@
                 </div>
                 <hr class="filterListDivider">
                 <p class="tagsEffectsFilterHint">
-                    {% trans "Możesz zaznaczyć wiele tagów/efektów naraz &dash; użyj klawisza Ctrl (Command na Mac OS). Wyświetlone zostaną wówczas wszystkie przedmioty, które zaliczają co najmniej jeden z wybranych tagów/efektów." %}
+                    {% trans "Możesz zaznaczyć wiele tagów/efektów naraz. Wyświetlone zostaną wówczas wszystkie przedmioty, które zaliczają co najmniej jeden z wybranych tagów/efektów." %}
                 </p>
             </div>
             <div class="showMoreFiltersContainer">
@@ -88,7 +88,6 @@
 			<span class="selectbox" style="display:block; float:none;">
 				<label for="enr-courseFilter-semester">{% trans "Semestr" %}: </label>
 				<select id="enr-courseFilter-semester">
-					<option value="0">{# Translators: filtr przedmiotów - wybór semestru #}{% trans "dowolny" %}</option>
 					{% for semester in semester_courses %}
 						<option value="{{ semester.id }}" {% if semester.id == default_semester.id %} selected="selected" {% endif %}>{{ semester.year }} {{ semester.get_type_display }}{% if semester.id == default_semester.id %} (bieżący){% endif %}</option>
 					{% endfor %}
@@ -119,11 +118,22 @@
     {% cache 3600 courses_list request.user %}
 	<div id="main-sidebar">
 		<div id="course-list">
-			<div class="semester">
+            <p class="main-side-message hidden" id="fetchingListMessage">
+                Pobieranie listy przedmiotów...
+                <img src="{% static "images/loading.gif" %}">
+            </p>
+		
+			<div class="semester" id="mainCoursesContainer">
 				{# Translators: Tytuł nad sidebarem  #}
 				<h3>{% trans "Semestr" %} <span id="current_semester_year">{{ default_semester.year }}</span>&nbsp;<span id="current_semester_type">{{ default_semester.get_type_display }}</span></h3>
 				<input type="hidden" id="semester_id" value="{{ default_semester.id }}" />
+				<!-- The course list the server sends to us when we first load the page,
+				then if the user changes the semester, we download the JSON using AJAX. -->
 				<input type="hidden" id="courses_list_json" value='{{ courses_list_json|safe }}'>
+				
+				<p class="main-side-message hidden" id="noResultsMessage">
+                    Do podanego filtra nie pasuje żaden przedmiot.
+                </p>
 				
 				<ul id="courses-list">
 				</ul>

@@ -23,10 +23,16 @@ def main(request):
     return render_to_response( 'enrollment/main.html', {}, context_instance = RequestContext( request ))
 
 
-def get_course_list_info_json_for_semester(semester):
+def get_course_list_info_json_for_semester(user, semester):
+    # TODO: this SQL has to die
     courses = Course.visible.filter(semester = semester).order_by('entity__name')
-    
-    print("We have %d courses" % len(courses))
+    """\
+         .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
+                                      ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
+                                      ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
+                                      ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
+                                      ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
+    """
     
     courses_list_for_json = [c.serialize_for_json() for c in courses]
     semester_for_json = {
@@ -50,7 +56,7 @@ def prepare_courses_list_to_render(request, default_semester=None, user=None, st
         user = request.user
     
     semesters = Semester.objects.filter(visible=True)
-    courses_list_json = get_course_list_info_json_for_semester(default_semester)
+    courses_list_json = get_course_list_info_json_for_semester(user, default_semester)
 
     return {
         'courses_list_json': courses_list_json,
@@ -90,7 +96,7 @@ def votes(request, slug):
 def get_semester_info(request, semester_id):
     try:
         semesterObj = Semester.objects.get(Q(pk = semester_id) & Q(visible = True))
-        jsonString = get_course_list_info_json_for_semester(semesterObj)
+        jsonString = get_course_list_info_json_for_semester(request.user, semesterObj)
         
         return HttpResponse(jsonString, content_type = 'application/json')
     except Semester.DoesNotExist:

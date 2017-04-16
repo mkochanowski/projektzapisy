@@ -10,38 +10,66 @@ CoursesList = new Object();
 CoursesList.init = function()
 {
 	CoursesList.initCourseLists();
-	CoursesList.initFilter();
     
     $("#enr-courseFilter-semester").change(CoursesList.onNewSemesterChosen);
+    
+    // TODO: turn this on when we migrate to jquery > 1.6
+   // $("#enr-courseFilter-effects").mousedown(CoursesList.onMultiselectClicked);
+   // $("#enr-courseFilter-tags").mousedown(CoursesList.onMultiselectClicked);
 };
 
 $(CoursesList.init);
+
+
+CoursesList.onMultiselectClicked = function(e)
+{
+    e.preventDefault();
+    $(this).attr("selected", !$(this).attr("selected"));
+    return false;
+};
+
+CoursesList.setDownloadingDataUi = function()
+{
+    $("#mainCoursesContainer").addClass("hidden");
+    $("#fetchingListMessage").removeClass("hidden");
+};
+
+CoursesList.setCoursesViewUi = function()
+{
+    $("#mainCoursesContainer").removeClass("hidden");
+    $("#fetchingListMessage").addClass("hidden");
+};
 
 CoursesList.onNewSemesterChosen = function()
 {
     var newId = parseInt($("#enr-courseFilter-semester").find(":selected").val());
     CoursesList.userChosenSemester = newId;
     
+    CoursesList.setDownloadingDataUi();
+    
     $.get(
         "/courses/get_semester_info/" + newId,
         CoursesList.onSemesterInfoReceived)
         .fail(CoursesList.onSemesterInfoReceiveFailed);
-}
+};
 
 CoursesList.onSemesterInfoReceiveFailed = function()
 {
-    alert("oops");
-}
+    CoursesList.setCoursesViewUi();
+    
+    $("#enr-courseFilter-semester").val(CoursesList.currentSemester.id);
+    CoursesList.userChosenSemester = CoursesList.currentSemester.id;
+    
+    alert("Nie udało się pobrać listy przedmiotów dla tego semestru.");
+};
 
 CoursesList.onSemesterInfoReceived = function(data, status)
 {
-//   alert("Status is " + status);
-//    alert("Data is " + data);
-    
     CoursesList.courses = data.courseList;
     CoursesList.currentSemester = data.semesterInfo;
     
     CoursesList.updateUiFromData();
+    CoursesList.setCoursesViewUi();
 }
 
 /**
@@ -68,6 +96,7 @@ CoursesList.updateUiFromData = function()
     $("#current_semester_type").text(CoursesList.currentSemester.type);
     
     $("#courses-list").empty();
+    
     CoursesList.courses.forEach(function(course)
     {
         var courseLink = $("<a/>", {
@@ -78,12 +107,17 @@ CoursesList.updateUiFromData = function()
         courseLink.appendTo(course["htmlNode"]);
         course["htmlNode"].appendTo($("#courses-list"));
     });
+    
+    CoursesList.initFilter();
 };
 
 CoursesList.setCourseVisible = function(course, visible)
 {
     course.visible = visible;
-    course.htmlNode.css("display", visible ? "" : "none");
+    if (visible)
+        course.htmlNode.removeClass("hidden");
+    else
+        course.htmlNode.addClass("hidden");
 }
 
 /**
@@ -101,11 +135,7 @@ CoursesList.initFilter = function()
 	});
 
 	// komunikat o pustym filtrze
-	CoursesList.emptyFilterWarning =
-		$.create('p', {className: 'main-side-message'}).
-		text('Do podanego filtra nie pasuje żaden przedmiot.').
-		css({marginTop: '50px', display: 'none'}).
-		insertAfter($('#course-list').assertOne());
+	CoursesList.emptyFilterWarning = $("#noResultsMessage");
 	CoursesList.emptyFilterWarningVisible = false;
 
 	// konfiguracja filtra
@@ -118,7 +148,11 @@ CoursesList.initFilter = function()
 		if (CoursesList.emptyFilterWarningVisible == visible)
 			return;
 		CoursesList.emptyFilterWarningVisible = visible;
-		CoursesList.emptyFilterWarning.css('display', visible?'':'none');
+        
+        if (visible)
+            CoursesList.emptyFilterWarning.removeClass("hidden");
+        else
+            CoursesList.emptyFilterWarning.addClass("hidden");
 	};
 
 	CoursesList.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
