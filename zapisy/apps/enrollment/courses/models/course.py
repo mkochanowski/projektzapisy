@@ -626,7 +626,7 @@ class Course(models.Model):
 
     def is_opened_for_student(self, student):
         opening_time = self.get_opening_time(student)
-        if not opening_time:
+        if opening_time is None:
             return False
         
         return opening_time < datetime.datetime.now()
