@@ -17,6 +17,9 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# With DEBUG = False Django will refuse to serve requests to hosts different
+# than this one.
+ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl']
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
 """
@@ -157,11 +160,6 @@ MEDIA_ROOT = 'site_media'
 MEDIA_URL = '/site_media/'
 
 USE_ETAGS = True
-
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
@@ -355,5 +353,5 @@ local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
 
-
 NEWS_PER_PAGE = 15
+

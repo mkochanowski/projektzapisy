@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import StringIO
 import csv
+import json
 import re
+import StringIO
 
 from django.conf import settings
-
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -15,7 +14,6 @@ from django.template import RequestContext
 from django.shortcuts import redirect
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
-from django.utils import simplejson
 from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
@@ -94,12 +92,17 @@ def set_enrolled(request, method):
         set_enrolled = request.POST['enroll'] == 'true'
     except MultiValueDictKeyError:
         return AjaxFailureMessage.auto_render('InvalidRequest', 'Nieprawidłowe zapytanie.', message_context)
-    
-    if request.user.student.block:
-        return AjaxFailureMessage.auto_render('ScheduleLocked',
-            u'Twój plan jest zablokowany. Możesz go odblokować w prototypie', message_context)
-    student = request.user.student
 
+
+    try:
+        if request.user.student.block:
+            return AjaxFailureMessage.auto_render('ScheduleLocked',
+                u'Twój plan jest zablokowany. Możesz go odblokować w prototypie', message_context)
+        student = request.user.student
+    except Student.DoesNotExist:
+        transaction.rollback()
+        return AjaxFailureMessage.auto_render('NonStudent',
+            u'Nie jesteś studentem.', message_context)
 
     try:
         group = Group.objects.get(id=group_id)
@@ -113,7 +116,6 @@ def set_enrolled(request, method):
 
     if set_enrolled:
         result, messages_list = group.enroll_student(student)
-
     else:
         result, messages_list = group.remove_student(student)
         
@@ -210,6 +212,9 @@ def set_queue_priority(request, method):
         transaction.rollback()
         return AjaxFailureMessage.auto_render('NotQueued',
             'Nie jesteś w kolejce do tej grupy.', message_context)
+    except Student.DoesNotExist:
+        return AjaxFailureMessage.auto_render('NonStudent',
+            u'Nie jesteś studentem.', message_context)
 
 @login_required
 def records(request, group_id):
@@ -285,19 +290,17 @@ def own(request):
 
     employee = None
     student  = None
-    if request.user.student:
+    if BaseUser.is_student(request.user):
         student = request.user.student
         groups = Course.get_student_courses_in_semester(student, default_semester)
         sum_points = student.get_points()
 
 
-    if student is None and request.user.employee is None:
+    if not BaseUser.is_student(request.user) and \
+       not BaseUser.is_employee(request.user):
         messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
         return render_to_response('common/error.html',
             context_instance=RequestContext(request))
-
-
-
 
     return TemplateResponse(request, 'enrollment/records/schedule.html', locals())
 
@@ -305,13 +308,13 @@ def own(request):
 def schedule_prototype(request):
     """ schedule prototype view """
 
-    if hasattr(request.user, 'student') and request.user.student:
+    if BaseUser.is_student(request.user):
         student = request.user.student
         student_id = student.id
     else:
         student = None
         student_id = 'None'
-        
+
     should_allow_leave = Semester.get_default_semester().can_remove_record()
 
     default_semester = Semester.objects.get_next()
@@ -338,9 +341,9 @@ def schedule_prototype(request):
             jsons = []
             for term in course['terms']:
                 term.update({ # TODO: do szablonu
-                    'json': simplejson.dumps(term['info'])
+                    'json': json.dumps(term['info'])
                 })
-                jsons.append({'json': simplejson.dumps(term['info'])})
+                jsons.append({'json': json.dumps(term['info'])})
             course['info'].update({
                 'is_recording_open': False,
                 #TODO: kod w prepare_courses_list_to_render moim zdaniem nie

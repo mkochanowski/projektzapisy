@@ -5,6 +5,7 @@ from django.db.models.query import EmptyQuerySet
 from django.forms import HiddenInput
 from apps.enrollment.courses.models import Course, Semester
 from apps.schedule.models import Event, Term, EventModerationMessage, EventMessage
+from apps.users.models import BaseUser
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from django.forms.models import inlineformset_factory
@@ -51,12 +52,12 @@ class EventForm(forms.ModelForm):
         super(EventForm, self).__init__(data, **kwargs)
         if not self.instance.pk:
             self.instance.author = user
-        if user.get_profile().is_employee:
+        if BaseUser.is_employee(user):
             self.fields['type'].choices = Event.TYPES_FOR_TEACHER
         else:
             self.fields['type'].choices = Event.TYPES_FOR_STUDENT
 
-        if not user.get_profile().is_employee:
+        if not BaseUser.is_employee(user):
             self.fields['course'].queryset = EmptyQuerySet()
         else:
             semester = Semester.get_current_semester()
