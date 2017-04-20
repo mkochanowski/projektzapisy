@@ -16,7 +16,6 @@ from django.template.response import TemplateResponse
 from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.offer.vote.models                   import SingleVote, SystemState
-from apps.offer.proposal.models               import Proposal
 from apps.enrollment.courses.models import Type
 
 from apps.users.decorators      import student_required

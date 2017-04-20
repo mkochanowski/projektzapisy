@@ -253,12 +253,15 @@ def my_profile(request):
         consultations = request.user.employee.consultations
         room = request.user.employee.room
         homepage = request.user.employee.homepage
+        title = request.user.employee.title
         room = room and room or ''
         homepage = homepage and homepage or ''
+        title = title and title or ''
     else:
         consultations = ''
         homepage = ''
         room = ''
+        title = ''
 
     grade = {}
 
