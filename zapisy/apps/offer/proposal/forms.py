@@ -9,7 +9,7 @@ from apps.offer.proposal.models import Syllabus, StudentWork
 class ProposalForm(ModelForm):
     ects = forms.IntegerField(label='ECTS')
     class Meta:
-        fields = ('name', 'type', 'exam', 'english', 'semester', 'web_page','effects', 'repetitions', 'lectures', 'exercises', 'laboratories', 'exercises_laboratiories', 'seminars')
+        fields = ('name', 'name_en', 'type', 'exam', 'english', 'semester', 'web_page','effects', 'repetitions', 'lectures', 'exercises', 'laboratories', 'exercises_laboratiories', 'seminars')
         model = CourseEntity
         widgets = {
             'effects': FilteredSelectMultiple(u"efekty kształcenia", is_stacked=False)

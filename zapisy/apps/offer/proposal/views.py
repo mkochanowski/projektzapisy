@@ -3,13 +3,13 @@
 """
     Proposal views
 """
-from django.contrib                 import messages
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.http                    import Http404
-from django.shortcuts               import redirect
+from django.http import Http404
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
-from django.views.decorators.http   import require_POST
+from django.views.decorators.http import require_POST
 from django.forms.models import inlineformset_factory
 from apps.enrollment.courses.models.course import CourseEntity, CourseDescription, Course
 from apps.enrollment.courses.models.points import PointsOfCourseEntities, PointTypes
@@ -19,11 +19,10 @@ from apps.enrollment.courses.models.course_type import Type
 
 from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm, SyllabusForm
 from apps.offer.proposal.models import Syllabus, StudentWork
-from apps.offer.proposal.exceptions      import  NotOwnerException
-
+from apps.offer.proposal.exceptions import  NotOwnerException
 
 import logging
-from apps.offer.proposal.utils import proposal_for_offer, employee_proposal
+from apps.offer.proposal.utils import proposal_for_offer, employee_proposal, send_notification_to_3d
 from apps.users.decorators import employee_required
 from apps.users.models import Employee
 
@@ -181,6 +180,9 @@ def proposal_edit(request, slug=None):
 
     if request.method == "POST":
         if proposal_form.is_valid() and description_form.is_valid() and syllabus_form.is_valid() and student_work_formset.is_valid():
+            new_proposal = False
+            if proposal is None:
+                new_proposal = True
             proposal = proposal_form.save(commit=False)
             description = description_form.save(commit=False)
             syllabus = syllabus_form.save(commit=False)
@@ -188,8 +190,13 @@ def proposal_edit(request, slug=None):
 
             if not proposal.owner:
                 proposal.owner = request.user.employee
-            if proposal.status == 5:
+            if new_proposal or proposal.status == 5 or proposal.status == 1:
                 proposal.status = 0
+                send_notification_to_3d(proposal, new_proposal)
+                messages.success(request, u'Wysłano wiadomość do DDD z prośbą o zaakceptowanie propozycji przedmiotu')
+
+                # send_email
+
             proposal.save()
 
             description.author = request.user.employee

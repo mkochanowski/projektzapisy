@@ -52,6 +52,9 @@
                 {% if not field.name in 'lectures,exercises,repetitions,laboratories,exercises_laboratiories,seminars,ects'|slice:',' %}
                 <tr>
                     <th>
+                    {% if field.field.required %}
+                    <span style="position:absolute; left:160px;">*</span>
+                    {% endif %}
                     {{field.label_tag}}
                     </th>
                     {% if field.errors %}
