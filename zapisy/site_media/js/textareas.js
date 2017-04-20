@@ -6,6 +6,7 @@ tinymce.init({
 	plugins: 'advlist autolink link code hr preview fullscreen lists table paste nonbreaking textcolor',
 	toolbar_items_size: 'small',
 	language: 'pl',
+	entity_encoding: 'raw',
 	resize: "both",
 	menubar: false
 });
