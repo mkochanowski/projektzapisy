@@ -1,5 +1,10 @@
 # projektzapisy Changelog
 
+
+# Version 17.04.20
+
+* Added possibility to edit syllabus
+
 # Version 17.04.07
 
 * Fixed mailto links escape '+'

@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.core.cache import cache as mcache
 from apps.enrollment.courses.models.effects import Effects
+
 from apps.enrollment.courses.models.tag import Tag
 
 from apps.offer.proposal.exceptions import NotOwnerException
