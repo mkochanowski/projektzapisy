@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from django.db.models import Q
 from django.db import models
 from django.db.models.query import EmptyQuerySet
@@ -28,6 +29,7 @@ class Term(models.Model):
     room = models.ForeignKey(to=Classroom, null=True, blank=True, verbose_name=u'Sala',
                              related_name='event_terms')
     place = models.CharField(max_length=255, null=True, blank=True, verbose_name=u'Miejsce')
+    ignore_conflicts = False
 
     def validate_against_event_terms(self):
         assert(self.room is not None)
@@ -86,11 +88,12 @@ class Term(models.Model):
                     code='invalid'
                 )
 
-            self.validate_against_event_terms()
-
-            self.validate_against_course_terms()
+            if not self.ignore_conflicts:
+                self.validate_against_event_terms()
+                self.validate_against_course_terms()
 
         super(Term, self).clean()
+
 
     class Meta:
         app_label = 'schedule'
@@ -100,7 +103,6 @@ class Term(models.Model):
         verbose_name_plural = u'terminy'
 
     def get_conflicted(self):
-
         if not self.room:
             return EmptyQuerySet()
 
@@ -112,7 +114,6 @@ class Term(models.Model):
 
         if self.pk:
             terms = terms.exclude(pk=self.pk)
-
         return terms
 
     def print_start(self):
@@ -135,6 +136,15 @@ class Term(models.Model):
         hours, remainder = divmod(self.end.seconds, 3600)
         minutes, __ = divmod(remainder, 60)
         return '%d:%02d' % (hours, minutes)
+    
+    def pretty_print(self):
+        """
+        Verbose html info about term
+        Format: {start} - {end} {title_with_url} (author)
+
+        @return: string
+        """
+        return '%s - %s <a href="%s">%s</a> (%s)' % (self.print_start(), self.print_end(), self.event.get_absolute_url(), self.event.title, self.event.author)
 
     def get_room(self):
         return self.room
@@ -174,6 +184,34 @@ class Term(models.Model):
                                    event__status=Event.STATUS_ACCEPTED).select_related('event')
 
         return terms
+
+    @classmethod
+    def prepare_conflict_dict(cls, start_time, end_time):
+        """
+        Head is top term for which next terms (if conflicted in terms of time) will be considered as conflicts.
+        current_result stores conflicts for given current head
+        @return OrderedDict[day][room][head|conflicted]
+        """
+        candidates = Term.objects.filter(day__gte=start_time, day__lte=end_time).order_by('day', 'room', 'start', 'end').select_related('room', 'event')
+        conflicts = OrderedDict()
+        current_result = dict()
+        head = None
+        for term in candidates:
+            if (head is not None and (term.day != head.day or term.room != head.room)) or head is None:
+                if current_result and current_result['conflicted']:
+                    if head.day not in conflicts:
+                        conflicts[head.day] = dict()
+                    if head.room not in conflicts[head.day]:
+                        conflicts[head.day][head.room] = dict()
+                        conflicts[head.day][head.room][head.pk] = dict()
+                    conflicts[head.day][head.room][head.pk] = current_result
+                head = term
+                current_result = {}
+                current_result['head'] = head
+                current_result['conflicted'] = list()
+            elif head.end >= term.end and term.start >= head.start: # conflict
+                current_result['conflicted'].append(term)
+        return conflicts
 
     def __unicode__(self):
         return '{0:s}: {1:s} - {2:s}'.format(smart_unicode(self.day),

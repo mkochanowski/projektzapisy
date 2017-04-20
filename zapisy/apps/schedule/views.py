@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-import datetime
+import datetime, timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template import Context
@@ -17,8 +17,8 @@ from apps.enrollment.courses.models import Classroom
 from apps.schedule.models import Event, Term
 from apps.schedule.filters import EventFilter, ExamFilter
 from apps.schedule.forms import EventForm, TermFormSet, DecisionForm, \
-    EventModerationMessageForm, EventMessageForm
-from apps.schedule.utils import EventAdapter
+    EventModerationMessageForm, EventMessageForm, ConflictsForm
+from apps.schedule.utils import EventAdapter, get_week_range_by_date
 from apps.utils.fullcalendar import FullCalendarView
 
 from xhtml2pdf import pisa
@@ -62,6 +62,7 @@ def reservation(request, event_id=None):
             formset.save()
 
             return redirect(event)
+        errors = True
     else:
         formset = TermFormSet(data=request.POST or None, instance=Event())
 
@@ -79,17 +80,18 @@ def edit_event(request, event_id=None):
     formset = TermFormSet(request.POST or None, instance=event)
     reservation = event.reservation
 
-    if form.is_valid() and formset.is_valid():
+    if form.is_valid():
         event = form.save(commit=False)
         if not event.id:
             event.author = request.user
         event.reservation = reservation
-        event.save()
-        formset.save()
+        if formset.is_valid():
+            event.save()
+            formset.save()
 
-        messages.success(request, u'Zmieniono zdarzenie')
+            messages.success(request, u'Zmieniono zdarzenie')
 
-        return redirect(event)
+            return redirect(event)
 
     return TemplateResponse(request, 'schedule/reservation.html', locals())
 
@@ -115,6 +117,25 @@ def reservations(request):
     title = u'Zarządzaj rezerwacjami'
     return TemplateResponse(request, 'schedule/reservations.html', locals())
 
+@login_required
+@permission_required('schedule.manage_events')
+def conflicts(request):
+    """
+    Finds conflicts in given daterange and pass into template.
+    Implemented as 3D dictionary (ordered by day,classroom,hour).
+    Works better than naive regroup in template (O(nlog(n)) vs O(n^2)).
+    """
+
+    form = ConflictsForm(request.GET)
+    if form.is_valid():
+        beg_date = form.cleaned_data['beg_date']
+        end_date = form.cleaned_data['end_date']
+    else:
+        beg_date, end_date = get_week_range_by_date(datetime.datetime.today())
+
+    terms = Term.prepare_conflict_dict(beg_date, end_date)
+    title = u'Konflikty'
+    return TemplateResponse(request, 'schedule/conflicts.html', locals())
 
 @login_required
 def history(request):
