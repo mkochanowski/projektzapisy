@@ -1,5 +1,9 @@
 # projektzapisy Changelog
 
+# Version 17.04.20
+
+* Added possibility to edit syllabus
+
 # Version 17.03.09
 
 * Added new date for records: end of unenrolling
