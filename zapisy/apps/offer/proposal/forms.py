@@ -8,6 +8,19 @@ from apps.offer.proposal.models import Syllabus, StudentWork
 
 class ProposalForm(ModelForm):
     ects = forms.IntegerField(label='ECTS')
+
+    def __init__(self, *args, **kwargs):
+        full_edit = kwargs.pop('full_edit', False)
+        super(ProposalForm, self).__init__(*args, **kwargs)
+        if not full_edit:
+            self.fields['lectures'].widget.attrs['readonly'] = True
+            self.fields['repetitions'].widget.attrs['readonly'] = True
+            self.fields['exercises'].widget.attrs['readonly'] = True
+            self.fields['laboratories'].widget.attrs['readonly'] = True
+            self.fields['exercises_laboratiories'].widget.attrs['readonly'] = True
+            self.fields['seminars'].widget.attrs['readonly'] = True
+            self.fields['ects'].widget.attrs['readonly'] = True
+
     class Meta:
         fields = ('name', 'name_en', 'type', 'exam', 'english', 'semester', 'web_page','effects', 'repetitions', 'lectures', 'exercises', 'laboratories', 'exercises_laboratiories', 'seminars')
         model = CourseEntity

@@ -50,7 +50,7 @@ class Syllabus(models.Model):
 
 class StudentWork(models.Model):
 	name = models.CharField(max_length=250, verbose_name=u'nazwa aktywności')
-	hours = models.IntegerField(verbose_name=u'ilość godzin')
+	hours = models.IntegerField(verbose_name=u'liczba godzin')
 	syllabus = models.ForeignKey(Syllabus, on_delete=models.CASCADE)
 
 	class Meta:

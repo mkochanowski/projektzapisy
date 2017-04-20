@@ -160,23 +160,15 @@ def proposal_edit(request, slug=None):
             raise Http404
         if (not request.user.is_staff) and (proposal.owner != request.user.employee):
             raise Http404
+    full_edit = False
+    if request.user.has_perm('proposal.can_create_offer'):
+        full_edit = True
+    proposal_form = ProposalForm(data=request.POST or None, instance=proposal, prefix='entity', initial={'ects': ects}, full_edit=True)
+    description_form = ProposalDescriptionForm(data=request.POST or None, instance=description, prefix='description')
 
-    proposal_form      = ProposalForm(data=request.POST or None,
-                                    instance=proposal, prefix='entity', initial={'ects': ects})
-    description_form = ProposalDescriptionForm(data=request.POST or None,
-                                               instance=description, prefix='description')
-
-    syllabus_form = SyllabusForm(data=request.POST or None,
-                                               instance=syllabus, prefix='syllabus')
+    syllabus_form = SyllabusForm(data=request.POST or None, instance=syllabus, prefix='syllabus')
     StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork,extra=1)
     student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
-    proposal_form.fields['lectures'].widget.attrs['readonly'] = True
-    proposal_form.fields['repetitions'].widget.attrs['readonly'] = True
-    proposal_form.fields['exercises'].widget.attrs['readonly'] = True
-    proposal_form.fields['laboratories'].widget.attrs['readonly'] = True
-    proposal_form.fields['exercises_laboratiories'].widget.attrs['readonly'] = True
-    proposal_form.fields['seminars'].widget.attrs['readonly'] = True
-    proposal_form.fields['ects'].widget.attrs['readonly'] = True
 
     if request.method == "POST":
         if proposal_form.is_valid() and description_form.is_valid() and syllabus_form.is_valid() and student_work_formset.is_valid():
@@ -194,8 +186,6 @@ def proposal_edit(request, slug=None):
                 proposal.status = 0
                 send_notification_to_3d(proposal, new_proposal)
                 messages.success(request, u'Wysłano wiadomość do DDD z prośbą o zaakceptowanie propozycji przedmiotu')
-
-                # send_email
 
             proposal.save()
 
