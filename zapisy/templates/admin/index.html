@@ -67,25 +67,6 @@
             </table>
         </div>
         {% endif %}
-        {% if app.name == 'Users' and app_list|length < 2 %}
-        <div class="module">
-            <table>
-                <caption>Import/Eksport studentów zamawianych</caption>
-                <tr>
-                    <th scope="row">Importuj dane</th>
-                    <td><a href="{{ model.admin_url }}import_zamawiani" class="addlink">Importuj</a></td>
-                </tr>
-                <tr>
-                    <th scope="row">Importuj nowych studentów</th>
-                    <td><a href="{{ model.admin_url }}import_new_zamawiani" class="addlink">Importuj</a></td>
-                </tr>
-                <tr>
-                    <th scope="row">Eksportuj dane</th>
-                    <td><a href="{{ model.admin_url }}export_zamawiani" class="addlink">Eksportuj</a></td>
-                </tr>
-            </table>
-        </div>
-        {% endif %}
         {% if app.name == 'Notifications' %}
         <div class="module">
             <table>

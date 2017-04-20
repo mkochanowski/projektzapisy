@@ -453,7 +453,9 @@ PIPELINE_JS = {
         'admin/js/prepopulate.js',
         'admin/js/SelectBox.js',
         'admin/js/SelectFilter2.js',
-        'js/tiny_mce/tiny_mce.js',
+        'js/tinymce/tinymce.min.js',
+        'js/textareas.js',
+        'js/jquery/jquery.formset.js',
         'js/offer/proposal/proposal.js'
 
         ),

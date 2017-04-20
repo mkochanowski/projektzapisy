@@ -1,5 +1,11 @@
 # projektzapisy Changelog
 
+# Version 17.04.20
+
+* Fixed bug with sending emails with "ó"
+* Added possibility to edit syllabus
+* Added conflict list for secretary
+
 # Version 17.04.07
 
 * Fixed mailto links escape '+'
