@@ -29,3 +29,7 @@ _O nowszego dumpa można poprosić na Slacku._
 ### Wskazówki
 
 * Napotykając na problem warto napisać na Slacku. Jest szansa, że ktoś inny już natrafił na ten problem (a jeśli nie to przynajmniej inne osoby mogą być świadome trudności)
+* Starą wersję bazy danych, możesz aktualizować aplikując migracje komendą:
+`./manage.py migrate`
+* Zmieniając model, możesz zmienić strukturę bazy danych. Poniższą komendą możesz wygenerować automatycznie migrację:
+`./manage.py schemamigration appname --auto --update`
