@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
@@ -304,7 +305,7 @@ class GroupAdmin(admin.ModelAdmin):
         while day <= semester.lectures_ending:
 
             if day in freedays:
-                day = day + timedelta(days=1)
+                day = day + datetime.timedelta(days=1)
                 continue
 
             weekday = day.weekday()
@@ -316,7 +317,7 @@ class GroupAdmin(admin.ModelAdmin):
 
             days[weekday].append(day)
 
-            day = day + timedelta(days=1)
+            day = day + datetime.timedelta(days=1)
 
         for t in terms:
             ev = Event()
@@ -337,8 +338,8 @@ class GroupAdmin(admin.ModelAdmin):
                     newTerm = Term()
                     newTerm.event = ev
                     newTerm.day = day
-                    newTerm.start = timedelta(hours=t.start_time.hour, minutes=t.start_time.minute)
-                    newTerm.end = timedelta(hours=t.end_time.hour, minutes=t.end_time.minute)
+                    newTerm.start = t.start_time
+                    newTerm.end = t.end_time
                     newTerm.room = room
                     newTerm.save()
 
@@ -394,6 +395,11 @@ class CourseDescriptionAdmin(TranslationAdmin):
     form = CourseDescriptionForm
 
     def save_model(self, request, obj, form, change):
+        """Saves the course description.
+
+        Raises:
+            Employee.DoesNotExist: If the user is not an employee.
+        """
         obj.author = request.user.employee
         obj.save()
         entity = obj.entity

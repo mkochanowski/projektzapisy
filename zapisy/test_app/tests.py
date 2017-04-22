@@ -44,6 +44,21 @@ class SeleniumTestCase(LiveServerTestCase):
 class NewSemesterTests(SeleniumTestCase):
 
     def setUp(self):
+        sql_calls = [
+            """
+                CREATE TABLE courses_studentpointsview (
+                    value smallint,
+                    student_id integer,
+                    entity_id integer
+                );
+            """
+            ]
+
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
+
         self.password = '11111'
         self.admin = User.objects.create_superuser(username='przemka',
                                               password=self.password,
@@ -148,6 +163,15 @@ class NewSemesterTests(SeleniumTestCase):
             max_vote=3
         )
 
+
+    def tearDown(self):
+        sql_calls = [
+            "DROP TABLE courses_studentpointsview;",
+        ]
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
 
     def test_new_semester_scenario(self):
         self.prepare_course_entities_for_voting()

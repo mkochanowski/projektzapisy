@@ -406,6 +406,11 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_employee_proposals(user):
+        """Returns Courses owned by the user.
+
+        Raises:
+            Employee.DoesNotExist: If the user is not an employee.
+        """
         return CourseEntity.noremoved.filter(owner=user.employee)
 
     @staticmethod

@@ -1,5 +1,9 @@
 # projektzapisy Changelog
 
+# Version 22.04.20
+
+* Upgrade to Django 1.5
+
 # Version 17.04.20
 
 * Fixed bug with sending emails with "ó"

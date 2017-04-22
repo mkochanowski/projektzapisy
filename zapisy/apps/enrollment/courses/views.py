@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
@@ -6,7 +8,6 @@ from django.http import Http404
 from django.shortcuts               import render_to_response
 from django.template                import RequestContext
 from django.template.response import TemplateResponse
-from django.utils import simplejson
 
 from apps.enrollment.courses.models         import *
 from apps.enrollment.records.models          import *
@@ -28,10 +29,10 @@ def prepare_courses_list_to_render(request,default_semester=None,user=None, stud
         default_semester = Semester.get_default_semester()
     if not user:
         user = request.user
-    
-   
+
+
     semesters = Semester.objects.filter(visible=True)
-    if hasattr(user, "student") and user.student:
+    if BaseUser.is_student(user):
         courses = Course.visible.all().order_by('entity__name')\
             .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
                                          ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
@@ -80,20 +81,20 @@ def course(request, slug):
     try:
         default_semester = Semester.get_default_semester()
         user = request.user
-        
+
         # Sprawdzamy, czy mamy studenta
         if user.is_anonymous():
             student = None
             student_id = 0
         else:
-            if hasattr(user, 'student') and user.student:
+            if BaseUser.is_student(user):
                 student = user.student
                 student_id = student.id
 
             else:
                 student = None
                 student_id = 0
-        
+
         data, course = prepare_courses_list_to_render_and_return_course(request, default_semester=default_semester, user=user, student=student, course_slug=slug)
         if student:
             try:
@@ -106,7 +107,7 @@ def course(request, slug):
         #course = list(Course.visible.filter(slug=slug).select_related('semester','entity'))
         if not course:
             raise Course.DoesNotExist
-        
+
         course.teachers_list = course.teachers.all() # potencjalnie problem z n zapytaniami do bazy
 
         groups = list(Group.objects.filter(course=course).
@@ -114,13 +115,13 @@ def course(request, slug):
                 'priority': "SELECT COALESCE((SELECT priority FROM records_queue WHERE courses_group.id=records_queue.group_id AND records_queue.student_id=%s AND records_queue.deleted = false),0)" % (student_id,),
                 'signed': "SELECT COALESCE((SELECT id FROM records_record WHERE courses_group.id=records_record.group_id AND status='%s' AND records_record.student_id=%s),0)" % (Record.STATUS_ENROLLED,student_id)}).
             select_related('teacher', 'teacher__user'))
-        
+
         ## TODO: zrobić sortowanie groups w pythonie po terminach
 
         # Póki co można to usunąć, bo nie ma wymagań w systemie i będzie tu problem n zapytań -> trzeba napisać sql ręcznie
         requirements = []
         #requirements = map(lambda x: x.name, course.requirements.all())
-        
+
         if not student:
                 course.is_recording_open = False
                 for g in groups:
@@ -129,7 +130,7 @@ def course(request, slug):
                 pass
         else:
             enrolled_pinned_queued_ids_sql = """
-            SELECT 
+            SELECT
                 array(SELECT group_id FROM records_record WHERE status=%s AND records_record.student_id=%s) AS enrolled_ids,
                 array(SELECT group_id FROM records_record WHERE status=%s AND records_record.student_id=%s) AS pinned_ids,
                 array(SELECT group_id FROM records_queue WHERE records_queue.student_id=%s AND records_queue.deleted = false) AS queued_ids
@@ -138,7 +139,7 @@ def course(request, slug):
             cursor = connection.cursor()
             cursor.execute(enrolled_pinned_queued_ids_sql, [Record.STATUS_ENROLLED, student_id, Record.STATUS_PINNED, student_id, student_id])
             (enrolled_ids, pinned_ids, queued_ids) = cursor.fetchall()[0]
-            
+
             queued = Queue.queued.filter(group__course=course, deleted=False).values('priority','group_id')
             queue_priorities = Queue.queue_priorities_map_values(queued)
 
@@ -146,15 +147,15 @@ def course(request, slug):
             course.is_recording_open = course.is_recording_open_for_student(student)
             if course.can_enroll_from:
                 course.can_enroll_interval = course.can_enroll_from - datetime.now()
-            
+
             for g in groups:
                 # TODO to poniżej
                 #g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
-                g.serialized = simplejson.dumps(g.serialize_for_ajax(
+                g.serialized = json.dumps(g.serialize_for_ajax(
                     enrolled_ids, queued_ids, pinned_ids,
                     queue_priorities, student, user=user
                 ))
-        
+
         lectures = []
         exercises = []
         laboratories = []
@@ -175,8 +176,8 @@ def course(request, slug):
         terms = Term.get_groups_terms(groups_ids)
         for term in terms:
             terms_list_setdefault(term['group_id'],[]).append(term['term_as_string'])
-        
-        
+
+
         for g in groups:
             g.terms_list = terms_list_get(g.id,[])
             if student:
@@ -211,7 +212,7 @@ def course(request, slug):
         # Statystyki wyświetlane tylko adminom (nieadmin -> 0 zapytań sql, admin -> 1 zapytanie sql)
         statistics = {}
         for group_type in xrange(1,11):
-            statistics[str(group_type)] = {"in_group": 0, "in_queue": 0}  
+            statistics[str(group_type)] = {"in_group": 0, "in_queue": 0}
 
         if request.user.is_staff:
             from django.db import connection
@@ -219,8 +220,8 @@ def course(request, slug):
             statistics_sql = """
                 SELECT type, SUM(s), COUNT(s) FROM
                 (
-                    SELECT type, student_id, MAX(rodzaj) as s FROM 
-                    ( 
+                    SELECT type, student_id, MAX(rodzaj) as s FROM
+                    (
                             SELECT records_record.student_id, courses_group."type", 1 as rodzaj FROM courses_group
                             JOIN records_record ON (records_record.group_id = courses_group.id)
                             WHERE records_record.status = '1' AND courses_group.course_id = %s
@@ -254,19 +255,18 @@ def course(request, slug):
             ]
 
         courseView_details_hidden = request.COOKIES.get('CourseView-details-hidden', False) == 'true'
-        
+
         ectsLimitExceeded = False
         maxEcts = default_semester.get_current_limit()
         currentEcts = 0
-        
         if student and student.get_points_with_course(course) > maxEcts:
             currentEcts = student.get_points()
             ectsLimitExceeded = True
-        
+
         data.update({
             'details_hidden': courseView_details_hidden,
             'course' : course,
-            'course_json': simplejson.dumps(course.serialize_for_ajax(student, is_recording_open=course.is_recording_open)),
+            'course_json': json.dumps(course.serialize_for_ajax(student, is_recording_open=course.is_recording_open)),
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
