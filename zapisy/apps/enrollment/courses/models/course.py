@@ -13,7 +13,7 @@ from apps.enrollment.courses.models.effects import Effects
 from apps.enrollment.courses.models.tag import Tag
 
 from apps.offer.proposal.exceptions import NotOwnerException
-
+from apps.users.models import OpeningTimesView
 import logging
 
 logger = logging.getLogger()
@@ -466,15 +466,15 @@ class Course(models.Model):
 
     def get_opening_time(self, student):
         """
-
-        @param student:
-        @return:
+        Gets the opening time of the current course for the given
+        student, that is, the earliest point in time such that
+        the student is allowed to sign up for the course.
+        @param student: The student for whom the course opening
+        time is to be determined.
         """
-
-        from apps.users.models import OpeningTimesView
-
         try:
-            return OpeningTimesView.objects.get(student=student, course=self).opening_time
+            o = OpeningTimesView.objects.get(student=student, course=self)
+            return o.opening_time
         except ObjectDoesNotExist:
             return None
 
@@ -625,10 +625,15 @@ class Course(models.Model):
             .count()
 
     def is_opened_for_student(self, student):
+        """
+        Determines whether the student is allowed
+        to sign up for this course at the current time.
+        Note: as the return value depends on the current time,
+        the function is not pure.
+        """
         opening_time = self.get_opening_time(student)
         if opening_time is None:
             return False
-        
         return opening_time < datetime.datetime.now()
         
 
