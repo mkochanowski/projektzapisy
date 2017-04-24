@@ -102,8 +102,8 @@
             <div class="container">
 
                 <ul>
-                    <li{% block enrollment_active %}{% endblock %}><a href="{% url 'enrollment-main' %}">System
-                        Zapisów</a>
+                    <li{% block enrollment_active %}{% endblock %}>
+                        <a href="{% url 'enrollment-main' %}">System Zapisów</a>
                     </li>
                     <li{% block grade_active %}{% endblock %}><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
                     <li{% block offer_active %}{% endblock %}><a href="{% url 'offer-main' %}">Oferta</a></li>
@@ -203,20 +203,14 @@
             </div>
         {% endfor %}
         {% endblock %}
-        {% block filter %}
-            {# end filter #}
-        {% endblock %}
         <div id="main-content-container" class="row show-grid sidebar-right">
+            {% block topContent %}{% endblock %}
             {% block center %}
                 <div class="span{% block content-width %}11{% endblock %} columns">
-
-
                     <div id="main-content">
                         {% block content %}
                         {% endblock %}
-                        &nbsp;
                     </div>
-
                 </div>
                 <div class="span{% block sidebar-width %}5{% endblock %} columns">
                     {% block sidebar %}
