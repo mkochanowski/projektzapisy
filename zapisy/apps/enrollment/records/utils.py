@@ -132,13 +132,13 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None, s
     return prepare_courses_with_terms(terms, records)
 
 def prepare_schedule_data(request, courses, semester=None):
-    try:
+    if BaseUser.is_student(request.user):
         student = request.user.student
-    except Student.DoesNotExist:
+    else:
         student = None
-    try:
+    if BaseUser.is_employee(request.user):
         employee = request.user.employee
-    except Employee.DoesNotExist:
+    else:
         employee = None
     default_semester = semester or Semester.objects.get_next()
 
