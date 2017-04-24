@@ -118,35 +118,14 @@ class Term(models.Model):
             terms = terms.exclude(pk=self.pk)
         return terms
 
-    def print_start(self):
-        """
-        Print beautfull time
-
-        @return: string
-        """
-
-        hours, remainder = divmod(self.start.seconds, 3600)
-        minutes, __ = divmod(remainder, 60)
-        return '%d:%02d' % (hours, minutes)
-
-    def print_end(self):
-        """
-        Print beautfull time
-
-        @return: string
-        """
-        hours, remainder = divmod(self.end.seconds, 3600)
-        minutes, __ = divmod(remainder, 60)
-        return '%d:%02d' % (hours, minutes)
-    
     def pretty_print(self):
-        """
-        Verbose html info about term
-        Format: {start} - {end} {title_with_url} (author)
+        """Verbose html info about term.
 
-        @return: string
+        Format: {start} - {end} {title_with_url} (author)
         """
-        return '%s - %s <a href="%s">%s</a> (%s)' % (self.print_start(), self.print_end(), self.event.get_absolute_url(), self.event.title, self.event.author)
+        return '%s - %s <a href="%s">%s</a> (%s)' % (
+            self.start, self.end, self.event.get_absolute_url(),
+            self.event.title, self.event.author)
 
     def get_room(self):
         return self.room
