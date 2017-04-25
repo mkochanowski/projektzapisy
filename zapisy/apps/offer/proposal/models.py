@@ -30,6 +30,9 @@ class Syllabus(models.Model):
     learning_methods = models.ManyToManyField(LearningMethod, verbose_name=u'Metody kształcenia', null=True, blank=True)
     literature = models.TextField(verbose_name=u'Zalecana literatura (podręczniki)', blank=True, default='')
     passing_form = models.TextField(verbose_name=u'Forma zaliczenia poszczególnych komponentów przedmiotu/modułu, sposób sprawdzenia osiągnięcia zamierzonych efektów kształcenia', blank=True, default='')
+    exam_hours = models.IntegerField(null=True, blank=True, verbose_name="egzamin")
+    tests_hours = models.IntegerField(null=True, blank=True, verbose_name="sprawdziany/kolokwia")
+    project_presentation_hours = models.IntegerField(null=True, blank=True, verbose_name="prezentacja projektu")
 
 
     @property
