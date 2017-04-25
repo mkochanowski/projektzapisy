@@ -167,26 +167,37 @@ def proposal_edit(request, slug=None):
     description_form = ProposalDescriptionForm(data=request.POST or None, instance=description, prefix='description')
 
     syllabus_form = SyllabusForm(data=request.POST or None, instance=syllabus, prefix='syllabus')
-    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork,extra=1)
-    student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
-
+    initial_data = [{'name':'studiowanie tematyki wykładów i literatury'},
+                    {'name':'przygotowanie do ćwiczeń'},
+                    {'name':'przygotowanie do pracowni'},
+                    {'name':'praca nad projektem'},
+                    {'name':'przygotowanie do sprawdzianów/kolokwiów'},
+                    {'name':'przygotowanie do egzaminu'},
+                    {'name':'przygotowanie raportu/prezentacji'}]
+    extrafields = 8
+    if request.method == "POST" or (syllabus is not None and len(syllabus.studentwork_set.all())>0):
+        extrafields = 1
+    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork,extra=extrafields)
+    if extrafields == 1:
+        student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
+    else:
+        student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus,initial=initial_data)
     if request.method == "POST":
         if proposal_form.is_valid() and description_form.is_valid() and syllabus_form.is_valid() and student_work_formset.is_valid():
+            sendnotification = False
             new_proposal = False
             if proposal is None:
                 new_proposal = True
             proposal = proposal_form.save(commit=False)
             description = description_form.save(commit=False)
             syllabus = syllabus_form.save(commit=False)
-            student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
 
             if not proposal.owner:
                 proposal.owner = request.user.employee
             if new_proposal or proposal.status == 5 or proposal.status == 1:
                 proposal.status = 0
-                send_notification_to_3d(proposal, new_proposal)
-                messages.success(request, u'Wysłano wiadomość do DDD z prośbą o zaakceptowanie propozycji przedmiotu')
-
+                sendnotification = True
+ 
             proposal.save()
 
             description.author = request.user.employee
@@ -200,6 +211,7 @@ def proposal_edit(request, slug=None):
             syllabus.entity_id = proposal.id
             syllabus.save()
             syllabus_form.save_m2m()
+            student_work_formset.instance = syllabus
             student_work_formset.save()
 
             if not ects_field:
@@ -213,6 +225,9 @@ def proposal_edit(request, slug=None):
             proposal.save()
 
             messages.success(request, u'Propozycja zapisana')
+            if sendnotification:
+                send_notification_to_3d(proposal, new_proposal)
+                messages.success(request, u'Wysłano wiadomość do DDD z prośbą o zaakceptowanie propozycji przedmiotu')
 
             return redirect('my-proposal-show', slug=proposal.slug)
         else:

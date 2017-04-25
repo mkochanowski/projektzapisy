@@ -12,6 +12,11 @@
         label { width: 150px; }
         textarea {width: 100%; }
         tr.haserrors {background-color: #ffd1d1;}
+        td.hours-col input {width:50px;}
+        td.hours-col {width:150px;}
+        th.name-col input {width:300px;}
+        th.name-col {width:300px;}
+        div#main-content form {width:770px;}
     </style>
     <script type="text/javascript">
         types_data = {{ types_data|safe }};
@@ -71,7 +76,26 @@
         </table>
         <table>
             {{ desc }}
-            {{ syllabus }}
+            {% for field in syllabus %}
+                {% if not field.name in 'exam_hours,tests_hours,project_presentation_hours'|slice:',' %}
+                <tr>
+                    <th>
+                    {% if field.field.required %}
+                    <span style="position:absolute; left:160px;">*</span>
+                    {% endif %}
+                    {{field.label_tag}}
+                    </th>
+                    {% if field.errors %}
+                    <td>{{field}}</td>
+                    <td>
+                        {{field.errors}}
+                    </td>
+                    {% else %}
+                    <td colspan="2">{{field}}</td>
+                    {% endif %}
+                </tr>
+                {% endif %}
+            {% endfor %}
         </table>
         <table id="hours-table">
         <h3>Nakład pracy studenta</h3>
@@ -88,29 +112,49 @@
 
         <tr>
             <th></th>
-            <th>repetytorium</th>
-            <td>{{ form.repetitions }}</td>
+            <th class="name-col">repetytorium</th>
+            <td class="hours-col">{{ form.repetitions }}</td>
+        </tr>
         <tr>
             <th></th>
-            <th>wykład</th>
-            <td>{{ form.lectures }}</td>
+            <th class="name-col">wykład</th>
+            <td class="hours-col">{{ form.lectures }}</td>
+        </tr>
         <tr>
             <th></th>
-            <th>ćwiczenia</th>
-            <td>{{ form.exercises }}</td>
+            <th class="name-col">ćwiczenia</th>
+            <td class="hours-col">{{ form.exercises }}</td>
+        </tr>
         <tr>
             <th></th>
-            <th>pracownię</th>
-            <td>{{ form.laboratories }}</td>
+            <th class="name-col">pracownię</th>
+            <td class="hours-col">{{ form.laboratories }}</td>
+        </tr>
         <tr>
             <th></th>
-            <th>ćwiczenio-pracownię</th>
-            <td>{{ form.exercises_laboratiories }}</td>
+            <th class="name-col">ćwiczenio-pracownię</th>
+            <td class="hours-col">{{ form.exercises_laboratiories }}</td>
+        </tr>
         <tr>
             <th></th>
-            <th>seminarium</th>
-            <td>{{ form.seminars }}</td>
-
+            <th class="name-col">seminarium</th>
+            <td class="hours-col">{{ form.seminars }}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="name-col">egzamin</th>
+            <td class="hours-col">{{ syllabus.exam_hours }}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="name-col">sprawdziany/kolokwia</th>
+            <td class="hours-col">{{ syllabus.tests_hours }}</td>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="name-col">prezentacja projektu</th>
+            <td class="hours-col">{{ syllabus.project_presentation_hours }}</td>
+        </tr>
         <tr>
             <th><label>Praca własna studenta</label></th>
             <th></th>
@@ -119,12 +163,12 @@
         {% for form in student_work_formset.forms %}
         <tr class="dynamic-formset">
             <th>{{ form.name.errors }}{{ form.hours.errors }}</th>
-            <th>
+            <th class="name-col">
               {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
               {{ form.id }}
               {{ form.name }}
             </th>
-            <td>{{ form.hours }}</td>
+            <td class="hours-col">{{ form.hours }}</td>
         </tr>
         {% endfor %}
         </table>
