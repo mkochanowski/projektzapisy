@@ -283,7 +283,7 @@ class Group(models.Model):
         if Record.objects.filter(group=self, student=student, status=Record.STATUS_ENROLLED).count() > 0:
             return False, [u"Jesteś już w tej grupie"]
 
-        if not self.student_have_opened_enrollment(student):
+        if not self.course.is_opened_for_student(student):
             return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
 
         semester = Semester.objects.get_next()
@@ -306,10 +306,6 @@ class Group(models.Model):
             queued, messages = self._add_student_to_queue(student)
             result.extend(messages)
             return queued, result
-
-    def student_have_opened_enrollment(self, student):
-        opening = self.course.get_opening_time(student).opening_time
-        return opening and opening < datetime.datetime.now()
 
     def student_can_enroll(self, student):
 
@@ -339,7 +335,7 @@ class Group(models.Model):
         to_removed = []
         result = None
         for q in queued:
-            if self.is_full_for_student(q.student) and not self.student_have_opened_enrollment(q.student):
+            if self.is_full_for_student(q.student) and not self.course.is_opened_for_student(q.student):
                 continue
 
             limit, __ = self.student_can_enroll(q.student)

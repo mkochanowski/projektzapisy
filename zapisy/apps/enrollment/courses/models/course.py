@@ -14,7 +14,7 @@ from apps.enrollment.courses.models.effects import Effects
 from apps.enrollment.courses.models.tag import Tag
 
 from apps.offer.proposal.exceptions import NotOwnerException
-
+from apps.users.models import OpeningTimesView
 import logging
 
 logger = logging.getLogger()
@@ -227,18 +227,6 @@ class CourseEntity(models.Model):
         verbose_name_plural = 'Podstawy przedmiotów'
         app_label = 'courses'
         ordering = ['name']
-
-
-    def get_opening_time(self, student):
-        """
-
-        @param student:
-        @return:
-        """
-
-        from apps.users.models import OpeningTimesView
-
-        return OpeningTimesView.objects.get(student=student, course=self)
 
 
     def get_points(self, student=None):
@@ -484,14 +472,17 @@ class Course(models.Model):
 
     def get_opening_time(self, student):
         """
-
-        @param student:
-        @return:
+        Gets the opening time of the current course for the given
+        student, that is, the earliest point in time such that
+        the student is allowed to sign up for the course.
+        @param student: The student for whom the course opening
+        time is to be determined.
         """
-
-        from apps.users.models import OpeningTimesView
-
-        return OpeningTimesView.objects.get(student=student, course=self)
+        try:
+            o = OpeningTimesView.objects.get(student=student, course=self)
+            return o.opening_time
+        except ObjectDoesNotExist:
+            return None
 
     @property
     def exam(self):
@@ -639,11 +630,18 @@ class Course(models.Model):
             .filter(Q(course=self), Q(state__semester_summer=self.semester) | Q(state__semester_winter=self.semester)) \
             .count()
 
-    def is_opened(self, student):
-        try:
-            return self.get_opening_time(student).opening_time < datetime.datetime.now()
-        except:
+    def is_opened_for_student(self, student):
+        """
+        Determines whether the student is allowed
+        to sign up for this course at the current time.
+        Note: as the return value depends on the current time,
+        the function is not pure.
+        """
+        opening_time = self.get_opening_time(student)
+        if opening_time is None:
             return False
+        return opening_time < datetime.datetime.now()
+        
 
     def is_recording_open_for_student(self, student=None):
         """ gives the answer to question: is course opened for apps.enrollment for student at the very moment? """
@@ -659,7 +657,7 @@ class Course(models.Model):
         if self.records_start and self.records_end and self.records_start <= now <= self.records_end:
             return True
 
-        if records_opening and self.is_opened(student) and now < records_closing:
+        if records_opening and self.is_opened_for_student(student) and now < records_closing:
             return True
 
         if self.records_start and self.records_end and self.records_start <= now < self.records_end:
