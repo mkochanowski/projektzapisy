@@ -194,7 +194,7 @@ def proposal_edit(request, slug=None):
 
             if not proposal.owner:
                 proposal.owner = request.user.employee
-            if new_proposal or proposal.status == 5 or proposal.status == 1:
+            if new_proposal or proposal.status == 5:
                 proposal.status = 0
                 sendnotification = True
  
