@@ -17,11 +17,11 @@ test:
     - mkdir logs
     - python manage.py test test_app
     # - coverage run manage.py test test_app
-    - coverage run manage.py test news
-    - coverage run manage.py test schedule
-    - coverage run manage.py test courses
-    - coverage run manage.py test records
-    - coverage run manage.py test vote
-    - coverage run manage.py test users
+    - coverage run manage.py test apps/news
+    - coverage run manage.py test apps/schedule
+    - coverage run manage.py test apps/courses
+    - coverage run manage.py test apps/records
+    - coverage run manage.py test apps/vote
+    - coverage run manage.py test apps/users
   post:
     - coverage html -d $CIRCLE_ARTIFACTS
