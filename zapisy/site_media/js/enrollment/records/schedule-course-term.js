@@ -38,11 +38,16 @@ Fereol.Enrollment.ScheduleCourseTerm._byID = {};
 
 Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 {
-	var sterm = new Fereol.Enrollment.ScheduleCourseTerm();
-	var raw = $.parseJSON(json)
+	let obj = $.parseJSON(json)
+    return Fereol.Enrollment.ScheduleCourseTerm.fromObject(obj);
+};
 
-	sterm.id = raw['id'].castToInt();
-	sterm.group = Fereol.Enrollment.CourseGroup.getByID(raw['group'].castToInt());
+Fereol.Enrollment.ScheduleCourseTerm.fromObject = function(obj)
+{
+    var sterm = new Fereol.Enrollment.ScheduleCourseTerm();
+    
+    sterm.id = obj['id'].castToInt();
+	sterm.group = Fereol.Enrollment.CourseGroup.getByID(obj['group'].castToInt());
 	sterm.group.updateListeners.push(function()
 	{
 		sterm._updateVisibility();
@@ -50,9 +55,9 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 	});
 
 	sterm.scheduleTerm = new Schedule.Term(
-		raw.day.castToInt() - 1,
-		new Schedule.Time(raw.start_time[0].castToInt(), raw.start_time[1].castToInt()),
-		new Schedule.Time(raw.end_time[0].castToInt(), raw.end_time[1].castToInt()),
+		obj.day.castToInt() - 1,
+		new Schedule.Time(obj.start_time[0].castToInt(), obj.start_time[1].castToInt()),
+		new Schedule.Time(obj.end_time[0].castToInt(), obj.end_time[1].castToInt()),
 		sterm.container,
 		sterm.popupContents
 	);
@@ -61,7 +66,7 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 		sterm._onResize(isFullSize);
 	};
 
-	sterm.classroom = raw.classroom;
+	sterm.classroom = obj.classroom;
 
 	Fereol.Enrollment.ScheduleCourseTerm._byID[sterm.id] = sterm;
 

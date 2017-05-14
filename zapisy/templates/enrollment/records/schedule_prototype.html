@@ -30,37 +30,6 @@
 	{% trans "Prototyp planu" %}
 {% endblock %}
 
-{% block topContent %}
-	<div id="enr-schedulePrototype-top-bar" class="main-top-bar" style="display: none">
-		<fieldset>
-			<legend><span>{# Translators: tytuł okienka filtrowania #}{% trans "Filtrowanie" %}</span></legend>
-			<div class="main-filter-input">
-				<input class="text filter-phrase" type="text" />
-				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
-			</div>
-		</fieldset>
-		<fieldset class="course-type-filter">
-			<legend><span>{# Translators: Filtrowanie -> tytuł kawałka z checkboxami #}{% trans "Rodzaj przedmiotu" %}</span></legend>
-			{% for type in types_list %}
-				<span class="checkbox">
-					<input type="checkbox" checked="checked" id="filter-course-type-{{ type.id }}" {% if type.meta_type %} class="filter-course-type-meta" {% endif %} value="{{ type.id }}"/>
-					<input type="hidden" class="group-id" value="{{ type.group.id }}" />
-					<label for="filter-course-type-{{ type.id }}"><span>{{ type.name }}</span></label>
-				</span>
-			{% endfor %}
-		</fieldset>
-		<fieldset id="enr-schedulePrototype-other">
-			<legend><span>{# Translators: Filtrowanie -> tytuł kawałka z opcjami #}{% trans "Inne" %}</span></legend>
-			<span class="checkbox"><input type="checkbox" id="enr-hidesigned" /><label for="enr-hidesigned">{% trans "Schowaj przedmioty, na które byłem zapisany" %}</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">{% trans "Pokaż przedmioty prowadzone w j.angielskim" %}</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">{% trans "Pokaż przedmioty kończące się egzaminem" %}</label></span>
-                        <span class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear"  style="color:red;">{% trans "Pokaż tylko przedmioty zalecane dla 1 roku" %}</label></span>
-		</fieldset>
-	</div>
-{% endblock %}
-
-
-
 {% block content-width %}12{% endblock %}
 {% block content %}
 	<form action="{% url 'records-set-locked' %}" method="post" id="enr-schedulePrototype-setLocked"><div>{% csrf_token %}
@@ -79,7 +48,7 @@
 	{% block messages %}{% endblock %}{% include 'common/messages.html' %}
 
 	<div id="enr-schedulePrototype-scheduleContainer">
-		<p>{% trans "Nie masz włączonej obsługi javascript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.</p>
+		<p>{% trans "Nie masz włączonej obsługi JavaScript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.</p>
 		<input type="hidden" name="courses" value="{{ courses_json }}" />
 		<input type="hidden" name="groups" value="{{ groups_json }}" />
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}" />
@@ -117,6 +86,7 @@
 	<div id="main-sidebar" class="prototype-sidebar">
 		{# Translators: tytuł nad sidebarem #}
 		<h3>{% trans "Semestr" %} {{ semester }}</h3>
+		<a id="enr-schedulePrototype-uncheckAll">Odznacz wszystkie</a>
         <hr>
 		<ul id="enr-schedulePrototype-course-list">
 			{% for course in courses %}

@@ -352,10 +352,11 @@ PIPELINE_JS = {
             'js/components/messageBox.js',
             'js/common/listFilter.js',
            	'js/common/listFilter-courseType.js',
+            'js/common/FilteredCoursesList.js',
+        	'js/enrollment/records/PrototypeCoursesList.js',
             'js/enrollment/records/course.js',
             'js/enrollment/records/course-group.js',
-            'js/enrollment/records/schedule-course-term.js',
-            'js/enrollment/views/schedule-prototype.js',
+            'js/enrollment/records/schedule-course-term.js'
         ),
         'output_filename': 'js/prototype.min.js',
     },

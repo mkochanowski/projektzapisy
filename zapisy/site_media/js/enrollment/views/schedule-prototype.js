@@ -18,7 +18,7 @@ SchedulePrototype.init = function()
 
 	/* //testowe
 	SchedulePrototype.schedule.addTerm(new Schedule.Term(0,
-		new Schedule.Time(13, 20), new Schedule.Time(16, 20), $.create('div').text('a')));
+		new Schedule.Time(13, 20), new Schedule.Time(16, 20), $.fcreate('div').text('a')));
 	SchedulePrototype.schedule.addTerm(new Schedule.Term(0,
 		new Schedule.Time(16, 10), new Schedule.Time(17, 10), $.create('div').text('b')));
 	SchedulePrototype.schedule.addTerm(new Schedule.Term(0,
@@ -30,7 +30,6 @@ SchedulePrototype.init = function()
 	*/
 
 	SchedulePrototype.initCourseList();
-	SchedulePrototype.initFilter();
     if( user_is_student ){
 	    SchedulePrototype.initRecordsLocking();
     }
@@ -45,98 +44,7 @@ $(SchedulePrototype.init);
 /**
  * Inicjuje filtrowanie.
  */
-SchedulePrototype.initFilter = function()
-{
-	var courseFilterForm = $('#enr-schedulePrototype-top-bar').assertOne();
 
-	courseFilterForm.css('display', 'block');
-
-	courseFilterForm.find('.filter-phrase-reset').assertOne().click(function()
-	{
-		courseFilterForm.find('.filter-phrase').assertOne().attr('value', '');
-	});
-
-	// komunikat o pustym filtrze
-	SchedulePrototype.emptyFilterWarning =
-		$.create('p', {className: 'main-side-message'}).
-		text('Do podanego filtra nie pasuje żaden przedmiot.').
-		css({marginTop: '50px', display: 'none'}).
-		insertAfter($('#enr-schedulePrototype-course-list').assertOne());
-	SchedulePrototype.emptyFilterWarningVisible = false;
-
-	// konfiguracja filtra
-
-	SchedulePrototype.courseFilter = new ListFilter('SchedulePrototype-courses', courseFilterForm.getDOM());
-
-	SchedulePrototype.courseFilter.afterFilter = function(matchedElementsCount)
-	{
-		var visible = (matchedElementsCount == 0);
-		if (SchedulePrototype.emptyFilterWarningVisible == visible)
-			return;
-		SchedulePrototype.emptyFilterWarningVisible = visible;
-		SchedulePrototype.emptyFilterWarning.css('display', visible?'':'none');
-		SchedulePrototype.uncheckAllButton.css('display', visible?'none':'');
-	};
-
-	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
-		'phrase', '.filter-phrase', function(element, value)
-	{
-		var course = element.data;
-		return (course.model.name.toLowerCase().indexOf(value.toLowerCase()) >= 0);
-	}));
-
-	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
-		'hideSigned', '#enr-hidesigned', function(element, value)
-	{
-		if (!value)
-			return true;
-		var course = element.data;
-		return !course.wasEnrolled;
-	}));
-	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
-		'showEnglish', '#enr-courseFilter-english', function(element, value)
-	{
-		if(value)
-			return true;
-		var course = element.data;
-		return !course.english;
-	}));
-	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
-		'showExam', '#enr-courseFilter-exam', function(element, value)
-	{
-		if(value)
-			return true;
-		var course = element.data;
-		return !course.exam;
-	}));
-	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
-		'showSyggestedForFirstYear', '#enr-courseFilter-suggestedForFirstYear', function(element, value)
-	{
-		if(!value)
-			return true;
-		var course = element.data;
-		return course.suggested_for_first_year;
-	}));
-
-	SchedulePrototype.courseFilter.addFilter(ListFilter.CustomFilters.createCourseTypeFilter(
-		function(element, courseType)
-	{
-		var course = element.data;
-		return (course.model.type == courseType);
-	}));
-
-	SchedulePrototype.courseList.forEach(function(course)
-	{
-		SchedulePrototype.courseFilter.addElement(new ListFilter.Element(course, function(visible)
-		{
-			var course = this.data;
-			course.setVisible(visible);
-		}));
-	});
-
-	SchedulePrototype.courseFilter.runThread(true);
-	$('#enr-schedulePrototype-top-bar').find('label').disableDragging();
-};
 
 /**
  * Inicjuje przycisk blokowania planu.
