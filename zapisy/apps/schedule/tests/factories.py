@@ -10,7 +10,8 @@ import factory.fuzzy
 from factory.django import DjangoModelFactory
 
 from apps.users.tests.factories import UserFactory
-from apps.enrollment.courses.tests.factories import GroupFactory, SummerSemesterFactory, \
+from apps.enrollment.courses.models import Semester
+from apps.enrollment.courses.tests.factories import GroupFactory, SemesterFactory, \
     ClassroomFactory
 from apps.schedule.models import Event, Term, SpecialReservation
 
@@ -19,9 +20,9 @@ class EventCourseFactory(DjangoModelFactory):
     class Meta:
         model = Event
 
+    visible = True
     group = factory.SubFactory(GroupFactory)
     author = factory.SubFactory(UserFactory)
-
 
 class EventFactory(DjangoModelFactory):
     class Meta:
@@ -86,11 +87,10 @@ class TermFixedDayFactory(TermThisYearFactory):
     start = time(15)
     end = time(16)
 
-class SepcialReservationFactory(DjangoModelFactory):
+class SpecialReservationFactory(DjangoModelFactory):
     class Meta:
         model = SpecialReservation
 
-    semester = factory.SubFactory(SummerSemesterFactory)
     title = factory.Sequence(lambda n: 'Special reservation %d' % n)
     classroom = factory.SubFactory(ClassroomFactory)
     dayOfWeek = common.FRIDAY

@@ -3,10 +3,10 @@ from datetime import datetime, timedelta, date
 from apps.enrollment.courses.models import Semester, Term
 from django.core.validators import ValidationError
 from django.test import TestCase
-import zapisy.common as common
+import common
 
-from zapisy.apps.enrollment.courses.models import Freeday, ChangedDay
-from zapisy.apps.enrollment.courses.tests.objectmothers import SemesterObjectMother
+from apps.enrollment.courses.models import Freeday, ChangedDay
+from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother
 
 
 class FreedayTestCase(TestCase):
