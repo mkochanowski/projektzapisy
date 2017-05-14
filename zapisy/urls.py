@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import *
-
 from django.contrib import admin
 import os
 import settings
@@ -9,6 +7,7 @@ import settings
 admin.autodiscover()
 
 from feeds import LatestNews
+from django.conf.urls import include, patterns, url
 from django.views.generic import TemplateView
 
 

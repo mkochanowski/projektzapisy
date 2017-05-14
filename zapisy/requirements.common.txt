@@ -1,11 +1,11 @@
 # Packages from our development environment
-Django==1.5.12 --no-binary django
+Django==1.6.11 --no-binary django
 Fabric==1.5.1
 South==0.7.6
 argparse==1.2.1
 django-autoslug==1.6.1
 django-debug-toolbar==0.9.4
-django-extensions==1.0.1
+django-extensions==1.6.7
 django-filter==0.5.4
 django-mailer==0.1.0
 django-modeltranslation==0.6.1
