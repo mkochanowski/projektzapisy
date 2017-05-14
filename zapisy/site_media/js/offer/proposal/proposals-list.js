@@ -150,7 +150,7 @@ ProposalsList.initFilter = function()
 		}));
 	};
 
-	ProposalsList.proposalFilter.runThread();
+	ProposalsList.proposalFilter.runThread(true);
 	$('#enr-proposalsList-top-bar').find('label').disableDragging();
 };
 

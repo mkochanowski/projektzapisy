@@ -180,7 +180,7 @@ hr.filterListDivider {
 }
 
 .course-type-filter {
-  width: 300px;
+  width: 290px;
 }
 
 .course-type-filter > span {
@@ -290,11 +290,11 @@ input.small {
 }
 
 .filter-phrase {
-  width: 190px;
+  width: 220px;
 }
 
 .main-top-bar fieldset:nth-child(1) {
-  width: 300px;
+  width: 290px;
 }
 
 table td.ects {

@@ -134,7 +134,7 @@ SchedulePrototype.initFilter = function()
 		}));
 	});
 
-	SchedulePrototype.courseFilter.runThread();
+	SchedulePrototype.courseFilter.runThread(true);
 	$('#enr-schedulePrototype-top-bar').find('label').disableDragging();
 };
 

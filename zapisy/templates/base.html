@@ -82,7 +82,7 @@
         })
     });
     </script>
-
+    <script src="{% static "js/common/utils.js" %}"></script>
 </head>
 
 <body>
@@ -203,10 +203,10 @@
             </div>
         {% endfor %}
         {% endblock %}
-        <div id="main-content-container" class="row show-grid sidebar-right">
+        <div id="main-content-container" class="row show-grid sidebar-right marginFix">
             {% block topContent %}{% endblock %}
             {% block center %}
-                <div class="span{% block content-width %}11{% endblock %} columns">
+                <div class="span{% block content-width %}11{% endblock %} columns marginFix">
                     <div id="main-content">
                         {% block content %}
                         {% endblock %}
