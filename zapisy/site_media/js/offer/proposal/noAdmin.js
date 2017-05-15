@@ -41,7 +41,7 @@ function beforeSubmitButton(nameEditPlID,nameEditEnID)
     var nameEN = document.getElementById(nameEditEnID);
     
     if (namePL.value=="") namePL.value=nameEN.value;
-    if (nameEN.value=="") nameEN.value=namePL.value;
+    //if (nameEN.value=="") nameEN.value=namePL.value;
 
     var listRows = document.querySelectorAll('[id^="id_studentwork_set-"]');
 
