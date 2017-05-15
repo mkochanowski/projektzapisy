@@ -99,28 +99,32 @@ class NewSemesterTests(SeleniumTestCase):
                 name='Course %s' % i,
                 semester='l',
                 type=self.course_type,
-                status=1 # w ofercie
+                status=1, # w ofercie
+                suggested_for_first_year=False,
             )
 
         CourseEntity.objects.create(
             name='Course 50',
             semester='l',
             type=self.course_type,
-            status=0 # propozycja
+            status=0, # propozycja
+            suggested_for_first_year=False,
         )
 
         CourseEntity.objects.create(
             name='Course 100',
             semester='z',
             type=self.course_type,
-            status=1 # w ofercie
+            status=1, # w ofercie
+            suggested_for_first_year=False,
         )
 
         CourseEntity.objects.create(
             name='Course 101',
             semester='l',
             type=self.course_type,
-            status=1 # w ofercie
+            status=1, # w ofercie
+            suggested_for_first_year=False,
         )
 
         for course_entity in CourseEntity.objects.all():
