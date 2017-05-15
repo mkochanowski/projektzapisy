@@ -91,7 +91,8 @@ class NewSemesterTests(SeleniumTestCase):
                 name='Course %s' % i,
                 semester='z',
                 type=self.course_type,
-                status=1 # w ofercie
+                status=1, # w ofercie
+                suggested_for_first_year=False,
             )
         for i in range(6, 11):
             CourseEntity.objects.create(
