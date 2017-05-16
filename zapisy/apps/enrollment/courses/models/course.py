@@ -705,7 +705,13 @@ class Course(models.Model):
     
     def get_tags_list(self):
         return self.tags
-
+    
+    def get_was_enrolled(self, student):
+        if student is None:
+            return False
+        
+        #TODO
+        return False
 
     def serialize_for_json(self, student=None, is_recording_open=None,
                            terms=None, includeWasEnrolled=False):
@@ -733,13 +739,13 @@ class Course(models.Model):
         
         if includeWasEnrolled:
             data.update({
-                'was_enrolled' : self.getWasEnrolled()
-            )}
-        
+                'was_enrolled' : self.get_was_enrolled(student)
+            })
+            
         if terms is not None:
             data.update({
-                'terms' : 
-            });
+                'terms' : [term.serialize_for_json() for term in terms]
+            })
 
         return data
 

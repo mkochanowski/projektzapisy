@@ -356,7 +356,8 @@ PIPELINE_JS = {
         	'js/enrollment/records/PrototypeCoursesList.js',
             'js/enrollment/records/course.js',
             'js/enrollment/records/course-group.js',
-            'js/enrollment/records/schedule-course-term.js'
+            'js/enrollment/records/schedule-course-term.js',
+            'js/enrollment/views/courses-list-filters-ui.js'
         ),
         'output_filename': 'js/prototype.min.js',
     },

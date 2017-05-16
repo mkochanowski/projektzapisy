@@ -43,7 +43,8 @@
 		<input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}" />
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
-
+    </div>
+    <br>
 		<div class="byWeekDays">
 			<h2>Zajęcia z podziałem na dni</h2>
 			{% for day in terms_by_days %}
@@ -69,14 +70,13 @@
 				</ul>
 			{% endfor %}
 		</div>
-	</div>
 
 	<div id="user-schedule-listByCourse" style="display:none">
 		{% for course in courses %}
 			<span>
-				<input type="hidden" name="id" value="{{ course.info.id }}" />
+				<input type="hidden" name="id" value="{{ course.id }}" />
 				{% for term in course.terms %}
-					<input type="hidden" name="term" value="{{ term.json }}" />
+					<input type="hidden" name="term" value="{{ term }}" />
 				{% endfor %}
 			</span>
 		{% endfor %}

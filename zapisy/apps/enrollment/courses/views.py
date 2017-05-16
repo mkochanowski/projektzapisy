@@ -34,11 +34,7 @@ def get_course_list_info_json_for_semester(user, semester):
     """
     
     courses_list_for_json = [c.serialize_for_json() for c in courses]
-    semester_for_json = {
-        "id" : semester.pk,
-        "year" : semester.year,
-        "type" : semester.get_type_display()
-    }
+    semester_for_json = semester.serialize_for_json()
     
     courses_list_info = {
         "courseList" : courses_list_for_json,

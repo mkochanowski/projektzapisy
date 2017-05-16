@@ -328,8 +328,10 @@ def schedule_prototype(request):
         messages.info(request, 'Brak aktywnego semestru.')
         data = {
             'student_records': [],
-            'courses' : [],
+            'groups_json': '',
             'semester' : 'nieokreślony',
+            'effects' : '',
+            'tags' : '',
             'types_list' : [],
             'allow_leave_course' : should_allow_leave,
         }
@@ -337,40 +339,17 @@ def schedule_prototype(request):
             data, context_instance = RequestContext(request))
     if student:
         StudentOptions.preload_cache(student, default_semester)
-    cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
-    if cached_courses == 'DoesNotExist':
+    cached_courses_json = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
+    if cached_courses_json == 'DoesNotExist':
         logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
-        terms = Term.get_all_in_semester(default_semester )
-        courses = prepare_courses_with_terms( terms )
-        ccourses = []
-        for course in courses:
-            jsons = []
-            for term in course['terms']:
-                term.update({ # TODO: do szablonu
-                    'json': simplejson.dumps(term['info'])
-                })
-                jsons.append({'json': simplejson.dumps(term['info'])})
-                
-            course['info'].update({
-                'is_recording_open': False,
-                #TODO: kod w prepare_courses_list_to_render moim zdaniem nie
-                #      zadziała
-                'was_enrolled': 'False',
-                'english': course['object'].english,
-                'exam': course['object'].exam,
-                'suggested_for_first_year': course['object'].suggested_for_first_year,
-                'terms':jsons
-            })
-            ccourses.append(course['info'])
-        cached_courses = ccourses
-        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
+        courses = prepare_courses_with_terms()
+        courses = [course.serialize_for_json(student=student, terms=terms, includeWasEnrolled=True)
+            for course, terms in courses]
+        cached_courses_json = simplejson.dumps(courses)
+        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses_json)
 #    else:
 #        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
-
-    print(prepare_courses_with_terms( terms ))
-    print "\n\n\n--------------------------------------\n\n\n"
-    print simplejson.dumps(cached_courses)
-
+    
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
     if cached_all_groups == 'DoesNotExist':
 
@@ -383,29 +362,12 @@ def schedule_prototype(request):
     all_groups_json = prepare_groups_json(default_semester, cached_all_groups,
         student=student)
 
-    cached_test = mcache.get("test_cache", "DoesNotExist")
-
-    if cached_test == 'DoesNotExist':
-#        logger.debug("test missed")
-        mcache.set("test_cache", 2)
-#    else:
-#        logger.debug("test is in cache")
-    cached_courses_json = mcache.get("schedule_prototype_courses_json_%s" % student_id, 'DoesNotExist')    
-    if cached_courses_json == 'DoesNotExist':
-#        logger.debug("miss schedule_prototype_courses_json_%s" % student.id)
-        cached_courses_json = prepare_courses_json(cached_all_groups, student) #OK!
-        mcache.set("schedule_prototype_courses_json_%s" % student_id, cached_courses_json)
-#    else:
-#        logger.debug("in cache schedule_prototype_courses_json_%s" % student.id)
-    
-    print "\n\n\n--------------------------------------\n\n\n"
-    print cached_courses_json
-
     data = {
         'courses_json': cached_courses_json,
         'groups_json': all_groups_json,
-        'courses' : cached_courses,
         'semester' : default_semester,
+        'effects' : Effects.objects.all(),
+        'tags' : Tag.objects.all(),
         'types_list' : Type.get_all_for_jsfilter(),
         'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
         'allow_leave_course' : should_allow_leave,

@@ -10,3 +10,8 @@ function findOne(haystack, arr)
         return haystack.indexOf(v) >= 0;
     });
 }; 
+
+function stackTrace() {
+    var err = new Error();
+    return err.stack;
+}

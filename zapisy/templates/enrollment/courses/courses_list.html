@@ -10,12 +10,16 @@
     {# end bread #}
 {% endblock %}
 
+{% block topContent %}
+{% include 'enrollment/filters.html' %}
+{% endblock %}
+
 {% block enrollment_menu_courses %} class="active"{% endblock %}
 
 {% block content %}
     <div class="alert-message info">
         <a href="#" class="close">×</a>
-        <p>{% trans "Wybierz przedmiot z listy" %}</p>
+        <p>{% trans "Wybierz asjdsadprzedmiot z listy" %}</p>
     </div>
     {# end content#}
 {% endblock %}

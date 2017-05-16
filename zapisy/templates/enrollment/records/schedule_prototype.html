@@ -22,6 +22,10 @@
     {% compressed_js 'prototype' %}
 {% endblock %}
 
+{% block topContent %}
+{% include 'enrollment/filters.html' %}
+{% endblock %}
+
 {% block enrollment_menu_prototype %} class="active"{% endblock %}
 
 {% block bread %}
@@ -32,6 +36,7 @@
 
 {% block content-width %}12{% endblock %}
 {% block content %}
+    {% comment %}
 	<form action="{% url 'records-set-locked' %}" method="post" id="enr-schedulePrototype-setLocked"><div>{% csrf_token %}
 		<input type="hidden" name="ajax-url" value="{% url 'records-set-locked' '.json' %}" />
         {% if request.user.student %}
@@ -44,17 +49,20 @@
             {% endif %}
 		{% endif %}
 	</div></form>
+	{% endcomment %}
 
 	{% block messages %}{% endblock %}{% include 'common/messages.html' %}
-
-	<div id="enr-schedulePrototype-scheduleContainer">
-		<p>{% trans "Nie masz włączonej obsługi JavaScript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.</p>
-		<input type="hidden" name="courses" value="{{ courses_json }}" />
-		<input type="hidden" name="groups" value="{{ groups_json }}" />
+    <div id="scheduleData">
+        <input type="hidden" id="courses_list_json" value='{{ courses_json|safe }}' />
+		<input type="hidden" id="courses_groups" value="{{ groups_json }}" />
 		<input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}" />
 		<input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}" />
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
+    </div>
+	
+	<div id="enr-schedulePrototype-scheduleContainer">
+		<p>{% trans "Nie masz włączonej obsługi JavaScript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.</p>
 	</div>
     <ul id="schedule-legend">
         <li>
@@ -89,24 +97,6 @@
 		<a id="enr-schedulePrototype-uncheckAll">Odznacz wszystkie</a>
         <hr>
 		<ul id="enr-schedulePrototype-course-list">
-			{% for course in courses %}
-			<li>
-				<span class="checkbox"><input type="checkbox" id="enr-schedulePrototype-course-{{ course.id }}" /></span>
-				<label for="enr-schedulePrototype-course-{{ course.id }}">{{ course.name }}</label>
-				<input type="hidden" name="id" value="{{ course.id }}" />
-				<input type="hidden" name="type" value="{{ course.type }}" />
-				<input type="hidden" name="short" value="{{ course.short }}" />
-				<input type="hidden" name="wasEnrolled" value="{{ course.was_enrolled }}" />
-				<input type="hidden" name="english" value="{{ course.english }}" />
-				<input type="hidden" name="exam" value="{{ course.exam }}" />
-				<input type="hidden" name="suggested_for_first_year" value="{{ course.suggested_for_first_year }}" />
-				<input type="hidden" name="isRecordingOpen" value="{{ course.is_recording_open }}" />
-				<input type="hidden" name="url" value="{% url 'course-page' course.slug %}" />
-				{% for term in course.terms %}
-					<input type="hidden" name="term" value="{{ term.json }}" />
-				{% endfor %}
-			</li>
-			{% endfor %}
 		</ul>
 	</div>
 {% endblock %}
