@@ -45,19 +45,8 @@ def prepare_courses_with_terms(terms, records = None):
     def add_course_to_map(course):
         if course.pk in courses_map:
             return
-        course_info = {
-            'object': course,
-            'info': {
-                'id' : course.pk,
-                'name': course.name,
-                'short': course.entity.get_short_name(),
-                'type': course.type and course.type.pk or 1,
-                'slug': course.slug,
-		'exam': course.exam,
-		'english': course.english,
-		'suggested_for_first_year': course.suggested_for_first_year,
-            },
-            'terms': []
+        serializedCourse = course.serialize_for_json()
+        'terms': []
         }
         courses_map[course.pk] = course_info
         courses_list.append(course_info)

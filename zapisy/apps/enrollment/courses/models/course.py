@@ -707,7 +707,8 @@ class Course(models.Model):
         return self.tags
 
 
-    def serialize_for_json(self, student=None, is_recording_open=None):
+    def serialize_for_json(self, student=None, is_recording_open=None,
+                           terms=None, includeWasEnrolled=False):
         from django.core.urlresolvers import reverse
         
         if student is not None:
@@ -729,6 +730,16 @@ class Course(models.Model):
             'effects': [effect.pk for effect in self.get_effects_list()],
             'tags': [tag.tag.pk for tag in self.get_tags_list()],
         }
+        
+        if includeWasEnrolled:
+            data.update({
+                'was_enrolled' : self.getWasEnrolled()
+            )}
+        
+        if terms is not None:
+            data.update({
+                'terms' : 
+            });
 
         return data
 

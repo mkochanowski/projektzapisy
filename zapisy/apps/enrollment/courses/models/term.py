@@ -153,6 +153,16 @@ class Term(models.Model):
             query = query.filter(start_time__lt=end_time, end_time__gt=start_time)
 
         return query.select_related('group__course')
+    
+    def serialize_for_json(self):
+        return {
+            'id': self.pk,
+            'group': self.group.pk,
+            'classroom': self.classrooms_as_string,
+            'day': int(self.dayOfWeek),
+            'start_time': [self.start_time.hour, self.start_time.minute],
+            'end_time': [self.end_time.hour, self.end_time.minute]
+        }
 
     def __unicode__(self):
         """

@@ -24,7 +24,6 @@ def main(request):
 
 
 def get_course_list_info_json_for_semester(user, semester):
-    # TODO: this SQL has to die
     courses = Course.visible.filter(semester = semester).order_by('entity__name')
     """\
          .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
