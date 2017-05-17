@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block topContent %}
-{% include 'enrollment/filters.html' %}
+{% include "common/course_list_filters.html" with custom_filters="enrollment/semesterChooser.html" %}
 {% endblock %}
 
 {% block enrollment_menu_courses %} class="active"{% endblock %}
@@ -19,7 +19,7 @@
 {% block content %}
     <div class="alert-message info">
         <a href="#" class="close">×</a>
-        <p>{% trans "Wybierz asjdsadprzedmiot z listy" %}</p>
+        <p>{% trans "Wybierz przedmiot z listy" %}</p>
     </div>
     {# end content#}
 {% endblock %}

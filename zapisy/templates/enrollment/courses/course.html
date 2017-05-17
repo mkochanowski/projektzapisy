@@ -27,6 +27,10 @@
     {# end bread #}
 {% endblock %}
 
+{% block topContent %}
+{% include "common/course_list_filters.html"  with custom_filters="enrollment/semesterChooser.html" %}
+{% endblock %}
+
 {% block enrollment_menu_courses %} class="active"{% endblock %}
 
 {% block content %}
