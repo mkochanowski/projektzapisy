@@ -257,8 +257,8 @@ class CourseEntity(models.Model):
 
     def get_short_name(self):
         """
-        If entity have shortName (e.g. JFiZO for Języki Formalne i Złożoność Obliczeniowa) return it.
-        Otherwise return full name
+        Return short name if present (e.g. JFiZO = Języki Formalne i Złożoność Obliczeniowa).
+        Otherwise return full name.
 
         @return: String
         """
@@ -266,8 +266,38 @@ class CourseEntity(models.Model):
             return self.name
         else:
             return self.shortName
+        
+    def get_all_effects(self):
+        cached_effects_list = mcache.get("cached_effects_%d" % (self.id), "DoesNotExist")
+        if cached_effects_list == "DoesNotExist":
+            cached_effects_list = list(self.effects.all())
+            mcache.set("cached_effects_%d" % (self.id), cached_effects_list)
+        return cached_effects_list
+    
+    def get_all_tags(self):
+        cached_tags_list = mcache.get("cached_tags_%d" % (self.id), "DoesNotExist")
+        if cached_tags_list == "DoesNotExist":
+            cached_tags_list = list(self.tags.all())
+            mcache.set("cached_tags_%d" % (self.id), cached_tags_list)
+        return cached_tags_list
 
-
+    # Serialize this object to be converted
+    # to JSON and used by the offer list JS code.
+    def serialize_for_offer_list(self):
+        return {
+            "id" : self.id,
+            "name" : self.name,
+            "status" : self.status,
+            "url" : reverse("offer-page", args=[self.slug]),
+            "type" : self.type.id if self.type else -1,
+            "english" : self.english,
+            "exam" : self.exam,
+            "suggested_for_first_year" : self.suggested_for_first_year,
+            "teacher" : self.owner.id if self.owner else -1,
+            "effects" : [effect.pk for effect in self.get_all_effects()],
+            "tags": [tag.pk for tag in self.get_all_tags()]
+        }
+    
     @property
     def description(self):
         return self.information.description
@@ -394,7 +424,9 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposal(slug):
+        print("get_proposal: " + slug)
         proposal = CourseEntity.noremoved.get(slug=slug)
+        print(proposal)
         try:
             information = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
         except IndexError:
@@ -519,14 +551,6 @@ class Course(models.Model):
             delta = 0
 
         return hours + delta
-
-    @property
-    def tags(self):
-        if not hasattr(self, '_tagscache'):
-            self._tagscache = TagCourseEntity.objects.filter(courseentity=self.entity)
-
-        return self._tagscache
-
 
     @property
     def repetitions(self):
@@ -701,10 +725,10 @@ class Course(models.Model):
         return self.entity.get_points(student)
     
     def get_effects_list(self):
-        return [effect for effect in self.entity.effects.all()]
+        return self.entity.get_all_effects()
     
     def get_tags_list(self):
-        return self.tags
+        return self.entity.get_all_tags()
     
     def get_was_enrolled(self, student):
         if student is None:
@@ -726,7 +750,7 @@ class Course(models.Model):
             'id': self.pk,
             'name': self.name,
             'short_name': self.entity.get_short_name(),
-            'type': self.type.id and self.type.id or 1,
+            'type': self.type.id if self.type.id else 1,
             'url': reverse('course-page', args=[self.slug]),
             'is_recording_open': is_recording_open,
             'english': self.english,
@@ -734,7 +758,7 @@ class Course(models.Model):
             'suggested_for_first_year': self.suggested_for_first_year,
             'was_enrolled': False,
             'effects': [effect.pk for effect in self.get_effects_list()],
-            'tags': [tag.tag.pk for tag in self.get_tags_list()],
+            'tags': [tag.pk for tag in self.get_tags_list()],
         }
         
         if includeWasEnrolled:

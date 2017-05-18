@@ -7,9 +7,12 @@ from django.contrib                 import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http                    import Http404
+from django.utils import simplejson
 from django.shortcuts               import redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.http   import require_POST
+from apps.enrollment.courses.models.effects import Effects
+from apps.enrollment.courses.models.tag import Tag
 from apps.enrollment.courses.models.course import CourseEntity, CourseDescription, Course
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.group import Group
@@ -32,12 +35,21 @@ def offer(request, slug=None):
     if slug is None, this view shows offer main page,
     else show proposal page
     """
-    proposal   = proposal_for_offer(slug)
+    proposal = proposal_for_offer(slug)
     proposals  = CourseEntity.get_proposals(request.user.is_authenticated())
+    serialized_proposals = [prop.serialize_for_offer_list() for prop in proposals]
+    proposals_json = simplejson.dumps(serialized_proposals)
     types_list = Type.get_all_for_jsfilter()
     teachers   = Employee.get_actives()
 
-    return TemplateResponse(request, 'offer/offer.html', locals())
+    return TemplateResponse(request, 'offer/offer.html', {
+        "proposal" : proposal,
+        "proposals_json" : proposals_json,
+        "types_list" : types_list,
+        "teachers" : teachers,
+        "effects" : Effects.objects.all(),
+        "tags" : Tag.objects.all(),
+    })
 
 @permission_required('proposal.can_create_offer')
 def select_for_voting(request):

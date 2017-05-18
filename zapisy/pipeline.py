@@ -319,7 +319,7 @@ PIPELINE_JS = {
         	'js/common/listFilter-courseType.js',
         	'js/common/FilteredCoursesList.js',
         	'js/enrollment/views/CoursesList.js',
-        	'js/enrollment/views/courses-list-filters-ui.js',
+            'js/common/courses-list-filters-ui.js'
         ),
         'output_filename': 'js/courses.min.js',
     },
@@ -353,11 +353,11 @@ PIPELINE_JS = {
             'js/common/listFilter.js',
            	'js/common/listFilter-courseType.js',
             'js/common/FilteredCoursesList.js',
+            'js/common/courses-list-filters-ui.js'
         	'js/enrollment/records/PrototypeCoursesList.js',
             'js/enrollment/records/course.js',
             'js/enrollment/records/course-group.js',
             'js/enrollment/records/schedule-course-term.js',
-            'js/enrollment/views/courses-list-filters-ui.js'
         ),
         'output_filename': 'js/prototype.min.js',
     },
@@ -379,7 +379,9 @@ PIPELINE_JS = {
             'js/enrollment/records/course-group.js',
             'js/enrollment/records/epanel-course-term.js',
             'js/enrollment/views/course.js',
-            'js/enrollment/views/courses-list-filters-ui.js',
+            'js/common/FilteredCoursesList.js',
+        	'js/enrollment/views/CoursesList.js',
+            'js/common/courses-list-filters-ui.js'
         ),
         'output_filename': 'js/course.min.js',
     },
@@ -435,7 +437,9 @@ PIPELINE_JS = {
             'js/components/topBarFilter.js',
            	'js/common/listFilter.js',
            	'js/common/listFilter-courseType.js',
-            'js/offer/proposal/proposals-list.js'
+            'js/common/FilteredCoursesList.js',
+        	'js/offer/proposal/OfferCoursesList.js',
+            'js/common/courses-list-filters-ui.js'
         ),
         'output_filename': 'js/proposal.min.js',
 
