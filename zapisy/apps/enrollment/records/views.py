@@ -339,16 +339,16 @@ def schedule_prototype(request):
             data, context_instance = RequestContext(request))
     if student:
         StudentOptions.preload_cache(student, default_semester)
-    cached_courses_json = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
-    if cached_courses_json == 'DoesNotExist':
+    cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
+    if cached_courses == 'DoesNotExist':
         logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
         courses = prepare_courses_with_terms()
         courses = [course.serialize_for_json(student=student, terms=terms, includeWasEnrolled=True)
             for course, terms in courses]
-        cached_courses_json = simplejson.dumps(courses)
-        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses_json)
-#    else:
-#        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
+        cached_courses = courses
+        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
+
+    courses_json = simplejson.dumps(cached_courses)
     
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
     if cached_all_groups == 'DoesNotExist':
@@ -363,7 +363,8 @@ def schedule_prototype(request):
         student=student)
 
     data = {
-        'courses_json': cached_courses_json,
+        'courses_json': courses_json,
+        'courses' : cached_courses,
         'groups_json': all_groups_json,
         'semester' : default_semester,
         'effects' : Effects.objects.all(),

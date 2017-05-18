@@ -44,6 +44,7 @@ def offer(request, slug=None):
 
     return TemplateResponse(request, 'offer/offer.html', {
         "proposal" : proposal,
+        "proposals" : proposals,
         "proposals_json" : proposals_json,
         "types_list" : types_list,
         "teachers" : teachers,

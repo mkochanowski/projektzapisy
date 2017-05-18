@@ -353,7 +353,7 @@ PIPELINE_JS = {
             'js/common/listFilter.js',
            	'js/common/listFilter-courseType.js',
             'js/common/FilteredCoursesList.js',
-            'js/common/courses-list-filters-ui.js'
+            'js/common/courses-list-filters-ui.js',
         	'js/enrollment/records/PrototypeCoursesList.js',
             'js/enrollment/records/course.js',
             'js/enrollment/records/course-group.js',

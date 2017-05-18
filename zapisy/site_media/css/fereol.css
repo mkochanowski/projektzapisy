@@ -327,6 +327,10 @@ table ul.voted-courses {
   vertical-align: middle;    
 }
 
+.contentNoCollapse {
+  min-height: 1px;
+}
+
 /* Bootstrap customizations/overrides */
 .marginFix {
   margin-left: 0px !important;
