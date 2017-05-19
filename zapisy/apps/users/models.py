@@ -119,7 +119,8 @@ class Employee(BaseUser):
     homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
     status = models.PositiveIntegerField(default=0, choices=EMPLOYEE_STATUS_CHOICES, verbose_name="Status")
-
+    title = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
+    
     def make_preferences(self):
         from apps.offer.preferences.models import Preference
 

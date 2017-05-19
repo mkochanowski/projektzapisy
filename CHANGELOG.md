@@ -1,5 +1,23 @@
 # projektzapisy Changelog
 
+# Version 22.04.20
+
+* Upgrade to Django 1.5
+
+# Version 17.04.20
+
+* Fixed bug with sending emails with "ó"
+* Added possibility to edit syllabus
+* Added conflict list for secretary
+
+# Version 17.04.07
+
+* Fixed mailto links escape '+'
+* Fixed proper author while creating cyclical reservation
+* Added posibility to add reservations with conflicts for secretary
+* Fixed FreeDay and ChangedDay are now unique
+* Added news content is now included in emails
+
 # Version 17.03.09
 
 * Added new date for records: end of unenrolling

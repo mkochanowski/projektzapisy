@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import StringIO
 import csv
+import json
 import re
+import StringIO
 
 from django.conf import settings
-
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -15,7 +14,6 @@ from django.template import RequestContext
 from django.shortcuts import redirect
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
-from django.utils import simplejson
 from django.views.decorators.http import require_POST
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db import transaction
@@ -94,20 +92,17 @@ def set_enrolled(request, method):
         set_enrolled = request.POST['enroll'] == 'true'
     except MultiValueDictKeyError:
         return AjaxFailureMessage.auto_render('InvalidRequest', 'Nieprawidłowe zapytanie.', message_context)
-    
-    cur_semester = Semester.get_current_semester()
-    
-    if cur_semester is None:
-        return AjaxFailureMessage.auto_render('NoOpenSemesters', u'W tej chwili nie trwa żaden semestr.', message_context)
-    
-    elif cur_semester.is_closed():
-        return AjaxFailureMessage.auto_render('SemesterIsLocked', u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.', message_context)
 
-    if request.user.student.block:
-        return AjaxFailureMessage.auto_render('ScheduleLocked',
-            u'Twój plan jest zablokowany. Możesz go doblokować w prototypie', message_context)
-    student = request.user.student
 
+    try:
+        if request.user.student.block:
+            return AjaxFailureMessage.auto_render('ScheduleLocked',
+                u'Twój plan jest zablokowany. Możesz go odblokować w prototypie', message_context)
+        student = request.user.student
+    except Student.DoesNotExist:
+        transaction.rollback()
+        return AjaxFailureMessage.auto_render('NonStudent',
+            u'Nie jesteś studentem.', message_context)
 
     try:
         group = Group.objects.get(id=group_id)
@@ -121,25 +116,23 @@ def set_enrolled(request, method):
 
     if set_enrolled:
         result, messages_list = group.enroll_student(student)
-        if result:
-            run_rearanged(result)
-
     else:
-        if cur_semester.can_remove_record() or group.has_student_in_queue(student):
-            result, messages_list = group.remove_student(student)
-            if result:
-                run_rearanged(result, group)
-                
-        else:
-            return AjaxFailureMessage.auto_render('PastRecordsEndTime',
-                u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.', message_context)
-
-    if not result:
+        result, messages_list = group.remove_student(student)
+        
+    if result:
+        run_rearanged(result, group)
+    else:
         transaction.rollback()
 
     if is_ajax:
         message = ', '.join(messages_list)
-        return AjaxSuccessMessage(message, prepare_group_data(group.course, student))
+        
+        if result:
+            return AjaxSuccessMessage(message, prepare_group_data(group.course, student))
+        
+        else:
+            return AjaxFailureMessage.auto_render('SetEnrolledFailed',
+                message, message_context)
 
     else:
         for message in messages_list:
@@ -219,6 +212,9 @@ def set_queue_priority(request, method):
         transaction.rollback()
         return AjaxFailureMessage.auto_render('NotQueued',
             'Nie jesteś w kolejce do tej grupy.', message_context)
+    except Student.DoesNotExist:
+        return AjaxFailureMessage.auto_render('NonStudent',
+            u'Nie jesteś studentem.', message_context)
 
 @login_required
 def records(request, group_id):
@@ -294,19 +290,17 @@ def own(request):
 
     employee = None
     student  = None
-    if request.user.student:
+    if BaseUser.is_student(request.user):
         student = request.user.student
         groups = Course.get_student_courses_in_semester(student, default_semester)
         sum_points = student.get_points()
 
 
-    if student is None and request.user.employee is None:
+    if not BaseUser.is_student(request.user) and \
+       not BaseUser.is_employee(request.user):
         messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
         return render_to_response('common/error.html',
             context_instance=RequestContext(request))
-
-
-
 
     return TemplateResponse(request, 'enrollment/records/schedule.html', locals())
 
@@ -314,13 +308,13 @@ def own(request):
 def schedule_prototype(request):
     """ schedule prototype view """
 
-    if hasattr(request.user, 'student') and request.user.student:
+    if BaseUser.is_student(request.user):
         student = request.user.student
         student_id = student.id
     else:
         student = None
         student_id = 'None'
-        
+
     should_allow_leave = Semester.get_default_semester().can_remove_record()
 
     default_semester = Semester.objects.get_next()
@@ -333,7 +327,7 @@ def schedule_prototype(request):
             'effects' : '',
             'tags' : '',
             'types_list' : [],
-            'allow_leave_course' : should_allow_leave,
+            'is_leaving_allowed' : should_allow_leave,
         }
         return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
@@ -346,9 +340,10 @@ def schedule_prototype(request):
         courses = [course.serialize_for_json(student=student, terms=terms, includeWasEnrolled=True)
             for course, terms in courses]
         cached_courses = courses
+
         mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
 
-    courses_json = simplejson.dumps(cached_courses)
+    courses_json = json.dumps(cached_courses)
     
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
     if cached_all_groups == 'DoesNotExist':

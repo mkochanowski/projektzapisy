@@ -282,9 +282,10 @@ class Semester( models.Model ):
     def __unicode__(self):
         return self.get_name()
 
-class Freeday(models.Model):
-    day = models.DateField(verbose_name='dzień wolny')
 
+class Freeday(models.Model):
+    day = models.DateField(verbose_name='dzień wolny', unique=True)
+    
     @classmethod
     def is_free(cls, date):
         """
@@ -308,7 +309,7 @@ class Freeday(models.Model):
 
 
 class ChangedDay(models.Model):
-    day = models.DateField(verbose_name='dzień')
+    day = models.DateField(verbose_name='dzień wolny', unique=True)
     weekday = models.CharField(choices=common.DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
 
     def clean(self):

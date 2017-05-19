@@ -13,7 +13,6 @@ from django.core.urlresolvers import reverse
 
 from django.http import QueryDict, HttpResponse
 from django.template.response import TemplateResponse
-from django.utils import simplejson
 from django.utils.translation import check_for_language
 from django.db.models import Q
 
@@ -255,21 +254,23 @@ def my_profile(request):
 
     notifications = NotificationFormset(queryset=NotificationPreferences.objects.create_and_get(request.user))
 
-    if hasattr(request.user, 'employee') and request.user.employee:
+    if BaseUser.is_employee(request.user):
         consultations = request.user.employee.consultations
         room = request.user.employee.room
         homepage = request.user.employee.homepage
+        title = request.user.employee.title
         room = room and room or ''
         homepage = homepage and homepage or ''
+        title = title and title or ''
     else:
         consultations = ''
         homepage = ''
         room = ''
+        title = ''
 
     grade = {}
 
-    if semester and request.user.student:
-
+    if semester and BaseUser.is_student(request.user):
         try:
             student = request.user.student
             courses = OpeningTimesView.objects.get_courses(student, semester)

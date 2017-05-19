@@ -168,7 +168,7 @@ class Group(models.Model):
             self.enrolled_isim += 1
         self.save()
 
-    def remove_student(self, student):
+    def remove_student(self, student, is_admin=False):
         #  Removes student from this group. If this is Lecture group remove from other too.
         #  Remove from
         #  @return (state, messages)
@@ -180,6 +180,17 @@ class Group(models.Model):
         #        [Text] - text info about actions
 
         from apps.enrollment.records.models import Record, Queue
+        from apps.enrollment.courses.models import Semester
+        
+        # admins are always allowed to remove students
+        if not is_admin:
+            semester = Semester.objects.get_next()
+        
+            if semester.is_closed():
+                return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
+            
+            elif not semester.can_remove_record() and not self.has_student_in_queue(student):
+                return False, [u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.']
 
         result = True
         if Record.objects.filter(student=student, group=self, status=Record.STATUS_ENROLLED).update(status=Record.STATUS_REMOVED) > 0:
@@ -272,10 +283,14 @@ class Group(models.Model):
         if Record.objects.filter(group=self, student=student, status=Record.STATUS_ENROLLED).count() > 0:
             return False, [u"Jesteś już w tej grupie"]
 
-        if not self.student_have_opened_enrollment(student):
+        if not self.course.is_opened_for_student(student):
             return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
 
         semester = Semester.objects.get_next()
+      
+        if semester.is_closed():
+            return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
+        
         current_limit = semester.get_current_limit()
 
         if not student.get_points_with_course(self.course) <= current_limit:
@@ -291,10 +306,6 @@ class Group(models.Model):
             queued, messages = self._add_student_to_queue(student)
             result.extend(messages)
             return queued, result
-
-    def student_have_opened_enrollment(self, student):
-        opening = self.course.get_opening_time(student).opening_time
-        return opening and opening < datetime.datetime.now()
 
     def student_can_enroll(self, student):
 
@@ -324,7 +335,7 @@ class Group(models.Model):
         to_removed = []
         result = None
         for q in queued:
-            if self.is_full_for_student(q.student) and not self.student_have_opened_enrollment(q.student):
+            if self.is_full_for_student(q.student) and not self.course.is_opened_for_student(q.student):
                 continue
 
             limit, __ = self.student_can_enroll(q.student)
