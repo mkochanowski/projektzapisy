@@ -27,7 +27,7 @@ def main(request):
 def get_course_list_info_json_for_semester(user, semester):
     if BaseUser.is_student(user):
         #TODO: restore this after fixing the client-side filters
-        courses = Course.visible.all().order_by('entity__name')
+        courses = Course.visible.filter(semester = semester).order_by('entity__name')
         """
             .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
                                          ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
@@ -36,7 +36,7 @@ def get_course_list_info_json_for_semester(user, semester):
                                                  ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
         """
     else:
-        courses = Course.visible.all().order_by('entity__name')
+        courses = Course.visible.filter(semester = semester).order_by('entity__name')
         
     courses_list_for_json = [c.serialize_for_json() for c in courses]
     semester_for_json = {

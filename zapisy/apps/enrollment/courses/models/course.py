@@ -259,7 +259,6 @@ class CourseEntity(models.Model):
     def get_all_effects(self):
         cached_effects_list = mcache.get("cached_effects_%d" % (self.id), "DoesNotExist")
         if cached_effects_list == "DoesNotExist":
-            print "missed effects reference for %s" % self.name
             cached_effects_list = list(self.effects.all())
             mcache.set("cached_effects_%d" % (self.id), cached_effects_list)
         return cached_effects_list
