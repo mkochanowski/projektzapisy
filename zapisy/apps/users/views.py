@@ -115,8 +115,12 @@ def employee_profile(request, user_id):
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
     try:
+        import time
+        start = time.time()
         courses = prepare_schedule_courses(request, for_employee=employee)
+        print("Grabbing stuff for employee")
         data = prepare_schedule_data(request, courses)
+        print(time.time() - start)
         data.update({
             'courses': courses,
             'employee': employee

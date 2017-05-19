@@ -96,16 +96,7 @@
 		<h3>{% trans "Semestr" %} {{ semester }}</h3>
 		<a id="enr-schedulePrototype-uncheckAll">Odznacz wszystkie</a>
         <hr>
-		<ul id="enr-schedulePrototype-course-list">
-            {% for course in courses %}
-                <li id="listItem-course-{{ course.id }}">
-                    <span class="checkbox">
-                        <input type="checkbox" id="checkbox-course-{{ course.id }}">
-                    </span>
-                    <label for="checkbox-course-{{ course.id }}">{{ course.name }}</label>
-                </li>
-            {% endfor %}
-		</ul>
+		<ul id="enr-schedulePrototype-course-list"></ul>
 		<p class="main-side-message hidden" id="noResultsMessage">
             Do podanego filtra nie pasuje żaden przedmiot.
         </p>

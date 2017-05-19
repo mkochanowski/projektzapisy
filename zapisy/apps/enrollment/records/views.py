@@ -352,7 +352,6 @@ def schedule_prototype(request):
     
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
     if cached_all_groups == 'DoesNotExist':
-
 #        logger.debug('Cache miss with semester id: %s' % \
 #                default_semester.id)
         mcache.delete("schedule_prototype_courses_json_%s" % student_id)
