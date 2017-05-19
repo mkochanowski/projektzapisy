@@ -288,8 +288,6 @@ def course(request, slug):
         if student and student.get_points_with_course(course) > maxEcts:
             currentEcts = student.get_points()
             ectsLimitExceeded = True
-            
-        print("course json: " + simplejson.dumps(course.serialize_for_json(student, is_recording_open=course.is_recording_open)));
         
         data.update({
             'details_hidden': courseView_details_hidden,

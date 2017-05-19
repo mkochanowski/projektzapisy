@@ -424,9 +424,7 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposal(slug):
-        print("get_proposal: " + slug)
         proposal = CourseEntity.noremoved.get(slug=slug)
-        print(proposal)
         try:
             information = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
         except IndexError:
