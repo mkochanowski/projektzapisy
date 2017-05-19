@@ -1,0 +1,16 @@
+<span class="selectbox" style="display:block; float:none;">
+   				<label for="enr-teacher">Prowadzący: </label>
+   				<select id="enr-teacher">
+   					<option value="-1">dowolny</option>
+   					{% for teacher in teachers %}
+   						<option value="{{ teacher.id }}">{{ teacher }}</option>
+   					{% endfor %}
+   				</select>
+   			</span>
+   			
+<hr class="filterListDivider"> 
+
+<span class="checkbox">
+    <input type="checkbox" id="enr-proposalFilter-vote" checked="checked" />
+    <label for="enr-proposalFilter-vote">Pokaż przedmioty niepoddane pod głosowanie</label>
+</span>
