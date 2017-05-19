@@ -48,7 +48,15 @@
 				<input type="hidden" id="courses_list_json" value="{{ proposals_json }}">
 				<ul id="proposal-list" class="proposal-list">
                        {% for course in proposals %}
-                        <li id="listItem-proposal-{{ course.id }}">
+                        <li id="listItem-proposal-{{ course.id }}" class="
+                            {% if course.status == 0 %}work
+                            {% elif course.status == 1 %}
+                                offer
+                            {% elif course.status == 2 %}
+                                vote
+                            {% elif course.status == 4 %}
+                                nooffer
+                            {% endif %}">
                             <a href="{{ cours.url }}">{{ course.name }}</a>
                         </li>
                         {% endfor %}
