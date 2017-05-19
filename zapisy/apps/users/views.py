@@ -41,6 +41,7 @@ import datetime
 from mailer.models import Message
 
 import logging
+import json
 
 from django.core.cache import cache as mcache
 from apps.notifications.forms import NotificationFormset
@@ -67,7 +68,7 @@ def student_profile(request, user_id):
         for course, terms in courses_with_terms:
             d = {}
             d["id"] = course.id
-            d["terms"] = [simplejson.dumps(term.serialize_for_json()) for term in terms]
+            d["terms"] = [json.dumps(term.serialize_for_json()) for term in terms]
             courses_for_template.append(d)
         data.update({
             'courses': courses_for_template,

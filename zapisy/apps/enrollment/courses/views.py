@@ -37,7 +37,7 @@ def get_course_list_info_json_for_semester(user, semester):
         """
     else:
         courses = Course.visible.all().order_by('entity__name')
-    
+        
     courses_list_for_json = [c.serialize_for_json() for c in courses]
     semester_for_json = {
         "id" : semester.pk,
@@ -50,7 +50,7 @@ def get_course_list_info_json_for_semester(user, semester):
         "semesterInfo" : semester_for_json
     }
 
-    return simplejson.dumps(courses_list_info)
+    return json.dumps(courses_list_info)
 
 def prepare_courses_list_to_render(request, default_semester=None, user=None, student=None):
     ''' generates template data for filtering and list of courses '''

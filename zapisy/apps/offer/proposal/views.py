@@ -24,6 +24,7 @@ from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm, Syl
 from apps.offer.proposal.models import Syllabus, StudentWork
 from apps.offer.proposal.exceptions import  NotOwnerException
 
+import json
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal, send_notification_to_3d
 from apps.users.decorators import employee_required
@@ -40,7 +41,7 @@ def offer(request, slug=None):
     proposal = proposal_for_offer(slug)
     proposals  = CourseEntity.get_proposals(request.user.is_authenticated())
     serialized_proposals = [prop.serialize_for_offer_list() for prop in proposals]
-    proposals_json = simplejson.dumps(serialized_proposals)
+    proposals_json = json.dumps(serialized_proposals)
     types_list = Type.get_all_for_jsfilter()
     teachers   = Employee.get_actives()
 

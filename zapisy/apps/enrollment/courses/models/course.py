@@ -259,6 +259,7 @@ class CourseEntity(models.Model):
     def get_all_effects(self):
         cached_effects_list = mcache.get("cached_effects_%d" % (self.id), "DoesNotExist")
         if cached_effects_list == "DoesNotExist":
+            print "missed effects reference for %s" % self.name
             cached_effects_list = list(self.effects.all())
             mcache.set("cached_effects_%d" % (self.id), cached_effects_list)
         return cached_effects_list
@@ -747,13 +748,14 @@ class Course(models.Model):
             'id': self.pk,
             'name': self.name,
             'short_name': self.entity.get_short_name(),
+            # TODO: could cache this, the database hit due to the related object
+            # takes around 2-3 msec
             'type': self.type.id if self.type.id else 1,
             'url': reverse('course-page', args=[self.slug]),
             'is_recording_open': is_recording_open,
             'english': self.english,
             'exam': self.exam,
             'suggested_for_first_year': self.suggested_for_first_year,
-            'was_enrolled': False,
             'effects': [effect.pk for effect in self.get_effects_list()],
             'tags': [tag.pk for tag in self.get_tags_list()],
         }
