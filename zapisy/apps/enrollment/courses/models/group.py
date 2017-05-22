@@ -482,11 +482,11 @@ class Group(models.Model):
         return Queue.objects.filter(student=student, group=self).count() != 0
 
     def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
-        student=None, employee=None, user=None):
+        student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.core.urlresolvers import reverse
 
-        zamawiany = user and user.is_zamawiany
+        zamawiany = student and student.is_zamawiany()
         data = {
             'id': self.pk,
             'type': int(self.type),
