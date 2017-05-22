@@ -165,26 +165,38 @@ class CourseEntity(models.Model):
     noremoved = NoRemoved()
     statistics = StatisticsManager()
 
+    def _add_or_null(self, hours1, hours2):
+        """
+        Adds two numbers denoting the number
+        of hours of a particular type of class.
+        If both are None, returns None, otherwise it
+        returns the sum, possibly casting None to 0
+        """
+        if hours1 is None and hours2 is None:
+            return None
+        
+        return (hours1 or 0) + (hours2 or 0)
 
     def get_lectures(self):
-        return self.lectures + self.information.lectures
+        return _add_or_null(self.lectures, self.information.lectures)
 
     def get_exercises(self):
-        return self.exercises + self.information.exercises
+        return _add_or_null(self.exercises, self.information.exercises)
 
     def get_laboratories(self):
-        return self.laboratories + self.information.laboratories
+        return _add_or_null(self.laboratories, self.information.laboratories)
 
     def get_repetitions(self):
-        return self.repetitions + self.information.repetitions
+        return _add_or_null(self.repetitions, self.information.repetitions)
 
     def get_seminars(self):
-        return self.seminars + self.information.seminars
+        return _add_or_null(self.seminars, self.information.seminars)
 
     def get_exercises_laboratiories(self):
-        return self.exercises_laboratiories + self.information.exercises_laboratories
+        return _add_or_null(
+            self.exercises_laboratiories,
+            self.information.exercises_laboratories)
 
-    #
 
     def get_status(self):
         return self.status

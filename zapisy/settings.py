@@ -9,7 +9,7 @@ DEBUG = False
 
 RELEASE = False
 
-TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = False
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
