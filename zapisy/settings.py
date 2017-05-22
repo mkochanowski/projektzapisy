@@ -229,7 +229,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mailer',
-    'south',
+    #'south',
     'pipeline',
     'apps.enrollment.courses',
     'apps.enrollment.records',
