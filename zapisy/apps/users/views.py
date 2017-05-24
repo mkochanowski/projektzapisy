@@ -351,7 +351,6 @@ def logout(request):
 def login_plus_remember_me(request, *args, **kwargs):
     """ funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika"""
     if request.user.is_authenticated():
-        print("Is authed!")
         return redirect("main-page")
 
     if 'polls' in request.session:
