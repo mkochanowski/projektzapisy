@@ -257,12 +257,12 @@ class Semester( models.Model ):
         now = datetime.now()
         return (self.desiderata_opening <= now and self.desiderata_closing is None) or\
             (self.desiderata_opening <= now and self.desiderata_closing >= now)
-        
+
     def serialize_for_json(self):
         return {
-            "id" : self.pk,
-            "year" : self.year,
-            "type" : self.get_type_display()
+            "id": self.pk,
+            "year": self.year,
+            "type": self.get_type_display()
         }
 
     @staticmethod

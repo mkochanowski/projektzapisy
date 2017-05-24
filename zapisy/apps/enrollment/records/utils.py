@@ -36,27 +36,28 @@ def run_rearanged(result, group=None):
     if group and group.should_be_rearranged():
         Group.do_rearanged(group)
 
-def prepare_courses_with_terms(terms = None, records = None):
+
+def prepare_courses_with_terms(terms=None, records=None):
     if records is None:
         records = []
-    
+
     if terms is None:
         default_semester = Semester.objects.get_next()
         if not default_semester:
             return []
         terms = Term.get_all_in_semester(default_semester)
-    
+
     courses_terms_map = {}
     for term in terms:
         course = term.group.course
         if course not in courses_terms_map:
             courses_terms_map[course] = []
         courses_terms_map[course].append(term)
-        
+
     for record in records:
         if record.group.course not in courses_terms_map:
             courses_terms_map[record.group.course] = []
-            
+
     courses = [(course, terms) for course, terms in courses_terms_map.items()]
 
     return sorted(courses, key=lambda item: item[0].name)
@@ -103,7 +104,7 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None, s
     except Student.DoesNotExist:
         records = []
 
-    return prepare_courses_with_terms(terms = terms, records = records)
+    return prepare_courses_with_terms(terms=terms, records=records)
 
 def prepare_schedule_data(request, courses, semester=None):
     if BaseUser.is_student(request.user):

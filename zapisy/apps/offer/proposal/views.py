@@ -40,19 +40,20 @@ def offer(request, slug=None):
     """
     proposal = proposal_for_offer(slug)
     proposals  = CourseEntity.get_proposals(request.user.is_authenticated())
-    serialized_proposals = [prop.serialize_for_offer_list() for prop in proposals]
+    serialized_proposals = [prop.serialize_for_offer_list() 
+                            for prop in proposals]
     proposals_json = json.dumps(serialized_proposals)
     types_list = Type.get_all_for_jsfilter()
     teachers   = Employee.get_actives()
 
     return TemplateResponse(request, 'offer/offer.html', {
-        "proposal" : proposal,
-        "proposals" : proposals,
-        "proposals_json" : proposals_json,
-        "types_list" : types_list,
-        "teachers" : teachers,
-        "effects" : Effects.objects.all(),
-        "tags" : Tag.objects.all(),
+        "proposal": proposal,
+        "proposals": proposals,
+        "proposals_json": proposals_json,
+        "types_list": types_list,
+        "teachers": teachers,
+        "effects": Effects.objects.all(),
+        "tags": Tag.objects.all(),
     })
 
 @permission_required('proposal.can_create_offer')

@@ -323,11 +323,11 @@ def schedule_prototype(request):
         data = {
             'student_records': [],
             'groups_json': '',
-            'semester' : 'nieokreślony',
-            'effects' : '',
-            'tags' : '',
-            'types_list' : [],
-            'is_leaving_allowed' : should_allow_leave,
+            'semester': 'nieokreślony',
+            'effects': '',
+            'tags': '',
+            'types_list': [],
+            'is_leaving_allowed': should_allow_leave,
         }
         return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
@@ -337,14 +337,15 @@ def schedule_prototype(request):
     if cached_courses == 'DoesNotExist':
         logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
         courses = prepare_courses_with_terms()
-        courses = [course.serialize_for_json(student=student, terms=terms, includeWasEnrolled=True)
-            for course, terms in courses]
+        courses = [course.serialize_for_json(
+                       student=student, terms=terms, includeWasEnrolled=True)
+                   for course, terms in courses]
         cached_courses = courses
 
         mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
 
     courses_json = json.dumps(cached_courses)
-    
+
     cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
     if cached_all_groups == 'DoesNotExist':
 #        logger.debug('Cache miss with semester id: %s' % \
@@ -358,14 +359,14 @@ def schedule_prototype(request):
 
     data = {
         'courses_json': courses_json,
-        'courses' : cached_courses,
+        'courses': cached_courses,
         'groups_json': all_groups_json,
-        'semester' : default_semester,
-        'effects' : Effects.objects.all(),
-        'tags' : Tag.objects.all(),
-        'types_list' : Type.get_all_for_jsfilter(),
+        'semester': default_semester,
+        'effects': Effects.objects.all(),
+        'tags': Tag.objects.all(),
+        'types_list': Type.get_all_for_jsfilter(),
         'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
-        'allow_leave_course' : should_allow_leave,
+        'allow_leave_course': should_allow_leave,
     }
     return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))

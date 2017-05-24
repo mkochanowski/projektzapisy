@@ -153,7 +153,7 @@ class Term(models.Model):
             query = query.filter(start_time__lt=end_time, end_time__gt=start_time)
 
         return query.select_related('group__course')
-    
+
     def serialize_for_json(self):
         return {
             'id': self.pk,

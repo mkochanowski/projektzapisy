@@ -246,8 +246,8 @@ class CourseEntity(models.Model):
 
     def get_short_name(self):
         """
-        Return short name if present (e.g. JFiZO = Języki Formalne i Złożoność Obliczeniowa).
-        Otherwise return full name.
+        Return short name if present (e.g. JFiZO = Języki Formalne 
+        i Złożoność Obliczeniowa). Otherwise return full name.
 
         @return: String
         """
@@ -255,7 +255,7 @@ class CourseEntity(models.Model):
             return self.name
         else:
             return self.shortName
-        
+
     def get_all_effects(self):
         cached_effects_list = mcache.get("cached_effects_%d" % (self.id), "DoesNotExist")
         if cached_effects_list == "DoesNotExist":
@@ -274,19 +274,19 @@ class CourseEntity(models.Model):
     # to JSON and used by the offer list JS code.
     def serialize_for_offer_list(self):
         return {
-            "id" : self.id,
-            "name" : self.name,
-            "status" : self.status,
-            "url" : reverse("offer-page", args=[self.slug]),
-            "type" : self.type.id if self.type else -1,
-            "english" : self.english,
-            "exam" : self.exam,
-            "suggested_for_first_year" : self.suggested_for_first_year,
-            "teacher" : self.owner.id if self.owner else -1,
-            "effects" : [effect.pk for effect in self.get_all_effects()],
+            "id": self.id,
+            "name": self.name,
+            "status": self.status,
+            "url": reverse("offer-page", args=[self.slug]),
+            "type": self.type.id if self.type else -1,
+            "english": self.english,
+            "exam": self.exam,
+            "suggested_for_first_year": self.suggested_for_first_year,
+            "teacher": self.owner.id if self.owner else -1,
+            "effects": [effect.pk for effect in self.get_all_effects()],
             "tags": [tag.pk for tag in self.get_all_tags()]
         }
-    
+
     @property
     def description(self):
         return self.information.description
@@ -725,30 +725,32 @@ class Course(models.Model):
         """
 
         return self.entity.get_points(student)
-    
+
     def get_effects_list(self):
         return self.entity.get_all_effects()
-    
+
     def get_tags_list(self):
         return self.entity.get_all_tags()
-    
+
     def get_was_enrolled(self, student):
         if student is None:
             return False
-        
-        #TODO
+
+        # TODO
         return False
 
     def serialize_for_json(self, student=None, is_recording_open=None,
                            terms=None, includeWasEnrolled=False):
         from django.core.urlresolvers import reverse
-      
+
         data = {
             'id': self.pk,
             'name': self.name,
             'short_name': self.entity.get_short_name(),
-            # TODO: could cache this, the database hit due to the related object
-            # takes around 2-3 msec
+            """
+            TODO: could cache this, the database hit due to the 
+            related object takes around 2-3 msec
+            """
             'type': self.type.id if self.type.id else 1,
             'url': reverse('course-page', args=[self.slug]),
             'is_recording_open': is_recording_open,
@@ -758,15 +760,15 @@ class Course(models.Model):
             'effects': [effect.pk for effect in self.get_effects_list()],
             'tags': [tag.pk for tag in self.get_tags_list()],
         }
-        
+
         if includeWasEnrolled:
             data.update({
-                'was_enrolled' : self.get_was_enrolled(student)
+                'was_enrolled': self.get_was_enrolled(student)
             })
-            
+
         if terms is not None:
             data.update({
-                'terms' : [term.serialize_for_json() for term in terms]
+                'terms': [term.serialize_for_json() for term in terms]
             })
 
         return data

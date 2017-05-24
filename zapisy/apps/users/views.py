@@ -61,14 +61,16 @@ def student_profile(request, user_id):
     """student profile"""
     try:
         student = Student.objects.select_related('user').get(user=user_id)
-        courses_with_terms = prepare_schedule_courses(request, for_student=student)
+        courses_with_terms = prepare_schedule_courses(
+            request, for_student=student)
         votes   = SingleVote.get_votes(student)
         data = prepare_schedule_data(request, courses_with_terms)
         courses_for_template = []
         for course, terms in courses_with_terms:
             d = {}
             d["id"] = course.id
-            d["terms"] = [json.dumps(term.serialize_for_json()) for term in terms]
+            d["terms"] = [json.dumps(term.serialize_for_json())
+                          for term in terms]
             courses_for_template.append(d)
         data.update({
             'courses': courses_for_template,
