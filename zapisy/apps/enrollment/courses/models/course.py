@@ -738,7 +738,6 @@ class Course(models.Model):
         # TODO
         return False
 
-
     @cache_result()
     def get_type_id(self):
         return self.type.id if self.type.id else 1

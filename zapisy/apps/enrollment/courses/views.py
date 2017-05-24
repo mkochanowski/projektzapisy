@@ -23,14 +23,15 @@ logger = logging.getLogger()
 def main(request):
     return render_to_response(
         'enrollment/main.html', {},
-        context_instance = RequestContext(request))
+        context_instance=RequestContext(request))
+
 
 def get_courses_list_in_semester_with_history_info(user, semester):
     """
         This ugly piece of SQL is generally the
         fastest way to implement the functionality we want, so it's here
         as an exception.
-        
+
         Disabled for now because the clients-side part isn't ready anyway.
         TODO: re-enable when that's done.
     """
@@ -65,7 +66,7 @@ def get_course_list_info_json_for_semester(user, semester):
 
 
 def prepare_courses_list_to_render(
-    request, default_semester=None, user=None, student=None):
+        request, default_semester=None, user=None, student=None):
     ''' generates template data for filtering and list of courses '''
     if not default_semester:
         default_semester = Semester.get_default_semester()
