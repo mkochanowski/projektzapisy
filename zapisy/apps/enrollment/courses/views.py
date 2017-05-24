@@ -50,19 +50,16 @@ def get_course_list_info_json_for_semester(user, semester):
     else:
         courses = Course.visible.filter(semester=semester)\
                                 .order_by('entity__name')
-
     courses_list_for_json = [c.serialize_for_json() for c in courses]
     semester_for_json = {
         "id": semester.pk,
         "year": semester.year,
         "type": semester.get_type_display()
     }
-
     courses_list_info = {
         "courseList": courses_list_for_json,
         "semesterInfo": semester_for_json
     }
-
     return json.dumps(courses_list_info)
 
 def prepare_courses_list_to_render(request, default_semester=None, user=None, student=None):
@@ -71,11 +68,9 @@ def prepare_courses_list_to_render(request, default_semester=None, user=None, st
         default_semester = Semester.get_default_semester()
     if not user:
         user = request.user
-
     semesters = Semester.objects.filter(visible=True)
     courses_list_json = get_course_list_info_json_for_semester(
         user, default_semester)
-
     return {
         'courses_list_json': courses_list_json,
         'semester_courses': semesters,

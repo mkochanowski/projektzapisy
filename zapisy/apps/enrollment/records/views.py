@@ -22,6 +22,7 @@ from xhtml2pdf import pisa
 from apps.enrollment.courses.utils import prepare_group_data
 from apps.users.decorators import employee_required
 
+from apps.cache_utils import cache_result
 from apps.enrollment.courses.models import *
 from apps.users.models import *
 from apps.enrollment.records.models import *
@@ -305,6 +306,19 @@ def own(request):
     return TemplateResponse(request, 'enrollment/records/schedule.html', locals())
 
 
+@cache_result()
+def get_schedule_prototype_courselist(student):
+    courses = prepare_courses_with_terms()
+    return [course.serialize_for_json(
+                student=student, terms=terms, includeWasEnrolled=True)
+            for course, terms in courses]
+
+
+@cache_result()
+def get_schedule_prototype_grouplist(semester):
+    return Group.get_groups_by_semester_opt(semester)
+
+
 def schedule_prototype(request):
     """ schedule prototype view """
 
@@ -333,33 +347,17 @@ def schedule_prototype(request):
             data, context_instance = RequestContext(request))
     if student:
         StudentOptions.preload_cache(student, default_semester)
-    cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
-    if cached_courses == 'DoesNotExist':
-        logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
-        courses = prepare_courses_with_terms()
-        courses = [course.serialize_for_json(
-                       student=student, terms=terms, includeWasEnrolled=True)
-                   for course, terms in courses]
-        cached_courses = courses
-
-        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
-
-    courses_json = json.dumps(cached_courses)
-
-    cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
-    if cached_all_groups == 'DoesNotExist':
-#        logger.debug('Cache miss with semester id: %s' % \
-#                default_semester.id)
-        mcache.delete("schedule_prototype_courses_json_%s" % student_id)
-        cached_all_groups = Group.get_groups_by_semester_opt(default_semester)
-        mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)
-
-    all_groups_json = prepare_groups_json(default_semester, cached_all_groups,
-        student=student)
+    
+    prototype_courses = get_schedule_prototype_courselist(student)
+    courses_json = json.dumps(prototype_courses)
+    
+    groups = get_schedule_prototype_grouplist(default_semester)
+    all_groups_json = prepare_groups_json(
+        default_semester, groups, student=student)
 
     data = {
         'courses_json': courses_json,
-        'courses': cached_courses,
+        'courses': prototype_courses,
         'groups_json': all_groups_json,
         'semester': default_semester,
         'effects': Effects.objects.all(),

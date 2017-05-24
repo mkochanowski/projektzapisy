@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.core.cache import cache as mcache
+from apps.cache_utils import cache_result
 from apps.enrollment.courses.models.effects import Effects
 
 from apps.enrollment.courses.models.tag import Tag
@@ -256,23 +257,23 @@ class CourseEntity(models.Model):
         else:
             return self.shortName
 
-    def get_all_effects(self):
-        cached_effects_list = mcache.get("cached_effects_%d" % (self.id), "DoesNotExist")
-        if cached_effects_list == "DoesNotExist":
-            cached_effects_list = list(self.effects.all())
-            mcache.set("cached_effects_%d" % (self.id), cached_effects_list)
-        return cached_effects_list
-    
-    def get_all_tags(self):
-        cached_tags_list = mcache.get("cached_tags_%d" % (self.id), "DoesNotExist")
-        if cached_tags_list == "DoesNotExist":
-            cached_tags_list = list(self.tags.all())
-            mcache.set("cached_tags_%d" % (self.id), cached_tags_list)
-        return cached_tags_list
 
-    # Serialize this object to be converted
-    # to JSON and used by the offer list JS code.
-    def serialize_for_offer_list(self):
+    @cache_result()
+    def get_all_effects(self):
+        return list(self.effects.all())
+
+
+    @cache_result()
+    def get_all_tags(self):
+        return list(self.tags.all())
+
+
+    def serialize_for_json(self):
+        """
+        Serialize this object to a dictionary
+        that contains the most important information and can
+        be passed to a template or json.dumps
+        """
         return {
             "id": self.id,
             "name": self.name,
@@ -286,6 +287,7 @@ class CourseEntity(models.Model):
             "effects": [effect.pk for effect in self.get_all_effects()],
             "tags": [tag.pk for tag in self.get_all_tags()]
         }
+
 
     @property
     def description(self):
@@ -738,28 +740,25 @@ class Course(models.Model):
 
         # TODO
         return False
-
+    
+    
+    @cache_result()
+    def get_type_id(self):
+        return self.type.id if self.type.id else 1
+    
+    
     def serialize_for_json(self, student=None, is_recording_open=None,
                            terms=None, includeWasEnrolled=False):
         from django.core.urlresolvers import reverse
 
-        data = {
-            'id': self.pk,
-            'name': self.name,
-            'short_name': self.entity.get_short_name(),
-            """
-            TODO: could cache this, the database hit due to the 
-            related object takes around 2-3 msec
-            """
-            'type': self.type.id if self.type.id else 1,
-            'url': reverse('course-page', args=[self.slug]),
-            'is_recording_open': is_recording_open,
-            'english': self.english,
-            'exam': self.exam,
-            'suggested_for_first_year': self.suggested_for_first_year,
-            'effects': [effect.pk for effect in self.get_effects_list()],
-            'tags': [tag.pk for tag in self.get_tags_list()],
-        }
+        data = self.entity.serialize_for_json()
+        data['id'] = self.pk
+        data['type'] = self.get_type_id()
+        data['url'] = reverse('course-page', args=[self.slug])
+        data['is_recording_open'] = is_recording_open
+        # TODO: why do we have this field defined in the model
+        # if the CourseEntity object has it as well? What's the difference?
+        data['english'] = self.english
 
         if includeWasEnrolled:
             data.update({
