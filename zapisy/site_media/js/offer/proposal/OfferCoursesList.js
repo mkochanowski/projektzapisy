@@ -36,11 +36,16 @@ OfferCoursesList.prototype.initCourses = function()
 
 OfferCoursesList.prototype.processCourse = function(courseProposal)
 {
+    // Assign the HTML node that corresponds to this course
+    // Needed so that we can show-hide it depending on the state
+    // of the filters.
     courseProposal["htmlNode"] = $("#listItem-proposal-" + courseProposal.id);
 };
 
 OfferCoursesList.prototype.addCustomFilters = function()
 {
+    // Two custom filters - they allow users to filter by teacher
+    // and filter by vote status.
     this.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
         'teacher', '#enr-teacher', function(element, value)
     {
@@ -56,6 +61,7 @@ OfferCoursesList.prototype.addCustomFilters = function()
         var course = element.data;
         if (!value)
         {
+            // We want to hide the courses students can vote for
             return course.status == 2;
         }
    		return true;

@@ -18,13 +18,16 @@ PrototypeCoursesList.prototype.init = function()
     FilteredCoursesList.prototype.init.call(this);
 	
     var scheduleContainer = $('#enr-schedulePrototype-scheduleContainer').assertOne();
+    // This object is responsible for the business logic.
+    // It implements the pinning functionality and allows users
+    // to sign up for courses or leave course groups.
     this.schedule = new Schedule(scheduleContainer);
     
     if( user_is_student )
     {
-        // TODO: this didn't work anyway (tried to use an undefined)
-        // variable, and besides, what is the point of this feature?
-	//    this.initRecordsLocking();
+        // TODO: this didn't work anyway (tried to use an undefined);
+        // to be fixed in the future.
+        // this.initRecordsLocking();
     }
     
     this.initCourses();
@@ -60,19 +63,27 @@ PrototypeCoursesList.prototype.initCourses = function()
 
 PrototypeCoursesList.prototype.processCourse = function(courseRawObj)
 {
+    // Create a course object for use by the Schedule-related
+    // code that actually implements the prototype functionality.
     Fereol.Enrollment.Course.fromJSON(courseRawObj);
     
+    // Create a course object for use by the legacy prototype code
+    // Copy the keys of the JSON object since we'll also be adding
+    // some custom stuff.
     let course = new PrototypeCourse();
     Object.keys(courseRawObj).forEach(function(key) {
         course[key] = courseRawObj[key];
     });
-
+    
+    // Find the related DOM nodes (needed for capturing events
+    // and hiding the course in response to filter events)
     let courseCheckbox = $("#checkbox-course-" + course.id);    
     let containingListItem = $("#listItem-course-" + course.id);
     
     courseRawObj.htmlNode = containingListItem;
+    
+    // Needed by legacy schedule prototype code
     course._prototypedCheckbox = courseCheckbox;
-        
     this.courseList.push(course);
 };
 
@@ -103,11 +114,11 @@ PrototypeCoursesList.prototype.processGroupsAndTerms = function()
     });
 };
 
-/**
- * Inicjuje przycisk blokowania planu.
- */
+
 PrototypeCoursesList.prototype.initRecordsLocking = function()
 {
+    // Not used right now. Has a bug below (self._updateVisibility();)
+    // - self is not defined. TODO: fix at a later date and re-enable.
 	var lockForm = $('#enr-schedulePrototype-setLocked').assertOne();
 	var lockURL = lockForm.find('input[name=ajax-url]').assertOne().
 		attr('value').trim();
@@ -189,11 +200,7 @@ $(document).ready(function()
 });
 
 
-/*******************************************************************************
- * Klasa przedmiotu używanego w prototypie planu, tzn posiadającego kolekcję
- * terminów.
- ******************************************************************************/
-
+// Used by legacy code.
 function PrototypeCourse()
 {
 	this.model = null; // model danych

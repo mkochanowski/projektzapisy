@@ -39,6 +39,10 @@ CoursesList.prototype.initCourseLists = function()
 
 CoursesList.prototype.setCoursesFromData = function()
 {
+    // Using this.courses and this.currentSemester, update the UI;
+    // add courses from the current list to the HTML <ul> list, 
+    // update the semester caption, etc.
+    
     let self = this;
     this.courses.forEach(function(course)
     {
@@ -53,7 +57,8 @@ CoursesList.prototype.setCoursesFromData = function()
 
 CoursesList.prototype.onNewSemesterChosen = function()
 {
-    var newId = parseInt($("#enr-courseFilter-semester").find(":selected").val());
+    // When a new semester is chosen, we make an AJAX request for the data.
+    let newId = parseInt($("#enr-courseFilter-semester").find(":selected").val());
     this.userChosenSemester = newId;
     
     this.setDownloadingDataUi();
@@ -67,6 +72,8 @@ CoursesList.prototype.onNewSemesterChosen = function()
 
 CoursesList.prototype.onSemesterInfoReceiveFailed = function()
 {
+    // If we didn't succeed, restore the old UI and
+    // show an error message box.
     this.setCoursesViewUi();
     
     $("#enr-courseFilter-semester").val(this.currentSemester.id);
@@ -77,6 +84,8 @@ CoursesList.prototype.onSemesterInfoReceiveFailed = function()
 
 CoursesList.prototype.onSemesterInfoReceived = function(data, status)
 {
+    // Otherwise save the data we received in response, clear the UI,
+    // and re-set it from the new data.
     this.courses = data.courseList;
     this.currentSemester = data.semesterInfo;
     
@@ -85,20 +94,33 @@ CoursesList.prototype.onSemesterInfoReceived = function(data, status)
     this.setCoursesViewUi();
 };
 
+
 CoursesList.prototype.setDownloadingDataUi = function()
 {
+    // Hide the current course list, show a notification
+    // that lets the user know we're downloading data.
+    
     $("#mainCoursesContainer").addClass("hidden");
     $("#fetchingListMessage").removeClass("hidden");
 };
 
 CoursesList.prototype.setCoursesViewUi = function()
 {
+    // The other way round - hide the notification,
+    // show the course list.
+    
     $("#mainCoursesContainer").removeClass("hidden");
     $("#fetchingListMessage").addClass("hidden");
 };
 
 CoursesList.prototype.addNewCourse = function(course)
 {
+    // Construct a HTML node (i.e. a link inside a <li>)
+    // to be added to the HTML course list.
+    // We also need to save the newly created <li> element
+    // so the filter code in FilteredCoursesList can hide it
+    // (or show it).
+    
     let courseLink = $("<a/>", {
              "href" : course.url,
              "text" : course.name

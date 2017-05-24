@@ -1,7 +1,7 @@
 /*
  * A base class that represents a filtered list of courses.
  * Inherited and extended by classes that implement the course
- * list page and the offer page.
+ * list page, the schedule prototype and the offer page.
 */
 
 "use strict";
@@ -13,6 +13,16 @@ function FilteredCoursesList()
 
 FilteredCoursesList.prototype.init = function()
 {
+    this.initializeTagEffectFilterElems();
+};
+
+FilteredCoursesList.prototype.initializeTagEffectFilterElems = function()
+{
+    // Initialize the tags and effects filter HTML elements
+    // (implemented as <select> tags with multiselect)
+    // We don't want the users to have to hold ctrl down
+    // to be able to select more than one option, so this code below
+    // and onMultiselectClicked take care of that.
     let self = this;
     $("#enr-courseFilter-effects option").mousedown(function(e)
     {
@@ -50,6 +60,8 @@ FilteredCoursesList.prototype.setCourseVisible = function(course, visible)
 
 FilteredCoursesList.prototype.initFilters = function()
 {
+    // Initialize all filters - boilerplate to interact with the
+    // filtering library.
 	var courseFilterForm = $('#enr-coursesList-top-bar').assertOne();
 
 	courseFilterForm.css('display', 'block');
@@ -94,6 +106,8 @@ FilteredCoursesList.prototype.initFilters = function()
 
 FilteredCoursesList.prototype.addFilters = function()
 {
+    // Install common filters (i.e. all those matching the HTML present in 
+    // templates/common/course_list_filters.html).
     this.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
 		'phrase', '.filter-phrase', function(element, value)
 	{
@@ -201,5 +215,6 @@ FilteredCoursesList.prototype.addFilters = function()
 	}));
 };
 
+// Initialize custom filters - to be overridden by subclasses.
 FilteredCoursesList.prototype.addCustomFilters = function()
 { };

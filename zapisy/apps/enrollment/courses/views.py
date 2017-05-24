@@ -48,7 +48,7 @@ def get_course_list_info_json_for_semester(user, semester):
         courses = get_courses_list_in_semester_with_history_info(
             user, semester)
     else:
-        courses = Course.visible.filter(semester=semester)
+        courses = Course.visible.filter(semester=semester)\
                                 .order_by('entity__name')
 
     courses_list_for_json = [c.serialize_for_json() for c in courses]
