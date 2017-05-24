@@ -247,7 +247,7 @@ class CourseEntity(models.Model):
 
     def get_short_name(self):
         """
-        Return short name if present (e.g. JFiZO = Języki Formalne 
+        Return short name if present (e.g. JFiZO = Języki Formalne
         i Złożoność Obliczeniowa). Otherwise return full name.
 
         @return: String
@@ -257,16 +257,13 @@ class CourseEntity(models.Model):
         else:
             return self.shortName
 
-
     @cache_result()
     def get_all_effects(self):
         return list(self.effects.all())
 
-
     @cache_result()
     def get_all_tags(self):
         return list(self.tags.all())
-
 
     def serialize_for_json(self):
         """
@@ -740,13 +737,12 @@ class Course(models.Model):
 
         # TODO
         return False
-    
-    
+
+
     @cache_result()
     def get_type_id(self):
         return self.type.id if self.type.id else 1
-    
-    
+
     def serialize_for_json(self, student=None, is_recording_open=None,
                            terms=None, includeWasEnrolled=False):
         from django.core.urlresolvers import reverse

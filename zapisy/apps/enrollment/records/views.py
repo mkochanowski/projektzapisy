@@ -347,10 +347,10 @@ def schedule_prototype(request):
             data, context_instance = RequestContext(request))
     if student:
         StudentOptions.preload_cache(student, default_semester)
-    
+
     prototype_courses = get_schedule_prototype_courselist(student)
     courses_json = json.dumps(prototype_courses)
-    
+
     groups = get_schedule_prototype_grouplist(default_semester)
     all_groups_json = prepare_groups_json(
         default_semester, groups, student=student)

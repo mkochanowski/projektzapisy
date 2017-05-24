@@ -23,7 +23,7 @@ logger = logging.getLogger()
 def main(request):
     return render_to_response(
         'enrollment/main.html', {},
-        context_instance = RequestContext( request ))
+        context_instance = RequestContext(request))
 
 def get_courses_list_in_semester_with_history_info(user, semester):
     """
@@ -42,6 +42,7 @@ def get_courses_list_in_semester_with_history_info(user, semester):
                                      ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
                                      ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
     """
+
 
 def get_course_list_info_json_for_semester(user, semester):
     if BaseUser.is_student(user):
@@ -62,7 +63,9 @@ def get_course_list_info_json_for_semester(user, semester):
     }
     return json.dumps(courses_list_info)
 
-def prepare_courses_list_to_render(request, default_semester=None, user=None, student=None):
+
+def prepare_courses_list_to_render(
+    request, default_semester=None, user=None, student=None):
     ''' generates template data for filtering and list of courses '''
     if not default_semester:
         default_semester = Semester.get_default_semester()

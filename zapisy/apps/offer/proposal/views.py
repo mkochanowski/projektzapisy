@@ -40,7 +40,7 @@ def offer(request, slug=None):
     """
     proposal = proposal_for_offer(slug)
     proposals  = CourseEntity.get_proposals(request.user.is_authenticated())
-    serialized_proposals = [prop.serialize_for_json() 
+    serialized_proposals = [prop.serialize_for_json()
                             for prop in proposals]
     proposals_json = json.dumps(serialized_proposals)
     types_list = Type.get_all_for_jsfilter()

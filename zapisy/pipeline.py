@@ -351,7 +351,7 @@ PIPELINE_JS = {
             'js/components/schedule.js',
             'js/components/messageBox.js',
             'js/common/listFilter.js',
-               'js/common/listFilter-courseType.js',
+            'js/common/listFilter-courseType.js',
             'js/common/FilteredCoursesList.js',
             'js/common/courses-list-filters-ui.js',
             'js/enrollment/records/PrototypeCoursesList.js',
@@ -435,8 +435,8 @@ PIPELINE_JS = {
             'js/jquery/baseExtensions.js',
             'js/main.js',
             'js/components/topBarFilter.js',
-               'js/common/listFilter.js',
-               'js/common/listFilter-courseType.js',
+            'js/common/listFilter.js',
+            'js/common/listFilter-courseType.js',
             'js/common/FilteredCoursesList.js',
             'js/offer/proposal/OfferCoursesList.js',
             'js/common/courses-list-filters-ui.js'
@@ -483,9 +483,9 @@ PIPELINE_JS = {
             'js/main.js',
             'js/components/messageBox.js',
             'js/components/topBarFilter.js',
-#               'js/common/listFilter.js',
-#               'js/common/listFilter-courseType.js',
-#            'js/offer/proposal/proposals-list.js'
+            #'js/common/listFilter.js',
+            #'js/common/listFilter-courseType.js',
+            #'js/offer/proposal/proposals-list.js'
         ),
         'output_filename': 'js/preferenes.min.js',
 

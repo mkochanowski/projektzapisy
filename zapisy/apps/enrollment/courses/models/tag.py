@@ -18,7 +18,7 @@ class Tag(models.Model):
 
     def serialize_for_json(self):
         return {
-            'id' : self.pk,
+            'id': self.pk,
             'short_name': self.short_name,
             'full_name': self.full_name,
             'description': self.description
