@@ -38,15 +38,17 @@ class VoteLinkTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.VOTE_LINK = '<a href="%s">głosuj</a>' % reverse('vote')
-        # cls.user = User.objects.create_user('user', 'user@user.com', 'password')
-        # s1 = Student.objects.create(user=cls.user)
-        # s1.status = 0
 
-        # cls.user2 = User.objects.create_user('user2', 'user2@user.com', 'password')
-        # s2 = Student.objects.create(user=cls.user2,matricula='111111')
-        # s2.status = 1
         cls.s1 = StudentFactory()
         cls.s2 = StudentFactory(status=1)
+        """
+        Needed because the login system is
+        username-based; so we'd be trying to login
+        the same user twice
+        """
+        cls.s1.user.name = "Student1"
+        cls.s2.user.name = "Student2"
+        
         sql_calls = [
             """
                 CREATE TABLE courses_studentpointsview (
@@ -98,7 +100,7 @@ class VoteLinkTestCase(TestCase):
         self.generic_voting_active_view_test_case('vote-view')
 
     def test_vote_link_in_vote_view_when_system_is_active_baduser(self):
-        self.client.login(username=self.s2.user.username, password='test')
+        self.client.login(username=self.s2.user.name, password='test')
         create_active_system_state()
         response = self.client.get(reverse('vote-view'), follow=True)
         self.assertNotContains(response, self.VOTE_LINK, html=True)
