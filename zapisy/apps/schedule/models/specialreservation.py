@@ -30,26 +30,26 @@ class SpecialReservationQuerySet(models.query.QuerySet):
 
 
 class SpecialReservationManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         return SpecialReservationQuerySet(self.model, using=self._db)
 
     def on_day_of_week(self, day_of_week):
-        return self.get_query_set().on_day_of_week(day_of_week)
+        return self.get_queryset().on_day_of_week(day_of_week)
 
     def this_semester(self):
-        return self.get_query_set().this_semester()
+        return self.get_queryset().this_semester()
 
     def any_semester(self, semester):
-        return self.get_query_set().any_semester(semester)
+        return self.get_queryset().any_semester(semester)
 
     def in_classroom(self, classroom):
-        return self.get_query_set().in_classroom(classroom)
+        return self.get_queryset().in_classroom(classroom)
 
     def in_classrooms(self, classrooms):
-        return self.get_query_set().in_classrooms(classrooms)
+        return self.get_queryset().in_classrooms(classrooms)
 
     def between_hours(self, start_time, end_time):
-        return self.get_query_set().between_hours(start_time, end_time)
+        return self.get_queryset().between_hours(start_time, end_time)
 
 
 class SpecialReservation(models.Model):

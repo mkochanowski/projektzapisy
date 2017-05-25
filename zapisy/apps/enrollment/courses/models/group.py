@@ -48,7 +48,7 @@ class StatisticManager(models.Manager):
     @return Queryset of Group
     """
     def in_semester(self, semester):
-        return self.get_query_set().filter(course__semester=semester)\
+        return self.get_queryset().filter(course__semester=semester)\
             .select_related('course', 'teacher', 'teacher__user', 'course__entity')\
             .order_by('course')\
             .extra(select={

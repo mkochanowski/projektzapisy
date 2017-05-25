@@ -22,8 +22,8 @@ logger = logging.getLogger()
 EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 
 class Related(models.Manager):
-    def get_query_set(self):
-        return super(Related, self).get_query_set().select_related('user')
+    def get_queryset(self):
+        return super(Related, self).get_queryset().select_related('user')
 
 class ExtendedUser(User):
     is_student = models.BooleanField(default = False, verbose_name="czy student?")

@@ -23,17 +23,17 @@ logger = logging.getLogger()
 class WithInformation(models.Manager):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(WithInformation, self).get_query_set().select_related('information')
+        return super(WithInformation, self).get_queryset().select_related('information')
 
 
 class NoRemoved(WithInformation):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(NoRemoved, self).get_query_set().filter(deleted=False, owner__isnull=False)
+        return super(NoRemoved, self).get_queryset().filter(deleted=False, owner__isnull=False)
 
 
 class SimpleManager(models.Manager):
@@ -42,9 +42,9 @@ class SimpleManager(models.Manager):
 
 
 class DefaultCourseManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(DefaultCourseManager, self).get_query_set().select_related('entity', 'information')
+        return super(DefaultCourseManager, self).get_queryset().select_related('entity', 'information')
 
 
 class StatisticsManager(models.Manager):
@@ -58,7 +58,7 @@ class StatisticsManager(models.Manager):
 
         #TODO: po przeniesieniu wszystkich metod do managerów filtrowanie na
         #  status powinno byc  z dziedziczenia
-        return self.get_query_set().filter(status=2)\
+        return self.get_queryset().filter(status=2)\
             .select_related('type', 'owner', 'owner__user')\
             .order_by('name')\
             .extra(
@@ -426,17 +426,17 @@ class CourseEntity(models.Model):
 class Related(models.Manager):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom', 'entity')
+        return super(Related, self).get_queryset().select_related('semester', 'type', 'type__classroom', 'entity')
 
 
 class VisibleManager(Related):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
+        return super(VisibleManager, self).get_queryset().filter(semester__visible=True)
 
 
 class Course(models.Model):
