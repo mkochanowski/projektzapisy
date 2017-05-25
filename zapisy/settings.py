@@ -267,14 +267,7 @@ AUTH_PROFILE_MODULE = 'users.UserProfile'
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
 
-SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
-SOUTH_TESTS_MIGRATE = False
-
-#TODO: udokumentowac zaleznosci!
-#TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
-#TEST_OUTPUT_VERBOSE = True
-#TEST_OUTPUT_DESCRIPTIONS = True
-#TEST_OUTPUT_DIR = 'xmlrunner'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 #settings for enrollment
 ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()

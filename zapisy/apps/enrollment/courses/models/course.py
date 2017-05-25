@@ -124,7 +124,7 @@ class CourseEntity(models.Model):
     exam = models.BooleanField(verbose_name='egzamin',
                                default=True)
 
-    suggested_for_first_year = models.BooleanField(verbose_name='polecany dla pierwszego roku')
+    suggested_for_first_year = models.BooleanField(verbose_name='polecany dla pierwszego roku', default=False)
 
     web_page = models.URLField(verbose_name='strona www', null=True, blank=True)
     ects = models.IntegerField(null=True, blank=True)
@@ -795,7 +795,7 @@ class CourseDescription(models.Model):
     entity = models.ForeignKey(CourseEntity) #Podstawa do ktorej jestesmy przypisani
     author = models.ForeignKey('users.Employee')
 
-    is_ready = models.BooleanField()
+    is_ready = models.BooleanField(default=False)
 
     description = models.TextField(verbose_name='opis', blank=True, default='')
 
@@ -809,7 +809,7 @@ class CourseDescription(models.Model):
                                                  default=0)
 
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
-    exam = models.BooleanField(verbose_name='egzamin')
+    exam = models.BooleanField(verbose_name='egzamin', default=False)
 
     created = models.DateTimeField(auto_now_add=True, auto_now=True)
 
