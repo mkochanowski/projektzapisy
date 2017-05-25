@@ -151,7 +151,7 @@ class Migration(migrations.Migration):
                 ('is_employee', models.BooleanField(default=False, verbose_name=b'czy pracownik?')),
                 ('is_zamawiany', models.BooleanField(default=False, verbose_name=b'czy zamawiany?')),
                 ('preferred_language', models.CharField(default=b'pl', max_length=5, verbose_name=b'preferowany j\xc4\x99zyk Systemu Zapis\xc3\xb3w', choices=[(b'pl', b'Polish'), (b'en', b'English')])),
-                ('user', models.OneToOneField(related_name='_profile_cache', to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(related_name='profile', to=settings.AUTH_USER_MODEL)),
             ],
             options={
             },

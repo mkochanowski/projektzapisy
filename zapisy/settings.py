@@ -262,8 +262,6 @@ AUTHENTICATION_BACKENDS = (
     'apps.users.auth_backend.BetterBackend',
 )
 
-AUTH_PROFILE_MODULE = 'users.UserProfile'
-
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
 

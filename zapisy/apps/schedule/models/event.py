@@ -86,7 +86,7 @@ class Event(models.Model):
         if not self.pk:
 
             # if author is an employee, accept any exam and test events
-            if (self.author.get_profile().is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
+            if (self.author.profile.is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
                 self.status = self.STATUS_ACCEPTED
 
@@ -97,7 +97,7 @@ class Event(models.Model):
 
             # students can only add generic events that have to be accepted first
 
-            if self.author.get_profile().is_student and not self.author.has_perm('schedule.manage_events'):
+            if self.author.profile.is_student and not self.author.has_perm('schedule.manage_events'):
                 if self.type != Event.TYPE_GENERIC:
                     raise ValidationError(
                         message={'type': [u'Nie masz uprawnień aby dodawać wydarzenia tego typu']},

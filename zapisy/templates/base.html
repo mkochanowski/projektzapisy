@@ -120,10 +120,10 @@
                         {% if user.is_staff %}
                             <a href="/fereol_admin/">Admin</a> |
                         {% endif %}
-                        {% if user.get_profile.is_student and user.student.get_number_of_news > 0 %}
+                        {% if user.profile.is_student and user.student.get_number_of_news > 0 %}
                             <a href="{% url 'news-all' %}"
                                class="unread">Aktualności ({{ user.student.get_number_of_news }})</a> |
-                            {% elif user.get_profile.is_employee and user.employee.get_number_of_news > 0 %}
+                            {% elif user.profile.is_employee and user.employee.get_number_of_news > 0 %}
                                 <a href="{% url 'news-all' %}"
                                    class="unread">Aktualności ({{ user.employee.get_number_of_news }})</a> |
                             {% else %}
