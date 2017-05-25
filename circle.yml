@@ -15,13 +15,13 @@ test:
     - cp ../env/settings_local_test.py settings_local.py
   override:
     - mkdir logs
-    - python manage.py test test_app
+    - python manage.py test test_app --nomigrations
     # - coverage run manage.py test test_app
-    - coverage run manage.py test apps.news.tests
-    - coverage run manage.py test apps.schedule
-    - coverage run manage.py test apps.enrollment.courses
-    - coverage run manage.py test apps.enrollment.records.tests
-    - coverage run manage.py test apps.grade.poll
-    - coverage run manage.py test apps.users
+    - coverage run manage.py test apps.news.tests --nomigrations
+    - coverage run manage.py test apps.schedule --nomigrations
+    - coverage run manage.py test apps.enrollment.courses --nomigrations
+    - coverage run manage.py test apps.enrollment.records.tests --nomigrations
+    - coverage run manage.py test apps.grade.poll --nomigrations
+    - coverage run manage.py test apps.users --nomigrations
   post:
     - coverage html -d $CIRCLE_ARTIFACTS
