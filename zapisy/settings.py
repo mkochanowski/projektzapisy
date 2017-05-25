@@ -216,6 +216,9 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'modeltranslation', # needs to be before django.contrib.admin
+    # needed from 1.7 onwards to prevent Django from trying to apply
+    # migrations when testing (slows down DB setup _a lot_)
+    'test_without_migrations',
     
     'django.contrib.auth',
     'django.contrib.contenttypes',
