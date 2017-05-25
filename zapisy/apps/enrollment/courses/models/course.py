@@ -257,11 +257,11 @@ class CourseEntity(models.Model):
         else:
             return self.shortName
 
-    @cache_result()
+    @cache_result
     def get_all_effects(self):
         return list(self.effects.all())
 
-    @cache_result()
+    @cache_result
     def get_all_tags(self):
         return list(self.tags.all())
 
@@ -738,7 +738,7 @@ class Course(models.Model):
         # TODO
         return False
 
-    @cache_result()
+    @cache_result
     def get_type_id(self):
         return self.type.id if self.type.id else 1
 

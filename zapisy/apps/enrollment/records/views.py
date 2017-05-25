@@ -306,7 +306,7 @@ def own(request):
     return TemplateResponse(request, 'enrollment/records/schedule.html', locals())
 
 
-@cache_result()
+@cache_result
 def get_schedule_prototype_courselist(student):
     courses = prepare_courses_with_terms()
     return [course.serialize_for_json(
@@ -314,7 +314,7 @@ def get_schedule_prototype_courselist(student):
             for course, terms in courses]
 
 
-@cache_result()
+@cache_result
 def get_schedule_prototype_grouplist(semester):
     return Group.get_groups_by_semester_opt(semester)
 
