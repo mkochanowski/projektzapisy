@@ -16,6 +16,7 @@ class NewsForm(forms.ModelForm):
         widgets = { 
             'body': forms.Textarea(attrs={'class': 'tinymce'})
         }
+        fields = '__all__' 
 
 class NewsAdmin(admin.ModelAdmin):
     """
