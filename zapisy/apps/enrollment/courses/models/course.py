@@ -381,6 +381,12 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposals(is_authenticated=False):
+        # TODO: in the order_by clause, we could just use "name";
+        # the model translation plugin will actually check the user's language
+        # (based on the account settings if logged in, or headers otherwise)
+        # and map it to name_en or name_pl accordingly. The trouble is, almost all
+        # CourseEntities have empty English names, so the sorting order is nonsensical.
+        # Could re-enable this when (if) we have proper translations for course names.
         result = CourseEntity.noremoved \
                 .exclude(status=CourseEntity.STATUS_PROPOSITION) \
                 .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
