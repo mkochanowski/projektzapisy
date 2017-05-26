@@ -53,11 +53,14 @@ Fereol.Enrollment.ScheduleCourseTerm.fromObject = function(obj)
 		sterm._updateVisibility();
 		sterm._updateControls();
 	});
-
+    
+    let startTimes = obj.start_time.split(":");
+    let endTimes = obj.end_time.split(":");
+    
 	sterm.scheduleTerm = new Schedule.Term(
 		obj.day.castToInt() - 1,
-		new Schedule.Time(obj.start_time[0].castToInt(), obj.start_time[1].castToInt()),
-		new Schedule.Time(obj.end_time[0].castToInt(), obj.end_time[1].castToInt()),
+		new Schedule.Time(parseInt(startTimes[0]), parseInt(startTimes[1])),
+		new Schedule.Time(parseInt(endTimes[0]), parseInt(endTimes[1])),
 		sterm.container,
 		sterm.popupContents
 	);

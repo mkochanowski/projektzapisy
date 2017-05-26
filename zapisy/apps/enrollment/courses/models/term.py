@@ -160,8 +160,8 @@ class Term(models.Model):
             'group': self.group.pk,
             'classroom': self.classrooms_as_string,
             'day': int(self.dayOfWeek),
-            'start_time': [self.start_time.hour, self.start_time.minute],
-            'end_time': [self.end_time.hour, self.end_time.minute]
+            'start_time': ("%d:%d" % (self.start_time.hour, self.start_time.minute)),
+            'end_time': ("%d:%d" % (self.end_time.hour, self.end_time.minute)),
         }
 
     def __unicode__(self):
