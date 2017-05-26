@@ -4,8 +4,6 @@
 
 from django.test import LiveServerTestCase
 
-from selenium import webdriver
-from pyvirtualdisplay import Display
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.support.ui import Select
@@ -32,10 +30,7 @@ from scripts.ectsimport import run_test as ectsimport_run_test
 class SeleniumTestCase(LiveServerTestCase):
 
     @classmethod
-    def setUpClass(cls):
-        cls.display = Display(visible=0, size=(1024, 1024))
-        cls.display.start()
-        
+    def setUpClass(cls):        
         cls.driver = WebDriver()
         cls.driver.set_window_size(1024, 1024)
         super(SeleniumTestCase, cls).setUpClass()
@@ -43,7 +38,6 @@ class SeleniumTestCase(LiveServerTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-        cls.display.stop()
         super(SeleniumTestCase, cls).tearDownClass()
 
 
