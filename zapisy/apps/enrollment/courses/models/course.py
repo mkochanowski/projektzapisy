@@ -381,17 +381,19 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposals(is_authenticated=False):
+        result = CourseEntity.noremoved \
+                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
+                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
+                .select_related('type', 'owner', 'owner__user') \
+                .order_by('name_pl')
+        
+        print(result[0])
+            
         if is_authenticated:
-            return CourseEntity.noremoved \
-                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
-                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
-                .select_related('type', 'owner', 'owner__user')
+            return result
+                
         else:
-            return CourseEntity.noremoved \
-                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
-                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
-                .exclude(status=CourseEntity.STATUS_WITHDRAWN) \
-                .select_related('type', 'owner', 'owner__user')
+            return result.exclude(status=CourseEntity.STATUS_WITHDRAWN)
 
     @staticmethod
     def get_proposal(slug):
