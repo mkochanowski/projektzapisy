@@ -145,7 +145,7 @@ class NewSemesterTests(SeleniumTestCase):
             semester_ending=date.today() + relativedelta(months=3),
             records_ects_limit_abolition=date.today() + relativedelta(days=10),
             visible=True,
-            is_grade_active=False
+            is_grade_active=True
         )
 
 
@@ -156,7 +156,7 @@ class NewSemesterTests(SeleniumTestCase):
             semester_ending=self.current_semester.semester_ending + relativedelta(days=1, months=3),
             records_ects_limit_abolition=self.current_semester.semester_ending + relativedelta(days=11),
             visible=True,
-            is_grade_active=False
+            is_grade_active=True
         )
 
         self.next_summer_semester = Semester.objects.create(
@@ -166,7 +166,7 @@ class NewSemesterTests(SeleniumTestCase):
             semester_ending=self.next_winter_semester.semester_ending + relativedelta(days=1, months=3),
             records_ects_limit_abolition=self.next_winter_semester.semester_ending + relativedelta(days=11),
             visible=True,
-            is_grade_active=False
+            is_grade_active=True
         )
 
         self.system_state = SystemState.objects.create(
