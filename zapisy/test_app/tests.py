@@ -145,7 +145,7 @@ class NewSemesterTests(SeleniumTestCase):
             semester_ending=date.today() + relativedelta(months=3),
             records_ects_limit_abolition=date.today() + relativedelta(days=10),
             visible=True,
-            is_grade_active=True
+            is_grade_active=False
         )
 
 
@@ -156,7 +156,7 @@ class NewSemesterTests(SeleniumTestCase):
             semester_ending=self.current_semester.semester_ending + relativedelta(days=1, months=3),
             records_ects_limit_abolition=self.current_semester.semester_ending + relativedelta(days=11),
             visible=True,
-            is_grade_active=True
+            is_grade_active=False
         )
 
         self.next_summer_semester = Semester.objects.create(
@@ -166,7 +166,7 @@ class NewSemesterTests(SeleniumTestCase):
             semester_ending=self.next_winter_semester.semester_ending + relativedelta(days=1, months=3),
             records_ects_limit_abolition=self.next_winter_semester.semester_ending + relativedelta(days=11),
             visible=True,
-            is_grade_active=True
+            is_grade_active=False
         )
 
         self.system_state = SystemState.objects.create(
@@ -208,7 +208,8 @@ class NewSemesterTests(SeleniumTestCase):
         self.driver.find_element_by_link_text('Oferta').click()
         self.driver.get('%s%s' % (self.driver.current_url, '/manage/proposals'))
         self.driver.find_element_by_link_text('Głosowanie').click()
-
+        self.driver.get_screenshot_as_file("screenshot.png")
+        
         nonselected_select = Select(
             WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.ID, 'bootstrap-duallistbox-nonselected-list_for_voting')))
         )
