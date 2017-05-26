@@ -386,8 +386,6 @@ class CourseEntity(models.Model):
                 .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
                 .select_related('type', 'owner', 'owner__user') \
                 .order_by('name_pl')
-        
-        print(result[0])
             
         if is_authenticated:
             return result
