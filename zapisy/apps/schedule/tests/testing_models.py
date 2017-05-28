@@ -228,10 +228,12 @@ class TermTestCase(TestCase):
         self.assertRaises(ValidationError, term3.full_clean)
 
     def test_different_semester_reservation(self):
-        semester = enrollment_factories.SemesterFactory(type=Semester.TYPE_SUMMER)
+        semester = \
+            enrollment_factories.SemesterFactory(type=Semester.TYPE_SUMMER)
         semester.save()
         semester.full_clean()
-        other_semester = enrollment_factories.SemesterFactory(type=Semester.TYPE_SUMMER)
+        other_semester = \
+                enrollment_factories.SemesterFactory(type=Semester.TYPE_SUMMER)
         other_semester.save()
         other_semester.full_clean()
 
@@ -612,7 +614,8 @@ class EventsOnChangedDayTestCase(TestCase):
         summer_semester = factories.SemesterFactory(type=Semester.TYPE_SUMMER)
         summer_semester.full_clean()
 
-        self.thursday = self.find_closest_day_of_week_to_date(summer_semester.semester_beginning, 3)
+        self.thursday = \
+            self.find_closest_day_of_week_to_date(summer_semester.semester_beginning, 3)
         changed_day = enrollment_factories.ChangedDayForFridayFactory(
             day=self.thursday
         )

@@ -43,4 +43,3 @@ def generate_key(user, email):
     return sha_constructor(
             default_token_generator.make_token(user) + email + str(random.random())
         ).hexdigest()
-    
