@@ -1,0 +1,47 @@
+{% extends "statistics/base.html" %}
+{% load url from future %}
+
+{% block swaps_active %} class="active"{% endblock %}
+
+{% block content %}
+    <table>
+        <thead>
+            <tr>
+                <th><h4>Prowadzący</h4></th>
+                <th><h4>Typ</h4></th>
+                <th><h4>Do zamiany</h4></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+                <tr>
+                <th colspan="12">{{ course.name }}</th>
+                </tr>
+                {% for group in course.groups_items|dictsort:'type' %}
+                    {% if group.swaps %}
+                    <tr>
+                        <td><a href="{% url 'records-group' group.id %}">{{ group.teacher.user.get_full_name }}</a></td>
+                        <td>{{ group.get_type_display }}</td>
+                        <td>
+                            <table>
+                                <thead>
+                                    <th>Osoba w kolejce</th>
+                                    <th>Do zamiany z</th>
+                                    <th>z grupy</th>
+                                </thead>
+                                {% for swap in group.swaps %}
+                                            <tr>
+                                                <td>{{ swap.student_in_queue }}</td>
+                                                <td>{{ swap.student_in_group }}</td>
+                                                <td><a href="{% url 'records-group' swap.to.id %}">{{ swap.to }}</a></td>
+                                            </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
