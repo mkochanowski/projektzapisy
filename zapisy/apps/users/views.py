@@ -339,21 +339,25 @@ def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
 
-def login_plus_remember_me(request, *args, **kwargs):
-    """ funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika"""
 
+def login_plus_remember_me(request, *args, **kwargs):
+    """Sign-in function with an option to save the session.
+
+    If the user clicked 'remember_me' button (we read it from POST data), the
+    session will expire after two weeks.
+    """
     if 'polls' in request.session:
         del request.session['polls']
-
     if 'finished' in request.session:
         del request.session['finished']
 
     if request.method == 'POST':
         if request.POST.get('remember_me', None):
-            request.session.set_expiry(datetime.timedelta(14))
+            request.session.set_expiry(datetime.timedelta(14).total_seconds())
         else:
-            request.session.set_expiry(0) # on browser close
+            request.session.set_expiry(0)  # Expires on browser closing.
     return login(request, *args, **kwargs)
+
 
 @login_required
 def create_ical_file(request):
