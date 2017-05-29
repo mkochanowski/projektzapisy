@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from django.conf.urls.defaults import *
-
-from django.contrib import admin
 import os
 import settings
+from django.conf.urls import include, patterns, url
+from django.contrib import admin
+from django.views.generic import TemplateView
+from feeds import LatestNews
 
 admin.autodiscover()
 
-from feeds import LatestNews
-from django.views.generic import TemplateView
 
 
 urlpatterns = patterns('',
