@@ -1,6 +1,14 @@
 # projektzapisy Changelog
 
-# Version 22.04.20
+# Version 17.05.29
+
+* Upgrade to Django 1.6
+
+# Version 17.05.05
+
+* Improved syllabus form
+
+# Version 17.04.20
 
 * Upgrade to Django 1.5
 

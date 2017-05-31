@@ -5,7 +5,7 @@ from apps.schedule.views import ClassroomTermsAjaxView, EventsTermsAjaxView, MyS
 __author__ = 'maciek'
 
 
-from django.conf.urls import *
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns('apps.schedule.views',
     url(r'^classrooms$', 'classrooms', name='classrooms'),

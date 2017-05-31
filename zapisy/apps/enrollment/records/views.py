@@ -34,7 +34,7 @@ from libs.ajax_messages import *
 
 
 @require_POST
-@transaction.commit_on_success
+@transaction.atomic
 def prototype_set_pinned(request):
     """
         Response for AJAX query for pinning or un-pinning group from student's
@@ -75,7 +75,7 @@ def prototype_set_pinned(request):
             'Grupa jest już odpięta od Twojego planu.')
 
 @require_POST
-@transaction.commit_on_success
+@transaction.atomic
 def set_enrolled(request, method):
     """
         Set student assigned (or not) to group.
@@ -177,7 +177,7 @@ def records_set_locked(request, method):
 
 @require_POST
 @login_required
-@transaction.commit_on_success
+@transaction.atomic
 def set_queue_priority(request, method):
     """
         Sets new priority for queue of some group

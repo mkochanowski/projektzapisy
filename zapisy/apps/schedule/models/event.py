@@ -6,6 +6,7 @@ from django.http import Http404
 
 from django.core.validators import ValidationError
 
+from apps.users.models import BaseUser
 
 class Event(models.Model):
     """
@@ -85,7 +86,6 @@ class Event(models.Model):
         if not self.pk:
 
             # if author is an employee, accept any exam and test events
-
             if (self.author.get_profile().is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
                 self.status = self.STATUS_ACCEPTED

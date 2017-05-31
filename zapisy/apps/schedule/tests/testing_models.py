@@ -19,6 +19,7 @@ from ..models import SpecialReservation, EventModerationMessage, EventMessage, E
 from django.utils.crypto import get_random_string
 import apps.enrollment.courses.tests.factories as enrollment_factories
 from apps.enrollment.records.tests.factories import RecordFactory
+
 from apps.enrollment.records.models import Record
 import factories
 import common
@@ -227,10 +228,12 @@ class TermTestCase(TestCase):
         self.assertRaises(ValidationError, term3.full_clean)
 
     def test_different_semester_reservation(self):
-        semester = enrollment_factories.WinterSemesterFactory()
+        semester = \
+            enrollment_factories.SemesterFactory(type=Semester.TYPE_SUMMER)
         semester.save()
         semester.full_clean()
-        other_semester = enrollment_factories.SummerSemesterFactory()
+        other_semester = \
+                enrollment_factories.SemesterFactory(type=Semester.TYPE_SUMMER)
         other_semester.save()
         other_semester.full_clean()
 
@@ -608,11 +611,11 @@ class EventsOnChangedDayTestCase(TestCase):
         return date
 
     def setUp(self):
-        semester_beginning = factories.SummerSemesterFactory.semester_beginning
-        summer_semester = factories.SummerSemesterFactory()
+        summer_semester = factories.SemesterFactory(type=Semester.TYPE_SUMMER)
         summer_semester.full_clean()
 
-        self.thursday = self.find_closest_day_of_week_to_date(semester_beginning, 3)
+        self.thursday = \
+            self.find_closest_day_of_week_to_date(summer_semester.semester_beginning, 3)
         changed_day = enrollment_factories.ChangedDayForFridayFactory(
             day=self.thursday
         )
@@ -620,7 +623,7 @@ class EventsOnChangedDayTestCase(TestCase):
 
         classroom = enrollment_factories.ClassroomFactory()
 
-        reservation = factories.SepcialReservationFactory.build(
+        reservation = factories.SpecialReservationFactory.build(
             semester=summer_semester,
             classroom=classroom
         )
@@ -645,7 +648,7 @@ class EventsOnChangedDayTestCase(TestCase):
         classroom = Classroom.get_by_number('25')
         reservation = SpecialReservation.objects.in_classroom(classroom)[0]
 
-        reserv_thursday = factories.SepcialReservationFactory.build(
+        reserv_thursday = factories.SpecialReservationFactory.build(
             semester=reservation.semester,
             classroom=classroom,
             start_time=time(16, 15),
