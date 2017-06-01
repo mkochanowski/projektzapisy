@@ -335,6 +335,10 @@ table ul.voted-courses {
   color: darkred;
 }
 
+.tagEffectListInCourseHead {
+  margin: 0px 0px 0px 10px;
+}
+
 /* Bootstrap customizations/overrides */
 .marginFix {
   margin-left: 0px !important;

@@ -264,6 +264,14 @@ class CourseEntity(models.Model):
     @cache_result
     def get_all_tags(self):
         return list(self.tags.all())
+    
+    @cache_result
+    def get_all_tags_with_weights(self):
+        """
+        TagCourseEntity is a glue model that contains extra info
+        about the relationship - in this case, the "weight" of the tag.
+        """
+        return list(TagCourseEntity.objects.filter(courseentity=self))
 
     def serialize_for_json(self):
         """
@@ -863,6 +871,11 @@ class CourseDescription(models.Model):
         self.id = None
         self.save(force_insert=True)
 
+"""
+Because a tag will have different weights for each
+CourseEntity it's assigned to, we need this special
+relationship glue model.
+"""
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)
     courseentity = models.ForeignKey(CourseEntity)

@@ -87,8 +87,12 @@ def prepare_courses_list_to_render(
 def prepare_courses_list_to_render_and_return_course(request,default_semester=None,user=None, student=None, course_slug=None):
     ''' generates template data for filtering and list of courses '''
     render_data = prepare_courses_list_to_render(request,default_semester,user, student)
-    result_course = Course.objects.get(slug=course_slug) if course_slug else None
-
+    result_course = None
+    if course_slug:
+        try:
+            result_course = Course.objects.get(slug=course_slug)
+        except Course.DoesNotExist:
+            pass
     return render_data, result_course
 
 def courses(request):
