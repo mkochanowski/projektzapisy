@@ -30,7 +30,7 @@ FEREOL_PATH = os.getcwd()
 path.append(FEREOL_PATH + '/dbimport/schedule')
 
 @staff_member_required
-@transaction.commit_on_success
+@transaction.atomic
 def add_student(request):
     try:
         group_id = int(request.POST.get('group_id', -1))
@@ -57,7 +57,7 @@ def add_student(request):
 
 
 @staff_member_required
-@transaction.commit_on_success
+@transaction.atomic
 def remove_student(request):
     try:
         group_id = int(request.POST.get('group_id', -1))
@@ -83,7 +83,7 @@ def remove_student(request):
     return HttpResponseRedirect(url)
 
 @staff_member_required
-@transaction.commit_on_success
+@transaction.atomic
 def change_group_limit(request):
     try:
         group_id = int(request.POST.get('group_id', -1))

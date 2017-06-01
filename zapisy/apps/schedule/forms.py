@@ -58,7 +58,7 @@ class EventForm(forms.ModelForm):
             self.fields['type'].choices = Event.TYPES_FOR_STUDENT
 
         if not BaseUser.is_employee(user):
-            self.fields['course'].queryset = EmptyQuerySet()
+            self.fields['course'].queryset = Course.objects.none()
         else:
             semester = Semester.get_current_semester()
 

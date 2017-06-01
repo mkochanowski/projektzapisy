@@ -77,7 +77,10 @@ function beforeSubmitButton(nameEditPlID,nameEditEnID)
         if (idString.indexOf('-hours')!=-1)
         if (listRows[i].value=="" || listRows[i].value=="0")
         {
-            listRows[i].parentElement.parentElement.remove();            
+           // listRows[i].parentElement.parentElement.remove();    
+			listRows[i].parentElement.getElementsByClassName("delete-row")[0].click();
+		
+			//parentElement.click();        
         }
     }
 }
