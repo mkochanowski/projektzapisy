@@ -57,7 +57,7 @@
                             {% elif course.status == 4 %}
                                 nooffer
                             {% endif %}">
-                            <a href="{{ cours.url }}">{{ course.name }}</a>
+                            <a href="{% url 'offer-page' course.slug %}">{{ course.name }}</a>
                         </li>
                         {% endfor %}
 				</ul>
