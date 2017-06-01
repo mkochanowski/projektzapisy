@@ -41,13 +41,6 @@ class VoteLinkTestCase(TestCase):
 
         cls.s1 = StudentFactory()
         cls.s2 = StudentFactory(status=1)
-        """
-        Needed because the login system is
-        username-based; so we'd be trying to login
-        the same user twice
-        """
-        cls.s1.user.name = "Student1"
-        cls.s2.user.name = "Student2"
         
         sql_calls = [
             """
@@ -100,7 +93,7 @@ class VoteLinkTestCase(TestCase):
         self.generic_voting_active_view_test_case('vote-view')
 
     def test_vote_link_in_vote_view_when_system_is_active_baduser(self):
-        self.client.login(username=self.s2.user.name, password='test')
+        self.client.login(username=self.s2.user.username, password='test')
         create_active_system_state()
         response = self.client.get(reverse('vote-view'), follow=True)
         self.assertNotContains(response, self.VOTE_LINK, html=True)

@@ -101,20 +101,35 @@
             <!-- up-menu  -->
             <div class="container">
 
-                <ul>
+                <ul class="topBarLinkContainer">
                     <li{% block enrollment_active %}{% endblock %}>
                         <a href="{% url 'enrollment-main' %}">System Zapisów</a>
                     </li>
-                    <li{% block grade_active %}{% endblock %}><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
-                    <li{% block offer_active %}{% endblock %}><a href="{% url 'offer-main' %}">Oferta</a></li>
-                    {% if perms.courses.view_stats %}<li{% block statistics_active %}{% endblock %}><a href="{% url 'statistics:main' %}">Statystyki</a></li>{% endif %}
-                    <li{% block events_active %}{% endblock %}><a href="{% url 'events:classrooms' %}">Sale <span style="color:red;font-size: 10px">beta</span></a></li>
+                    <li{% block grade_active %}{% endblock %}>
+                        <a href="{% url 'grade-main' %}">Ocena Zajęć</a>
+                    </li>
+                    <li{% block offer_active %}{% endblock %}>
+                        <a href="{% url 'offer-main' %}">Oferta</a>
+                    </li>
+                    {% if perms.courses.view_stats %}
+                        <li{% block statistics_active %}{% endblock %}>
+                            <a href="{% url 'statistics:main' %}">Statystyki</a>
+                        </li>
+                    {% endif %}
+                    <li{% block events_active %}{% endblock %}>
+                        <a href="{% url 'events:classrooms' %}">Sale</a>
+                    </li>
 
                 </ul>
                 {% if user.is_authenticated %}
                     <div class="user-panel">
-                        Witaj,
-                        <strong>{{ user.get_full_name }}</strong>
+                        {% if user.is_staff %}
+                            <strong class="adminUserName">
+                        {% else %}
+                            <strong>
+                        {% endif %}
+                        {{ user.get_full_name }}
+                        </strong>
                         |
                         <a href="{% url 'my-profile' %}">Moje konto</a> |
                         {% if user.is_staff %}

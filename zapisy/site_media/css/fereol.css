@@ -331,7 +331,22 @@ table ul.voted-courses {
   min-height: 1px;
 }
 
+.adminUserName {
+  color: darkred;
+}
+
 /* Bootstrap customizations/overrides */
 .marginFix {
   margin-left: 0px !important;
+}
+
+/* If someone reports that the user name in the top bar is too long
+ * and gets moved to the next line as a result, uncomment this
+ * to squash the nav links and make room for the user name.
+/*.topBarLinkContainer li a {
+  padding: 10px 7px !important;
+}*/
+
+.topBarLinkContainer {
+  margin: 0px !important;
 }
