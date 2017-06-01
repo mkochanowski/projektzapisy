@@ -4,7 +4,7 @@ from django.core.validators import ValidationError
 from datetime import date, datetime
 from apps.schedule.models import Event
 
-import zapisy.common as common
+import common
 
 from apps.enrollment.courses.models import Semester, Term as CourseTerm
 

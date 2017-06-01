@@ -6,8 +6,8 @@ from django import forms
 from django.contrib.auth.models import User
 
 from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser, UserProfile, StudiaZamawiane2012
-from zapisy.apps.enrollment.courses.models import Semester
-from zapisy.apps.enrollment.records.models import Record
+from apps.enrollment.courses.models import Semester
+from apps.enrollment.records.models import Record
 
 
 class ExtendedUserAdmin(admin.ModelAdmin):
