@@ -274,6 +274,7 @@ class CourseEntity(models.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "short_name" : self.get_short_name(),
             "status": self.status,
             "url": reverse("offer-page", args=[self.slug]),
             "type": self.type.id if self.type else -1,
