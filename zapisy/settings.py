@@ -329,7 +329,7 @@ PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
 #PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
 
 STATIC_URL = '/static/'
-STATIC_ROOT =  os.path.join(PROJECT_PATH, 'static')
+STATIC_ROOT =  os.path.join(PROJECT_PATH, 'site_media')
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_VERSIONING = 'pipeline.versioning.hash.MD5Versioning'

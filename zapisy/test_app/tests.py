@@ -4,7 +4,6 @@
 
 from django.test import LiveServerTestCase
 
-from pyvirtualdisplay import Display
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.webdriver import WebDriver
@@ -33,9 +32,6 @@ class SeleniumTestCase(LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.display = Display(visible=0, size=(1024, 1024))
-        cls.display.start()
-        
         cls.driver = webdriver.Firefox()
         cls.driver.set_window_size(1024, 1024)
         super(SeleniumTestCase, cls).setUpClass()
@@ -43,7 +39,6 @@ class SeleniumTestCase(LiveServerTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-        cls.display.stop()
         super(SeleniumTestCase, cls).tearDownClass()
 
 
@@ -201,14 +196,13 @@ class NewSemesterTests(SeleniumTestCase):
         self.driver.get_screenshot_as_file("screenshot.png")
 
     def prepare_course_entities_for_voting(self):
-        self.driver.get('%s%s' % (self.live_server_url, '//'))
+        self.driver.get(self.live_server_url)
         self.driver.find_element_by_id('id_login').send_keys(self.admin.username)
         self.driver.find_element_by_id('id_password').send_keys(self.password)
         self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
         self.driver.find_element_by_link_text('Oferta').click()
         self.driver.get('%s%s' % (self.driver.current_url, '/manage/proposals'))
         self.driver.find_element_by_link_text('Głosowanie').click()
-        self.driver.get_screenshot_as_file("screenshot.png")
         
         nonselected_select = Select(
             WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.ID, 'bootstrap-duallistbox-nonselected-list_for_voting')))
@@ -281,7 +275,7 @@ class NewSemesterTests(SeleniumTestCase):
 
     def vote(self, student, points):
         self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
-        self.driver.get('%s%s' % (self.live_server_url, '//'))
+        self.driver.get(self.live_server_url)
         self.driver.find_element_by_id('id_login').send_keys(student.user.username)
         self.driver.find_element_by_id('id_password').send_keys(self.password)
         self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
@@ -343,7 +337,7 @@ class NewSemesterTests(SeleniumTestCase):
 
     def correction(self, student, points):
         self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
-        self.driver.get('%s%s' % (self.live_server_url, '//'))
+        self.driver.get(self.live_server_url)
         self.driver.find_element_by_id('id_login').send_keys(student.user.username)
         self.driver.find_element_by_id('id_password').send_keys(self.password)
         self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
