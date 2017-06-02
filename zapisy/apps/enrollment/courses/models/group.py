@@ -486,7 +486,8 @@ class Group(models.Model):
         """ Dumps this group state to form readable by JavaScript """
         from django.core.urlresolvers import reverse
 
-        zamawiany = user and user.is_zamawiany
+        zamawiany = user and user.student.is_zamawiany()
+
         data = {
             'id': self.pk,
             'type': int(self.type),
