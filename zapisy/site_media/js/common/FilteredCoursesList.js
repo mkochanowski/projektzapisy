@@ -104,10 +104,8 @@ FilteredCoursesList.prototype.initFilters = function()
 	$('#enr-coursesList-top-bar').find('label').disableDragging();
 };
 
-FilteredCoursesList.prototype.addFilters = function()
+FilteredCoursesList.prototype.addGeneralFilters = function()
 {
-    // Install common filters (i.e. all those matching the HTML present in 
-    // templates/common/course_list_filters.html).
     this.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleTextFilter(
 		'phrase', '.filter-phrase', function(element, value)
 	{
@@ -156,7 +154,10 @@ FilteredCoursesList.prototype.addFilters = function()
 		const course = element.data;
 		return (course.type == courseType);
 	}));
-    
+};
+
+FilteredCoursesList.prototype.addTagsEffectsFilters = function()
+{
     this.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
 		'effects', '#enr-courseFilter-effects', function(element, option)
 	{
@@ -213,6 +214,14 @@ FilteredCoursesList.prototype.addFilters = function()
         
         return findOne(courseTagsArray, selectedTagsArray);
 	}));
+};
+
+FilteredCoursesList.prototype.addFilters = function()
+{
+    // Install common filters (i.e. all those matching the HTML present in 
+    // templates/common/course_list_filters.html).
+    this.addGeneralFilters();
+    this.addTagsEffectsFilters();
 };
 
 // Initialize custom filters - to be overridden by subclasses.
