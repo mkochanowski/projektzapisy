@@ -26,7 +26,7 @@ function unselectAllOptions(listId)
 // TODO: should we unselect when the filters are hidden?
 function onEffectsFilterToggled()
 {
-//    unselectAllOptions("effects", false);
+    unselectAllOptions("effects", false);
 
     if ($("#effectsSearchEnabled").is(":checked"))
     {
@@ -43,7 +43,7 @@ function onEffectsFilterToggled()
 
 function onTagsFilterToggled()
 {
-//    unselectAllOptions("tags", false);
+    unselectAllOptions("tags", false);
 
     if ($("#tagsSearchEnabled").is(":checked"))
     {

@@ -1,15 +1,5 @@
 {% load url from future %}
     <table class="table-info">
-        {% if course.owner %}
-            <tr>
-                <th>Prowadzący</th>
-                <td>
-                    <a href="{% url 'employee-profile' course.owner.user.id %}"
-                           class="person">{{ course.owner.user.get_full_name }}</a>
-                    </td>
-            </tr>
-        {% endif %}
-
         {% if course.ects %}
         <tr>
             <th>ECTS</th>

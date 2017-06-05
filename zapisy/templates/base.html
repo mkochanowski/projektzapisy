@@ -123,11 +123,7 @@
                 </ul>
                 {% if user.is_authenticated %}
                     <div class="user-panel">
-                        {% if user.is_staff %}
-                            <strong class="adminUserName">
-                        {% else %}
-                            <strong>
-                        {% endif %}
+                        <strong>
                         {{ user.get_full_name }}
                         </strong>
                         |

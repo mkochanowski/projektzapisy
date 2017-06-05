@@ -5,7 +5,7 @@
 			<legend><span>{% trans "Filtrowanie" %}</span></legend>
 			<div class="main-filter-input">
 				<input class="text filter-phrase" type="text" />
-				<input class="reset filter-phrase-reset" type="button" value="X" style="display:none;" />
+				<input class="reset filter-phrase-reset" type="button" value="X" style="display: inline-block;">
 			</div>
 			
 			<div id="tagsEffectsFilters" style="display: none">
@@ -84,7 +84,7 @@
                 {% endif %}
                 {% endcomment %}
                 
-                <li class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">{% trans "Pokaż przedmioty prowadzone w j.angielskim" %}</label></li>
+                <li class="checkbox"><input type="checkbox" id="enr-courseFilter-english" checked="checked"/><label for="enr-courseFilter-english">{% trans "Pokaż przedmioty prowadzone w j. angielskim" %}</label></li>
                 <li class="checkbox"><input type="checkbox" id="enr-courseFilter-exam" checked="checked"/><label for="enr-courseFilter-exam">{% trans "Pokaż przedmioty kończące się egzaminem" %}</label></li>
                 <li class="checkbox"><input type="checkbox" id="enr-courseFilter-suggestedForFirstYear" {% if user.student.is_first_year_student %}checked="checked"{% endif %}/><label for="enr-courseFilter-suggestedForFirstYear">{% trans "Pokaż tylko przedmioty zalecane dla 1 roku" %}</label></li>
             </ol>

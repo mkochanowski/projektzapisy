@@ -331,10 +331,6 @@ table ul.voted-courses {
   min-height: 1px;
 }
 
-.adminUserName {
-  color: darkred;
-}
-
 .tagEffectListInCourseHead {
   margin: 0px 0px 0px 10px;
 }

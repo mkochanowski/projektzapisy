@@ -1,5 +1,15 @@
 {% load i18n %}
 
+{% if course_entity.owner %}
+<tr>
+    <th>Prowadzący</th>
+    <td>
+        <a href="{% url 'employee-profile' course_entity.owner.user.id %}"
+           class="person">{{ course_entity.owner.user.get_full_name }}</a>
+    </td>
+</tr>
+{% endif %}
+
 <tr>
     <th>{% trans "Rodzaj" context "rodzaj kursu" %}</th>
     <td>{{ course_entity.type }}</td>

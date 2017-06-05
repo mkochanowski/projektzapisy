@@ -2,6 +2,7 @@
 {% load url from future %}
 {% load compressed %}
 {% load i18n %}
+{% load static %}
 
 {% block main-subtitle %}{# Translators: podtytuł #}{% trans "Prototyp planu zajęć" %}{% endblock %}
 
@@ -55,9 +56,20 @@
     </div>
 	
 	<div id="enr-schedulePrototype-scheduleContainer">
-		<p>{% trans "Nie masz włączonej obsługi JavaScript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.</p>
+        <h3 style="display: inline">Trwa ładowanie prototypu planu zajęć</h3>
+        <img src="{% static "images/loading.gif" %}" style="vertical-align: middle">
+		
+		<noscript>
+		<div class="main-message">
+		{% trans "Nie masz włączonej obsługi JavaScript &ndash; aplikacja prototypu planu nie może bez niej działać" %}.
+		</div>
+		</noscript>
 	</div>
-    <ul id="schedule-legend">
+	<br>
+	<hr>
+	<h4>{% trans "Legenda" %}</h4>
+	<br>	
+    <ul class="schedule-legend">
         <li>
             <div class="legend-box enrolled"></div> - {% trans "jesteś zapisany do tej grupy" %}
         </li>
@@ -67,6 +79,8 @@
         <li>
             <div class="legend-box pinned"></div> - {% trans "grupa przypięta do prototypu" %}
         </li>
+    </ul>
+    <ul class="schedule-legend">
         <li>
             <div class="legend-box icons pinIn"></div> - {% trans "przypnij do prototypu. Widoczność grupy w prototypie zostaje zapamiętana. Przycisk <strong>NIE</strong> zapisuje na zajęcia" %}.
         </li>
