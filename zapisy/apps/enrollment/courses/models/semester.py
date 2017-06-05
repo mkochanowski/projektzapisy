@@ -258,6 +258,13 @@ class Semester( models.Model ):
         return (self.desiderata_opening <= now and self.desiderata_closing is None) or\
             (self.desiderata_opening <= now and self.desiderata_closing >= now)
 
+    def serialize_for_json(self):
+        return {
+            "id": self.pk,
+            "year": self.year,
+            "type": self.get_type_display()
+        }
+
     @staticmethod
     def is_visible(id):
         """ Answers if course is sat as visible (displayed on course lists) """

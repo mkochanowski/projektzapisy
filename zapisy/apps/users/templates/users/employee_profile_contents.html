@@ -39,10 +39,15 @@
 		</tr>
 	</table>
 
-	<h3>Konsultacje:</h3>
-	<p>{{employee.consultations}}</p>
-
-	<h3>Plan zajęć:</h3>
+	{% if employee.consultations %}
+        <h3>Konsultacje:</h3>
+        <p>{{ employee.consultations }}</p>
+        <hr>
+    {% endif %}
+    
+    {% if terms_by_days|length > 0 %}
+        <h3>Plan zajęć:</h3>
+    {% endif %}
 	<div id="user-schedule-scheduleContainer">
 		<input type="hidden" name="courses" value="{{ courses_json }}" />
 		<input type="hidden" name="groups" value="{{ groups_json }}" />
@@ -51,31 +56,32 @@
 		<input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}" />
 		<input type="hidden" name="priority-limit" value="{{ priority_limit }}" />
 
-		<div class="byWeekDays">
-			<h2>Zajęcia z podziałem na dni</h2>
-			{% for day in terms_by_days %}
-				<h3>{{ day.day_name|capfirst }}</h3>
-				<ul>
-					{% for term in day.terms %}
-						<li>
-							<span class="time">
-								{{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
-							</span>
-							<span class="name">
-								{{ term.object.group.course.name }}
-							</span>
-							<span class="type">
-								&ndash;
-								{{ term.object.group.get_type_display }}
-							</span>
-							<span class="classroom">
-								{{ term.object.numbers }}
-							</span>
-						</li>
-					{% endfor %}
-				</ul>
-			{% endfor %}
-		</div>
+		{% if terms_by_days|length > 0 %}
+            <div class="byWeekDays">
+                {% for day in terms_by_days %}
+                    <h5>{{ day.day_name|capfirst }}</h5>
+                    <ul>
+                        {% for term in day.terms %}
+                            <li>
+                                <span class="time">
+                                    {{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
+                                </span>
+                                <span class="name">
+                                    {{ term.object.group.course.name }}
+                                </span>
+                                <span class="type">
+                                    &ndash;
+                                    {{ term.object.group.get_type_display }}
+                                </span>
+                                <span class="classroom">
+                                    {{ term.object.numbers }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            </div>
+        {% endif %}
 	</div>
 
 	<div id="user-schedule-listByCourse" style="display:none">

@@ -62,9 +62,8 @@ def main_page( request ):
     """
         Main page
     """
-    try:
-        news = News.objects.exclude(category='-').select_related('author')[0]
-    except ObjectDoesNotExist:
-        news = None
+    allNews = News.objects.exclude(category='-')\
+              .order_by("-date").select_related('author')
+    news = allNews[0] if len(allNews) > 0 else None
 
     return render_to_response('common/index.html', {'news': news}, context_instance = RequestContext(request))
