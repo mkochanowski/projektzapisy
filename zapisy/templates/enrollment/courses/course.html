@@ -108,7 +108,6 @@
                             {% endif %}
                         </td>
                         <td class="number termQueuedCount">{% if t.queued %}{{ t.queued }}{% else %}0{% endif %}</td>
-                        <h2>{{ course.is_recording_open }} {{ user.student.is_active }}</h2>
                         <td class="controls">
                             <input type="hidden" name="group-id" value="{{ t.id }}"/>
                             <input type="hidden" name="group-json-{% now "Hms" %}" value='{{ t.serialized }}'/>

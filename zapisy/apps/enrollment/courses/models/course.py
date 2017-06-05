@@ -673,12 +673,12 @@ class Course(models.Model):
         return opening_time < datetime.datetime.now()
         
 
-    def is_recording_open_for_student(self, student=None):
-        """ gives the answer to question: is course opened for apps.enrollment for student at the very moment? """
-
-        if not student:
-            return False
-
+    def is_recording_open_for_student(self, student):
+        """
+        Determines whether the course is "open"
+        for the given student, i.e. whether they're
+        allowed to sign up or leave a course group.
+        """
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
 
@@ -751,7 +751,7 @@ class Course(models.Model):
     def get_type_id(self):
         return self.type.id if self.type.id else 1
 
-    def serialize_for_json(self, student=None, is_recording_open=None,
+    def serialize_for_json(self, student=None,
                            terms=None, includeWasEnrolled=False):
         from django.core.urlresolvers import reverse
 
@@ -759,7 +759,12 @@ class Course(models.Model):
         data['id'] = self.pk
         data['type'] = self.get_type_id()
         data['url'] = reverse('course-page', args=[self.slug])
+        if student is not None:
+            is_recording_open = self.is_recording_open_for_student(student)
+        else:
+            is_recording_open = False
         data['is_recording_open'] = is_recording_open
+            
         # TODO: why do we have this field defined in the model
         # if the CourseEntity object has it as well? What's the difference?
         data['english'] = self.english

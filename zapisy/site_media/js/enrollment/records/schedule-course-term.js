@@ -312,11 +312,6 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
     const displaySignInOutButton = 
         this.group.course.isRecordingOpen && 
         (!this.group.isEnrolled || Fereol.Enrollment.isLeavingAllowed);
-        
-    console.log(displaySignInOutButton);
-    console.log(this.group.course.isRecordingOpen);
-    console.log(this.group.isEnrolled);
-    console.log(Fereol.Enrollment.isLeavingAllowed);
 
 	this._signInOutButton.css({
 		backgroundPosition: this.group.isEnrolledOrQueued() ? '-12px 0' : '0 0',

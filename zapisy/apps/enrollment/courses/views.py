@@ -314,8 +314,7 @@ def course(request, slug):
             currentEcts = student.get_points()
             ectsLimitExceeded = True
 
-        serializedCourse = course.serialize_for_json(
-            student, is_recording_open=course.is_recording_open)
+        serializedCourse = course.serialize_for_json(student)
 
         data.update({
             'details_hidden': courseView_details_hidden,

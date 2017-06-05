@@ -81,6 +81,9 @@ def set_enrolled(request, method):
     """
         Set student assigned (or not) to group.
     """
+    # Used to roll the transaction back if an error occurrs.
+    savept = transaction.savepoint()
+    
     from django.db.models.query import QuerySet
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
@@ -101,7 +104,7 @@ def set_enrolled(request, method):
                 u'Twój plan jest zablokowany. Możesz go odblokować w prototypie', message_context)
         student = request.user.student
     except Student.DoesNotExist:
-        transaction.rollback()
+        transaction.savepoint_rollback(savept)
         return AjaxFailureMessage.auto_render('NonStudent',
             u'Nie jesteś studentem.', message_context)
 
@@ -111,7 +114,7 @@ def set_enrolled(request, method):
         group = Group.objects.select_for_update().get(id=group_id)
         group.course = course
     except ObjectDoesNotExist:
-        transaction.rollback()
+        transaction.savepoint_rollback(savept)
         return AjaxFailureMessage.auto_render('NonGroup',
             'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona nie istnieje.', message_context)
 
@@ -123,7 +126,8 @@ def set_enrolled(request, method):
     if result:
         run_rearanged(result, group)
     else:
-        transaction.rollback()
+        print("Failed to enroll, rolling transaction back")
+        transaction.savepoint_rollback(savept)
 
     if is_ajax:
         message = ', '.join(messages_list)
