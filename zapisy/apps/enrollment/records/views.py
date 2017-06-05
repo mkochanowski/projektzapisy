@@ -356,7 +356,9 @@ def schedule_prototype(request):
         default_semester, groups, student=student)
 
     data = {
+        # Info needed by the JS prototype code
         'courses_json': courses_json,
+        # Needed by the template to generate a list of courses
         'courses': prototype_courses,
         'groups_json': all_groups_json,
         'semester': default_semester,

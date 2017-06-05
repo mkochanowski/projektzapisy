@@ -12,9 +12,6 @@ function effectsTagsFiltersToggled()
     {
         $("#tagsEffectsFilters").css("display", "none");
         $("#tagsEffectsFiltersToggle").text("pokaż filtry efektów/tagów");
-
-        $("#effectsSearchEnabled").attr("checked", false);
-        $("#tagsSearchEnabled").attr("checked", false);
     }
 }
 
@@ -26,9 +23,10 @@ function unselectAllOptions(listId)
     });
 }
 
+// TODO: should we unselect when the filters are hidden?
 function onEffectsFilterToggled()
 {
-    unselectAllOptions("effects", false);
+//    unselectAllOptions("effects", false);
 
     if ($("#effectsSearchEnabled").is(":checked"))
     {
@@ -45,7 +43,7 @@ function onEffectsFilterToggled()
 
 function onTagsFilterToggled()
 {
-    unselectAllOptions("tags", false);
+//    unselectAllOptions("tags", false);
 
     if ($("#tagsSearchEnabled").is(":checked"))
     {

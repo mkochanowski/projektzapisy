@@ -23,9 +23,14 @@ PrototypeCoursesList.prototype.init = function()
     // to sign up for courses or leave course groups.
     this.schedule = new Schedule(scheduleContainer);
     
+    // Whether the user is still allowed to leave a course group
+    // they've signed up for.
+    const leavingAllowedStr = $('#isLeavingAllowed').val();
+	Fereol.Enrollment.isLeavingAllowed = (leavingAllowedStr.toLowerCase() === 'true');
+    
     if( user_is_student )
     {
-        // TODO: this didn't work anyway (tried to use an undefined);
+        // TODO: this didn't work anyway (tried to use an undefined var);
         // to be fixed in the future.
         // this.initRecordsLocking();
     }
