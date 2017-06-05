@@ -82,7 +82,7 @@
         })
     });
     </script>
-
+    <script src="{% static "js/common/utils.js" %}"></script>
 </head>
 
 <body>
@@ -101,20 +101,31 @@
             <!-- up-menu  -->
             <div class="container">
 
-                <ul>
-                    <li{% block enrollment_active %}{% endblock %}><a href="{% url 'enrollment-main' %}">System
-                        Zapisów</a>
+                <ul class="topBarLinkContainer">
+                    <li{% block enrollment_active %}{% endblock %}>
+                        <a href="{% url 'enrollment-main' %}">System Zapisów</a>
                     </li>
-                    <li{% block grade_active %}{% endblock %}><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
-                    <li{% block offer_active %}{% endblock %}><a href="{% url 'offer-main' %}">Oferta</a></li>
-                    {% if perms.courses.view_stats %}<li{% block statistics_active %}{% endblock %}><a href="{% url 'statistics:main' %}">Statystyki</a></li>{% endif %}
-                    <li{% block events_active %}{% endblock %}><a href="{% url 'events:classrooms' %}">Sale <span style="color:red;font-size: 10px">beta</span></a></li>
+                    <li{% block grade_active %}{% endblock %}>
+                        <a href="{% url 'grade-main' %}">Ocena Zajęć</a>
+                    </li>
+                    <li{% block offer_active %}{% endblock %}>
+                        <a href="{% url 'offer-main' %}">Oferta</a>
+                    </li>
+                    {% if perms.courses.view_stats %}
+                        <li{% block statistics_active %}{% endblock %}>
+                            <a href="{% url 'statistics:main' %}">Statystyki</a>
+                        </li>
+                    {% endif %}
+                    <li{% block events_active %}{% endblock %}>
+                        <a href="{% url 'events:classrooms' %}">Sale</a>
+                    </li>
 
                 </ul>
                 {% if user.is_authenticated %}
                     <div class="user-panel">
-                        Witaj,
-                        <strong>{% if user.is_staff %}{{ user.first_name }}{% else %}{{ user.get_full_name }}{% endif %}</strong>
+                        <strong>
+                        {{ user.get_full_name }}
+                        </strong>
                         |
                         <a href="{% url 'my-profile' %}">Moje konto</a> |
                         {% if user.is_staff %}
@@ -143,15 +154,11 @@
                             {% else %}
                                 <input type="hidden" name="next" value="{{request.path}}"/>
                             {% endif %}
-                            <label for="id_login">użytkownik:</label>
-                            <input class="small" tabindex="1" type="text" id="id_login" name="username">
-
-                            <label for="id_password">hasło:</label>
-                            <input class="small" tabindex="2"  type="password" id="id_password" name="password">
-
-                            <button class="btn small" tabindex="4"  type="submit">Loguj &raquo;</button>
-                            <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me">
-                            <label for="xlInput3">Zapamiętaj mnie</label>
+                            <label for="id_login">użytkownik: </label><input class="small" tabindex="1" type="text" id="id_login" name="username">&nbsp;
+                            <label for="id_password">hasło: </label><input class="small" tabindex="2" type="password" id="id_password" name="password">&nbsp;
+                            <button class="btn" tabindex="4" type="submit">Loguj &raquo;</button>
+                            &nbsp;|&nbsp;
+                            <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me">&nbsp;<label for="xlInput3">Pamiętaj mnie</label>
                         </div>
                     </form>
                 {% endif %}
@@ -203,20 +210,14 @@
             </div>
         {% endfor %}
         {% endblock %}
-        {% block filter %}
-            {# end filter #}
-        {% endblock %}
-        <div id="main-content-container" class="row show-grid sidebar-right">
+        <div id="main-content-container" class="row show-grid sidebar-right marginFix">
+            {% block topContent %}{% endblock %}
             {% block center %}
-                <div class="span{% block content-width %}11{% endblock %} columns">
-
-
+                <div class="span{% block content-width %}11{% endblock %} columns marginFix contentNoCollapse">
                     <div id="main-content">
                         {% block content %}
                         {% endblock %}
-                        &nbsp;
                     </div>
-
                 </div>
                 <div class="span{% block sidebar-width %}5{% endblock %} columns">
                     {% block sidebar %}

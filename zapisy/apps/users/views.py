@@ -41,6 +41,7 @@ import datetime
 from mailer.models import Message
 
 import logging
+import json
 
 from django.core.cache import cache as mcache
 from apps.notifications.forms import NotificationFormset
@@ -60,11 +61,19 @@ def student_profile(request, user_id):
     """student profile"""
     try:
         student = Student.objects.select_related('user').get(user=user_id)
-        courses = prepare_schedule_courses(request, for_student=student)
+        courses_with_terms = prepare_schedule_courses(
+            request, for_student=student)
         votes   = SingleVote.get_votes(student)
-        data = prepare_schedule_data(request, courses)
+        data = prepare_schedule_data(request, courses_with_terms)
+        courses_for_template = []
+        for course, terms in courses_with_terms:
+            d = {}
+            d["id"] = course.id
+            d["terms"] = [json.dumps(term.serialize_for_json())
+                          for term in terms]
+            courses_for_template.append(d)
         data.update({
-            'courses': courses,
+            'courses': courses_for_template,
             'student': student,
             'votes': votes
         })
@@ -341,11 +350,13 @@ def logout(request):
 
 
 def login_plus_remember_me(request, *args, **kwargs):
-    """Sign-in function with an option to save the session.
-
-    If the user clicked 'remember_me' button (we read it from POST data), the
+    """
+    Sign-in function with an option to save the session.
+    If the user clicked the 'Remember me' button (we read it from POST data), the
     session will expire after two weeks.
     """
+    if request.user.is_authenticated():
+        return redirect("main-page")
     if 'polls' in request.session:
         del request.session['polls']
     if 'finished' in request.session:

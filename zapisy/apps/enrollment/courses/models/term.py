@@ -154,6 +154,16 @@ class Term(models.Model):
 
         return query.select_related('group__course')
 
+    def serialize_for_json(self):
+        return {
+            'id': self.pk,
+            'group': self.group.pk,
+            'classroom': self.classrooms_as_string,
+            'day': int(self.dayOfWeek),
+            'start_time': ("%d:%d" % (self.start_time.hour, self.start_time.minute)),
+            'end_time': ("%d:%d" % (self.end_time.hour, self.end_time.minute)),
+        }
+
     def __unicode__(self):
         """
         N query problem with self.classrooms.all(). If you want to optimize, use Term.get_groups_terms.
