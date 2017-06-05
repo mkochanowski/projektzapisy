@@ -11,6 +11,7 @@ from apps.users.models import Employee
 
 XSCHEMA = os.path.join(PROJECT_PATH, 'enrollment/courses/admin/xml/semesterschedule.xsd')
 
+
 @transaction.atomic
 def import_semester_schedule(xmlfile):
     """ This function parses XML file containing complete schedule of semester (courses, grups, terms,

@@ -339,21 +339,25 @@ def logout(request):
     auth.logout(request)
     return HttpResponseRedirect('/')
 
-def login_plus_remember_me(request, *args, **kwargs):
-    """ funkcja logowania uzględniająca zapamiętanie sesji na życzenie użytkownika"""
 
+def login_plus_remember_me(request, *args, **kwargs):
+    """Sign-in function with an option to save the session.
+
+    If the user clicked 'remember_me' button (we read it from POST data), the
+    session will expire after two weeks.
+    """
     if 'polls' in request.session:
         del request.session['polls']
-
     if 'finished' in request.session:
         del request.session['finished']
 
     if request.method == 'POST':
         if request.POST.get('remember_me', None):
-            request.session.set_expiry(datetime.timedelta(14))
+            request.session.set_expiry(datetime.timedelta(14).total_seconds())
         else:
-            request.session.set_expiry(0) # on browser close
+            request.session.set_expiry(0)  # Expires on browser closing.
     return login(request, *args, **kwargs)
+
 
 @login_required
 def create_ical_file(request):
@@ -388,13 +392,8 @@ def create_ical_file(request):
         except IndexError:
             continue
         for term in terms:
-            start_time = term.start
-            end_time = term.end
-            date = term.day
-            dt = datetime.datetime.combine(date, datetime.time(0, 0))
-            start_datetime = dt + start_time
-            end_datetime = dt + end_time
-
+            start_datetime = datetime.datetime.combine(term.day, term.start)
+            end_datetime = datetime.datetime.combine(term.day, term.end)
             event = cal.add('vevent')
             event.add('summary').value = '%s - %s' % (course_name, group_type)
             if term.room:

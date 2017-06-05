@@ -26,7 +26,7 @@ class SemesterFactory(DjangoModelFactory):
     year = \
         factory.LazyAttribute(lambda x: ("%s/%s" % (x.whole_year,
                                                     x.whole_year % 100 + 1)))
-    is_grade_active = False    
+    is_grade_active = False
     if type == Semester.TYPE_WINTER:
         records_opening = \
             factory.LazyAttribute(lambda x: datetime(x.whole_year, 9, 20))

@@ -487,6 +487,7 @@ class Group(models.Model):
         from django.core.urlresolvers import reverse
 
         zamawiany = student and student.is_zamawiany()
+        
         data = {
             'id': self.pk,
             'type': int(self.type),

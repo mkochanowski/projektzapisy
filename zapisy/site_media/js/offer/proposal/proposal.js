@@ -57,3 +57,30 @@ $(function() {
 function proposal_init(types_data) {
 	data = types_data;
 }
+
+
+function beforeSubmitButton(nameEditPlID,nameEditEnID) 
+{ 
+    var namePL = document.getElementById(nameEditPlID);
+    var nameEN = document.getElementById(nameEditEnID);
+    
+    if (namePL.value=="") namePL.value=nameEN.value;
+    //if (nameEN.value=="") nameEN.value=namePL.value;
+
+    var listRows = document.querySelectorAll('[id^="id_studentwork_set-"]');
+
+    for ( var i = listRows.length-1; i>=0 ; i-- ) {
+        //id_studentwork_set-2-hours
+        var idString = listRows[i].id;
+
+        if (idString.indexOf('id_studentwork_set')==0)
+        if (idString.indexOf('-hours')!=-1)
+        if (listRows[i].value=="" || listRows[i].value=="0")
+        {
+           // listRows[i].parentElement.parentElement.remove();    
+			listRows[i].parentElement.getElementsByClassName("delete-row")[0].click();
+		
+			//parentElement.click();        
+        }
+    }
+}

@@ -11,8 +11,8 @@ from factory.django import DjangoModelFactory
 
 from apps.users.tests.factories import UserFactory
 from apps.enrollment.courses.models import Semester
-from apps.enrollment.courses.tests.factories import GroupFactory, SemesterFactory, \
-    ClassroomFactory
+from apps.enrollment.courses.tests.factories import GroupFactory, \
+    SemesterFactory, ClassroomFactory
 from apps.schedule.models import Event, Term, SpecialReservation
 
 
@@ -86,6 +86,7 @@ class TermFixedDayFactory(TermThisYearFactory):
     day = date(2016, 5, 20)
     start = time(15)
     end = time(16)
+
 
 class SpecialReservationFactory(DjangoModelFactory):
     class Meta:
