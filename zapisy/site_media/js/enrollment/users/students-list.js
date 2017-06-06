@@ -167,7 +167,7 @@ StudentsList.initFilter = function()
 
     StudentsList.runStudents( StudentsList.studentFilter );
 
-	StudentsList.studentFilter.runThread();
+	StudentsList.studentFilter.runThread(true);
 	$('#enr-StudentsList-top-bar').find('label').disableDragging();
 };
 

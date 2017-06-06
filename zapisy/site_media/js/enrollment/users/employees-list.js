@@ -167,7 +167,7 @@ EmployeesList.initFilter = function()
 
     EmployeesList.runEmployees( EmployeesList.employeeFilter );
 
-	EmployeesList.employeeFilter.runThread();
+	EmployeesList.employeeFilter.runThread(true);
 	$('#enr-EmployeesList-top-bar').find('label').disableDragging();
 };
 

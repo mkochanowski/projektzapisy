@@ -1,5 +1,12 @@
 # projektzapisy Changelog
 
+# Current version
+
+# Version 17.06.06
+
+* Added tag/effects filtering
+* Bugfixes after Django 1.6
+
 # Version 17.05.29
 
 * Upgrade to Django 1.6

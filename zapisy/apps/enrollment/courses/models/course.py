@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.core.cache import cache as mcache
+from apps.cache_utils import cache_result
 from apps.enrollment.courses.models.effects import Effects
 
 from apps.enrollment.courses.models.tag import Tag
@@ -246,8 +247,8 @@ class CourseEntity(models.Model):
 
     def get_short_name(self):
         """
-        If entity have shortName (e.g. JFiZO for Języki Formalne i Złożoność Obliczeniowa) return it.
-        Otherwise return full name
+        Return short name if present (e.g. JFiZO = Języki Formalne
+        i Złożoność Obliczeniowa). Otherwise return full name.
 
         @return: String
         """
@@ -255,6 +256,43 @@ class CourseEntity(models.Model):
             return self.name
         else:
             return self.shortName
+
+    @cache_result
+    def get_all_effects(self):
+        return list(self.effects.all())
+
+    @cache_result
+    def get_all_tags(self):
+        return list(self.tags.all())
+    
+    @cache_result
+    def get_all_tags_with_weights(self):
+        """
+        TagCourseEntity is a glue model that contains extra info
+        about the relationship - in this case, the "weight" of the tag.
+        """
+        return list(TagCourseEntity.objects.filter(courseentity=self))
+
+    def serialize_for_json(self):
+        """
+        Serialize this object to a dictionary
+        that contains the most important information and can
+        be passed to a template or json.dumps
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "short_name" : self.get_short_name(),
+            "status": self.status,
+            "slug": self.slug,
+            "type": self.type.id if self.type else -1,
+            "english": self.english,
+            "exam": self.exam,
+            "suggested_for_first_year": self.suggested_for_first_year,
+            "teacher": self.owner.id if self.owner else -1,
+            "effects": [effect.pk for effect in self.get_all_effects()],
+            "tags": [tag.pk for tag in self.get_all_tags()]
+        }
 
 
     @property
@@ -518,14 +556,6 @@ class Course(models.Model):
         return hours + delta
 
     @property
-    def tags(self):
-        if not hasattr(self, '_tagscache'):
-            self._tagscache = TagCourseEntity.objects.filter(courseentity=self.entity)
-
-        return self._tagscache
-
-
-    @property
     def repetitions(self):
         if self.entity.repetitions:
             hours = self.entity.repetitions
@@ -643,12 +673,12 @@ class Course(models.Model):
         return opening_time < datetime.datetime.now()
         
 
-    def is_recording_open_for_student(self, student=None):
-        """ gives the answer to question: is course opened for apps.enrollment for student at the very moment? """
-
-        if not student:
-            return False
-
+    def is_recording_open_for_student(self, student):
+        """
+        Determines whether the course is "open"
+        for the given student, i.e. whether they're
+        allowed to sign up or leave a course group.
+        """
         records_opening = self.semester.records_opening
         records_closing = self.semester.records_closing
 
@@ -704,20 +734,50 @@ class Course(models.Model):
 
         return self.entity.get_points(student)
 
+    def get_effects_list(self):
+        return self.entity.get_all_effects()
 
-    def serialize_for_ajax(self, student=None, is_recording_open=None):
+    def get_tags_list(self):
+        return self.entity.get_all_tags()
+
+    def get_was_enrolled(self, student):
+        if student is None:
+            return False
+
+        # TODO
+        return False
+
+    @cache_result
+    def get_type_id(self):
+        return self.type.id if self.type.id else 1
+
+    def serialize_for_json(self, student=None,
+                           terms=None, includeWasEnrolled=False):
         from django.core.urlresolvers import reverse
-        
-        data = {
-            'id': self.pk,
-            'name': self.name,
-            'short_name': self.entity.get_short_name(),
-            'type': self.type.id and self.type.id or 1,
-            'url': reverse('course-page', args=[self.slug]),
-            'is_recording_open': is_recording_open is not None and is_recording_open or (False if (student is None) else \
-                                                                                             self.is_recording_open_for_student(
-                                                                                                 student))
-        }
+
+        data = self.entity.serialize_for_json()
+        data['id'] = self.pk
+        data['type'] = self.get_type_id()
+        data['url'] = reverse('course-page', args=[self.slug])
+        if student is not None:
+            is_recording_open = self.is_recording_open_for_student(student)
+        else:
+            is_recording_open = False
+        data['is_recording_open'] = is_recording_open
+            
+        # TODO: why do we have this field defined in the model
+        # if the CourseEntity object has it as well? What's the difference?
+        data['english'] = self.english
+
+        if includeWasEnrolled:
+            data.update({
+                'was_enrolled': self.get_was_enrolled(student)
+            })
+
+        if terms is not None:
+            data.update({
+                'terms': [term.serialize_for_json() for term in terms]
+            })
 
         return data
 
@@ -816,6 +876,11 @@ class CourseDescription(models.Model):
         self.id = None
         self.save(force_insert=True)
 
+"""
+Because a tag will have different weights for each
+CourseEntity it's assigned to, we need this special
+relationship glue model.
+"""
 class TagCourseEntity(models.Model):
     tag = models.ForeignKey(Tag)
     courseentity = models.ForeignKey(CourseEntity)

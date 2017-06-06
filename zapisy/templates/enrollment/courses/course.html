@@ -27,11 +27,15 @@
     {# end bread #}
 {% endblock %}
 
+{% block topContent %}
+{% include "common/course_list_filters.html"  with custom_filters="enrollment/semesterChooser.html" %}
+{% endblock %}
+
 {% block enrollment_menu_courses %} class="active"{% endblock %}
 
 {% block content %}
 
-<input type="hidden" name="ajax-course-data" value="{{ course_json }}"/>
+<input type="hidden" name="ajax-course-data" value='{{ course_json|safe }}'/>
 <input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}"/>
 <input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}"/>
 <input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}"/>

@@ -6,4 +6,5 @@ urlpatterns = patterns( 'apps.enrollment.courses.views',
     url('^$', 'courses',  name='enrollment-main'),
     url('^(?P<slug>[\w\-_]+)/votes$', 'votes',  name='course-votes'),
     url('^(?P<slug>[\w\-_]+)/consultations$', 'course_consultations', name='course-consiltations-page'),
+    url('^get_semester_info/(?P<semester_id>\d+)$', 'get_semester_info'),
 )

@@ -22,6 +22,7 @@ from xhtml2pdf import pisa
 from apps.enrollment.courses.utils import prepare_group_data
 from apps.users.decorators import employee_required
 
+from apps.cache_utils import cache_result
 from apps.enrollment.courses.models import *
 from apps.users.models import *
 from apps.enrollment.records.models import *
@@ -80,6 +81,9 @@ def set_enrolled(request, method):
     """
         Set student assigned (or not) to group.
     """
+    # Used to roll the transaction back if an error occurrs.
+    savept = transaction.savepoint()
+    
     from django.db.models.query import QuerySet
     is_ajax = (method == '.json')
     message_context = None if is_ajax else request
@@ -100,7 +104,7 @@ def set_enrolled(request, method):
                 u'Twój plan jest zablokowany. Możesz go odblokować w prototypie', message_context)
         student = request.user.student
     except Student.DoesNotExist:
-        transaction.rollback()
+        transaction.savepoint_rollback(savept)
         return AjaxFailureMessage.auto_render('NonStudent',
             u'Nie jesteś studentem.', message_context)
 
@@ -110,7 +114,7 @@ def set_enrolled(request, method):
         group = Group.objects.select_for_update().get(id=group_id)
         group.course = course
     except ObjectDoesNotExist:
-        transaction.rollback()
+        transaction.savepoint_rollback(savept)
         return AjaxFailureMessage.auto_render('NonGroup',
             'Nie możesz zapisać lub wypisać się z grupy, ponieważ ona nie istnieje.', message_context)
 
@@ -122,7 +126,7 @@ def set_enrolled(request, method):
     if result:
         run_rearanged(result, group)
     else:
-        transaction.rollback()
+        transaction.savepoint_rollback(savept)
 
     if is_ajax:
         message = ', '.join(messages_list)
@@ -305,6 +309,19 @@ def own(request):
     return TemplateResponse(request, 'enrollment/records/schedule.html', locals())
 
 
+@cache_result
+def get_schedule_prototype_courselist(student):
+    courses = prepare_courses_with_terms()
+    return [course.serialize_for_json(
+                student=student, terms=terms, includeWasEnrolled=True)
+            for course, terms in courses]
+
+
+@cache_result
+def get_schedule_prototype_grouplist(semester):
+    return Group.get_groups_by_semester_opt(semester)
+
+
 def schedule_prototype(request):
     """ schedule prototype view """
 
@@ -322,80 +339,37 @@ def schedule_prototype(request):
         messages.info(request, 'Brak aktywnego semestru.')
         data = {
             'student_records': [],
-            'courses' : [],
-            'semester' : 'nieokreślony',
-            'types_list' : [],
-            'is_leaving_allowed' : should_allow_leave,
+            'groups_json': '',
+            'semester': 'nieokreślony',
+            'effects': '',
+            'tags': '',
+            'types_list': [],
+            'is_leaving_allowed': should_allow_leave,
         }
         return render_to_response('enrollment/records/schedule_prototype.html',
             data, context_instance = RequestContext(request))
     if student:
         StudentOptions.preload_cache(student, default_semester)
-    cached_courses = mcache.get("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), 'DoesNotExist')
-    if cached_courses == 'DoesNotExist':
-        logger.debug("missed cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
-        terms = Term.get_all_in_semester(default_semester )
-        courses = prepare_courses_with_terms( terms )
-        ccourses = []
-        for course in courses:
-            jsons = []
-            for term in course['terms']:
-                term.update({ # TODO: do szablonu
-                    'json': json.dumps(term['info'])
-                })
-                jsons.append({'json': json.dumps(term['info'])})
-            course['info'].update({
-                'is_recording_open': False,
-                #TODO: kod w prepare_courses_list_to_render moim zdaniem nie
-                #      zadziała
-                'was_enrolled': 'False',
-	        'english': course['object'].english,
-	        'exam': course['object'].exam,
-	        'suggested_for_first_year': course['object'].suggested_for_first_year,
-            'terms':jsons
-            })
-            ccourses.append(course['info'])
-        cached_courses = ccourses
-        mcache.set("schedule_prototype_courses_%s_%s" % (default_semester.id, student_id), cached_courses)
-#    else:
-#        logger.debug("in cache schedule_prototype_courses_%s_%s" % (default_semester.id, student_id))
 
+    prototype_courses = get_schedule_prototype_courselist(student)
+    courses_json = json.dumps(prototype_courses)
 
-    cached_all_groups = mcache.get("schedule_prototype_all_groups_%s" % default_semester.id, 'DoesNotExist')
-    if cached_all_groups == 'DoesNotExist':
-
-#        logger.debug('Cache miss with semester id: %s' % \
-#                default_semester.id)
-        mcache.delete("schedule_prototype_courses_json_%s" % student_id)
-        cached_all_groups = Group.get_groups_by_semester_opt(default_semester)
-        mcache.set("schedule_prototype_all_groups_%s" % default_semester.id, cached_all_groups)
-
-    all_groups_json = prepare_groups_json(default_semester, cached_all_groups,
-        student=student)
-
-    cached_test = mcache.get("test_cache", "DoesNotExist")
-
-    if cached_test == 'DoesNotExist':
-#        logger.debug("test missed")
-        mcache.set("test_cache", 2)
-#    else:
-#        logger.debug("test is in cache")
-    cached_courses_json = mcache.get("schedule_prototype_courses_json_%s" % student_id, 'DoesNotExist')
-    if cached_courses_json == 'DoesNotExist':
-#        logger.debug("miss schedule_prototype_courses_json_%s" % student.id)
-        cached_courses_json = prepare_courses_json(cached_all_groups, student) #OK!
-        mcache.set("schedule_prototype_courses_json_%s" % student_id, cached_courses_json)
-#    else:
-#        logger.debug("in cache schedule_prototype_courses_json_%s" % student.id)
+    groups = get_schedule_prototype_grouplist(default_semester)
+    all_groups_json = prepare_groups_json(
+        default_semester, groups, student=student)
 
     data = {
-        'courses_json': cached_courses_json,
+        # Info needed by the JS prototype code
+        'courses_json': courses_json,
+        # Needed by the template to generate a list of courses
+        'courses': prototype_courses,
         'groups_json': all_groups_json,
-        'courses' : cached_courses,
-        'is_leaving_allowed' : should_allow_leave,
-        'semester' : default_semester,
-        'types_list' : Type.get_all_for_jsfilter(),
+        'semester': default_semester,
+        'effects': Effects.objects.all(),
+        'tags': Tag.objects.all(),
+        'types_list': Type.get_all_for_jsfilter(),
         'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
+        'allow_leave_course': should_allow_leave,
     }
     return render_to_response('enrollment/records/schedule_prototype.html',
         data, context_instance = RequestContext(request))
