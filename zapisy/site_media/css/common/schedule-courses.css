@@ -103,9 +103,14 @@
 
 .schedule .term .controls span, .legend-box.icons
 {
-	width: 12px;
-	height: 12px;
-	background-image: url('/site_media/images/schedule-prototype-controls.png');
+	display: block;
+ 	width: 12px;
+ 	height: 12px;
+	margin: 3px;
+	overflow: hidden;
+	cursor: pointer;
+	background: no-repeat;
+ 	background-image: url('/site_media/images/schedule-prototype-controls.png');
 }
 
 .legend-box.icons {
