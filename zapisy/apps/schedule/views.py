@@ -26,9 +26,6 @@ from xhtml2pdf import pisa
 import StringIO
 
 
-__author__ = 'maciek'
-
-
 def classrooms(request):
     from apps.enrollment.courses.models import Classroom
 
