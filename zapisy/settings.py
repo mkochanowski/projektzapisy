@@ -17,8 +17,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-# With DEBUG = False Django will refuse to serve requests to hosts different
-# than this one.
 ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl']
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
@@ -198,7 +196,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
@@ -340,6 +337,7 @@ STATICFILES_FINDERS = (
 
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
+    print("Execing thing")
     execfile(local_settings_file)
 
 NEWS_PER_PAGE = 15

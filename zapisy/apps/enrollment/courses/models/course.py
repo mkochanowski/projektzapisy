@@ -425,6 +425,7 @@ class CourseEntity(models.Model):
         # and map it to name_en or name_pl accordingly. The trouble is, almost all
         # CourseEntities have empty English names, so the sorting order is nonsensical.
         # Could re-enable this when (if) we have proper translations for course names.
+        print("About to blow up")
         result = CourseEntity.noremoved \
                 .exclude(status=CourseEntity.STATUS_PROPOSITION) \
                 .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
@@ -472,7 +473,7 @@ class Related(models.Manager):
 
     def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(Related, self).get_queryset().select_related('semester', 'type', 'type__classroom', 'entity')
+        return super(Related, self).get_queryset().select_related('semester', 'entity')
 
 
 class VisibleManager(Related):
@@ -877,7 +878,7 @@ class CourseDescription(models.Model):
     requirements = models.ManyToManyField(CourseEntity, verbose_name='wymagania', related_name='+', blank=True)
     exam = models.BooleanField(verbose_name='egzamin', default=False)
 
-    created = models.DateTimeField(auto_now_add=True, auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'opis przedmiotu'

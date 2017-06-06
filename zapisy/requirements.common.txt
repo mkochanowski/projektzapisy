@@ -1,5 +1,5 @@
 # Packages from our development environment
-Django==1.7.11 --no-binary django
+Django==1.8.18 --no-binary django
 Fabric==1.5.1
 argparse==1.2.1
 django-autoslug==1.6.1
