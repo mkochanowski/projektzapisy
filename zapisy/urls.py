@@ -11,7 +11,6 @@ from apps.news import views as news_views
 admin.autodiscover()
 
 
-
 urlpatterns = [
     url('^$', news_views.main_page, name='main-page'),
     url(r'^help/', include('apps.help.urls')),
@@ -44,12 +43,11 @@ urlpatterns = [
     url(r'^vote/', include('apps.offer.vote.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^fereol_admin/', include(admin.site.urls)),
+]
 
-)
-
-
+"""
 if not settings.RELEASE:
-    urlpatterns += patterns('',
+    urlpatterns += [
     url(r'^static/(.*)$', 'django.views.static.serve', {'document_root': os.path.join(os.path.dirname(__file__), 'static')}),
     url(r'^vote/', include('apps.offer.vote.urls')),
     # OD
@@ -65,6 +63,5 @@ if not settings.RELEASE:
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-
-)
+]
+"""

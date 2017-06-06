@@ -357,7 +357,7 @@ def schedule_prototype(request):
     groups = get_schedule_prototype_grouplist(default_semester)
     all_groups_json = prepare_groups_json(
         default_semester, groups, student=student)
-
+    
     data = {
         # Info needed by the JS prototype code
         'courses_json': courses_json,

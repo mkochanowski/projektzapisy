@@ -425,7 +425,6 @@ class CourseEntity(models.Model):
         # and map it to name_en or name_pl accordingly. The trouble is, almost all
         # CourseEntities have empty English names, so the sorting order is nonsensical.
         # Could re-enable this when (if) we have proper translations for course names.
-        print("About to blow up")
         result = CourseEntity.noremoved \
                 .exclude(status=CourseEntity.STATUS_PROPOSITION) \
                 .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
