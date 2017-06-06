@@ -6,18 +6,20 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 from feeds import LatestNews
-from apps.news import views as news_views
+import apps.news.views
+from apps.users import views as users_views
+from apps.enrollment.courses.admin import views as courses_admin_views
 
 admin.autodiscover()
 
 
 urlpatterns = [
-    url('^$', news_views.main_page, name='main-page'),
+    url('^$', apps.news.views.main_page, name='main-page'),
     url(r'^help/', include('apps.help.urls')),
     url(r'^courses/', include('apps.enrollment.courses.urls')),
     url(r'^records/', include('apps.enrollment.records.urls')),
     url(r'^statistics/', include('apps.statistics.urls', namespace='statistics')),
-    url(r'^consultations/$', 'apps.users.views.consultations_list', name="consultations-list"),
+    url(r'^consultations/$', users_views.consultations_list, name="consultations-list"),
 
     url(r'^news/', include('apps.news.urls')),
     url(r'^jstests/', TemplateView.as_view(template_name="jstests/tests.html")),
@@ -26,15 +28,15 @@ urlpatterns = [
 
     url(r'^grade/', include('apps.grade.urls')),
     url(r'^feeds/news/$', LatestNews()),
-    url(r'^s/(?P<query>.*)/$', 'apps.users.views.students_list', name='users-list-search'),
-    url(r'^e/(?P<query>.*)/$', 'apps.users.views.employees_list', name='users-list-search'),
+    url(r'^s/(?P<query>.*)/$', users_views.students_list, name='users-list-search'),
+    url(r'^e/(?P<query>.*)/$', users_views.employees_list, name='users-list-search'),
 
-    url(r'^fereol_admin/courses/import_semester', 'apps.enrollment.courses.admin.views.import_semester'),
-    url(r'^fereol_admin/courses/import_schedule', 'apps.enrollment.courses.admin.views.import_schedule'),
-    url(r'^fereol_admin/courses/refresh_semester', 'apps.enrollment.courses.admin.views.refresh_semester'),
-    url(r'^fereol_admin/courses/group/change_limit', 'apps.enrollment.courses.admin.views.change_group_limit', name='change-group-limit'),
-    url(r'^fereol_admin/courses/group/remove_student', 'apps.enrollment.courses.admin.views.remove_student'),
-    url(r'^fereol_admin/courses/group/add_student', 'apps.enrollment.courses.admin.views.add_student'),
+    url(r'^fereol_admin/courses/import_semester', courses_admin_views.import_semester),
+    url(r'^fereol_admin/courses/import_schedule', courses_admin_views.import_schedule),
+    url(r'^fereol_admin/courses/refresh_semester', courses_admin_views.refresh_semester),
+    url(r'^fereol_admin/courses/group/change_limit', courses_admin_views.change_group_limit, name='change-group-limit'),
+    url(r'^fereol_admin/courses/group/remove_student', courses_admin_views.remove_student),
+    url(r'^fereol_admin/courses/group/add_student', courses_admin_views.add_student),
     url(r'^offer', include('apps.offer.proposal.urls')),
     url(r'^prefs/', include('apps.offer.preferences.urls')),
     url(r'^desiderata', include('apps.offer.desiderata.urls')),
