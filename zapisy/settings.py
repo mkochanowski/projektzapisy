@@ -338,10 +338,6 @@ STATICFILES_FINDERS = (
   'django.contrib.staticfiles.finders.AppDirectoriesFinder'
 )
 
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'site_media'),
-)
-
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
