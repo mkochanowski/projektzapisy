@@ -126,7 +126,6 @@ def set_enrolled(request, method):
     if result:
         run_rearanged(result, group)
     else:
-        print("Failed to enroll, rolling transaction back")
         transaction.savepoint_rollback(savept)
 
     if is_ajax:
