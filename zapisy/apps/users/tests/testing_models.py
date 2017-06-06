@@ -160,7 +160,7 @@ class IBANTest(TestCase):
 
 class MailsToStudentsLinkTestCase(TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
         cls.MSG_HEADER = 'Wyślij wiadomość do studentów'
         regular_user = User.objects.create_user('regular_user', 'user@user.com', 'password')
         Student.objects.create(user=regular_user)
