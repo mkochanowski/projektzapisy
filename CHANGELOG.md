@@ -2,6 +2,12 @@
 
 # Current version
 
+# Version 17.06.07
+
+* fixed error with not visible plans and not working prototype when new hidden future semester is added
+* fixed 500 error on vote summary
+* fixed password reset functionality after upgrade to Django 1.6. The issue was with wrong url names
+
 # Version 17.06.06
 
 * Added tag/effects filtering
