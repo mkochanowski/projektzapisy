@@ -122,6 +122,13 @@ class Event(models.Model):
 
         super(Event, self).clean()
 
+    def remove(self):
+        from .term import Term
+        terms = Term.objects.filter(event=self)
+        for term in terms:
+            term.delete()
+        self.delete()
+
     def _user_can_see_or_404(self, user):
         """
 
