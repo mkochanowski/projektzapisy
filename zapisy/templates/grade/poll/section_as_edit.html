@@ -1,4 +1,4 @@
-
+{% load url from future %}
 {% for section in sections %}
 <form method="Post" id="questionset" action="{% url 'grade-poll-questionset-create' %}">{% csrf_token %}
 
