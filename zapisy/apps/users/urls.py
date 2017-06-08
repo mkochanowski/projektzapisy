@@ -6,7 +6,6 @@ from django.contrib.auth.views import\
     password_reset_complete, password_reset_done
 from . import views
 
-<<<<<<< HEAD
 urlpatterns = [
     url('^login/$', views.login_plus_remember_me, {'template_name': 'users/login.html'}, 'user-login'),
     url(r'^profile/employee/(?P<user_id>(\d+))?$', views.employee_profile, name='employee-profile'),
@@ -21,7 +20,7 @@ urlpatterns = [
     url('^password-reset/$', password_reset, {'template_name': 'users/password_reset_form.html'}, name='password_reset'),
     url('^password-reset-done/$', password_reset_done, {'template_name': 'users/password_reset_done.html'}, name='password_reset_done'),
     url('^password-reset-confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', password_reset_confirm, {'template_name': 'users/password_reset_confirm.html'}, name='password_reset_confirm'),
-    url('^password_reset_complete/$', password_reset_complete, {'template_name': 'users/password_reset_complete.html'}, name='password-reset-complete'),
+    url('^password-reset-complete/$', password_reset_complete, {'template_name': 'users/password_reset_complete.html'}, name='password_reset_complete'),
     url('^logout/$', views.logout, name='user-logout'),
     url('^employees/$', views.employees_list, name='employees-list'),
     url('^students/$', views.students_list, name='students-list'),
