@@ -91,7 +91,7 @@ def vote_summary( request ):
 
     subs = CourseEntity.get_vote()
     subs = SingleVote.add_vote_count(subs, state)
-    subs = subs.values('votes', 'voters', 'name', 'slug', 'semester')
+    subs = subs.values('name', 'slug', 'semester','votes', 'voters')
 
     for sub in subs:
 
