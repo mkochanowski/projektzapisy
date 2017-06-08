@@ -411,8 +411,8 @@ class CourseDescriptionAdmin(TranslationAdmin):
         entity.information = obj
         entity.save()
     class Media:
-        js = ('/site_media/js/tinymce/tinymce.min.js',
-              '/site_media/js/textareas.js',)
+        js = ('/static/js/tinymce/tinymce.min.js',
+              '/static/js/textareas.js',)
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseDescription, CourseDescriptionAdmin)
