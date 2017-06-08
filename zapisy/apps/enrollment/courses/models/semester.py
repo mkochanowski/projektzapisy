@@ -17,7 +17,7 @@ class GetterManager(models.Manager):
 
     def get_next(self):
         try:
-            return self.get(records_closing__gte=datetime.now())
+            return self.get(visible=True, records_closing__gte=datetime.now())
         except (ObjectDoesNotExist, MultipleObjectsReturned):
             return self.filter(visible=True).order_by('-records_closing')[0]
 
