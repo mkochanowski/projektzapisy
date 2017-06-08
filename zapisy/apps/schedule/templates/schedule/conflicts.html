@@ -4,9 +4,9 @@
 
 {% block styles %}
     {{ block.super }}
-    <link href="/site_media/css/jquery-ui-1.8.14.custom.css" rel="stylesheet" type="text/css"
+    <link href="{% static "css/jquery-ui-1.8.14.custom.css" %}" rel="stylesheet" type="text/css"
           media="screen,projection"/>
-    <link href="/site_media/js/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"
+    <link href="{% static "js/timepicker/jquery.ui.timepicker.css" %}" rel="stylesheet" type="text/css"
           media="screen,projection"/>
 <style>
   #days-list { list-style: none; }
@@ -23,9 +23,9 @@
   <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
   <script type="text/javascript">window.__admin_media_prefix__ = "/static/admin/";</script>
   <script type="text/javascript" src="/fereol_admin/jsi18n/"></script>
-  <script type="text/javascript" src="/site_media/js/timepicker/jquery.ui.timepicker.js"></script>
-  <script type="text/javascript" src="/site_media/js/timepicker/i18n/jquery.ui.timepicker-pl.js"></script>
-  <script type="text/javascript" src="/site_media/js/jquery/jquery.smooth-scroll.js"></script>
+  <script type="text/javascript" src="{% static "js/timepicker/jquery.ui.timepicker.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/timepicker/i18n/jquery.ui.timepicker-pl.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/jquery/jquery.smooth-scroll.js" %}"></script>
   <script>
   var LoadPickers = function () {
       $(".datepicker").datepicker({dateFormat: 'yy-mm-dd'});
