@@ -19,7 +19,7 @@ MANAGERS = ADMINS
 
 # With DEBUG = False Django will refuse to serve requests to hosts different
 # than this one.
-ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl']
+ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl', 'localhost']
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
 """
@@ -240,6 +240,7 @@ INSTALLED_APPS = (
     'apps.offer.vote',
     'apps.offer.desiderata',
 
+    'apps.utils',
     'apps.schedule',
     #'debug_toolbar',
     'apps.grade.poll',
@@ -326,6 +327,14 @@ CACHES = {
         }
     }
 }
+        
+NEWS_PER_PAGE = 15
+
+# The URL to the issue tracker where users
+# can submit issues or bug reports. Used in several templates.
+ISSUE_TRACKER_URL = "https://tracker-zapisy.ii.uni.wroc.pl"
+# As above, but takes the user straight to the "create new issue" page
+ISSUE_TRACKER_NEW_ISSUE_URL = "https://tracker-zapisy.ii.uni.wroc.pl/projects/zapisy-tracker/issues/new"
 
 if os.path.isfile(os.path.join(PROJECT_PATH, 'pipeline.py')):
     execfile(os.path.join(PROJECT_PATH, 'pipeline.py'))
@@ -355,6 +364,3 @@ STATICFILES_DIRS = (
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
-
-NEWS_PER_PAGE = 15
-

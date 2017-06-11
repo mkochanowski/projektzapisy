@@ -1,4 +1,4 @@
-DEBUG = True
+DEBUG = False
 PIPELINE = False
 DATABASES = {
      'default' : {
@@ -12,4 +12,5 @@ DATABASES = {
             'USE_UNICODE' : True,
         } 
 }
+
 
