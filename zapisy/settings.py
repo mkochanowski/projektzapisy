@@ -292,6 +292,10 @@ SESSION_COOKIE_PATH = '/;HttpOnly'
 #TEMPLATE_DEBUG = DEBUG
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Since Django 1.6 the default session serializer is json, which
+# doesn't have as many features, in particular it cannot serialize
+# custom objects, and we need this behavior.
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 DEBUG_TOOLBAR_ALLOWED_USERS = [
     "209067", # Tomasz Wasilczyk
