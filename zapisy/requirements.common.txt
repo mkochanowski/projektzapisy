@@ -32,7 +32,7 @@ rq==0.7.1
 readline==6.2.4.1
 
 # Additional packages on production environment
-gunicorn==0.14.6
+gunicorn==19.7.1
 lxml==3.0.1
 python-dateutil==2.1
 reportlab==2.6
