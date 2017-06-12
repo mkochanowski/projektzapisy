@@ -433,7 +433,7 @@
         $('#save_event').click(function (event) {
 
             if ($('#termstable tbody').find('tr:not(.removed)').length == 0) {
-                if (window.confirm("Czy na pewno chcesz usunąć to wydarzenie?"));
+                if (window.confirm("Czy na pewno chcesz usunąć to wydarzenie?"))
                   $('#testmainform').click();                          
             } else {
                 this.setCustomValidity('');

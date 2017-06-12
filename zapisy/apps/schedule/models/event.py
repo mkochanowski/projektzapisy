@@ -123,6 +123,10 @@ class Event(models.Model):
         super(Event, self).clean()
 
     def remove(self):
+        """
+            Removing all terms bounded with given event
+
+        """
         from .term import Term
         terms = Term.objects.filter(event=self)
         for term in terms:
