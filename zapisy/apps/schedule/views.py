@@ -75,12 +75,11 @@ def edit_event(request, event_id=None):
     from apps.schedule.models import Event
 
     is_edit = True
-
     event = Event.get_event_for_moderation_or_404(event_id, request.user)
     form = EventForm(data=request.POST or None, instance=event, user=request.user)
     formset = TermFormSet(request.POST or None, instance=event)
     reservation = event.reservation
-
+    
     if form.is_valid():
         event = form.save(commit=False)
         if not event.id:
@@ -90,8 +89,12 @@ def edit_event(request, event_id=None):
             event.save()
             formset.save()
 
-            messages.success(request, u'Zmieniono zdarzenie')
+            if Term.objects.filter(event=event).count() == 0:
+                event.remove()
+                messages.success(request, u'Usunięto wydarzenie')
+                return reservations(request)
 
+            messages.success(request, u'Zmieniono zdarzenie')
             return redirect(event)
 
     return TemplateResponse(request, 'schedule/reservation.html', locals())
