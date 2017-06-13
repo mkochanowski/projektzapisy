@@ -256,6 +256,8 @@ INSTALLED_APPS = (
     'test_app'
 )
 
+MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
+
 AUTHENTICATION_BACKENDS = (
     'apps.users.auth_backend.BetterBackend',
 )

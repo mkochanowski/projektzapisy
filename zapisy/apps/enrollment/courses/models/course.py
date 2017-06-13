@@ -228,9 +228,7 @@ class CourseEntity(models.Model):
         verbose_name = 'Podstawa przedmiotu'
         verbose_name_plural = 'Podstawy przedmiotów'
         app_label = 'courses'
-        # FIXME: we either need all courses to have their names
-        # translated, or we need to drop this feature altogether
-        ordering = ['name_pl']
+        ordering = ['name']
 
 
     def get_points(self, student=None):
@@ -296,18 +294,6 @@ class CourseEntity(models.Model):
             "effects": [effect.pk for effect in self.get_all_effects()],
             "tags": [tag.pk for tag in self.get_all_tags()]
         }
-    
-    @property
-    def safe_get_name(self):
-        """
-        Returns the name properly localized, unless
-        there's no translation, in which case it returns
-        the Polish "base name".
-        """
-        language = get_language()
-        if language == "en" and self.name_en:
-            return self.name_en
-        return self.name_pl
 
     @property
     def description(self):
