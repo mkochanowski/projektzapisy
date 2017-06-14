@@ -35,7 +35,7 @@ def get_courses_list_in_semester_with_history_info(user, semester):
         Disabled for now because the clients-side part isn't ready anyway.
         TODO: re-enable when that's done.
     """
-    return Course.visible.filter(semester=semester).order_by('entity__name')
+    return Course.visible.filter(semester=semester)
     """
         .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
                                      ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \

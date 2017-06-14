@@ -335,6 +335,26 @@ table ul.voted-courses {
   margin: 0px 0px 0px 10px;
 }
 
+#filterTable {
+  border: 0px;
+  margin: 0px;
+}
+
+#filterTable td {
+  border: 0px;
+  padding: 5px 0px 0px 0px;
+  vertical-align: top;
+  text-align: left;
+}
+
+#filterTable td:not(:last-child) {
+  border-right: 1px dotted #cbcbcb;
+}
+
+.tableNameField {
+  margin-right: 5px;
+}
+
 /* Bootstrap customizations/overrides */
 .marginFix {
   margin-left: 0px !important;

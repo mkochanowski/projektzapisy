@@ -97,7 +97,7 @@ def vote_summary( request ):
             winter.append( (sub.votes, sub.voters, sub) )
         elif sub.semester == 'l':
             summer.append( (sub.votes, sub.voters, sub) )
-        else:
+        elif sub.semester == 'u':
             unknown.append( (sub.votes, sub.voters, sub) )
 
     data = { 'winter'  : winter,

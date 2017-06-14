@@ -228,7 +228,14 @@ class CourseEntity(models.Model):
         verbose_name = 'Podstawa przedmiotu'
         verbose_name_plural = 'Podstawy przedmiotów'
         app_label = 'courses'
-        ordering = ['name']
+        # FIXME: this should not be needed, the modeltranslation lib
+        # should automatically fall back to the Polish base name
+        # (it's the default + we have it defined in settings.py)
+        # For whatever reason Course instances (that use entity__name) are
+        # actually ordered properly, but when accessing CourseEntity directly
+        # it doesn't work...
+        # As it is, we need this so lists in the offer app are sorted properly
+        ordering = ['name_pl']
 
 
     def get_points(self, student=None):
@@ -289,6 +296,7 @@ class CourseEntity(models.Model):
             "type": self.type.id if self.type else -1,
             "english": self.english,
             "exam": self.exam,
+            "semester" : self.semester,
             "suggested_for_first_year": self.suggested_for_first_year,
             "teacher": self.owner.id if self.owner else -1,
             "effects": [effect.pk for effect in self.get_all_effects()],

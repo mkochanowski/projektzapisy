@@ -58,8 +58,51 @@ function onTagsFilterToggled()
     }
 }
 
+function getCourseIdFromIdString(idString)
+{
+    let chunks = idString.split("-");
+    return parseInt(chunks[3]);
+}
+
+function onCourseMiddleMouseClick(sender)
+{
+    let tagName = sender.attr("tagName").toLowerCase();
+    let idString = "";
+    if (tagName === "label")
+    {
+        idString = sender.attr("for");
+    }
+    else if (tagName === "input")
+    {
+        idString = sender.attr("id");
+    }
+    
+    let ourCourseId = getCourseIdFromIdString(idString);
+    $.each($("#typeFilterList input[type='checkbox']"), function(i, val)
+    {
+        let checkboxElem = $(val);
+        let curId = getCourseIdFromIdString(checkboxElem.attr("id"));
+        if (curId !== ourCourseId)
+        {
+            checkboxElem.attr("checked", "");
+        }
+    });
+    
+    let checkboxForThisId = $("#filter-course-type-" + ourCourseId);
+    checkboxForThisId.attr("checked", "true");
+}
+
 $(document).ready(function()
 {
     unselectAllOptions("effects", false);
     unselectAllOptions("tags", false);
+    
+    $(".courseTypeClickable").mousedown(function(e) {
+        if (e.which === 2)
+        {
+            onCourseMiddleMouseClick($(this));
+            return false;
+        }
+        return true;
+    });
 });
