@@ -44,15 +44,24 @@ OfferCoursesList.prototype.processCourse = function(courseProposal)
 
 OfferCoursesList.prototype.addCustomFilters = function()
 {
-    // Two custom filters - they allow users to filter by teacher
-    // and filter by vote status.
+    // Three custom filters - they allow users to filter by teacher, by semester
+    // and by vote status.
     this.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
         'teacher', '#enr-teacher', function(element, value)
     {
         if (!value || value == -1)
-          			return true;
+            return true;
         var course = element.data;
         return (course.teacher == value);
+    }));
+    
+    this.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleComboFilter(
+        'semester', '#enr-semester', function(element, value)
+    {
+        if (value === "any")
+            return true;
+        var course = element.data;
+        return course.semester === value;
     }));
     
     this.courseFilter.addFilter(ListFilter.CustomFilters.createSimpleBooleanFilter(
