@@ -22,8 +22,8 @@ logger = logging.getLogger()
 EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 
 class Related(models.Manager):
-    def get_query_set(self):
-        return super(Related, self).get_query_set().select_related('user')
+    def get_queryset(self):
+        return super(Related, self).get_queryset().select_related('user')
 
 class ExtendedUser(User):
     is_student = models.BooleanField(default = False, verbose_name="czy student?")
@@ -38,7 +38,7 @@ class ExtendedUser(User):
 
 class UserProfile(models.Model):
     # This field is required.
-    user         = models.OneToOneField(User, related_name='_profile_cache')
+    user         = models.OneToOneField(User, related_name='profile')
     is_student   = models.BooleanField(default = False, verbose_name="czy student?")
     is_employee  = models.BooleanField(default = False, verbose_name="czy pracownik?")
     is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
@@ -52,7 +52,7 @@ class UserProfile(models.Model):
         super(UserProfile, self).clean()
         if not (self.is_employee or self.is_student) or (self.is_student and self.is_employee):
             raise ValidationError(
-                message={'integrity': [u'Profil musi jedoznacznie określać rolę użytkownika w systemie']},
+                message={'integrity': [u'Profil musi jedoznacznie określać rolę użytkownika w systemie']},
             )
 
 
@@ -70,7 +70,7 @@ class BaseUser(models.Model):
     receive_mass_mail_grade = models.BooleanField(
         default = True,
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
-    last_news_view = models.DateTimeField(default=datetime.datetime.now())
+    last_news_view = models.DateTimeField(default=datetime.datetime.now)
 
     objects = Related()
 

@@ -28,7 +28,7 @@ class Semester( models.Model ):
     TYPE_SUMMER = 'l'
     TYPE_CHOICES = [(TYPE_WINTER, u'zimowy'), (TYPE_SUMMER, u'letni')]
 
-    visible = models.BooleanField(verbose_name='widoczny')
+    visible = models.BooleanField(verbose_name='widoczny', default=False)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.CharField(max_length=7, default='0', verbose_name='rok akademicki')
     records_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia zapisów', help_text='Godzina powinna być ustawiona na 00:00:00, by studenci mieli otwarcie między 10:00 a 22:00.')
@@ -43,7 +43,7 @@ class Semester( models.Model ):
     desiderata_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia dezyderat')
     desiderata_closing = models.DateTimeField(null = True, blank=True, verbose_name='Czas zamknięcia dezyderat')
 
-    is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna' )
+    is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna', default=False)
     records_ects_limit_abolition = models.DateTimeField(null = True, verbose_name='Czas zniesienia limitu 35 ECTS')
 
     t0_are_ready = models.BooleanField( verbose_name= u'T0 zostały ustalone', default=False)

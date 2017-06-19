@@ -2,6 +2,13 @@
 
 # Current version
 
+# Version 17.06.19
+
+* Upgrade to Django 1.7
+* Added maintentance mode switcher
+* Fixed course names in vote results
+* Enhanced filtering for offer
+
 # Version 17.06.13
 
 * added possibility to remove reservations

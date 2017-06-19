@@ -48,7 +48,7 @@ class StatisticManager(models.Manager):
     @return Queryset of Group
     """
     def in_semester(self, semester):
-        return self.get_query_set().filter(course__semester=semester)\
+        return self.get_queryset().filter(course__semester=semester)\
             .select_related('course', 'teacher', 'teacher__user', 'course__entity')\
             .order_by('course')\
             .extra(select={
@@ -482,12 +482,12 @@ class Group(models.Model):
         return Queue.objects.filter(student=student, group=self).count() != 0
 
     def serialize_for_json(self, enrolled, queued, pinned, queue_priorities,
-        student=None, employee=None, user=None):
+        student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
         from django.core.urlresolvers import reverse
 
-        zamawiany = user and user.student.is_zamawiany()
-
+        zamawiany = student and student.is_zamawiany()
+        
         data = {
             'id': self.pk,
             'type': int(self.type),

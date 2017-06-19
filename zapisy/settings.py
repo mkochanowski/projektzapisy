@@ -9,7 +9,7 @@ DEBUG = False
 
 RELEASE = False
 
-TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = False
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -215,6 +215,11 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'modeltranslation', # needs to be before django.contrib.admin
+    # needed from 1.7 onwards to prevent Django from trying to apply
+    # migrations when testing (slows down DB setup _a lot_)
+    'test_without_migrations',
+    
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -222,14 +227,12 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
 
-    'modeltranslation',
-
     'apps.users',
 
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mailer',
-    'south',
+    #'south',
     'pipeline',
     'apps.enrollment.courses',
     'apps.enrollment.records',
@@ -262,19 +265,10 @@ AUTHENTICATION_BACKENDS = (
     'apps.users.auth_backend.BetterBackend',
 )
 
-AUTH_PROFILE_MODULE = 'users.UserProfile'
-
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
 
-SKIP_SOUTH_TESTS = True # wylacza wbudowane testy south
-SOUTH_TESTS_MIGRATE = False
-
-#TODO: udokumentowac zaleznosci!
-#TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
-#TEST_OUTPUT_VERBOSE = True
-#TEST_OUTPUT_DESCRIPTIONS = True
-#TEST_OUTPUT_DIR = 'xmlrunner'
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 #settings for enrollment
 ECTS_BONUS = 5 # ECTS_BONUS * ECTS = abs(t0-t1); set to 7, if changed, change also get_t0_interval()
@@ -349,7 +343,7 @@ PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
 #PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
 
 STATIC_URL = '/static/'
-STATIC_ROOT =  os.path.join(PROJECT_PATH, 'static')
+STATIC_ROOT =  os.path.join(PROJECT_PATH, 'site_media')
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_VERSIONING = 'pipeline.versioning.hash.MD5Versioning'
@@ -357,10 +351,6 @@ STATICFILES_FINDERS = (
   'pipeline.finders.PipelineFinder',
   'django.contrib.staticfiles.finders.FileSystemFinder',
   'django.contrib.staticfiles.finders.AppDirectoriesFinder'
-)
-
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_PATH, 'site_media'),
 )
 
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')

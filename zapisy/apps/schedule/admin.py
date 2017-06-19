@@ -27,6 +27,7 @@ class SpecialReservationForm(forms.ModelForm):
 
 	class Meta:
 		model = SpecialReservation
+		fields = '__all__' 
 
 class SpecialReservationAdmin(admin.ModelAdmin):
 	form = SpecialReservationForm

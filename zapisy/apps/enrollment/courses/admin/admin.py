@@ -23,6 +23,7 @@ class CourseForm(forms.ModelForm):
 
     class Meta:
         model = Course
+        fields = '__all__' 
 
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
@@ -37,6 +38,7 @@ class CourseEntityForm(forms.ModelForm):
 
     class Meta:
         model = CourseEntity
+        fields = '__all__' 
 
     def __init__(self, *args, **kwargs):
         super(CourseEntityForm, self).__init__(*args, **kwargs)
@@ -180,6 +182,7 @@ class TermInline(admin.TabularInline):
 class RecordInlineForm(forms.ModelForm):
     class Meta:
         model = Record
+        fields = '__all__' 
 
     # def save(self, commit=True):
     #
@@ -221,6 +224,7 @@ class RecordInline(admin.TabularInline):
 class QueuedInlineForm(forms.ModelForm):
     class Meta:
         model = Queue
+        fields = '__all__' 
 
     # def save(self, commit=True):
     #     queue = super(QueuedInlineForm, self).save(commit=False)
@@ -383,7 +387,8 @@ class CourseDescriptionForm(forms.ModelForm):
             'description_pl': forms.Textarea(attrs={'class': 'tinymce'}),
             'description_en': forms.Textarea(attrs={'class': 'tinymce'}),
             'requirements': FilteredSelectMultiple("wymagania", is_stacked=False)
-        }        
+        }
+        fields = '__all__' 
 
 
 class CourseDescriptionAdmin(TranslationAdmin):

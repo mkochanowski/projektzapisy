@@ -25,17 +25,17 @@ logger = logging.getLogger()
 class WithInformation(models.Manager):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(WithInformation, self).get_query_set().select_related('information')
+        return super(WithInformation, self).get_queryset().select_related('information')
 
 
 class NoRemoved(WithInformation):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(NoRemoved, self).get_query_set().filter(deleted=False, owner__isnull=False)
+        return super(NoRemoved, self).get_queryset().filter(deleted=False, owner__isnull=False)
 
 
 class SimpleManager(models.Manager):
@@ -44,9 +44,9 @@ class SimpleManager(models.Manager):
 
 
 class DefaultCourseManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(DefaultCourseManager, self).get_query_set().select_related('entity', 'information')
+        return super(DefaultCourseManager, self).get_queryset().select_related('entity', 'information')
 
 
 class StatisticsManager(models.Manager):
@@ -60,7 +60,7 @@ class StatisticsManager(models.Manager):
 
         #TODO: po przeniesieniu wszystkich metod do managerów filtrowanie na
         #  status powinno byc  z dziedziczenia
-        return self.get_query_set().filter(status=2)\
+        return self.get_queryset().filter(status=2)\
             .select_related('type', 'owner', 'owner__user')\
             .order_by('name')\
             .extra(
@@ -167,26 +167,38 @@ class CourseEntity(models.Model):
     noremoved = NoRemoved()
     statistics = StatisticsManager()
 
+    def _add_or_none(self, hours1, hours2):
+        """
+        Adds two numbers denoting the number
+        of hours of a particular type of class.
+        If both are None, returns None, otherwise it
+        returns the sum, possibly casting None to 0
+        """
+        if hours1 is None and hours2 is None:
+            return None
+        
+        return (hours1 or 0) + (hours2 or 0)
 
     def get_lectures(self):
-        return self.lectures + self.information.lectures
+        return _add_or_none(self.lectures, self.information.lectures)
 
     def get_exercises(self):
-        return self.exercises + self.information.exercises
+        return _add_or_none(self.exercises, self.information.exercises)
 
     def get_laboratories(self):
-        return self.laboratories + self.information.laboratories
+        return _add_or_none(self.laboratories, self.information.laboratories)
 
     def get_repetitions(self):
-        return self.repetitions + self.information.repetitions
+        return _add_or_none(self.repetitions, self.information.repetitions)
 
     def get_seminars(self):
-        return self.seminars + self.information.seminars
+        return _add_or_none(self.seminars, self.information.seminars)
 
     def get_exercises_laboratiories(self):
-        return self.exercises_laboratiories + self.information.exercises_laboratories
+        return _add_or_none(
+            self.exercises_laboratiories,
+            self.information.exercises_laboratories)
 
-    #
 
     def get_status(self):
         return self.status
@@ -415,17 +427,23 @@ class CourseEntity(models.Model):
 
     @staticmethod
     def get_proposals(is_authenticated=False):
+        # TODO: in the order_by clause, we could just use "name";
+        # the model translation plugin will actually check the user's language
+        # (based on the account settings if logged in, or headers otherwise)
+        # and map it to name_en or name_pl accordingly. The trouble is, almost all
+        # CourseEntities have empty English names, so the sorting order is nonsensical.
+        # Could re-enable this when (if) we have proper translations for course names.
+        result = CourseEntity.noremoved \
+                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
+                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
+                .select_related('type', 'owner', 'owner__user') \
+                .order_by('name_pl')
+            
         if is_authenticated:
-            return CourseEntity.noremoved \
-                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
-                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
-                .select_related('type', 'owner', 'owner__user')
+            return result
+                
         else:
-            return CourseEntity.noremoved \
-                .exclude(status=CourseEntity.STATUS_PROPOSITION) \
-                .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
-                .exclude(status=CourseEntity.STATUS_WITHDRAWN) \
-                .select_related('type', 'owner', 'owner__user')
+            return result.exclude(status=CourseEntity.STATUS_WITHDRAWN)
 
     @staticmethod
     def get_proposal(slug):
@@ -460,17 +478,17 @@ class CourseEntity(models.Model):
 class Related(models.Manager):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(Related, self).get_query_set().select_related('semester', 'type', 'type__classroom', 'entity')
+        return super(Related, self).get_queryset().select_related('semester', 'type', 'type__classroom', 'entity')
 
 
 class VisibleManager(Related):
     """ Manager for course objects with visible semester """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns all courses which have marked semester as visible """
-        return super(VisibleManager, self).get_query_set().filter(semester__visible=True)
+        return super(VisibleManager, self).get_queryset().filter(semester__visible=True)
 
 
 class Course(models.Model):
