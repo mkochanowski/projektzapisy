@@ -203,7 +203,7 @@ def course(request, slug):
                 #g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
                 g.serialized = json.dumps(g.serialize_for_json(
                     enrolled_ids, queued_ids, pinned_ids,
-                    queue_priorities, student, user=user
+                    queue_priorities, student
                 ))
 
         lectures = []

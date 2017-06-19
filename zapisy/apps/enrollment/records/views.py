@@ -254,7 +254,7 @@ def records_group_csv(request, group_id):
         students_in_group = Record.get_students_in_group(group_id)
         group = Group.objects.get(id=group_id)
 
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=' + re.sub(r'\s', '', slugify(str(group))) + '-group.csv'
 
         writer = UnicodeWriter(response)
@@ -272,7 +272,7 @@ def records_queue_csv(request, group_id):
         students_in_queue = Queue.get_students_in_queue(group_id)
         group = Group.objects.get(id=group_id)
 
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=' + re.sub(r'\s', '', slugify(str(group))) + '-queue.csv'
 
         writer = UnicodeWriter(response)
@@ -394,7 +394,7 @@ def records_group_pdf(request, group_id):
     result = StringIO.StringIO()
 
     pdf      = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result, encoding='UTF-8')
-    response = HttpResponse(result.getvalue(), mimetype='application/pdf')
+    response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + re.sub(r'\s', '', slugify(str(group))) + '-group.pdf'
 
     return response
@@ -419,7 +419,7 @@ def records_queue_pdf(request, group_id):
     result = StringIO.StringIO()
 
     pdf      = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result, encoding='UTF-8')
-    response = HttpResponse(result.getvalue(), mimetype='application/pdf')
+    response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + re.sub(r'\s', '', slugify(str(group))) + '-queue.pdf'
 
     return response

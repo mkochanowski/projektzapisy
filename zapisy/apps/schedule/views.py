@@ -275,7 +275,7 @@ def ajax_get_terms(request, year, month, day):
 
     time = datetime.date(int(year), int(month), int(day))
     terms = Classroom.get_terms_in_day(time, ajax=True)
-    return HttpResponse(terms, mimetype="application/json")
+    return HttpResponse(terms, content_type="application/json")
 
 
 class ClassroomTermsAjaxView(FullCalendarView):
@@ -381,7 +381,7 @@ def events_raport_pdf(request, beg_date, end_date, rooms):
 
     pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result,
                             encoding='UTF-8')
-    response = HttpResponse(result.getvalue(), mimetype='application/pdf')
+    response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=raport.pdf'
 
     return response

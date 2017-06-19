@@ -278,7 +278,7 @@ def autocomplete(request):
         json = json.dumps(results)
     else:
         json = ""
-    return HttpResponse(json, mimetype='application/javascript')
+    return HttpResponse(json, content_type='application/javascript')
 
 @employee_required
 def ajax_get_groups(request):
@@ -1303,7 +1303,7 @@ def save_csv(request, mode, poll_id):
                 else:
                     answer.append( unicode(question_answer[0]) )
         answers.append( answer )
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename='+ smart_str(csv_title)
     csv_content = csv_prepare(response, sections, answers)
     return response
