@@ -189,7 +189,7 @@ def import_schedule(request):
 
 @staff_member_required
 def refresh_semester(request):
-    semester = Semester.objects.filter(records_closing__gt=datetime.datetime.now())[0]
+    semester = Semester.objects.get_next()
     cursor = connection.cursor()
     cursor.execute("SELECT users_openingtimesview_refresh_for_semester(%s);" % str(semester.id))
     connection.commit()
