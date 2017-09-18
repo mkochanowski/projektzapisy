@@ -269,6 +269,7 @@ AUTHENTICATION_BACKENDS = (
 
 CAS_SERVER_URL = 'https://login.uni.wroc.pl/cas/'
 CAS_CREATE_USER = False
+CAS_LOGIN_MSG = u'Sukces! Zalogowano przez USOS (login: %s).'
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
