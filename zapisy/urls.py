@@ -6,6 +6,7 @@ from django.conf.urls import include, patterns, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 from feeds import LatestNews
+from django_cas_ng import views
 
 admin.autodiscover()
 
@@ -48,6 +49,9 @@ urlpatterns = patterns('',
     (r'^vote/', include('apps.offer.vote.urls')),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^fereol_admin/', include(admin.site.urls)),
+    url(r'^accounts/login$', views.login, name='cas_ng_login'),
+    url(r'^accounts/logout$', views.logout, name='cas_ng_logout'),
+    url(r'^accounts/callback$', views.callback, name='cas_ng_proxy_callback'),
 
 )
 

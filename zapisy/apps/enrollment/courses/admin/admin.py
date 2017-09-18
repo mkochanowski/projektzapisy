@@ -309,7 +309,7 @@ class GroupAdmin(admin.ModelAdmin):
         while day <= semester.lectures_ending:
 
             if day in freedays:
-                day = day + datetime.timedelta(days=1)
+                day = day + timedelta(days=1)
                 continue
 
             weekday = day.weekday()
@@ -321,7 +321,7 @@ class GroupAdmin(admin.ModelAdmin):
 
             days[weekday].append(day)
 
-            day = day + datetime.timedelta(days=1)
+            day = day + timedelta(days=1)
 
         for t in terms:
             ev = Event()
