@@ -71,6 +71,7 @@ div.top .systemtopbar ul li.active a {
     min-width: 250px;
     padding: 14px 14px 0;
     overflow:hidden;
+    z-index: 10000;
 }
 
 #login-dp #btn-usos{
