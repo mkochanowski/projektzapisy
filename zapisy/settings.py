@@ -255,6 +255,7 @@ INSTALLED_APPS = (
     'autoslug',
     'endless_pagination',
     'apps.notifications',
+    'django_cas_ng',
 
     'test_app'
 )
@@ -263,7 +264,11 @@ MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
 
 AUTHENTICATION_BACKENDS = (
     'apps.users.auth_backend.BetterBackend',
+    'django_cas_ng.backends.CASBackend',
 )
+
+CAS_SERVER_URL = 'https://login.uni.wroc.pl/cas/'
+CAS_CREATE_USER = False
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
