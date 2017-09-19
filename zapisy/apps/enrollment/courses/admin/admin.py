@@ -31,8 +31,7 @@ class CourseForm(forms.ModelForm):
             self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance'].entity)\
                 .select_related('entity')
         else:
-            self.fields['information'].queryset = EmptyQuerySet()
-
+            self.fields['information'].queryset = CourseDescription.objects.none()
 
 class CourseEntityForm(forms.ModelForm):
 
@@ -45,7 +44,7 @@ class CourseEntityForm(forms.ModelForm):
         if 'instance' in kwargs:
             self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance']).select_related('entity')
         else:
-            self.fields['information'].queryset = EmptyQuerySet()
+            self.fields['information'].queryset = CourseDescription.objects.none()
 
 
 class CourseAdmin(admin.ModelAdmin):
