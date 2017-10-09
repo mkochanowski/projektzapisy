@@ -361,4 +361,5 @@ STATICFILES_FINDERS = (
 
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
+    print "Loading local settings file %s" % local_settings_file
     execfile(local_settings_file)
