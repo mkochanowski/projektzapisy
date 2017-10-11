@@ -14,7 +14,7 @@ from apps.enrollment.records.models import *
 
 from apps.enrollment.courses.exceptions import NonCourseException
 from apps.users.models import BaseUser, OpeningTimesView
-
+import base64
 import logging
 from django.conf import settings
 logger = logging.getLogger()
@@ -76,7 +76,7 @@ def prepare_courses_list_to_render(
     courses_list_json = get_course_list_info_json_for_semester(
         user, default_semester)
     return {
-        'courses_list_json': courses_list_json,
+        'courses_list_json_base64': base64.b64encode(courses_list_json),
         'semester_courses': semesters,
         'types_list': Type.get_all_for_jsfilter(),
         'default_semester': default_semester,

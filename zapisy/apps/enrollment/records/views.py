@@ -3,6 +3,7 @@ import csv
 import json
 import re
 import StringIO
+import base64
 
 from django.conf import settings
 from django.contrib import messages
@@ -360,7 +361,7 @@ def schedule_prototype(request):
 
     data = {
         # Info needed by the JS prototype code
-        'courses_json': courses_json,
+        'courses_json_base64': base64.b64encode(courses_json),
         # Needed by the template to generate a list of courses
         'courses': prototype_courses,
         'groups_json': all_groups_json,
