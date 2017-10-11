@@ -148,12 +148,11 @@ $('.checkall').live('click', function(){
 {% if grade %}
     <p class="info-table-header">Udział w Ocenie zajęć</p>
     <table class="table-info-big">
-            {% for semester in grade %}
-
-        <tr>
-            <td>{{ semester }}</td>
-        </tr>
-            {% endfor %}
+        {% for semester in grade|slice:"::-1" %}
+            <tr>
+                <td>{{ semester }}</td>
+            </tr>
+        {% endfor %}
     </table>
 {% endif %}
 
