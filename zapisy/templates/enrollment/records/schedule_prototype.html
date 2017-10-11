@@ -46,7 +46,7 @@
 	{% block messages %}{% endblock %}{% include 'common/messages.html' %}
 
     <div id="scheduleData">
-      <input type="hidden" id="courses_list_json_base64" value="{{ courses_json_base64 }}" />
+      <input type="hidden" id="courses_list_json" value="{{ courses_json }}" />
       <input type="hidden" id="courses_groups" value="{{ groups_json }}" />
       <input type="hidden" id="isLeavingAllowed" value="{{ allow_leave_course }}" />
       <input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}" />

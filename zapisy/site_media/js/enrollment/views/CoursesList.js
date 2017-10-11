@@ -28,10 +28,11 @@ CoursesList.prototype.init = function()
 
 CoursesList.prototype.initCourseLists = function()
 {
-    const coursesListObj = FilteredCoursesList.getCoursesJson("courses_list_json_base64");
+    const jsonString = $("#courses_list_json").assertOne().val();
+    let coursesListObject = JSON.parse(jsonString);
     
-    this.courses = coursesListObj.courseList;
-    this.currentSemester = coursesListObj.semesterInfo;
+    this.courses = coursesListObject.courseList;
+    this.currentSemester = coursesListObject.semesterInfo;
     
     this.setCoursesFromData();
 };

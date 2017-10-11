@@ -21,7 +21,8 @@ OfferCoursesList.prototype.init = function()
 
 OfferCoursesList.prototype.initCourses = function()
 {
-    const coursesObj = FilteredCoursesList.getCoursesJson("courses_list_json_base64");
+    const jsonString = $("#courses_list_json").assertOne().val();
+    let coursesObj = JSON.parse(jsonString);
     this.courses = coursesObj;
     
     let self = this;

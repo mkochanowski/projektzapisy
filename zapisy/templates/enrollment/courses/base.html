@@ -28,7 +28,7 @@
 				<input type="hidden" id="semester_id" value="{{ default_semester.id }}" />
 				<!-- The course list the server sends to us when we first load the page,
 				then if the user changes the semester, we download the JSON using AJAX. -->
-				<input type="hidden" id="courses_list_json_base64" value='{{ courses_list_json_base64 }}'>
+				<input type="hidden" id="courses_list_json" value='{{ courses_list_json|safe }}'>
 				
 				<p class="main-side-message hidden" id="noResultsMessage">
                     Do podanego filtra nie pasuje żaden przedmiot.

@@ -25,7 +25,6 @@ from apps.offer.proposal.models import Syllabus, StudentWork
 from apps.offer.proposal.exceptions import  NotOwnerException
 
 import json
-import base64
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal, send_notification_to_3d
 from apps.users.decorators import employee_required
@@ -50,7 +49,7 @@ def offer(request, slug=None):
     return TemplateResponse(request, 'offer/offer.html', {
         "proposal": proposal,
         "proposals": proposals,
-        "proposals_json_base64": base64.b64encode(proposals_json),
+        "proposals_json": proposals_json,
         "types_list": types_list,
         "teachers": teachers,
         "effects": Effects.objects.all(),
