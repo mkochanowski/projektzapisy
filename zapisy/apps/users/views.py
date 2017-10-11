@@ -278,6 +278,7 @@ def my_profile(request):
             student = request.user.student
             courses = OpeningTimesView.objects.get_courses(student, semester)
             grade = [x.semester for x in StudentGraded.objects.filter(student=student).select_related('semester')]
+            current_semester_ects = student.get_points()
 
         except (KeyError, Student.DoesNotExist):
             grade = {}
