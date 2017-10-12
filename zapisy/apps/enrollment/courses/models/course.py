@@ -693,6 +693,8 @@ class Course(models.Model):
         Note: as the return value depends on the current time,
         the function is not pure.
         """
+        if student.status == 1:
+            return False
         opening_time = self.get_opening_time(student)
         if opening_time is None:
             return False
