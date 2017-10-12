@@ -148,7 +148,7 @@ $('.checkall').live('click', function(){
 {% if courses %}
 <p class="info-table-header">Terminy</p>
 <table class="table-info-big">
-        {% with dateFormatStr="l j E G:i" %}
+    {% with dateFormatStr="l j E G:i" %}
             <tr>
                 <th>Zniesienie limitu 35 ECTS</th>
                 <td>{{ semester.records_ects_limit_abolition|date:dateFormatStr }}</td>
@@ -161,12 +161,12 @@ $('.checkall').live('click', function(){
                 <th>Koniec zapisów</th>
                 <td>{{ semester.records_closing|date:dateFormatStr }}</td>
             </tr>
-        {% endwith %}
+        
     {% regroup courses by opening_time as times %}
         {% for time in times %}
         <tr>
             <th>Czas:</th>
-            <td>{{time.grouper|date:"d.m.Y, H:i"}}</td>
+            <td>{{ time.grouper|date:dateFormatStr }}</td>
         </tr>
             <tr>
             <td></td>
@@ -182,6 +182,7 @@ $('.checkall').live('click', function(){
             </td>                    
         </tr>
         {% endfor %}
+    {% endwith %}
 </table>
 {% endif %}
 
