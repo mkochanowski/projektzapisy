@@ -145,20 +145,23 @@ $('.checkall').live('click', function(){
      </table>
 {% endif %}
 
-{% if grade %}
-    <p class="info-table-header">Udział w Ocenie zajęć</p>
-    <table class="table-info-big">
-        {% for semester in grade %}
-            <tr>
-                <td>{{ semester }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-{% endif %}
-
 {% if courses %}
-<p class="info-table-header">Terminy zapisów</p>
+<p class="info-table-header">Terminy</p>
 <table class="table-info-big">
+        {% with dateFormatStr="l j E G:i" %}
+            <tr>
+                <th>Zniesienie limitu 35 ECTS</th>
+                <td>{{ semester.records_ects_limit_abolition|date:dateFormatStr }}</td>
+            </tr>
+            <tr>
+                <th>Koniec wypisów</th>
+                <td>{{ semester.records_ending|date:dateFormatStr }}</td>
+            </tr>
+            <tr>
+                <th>Koniec zapisów</th>
+                <td>{{ semester.records_closing|date:dateFormatStr }}</td>
+            </tr>
+        {% endwith %}
     {% regroup courses by opening_time as times %}
         {% for time in times %}
         <tr>
@@ -179,16 +182,20 @@ $('.checkall').live('click', function(){
             </td>                    
         </tr>
         {% endfor %}
-        <tr>
-            <th>Zniesienie limitu 35 ECTS</th>
-            <td>{{ semester.records_ects_limit_abolition }}</td>
-        </tr>
-        <tr>
-            <th>Koniec zapisów</th>
-            <td>{{ semester.records_closing }}</td>
-        </tr>
 </table>
 {% endif %}
+
+{% if grade %}
+    <p class="info-table-header">Udział w Ocenie zajęć</p>
+    <table class="table-info-big">
+        {% for semester in grade %}
+            <tr>
+                <td>{{ semester }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
 {% if user.is_staff %}
 <p class="info-table-header">{%  trans "Ustawienie preferencji językowych" %}</p>
 {% get_available_languages as LANGUAGES %}
