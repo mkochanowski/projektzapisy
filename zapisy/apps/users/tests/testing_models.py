@@ -13,6 +13,7 @@ from apps.enrollment.courses.models import Course, Term, Group
 from apps.users.models import Employee, Student, StudiaZamawiane
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from django.contrib.auth.models import Permission
+from django.db import connection
 
 from apps.users.tests.factories import UserFactory
 from apps.enrollment.courses.models import Semester
@@ -161,6 +162,21 @@ class IBANTest(TestCase):
 class MailsToStudentsLinkTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
+        sql_calls = [
+            """
+                CREATE TABLE courses_studentpointsview (
+                    value smallint,
+                    student_id integer,
+                    entity_id integer
+                );
+            """
+            ]
+
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
+    
         cls.MSG_HEADER = 'Wyślij wiadomość do studentów'
         regular_user = User.objects.create_user('regular_user', 'user@user.com', 'password')
         Student.objects.create(user=regular_user)
@@ -174,6 +190,16 @@ class MailsToStudentsLinkTestCase(TestCase):
         from apps.enrollment.courses.tests.factories import SemesterFactory
         summer_semester = SemesterFactory(type=Semester.TYPE_SUMMER)
         summer_semester.full_clean()
+        
+    @classmethod
+    def tearDownClass(cls):
+        sql_calls = [
+            "DROP TABLE courses_studentpointsview;",
+        ]
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
 
     def test_mailto_link_not_exists_regular_user(self):
         self.client.login(username='regular_user', password='password')
