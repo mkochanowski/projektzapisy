@@ -61,6 +61,21 @@
 </style>
 <script>
     this.sitemapstyler = function(){
+        var isDirty = true;
+        var submitForm = function () {
+            isDirty = false;
+        };
+        // add on close popup
+        window.onbeforeunload = function (e) {
+            const dialogText = 'Czy na pewno chcesz wyjść?';
+            if (isDirty) {
+                e.returnValue = dialogText;
+                return dialogText;
+            }
+            else {
+                return undefined;
+            }
+        };
     	var sitemaps = $('.sitemap')
         var listitem =  function(li){
             			if(li.getElementsByTagName("ul").length > 0){
