@@ -84,6 +84,7 @@
             				var span = document.createElement("span");
             				span.className = "collapsed";
             				span.onclick = function(){
+            				    isDirty = false;
             					ul.style.display = (ul.style.display == "none") ? "block" : "none";
             					this.className = (ul.style.display == "none") ? "collapsed" : "expanded";
             				};
