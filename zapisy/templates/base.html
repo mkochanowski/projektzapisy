@@ -83,6 +83,7 @@
     });
     </script>
     <script src="{% static "js/common/utils.js" %}"></script>
+    <script src="{% static "js/common/base.js" %}"></script>
 </head>
 
 <body>
@@ -152,35 +153,38 @@
                 {% else %}
       <ul class="nav secondary-nav">
           <li class="dropdown" data-dropdown="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b>Zaloguj się</b> <span class="caret"></span></a>
+              <a href="#" id="login-dropdown" class="dropdown-toggle" data-toggle="dropdown"><b>Zaloguj się</b> <span class="caret"></span></a>
                 <ul id="login-dp" class="dropdown-menu">
                     <li>
                          <div class="row">
                                 <div class="col-md-12">
-                                    <a href="{% url 'cas_ng_login' %}" class="btn" id="btn-usos" style=""><img src="{% static 'images/logotyp.jpg'%}" alt="Uniwersytet Wrocławski">Zaloguj się przez USOS</a>
-                                    lub użyj konta Systemu Zapisów
-                                    <form action="{% url 'apps.users.views.login_plus_remember_me' %}" method="POST">
-                                        {% csrf_token %}
-                                    
-                                        {% if request.path == '/' %}
-                                            <input type="hidden" name="next" value="{% url 'schedule-own' %}"/>
-                                        {% else %}
-                                            <input type="hidden" name="next" value="{{request.path}}"/>
-                                        {% endif %}
-                                        <div class="form-group">
-                                            <input tabindex="1" type="text" id="id_login" name="username" placeholder="Użytkownik">
-                                        </div>
-                                        <div class="form-group">
-                                            <input tabindex="2" type="password" id="id_password" name="password" placeholder="Hasło">
-                                        </div>
-                                        <div class="form-group">
-                                             <button type="submit" tabindex="4" class="btn btn-primary btn-block">Zaloguj &raquo;</button>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>
-                                            <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me"> Pamiętaj mnie</label>
-                                        </div>
-                                    </form>
+                                    <a href="{% url 'cas_ng_login' %}" class="btn" id="btn-usos"><img src="{% static 'images/logotyp.jpg'%}" alt="Uniwersytet Wrocławski">Zaloguj się przez USOS</a>
+                                    <button class="btn primary" id="btn-no-usos">
+                                      lub użyj konta Systemu Zapisów
+                                    </button>
+                                    <div id="login-without-usos">
+                                      <form action="{% url 'apps.users.views.login_plus_remember_me' %}" method="POST">
+                                          {% csrf_token %}
+                                          {% if request.path == '/' %}
+                                              <input type="hidden" name="next" value="{% url 'schedule-own' %}"/>
+                                          {% else %}
+                                              <input type="hidden" name="next" value="{{request.path}}"/>
+                                          {% endif %}
+                                          <div class="form-group">
+                                              <input tabindex="1" type="text" id="id_login" name="username" placeholder="Użytkownik">
+                                          </div>
+                                          <div class="form-group">
+                                              <input tabindex="2" type="password" id="id_password" name="password" placeholder="Hasło">
+                                          </div>
+                                          <div class="form-group">
+                                               <button type="submit" tabindex="4" class="btn btn-primary btn-block">Zaloguj &raquo;</button>
+                                          </div>
+                                          <div class="form-group">
+                                              <label>
+                                              <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me"> Pamiętaj mnie</label>
+                                          </div>
+                                      </form>
+                                    </div>
                                 </div>
                          </div>
                     </li>
@@ -276,6 +280,7 @@
   })();
 
 </script>
+
 </body>
 
 </html>
