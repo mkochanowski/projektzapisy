@@ -60,13 +60,13 @@
     }
 </style>
 <script>
-    this.sitemapstyler = function(){
-        var isDirty = true;
-        var submitForm = function () {
-            isDirty = false;
-        };
-        // add on close popup
-        window.onbeforeunload = function (e) {
+    let isDirty = true;
+     function submitForm() {
+        isDirty = false;
+    }
+
+    window.addEventListener('load', () => {
+        window.addEventListener('beforeunload', (e) => {
             const dialogText = 'Czy na pewno chcesz wyjść?';
             if (isDirty) {
                 e.returnValue = dialogText;
@@ -75,33 +75,8 @@
             else {
                 return undefined;
             }
-        };
-    	var sitemaps = $('.sitemap')
-        var listitem =  function(li){
-            			if(li.getElementsByTagName("ul").length > 0){
-            				var ul = li.getElementsByTagName("ul")[0];
-            				ul.style.display = "none";
-            				var span = document.createElement("span");
-            				span.className = "collapsed";
-            				span.onclick = function(){
-            				    isDirty = false;
-            					ul.style.display = (ul.style.display == "none") ? "block" : "none";
-            					this.className = (ul.style.display == "none") ? "collapsed" : "expanded";
-            				};
-            				li.appendChild(span);
-            			};};
-        for(var i = 0; i<sitemaps.length;i++){
-
-    		var items = sitemaps[i].getElementsByTagName("li");
-    		for(var j=0;j<items.length;j++){
-                listitem(items[j]);
-    		};
-
-    	};
-        $(function(){$('.active_poll').parent().parent().parent().find('a').click();});
-    };
-
-    window.onload = sitemapstyler;
+        });
+    });
 </script>
 
 {% endblock %}
