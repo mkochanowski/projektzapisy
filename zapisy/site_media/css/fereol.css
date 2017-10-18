@@ -80,6 +80,8 @@ div.top .systemtopbar ul li.active a {
   text-align: center;
   background-image: none;
   border: none;
+  color: white;
+  font-weight: bold;
 }
 
 #btn-no-usos {
