@@ -213,7 +213,7 @@ $('.checkall').live('click', function(){
     </table>
 </form>
 {% endif %}
-<p class="info-table-header">Ustawienie powiadomień</p>
+<p class="info-table-header">Ustawienia powiadomień</p>
 
 <form method="POST" action="{% url 'notifications:save' %}">
     {% csrf_token %}
