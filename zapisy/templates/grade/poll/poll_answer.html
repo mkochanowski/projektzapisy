@@ -14,8 +14,8 @@
 
 
 {% block poll-content %}
-    <form id="poll-form" action="." method="post">{% csrf_token %}
-        <input type="hidden" id="poll-form-id" value="{{ pid }}">
+    <form id="poll-form" action="." method="post" onclick="submitForm()">{% csrf_token %}
+    	<input type="hidden" id="poll-form-id" value="{{pid}}">
         {% if form.instance.group %}
             <h2>{{ form.instance.group.course }}</h2>
         {% else %}

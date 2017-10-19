@@ -6,116 +6,103 @@
 {% endblock %}
 
 {% block styles %}{{ block.super }}
-    <style>
-        .sitemap, .sitemap ul, .sitemap li {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
+  <style>
+      .sitemap, .sitemap ul, .sitemap li {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+      }
 
-        .sitemap ul {
-            display: none;
-        }
+      .sitemap ul {
+          display: none;
+      }
 
-        .sitemap li {
-            line-height: 200%;
-            margin-top: 1px;
-            background: #eee;
-            position: relative;
-            width: 250px;
-        }
+      .sitemap li {
+          line-height: 200%;
+          margin-top: 1px;
+          background: #eee;
+          position: relative;
+          width: 250px;
+      }
 
-        /* IE leaves a blank space where span is added so this is to avoid that */
-        * html .sitemap li {
-            float: left;
-            display: inline;
-        }
+      /* IE leaves a blank space where span is added so this is to avoid that */
+      * html .sitemap li {
+          float: left;
+          display: inline;
+      }
 
-        .sitemap li a {
-            padding-left: 28px;
-        }
+      .sitemap li a {
+          padding-left: 28px;
+      }
 
-        .sitemap li span {
-            float: left;
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            width: 13px;
-            height: 13px;
-            cursor: auto;
-            font-size: 0;
-        }
+      .sitemap li span {
+          float: left;
+          position: absolute;
+          top: 5px;
+          left: 5px;
+          width: 13px;
+          height: 13px;
+          cursor: auto;
+          font-size: 0;
+      }
 
-        .sitemap li span, .sitemap li span.collapsed {
-            background: url(../images/collapsed.gif) no-repeat 0 0;
-        }
+      .sitemap li span, .sitemap li span.collapsed {
+          background: url(../images/collapsed.gif) no-repeat 0 0;
+      }
 
-        .sitemap li span.expanded {
-            background: url(../images/expanded.gif) no-repeat 0 0;
-        }
+      .sitemap li span.expanded {
+          background: url(../images/expanded.gif) no-repeat 0 0;
+      }
 
-        /* second level */
+      /* second level */
 
-        .sitemap li li {
-            background: #fff;
-        }
+      .sitemap li li {
+          background: #fff;
+      }
 
-        .sitemap li li a {
-            padding-left: 56px;
-        }
+      .sitemap li li a {
+          padding-left: 56px;
+      }
 
-        .sitemap li li span {
-            left: 28px;
-        }
+      .sitemap li li span {
+          left: 28px;
+      }
 
-        /* third level */
+      /* third level */
 
-        .sitemap li li li a {
-            padding-left: 84px;
-        }
+      .sitemap li li li a {
+          padding-left: 84px;
+      }
 
-        .sitemap li li li span {
-            left: 56px;
-        }
+      .sitemap li li li span {
+          left: 56px;
+      }
 
-        p {
-            margin: 0 auto;
-            width: 680px;
-            padding: 1em 0;
-        }
-    </style>
-    <script>
-        this.sitemapstyler = function () {
-            var sitemaps = $('.sitemap');
-            var listitem = function (li) {
-                if (li.getElementsByTagName("ul").length > 0) {
-                    var ul = li.getElementsByTagName("ul")[0];
-                    ul.style.display = "none";
-                    var span = document.createElement("span");
-                    span.className = "collapsed";
-                    span.onclick = function () {
-                        ul.style.display = (ul.style.display === "none") ? "block" : "none";
-                        this.className = (ul.style.display === "none") ? "collapsed" : "expanded";
-                    };
-                    li.appendChild(span);
-                }
-            };
+      p {
+          margin: 0 auto;
+          width: 680px;
+          padding: 1em 0;
+      }
+  </style>
+  <script>
+    let isDirty = true;
+     function submitForm() {
+        isDirty = false;
+    }
 
-            for (var i = 0; i < sitemaps.length; i++) {
-                var items = sitemaps[i].getElementsByTagName("li");
-                for (var j = 0; j < items.length; j++) {
-                    listitem(items[j]);
-                }
+    window.addEventListener('load', () => {
+        window.addEventListener('beforeunload', (e) => {
+            const dialogText = 'Czy na pewno chcesz wyjść?';
+            if (isDirty) {
+                e.returnValue = dialogText;
+                return dialogText;
             }
-            
-            $(function () {
-                $('.active_poll').parent().parent().parent().find('a').click();
-            });
-        };
-
-        window.onload = sitemapstyler;
-    </script>
-
+            else {
+                return undefined;
+            }
+        });
+    });
+</script>
 {% endblock %}
 
 {% block main-navigation %}
