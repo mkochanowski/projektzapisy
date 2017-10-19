@@ -95,10 +95,10 @@ $('.checkall').live('click', function(){
 <a href="{% url 'consultations-change' %}">zmień inne dane</a>
 {% endif %}
 
-{% if user.employee and consultations %}
+{% if user.employee %}
 <p class="info-table-header">Konsultacje</p>
     {% if consultations %}
-{{ consultations }}
+		{{ consultations }}
     {% else %}
         Brak informacji
     {% endif %}
