@@ -314,12 +314,9 @@ def course(request, slug):
             currentEcts = student.get_points()
             ectsLimitExceeded = True
 
-        serializedCourse = course.serialize_for_json(student)
-
         data.update({
             'details_hidden': courseView_details_hidden,
             'course' : course,
-            'course_json': json.dumps(serializedCourse),
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,

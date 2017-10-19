@@ -374,31 +374,6 @@ PIPELINE_JS = {
         'output_filename': 'js/prototype.min.js',
     },
 
-    'course': {
-        'source_filenames': (
-            'js/jquery/jquery-1.5.2.js',
-            'js/jquery/jquery-ui-1.8.17.custom.js',
-            'js/jquery/jquery.cookies.2.2.0.min.js',
-            'js/jquery/baseExtensions.js',
-            'js/main.js',
-            'js/common/bootstrap-dropdown.js',
-            'js/components/sidebar.js',
-            'js/components/topBarFilter.js',
-            'js/common/listFilter.js',
-            'js/common/listFilter-courseType.js',
-            'js/enrollment/views/courses-list.js',
-            'js/components/messageBox.js',
-            'js/enrollment/records/course.js',
-            'js/enrollment/records/course-group.js',
-            'js/enrollment/records/epanel-course-term.js',
-            'js/enrollment/views/course.js',
-            'js/common/FilteredCoursesList.js',
-            'js/enrollment/views/CoursesList.js',
-            'js/common/courses-list-filters-ui.js'
-        ),
-        'output_filename': 'js/course.min.js',
-    },
-
     'employeelist': {
         'source_filenames': (
             'js/jquery/jquery-1.5.2.js',
