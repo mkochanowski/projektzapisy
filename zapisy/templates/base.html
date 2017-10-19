@@ -6,7 +6,7 @@
 <html lang="pl">
 <head>
     <meta charset="utf-8">
-    <title>{% block main-subtitle %}{% endblock %} - {% block title %}System Zapisów{% endblock %}</title>
+    <title>{% block main-subtitle %}{% endblock %} &ndash; {% block title %}System Zapisów{% endblock %}</title>
     <meta name="description"
           content="System obsługi cyklu dydaktycznego Instytut Informatyki Uniwersytetu Wrocławskiego">
     <meta name="author" content="KSI i Studenci Instytutu Informatyki Uniwersytetu Wrocławskiego">
@@ -92,6 +92,11 @@
 </form>
 <script type="text/javascript">
     jQuery.dataInvalidate_check();
+    $(document).ready(function() {
+        $('.dropdown-menu input,label').click(function(e) {
+                e.stopPropagation(); //This will prevent the event from bubbling up and close the dropdown when you type/click on text boxes.
+        });
+    });
 </script>
 
 <div class="top">
@@ -141,25 +146,46 @@
 
                         {% endif %}
                         <a href="{% url 'help' %}">Pomoc</a> |
-                        <a href="{% url 'user-logout' %}">Wyloguj</a>
+                        <a href="{% url 'cas_ng_logout' %}">Wyloguj</a>
                     </div>
                 {% else %}
-
-                    <form action="{% url 'apps.users.views.login_plus_remember_me' %}" method="POST">
-                        {% csrf_token %}
-                        <div class="inline-inputs">
-                            {% if request.path == '/' %}
-                                <input type="hidden" name="next" value="{% url 'schedule-own' %}"/>
-                            {% else %}
-                                <input type="hidden" name="next" value="{{request.path}}"/>
-                            {% endif %}
-                            <label for="id_login">użytkownik: </label><input class="small" tabindex="1" type="text" id="id_login" name="username">&nbsp;
-                            <label for="id_password">hasło: </label><input class="small" tabindex="2" type="password" id="id_password" name="password">&nbsp;
-                            <button class="btn" tabindex="4" type="submit">Loguj &raquo;</button>
-                            &nbsp;|&nbsp;
-                            <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me">&nbsp;<label for="xlInput3">Pamiętaj mnie</label>
-                        </div>
-                    </form>
+      <ul class="nav secondary-nav">
+          <li class="dropdown" data-dropdown="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b>Zaloguj się</b> <span class="caret"></span></a>
+                <ul id="login-dp" class="dropdown-menu">
+                    <li>
+                         <div class="row">
+                                <div class="col-md-12">
+                                    <a href="{% url 'cas_ng_login' %}" class="btn" id="btn-usos" style=""><img src="{% static 'images/logotyp.jpg'%}" alt="Uniwersytet Wrocławski">Zaloguj się przez USOS</a>
+                                    lub użyj konta Systemu Zapisów
+                                    <form action="{% url 'apps.users.views.login_plus_remember_me' %}" method="POST">
+                                        {% csrf_token %}
+                                    
+                                        {% if request.path == '/' %}
+                                            <input type="hidden" name="next" value="{% url 'schedule-own' %}"/>
+                                        {% else %}
+                                            <input type="hidden" name="next" value="{{request.path}}"/>
+                                        {% endif %}
+                                        <div class="form-group">
+                                            <input tabindex="1" type="text" id="id_login" name="username" placeholder="Użytkownik">
+                                        </div>
+                                        <div class="form-group">
+                                            <input tabindex="2" type="password" id="id_password" name="password" placeholder="Hasło">
+                                        </div>
+                                        <div class="form-group">
+                                             <button type="submit" tabindex="4" class="btn btn-primary btn-block">Zaloguj &raquo;</button>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                            <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me"> Pamiętaj mnie</label>
+                                        </div>
+                                    </form>
+                                </div>
+                         </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
                 {% endif %}
             </div>
             <!-- end up-menu  -->

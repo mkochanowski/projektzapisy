@@ -3,6 +3,7 @@ Django==1.8.18 --no-binary django
 Fabric==1.5.1
 argparse==1.2.1
 django-autoslug==1.6.1
+django-cas-ng==3.5.7
 django-debug-toolbar==1.3.0
 django-extensions==1.6.7
 django-filter==0.11.0
@@ -32,7 +33,7 @@ rq==0.7.1
 readline==6.2.4.1
 
 # Additional packages on production environment
-gunicorn==0.14.6
+gunicorn==19.7.1
 lxml==3.0.1
 python-dateutil==2.1
 reportlab==2.6

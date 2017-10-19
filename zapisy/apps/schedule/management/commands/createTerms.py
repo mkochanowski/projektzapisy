@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         semester = Semester.objects.get_next()
-
+        Event.objects.filter(course__semester=semester, type=3).delete()
         freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
                                           Q(day__lte=semester.lectures_ending))\
                           .values_list('day', flat=True)

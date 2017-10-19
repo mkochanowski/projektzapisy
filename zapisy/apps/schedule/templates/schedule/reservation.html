@@ -433,7 +433,8 @@
         $('#save_event').click(function (event) {
 
             if ($('#termstable tbody').find('tr:not(.removed)').length == 0) {
-                this.setCustomValidity('Musisz podać przynajmniej jeden termin');
+                if (window.confirm("Czy na pewno chcesz usunąć to wydarzenie?"))
+                  $('#testmainform').click();                          
             } else {
                 this.setCustomValidity('');
                 $('#testmainform').click();

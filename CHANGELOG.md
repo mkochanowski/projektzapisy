@@ -2,6 +2,18 @@
 
 # Current version
 
+# Version 17.06.19
+
+* Upgrade to Django 1.7
+* Added maintentance mode switcher
+* Fixed course names in vote results
+* Enhanced filtering for offer
+
+# Version 17.06.13
+
+* added possibility to remove reservations
+* added link to tracker to 500 error page
+
 # Version 17.06.07
 
 * fixed error with not visible plans and not working prototype when new hidden future semester is added

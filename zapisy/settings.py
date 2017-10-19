@@ -239,6 +239,7 @@ INSTALLED_APPS = (
     'apps.offer.vote',
     'apps.offer.desiderata',
 
+    'apps.utils',
     'apps.schedule',
     #'debug_toolbar',
     'apps.grade.poll',
@@ -250,13 +251,21 @@ INSTALLED_APPS = (
     'autoslug',
     'endless_pagination',
     'apps.notifications',
+    'django_cas_ng',
 
     'test_app'
 )
 
+MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
+
 AUTHENTICATION_BACKENDS = (
     'apps.users.auth_backend.BetterBackend',
+    'django_cas_ng.backends.CASBackend',
 )
+
+CAS_SERVER_URL = 'https://login.uni.wroc.pl/cas/'
+CAS_CREATE_USER = False
+CAS_LOGIN_MSG = u'Sukces! Zalogowano przez USOS (login: %s).'
 
 LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/'
@@ -282,6 +291,10 @@ SESSION_COOKIE_PATH = '/;HttpOnly'
 #TEMPLATE_DEBUG = DEBUG
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Since Django 1.6 the default session serializer is json, which
+# doesn't have as many features, in particular it cannot serialize
+# custom objects, and we need this behavior.
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 DEBUG_TOOLBAR_ALLOWED_USERS = [
     "209067", # Tomasz Wasilczyk
@@ -312,6 +325,14 @@ CACHES = {
         }
     }
 }
+        
+NEWS_PER_PAGE = 15
+
+# The URL to the issue tracker where users
+# can submit issues or bug reports. Used in several templates.
+ISSUE_TRACKER_URL = "https://tracker-zapisy.ii.uni.wroc.pl"
+# As above, but takes the user straight to the "create new issue" page
+ISSUE_TRACKER_NEW_ISSUE_URL = "https://tracker-zapisy.ii.uni.wroc.pl/projects/zapisy-tracker/issues/new"
 
 if os.path.isfile(os.path.join(PROJECT_PATH, 'pipeline.py')):
     execfile(os.path.join(PROJECT_PATH, 'pipeline.py'))
@@ -337,6 +358,3 @@ STATICFILES_FINDERS = (
 local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
 if os.path.isfile(local_settings_file):
     execfile(local_settings_file)
-
-NEWS_PER_PAGE = 15
-

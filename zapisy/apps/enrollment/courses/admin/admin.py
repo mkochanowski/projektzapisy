@@ -31,8 +31,7 @@ class CourseForm(forms.ModelForm):
             self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance'].entity)\
                 .select_related('entity')
         else:
-            self.fields['information'].queryset = EmptyQuerySet()
-
+            self.fields['information'].queryset = CourseDescription.objects.none()
 
 class CourseEntityForm(forms.ModelForm):
 
@@ -45,7 +44,7 @@ class CourseEntityForm(forms.ModelForm):
         if 'instance' in kwargs:
             self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance']).select_related('entity')
         else:
-            self.fields['information'].queryset = EmptyQuerySet()
+            self.fields['information'].queryset = CourseDescription.objects.none()
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -309,7 +308,7 @@ class GroupAdmin(admin.ModelAdmin):
         while day <= semester.lectures_ending:
 
             if day in freedays:
-                day = day + datetime.timedelta(days=1)
+                day = day + timedelta(days=1)
                 continue
 
             weekday = day.weekday()
@@ -321,7 +320,7 @@ class GroupAdmin(admin.ModelAdmin):
 
             days[weekday].append(day)
 
-            day = day + datetime.timedelta(days=1)
+            day = day + timedelta(days=1)
 
         for t in terms:
             ev = Event()

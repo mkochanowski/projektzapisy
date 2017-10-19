@@ -9,6 +9,7 @@ from feeds import LatestNews
 import apps.news.views
 from apps.users import views as users_views
 from apps.enrollment.courses.admin import views as courses_admin_views
+from django_cas_ng import views
 
 admin.autodiscover()
 
@@ -45,6 +46,9 @@ urlpatterns = [
     url(r'^vote/', include('apps.offer.vote.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^fereol_admin/', include(admin.site.urls)),
+    url(r'^accounts/login$', views.login, name='cas_ng_login'),
+    url(r'^accounts/logout$', views.logout, name='cas_ng_logout'),
+    url(r'^accounts/callback$', views.callback, name='cas_ng_proxy_callback'),
 ]
 
 """

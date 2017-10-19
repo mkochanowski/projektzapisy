@@ -66,7 +66,9 @@
                                     {{ term.object.start_time|time:'G:i' }}-{{ term.object.end_time|time:'G:i' }}
                                 </span>
                                 <span class="name">
-                                    {{ term.object.group.course.name }}
+                                    <a href="{{ term.object.group.course.get_absolute_url }}">
+                                        {{ term.object.group.course.name }}
+                                    </a>
                                 </span>
                                 <span class="type">
                                     &ndash;
