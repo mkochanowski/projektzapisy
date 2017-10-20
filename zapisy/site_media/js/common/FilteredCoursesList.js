@@ -13,7 +13,7 @@ function FilteredCoursesList()
 
 FilteredCoursesList.getCoursesListFromJson = function(elementName = "courses_list_json")
 {
-	const jsonString = $("#" + elementName).assertOne().html();
+    const jsonString = $("#" + elementName).assertOne().html();
     return JSON.parse(jsonString);
 }
 
