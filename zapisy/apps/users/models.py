@@ -159,7 +159,7 @@ class Employee(BaseUser):
 
 
     @staticmethod
-    def get_list(begin):
+    def get_list(begin='All'):
         def next_char(begin):
             try:
                 return chr(ord(begin) + 1)

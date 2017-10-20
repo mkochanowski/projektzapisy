@@ -81,11 +81,10 @@ def student_profile(request, user_id):
         if request.is_ajax():
             return render_to_response('users/student_profile_contents.html', data, context_instance=RequestContext(request))
         else:
-            begin = student.user.last_name[0]
-            students = Student.get_list(begin)
+            students = Student.get_list()
             students = Record.recorded_students(students)
             data['students'] = students
-            data['char']     = begin
+            data['char']     = "All"
             return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except Student.DoesNotExist:
@@ -127,9 +126,8 @@ def employee_profile(request, user_id):
             return render_to_response('users/employee_profile_contents.html',
                 data, context_instance=RequestContext(request))
         else:
-            begin = user.last_name[0] if user.last_name else 'All'
-            employees = Employee.get_list(begin)
             semester = Semester.get_current_semester()
+            employees = Employee.get_list()
             employees = Group.teacher_in_present(employees, semester)
 
             for e in employees:
@@ -137,7 +135,7 @@ def employee_profile(request, user_id):
                 e.short_old = e.user.first_name[:2] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
 
             data['employees'] = employees
-            data['char'] = begin
+            data['char'] = 'All'
 
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
 
