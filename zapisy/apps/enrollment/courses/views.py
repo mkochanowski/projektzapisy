@@ -328,7 +328,14 @@ def course(request, slug):
             'current_ects' : currentEcts
         })
 
-        return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )
+        if request.is_ajax():
+            render_to_response(
+                'enrollment/courses/course_info.html',
+                data, context_instance = RequestContext(request))
+        else:
+            return render_to_response(
+                'enrollment/courses/course.html',
+                data, context_instance = RequestContext(request))
 
     except (Course.DoesNotExist, NonCourseException):
         raise Http404

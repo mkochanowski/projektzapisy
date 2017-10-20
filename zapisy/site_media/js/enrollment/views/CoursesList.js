@@ -123,7 +123,8 @@ CoursesList.prototype.addNewCourse = function(course)
     
     let courseLink = $("<a/>", {
              "href" : course.url,
-             "text" : course.name
+             "text" : course.name,
+             "class" : "course-link"
         });
     course["htmlNode"] = $("<li/>");
     courseLink.appendTo(course["htmlNode"]);
