@@ -27,7 +27,7 @@ def staging():
     env.current_path = "%(domain_path)s/current" % { 'domain_path': env.domain_path }
     env.releases_path = "%(domain_path)s/releases" % { 'domain_path': env.domain_path }
     env.shared_path = "%(domain_path)s/shared" % { 'domain_path': env.domain_path }
-    env.git_clone = "git@github.com:lewymati/projektzapisy.git"
+    env.git_clone = "git@github.com:iiuni/projektzapisy.git"
     env.git_branch = "master-dev"
     env.max_releases = 3
     # env.env_file = "deploy/production.txt"
