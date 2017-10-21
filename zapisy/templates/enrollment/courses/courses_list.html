@@ -9,14 +9,19 @@
 {% endblock %}
 
 {% block bread %}
-<a href="{% url "main-page" %}">{% trans "Strona główna" %}</a> &raquo;
-<a href="{% url "course-list" %}">{% trans "Przedmioty" %}</a> <span class="hidden" id="enr-course-arrow">&raquo;</span>
-<span class="hidden" id="enr-course-name">{{ course.name }}</span>
-{% if user.is_staff %}
-    <a class="hidden" id="enr-course-edit-link" href="{% url 'admin:courses_course_change' course.pk %}">
-        {% trans "Edycja" %}
-    </a>
-{% endif %}
+<a href="{% url "main-page" %}">{% trans "Strona główna" %}</a>&nbsp;&raquo;&nbsp;<a
+    href="{% url "course-list" %}">{% trans "Przedmioty" %}</a>&nbsp;<span
+        class="hidden" id="enr-course-arrow">&raquo;</span>&nbsp;<span
+            class="hidden" id="enr-course-name">{{ course.name }}</span>
+            {% if user.is_staff %}
+            <a
+                id="enr-course-edit-link"
+                href=""
+                class="hidden"
+            >
+            {% trans "Edytuj przedmiot" %}
+            </a>
+            {% endif %}
 {% endblock %}
 
 {% block topContent %}

@@ -63,10 +63,28 @@ function setPageTitleAndUrl(courseName, url) {
     history.pushState({}, "", url);
 }
 
+function updateCourseNameAndEditLink(courseInfo) {
+    // The little arrow before the course name above the filters
+    const arrowElem = document.getElementById("enr-course-arrow");
+    arrowElem.classList.remove("hidden");
+
+    const courseNameElem = document.getElementById("enr-course-name");
+    courseNameElem.innerText = courseInfo.courseName;
+    courseNameElem.classList.remove("hidden");
+
+    const courseEditLink = document.getElementById("enr-course-edit-link");
+    // It might not exist, only admins see that link
+    if (courseEditLink) {
+        courseEditLink.setAttribute("href", courseInfo.courseEditLink);
+        courseEditLink.classList.remove("hidden");
+    }
+}
+
 function onCourseResponseReceived(resp, courseUrl) {
     const courseInfo = JSON.parse(resp);
     fillCourseHtml(courseInfo.courseHtml);
     setPageTitleAndUrl(courseInfo.courseName, courseUrl);
+    updateCourseNameAndEditLink(courseInfo);
 }
 
 document.addEventListener("CoursesListChanged", installClickHandlers);
