@@ -31,11 +31,6 @@ $('.checkall').live('click', function(){
     } else {
         $('tr[class="'+ cls +'"]').find('input[type="checkbox"]').attr('checked', false);
     }
-
-
-
-
-
 })
 });
 </script>
@@ -145,10 +140,12 @@ $('.checkall').live('click', function(){
                 <th>Zniesienie limitu 35 ECTS</th>
                 <td>{{ semester.records_ects_limit_abolition|date:dateFormatStr }}</td>
             </tr>
-            <tr>
-                <th>Koniec wypisów</th>
-                <td>{{ semester.records_ending|date:dateFormatStr }}</td>
-            </tr>
+            {% if semester.records_ending %}
+                <tr>
+                    <th>Koniec wypisów</th>
+                    <td>{{ semester.records_ending|date:dateFormatStr }}</td>
+                </tr>
+            {% endif %}
             <tr>
                 <th>Koniec zapisów</th>
                 <td>{{ semester.records_closing|date:dateFormatStr }}</td>
