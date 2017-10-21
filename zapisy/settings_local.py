@@ -16,4 +16,4 @@ DATABASES = {
 
 # Changed in Django 1.8.16: with DEBUG = True
 # the Host header is still checked
-ALLOWED_HOSTS += ['localhost', '127.0.0.1']
+ALLOWED_HOSTS += ['*']
