@@ -20,11 +20,11 @@ EmployeesList.activeStudentProfile = null;
 
 function loadEmployeeProfile(profileUrl){
     if (EmployeesList.activeStudentProfile == profileUrl)
-    		return;
+    	return;
     EmployeesList.activeStudentProfile = profileUrl;
 
     var $profileDiv = $('#employee-profile'),
-    $loadingDiv = $('<div>&nbsp;</div>').addClass('profile-loading');
+    $loadingDiv = $('<div>&nbsp;</div>').addClass('content-loading');
     $profileDiv.append($loadingDiv);
 	var $mainDiv = $('#main-content').assertOne();
     
@@ -57,7 +57,7 @@ EmployeesList.ajax.init = function()
 {
     EmployeesList.ajax.activeA =  $('#user-list-menu li a.active').assertOne();
     $('.ajax').click(function(){
-	    $('#employees-list').addClass('profile-loading');
+	    $('#employees-list').addClass('content-loading');
         EmployeesList.ajax.getList($(this).attr('href'));
 
         $(EmployeesList.ajax.activeA).removeClass('active')
@@ -90,7 +90,7 @@ EmployeesList.ajax.getList = function(link)
 
 EmployeesList.ajax.parseList = function(data)
 {
-    $('#employees-list').removeClass('profile-loading');
+    $('#employees-list').removeClass('content-loading');
     var employee_list = $('#employees-list').assertOne().children('ul.employees');
     $(employee_list).children().remove();
     if ( data.data )

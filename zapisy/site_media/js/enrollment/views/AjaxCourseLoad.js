@@ -14,6 +14,8 @@ function onCourseLinkClicked(event) {
 }
 
 function loadCourseInfo(courseUrl) {
+    const container = document.getElementById("main-content");
+    setElementLoadingUi(container);
     $.ajax({
         type: "GET",
         dataType: "html",
@@ -22,7 +24,25 @@ function loadCourseInfo(courseUrl) {
             onCourseResponseReceived(resp);
         },
         error: function() {
+            removeElementLoadingUi(container);
             alert("Nie udało się pobrać strony tego przedmiotu.");
+        },
+    });
+}
+
+function setElementLoadingUi(elem) {
+    const coveringLoadElem = document.createElement("div");
+    coveringLoadElem.innerHTML = "&nbsp";
+    coveringLoadElem.classList.add("content-loading");
+    elem.appendChild(coveringLoadElem);
+}
+
+function removeElementLoadingUi(elem) {
+    const elemChildren = Array.from(elem.children);
+    elemChildren.forEach(function(child) {
+        const childClasses = Array.from(child.classList);
+        if (childClasses.indexOf("content-loading") !== -1) {
+            elem.removeChild(child);
         }
     });
 }
@@ -38,5 +58,4 @@ function onCourseResponseReceived(resp) {
     mainContainer.appendChild(courseContainer);
 }
 
-// document.addEventListener("DOMContentLoaded", installClickHandlers);
 document.addEventListener("CoursesListChanged", installClickHandlers);

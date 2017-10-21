@@ -25,7 +25,7 @@ function loadStudentProfile(profileUrl){
 	StudentsList.activeStudentProfile = profileUrl;
 
     var $profileDiv = $('#student-profile'),
-    $loadingDiv = $('<div>&nbsp;</div>').addClass('profile-loading');
+    $loadingDiv = $('<div>&nbsp;</div>').addClass('content-loading');
     $profileDiv.append($loadingDiv);
     
     $("html, body").animate({ scrollTop: $("#enr-StudentsList-top-bar").offset().top}, 400)
@@ -61,7 +61,7 @@ StudentsList.ajax.init = function()
 
     StudentsList.ajax.activeA =  $('#user-list-menu li a.active').assertOne();
     $('.ajax').click(function(){
-	    $('#students-list').addClass('profile-loading');
+	    $('#students-list').addClass('content-loading');
         StudentsList.ajax.getList($(this).attr('href'));
 
         $(StudentsList.ajax.activeA).removeClass('active')
@@ -88,7 +88,7 @@ StudentsList.ajax.getList = function(link)
 
 StudentsList.ajax.parseList = function(data)
 {
-    $('#students-list').removeClass('profile-loading');
+    $('#students-list').removeClass('content-loading');
     var student_list = $('#students-list').assertOne().children('ul.students');
     $(student_list).children().remove();
     StudentsList.studentFilter.clearElements();
