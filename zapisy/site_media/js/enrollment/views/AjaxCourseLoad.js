@@ -9,11 +9,15 @@ function installClickHandlers() {
 
 function onCourseLinkClicked(event) {
     event.preventDefault();
+    if (window.isLoadingCourse) {
+        return;
+    }
     const courseUrl = event.target.getAttribute("href");
     loadCourseInfo(courseUrl);
 }
 
 function loadCourseInfo(courseUrl) {
+    window.isLoadingCourse = true;
     const container = document.getElementById("main-content");
     setElementLoadingUi(container);
     scrollUpToElementIfWindowBelow("#main-menu-list");
@@ -28,6 +32,9 @@ function loadCourseInfo(courseUrl) {
             removeElementLoadingUi(container);
             alert("Nie udało się pobrać strony tego przedmiotu.");
         },
+        complete: function() {
+            window.isLoadingCourse = false;
+        }
     });
 }
 
