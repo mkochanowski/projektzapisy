@@ -101,21 +101,6 @@ def courses(request):
     return render_to_response('enrollment/courses/courses_list.html',
         prepare_courses_list_to_render(request), context_instance=RequestContext(request))
 
-@login_required
-def votes(request, slug):
-    from apps.offer.vote.models import SystemState, SingleVote
-    data, course = prepare_courses_list_to_render_and_return_course(request, course_slug=slug)
-
-    data['course'] = course
-    data['voters'] = map(lambda x: x.student, SingleVote.objects\
-                .filter(Q(course__slug=slug),
-                            Q(state__semester_winter=data['default_semester']) |
-                            Q(state__semester_summer=data['default_semester']))\
-                .select_related('student', 'student__user'))
-    data['voters_count'] = len(data['voters'])
-
-    return render_to_response('enrollment/courses/voters.html', data, context_instance=RequestContext(request))
-
 
 def get_semester_info(request, semester_id):
     try:
@@ -315,10 +300,13 @@ def course(request, slug):
         if student and student.get_points_with_course(course) > maxEcts:
             currentEcts = student.get_points()
             ectsLimitExceeded = True
+        
+        employees = set(map(lambda x: x.teacher, Group.objects.filter(course=course)))
 
         data.update({
             'details_hidden': courseView_details_hidden,
             'course' : course,
+            'employees': employees,
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
@@ -346,20 +334,3 @@ def course(request, slug):
 
     except (Course.DoesNotExist, NonCourseException):
         raise Http404
-
-
-def course_consultations(request, slug):
-    try:
-        course = Course.visible.get(slug=slug)
-        employees = set(map(lambda x: x.teacher, Group.objects.filter(course=course)))
-        data = prepare_courses_list_to_render(request)
-        data.update({
-            'course' : course,
-            'employees' : employees
-        })
-        return render_to_response( 'enrollment/courses/course_consultations.html', data, context_instance = RequestContext( request ) )
-
-    except (Course.DoesNotExist, NonCourseException):
-        logger.error('Function course_consultations(slug = %s) throws Course.DoesNotExist exception.' % unicode(slug) )
-        messages.error(request, "Przedmiot nie istnieje.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
