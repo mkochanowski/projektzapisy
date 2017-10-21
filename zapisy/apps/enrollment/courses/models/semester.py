@@ -95,6 +95,13 @@ class Semester( models.Model ):
             return '%s %s (BLAD)' % (self.get_type_display() , self.year)
         return '%s %s' % (self.year, self.get_type_display())
 
+    def get_short_name(self):
+        if self.type == self.TYPE_WINTER:
+            return 'zima %s' % self.year
+        elif self.type == self.TYPE_SUMMER:
+            return 'lato %s' % self.year
+        return self.year
+
     def is_current_semester(self):
         """ Answers to question: is semester current semester"""
         if self.semester_beginning == None or self.semester_ending == None:

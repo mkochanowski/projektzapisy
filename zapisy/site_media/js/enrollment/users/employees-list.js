@@ -28,7 +28,7 @@ function loadEmployeeProfile(profileUrl){
     $profileDiv.append($loadingDiv);
 	var $mainDiv = $('#main-content').assertOne();
     
-    $("html, body").animate({ scrollTop: $("#enr-EmployeesList-top-bar").offset().top}, 400);
+    scrollUpToElementIfWindowBelow("#enr-EmployeesList-top-bar");
     
     $.ajax({
         type: "POST",

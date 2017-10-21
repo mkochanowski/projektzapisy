@@ -28,7 +28,7 @@ function loadStudentProfile(profileUrl){
     $loadingDiv = $('<div>&nbsp;</div>').addClass('content-loading');
     $profileDiv.append($loadingDiv);
     
-    $("html, body").animate({ scrollTop: $("#enr-StudentsList-top-bar").offset().top}, 400)
+    scrollUpToElementIfWindowBelow("#enr-StudentsList-top-bar");
 
     $.ajax({
         type: "POST",
