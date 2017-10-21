@@ -1,13 +1,22 @@
 {% extends "enrollment/courses/base.html" %}
 {% load i18n %}
+{% load compressed %}
 
 {% block main-subtitle %}{% trans "Przedmioty" %}{% endblock %}
 
+{% block styles %}
+    {% compressed_css 'courseview' %}
+{% endblock %}
+
 {% block bread %}
-<a href="/">{% trans "Strona główna" %}</a> &raquo;
-<a href="/">{% trans "System Zapisów" %}</a> &raquo;
-{% trans "Przedmioty" %}
-    {# end bread #}
+<a href="{% url "main-page" %}">{% trans "Strona główna" %}</a> &raquo;
+<a href="{% url "course-list" %}">{% trans "Przedmioty" %}</a> <span class="hidden" id="enr-course-arrow">&raquo;</span>
+<span class="hidden" id="enr-course-name">{{ course.name }}</span>
+{% if user.is_staff %}
+    <a class="hidden" id="enr-course-edit-link" href="{% url 'admin:courses_course_change' course.pk %}">
+        {% trans "Edycja" %}
+    </a>
+{% endif %}
 {% endblock %}
 
 {% block topContent %}
@@ -17,9 +26,8 @@
 {% block enrollment_menu_courses %} class="active"{% endblock %}
 
 {% block content %}
-    <div class="alert-message info">
+    <div id="select-course-notification" class="alert-message info">
         <a href="#" class="close">×</a>
         <p>{% trans "Wybierz przedmiot z listy" %}</p>
     </div>
-    {# end content#}
 {% endblock %}

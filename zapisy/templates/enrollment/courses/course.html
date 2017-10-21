@@ -1,40 +1,24 @@
-{% extends "enrollment/courses/base.html" %}
+{% extends "enrollment/courses/courses_list.html" %}
 {% load url from future %}
 
 {% load fereol_common %}
-{% load compressed %}
 {% load i18n %}
 
 {% block main-subtitle %}{{ course.name }}{% endblock %}
 
-{% block styles %}
-    {% compressed_css 'courseview' %}
-{% endblock %}
-
 {% block bread %}
     <a href="/">{% trans "Strona główna" %}</a> &raquo;
-    <a href="/">{% trans "System Zapisów" %}</a> &raquo;
-    <a href="/">{% trans "Przedmioty" %}</a> &raquo;
-    {{ course.name }}
+    <a href="/">{% trans "Przedmioty" %}</a>&nbsp;<span id="enr-course-arrow">&raquo;</span>
+    &nbsp;<span id="enr-course-name">{{ course.name }}</span>
     {% if user.is_staff %}
-        <a href="{% url 'admin:courses_course_change' course.pk %}">{% trans "Edycja" %}</a>
+        <a id="enr-course-edit-link" href="{% url 'admin:courses_course_change' course.pk %}">
+            {% trans "Edycja" %}
+        </a>
     {% endif %}
-    {# end bread #}
 {% endblock %}
 
-{% block topContent %}
-{% include "common/course_list_filters.html"  with custom_filters="enrollment/semesterChooser.html" %}
-{% endblock %}
-
-{% block enrollment_menu_courses %} class="active"{% endblock %}
 
 {% block content %}
-
-<input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}"/>
-<input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}"/>
-<input type="hidden" name="ajax-set-queue-priority-url" value="{% url 'records-set-queue-priority' '.json' %}"/>
-<input type="hidden" name="priority-limit" value="{{ priority_limit }}"/>
-
 <div id="enr-course-view">
     {% include "enrollment/courses/course_info.html" %}
 </div>

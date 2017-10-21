@@ -7,6 +7,7 @@ if (!Fereol.Enrollment)
 
 Fereol.Enrollment.CourseGroup = function()
 {
+	alert("Fereol::Enrollment::CourseGroup");
 	this.id = null;
 	this.type = null;
 	this.course = null;

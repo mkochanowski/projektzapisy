@@ -4,10 +4,12 @@ import json
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.response import TemplateResponse
+from django.template.loader import render_to_string
+from django.core.urlresolvers import reverse
 
 from apps.enrollment.courses.models import *
 from apps.enrollment.records.models import *
@@ -329,9 +331,14 @@ def course(request, slug):
         })
 
         if request.is_ajax():
-            render_to_response(
+            rendered_html = render_to_string(
                 'enrollment/courses/course_info.html',
                 data, context_instance = RequestContext(request))
+            return JsonResponse({
+                'courseHtml': rendered_html,
+                'courseName': course.name,
+                'courseEditLink': reverse('admin:courses_course_change', args=[course.pk])
+            })
         else:
             return render_to_response(
                 'enrollment/courses/course.html',
