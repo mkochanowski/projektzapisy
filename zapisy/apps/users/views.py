@@ -82,9 +82,9 @@ def student_profile(request, user_id):
             return render_to_response('users/student_profile_contents.html', data, context_instance=RequestContext(request))
         else:
             students = Student.get_list()
-            students = Record.recorded_students(students)
-            data['students'] = students
-            data['char']     = "All"
+            enrolled_students = Record.recorded_students(students)
+            data['students'] = enrolled_students
+            data['char'] = "All"
             return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except Student.DoesNotExist:
@@ -128,13 +128,13 @@ def employee_profile(request, user_id):
         else:
             semester = Semester.get_current_semester()
             employees = Employee.get_list()
-            employees = Group.teacher_in_present(employees, semester)
+            active_employees = Group.teacher_in_present(employees, semester)
 
-            for e in employees:
+            for e in active_employees:
                 e.short_new = e.user.first_name[:1] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
                 e.short_old = e.user.first_name[:2] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
 
-            data['employees'] = employees
+            data['employees'] = active_employees
             data['char'] = 'All'
 
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
