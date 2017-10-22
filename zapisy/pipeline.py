@@ -203,6 +203,8 @@ PIPELINE_JS = {
             'js/jquery/jquery.cookies.2.2.0.min.js',
             'js/jquery/baseExtensions.js',
             'js/main.js',
+            'js/test.ts',
+            #'js/test.coffee',
             'js/common/bootstrap-dropdown.js',
             'js/cookieconsent.min.js',
             ),

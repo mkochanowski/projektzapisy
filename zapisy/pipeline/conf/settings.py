@@ -17,12 +17,12 @@ PIPELINE_CACHE_TIMEOUT = getattr(settings, 'PIPELINE_CACHE_TIMEOUT', 63072000)
 PIPELINE_STORAGE = getattr(settings, 'PIPELINE_STORAGE',
     'pipeline.storage.PipelineStorage')
 
-PIPELINE_CSS_COMPRESSOR = getattr(settings, 'PIPELINE_CSS_COMPRESSOR',
-    'pipeline.compressors.yui.YUICompressor'
-)
-PIPELINE_JS_COMPRESSOR = getattr(settings, 'PIPELINE_JS_COMPRESSOR',
-    'pipeline.compressors.yui.YUICompressor'
-)
+#PIPELINE_CSS_COMPRESSOR = getattr(settings, 'PIPELINE_CSS_COMPRESSOR',
+#    'pipeline.compressors.yui.YUICompressor'
+#)
+#PIPELINE_JS_COMPRESSOR = getattr(settings, 'PIPELINE_JS_COMPRESSOR',
+#    'pipeline.compressors.yui.YUICompressor'
+#)
 PIPELINE_COMPILERS = getattr(settings, 'PIPELINE_COMPILERS', [])
 
 PIPELINE_CSS = getattr(settings, 'PIPELINE_CSS', {})
@@ -47,6 +47,9 @@ PIPELINE_UGLIFYJS_ARGUMENTS = getattr(settings, 'PIPELINE_UGLIFYJS_ARGUMENTS', '
 
 PIPELINE_COFFEE_SCRIPT_BINARY = getattr(settings, 'PIPELINE_COFFEE_SCRIPT_BINARY', '/usr/local/bin/coffee')
 PIPELINE_COFFEE_SCRIPT_ARGUMENTS = getattr(settings, 'PIPELINE_COFFEE_SCRIPT_ARGUMENTS', '')
+
+PIPELINE_TYPESCRIPT_BINARY = getattr(settings, 'PIPELINE_COFFEE_SCRIPT_BINARY', '/usr/bin/env tsc')
+PIPELINE_TYPESCRIPT_ARGUMENTS = getattr(settings, 'PIPELINE_COFFEE_SCRIPT_ARGUMENTS', '')
 
 PIPELINE_SASS_BINARY = getattr(settings, 'PIPELINE_SASS_BINARY', '/usr/local/bin/sass')
 PIPELINE_SASS_ARGUMENTS = getattr(settings, 'PIPELINE_SASS_ARGUMENTS', '')
