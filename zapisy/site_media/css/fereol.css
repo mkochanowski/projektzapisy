@@ -75,6 +75,7 @@ div.top .systemtopbar ul li.active a {
 }
 
 #btn-usos {
+  padding: 10px 0;
   margin-bottom:10px;
   background-color: #00709e;
   text-align: center;
@@ -92,7 +93,7 @@ div.top .systemtopbar ul li.active a {
   background-image: none;
 }
 
-#btn-no-usos:hover {
+#btn-no-usos:hover, #btn-usos:hover {
   background-color: #2696C4;
 }
 
