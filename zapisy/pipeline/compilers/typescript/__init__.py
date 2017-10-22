@@ -28,6 +28,7 @@ class TypeScriptCompiler(SubProcessCompiler):
             ifpath,
             ofpath
         )
+        print command
         self.run_typescript_compiler(command, ifpath, path)
         os.remove(ifpath)
         f = open(ofpath, "r")

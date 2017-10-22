@@ -338,9 +338,9 @@ ISSUE_TRACKER_URL = "https://tracker-zapisy.ii.uni.wroc.pl"
 # As above, but takes the user straight to the "create new issue" page
 ISSUE_TRACKER_NEW_ISSUE_URL = "https://tracker-zapisy.ii.uni.wroc.pl/projects/zapisy-tracker/issues/new"
 
+PIPELINE_TYPESCRIPT_ARGUMENTS = "--alwaysStrict"
 PIPELINE_COMPILERS = (
   'pipeline.compilers.typescript.TypeScriptCompiler',
-  'pipeline.compilers.coffee.CoffeeScriptCompiler',
 )
 
 if os.path.isfile(os.path.join(PROJECT_PATH, 'pipeline.py')):

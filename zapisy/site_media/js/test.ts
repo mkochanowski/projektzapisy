@@ -3,6 +3,8 @@ function test(x: string) {
 	console.log(x);
 }
 
-test(123);
-ksjdflksd
-l
+test("123231233" + 3);
+
+function test2(x) {
+	console.log(x);
+}
