@@ -115,7 +115,7 @@ class Group(models.Model):
             '6':  'Seminarium',
             '7':  'Lektorat',
             '8':  'Zajęcia sportowe',
-           ' 10': 'Projekt',
+            '10': 'Projekt',
         }
         return types[self.type]
 
