@@ -67,18 +67,34 @@ div.top .systemtopbar ul li.active a {
   font-size: 15px;
 }
 
-#login-dp{
+#login-dp {
     min-width: 250px;
     padding: 14px 14px 0;
     overflow:hidden;
+    z-index: 10000;
 }
 
-#login-dp #btn-usos{
+#btn-usos {
+  padding: 10px 0;
   margin-bottom:10px;
   background-color: #00709e;
   text-align: center;
   background-image: none;
   border: none;
+  color: white;
+  font-weight: bold;
+}
+
+#btn-no-usos {
+  text-align: center;
+  width: 100%;
+  font-weight: bold;
+  background-color: #00709e;
+  background-image: none;
+}
+
+#btn-no-usos:hover, #btn-usos:hover {
+  background-color: #2696C4;
 }
 
 #login-dp .row {

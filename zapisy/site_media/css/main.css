@@ -493,5 +493,5 @@ form#courses-in-voting select
 }
 
 .topbar {
-	z-index: 999;
+	z-index: initial;
 }
