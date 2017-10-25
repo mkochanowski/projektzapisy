@@ -17,25 +17,25 @@
 # Version 17.06.19
 
 * Upgrade to Django 1.7
-* Added maintentance mode switcher
+* Added maintenance mode switcher
 * Fixed course names in vote results
 * Enhanced filtering for offer
 
 # Version 17.06.13
 
-* added possibility to remove reservations
-* added link to tracker to 500 error page
+* Added possibility to remove reservations
+* Added link to tracker to 500 error page
 
 # Version 17.06.07
 
-* fixed error with not visible plans and not working prototype when new hidden future semester is added
-* fixed 500 error on vote summary
-* fixed password reset functionality after upgrade to Django 1.6. The issue was with wrong url names
+* Fixed error with not visible plans and not working prototype when new hidden future semester is added
+* Fixed 500 error on vote summary
+* Fixed password reset functionality after upgrade to Django 1.6. The issue was with wrong url names
 
 # Version 17.06.06
 
 * Added tag/effects filtering
-* Bugfixes after Django 1.6
+* Bug-fixes after Django 1.6
 
 # Version 17.05.29
 
@@ -57,9 +57,9 @@
 
 # Version 17.04.07
 
-* Fixed mailto links escape '+'
+* Fixed mail-to links escape '+'
 * Fixed proper author while creating cyclical reservation
-* Added posibility to add reservations with conflicts for secretary
+* Added possibility to add reservations with conflicts for secretary
 * Fixed FreeDay and ChangedDay are now unique
 * Added news content is now included in emails
 
@@ -131,7 +131,7 @@
 
 * Created unified dev environment with Vagrant
 * Fixed template for enabling grade
-* Fixed an issue with queue rearrangments
+* Fixed an issue with queue rearrangements
 * Added csv/pdf export links for queues
 * Reviewed, fixed and merged `Courses Proposals` (Filip's thesis?)
 * Button for refreshing opening times
