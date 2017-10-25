@@ -2,6 +2,18 @@
 
 # Current version
 
+# Version 17.10.25
+
+* Fixed missing title for login page
+* Hid vote button for employees
+* Added notification when leaving voting page
+* Fixed several typos
+* Fixed 'None' in news search field
+* Improved login UX
+* Added displaying links to courses on employee's page
+* Added showing records ending time
+* Added USOS CAS authentication
+
 # Version 17.06.19
 
 * Upgrade to Django 1.7
