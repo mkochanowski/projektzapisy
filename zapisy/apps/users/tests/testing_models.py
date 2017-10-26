@@ -219,6 +219,21 @@ class MailsToStudentsLinkTestCase(TestCase):
 class MyProfileSemesterInfoTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
+        sql_calls = [
+            """
+                CREATE TABLE courses_studentpointsview (
+                    value smallint,
+                    student_id integer,
+                    entity_id integer
+                );
+            """
+            ]
+
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
+
         student_user = User.objects.create_user('student_user', 'student@user.com', 'password')
         s = Student.objects.create(user=student_user, matricula=str(randint(100000, 200000)))
         student_user.save()
@@ -236,6 +251,16 @@ class MyProfileSemesterInfoTestCase(TestCase):
         )
         cls.semester.full_clean()
         cls.semester.save()
+
+    @classmethod
+    def tearDownClass(cls):
+        sql_calls = [
+            "DROP TABLE courses_studentpointsview;",
+        ]
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
     
     def test_my_profile_contains_records_closing_time(self):
         self.semester.records_ending = datetime.now()+timedelta(days=10)
