@@ -11,6 +11,8 @@
 	{% compressed_css "login" %}
 {% endblock %}
 
+{% block main-subtitle %}Logowanie{% endblock %}
+
 {% block content %}
     {% if user.is_authenticated %}
         <p class="main-message">Jesteś już zalogowany. Możesz się <a href="{% url 'user-logout' %}">wylogować</a>.</p>
