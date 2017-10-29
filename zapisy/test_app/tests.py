@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import ElementNotVisibleException, NoSuchElementException, TimeoutException
 
 from django.contrib.auth.models import User
 from apps.users.models import Employee, Student
@@ -18,6 +19,7 @@ from apps.enrollment.courses.models import Semester, CourseEntity, Course, Type,
 from apps.offer.vote.models import SystemState
 
 import os
+from time import sleep
 from datetime import datetime, date, time
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
@@ -199,20 +201,31 @@ class NewSemesterTests(SeleniumTestCase):
 
         self.driver.get_screenshot_as_file("screenshot.png")
 
+    def wait_for_pass(self, block, times = 3):
+      while times > 1:
+        try:
+          return block()
+        except (ElementNotVisibleException, NoSuchElementException, TimeoutException) as e:
+          times -= 1
+          sleep(3)
+      return block()
+
     def prepare_course_entities_for_voting(self):
         self.driver.get(self.live_server_url)
-        self.driver.find_element_by_id('id_login').send_keys(self.admin.username)
-        self.driver.find_element_by_id('id_password').send_keys(self.password)
-        self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
-        self.driver.find_element_by_link_text('Oferta').click()
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('login-dropdown').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('btn-no-usos').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('id_login').send_keys(self.admin.username))
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('id_password').send_keys(self.password))
+        self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//button[contains(text(), "Zaloguj")]').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_link_text('Oferta').click())
         self.driver.get('%s%s' % (self.driver.current_url, '/manage/proposals'))
-        self.driver.find_element_by_link_text('Głosowanie').click()
-        
+        self.wait_for_pass(lambda: self.driver.find_element_by_link_text('Głosowanie').click())
+
         nonselected_select = Select(
-            WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.ID, 'bootstrap-duallistbox-nonselected-list_for_voting')))
+            self.wait_for_pass(lambda: WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.ID, 'bootstrap-duallistbox-nonselected-list_for_voting'))))
         )
         # nonselected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-nonselected-list_for_voting'))
-        selected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting'))
+        selected_select = Select(self.wait_for_pass(lambda: self.driver.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting')))
         self.assertEqual(CourseEntity.objects.filter(status=1).count(), len(nonselected_select.options))
         self.assertEqual(CourseEntity.objects.filter(status=2).count(), len(selected_select.options))
 
@@ -220,10 +233,10 @@ class NewSemesterTests(SeleniumTestCase):
             if ce.name != 'Course 100' and ce.name != 'Course 101':
                 nonselected_select.select_by_visible_text(ce.name)
 
-        self.driver.find_element_by_xpath('//input[@value="Zapisz"]').click()
+        self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//input[@value="Zapisz"]').click())
 
-        nonselected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-nonselected-list_for_voting'))
-        selected_select = Select(self.driver.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting'))
+        nonselected_select = Select(self.wait_for_pass(lambda: self.driver.find_element_by_id('bootstrap-duallistbox-nonselected-list_for_voting')))
+        selected_select = Select(self.wait_for_pass(lambda: self.driver.find_element_by_id('bootstrap-duallistbox-selected-list_for_voting')))
         self.assertEqual(CourseEntity.objects.filter(status=1).count(), len(nonselected_select.options))
         self.assertEqual(CourseEntity.objects.filter(status=2).count(), len(selected_select.options))
 
@@ -263,9 +276,9 @@ class NewSemesterTests(SeleniumTestCase):
         )
 
         # check voting results
-        self.driver.find_element_by_link_text('Głosowanie').click()
-        WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Podsumowanie głosowania'))).click()
-        rows = self.driver.find_elements_by_xpath('//table/tbody/tr')
+        self.wait_for_pass(lambda: self.driver.find_element_by_link_text('Głosowanie').click())
+        self.wait_for_pass(lambda: WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Podsumowanie głosowania'))).click())
+        rows = self.wait_for_pass(lambda: self.driver.find_elements_by_xpath('//table/tbody/tr'))
         for row in rows:
             cells = row.find_elements_by_tag_name('td')
             self.assertEqual(self.results_points[cells[0].text], int(cells[1].text))
@@ -280,23 +293,25 @@ class NewSemesterTests(SeleniumTestCase):
     def vote(self, student, points):
         self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
         self.driver.get(self.live_server_url)
-        self.driver.find_element_by_id('id_login').send_keys(student.user.username)
-        self.driver.find_element_by_id('id_password').send_keys(self.password)
-        self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
-        self.driver.find_element_by_link_text('Oferta').click()
-        self.driver.find_element_by_link_text('Głosowanie').click()
-        WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click()
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('login-dropdown').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('btn-no-usos').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('id_login').send_keys(student.user.username))
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('id_password').send_keys(self.password))
+        self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//button[contains(text(), "Zaloguj")]').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_link_text('Oferta').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_link_text('Głosowanie').click())
+        self.wait_for_pass(lambda: WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click())
 
         sum_points = sum(points.itervalues())
 
         for course_name, value in points.iteritems():
-            select = Select(self.driver.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name))
+            select = Select(self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name)))
             select.select_by_value(str(value))
             if sum_points <= self.system_state.max_points:
                 self.results_points[course_name] += value
                 self.results_votes[course_name] += 1
 
-        self.driver.find_element_by_xpath('//input[@value="Głosuj"]').click()
+        self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//input[@value="Głosuj"]').click())
 
         if sum_points <= self.system_state.max_points:
             self.assertEqual(len(self.driver.find_elements_by_xpath('//div[contains(text(), "Oddano poprawny głos")]')), 1)
@@ -342,18 +357,20 @@ class NewSemesterTests(SeleniumTestCase):
     def correction(self, student, points):
         self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
         self.driver.get(self.live_server_url)
-        self.driver.find_element_by_id('id_login').send_keys(student.user.username)
-        self.driver.find_element_by_id('id_password').send_keys(self.password)
-        self.driver.find_element_by_xpath('//button[contains(text(), "Loguj")]').click()
-        self.driver.find_element_by_link_text('Oferta').click()
-        self.driver.find_element_by_link_text('Głosowanie').click()
-        WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click()
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('login-dropdown').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('btn-no-usos').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('id_login').send_keys(student.user.username))
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('id_password').send_keys(self.password))
+        self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//button[contains(text(), "Zaloguj")]').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_link_text('Oferta').click())
+        self.wait_for_pass(lambda: self.driver.find_element_by_link_text('Głosowanie').click())
+        self.wait_for_pass(lambda: WebDriverWait(self.driver, 1).until(EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click())
 
         for course_name, value in points.iteritems():
-            select = Select(self.driver.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name))
-            select.select_by_value(str(value))
+          select = Select(self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//li[label/a[text()="%s"]]/select' % course_name)))
+          select.select_by_value(str(value))
 
-        self.driver.find_element_by_xpath('//input[@value="Głosuj"]').click()
+        self.wait_for_pass(lambda: self.driver.find_element_by_xpath('//input[@value="Głosuj"]').click())
 
     def import_winter_schedule(self):
         courses = {}
