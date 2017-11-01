@@ -224,7 +224,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.driver.get_screenshot_as_file("screenshot.png")
 
     def wait_for_pass(self, block, times=3):
-        for _ in xrange(1, 3):
+        for _ in xrange(1, times + 1):
             try:
                 return block()
             except (ElementNotVisibleException, NoSuchElementException, TimeoutException):
