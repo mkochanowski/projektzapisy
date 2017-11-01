@@ -92,14 +92,14 @@ class Semester( models.Model ):
         """ returns name of semester """
         #TODO: wymuszanie formatu roku "XXXX/YY" zamiast "XXXX"
         if len(self.year) != 7:
-            return '%s %s (BLAD)' % (self.get_type_display() , self.year)
-        return '%s %s' % (self.year, self.get_type_display())
+            return u'(BŁĄD) {0} {1}'.format(self.year, self.get_type_display())
+        return '{0} {1}'.format(self.year, self.get_type_display())
 
     def get_short_name(self):
         if self.type == self.TYPE_WINTER:
-            return 'zima %s' % self.year
+            return 'zima {0}'.format(self.year)
         elif self.type == self.TYPE_SUMMER:
-            return 'lato %s' % self.year
+            return 'lato {0}'.format(self.year)
         return self.year
 
     def is_current_semester(self):

@@ -301,7 +301,7 @@ def course(request, slug):
             currentEcts = student.get_points()
             ectsLimitExceeded = True
         
-        employees = set(map(lambda x: x.teacher, Group.objects.filter(course=course)))
+        employees = { group.teacher for group in Group.objects.filter(course=course) }
 
         data.update({
             'details_hidden': courseView_details_hidden,
