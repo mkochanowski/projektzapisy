@@ -53,8 +53,7 @@ PrototypeCoursesList.prototype.init = function()
 
 PrototypeCoursesList.prototype.initCourses = function()
 {
-    const coursesObj = FilteredCoursesList.getCoursesListFromJson();
-    this.courses = coursesObj;
+    this.courses = FilteredCoursesList.getCoursesListFromJson();
     
     let self = this;
     this.courses.forEach(function(course)
