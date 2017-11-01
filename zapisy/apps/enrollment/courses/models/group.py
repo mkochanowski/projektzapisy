@@ -7,6 +7,7 @@ from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
 from django.conf import settings
 from apps.notifications.models import Notification
+from django.core.urlresolvers import reverse
 
 from course import *
 
@@ -484,7 +485,6 @@ class Group(models.Model):
     def serialize_for_json(self, enrolled, queued, pinned, queue_priorities,
         student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
-        from django.core.urlresolvers import reverse
         zamawiany = student and student.is_zamawiany()
         
         data = {

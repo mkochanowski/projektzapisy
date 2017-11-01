@@ -15,6 +15,4 @@ urlpatterns = [
     
     url(r'^poll/', include('apps.grade.poll.urls')),
     url(r'^ticket/', include('apps.grade.ticket_create.urls')),
-
-#    url(r'^declaration$', views.declaration, name='grade-poll-show'),
 ]
