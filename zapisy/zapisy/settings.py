@@ -22,11 +22,6 @@ MANAGERS = ADMINS
 ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl', 'localhost']
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
-LOCAL_SETTINGS = os.path.join(BASE_DIR, 'zapisy', 'settings_local.py')
-if os.path.isfile(LOCAL_SETTINGS):
-    print("Running local settings file {0}".format(LOCAL_SETTINGS))
-    execfile(LOCAL_SETTINGS)
-
 """
 DATABASES = {
      'default' : {
@@ -344,11 +339,12 @@ PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
 #PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.jsmin.JSMinCompressor'
 #PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
-STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = (
 	os.path.join(BASE_DIR, "asset_bundles"),
 )
+
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_VERSIONING = 'pipeline.versioning.hash.MD5Versioning'
@@ -357,6 +353,11 @@ STATICFILES_FINDERS = (
   'django.contrib.staticfiles.finders.FileSystemFinder',
   'django.contrib.staticfiles.finders.AppDirectoriesFinder'
 )
+
+LOCAL_SETTINGS = os.path.join(BASE_DIR, 'zapisy', 'settings_local.py')
+if os.path.isfile(LOCAL_SETTINGS):
+    print("Running local settings file {0}".format(LOCAL_SETTINGS))
+    execfile(LOCAL_SETTINGS)
 
 WEBPACK_LOADER = {
     'DEFAULT': {

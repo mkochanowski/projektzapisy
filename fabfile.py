@@ -102,7 +102,7 @@ def symlink():
     run("ln -nfs %(current_release)s %(current_path)s" % { 'current_release': env.current_release, 'current_path': env.current_path })
     run("ln -nfs %(shared_path)s/logs %(current_release)s/zapisy/logs" % { 'shared_path': env.shared_path, 'current_release': env.current_release })
     run("ln -nfs %(shared_path)s/system/settings_local.py %(current_release)s/zapisy/settings_local.py" % { 'shared_path': env.shared_path, 'current_release': env.current_release })
-    run("ln -nfs /home/zapisy/env26/lib/python2.6/site-packages/django/contrib/admin/static/admin %(current_release)s/zapisy/site_media/admin" % { 'current_release': env.current_release })
+    run("ln -nfs /home/zapisy/env26/lib/python2.6/site-packages/django/contrib/admin/static/admin %(current_release)s/zapisy/static/admin" % { 'current_release': env.current_release })
 
 def update_env():
     """Update servers environment on the remote servers"""
