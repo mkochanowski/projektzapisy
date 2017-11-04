@@ -117,10 +117,16 @@ $('.checkall').live('click', function(){
 {% if user.student %}
 <p class="info-table-header">Moje studia</p>
     <table class="table-info">
+        {% comment %}
+        W tej chwili nie mamy aktualnych informacji z USOSa i znamy tylko
+        liczbę ECTS bez uwzględnienia ostatniego semestru, co jest mało
+        przydatne dla studenta (a pewnie nawet mylące). W związku z tym to pole
+        jest tymczasowo wyłączone.
         <tr>
             <th>Punkty ECTS uzyskane do tej pory</th>
             <td>{{user.student.ects}}</td>
         </tr>
+        {% endcomment %}
         <tr>
             <th>Program</th>
             <td>{{user.student.program}}</td>
