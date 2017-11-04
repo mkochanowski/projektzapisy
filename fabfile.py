@@ -24,11 +24,10 @@ def staging():
     env.app_name = "projektzapisy"
     env.domain_name = "zapisyuwr.swistak35.com"
     env.domain_path = "%(base_dir)s/%(app_name)s" % { 'base_dir': env.base_dir, 'app_name': env.app_name }
-    env.venv_path = "%(base_dir)s/env27" % { 'base_dir': env.base_dir }
     env.current_path = "%(domain_path)s/current" % { 'domain_path': env.domain_path }
     env.releases_path = "%(domain_path)s/releases" % { 'domain_path': env.domain_path }
     env.shared_path = "%(domain_path)s/shared" % { 'domain_path': env.domain_path }
-    env.git_clone = "git@github.com:iiuni/projektzapisy.git"
+    env.git_clone = "git@github.com:lewymati/projektzapisy.git"
     env.git_branch = "master-dev"
     env.max_releases = 3
     # env.env_file = "deploy/production.txt"
@@ -91,7 +90,6 @@ def update():
     update_code()
     update_env()
     symlink()
-    run("echo \"ALLOWED_HOSTS = %(hosts)s\" >> %(current_release)s/zapisy/settings_local.py" % {'hosts': env.hosts, 'current_release': env.current_release} )
 
 def update_code():
     """Copies your project to the remote servers"""
