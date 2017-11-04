@@ -9,11 +9,15 @@ dependencies:
   override:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
+    # npm
+    - npm i
 
 test:
   pre:
     - cp ../env/settings_local_test.py settings_local.py
   override:
+    - npm run build
+    - python manage.py collectstatic -y
     - mkdir logs
     # - python manage.py test test_app --nomigrations
     # - coverage run manage.py test test_app
