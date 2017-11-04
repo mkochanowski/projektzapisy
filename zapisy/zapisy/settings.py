@@ -62,7 +62,6 @@ DATABASES = {
         }
 }
 
-
 # mass-mail account
 # You can test sending with:
 # $ python -m smtpd -n -c DebuggingServer localhost:1025
@@ -339,6 +338,11 @@ PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
 #PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.jsmin.JSMinCompressor'
 #PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
 
+LOCAL_SETTINGS = os.path.join(BASE_DIR, 'zapisy', 'settings_local.py')
+if os.path.isfile(LOCAL_SETTINGS):
+    print("Running local settings file {0}".format(LOCAL_SETTINGS))
+    execfile(LOCAL_SETTINGS)
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
@@ -354,17 +358,12 @@ STATICFILES_FINDERS = (
   'django.contrib.staticfiles.finders.AppDirectoriesFinder'
 )
 
-LOCAL_SETTINGS = os.path.join(BASE_DIR, 'zapisy', 'settings_local.py')
-if os.path.isfile(LOCAL_SETTINGS):
-    print("Running local settings file {0}".format(LOCAL_SETTINGS))
-    execfile(LOCAL_SETTINGS)
-
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
 		# This setting is badly named, it's the bundle dir relative
 		# to whatever you have in your STATICFILES_DIRS
-        'BUNDLE_DIR_NAME': '/', # must end with slash
+        'BUNDLE_DIR_NAME': '', # must end with slash
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
         'POLL_INTERVAL': 0.1,
         'TIMEOUT': None,

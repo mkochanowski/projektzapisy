@@ -2,6 +2,7 @@
 {% load fereol_common %}
 {% load compressed %}
 {% load staticfiles %}
+{% load static %}
 {% load i18n %}
 <!DOCTYPE html>
 <html lang="pl">
@@ -54,8 +55,8 @@
     <script type="text/javascript">
         var user_is_authenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %},
             user_is_student = {% if request.user.student %}true{% else %}false{% endif %};
-
     </script>
+    <script type="text/javascript" src="{% static "vendor.js" %}"></script>
     {% block js %}{% compressed_js 'main' %}{% endblock %}
     {% block rss %}{% endblock %}
     {% block head_extra %}{% endblock %}
