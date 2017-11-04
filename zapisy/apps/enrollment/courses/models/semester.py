@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.core.validators import ValidationError
 from datetime import datetime, timedelta
 
-import common
+from zapisy import common
 
 from .term import Term
 
