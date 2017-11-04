@@ -3,7 +3,7 @@
 import os
 import logging
 
-PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = False
 
@@ -52,7 +52,7 @@ DATABASES = {
 DATABASES = {
      'default' : {
         'ENGINE' : 'django.db.backends.sqlite3',
-        'NAME' : os.path.join(PROJECT_PATH, 'database/db.sqlite3'),
+        'NAME' : os.path.join(BASE_DIR, 'database/db.sqlite3'),
         'PORT' : '',
         'USER' : '',
         'PASSWORD' : '',
@@ -85,7 +85,7 @@ EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing spa
 
 #loggin settings:
 
-#LOG_FILE = os.path.join(PROJECT_PATH, "logs/log.log")
+#LOG_FILE = os.path.join(BASE_DIR, "logs/log.log")
 #LOG_LEVEL = logging.NOTSET
 #INTERNAL_IPS = ('127.0.0.1',)
 #logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
@@ -208,10 +208,10 @@ MIDDLEWARE_CLASSES = (
     'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
 )
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'zapisy.urls'
 
 TEMPLATE_DIRS = (
-    os.path.join(PROJECT_PATH, 'templates'),
+    os.path.join(BASE_DIR, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -338,8 +338,8 @@ ISSUE_TRACKER_URL = "https://tracker-zapisy.ii.uni.wroc.pl"
 # As above, but takes the user straight to the "create new issue" page
 ISSUE_TRACKER_NEW_ISSUE_URL = "https://tracker-zapisy.ii.uni.wroc.pl/projects/zapisy-tracker/issues/new"
 
-if os.path.isfile(os.path.join(PROJECT_PATH, 'pipeline.py')):
-    execfile(os.path.join(PROJECT_PATH, 'pipeline.py'))
+if os.path.isfile(os.path.join(BASE_DIR, 'zapisy', 'pipeline.py')):
+    execfile(os.path.join(BASE_DIR, 'zapisy', 'pipeline.py'))
 
 PIPELINE = True
 PIPELINE_AUTO = False
@@ -349,7 +349,7 @@ PIPELINE_YUI_BINARY = 'java -jar libs/yuicompressor-2.4.7.jar'
 #PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.csstidy.CSSTidyCompressor'
 
 STATIC_URL = '/static/'
-STATIC_ROOT =  os.path.join(PROJECT_PATH, 'site_media')
+STATIC_ROOT =  os.path.join(BASE_DIR, 'site_media')
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_VERSIONING = 'pipeline.versioning.hash.MD5Versioning'
@@ -359,6 +359,7 @@ STATICFILES_FINDERS = (
   'django.contrib.staticfiles.finders.AppDirectoriesFinder'
 )
 
-local_settings_file = os.path.join(PROJECT_PATH, 'settings_local.py')
-if os.path.isfile(local_settings_file):
-    execfile(local_settings_file)
+LOCAL_SETTINGS = os.path.join(BASE_DIR, 'zapisy', 'settings_local.py')
+if os.path.isfile(LOCAL_SETTINGS):
+    print("Running local settings file {0}".format(LOCAL_SETTINGS))
+    execfile(LOCAL_SETTINGS)

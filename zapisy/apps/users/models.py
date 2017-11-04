@@ -14,7 +14,7 @@ from django.core.cache import cache as mcache
 import datetime
 from apps.users.managers import GettersManager, T0Manager
 
-import settings
+from django.conf import settings
 
 import logging
 logger = logging.getLogger()

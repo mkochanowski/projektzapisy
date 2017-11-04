@@ -237,7 +237,6 @@ class Group(models.Model):
         return records or True
 
     def _add_to_lecture(self, student):
-        import settings
         from apps.enrollment.records.models import Record
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
         result = []
@@ -251,7 +250,6 @@ class Group(models.Model):
 
     def add_student(self, student, return_group=False, commit=True):
         from apps.enrollment.records.models import Record
-        import settings
 
         result = True
         #REMOVE FROM OTHER GROUP

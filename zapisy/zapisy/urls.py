@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import settings
+from django.conf import settings
 from django.conf.urls import include, patterns, url
 from django.contrib import admin
 from django.views.generic import TemplateView

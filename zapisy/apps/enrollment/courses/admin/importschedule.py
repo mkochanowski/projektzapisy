@@ -9,7 +9,7 @@ from apps.enrollment.courses.models import Semester, Group, Course, Term, \
      CourseEntity, Type, Classroom
 from apps.users.models import Employee
 
-XSCHEMA = os.path.join(settings.PROJECT_PATH, 'enrollment/courses/admin/xml/semesterschedule.xsd')
+XSCHEMA = os.path.join(settings.BASE_DIR, 'enrollment/courses/admin/xml/semesterschedule.xsd')
 
 
 @transaction.atomic
