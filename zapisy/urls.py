@@ -5,7 +5,7 @@ import settings
 from django.conf.urls import include, patterns, url
 from django.contrib import admin
 from django.views.generic import TemplateView
-from feeds import LatestNews
+from apps.feeds import LatestNews
 from django_cas_ng import views
 
 admin.autodiscover()
