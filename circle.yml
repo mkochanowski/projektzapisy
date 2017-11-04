@@ -20,7 +20,7 @@ test:
   override:
     - mkdir logs
     - npm run build
-    - python manage.py collectstatic -y
+    - python manage.py collectstatic --noinput
     # - python manage.py test test_app --nomigrations
     # - coverage run manage.py test test_app
     - coverage run manage.py test apps.news.tests --nomigrations
