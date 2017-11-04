@@ -190,3 +190,7 @@ apt-get -y install redis-server
 # This can be removed after upgrading Ubuntu.
 pip install --upgrade pip
 pip install --upgrade virtualenv
+
+# Install nodejs
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs

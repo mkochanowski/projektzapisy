@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "es6",
+    "alwaysStrict": true,
+    "module": "commonjs"
+  },
+  "include": [
+    "assets/tsfix/index.ts"
+  ]
+}
