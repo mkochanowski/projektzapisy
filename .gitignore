@@ -19,3 +19,7 @@ a_dump_20160301.sql
 .DS_Store
 zapisy/logs/
 personal/
+static/
+node_modules/
+asset_bundles/
+webpack-stats.json

@@ -1,5 +1,6 @@
 {% extends "enrollment/courses/base.html" %}
 {% load url from future %}
+{% load render_bundle from webpack_loader %}
 
 {% load fereol_common %}
 {% load compressed %}
@@ -17,6 +18,7 @@
 {% endblock %}
 
 {% block bread %}
+    {% render_bundle "course-details" %}
     <a href="/">{% trans "Strona główna" %}</a> &raquo;
     <a href="/">{% trans "System Zapisów" %}</a> &raquo;
     <a href="/">{% trans "Przedmioty" %}</a> &raquo;
