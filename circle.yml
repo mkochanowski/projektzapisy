@@ -4,6 +4,8 @@ general:
 machine:
   python:
     version: 2.7.10
+  node:
+    version: 6.11.5
 
 dependencies:
   override:
