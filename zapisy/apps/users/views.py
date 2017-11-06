@@ -1,27 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import vobject
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
-from django.views.decorators.http import require_POST
 from django.contrib.auth.views import login
 from django.shortcuts import render_to_response, redirect
-from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from django.http import QueryDict, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils.translation import check_for_language
-from django.db.models import Q
 
 from django.conf import settings
 from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.offer.vote.models.single_vote import SingleVote
 
-from apps.users.exceptions import NonUserException, NonEmployeeException,\
-                                 NonStudentException
 from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException
 from apps.users.utils import prepare_ajax_students_list,\
                              prepare_ajax_employee_list
@@ -35,19 +31,17 @@ from apps.users.forms import EmailChangeForm, BankAccountChangeForm, Consultatio
 
 from apps.enrollment.records.utils import *
 
-from datetime import timedelta
-from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
+from libs.ajax_messages import AjaxSuccessMessage
 import datetime
 from mailer.models import Message
 
 import logging
 import json
 
-from django.core.cache import cache as mcache
+
 from apps.notifications.forms import NotificationFormset
 from apps.notifications.models import NotificationPreferences
 logger = logging.getLogger()
-import vobject
 
 
 GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',

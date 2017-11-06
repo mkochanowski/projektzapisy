@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.http import urlquote
 from functools import update_wrapper

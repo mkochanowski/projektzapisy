@@ -5,8 +5,7 @@ import json
 from django import http
 from django.db.models import Q
 from django.http import Http404
-from django.views.generic.list import MultipleObjectMixin, BaseListView
-from django.views.generic import View
+from django.views.generic.list import BaseListView
 
 class FullCalendarAdapter(object):
 

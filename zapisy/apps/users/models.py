@@ -3,14 +3,11 @@
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 from django.core.mail import send_mail
-from django.db.models import Q, Sum
 from django.db.models.loading import cache
-from django.db.models.query import EmptyQuerySet
 from django.template import Context
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
-from django.core.cache import cache as mcache
 import datetime
 from apps.users.managers import GettersManager, T0Manager
 

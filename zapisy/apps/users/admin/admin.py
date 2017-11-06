@@ -2,10 +2,10 @@
 import unicodecsv
 from django.http import HttpResponse
 from django.contrib import admin
-from django import forms
 from django.contrib.auth.models import User
 
-from apps.users.models import Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, ExtendedUser, UserProfile, StudiaZamawiane2012
+from apps.users.models import (Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, UserProfile,
+    StudiaZamawiane2012)
 from apps.enrollment.courses.models import Semester
 from apps.enrollment.records.models import Record
 
@@ -117,12 +117,11 @@ class StudiaZamawianeAdmin2012(admin.ModelAdmin):
        qs = super(StudiaZamawianeAdmin2012, self).queryset(request)
        return qs.select_related('student', 'student__user')
 
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin as UA
 
 
 
-class UserAdmin(UserAdmin):
+class UserAdmin(UA):
     inlines =  [StudentInline, ProfileInline, EmployeeInline]
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
     list_filter = ('is_active', 'is_staff', 'profile__is_student',
@@ -133,7 +132,6 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
-#admin.site.register(ExtendedUser, ExtendedUserAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Program, ProgramAdmin)
