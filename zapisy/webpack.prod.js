@@ -8,7 +8,7 @@ module.exports = merge(common({
 }), {
 	plugins: [
 		new UglifyJSPlugin({
-			sourceMap: true,
+			sourceMap: false,
 			compress: true,
 			output: {comments: false},
 			comments: false,

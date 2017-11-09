@@ -6,12 +6,12 @@ module.exports = {
 		]
 	},
 	rawfiles: [
-		"css/",
-		"help/",
-		"images/",
-		"js/",
-		"vendor/",
-		"favicon.ico",
-		"feed-icon.png",
+		{ src: "legacy_assets/css/", dest: "css/" },
+		{ src: "legacy_assets/help/", dest: "help/" },
+		{ src: "legacy_assets/images/", dest: "images/" },
+		{ src: "legacy_assets/js/", dest: "js/" },
+		{ src: "legacy_assets/vendor/", dest: "vendor/" },
+		{ src: "legacy_assets/favicon.ico", dest: "favicon.ico" },
+		{ src: "legacy_assets/feed-icon.png", dest: "feed-icon.png" },
     ],
 };

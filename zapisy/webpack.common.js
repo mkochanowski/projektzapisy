@@ -34,9 +34,15 @@ function processBundles(bundles) {
 
 function processRawfiles(rawfiles) {
   return rawfiles.map(rawfile => {
+    if (typeof rawfile === "string") {
+      return {
+        from: `./${BUNDLE_SOURCE_DIR}/${rawfile}`,
+        to: rawfile,
+      };
+    }
     return {
-      from: `./${BUNDLE_SOURCE_DIR}/${rawfile}`,
-      to: rawfile,
+      from: `./${BUNDLE_SOURCE_DIR}/${rawfile.src}`,
+      to: rawfile.dest,
     };
   });
 }
