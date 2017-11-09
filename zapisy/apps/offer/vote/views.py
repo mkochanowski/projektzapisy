@@ -20,6 +20,7 @@ from apps.enrollment.courses.models import Type
 
 from apps.users.decorators      import student_required
 
+
 @student_required
 def vote( request ):
     from vote_form import VoteFormsets
@@ -58,6 +59,7 @@ def vote( request ):
 
     return render_to_response ('offer/vote/form.html', data, context_instance = RequestContext( request ))
 
+
 @login_required
 def vote_main( request ):
     """
@@ -66,6 +68,7 @@ def vote_main( request ):
     sytem_state = SystemState.get_state()
     data        = { 'isVoteActive' : sytem_state.is_system_active(), 'max_points': sytem_state.max_points }
     return render_to_response ('offer/vote/index.html', data, context_instance = RequestContext( request ))
+
 
 @student_required
 def vote_view( request ):
@@ -76,6 +79,7 @@ def vote_view( request ):
     is_voting_active = SystemState.get_state(date.today().year).is_system_active()
 
     return TemplateResponse(request, 'offer/vote/view.html', locals())
+
 
 @login_required
 def vote_summary( request ):
