@@ -77,7 +77,7 @@ def vote_view( request ):
 
     return TemplateResponse(request, 'offer/vote/view.html', locals())
 
-
+@login_required
 def vote_summary( request ):
     """
         summary for vote
