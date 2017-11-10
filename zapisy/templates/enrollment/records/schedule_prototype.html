@@ -46,8 +46,8 @@
 	{% block messages %}{% endblock %}{% include 'common/messages.html' %}
 
     <div id="scheduleData">
-      <input type="hidden" id="courses_list_json" value="{{ courses_json }}" />
-      <input type="hidden" id="courses_groups" value="{{ groups_json }}" />
+	  <script type="application/json" id="courses_list_json">{{ courses_json|safe }}</script>
+	  <script type="application/json" id="courses_groups">{{ groups_json|safe }}</script>
       <input type="hidden" id="isLeavingAllowed" value="{{ allow_leave_course }}" />
       <input type="hidden" name="ajax-set-enrolled-url" value="{% url 'records-set-enrolled' '.json' %}" />
       <input type="hidden" name="ajax-set-pinned-url" value="{% url 'schedule-prototype-set-pinned' %}" />
