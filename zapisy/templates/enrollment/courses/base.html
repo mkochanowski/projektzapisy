@@ -25,8 +25,8 @@
 			<div class="semester" id="mainCoursesContainer">
 				{# Translators: Tytuł nad sidebarem  #}
 				<h3>{% trans "Semestr" %}
-					<span id="current_semester_year">{{ default_semester.year }}</span>&nbsp;
-					<span id="current_semester_type">{{ default_semester.get_type_display }}</span>
+					<span id="current_semester_year">{{ default_semester.year }}</span>&nbsp;<span 
+						id="current_semester_type">{{ default_semester.get_type_display }}</span>
 				</h3>
 				<input type="hidden" id="semester_id" value="{{ default_semester.id }}" />
 				<!-- The course list the server sends to us when we first load the page,

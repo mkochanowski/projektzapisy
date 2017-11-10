@@ -36,6 +36,7 @@ CoursesList.prototype.initCourseLists = function()
     this.setCoursesFromData();
 };
 
+const listChangedEvent = new Event("CoursesListChanged");
 CoursesList.prototype.setCoursesFromData = function()
 {
     // Using this.courses and this.currentSemester, update the UI;
@@ -47,6 +48,9 @@ CoursesList.prototype.setCoursesFromData = function()
     {
         self.addNewCourse(course);
     });
+
+    // Let the ajax course list code know the list changed
+    document.dispatchEvent(listChangedEvent);
     
     $("#current_semester_year").text(this.currentSemester.year);
     $("#current_semester_type").text(this.currentSemester.type);
@@ -122,7 +126,8 @@ CoursesList.prototype.addNewCourse = function(course)
     
     let courseLink = $("<a/>", {
              "href" : course.url,
-             "text" : course.name
+             "text" : course.name,
+             "class" : "course-link"
         });
     course["htmlNode"] = $("<li/>");
     courseLink.appendTo(course["htmlNode"]);
