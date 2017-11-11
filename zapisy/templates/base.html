@@ -1,6 +1,9 @@
 {% load fereol_common %}
 {% load compressed %}
 {% load staticfiles %}
+{% load settings_value %}
+{% load osenv_value %}
+{% load django_version %}
 {% load i18n %}
 <!DOCTYPE html>
 <html lang="pl">
@@ -260,8 +263,10 @@
     <footer>
         <p>
             {# <a href="{% url 'on-mobile' %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
-            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>{% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@cs.uni.wroc.pl">zapisy@cs.uni.wroc.pl</a>{% endif %} | Błędy i uwagi: <a href="https://tracker-zapisy.ii.uni.wroc.pl/">[link]</a> Wygenerowano: {% now "H:i:s" %}</p>
-
+            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>
+            {% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@cs.uni.wroc.pl">zapisy@cs.uni.wroc.pl</a>{% endif %}
+            | Błędy i uwagi: <a href="https://tracker-zapisy.ii.uni.wroc.pl/">[link]</a> Wygenerowano: {% now "H:i:s" %}
+            {% if "DEBUG"|settings_value == lol or "II_ZAPISY"|osenv_value == "True" %}| <strong>Django {% django_version %}</strong>{% endif %}
     </footer>
 
 </div>
