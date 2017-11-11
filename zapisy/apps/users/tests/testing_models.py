@@ -178,7 +178,6 @@ class MailsToStudentsLinkTestCase(TestCase):
         for sql_call in sql_calls:
             cursor = connection.cursor()
             cursor.execute(sql_call)
-            connection.commit()
     
         cls.MSG_HEADER = 'Wyślij wiadomość do studentów'
         regular_user = User.objects.create_user('regular_user', 'user@user.com', 'password')
@@ -202,7 +201,6 @@ class MailsToStudentsLinkTestCase(TestCase):
         for sql_call in sql_calls:
             cursor = connection.cursor()
             cursor.execute(sql_call)
-            connection.commit()
 
     def test_mailto_link_not_exists_regular_user(self):
         self.client.login(username='regular_user', password='password')
@@ -232,7 +230,6 @@ class MyProfileSemesterInfoTestCase(TestCase):
         for sql_call in sql_calls:
             cursor = connection.cursor()
             cursor.execute(sql_call)
-            connection.commit()
 
         student_user = User.objects.create_user('student_user', 'student@user.com', 'password')
         s = Student.objects.create(user=student_user, matricula=str(randint(100000, 200000)))
