@@ -13,6 +13,7 @@ from apps.enrollment.courses.models import Course, Term, Group
 from apps.users.models import Employee, Student, StudiaZamawiane
 from apps.users.exceptions import NonEmployeeException, NonStudentException
 from django.contrib.auth.models import Permission
+from django.db import connection
 
 from apps.users.tests.factories import UserFactory, StudentFactory
 from apps.enrollment.courses.models import Semester
@@ -164,6 +165,21 @@ class IBANTest(TestCase):
 class MailsToStudentsLinkTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
+        sql_calls = [
+            """
+                CREATE TABLE courses_studentpointsview (
+                    value smallint,
+                    student_id integer,
+                    entity_id integer
+                );
+            """
+            ]
+
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
+    
         cls.MSG_HEADER = 'Wyślij wiadomość do studentów'
         regular_user = User.objects.create_user('regular_user', 'user@user.com', 'password')
         Student.objects.create(user=regular_user)
@@ -177,6 +193,16 @@ class MailsToStudentsLinkTestCase(TestCase):
         from apps.enrollment.courses.tests.factories import SemesterFactory
         summer_semester = SemesterFactory(type=Semester.TYPE_SUMMER)
         summer_semester.full_clean()
+        
+    @classmethod
+    def tearDownClass(cls):
+        sql_calls = [
+            "DROP TABLE courses_studentpointsview;",
+        ]
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
 
     def test_mailto_link_not_exists_regular_user(self):
         self.client.login(username='regular_user', password='password')
@@ -193,6 +219,21 @@ class MailsToStudentsLinkTestCase(TestCase):
 class MyProfileSemesterInfoTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
+        sql_calls = [
+            """
+                CREATE TABLE courses_studentpointsview (
+                    value smallint,
+                    student_id integer,
+                    entity_id integer
+                );
+            """
+            ]
+
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
+
         student_user = User.objects.create_user('student_user', 'student@user.com', 'password')
         s = Student.objects.create(user=student_user, matricula=str(randint(100000, 200000)))
         student_user.save()
@@ -210,6 +251,16 @@ class MyProfileSemesterInfoTestCase(TestCase):
         )
         cls.semester.full_clean()
         cls.semester.save()
+
+    @classmethod
+    def tearDownClass(cls):
+        sql_calls = [
+            "DROP TABLE courses_studentpointsview;",
+        ]
+        for sql_call in sql_calls:
+            cursor = connection.cursor()
+            cursor.execute(sql_call)
+            connection.commit()
     
     def test_my_profile_contains_records_closing_time(self):
         self.semester.records_ending = datetime.now()+timedelta(days=10)
