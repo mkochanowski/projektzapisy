@@ -2,7 +2,7 @@ module.exports = {
 	bundles: {
 		"course-details": [
 			"enrollment/courses/courseDetailsTest.ts",
-			"enrollment/courses/testStyle.less",
+			"enrollment/courses/testStyle.less"
 		]
 	},
 	rawfiles: [
@@ -12,6 +12,9 @@ module.exports = {
 		{ src: "legacy_assets/js/", dest: "js/" },
 		{ src: "legacy_assets/vendor/", dest: "vendor/" },
 		{ src: "legacy_assets/favicon.ico", dest: "favicon.ico" },
-		{ src: "legacy_assets/feed-icon.png", dest: "feed-icon.png" },
-    ],
+		{ src: "legacy_assets/feed-icon.png", dest: "feed-icon.png" }
+	],
+	otherDefs: [
+		"./apps/enrollment/courses/asset-defs",
+	],
 };

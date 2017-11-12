@@ -4,9 +4,9 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --config webpack.dev.js",
-    "devw": "webpack --watch --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js"
+    "dev": "webpack --config webpack.dev.ts",
+    "devw": "webpack --watch --config webpack.dev.ts",
+    "build": "webpack --config webpack.prod.ts"
   },
   "repository": {
     "type": "git",
@@ -20,12 +20,14 @@
   "homepage": "https://github.com/iiuni/projektzapisy#README",
   "dependencies": {
     "babel-runtime": "^6.26.0",
-    "jquery": "^3.2.1"
+    "jquery": "^3.2.1",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "@types/clipboard": "^1.5.35",
     "@types/jquery": "^3.2.15",
     "@types/js-cookie": "^2.1.0",
+    "@types/node": "^8.0.51",
     "@types/webpack-env": "^1.13.2",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
@@ -41,6 +43,7 @@
     "less-loader": "^4.0.5",
     "style-loader": "^0.19.0",
     "ts-loader": "^3.1.0",
+    "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "tslint-config-standard": "^7.0.0",
     "typescript": "^2.5.3",
