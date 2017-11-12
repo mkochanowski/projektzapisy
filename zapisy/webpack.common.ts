@@ -39,7 +39,7 @@ function importDefs(fileName: string): AssetDefs {
 		bundles: {},
 		rawfiles: [],
 	};
-	const getFullInputPath = inputPath => path.join(dirPath, inputPath);
+	const getFullInputPath = inputPath => "./" + path.join(dirPath, inputPath);
 	for (const bundleName in defs.bundles || {}) {
 		const fullBundleName = `${dirName}-${bundleName}`;
 		const fullBundlePaths = defs.bundles[bundleName].map(bundlePath => {
