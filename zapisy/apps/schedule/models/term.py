@@ -86,7 +86,7 @@ class Term(models.Model):
         if self.room:
             if not self.room.can_reserve:
                 raise ValidationError(
-                    message={'classroom': [u'Ta sala nie jest przeznaczona do rezerwacji']},
+                    message={'room': [u'Ta sala nie jest przeznaczona do rezerwacji']},
                     code='invalid'
                 )
 
