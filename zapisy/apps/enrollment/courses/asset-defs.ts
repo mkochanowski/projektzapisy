@@ -1,12 +1,8 @@
 module.exports = {
 	bundles: {
-		"course-stuff": [
-			"assets/script.ts",
-			"assets/style.less"
+		"course-details": [
+			"./assets/courseDetailsTest.ts",
+			"./assets/testStyle.less"
 		]
 	},
-	rawfiles: [
-		{ src: "assets/raw1", dest: "rawasset1" },
-		"assets/raw2"
-	]
 };

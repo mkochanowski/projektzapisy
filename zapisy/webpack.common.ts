@@ -6,7 +6,6 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const BUNDLE_SOURCE_DIR = "assets";
 const BUNDLE_TARGET_DIR = "asset_bundles";
 
 // the path(s) that should be cleaned
@@ -20,14 +19,13 @@ const cleanOptions = {
 	dry:      false
 };
 
-type RawfileFullDef = {
+type RawfileDef = {
 	src: string,
 	dest: string
 };
-type RawfileDef = string | RawfileFullDef;
 
 type AssetDefs = {
-	bundles: {
+	bundles?: {
 		[key: string]: Array<string>
 	},
 	rawfiles?: Array<RawfileDef>
@@ -38,10 +36,11 @@ function importDefs(fileName: string): AssetDefs {
 	const dirName = path.basename(dirPath);
 	const defs: AssetDefs = require(fileName);
 	const result: AssetDefs = {
-		bundles: {}
+		bundles: {},
+		rawfiles: [],
 	};
 	const getFullInputPath = inputPath => path.join(dirPath, inputPath);
-	for (const bundleName in defs.bundles) {
+	for (const bundleName in defs.bundles || {}) {
 		const fullBundleName = `${dirName}-${bundleName}`;
 		const fullBundlePaths = defs.bundles[bundleName].map(bundlePath => {
 			return getFullInputPath(bundlePath);
@@ -53,57 +52,21 @@ function importDefs(fileName: string): AssetDefs {
 			return path.join(dirName, rawfilePath);
 		};
 		result.rawfiles = defs.rawfiles.map(rawfileDef => {
-			if (typeof rawfileDef === "string") {
-				return {
-					src: getFullInputPath(rawfileDef),
-					dest: getRawfileOutputPath(rawfileDef)
-				};
-			} else if (typeof rawfileDef === "object") {
-				return {
-					src: getFullInputPath(rawfileDef.src),
-					dest: getRawfileOutputPath(rawfileDef.dest)
-				};
-			}
-		});
-	}
-	return result;
-}
-
-function processBundles(bundles) {
-	const result = {};
-	for (const bundleName in bundles) {
-		const fileList = bundles[bundleName].map(fileName => {
-			return `./${BUNDLE_SOURCE_DIR}/${fileName}`;
-		});
-		result[bundleName] = fileList;
-	}
-	return result;
-}
-
-function processRawfiles(rawfiles) {
-	return rawfiles.map(rawfile => {
-		if (typeof rawfile === "string") {
 			return {
-				from: `./${BUNDLE_SOURCE_DIR}/${rawfile}`,
-				to: rawfile
+				src: getFullInputPath(rawfileDef.src),
+				dest: getRawfileOutputPath(rawfileDef.dest)
 			};
-		}
-		return {
-			from: `./${BUNDLE_SOURCE_DIR}/${rawfile.src}`,
-			to: rawfile.dest
-		};
-	});
+		});
+	}
+	return result;
 }
 
 function getAllAssetDefs() {
 	const globalDefs = require("./asset-defs");
 	const result = {
-		bundles: globalDefs.bundles,
-		rawfiles: [],
+		bundles: globalDefs.bundles || {},
+		rawfiles: globalDefs.rawfiles || [],
 	};
-	if (globalDefs.rawfiles) {
-		result.rawfiles = globalDefs.rawfiles;
-	}
 	for (const defPath of globalDefs.otherDefs) {
 		const def = importDefs(defPath);
 		Object.assign(result.bundles, def.bundles);
@@ -123,24 +86,25 @@ function isExternal(module) {
 }
 
 const allAssetDefs = getAllAssetDefs();
+console.log(allAssetDefs);
 module.exports = function(config) {
 	return {
-		entry: processBundles(allAssetDefs.bundles),
+		entry: allAssetDefs.bundles,
 		output: {
 			path: path.resolve(`./${BUNDLE_TARGET_DIR}/`),
 			filename: "[name]-[hash].min.js"
 		},
 		module: {
 			rules: [
-			// TypeScript source:
-			// 1) tsc: TS -> ES6
-			// 2) babel: ES6 -> ES5 (and polyfilling)
+				// TypeScript source:
+				// 1) tsc: TS -> ES6
+				// 2) babel: ES6 -> ES5 (and polyfilling)
 				{
 					test: /\.ts?$/,
 					loaders: ["babel-loader", "ts-loader"],
 					exclude: /node_modules/
 				},
-			// ES6 source: babel converts to ES5 (and polyfills)
+				// ES6 source: babel converts to ES5 (and polyfills)
 				{
 					test: /\.js?$/,
 					loader: "babel-loader",
@@ -176,9 +140,9 @@ module.exports = function(config) {
 				allChunks: true
 			}),
 			new BundleTracker({ filename: "./webpack-stats.json" }),
-		// This will copy "raw" assets - ones where we don't want any transformations
-		// (e.g. bootstrap styles)
-			new CopyWebpackPlugin(processRawfiles(allAssetDefs.rawfiles))
+			// This will copy "raw" assets - ones where we don't want any transformations
+			// (e.g. bootstrap styles)
+			new CopyWebpackPlugin(allAssetDefs.rawfiles),
 		]
 	};
 };

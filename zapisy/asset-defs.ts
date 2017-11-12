@@ -1,20 +1,20 @@
 module.exports = {
 	bundles: {
-		"course-details": [
-			"enrollment/courses/courseDetailsTest.ts",
-			"enrollment/courses/testStyle.less"
-		]
+		"courses-course-details":
+		[
+			"./assets/test.ts",
+		],
 	},
 	rawfiles: [
-		{ src: "legacy_assets/css/", dest: "css/" },
-		{ src: "legacy_assets/help/", dest: "help/" },
-		{ src: "legacy_assets/images/", dest: "images/" },
-		{ src: "legacy_assets/js/", dest: "js/" },
-		{ src: "legacy_assets/vendor/", dest: "vendor/" },
-		{ src: "legacy_assets/favicon.ico", dest: "favicon.ico" },
-		{ src: "legacy_assets/feed-icon.png", dest: "feed-icon.png" }
+		{ src: "assets/legacy/css/", dest: "css/" },
+		{ src: "assets/legacy/help/", dest: "help/" },
+		{ src: "assets/legacy/images/", dest: "images/" },
+		{ src: "assets/legacy/js/", dest: "js/" },
+		{ src: "assets/legacy/vendor/", dest: "vendor/" },
+		{ src: "assets/legacy/favicon.ico", dest: "favicon.ico" },
+		{ src: "assets/legacy/feed-icon.png", dest: "feed-icon.png" }
 	],
 	otherDefs: [
-		"./apps/enrollment/courses/asset-defs",
+		// "./apps/enrollment/courses/asset-defs",
 	],
 };
