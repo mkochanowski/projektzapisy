@@ -74,13 +74,13 @@ class CourseAdmin(admin.ModelAdmin):
             request.META['QUERY_STRING'] = request.GET.urlencode()
         return super(CourseAdmin,self).changelist_view(request, extra_context=extra_context)
 
-    def get_object(self, request, object_id):
+    def get_object(self, request, object_id, from_field=None):
         """
         Returns an instance matching the primary key provided. ``None``  is
         returned if no match is found (or the object_id failed validation
         against the primary key field).
         """
-        queryset = self.queryset(request)
+        queryset = self.get_queryset(request)
         model = queryset.model
         try:
             object_id = model._meta.pk.to_python(object_id)
@@ -88,12 +88,12 @@ class CourseAdmin(admin.ModelAdmin):
         except (model.DoesNotExist, ValidationError):
             return None
 
-    def queryset(self, request):
+    def get_queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
        display those for the currently signed in user.
        """
-       qs = super(CourseAdmin, self).queryset(request)
+       qs = super(CourseAdmin, self).get_queryset(request)
        return qs.select_related('semester', 'type')
 
 class ClassroomAdmin(admin.ModelAdmin):
@@ -168,12 +168,12 @@ class CourseEntityAdmin(TranslationAdmin):
 
     inlines = [PointsInline, TagsInline]
 
-    def queryset(self, request):
+    def get_queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
        display those for the currently signed in user.
        """
-       qs = super(CourseEntityAdmin, self).queryset(request)
+       qs = super(CourseEntityAdmin, self).get_queryset(request)
        return qs.select_related('owner', 'owner__user', 'type')
 
 class TermInline(admin.TabularInline):
@@ -361,12 +361,12 @@ class GroupAdmin(admin.ModelAdmin):
             request.META['QUERY_STRING'] = request.GET.urlencode()
         return super(GroupAdmin,self).changelist_view(request, extra_context=extra_context)
 
-    def queryset(self, request):
+    def get_queryset(self, request):
        """
        Filter the objects displayed in the change_list to only
        display those for the currently signed in user.
        """
-       qs = super(GroupAdmin, self).queryset(request)
+       qs = super(GroupAdmin, self).get_queryset(request)
        return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type').prefetch_related('term')
 
     class Media:
