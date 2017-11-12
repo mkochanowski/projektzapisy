@@ -302,7 +302,7 @@ class GroupAdmin(admin.ModelAdmin):
                                           Q(day__lte=semester.lectures_ending))\
                           .values_list('day', flat=True)
         changed = ChangedDay.objects.filter(Q(day__gte=semester.lectures_beginning), Q(day__lte=semester.lectures_ending)).values_list('day', 'weekday')
-        terms = T.objects.filter(group=obj).select_related('group', 'group__course', 'group__course__courseentity')
+        terms = T.objects.filter(group=obj).select_related('group', 'group__course', 'group__course__entity')
         days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
 
         day = semester.lectures_beginning
@@ -367,7 +367,7 @@ class GroupAdmin(admin.ModelAdmin):
        display those for the currently signed in user.
        """
        qs = super(GroupAdmin, self).get_queryset(request)
-       return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester', 'course__type').prefetch_related('term')
+       return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester').prefetch_related('term')
 
     class Media:
         css = {
