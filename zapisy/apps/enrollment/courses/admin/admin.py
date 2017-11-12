@@ -94,7 +94,7 @@ class CourseAdmin(admin.ModelAdmin):
        display those for the currently signed in user.
        """
        qs = super(CourseAdmin, self).get_queryset(request)
-       return qs.select_related('semester', 'type')
+       return qs.select_related('semester')
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('number', 'capacity', 'building')
