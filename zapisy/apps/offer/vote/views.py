@@ -16,7 +16,6 @@ from django.template.response import TemplateResponse
 from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.offer.vote.models                   import SingleVote, SystemState
-from apps.offer.proposal.models               import Proposal
 from apps.enrollment.courses.models import Type
 
 from apps.users.decorators      import student_required
@@ -86,22 +85,20 @@ def vote_summary( request ):
     summer = []
     winter = []
     unknown = []
-
+    
     year = date.today().year
     state = SystemState.get_state(year)
 
     subs = CourseEntity.get_vote()
     subs = SingleVote.add_vote_count(subs, state)
-    subs = subs.values('votes', 'voters', 'name', 'slug', 'semester')
 
     for sub in subs:
-
-        if sub['semester'] == 'z':
-            winter.append( (sub['votes'], sub['voters'], sub) )
-        elif sub['semester'] == 'l':
-            summer.append( (sub['votes'], sub['voters'], sub) )
-        else:
-            unknown.append( (sub['votes'], sub['voters'], sub) )
+        if sub.semester == 'z':
+            winter.append( (sub.votes, sub.voters, sub) )
+        elif sub.semester == 'l':
+            summer.append( (sub.votes, sub.voters, sub) )
+        elif sub.semester == 'u':
+            unknown.append( (sub.votes, sub.voters, sub) )
 
     data = { 'winter'  : winter,
              'summer'  : summer,

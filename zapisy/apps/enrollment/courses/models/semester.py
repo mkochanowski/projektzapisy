@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.core.validators import ValidationError
 from datetime import datetime, timedelta
 
-import zapisy.common as common
+import common
 
 from .term import Term
 
@@ -17,7 +17,7 @@ class GetterManager(models.Manager):
 
     def get_next(self):
         try:
-            return self.get(records_closing__gte=datetime.now())
+            return self.get(visible=True, records_closing__gte=datetime.now())
         except (ObjectDoesNotExist, MultipleObjectsReturned):
             return self.filter(visible=True).order_by('-records_closing')[0]
 
@@ -28,7 +28,7 @@ class Semester( models.Model ):
     TYPE_SUMMER = 'l'
     TYPE_CHOICES = [(TYPE_WINTER, u'zimowy'), (TYPE_SUMMER, u'letni')]
 
-    visible = models.BooleanField(verbose_name='widoczny')
+    visible = models.BooleanField(verbose_name='widoczny', default=False)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, verbose_name='rodzaj semestru')
     year = models.CharField(max_length=7, default='0', verbose_name='rok akademicki')
     records_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia zapisów', help_text='Godzina powinna być ustawiona na 00:00:00, by studenci mieli otwarcie między 10:00 a 22:00.')
@@ -43,7 +43,7 @@ class Semester( models.Model ):
     desiderata_opening = models.DateTimeField(null = True, blank=True, verbose_name='Czas otwarcia dezyderat')
     desiderata_closing = models.DateTimeField(null = True, blank=True, verbose_name='Czas zamknięcia dezyderat')
 
-    is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna' )
+    is_grade_active = models.BooleanField( verbose_name = 'Ocena aktywna', default=False)
     records_ects_limit_abolition = models.DateTimeField(null = True, verbose_name='Czas zniesienia limitu 35 ECTS')
 
     t0_are_ready = models.BooleanField( verbose_name= u'T0 zostały ustalone', default=False)
@@ -69,7 +69,7 @@ class Semester( models.Model ):
             )
 
     def can_remove_record(self):
-        return self.records_ending is None or self.records_opening <= datetime.now() <= self.records_ending
+        return self.records_ending is None or datetime.now() <= self.records_ending
     
     def is_closed(self):
         return self.records_closing is not None and self.records_closing <= datetime.now()
@@ -92,8 +92,15 @@ class Semester( models.Model ):
         """ returns name of semester """
         #TODO: wymuszanie formatu roku "XXXX/YY" zamiast "XXXX"
         if len(self.year) != 7:
-            return '%s %s (BLAD)' % (self.get_type_display() , self.year)
-        return '%s %s' % (self.year, self.get_type_display())
+            return u'(BŁĄD) {0} {1}'.format(self.year, self.get_type_display())
+        return '{0} {1}'.format(self.year, self.get_type_display())
+
+    def get_short_name(self):
+        if self.type == self.TYPE_WINTER:
+            return 'zima {0}'.format(self.year)
+        elif self.type == self.TYPE_SUMMER:
+            return 'lato {0}'.format(self.year)
+        return self.year
 
     def is_current_semester(self):
         """ Answers to question: is semester current semester"""
@@ -258,6 +265,13 @@ class Semester( models.Model ):
         return (self.desiderata_opening <= now and self.desiderata_closing is None) or\
             (self.desiderata_opening <= now and self.desiderata_closing >= now)
 
+    def serialize_for_json(self):
+        return {
+            "id": self.pk,
+            "year": self.year,
+            "type": self.get_type_display()
+        }
+
     @staticmethod
     def is_visible(id):
         """ Answers if course is sat as visible (displayed on course lists) """
@@ -275,9 +289,10 @@ class Semester( models.Model ):
     def __unicode__(self):
         return self.get_name()
 
-class Freeday(models.Model):
-    day = models.DateField(verbose_name='dzień wolny')
 
+class Freeday(models.Model):
+    day = models.DateField(verbose_name='dzień wolny', unique=True)
+    
     @classmethod
     def is_free(cls, date):
         """
@@ -301,7 +316,7 @@ class Freeday(models.Model):
 
 
 class ChangedDay(models.Model):
-    day = models.DateField(verbose_name='dzień')
+    day = models.DateField(verbose_name='dzień wolny', unique=True)
     weekday = models.CharField(choices=common.DAYS_OF_WEEK, max_length=1, verbose_name='zmieniony na')
 
     def clean(self):

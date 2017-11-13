@@ -4,7 +4,7 @@ from django.core.validators import ValidationError
 from datetime import date, datetime
 from apps.schedule.models import Event
 
-import zapisy.common as common
+import common
 
 from apps.enrollment.courses.models import Semester, Term as CourseTerm
 
@@ -30,26 +30,26 @@ class SpecialReservationQuerySet(models.query.QuerySet):
 
 
 class SpecialReservationManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         return SpecialReservationQuerySet(self.model, using=self._db)
 
     def on_day_of_week(self, day_of_week):
-        return self.get_query_set().on_day_of_week(day_of_week)
+        return self.get_queryset().on_day_of_week(day_of_week)
 
     def this_semester(self):
-        return self.get_query_set().this_semester()
+        return self.get_queryset().this_semester()
 
     def any_semester(self, semester):
-        return self.get_query_set().any_semester(semester)
+        return self.get_queryset().any_semester(semester)
 
     def in_classroom(self, classroom):
-        return self.get_query_set().in_classroom(classroom)
+        return self.get_queryset().in_classroom(classroom)
 
     def in_classrooms(self, classrooms):
-        return self.get_query_set().in_classrooms(classrooms)
+        return self.get_queryset().in_classrooms(classrooms)
 
     def between_hours(self, start_time, end_time):
-        return self.get_query_set().between_hours(start_time, end_time)
+        return self.get_queryset().between_hours(start_time, end_time)
 
 
 class SpecialReservation(models.Model):
@@ -150,7 +150,7 @@ class SpecialReservation(models.Model):
         verbose_name = u'rezerwacja stała'
         verbose_name_plural = u'rezerwacje stałe'
 
-    def create_event(self):
+    def create_event(self, author_id):
         from .term import Term
         from .event import Event
 
@@ -165,7 +165,7 @@ class SpecialReservation(models.Model):
         ev.type = Event.TYPE_GENERIC
         ev.visible = True
         ev.status = Event.STATUS_ACCEPTED
-        ev.author_id = 1
+        ev.author_id = author_id
         ev.save()
 
         term_days = semester.get_all_days_of_week(day_of_week=self.dayOfWeek, start_date=max(datetime.now().date(), semester.lectures_beginning))
@@ -179,9 +179,9 @@ class SpecialReservation(models.Model):
             term.room = self.classroom
             term.save()
 
-    def save(self, *args, **kwargs):
+    def save(self, author_id=1, *args, **kwargs):
         super(SpecialReservation, self).save(*args, **kwargs)
-        self.create_event()
+        self.create_event(author_id)
 
     def __unicode__(self):
         return u'%s: %s - %s %s - %s' % (self.semester, self.title, self.get_dayOfWeek_display(),

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+import datetime
 
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.core.exceptions import ValidationError
 from django.db.models.query import EmptyQuerySet
-from django.forms import ModelForm
+from django import forms
 from modeltranslation.admin import TranslationAdmin
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from apps.enrollment.courses.models import *
 from apps.enrollment.records.models import Record, Queue
@@ -17,31 +19,34 @@ class GroupInline(admin.TabularInline):
     raw_id_fields = ("teacher",)
 
 
-class CourseForm(ModelForm):
+class CourseForm(forms.ModelForm):
 
     class Meta:
         model = Course
+        fields = '__all__' 
 
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
-        if 'instance' in kwargs:
-            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance'].entity)\
+        instance = kwargs['instance'] if 'instance' in kwargs else None
+        if instance is not None:
+            self.fields['information'].queryset = CourseDescription.objects.filter(entity=instance.entity)\
                 .select_related('entity')
         else:
-            self.fields['information'].queryset = EmptyQuerySet()
+            self.fields['information'].queryset = CourseDescription.objects.none()
 
-
-class CourseEntityForm(ModelForm):
+class CourseEntityForm(forms.ModelForm):
 
     class Meta:
         model = CourseEntity
+        fields = '__all__' 
 
     def __init__(self, *args, **kwargs):
         super(CourseEntityForm, self).__init__(*args, **kwargs)
-        if 'instance' in kwargs:
-            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance']).select_related('entity')
+        instance = kwargs['instance'] if 'instance' in kwargs else None
+        if instance is not None:
+            self.fields['information'].queryset = CourseDescription.objects.filter(entity=instance).select_related('entity')
         else:
-            self.fields['information'].queryset = EmptyQuerySet()
+            self.fields['information'].queryset = CourseDescription.objects.none()
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -175,9 +180,10 @@ class TermInline(admin.TabularInline):
     model = Term
     extra = 0
 
-class RecordInlineForm(ModelForm):
+class RecordInlineForm(forms.ModelForm):
     class Meta:
         model = Record
+        fields = '__all__' 
 
     # def save(self, commit=True):
     #
@@ -216,9 +222,10 @@ class RecordInline(admin.TabularInline):
     readonly_fields = ('id', 'student', 'status')
     can_delete = False
 
-class QueuedInlineForm(ModelForm):
+class QueuedInlineForm(forms.ModelForm):
     class Meta:
         model = Queue
+        fields = '__all__' 
 
     # def save(self, commit=True):
     #     queue = super(QueuedInlineForm, self).save(commit=False)
@@ -336,8 +343,8 @@ class GroupAdmin(admin.ModelAdmin):
                     newTerm = Term()
                     newTerm.event = ev
                     newTerm.day = day
-                    newTerm.start = timedelta(hours=t.start_time.hour, minutes=t.start_time.minute)
-                    newTerm.end = timedelta(hours=t.end_time.hour, minutes=t.end_time.minute)
+                    newTerm.start = t.start_time
+                    newTerm.end = t.end_time
                     newTerm.room = room
                     newTerm.save()
 
@@ -374,7 +381,15 @@ class TypeAdmin(admin.ModelAdmin):
     list_filter = ('group','meta_type')
 
 
-
+class CourseDescriptionForm(forms.ModelForm):
+    class Meta:
+        model = CourseDescription
+        widgets = { 
+            'description_pl': forms.Textarea(attrs={'class': 'tinymce'}),
+            'description_en': forms.Textarea(attrs={'class': 'tinymce'}),
+            'requirements': FilteredSelectMultiple("wymagania", is_stacked=False)
+        }
+        fields = '__all__' 
 
 
 class CourseDescriptionAdmin(TranslationAdmin):
@@ -383,14 +398,22 @@ class CourseDescriptionAdmin(TranslationAdmin):
     list_filter = ('entity__type',)
 
     save_as = True
+    form = CourseDescriptionForm
 
     def save_model(self, request, obj, form, change):
+        """Saves the course description.
+
+        Raises:
+            Employee.DoesNotExist: If the user is not an employee.
+        """
         obj.author = request.user.employee
         obj.save()
         entity = obj.entity
         entity.information = obj
         entity.save()
-
+    class Media:
+        js = ('/site_media/js/tinymce/tinymce.min.js',
+              '/site_media/js/textareas.js',)
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(CourseDescription, CourseDescriptionAdmin)

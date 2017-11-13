@@ -6,6 +6,7 @@ from django.http import Http404
 
 from django.core.validators import ValidationError
 
+from apps.users.models import BaseUser
 
 class Event(models.Model):
     """
@@ -43,7 +44,7 @@ class Event(models.Model):
     title = models.CharField(max_length=255, verbose_name=u'Tytuł', null=True, blank=True)
     description = models.TextField(verbose_name=u'Opis', blank=True)
     type = models.CharField(choices=TYPES, max_length=1, verbose_name=u'Typ')
-    visible = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne')
+    visible = models.BooleanField(verbose_name=u'Wydarzenie jest publiczne', default=False)
 
     status = models.CharField(choices=STATUSES, max_length=1, verbose_name=u'Stan', default='0')
 
@@ -85,8 +86,7 @@ class Event(models.Model):
         if not self.pk:
 
             # if author is an employee, accept any exam and test events
-
-            if (self.author.get_profile().is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
+            if (self.author.profile.is_employee and self.type in [Event.TYPE_EXAM, Event.TYPE_TEST]) or \
                     self.author.has_perm('schedule.manage_events'):
                 self.status = self.STATUS_ACCEPTED
 
@@ -97,7 +97,7 @@ class Event(models.Model):
 
             # students can only add generic events that have to be accepted first
 
-            if self.author.get_profile().is_student and not self.author.has_perm('schedule.manage_events'):
+            if self.author.profile.is_student and not self.author.has_perm('schedule.manage_events'):
                 if self.type != Event.TYPE_GENERIC:
                     raise ValidationError(
                         message={'type': [u'Nie masz uprawnień aby dodawać wydarzenia tego typu']},
@@ -121,6 +121,17 @@ class Event(models.Model):
                         term.clean()
 
         super(Event, self).clean()
+
+    def remove(self):
+        """
+            Removing all terms bounded with given event
+
+        """
+        from .term import Term
+        terms = Term.objects.filter(event=self)
+        for term in terms:
+            term.delete()
+        self.delete()
 
     def _user_can_see_or_404(self, user):
         """

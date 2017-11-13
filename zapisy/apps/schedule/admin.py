@@ -27,9 +27,15 @@ class SpecialReservationForm(forms.ModelForm):
 
 	class Meta:
 		model = SpecialReservation
+		fields = '__all__' 
 
 class SpecialReservationAdmin(admin.ModelAdmin):
 	form = SpecialReservationForm
+
+        def save_model(self, request, obj, form, change):
+             instance = form.save(commit=False)
+             instance.save(author_id=request.user.id)
+             return instance
 
 
 class TermAdmin(admin.ModelAdmin):
