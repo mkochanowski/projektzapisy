@@ -25,52 +25,6 @@ type AssetDefs = {
 	rawfiles?: Array<RawfileDef>
 };
 
-/*
-function importDefs(fileName: string): AssetDefs {
-	const dirPath = path.dirname(fileName);
-	const dirName = path.basename(dirPath);
-	const defs: AssetDefs = require(fileName);
-	const result: AssetDefs = {
-		bundles: {},
-		rawfiles: [],
-	};
-	const getFullInputPath = inputPath => path.resolve("./", path.join(dirPath, inputPath));
-	for (const bundleName in defs.bundles || {}) {
-		const fullBundleName = `${dirName}-${bundleName}`;
-		const fullBundlePaths = defs.bundles[bundleName].map(bundlePath => {
-			return getFullInputPath(bundlePath);
-		});
-		result.bundles[fullBundleName] = fullBundlePaths;
-	}
-	if (defs.rawfiles) {
-		const getRawfileOutputPath = rawfilePath => {
-			return path.join(dirName, rawfilePath);
-		};
-		result.rawfiles = defs.rawfiles.map(rawfileDef => {
-			return {
-				src: getFullInputPath(rawfileDef.src),
-				dest: getRawfileOutputPath(rawfileDef.dest)
-			};
-		});
-	}
-	return result;
-}
-
-function getAllAssetDefs() {
-	const globalDefs = require("./asset-defs");
-	const result = {
-		bundles: globalDefs.bundles || {},
-		rawfiles: globalDefs.rawfiles || [],
-	};
-	for (const defPath of globalDefs.otherDefs) {
-		const def = importDefs(defPath);
-		Object.assign(result.bundles, def.bundles);
-		result.rawfiles = result.rawfiles.concat(def.rawfiles);
-	}
-	return result;
-}
-*/
-
 function mergeAssetDefs(defs: AssetDefs, newDefs: AssetDefs): AssetDefs {
 	Object.assign(defs.bundles, newDefs.bundles);
 	defs.rawfiles = defs.rawfiles.concat(newDefs.rawfiles);
