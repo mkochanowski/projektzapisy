@@ -1,4 +1,6 @@
 import * as path from "path";
+import * as fs from "fs";
+import { sync as globSync } from "glob";
 const webpack = require("webpack");
 const BundleTracker = require("webpack-bundle-tracker");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
@@ -6,23 +8,15 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const BUNDLE_TARGET_DIR = "asset_bundles";
-
-// the path(s) that should be cleaned
-const pathsToClean = [
-	`${BUNDLE_TARGET_DIR}/`
-];
-
-// the clean options to use
-const cleanOptions = {
-	verbose:  true,
-	dry:      false
-};
+const BUNDLE_OUTPUT_DIR = "asset_bundles";
+const ASSET_DIR = "assets";
+const ASSET_DEF_FILENAME = "asset-defs.ts";
+const ASSET_DEF_SEARCH_DIR = "apps";
 
 type RawfileDef = {
-	src: string,
-	dest: string
-};
+	from: string,
+	to: string
+} | string;
 
 type AssetDefs = {
 	bundles?: {
@@ -31,6 +25,7 @@ type AssetDefs = {
 	rawfiles?: Array<RawfileDef>
 };
 
+/*
 function importDefs(fileName: string): AssetDefs {
 	const dirPath = path.dirname(fileName);
 	const dirName = path.basename(dirPath);
@@ -74,6 +69,86 @@ function getAllAssetDefs() {
 	}
 	return result;
 }
+*/
+
+function mergeAssetDefs(defs: AssetDefs, newDefs: AssetDefs): AssetDefs {
+	Object.assign(defs.bundles, newDefs.bundles);
+	defs.rawfiles = defs.rawfiles.concat(newDefs.rawfiles);
+	return defs;
+}
+
+function getFileInputPath(packageDir: string, packageFilePath: string): string {
+	if (path.isAbsolute(packageFilePath)) {
+		return packageFilePath;
+	}
+	// All relative paths are assumed to be in ASSET_DIR, so check if it exists
+	// and throw a friendly message if it doesn't
+	const packageAssetDirPath = path.resolve(packageDir, ASSET_DIR);
+	if (!fs.existsSync(packageAssetDirPath)) {
+		throw new Error(
+			`${packageAssetDirPath} does not exist. ` +
+			`Create it and put your assets for this app there.`);
+	} else if (!fs.lstatSync(packageAssetDirPath).isDirectory()) {
+		throw new Error(
+			`${packageAssetDirPath} is not a directory. ` +
+			`It should be a directory containing all your assets for this app`);
+	}
+	return path.resolve(packageDir, ASSET_DIR, packageFilePath);
+}
+
+function processDefs(defs: AssetDefs, packageName: string, packageDir: string): AssetDefs {
+	const result: AssetDefs = {
+		bundles: {},
+		rawfiles: [],
+	};
+	for (const bundle in defs.bundles || {}) {
+		const fullName = packageName.length ? `${packageName}-${bundle}` : packageName;
+		result.bundles[fullName] = defs.bundles[bundle].map(filepath => {
+			return getFileInputPath(packageDir, filepath);
+		});
+	}
+	result.rawfiles = (defs.rawfiles || []).map(rawfileDef => {
+		if (typeof rawfileDef === "string") {
+			rawfileDef = {
+				from: rawfileDef,
+				to: rawfileDef,
+			};
+		}
+		const getRawfileOutputPath = rawfilePath => {
+			return path.resolve(BUNDLE_OUTPUT_DIR, packageName, rawfilePath);
+		};
+		return {
+			from: getFileInputPath(packageDir, rawfileDef.from),
+			to: getRawfileOutputPath(rawfileDef.to),
+		};
+	});
+	return result;
+}
+
+function readAsssetDefsFromFile(filepath: string): AssetDefs {
+	const dirPath = path.dirname(filepath);
+	const dirName = path.basename(dirPath);
+	const defs: AssetDefs = require(path.resolve(filepath));
+	const packageName = dirName !== "." ? dirName : "";
+	return processDefs(defs, packageName, dirPath);
+}
+
+function getAllAssetDefs() {
+	const result: AssetDefs = {
+		bundles: {},
+		rawfiles: [],
+	};
+	if (fs.existsSync(ASSET_DEF_FILENAME)) {
+		const defs = readAsssetDefsFromFile(ASSET_DEF_FILENAME);
+		mergeAssetDefs(result, defs);
+	}
+	const searchPath = path.join(ASSET_DEF_SEARCH_DIR, "**", ASSET_DEF_FILENAME);
+	for (const defFile of globSync(searchPath)) {
+		const defs = readAsssetDefsFromFile(defFile);
+		mergeAssetDefs(result, defs);
+	}
+	return result;
+}
 
 function isExternal(module) {
 	const context = module.context;
@@ -91,7 +166,7 @@ module.exports = function(config) {
 	return {
 		entry: allAssetDefs.bundles,
 		output: {
-			path: path.resolve(`./${BUNDLE_TARGET_DIR}/`),
+			path: path.resolve(BUNDLE_OUTPUT_DIR),
 			filename: "[name]-[hash].min.js"
 		},
 		watchOptions: {
@@ -128,7 +203,10 @@ module.exports = function(config) {
 			]
 		},
 		resolve: {
-			modules: [path.resolve("./assets/"), "node_modules"],
+			modules: [
+				path.resolve(ASSET_DIR),
+				path.resolve("node_modules"),
+			],
 			extensions: [".ts", ".js"],
 		},
 		plugins: [
@@ -139,7 +217,10 @@ module.exports = function(config) {
 					return isExternal(module);
 				}
 			}),
-			new CleanWebpackPlugin(pathsToClean, cleanOptions),
+			new CleanWebpackPlugin([path.resolve(BUNDLE_OUTPUT_DIR)], {
+				verbose:  true,
+				dry:      false,
+			}),
 			new ExtractTextPlugin("[name]-[hash].min.css", {
 				allChunks: true
 			}),

@@ -1,11 +1,11 @@
 module.exports = {
 	bundles: {
 		"course-details": [
-			"./assets/courseDetailsTest.ts",
-			"./assets/testStyle.less"
+			"courseDetailsTest.ts",
+			"testStyle.less"
 		],
 		"course-list": [
-			"./assets/ajaxCourseLoad.ts",
+			"ajaxCourseLoad.ts",
 		],
 	},
 };
