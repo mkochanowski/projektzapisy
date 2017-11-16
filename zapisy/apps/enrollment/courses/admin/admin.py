@@ -27,8 +27,9 @@ class CourseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
-        if 'instance' in kwargs:
-            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance'].entity)\
+        instance = kwargs['instance'] if 'instance' in kwargs else None
+        if instance is not None:
+            self.fields['information'].queryset = CourseDescription.objects.filter(entity=instance.entity)\
                 .select_related('entity')
         else:
             self.fields['information'].queryset = CourseDescription.objects.none()
@@ -41,8 +42,9 @@ class CourseEntityForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CourseEntityForm, self).__init__(*args, **kwargs)
-        if 'instance' in kwargs:
-            self.fields['information'].queryset = CourseDescription.objects.filter(entity=kwargs['instance']).select_related('entity')
+        instance = kwargs['instance'] if 'instance' in kwargs else None
+        if instance is not None:
+            self.fields['information'].queryset = CourseDescription.objects.filter(entity=instance).select_related('entity')
         else:
             self.fields['information'].queryset = CourseDescription.objects.none()
 

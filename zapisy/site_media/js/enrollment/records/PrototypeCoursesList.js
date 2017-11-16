@@ -53,9 +53,7 @@ PrototypeCoursesList.prototype.init = function()
 
 PrototypeCoursesList.prototype.initCourses = function()
 {
-    const jsonString = $("#courses_list_json").assertOne().val();
-    let coursesObj = JSON.parse(jsonString);
-    this.courses = coursesObj;
+    this.courses = FilteredCoursesList.getCoursesListFromJson();
     
     let self = this;
     this.courses.forEach(function(course)
@@ -191,7 +189,7 @@ PrototypeCoursesList.prototype.initRecordsLocking = function()
 
 PrototypeCoursesList.prototype.initGroups = function()
 {
-	var groupsRAW = $.parseJSON($('#courses_groups').val());
+	const groupsRAW = JSON.parse($('#courses_groups').html());
 	groupsRAW.forEach(function(groupRAW)
 	{
 		Fereol.Enrollment.CourseGroup.fromJSON(groupRAW);
