@@ -94,6 +94,9 @@ module.exports = function(config) {
 			path: path.resolve(`./${BUNDLE_TARGET_DIR}/`),
 			filename: "[name]-[hash].min.js"
 		},
+		watchOptions: {
+			poll: 1000
+		},
 		module: {
 			rules: [
 				// TypeScript source:
