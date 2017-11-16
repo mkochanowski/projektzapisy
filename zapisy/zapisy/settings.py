@@ -6,16 +6,8 @@ import logging
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 DEBUG = False
-
 RELEASE = False
-
 TEMPLATE_DEBUG = False
-
-ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-)
-
-MANAGERS = ADMINS
 
 # With DEBUG = False Django will refuse to serve requests to hosts different
 # than this one.
@@ -67,28 +59,9 @@ DATABASES = {
 # You can test sending with:
 # $ python -m smtpd -n -c DebuggingServer localhost:1025
 
-# For gmail:
-#EMAIL_USE_TLS = True
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_HOST_USER = 'youremail@gmail.com'
-#EMAIL_HOST_PASSWORD = 'password'
-#EMAIL_PORT = 587
-
-#EMAIL_HOST = 'localhost'
-#EMAIL_PORT = 1025
-#EMAIL_HOST_USER = ''
-#EMAIL_HOST_PASSWORD = ''
-
 MASS_MAIL_FROM = 'zapisy@cs.uni.wroc.pl'
-
 EMAIL_COURSE_PREFIX = '[System Zapisow] ' # please don't remove the trailing space
 
-#loggin settings:
-
-#LOG_FILE = os.path.join(BASE_DIR, "logs/log.log")
-#LOG_LEVEL = logging.NOTSET
-#INTERNAL_IPS = ('127.0.0.1',)
-#logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE, format = '%(asctime)s | %(levelname)s | %(message)s')
 LOGGING = {
         'version': 1,
         'disable_existing_loggers': False, # keep Django's default loggers
@@ -175,12 +148,6 @@ TEMPLATE_LOADERS = (
      )),
 )
 
-#TEMPLATE_LOADERS = (
-#    'django.template.loaders.filesystem.Loader',
-#    'django.template.loaders.app_directories.Loader',
-##    'django.template.loaders.eggs.load_template_source',
-#)
-
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'django.contrib.auth.context_processors.auth',
@@ -216,6 +183,7 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'modeltranslation', # needs to be before django.contrib.admin
+    
     # needed from 1.7 onwards to prevent Django from trying to apply
     # migrations when testing (slows down DB setup _a lot_)
     'test_without_migrations',
