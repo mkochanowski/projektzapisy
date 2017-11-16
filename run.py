@@ -15,7 +15,7 @@ signal.signal(signal.SIGINT, signal_handler)
 os.chdir("/vagrant/zapisy")
 
 p1 = subprocess.Popen(["python", "manage.py", "runserver", "0.0.0.0:8000"])
-p2 = subprocess.Popen(["npm", "run", "dev"])
+p2 = subprocess.Popen(["npm", "run", "devw"])
 
 p1.wait()
 p2.wait()

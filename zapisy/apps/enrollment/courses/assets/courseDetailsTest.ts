@@ -3,5 +3,5 @@ function test(x: string): void {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-	test("123");
+	test("1234ejd4");
 });

@@ -39,7 +39,7 @@ function importDefs(fileName: string): AssetDefs {
 		bundles: {},
 		rawfiles: [],
 	};
-	const getFullInputPath = inputPath => "./" + path.join(dirPath, inputPath);
+	const getFullInputPath = inputPath => path.resolve("./", path.join(dirPath, inputPath));
 	for (const bundleName in defs.bundles || {}) {
 		const fullBundleName = `${dirName}-${bundleName}`;
 		const fullBundlePaths = defs.bundles[bundleName].map(bundlePath => {
@@ -125,7 +125,8 @@ module.exports = function(config) {
 			]
 		},
 		resolve: {
-			extensions: [".ts", ".js"]
+			// modules: [path.resolve("./assets/"), "node_modules"],
+			extensions: [".ts", ".js"],
 		},
 		plugins: [
 			new webpack.optimize.CommonsChunkPlugin({
