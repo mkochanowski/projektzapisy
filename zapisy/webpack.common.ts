@@ -125,7 +125,7 @@ module.exports = function(config) {
 			]
 		},
 		resolve: {
-			// modules: [path.resolve("./assets/"), "node_modules"],
+			modules: [path.resolve("./assets/"), "node_modules"],
 			extensions: [".ts", ".js"],
 		},
 		plugins: [

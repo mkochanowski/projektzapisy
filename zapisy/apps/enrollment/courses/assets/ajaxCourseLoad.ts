@@ -1,7 +1,7 @@
 // Load course info using AJAX
 
 import * as $ from "jquery";
-// import { scrollUpToElementIfWindowBelow } from "common/utils";
+import { scrollUpToElementIfWindowBelow } from "common/utils";
 
 let isLoadingCourse: boolean = false;
 type CourseInfo = {
@@ -31,7 +31,7 @@ function loadCourseInfo(courseUrl: string): void {
 	isLoadingCourse = true;
 	const container = document.getElementById("main-content");
 	setElementLoadingUi(container);
-	// scrollUpToElementIfWindowBelow("#main-menu-list");
+	scrollUpToElementIfWindowBelow("#main-menu-list");
 	$.ajax({
 		type: "GET",
 		dataType: "html",
@@ -105,5 +105,4 @@ function onCourseResponseReceived(resp, courseUrl) {
 	updateCourseNameAndEditLink(courseInfo);
 }
 
-console.log("LOL");
 document.addEventListener("CoursesListChanged", installClickHandlers);
