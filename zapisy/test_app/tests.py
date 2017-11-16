@@ -77,7 +77,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.employees = []
         for i in range(1, 5):
             user = User.objects.create_user(
-                username=('employee%s' % i),
+                username=('employee{}'.format(i)),
                 password=self.password)
             user.first_name = 'Employee'
             user.last_name = str(i)
@@ -109,9 +109,9 @@ class NewSemesterTests(SeleniumTestCase):
         self.course_type = Type.objects.create(name='Informatyczny')
         for i in range(1, 6):
             CourseEntity.objects.create(
-                name='Course %s' % i,
-                name_pl='Course %s' % i,
-                name_en='Course %s' % i,
+                name='Course {}'.format(i),
+                name_pl='Course {}'.format(i),
+                name_en='Course {}'.format(i),
                 semester='z',
                 type=self.course_type,
                 status=1,  # w ofercie
@@ -119,9 +119,9 @@ class NewSemesterTests(SeleniumTestCase):
             )
         for i in range(6, 11):
             CourseEntity.objects.create(
-                name='Course %s' % i,
-                name_pl='Course %s' % i,
-                name_en='Course %s' % i,
+                name='Course {}'.format(i),
+                name_pl='Course {}'.format(i),
+                name_en='Course {}'.format(i),
                 semester='l',
                 type=self.course_type,
                 status=1,  # w ofercie
@@ -170,12 +170,9 @@ class NewSemesterTests(SeleniumTestCase):
         self.next_winter_semester = Semester.objects.create(
             type=Semester.TYPE_WINTER,
             year='2',
-            semester_beginning=self.current_semester.semester_ending +
-                relativedelta(days=1),
-            semester_ending=self.current_semester.semester_ending +
-                relativedelta(days=1, months=3),
-            records_ects_limit_abolition=self.current_semester.semester_ending +
-                relativedelta(days=11),
+            semester_beginning=self.current_semester.semester_ending + relativedelta(days=1),
+            semester_ending=self.current_semester.semester_ending + relativedelta(days=1, months=3),
+            records_ects_limit_abolition=self.current_semester.semester_ending + relativedelta(days=11),
             visible=True,
             is_grade_active=False
         )
@@ -183,12 +180,9 @@ class NewSemesterTests(SeleniumTestCase):
         self.next_summer_semester = Semester.objects.create(
             type=Semester.TYPE_SUMMER,
             year='3',
-            semester_beginning=self.next_winter_semester.semester_ending +
-                relativedelta(days=1),
-            semester_ending=self.next_winter_semester.semester_ending +
-                relativedelta(days=1, months=3),
-            records_ects_limit_abolition=self.next_winter_semester.semester_ending +
-                relativedelta(days=11),
+            semester_beginning=self.next_winter_semester.semester_ending + relativedelta(days=1),
+            semester_ending=self.next_winter_semester.semester_ending + relativedelta(days=1, months=3),
+            records_ects_limit_abolition=self.next_winter_semester.semester_ending + relativedelta(days=11),
             visible=True,
             is_grade_active=False
         )
@@ -256,8 +250,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.wait_for_pass(
             lambda: self.driver.find_element_by_link_text('Oferta').click())
         self.driver.get(
-            '%s%s' %
-            (self.driver.current_url, '/manage/proposals'))
+            '{}{}'.format(self.driver.current_url, '/manage/proposals'))
         self.wait_for_pass(
             lambda: self.driver.find_element_by_link_text('Głosowanie').click())
 
@@ -359,7 +352,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.system_state.save()
 
     def vote(self, student, points):
-        self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
+        self.driver.get('{}{}'.format(self.live_server_url, '/users/logout/'))
         self.driver.get(self.live_server_url)
         self.wait_for_pass(
             lambda: self.driver.find_element_by_id(
@@ -394,8 +387,7 @@ class NewSemesterTests(SeleniumTestCase):
             select = Select(
                 self.wait_for_pass(
                     lambda: self.driver.find_element_by_xpath(
-                        '//li[label/a[text()="%s"]]/select' %
-                        course_name)))
+                        '//li[label/a[text()="{}"]]/select'.format(course_name))))
             select.select_by_value(str(value))
             if sum_points <= self.system_state.max_points:
                 self.results_points[course_name] += value
@@ -456,7 +448,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.system_state.save()
 
     def correction(self, student, points):
-        self.driver.get('%s%s' % (self.live_server_url, '/users/logout/'))
+        self.driver.get('{}{}'.format(self.live_server_url, '/users/logout/'))
         self.driver.get(self.live_server_url)
         self.wait_for_pass(
             lambda: self.driver.find_element_by_id(
@@ -489,8 +481,9 @@ class NewSemesterTests(SeleniumTestCase):
             select = Select(
                 self.wait_for_pass(
                     lambda: self.driver.find_element_by_xpath(
-                        '//li[label/a[text()="%s"]]/select' %
-                        course_name)))
+                        '//li[label/a[text()="{}"]]/select'.format(course_name))
+                    )
+            )
             select.select_by_value(str(value))
 
         self.wait_for_pass(
@@ -505,7 +498,7 @@ class NewSemesterTests(SeleniumTestCase):
 
         employees = {}
         for empl in self.employees:
-            employees['%s %s' % (
+            employees['{} {}'.format(
                       empl.user.first_name,
                       empl.user.last_name)] = empl.id
 
@@ -597,8 +590,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.new_students = []
         for i in range(1, 6):
             user = User.objects.create_user(
-                username='student%d' %
-                (i + number_of_students), password=self.password)
+                username='student{}'.format(i + number_of_students), password=self.password)
             student = Student.objects.create(
                 user=user,
                 matricula=str(i + number_of_students))
@@ -615,8 +607,7 @@ class NewSemesterTests(SeleniumTestCase):
         test_ectsimport = ''
         for student, points in students_ects.iteritems():
             for deg, ects in points.iteritems():
-                test_ectsimport += '%s %d T %s stopnia\n' % (
-                    student.matricula, ects, deg)
+                test_ectsimport += '{} {} T {} stopnia\n'.format(student.matricula, ects, deg)
 
         test_ectsimport_path = PROJECT_PATH + '/test_ectsimport.txt'
         with open(test_ectsimport_path, 'w') as file:
