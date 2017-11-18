@@ -26,8 +26,10 @@ type AssetDefs = {
 };
 
 function mergeAssetDefs(defs: AssetDefs, newDefs: AssetDefs): AssetDefs {
+	defs.bundles = defs.bundles || {};
+	defs.rawfiles = defs.rawfiles || [];
 	Object.assign(defs.bundles, newDefs.bundles);
-	defs.rawfiles = defs.rawfiles.concat(newDefs.rawfiles);
+	defs.rawfiles = defs.rawfiles.concat(newDefs.rawfiles || []);
 	return defs;
 }
 
@@ -57,7 +59,7 @@ function processDefs(defs: AssetDefs, packageName: string, packageDir: string): 
 	};
 	for (const bundle in defs.bundles || {}) {
 		const fullName = packageName.length ? `${packageName}-${bundle}` : packageName;
-		result.bundles[fullName] = defs.bundles[bundle].map(filepath => {
+		result.bundles![fullName] = defs.bundles![bundle].map(filepath => {
 			return getFileInputPath(packageDir, filepath);
 		});
 	}
@@ -68,7 +70,7 @@ function processDefs(defs: AssetDefs, packageName: string, packageDir: string): 
 				to: rawfileDef,
 			};
 		}
-		const getRawfileOutputPath = rawfilePath => {
+		const getRawfileOutputPath = (rawfilePath: string) => {
 			return path.resolve(BUNDLE_OUTPUT_DIR, packageName, rawfilePath);
 		};
 		return {
@@ -104,7 +106,7 @@ function getAllAssetDefs() {
 	return result;
 }
 
-function isExternal(module) {
+function isExternal(module: any) {
 	const context = module.context;
 
 	if (typeof context !== "string") {
@@ -116,7 +118,7 @@ function isExternal(module) {
 
 const allAssetDefs = getAllAssetDefs();
 console.log(allAssetDefs);
-module.exports = function(config) {
+module.exports = function(config: any) {
 	return {
 		entry: allAssetDefs.bundles,
 		output: {
@@ -133,14 +135,33 @@ module.exports = function(config) {
 				// 2) babel: ES6 -> ES5 (and polyfilling)
 				{
 					test: /\.ts?$/,
-					loaders: ["babel-loader", "ts-loader"],
-					exclude: /node_modules/
+					use: [
+						{ loader: "babel-loader" },
+						{
+							loader: "ts-loader",
+							options: { appendTsSuffixTo: [/\.vue$/] }
+						},
+					],
+					exclude: /node_modules/,
 				},
 				// ES6 source: babel converts to ES5 (and polyfills)
 				{
 					test: /\.js?$/,
 					loader: "babel-loader",
 					exclude: /node_modules/
+				},
+				{
+					test: /\.vue$/,
+					loader: "vue-loader",
+					options: {
+						loaders: getVueCssLoaders(),
+						esModule: true,
+						postcss: [
+						  require("autoprefixer")({
+							browsers: ["last 2 versions"]
+						  })
+						],
+					},
 				},
 				{
 					test: /\.less$/,
@@ -161,13 +182,16 @@ module.exports = function(config) {
 				path.resolve(ASSET_DIR),
 				path.resolve("node_modules"),
 			],
-			extensions: [".ts", ".js"],
+			extensions: [".ts", ".js", ".vue"],
+			alias: {
+				"vue$": "vue/dist/vue.common.js",
+			},
 		},
 		plugins: [
 			new webpack.optimize.CommonsChunkPlugin({
 				name: "vendor",
 				filename: "vendor.js",
-				minChunks: function(module) {
+				minChunks: function(module: any) {
 					return isExternal(module);
 				}
 			}),
@@ -182,6 +206,32 @@ module.exports = function(config) {
 			// This will copy "raw" assets - ones where we don't want any transformations
 			// (e.g. bootstrap styles)
 			new CopyWebpackPlugin(allAssetDefs.rawfiles),
-		]
+		],
 	};
 };
+
+function getVueCssLoaders() {
+	// generate loader string to be used with extract text plugin
+	function generateLoaders (loaders: Array<string>) {
+	  let sourceLoader = loaders.map(function (loader: string) {
+		let extraParamChar;
+		if (/\?/.test(loader)) {
+		  loader = loader.replace(/\?/, "-loader?");
+		  extraParamChar = "&";
+		} else {
+		  loader = loader + "-loader";
+		  extraParamChar = "?";
+		}
+		return loader + extraParamChar + "sourceMap";
+	  }).join("!");
+
+		return ["vue-style-loader", sourceLoader].join("!");
+	}
+
+	// http://vuejs.github.io/vue-loader/en/configurations/extract-css.html
+	return {
+		css: generateLoaders(["css"]),
+		postcss: generateLoaders(["css"]),
+		less: generateLoaders(["css", "less"]),
+	};
+}

@@ -3,6 +3,7 @@
     "sourceMap": true,
     "target": "es6",
     "alwaysStrict": true,
+    "strict": true,
     "module": "commonjs",
     "baseUrl": "/vagrant/zapisy/assets/"
   },

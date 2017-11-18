@@ -17,26 +17,32 @@ function installClickHandlers(): void {
 	});
 }
 
-function onCourseLinkClicked(event: MouseEvent): void {
+function onCourseLinkClicked(event: Event): void {
 	event.preventDefault();
 	if (isLoadingCourse) {
 		return;
 	}
 	const clickedLink = event.target as HTMLHRElement;
 	const courseUrl = clickedLink.getAttribute("href");
+	if (!courseUrl) {
+		throw new Error("Missing course link on event sender");
+	}
 	loadCourseInfo(courseUrl);
 }
 
 function loadCourseInfo(courseUrl: string): void {
 	isLoadingCourse = true;
 	const container = document.getElementById("main-content");
+	if (!container) {
+		throw new Error("Missing container element");
+	}
 	setElementLoadingUi(container);
 	scrollUpToElementIfWindowBelow("#main-menu-list");
 	$.ajax({
 		type: "GET",
 		dataType: "html",
 		url: courseUrl,
-		success: function(resp) {
+		success: function(resp: string) {
 			onCourseResponseReceived(resp, courseUrl);
 		},
 		error: function() {
@@ -68,9 +74,15 @@ function removeElementLoadingUi(elem: HTMLElement): void {
 
 function fillCourseHtml(courseHtml: string) {
 	const mainContainer = document.getElementById("main-content");
+	if (!mainContainer) {
+		throw new Error("Missing main container element");
+	}
 	mainContainer.innerHTML = "";
 
 	const courseContainer = document.createElement("div");
+	if (!courseContainer) {
+		throw new Error("Missing course container element");
+	}
 	courseContainer.setAttribute("id", "enr-course-view");
 	courseContainer.innerHTML = courseHtml;
 	mainContainer.appendChild(courseContainer);
@@ -84,11 +96,15 @@ function setPageTitleAndUrl(courseName: string, url: string) {
 function updateCourseNameAndEditLink(courseInfo: CourseInfo) {
 	// The little arrow before the course name above the filters
 	const arrowElem = document.getElementById("enr-course-arrow");
-	arrowElem.classList.remove("hidden");
+	if (arrowElem) {
+		arrowElem.classList.remove("hidden");
+	}
 
 	const courseNameElem = document.getElementById("enr-course-name");
-	courseNameElem.innerText = courseInfo.courseName;
-	courseNameElem.classList.remove("hidden");
+	if (courseNameElem) {
+		courseNameElem.innerText = courseInfo.courseName;
+		courseNameElem.classList.remove("hidden");
+	}
 
 	const courseEditLink = document.getElementById("enr-course-edit-link");
 	// It might not exist, only admins see that link
@@ -98,7 +114,7 @@ function updateCourseNameAndEditLink(courseInfo: CourseInfo) {
 	}
 }
 
-function onCourseResponseReceived(resp, courseUrl) {
+function onCourseResponseReceived(resp: string, courseUrl: string) {
 	const courseInfo: CourseInfo = JSON.parse(resp);
 	fillCourseHtml(courseInfo.courseHtml);
 	setPageTitleAndUrl(courseInfo.courseName, courseUrl);

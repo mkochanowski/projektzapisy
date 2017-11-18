@@ -1,11 +1,18 @@
 import * as $ from "jquery";
 
-function scrollUpToElementIfWindowBelow(selector) {
+function scrollUpToElementIfWindowBelow(selector: string) {
 	const SCROL_TIME = 400;
 	const currentWindowTop = $(window).scrollTop();
-	const elemTop = $(selector).offset().top;
+	if (!currentWindowTop) {
+		return;
+	}
+	const elem = $(selector);
+	if (!elem) {
+		throw new Error(`Unable to find ${selector}`);
+	}
+	const elemTop = elem.offset()!.top;
 	if (currentWindowTop > elemTop) {
-		$("html, body").animate({ scrollTop: elemTop }, SCROL_TIME);
+		$("html, body")!.animate({ scrollTop: elemTop }, SCROL_TIME);
 	}
 }
 
