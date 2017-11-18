@@ -90,8 +90,8 @@ def update():
     """Copies your project and updates environment and symlink"""
     update_code()
     update_env()
-    collectstatic()
     symlink()
+    collectstatic()
     run("echo \"ALLOWED_HOSTS = %(hosts)s\" >> %(current_release)s/zapisy/settings_local.py" % {'hosts': env.hosts, 'current_release': env.current_release})
 
 def update_code():
@@ -117,7 +117,7 @@ def perform_action_in_main_directory(action):
     run("source {venv_path}/bin/activate;" 
         "cd {current_release}/zapisy;"
         "{action}".format(action=action, current_release=env.current_release, 
-                          venv_path=env.venv_path)
+                          venv_path=env.venv_path))
 
 
 def update_env():
