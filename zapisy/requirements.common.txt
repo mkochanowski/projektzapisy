@@ -25,7 +25,7 @@ yolk==0.4.3
 django-paranoid-sessions==0.2.0
 newrelic==2.68.0.50
 pyvirtualdisplay
-https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/django-endless-pagination/django-endless-pagination-1.1.tar.gz
+django-el-pagination==3.1.0
 
 rq==0.7.1
 
