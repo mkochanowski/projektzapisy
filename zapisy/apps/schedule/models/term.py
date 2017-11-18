@@ -106,7 +106,7 @@ class Term(models.Model):
 
     def get_conflicted(self):
         if not self.room:
-            return EmptyQuerySet()
+            return Term.objects.none()
 
         # X < B AND A < Y
 
