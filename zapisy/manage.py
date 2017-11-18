@@ -11,9 +11,5 @@ except ImportError:
 os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 if __name__ == "__main__":
     from django.core.management import execute_from_command_line
-    from django.contrib.auth.models import Permission
-    # Patch the field width to allow for our long model names
-    Permission._meta.get_field('name').max_length=200
-    Permission._meta.get_field('codename').max_length=200
     execute_from_command_line(sys.argv)
 
