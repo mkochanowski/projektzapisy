@@ -16,7 +16,8 @@
 {% endblock %}
 
 {% block sidebar %}
-    {% cache 3600 courses_list request.user %}
+	{% cache 3600 courses_list request.user %}
+	<div id="app" style="width: 200px; height: 200px; background-color: yellow;"></div>
 	<div id="main-sidebar">
 		<div id="course-list">
             <p class="main-side-message hidden" id="fetchingListMessage">
@@ -44,5 +45,7 @@
             </div>
 		</div>
 	</div>
-    {% endcache %}
+	{% endcache %}
+	
+	{% render_bundle "courses-vue" %}
 {% endblock %}

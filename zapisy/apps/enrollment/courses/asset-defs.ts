@@ -7,5 +7,8 @@ module.exports = {
 		"course-list": [
 			"ajaxCourseLoad.ts",
 		],
+		"vue": [
+			"vue/main.ts"
+		],
 	},
 };
