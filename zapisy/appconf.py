@@ -1,5 +1,7 @@
 import sys
 
+from django.utils.module_loading import import_string
+
 # following PEP 386, versiontools will pick it up
 __version__ = (0, 4, 1, "final", 0)
 
@@ -94,10 +96,9 @@ class AppConfMetaClass(type):
 
 
 def import_attribute(import_path, exception_handler=None):
-    from django.utils.importlib import import_module
     module_name, object_name = import_path.rsplit('.', 1)
     try:
-        module = import_module(module_name)
+        module = import_string(module_name)
     except:  # pragma: no cover
         if callable(exception_handler):
             exctype, excvalue, tb = sys.exc_info()
