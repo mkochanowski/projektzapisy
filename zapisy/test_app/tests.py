@@ -496,11 +496,7 @@ class NewSemesterTests(SeleniumTestCase):
         for course in Course.objects.filter(semester=self.next_winter_semester):
             courses[course.entity.name] = course.id
 
-        employees = {}
-        for empl in self.employees:
-            employees['{} {}'.format(
-                      empl.user.first_name,
-                      empl.user.last_name)] = empl.id
+        employees = { '{} {}'.format(empl.user.first_name, empl.user.last_name): empl.id for empl in self.employees }
 
         Classroom.objects.create(number=5, type=1)
         Classroom.objects.create(number=7, type=3)
