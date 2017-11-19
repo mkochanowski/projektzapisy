@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import { sync as globSync } from "glob";
+import { getVueCssLoaders } from "./webpack-utils";
 const webpack = require("webpack");
 const BundleTracker = require("webpack-bundle-tracker");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
@@ -154,7 +155,7 @@ module.exports = function(config: any) {
 					test: /\.vue$/,
 					loader: "vue-loader",
 					options: {
-						loaders: getVueCssLoaders(),
+						loaders: getVueCssLoaders(config.vueCssOptions),
 						esModule: true,
 						postcss: [
 						  require("autoprefixer")({
@@ -209,29 +210,3 @@ module.exports = function(config: any) {
 		],
 	};
 };
-
-function getVueCssLoaders() {
-	// generate loader string to be used with extract text plugin
-	function generateLoaders (loaders: Array<string>) {
-	  let sourceLoader = loaders.map(function (loader: string) {
-		let extraParamChar;
-		if (/\?/.test(loader)) {
-		  loader = loader.replace(/\?/, "-loader?");
-		  extraParamChar = "&";
-		} else {
-		  loader = loader + "-loader";
-		  extraParamChar = "?";
-		}
-		return loader + extraParamChar + "sourceMap";
-	  }).join("!");
-
-		return ["vue-style-loader", sourceLoader].join("!");
-	}
-
-	// http://vuejs.github.io/vue-loader/en/configurations/extract-css.html
-	return {
-		css: generateLoaders(["css"]),
-		postcss: generateLoaders(["css"]),
-		less: generateLoaders(["css", "less"]),
-	};
-}

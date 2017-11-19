@@ -1,16 +1,26 @@
-const merge = require('webpack-merge');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const merge = require("webpack-merge");
+const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const common = require('./webpack.common.ts');
+const common = require("./webpack.common.ts");
+const webpack = require("webpack");
 
 module.exports = merge(common({
-	minifyCss: true
+	minifyCss: true,
+	vueCssOptions: {
+		sourceMap: false,
+		extract: true,
+	}
 }), {
 	plugins: [
+		new webpack.DefinePlugin({
+			"process.env": {
+				NODE_ENV: "\"production\""
+			}
+		}),
 		new UglifyJSPlugin({
 			sourceMap: false,
 			compress: true,
-			output: {comments: false},
+			output: { comments: false },
 			comments: false,
 		}),
 	]

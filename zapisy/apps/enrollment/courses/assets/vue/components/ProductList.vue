@@ -1,5 +1,6 @@
+
 <template>
-  <table class="table table-hover">
+  <table id="mytable" class="table table-hover">
      <thead>
       <tr>
         <th>Product Id</th>
