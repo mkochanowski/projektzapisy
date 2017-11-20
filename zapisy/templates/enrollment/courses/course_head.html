@@ -3,6 +3,7 @@
 {% load i18n %}
 
 <h2>{{ course.name }}</h2>
+<h5>{{ course.semester.get_short_name }}</h5>
 {% if ects_limit_would_be_exceeded %}
 <div class="main-message">Nie możesz zapisać się na ten przedmiot, gdyż przekroczony zostałby limit {{ max_ects }} punktów ECTS
 (masz już {{ current_ects }} na ten semestr).

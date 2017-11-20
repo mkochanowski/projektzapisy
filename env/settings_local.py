@@ -1,4 +1,5 @@
-DEBUG = False
+DEBUG = True
+TEMPLATE_DEBUG = True
 PIPELINE = False
 DATABASES = {
      'default' : {
@@ -12,5 +13,3 @@ DATABASES = {
             'USE_UNICODE' : True,
         } 
 }
-
-

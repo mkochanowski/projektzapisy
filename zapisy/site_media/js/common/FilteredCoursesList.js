@@ -11,6 +11,12 @@ function FilteredCoursesList()
     this.init();
 };
 
+FilteredCoursesList.getCoursesListFromJson = function(elementName = "courses_list_json")
+{
+    const jsonString = $("#" + elementName).assertOne().html();
+    return JSON.parse(jsonString);
+}
+
 FilteredCoursesList.prototype.init = function()
 {
     this.initializeTagEffectFilterElems();
