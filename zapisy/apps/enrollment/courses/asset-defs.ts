@@ -2,7 +2,8 @@ module.exports = {
 	bundles: {
 		"course-details": [
 			"courseDetailsTest.ts",
-			"testStyle.less"
+			"testStyle.less",
+			"testCssStyle.css",
 		],
 		"course-list": [
 			"ajaxCourseLoad.ts",
