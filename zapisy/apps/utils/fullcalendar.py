@@ -7,8 +7,8 @@ from django.db.models import Q
 from django.http import Http404
 from django.views.generic.list import BaseListView
 
-class FullCalendarAdapter(object):
 
+class FullCalendarAdapter(object):
     def __init__(self, queryset, request):
         self.queryset = queryset
         self.request = request
