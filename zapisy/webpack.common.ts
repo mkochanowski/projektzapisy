@@ -9,7 +9,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const BUNDLE_OUTPUT_DIR = "asset_bundles";
+const BUNDLE_OUTPUT_DIR = "compiled_assets";
 const ASSET_DIR = "assets";
 const ASSET_DEF_FILENAME = "asset-defs.ts";
 const ASSET_DEF_SEARCH_DIR = "apps";
