@@ -314,7 +314,7 @@ if os.path.isfile(LOCAL_SETTINGS):
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-	os.path.join(BASE_DIR, "asset_bundles"),
+	os.path.join(BASE_DIR, "compiled_assets"),
 )
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
