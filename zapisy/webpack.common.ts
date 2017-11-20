@@ -59,7 +59,7 @@ function processDefs(defs: AssetDefs, packageName: string, packageDir: string): 
 		rawfiles: [],
 	};
 	for (const bundle in defs.bundles || {}) {
-		const fullName = packageName.length ? `${packageName}-${bundle}` : packageName;
+		const fullName = packageName.length ? `${packageName}-${bundle}` : bundle;
 		result.bundles![fullName] = defs.bundles![bundle].map(filepath => {
 			return getFileInputPath(packageDir, filepath);
 		});
