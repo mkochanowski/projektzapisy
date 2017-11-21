@@ -10,6 +10,7 @@ from django.shortcuts import render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from django.http import QueryDict, HttpResponse
 from django.template.response import TemplateResponse
@@ -171,7 +172,7 @@ def set_language(request):
             account.preferred_language = lang_code
             account.save()
             if hasattr(request, 'session'):
-                request.session['django_language'] = lang_code
+                request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response

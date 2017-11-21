@@ -2,6 +2,14 @@
 
 # Current version
 
+# Version 17.11.21
+
+* Upgrade to Django 1.8
+* Loading courses with ajax
+* Fixed disappearing pop-up
+* Fixed issues with reservations and conflicts
+* Hided vote summary from non-users
+
 # Version 17.10.25
 
 * Fixed missing title for login page

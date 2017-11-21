@@ -7,6 +7,7 @@ from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
 from django.conf import settings
 from apps.notifications.models import Notification
+from django.core.urlresolvers import reverse
 
 from course import *
 
@@ -423,14 +424,14 @@ class Group(models.Model):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
             select_related('teacher', 'teacher__user', 'course',
-            'course__type', 'course__entity', 'course__semester').all()
+                'course__entity__type', 'course__entity', 'course__semester').all()
 
     @staticmethod
     def get_groups_by_semester_opt(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
             select_related('teacher', 'teacher__user', 'course',
-                'course__type', 'course__entity', 'course__semester').all()
+                'course__entity__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
@@ -482,8 +483,6 @@ class Group(models.Model):
     def serialize_for_json(self, enrolled, queued, pinned, queue_priorities,
         student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
-        from django.core.urlresolvers import reverse
-
         zamawiany = student and student.is_zamawiany()
         
         data = {

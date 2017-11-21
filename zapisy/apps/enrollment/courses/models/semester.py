@@ -344,7 +344,7 @@ class ChangedDay(models.Model):
             return added_days.filter(weekday=day_of_week)
 
     def __unicode__(self):
-        return str(self.day) + ' -> ' + str(self.get_weekday_display())
+        return u"{0} -> {1}".format(str(self.day), unicode(self.get_weekday_display()))
 
     class Meta:
         verbose_name = 'dzień zmienony na inny'

@@ -122,7 +122,7 @@ class Record(models.Model):
         return Record.enrolled.\
             filter(student=student, group__course__semester=semester).\
             select_related('group', 'group__course', 'group__course__entity',\
-            'group__course__type')
+            'group__course__entity__type')
     
     @staticmethod
     def get_student_enrolled_ids(student, semester):

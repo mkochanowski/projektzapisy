@@ -61,14 +61,14 @@ class StudentAdmin(admin.ModelAdmin):
 
     actions = [export_as_csv]
 
-    def queryset(self, request):
-       qs = super(StudentAdmin, self).queryset(request)
+    def get_queryset(self, request):
+       qs = super(StudentAdmin, self).get_queryset(request)
        return qs.select_related('program', 'program__type_of_points', 'user')
 
 class ProgramAdmin(admin.ModelAdmin):
 
-    def queryset(self, request):
-       qs = super(ProgramAdmin, self).queryset(request)
+    def get_queryset(self, request):
+       qs = super(ProgramAdmin, self).get_queryset(request)
        return qs.select_related('type_of_points')
         
 class EmployeeAdmin(admin.ModelAdmin):
@@ -82,8 +82,8 @@ class EmployeeAdmin(admin.ModelAdmin):
     ordering = ['user__last_name','user__first_name']
     list_display_links = ('get_full_name',)
 
-    def queryset(self, request):
-       qs = super(EmployeeAdmin, self).queryset(request)
+    def get_queryset(self, request):
+       qs = super(EmployeeAdmin, self).get_queryset(request)
        return qs.select_related('user')
 
 class StudentInline(admin.StackedInline):
@@ -104,8 +104,8 @@ class StudiaZamawianeAdmin(admin.ModelAdmin):
     search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
     ordering = ['student__user__last_name','student__user__first_name']
 
-    def queryset(self, request):
-       qs = super(StudiaZamawianeAdmin, self).queryset(request)
+    def get_queryset(self, request):
+       qs = super(StudiaZamawianeAdmin, self).get_queryset(request)
        return qs.select_related('student', 'student__user')
 
 class StudiaZamawianeAdmin2012(admin.ModelAdmin):
@@ -113,8 +113,8 @@ class StudiaZamawianeAdmin2012(admin.ModelAdmin):
     search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
     ordering = ['student__user__last_name','student__user__first_name']
 
-    def queryset(self, request):
-       qs = super(StudiaZamawianeAdmin2012, self).queryset(request)
+    def get_queryset(self, request):
+       qs = super(StudiaZamawianeAdmin2012, self).get_queryset(request)
        return qs.select_related('student', 'student__user')
 
 from django.contrib.auth.admin import UserAdmin

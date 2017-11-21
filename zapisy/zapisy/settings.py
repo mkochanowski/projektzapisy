@@ -11,7 +11,7 @@ TEMPLATE_DEBUG = False
 
 # With DEBUG = False Django will refuse to serve requests to hosts different
 # than this one.
-ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl', 'localhost']
+ALLOWED_HOSTS = ['zapisy.ii.uni.wroc.pl']
 EVENT_MODERATOR_EMAIL = 'zapisy@cs.uni.wroc.pl'
 
 """
@@ -123,15 +123,6 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-# Absolute path to the directory that holds media.
-# Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = 'site_media'
-
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/site_media/'
-
 USE_ETAGS = True
 
 # Make this unique, and don't share it with anybody.
@@ -141,11 +132,10 @@ SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
 
 TEMPLATE_LOADERS = (
     ('django.template.loaders.cached.Loader', (
-
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
-     )),
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+        'django.template.loaders.eggs.Loader',
+    )),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -165,7 +155,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
     #'middleware.mobile_detector.mobileDetectionMiddleware',
@@ -200,7 +189,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mailer',
-    #'south',
     'pipeline',
     'apps.enrollment.courses',
     'apps.enrollment.records',
