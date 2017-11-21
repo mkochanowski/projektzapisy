@@ -25,7 +25,7 @@
 #
 
 from django import forms
-from django.db.models.loading import cache
+from django.apps import apps
 
 
 class EmailChangeForm(forms.Form):
@@ -51,7 +51,7 @@ class EmailChangeForm(forms.Form):
         """
         email = self.cleaned_data.get('email')
         
-        User = cache.get_model('auth', 'User')
+        User = apps.cache.get_model('auth', 'User')
         user = User.objects.get(username__exact=self.username)
         
         # Check if the new email address differs from the current email address.
