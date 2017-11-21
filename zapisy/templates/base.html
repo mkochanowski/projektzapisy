@@ -1,8 +1,9 @@
-{% load url from future %}
 {% load fereol_common %}
 {% load compressed %}
 {% load staticfiles %}
-{% load static %}
+{% load settings_value %}
+{% load osenv_value %}
+{% load django_version %}
 {% load i18n %}
 <!DOCTYPE html>
 <html lang="pl">
@@ -55,8 +56,8 @@
     <script type="text/javascript">
         var user_is_authenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %},
             user_is_student = {% if request.user.student %}true{% else %}false{% endif %};
+
     </script>
-    <script type="text/javascript" src="{% static "vendor.js" %}"></script>
     {% block js %}{% compressed_js 'main' %}{% endblock %}
     {% block rss %}{% endblock %}
     {% block head_extra %}{% endblock %}
@@ -262,8 +263,11 @@
     <footer>
         <p>
             {# <a href="{% url 'on-mobile' %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
-            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>{% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@cs.uni.wroc.pl">zapisy@cs.uni.wroc.pl</a>{% endif %} | Błędy i uwagi: <a href="https://tracker-zapisy.ii.uni.wroc.pl/">[link]</a> Wygenerowano: {% now "H:i:s" %}</p>
-
+            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>
+            {% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@cs.uni.wroc.pl">zapisy@cs.uni.wroc.pl</a>{% endif %}
+            | Błędy i uwagi: <a href="https://tracker-zapisy.ii.uni.wroc.pl/">[link]</a> Wygenerowano: {% now "H:i:s" %}
+            {% if "DEBUG"|settings_value == True or "II_ZAPISY_STAGING"|osenv_value == "True" %}| <strong>Django {% django_version %}</strong>{% endif %}
+        </p>
     </footer>
 
 </div>
