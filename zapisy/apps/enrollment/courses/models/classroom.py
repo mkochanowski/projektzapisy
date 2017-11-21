@@ -33,7 +33,10 @@ class Classroom( models.Model ):
         ordering = ['floor', 'number']
 
     def get_absolute_url(self):
-        return reverse('events:classroom', args=[self.slug])
+        try:
+            return reverse('events:classroom', args=[self.slug])
+        except:
+            return reverse('events:classrooms')
 
     def __unicode__(self):
         return str(self.number) + ' ('+str(self.capacity)+')'

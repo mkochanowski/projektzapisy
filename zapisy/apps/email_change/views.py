@@ -26,7 +26,7 @@
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
-from django.db.models.loading import cache
+from django.apps import apps
 from django.template import RequestContext, Context
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
@@ -51,8 +51,8 @@ def email_change_view(request, extra_context={},
         form = EmailChangeForm(username=request.user.username, data=request.POST, files=request.FILES)
         if form.is_valid():
             
-            EmailChangeRequest = cache.get_model('email_change', 'EmailChangeRequest')
-            Site = cache.get_model('sites', 'Site')
+            EmailChangeRequest = apps.cache.get_model('email_change', 'EmailChangeRequest')
+            Site = apps.cache.get_model('sites', 'Site')
             
             email = form.cleaned_data.get('email')
             user = User.objects.filter(email=email)
@@ -119,7 +119,7 @@ def email_verify_view(request, verification_key, extra_context={},
         template_name='email_change/email_verify.html'):
     """
     """
-    EmailChangeRequest = cache.get_model('email_change', 'EmailChangeRequest')
+    EmailChangeRequest = apps.cache.get_model('email_change', 'EmailChangeRequest')
     context = RequestContext(request, extra_context)
     try:
         ecr = EmailChangeRequest.objects.get(

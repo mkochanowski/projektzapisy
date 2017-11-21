@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User, UserManager
 from django.core.mail import send_mail
 from django.db.models import Q, Sum
-from django.db.models.loading import cache
+from django.apps import apps
 from django.db.models.query import EmptyQuerySet
 from django.template import Context
 from django.template.loader import render_to_string
@@ -550,7 +550,7 @@ class StudiaZamawiane(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = cache.get_model('sites', 'Site')
+                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
@@ -597,7 +597,7 @@ class StudiaZamawiane2012(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane2012.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = cache.get_model('sites', 'Site')
+                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
@@ -678,7 +678,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class OpeningTimesView(models.Model):
-    student  = models.ForeignKey(Student, primary_key=True,
+    student  = models.OneToOneField(Student, primary_key=True,
                                  related_name='opening_times')
     course   = models.ForeignKey('courses.Course')
     semester = models.ForeignKey('courses.Semester')

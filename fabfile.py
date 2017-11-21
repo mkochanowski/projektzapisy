@@ -91,6 +91,7 @@ def update():
     update_code()
     update_env()
     symlink()
+    collectstatic()
     run("echo \"ALLOWED_HOSTS = %(hosts)s\" >> %(current_release)s/zapisy/settings_local.py" % {'hosts': env.hosts, 'current_release': env.current_release})
 
 def update_code():
@@ -104,19 +105,41 @@ def symlink():
     run("ln -nfs %(current_release)s %(current_path)s" % {'current_release': env.current_release, 'current_path': env.current_path})
     run("ln -nfs %(shared_path)s/logs %(current_release)s/zapisy/logs" % {'shared_path': env.shared_path, 'current_release': env.current_release})
     run("ln -nfs %(shared_path)s/system/settings_local.py %(current_release)s/zapisy/settings_local.py" % {'shared_path': env.shared_path, 'current_release': env.current_release})
-    run("ln -nfs /home/zapisy/env26/lib/python2.6/site-packages/django/contrib/admin/static/admin %(current_release)s/zapisy/site_media/admin" % {'current_release': env.current_release})
+
+
+def perform_action_in_main_directory(action):
+    """
+    Runs action in main directory with venv activated
+    """
+    if 'current_release' not in env:
+        releases()
+
+    run("source {venv_path}/bin/activate;" 
+        "cd {current_release}/zapisy;"
+        "{action}".format(action=action, current_release=env.current_release, 
+                          venv_path=env.venv_path))
+
 
 def update_env():
-    """Update servers environment on the remote servers"""
-    if not env.has_key('current_release'):
-        releases()
-    run("source %(venv_path)s/bin/activate; pip install -r %(current_release)s/zapisy/requirements.production.txt" % {'current_release': env.current_release, 'venv_path': env.venv_path})
+    """
+    Update server's environment on the remotes
+    """
+    perform_action_in_main_directory("pip install -r requirements.production.txt")
+
 
 def migrate():
-    """Run the migrate task"""
-    if not env.has_key('current_release'):
-        releases()
-    run("source %(venv_path)s/bin/activate; cd %(current_release)s/zapisy; python manage.py migrate" % {'current_release': env.current_release, 'venv_path': env.venv_path})
+    """
+    Run the migrate task
+    """
+    perform_action_in_main_directory("python manage.py migrate")
+
+
+def collectstatic():
+    """
+    Collect static files from apps (here used to collect statics from native django apps)
+    """
+    perform_action_in_main_directory("python manage.py collectstatic --noinput")
+
 
 def cleanup():
     """Clean up old releases"""
