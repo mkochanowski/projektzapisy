@@ -2,7 +2,7 @@ module.exports = {
 	bundles: {
 		"course-details": [
 			"courseDetailsTest.ts",
-			"testStyle.less",
+			"testStyle.scss",
 			"testCssStyle.css",
 		],
 		"course-list": [

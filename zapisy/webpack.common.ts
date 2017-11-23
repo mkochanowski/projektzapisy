@@ -177,6 +177,18 @@ module.exports = function(config: any) {
 					})
 				},
 				{
+					test: /\.s[c|a]ss$/,
+					use: ExtractTextPlugin.extract({
+						fallback: "style-loader",
+						use: [{
+							loader: "css-loader",
+							options: { minimize: config.minifyCss }
+						}, {
+							loader: "sass-loader"
+						}]
+					})
+				},
+				{
 					test: /\.css$/,
 					use: ExtractTextPlugin.extract({
 						fallback: "style-loader",
