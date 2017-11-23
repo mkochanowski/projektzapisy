@@ -20,8 +20,6 @@ from datetime import datetime, timedelta, date
 from itertools import cycle
 
 from django.db.models import signals
-#from django.dispatch import receiver
-from settings import ECTS_LIMIT
 from apps.enrollment.utils import mail_enrollment_from_queue
 import logging
 logger = logging.getLogger('project.default')

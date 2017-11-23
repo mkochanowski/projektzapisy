@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-import settings
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
-from feeds import LatestNews
+from apps.feeds import LatestNews
 import apps.news.views
 from apps.users import views as users_views
 from apps.enrollment.courses.admin import views as courses_admin_views

@@ -23,7 +23,7 @@ from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from django.db import connection
 
-from settings import PROJECT_PATH
+from django.conf import settings
 from scripts.scheduleimport import run_test as scheduleimport_run_test
 from scripts.ectsimport import run_test as ectsimport_run_test
 
@@ -395,7 +395,7 @@ class NewSemesterTests(SeleniumTestCase):
 
 '''
 
-        test_schedule_path = PROJECT_PATH + '/test_schedule.txt'
+        test_schedule_path = settings.BASE_DIR + '/test_schedule.txt'
         with open(test_schedule_path, 'w') as file:
             file.write(test_schedule)
         print employees
@@ -454,7 +454,7 @@ class NewSemesterTests(SeleniumTestCase):
             for deg, ects in points.iteritems():
                 test_ectsimport += '%s %d T %s stopnia\n' % (student.matricula, ects, deg)
 
-        test_ectsimport_path = PROJECT_PATH + '/test_ectsimport.txt'
+        test_ectsimport_path = settings.BASE_DIR + '/test_ectsimport.txt'
         with open(test_ectsimport_path, 'w') as file:
             file.write(test_ectsimport)
 
