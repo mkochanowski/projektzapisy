@@ -92,7 +92,7 @@ def update():
     update_env()
     symlink()
     collectstatic()
-    run("echo \"ALLOWED_HOSTS = %(hosts)s\" >> %(current_release)s/zapisy/settings_local.py" % {'hosts': env.hosts, 'current_release': env.current_release})
+    run("echo \"ALLOWED_HOSTS = %(hosts)s\" >> %(current_release)s/zapisy/zapisy/settings_local.py" % {'hosts': env.hosts, 'current_release': env.current_release})
 
 def update_code():
     """Copies your project to the remote servers"""
@@ -104,7 +104,7 @@ def symlink():
         releases()
     run("ln -nfs %(current_release)s %(current_path)s" % {'current_release': env.current_release, 'current_path': env.current_path})
     run("ln -nfs %(shared_path)s/logs %(current_release)s/zapisy/logs" % {'shared_path': env.shared_path, 'current_release': env.current_release})
-    run("ln -nfs %(shared_path)s/system/settings_local.py %(current_release)s/zapisy/settings_local.py" % {'shared_path': env.shared_path, 'current_release': env.current_release})
+    run("ln -nfs %(shared_path)s/system/settings_local.py %(current_release)s/zapisy/zapisy/settings_local.py" % {'shared_path': env.shared_path, 'current_release': env.current_release})
 
 
 def perform_action_in_main_directory(action):
