@@ -47,6 +47,15 @@ class SeleniumTestCase(LiveServerTestCase):
         cls.driver.quit()
         super(SeleniumTestCase, cls).tearDownClass()
 
+    def wait_for_pass(self, block, times=3):
+        for _ in xrange(1, times + 1):
+            try:
+                return block()
+            except (ElementNotVisibleException, NoSuchElementException, TimeoutException):
+                sleep(3)
+        return block()
+
+
 
 class NewSemesterTests(SeleniumTestCase):
 
@@ -98,13 +107,13 @@ class NewSemesterTests(SeleniumTestCase):
             username='student4',
             password=self.password)
         self.student1 = Student.objects.create(
-            user=user_student1, matricula="264823")
+            user=user_student1, matricula='264823')
         self.student2 = Student.objects.create(
-            user=user_student2, matricula="222222")
+            user=user_student2, matricula='222222')
         self.student3 = Student.objects.create(
-            user=user_student3, matricula="333333")
+            user=user_student3, matricula='333333')
         self.student4 = Student.objects.create(
-            user=user_student4, matricula="444444")
+            user=user_student4, matricula='444444')
 
         self.course_type = Type.objects.create(name='Informatyczny')
         for i in range(1, 6):
@@ -196,7 +205,7 @@ class NewSemesterTests(SeleniumTestCase):
 
     def tearDown(self):
         sql_calls = [
-            "DROP TABLE courses_studentpointsview;",
+            'DROP TABLE courses_studentpointsview;',
         ]
         for sql_call in sql_calls:
             cursor = connection.cursor()
@@ -215,15 +224,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.open_records()
         self.generate_t0()
 
-        self.driver.get_screenshot_as_file("screenshot.png")
-
-    def wait_for_pass(self, block, times=3):
-        for _ in xrange(1, times + 1):
-            try:
-                return block()
-            except (ElementNotVisibleException, NoSuchElementException, TimeoutException):
-                sleep(3)
-        return block()
+        self.driver.get_screenshot_as_file('screenshot.png')
 
     def prepare_course_entities_for_voting(self):
         self.driver.get(self.live_server_url)
@@ -627,7 +628,60 @@ class NewSemesterTests(SeleniumTestCase):
 
     def generate_t0(self):
         # cursor = connection.cursor()
-        # cursor.execute("SELECT
-        # users_openingtimesview_refresh_for_semester(%s)",
+        # cursor.execute('SELECT
+        # users_openingtimesview_refresh_for_semester(%s)',
         # [self.next_winter_semester.id])
         pass
+
+class AdminTests(SeleniumTestCase):
+    SUB_PAGES = [u'Dni wolne od zajęć', u'Dni zmienione na inne', u'Grupy', u'Grupy Efektów', u'Opisy przedmiotu',
+        u'Podstawy przedmiotów', u'Przedmioty', u'Rodzaje przedmiotów', u'Rodzaje punktów', u'Sale', u'Semestry',
+        u'Tagi', u'Zależności podstawy przedmiotu-punkty', u'Desiderata others', u'Desideratas', u'Blokady', u'Logi',
+        u'Wiadomości', u'Ogłoszenia', u'Ustawienia Notyfikacji', u'Szablony', u'Zapisane bilety', u'Preferencje',
+        u'Rezerwacje stałe', u'Terminy', u'Strony', u'Klucze prywatne', u'Klucze publiczne', u'Udzial w ocenie',
+        u'Wykorzystane bilety', u'Pracownicy', u'Programy studiów', u'Studenci', u'Studia zamawiane - opiekunowie',
+        u'Studia zamawiane2009', u'Studia zamawiane2012', u'Grupy', u'Użytkownicy', u'Pojedyncze głosy',
+        u'Ustawienia głosowań']
+    @classmethod
+    def setUpClass(cls):
+        super(AdminTests, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(AdminTests, cls).tearDownClass()
+
+    def createAdmin(self):
+        self.password = '11111'
+        self.admin = User.objects.create_superuser(username='przemka',
+                                                   password=self.password,
+                                                   email='admin@admin.com')
+        self.admin.first_name = 'przemka'
+        self.admin.save()
+
+    def setUp(self):
+        self.createAdmin()
+        self.driver.get('{}{}'.format(self.live_server_url, '/fereol_admin'))
+        self.wait_for_pass(
+            lambda: self.driver.find_element_by_id('id_username').send_keys(self.admin.username)
+            )
+        self.wait_for_pass(
+            lambda: self.driver.find_element_by_id('id_password').send_keys(self.password)
+            )
+        self.wait_for_pass(
+            lambda: self.driver.find_element_by_xpath('//input[@type="submit"]').click()
+            )
+    def tearDown(self):
+        self.admin.delete()
+    def testAdminLogin(self):
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('user-tools'))
+
+def createSubPageTest(link_text):
+    def f(self):
+        self.wait_for_pass(
+            lambda: self.driver.find_element_by_xpath(u'//a[contains(text(), "{}")]'.format(link_text)).click()
+            )
+        self.wait_for_pass(lambda: self.driver.find_element_by_id('user-tools'))
+    return f
+
+for idx, name in enumerate(AdminTests.SUB_PAGES):
+    setattr(AdminTests, 'testSubpageId' + str(idx), createSubPageTest(name))
