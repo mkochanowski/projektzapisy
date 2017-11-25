@@ -637,15 +637,24 @@ class NewSemesterTests(SeleniumTestCase):
 class AdminTests(SeleniumTestCase):
 
     SUB_PAGES = [
-        u'Dni wolne od zajęć', u'Dni zmienione na inne', u'Grupy', u'Grupy Efektów', u'Opisy przedmiotu',
-        u'Podstawy przedmiotów', u'Przedmioty', u'Rodzaje przedmiotów', u'Rodzaje punktów', u'Sale', u'Semestry',
-        u'Tagi', u'Zależności podstawy przedmiotu-punkty', u'Desiderata others', u'Desideratas', u'Blokady', u'Logi',
-        u'Wiadomości', u'Ogłoszenia', u'Ustawienia Notyfikacji', u'Szablony', u'Zapisane bilety', u'Preferencje',
-        u'Rezerwacje stałe', u'Terminy', u'Strony', u'Klucze prywatne', u'Klucze publiczne', u'Udzial w ocenie',
-        u'Wykorzystane bilety', u'Pracownicy', u'Programy studiów', u'Studenci', u'Studia zamawiane - opiekunowie',
-        u'Studia zamawiane2009', u'Studia zamawiane2012', u'Grupy', u'Użytkownicy', u'Pojedyncze głosy',
-        u'Ustawienia głosowań'
-    ]
+      "/fereol_admin/courses/freeday/", "/fereol_admin/courses/changedday/", "/fereol_admin/courses/group/",
+      "/fereol_admin/courses/effects/", "/fereol_admin/courses/coursedescription/",
+      "/fereol_admin/courses/courseentity/", "/fereol_admin/courses/course/", "/fereol_admin/courses/type/",
+      "/fereol_admin/courses/pointtypes/", "/fereol_admin/courses/classroom/", "/fereol_admin/courses/semester/",
+      "/fereol_admin/courses/tag/", "/fereol_admin/courses/pointsofcourseentities/",
+      "/fereol_admin/desiderata/desiderataother/", "/fereol_admin/desiderata/desiderata/",
+      "/fereol_admin/mailer/dontsendentry/", "/fereol_admin/mailer/messagelog/", "/fereol_admin/mailer/message/",
+      "/fereol_admin/news/news/", "/fereol_admin/notifications/notificationpreferences/",
+      "/fereol_admin/poll/template/",
+      "/fereol_admin/poll/savedticket/", "/fereol_admin/preferences/preference/",
+      "/fereol_admin/schedule/specialreservation/", "/fereol_admin/schedule/term/", "/fereol_admin/sites/site/",
+      "/fereol_admin/ticket_create/privatekey/", "/fereol_admin/ticket_create/publickey/",
+      "/fereol_admin/ticket_create/studentgraded/", "/fereol_admin/ticket_create/usedticketstamp/",
+      "/fereol_admin/users/employee/", "/fereol_admin/users/program/", "/fereol_admin/users/student/",
+      "/fereol_admin/users/studiazamawianemaileopiekunow/", "/fereol_admin/users/studiazamawiane/",
+      "/fereol_admin/users/studiazamawiane2012/", "/fereol_admin/auth/group/", "/fereol_admin/auth/user/",
+      "/fereol_admin/vote/singlevote/", "/fereol_admin/vote/systemstate/"
+      ]
 
     @classmethod
     def setUpClass(cls):
@@ -686,7 +695,7 @@ class AdminTests(SeleniumTestCase):
 def createSubPageTest(link_text):
     def f(self):
         self.wait_for_pass(
-            lambda: self.driver.find_element_by_xpath(u'//a[contains(text(), "{}")]'.format(link_text)).click()
+            lambda: self.driver.find_element_by_xpath(u'//th//a[@href="{}"]'.format(link_text)).click()
             )
         self.wait_for_pass(lambda: self.driver.find_element_by_id('user-tools'))
     return f
