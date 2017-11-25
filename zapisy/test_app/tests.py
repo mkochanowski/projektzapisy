@@ -633,15 +633,20 @@ class NewSemesterTests(SeleniumTestCase):
         # [self.next_winter_semester.id])
         pass
 
+
 class AdminTests(SeleniumTestCase):
-    SUB_PAGES = [u'Dni wolne od zajęć', u'Dni zmienione na inne', u'Grupy', u'Grupy Efektów', u'Opisy przedmiotu',
+
+    SUB_PAGES = [
+        u'Dni wolne od zajęć', u'Dni zmienione na inne', u'Grupy', u'Grupy Efektów', u'Opisy przedmiotu',
         u'Podstawy przedmiotów', u'Przedmioty', u'Rodzaje przedmiotów', u'Rodzaje punktów', u'Sale', u'Semestry',
         u'Tagi', u'Zależności podstawy przedmiotu-punkty', u'Desiderata others', u'Desideratas', u'Blokady', u'Logi',
         u'Wiadomości', u'Ogłoszenia', u'Ustawienia Notyfikacji', u'Szablony', u'Zapisane bilety', u'Preferencje',
         u'Rezerwacje stałe', u'Terminy', u'Strony', u'Klucze prywatne', u'Klucze publiczne', u'Udzial w ocenie',
         u'Wykorzystane bilety', u'Pracownicy', u'Programy studiów', u'Studenci', u'Studia zamawiane - opiekunowie',
         u'Studia zamawiane2009', u'Studia zamawiane2012', u'Grupy', u'Użytkownicy', u'Pojedyncze głosy',
-        u'Ustawienia głosowań']
+        u'Ustawienia głosowań'
+    ]
+
     @classmethod
     def setUpClass(cls):
         super(AdminTests, cls).setUpClass()
@@ -670,10 +675,13 @@ class AdminTests(SeleniumTestCase):
         self.wait_for_pass(
             lambda: self.driver.find_element_by_xpath('//input[@type="submit"]').click()
             )
+
     def tearDown(self):
         self.admin.delete()
+
     def testAdminLogin(self):
         self.wait_for_pass(lambda: self.driver.find_element_by_id('user-tools'))
+
 
 def createSubPageTest(link_text):
     def f(self):
@@ -682,6 +690,7 @@ def createSubPageTest(link_text):
             )
         self.wait_for_pass(lambda: self.driver.find_element_by_id('user-tools'))
     return f
+
 
 for idx, name in enumerate(AdminTests.SUB_PAGES):
     setattr(AdminTests, 'testSubpageId' + str(idx), createSubPageTest(name))
