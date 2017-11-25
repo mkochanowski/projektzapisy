@@ -320,7 +320,7 @@ def course(request, slug):
         if request.is_ajax():
             rendered_html = render_to_string(
                 'enrollment/courses/course_info.html',
-                data, context_instance = RequestContext(request))
+                data, request)
             return JsonResponse({
                 'courseHtml': rendered_html,
                 'courseName': course.name,

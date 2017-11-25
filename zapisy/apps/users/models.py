@@ -562,9 +562,8 @@ class StudiaZamawiane(ZamawianeAbstract):
                     'old_account' : old_sz.bank_account and old_sz.bank_account or '',
                     'new_account' : self.bank_account and self.bank_account or '',
                 }
-                context = Context(c)
-                message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
-                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context)
+                message_user = render_to_string('users/bank_account_change_email.html', c)
+                message_employee = render_to_string('users/bank_account_change_email_employee.html', c)
 
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
 
@@ -609,9 +608,8 @@ class StudiaZamawiane2012(ZamawianeAbstract):
                     'old_account' : old_sz.bank_account and old_sz.bank_account or '',
                     'new_account' : self.bank_account and self.bank_account or '',
                 }
-                context = Context(c)
-                message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
-                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context)
+                message_user = render_to_string('users/bank_account_change_email.html', c)
+                message_employee = render_to_string('users/bank_account_change_email_employee.html', c)
 
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
 

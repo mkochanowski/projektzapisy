@@ -124,8 +124,7 @@ def employee_profile(request, user_id):
         })
 
         if request.is_ajax():
-            return render($3, $1, $2)ontents.html',
-                data, context_instance=RequestContext(request))
+            return render(request, 'users/employee_profile_contents.html', data)
         else:
             semester = Semester.get_current_semester()
             employees = Employee.get_list()
@@ -236,8 +235,7 @@ def consultations_change(request):
         return render(request, 'users/consultations_change_form.html', {'form':form})
     except Employee.DoesNotExist:
         messages.error(request, 'Nie jesteś pracownikiem.')
-        return render($2, $1)
-                context_instance=RequestContext(request))
+        return render(request, 'common/error.html')
 
 @login_required
 def password_change_done(request):

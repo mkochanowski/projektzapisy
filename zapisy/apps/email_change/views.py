@@ -92,11 +92,10 @@ def email_change_view(request, extra_context={},
                 'protocol': protocol,
             }
             c.update(extra_context)
-            context = Context(c)
 
             # Send success email
-            subject = render_to_string(email_subject_template_name, context_instance=context)
-            message = render_to_string(email_message_template_name, context_instance=context)
+            subject = render_to_string(email_subject_template_name, c)
+            message = render_to_string(email_message_template_name, c)
             
             send_mail('[Fereol] Weryfikacja zmiany adresu email', message, None, [email])
             messages.success(request, "Mail zawierający link weryfikacyjny został wysłany na Twój nowy adres email. Postępuj zgodnie z instrukcjami w tym mailu by z sukcesem zmienić Twój obecny adres email.")

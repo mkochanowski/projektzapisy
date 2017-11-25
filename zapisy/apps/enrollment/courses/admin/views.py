@@ -148,14 +148,14 @@ def import_semester(request):
                 {
                     'form': form,
                     'errormsg': errormsg,
-                })
+                }
             )
     else:
         form = SemesterImportForm()
 
     return render(
         request, 'enrollment/courses/admin/import_semester.html',
-        { 'form': form })
+        { 'form': form }
     )
 
 
