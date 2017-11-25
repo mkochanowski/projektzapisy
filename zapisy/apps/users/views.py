@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.views import login
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -80,22 +80,22 @@ def student_profile(request, user_id):
         })
 
         if request.is_ajax():
-            return render_to_response('users/student_profile_contents.html', data, context_instance=RequestContext(request))
+            return render(request, 'users/student_profile_contents.html', data)
         else:
             students = Student.get_list()
             enrolled_students = Record.recorded_students(students)
             data['students'] = enrolled_students
             data['char'] = "All"
-            return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
+            return render(request, 'users/student_profile.html', data)
 
     except Student.DoesNotExist:
         logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % int(user_id) )
         messages.error(request, "Nie ma takiego studenta.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return render(request, 'common/error.html')
     except User.DoesNotExist:
         logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
         messages.error(request, "Nie ma takiego użytkownika.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return render(request, 'common/error.html')
 
 def employee_profile(request, user_id):
     """employee profile"""
@@ -109,11 +109,11 @@ def employee_profile(request, user_id):
     except Employee.DoesNotExist:
         logger.error('Function employee_profile(user_id = %s) throws NonEmployeeException while acessing to non existing employee.' % str(user_id) )
         messages.error(request, "Nie ma takiego pracownika.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return render(request, 'common/error.html')
     except User.DoesNotExist:
         logger.error('Function employee_profile(id = %s) throws User.DoesNotExist while acessing to non existing user.' % str(user_id) )
         messages.error(request, "Nie ma takiego użytkownika.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))
+        return render(request, 'common/error.html')
 
     try:
         courses = prepare_schedule_courses(request, for_employee=employee)
@@ -124,7 +124,7 @@ def employee_profile(request, user_id):
         })
 
         if request.is_ajax():
-            return render_to_response('users/employee_profile_contents.html',
+            return render($3, $1, $2)ontents.html',
                 data, context_instance=RequestContext(request))
         else:
             semester = Semester.get_current_semester()
@@ -138,14 +138,14 @@ def employee_profile(request, user_id):
             data['employees'] = active_employees
             data['char'] = 'All'
 
-            return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
+            return render(request, 'users/employee_profile.html', data)
 
 
     except MoreThanOneCurrentSemesterException:
         data = {'employee' : employee}
         logger.error('Function employee_profile throws MoreThanOneCurrentSemesterException.' )
         messages.error(request, "Przepraszamy, system jest obecnie nieaktywny z powodu niewłaściwej konfiguracji semestrów. Prosimy spróbować później.")
-        return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
+        return render(request, 'users/employee_profile.html', data)
 
 @login_required
 def set_language(request):
@@ -191,7 +191,7 @@ def email_change(request):
 
             if user and user <> request.user:
                 messages.error(request, "Podany adres jest już przypisany do innego użytkownika!")
-                return render_to_response('users/email_change_form.html', {'form':form}, context_instance=RequestContext(request))
+                return render(request, 'users/email_change_form.html', {'form':form})
 
             form.save()
             logger.info('User (%s) changed email' % request.user.get_full_name())
@@ -199,7 +199,7 @@ def email_change(request):
             return HttpResponseRedirect(reverse('my-profile'))
     else:
         form = EmailChangeForm({'email' : request.user.email})
-    return render_to_response('users/email_change_form.html', {'form':form}, context_instance=RequestContext(request))
+    return render(request, 'users/email_change_form.html', {'form':form})
 
 @login_required
 def bank_account_change(request):
@@ -216,7 +216,7 @@ def bank_account_change(request):
     else:
         zamawiany = Student.get_zamawiany(request.user.id)
         form = BankAccountChangeForm({'bank_account': zamawiany.bank_account})
-    return render_to_response('users/bank_account_change_form.html', {'form':form}, context_instance=RequestContext(request))
+    return render(request, 'users/bank_account_change_form.html', {'form':form})
 
 @login_required
 def consultations_change(request):
@@ -233,10 +233,10 @@ def consultations_change(request):
                 return HttpResponseRedirect(reverse('my-profile'))
         else:
             form = ConsultationsChangeForm({'consultations': employee.consultations, 'homepage': employee.homepage, 'room': employee.room})
-        return render_to_response('users/consultations_change_form.html', {'form':form}, context_instance=RequestContext(request))
+        return render(request, 'users/consultations_change_form.html', {'form':form})
     except Employee.DoesNotExist:
         messages.error(request, 'Nie jesteś pracownikiem.')
-        return render_to_response('common/error.html',
+        return render($2, $1)
                 context_instance=RequestContext(request))
 
 @login_required
@@ -308,7 +308,7 @@ def employees_list(request, begin = 'All', query=None):
             "query": query
             }
 
-    return render_to_response('users/employees_list.html', data, context_instance=RequestContext(request))
+    return render(request, 'users/employees_list.html', data)
 
 def consultations_list(request, begin='A'):
 
@@ -324,7 +324,7 @@ def consultations_list(request, begin='A'):
             "employees" : employees,
             "char": begin
             }
-        return render_to_response('users/consultations_list.html', data, context_instance=RequestContext(request))
+        return render(request, 'users/consultations_list.html', data)
 
 
 @login_required
@@ -343,7 +343,7 @@ def students_list(request, begin = 'All', query=None):
             'mailto_group': mailto(request.user, students),
             'mailto_group_bcc': mailto(request.user, students, True)
         }
-        return render_to_response('users/students_list.html', data, context_instance=RequestContext(request))
+        return render(request, 'users/students_list.html', data)
 
 @login_required
 def logout(request):
@@ -455,4 +455,4 @@ def email_students(request):
     else:
         form = EmailToAllStudentsForm(initial={'sender': 'zapisy@cs.uni.wroc.pl'})
         form.fields['sender'].widget.attrs['readonly'] = True
-    return render_to_response('users/email_students.html', {'form':form, 'students_mails': studentsmails}, context_instance=RequestContext(request))
+    return render(request, 'users/email_students.html', {'form':form, 'students_mails': studentsmails})
