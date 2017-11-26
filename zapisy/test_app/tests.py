@@ -656,14 +656,6 @@ class AdminTests(SeleniumTestCase):
       "/fereol_admin/vote/singlevote/", "/fereol_admin/vote/systemstate/"
       ]
 
-    @classmethod
-    def setUpClass(cls):
-        super(AdminTests, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super(AdminTests, cls).tearDownClass()
-
     def createAdmin(self):
         self.password = '11111'
         self.admin = User.objects.create_superuser(username='przemka',
