@@ -14,7 +14,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.translation import check_for_language
+from django.utils.translation import check_for_language, LANGUAGE_SESSION_KEY
 from django.conf import settings
 
 import vobject
@@ -157,7 +157,7 @@ def set_language(request):
             account.preferred_language = lang_code
             account.save()
             if hasattr(request, 'session'):
-                request.session['django_language'] = lang_code
+                request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response
