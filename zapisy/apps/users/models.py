@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-import settings
 import logging
 
 from django.db import models
