@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
+import datetime
+import logging
 
 from django.db import models
+from django.conf import settings
+from django.apps import apps
 from django.contrib.auth.models import User, UserManager
 from django.core.mail import send_mail
-from django.db.models import Q, Sum
-from django.apps import apps
-from django.db.models.query import EmptyQuerySet
 from django.template import Context
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
+
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
-from django.core.cache import cache as mcache
-import datetime
 from apps.users.managers import GettersManager, T0Manager
 
-from django.conf import settings
-
-import logging
 logger = logging.getLogger()
 
 EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 
+
 class Related(models.Manager):
     def get_queryset(self):
         return super(Related, self).get_queryset().select_related('user')
+
 
 class ExtendedUser(User):
     is_student = models.BooleanField(default = False, verbose_name="czy student?")

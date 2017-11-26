@@ -1,60 +1,45 @@
 # -*- coding: utf-8 -*-
 
+import logging
+import json
+import datetime
+
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
-from django.views.decorators.http import require_POST
 from django.contrib.auth.views import login
 from django.shortcuts import render_to_response, redirect
-from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
-from django.utils.translation import LANGUAGE_SESSION_KEY
-
-from django.http import QueryDict, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.translation import check_for_language
-from django.db.models import Q
-
+from django.utils.translation import check_for_language, LANGUAGE_SESSION_KEY
 from django.conf import settings
+
+import vobject
+
 from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.offer.vote.models.single_vote import SingleVote
-
-from apps.users.exceptions import NonUserException, NonEmployeeException,\
-                                 NonStudentException
 from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException
-from apps.users.utils import prepare_ajax_students_list,\
-                             prepare_ajax_employee_list
-
+from apps.users.utils import prepare_ajax_students_list, prepare_ajax_employee_list
 from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 from apps.enrollment.utils import mailto
-
 from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
-
 from apps.enrollment.records.utils import *
-
-from datetime import timedelta
-from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
-import datetime
-from mailer.models import Message
-
-import logging
-import json
-
-from django.core.cache import cache as mcache
 from apps.notifications.forms import NotificationFormset
 from apps.notifications.models import NotificationPreferences
+from libs.ajax_messages import AjaxSuccessMessage
+from mailer.models import Message
+
 logger = logging.getLogger()
-import vobject
 
-
-GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
-        '4': 'cw', '5': 'cw+prac',
-        '6': 'sem', '7': 'lek', '8': 'WF',
-        '9': 'rep', '10': 'proj'}
+GTC = {'1': 'wy', '2': 'cw', '3': 'pr',
+       '4': 'cw', '5': 'cw+prac',
+       '6': 'sem', '7': 'lek', '8': 'WF',
+       '9': 'rep', '10': 'proj'}
 
 
 @login_required
