@@ -24,10 +24,10 @@ def refresh(matricula, ects):
             print "***" + str(matricula) + " brak"
             return
 
-        print student
-        print student.ects
-        print ects_sum
-        print ""
+        #  print student
+        #  print student.ects
+        #  print ects_sum
+        #  print ""
         student.ects = max(student.ects, ects_sum)
         student.save()
 

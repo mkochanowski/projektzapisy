@@ -232,7 +232,7 @@ def import_schedule(file, semester):
     course = None
     while True:
         line = file.readline()
-        print line
+        #  print line
         if not line:
             return
         if line.startswith('  '):
@@ -281,7 +281,7 @@ def import_schedule(file, semester):
             try:
                 course = get_course(name)
             except Exception, e:
-                print 'Error during creating course:%s. \nError: %s ' % (name, e)
+                #  print 'Error during creating course:%s. \nError: %s ' % (name, e)
                 break
 
         else:
@@ -304,7 +304,7 @@ def run_test(TEST_SCHEDULE_FILE, test_przedmioty, TEST_TECH, TEST_SEMESTERID):
 
 def run():
     semester = get_semester()
-    print 'Przenosimy na semestr <%s>' % semester
+    #  print 'Przenosimy na semestr <%s>' % semester
     file = open(SCHEDULE_FILE)
     import_schedule(file, semester)
 

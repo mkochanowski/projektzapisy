@@ -533,7 +533,6 @@ class NewSemesterTests(SeleniumTestCase):
         test_schedule_path = settings.BASE_DIR + '/test_schedule.txt'
         with open(test_schedule_path, 'w') as file:
             file.write(test_schedule)
-        print employees
         scheduleimport_run_test(
             test_schedule_path,
             courses,
