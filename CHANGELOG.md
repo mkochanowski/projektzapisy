@@ -2,6 +2,12 @@
 
 # Current version
 
+# Version 17.11.28
+
+* Fixed users schedules
+* Fixed course proposal form
+* Fixed removing student from group in admin
+
 # Version 17.11.21
 
 * Upgrade to Django 1.8
