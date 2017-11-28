@@ -7,6 +7,9 @@
 * Fixed users schedules
 * Fixed course proposal form
 * Fixed removing student from group in admin
+* Removed paranoid sessions
+* Fixed ignoring conflicts on reservation edition
+* Cleaned main repository directory
 
 # Version 17.11.21
 
