@@ -11,7 +11,7 @@ from ..models.group import Group
 from ..models.semester import ChangedDay, Semester
 from ..models.classroom import Classroom
 from apps.users.tests.factories import EmployeeFactory
-import common
+from zapisy import common
 
 
 class SemesterFactory(DjangoModelFactory):

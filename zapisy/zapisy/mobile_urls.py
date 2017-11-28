@@ -2,8 +2,6 @@
 from django.conf.urls.defaults import *
 from django.contrib.auth.views import login, logout
 
-from settings import PROJECT_PATH
-
 import os
 
 urlpatterns = patterns('',

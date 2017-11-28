@@ -7,8 +7,8 @@ from apps.enrollment.courses.exceptions import *
 from django.db.models import Q
 from django.core.validators import ValidationError
 from datetime import datetime, timedelta
-
-import common
+from django.conf import settings
+from zapisy import common
 
 from .term import Term
 
@@ -76,8 +76,6 @@ class Semester( models.Model ):
 
 
     def get_current_limit(self):
-        import settings
-
         if datetime.now() < self.records_ects_limit_abolition:
             return settings.ECTS_LIMIT
         else:
