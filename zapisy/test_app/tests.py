@@ -665,7 +665,7 @@ class AdminTests(SeleniumTestCase):
 
     def setUp(self):
         self.createAdmin()
-        self.driver.get('{}{}'.format(self.live_server_url, '/fereol_admin'))
+        self.driver.get('{}/fereol_admin'.format(self.live_server_url))
         self.wait_for_pass(
             lambda: self.driver.find_element_by_id('id_username').send_keys(self.admin.username)
             )
