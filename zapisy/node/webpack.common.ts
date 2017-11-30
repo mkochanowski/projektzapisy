@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
-import { sync as globSync } from "glob";
+const glob = require("glob");
 import { getVueCssLoaders } from "./webpack-utils";
 const webpack = require("webpack");
 const BundleTracker = require("webpack-bundle-tracker");
@@ -100,7 +100,7 @@ function getAllAssetDefs() {
 		mergeAssetDefs(result, defs);
 	}
 	const searchPath = path.join(ASSET_DEF_SEARCH_DIR, "**", ASSET_DEF_FILENAME);
-	for (const defFile of globSync(searchPath)) {
+	for (const defFile of glob.sync(searchPath)) {
 		const defs = readAsssetDefsFromFile(defFile);
 		mergeAssetDefs(result, defs);
 	}
@@ -203,12 +203,17 @@ module.exports = function(config: any) {
 		resolve: {
 			modules: [
 				path.resolve(ASSET_DIR),
-				path.resolve("node_modules"),
+				path.resolve("/home/vagrant/node/node_modules"),
 			],
 			extensions: [".ts", ".js", ".vue"],
 			alias: {
 				"vue$": "vue/dist/vue.runtime.esm.js",
 			},
+		},
+		resolveLoader: {
+			modules: [
+				path.resolve("/home/vagrant/node/node_modules"),
+			],
 		},
 		plugins: [
 			new webpack.optimize.CommonsChunkPlugin({
@@ -221,11 +226,12 @@ module.exports = function(config: any) {
 			new CleanWebpackPlugin([path.resolve(BUNDLE_OUTPUT_DIR)], {
 				verbose:  true,
 				dry:      false,
+				root:	  process.cwd(),
 			}),
 			new ExtractTextPlugin("[name]-[hash].min.css", {
 				allChunks: true
 			}),
-			new BundleTracker({ filename: "./webpack-stats.json" }),
+			new BundleTracker({ filename: "node/webpack-stats.json" }),
 			// This will copy "raw" assets - ones where we don't want any transformations
 			// (e.g. bootstrap styles)
 			new CopyWebpackPlugin(allAssetDefs.rawfiles),

@@ -5,7 +5,17 @@
     "alwaysStrict": true,
     "strict": true,
     "module": "commonjs",
-    "baseUrl": "/vagrant/zapisy/assets/"
+    "baseUrl": "/",
+    "paths": {
+      "*": [
+        "vagrant/zapisy/assets/*",
+        "home/vagrant/node/node_modules/*"
+      ]
+    },
+    "typeRoots": [
+      "/home/vagrant/node/node_modules/@types"
+    ],
+    "traceResolution": true
   },
   "include": [
     "assets/tsfix/index.ts"

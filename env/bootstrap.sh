@@ -194,3 +194,14 @@ pip install --upgrade virtualenv
 # Install nodejs
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt-get install -y nodejs
+
+# Create node dir outside VM shared folder for Windows compatibility
+mkdir /home/vagrant/node
+
+# package.json needs to be in the --prefixed dir
+cp /vagrant/zapisy/package.json /home/vagrant/node/package.json
+
+npm i --prefix /home/vagrant/node
+
+# Needed for module resolving
+export NODE_PATH=/home/vagrant/node/node_modules
