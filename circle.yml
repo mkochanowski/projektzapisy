@@ -12,7 +12,10 @@ dependencies:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
     # npm
-    - npm i
+    - mkdir -p /home/vagrant/node
+    - cp package.json /home/vagrant/node
+    - npm i --prefix /home/vagrant/node
+    - export NODE_PATH=/home/vagrant/node/node_modules
 
 test:
   pre:
