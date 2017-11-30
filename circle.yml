@@ -13,8 +13,9 @@ dependencies:
     - pip install -r requirements.test.txt
     # npm
     - sudo mkdir -p /home/vagrant/node
-    - sudo cp package.json /home/vagrant/node
-    - sudo `which npm` i --prefix /home/vagrant/node
+    - chmod +rw /home/vagrant/node
+    - cp package.json /home/vagrant/node
+    - npm i --prefix /home/vagrant/node
     - export NODE_PATH=/home/vagrant/node/node_modules
 
 test:
