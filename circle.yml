@@ -14,6 +14,7 @@ dependencies:
     # npm
     - sudo mkdir -p /home/vagrant/node
     - sudo cp package.json /home/vagrant/node
+    - echo `which npm`
     - sudo npm i --prefix /home/vagrant/node
     - export NODE_PATH=/home/vagrant/node/node_modules
 
