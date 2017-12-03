@@ -1,0 +1,11 @@
+# This cannot be run as root because node-sass is a piece of shit
+# and will fail with EACCES
+echo "Installing npm packages"
+
+# package.json needs to be in the --prefixed dir
+cp /vagrant/zapisy/package.json /node/package.json
+
+npm i --prefix /node
+
+# Needed for module resolving
+export NODE_PATH=/node/node_modules

@@ -13,7 +13,7 @@
       ]
     },
     "typeRoots": [
-      "/home/vagrant/node/node_modules/@types"
+      "/node/node_modules/@types"
     ],
     "traceResolution": true
   },

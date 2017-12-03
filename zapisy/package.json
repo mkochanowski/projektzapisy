@@ -4,9 +4,9 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "/home/vagrant/node/node_modules/.bin/webpack --progress --colors --config node/webpack.dev.ts",
-    "devw": "/home/vagrant/node/node_modules/.bin/webpack --progress --colors --watch --config node/webpack.dev.ts",
-    "build": "/home/vagrant/node/node_modules/.bin/webpack --progress --colors --config node/webpack.prod.ts"
+    "dev": "/node/node_modules/.bin/webpack --progress --colors --config node/webpack.dev.ts",
+    "devw": "/node/node_modules/.bin/webpack --progress --colors --watch --config node/webpack.dev.ts",
+    "build": "/node/node_modules/.bin/webpack --progress --colors --config node/webpack.prod.ts"
   },
   "repository": {
     "type": "git",

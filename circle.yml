@@ -12,12 +12,12 @@ dependencies:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
     # npm
-    - sudo mkdir -p /home/vagrant/node
+    - sudo mkdir -p /node
     - |
-      sudo chown `whoami`: /home/vagrant/node
-    - cp package.json /home/vagrant/node
-    - npm i --prefix /home/vagrant/node
-    - export NODE_PATH=/home/vagrant/node/node_modules
+      sudo chown `whoami`: /node
+    - cp package.json /node
+    - npm i --prefix /node
+    - export NODE_PATH=/node/node_modules
 
 test:
   pre:
