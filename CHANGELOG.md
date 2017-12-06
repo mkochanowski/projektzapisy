@@ -2,6 +2,9 @@
 
 # Current version
 
+* Upgraded the google analytics library
+
+
 # Version 17.10.25
 
 * Fixed missing title for login page
