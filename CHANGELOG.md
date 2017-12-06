@@ -2,8 +2,18 @@
 
 # Current version
 
+<<<<<<< HEAD
 * Upgraded the google analytics library
 
+=======
+# Version 17.11.21
+
+* Upgrade to Django 1.8
+* Loading courses with ajax
+* Fixed disappearing pop-up
+* Fixed issues with reservations and conflicts
+* Hided vote summary from non-users
+>>>>>>> master-dev
 
 # Version 17.10.25
 
