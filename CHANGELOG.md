@@ -20,7 +20,7 @@
 * Loading courses with ajax
 * Fixed disappearing pop-up
 * Fixed issues with reservations and conflicts
-* Hided vote summary from non-users
+* Hid vote summary from non-users
 
 # Version 17.10.25
 
