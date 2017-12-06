@@ -4,7 +4,6 @@
 
 * Upgraded the google analytics library
 
-=======
 # Version 17.11.28
 
 * Fixed users schedules
