@@ -69,8 +69,7 @@ class CourseAdmin(admin.ModelAdmin):
 
             q = request.GET.copy()
             semester = Semester.get_current_semester()
-            if semester:
-                q['semester__id__exact'] = semester.id
+            q['semester__id__exact'] = semester.id
             request.GET = q
             request.META['QUERY_STRING'] = request.GET.urlencode()
         return super(CourseAdmin,self).changelist_view(request, extra_context=extra_context)
@@ -357,8 +356,7 @@ class GroupAdmin(admin.ModelAdmin):
 
             q = request.GET.copy()
             semester = Semester.get_current_semester()
-            if semester:
-                q['course__semester__id__exact'] = semester.id
+            q['course__semester__id__exact'] = semester.id
             request.GET = q
             request.META['QUERY_STRING'] = request.GET.urlencode()
         return super(GroupAdmin,self).changelist_view(request, extra_context=extra_context)

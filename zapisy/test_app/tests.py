@@ -24,7 +24,7 @@ from apps.offer.vote.models import SystemState
 
 import os
 from time import sleep
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from django.db import connection
@@ -48,7 +48,7 @@ class SeleniumTestCase(LiveServerTestCase):
         super(SeleniumTestCase, cls).tearDownClass()
 
     def wait_for_pass(self, block, times=3):
-        for _ in xrange(1, times + 1):
+        for _ in xrange(times):
             try:
                 return block()
             except (ElementNotVisibleException, NoSuchElementException, TimeoutException):
@@ -662,9 +662,24 @@ class AdminTests(SeleniumTestCase):
                                                    email='admin@admin.com')
         self.admin.first_name = 'przemka'
         self.admin.save()
+    def createSemester(self):
+       today = datetime.now()
+       self.semester = Semester(
+           visible=True,
+           type=Semester.TYPE_WINTER,
+           year='2016/17',
+           records_opening=(today + timedelta(days=-1)),
+           records_closing=today + timedelta(days=6),
+           lectures_beginning=today + timedelta(days=4),
+           lectures_ending=today + timedelta(days=120),
+           semester_beginning=today,
+           semester_ending=today + timedelta(days=130),
+           records_ects_limit_abolition=(today + timedelta(days=1)))
+       self.semester.save()
 
     def setUp(self):
         self.createAdmin()
+        self.createSemester()
         self.driver.get('{}/fereol_admin'.format(self.live_server_url))
         self.wait_for_pass(
             lambda: self.driver.find_element_by_id('id_username').send_keys(self.admin.username)
@@ -678,6 +693,7 @@ class AdminTests(SeleniumTestCase):
 
     def tearDown(self):
         self.admin.delete()
+        self.semester.delete()
 
     def testAdminLogin(self):
         self.wait_for_pass(lambda: self.driver.find_element_by_id('user-tools'))
