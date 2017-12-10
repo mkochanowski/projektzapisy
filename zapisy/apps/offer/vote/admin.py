@@ -44,8 +44,8 @@ class SingleVoteAdmin( admin.ModelAdmin ):
        display those for the currently signed in user.
        """
        qs = super(SingleVoteAdmin, self).get_queryset(request)
-       return qs.select_related('student', 'student__user', 'course', 'course__semester', 'course__type', 'entity',
-           'proposal', 'state')
+       return qs.select_related('student', 'student__user', 'course', 'course__semester', 'course__information',
+                                'entity', 'state')
 
 class StateAdmin( admin.ModelAdmin ):
     """
