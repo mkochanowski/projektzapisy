@@ -1,6 +1,7 @@
 # projektzapisy Changelog
 
 # Current version
+* Show desiderates in offer menu
 
 # Version 17.11.28
 
