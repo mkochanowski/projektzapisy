@@ -74,11 +74,17 @@ def student_profile(request, user_id):
             return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except Student.DoesNotExist:
-        logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % int(user_id) )
+        logger.error(
+            'Function student_profile(id = {}) throws NonStudentException while acessing to non existing student.'
+            .format(str(user_id))
+        )
         messages.error(request, "Nie ma takiego studenta.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
-        logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
+        logger.error(
+            'Function student_profile(id = {}) throws User.DoesNotExist while acessing to non existing user.'
+            .format(str(user_id))
+        )
         messages.error(request, "Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
