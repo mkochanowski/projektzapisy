@@ -2,6 +2,8 @@
 
 {% block sidebar %}{% endblock %}
 
+{% block offer_menu_desiderata %} class="active"{% endblock %}
+
 {% block bread %}
     <a href="/">Strona główna</a> &raquo;
     <a href="{% url 'offer-main' %}">Oferta dydaktyczna</a> &raquo;
@@ -14,7 +16,8 @@
     <h3>Dezyderaty</h3>
 
     {% if semester.desiderata_is_open %}
-    Zaznacz godziny, w których nie możesz prowadzić zajęć.<br>
+    Zaznacz godziny, w których możesz prowadzić zajęcia. 
+    <p id="desiderata-emphasis">Proszę zwrócić uwagę, że zaznaczamy odwrotnie, niż było przyjęte na papierowych dezyderatach.</p><br>
     <form method="post">{% csrf_token %}
     <table>
         <thead>
