@@ -1,8 +1,10 @@
 # projektzapisy Changelog
 
 # Current version
-* Show desiderates in offer menu
 
+# Version 17.12.11
+
+* Show desiderates in offer menu
 * Upgraded the google analytics library
 
 # Version 17.11.28
