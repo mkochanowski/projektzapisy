@@ -8,12 +8,13 @@
     "baseUrl": "/",
     "paths": {
       "*": [
-        "vagrant/zapisy/assets/*",
-        "home/vagrant/node/node_modules/*"
+        "/vagrant/zapisy/assets/*",
+        "/node/node_modules/*"
       ]
     },
     "typeRoots": [
-      "/node/node_modules/@types"
+      "/node/node_modules/@types",
+      "/vagrant/zapisy/node/typings/"
     ],
     "traceResolution": true
   },
