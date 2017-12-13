@@ -50,7 +50,7 @@ def email_change_view(request, extra_context={},
     """
     if request.method == 'POST':
         form = EmailChangeForm(request.POST, instance=request.user)
-        if form.is_valid():            
+        if form.is_valid():
             email = form.cleaned_data.get('email')
             user = User.objects.filter(email=email)
 
