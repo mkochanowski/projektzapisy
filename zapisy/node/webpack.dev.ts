@@ -10,3 +10,5 @@ module.exports = merge(common({
 }), {
 	devtool: "inline-source-map"
 });
+
+console.warn(module.exports.module.rules[2].options);

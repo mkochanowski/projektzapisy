@@ -25,3 +25,5 @@ module.exports = merge(common({
 		}),
 	]
 });
+
+console.warn(module.exports.module.rules[2].options);
