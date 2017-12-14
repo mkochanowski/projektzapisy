@@ -12,13 +12,23 @@ function getVueCssLoaders(options: any) {
 				loader = loader + "-loader";
 				extraParamChar = "?";
 			}
-			return loader + (options.sourceMap ? extraParamChar + "sourceMap" : "");
+			let result = loader;
+			if (options.sourceMap) {
+				result += `${extraParamChar}sourceMap`;
+				extraParamChar = "&";
+			}
+			if (options.minifyCss) {
+				result += `${extraParamChar}minimize`;
+			}
+			return result;
 	  	}).join("!");
 
 		// Extract CSS when that option is specified
 		// (which is the case during production build)
 		if (options.extract) {
-			return ExtractTextPlugin.extract("vue-style-loader", sourceLoader);
+			return ExtractTextPlugin.extract({
+				use: sourceLoader
+			});
 	  	} else {
 			return ["vue-style-loader", sourceLoader].join("!");
 		}
@@ -29,6 +39,8 @@ function getVueCssLoaders(options: any) {
 		css: generateLoaders(["css"]),
 		postcss: generateLoaders(["css"]),
 		less: generateLoaders(["css", "less"]),
+		scss: generateLoaders(["css", "sass"]),
+		sass: generateLoaders(["css", "sass"]),
 	};
 }
 
