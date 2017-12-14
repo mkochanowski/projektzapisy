@@ -1,13 +1,15 @@
-{% load url from future %}
 {% load fereol_common %}
 {% load compressed %}
 {% load staticfiles %}
+{% load settings_value %}
+{% load osenv_value %}
+{% load django_version %}
 {% load i18n %}
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="utf-8">
-    <title>{% block main-subtitle %}{% endblock %} - {% block title %}System Zapisów{% endblock %}</title>
+    <title>{% block main-subtitle %}{% endblock %} &ndash; {% block title %}System Zapisów{% endblock %}</title>
     <meta name="description"
           content="System obsługi cyklu dydaktycznego Instytut Informatyki Uniwersytetu Wrocławskiego">
     <meta name="author" content="KSI i Studenci Instytutu Informatyki Uniwersytetu Wrocławskiego">
@@ -16,10 +18,18 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <!-- Le fav and touch icons -->
-    <link rel="shortcut icon" href="{% static 'favicon.ico'%}">
-    <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png'%}">
-    <link rel="apple-touch-icon" sizes="72x72" href="{% static 'images/apple-touch-icon-72x72.png'%}">
-    <link rel="apple-touch-icon" sizes="114x114" href="{% static 'images/apple-touch-icon-114x114.png'%}">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png' %}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{% static 'images/apple-touch-icon-72x72.png' %}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{% static 'images/apple-touch-icon-114x114.png' %}">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-109984921-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-109984921-1');
+    </script>
     <!-- Le styles -->
     <style>
         .label {
@@ -82,7 +92,8 @@
         })
     });
     </script>
-
+    <script src="{% static "js/common/utils.js" %}"></script>
+    <script src="{% static "js/common/base.js" %}"></script>
 </head>
 
 <body>
@@ -93,6 +104,11 @@
 </form>
 <script type="text/javascript">
     jQuery.dataInvalidate_check();
+    $(document).ready(function() {
+        $('.dropdown-menu input,label').click(function(e) {
+                e.stopPropagation(); //This will prevent the event from bubbling up and close the dropdown when you type/click on text boxes.
+        });
+    });
 </script>
 
 <div class="top">
@@ -101,29 +117,40 @@
             <!-- up-menu  -->
             <div class="container">
 
-                <ul>
-                    <li{% block enrollment_active %}{% endblock %}><a href="{% url 'enrollment-main' %}">System
-                        Zapisów</a>
+                <ul class="topBarLinkContainer">
+                    <li{% block enrollment_active %}{% endblock %}>
+                        <a href="{% url 'enrollment-main' %}">System Zapisów</a>
                     </li>
-                    <li{% block grade_active %}{% endblock %}><a href="{% url 'grade-main' %}">Ocena Zajęć</a></li>
-                    <li{% block offer_active %}{% endblock %}><a href="{% url 'offer-main' %}">Oferta</a></li>
-                    {% if perms.courses.view_stats %}<li{% block statistics_active %}{% endblock %}><a href="{% url 'statistics:main' %}">Statystyki</a></li>{% endif %}
-                    <li{% block events_active %}{% endblock %}><a href="{% url 'events:classrooms' %}">Sale <span style="color:red;font-size: 10px">beta</span></a></li>
+                    <li{% block grade_active %}{% endblock %}>
+                        <a href="{% url 'grade-main' %}">Ocena Zajęć</a>
+                    </li>
+                    <li{% block offer_active %}{% endblock %}>
+                        <a href="{% url 'offer-main' %}">Oferta</a>
+                    </li>
+                    {% if perms.courses.view_stats %}
+                        <li{% block statistics_active %}{% endblock %}>
+                            <a href="{% url 'statistics:main' %}">Statystyki</a>
+                        </li>
+                    {% endif %}
+                    <li{% block events_active %}{% endblock %}>
+                        <a href="{% url 'events:classrooms' %}">Sale</a>
+                    </li>
 
                 </ul>
                 {% if user.is_authenticated %}
                     <div class="user-panel">
-                        Witaj,
-                        <strong>{% if user.is_staff %}{{ user.first_name }}{% else %}{{ user.get_full_name }}{% endif %}</strong>
+                        <strong>
+                        {{ user.get_full_name }}
+                        </strong>
                         |
                         <a href="{% url 'my-profile' %}">Moje konto</a> |
                         {% if user.is_staff %}
                             <a href="/fereol_admin/">Admin</a> |
                         {% endif %}
-                        {% if user.get_profile.is_student and user.student.get_number_of_news > 0 %}
+                        {% if user.profile.is_student and user.student.get_number_of_news > 0 %}
                             <a href="{% url 'news-all' %}"
                                class="unread">Aktualności ({{ user.student.get_number_of_news }})</a> |
-                            {% elif user.get_profile.is_employee and user.employee.get_number_of_news > 0 %}
+                            {% elif user.profile.is_employee and user.employee.get_number_of_news > 0 %}
                                 <a href="{% url 'news-all' %}"
                                    class="unread">Aktualności ({{ user.employee.get_number_of_news }})</a> |
                             {% else %}
@@ -131,29 +158,49 @@
 
                         {% endif %}
                         <a href="{% url 'help' %}">Pomoc</a> |
-                        <a href="{% url 'user-logout' %}">Wyloguj</a>
+                        <a href="{% url 'cas_ng_logout' %}">Wyloguj</a>
                     </div>
                 {% else %}
-
-                    <form action="{% url 'apps.users.views.login_plus_remember_me' %}" method="POST">
-                        {% csrf_token %}
-                        <div class="inline-inputs">
-                            {% if request.path == '/' %}
-                                <input type="hidden" name="next" value="{% url 'schedule-own' %}"/>
-                            {% else %}
-                                <input type="hidden" name="next" value="{{request.path}}"/>
-                            {% endif %}
-                            <label for="id_login">użytkownik:</label>
-                            <input class="small" tabindex="1" type="text" id="id_login" name="username">
-
-                            <label for="id_password">hasło:</label>
-                            <input class="small" tabindex="2"  type="password" id="id_password" name="password">
-
-                            <button class="btn small" tabindex="4"  type="submit">Loguj &raquo;</button>
-                            <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me">
-                            <label for="xlInput3">Zapamiętaj mnie</label>
-                        </div>
-                    </form>
+      <ul class="nav secondary-nav">
+          <li class="dropdown" data-dropdown="dropdown">
+              <a href="#" id="login-dropdown" class="dropdown-toggle" data-toggle="dropdown"><b>Zaloguj się</b> <span class="caret"></span></a>
+                <ul id="login-dp" class="dropdown-menu">
+                    <li>
+                         <div class="row">
+                                <div class="col-md-12">
+                                    <a href="{% url 'cas_ng_login' %}" class="btn" id="btn-usos"><img src="{% static 'images/usos-login-logo.png'%}" alt="Uniwersytet Wrocławski">Zaloguj się przez USOS</a>
+                                    <button class="btn primary" id="btn-no-usos">
+                                      lub użyj konta Systemu Zapisów
+                                    </button>
+                                    <div id="login-without-usos">
+                                      <form action="{% url 'apps.users.views.login_plus_remember_me' %}" method="POST">
+                                          {% csrf_token %}
+                                          {% if request.path == '/' %}
+                                              <input type="hidden" name="next" value="{% url 'schedule-own' %}"/>
+                                          {% else %}
+                                              <input type="hidden" name="next" value="{{request.path}}"/>
+                                          {% endif %}
+                                          <div class="form-group">
+                                              <input tabindex="1" type="text" id="id_login" name="username" placeholder="Użytkownik">
+                                          </div>
+                                          <div class="form-group">
+                                              <input tabindex="2" type="password" id="id_password" name="password" placeholder="Hasło">
+                                          </div>
+                                          <div class="form-group">
+                                               <button type="submit" tabindex="4" class="btn btn-primary btn-block">Zaloguj &raquo;</button>
+                                          </div>
+                                          <div class="form-group">
+                                              <label>
+                                              <input type="checkbox" tabindex="3"  value="true" id="xlInput3" name="remember_me"> Pamiętaj mnie</label>
+                                          </div>
+                                      </form>
+                                    </div>
+                                </div>
+                         </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
                 {% endif %}
             </div>
             <!-- end up-menu  -->
@@ -203,20 +250,14 @@
             </div>
         {% endfor %}
         {% endblock %}
-        {% block filter %}
-            {# end filter #}
-        {% endblock %}
-        <div id="main-content-container" class="row show-grid sidebar-right">
+        <div id="main-content-container" class="row show-grid sidebar-right marginFix">
+            {% block topContent %}{% endblock %}
             {% block center %}
-                <div class="span{% block content-width %}11{% endblock %} columns">
-
-
+                <div class="span{% block content-width %}11{% endblock %} columns marginFix contentNoCollapse">
                     <div id="main-content">
                         {% block content %}
                         {% endblock %}
-                        &nbsp;
                     </div>
-
                 </div>
                 <div class="span{% block sidebar-width %}5{% endblock %} columns">
                     {% block sidebar %}
@@ -230,25 +271,16 @@
     <footer>
         <p>
             {# <a href="{% url 'on-mobile' %}" class="go-mobile">Przejdź do wersji mobilnej</a> #}
-            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>{% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@cs.uni.wroc.pl">zapisy@cs.uni.wroc.pl</a>{% endif %} | Błędy i uwagi: <a href="https://tracker-zapisy.ii.uni.wroc.pl/">[link]</a> Wygenerowano: {% now "H:i:s" %}</p>
-
+            &copy; {% now "Y" %} <a href="http://www.ii.uni.wroc.pl/">Instytut Informatyki UWr</a>
+            {% if user.is_authenticated %} | Nieprawidłowe dane należy zgłaszać na adres <a href="mailto:zapisy@cs.uni.wroc.pl">zapisy@cs.uni.wroc.pl</a>{% endif %}
+            | Błędy i uwagi: <a href="https://tracker-zapisy.ii.uni.wroc.pl/">[link]</a> Wygenerowano: {% now "H:i:s" %}
+            {% if "DEBUG"|settings_value == True or "II_ZAPISY_STAGING"|osenv_value == "True" %}| <strong>Django {% django_version %}</strong>{% endif %}
+        </p>
     </footer>
 
 </div>
 <!-- /container -->
-<script type="text/javascript">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-32366226-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
 </body>
 
 </html>

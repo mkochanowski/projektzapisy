@@ -29,15 +29,15 @@ UserScheduleView.courseList = [];
 
 UserScheduleView.initGroups = function()
 {
-	var coursesRAW = $.parseJSON($(
-		'#user-schedule-scheduleContainer input[name=courses]').val());
+	const coursesRAW = JSON.parse($(
+		"#userScheduleCoursesJson").html());
 	coursesRAW.forEach(function(courseRAW)
 	{
 		Fereol.Enrollment.Course.fromJSON(courseRAW);
 	});
 
-	var groupsRAW = $.parseJSON(
-		$('#user-schedule-scheduleContainer input[name=groups]').val());
+	const groupsRAW = JSON.parse($(
+		"#userScheduleGroupsJson").html());
 	groupsRAW.forEach(function(groupRAW)
 	{
 		Fereol.Enrollment.CourseGroup.fromJSON(groupRAW);

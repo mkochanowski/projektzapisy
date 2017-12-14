@@ -1,5 +1,4 @@
 {% extends "enrollment/base.html" %}
-{% load url from future %}
 {% load compressed %}
 {% load cache %}
 {% block styles %}
@@ -49,7 +48,7 @@
     {% endcache %}
 {% endblock %}
 
-{% block filter %}
+{% block topContent %}
 	<div id="enr-EmployeesList-top-bar" class="main-top-bar" style="display: none">
 		<fieldset>
 			<legend><span>Filtrowanie</span></legend>

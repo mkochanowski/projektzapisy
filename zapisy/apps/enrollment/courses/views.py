@@ -4,13 +4,15 @@ import json
 from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from django.shortcuts               import render_to_response
-from django.template                import RequestContext
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.template.response import TemplateResponse
+from django.template.loader import render_to_string
+from django.core.urlresolvers import reverse
 
-from apps.enrollment.courses.models         import *
-from apps.enrollment.records.models          import *
+from apps.enrollment.courses.models import *
+from apps.enrollment.records.models import *
 
 from apps.enrollment.courses.exceptions import NonCourseException
 from apps.users.models import BaseUser, OpeningTimesView
@@ -21,61 +23,96 @@ logger = logging.getLogger()
 
 
 def main(request):
-    return render_to_response( 'enrollment/main.html', {}, context_instance = RequestContext( request ))
+    return render_to_response(
+        'enrollment/main.html', {},
+        context_instance=RequestContext(request))
 
-def prepare_courses_list_to_render(request,default_semester=None,user=None, student=None):
+
+def get_courses_list_in_semester_with_history_info(user, semester):
+    """
+        This ugly piece of SQL is generally the
+        fastest way to implement the functionality we want, so it's here
+        as an exception.
+
+        Disabled for now because the clients-side part isn't ready anyway.
+        TODO: re-enable when that's done.
+    """
+    return Course.visible.filter(semester=semester)
+    """
+        .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
+                                     ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
+                                     ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
+                                     ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
+                                     ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
+    """
+
+
+def get_course_list_info_json_for_semester(user, semester):
+    if BaseUser.is_student(user):
+        courses = get_courses_list_in_semester_with_history_info(
+            user, semester)
+    else:
+        courses = Course.visible.filter(semester=semester)\
+                                .order_by('entity__name')
+    courses_list_for_json = [c.serialize_for_json() for c in courses]
+    semester_for_json = {
+        "id": semester.pk,
+        "year": semester.year,
+        "type": semester.get_type_display()
+    }
+    courses_list_info = {
+        "courseList": courses_list_for_json,
+        "semesterInfo": semester_for_json
+    }
+    return json.dumps(courses_list_info)
+
+
+def prepare_courses_list_to_render(
+        request, default_semester=None, user=None, student=None):
     ''' generates template data for filtering and list of courses '''
     if not default_semester:
         default_semester = Semester.get_default_semester()
     if not user:
         user = request.user
-
-
     semesters = Semester.objects.filter(visible=True)
-    if BaseUser.is_student(user):
-        courses = Course.visible.all().order_by('entity__name')\
-            .extra(select={'in_history': 'SELECT COUNT(*) FROM "records_record"' \
-                                         ' INNER JOIN "courses_group" ON ("records_record"."group_id" = "courses_group"."id")' \
-                                         ' INNER JOIN "courses_course" cc ON ("courses_group"."course_id" = cc."id")' \
-                                         ' WHERE (cc."entity_id" = "courses_course"."entity_id"  AND "records_record"."student_id" = '+ str(user.student.id)+ '' \
-                                                 ' AND "records_record"."status" = \'1\' AND "cc"."semester_id" <> "courses_course"."semester_id")'})
-    else:
-        courses = Course.visible.all().order_by('entity__name')
-
-
-
+    courses_list_json = get_course_list_info_json_for_semester(
+        user, default_semester)
     return {
-        'courses': courses,
+        'courses_list_json': courses_list_json,
         'semester_courses': semesters,
-        'types_list' : Type.get_all_for_jsfilter(),
-        'default_semester': default_semester
+        'types_list': Type.get_all_for_jsfilter(),
+        'default_semester': default_semester,
+        'effects': Effects.objects.all(),
+        'tags': Tag.objects.all(),
     }
 
 def prepare_courses_list_to_render_and_return_course(request,default_semester=None,user=None, student=None, course_slug=None):
     ''' generates template data for filtering and list of courses '''
     render_data = prepare_courses_list_to_render(request,default_semester,user, student)
-    result_course = Course.objects.get(slug=course_slug) if course_slug else None
-
+    result_course = None
+    if course_slug:
+        try:
+            result_course = Course.objects.get(slug=course_slug)
+        except Course.DoesNotExist:
+            pass
     return render_data, result_course
 
 def courses(request):
     return render_to_response('enrollment/courses/courses_list.html',
         prepare_courses_list_to_render(request), context_instance=RequestContext(request))
 
-@login_required
-def votes(request, slug):
-    from apps.offer.vote.models import SystemState, SingleVote
-    data, course = prepare_courses_list_to_render_and_return_course(request, course_slug=slug)
 
-    data['course'] = course
-    data['voters'] = map(lambda x: x.student, SingleVote.objects\
-                .filter(Q(course__slug=slug),
-                            Q(state__semester_winter=data['default_semester']) |
-                            Q(state__semester_summer=data['default_semester']))\
-                .select_related('student', 'student__user'))
-    data['voters_count'] = len(data['voters'])
+def get_semester_info(request, semester_id):
+    try:
+        semesterObj = Semester.objects.get(
+            Q(pk=semester_id) & Q(visible=True))
+        jsonString = get_course_list_info_json_for_semester(
+            request.user, semesterObj)
 
-    return render_to_response('enrollment/courses/voters.html', data, context_instance=RequestContext(request))
+        return HttpResponse(jsonString, content_type='application/json')
+    except Semester.DoesNotExist:
+        raise Http404
+
 
 def course(request, slug):
     try:
@@ -151,9 +188,9 @@ def course(request, slug):
             for g in groups:
                 # TODO to poniżej
                 #g.is_in_diff = [group.id for group in student_groups if group.type == g.type]
-                g.serialized = json.dumps(g.serialize_for_ajax(
+                g.serialized = json.dumps(g.serialize_for_json(
                     enrolled_ids, queued_ids, pinned_ids,
-                    queue_priorities, student, user=user
+                    queue_priorities, student
                 ))
 
         lectures = []
@@ -259,14 +296,17 @@ def course(request, slug):
         ectsLimitExceeded = False
         maxEcts = default_semester.get_current_limit()
         currentEcts = 0
+
         if student and student.get_points_with_course(course) > maxEcts:
             currentEcts = student.get_points()
             ectsLimitExceeded = True
+        
+        employees = { group.teacher for group in Group.objects.filter(course=course) }
 
         data.update({
             'details_hidden': courseView_details_hidden,
             'course' : course,
-            'course_json': json.dumps(course.serialize_for_ajax(student, is_recording_open=course.is_recording_open)),
+            'employees': employees,
             'points' : course.get_points(student),
             'tutorials' : tutorials,
             'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
@@ -278,24 +318,19 @@ def course(request, slug):
             'current_ects' : currentEcts
         })
 
-        return render_to_response( 'enrollment/courses/course.html', data, context_instance = RequestContext( request ) )
+        if request.is_ajax():
+            rendered_html = render_to_string(
+                'enrollment/courses/course_info.html',
+                data, context_instance = RequestContext(request))
+            return JsonResponse({
+                'courseHtml': rendered_html,
+                'courseName': course.name,
+                'courseEditLink': reverse('admin:courses_course_change', args=[course.pk])
+            })
+        else:
+            return render_to_response(
+                'enrollment/courses/course.html',
+                data, context_instance = RequestContext(request))
 
     except (Course.DoesNotExist, NonCourseException):
         raise Http404
-
-
-def course_consultations(request, slug):
-    try:
-        course = Course.visible.get(slug=slug)
-        employees = set(map(lambda x: x.teacher, Group.objects.filter(course=course)))
-        data = prepare_courses_list_to_render(request)
-        data.update({
-            'course' : course,
-            'employees' : employees
-        })
-        return render_to_response( 'enrollment/courses/course_consultations.html', data, context_instance = RequestContext( request ) )
-
-    except (Course.DoesNotExist, NonCourseException):
-        logger.error('Function course_consultations(slug = %s) throws Course.DoesNotExist exception.' % unicode(slug) )
-        messages.error(request, "Przedmiot nie istnieje.")
-        return render_to_response('common/error.html', context_instance=RequestContext(request))

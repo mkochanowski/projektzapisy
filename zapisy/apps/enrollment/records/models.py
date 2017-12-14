@@ -20,24 +20,22 @@ from datetime import datetime, timedelta, date
 from itertools import cycle
 
 from django.db.models import signals
-#from django.dispatch import receiver
-from settings import ECTS_LIMIT
 from apps.enrollment.utils import mail_enrollment_from_queue
 import logging
 logger = logging.getLogger('project.default')
 backup_logger = logging.getLogger('project.backup')
 
 class EnrolledManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns only enrolled students. """
         # hate to do it like this but seems like there is no other way
-        return super(EnrolledManager, self).get_query_set().filter(status='1')
+        return super(EnrolledManager, self).get_queryset().filter(status='1')
 
 class PinnedManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns only enrolled students. """
         # hate to do it like this but seems like there is no other way
-        return super(PinnedManager, self).get_query_set().filter(status='2')
+        return super(PinnedManager, self).get_queryset().filter(status='2')
 
 class Record(models.Model):
 
@@ -124,7 +122,7 @@ class Record(models.Model):
         return Record.enrolled.\
             filter(student=student, group__course__semester=semester).\
             select_related('group', 'group__course', 'group__course__entity',\
-            'group__course__type')
+            'group__course__entity__type')
     
     @staticmethod
     def get_student_enrolled_ids(student, semester):
@@ -291,9 +289,9 @@ class Record(models.Model):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
 
 class QueueManager(models.Manager):
-    def get_query_set(self):
+    def get_queryset(self):
         """ Returns only queued students. """
-        return super(QueueManager, self).get_query_set()
+        return super(QueueManager, self).get_queryset()
     
 
 def queue_priority(value):

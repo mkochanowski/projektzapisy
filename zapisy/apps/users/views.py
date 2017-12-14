@@ -1,58 +1,45 @@
 # -*- coding: utf-8 -*-
 
+import logging
+import json
+import datetime
+
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
-from django.views.decorators.http import require_POST
 from django.contrib.auth.views import login
 from django.shortcuts import render_to_response, redirect
-from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
-
-from django.http import QueryDict, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.translation import check_for_language
-from django.db.models import Q
-
+from django.utils.translation import check_for_language, LANGUAGE_SESSION_KEY
 from django.conf import settings
+
+import vobject
+
 from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.offer.vote.models.single_vote import SingleVote
-
-from apps.users.exceptions import NonUserException, NonEmployeeException,\
-                                 NonStudentException
 from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException
-from apps.users.utils import prepare_ajax_students_list,\
-                             prepare_ajax_employee_list
-
+from apps.users.utils import prepare_ajax_students_list, prepare_ajax_employee_list
 from apps.users.models import Employee, Student, BaseUser
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 from apps.enrollment.utils import mailto
-
 from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
-
 from apps.enrollment.records.utils import *
-
-from datetime import timedelta
-from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
-import datetime
-from mailer.models import Message
-
-import logging
-
-from django.core.cache import cache as mcache
 from apps.notifications.forms import NotificationFormset
 from apps.notifications.models import NotificationPreferences
+from libs.ajax_messages import AjaxSuccessMessage
+from mailer.models import Message
+
 logger = logging.getLogger()
-import vobject
 
-
-GTC = {'1' : 'wy', '2': 'cw', '3': 'pr',
-        '4': 'cw', '5': 'cw+prac',
-        '6': 'sem', '7': 'lek', '8': 'WF',
-        '9': 'rep', '10': 'proj'}
+GTC = {'1': 'wy', '2': 'cw', '3': 'pr',
+       '4': 'cw', '5': 'cw+prac',
+       '6': 'sem', '7': 'lek', '8': 'WF',
+       '9': 'rep', '10': 'proj'}
 
 
 @login_required
@@ -60,11 +47,19 @@ def student_profile(request, user_id):
     """student profile"""
     try:
         student = Student.objects.select_related('user').get(user=user_id)
-        courses = prepare_schedule_courses(request, for_student=student)
+        courses_with_terms = prepare_schedule_courses(
+            request, for_student=student)
         votes   = SingleVote.get_votes(student)
-        data = prepare_schedule_data(request, courses)
+        data = prepare_schedule_data(request, courses_with_terms)
+        courses_for_template = []
+        for course, terms in courses_with_terms:
+            d = {}
+            d["id"] = course.id
+            d["terms"] = [json.dumps(term.serialize_for_json())
+                          for term in terms]
+            courses_for_template.append(d)
         data.update({
-            'courses': courses,
+            'courses': courses_for_template,
             'student': student,
             'votes': votes
         })
@@ -72,19 +67,24 @@ def student_profile(request, user_id):
         if request.is_ajax():
             return render_to_response('users/student_profile_contents.html', data, context_instance=RequestContext(request))
         else:
-            begin = student.user.last_name[0]
-            students = Student.get_list(begin)
-            students = Record.recorded_students(students)
-            data['students'] = students
-            data['char']     = begin
+            students = Student.get_list()
+            enrolled_students = Record.recorded_students(students)
+            data['students'] = enrolled_students
+            data['char'] = "All"
             return render_to_response('users/student_profile.html', data, context_instance=RequestContext(request))
 
     except Student.DoesNotExist:
-        logger.error('Function student_profile(id = %d) throws NonStudentException while acessing to non existing student.' % int(user_id) )
+        logger.error(
+            'Function student_profile(id = {}) throws NonStudentException while acessing to non existing student.'
+            .format(str(user_id))
+        )
         messages.error(request, "Nie ma takiego studenta.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
     except User.DoesNotExist:
-        logger.error('Function student_profile(id = %d) throws User.DoesNotExist while acessing to non existing user.' % int(user_id) )
+        logger.error(
+            'Function student_profile(id = {}) throws User.DoesNotExist while acessing to non existing user.'
+            .format(str(user_id))
+        )
         messages.error(request, "Nie ma takiego użytkownika.")
         return render_to_response('common/error.html', context_instance=RequestContext(request))
 
@@ -118,17 +118,16 @@ def employee_profile(request, user_id):
             return render_to_response('users/employee_profile_contents.html',
                 data, context_instance=RequestContext(request))
         else:
-            begin = user.last_name[0] if user.last_name else 'All'
-            employees = Employee.get_list(begin)
             semester = Semester.get_current_semester()
-            employees = Group.teacher_in_present(employees, semester)
+            employees = Employee.get_list()
+            active_employees = Group.teacher_in_present(employees, semester)
 
-            for e in employees:
+            for e in active_employees:
                 e.short_new = e.user.first_name[:1] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
                 e.short_old = e.user.first_name[:2] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
 
-            data['employees'] = employees
-            data['char'] = begin
+            data['employees'] = active_employees
+            data['char'] = 'All'
 
             return render_to_response('users/employee_profile.html', data, context_instance=RequestContext(request))
 
@@ -164,7 +163,7 @@ def set_language(request):
             account.preferred_language = lang_code
             account.save()
             if hasattr(request, 'session'):
-                request.session['django_language'] = lang_code
+                request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:
                 response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
     return response
@@ -268,7 +267,12 @@ def my_profile(request):
         try:
             student = request.user.student
             courses = OpeningTimesView.objects.get_courses(student, semester)
-            grade = [x.semester for x in StudentGraded.objects.filter(student=student).select_related('semester')]
+            gradeInfo = StudentGraded.objects\
+                .filter(student=student)\
+                .select_related('semester')\
+                .order_by('-semester__records_opening')
+            grade = [x.semester for x in gradeInfo]
+            current_semester_ects = student.get_points()
 
         except (KeyError, Student.DoesNotExist):
             grade = {}
@@ -341,11 +345,13 @@ def logout(request):
 
 
 def login_plus_remember_me(request, *args, **kwargs):
-    """Sign-in function with an option to save the session.
-
-    If the user clicked 'remember_me' button (we read it from POST data), the
+    """
+    Sign-in function with an option to save the session.
+    If the user clicked the 'Remember me' button (we read it from POST data), the
     session will expire after two weeks.
     """
+    if request.user.is_authenticated():
+        return redirect("main-page")
     if 'polls' in request.session:
         del request.session['polls']
     if 'finished' in request.session:

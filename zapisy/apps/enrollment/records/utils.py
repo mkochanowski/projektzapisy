@@ -2,7 +2,7 @@
 import json
 
 from django.db.models.query import QuerySet
-
+from django.conf import settings
 from apps.enrollment.courses.models import Term
 from apps.enrollment.records.models import *
 from apps.users.models import *
@@ -36,56 +36,31 @@ def run_rearanged(result, group=None):
     if group and group.should_be_rearranged():
         Group.do_rearanged(group)
 
-def prepare_courses_with_terms(terms, records = None):
+
+def prepare_courses_with_terms(terms=None, records=None):
     if records is None:
         records = []
-    courses_list = []
-    courses_map = {}
-    def add_course_to_map(course):
-        if course.pk in courses_map:
-            return
-        course_info = {
-            'object': course,
-            'info': {
-                'id' : course.pk,
-                'name': course.name,
-                'short': course.entity.get_short_name(),
-                'type': course.type and course.type.pk or 1,
-                'slug': course.slug,
-		'exam': course.exam,
-		'english': course.english,
-		'suggested_for_first_year': course.suggested_for_first_year,
-            },
-            'terms': []
-        }
-        courses_map[course.pk] = course_info
-        courses_list.append(course_info)
+
+    if terms is None:
+        default_semester = Semester.objects.get_next()
+        if not default_semester:
+            return []
+        terms = Term.get_all_in_semester(default_semester)
+
+    courses_terms_map = {}
     for term in terms:
         course = term.group.course
-        add_course_to_map(course)
-        term_info = {
-            'id': term.pk,
-            'group': term.group.pk,
-            'classroom': term.classrooms_as_string,
-            'day': int(term.dayOfWeek),
-            'start_time': [term.start_time.hour, term.start_time.minute],
-            'end_time': [term.end_time.hour, term.end_time.minute],
+        if course not in courses_terms_map:
+            courses_terms_map[course] = []
+        courses_terms_map[course].append(term)
 
-            #TODO: to chyba zbędne?
-            #'enrolled_count': term.group.get_count_of_enrolled(),
-            #'queued_count': term.group.get_count_of_queued(),
-        }
-        courses_map[course.pk]['terms'].append({
-            'id': term.pk,
-            'object': term,
-            'info': term_info
-        })
     for record in records:
-        add_course_to_map(record.group.course)
+        if record.group.course not in courses_terms_map:
+            courses_terms_map[record.group.course] = []
 
-    courses_list = sorted(courses_list,
-        key=lambda course: course['info']['name'])
-    return courses_list
+    courses = [(course, terms) for course, terms in courses_terms_map.items()]
+
+    return sorted(courses, key=lambda item: item[0].name)
 
 def prepare_groups_json(semester, groups, student=None, employee=None):
     record_ids = Record.get_student_records_ids(student, semester)
@@ -96,7 +71,7 @@ def prepare_groups_json(semester, groups, student=None, employee=None):
         queue_priorities = {}
     groups_json = []
     for group in groups:
-        groups_json.append(group.serialize_for_ajax(
+        groups_json.append(group.serialize_for_json(
             record_ids['enrolled'], record_ids['queued'], record_ids['pinned'],
             queue_priorities, student=student, employee=employee
         ))
@@ -105,7 +80,7 @@ def prepare_groups_json(semester, groups, student=None, employee=None):
 def prepare_courses_json(groups, student):
     courses_json = []
     for group in groups:
-        courses_json.append(group.course.serialize_for_ajax(student))
+        courses_json.append(group.course.serialize_for_json(student))
     return json.dumps(courses_json)
 
 def prepare_schedule_courses(request, for_student = None, for_employee = None, semester=None):
@@ -129,7 +104,7 @@ def prepare_schedule_courses(request, for_student = None, for_employee = None, s
     except Student.DoesNotExist:
         records = []
 
-    return prepare_courses_with_terms(terms, records)
+    return prepare_courses_with_terms(terms=terms, records=records)
 
 def prepare_schedule_data(request, courses, semester=None):
     if BaseUser.is_student(request.user):
@@ -143,19 +118,20 @@ def prepare_schedule_data(request, courses, semester=None):
     default_semester = semester or Semester.objects.get_next()
 
     terms_by_days = [None for i in range(8)] # dni numerowane od 1
-    for course in courses:
-        for term in course['terms']:
-            day = int(term['object'].dayOfWeek)
+    for item in courses:
+        for term in item[1]:
+            day = int(term.dayOfWeek)
             if not terms_by_days[day]:
                 terms_by_days[day] = {
                     'day_id': day,
-                    'day_name': term['object'].get_dayOfWeek_display(),
+                    'day_name': term.get_dayOfWeek_display(),
                     'terms': []
                 }
+            oldTerm = term
+            term = {}
+            term['object'] = oldTerm
+            term['json'] = json.dumps(term['object'].serialize_for_json())
             terms_by_days[day]['terms'].append(term)
-            term.update({ # TODO: do szablonu
-                'json': json.dumps(term['info'])
-            })
     terms_by_days = filter(lambda term: term, terms_by_days)
 
     # TODO: tylko grupy, na które jest zapisany
@@ -163,13 +139,11 @@ def prepare_schedule_data(request, courses, semester=None):
     all_groups_json = prepare_groups_json(default_semester, all_groups, \
         student=student, employee=employee)
 
-    from settings import QUEUE_PRIORITY_LIMIT
-
     return {
         'courses_json': prepare_courses_json(all_groups, student),
         'groups_json': all_groups_json,
         'terms_by_days': terms_by_days,
-        'priority_limit': QUEUE_PRIORITY_LIMIT,
+        'priority_limit': settings.QUEUE_PRIORITY_LIMIT,
     }
 
 

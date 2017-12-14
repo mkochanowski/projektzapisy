@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-
 from django.db import models
 from django.db.models.aggregates import Min
 
@@ -8,7 +6,7 @@ from django.db.models.aggregates import Min
 class GettersManager(models.Manager):
 
     def filter_with_t0(self, *args, **kwargs):
-        return self.get_query_set().filter(*args, **kwargs).only('user__first_name',
+        return self.get_queryset().filter(*args, **kwargs).only('user__first_name',
                              'user__last_name', 'matricula', 'ects').annotate(t0_min=Min('opening_times__opening_time'))
 
 

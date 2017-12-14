@@ -1,5 +1,64 @@
 # projektzapisy Changelog
 
+# Current version
+
+# Version 17.12.11
+
+* Show desiderates in offer menu
+* Upgraded the google analytics library
+
+# Version 17.11.28
+
+* Fixed users schedules
+* Fixed course proposal form
+* Fixed removing student from group in admin
+* Removed paranoid sessions
+* Fixed ignoring conflicts on reservation edition
+* Cleaned main repository directory
+
+# Version 17.11.21
+
+* Upgrade to Django 1.8
+* Loading courses with ajax
+* Fixed disappearing pop-up
+* Fixed issues with reservations and conflicts
+* Hid vote summary from non-users
+
+# Version 17.10.25
+
+* Fixed missing title for login page
+* Hid vote button for employees
+* Added notification when leaving voting page
+* Fixed several typos
+* Fixed 'None' in news search field
+* Improved login UX
+* Added displaying links to courses on employee's page
+* Added showing records ending time
+* Added USOS CAS authentication
+
+# Version 17.06.19
+
+* Upgrade to Django 1.7
+* Added maintenance mode switcher
+* Fixed course names in vote results
+* Enhanced filtering for offer
+
+# Version 17.06.13
+
+* Added possibility to remove reservations
+* Added link to tracker to 500 error page
+
+# Version 17.06.07
+
+* Fixed error with not visible plans and not working prototype when new hidden future semester is added
+* Fixed 500 error on vote summary
+* Fixed password reset functionality after upgrade to Django 1.6. The issue was with wrong url names
+
+# Version 17.06.06
+
+* Added tag/effects filtering
+* Bug-fixes after Django 1.6
+
 # Version 17.05.29
 
 * Upgrade to Django 1.6
@@ -20,9 +79,9 @@
 
 # Version 17.04.07
 
-* Fixed mailto links escape '+'
+* Fixed mail-to links escape '+'
 * Fixed proper author while creating cyclical reservation
-* Added posibility to add reservations with conflicts for secretary
+* Added possibility to add reservations with conflicts for secretary
 * Fixed FreeDay and ChangedDay are now unique
 * Added news content is now included in emails
 
@@ -94,7 +153,7 @@
 
 * Created unified dev environment with Vagrant
 * Fixed template for enabling grade
-* Fixed an issue with queue rearrangments
+* Fixed an issue with queue rearrangements
 * Added csv/pdf export links for queues
 * Reviewed, fixed and merged `Courses Proposals` (Filip's thesis?)
 * Button for refreshing opening times

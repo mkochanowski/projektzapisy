@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
+import datetime
+import logging
 
 from django.db import models
+from django.conf import settings
+from django.apps import apps
 from django.contrib.auth.models import User, UserManager
 from django.core.mail import send_mail
-from django.db.models import Q, Sum
-from django.db.models.loading import cache
-from django.db.models.query import EmptyQuerySet
 from django.template import Context
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
+
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
-from django.core.cache import cache as mcache
-import datetime
 from apps.users.managers import GettersManager, T0Manager
 
-import settings
-
-import logging
 logger = logging.getLogger()
 
 EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 
+
 class Related(models.Manager):
-    def get_query_set(self):
-        return super(Related, self).get_query_set().select_related('user')
+    def get_queryset(self):
+        return super(Related, self).get_queryset().select_related('user')
+
 
 class ExtendedUser(User):
     is_student = models.BooleanField(default = False, verbose_name="czy student?")
@@ -38,7 +37,7 @@ class ExtendedUser(User):
 
 class UserProfile(models.Model):
     # This field is required.
-    user         = models.OneToOneField(User, related_name='_profile_cache')
+    user         = models.OneToOneField(User, related_name='profile')
     is_student   = models.BooleanField(default = False, verbose_name="czy student?")
     is_employee  = models.BooleanField(default = False, verbose_name="czy pracownik?")
     is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
@@ -52,7 +51,7 @@ class UserProfile(models.Model):
         super(UserProfile, self).clean()
         if not (self.is_employee or self.is_student) or (self.is_student and self.is_employee):
             raise ValidationError(
-                message={'integrity': [u'Profil musi jedoznacznie określać rolę użytkownika w systemie']},
+                message={'integrity': [u'Profil musi jedoznacznie określać rolę użytkownika w systemie']},
             )
 
 
@@ -70,7 +69,7 @@ class BaseUser(models.Model):
     receive_mass_mail_grade = models.BooleanField(
         default = True,
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
-    last_news_view = models.DateTimeField(default=datetime.datetime.now())
+    last_news_view = models.DateTimeField(default=datetime.datetime.now)
 
     objects = Related()
 
@@ -159,7 +158,7 @@ class Employee(BaseUser):
 
 
     @staticmethod
-    def get_list(begin):
+    def get_list(begin='All'):
         def next_char(begin):
             try:
                 return chr(ord(begin) + 1)
@@ -550,7 +549,7 @@ class StudiaZamawiane(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = cache.get_model('sites', 'Site')
+                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
@@ -597,7 +596,7 @@ class StudiaZamawiane2012(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane2012.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = cache.get_model('sites', 'Site')
+                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
@@ -678,7 +677,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class OpeningTimesView(models.Model):
-    student  = models.ForeignKey(Student, primary_key=True,
+    student  = models.OneToOneField(Student, primary_key=True,
                                  related_name='opening_times')
     course   = models.ForeignKey('courses.Course')
     semester = models.ForeignKey('courses.Semester')

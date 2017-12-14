@@ -38,21 +38,29 @@ Fereol.Enrollment.ScheduleCourseTerm._byID = {};
 
 Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 {
-	var sterm = new Fereol.Enrollment.ScheduleCourseTerm();
-	var raw = $.parseJSON(json)
+	let obj = $.parseJSON(json)
+    return Fereol.Enrollment.ScheduleCourseTerm.fromObject(obj);
+};
 
-	sterm.id = raw['id'].castToInt();
-	sterm.group = Fereol.Enrollment.CourseGroup.getByID(raw['group'].castToInt());
+Fereol.Enrollment.ScheduleCourseTerm.fromObject = function(obj)
+{
+    var sterm = new Fereol.Enrollment.ScheduleCourseTerm();
+    
+    sterm.id = obj['id'].castToInt();
+	sterm.group = Fereol.Enrollment.CourseGroup.getByID(obj['group'].castToInt());
 	sterm.group.updateListeners.push(function()
 	{
 		sterm._updateVisibility();
 		sterm._updateControls();
 	});
-
+    
+    let startTimes = obj.start_time.split(":");
+    let endTimes = obj.end_time.split(":");
+    
 	sterm.scheduleTerm = new Schedule.Term(
-		raw.day.castToInt() - 1,
-		new Schedule.Time(raw.start_time[0].castToInt(), raw.start_time[1].castToInt()),
-		new Schedule.Time(raw.end_time[0].castToInt(), raw.end_time[1].castToInt()),
+		obj.day.castToInt() - 1,
+		new Schedule.Time(parseInt(startTimes[0]), parseInt(startTimes[1])),
+		new Schedule.Time(parseInt(endTimes[0]), parseInt(endTimes[1])),
 		sterm.container,
 		sterm.popupContents
 	);
@@ -61,7 +69,7 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 		sterm._onResize(isFullSize);
 	};
 
-	sterm.classroom = raw.classroom;
+	sterm.classroom = obj.classroom;
 
 	Fereol.Enrollment.ScheduleCourseTerm._byID[sterm.id] = sterm;
 
@@ -222,7 +230,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 				', limit miejsc w grupie: ' + this.group.limit);
 		if (this.group.isFull() && !this.group.isEnrolledOrQueued())
 			$.create('img', {
-				src: '/site_media/images/warning.png',
+				src: '/static/images/warning.png',
 				alt: '(brak wolnych miejsc)',
 				title: 'nie ma wolnych miejsc w tej grupie, możesz zapisać ' +
 					'się do kolejki'
@@ -303,7 +311,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
     // * they're enrolled (not in queue) and leaving is not allowed (records ended)
     const displaySignInOutButton = 
         this.group.course.isRecordingOpen && 
-        (!this.group.isEnrolled || SchedulePrototype.isLeavingAllowed);
+        (!this.group.isEnrolled || Fereol.Enrollment.isLeavingAllowed);
 
 	this._signInOutButton.css({
 		backgroundPosition: this.group.isEnrolledOrQueued() ? '-12px 0' : '0 0',

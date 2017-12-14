@@ -26,9 +26,6 @@ from xhtml2pdf import pisa
 import StringIO
 
 
-__author__ = 'maciek'
-
-
 def classrooms(request):
     from apps.enrollment.courses.models import Classroom
 
@@ -75,12 +72,11 @@ def edit_event(request, event_id=None):
     from apps.schedule.models import Event
 
     is_edit = True
-
     event = Event.get_event_for_moderation_or_404(event_id, request.user)
     form = EventForm(data=request.POST or None, instance=event, user=request.user)
     formset = TermFormSet(request.POST or None, instance=event)
     reservation = event.reservation
-
+    
     if form.is_valid():
         event = form.save(commit=False)
         if not event.id:
@@ -90,9 +86,14 @@ def edit_event(request, event_id=None):
             event.save()
             formset.save()
 
-            messages.success(request, u'Zmieniono zdarzenie')
+            if Term.objects.filter(event=event).count() == 0:
+                event.remove()
+                messages.success(request, u'Usunięto wydarzenie')
+                return reservations(request)
 
+            messages.success(request, u'Zmieniono zdarzenie')
             return redirect(event)
+    errors = True
 
     return TemplateResponse(request, 'schedule/reservation.html', locals())
 
@@ -272,7 +273,7 @@ def ajax_get_terms(request, year, month, day):
 
     time = datetime.date(int(year), int(month), int(day))
     terms = Classroom.get_terms_in_day(time, ajax=True)
-    return HttpResponse(terms, mimetype="application/json")
+    return HttpResponse(terms, content_type="application/json")
 
 
 class ClassroomTermsAjaxView(FullCalendarView):
@@ -378,7 +379,7 @@ def events_raport_pdf(request, beg_date, end_date, rooms):
 
     pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result,
                             encoding='UTF-8')
-    response = HttpResponse(result.getvalue(), mimetype='application/pdf')
+    response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=raport.pdf'
 
     return response

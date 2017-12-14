@@ -7,6 +7,7 @@ from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
 from django.conf import settings
 from apps.notifications.models import Notification
+from django.core.urlresolvers import reverse
 
 from course import *
 
@@ -48,7 +49,7 @@ class StatisticManager(models.Manager):
     @return Queryset of Group
     """
     def in_semester(self, semester):
-        return self.get_query_set().filter(course__semester=semester)\
+        return self.get_queryset().filter(course__semester=semester)\
             .select_related('course', 'teacher', 'teacher__user', 'course__entity')\
             .order_by('course')\
             .extra(select={
@@ -115,7 +116,7 @@ class Group(models.Model):
             '6':  'Seminarium',
             '7':  'Lektorat',
             '8':  'Zajęcia sportowe',
-           ' 10': 'Projekt',
+            '10': 'Projekt',
         }
         return types[self.type]
 
@@ -237,7 +238,6 @@ class Group(models.Model):
         return records or True
 
     def _add_to_lecture(self, student):
-        import settings
         from apps.enrollment.records.models import Record
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
         result = []
@@ -251,7 +251,6 @@ class Group(models.Model):
 
     def add_student(self, student, return_group=False, commit=True):
         from apps.enrollment.records.models import Record
-        import settings
 
         result = True
         #REMOVE FROM OTHER GROUP
@@ -425,14 +424,14 @@ class Group(models.Model):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
             select_related('teacher', 'teacher__user', 'course',
-            'course__type', 'course__entity', 'course__semester').all()
+                'course__entity__type', 'course__entity', 'course__semester').all()
 
     @staticmethod
     def get_groups_by_semester_opt(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
             select_related('teacher', 'teacher__user', 'course',
-                'course__type', 'course__entity', 'course__semester').all()
+                'course__entity__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
@@ -481,13 +480,11 @@ class Group(models.Model):
         from apps.enrollment.records.models import Queue
         return Queue.objects.filter(student=student, group=self).count() != 0
 
-    def serialize_for_ajax(self, enrolled, queued, pinned, queue_priorities,
-        student=None, employee=None, user=None):
+    def serialize_for_json(self, enrolled, queued, pinned, queue_priorities,
+        student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
-        from django.core.urlresolvers import reverse
-
-        zamawiany = user and user.student.is_zamawiany()
-
+        zamawiany = student and student.is_zamawiany()
+        
         data = {
             'id': self.pk,
             'type': int(self.type),

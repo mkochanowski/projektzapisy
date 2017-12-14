@@ -13,12 +13,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         semester = Semester.objects.get_next()
-
+        Event.objects.filter(course__semester=semester, type=3).delete()
         freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
                                           Q(day__lte=semester.lectures_ending))\
                           .values_list('day', flat=True)
         changed = ChangedDay.objects.filter(Q(day__gte=semester.lectures_beginning), Q(day__lte=semester.lectures_ending)).values_list('day', 'weekday')
-        terms = T.objects.filter(group__course__semester=semester).select_related('group', 'group__course', 'group__course__courseentity')
+        terms = T.objects.filter(group__course__semester=semester).select_related('group', 'group__course', 'group__course__entity')
         days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
 
         day = semester.lectures_beginning

@@ -16,6 +16,7 @@ class NewsForm(forms.ModelForm):
         widgets = { 
             'body': forms.Textarea(attrs={'class': 'tinymce'})
         }
+        fields = '__all__' 
 
 class NewsAdmin(admin.ModelAdmin):
     """
@@ -26,7 +27,7 @@ class NewsAdmin(admin.ModelAdmin):
     list_filter  = ['date']
     form = NewsForm
     class Media:
-        js = ('/site_media/js/tinymce/tinymce.min.js',
-              '/site_media/js/textareas.js',)
+        js = ('/static/js/tinymce/tinymce.min.js',
+              '/static/js/textareas.js',)
 
 admin.site.register(News, NewsAdmin)

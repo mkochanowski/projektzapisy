@@ -11,6 +11,9 @@ from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 from django.forms.models import inlineformset_factory
+
+from apps.enrollment.courses.models.effects import Effects
+from apps.enrollment.courses.models.tag import Tag
 from apps.enrollment.courses.models.course import CourseEntity, CourseDescription, Course
 from apps.enrollment.courses.models.points import PointsOfCourseEntities, PointTypes
 from apps.enrollment.courses.models.semester import Semester
@@ -21,6 +24,7 @@ from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm, Syl
 from apps.offer.proposal.models import Syllabus, StudentWork
 from apps.offer.proposal.exceptions import  NotOwnerException
 
+import json
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal, send_notification_to_3d
 from apps.users.decorators import employee_required
@@ -34,12 +38,24 @@ def offer(request, slug=None):
     if slug is None, this view shows offer main page,
     else show proposal page
     """
-    proposal   = proposal_for_offer(slug)
+    proposal = proposal_for_offer(slug)
     proposals  = CourseEntity.get_proposals(request.user.is_authenticated())
+    serialized_proposals = [prop.serialize_for_json()
+                            for prop in proposals]
+    proposals_json = json.dumps(serialized_proposals)
     types_list = Type.get_all_for_jsfilter()
     teachers   = Employee.get_actives()
 
-    return TemplateResponse(request, 'offer/offer.html', locals())
+    return TemplateResponse(request, 'offer/offer.html', {
+        "proposal": proposal,
+        "proposals": proposals,
+        "proposals_json": proposals_json,
+        "types_list": types_list,
+        "teachers": teachers,
+        "effects": Effects.objects.all(),
+        "semester": Semester.get_current_semester(),
+        "tags": Tag.objects.all(),
+    })
 
 @permission_required('proposal.can_create_offer')
 def select_for_voting(request):
@@ -126,6 +142,7 @@ def proposal(request, slug=None):
         in_offer = filter((lambda course: 1 <= course.get_status() <= 3), proposals)
         removed = filter((lambda course: course.get_status() == 4), proposals)
         proposal  = employee_proposal(request.user, slug)
+        semester = Semester.get_current_semester()
     except NotOwnerException:
         return redirect('offer-page', slug=slug)
     except Http404:
@@ -177,7 +194,7 @@ def proposal_edit(request, slug=None):
     extrafields = 8
     if request.method == "POST" or (syllabus is not None and len(syllabus.studentwork_set.all())>0):
         extrafields = 1
-    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork,extra=extrafields)
+    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork, extra=extrafields, fields='__all__')
     if extrafields == 1:
         student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
     else:

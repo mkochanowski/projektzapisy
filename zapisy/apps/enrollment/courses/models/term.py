@@ -5,7 +5,7 @@ from datetime import time, date
 from django.db import models
 from django.db.models import signals
 from django.core.cache import cache as mcache
-import common
+from zapisy import common
 import logging
 
 backup_logger = logging.getLogger('project.backup')
@@ -21,7 +21,7 @@ class Term(models.Model):
     end_time   = models.TimeField(verbose_name = 'zakończenie')
     classroom  = models.ForeignKey('Classroom', verbose_name='sala', null=True, blank=True)
     group      = models.ForeignKey('Group', verbose_name='grupa', related_name='term')
-    classrooms = models.ManyToManyField('Classroom', related_name='new_classrooms', verbose_name='sale', null=True, blank=True)
+    classrooms = models.ManyToManyField('Classroom', related_name='new_classrooms', verbose_name='sale', blank=True)
 
     class Meta:
         #TO DO /pkacprzak/ add advanced constraint - example: start_time < end_time, any pair of terms can't overlap
@@ -56,10 +56,11 @@ class Term(models.Model):
             from apps.enrollment.records.models import Record
             filtered = filtered.filter(group__teacher=employee)
             
-        return filtered.select_related('classroom', 'classrooms', 'group', 'group__course', \
+        return filtered.select_related('classroom', 'group', 'group__course', \
             'group__course__semester', 'group__course__entity',
             'group__course__entity__type', \
             'group__teacher', 'group__teacher__user').\
+            prefetch_related('classrooms').\
             order_by('dayOfWeek', 'start_time').all()
 
     def day_in_zero_base(self):
@@ -153,6 +154,16 @@ class Term(models.Model):
             query = query.filter(start_time__lt=end_time, end_time__gt=start_time)
 
         return query.select_related('group__course')
+
+    def serialize_for_json(self):
+        return {
+            'id': self.pk,
+            'group': self.group.pk,
+            'classroom': self.classrooms_as_string,
+            'day': int(self.dayOfWeek),
+            'start_time': ("%d:%d" % (self.start_time.hour, self.start_time.minute)),
+            'end_time': ("%d:%d" % (self.end_time.hour, self.end_time.minute)),
+        }
 
     def __unicode__(self):
         """
