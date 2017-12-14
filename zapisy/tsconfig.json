@@ -14,7 +14,7 @@
     },
     "typeRoots": [
       "/node/node_modules/@types",
-      "/vagrant/zapisy/node/typings/"
+      "/node/typings/"
     ],
     "traceResolution": true
   },
