@@ -2,6 +2,8 @@
 
 # Current version
 
+* Improved desideratas form
+
 # Version 17.12.11
 
 * Show desiderates in offer menu
