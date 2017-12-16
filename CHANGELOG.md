@@ -2,6 +2,11 @@
 
 # Current version
 
+# Version 17.12.16
+
+* Improved desideratas form
+* Upgrade to Django 1.9
+
 # Version 17.12.11
 
 * Show desiderates in offer menu
