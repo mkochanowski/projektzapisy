@@ -250,8 +250,8 @@ class NewSemesterTests(SeleniumTestCase):
                 )
         self.wait_for_pass(
             lambda: self.driver.find_element_by_link_text('Oferta').click())
-        self.driver.get(
-            '{}{}'.format(self.driver.current_url, '/manage/proposals'))
+        self.wait_for_pass(
+            lambda: self.driver.find_element_by_link_text('Zarządzaj').click())
         self.wait_for_pass(
             lambda: self.driver.find_element_by_link_text('Głosowanie').click())
 
