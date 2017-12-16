@@ -52,7 +52,7 @@ def add_student(request):
     if result:
         run_rearanged(result, group)
 
-    url = reverse('admin:%s_%s_change' %(group._meta.app_label,  group._meta.module_name),  args=[group.id])
+    url = reverse('admin:{}_{}_change'.format(group._meta.app_label, group._meta.model_name), args=[group.id])
     return HttpResponseRedirect(url)
 
 
@@ -79,7 +79,7 @@ def remove_student(request):
     if result:
         run_rearanged(result, group)
 
-    url = reverse('admin:%s_%s_change' %(group._meta.app_label,  group._meta.module_name),  args=[group.id])
+    url = reverse('admin:{}_{}_change'.format(group._meta.app_label, group._meta.model_name), args=[group.id])
     return HttpResponseRedirect(url)
 
 @staff_member_required
@@ -109,7 +109,7 @@ def change_group_limit(request):
             group.save()
             run_rearanged(None, group)
 
-    url = reverse('admin:%s_%s_change' %(group._meta.app_label,  group._meta.module_name),  args=[group.id])
+    url = reverse('admin:{}_{}_change'.format(group._meta.app_label, group._meta.model_name), args=[group.id])
     return HttpResponseRedirect(url)
 
 
