@@ -10,12 +10,12 @@
       "*": [
         "/vagrant/zapisy/assets/*",
         "/node/node_modules/*",
-        "/node-typings/*"
+        "./node/typings/*"
       ]
     },
     "typeRoots": [
       "/node/node_modules/@types",
-      "/node/typings"
+      "./node/typings"
     ],
     "traceResolution": true
   },

@@ -2,9 +2,6 @@
 # and will fail with EACCES
 echo "Installing npm packages"
 
-# Fake typings for tsc
-cp -R node/typings /node/
-
 # Needed for module resolving
 export NODE_PATH=/node/node_modules
 

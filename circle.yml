@@ -15,7 +15,6 @@ dependencies:
     - sudo mkdir -p /node
     - |
       sudo chown `whoami`: /node
-    - cp -R node/typings /node/
     - cp package.json /node
     - npm i --prefix /node
     - export NODE_PATH=/node/node_modules
