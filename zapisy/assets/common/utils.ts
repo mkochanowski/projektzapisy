@@ -1,3 +1,5 @@
+// Common utility functions shared between apps
+
 import * as $ from "jquery";
 
 function scrollUpToElementIfWindowBelow(selector: string) {

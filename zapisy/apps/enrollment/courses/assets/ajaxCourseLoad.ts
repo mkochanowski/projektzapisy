@@ -1,4 +1,4 @@
-// Load course info using AJAX
+// Code to load course info asynchronously, without refreshing the page
 
 import * as $ from "jquery";
 import { scrollUpToElementIfWindowBelow } from "common/utils";
