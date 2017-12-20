@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
+import datetime
+import logging
 
 from django.db import models
-from django.contrib.auth.models import User, UserManager
-from django.core.mail import send_mail
-from django.db.models import Q, Sum
+from django.conf import settings
 from django.apps import apps
-from django.db.models.query import EmptyQuerySet
+from django.contrib.auth.models import User, UserManager
+from django.contrib.sites.models import Site
+from django.core.mail import send_mail
 from django.template import Context
 from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
+
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
-from django.core.cache import cache as mcache
-import datetime
 from apps.users.managers import GettersManager, T0Manager
 
-from django.conf import settings
-
-import logging
 logger = logging.getLogger()
 
 EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 
+
 class Related(models.Manager):
     def get_queryset(self):
         return super(Related, self).get_queryset().select_related('user')
+
 
 class ExtendedUser(User):
     is_student = models.BooleanField(default = False, verbose_name="czy student?")
@@ -550,7 +550,6 @@ class StudiaZamawiane(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
@@ -597,7 +596,6 @@ class StudiaZamawiane2012(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane2012.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'

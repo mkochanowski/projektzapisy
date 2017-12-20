@@ -53,6 +53,7 @@ def offer(request, slug=None):
         "types_list": types_list,
         "teachers": teachers,
         "effects": Effects.objects.all(),
+        "semester": Semester.get_current_semester(),
         "tags": Tag.objects.all(),
     })
 
@@ -141,6 +142,7 @@ def proposal(request, slug=None):
         in_offer = filter((lambda course: 1 <= course.get_status() <= 3), proposals)
         removed = filter((lambda course: course.get_status() == 4), proposals)
         proposal  = employee_proposal(request.user, slug)
+        semester = Semester.get_current_semester()
     except NotOwnerException:
         return redirect('offer-page', slug=slug)
     except Http404:
@@ -192,7 +194,7 @@ def proposal_edit(request, slug=None):
     extrafields = 8
     if request.method == "POST" or (syllabus is not None and len(syllabus.studentwork_set.all())>0):
         extrafields = 1
-    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork,extra=extrafields)
+    StudentWorkFormset = inlineformset_factory(Syllabus, StudentWork, extra=extrafields, fields='__all__')
     if extrafields == 1:
         student_work_formset = StudentWorkFormset(request.POST or None, instance = syllabus)
     else:

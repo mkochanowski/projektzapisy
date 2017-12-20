@@ -1,1 +1,10 @@
--r requirements.development.txt
+-r requirements.common.txt
+
+# Additional test dependencies
+selenium==2.53.6
+factory_boy==2.9.2
+coverage==4.4.2
+pyvirtualdisplay
+
+# Webpack for frontend development and staticfile bundling
+django-webpack-loader

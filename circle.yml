@@ -18,6 +18,7 @@ dependencies:
     - cp package.json /node
     - npm i --prefix /node
     - export NODE_PATH=/node/node_modules
+    - pip freeze
 
 test:
   pre:
@@ -29,6 +30,7 @@ test:
     - python manage.py collectstatic --noinput
     # - python manage.py test test_app --nomigrations
     # - coverage run manage.py test test_app
+    - coverage run manage.py test test_app --nomigrations
     - coverage run manage.py test apps.news.tests --nomigrations
     - coverage run manage.py test apps.schedule --nomigrations
     - coverage run manage.py test apps.enrollment.courses --nomigrations

@@ -15,7 +15,6 @@ zapisy/zapisy/settings_local.py
 .rvmrc
 static/
 .vagrant/
-a_dump_20160301.sql
 .DS_Store
 zapisy/logs/
 personal/
@@ -23,3 +22,5 @@ static/
 node_modules/
 compiled_assets/
 webpack-stats.json
+*.gz
+*.sql
