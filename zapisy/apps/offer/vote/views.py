@@ -17,8 +17,10 @@ from apps.enrollment.courses.models.course import CourseEntity
 
 from apps.offer.vote.models                   import SingleVote, SystemState
 from apps.enrollment.courses.models import Type
+from apps.enrollment.courses.models import Semester
 
 from apps.users.decorators      import student_required
+
 
 @student_required
 def vote( request ):
@@ -58,14 +60,17 @@ def vote( request ):
 
     return render_to_response ('offer/vote/form.html', data, context_instance = RequestContext( request ))
 
+
 @login_required
 def vote_main( request ):
     """
         Vote main page
     """
     sytem_state = SystemState.get_state()
-    data        = { 'isVoteActive' : sytem_state.is_system_active(), 'max_points': sytem_state.max_points }
+    data        = { 'isVoteActive' : sytem_state.is_system_active(), 'max_points': sytem_state.max_points,
+                   'semester' : Semester.get_current_semester()}
     return render_to_response ('offer/vote/index.html', data, context_instance = RequestContext( request ))
+
 
 @student_required
 def vote_view( request ):
@@ -78,6 +83,7 @@ def vote_view( request ):
     return TemplateResponse(request, 'offer/vote/view.html', locals())
 
 
+@login_required
 def vote_summary( request ):
     """
         summary for vote

@@ -3,11 +3,11 @@
 from django.db import models
 from django.db.models import signals
 from django.db.models import Count
-from django.core.cache import cache as mcache
 from django.db.models.query import QuerySet
+from django.core.cache import cache as mcache
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from apps.notifications.models import Notification
-
 from ...records.exceptions import *
 
 from course import *
@@ -239,7 +239,6 @@ class Group(models.Model):
         return records or True
 
     def _add_to_lecture(self, student):
-        import settings
         from apps.enrollment.records.models import Record, Queue
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
 
@@ -264,7 +263,6 @@ class Group(models.Model):
 
     def add_student(self, student, return_group=False, commit=True):
         from apps.enrollment.records.models import Record
-        import settings
 
         result = True
         #REMOVE FROM OTHER GROUP
@@ -439,14 +437,14 @@ class Group(models.Model):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
             select_related('teacher', 'teacher__user', 'course',
-            'course__type', 'course__entity', 'course__semester').all()
+                'course__entity__type', 'course__entity', 'course__semester').all()
 
     @staticmethod
     def get_groups_by_semester_opt(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
             select_related('teacher', 'teacher__user', 'course',
-                'course__type', 'course__entity', 'course__semester').all()
+                'course__entity__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""
@@ -498,8 +496,6 @@ class Group(models.Model):
     def serialize_for_json(self, enrolled, queued, pinned, queue_priorities,
         student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
-        from django.core.urlresolvers import reverse
-
         zamawiany = student and student.is_zamawiany()
         
         data = {
