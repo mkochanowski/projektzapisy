@@ -246,11 +246,13 @@ class Group(models.Model):
             try:
                 Queue.remove_student_from_queue(student.user.id, group.id)
             except AlreadyNotAssignedException:
-                # student wasnt in queue
+                # student wasn't in the queue
                 pass
             except (NonGroupException, NonStudentException):
-                # shouldnt happen
+                # shouldn't happen
                 return [u'Wystąpił błąd przy zapisie na wykład. Skontaktuj się z administratorem serwisu.']
+            else:
+                group.remove_from_queued_counter(student)
 
         result = []
         for group in groups:
@@ -258,7 +260,6 @@ class Group(models.Model):
             if created:
                 result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
                 group.add_to_enrolled_counter(student)
-                group.remove_from_queued_counter(student)
 
         return result
 
