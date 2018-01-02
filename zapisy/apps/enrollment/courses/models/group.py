@@ -258,6 +258,7 @@ class Group(models.Model):
             if created:
                 result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
                 group.add_to_enrolled_counter(student)
+                group.remove_from_queued_counter(student)
 
         return result
 
