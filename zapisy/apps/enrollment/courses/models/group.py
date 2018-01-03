@@ -7,8 +7,9 @@ from django.db.models.query import QuerySet
 from django.core.cache import cache as mcache
 from django.core.urlresolvers import reverse
 from django.conf import settings
+
+from apps.enrollment.records.exceptions import AlreadyNotAssignedException, NonGroupException, NonStudentException
 from apps.notifications.models import Notification
-from ...records.exceptions import NonGroupException, NonStudentException, AlreadyNotAssignedException
 
 from course import *
 
