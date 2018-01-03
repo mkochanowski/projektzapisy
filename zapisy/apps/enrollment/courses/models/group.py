@@ -243,20 +243,21 @@ class Group(models.Model):
         from apps.enrollment.records.models import Record, Queue
         groups = Group.objects.filter(type=settings.LETURE_TYPE, course=self.course)
 
+        affected_groups = []
         for group in groups:
-            try:
-                Queue.remove_student_from_queue(student.user.id, group.id)
-            except AlreadyNotAssignedException:
-                # student wasn't in the queue
-                pass
-            except (NonGroupException, NonStudentException):
-                # shouldn't happen
-                return [u'Wystąpił błąd przy zapisie na wykład. Skontaktuj się z administratorem serwisu.']
-            else:
-                group.remove_from_queued_counter(student)
+            if not group.is_full_for_student(student):
+                try:
+                    Queue.remove_student_from_queue(student.user.id, group.id)
+                    group.remove_from_queued_counter(student)
+                    affected_groups.append(group)
+                except AlreadyNotAssignedException:
+                    affected_groups.append(group)
+                except (NonGroupException, NonStudentException):
+                    # shouldn't happen
+                    return [u'Wystąpił błąd przy zapisie na wykład. Skontaktuj się z administratorem serwisu.']
 
         result = []
-        for group in groups:
+        for group in affected_groups:
             __, created = Record.objects.get_or_create(student=student, group=group, status=Record.STATUS_ENROLLED)
             if created:
                 result.append(u'Nastąpiło automatyczne dopisanie do grupy wykładowej')
