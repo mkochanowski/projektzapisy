@@ -6,6 +6,7 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'test', test_rest_api.UserViewSet)
+# router.register(r'semester', semester_api.get_semester_list)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),
