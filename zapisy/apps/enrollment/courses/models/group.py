@@ -251,6 +251,7 @@ class Group(models.Model):
                     group.remove_from_queued_counter(student)
                     affected_groups.append(group)
                 except AlreadyNotAssignedException:
+                    # student wasn't in queue
                     affected_groups.append(group)
                 except (NonGroupException, NonStudentException):
                     # shouldn't happen
