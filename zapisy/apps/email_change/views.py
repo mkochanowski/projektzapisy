@@ -102,10 +102,9 @@ def email_change_view(request, extra_context={},
     else:
         form = EmailChangeForm(instance=request.user)
     
-    context = RequestContext(request, extra_context)
-    context['form'] = form
+    extra_context['form'] = form
     
-    return render(context, template_name)
+    return render(request, template_name, extra_context)
 
 
 

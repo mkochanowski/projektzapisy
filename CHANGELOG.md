@@ -2,6 +2,8 @@
 
 # Current version
 
+* Fix changing email
+
 # Version 18.01.05
 
 * Upgrade to Django 1.10
