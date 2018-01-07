@@ -3,6 +3,8 @@
 import logging
 import json
 import datetime
+import unidecode
+import re
 
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
@@ -29,6 +31,7 @@ from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 from apps.enrollment.utils import mailto
 from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
+from apps.users.exceptions import InvalidUserException
 from apps.enrollment.records.utils import *
 from apps.notifications.forms import NotificationFormset
 from apps.notifications.models import NotificationPreferences
@@ -359,11 +362,16 @@ def login_plus_remember_me(request, *args, **kwargs):
             request.session.set_expiry(0)  # Expires on browser closing.
     return login(request, *args, **kwargs)
 
+def get_ical_filename(user, semester):
+    ascii_only_user_name = unidecode.unidecode(user.get_full_name())
+    name_with_semester = "{0}_{1}".format(ascii_only_user_name, semester.get_short_name())
+    path_safe_name = re.sub(r"[\s+/]", "_", name_with_semester)
+    return "fereol_schedule_{0}.ical".format(path_safe_name.lower())
+
 
 @login_required
 def create_ical_file(request):
     user = request.user
-    user_full_name = user.get_full_name()
     semester = Semester.get_default_semester()
 
     cal = vobject.iCalendar()
@@ -371,20 +379,15 @@ def create_ical_file(request):
     cal.add('version').value = '2.0'
     cal.add('prodid').value = 'Fereol'
     cal.add('calscale').value = 'GREGORIAN'
-    cal.add('calname').value = user_full_name + ' - schedule'
+    cal.add('calname').value = u"{0} - schedule".format(user.get_full_name())
     cal.add('method').value = 'PUBLISH'
 
-    groups_employee = []
-    groups_student = []
-    try:
-        groups_student = filter(lambda x: x.course.semester==semester, Record.get_groups_for_student(user))
-    except Student.DoesNotExist:
-        pass
-    try:
-        groups_employee = map(lambda x: x, Group.objects.filter(course__semester = semester, teacher = user.employee))
-    except Employee.DoesNotExist:
-        pass
-    groups = groups_employee + groups_student
+    if BaseUser.is_student(user):
+        groups = [g for g in Record.get_groups_for_student(user) if g.course.semester == semester]
+    elif BaseUser.is_employee(user):
+        groups = list(Group.objects.filter(course__semester = semester, teacher = user.employee))
+    else:
+        raise InvalidUserException()
     for group in groups:
         course_name = group.course.name
         group_type = group.human_readable_type().decode('utf-8').lower()
@@ -398,7 +401,7 @@ def create_ical_file(request):
             event = cal.add('vevent')
             event.add('summary').value = '%s - %s' % (course_name, group_type)
             if term.room:
-                event.add('location').value = 'sala '+term.room.number \
+                event.add('location').value = 'sala '+ term.room.number \
                     + u', Instytut Informatyki Uniwersytetu Wrocławskiego'
 
             event.add('description').value = u'prowadzący: ' \
@@ -408,7 +411,8 @@ def create_ical_file(request):
 
     cal_str = cal.serialize()
     response = HttpResponse(cal_str, content_type='application/calendar')
-    response['Content-Disposition'] = 'attachment; filename=schedule.ical'
+    ical_file_name = get_ical_filename(user, semester)
+    response['Content-Disposition'] = "attachment; filename={0}".format(ical_file_name)
     return response
 
 
