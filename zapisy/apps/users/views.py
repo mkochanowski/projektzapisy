@@ -399,7 +399,7 @@ def create_ical_file(request):
             start_datetime = datetime.datetime.combine(term.day, term.start)
             end_datetime = datetime.datetime.combine(term.day, term.end)
             event = cal.add('vevent')
-            event.add('summary').value = "{} - {}".format(course_name, group_type)
+            event.add('summary').value = u"{} - {}".format(course_name, group_type)
             if term.room:
                 event.add('location').value = 'sala '+ term.room.number \
                     + u', Instytut Informatyki Uniwersytetu Wrocławskiego'
