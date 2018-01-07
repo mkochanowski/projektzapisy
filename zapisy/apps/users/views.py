@@ -363,9 +363,9 @@ def login_plus_remember_me(request, *args, **kwargs):
     return login(request, *args, **kwargs)
 
 def get_ical_filename(user, semester):
-    ascii_only_user_name = unidecode.unidecode(user.get_full_name())
-    name_with_semester = "{}_{}".format(ascii_only_user_name, semester.get_short_name())
-    path_safe_name = re.sub(r"[\s+/]", "_", name_with_semester)
+    name_with_semester = u"{}_{}".format(user.get_full_name(), semester.get_short_name())
+    name_ascii_only = unidecode.unidecode(name_with_semester)
+    path_safe_name = re.sub(r"[\s+/]", "_", name_ascii_only)
     return "fereol_schedule_{}.ical".format(path_safe_name.lower())
 
 
