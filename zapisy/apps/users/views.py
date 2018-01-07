@@ -18,7 +18,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import check_for_language, LANGUAGE_SESSION_KEY
 from django.conf import settings
 
-import vobject
+from vobject import iCalendar
 
 from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.offer.vote.models.single_vote import SingleVote
@@ -366,7 +366,7 @@ def create_ical_file(request):
     user_full_name = user.get_full_name()
     semester = Semester.get_default_semester()
 
-    cal = vobject.iCalendar()
+    cal = iCalendar()
     cal.add('x-wr-timezone').value = 'Europe/Warsaw'
     cal.add('version').value = '2.0'
     cal.add('prodid').value = 'Fereol'
