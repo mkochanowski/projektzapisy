@@ -364,9 +364,9 @@ def login_plus_remember_me(request, *args, **kwargs):
 
 def get_ical_filename(user, semester):
     ascii_only_user_name = unidecode.unidecode(user.get_full_name())
-    name_with_semester = "{0}_{1}".format(ascii_only_user_name, semester.get_short_name())
+    name_with_semester = "{}_{}".format(ascii_only_user_name, semester.get_short_name())
     path_safe_name = re.sub(r"[\s+/]", "_", name_with_semester)
-    return "fereol_schedule_{0}.ical".format(path_safe_name.lower())
+    return "fereol_schedule_{}.ical".format(path_safe_name.lower())
 
 
 @login_required
@@ -379,7 +379,7 @@ def create_ical_file(request):
     cal.add('version').value = '2.0'
     cal.add('prodid').value = 'Fereol'
     cal.add('calscale').value = 'GREGORIAN'
-    cal.add('calname').value = u"{0} - schedule".format(user.get_full_name())
+    cal.add('calname').value = u"{} - schedule".format(user.get_full_name())
     cal.add('method').value = 'PUBLISH'
 
     if BaseUser.is_student(user):
@@ -399,7 +399,7 @@ def create_ical_file(request):
             start_datetime = datetime.datetime.combine(term.day, term.start)
             end_datetime = datetime.datetime.combine(term.day, term.end)
             event = cal.add('vevent')
-            event.add('summary').value = '%s - %s' % (course_name, group_type)
+            event.add('summary').value = "{} - {}".format(course_name, group_type)
             if term.room:
                 event.add('location').value = 'sala '+ term.room.number \
                     + u', Instytut Informatyki Uniwersytetu Wrocławskiego'
@@ -412,7 +412,7 @@ def create_ical_file(request):
     cal_str = cal.serialize()
     response = HttpResponse(cal_str, content_type='application/calendar')
     ical_file_name = get_ical_filename(user, semester)
-    response['Content-Disposition'] = "attachment; filename={0}".format(ical_file_name)
+    response['Content-Disposition'] = "attachment; filename={}".format(ical_file_name)
     return response
 
 
