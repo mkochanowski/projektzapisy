@@ -3,6 +3,7 @@
 # Current version
 
 * Fix changing email
+* Fixed events' start time in iCalc
 
 # Version 18.01.05
 
