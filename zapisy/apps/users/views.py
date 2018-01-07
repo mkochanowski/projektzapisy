@@ -11,7 +11,6 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.views import login
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
-from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse

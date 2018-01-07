@@ -3,7 +3,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.shortcuts import render
-from django.template import RequestContext
 
 from apps.offer.preferences.forms import PreferenceFormset, PreferenceForm
 from apps.offer.preferences.models import Preference

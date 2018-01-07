@@ -10,7 +10,6 @@ from django.http                       import HttpResponse, \
                                               HttpResponseRedirect,\
                                               Http404
 from django.shortcuts                  import render, redirect
-from django.template                   import RequestContext
 from django.template.response import TemplateResponse
 from django.utils.safestring import SafeUnicode, mark_safe
 from django.utils.encoding import smart_str
