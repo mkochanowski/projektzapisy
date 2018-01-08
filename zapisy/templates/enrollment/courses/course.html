@@ -1,5 +1,4 @@
 {% extends "enrollment/courses/courses_list.html" %}
-{% load render_bundle from webpack_loader %}
 
 {% load fereol_common %}
 {% load i18n %}
@@ -7,7 +6,6 @@
 {% block main-subtitle %}{{ course.name }}{% endblock %}
 
 {% block bread %}
-    {% render_bundle "courses-course-details" %}
     <a href="{% url "main-page" %}">{% trans "Strona główna" %}</a>&nbsp;&raquo;&nbsp;<a
         href="{% url "course-list" %}">{% trans "Przedmioty" %}</a>&nbsp;<span
             id="enr-course-arrow">&raquo;</span>&nbsp;<span 
