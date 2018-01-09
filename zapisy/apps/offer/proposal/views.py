@@ -6,11 +6,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 from django.forms.models import inlineformset_factory
+from django.utils.safestring import mark_safe
 
 from apps.enrollment.courses.models.effects import Effects
 from apps.enrollment.courses.models.tag import Tag
@@ -153,6 +155,22 @@ def proposal(request, slug=None):
     else:
         return TemplateResponse(request, 'offer/proposal/employee_proposals.html', locals())
 
+
+# FIXME: course descriptions and course entities have a two way foreign key
+# relationship, and we have special form code in the admin UI to make sure
+# both foreign keys are pointing at each other. The admin must
+# manually create a course description and assign it to the course entity
+# (and vice versa) for this code here to work. What we're doing below
+# is impossibly ugly and should be removed when the enrollment.courses app
+# is refactored
+def _handle_missing_course_description(request, slug):
+    base_err_msg = u'Brak poprawnego opisu przypisanego do tego przedmiotu. ' + \
+        u'<a href="{}">Stwórz opis</a> w panelu administracyjnym ' + \
+        u'i przypisz go do podstawy przedmiotu, by edytować tą propozycję.'
+    full_err_msg = base_err_msg.format(reverse("admin:courses_coursedescription_add"))
+    messages.error(request, mark_safe(full_err_msg))
+    return redirect('offer-page', slug=slug)
+
 @login_required
 @employee_required
 def proposal_edit(request, slug=None):
@@ -167,7 +185,10 @@ def proposal_edit(request, slug=None):
     if slug:
         try:
             proposal = CourseEntity.get_employee_proposal(request.user, slug)
-            description = CourseDescription.objects.filter(entity=proposal).order_by('-id')[0]
+            descriptions = CourseDescription.objects.filter(entity=proposal)
+            if descriptions.count() == 0:
+                return _handle_missing_course_description(request, slug)
+            description = descriptions.order_by('-id')[0]
             syllabus, _ = Syllabus.objects.get_or_create(entity=proposal)
             ects_field, _ = PointsOfCourseEntities.objects.get_or_create(entity=proposal, type_of_point=pt, program__isnull=True)
             ects = ects_field.value
