@@ -166,7 +166,7 @@ def proposal(request, slug=None):
 def _handle_missing_course_description(request, slug):
     base_err_msg = u'Brak poprawnego opisu przypisanego do tego przedmiotu. ' + \
         u'<a href="{}">Stwórz opis</a> w panelu administracyjnym ' + \
-        u'i przypisz go do podstawy przedmiotu, by edytować tą propozycję.'
+        u'i przypisz go do podstawy przedmiotu, by edytować tę propozycję.'
     full_err_msg = base_err_msg.format(reverse("admin:courses_coursedescription_add"))
     messages.error(request, mark_safe(full_err_msg))
     return redirect('offer-page', slug=slug)
