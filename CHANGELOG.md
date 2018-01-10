@@ -3,6 +3,7 @@
 # Current version
 
 * Fixed events' start time in iCalc
+* Added simple semester REST API serving semesters(id, display_name)
 
 # Version 18.01.05
 
