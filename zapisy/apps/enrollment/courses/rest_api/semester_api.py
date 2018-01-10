@@ -1,11 +1,9 @@
 from rest_framework import serializers, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
-from enrollment.courses.models.semester import Semester
+from ..models.semester import Semester
 
 
-class SimpleSemesterSerializer(serializers.ModelSerializer):
+class SemesterSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()
 
     class Meta:
@@ -13,12 +11,9 @@ class SimpleSemesterSerializer(serializers.ModelSerializer):
         fields = ('id', 'display_name')
 
     def get_display_name(self, obj):
-        return 'Semestr {} {}'.format(obj.year, obj.type)
+        return obj.get_name()
 
 
-@api_view(['GET'])
-def get_semester_list(request):
-    semesters = Semester.objects.all()
-    serializer = SimpleSemesterSerializer(semesters, many=True)
-
-    return Response(serializer.data)
+class SemesterViewSet(viewsets.ModelViewSet):
+    queryset = Semester.objects.order_by('-semester_beginning')
+    serializer_class = SemesterSerializer

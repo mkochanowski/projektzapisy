@@ -2,11 +2,12 @@ from django.conf.urls import url, include
 from rest_framework import routers
 
 from rest_api import test as test_rest_api
+from rest_api import semester_api
 from . import views
 
 router = routers.DefaultRouter()
 router.register(r'test', test_rest_api.UserViewSet)
-# router.register(r'semester', semester_api.get_semester_list)
+router.register(r'semesters', semester_api.SemesterViewSet)
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),
