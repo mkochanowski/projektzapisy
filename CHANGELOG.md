@@ -2,6 +2,7 @@
 
 # Current version
 
+* Fix changing email
 * added news author in emails
 * Fixed events' start time in iCalc
 
