@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import patterns, url
-
+from django.conf.urls import url
 from apps.users.api import StudentList
 
-urlpatterns = patterns('', url('^student/$', StudentList.as_view()))
+urlpatterns = [
+    url('^student/$', StudentList.as_view())
+]

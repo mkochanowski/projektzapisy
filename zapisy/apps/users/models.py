@@ -6,6 +6,7 @@ from django.db import models
 from django.conf import settings
 from django.apps import apps
 from django.contrib.auth.models import User, UserManager
+from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.template import Context
 from django.template.loader import render_to_string
@@ -549,7 +550,6 @@ class StudiaZamawiane(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
@@ -561,9 +561,8 @@ class StudiaZamawiane(ZamawianeAbstract):
                     'old_account' : old_sz.bank_account and old_sz.bank_account or '',
                     'new_account' : self.bank_account and self.bank_account or '',
                 }
-                context = Context(c)
-                message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
-                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context)
+                message_user = render_to_string('users/bank_account_change_email.html', c)
+                message_employee = render_to_string('users/bank_account_change_email_employee.html', c)
 
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
 
@@ -596,7 +595,6 @@ class StudiaZamawiane2012(ZamawianeAbstract):
         try:
             old_sz = StudiaZamawiane2012.objects.get(id=self.id)
             if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                Site = apps.cache.get_model('sites', 'Site')
                 current_site = Site.objects.get_current()
                 site_name, domain = current_site.name, current_site.domain
                 subject = '[Fereol] Zmiana numeru konta bankowego'
@@ -608,9 +606,8 @@ class StudiaZamawiane2012(ZamawianeAbstract):
                     'old_account' : old_sz.bank_account and old_sz.bank_account or '',
                     'new_account' : self.bank_account and self.bank_account or '',
                 }
-                context = Context(c)
-                message_user = render_to_string('users/bank_account_change_email.html', context_instance=context)
-                message_employee = render_to_string('users/bank_account_change_email_employee.html', context_instance=context)
+                message_user = render_to_string('users/bank_account_change_email.html', c)
+                message_employee = render_to_string('users/bank_account_change_email_employee.html', c)
 
                 emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
 

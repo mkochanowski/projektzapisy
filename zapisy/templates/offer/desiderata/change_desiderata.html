@@ -1,6 +1,12 @@
 {% extends "offer/base.html" %}
+{% load staticfiles %}
 
+{% block main-subtitle %}Dezyderaty{% endblock %}
 {% block sidebar %}{% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static "js/offer/desiderata.js" %}"></script>
+{% endblock %}
 
 {% block offer_menu_desiderata %} class="active"{% endblock %}
 
@@ -26,6 +32,7 @@
                 {% for hour in formset.hours %}
                 <th>{{hour}}</th>
                 {% endfor %}
+                <th>Cały dzień</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +44,9 @@
                         {{ form.value }}{{form.day}}{{form.hour}}
                     </td>
                 {% endfor %}
+                    <td>
+                        <button class="btn btn-small btn-info desiderata-toggler">Przełącz</button>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
