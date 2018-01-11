@@ -4,7 +4,6 @@
     Help views
 """
 
-from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
