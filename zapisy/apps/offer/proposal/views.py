@@ -158,18 +158,17 @@ def proposal(request, slug=None):
 
 # FIXME: course descriptions and course entities have a two way foreign key
 # relationship, and we have special form code in the admin UI to make sure
-# both foreign keys are pointing at each other. The admin must
-# manually create a course description and assign it to the course entity
-# (and vice versa) for this code here to work. What we're doing below
-# is impossibly ugly and should be removed when the enrollment.courses app
-# is refactored
-def _handle_missing_course_description(request, slug):
-    base_err_msg = u'Brak poprawnego opisu przypisanego do tego przedmiotu. ' + \
-        u'<a href="{}">Stwórz opis</a> w panelu administracyjnym ' + \
-        u'i przypisz go do podstawy przedmiotu, by edytować tę propozycję.'
-    full_err_msg = base_err_msg.format(reverse("admin:courses_coursedescription_add"))
-    messages.error(request, mark_safe(full_err_msg))
-    return redirect('offer-page', slug=slug)
+# both foreign keys are pointing at each other. If the admin forgets to
+# create a corresponding course description after creating a course entity
+# we create a default one below. (This can be removed when the courses
+# app is refactored)
+def _create_missing_course_description(request, proposal):
+    description = CourseDescription.objects.create(
+            entity=proposal,
+            author=request.user.employee)
+    proposal.information = description
+    proposal.save()
+    return description
 
 @login_required
 @employee_required
@@ -187,8 +186,9 @@ def proposal_edit(request, slug=None):
             proposal = CourseEntity.get_employee_proposal(request.user, slug)
             descriptions = CourseDescription.objects.filter(entity=proposal)
             if descriptions.count() == 0:
-                return _handle_missing_course_description(request, slug)
-            description = descriptions.order_by('-id')[0]
+                description = _create_missing_course_description(request, proposal)
+            else:
+                description = descriptions.order_by('-id')[0]
             syllabus, _ = Syllabus.objects.get_or_create(entity=proposal)
             ects_field, _ = PointsOfCourseEntities.objects.get_or_create(entity=proposal, type_of_point=pt, program__isnull=True)
             ects = ects_field.value
