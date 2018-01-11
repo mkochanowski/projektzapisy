@@ -12,12 +12,11 @@ dependencies:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
     # npm
-    - sudo mkdir -p /node
+    - sudo mkdir -p /webpack_modules
     - |
-      sudo chown `whoami`: /node
-    - cp package.json /node
-    - npm i --prefix /node
-    - export NODE_PATH=/node/node_modules
+      sudo chown `whoami`: /webpack_modules
+    - cp package.json /webpack_modules
+    - npm i --prefix /webpack_modules
     - pip freeze
 
 test:

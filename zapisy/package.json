@@ -4,9 +4,9 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_PATH=/node/node_modules /node/node_modules/.bin/webpack --progress --colors --config node/webpack.dev.ts",
-    "devw": "NODE_PATH=/node/node_modules /node/node_modules/.bin/webpack --progress --colors --watch --config node/webpack.dev.ts",
-    "build": "NODE_PATH=/node/node_modules /node/node_modules/.bin/webpack --progress --colors --config node/webpack.prod.ts"
+    "dev": "NODE_PATH=/webpack_modules/node_modules /webpack_modules/node_modules/.bin/webpack --progress --colors --config webpack_configs/webpack.dev.ts",
+    "devw": "NODE_PATH=/webpack_modules/node_modules /webpack_modules/node_modules/.bin/webpack --progress --colors --watch --config webpack_configs/webpack.dev.ts",
+    "build": "NODE_PATH=/webpack_modules/node_modules /webpack_modules/node_modules/.bin/webpack --progress --colors --config webpack_configs/webpack.prod.ts"
   },
   "repository": {
     "type": "git",

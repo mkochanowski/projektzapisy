@@ -2,10 +2,7 @@
 # and will fail with EACCES
 echo "Installing npm packages"
 
-# Needed for module resolving
-export NODE_PATH=/node/node_modules
-
 # package.json needs to be in the --prefixed dir
-cp /vagrant/zapisy/package.json /node/package.json
+cp /vagrant/zapisy/package.json /webpack_modules/package.json
 
-npm i --prefix /node
+npm i --prefix /webpack_modules

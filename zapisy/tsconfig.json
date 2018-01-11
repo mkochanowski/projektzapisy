@@ -9,13 +9,13 @@
     "paths": {
       "*": [
         "/vagrant/zapisy/assets/*",
-        "/node/node_modules/*",
-        "./node/typings/*"
+        "/webpack_modules/node_modules/*",
+        "./webpack_configs/typings/*"
       ]
     },
     "typeRoots": [
-      "/node/node_modules/@types",
-      "./node/typings"
+      "/webpack_modules/node_modules/@types",
+      "./webpack_configs/typings"
     ],
     "traceResolution": true
   },

@@ -196,6 +196,8 @@ curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # Create node dir outside VM shared folder for Windows compatibility
-rm -rf /node
-mkdir -m 777 /node
-chown vagrant: /node
+# (npm uses symlinks and they don't work inside the shared folder on Windows)
+# Do it in this script because we need root
+rm -rf /webpack_modules
+mkdir -m 777 /webpack_modules
+chown vagrant: /webpack_modules
