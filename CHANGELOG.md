@@ -2,6 +2,7 @@
 
 # Current version
 
+* added news author in emails
 * Fixed events' start time in iCalc
 
 # Version 18.01.05
