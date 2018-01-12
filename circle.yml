@@ -12,6 +12,7 @@ dependencies:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
     # npm
+    - chmod +x npm.sh
     - ./npm.sh i
     - pip freeze
 
