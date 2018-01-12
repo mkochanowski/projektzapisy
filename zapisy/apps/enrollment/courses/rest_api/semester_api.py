@@ -15,5 +15,6 @@ class SemesterSerializer(serializers.ModelSerializer):
 
 
 class SemesterViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get']
     queryset = Semester.objects.order_by('-semester_beginning')
     serializer_class = SemesterSerializer
