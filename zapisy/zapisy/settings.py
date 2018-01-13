@@ -332,7 +332,7 @@ WEBPACK_LOADER = {
 		# This setting is badly named, it's the bundle dir relative
 		# to whatever you have in your STATICFILES_DIRS
         'BUNDLE_DIR_NAME': '', # must end with slash
-        'STATS_FILE': os.path.join(BASE_DIR, "webpack_configs", 'webpack-stats.json'),
+        'STATS_FILE': os.path.join(BASE_DIR, "webpack_resources", 'webpack-stats.json'),
         'POLL_INTERVAL': 0.1,
         'TIMEOUT': None,
         'IGNORE': ['.+\.hot-update.js', '.+\.map']

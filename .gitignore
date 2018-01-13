@@ -21,6 +21,6 @@ personal/
 static/
 node_modules/
 compiled_assets/
-zapisy/webpack_configs/webpack-stats.json
+zapisy/webpack_resources/webpack-stats.json
 *.gz
 *.sql

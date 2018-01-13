@@ -231,7 +231,7 @@ module.exports = function(config: any) {
 			new ExtractTextPlugin("[name]-[hash].min.css", {
 				allChunks: true
 			}),
-			new BundleTracker({ filename: "webpack_configs/webpack-stats.json" }),
+			new BundleTracker({ filename: "webpack_resources/webpack-stats.json" }),
 			// This will copy "raw" assets - ones where we don't want any transformations
 			// (e.g. bootstrap styles)
 			new CopyWebpackPlugin(allAssetDefs.rawfiles),

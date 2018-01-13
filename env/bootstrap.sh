@@ -198,6 +198,5 @@ sudo apt-get install -y nodejs
 # Create node dir outside VM shared folder for Windows compatibility
 # (npm uses symlinks and they don't work inside the shared folder on Windows)
 # Do it in this script because we need root
-rm -rf /webpack_modules
-mkdir -m 777 /webpack_modules
-chown vagrant: /webpack_modules
+cd /vagrant/zapisy
+./webpack_resources/create_modules_dir.sh vagrant

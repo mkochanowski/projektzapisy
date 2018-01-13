@@ -10,12 +10,12 @@
       "*": [
         "/vagrant/zapisy/assets/*",
         "/webpack_modules/node_modules/*",
-        "./webpack_configs/typings/*"
+        "./webpack_resources/typings/*"
       ]
     },
     "typeRoots": [
       "/webpack_modules/node_modules/@types",
-      "./webpack_configs/typings"
+      "./webpack_resources/typings"
     ],
     "traceResolution": true
   },

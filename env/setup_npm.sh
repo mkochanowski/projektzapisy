@@ -3,4 +3,4 @@
 echo "Installing npm packages"
 
 cd /vagrant/zapisy
-./npm.sh i
+./webpack_resources/run_npm_with_copy.sh
