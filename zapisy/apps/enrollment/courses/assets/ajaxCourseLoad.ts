@@ -1,4 +1,13 @@
 // Code to load course info asynchronously, without refreshing the page
+// This script mutates the DOM to display the downloaded
+// course info (TODO Vueify this). As such it depends on the
+// layout of the DOM as defined in:
+// -> templates/enrollment/courses/course.html
+// -> templates/enrollment/courses/course_list.html
+// -> template/base.html
+// The received HTML response is then simply dumped into the DOM
+// (main-content); we also update the page title and links
+
 
 import * as $ from "jquery";
 import { scrollUpToElementIfWindowBelow } from "common/utils";
@@ -30,6 +39,9 @@ function onCourseLinkClicked(event: Event): void {
 	loadCourseInfo(courseUrl);
 }
 
+// Dispatch an AJAX GET request to the course
+// page URL; the received response will be loaded
+// into the DOM
 function loadCourseInfo(courseUrl: string): void {
 	isLoadingCourse = true;
 	const container = document.getElementById("main-content");
@@ -55,6 +67,7 @@ function loadCourseInfo(courseUrl: string): void {
 	});
 }
 
+// Add the "loading" spinner overlay
 function setElementLoadingUi(elem: HTMLElement): void {
 	const coveringLoadElem = document.createElement("div");
 	coveringLoadElem.innerHTML = "&nbsp";
@@ -93,6 +106,9 @@ function setPageTitleAndUrl(courseName: string, url: string) {
 	history.pushState({}, "", url);
 }
 
+// At the top of the page we have the course name and
+// if we're staff a link to the admin panel edit page
+// on the right; they both need to be updated
 function updateCourseNameAndEditLink(courseInfo: CourseInfo) {
 	// The little arrow before the course name above the filters
 	const arrowElem = document.getElementById("enr-course-arrow");
@@ -121,4 +137,8 @@ function onCourseResponseReceived(resp: string, courseUrl: string) {
 	updateCourseNameAndEditLink(courseInfo);
 }
 
+// The courses list itself is loaded with AJAX
+// and when that happpens new HTMLHRElements are created
+// so we need to reinstall our click handlers
+// This event is emitted in CoursesList.js (in legacy assets)
 document.addEventListener("CoursesListChanged", installClickHandlers);

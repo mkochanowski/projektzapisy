@@ -256,6 +256,7 @@
             {% block topContent %}{% endblock %}
             {% block center %}
                 <div class="span{% block content-width %}11{% endblock %} columns marginFix contentNoCollapse">
+                    {# WARNING ajaxCourseLoad.ts depends on this #}
                     <div id="main-content">
                         {% block content %}
                         {% endblock %}

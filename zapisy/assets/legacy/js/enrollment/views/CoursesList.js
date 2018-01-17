@@ -36,6 +36,7 @@ CoursesList.prototype.initCourseLists = function()
     this.setCoursesFromData();
 };
 
+// Event dependencies: ajaxCourseLoad.ts
 const listChangedEvent = new Event("CoursesListChanged");
 CoursesList.prototype.setCoursesFromData = function()
 {
