@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='employee',
             name='user',
-            field=models.OneToOneField(related_name='employee', verbose_name=b'U\xc5\xbcytkownik', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='employee', verbose_name=b'U\xc5\xbcytkownik', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

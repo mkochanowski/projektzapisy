@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='syllabus',
             name='entity',
-            field=models.OneToOneField(related_name='syllabus', verbose_name=b'podstawa przedmiotu', to='courses.CourseEntity'),
+            field=models.OneToOneField(related_name='syllabus', verbose_name=b'podstawa przedmiotu', to='courses.CourseEntity', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(

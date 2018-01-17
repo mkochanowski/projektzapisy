@@ -56,7 +56,7 @@ class PointsOfCourseEntities(models.Model):
 
 class StudentPointsView(models.Model):
     value   = models.SmallIntegerField()
-    student = models.OneToOneField(Student, primary_key=True)
+    student = models.OneToOneField(Student, primary_key=True, on_delete=models.CASCADE)
     entity  = models.ForeignKey('courses.CourseEntity', on_delete=models.CASCADE)
 
     # just for testing

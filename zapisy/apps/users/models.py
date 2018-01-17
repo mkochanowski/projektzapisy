@@ -38,7 +38,7 @@ class ExtendedUser(User):
 
 class UserProfile(models.Model):
     # This field is required.
-    user         = models.OneToOneField(User, related_name='profile')
+    user         = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     is_student   = models.BooleanField(default = False, verbose_name="czy student?")
     is_employee  = models.BooleanField(default = False, verbose_name="czy pracownik?")
     is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
@@ -114,7 +114,7 @@ class Employee(BaseUser):
     Employee.
     '''
 
-    user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='employee')
+    user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='employee', on_delete=models.CASCADE)
     consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
     homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
@@ -240,7 +240,7 @@ class Student(BaseUser):
     Student.
     '''
 
-    user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='student')
+    user = models.OneToOneField(User, verbose_name="Użytkownik", related_name='student', on_delete=models.CASCADE)
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_bonus_minutes = models.PositiveIntegerField(default=0, verbose_name="Przyspieszenie otwarcia zapisów (minuty)")
@@ -541,7 +541,7 @@ class StudiaZamawiane(ZamawianeAbstract):
         Model przechowuje dodatkowe informacje o studentach zamawianych
     """
 
-    student = models.OneToOneField(Student, related_name='zamawiane', verbose_name='Student')
+    student = models.OneToOneField(Student, related_name='zamawiane', verbose_name='Student', on_delete=models.CASCADE)
 
     def __unicode__(self):
         return 'Student zamawiany: '+str(self.student).decode('utf-8')
@@ -586,7 +586,7 @@ class StudiaZamawiane2012(ZamawianeAbstract):
         Model przechowuje dodatkowe informacje o studentach zamawianych
     """
 
-    student = models.OneToOneField(Student, related_name='zamawiane2012', verbose_name='Student')
+    student = models.OneToOneField(Student, related_name='zamawiane2012', verbose_name='Student', on_delete=models.CASCADE)
 
     def __unicode__(self):
         return 'Student zamawiany: '+str(self.student).decode('utf-8')
@@ -674,8 +674,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class OpeningTimesView(models.Model):
-    student  = models.OneToOneField(Student, primary_key=True,
-                                 related_name='opening_times')
+    student  = models.OneToOneField(Student, primary_key=True,on_delete=models.CASCADE,
+                                    related_name='opening_times')
     course   = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
     semester = models.ForeignKey('courses.Semester', on_delete=models.CASCADE)
     opening_time = models.DateTimeField()
