@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='studentwork',
             name='syllabus',
-            field=models.ForeignKey(to='proposal.Syllabus'),
+            field=models.ForeignKey(to='proposal.Syllabus', on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]

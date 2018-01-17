@@ -244,7 +244,7 @@ class Student(BaseUser):
     matricula = models.CharField(max_length=20, default="", unique=True, verbose_name="Numer indeksu")
     ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
     records_opening_bonus_minutes = models.PositiveIntegerField(default=0, verbose_name="Przyspieszenie otwarcia zapisów (minuty)")
-    program = models.ForeignKey('Program', verbose_name='Program Studiów', null=True, default=None)
+    program = models.ForeignKey('Program', verbose_name='Program Studiów', null=True, default=None, on_delete=models.CASCADE)
     block = models.BooleanField(verbose_name="blokada planu", default = False)
     semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
     status = models.PositiveIntegerField(default=0, verbose_name="Status")
@@ -481,7 +481,7 @@ class Program( models.Model ):
         Program of student studies
     """
     name = models.CharField(max_length=50, unique=True, verbose_name="Program")
-    type_of_points = models.ForeignKey('courses.PointTypes', verbose_name='rodzaj punktów')
+    type_of_points = models.ForeignKey('courses.PointTypes', verbose_name='rodzaj punktów', on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Program studiów'
@@ -676,8 +676,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 class OpeningTimesView(models.Model):
     student  = models.OneToOneField(Student, primary_key=True,
                                  related_name='opening_times')
-    course   = models.ForeignKey('courses.Course')
-    semester = models.ForeignKey('courses.Semester')
+    course   = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
+    semester = models.ForeignKey('courses.Semester', on_delete=models.CASCADE)
     opening_time = models.DateTimeField()
 
     objects = T0Manager()

@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='OpeningTimesView',
             fields=[
-                ('student', models.ForeignKey(related_name='opening_times', primary_key=True, serialize=False, to='users.Student')),
+                ('student', models.ForeignKey(related_name='opening_times', primary_key=True, serialize=False, to='users.Student', on_delete=models.CASCADE)),
                 ('opening_time', models.DateTimeField()),
             ],
             options={
@@ -160,7 +160,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='student',
             name='program',
-            field=models.ForeignKey(default=None, verbose_name=b'Program Studi\xc3\xb3w', to='users.Program', null=True),
+            field=models.ForeignKey(default=None, verbose_name=b'Program Studi\xc3\xb3w', to='users.Program', null=True, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(

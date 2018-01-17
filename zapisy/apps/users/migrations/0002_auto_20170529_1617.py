@@ -17,19 +17,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='program',
             name='type_of_points',
-            field=models.ForeignKey(verbose_name=b'rodzaj punkt\xc3\xb3w', to='courses.PointTypes'),
+            field=models.ForeignKey(verbose_name=b'rodzaj punkt\xc3\xb3w', to='courses.PointTypes', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='openingtimesview',
             name='course',
-            field=models.ForeignKey(to='courses.Course'),
+            field=models.ForeignKey(to='courses.Course', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='openingtimesview',
             name='semester',
-            field=models.ForeignKey(to='courses.Semester'),
+            field=models.ForeignKey(to='courses.Semester', on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
