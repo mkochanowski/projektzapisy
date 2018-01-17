@@ -11,8 +11,6 @@ dependencies:
   override:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
-    # npm
-    - chmod +x npm.sh
     - ./npm.sh i
     - pip freeze
 
@@ -21,7 +19,7 @@ test:
     - cp ../env/settings_local_test.py settings_local.py
   override:
     - mkdir logs
-    - npm run build
+    - NODE_PATH=/webpack_modules/node_modules npm run build
     - mkdir static
     - python manage.py collectstatic --noinput
     # - python manage.py test test_app --nomigrations
