@@ -41,7 +41,7 @@ GTC = {'1': 'wy', '2': 'cw', '3': 'pr',
        '4': 'cw', '5': 'cw+prac',
        '6': 'sem', '7': 'lek', '8': 'WF',
        '9': 'rep', '10': 'proj'}
-
+BREAK_DURATION = datetime.timedelta(minutes=15)
 
 @login_required
 def student_profile(request, user_id):
@@ -394,6 +394,7 @@ def create_ical_file(request):
             continue
         for term in terms:
             start_datetime = datetime.datetime.combine(term.day, term.start)
+            start_datetime += BREAK_DURATION
             end_datetime = datetime.datetime.combine(term.day, term.end)
             event = cal.add('vevent')
             event.add('summary').value = '%s - %s' % (course_name, group_type)
