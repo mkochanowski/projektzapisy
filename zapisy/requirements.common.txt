@@ -1,3 +1,7 @@
+# Apparently needed to install some other packages
+# but not pulled automatically as a depdendency
+setuptools==38.4.0
+
 # Packages from our development environment
 Django==1.11.9 --no-binary django
 Fabric==1.5.1
