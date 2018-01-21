@@ -28,6 +28,7 @@ from datetime import datetime, date, time, timedelta
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from django.db import connection
+from django.core import mail
 
 from django.conf import settings
 from scripts.scheduleimport import run_test as scheduleimport_run_test
