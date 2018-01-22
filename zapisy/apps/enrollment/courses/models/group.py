@@ -245,17 +245,17 @@ class Group(models.Model):
 
         affected_groups = []
         for group in groups:
-            if not group.is_full_for_student(student):
-                try:
-                    Queue.remove_student_from_queue(student.user.id, group.id)
-                    group.remove_from_queued_counter(student)
-                    affected_groups.append(group)
-                except AlreadyNotAssignedException:
-                    # student wasn't in queue
-                    affected_groups.append(group)
-                except (NonGroupException, NonStudentException):
-                    # shouldn't happen
-                    return [u'Wystąpił błąd przy zapisie na wykład. Skontaktuj się z administratorem serwisu.']
+            try:
+                Queue.remove_student_from_queue(student.user.id, group.id)
+            except AlreadyNotAssignedException:
+                # student wasn't in queue
+                affected_groups.append(group)
+            except (NonGroupException, NonStudentException):
+                # shouldn't happen
+                return [u'Wystąpił błąd przy zapisie na wykład. Skontaktuj się z administratorem serwisu.']
+            else:
+                group.remove_from_queued_counter(student)
+                affected_groups.append(group)
 
         result = []
         for group in affected_groups:
