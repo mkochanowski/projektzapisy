@@ -2,8 +2,7 @@
 import json
 
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 
 class AjaxMessage(HttpResponse):
 	def __init__(self, type, code, message, data = None):
@@ -36,7 +35,6 @@ class AjaxFailureMessage(AjaxMessage):
 			rdata = {
 				'messages': [message]
 			}
-			return render_to_response('common/error.html', rdata, \
-				context_instance=RequestContext(request))
+			return render(request, 'common/error.html', rdata)
 		else:
 			return AjaxFailureMessage(code, message, data)

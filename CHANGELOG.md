@@ -2,6 +2,15 @@
 
 # Current version
 
+* Fix changing email
+* added news author in emails
+* Fixed events' start time in iCalc
+
+# Version 18.01.05
+
+* Upgrade to Django 1.10
+* Fix for pulling student from queue
+
 # Version 17.12.16
 
 * Improved desideratas form

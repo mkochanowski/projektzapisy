@@ -1,38 +1,23 @@
 ﻿# -*- coding: utf-8 -*-
 import json
 
-from django.contrib                      import messages
-from django.http                         import HttpResponse, HttpResponseRedirect
-from django.shortcuts                    import render_to_response
-from django.template                     import RequestContext
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import render
 from apps.grade.ticket_create.models.student_graded import StudentGraded
-from apps.users.decorators             import student_required, employee_required
+from apps.users.decorators import student_required, employee_required
 from apps.users.models import BaseUser
-from django.contrib.auth.decorators      import login_required
 
-from apps.enrollment.courses.models   import Semester, \
-                                                Group,\
-                                                Course
-from apps.enrollment.records.models    import Record
-from apps.grade.poll.models.poll            import Poll
-from apps.grade.ticket_create.utils    import generate_keys_for_polls, \
-                                                generate_keys,          \
-                                                group_polls_by_course, \
-                                                secure_signer, \
-                                                unblind, \
-                                                get_valid_tickets, \
-                                                to_plaintext, \
-                                                connect_groups, \
-                                                secure_signer_without_save, \
-                                                secure_mark
-from apps.grade.ticket_create.forms      import PollCombineForm
-from apps.grade.ticket_create.exceptions import *
-from apps.grade.ticket_create.models     import PublicKey
-from django.contrib.auth                   import authenticate, login, logout
-from apps.grade.ticket_create.forms      import *
-from django.views.decorators.csrf          import csrf_exempt
-from Crypto.PublicKey import RSA
+from apps.enrollment.courses.models import Semester
+from apps.grade.poll.models.poll import Poll
+from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
+    secure_signer, unblind, get_valid_tickets, to_plaintext, connect_groups, secure_signer_without_save, secure_mark
+from apps.grade.ticket_create.models import PublicKey
+from django.contrib.auth import authenticate
+from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
+from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
+from django.utils.safestring import SafeUnicode
 
 
 ### KEYS generate:
@@ -132,17 +117,17 @@ def connections_choice( request ):
                     StudentGraded.objects.get_or_create(student=request.user.student,
                                                       semester=semester)
 
-                return render_to_response( "grade/ticket_create/tickets_save.html", data, context_instance = RequestContext( request ))
+                return render(request, "grade/ticket_create/tickets_save.html", data)
 
         else:
            pass
 #             form = PollCombineForm( polls = groupped_polls )
 
         data = { 'polls':polls_lists, 'grade' : grade, 'general_polls': general_polls}
-        return render_to_response ('grade/ticket_create/connection_choice.html', data, context_instance = RequestContext ( request ))
+        return render(request, 'grade/ticket_create/connection_choice.html', data)
     else:
         messages.error( request, "Ocena zajęć jest w tej chwili zamknięta; nie można pobrać biletów" )
-        return render_to_response ('grade/ticket_create/connection_choice.html', {'grade': grade }, context_instance = RequestContext ( request ))
+        return render(request, 'grade/ticket_create/connection_choice.html', { 'grade': grade })
 
 
 @csrf_exempt
@@ -235,10 +220,10 @@ def client_connection( request ):
 @csrf_exempt
 def keys_list( request ):
     l = PublicKey.objects.all()#.order_by('poll__group__course__name')
-    return render_to_response('grade/ticket_create/keys_list.html', {'list': l,},context_instance = RequestContext( request ))
+    return render(request, 'grade/ticket_create/keys_list.html', {'list': l,})
 
 @csrf_exempt
 def keys_generate( request ):
     data = {}
     data['keys_to_create'] = Poll.count_polls_without_keys()
-    return render_to_response('grade/ticket_create/keys_generate.html', data,context_instance = RequestContext( request ))
+    return render(request, 'grade/ticket_create/keys_generate.html', data)

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls import url
 from django.contrib.auth.views import (
-    login, password_change, password_change_done,
-    password_reset, password_reset_confirm,
+    password_change, password_reset, password_reset_confirm,
     password_reset_complete, password_reset_done
 )
 from . import views
 
 urlpatterns = [
-    url('^login/$', views.login_plus_remember_me, {'template_name': 'users/login.html'}, 'user-login'),
+    url('^login/$', views.login_plus_remember_me, {'template_name': 'users/login.html'}, name='user-login'),
     url(r'^profile/employee/(?P<user_id>(\d+))?$', views.employee_profile, name='employee-profile'),
     url(r'^profile/student/(?P<user_id>(\d+))?$', views.student_profile, name='student-profile'),
     url('^$', views.my_profile, name='my-profile'),
