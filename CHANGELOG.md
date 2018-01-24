@@ -5,6 +5,7 @@
 * Fix changing email
 * added news author in emails
 * Fixed events' start time in iCalc
+* Fixed remove student from queue when enrolling to lecture
 
 # Version 18.01.05
 
