@@ -202,7 +202,8 @@ class Command(BaseCommand):
                 term.save()
                 term.group.save()
                 self.stdout.write(self.style.SUCCESS('Group updated: ' +
-                                  str(term.group).decode('utf-8') + ' ' + str(term).decode('utf-8') +
+                                  str(term.group).decode('utf-8') + ' ' +
+                                  str(term).decode('utf-8') +
                                   '\n  ' + str(diffs).decode('utf-8') + '\n'))
                 self.updated_terms += 1
 
