@@ -66,8 +66,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-semester', type=int, default=0)
-        parser.add_argument('-create_terms', action='store_true', dest='create_terms')
         parser.add_argument('-create_courses', action='store_true', dest='create_courses')
+        parser.add_argument('-dry_run', action='store_true', dest='dry_run')
 
     def get_entity(self, name):
         name = name.upper()
@@ -260,7 +260,7 @@ class Command(BaseCommand):
         return groups
 
     @transaction.atomic
-    def import_from_api(self):
+    def import_from_api(self, create_courses=False, create_terms=False):
         self.created_terms = 0
         self.updated_terms = 0
         self.created_courses = 0
@@ -269,10 +269,10 @@ class Command(BaseCommand):
         for g in groups:
             entity = self.get_entity(g['entity_name'])
             if entity is not None:
-                course = self.get_course(entity, True)
+                course = self.get_course(entity, create_courses)
                 if course is None:
                     raise CommandError('Course does not exists! Check your input file.')
-                if True:
+                if create_terms:
                     self.create_or_update_group(course, g)
         self.stdout.write(self.style.SUCCESS('Created {} courses successfully! '
                                              'Moreover {} courses was already there.'
@@ -289,4 +289,7 @@ class Command(BaseCommand):
         self.verbosity = options['verbosity']
         if self.verbosity >= 1:
             self.stdout.write('Adding to semester: '+str(self.semester)+'\n')
-        self.import_from_api()
+        if options['dry_run']:
+            self.import_from_api(False, False)
+        else:
+            self.import_from_api(options['create_courses'])
