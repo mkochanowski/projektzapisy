@@ -260,7 +260,7 @@ class Command(BaseCommand):
         return groups
 
     @transaction.atomic
-    def import_from_api(self, create_courses=False, create_terms=False):
+    def import_from_api(self, create_courses=False, create_terms=True):
         self.created_terms = 0
         self.updated_terms = 0
         self.created_courses = 0
