@@ -236,7 +236,6 @@ class Command(BaseCommand):
 
     def get_groups(self):
         url = ('http://scheduler.gtch.eu/admin/login/')
-        # r = requests.get(url, auth=('test', 'test'))
         client = requests.session()
         client.get(url)
         csrftoken = client.cookies['csrftoken']
@@ -271,7 +270,6 @@ class Command(BaseCommand):
             entity = self.get_entity(g['entity_name'])
             if entity is not None:
                 course = self.get_course(entity, True)
-                # data = self.prepare_term_data(term_ex)
                 if course is None:
                     raise CommandError('Course does not exists! Check your input file.')
                 if True:
