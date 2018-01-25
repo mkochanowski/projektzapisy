@@ -64,7 +64,7 @@
     <script type="text/javascript">
         var user_is_authenticated = {% if request.user.is_authenticated %}true{% else %}false{% endif %},
             user_is_student = {% if request.user.student %}true{% else %}false{% endif %};
-
+        console.warn("is_auth/is_student:", user_is_authenticated, user_is_student);
     </script>
     {% block js %}{% compressed_js 'main' %}{% endblock %}
     {% block rss %}{% endblock %}
@@ -97,6 +97,8 @@
 </head>
 
 <body>
+
+<h1>REQUEST: {{ request }} {{ request.user }}</h1>
 
 
 <form action="/" method="post" style="display: none">
