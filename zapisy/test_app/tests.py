@@ -500,15 +500,15 @@ class NewSemesterTests(SeleniumTestCase):
 
         employees = {'{} {}'.format(empl.user.first_name, empl.user.last_name): empl.id for empl in self.employees}
 
-        Classroom.objects.create(number=5, type=1)
-        Classroom.objects.create(number=7, type=3)
-        Classroom.objects.create(number=25, type=0)
-        Classroom.objects.create(number=103, type=1)
-        Classroom.objects.create(number=104, type=1)
-        Classroom.objects.create(number=105, type=1)
-        Classroom.objects.create(number=108, type=3)
-        Classroom.objects.create(number=119, type=0)
-        Classroom.objects.create(number=139, type=1)
+        Classroom.objects.create(number=5, type='1')
+        Classroom.objects.create(number=7, type='3')
+        Classroom.objects.create(number=25, type='0')
+        Classroom.objects.create(number=103, type='1')
+        Classroom.objects.create(number=104, type='1')
+        Classroom.objects.create(number=105, type='1')
+        Classroom.objects.create(number=108, type='3')
+        Classroom.objects.create(number=119, type='0')
+        Classroom.objects.create(number=139, type='1')
 
         test_schedule = '''
 
