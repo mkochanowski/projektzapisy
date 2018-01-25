@@ -746,7 +746,7 @@ class EmailChangeTest(SeleniumTestCase):
           lambda: self.driver.find_element_by_id('id_email').clear()
         )
         self.wait_for_pass(
-          lambda: self.driver.find_element_by_id('id_email').send_keys('mle@gmail.com')
+          lambda: self.driver.find_element_by_id('id_email').send_keys('example@example.com')
         )
         current_len = len(mail.outbox)
         self.wait_for_pass(
