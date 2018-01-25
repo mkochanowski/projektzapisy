@@ -1,11 +1,16 @@
 # projektzapisy Changelog
 
 # Current version
+* Added simple semester REST API serving semesters
+
+# Version 18.01.24
 
 * Fix changing email
 * added news author in emails
 * Fixed events' start time in iCalc
-* Added simple semester REST API serving semesters(id, display_name)
+* Fixed remove student from queue when enrolling to lecture
+* Fixed issue with contextprocessors
+* Fixed editing course in offer
 
 # Version 18.01.05
 
