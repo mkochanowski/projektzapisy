@@ -489,15 +489,6 @@ class Group(models.Model):
     def course_slug(self):
         return self.course.slug
 
-    @staticmethod
-    def teacher_in_present(employees, semester):
-        teachers = Group.objects.filter(course__semester = semester).distinct().values_list('teacher__pk', flat=True)
-
-        for employee in employees:
-            employee.teacher = employee.pk in teachers
-
-        return employees
-
     def has_student_in_queue(self, student):
         from apps.enrollment.records.models import Queue
         return Queue.objects.filter(student=student, group=self).count() != 0

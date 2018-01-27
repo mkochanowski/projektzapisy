@@ -120,15 +120,13 @@ def employee_profile(request, user_id):
         if request.is_ajax():
             return render(request, 'users/employee_profile_contents.html', data)
         else:
-            semester = Semester.get_current_semester()
             employees = Employee.get_list()
-            active_employees = Group.teacher_in_present(employees, semester)
 
-            for e in active_employees:
+            for e in employees:
                 e.short_new = e.user.first_name[:1] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
                 e.short_old = e.user.first_name[:2] + e.user.last_name[:2] if e.user.first_name and e.user.last_name else None
 
-            data['employees'] = active_employees
+            data['employees'] = employees
             data['char'] = 'All'
 
             return render(request, 'users/employee_profile.html', data)
@@ -299,20 +297,15 @@ def employees_list(request, begin = 'All', query=None):
     return render(request, 'users/employees_list.html', data)
 
 def consultations_list(request, begin='A'):
-
     employees = Employee.get_list('All')
-    semester = Semester.get_current_semester()
-    employees = Group.teacher_in_present(employees, semester)
-
     if request.is_ajax():
         employees = prepare_ajax_employee_list(employees)
         return AjaxSuccessMessage(message="ok", data=employees)
-    else:
-        data = {
-            "employees" : employees,
-            "char": begin
-            }
-        return render(request, 'users/consultations_list.html', data)
+    data = {
+        "employees" : employees,
+        "char": begin
+    }
+    return render(request, 'users/consultations_list.html', data)
 
 
 @login_required
