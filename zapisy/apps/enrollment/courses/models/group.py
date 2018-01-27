@@ -65,6 +65,7 @@ class Group(models.Model):
     """group for course"""
     course = models.ForeignKey('Course', verbose_name='przedmiot', related_name='groups')
     teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
+    teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
     type    = models.CharField(max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych 2009', help_text='miejsca gwarantowane dla studentów zamawianych 2009')
@@ -93,10 +94,10 @@ class Group(models.Model):
 
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
-        if self.teacher is None:
+        if self.teachers.count() == 0:
             return u'(nieznany prowadzący)'
         else:
-            return self.teacher.user.get_full_name()
+            return ', '.join(t.user.get_full_name() for t in self.teachers)
 
     def get_all_terms(self):
         """return all terms of current group"""
@@ -184,14 +185,14 @@ class Group(models.Model):
 
         from apps.enrollment.records.models import Record, Queue
         from apps.enrollment.courses.models import Semester
-        
+
         # admins are always allowed to remove students
         if not is_admin:
             semester = Semester.objects.get_next()
-        
+
             if semester.is_closed():
                 return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
-            
+
             elif not semester.can_remove_record() and not self.has_student_in_queue(student):
                 return False, [u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.']
 
@@ -304,10 +305,10 @@ class Group(models.Model):
             return False, [u"Zapisy na ten przedmiot są dla Ciebie zamknięte"]
 
         semester = Semester.objects.get_next()
-      
+
         if semester.is_closed():
             return False, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.']
-        
+
         current_limit = semester.get_current_limit()
 
         if not student.get_points_with_course(self.course) <= current_limit:
@@ -444,14 +445,14 @@ class Group(models.Model):
     def get_groups_by_semester(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teacher', 'teacher__user', 'course',
+            select_related('teachers', 'teachers__user', 'course',
                 'course__entity__type', 'course__entity', 'course__semester').all()
 
     @staticmethod
     def get_groups_by_semester_opt(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teacher', 'teacher__user', 'course',
+            select_related('teachers', 'teachers__user', 'course',
                 'course__entity__type', 'course__entity', 'course__semester').all()
 
     def get_group_limit(self):
@@ -496,7 +497,7 @@ class Group(models.Model):
             employee.teacher = employee.pk in teachers
 
         return employees
-    
+
     def has_student_in_queue(self, student):
         from apps.enrollment.records.models import Queue
         return Queue.objects.filter(student=student, group=self).count() != 0
@@ -505,7 +506,7 @@ class Group(models.Model):
         student=None, employee=None):
         """ Dumps this group state to form readable by JavaScript """
         zamawiany = student and student.is_zamawiany()
-        
+
         data = {
             'id': self.pk,
             'type': int(self.type),
@@ -557,10 +558,10 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse('records-group', args=[self.id])
-    
-    
-    
-    
+
+
+
+
 
 def log_add_group(sender, instance, created, **kwargs):
     if Group.disable_update_signal:
