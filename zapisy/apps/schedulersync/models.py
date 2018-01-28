@@ -6,7 +6,7 @@ from django.db import models
 
 
 class TermSyncData(models.Model):
-    """Models the relation between """
+    """Stores the group numbers for the scheduler IDs so the importer can detect changes"""
     term = models.ForeignKey('courses.Term', verbose_name='termin')
     scheduler_id = models.PositiveIntegerField(null=True, unique=True,
                                                verbose_name='id grupy w schedulerze')

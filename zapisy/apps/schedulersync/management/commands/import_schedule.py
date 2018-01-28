@@ -2,11 +2,12 @@
 import re
 import logging
 from datetime import time
-from sets import Set
+import json
 
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+
+import requests
 
 from apps.users.models import Student, Employee, Program
 from apps.enrollment.courses.models import Classroom
@@ -16,14 +17,15 @@ from apps.enrollment.courses.models import (
 )
 from apps.schedulersync.models import TermSyncData
 
-import requests
-import json
+URL_LOGIN = 'http://scheduler.gtch.eu/admin/login/'
+URL_ASSIGNEMENTS = '/scheduler/api/config/2017-18-lato3-2/'
+URL_SCHEDULE = 'http://scheduler.gtch.eu/scheduler/api/task/07164b02-de37-4ddc-b81b-ddedab533fec/'
 
 LIMITS = {'1': 300, '9': 300, '2': 20, '3': 15, '5': 18, '6': 15}
 GROUP_TYPES = {'w': '1', 'e': '9', 'c': '2', 'p': '3',
                'r': '5', 's': '6'}
 
-employee_map = {
+EMPLOYEE_MAP = {
     'PWL': u'PWN',
     'MBI': u'MBIEŃKOWSKI',
     'KBACLAWSKI': u'KBACŁAWSKI',
@@ -46,7 +48,7 @@ employee_map = {
     'MPI': u'MPIOTRÓW'
 }
 
-courses_map = {
+COURSES_MAP = {
     u'ALGORYTMY I STRUKTURY DANYCH M': u'ALGORYTMY I STRUKTURY DANYCH (M)',
     u'KURS PHP': u'Kurs: Projektowanie i implementacja zaawansowanych aplikacji PHP',
     u'PROJEKT DYPLOMOWY (LATO)': u'PROJEKT DYPLOMOWY',
@@ -57,7 +59,7 @@ courses_map = {
     u'TUTORING (LATO)': u'Kształtowanie ścieżki akademicko-zawodowej'
 }
 
-courses_dont_import = [u'XIV LO LATO', u'ZASADY KRYTYCZNEGO MYŚLENIA']
+COURSES_DONT_IMPORT = [u'XIV LO LATO', u'ZASADY KRYTYCZNEGO MYŚLENIA']
 
 
 class Command(BaseCommand):
@@ -67,21 +69,21 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-semester', type=int, default=0)
         parser.add_argument('-create_courses', action='store_true', dest='create_courses')
-        parser.add_argument('-dry_run', action='store_true', dest='dry_run')
+        parser.add_argument('--dry-run', action='store_true', dest='dry_run')
 
     def get_entity(self, name):
         name = name.upper()
-        if name in courses_map:
-            name = courses_map[name]
-        if name in courses_dont_import:
+        if name in COURSES_MAP:
+            name = COURSES_MAP[name]
+        if name in COURSES_DONT_IMPORT:
             return None
         ce = None
         try:
             ce = CourseEntity.objects.get(name_pl__iexact=name)
-        except ObjectDoesNotExist:
+        except CourseEntity.DoesNotExist:
             self.stdout.write(self.style.ERROR(u">Couldn't find course entity for "
                                                + name.decode('utf-8')))
-        except MultipleObjectsReturned:
+        except CourseEntity.MultipleObjectsReturned:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.WARNING('Multiple course entity'))
                 ces = CourseEntity.objects.filter(name_pl__iexact=name, status=2).order_by('-id')
@@ -96,13 +98,13 @@ class Command(BaseCommand):
         try:
             course = Course.objects.get(semester=self.semester, entity=entity)
             self.used_courses.add(course)
-        except ObjectDoesNotExist:
+        except Course.DoesNotExist:
             if entity.slug is None:
                 self.stdout.write(self.style.ERROR(u"Couldn't find slug for "
                                                    + str(entity).decode('utf-8')))
             else:
                 newslug = entity.slug + '_' + \
-                          self.semester.get_short_name().replace(' ', '_').replace('/', '_')
+                          re.sub(r'^\w', '_', self.semester.get_short_name())
                 if create_courses:
                     course = Course(entity=entity, information=entity.information,
                                     semester=self.semester, slug=newslug)
@@ -118,7 +120,7 @@ class Command(BaseCommand):
                     classroom = None
                 else:
                     classroom = Classroom.objects.get(number=room)
-            except ObjectDoesNotExist:
+            except Classroom.DoesNotExist:
                 classroom = None
                 self.stdout.write(self.style.ERROR(u"Couldn't find classroom for "
                                   + room.decode('utf-8')))
@@ -128,8 +130,8 @@ class Command(BaseCommand):
 
     def get_employee(self, name):
         name = name.upper()
-        if name in employee_map:
-            name = employee_map[name]
+        if name in EMPLOYEE_MAP:
+            name = EMPLOYEE_MAP[name]
         try:
             int(name)
             emps = Employee.objects.filter(id=name)
@@ -152,11 +154,11 @@ class Command(BaseCommand):
             return emps[0]
         elif len(emps) > 1:
             self.stdout.write(self.style.ERROR(u"Multiple employee matches for "
-                              + name+". Choices are:"))
+                              + name + ". Choices are:"))
             for e in emps:
                 self.stdout.write(self.style.ERROR("  -"+e.user.get_full_name()))
         else:
-            raise CommandError('Employee %s does not exists! Fix your input file.' % name)
+            raise CommandError('Employee {} does not exists! Fix your input file.'.format(name))
 
         return None
 
@@ -164,7 +166,7 @@ class Command(BaseCommand):
         try:
             sync_data_object = TermSyncData.objects.get(scheduler_id=data['id'])
             term = sync_data_object.term
-        except ObjectDoesNotExist:
+        except TermSyncData.DoesNotExist:
             # Create the group in the enrollment system
             if data['group_type'] == '1':
                 # The lecture always has a single group but possibly many terms
@@ -215,7 +217,7 @@ class Command(BaseCommand):
         group['teacher'] = self.get_employee(g['teachers'][0])
         start_time = 20
         end_time = 0
-        classrooms = Set()
+        classrooms = set()
         if g['id'] in results:
             for t in results[g['id']]:
                 t_start = terms[t['term']]['start']['hour']
@@ -235,15 +237,13 @@ class Command(BaseCommand):
             return None
 
     def get_groups(self):
-        url = ('http://scheduler.gtch.eu/admin/login/')
         client = requests.session()
-        client.get(url)
+        client.get(URL_LOGIN)
         csrftoken = client.cookies['csrftoken']
         login_data = {'username': 'test', 'password': 'test', 'csrfmiddlewaretoken': csrftoken,
-                      'next': '/scheduler/api/config/2017-18-lato3-2/'}
-        r = client.post(url, data=login_data)
-        r2 = client.get('http://scheduler.gtch.eu/'
-                        'scheduler/api/task/07164b02-de37-4ddc-b81b-ddedab533fec/')
+                      'next': URL_ASSIGNEMENTS}
+        r = client.post(URL_LOGIN, data=login_data)
+        r2 = client.get(URL_SCHEDULE)
         results = r2.json()['timetable']['results']
         groups = []
         terms = {}
@@ -264,7 +264,7 @@ class Command(BaseCommand):
         self.created_terms = 0
         self.updated_terms = 0
         self.created_courses = 0
-        self.used_courses = Set()
+        self.used_courses = set()
         groups = self.get_groups()
         for g in groups:
             entity = self.get_entity(g['entity_name'])
@@ -281,15 +281,14 @@ class Command(BaseCommand):
                           .format(self.created_terms, self.updated_terms)))
 
     def handle(self, *args, **options):
-        self.semester = None
-        if options['semester'] == 0:
-            self.semester = Semester.objects.get_next()
-        else:
-            self.semester = Semester.objects.get(pk=int(options['semester']))
+        self.semester = (Semester.objects.get_next() if options['semester'] == 0
+                         else Semester.objects.get(pk=int(options['semester'])))
         self.verbosity = options['verbosity']
         if self.verbosity >= 1:
-            self.stdout.write('Adding to semester: '+str(self.semester)+'\n')
+            self.stdout.write('Adding to semester: ' + str(self.semester) + '\n')
         if options['dry_run']:
+            if self.verbosity >= 1:
+                self.stdout.write('Dry run is on. Nothing will be saved.')
             self.import_from_api(False, False)
         else:
             self.import_from_api(options['create_courses'])
