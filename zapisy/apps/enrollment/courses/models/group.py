@@ -65,7 +65,7 @@ class Group(models.Model):
     """group for course"""
     course = models.ForeignKey('Course', verbose_name='przedmiot', related_name='groups')
     teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
-    teachers = models.ManyToManyField('users.Employee', related_name='taught_groups', verbose_name='prowadzący')
+    teachers = models.ManyToManyField('users.Employee', related_name='taught_groups', verbose_name='nauczyciele')
     type    = models.CharField(max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych 2009', help_text='miejsca gwarantowane dla studentów zamawianych 2009')
@@ -97,7 +97,8 @@ class Group(models.Model):
         if self.teachers.count() == 0:
             return u'(nieznany prowadzący)'
         else:
-            return ', '.join(t.user.get_full_name() for t in self.teachers)
+            return ', '.join(t.user.get_full_name() for t in self.teachers.all())
+    get_teacher_full_name.short_description = 'Nauczyciele'
 
     def get_all_terms(self):
         """return all terms of current group"""

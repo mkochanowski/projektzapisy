@@ -267,7 +267,8 @@ class GroupAdmin(admin.ModelAdmin):
     ]
 
 
-    raw_id_fields = ('course', 'teachers')
+    raw_id_fields = ('course',)
+    filter_horizontal = ('teachers',)
 
     def response_add(self, request, new_object, post_url_continue='../%s/'):
         obj = self.after_saving_model_and_related_inlines(new_object)
@@ -360,8 +361,7 @@ class GroupAdmin(admin.ModelAdmin):
        display those for the currently signed in user.
        """
        qs = super(GroupAdmin, self).get_queryset(request)
-       return qs.select_related('teachers', 'teachers__user', 'course',
-                                'course__semester').prefetch_related('term')
+       return qs.select_related('course', 'course__semester').prefetch_related('term', 'teachers', 'teachers__user')
 
     class Media:
         css = {
