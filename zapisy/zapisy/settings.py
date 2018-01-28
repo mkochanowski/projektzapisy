@@ -36,9 +36,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fereol',
-        'PORT': '5432',
-        'USER': 'fereol',
+        'NAME': env.str('DATABASE_NAME', default='fereol'),
+        'PORT': env.str('DATABASE_PORT', default='5432'),
+        'USER': env.str('DATABASE_USER', default='fereol'),
         'PASSWORD': env.str('DATABASE_PASSWORD'),
         'HOST': 'localhost',
         'CHARSET': 'utf8',
