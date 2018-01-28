@@ -34,16 +34,16 @@ ADMINS = ARRAY_VALS['ADMINS'] if ARRAY_VALS else []
 MANAGERS = ADMINS
 
 DATABASES = {
-     'default' : {
-        'ENGINE' : 'django.db.backends.postgresql_psycopg2',
-            'NAME' : 'fereol',
-            'PORT' : '5432',
-            'USER' : 'fereol',
-            'PASSWORD' : env.str('DATABASE_PASSWORD'),
-            'HOST' : 'localhost',
-            'CHARSET' : 'utf8',
-            'USE_UNICODE' : True,
-        } 
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'fereol',
+        'PORT': '5432',
+        'USER': 'fereol',
+        'PASSWORD': env.str('DATABASE_PASSWORD'),
+        'HOST': 'localhost',
+        'CHARSET': 'utf8',
+        'USE_UNICODE': True,
+    }
 }
 
 # mass-mail account
