@@ -14,6 +14,8 @@ from zapisy import common
 from apps.users.tests.factories import EmployeeFactory
 
 SEMESTER_YEAR_RANGE = 30
+
+
 def get_unique_new_semester_raw_year(semester_instance):
     start_year = datetime.now().year
     end_year = start_year + SEMESTER_YEAR_RANGE
@@ -21,9 +23,11 @@ def get_unique_new_semester_raw_year(semester_instance):
         year = FuzzyInteger(start_year, end_year).fuzz()
         try:
             semester_year = Semester.get_semester_year_from_raw_year(year)
-            Semester.objects.get(type=semester_instance.type, year=semester_year)
+            Semester.objects.get(
+                type=semester_instance.type, year=semester_year)
         except Semester.DoesNotExist:
             return year
+
 
 class SemesterFactory(DjangoModelFactory):
     class Meta:
@@ -33,7 +37,8 @@ class SemesterFactory(DjangoModelFactory):
     visible = True
     type = factory.Iterator([Semester.TYPE_WINTER, Semester.TYPE_SUMMER])
     raw_year = factory.LazyAttribute(get_unique_new_semester_raw_year)
-    year = factory.LazyAttribute(lambda sem: Semester.get_semester_year_from_raw_year(sem.raw_year))
+    year = factory.LazyAttribute(
+        lambda sem: Semester.get_semester_year_from_raw_year(sem.raw_year))
     is_grade_active = False
     if type == Semester.TYPE_WINTER:
         records_opening = \
@@ -75,6 +80,7 @@ class CourseEntityFactory(DjangoModelFactory):
     ects = 5
     suggested_for_first_year = False
 
+
 class CourseDescriptionFactory(DjangoModelFactory):
     class Meta:
         model = CourseDescription
@@ -85,6 +91,7 @@ class CourseDescriptionFactory(DjangoModelFactory):
     exercises = 30
     laboratories = 30
 
+
 class CourseFactory(DjangoModelFactory):
     class Meta:
         model = Course
@@ -93,6 +100,7 @@ class CourseFactory(DjangoModelFactory):
     information = factory.SubFactory(CourseDescriptionFactory)
     semester = factory.SubFactory(SemesterFactory)
 
+
 class GroupFactory(DjangoModelFactory):
     class Meta:
         model = Group
@@ -100,7 +108,17 @@ class GroupFactory(DjangoModelFactory):
     course = factory.SubFactory(CourseFactory)
     type = 2
     limit = 10
-    teacher = factory.SubFactory(EmployeeFactory)
+
+    @factory.post_generation
+    def teachers(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            # A list of teachers were passed in, use them
+            for teacher in extracted:
+                self.teachers.add(teacher)
 
 
 class ChangedDayForFridayFactory(DjangoModelFactory):
@@ -108,6 +126,7 @@ class ChangedDayForFridayFactory(DjangoModelFactory):
         model = ChangedDay
 
     weekday = common.FRIDAY
+
 
 class ClassroomFactory(DjangoModelFactory):
     class Meta:

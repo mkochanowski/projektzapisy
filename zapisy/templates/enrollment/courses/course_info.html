@@ -4,7 +4,7 @@
 <hr>
 {% for tutorial in tutorials %}{% if tutorial.groups %}
     <div class="tutorial">
-        <h2>{{ tutorial.name }} {% if user.is_staff %}&nbsp;&nbsp; 
+        <h2>{{ tutorial.name }} {% if user.is_staff %}&nbsp;&nbsp;
             <small class='right'>({% blocktrans %}Studenci w grupach: {{tutorial.statistics.in_group}}, studenci bez grupy: {{tutorial.statistics.in_queue}}{% endblocktrans %})</small>
         {% endif %}</h2>
         <input type="hidden" name="tutorial-type" value="{{ tutorial.type }}"/>
@@ -27,13 +27,13 @@
             {% for t in tutorial.groups %}
                 <tr {% if t.signed %} class="signed" {% endif %} >
                     <td>
-                        {% if t.teacher %}
-                            <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">
-                                {{ t.teacher.user.get_full_name }}
+                        {% for tchr in t.teachers.all %}
+                            <a href="{% url 'employee-profile' tchr.user.id %}" class="person">
+                                {{ tchr.user.get_full_name }}
                             </a>
-                        {% else %}
+                        {% empty %}
                             {% trans "(nieznany prowadzący)" %}
-                        {% endif %}
+                        {% endfor %}
                         {% if t.extra %}
                             <br/><span class="small">{{ t.extra }}</span>
                         {% endif %}
@@ -87,7 +87,7 @@
                                         {% endif %}
                                         {% else %}{% if not t.is_full %}
                                             <input type="hidden" name="enroll" value="true"/>
-                                            
+
                                             {% if ects_limit_would_be_exceeded %}
                                                 <button type="submit" disabled="disabled"
                                                 title="Przekroczono limit {{ max_ects }} punktów ECTS, zapis niemożliwy"
@@ -100,7 +100,7 @@
                                                 {% if t.is_in_diff %}przenieś{% else %}{% trans "zapisz" %}{% endif %}
                                             </button>
                                             {% endif %}
-                                                
+
                                             {% else %}{% if t.priority %}
                                                 <input type="hidden" name="enroll" value="false"/>
                                                 <button type="submit" class="btn small danger setEnrolledButton">
@@ -108,9 +108,9 @@
                                                 </button>
                                             {% else %}
                                                 <input type="hidden" name="enroll" value="true"/>
-                                                
+
                                                 {% if ects_limit_would_be_exceeded %}
-                                                    <button type="submit" class="btn small disabled setEnrolledButton" disabled="disabled" 
+                                                    <button type="submit" class="btn small disabled setEnrolledButton" disabled="disabled"
                                                     title="Przekroczono limit {{ max_ects }} punktów ECTS, zapis niemożliwy">
                                                         {% trans "zapisz do kolejki" %}
                                                     </button>
@@ -119,11 +119,11 @@
                                                         {% trans "zapisz do kolejki" %}
                                                     </button>
                                                 {% endif %}
-                                                
+
                                             {% endif %}
                                             {% endif %}{% endif %}
                                 </div></form>
-                        
+
                         {% endif %}
                         {% if user.student or user.employee or user.is_staff %}
                             <a href="{% url 'records-group' t.id %}">{% trans "lista" %}</a>

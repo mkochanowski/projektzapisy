@@ -446,15 +446,17 @@ class Group(models.Model):
     def get_groups_by_semester(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teachers', 'teachers__user', 'course',
-                'course__entity__type', 'course__entity', 'course__semester').all()
+            select_related('course', 'course__entity__type', 'course__entity',
+                           'course__semester'). \
+            prefetch_related('teachers', 'teachers__user').all()
 
     @staticmethod
     def get_groups_by_semester_opt(semester):
         """ returns all groups in semester """
         return Group.objects.filter(course__semester=semester). \
-            select_related('teachers', 'teachers__user', 'course',
-                'course__entity__type', 'course__entity', 'course__semester').all()
+            select_related('course', 'course__entity__type', 'course__entity',
+                           'course__semester'). \
+            prefetch_related('teachers', 'teachers__user').all()
 
     def get_group_limit(self):
         """return maximal amount of participants"""

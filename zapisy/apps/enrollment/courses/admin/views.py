@@ -204,7 +204,7 @@ def finish_import_schedule(request):
             gr = Group()
             gr.course = c
             if g['teacher'] <> '':
-                gr.teacher_id = Employee.objects.get(user__id=g['teacher']).id
+                gr.teachers.add(Employee.objects.get(user__id=g['teacher']))
             gr.type = g['type']
             gr.limit = 0
             gr.save()

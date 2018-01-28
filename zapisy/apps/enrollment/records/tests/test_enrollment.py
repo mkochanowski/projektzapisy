@@ -98,18 +98,18 @@ class DummyTest(TransactionTestCase):
         group = Group(
             type=2,
             limit=5,
-            course = course,
-            teacher = teacher)
+            course=course)
         group.save()
+        group.teachers.add(teacher)
         return group
 
     def createLectureGroup(self, course, teacher):
         group = Group(
             type=1,
             limit=100,
-            course = course,
-            teacher = teacher)
+            course=course)
         group.save()
+        group.teachers.add(teacher)
         return group
 
     def setUp(self):
@@ -237,7 +237,7 @@ class DummyTest(TransactionTestCase):
 
         self.assertFalse(result)
         self.assertEqual(messages_list, [u'Zapisy na ten przedmiot są dla Ciebie zamknięte'])
-        
+
     def testEnrollmentFailsIfEnrollmentHasEnded(self):
         today = datetime.now()
         exercises_group = GroupFactory(
@@ -252,7 +252,7 @@ class DummyTest(TransactionTestCase):
 
         self.assertFalse(result)
         self.assertEqual(messages_list, [u'Zapisy na ten semestr zostały zakończone. Nie możesz dokonywać zmian.'])
-        
+
     def testCannotLeaveGroupAfterRecordsEnded(self):
         today = datetime.now()
         exercises_group = GroupFactory(
@@ -267,13 +267,13 @@ class DummyTest(TransactionTestCase):
         run_rearanged(result)
 
         self.assertTrue(result)
-        
+
         result, messages_list = exercises_group.remove_student(student)
         run_rearanged(result)
-        
+
         self.assertFalse(result)
         self.assertEqual(messages_list, [u'Wypisy w tym semestrze zostały zakończone. Nie możesz wypisać się z grupy.'])
-        
+
     def testCanLeaveQueueAfterRecordsEnded(self):
         today = datetime.now()
         exercises_group = GroupFactory(
@@ -281,7 +281,7 @@ class DummyTest(TransactionTestCase):
             course__semester__records_closing=today+timedelta(days=6),
             course__semester__records_ending=today+timedelta(-2)
         )
-        
+
         students = StudentFactory.create_batch(10)
         for student in students:
             open_course_for_student(student, exercises_group.course)
@@ -289,18 +289,18 @@ class DummyTest(TransactionTestCase):
             run_rearanged(result)
             self.assertTrue(result)
             self.assertEqual(messages_list, [u'Student dopisany do grupy'])
-            
+
         student = StudentFactory()
         open_course_for_student(student, exercises_group.course)
-            
+
         result, messages_list = exercises_group.enroll_student(student)
         run_rearanged(result)
 
         self.assertTrue(result)
-        
+
         result, messages_list = exercises_group.remove_student(student)
         run_rearanged(result)
-        
+
         self.assertTrue(result)
 
     def testAddStudentToQueue(self):
