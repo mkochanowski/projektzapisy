@@ -16,14 +16,14 @@ from apps.enrollment.records.models import Record, Queue
 class GroupInline(admin.TabularInline):
     model = Group
     extra = 0
-    raw_id_fields = ("teacher",)
+    raw_id_fields = ("teachers",)
 
 
 class CourseForm(forms.ModelForm):
 
     class Meta:
         model = Course
-        fields = '__all__' 
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
@@ -38,7 +38,7 @@ class CourseEntityForm(forms.ModelForm):
 
     class Meta:
         model = CourseEntity
-        fields = '__all__' 
+        fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super(CourseEntityForm, self).__init__(*args, **kwargs)
@@ -183,7 +183,7 @@ class TermInline(admin.TabularInline):
 class RecordInlineForm(forms.ModelForm):
     class Meta:
         model = Record
-        fields = '__all__' 
+        fields = '__all__'
 
     # def save(self, commit=True):
     #
@@ -225,7 +225,7 @@ class RecordInline(admin.TabularInline):
 class QueuedInlineForm(forms.ModelForm):
     class Meta:
         model = Queue
-        fields = '__all__' 
+        fields = '__all__'
 
     # def save(self, commit=True):
     #     queue = super(QueuedInlineForm, self).save(commit=False)
@@ -258,15 +258,16 @@ class QueuedInline(admin.TabularInline):
 
 class GroupAdmin(admin.ModelAdmin):
     readonly_fields = ('limit', 'id')
-    list_display = ('id', 'course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012', 'limit_isim', 'get_terms_as_string')
-    list_filter = ('type', 'course__semester', 'teacher')
-    search_fields = ('teacher__user__first_name','teacher__user__last_name','course__entity__name')
+    list_display = ('id', 'course', 'get_teacher_full_name','type','limit','limit_zamawiane',
+                    'limit_zamawiane2012', 'limit_isim', 'get_terms_as_string')
+    list_filter = ('type', 'course__semester', 'teachers')
+    search_fields = ('teachers__user__first_name','teachers__user__last_name','course__entity__name')
     inlines = [
         TermInline,RecordInline, QueuedInline
     ]
 
 
-    raw_id_fields = ('course', 'teacher')
+    raw_id_fields = ('course', 'teachers')
 
     def response_add(self, request, new_object, post_url_continue='../%s/'):
         obj = self.after_saving_model_and_related_inlines(new_object)
@@ -291,63 +292,55 @@ class GroupAdmin(admin.ModelAdmin):
         obj.save()
 
     def after_saving_model_and_related_inlines(self, obj):
+        """Suplements saving the Group model with additional actions
+
+        When a group is created we delete all events associated with it and
+        create them back.
+        """
         from apps.enrollment.courses.models import Term as T
         from apps.schedule.models import Event, Term
-        # Perform extra operation after all inlines are saved
 
         Event.objects.filter(group=obj, type='3').delete()
         semester = obj.course.semester
 
+        # For every weekday we will collect dates within semester, when
+        # classes of that day will be held.
+        days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
         freedays = Freeday.objects.filter(Q(day__gte=semester.lectures_beginning),
                                           Q(day__lte=semester.lectures_ending))\
                           .values_list('day', flat=True)
-        changed = ChangedDay.objects.filter(Q(day__gte=semester.lectures_beginning), Q(day__lte=semester.lectures_ending)).values_list('day', 'weekday')
-        terms = T.objects.filter(group=obj).select_related('group', 'group__course', 'group__course__entity')
-        days = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
-
-        day = semester.lectures_beginning
-
-        while day <= semester.lectures_ending:
-
+        changed_days = ChangedDay.objects.filter(
+            Q(day__gte=semester.lectures_beginning),
+            Q(day__lte=semester.lectures_ending)
+        ).values_list('day', 'weekday')
+        changed_days = dict(changed)
+        delta = semester.lectures_ending - semester.lectures_beginning
+        for i in range(delta.days + 1):
+            day = semester.lectures_beginning + datetime.timedelta(days=i)
             if day in freedays:
-                day = day + timedelta(days=1)
                 continue
-
             weekday = day.weekday()
-
-            for d in changed:
-                if d[0] == day:
-                    weekday = int(d[1]) - 1
-                    break
-
+            if day in changed_days:
+                weekday = int(changed_days[day]) - 1
             days[weekday].append(day)
 
-            day = day + timedelta(days=1)
-
+        terms = T.objects.filter(group=obj).\
+            select_related('group', 'group__course', 'group__course__entity')
         for t in terms:
-            ev = Event()
-            ev.group = obj
-            ev.course = t.group.course
-            ev.title = ev.course.entity.get_short_name()
-            ev.type = '3'
-            ev.visible = True
-            ev.status = '1'
-            if obj.teacher:
-                ev.author_id = obj.teacher.user.id
+            ev = Event(title=ev.course.entity.get_short_name(),
+                       type='3',visible=True, status='1', group=obj,
+                       course=t.group.course)
+            # The first of teachers is arbitrarily selected as the event author.
+            if obj.teachers.count() != 0:
+                ev.author_id = obj.teachers.all()[0].user.id
             else:
                 ev.author_id = 1
             ev.save()
 
             for room in t.classrooms.all():
                 for day in days[int(t.dayOfWeek) - 1]:
-                    newTerm = Term()
-                    newTerm.event = ev
-                    newTerm.day = day
-                    newTerm.start = t.start_time
-                    newTerm.end = t.end_time
-                    newTerm.room = room
-                    newTerm.save()
-
+                    Term.objects.create(event=ev, day=day, start=t.start_time,
+                                        end=t.end_time, room=room)
         return obj
 
     def changelist_view(self, request, extra_context=None):
@@ -367,7 +360,8 @@ class GroupAdmin(admin.ModelAdmin):
        display those for the currently signed in user.
        """
        qs = super(GroupAdmin, self).get_queryset(request)
-       return qs.select_related('teacher', 'teacher__user', 'course', 'course__semester').prefetch_related('term')
+       return qs.select_related('teachers', 'teachers__user', 'course',
+                                'course__semester').prefetch_related('term')
 
     class Media:
         css = {
@@ -384,12 +378,12 @@ class TypeAdmin(admin.ModelAdmin):
 class CourseDescriptionForm(forms.ModelForm):
     class Meta:
         model = CourseDescription
-        widgets = { 
+        widgets = {
             'description_pl': forms.Textarea(attrs={'class': 'tinymce'}),
             'description_en': forms.Textarea(attrs={'class': 'tinymce'}),
             'requirements': FilteredSelectMultiple("wymagania", is_stacked=False)
         }
-        fields = '__all__' 
+        fields = '__all__'
 
 
 class CourseDescriptionAdmin(TranslationAdmin):
