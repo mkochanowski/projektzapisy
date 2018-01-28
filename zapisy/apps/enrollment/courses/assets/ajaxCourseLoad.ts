@@ -26,6 +26,8 @@ function installClickHandlers(): void {
 	});
 }
 
+// When the user clicks on a course in the course list,
+// send an async request to fetch course info
 function onCourseLinkClicked(event: Event): void {
 	event.preventDefault();
 	if (isLoadingCourse) {
@@ -36,13 +38,13 @@ function onCourseLinkClicked(event: Event): void {
 	if (!courseUrl) {
 		throw new Error("Missing course link on event sender");
 	}
-	loadCourseInfo(courseUrl);
+	fetchCourseInfoAsync(courseUrl);
 }
 
 // Dispatch an AJAX GET request to the course
 // page URL; the received response will be loaded
 // into the DOM
-function loadCourseInfo(courseUrl: string): void {
+function fetchCourseInfoAsync(courseUrl: string): void {
 	isLoadingCourse = true;
 	const container = document.getElementById("main-content");
 	if (!container) {
