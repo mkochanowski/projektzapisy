@@ -65,7 +65,7 @@ class Group(models.Model):
     """group for course"""
     course = models.ForeignKey('Course', verbose_name='przedmiot', related_name='groups')
     teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
-    teachers = models.ManyToManyField('users.Employee', verbose_name='prowadzący')
+    teachers = models.ManyToManyField('users.Employee', related_name='taught_groups', verbose_name='prowadzący')
     type    = models.CharField(max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_zamawiane = models.PositiveSmallIntegerField(default=0, verbose_name='miejsca dla zamawianych 2009', help_text='miejsca gwarantowane dla studentów zamawianych 2009')
