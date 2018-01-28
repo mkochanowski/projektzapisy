@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 import re
-import logging
 from datetime import time
-import json
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 import requests
 
-from apps.users.models import Student, Employee, Program
-from apps.enrollment.courses.models import Classroom
+from apps.users.models import Employee
 from apps.enrollment.courses.models import (
-    Course, Semester, CourseEntity,
-    Type, Group, Term, PointsOfCourseEntities, PointTypes
+    Classroom, Course, Semester, CourseEntity, Group, Term
 )
 from apps.schedulersync.models import TermSyncData
 
 URL_LOGIN = 'http://scheduler.gtch.eu/admin/login/'
-URL_ASSIGNEMENTS = '/scheduler/api/config/2017-18-lato3-2/'
+URL_ASSIGNMENTS = '/scheduler/api/config/2017-18-lato3-2/'
 URL_SCHEDULE = 'http://scheduler.gtch.eu/scheduler/api/task/07164b02-de37-4ddc-b81b-ddedab533fec/'
 
 LIMITS = {'1': 300, '9': 300, '2': 20, '3': 15, '5': 18, '6': 15}
@@ -82,13 +78,13 @@ class Command(BaseCommand):
             ce = CourseEntity.objects.get(name_pl__iexact=name)
         except CourseEntity.DoesNotExist:
             self.stdout.write(self.style.ERROR(u">Couldn't find course entity for "
-                                               + name.decode('utf-8')))
+                                               .format(name.decode('utf-8'))))
         except CourseEntity.MultipleObjectsReturned:
+            ces = CourseEntity.objects.filter(name_pl__iexact=name, status=2).order_by('-id')
             if self.verbosity >= 1:
-                self.stdout.write(self.style.WARNING('Multiple course entity'))
-                ces = CourseEntity.objects.filter(name_pl__iexact=name, status=2).order_by('-id')
+                self.stdout.write(self.style.WARNING(u'Multiple course entity. Took first among:'))
                 for ce in ces:
-                    self.stdout.write(self.style.WARNING('  '+str(ce).decode('utf-8')))
+                    self.stdout.write(self.style.WARNING(u'  {}'.format(str(ce).decode('utf-8'))))
                 self.stdout.write('')
             ce = ces[0]
         return ce
@@ -100,11 +96,11 @@ class Command(BaseCommand):
             self.used_courses.add(course)
         except Course.DoesNotExist:
             if entity.slug is None:
-                self.stdout.write(self.style.ERROR(u"Couldn't find slug for "
-                                                   + str(entity).decode('utf-8')))
+                self.stdout.write(self.style.ERROR(u"Couldn't find slug for {}"
+                                                   .format(str(entity).decode('utf-8'))))
             else:
-                newslug = entity.slug + '_' + \
-                          re.sub(r'^\w', '_', self.semester.get_short_name())
+                newslug = '{}_{}'.format(entity.slug,
+                                         re.sub(r'[^\w]', '_', self.semester.get_short_name()))
                 if create_courses:
                     course = Course(entity=entity, information=entity.information,
                                     semester=self.semester, slug=newslug)
@@ -116,16 +112,11 @@ class Command(BaseCommand):
         classrooms = []
         for room in rooms:
             try:
-                if room.replace(' ', '') == '':
-                    classroom = None
-                else:
-                    classroom = Classroom.objects.get(number=room)
+                if room.replace(' ', '') != '':
+                    classrooms.append(Classroom.objects.get(number=room))
             except Classroom.DoesNotExist:
-                classroom = None
-                self.stdout.write(self.style.ERROR(u"Couldn't find classroom for "
-                                  + room.decode('utf-8')))
-            if classroom:
-                classrooms.append(classroom)
+                self.stdout.write(self.style.ERROR(u"Couldn't find classroom for {}"
+                                                   .format(room.decode('utf-8'))))
         return classrooms
 
     def get_employee(self, name):
@@ -153,12 +144,12 @@ class Command(BaseCommand):
         if len(emps) == 1:
             return emps[0]
         elif len(emps) > 1:
-            self.stdout.write(self.style.ERROR(u"Multiple employee matches for "
-                              + name + ". Choices are:"))
+            self.stdout.write(self.style.ERROR(u'Multiple employee matches for {}. Choices are:'
+                              .format(name)))
             for e in emps:
-                self.stdout.write(self.style.ERROR("  -"+e.user.get_full_name()))
+                self.stdout.write(self.style.ERROR(u' -{}'.format(e.user.get_full_name())))
         else:
-            raise CommandError('Employee {} does not exists! Fix your input file.'.format(name))
+            raise CommandError(u'Employee {} does not exists! Fix your input file.'.format(name))
 
         return None
 
@@ -200,48 +191,51 @@ class Command(BaseCommand):
             term.end_time = data['end_time']
             term.group.type = data['group_type']
             term.group.teacher = data['teacher']
-            if len(diffs) > 0:
+            if diffs:
                 term.save()
                 term.group.save()
-                self.stdout.write(self.style.SUCCESS('Group updated: ' +
-                                  str(term.group).decode('utf-8') + ' ' +
-                                  str(term).decode('utf-8') +
-                                  '\n  ' + str(diffs).decode('utf-8') + '\n'))
+                self.stdout.write(self.style.SUCCESS(u'Group {} {} updated. Difference:\n {}\n'
+                                  .format(str(term.group).decode('utf-8'),
+                                          str(term).decode('utf-8'),
+                                          str(diffs).decode('utf-8'))))
                 self.updated_terms += 1
 
     def prepare_group(self, g, results, terms):
+        """Convert information about group from scheduler format."""
         group = {}
         group['id'] = g['id']
         group['entity_name'] = g['extra']['course']
         group['group_type'] = GROUP_TYPES[g['extra']['group_type']]
         group['teacher'] = self.get_employee(g['teachers'][0])
-        start_time = 20
+
+        # start_time will be determined as the minimum start_time among all terms
+        # end_time - as maximum. All the terms in scheduler are one hour long.
+        start_time = 24  # acts as inifinity
         end_time = 0
         classrooms = set()
-        if g['id'] in results:
-            for t in results[g['id']]:
-                t_start = terms[t['term']]['start']['hour']
-                t_end = terms[t['term']]['end']['hour']
-                if t_start < start_time:
-                    start_time = t_start
-                if t_end > end_time:
-                    end_time = t_end
-                group['dayOfWeek'] = str(terms[t['term']]['day']+1)
-                classrooms.add(t['room'])
-            group['start_time'] = time(hour=int(start_time))
-            group['end_time'] = time(hour=int(end_time))
-            group['classrooms'] = self.get_classrooms(list(classrooms))
-            group['limit'] = LIMITS[group['group_type']]
-            return group
-        else:
+        if g['id'] not in results:
             return None
+        for t in results[g['id']]:
+            t_start = terms[t['term']]['start']['hour']
+            t_end = terms[t['term']]['end']['hour']
+            if t_start < start_time:
+                start_time = t_start
+            if t_end > end_time:
+                end_time = t_end
+            group['dayOfWeek'] = str(terms[t['term']]['day'] + 1)
+            classrooms.add(t['room'])
+        group['start_time'] = time(hour=int(start_time))
+        group['end_time'] = time(hour=int(end_time))
+        group['classrooms'] = self.get_classrooms(list(classrooms))
+        group['limit'] = LIMITS[group['group_type']]
+        return group
 
     def get_groups(self):
         client = requests.session()
         client.get(URL_LOGIN)
         csrftoken = client.cookies['csrftoken']
         login_data = {'username': 'test', 'password': 'test', 'csrfmiddlewaretoken': csrftoken,
-                      'next': URL_ASSIGNEMENTS}
+                      'next': URL_ASSIGNMENTS}
         r = client.post(URL_LOGIN, data=login_data)
         r2 = client.get(URL_SCHEDULE)
         results = r2.json()['timetable']['results']
@@ -255,7 +249,7 @@ class Command(BaseCommand):
             if prepared_group is not None:
                 groups.append(prepared_group)
             else:
-                self.stdout.write(self.style.WARNING('Group number {} does not have a term ({})\n'
+                self.stdout.write(self.style.WARNING(u'Group number {} does not have a term ({})\n'
                                   .format(g['id'], g['extra']['course'])))
         return groups
 
@@ -271,13 +265,14 @@ class Command(BaseCommand):
             if entity is not None:
                 course = self.get_course(entity, create_courses)
                 if course is None:
-                    raise CommandError('Course does not exists! Check your input file.')
+                    raise CommandError(u'Course {} does not exist! Check your input file.'
+                                       .format(entity))
                 if create_terms:
                     self.create_or_update_group(course, g)
-        self.stdout.write(self.style.SUCCESS('Created {} courses successfully! '
-                                             'Moreover {} courses was already there.'
+        self.stdout.write(self.style.SUCCESS(u'Created {} courses successfully! '
+                                             'Moreover {} courses were already there.'
                           .format(self.created_courses, len(self.used_courses))))
-        self.stdout.write(self.style.SUCCESS('Created {} terms and updated {} terms successfully!'
+        self.stdout.write(self.style.SUCCESS(u'Created {} terms and updated {} terms successfully!'
                           .format(self.created_terms, self.updated_terms)))
 
     def handle(self, *args, **options):
@@ -285,7 +280,7 @@ class Command(BaseCommand):
                          else Semester.objects.get(pk=int(options['semester'])))
         self.verbosity = options['verbosity']
         if self.verbosity >= 1:
-            self.stdout.write('Adding to semester: ' + str(self.semester) + '\n')
+            self.stdout.write('Adding to semester: {}\n'.format(str(self.semester)))
         if options['dry_run']:
             if self.verbosity >= 1:
                 self.stdout.write('Dry run is on. Nothing will be saved.')
