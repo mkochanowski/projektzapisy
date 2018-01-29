@@ -41,7 +41,8 @@ EMPLOYEE_MAP = {
     'PACHOLSKI LESZEK': u'LPA',
     'MML': u'MMŁ',
     'LJE': u'ŁJE',
-    'MPI': u'MPIOTRÓW'
+    'MPI': u'MPIOTRÓW',
+    'SZDUDYCZ': u'SDUDYCZ'
 }
 
 COURSES_MAP = {
@@ -64,7 +65,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-semester', type=int, default=0)
-        parser.add_argument('-create_courses', action='store_true', dest='create_courses')
+        parser.add_argument('--create_courses', action='store_true', dest='create_courses')
         parser.add_argument('--dry-run', action='store_true', dest='dry_run')
 
     def get_entity(self, name):
@@ -153,30 +154,31 @@ class Command(BaseCommand):
 
         return None
 
-    def create_or_update_group(self, course, data):
+    def create_or_update_group(self, course, data, create_terms=True):
         try:
             sync_data_object = TermSyncData.objects.get(scheduler_id=data['id'])
             term = sync_data_object.term
         except TermSyncData.DoesNotExist:
-            # Create the group in the enrollment system
-            if data['group_type'] == '1':
-                # The lecture always has a single group but possibly many terms
-                group = Group.objects.get_or_create(course=course,
-                                                    teacher=data['teacher'],
-                                                    type=data['group_type'],
-                                                    limit=data['limit'])[0]
-            else:
-                group = Group.objects.create(course=course,
-                                             teacher=data['teacher'],
-                                             type=data['group_type'],
-                                             limit=data['limit'])
-            term = Term.objects.create(dayOfWeek=data['dayOfWeek'],
-                                       start_time=data['start_time'],
-                                       end_time=data['end_time'],
-                                       group=group)
-            term.classrooms = data['classrooms']
-            term.save()
-            TermSyncData.objects.create(term=term, scheduler_id=data['id'])
+            if create_terms:
+                # Create the group in the enrollment system
+                if data['group_type'] == '1':
+                    # The lecture always has a single group but possibly many terms
+                    group = Group.objects.get_or_create(course=course,
+                                                        teacher=data['teacher'],
+                                                        type=data['group_type'],
+                                                        limit=data['limit'])[0]
+                else:
+                    group = Group.objects.create(course=course,
+                                                 teacher=data['teacher'],
+                                                 type=data['group_type'],
+                                                 limit=data['limit'])
+                term = Term.objects.create(dayOfWeek=data['dayOfWeek'],
+                                           start_time=data['start_time'],
+                                           end_time=data['end_time'],
+                                           group=group)
+                term.classrooms = data['classrooms']
+                term.save()
+                TermSyncData.objects.create(term=term, scheduler_id=data['id'])
             self.created_terms += 1
         else:
             diff_track_fields = ['dayOfWeek', 'start_time', 'end_time']
@@ -191,13 +193,23 @@ class Command(BaseCommand):
             term.end_time = data['end_time']
             term.group.type = data['group_type']
             term.group.teacher = data['teacher']
+            if set(term.classrooms.all()) != set(data['classrooms']):
+                diffs.append(('classroom', (set(term.classrooms.all()), set(data['classrooms']))))
+                if create_terms:
+                    term.classrooms = data['classrooms']  # this already saves the relation!
             if diffs:
-                term.save()
-                term.group.save()
-                self.stdout.write(self.style.SUCCESS(u'Group {} {} updated. Difference:\n {}\n'
+                if create_terms:
+                    term.save()
+                    term.group.save()
+                self.stdout.write(self.style.SUCCESS(u'Group {} {} updated. Difference:'
                                   .format(str(term.group).decode('utf-8'),
-                                          str(term).decode('utf-8'),
-                                          str(diffs).decode('utf-8'))))
+                                          str(term).decode('utf-8'))))
+                for diff in diffs:
+                    self.stdout.write(self.style.WARNING(u'  {}: '.format(diff[0])), ending='')
+                    self.stdout.write(self.style.NOTICE(diff[1][0]), ending='')
+                    self.stdout.write(self.style.WARNING(u' -> '), ending='')
+                    self.stdout.write(self.style.SUCCESS(diff[1][1]))
+                self.stdout.write(u'\n')
                 self.updated_terms += 1
 
     def prepare_group(self, g, results, terms):
@@ -267,8 +279,7 @@ class Command(BaseCommand):
                 if course is None:
                     raise CommandError(u'Course {} does not exist! Check your input file.'
                                        .format(entity))
-                if create_terms:
-                    self.create_or_update_group(course, g)
+                self.create_or_update_group(course, g, create_terms)
         self.stdout.write(self.style.SUCCESS(u'Created {} courses successfully! '
                                              'Moreover {} courses were already there.'
                           .format(self.created_courses, len(self.used_courses))))
