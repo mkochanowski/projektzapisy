@@ -123,9 +123,8 @@ def course_groups(request, slug):
             group_id = group_id[6:]
             group = Group.objects.get(pk=group_id)
             teacher = Employee.objects.get(pk=teacher_id)
-            if group.teacher != teacher:
-                group.teacher = teacher
-                group.save()
+            if teacher not in group.teachers.all():
+                group.teachers.add(teacher)
         return redirect(request.path)
 
 def main(request):
@@ -235,7 +234,7 @@ def proposal_edit(request, slug=None):
             if new_proposal or proposal.status == 5:
                 proposal.status = 0
                 sendnotification = True
- 
+
             proposal.save()
 
             description.author = request.user.employee

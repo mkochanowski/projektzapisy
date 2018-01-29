@@ -120,7 +120,7 @@ class Employee(BaseUser):
     room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
     status = models.PositiveIntegerField(default=0, choices=EMPLOYEE_STATUS_CHOICES, verbose_name="Status")
     title = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
-    
+
     def make_preferences(self):
         from apps.offer.preferences.models import Preference
 
@@ -140,7 +140,8 @@ class Employee(BaseUser):
 
         try:
             group = Group.objects.get(pk=group_id)
-            return group.teacher == self or self in group.course.teachers.all() or self.user.is_staff
+            return self in group.teachers.all(
+                ) or self in group.course.teachers.all() or self.user.is_staff
         except Group.DoesNotExist:
             logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
         return False
@@ -189,7 +190,7 @@ class Employee(BaseUser):
         semester = Semester.get_default_semester()
         try:
             employee = user.employee
-            groups = Group.objects.filter(teacher=employee, course__semester=semester)
+            groups = Group.objects.filter(teachers__in=[employee], course__semester=semester)
         except Employee.DoesNotExist:
              logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()
@@ -202,7 +203,7 @@ class Employee(BaseUser):
         user = User.objects.get(id=user_id)
         try:
             employee = user.employee
-            groups = Group.objects.filter(teacher=employee)
+            groups = Group.objects.filter(teachers__in=[employee])
         except Employee.DoesNotExist:
              logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
              raise NonEmployeeException()

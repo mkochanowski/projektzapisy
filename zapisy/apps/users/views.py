@@ -377,7 +377,7 @@ def create_ical_file(request):
     if BaseUser.is_student(user):
         groups = [g for g in Record.get_groups_for_student(user) if g.course.semester == semester]
     elif BaseUser.is_employee(user):
-        groups = list(Group.objects.filter(course__semester = semester, teacher = user.employee))
+        groups = list(Group.objects.filter(course__semester=semester, teachers__in=[user.employee]))
     else:
         raise InvalidUserException()
     for group in groups:

@@ -55,7 +55,8 @@ def swap(request):
         course.groups_items = []
 
         for type in types:
-            groups = Group.objects.filter(course=course, type=type[0]).select_related('course', 'course__entity', 'teacher')
+            groups = Group.objects.filter(course=course, type=type[0]). \
+                select_related('course', 'course__entity').prefetch_related('teachers')
             queues = {}
             students = {}
             lists = {}

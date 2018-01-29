@@ -76,7 +76,7 @@ def edit_event(request, event_id=None):
     form = EventForm(data=request.POST or None, instance=event, user=request.user)
     formset = TermFormSet(request.POST or None, instance=event)
     reservation = event.reservation
-    
+
     if form.is_valid():
         event = form.save(commit=False)
         if not event.id:
@@ -314,7 +314,7 @@ class MyScheduleAjaxView(FullCalendarView):
             query.append(Q(record__student=self.request.user.student) & Q(record__status='1'))
 
         if BaseUser.is_employee(self.request.user):
-            query.append(Q(teacher=self.request.user.employee))
+            query.append(Q(teachers__in=[self.request.user.employee]))
 
         queryset = super(MyScheduleAjaxView, self).get_queryset()
         groups = Group.objects.filter(reduce(operator.or_, query))

@@ -49,7 +49,7 @@ class Command(BaseCommand):
                 type='3',
                 visible=True,
                 status='1',
-                author=t.group.teacher.user)[0]
+                author=t.group.teachers.all()[0].user)[0]
 
             for room in t.classrooms.all():
                 for day in days[int(t.dayOfWeek)-1]:
