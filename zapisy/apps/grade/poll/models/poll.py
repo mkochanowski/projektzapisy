@@ -32,120 +32,120 @@ class Poll( models.Model ):
     origin            = models.ForeignKey( Origin, verbose_name='zbiór', default=None, blank = True, null= True)
 
     class Meta:
-        verbose_name        = 'ankieta' 
+        verbose_name        = 'ankieta'
         verbose_name_plural = 'ankiety'
         app_label           = 'poll'
-        
+
     def __unicode__( self ):
         res = unicode( self.title )
         if self.group: res += u', ' + unicode(self.group.get_type_display()) + u" - " + unicode(self.group.get_teacher_full_name())
         if self.studies_type: res += u', typ studiów: ' + unicode( self.studies_type )
         return res
-        
+
     def to_url_title( self, break_lines = False ):
         res = unicode( self.title )
         if break_lines:
             sep = u'<br>'
         else:
             sep = u', '
-            
+
         if self.group:
             res += u': '   + self.group.get_teacher_full_name()
         else:
             res += sep + u'Ankieta ogólna'
-            
-        if self.studies_type: 
+
+        if self.studies_type:
             res += sep + u'typ studiów: ' + unicode( self.studies_type )
-        
+
         return SafeUnicode( res )
-        
+
     def is_student_entitled_to_poll( self, student ):
         if self.group:
-            rec = Record.objects.filter( student = student, 
+            rec = Record.objects.filter( student = student,
                                          group   = self.group,
                                          status  = Record.STATUS_ENROLLED )
-            try:                
+            try:
                 rec[ 0 ]
             except:
                 return False
-                
+
         if self.studies_type:
             if self.studies_type != student.program:
                 return False
-        
-        return True 
-    
+
+        return True
+
     def is_user_entitled_to_view_result( self, user ):
         if not user.is_authenticated(): return False
         if user.is_superuser: return True
         if self.share_result: return True
-        
+
         try:
             viewer  = user.employee
-            
+
             if self.group:
-                if viewer == self.group.teacher: return True
-                
+                if viewer in self.group.teachers.all(): return True
+
                 lecture = filter( lambda (x,y): y == 'wykład', GROUP_TYPE_CHOICES )[ 0 ][ 0 ]
-                groups  = Group.objects.filter( course = self.group.course,
-                                                teacher = viewer,
-                                                type    = lecture )
+                groups = Group.objects.filter(course=self.group.course,
+                                              teachers__in=[viewer],
+                                              type=lecture)
                 if groups: return True
             else:
                 # Zakładam, że wszyscy pracownicy powinni widzieć wyniki ankiet
                 # ogólnych
                 return True
-        except Employee.DoesNotExist: 
+        except Employee.DoesNotExist:
             pass
-        
+
         return False
-               
+
     def all_sections( self ):
         return self.section_set.all()
-    
+
     def all_answers( self ):
         result = []
         for section in self.all_sections():
             result.append( section.all_answers( self ))
         return result
-    
+
     def as_row( self ):
         from apps.grade.ticket_create.models.public_key import PublicKey
 
         res  = u"<tr><td>"
         res += unicode( self.pk ) + u'</td><td>'
         res += unicode( self.title ) + u'</td><td>'
-        
+
         if self.group:
             res += unicode( self.group.course.name ) + u'</td><td>'
             res += unicode( self.group.get_type_display()) + u'</td><td>'
             res += unicode( self.group.get_teacher_full_name()) + u'</td><td>'
         else:
             res += u'-</td><td>-</td><td>-</td><td>'
-        
+
         if self.studies_type:
             res += unicode( self.studies_type ) + u'</td><td>'
         else:
             res += u'-</td><td>'
-            
+
         res += unicode( " &#10;".join(PublicKey.objects.get( poll = self.pk ).public_key.split('\n')))
         res += u'</td></tr>'
         return SafeUnicode( res )
-    
+
     @staticmethod
     def get_polls_for_semester( semester = None):
         if not semester:
             semester = Semester.get_current_semester()
         return Poll.objects.filter( semester = semester, deleted = False ).select_related('group', 'group__course', 'group__teacher', 'group__teacher__user')
-    
+
     @staticmethod
     def get_groups_without_poll():
         semester = Semester.get_current_semester()
-        polls    = Poll.objects.filter( semester = semester, group__isnull=False, deleted = False ).order_by('pk') 
+        polls    = Poll.objects.filter( semester = semester, group__isnull=False, deleted = False ).order_by('pk')
         polls    = map( lambda p: p.group_id, polls)
         groups   = Group.objects.filter(course__semester = semester).order_by('pk')
         return filter( lambda g: g.pk not in polls, groups)
-    
+
     @staticmethod
     def get_current_polls(student=None):
         semester = Semester.objects.get(is_grade_active=True)
@@ -219,16 +219,16 @@ class Poll( models.Model ):
                                 .values_list('group__id', flat=True)
 
         return filter( lambda x: not x.group or x.group.id in groups, Poll.get_current_polls(student=student) )
-    
+
     @staticmethod
     def get_all_polls_for_group( group, semester = None ):
         if not semester:
             semester = Semester.get_current_semester()
         return Poll.objects.filter( semester = semester, group = group, deleted=False )
-    
+
     def get_section_by_id(self, section_id):
         return self.section_set.get(section__pk = section_id)
-            
+
     def all_answers_by_tickets( self ):
         results = []
         tickets = SavedTicket.objects.filter( poll = self, finished = True)
@@ -238,7 +238,7 @@ class Poll( models.Model ):
             # for each section, we want to get all the answers for this section's questions - and in the right order!
             for section in sections:
                 answers_in_section = section.all_answers_for_ticket(self, ticket)
-                sections_answers.append( answers_in_section )                
+                sections_answers.append( answers_in_section )
             #print sections_answers
-            results.append( (ticket, sections_answers) ) 
+            results.append( (ticket, sections_answers) )
         return results

@@ -1121,14 +1121,8 @@ def poll_results( request, mode='S', poll_id = None, semester=None ):
             except:
                 data[ 'poll_course' ] = "Ankieta ogólna"
 
-            try:
-                user = poll.group.teacher
-            except:
-                user = None
-
-            if user:
-                if user == request.user:
-                    data['show_share_toggle'] = True
+            if request.user in poll.group.teachers.all():
+                data['show_share_toggle'] = True
             else:
                 data['show_share_toggle'] = request.user.is_superuser
 

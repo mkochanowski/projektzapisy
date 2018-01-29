@@ -448,10 +448,10 @@ def course_list( courses ):
         course_list.append( (course.pk , unicode(course.name)) )
     return course_list
 
-def groups_list( groups ):
+def groups_list(groups):
     group_list = []
     for group in groups:
-        group_list.append( (group.pk, unicode(group.teacher)) )
+        group_list.extend([(group.pk, unicode(t)) for t in group.teachers])
     return group_list
 
 
@@ -728,7 +728,7 @@ def prepare_data_for_create_poll( request, group_id = 0 ):
         data['type']         = group.type
         data['course_id']    = group.course.pk
         data['semester']     = group.course.semester.pk
-        data['groups']       = Group.objects.filter(type=group.type, course=group.course).order_by('teacher')
+        data['groups']       = Group.objects.filter(type=group.type, course=group.course).order_by('pk')
 
     if data['semester']:
         data['courses'] = get_courses_for_user(request, data['semester'])
@@ -752,7 +752,7 @@ def prepare_data_for_create_template( request, group_id = 0 ):
         data['group']        = group.pk
         data['type']         = group.type
         data['course_id']    = group.course.pk
-        data['groups']       = Group.objects.filter(type=group.type, course=group.course).order_by('teacher')
+        data['groups']       = Group.objects.filter(type=group.type, course=group.course).order_by('pk')
 
     data['courses'] = CourseEntity.objects.all()
 
@@ -772,7 +772,7 @@ def get_courses_for_user(request, semester):
     if request.user.is_staff:
         return Course.objects.filter(semester=semester).order_by('entity__name')
     else:
-        courses = Group.objects.filter(course__semester=semester, teacher=request.user.employee)\
+        courses = Group.objects.filter(course__semester=semester, teachers__in=[request.user.employee])\
             .values_list('course__pk', flat=True)
         return Course.objects.filter(Q(semester=semester), Q(teachers=request.user.employee) | Q(pk__in=courses))\
             .order_by('name')
@@ -785,9 +785,9 @@ def get_groups_for_user(request, type, course):
     """
     sub = Course.objects.filter(pk=course, teachers=request.user.employee)
     if request.user.is_staff or sub:
-        return Group.objects.filter(type=type, course=course).order_by('teacher')
+        return Group.objects.filter(type=type, course=course).order_by('pk')
     else:
-        return Group.objects.filter(type=type, course=course, teacher=request.user.employee).order_by('teacher')
+        return Group.objects.filter(type=type, course=course, teachers__in=[request.user.employee]).order_by('pk')
 
 def make_pages( pages, page_number ):
     if pages < 12:
