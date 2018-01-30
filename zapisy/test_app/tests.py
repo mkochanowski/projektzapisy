@@ -556,8 +556,8 @@ class NewSemesterTests(SeleniumTestCase):
         self.assertEqual(
             terms.filter(
                 group__course__entity__name='Course 1',
-                group__teacher__user__first_name='Employee',
-                group__teacher__user__last_name='4',
+                group__teachers__user__first_name='Employee',
+                group__teachers__user__last_name='4',
                 group__type=2,
                 classrooms__number__in=[103],
                 dayOfWeek=1,
