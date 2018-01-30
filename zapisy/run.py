@@ -1,10 +1,8 @@
 import os
-import signal
 import subprocess
 import sys
 
 import click
-from fabric.context_managers import cd
 from fabric.operations import local
 
 
@@ -39,16 +37,6 @@ def server(ip, port, no_npmi):
     Run development server.
     Install all required node dependencies before.
     """
-    def signal_handler(sig, frame):
-        os.kill(p1.pid, signal.SIGTERM)
-        os.kill(p2.pid, signal.SIGTERM)
-        p1.wait()
-        p2.wait()
-        sys.exit(0)
-
-    signal.signal(signal.SIGINT, signal_handler)
-
-    os.chdir("/vagrant/zapisy")
 
     if not no_npmi:
         npm_result = os.system("./npm.sh i")
@@ -58,11 +46,14 @@ def server(ip, port, no_npmi):
                 npm_exit_code), fg='red'))
             sys.exit(1)
 
-    p1 = subprocess.Popen(["python", "manage.py", "runserver", "0.0.0.0:8000"])
+    p1 = subprocess.Popen([
+        "python", "manage.py", "runserver", "{ip}:{port}".format(
+            ip=ip, port=port)])
     p2 = subprocess.Popen(["npm", "run", "devw"])
 
     p1.wait()
     p2.wait()
+    sys.exit(0)
 
 
 @click.command()
