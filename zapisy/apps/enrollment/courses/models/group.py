@@ -64,7 +64,6 @@ class StatisticManager(models.Manager):
 class Group(models.Model):
     """group for course"""
     course = models.ForeignKey('Course', verbose_name='przedmiot', related_name='groups')
-    teacher = models.ForeignKey('users.Employee', null=True, blank=True, verbose_name='prowadzący')
     teachers = models.ManyToManyField('users.Employee', related_name='taught_groups', verbose_name='nauczyciele')
     type    = models.CharField(max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit   = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
@@ -507,13 +506,12 @@ class Group(models.Model):
             'course': self.course_id,
 
             'url': reverse('records-group', args=[self.pk]),
-            'teacher_name': self.teacher and self.teacher.user.get_full_name() \
-                or 'nieznany prowadzący',
-            'teacher_url': self.teacher and reverse('employee-profile', args= \
-                [self.teacher.user.id]) or '',
-
-            'is_teacher': False if (employee is None or self.teacher is None) \
-                else self.teacher.id == employee.id,
+            'teachers': [{
+                    'name': teacher.user.get_full_name(),
+                    'url': reverse('employee-profile', args=[teacher.user.id]),
+                } for teacher in self.teachers.all()
+            ],
+            'is_teacher': False if (employee is None) else employee in self.teachers.all(),
             'is_enrolled': self.id in enrolled,
             'is_queued': self.id in queued,
             'is_pinned': self.id in pinned,
