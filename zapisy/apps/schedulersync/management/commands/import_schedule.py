@@ -42,7 +42,8 @@ EMPLOYEE_MAP = {
     'MML': u'MMŁ',
     'LJE': u'ŁJE',
     'MPI': u'MPIOTRÓW',
-    'SZDUDYCZ': u'SDUDYCZ'
+    'SZDUDYCZ': u'SDUDYCZ',
+    'MSZYKULA': u'MSZYKUŁA'
 }
 
 COURSES_MAP = {
@@ -60,7 +61,6 @@ COURSES_DONT_IMPORT = [u'XIV LO LATO', u'ZASADY KRYTYCZNEGO MYŚLENIA']
 
 
 class Command(BaseCommand):
-    args = ''
     help = 'Imports the timetable for the next semester from the external scheduler.'
 
     def add_arguments(self, parser):
@@ -78,7 +78,7 @@ class Command(BaseCommand):
         try:
             ce = CourseEntity.objects.get(name_pl__iexact=name)
         except CourseEntity.DoesNotExist:
-            self.stdout.write(self.style.ERROR(u">Couldn't find course entity for "
+            self.stdout.write(self.style.ERROR(u">Couldn't find course entity for {}"
                                                .format(name.decode('utf-8'))))
         except CourseEntity.MultipleObjectsReturned:
             ces = CourseEntity.objects.filter(name_pl__iexact=name, status=2).order_by('-id')
@@ -131,16 +131,12 @@ class Command(BaseCommand):
             if name == 'NN':
                 emps = Employee.objects.filter(user__first_name='Nieznany')
             elif len(name) == 3:
-                emps = Employee.objects.filter(user__first_name__istartswith=(
-                                               name[0]),
-                                               user__last_name__istartswith=(
-                                               name[1:3]),
+                emps = Employee.objects.filter(user__first_name__istartswith=name[0],
+                                               user__last_name__istartswith=name[1:3],
                                                status=0)
             else:
-                emps = Employee.objects.filter(user__first_name__istartswith=(
-                                               name[0]),
-                                               user__last_name__istartswith=(
-                                               name[1:]),
+                emps = Employee.objects.filter(user__first_name__istartswith=name[0],
+                                               user__last_name__istartswith=name[1:],
                                                status=0)
         if len(emps) == 1:
             return emps[0]
@@ -157,7 +153,6 @@ class Command(BaseCommand):
     def create_or_update_group(self, course, data, create_terms=True):
         try:
             sync_data_object = TermSyncData.objects.get(scheduler_id=data['id'])
-            term = sync_data_object.term
         except TermSyncData.DoesNotExist:
             if create_terms:
                 # Create the group in the enrollment system
@@ -179,8 +174,17 @@ class Command(BaseCommand):
                 term.classrooms = data['classrooms']
                 term.save()
                 TermSyncData.objects.create(term=term, scheduler_id=data['id'])
+            self.stdout.write(self.style.SUCCESS(u'Group with scheduler_id={} created!'
+                                                 .format(data['id'])))
+            self.stdout.write(self.style.SUCCESS(u'  time: {}-{}'
+                                                 .format(data['start_time'], data['end_time'])))
+            self.stdout.write(self.style.SUCCESS(u'  teacher: {}'
+                                                 .format(data['teacher'])))
+            self.stdout.write(self.style.SUCCESS(u'  classrooms: {}\n'
+                                                 .format(data['classrooms'])))
             self.created_terms += 1
         else:
+            term = sync_data_object.term
             diff_track_fields = ['dayOfWeek', 'start_time', 'end_time']
             diffs = [(k, (getattr(term, k), data[k])) for k in diff_track_fields
                      if getattr(term, k) != data[k]]
@@ -208,25 +212,26 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.WARNING(u'  {}: '.format(diff[0])), ending='')
                     self.stdout.write(self.style.NOTICE(diff[1][0]), ending='')
                     self.stdout.write(self.style.WARNING(u' -> '), ending='')
-                    self.stdout.write(self.style.SUCCESS(diff[1][1]))
+                    self.stdout.write(self.style.SUCCESS(str(diff[1][1])))
                 self.stdout.write(u'\n')
                 self.updated_terms += 1
 
     def prepare_group(self, g, results, terms):
         """Convert information about group from scheduler format."""
-        group = {}
-        group['id'] = g['id']
-        group['entity_name'] = g['extra']['course']
-        group['group_type'] = GROUP_TYPES[g['extra']['group_type']]
-        group['teacher'] = self.get_employee(g['teachers'][0])
+        if g['id'] not in results:
+            return None
+        group = {
+            'id': g['id'],
+            'entity_name': g['extra']['course'],
+            'group_type': GROUP_TYPES[g['extra']['group_type']],
+            'teacher': self.get_employee(g['teachers'][0])
+        }
 
         # start_time will be determined as the minimum start_time among all terms
         # end_time - as maximum. All the terms in scheduler are one hour long.
         start_time = 24  # acts as inifinity
         end_time = 0
         classrooms = set()
-        if g['id'] not in results:
-            return None
         for t in results[g['id']]:
             t_start = terms[t['term']]['start']['hour']
             t_end = terms[t['term']]['end']['hour']
@@ -291,7 +296,7 @@ class Command(BaseCommand):
                          else Semester.objects.get(pk=int(options['semester'])))
         self.verbosity = options['verbosity']
         if self.verbosity >= 1:
-            self.stdout.write('Adding to semester: {}\n'.format(str(self.semester)))
+            self.stdout.write('Adding to semester: {}\n'.format(self.semester))
         if options['dry_run']:
             if self.verbosity >= 1:
                 self.stdout.write('Dry run is on. Nothing will be saved.')
