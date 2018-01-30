@@ -12,8 +12,7 @@ Fereol.Enrollment.CourseGroup = function()
 	this.course = null;
 
 	this.url = null;
-	this.teacherName = null;
-	this.teacherURL = null;
+	this.teachers = [];
 
 	this.isEnrolled = null; // czy student jest zapisany
 	this.isQueued = null; // czy jest "w kolejce"
@@ -96,10 +95,7 @@ Fereol.Enrollment.CourseGroup.fromJSON = function(json)
 	ct.course = Fereol.Enrollment.Course.getByID(raw['course'].castToInt());
 
 	ct.url = raw['url'];
-	ct.teacherName = raw['teacher_name'];
-	ct.teacherURL = raw['teacher_url'];
-	if (!ct.teacherURL)
-		ct.teacherURL = null;
+	ct.teachers = raw['teachers'];
 
 	ct.updateFromJSON(json);
 
@@ -214,7 +210,7 @@ Fereol.Enrollment.CourseGroup.prototype.setEnrolled = function(enroll)
 				Fereol.Enrollment.CourseGroup.getByID(gid).
 					_notifyUpdateListeners();
 		}
-		
+
 		Fereol.Enrollment.CourseGroup._setLoading(false);
 	}, 'json');
     }

@@ -10,7 +10,7 @@ Fereol.Enrollment.ScheduleCourseTerm = function()
 {
 	this.id = null;
 	this.classroom = null;
-	
+
 	this.isPrototyped = false; // czy jest tymczasowo wyświetlony w prototypie
 	this._isVisible = false;
 	this.displayStyle =
@@ -45,7 +45,7 @@ Fereol.Enrollment.ScheduleCourseTerm.fromJSON = function(json, readOnly)
 Fereol.Enrollment.ScheduleCourseTerm.fromObject = function(obj)
 {
     var sterm = new Fereol.Enrollment.ScheduleCourseTerm();
-    
+
     sterm.id = obj['id'].castToInt();
 	sterm.group = Fereol.Enrollment.CourseGroup.getByID(obj['group'].castToInt());
 	sterm.group.updateListeners.push(function()
@@ -53,10 +53,10 @@ Fereol.Enrollment.ScheduleCourseTerm.fromObject = function(obj)
 		sterm._updateVisibility();
 		sterm._updateControls();
 	});
-    
+
     let startTimes = obj.start_time.split(":");
     let endTimes = obj.end_time.split(":");
-    
+
 	sterm.scheduleTerm = new Schedule.Term(
 		obj.day.castToInt() - 1,
 		new Schedule.Time(parseInt(startTimes[0]), parseInt(startTimes[1])),
@@ -92,7 +92,13 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 
 		$.create('span', {className: 'name'}).text(this.group.course.shortName).
 			attr('title', this.group.course.name).appendTo(this.container);
-		this._teacherLabel = $.create('span', {className: 'teacher'}).text(this.group.teacherName).
+
+		let teacherNames = [];
+		for (const tchr of this.group.teachers) {
+			console.log('tchr: ', tchr);
+			teacherNames.push(tchr.name);
+		}
+		this._teacherLabel = $.create('span', {className: 'teacher'}).text(teacherNames.join()).
 			appendTo(this.container);
 		this._typeLabel = $.create('span', {className: 'type'}).
 			appendTo(this.container).attr('title',
@@ -116,7 +122,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 				appendTo(this._controlsBox);
 			this._signInOutButton = $.create('span', { className: 'signInOut'}).
 				appendTo(this._controlsBox);
-            
+
 			this._loadingIndicator =
 				$.create('div', { className: 'loadingIndicator'}).
 				appendTo(this._controlsBox).css('display', 'none');
@@ -174,7 +180,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateVisibility = function()
 Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 {
 	this.popupContents.empty();
-	
+
 	$.create('h2', {className: 'name'}).appendTo(this.popupContents).append(
 		$.create('a').text(this.group.course.name).attr('href', this.group.course.url));
 	$.create('p', {className: 'typeAndTerm'}).text(
@@ -183,17 +189,18 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 		this.scheduleTerm.timeFrom.toString() + '-' +
 		this.scheduleTerm.timeTo.toString() + ')'
 	).appendTo(this.popupContents);
-    if (this.group.teacherURL)
-	{
-		$.create('p', {className: 'teacher'}).text('Prowadzący: ').
-			appendTo(this.popupContents).append($.create('a').text(this.group.teacherName).
-			attr('href', this.group.teacherURL));
-    }
-    else
-	{
-		$.create('p', {className: 'teacher'}).text('Prowadzący: ').
-			appendTo(this.popupContents).append($.create('span').text(this.group.teacherName));
-    }
+	if (this.group.teachers.length) {
+		let tpara = $.create('p', {className: 'teacher'}).text('Prowadzący: ');
+		tpara.appendTo(this.popupContents);
+		for (const tchr of this.group.teachers) {
+			if (tchr.url) {
+				tpara.append($.create('a').text(tchr.name).attr('href', tchr.url));
+			} else {
+				tpara.append($.create('span').text(tchr.name));
+			}
+		}
+
+	}
 	if (this.classroom)
 		$.create('p', {className: 'classroom'}).text(
 			'Sala: ' + this.classroom
@@ -264,7 +271,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 	var self = this;
 	if (!this._controlsBox)
 		return;
-	
+
 	if (!this._controlsReady)
 	{
 		this._controlsReady = true;
@@ -304,13 +311,13 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 		backgroundPosition: this.group.isPinned ? '-12px -12px' : '0 -12px',
 		display: this.group.isEnrolledOrQueued() ? 'none' : ''
 	}).attr('title', this.group.isPinned ? 'odepnij od planu' : 'przypnij do planu');
-	
-    // students are not allowed to leave the group 
+
+    // students are not allowed to leave the group
     // (i.e. should not see the sign out button) if one of the following holds:
     // * recording is not open
     // * they're enrolled (not in queue) and leaving is not allowed (records ended)
-    const displaySignInOutButton = 
-        this.group.course.isRecordingOpen && 
+    const displaySignInOutButton =
+        this.group.course.isRecordingOpen &&
         (!this.group.isEnrolled || Fereol.Enrollment.isLeavingAllowed);
 
 	this._signInOutButton.css({
@@ -318,7 +325,7 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._updateControls = function()
 		display: displaySignInOutButton ? '' : 'none'
 	}).attr('title', this.group.isEnrolledOrQueued() ? 'wypisz się' +
 		(this.group.isQueued ? ' z kolejki' : '') : 'zapisz się');
-	
+
 	this._controlsEmpty = this.group.isEnrolledOrQueued() &&
 		!this.group.course.isRecordingOpen;
 };
