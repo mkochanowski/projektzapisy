@@ -1,6 +1,10 @@
-#!/usr/bin/env python
+import os
+import signal
+import subprocess
+import sys
 
 import click
+from fabric.context_managers import cd
 from fabric.operations import local
 
 
@@ -29,12 +33,36 @@ def dc(cmd):
 @click.command()
 @click.option('--ip', default='0.0.0.0')
 @click.option('--port', default=8000)
-def server(ip, port):
+@click.option('--no-npmi', '-n', is_flag=True, default=False)
+def server(ip, port, no_npmi):
     """
-    Run development server
+    Run development server.
+    Install all required node dependencies before.
     """
-    cmd = 'runserver {ip}:{port}'.format(ip=ip, port=port)
-    run_locally_with_manage_py(cmd)
+    def signal_handler(sig, frame):
+        os.kill(p1.pid, signal.SIGTERM)
+        os.kill(p2.pid, signal.SIGTERM)
+        p1.wait()
+        p2.wait()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+
+    os.chdir("/vagrant/zapisy")
+
+    if not no_npmi:
+        npm_result = os.system("./npm.sh i")
+        npm_exit_code = os.WEXITSTATUS(npm_result)
+        if npm_exit_code != 0:
+            click.echo(click.style("NPM failed with exit code {}".format(
+                npm_exit_code), fg='red'))
+            sys.exit(1)
+
+    p1 = subprocess.Popen(["python", "manage.py", "runserver", "0.0.0.0:8000"])
+    p2 = subprocess.Popen(["npm", "run", "devw"])
+
+    p1.wait()
+    p2.wait()
 
 
 @click.command()
