@@ -12,6 +12,8 @@ dependencies:
     - pip freeze
 
 test:
+  pre:
+    - mv ../env/.env_circleci ../env/.env
   override:
     - mkdir logs
     - coverage run manage.py test test_app --nomigrations
