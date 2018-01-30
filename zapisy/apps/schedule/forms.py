@@ -16,7 +16,7 @@ from datetime import timedelta, datetime
 
 class TermForm(forms.ModelForm):
     ignore_conflicts = forms.BooleanField(required=False, label="", widget=forms.HiddenInput())
-    
+
     def clean(self):
         cleaned_data = super(TermForm, self).clean()
         self.instance.ignore_conflicts = cleaned_data.get('ignore_conflicts')
@@ -71,7 +71,7 @@ class EventForm(forms.ModelForm):
 
             if not user.has_perm('schedule.manage_events'):
                 queryset = Course.objects.filter(groups__type='1',
-                                                 groups__teacher=user.employee,
+                                                 groups__teachers=user.employee,
                                                  semester__in=[semester, previous_semester])
 
             self.fields['course'].queryset = queryset
