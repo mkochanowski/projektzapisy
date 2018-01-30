@@ -136,7 +136,9 @@ class Poll( models.Model ):
     def get_polls_for_semester( semester = None):
         if not semester:
             semester = Semester.get_current_semester()
-        return Poll.objects.filter( semester = semester, deleted = False ).select_related('group', 'group__course', 'group__teacher', 'group__teacher__user')
+        return Poll.objects.filter(semester=semester, deleted=False).\
+            select_related('group', 'group__course').\
+            prefetch_related('group__teachers', 'group__teachers__user')
 
     @staticmethod
     def get_groups_without_poll():

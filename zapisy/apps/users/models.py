@@ -389,9 +389,8 @@ class Student(BaseUser):
     def get_all_groups(student):
         try:
             groups = map(lambda x: x.group, student.records.filter(status="1").\
-                        select_related('group', 'group__teacher',
-                                      'group__course__semester',
-                                      'group__course__term'))
+                select_related('group', 'group__course__semester', 'group__course__term')).\
+                prefetch_related('group__teachers')
         except Student.DoesNotExist:
              logger.error('Function Student.get_all_groups(student = %d)' + \
              'throws Student.DoesNotExist exception.' % student.pk )

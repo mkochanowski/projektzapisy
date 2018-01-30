@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from apps.enrollment.records.exceptions import NonGroupException
-from apps.enrollment.records.exceptions import ECTS_Limit_Exception 
+from apps.enrollment.records.exceptions import ECTS_Limit_Exception
 from apps.enrollment.records.exceptions import InactiveStudentException
 
 from apps.enrollment.courses.models.course import Course
@@ -51,7 +51,7 @@ class Record(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, verbose_name='utworzono')
     edited  = models.DateTimeField(auto_now=True, verbose_name='zmieniano')
-    
+
     objects = models.Manager()
     enrolled = EnrolledManager()
     pinned = PinnedManager()
@@ -84,14 +84,14 @@ class Record(models.Model):
     @staticmethod
     def recorded_students(students):
         """ Returns students with information about his/her records """
-        
+
         recorded = Record.enrolled.distinct().\
                    values_list('student__user__id', flat=True).\
                    order_by('student__user__id')
-        
+
         for student in students: # O(n^2) - da sie liniowo, jezeli posortujemy po id a nie nazwiskach
             student.recorded = student.id in recorded
-        
+
         return students
 
     @staticmethod
@@ -113,7 +113,7 @@ class Record(models.Model):
                       group__course__semester=semester, deleted=False).\
                       values_list('group__pk', flat=True)
         }
-    
+
     @staticmethod
     def get_student_enrolled_objects(student, semester):
         '''
@@ -123,28 +123,28 @@ class Record(models.Model):
             filter(student=student, group__course__semester=semester).\
             select_related('group', 'group__course', 'group__course__entity',\
             'group__course__entity__type')
-    
+
     @staticmethod
     def get_student_enrolled_ids(student, semester):
         return Record.enrolled.\
             filter(student=student, group__course__semester=semester).\
             values_list('group__pk', flat=True)
-    
+
     @staticmethod
     def get_student_records(student):
         '''
             TODO: DEPRECATED
         '''
         records = Record.enrolled.filter(student=student).\
-            select_related('group', 'group__course', 'group__teacher',
-                'group__teacher__user', 'group__term').\
-                order_by('group__course__entity__name')
+            select_related('group', 'group__course', 'group__term').\
+            prefetch_related('group__teachers', 'group__teachers__user').\
+            order_by('group__course__entity__name')
         groups = [record.group for record in records]
         for group in groups:
             group.terms_ = group.get_all_terms() # za dużo zapytań
             group.course_ = group.course
         return groups
-    
+
     @staticmethod
     def get_groups_with_records_for_course(slug, user_id, group_type):
         user = User.objects.get(id=user_id)
@@ -173,14 +173,14 @@ class Record(models.Model):
             logger.warning('Record.get_groups_with_records_for_course(slug = %s, user_id = %d, group_type = %s) throws Student.DoesNotExist exception.' % (unicode(slug), int(user_id), unicode(group_type)))
             raise NonCourseException()
         return groups
-    
+
     @staticmethod
     def get_students_in_group(group_id):
         try:
             return Student.objects.filter(records__group_id=group_id, records__status=1).select_related('program', 'user', 'zamawiane', 'zamawiane2012')
         except Group.DoesNotExist:
             raise NonGroupException()
-    
+
     @staticmethod
     def get_groups_for_student(user):
         try:
@@ -191,7 +191,7 @@ class Record(models.Model):
         except Student.DoesNotExist:
             logger.warning('Record.get_groups_for_student(user_id = %d) throws Student.DoesNotExist exception.' % int(user.id))
             raise NonStudentException()
-    
+
     @staticmethod
     def is_student_in_course_group_type(user, slug, group_type):
         try:
@@ -206,7 +206,7 @@ class Record(models.Model):
         except Course.DoesNotExist:
             logger.warning('Record.is_student_in_course_group_type(slug = %s, user_id = %d, group_type = %s) throws Course.DoesNotExist exception.' % (unicode(slug), int(user.id), unicode(group_type)))
             raise NonCourseException()
-    
+
     @staticmethod
     def pin_student_to_group(user_id, group_id):
         user = User.objects.get(id=user_id)
@@ -225,7 +225,7 @@ class Record(models.Model):
         except Group.DoesNotExist:
             logger.warning('Record.pin_student_to_group(user_id = %d, group_id = %d) throws Group.DoesNotExists exception.' % (int(user_id), int(group_id)))
             raise NonGroupException()
-    
+
     @staticmethod
     def unpin_student_from_group(user_id, group_id):
         user = User.objects.get(id=user_id)
@@ -245,7 +245,7 @@ class Record(models.Model):
         except Group.DoesNotExist:
             logger.warning('Record.unpin_student_from_group(user_id = %d, group_id = %d) throws Group.DoesNotExist exception' % (int(user_id), int(group_id)))
             raise NonGroupException()
-    
+
     @staticmethod
     def add_student_to_lecture_group(user, course):
         """ assignes student to lectures group for a given course """
@@ -280,11 +280,11 @@ class Record(models.Model):
 
     def group_slug(self):
         return self.group.course_slug()
-    
+
     class Meta:
         verbose_name = 'zapis'
         verbose_name_plural = 'zapisy'
-    
+
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
 
@@ -292,7 +292,7 @@ class QueueManager(models.Manager):
     def get_queryset(self):
         """ Returns only queued students. """
         return super(QueueManager, self).get_queryset()
-    
+
 
 def queue_priority(value):
     """ Controls range of priority"""
@@ -351,8 +351,8 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.warning('Queue.get_priority() throws Group.DoesNotExist(parameters : user_id = %d, group_id = %d)' %(int(user_id), int(group_id)))
             raise NonGroupException()
-            
-    
+
+
     @staticmethod
     def get_students_in_queue(group_id):
         """ Returns state of queue for group ordered by time (FIFO)."""
@@ -366,7 +366,7 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.warning('Queue.get_students_in_queue() throws Group.DoesNotExist(parameters : group_id = %d)' % int(group_id))
             raise NonGroupException()
-    
+
     @staticmethod
     def change_student_priority(user_id, group_id, new_priority) :
         """change student's priority in group queue"""
@@ -387,7 +387,7 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.warning('Queue.add_student_to_queue()  throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d, new_priority = %d)' % (int(user_id), int(group_id), int(new_priority)))
             raise NonGroupException()
-    
+
     @staticmethod
     def remove_student_from_queue(user_id, group_id):
         """remove student from queue"""
@@ -408,7 +408,7 @@ class Queue(models.Model):
         except Group.DoesNotExist:
             logger.warning('Queue.remove_student_from_group() throws Group.DoesNotExist exception (parameters: user_id = %d, group_id = %d)' % (int(user_id), int(group_id)))
             raise NonGroupException()
-    
+
 
     @staticmethod
     def get_groups_for_student(user):
@@ -419,7 +419,7 @@ class Queue(models.Model):
         except Student.DoesNotExist:
             logger.warning('Queue.get_groups_for_student(user_id = %d) throws Student.DoesNotExist exception.' % int(user.id))
             raise NonStudentException()
-    
+
     @staticmethod
     def remove_student_low_priority_records(user_id, group_id, priority) :
         """ Funkcja, która czyści kolejkę z wpisów do grup z tego samego przedmiotu o tym samym rodzaju ale mniejszym priorytecie"""
@@ -459,7 +459,7 @@ class Queue(models.Model):
         for r in raw:
             m[r['group__id']] = r['priority']
         return m
-    
+
     @staticmethod
     def queue_priorities_map_values(queue_values):
         m = {}
@@ -469,18 +469,18 @@ class Queue(models.Model):
 
     def group_slug(self):
         return self.group.course_slug()
-    
+
     class Meta:
         verbose_name = 'kolejka'
         verbose_name_plural = 'kolejki'
-    
+
     def __unicode__(self):
         return u"%s (%s - %s)" % (self.group.course, self.group.get_type_display(), self.group.get_teacher_full_name())
 
 def log_add_record(sender, instance, created, **kwargs):
     if instance.status == Record.STATUS_ENROLLED:
         backup_logger.info('[01] user <%s> is added to group <%s>' % (instance.student.user.id, instance.group.id))
-        
+
 def log_delete_record(sender, instance, **kwargs):
     if instance.status == Record.STATUS_ENROLLED and instance.group:
         backup_logger.info('[03] user <%s> is removed from group <%s>' % (instance.student.user.id, instance.group.id))

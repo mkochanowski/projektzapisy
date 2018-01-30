@@ -176,7 +176,7 @@ class CourseEntity(models.Model):
         """
         if hours1 is None and hours2 is None:
             return None
-        
+
         return (hours1 or 0) + (hours2 or 0)
 
     def get_lectures(self):
@@ -284,7 +284,7 @@ class CourseEntity(models.Model):
     @cache_result
     def get_all_tags(self):
         return list(self.tags.all())
-    
+
     @cache_result
     def get_all_tags_with_weights(self):
         """
@@ -441,10 +441,10 @@ class CourseEntity(models.Model):
                 .exclude(status=CourseEntity.STATUS_FOR_REVIEW) \
                 .select_related('type', 'owner', 'owner__user') \
                 .order_by('name_pl')
-            
+
         if is_authenticated:
             return result
-                
+
         else:
             return result.exclude(status=CourseEntity.STATUS_WITHDRAWN)
 
@@ -702,7 +702,7 @@ class Course(models.Model):
         if opening_time is None:
             return False
         return opening_time < datetime.datetime.now()
-        
+
 
     def is_recording_open_for_student(self, student):
         """
@@ -795,7 +795,7 @@ class Course(models.Model):
         else:
             is_recording_open = False
         data['is_recording_open'] = is_recording_open
-            
+
         # TODO: why do we have this field defined in the model
         # if the CourseEntity object has it as well? What's the difference?
         data['english'] = self.english
@@ -836,9 +836,9 @@ class Course(models.Model):
     def get_student_courses_in_semester(student, semester):
         from apps.enrollment.records.models import Record
 
-        return Record.objects.select_related('group', 'group__teacher', 'group__course',
-                                             'group__course__entity').prefetch_related('group__term',
-                                                                                       'group__term__classrooms').filter(
+        return Record.objects.select_related('group', 'group__course',
+            'group__course__entity').prefetch_related('group__term',
+            'group__term__classrooms', 'group__teachers').filter(
             status='1', student=student, group__course__semester=semester). \
             extra(select={'points': 'SELECT value FROM courses_studentpointsview WHERE student_id='
                                     + str(student.id) + ' AND entity_id=courses_course.entity_id'}).order_by(

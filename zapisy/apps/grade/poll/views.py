@@ -478,7 +478,7 @@ def polls_list( request ):
             data['my_polls'] = True
 
         if int(request.POST['filter-employee']) > 0:
-            kwargs['group__teacher__pk'] = int(request.POST['filter-employee'])
+            kwargs['group__teachers__pk'] = int(request.POST['filter-employee'])
             data['filter_employee'] =  int(request.POST['filter-employee'])
 
         polls = Poll.objects.filter( **kwargs )

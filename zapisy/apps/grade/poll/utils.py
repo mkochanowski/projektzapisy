@@ -116,7 +116,8 @@ def prepare_data( request, slug ):
                                 map( lambda (id, t, st):
                                         id,
                                     l), polls))
-        for poll in Poll.objects.filter(pk__in=polls_id).select_related('group', 'group__course', 'group__teacher', 'group__teacher__user'):
+        for poll in Poll.objects.filter(pk__in=polls_id).select_related('group', 'group__course').\
+                prefetch_related('group__teachers', 'group__teachers__user'):
             dict[poll.pk] = poll
 
         data[ 'polls' ]    = map( lambda ((x, s), l):
@@ -134,7 +135,8 @@ def prepare_data( request, slug ):
                                 map( lambda (id, t, st):
                                         id,
                                     l), finished))
-        for poll in Poll.objects.filter(pk__in=finished_id).select_related('group', 'group__course', 'group__teacher', 'group__teacher__user'):
+        for poll in Poll.objects.filter(pk__in=finished_id).select_related('group', 'group__course').\
+                prefetch_related('group__teachers', 'group__teachers__user'):
             dict[poll.pk] = poll
 
         data[ 'finished' ] = map( lambda ((x, s), l):

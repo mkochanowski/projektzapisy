@@ -321,8 +321,9 @@ class MyScheduleAjaxView(FullCalendarView):
 
         return queryset.filter(Q(event__group__in=groups) |
                                Q(event__interested=self.request.user) |
-                               Q(event__author=self.request.user)).select_related('event', 'event__group',
-                                                                                  'event__group__teacher')
+                               Q(event__author=self.request.user)).\
+            select_related('event', 'event__group').\
+            prefetch_related('event__group__teachers')
 
 
 @login_required
