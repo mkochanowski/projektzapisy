@@ -75,6 +75,7 @@ class Command(BaseCommand):
         parser.add_argument('--create_courses', action='store_true', dest='create_courses')
         parser.add_argument('--dry-run', action='store_true', dest='dry_run')
         parser.add_argument('--slack', action='store_true', dest='write_to_slack')
+        parser.add_argument('--delete-groups', action='store_true', dest='delete_groups')
 
     def get_entity(self, name):
         name = name.upper()
@@ -282,14 +283,31 @@ class Command(BaseCommand):
                                   .format(g['id'], g['extra']['course'])))
         return groups
 
+    def remove_groups(self):
+        groups_to_remove = set()
+        for sync_data_object in TermSyncData.objects.all():
+            if sync_data_object.scheduler_id not in self.scheduler_ids:
+                groups_to_remove.add(sync_data_object.term.group)
+                self.stdout.write(self.style.NOTICE(u'Term {} for group {} removed\n'
+                                  .format(sync_data_object.term, sync_data_object.term.group)))
+                if self.delete_groups:
+                    sync_data_object.term.delete()
+                    sync_data_object.delete()
+        for group in groups_to_remove:
+            if not Term.objects.filter(group=group):
+                if self.remove_groups:
+                    group.delete()
+
     @transaction.atomic
     def import_from_api(self, create_courses=False, create_terms=True):
         self.created_terms = 0
         self.updated_terms = 0
         self.created_courses = 0
         self.used_courses = set()
+        self.scheduler_ids = set()
         groups = self.get_groups()
         for g in groups:
+            self.scheduler_ids.add(int(g['id']))
             entity = self.get_entity(g['entity_name'])
             if entity is not None:
                 course = self.get_course(entity, create_courses)
@@ -297,6 +315,7 @@ class Command(BaseCommand):
                     raise CommandError(u'Course {} does not exist! Check your input file.'
                                        .format(entity))
                 self.create_or_update_group(course, g, create_terms)
+        self.remove_groups()
         self.stdout.write(self.style.SUCCESS(u'Created {} courses successfully! '
                                              'Moreover {} courses were already there.'
                           .format(self.created_courses, len(self.used_courses))))
@@ -352,6 +371,7 @@ class Command(BaseCommand):
             self.stdout.write('Adding to semester: {}\n'.format(self.semester))
         self.all_updates = []
         self.all_creations = []
+        self.delete_groups = True if options['delete_groups'] else False
         if options['dry_run']:
             if self.verbosity >= 1:
                 self.stdout.write('Dry run is on. Nothing will be saved.')
