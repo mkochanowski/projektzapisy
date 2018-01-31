@@ -290,6 +290,8 @@ class Command(BaseCommand):
                 groups_to_remove.add(sync_data_object.term.group)
                 self.stdout.write(self.style.NOTICE(u'Term {} for group {} removed\n'
                                   .format(sync_data_object.term, sync_data_object.term.group)))
+                self.all_deletions.append((str(sync_data_object.term),
+                                           str(sync_data_object.term.group)))
                 if self.delete_groups:
                     sync_data_object.term.delete()
                     sync_data_object.delete()
@@ -303,6 +305,9 @@ class Command(BaseCommand):
         self.created_terms = 0
         self.updated_terms = 0
         self.created_courses = 0
+        self.all_updates = []
+        self.all_creations = []
+        self.all_deletions = []
         self.used_courses = set()
         self.scheduler_ids = set()
         groups = self.get_groups()
@@ -344,11 +349,18 @@ class Command(BaseCommand):
                 "text": text
             }
             attachments.append(attachment)
+        for term_str, group_str in self.all_deletions:
+            attachment = {
+                "color": "danger",
+                "title": "Deleted a term:",
+                "text": "group: {}\nterm: {}".format(group_str, term_str)
+            }
+            attachments.append(attachment)
         return attachments
 
     def write_to_slack(self):
         slack_data = {
-            'text': "The following groups were imported from the scheduler:",
+            'text': "The following groups were updated in fereol (scheduler's sync):",
             'attachments': self.prepare_slack_message()
         }
         response = requests.post(
@@ -369,8 +381,6 @@ class Command(BaseCommand):
         self.verbosity = options['verbosity']
         if self.verbosity >= 1:
             self.stdout.write('Adding to semester: {}\n'.format(self.semester))
-        self.all_updates = []
-        self.all_creations = []
         self.delete_groups = True if options['delete_groups'] else False
         if options['dry_run']:
             if self.verbosity >= 1:
