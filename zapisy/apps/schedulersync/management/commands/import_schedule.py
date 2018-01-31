@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from datetime import time
+import json
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -14,8 +15,10 @@ from apps.enrollment.courses.models import (
 from apps.schedulersync.models import TermSyncData
 
 URL_LOGIN = 'http://scheduler.gtch.eu/admin/login/'
-URL_ASSIGNMENTS = '/scheduler/api/config/2017-18-lato3-2/'
-URL_SCHEDULE = 'http://scheduler.gtch.eu/scheduler/api/task/07164b02-de37-4ddc-b81b-ddedab533fec/'
+
+SLACK_WEBHOOK_URL = (
+    'https://hooks.slack.com/services/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'
+)
 
 LIMITS = {'1': 300, '9': 300, '2': 20, '3': 15, '5': 18, '6': 15}
 GROUP_TYPES = {'w': '1', 'e': '9', 'c': '2', 'p': '3',
@@ -42,8 +45,7 @@ EMPLOYEE_MAP = {
     'MML': u'MMŁ',
     'LJE': u'ŁJE',
     'MPI': u'MPIOTRÓW',
-    'SZDUDYCZ': u'SDUDYCZ',
-    'MSZYKULA': u'MSZYKUŁA'
+    'SZDUDYCZ': u'SDUDYCZ'
 }
 
 COURSES_MAP = {
@@ -64,9 +66,15 @@ class Command(BaseCommand):
     help = 'Imports the timetable for the next semester from the external scheduler.'
 
     def add_arguments(self, parser):
+        parser.add_argument('url_assignments', help='Should look like this: '
+                            '/scheduler/api/config/2017-18-lato3-2/')
+        parser.add_argument('url_schedule', help='Should look like this: '
+                            'http://scheduler.gtch.eu/scheduler/api/task/'
+                            '07164b02-de37-4ddc-b81b-ddedab533fec/')
         parser.add_argument('-semester', type=int, default=0)
         parser.add_argument('--create_courses', action='store_true', dest='create_courses')
         parser.add_argument('--dry-run', action='store_true', dest='dry_run')
+        parser.add_argument('--slack', action='store_true', dest='write_to_slack')
 
     def get_entity(self, name):
         name = name.upper()
@@ -138,6 +146,8 @@ class Command(BaseCommand):
                 emps = Employee.objects.filter(user__first_name__istartswith=name[0],
                                                user__last_name__istartswith=name[1:],
                                                status=0)
+        if not emps:
+            emps = Employee.objects.filter(user__username__istartswith=name)
         if len(emps) == 1:
             return emps[0]
         elif len(emps) > 1:
@@ -173,6 +183,7 @@ class Command(BaseCommand):
                                            group=group)
                 term.classrooms = data['classrooms']
                 term.save()
+                self.all_creations.append(term)
                 TermSyncData.objects.create(term=term, scheduler_id=data['id'])
             self.stdout.write(self.style.SUCCESS(u'Group with scheduler_id={} created!'
                                                  .format(data['id'])))
@@ -210,10 +221,11 @@ class Command(BaseCommand):
                                           str(term).decode('utf-8'))))
                 for diff in diffs:
                     self.stdout.write(self.style.WARNING(u'  {}: '.format(diff[0])), ending='')
-                    self.stdout.write(self.style.NOTICE(diff[1][0]), ending='')
+                    self.stdout.write(self.style.NOTICE(str(diff[1][0])).decode('utf-8'), ending='')
                     self.stdout.write(self.style.WARNING(u' -> '), ending='')
-                    self.stdout.write(self.style.SUCCESS(str(diff[1][1])))
+                    self.stdout.write(self.style.SUCCESS(str(diff[1][1])).decode('utf-8'))
                 self.stdout.write(u'\n')
+                self.all_updates.append((term, diffs))
                 self.updated_terms += 1
 
     def prepare_group(self, g, results, terms):
@@ -252,9 +264,9 @@ class Command(BaseCommand):
         client.get(URL_LOGIN)
         csrftoken = client.cookies['csrftoken']
         login_data = {'username': 'test', 'password': 'test', 'csrfmiddlewaretoken': csrftoken,
-                      'next': URL_ASSIGNMENTS}
+                      'next': self.url_assignments}
         r = client.post(URL_LOGIN, data=login_data)
-        r2 = client.get(URL_SCHEDULE)
+        r2 = client.get(self.url_schedule)
         results = r2.json()['timetable']['results']
         groups = []
         terms = {}
@@ -291,15 +303,60 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(u'Created {} terms and updated {} terms successfully!'
                           .format(self.created_terms, self.updated_terms)))
 
+    def prepare_slack_message(self):
+        attachments = []
+        for term in self.all_creations:
+            text = "day: {}\nstart_time: {}\nend_time: {}\nteacher: {}".format(
+                 term.dayOfWeek, term.start_time, term.end_time, term.group.teacher
+                )
+            attachment = {
+                "color": "good",
+                "title": "Created: {}".format(term.group),
+                "text": text
+            }
+            attachments.append(attachment)
+        for term, diffs in self.all_updates:
+            text = ""
+            for diff in diffs:
+                text = text + "{}: {}->{}\n".format(diff[0], diff[1][0], diff[1][1])
+            attachment = {
+                "color": "warning",
+                "title": "Updated: {}".format(term.group),
+                "text": text
+            }
+            attachments.append(attachment)
+        return attachments
+
+    def write_to_slack(self):
+        slack_data = {
+            'text': "The following groups were imported from the scheduler:",
+            'attachments': self.prepare_slack_message()
+        }
+        response = requests.post(
+            SLACK_WEBHOOK_URL, data=json.dumps(slack_data),
+            headers={'Content-Type': 'application/json'}
+        )
+        if response.status_code != 200:
+            raise ValueError(
+                'Request to slack returned an error %s, the response is:\n%s'
+                % (response.status_code, response.text)
+            )
+
     def handle(self, *args, **options):
         self.semester = (Semester.objects.get_next() if options['semester'] == 0
                          else Semester.objects.get(pk=int(options['semester'])))
+        self.url_assignments = options['url_assignments']
+        self.url_schedule = options['url_schedule']
         self.verbosity = options['verbosity']
         if self.verbosity >= 1:
             self.stdout.write('Adding to semester: {}\n'.format(self.semester))
+        self.all_updates = []
+        self.all_creations = []
         if options['dry_run']:
             if self.verbosity >= 1:
                 self.stdout.write('Dry run is on. Nothing will be saved.')
             self.import_from_api(False, False)
         else:
             self.import_from_api(options['create_courses'])
+        if options['write_to_slack']:
+            self.write_to_slack()
