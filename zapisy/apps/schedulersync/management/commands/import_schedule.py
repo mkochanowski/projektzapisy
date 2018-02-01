@@ -163,7 +163,8 @@ class Command(BaseCommand):
 
     def create_or_update_group(self, course, data, create_terms=True):
         try:
-            sync_data_object = TermSyncData.objects.get(scheduler_id=data['id'])
+            sync_data_object = TermSyncData.objects.get(scheduler_id=data['id'],
+                                                        term__group__course__semester=self.semester)
         except TermSyncData.DoesNotExist:
             if create_terms:
                 # Create the group in the enrollment system
@@ -285,7 +286,8 @@ class Command(BaseCommand):
 
     def remove_groups(self):
         groups_to_remove = set()
-        for sync_data_object in TermSyncData.objects.all():
+        sync_data_objects = TermSyncData.objects.filter(term__group__course__semester=self.semester)
+        for sync_data_object in sync_data_objects:
             if sync_data_object.scheduler_id not in self.scheduler_ids:
                 groups_to_remove.add(sync_data_object.term.group)
                 self.stdout.write(self.style.NOTICE(u'Term {} for group {} removed\n'
