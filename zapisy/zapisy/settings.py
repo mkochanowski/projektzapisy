@@ -152,10 +152,10 @@ TEMPLATES = [
 ]
 
 
-# Be careful with the order! I'm aware that SessionMiddleware
+# Be careful with the order! SessionMiddleware
 # and Authentication both must come before LocalePref which
 # must precede LocaleMiddleware, and Common must go afterwards.
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'middleware.localePrefMiddleware.LocalePrefMiddleware',
@@ -163,13 +163,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
-    #'middleware.mobile_detector.mobileDetectionMiddleware',
-    #'middleware.mobileMiddleware.SubdomainMiddleware',
     'middleware.error_handling.ErrorHandlerMiddleware',
     'pipeline.middleware.MinifyHTMLMiddleware',
     'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
-)
+]
 
 ROOT_URLCONF = 'zapisy.urls'
 
@@ -211,6 +208,7 @@ INSTALLED_APPS = (
     'apps.grade.ticket_create',
     #'apps.mobile',
     'apps.email_change',
+    'apps.schedulersync',
     'django_extensions',
     'django_filters',
     'autoslug',
@@ -285,9 +283,6 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
         'TIMEOUT': 86400,
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
-        }
     }
 }
         
