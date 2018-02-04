@@ -11,6 +11,7 @@ dependencies:
   override:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
+    - npm i -g npm  # Make sure we're using the latest npm version
     - npm i -g yarn
     - ./npm.sh
     - pip freeze

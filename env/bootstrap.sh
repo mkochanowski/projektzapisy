@@ -196,7 +196,7 @@ curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # Install yarn, needed globally
-npm i -g yarn
+sudo npm i -g yarn
 
 # Create node dir outside VM shared folder for Windows compatibility
 # (npm uses symlinks and they don't work inside the shared folder on Windows)
