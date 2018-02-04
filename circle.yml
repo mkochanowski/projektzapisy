@@ -12,7 +12,7 @@ dependencies:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
     - npm i -g yarn
-    - ./npm.sh i
+    - ./npm.sh
     - pip freeze
 
 test:
