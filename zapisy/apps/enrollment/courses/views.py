@@ -301,7 +301,7 @@ def course(request, slug):
 
         employees = set()
         for group in Group.objects.filter(course=course):
-            employees |= set(group.teachers.all())
+            employees.update(group.teachers.all())
 
         data.update({
             'details_hidden': courseView_details_hidden,

@@ -194,7 +194,8 @@ Fereol.Enrollment.ScheduleCourseTerm.prototype._generatePopup = function()
 		tpara.appendTo(this.popupContents);
 		for (const tchr of this.group.teachers) {
 			if (tchr.url) {
-				tpara.append($.create('a').text(tchr.name).attr('href', tchr.url));
+				const personLink = $.create('a').text(tchr.name).attr('href', tchr.url);
+				tpara.append($.create('span', {className: 'person'}).append(personLink));
 			} else {
 				tpara.append($.create('span').text(tchr.name));
 			}

@@ -28,9 +28,9 @@
                 <tr {% if t.signed %} class="signed" {% endif %} >
                     <td>
                         {% for tchr in t.teachers.all %}
-                            <a href="{% url 'employee-profile' tchr.user.id %}" class="person">
-                                {{ tchr.user.get_full_name }}
-                            </a>
+                            <span class="person">
+                                <a href="{% url 'employee-profile' tchr.user.id %}" >{{ tchr.user.get_full_name }}</a>
+                            </span>
                         {% empty %}
                             {% trans "(nieznany prowadzący)" %}
                         {% endfor %}

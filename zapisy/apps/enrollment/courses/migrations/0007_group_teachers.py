@@ -31,5 +31,6 @@ class Migration(migrations.Migration):
                 to='users.Employee',
                 verbose_name=b'prowadzący'),
         ),
-        migrations.RunPython(group_copy_teacher_to_teachers),
+        migrations.RunPython(group_copy_teacher_to_teachers,
+                             reverse_code=migrations.RunPython.noop),
     ]

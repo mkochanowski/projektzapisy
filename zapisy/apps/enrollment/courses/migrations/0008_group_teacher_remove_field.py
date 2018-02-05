@@ -11,8 +11,8 @@ def copy_first_of_teachers(apps, schema_editor):
     Group = apps.get_model('courses', 'Group')
     for group in Group.objects.all():
         teachers = list(group.teachers.all())
-        if len(teachers) == 0:
-            return
+        if not teachers:
+            continue
         group.teacher = teachers[0]
         group.save()
 
@@ -23,14 +23,16 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(migrations.RunPython.noop, reverse_code=copy_first_of_teachers),
         migrations.RemoveField(
             model_name='group',
             name='teacher',
         ),
-        migrations.RunPython(migrations.RunPython.noop, reverse_code=copy_first_of_teachers),
         migrations.AlterField(
             model_name='group',
             name='teachers',
-            field=models.ManyToManyField(related_name='taught_groups', to='users.Employee', verbose_name=b'nauczyciele'),
+            field=models.ManyToManyField(related_name='taught_groups',
+                                         to='users.Employee',
+                                         verbose_name=b'nauczyciele'),
         ),
     ]

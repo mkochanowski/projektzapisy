@@ -293,7 +293,7 @@ class GroupAdmin(admin.ModelAdmin):
         obj.save()
 
     def after_saving_model_and_related_inlines(self, obj):
-        """Suplements saving the Group model with additional actions
+        """Supplements saving the Group model with additional actions
 
         When a group is created we delete all events associated with it and
         create them back.
@@ -314,10 +314,10 @@ class GroupAdmin(admin.ModelAdmin):
             Q(day__gte=semester.lectures_beginning),
             Q(day__lte=semester.lectures_ending)
         ).values_list('day', 'weekday')
-        changed_days = dict(changed)
+        changed_days = dict(changed_days)
         delta = semester.lectures_ending - semester.lectures_beginning
         for i in range(delta.days + 1):
-            day = semester.lectures_beginning + datetime.timedelta(days=i)
+            day = semester.lectures_beginning + timedelta(days=i)
             if day in freedays:
                 continue
             weekday = day.weekday()
@@ -328,7 +328,7 @@ class GroupAdmin(admin.ModelAdmin):
         terms = T.objects.filter(group=obj).\
             select_related('group', 'group__course', 'group__course__entity')
         for t in terms:
-            ev = Event(title=ev.course.entity.get_short_name(),
+            ev = Event(title=t.group.course.entity.get_short_name(),
                        type='3',visible=True, status='1', group=obj,
                        course=t.group.course)
             # The first of teachers is arbitrarily selected as the event author.

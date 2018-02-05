@@ -90,3 +90,7 @@
 {
 	position: absolute;
 }
+
+.schedule .termPopupContainer .teacher .person+.person::before {
+	content: ", ";
+}

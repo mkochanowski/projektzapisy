@@ -287,6 +287,11 @@
 	border-bottom: 0;
 	padding-bottom: 3px;
 }
+
+#enr-course-view .tutorial .person+.person::before {
+	content: ", ";
+}
+
 .bold
 {
     font-weight:bold;
