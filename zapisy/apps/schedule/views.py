@@ -367,21 +367,20 @@ def events_raport_pdf(request, beg_date, end_date, rooms):
             event__status=Event.STATUS_ACCEPTED,
             ).order_by('day', 'start')))
 
-    data = {
+    context = {
         'beg_date': beg_date,
         'end_date': end_date,
         'events': sorted(events),
         'pagesize': 'A4',
         'report': True
     }
-    context = Context(data)
 
     template = get_template('schedule/events_report_pdf.html')
     html = template.render(context)
     result = StringIO.StringIO()
 
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result,
-                            encoding='UTF-8')
+    pisa.pisaDocument(StringIO.StringIO(html.encode('UTF-8')), result, encoding='UTF-8')
+
     response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=raport.pdf'
 
