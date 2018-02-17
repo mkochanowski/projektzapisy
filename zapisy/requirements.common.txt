@@ -4,6 +4,7 @@ Fabric==1.5.1
 django-autoslug==1.9.3
 django-cas-ng==3.5.8
 django-el-pagination==3.1.0
+django-environ==0.4.4
 django-extensions==1.9.9
 django-filter==1.0.4
 django-mailer==1.0.0

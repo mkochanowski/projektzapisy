@@ -13,7 +13,7 @@ dependencies:
 
 test:
   pre:
-    - cp ../env/settings_local_test.py settings_local.py
+    - mv ../env/.env_circleci ../env/.env
   override:
     - mkdir logs
     - coverage run manage.py test test_app --nomigrations
