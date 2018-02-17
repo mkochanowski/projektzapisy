@@ -200,6 +200,7 @@ INSTALLED_APPS = (
     'apps.grade.ticket_create',
     #'apps.mobile',
     'apps.email_change',
+    'apps.schedulersync',
     'django_extensions',
     'django_filters',
     'autoslug',

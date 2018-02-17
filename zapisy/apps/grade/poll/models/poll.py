@@ -172,7 +172,7 @@ class Poll( models.Model ):
     def get_polls_without_keys(semester=None):
         from apps.grade.ticket_create.models.public_key import PublicKey
 
-        polls_with_keys = PublicKey.objects.filter(poll__semester=Semester)
+        polls_with_keys = PublicKey.objects.filter(poll__semester=semester)
         return Poll.objects.filter( semester=semester, deleted=False ).exclude( pk__in = polls_with_keys)
 
     @staticmethod

@@ -2,6 +2,11 @@
 
 # Current version
 
+# Version 18.02.02
+
+* Upgrade to Django 1.11
+* Fix email sending
+
 # Version 18.01.24
 
 * Fix changing email
