@@ -27,8 +27,8 @@ var send_post = function(url, items){
     };
 
 $(document).ready(function () {
-    var group = $('.field-id div p').text();
-    $('.field-limit').find('p').append("" +
+    var group = $('.field-id div div').text();
+    $('.field-limit').find('.readonly').append("" +
        "<label style='float:right'>Zmień limit na: <input type='text' name='new_limit' id='new_limit'><button id='change_group_limit'>Zmień</button></label><div id='hidden_form_container' style='display:hidden'></div>");
     $('#change_group_limit').click(function (event) {
         event.preventDefault();
