@@ -24,7 +24,6 @@ newrelic==2.68.0.50
 gunicorn==19.7.1
 lxml==3.0.1
 python-dateutil==2.6.1
-reportlab==2.6
 
 # Packages which have version in both environments
 #   I am choosing to install versions from production environment.
@@ -42,7 +41,7 @@ vobject==0.9.5
 python-memcached==1.48
 
 # On production, but one would need to find suitable version.
-xhtml2pdf==0.0.5
+xhtml2pdf==0.0.6
 
 # Webpack for frontend development and staticfile bundling
 django-webpack-loader==0.5.0
