@@ -113,7 +113,6 @@ SITE_ID = 1
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-
 USE_ETAGS = True
 
 # Make this unique, and don't share it with anybody.
@@ -208,7 +207,8 @@ INSTALLED_APPS = (
     'apps.notifications',
     'django_cas_ng',
 
-    'test_app'
+    'test_app',
+    'webpack_loader',
 )
 
 MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
@@ -298,17 +298,33 @@ COMPRESS_OFFLINE = env.bool('COMPRESS_OFFLINE', default=False)
 COMPRESS_ENABLED = env.bool('COMPRESS_ENABLED', default=False)
 COMPRESS_OFFLINT_TIMEOUT = env.int('COMPRESS_OFFLINT_TIMEOUT', default=0)
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
-STATIC_ROOT =  os.path.join(BASE_DIR, 'site_media')
+STATICFILES_DIRS = (
+	os.path.join(BASE_DIR, "compiled_assets"),
+)
+
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
 PIPELINE_STORAGE = 'pipeline.storage.PipelineFinderStorage'
 PIPELINE_VERSIONING = 'pipeline.versioning.hash.MD5Versioning'
 STATICFILES_FINDERS = (
   'pipeline.finders.PipelineFinder',
   'django.contrib.staticfiles.finders.FileSystemFinder',
-  'django.contrib.staticfiles.finders.AppDirectoriesFinder'
+  'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+		# This setting is badly named, it's the bundle dir relative
+		# to whatever you have in your STATICFILES_DIRS
+        'BUNDLE_DIR_NAME': '',
+        'STATS_FILE': os.path.join(BASE_DIR, "webpack_resources", 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.

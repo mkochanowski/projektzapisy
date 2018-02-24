@@ -31,25 +31,30 @@ def dc(cmd):
 @click.command()
 @click.option('--ip', default='0.0.0.0')
 @click.option('--port', default=8000)
-@click.option('--no-npmi', '-n', is_flag=True, default=False)
-def server(ip, port, no_npmi):
+@click.option('--no-package-install', '-n', is_flag=True, default=False)
+def server(ip, port, no_package_install):
     """
     Run development server.
     Install all required node dependencies before.
     """
 
-    if not no_npmi:
-        npm_result = os.system("./npm.sh i")
+    if no_package_install:
+        print("******************************************")
+        print("WARNING: Skipping Node/Webpack packages installation. " +
+              "Only use this option if you know what you're doing.")
+        print("******************************************")
+    else:
+        npm_result = os.system("./npm.sh")
         npm_exit_code = os.WEXITSTATUS(npm_result)
         if npm_exit_code != 0:
-            click.echo(click.style("NPM failed with exit code {}".format(
+            click.echo(click.style("Package installation failed with exit code {}".format(
                 npm_exit_code), fg='red'))
             sys.exit(1)
 
     p1 = subprocess.Popen([
         "python", "manage.py", "runserver", "{ip}:{port}".format(
             ip=ip, port=port)])
-    p2 = subprocess.Popen(["npm", "run", "devw"])
+    p2 = subprocess.Popen(["yarn", "devw"])
 
     p1.wait()
     p2.wait()
