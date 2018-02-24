@@ -3,7 +3,7 @@ general:
 
 machine:
   python:
-    version: 2.7.10
+    version: 2.7.12
   node:
     version: 9.20
 
@@ -18,7 +18,7 @@ dependencies:
 
 test:
   pre:
-    - cp ../env/settings_local_test.py settings_local.py
+    - mv ../env/.env_circleci ../env/.env
   override:
     - mkdir logs
     - NODE_PATH=/webpack_modules/node_modules yarn build
