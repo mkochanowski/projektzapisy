@@ -2,6 +2,12 @@
 
 # Current version
 
+# Version 18.02.25
+
+* Added webpack
+* Fixed reports generation
+* Changed email signature for news
+
 # Version 18.02.02
 
 * Upgrade to Django 1.11
