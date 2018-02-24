@@ -23,6 +23,14 @@ module.exports = merge(common({
 			compress: true,
 			output: { comments: false },
 			comments: false,
+			uglifyOptions: {
+				ecma: 5,
+				mangle: {
+					toplevel: true,
+					eval: true,
+				},
+				hoist_funs: true,
+			},
 		}),
 	]
 });
