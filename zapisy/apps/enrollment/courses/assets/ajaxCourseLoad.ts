@@ -103,9 +103,8 @@ function fillCourseHtml(courseHtml: string) {
 	mainContainer.appendChild(courseContainer);
 }
 
-function setPageTitleAndUrl(courseName: string, url: string) {
+function setPageTitle(courseName: string) {
 	document.title = `${courseName} - System Zapisów`;
-	history.pushState({}, "", url);
 }
 
 // At the top of the page we have the course name and
@@ -132,10 +131,27 @@ function updateCourseNameAndEditLink(courseInfo: CourseInfo) {
 	}
 }
 
+function pushHistoryEntry(url: string, thisCourseInfo: CourseInfo) {
+	window.history.pushState(thisCourseInfo, "", url);
+}
+
+function onPopState(event : PopStateEvent) {
+	if (event.state) {
+		populateCoursePageFromCourseInfo(event.state);
+	} else {
+		window.location.href = window.location.href;
+	}
+}
+
 function onCourseResponseReceived(resp: string, courseUrl: string) {
 	const courseInfo: CourseInfo = JSON.parse(resp);
+	pushHistoryEntry(courseUrl, courseInfo);
+	populateCoursePageFromCourseInfo(courseInfo);
+}
+
+function populateCoursePageFromCourseInfo(courseInfo: CourseInfo) {
 	fillCourseHtml(courseInfo.courseHtml);
-	setPageTitleAndUrl(courseInfo.courseName, courseUrl);
+	setPageTitle(courseInfo.courseName);
 	updateCourseNameAndEditLink(courseInfo);
 }
 
@@ -144,3 +160,4 @@ function onCourseResponseReceived(resp: string, courseUrl: string) {
 // so we need to reinstall our click handlers
 // This event is emitted in CoursesList.js (in legacy assets)
 document.addEventListener("CoursesListChanged", installClickHandlers);
+window.addEventListener("popstate", onPopState);
