@@ -120,7 +120,9 @@ const allAssetDefs = getAllAssetDefs();
 console.log(allAssetDefs);
 module.exports = function(config: any) {
 	return {
-		entry: allAssetDefs.bundles,
+		entry: Object.assign({
+			polyfill: "babel-polyfill",
+		}, allAssetDefs.bundles),
 		output: {
 			path: path.resolve(BUNDLE_OUTPUT_DIR),
 			filename: "[name]-[hash].min.js"
