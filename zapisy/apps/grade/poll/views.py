@@ -1069,7 +1069,7 @@ def poll_results( request, mode='S', poll_id = None, semester=None ):
                             perc = int(100 * (float(sts_fin - len( q_data))/ float(sts_fin)))
                         else:
                             perc = 0
-                        ans_data.append((u"Brak odpowiedzi", sts_fin - len( q_data), perc))
+                        ans_data.append((u"Brak odpowiedzi", sts_all - len(question_answers), perc))
                         s_ans.append(( mode, question.content, ans_data, ( 100 / len( ans_data ))-1))
 
                     elif isinstance( question, MultipleChoiceQuestion ):
