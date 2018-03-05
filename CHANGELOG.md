@@ -2,6 +2,8 @@
 
 # Current version
 
+* Fixed negative counts in grade summary
+
 # Version 18.02.25
 
 * Added webpack
