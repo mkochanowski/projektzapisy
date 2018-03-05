@@ -84,27 +84,26 @@ def db():
     pass
 
 
-@click.option("--path", default='')
+@click.argument("path", required=True)
 @click.option("--user", default='fereol')
 @click.command()
 def load(path, user):
     """
     Load database
     """
-    local('sudo su - postgres -c \"psql -f {db_path} {db_user}\"'.format(
-        db_path=path, db_user=user))
+    # remove old db
+    local('sudo su - postgres  <<\'ENDSUDO\'\n'
+          'psql -c "DROP DATABASE \"fereol\";"\n'
+          'psql -c "CREATE DATABASE \"fereol\";"\n'
+          'logout\n'
+          'ENDSUDO\n')
 
-
-@click.command()
-def reset():
-    """
-    Reset default database
-    """
-    local('sudo su - postgres -c \"psql -f reset_zapisy.sql\"')
+    # new db
+    local('PGPASSWORD="fereolpass" psql -U fereol -h localhost -f {db_path} {db_user}'.format(
+          db_path=path, db_user=user))
 
 
 db.add_command(load)
-db.add_command(reset)
 
 
 cli.add_command(dc)

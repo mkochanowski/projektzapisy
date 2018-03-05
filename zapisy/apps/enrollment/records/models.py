@@ -394,7 +394,8 @@ class Queue(models.Model):
         try:
             student = Student.objects.select_related('user').get(user__id=user_id)
 
-            record = Queue.queued.select_related('group').get(group__id=group_id, student=student)
+            record = Queue.queued.select_related('group').get(
+                group__id=group_id, student=student, deleted=False)
             group = record.group
             record.delete()
             logger.info('User %s <id: %s> is now removed from queue of group "%s" <id: %s>' % (student.user.username, student.user.id, group, group.id))

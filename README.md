@@ -6,7 +6,7 @@ Aby rozpocząć pracę w projekcie przejdź przez instrukcję:
 https://github.com/lewymati/projektzapisy/wiki/Developer's-environment-setup
 
 Będziesz potrzebował dump-a bazy:
-https://www.dropbox.com/s/exwyayfu38nlgqh/a_dump2017_04_10__12_33_58.sql.gz?dl=0
+https://www.dropbox.com/s/c0xz8i7l3z37o0n/a_dump2018_02_27__00_35_26.sql.gz?dl=0
 
 _O nowszego dumpa można poprosić na Slacku._
 
