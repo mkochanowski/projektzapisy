@@ -1066,7 +1066,7 @@ def poll_results( request, mode='S', poll_id = None, semester=None ):
                                 perc = 0
                             ans_data.append((option.content, q_data.count(option), perc))
                         if sts_all:
-                            perc = int(100 * (float(sts_all - len(question_answers))/ float(sts_all)))
+                            perc = int(100 * (float(sts_all - len(question_answers)) / float(sts_all)))
                         else:
                             perc = 0
                         ans_data.append((u"Brak odpowiedzi", sts_all - len(question_answers), perc))
@@ -1096,10 +1096,10 @@ def poll_results( request, mode='S', poll_id = None, semester=None ):
                                 perc = 0
                             ans_data.append((u"Inne", len(other_data), perc, other_data))
                         if sts_all:
-                            perc = int(100 * (float(sts_all - len(question_answers))/ float(sts_all)))
+                            perc = int(100 * (float(sts_all - len(question_answers)) / float(sts_all)))
                         else:
                             perc = 0
-                        ans_data.append((u"Brak odpowiedzi", sts_all - len( question_answers), perc))
+                        ans_data.append((u"Brak odpowiedzi", sts_all - len(question_answers), perc))
                         s_ans.append(( mode, question.content, ans_data, ( 100 / len( ans_data ))-1))
 
                     elif isinstance( question, OpenQuestion ):
