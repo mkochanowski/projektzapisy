@@ -139,6 +139,7 @@ function onPopState(event : PopStateEvent) {
 	if (event.state) {
 		populateCoursePageFromCourseInfo(event.state);
 	} else {
+		// See https://stackoverflow.com/questions/2405117/difference-between-window-location-href-window-location-href-and-window-location
 		window.location.href = window.location.href;
 	}
 }
