@@ -4,6 +4,8 @@
 * Added simple semester REST API serving semesters
 * Classroom REST API serving classroom data
 
+* Fixed negative counts in grade summary
+
 # Version 18.02.25
 
 * Added webpack
