@@ -6,6 +6,8 @@
 
 * Fixed negative counts in grade summary
 
+* Added confirmation pop-up before direct disenrollment
+
 # Version 18.02.25
 
 * Added webpack
