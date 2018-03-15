@@ -208,21 +208,6 @@ class Employee(BaseUser):
              raise NonEmployeeException()
         return groups
 
-#    @staticmethod
-#    def get_schedule(user_id):
-#        user = User.objects.get(id=user_id)
-#        try:
-#            employee = user.employee
-#            groups = [g for g in Employee.get_all_groups_in_semester(user_id) ]
-#            courses = set([group.course for group in groups])
-#            for group in groups:
-#                group.terms_ = group.get_all_terms()
-#                group.course_ = group.course
-#            return groups
-#        except Employee.DoesNotExist:
-#             logger.error('Function Employee.get_schedule(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
-#             raise NonEmployeeException()
-
     class Meta:
         verbose_name = 'pracownik'
         verbose_name_plural = 'Pracownicy'
@@ -313,7 +298,6 @@ class Student(BaseUser):
         from apps.offer.vote.models.single_vote import SingleVote
         return map(lambda x: x.course, SingleVote.objects.filter(student=self, state__semester_winter=current_semester,
                                               correction=given_points).select_related('course').order_by('course__entity__name'))
-        #return map(lambda x: x.course, StudentOptions.objects.filter(course__semester__id__exact=current_semester.id).filter(student=self, records_opening_bonus_minutes=minutes).order_by('course__name'))
 
     def get_records_history(self,default_semester=None):
         '''
@@ -397,22 +381,6 @@ class Student(BaseUser):
              raise NonStudentException()
         return groups
 
-#    @staticmethod
-#    def get_schedule(student):
-#        from apps.enrollment.courses.models import Semester
-#        try:
-#            default_semester = Semester.get_default_semester()
-#            groups = [g for g in Student.get_all_groups(student) \
-#                if g.course.semester == default_semester] #TODO: nieoptymalnie
-#            courses = set([group.course for group in groups])
-#            for group in groups:
-#                group.terms_ = group.get_all_terms()
-#                group.course_ = group.course
-#            return groups
-#        except Student.DoesNotExist:
-#             logger.error('Function Student.get_schedule(user_id = %d) throws Student.DoesNotExist exception.' % student )
-#             raise NonStudentException()
-
     def records_set_locked(self, locked):
         self.block = locked
         self.save()
@@ -436,7 +404,6 @@ class Student(BaseUser):
     #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
     is_zamawiany_cache = None
     def is_zamawiany(self):
-#        return self.zamawiane <> None
 
         if not (self.is_zamawiany_cache is None):
             return self.is_zamawiany_cache
@@ -450,7 +417,6 @@ class Student(BaseUser):
     is_zamawiany_cache2012 = None
     def is_zamawiany2012(self):
 
-#        return self.zamawiane2012 <> None
         if not (self.is_zamawiany_cache2012 is None):
             return self.is_zamawiany_cache2012
         try:
@@ -659,19 +625,9 @@ CREATE OR REPLACE VIEW users_courses AS
    FROM users_student au, courses_course cc;
 """
 
-
-# definition of UserProfile from above
-# ...
-
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
-
-#post_save.connect(create_user_profile, sender=User)
-
-
-
-
 
 class OpeningTimesView(models.Model):
     student  = models.OneToOneField(Student, primary_key=True,on_delete=models.CASCADE,

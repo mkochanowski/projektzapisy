@@ -318,7 +318,6 @@ def consultations_list(request, begin='A'):
 @login_required
 def students_list(request, begin = 'All', query=None):
     students = Student.get_list(begin)
-#    students = Record.recorded_students(students)
 
     if request.is_ajax():
         students = prepare_ajax_students_list(students)
