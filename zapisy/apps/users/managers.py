@@ -9,7 +9,6 @@ class GettersManager(models.Manager):
         return self.get_queryset().filter(*args, **kwargs).only('user__first_name',
                              'user__last_name', 'matricula', 'ects').annotate(t0_min=Min('opening_times__opening_time'))
 
-
     def get_list_full_info(self, begin='All'):
         def next_char(begin):
             try:
@@ -27,12 +26,6 @@ class GettersManager(models.Manager):
             end = next_char(begin)
             return self.filter_with_t0(status=0,user__last_name__range=(begin, end)).\
                     select_related('user').order_by('user__last_name', 'user__first_name')
-
-
-    def get_statistics(self, semester):
-
-        return self.get_list_full_info().extra(select={})
-
 
 class T0Manager(models.Manager):
 

@@ -401,7 +401,6 @@ class Student(BaseUser):
     def zamawiany2012(self):
         return StudiaZamawiane2012.objects.get(student=self)
 
-    #TODO: to NIE MA być pole statyczne - najlepiej zrobić mapę (pole statyczne)
     is_zamawiany_cache = None
     def is_zamawiany(self):
 
@@ -458,15 +457,12 @@ class Program( models.Model ):
 
 class ZamawianeAbstract(models.Model):
 
-
     points =  models.FloatField(verbose_name='Punkty', null=True, blank=True)
     comments = models.TextField(verbose_name='Uwagi', blank=True, null=True)
     bank_account = models.CharField(max_length=40, null=True, blank=True, verbose_name="Numer konta bankowego")
 
     class Meta:
         abstract = True
-
-
 
     def clean(self):
         self.bank_account = self.bank_account.upper().replace(' ', '')
@@ -500,7 +496,6 @@ class ZamawianeAbstract(models.Model):
                 return False
         code = int(''.join(map(cls._normalize_char, number[4:] + number[:4])))
         return code % 97 == 1
-
 
 class StudiaZamawiane(ZamawianeAbstract):
     """
@@ -540,8 +535,6 @@ class StudiaZamawiane(ZamawianeAbstract):
         if self.bank_account=='':
             self.bank_account = None
         super(StudiaZamawiane, self).save(*args, **kwargs)
-
-
 
     class Meta:
         verbose_name = 'Studia zamawiane2009'
@@ -586,12 +579,9 @@ class StudiaZamawiane2012(ZamawianeAbstract):
             self.bank_account = None
         super(StudiaZamawiane2012, self).save(*args, **kwargs)
 
-
-
     class Meta:
         verbose_name = 'Studia zamawiane2012'
         verbose_name_plural = 'Studia zamawiane2012'
-
 
 class StudiaZamawianeMaileOpiekunow(models.Model):
     """
@@ -605,29 +595,6 @@ class StudiaZamawianeMaileOpiekunow(models.Model):
 
     def __unicode__(self):
         return self.email
-
-"""
-CREATE OR REPLACE VIEW users_courses AS
- SELECT cc.semester_id, au.id AS student_id, cc.id AS course_id, COALESCE(
-        CASE
-            WHEN au.numeryczna_l AND cc.numeryczna_l OR au.dyskretna_l AND cc.dyskretna_l THEN ( SELECT cp.value
-               FROM courses_pointsofcourses cp
-              WHERE cp.course_id = cc.id AND cp.program_id = 1)
-            ELSE ( SELECT cp.value
-               FROM courses_pointsofcourses cp
-              WHERE cp.course_id = cc.id AND cp.program_id = au.program_id)
-        END::integer, (( SELECT cpe.value
-           FROM courses_pointsofcourseentities cpe
-          WHERE cpe.entity_id = cc.entity_id))::integer, 0) AS value, ( SELECT count(*) AS count
-           FROM records_record rr
-      LEFT JOIN courses_group cg ON rr.group_id = cg.id
-     WHERE cg.course_id = cc.id AND rr.status::integer = 1 AND rr.student_id = au.id) AS groups
-   FROM users_student au, courses_course cc;
-"""
-
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
 
 class OpeningTimesView(models.Model):
     student  = models.OneToOneField(Student, primary_key=True,on_delete=models.CASCADE,
