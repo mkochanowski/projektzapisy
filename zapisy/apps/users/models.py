@@ -260,7 +260,10 @@ class Student(BaseUser):
 
     def is_isim(self):
         """"Returns True if student's program is "ISIM, dzienne I stopnia", False otherwise."""
-        return self.program == Program.objects.get(name='ISIM, dzienne I stopnia')
+        try:
+            return self.program == Program.objects.get(name='ISIM, dzienne I stopnia')
+        except Program.DoesNotExist:
+            return False
 
     def get_sex(self):
         if self.user.first_name[-1] == 'a':
