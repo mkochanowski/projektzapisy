@@ -152,7 +152,7 @@ class Group(models.Model):
             self.enrolled_zam -= 1
         if student.is_zamawiany2012():
             self.enrolled_zam2012 -= 1
-        if student.isim:
+        if student.is_isim():
             self.enrolled_isim -= 1
 
         self.save()
@@ -167,7 +167,7 @@ class Group(models.Model):
             self.enrolled_zam += 1
         if student.is_zamawiany2012():
             self.enrolled_zam2012 += 1
-        if student.isim:
+        if student.is_isim():
             self.enrolled_isim += 1
         self.save()
 
@@ -420,7 +420,7 @@ class Group(models.Model):
 
     def is_full_for_student(self, student):
         if self.limit_isim > 0:
-            if student.isim:
+            if student.is_isim():
                 return self.limit <= self.enrolled
             else:
                 return self.limit - self.limit_isim <= self.enrolled - min(self.enrolled_isim, self.limit_isim)

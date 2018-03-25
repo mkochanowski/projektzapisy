@@ -84,13 +84,11 @@ def process(line):
             return
 
     student.status = 0
-    student.isim = False
 
     if program == 'INF-K-S1':
         student.program = Program.objects.get(name='Informatyka, dzienne I stopnia')
     elif program == 'ISIM-K-S1':
-        student.program = Program.objects.get(name='Informatyka, dzienne I stopnia')
-        student.isim = True
+        student.program = Program.objects.get(name='ISIM, dzienne I stopnia')
     elif program == 'INF-K-2S1':
         student.program = Program.objects.get(name='Informatyka, dzienne I stopnia inżynierskie')
     elif program == 'INF-K-S2':

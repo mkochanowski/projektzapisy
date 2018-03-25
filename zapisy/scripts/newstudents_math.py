@@ -11,14 +11,13 @@ import random
 
 studentsfile = 'newstudents_math2016.txt'
 
-def create_user(indeks, imie, nazwisko, mail, isim, pswd):
+def create_user(indeks, imie, nazwisko, mail, pswd):
     p = Program.objects.get(id=11)
     user = User.objects.create_user(username=indeks, email=mail, password=pswd)
     user.first_name = imie
     user.last_name = nazwisko
     user.save()
     s = Student.objects.create(user=user, matricula=indeks)
-    s.isim = isim
     s.semestr = 1
     s.program = p
     s.save()
@@ -55,10 +54,7 @@ def process(line):
         student = Student.objects.get(matricula=indeks)
     except ObjectDoesNotExist:
         haslo = random_pass()
-        isim = False
-        if program == 'ISIM':
-            isim = True
-        u = create_user(indeks, imie, nazwisko, mail, isim, haslo)
+        u = create_user(indeks, imie, nazwisko, mail, haslo)
         refresh_student_ECTS(u.student)
         send_email(mail)
         print imie + ',' + nazwisko + ',' + indeks + ',' + haslo + ',' + program

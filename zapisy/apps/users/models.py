@@ -237,8 +237,6 @@ class Student(BaseUser):
 
     t0 = models.DateTimeField(null=True, blank=True)
 
-    isim = models.BooleanField(default=False)
-
     ects_in_semester = models.SmallIntegerField(default=0)
 
     dyskretna_l  = models.BooleanField(default=False)
@@ -259,6 +257,10 @@ class Student(BaseUser):
 
     def is_active(self):
         return self.status == 0
+
+    def is_isim(self):
+        """"Returns True if student's program is "ISIM, dzienne I stopnia", False otherwise."""
+        return self.program == Program.objects.get(name='ISIM, dzienne I stopnia')
 
     def get_sex(self):
         if self.user.first_name[-1] == 'a':
