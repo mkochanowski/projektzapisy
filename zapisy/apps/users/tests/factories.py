@@ -44,9 +44,6 @@ class UserProfileFactory(DjangoModelFactory):
     preferred_language = factory.fuzzy.FuzzyChoice(langs)
     is_employee = random.choice([True, False])
     is_student = factory.LazyAttribute(lambda o: False if o.is_employee else True)
-    is_zamawiany = factory.LazyAttribute(
-        lambda o: random.choice([True, False]) if o.is_student else False
-    )
 
 
 class StudentProfileFactory(UserProfileFactory):
@@ -56,11 +53,6 @@ class StudentProfileFactory(UserProfileFactory):
 
 class EmployeeProfileFactory(UserProfileFactory):
     is_employee = True
-
-
-class OrderedStudentProfileFactory(UserProfileFactory):
-    is_zamawiany = True
-    is_employee = False
 
 
 class EmployeeFactory(DjangoModelFactory):

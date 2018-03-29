@@ -177,7 +177,7 @@ class Record(models.Model):
     @staticmethod
     def get_students_in_group(group_id):
         try:
-            return Student.objects.filter(records__group_id=group_id, records__status=1).select_related('program', 'user', 'zamawiane', 'zamawiane2012')
+            return Student.objects.filter(records__group_id=group_id, records__status=1).select_related('program', 'user')
         except Group.DoesNotExist:
             raise NonGroupException()
     

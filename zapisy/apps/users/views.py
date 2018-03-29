@@ -29,7 +29,7 @@ from apps.users.models import Employee, Student, BaseUser, UserProfile, OpeningT
 from apps.enrollment.courses.models import Semester, Group
 from apps.enrollment.records.models import Record
 from apps.enrollment.utils import mailto
-from apps.users.forms import EmailChangeForm, BankAccountChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
+from apps.users.forms import EmailChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
 from apps.users.exceptions import InvalidUserException
 from apps.notifications.forms import NotificationFormset
 from apps.notifications.models import NotificationPreferences
@@ -191,23 +191,6 @@ def email_change(request):
     return render(request, 'users/email_change_form.html', {'form':form})
 
 @login_required
-def bank_account_change(request):
-    """function that enables bank account changing"""
-    if request.POST:
-        data = request.POST.copy()
-        zamawiany = Student.get_zamawiany(request.user.id)
-        form = BankAccountChangeForm(data, instance=zamawiany)
-        if form.is_valid():
-            form.save()
-            logger.info('User (%s) changed bank account' % request.user.get_full_name())
-            messages.success(request, "Twój numer konta bankowego został zmieniony.")
-            return HttpResponseRedirect(reverse('my-profile'))
-    else:
-        zamawiany = Student.get_zamawiany(request.user.id)
-        form = BankAccountChangeForm({'bank_account': zamawiany.bank_account})
-    return render(request, 'users/bank_account_change_form.html', {'form':form})
-
-@login_required
 def consultations_change(request):
     """function that enables consultations changing"""
     try:
@@ -238,9 +221,6 @@ def password_change_done(request):
 def my_profile(request):
     """profile site"""
     semester = Semester.objects.get_next()
-    zamawiany = Student.get_zamawiany(request.user.id)
-    comments = zamawiany and zamawiany.comments or ''
-    points = zamawiany and zamawiany.points or 0
 
     notifications = NotificationFormset(queryset=NotificationPreferences.objects.create_and_get(request.user))
 

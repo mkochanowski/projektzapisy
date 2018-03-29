@@ -26,9 +26,8 @@ class Related(models.Manager):
 
 
 class ExtendedUser(User):
-    is_student = models.BooleanField(default = False, verbose_name="czy student?")
-    is_employee = models.BooleanField(default = False, verbose_name="czy pracownik?")
-    is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
+    is_student = models.BooleanField(default=False, verbose_name="czy student?")
+    is_employee = models.BooleanField(default=False, verbose_name="czy pracownik?")
 
     objects = UserManager()
 
@@ -36,12 +35,12 @@ class ExtendedUser(User):
         verbose_name = 'użutkownik'
         verbose_name_plural = 'użytkownicy'
 
+
 class UserProfile(models.Model):
     # This field is required.
-    user         = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
-    is_student   = models.BooleanField(default = False, verbose_name="czy student?")
-    is_employee  = models.BooleanField(default = False, verbose_name="czy pracownik?")
-    is_zamawiany = models.BooleanField(default = False, verbose_name="czy zamawiany?")
+    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
+    is_student = models.BooleanField(default=False, verbose_name="czy student?")
+    is_employee = models.BooleanField(default=False, verbose_name="czy pracownik?")
     preferred_language = models.CharField(
         max_length=5,
         choices=settings.LANGUAGES,
@@ -62,13 +61,13 @@ class BaseUser(models.Model):
     We do not inherit after User directly, because of problems with logging beckend etc.
     '''
     receive_mass_mail_enrollment = models.BooleanField(
-        default = True,
+        default=True,
         verbose_name="otrzymuje mailem ogłoszenia Zapisów")
     receive_mass_mail_offer = models.BooleanField(
-        default = True,
+        default=True,
         verbose_name="otrzymuje mailem ogłoszenia OD")
     receive_mass_mail_grade = models.BooleanField(
-        default = True,
+        default=True,
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
     last_news_view = models.DateTimeField(default=datetime.datetime.now)
 
@@ -390,46 +389,6 @@ class Student(BaseUser):
         self.block = locked
         self.save()
 
-    @staticmethod
-    def get_zamawiany(user_id):
-        try:
-            user = User.objects.get(id=user_id)
-            student = Student.objects.get(user=user)
-            zamawiany = StudiaZamawiane.objects.get(student=student)
-            return zamawiany
-        except (User.DoesNotExist, Student.DoesNotExist, StudiaZamawiane.DoesNotExist):
-             return None
-
-    def zamawiany(self):
-        return StudiaZamawiane.objects.get(student=self)
-
-    def zamawiany2012(self):
-        return StudiaZamawiane2012.objects.get(student=self)
-
-    is_zamawiany_cache = None
-    def is_zamawiany(self):
-
-        if not (self.is_zamawiany_cache is None):
-            return self.is_zamawiany_cache
-        try:
-            self.zamawiany()
-            self.is_zamawiany_cache = True
-        except StudiaZamawiane.DoesNotExist:
-            self.is_zamawiany_cache = False
-        return self.is_zamawiany_cache
-
-    is_zamawiany_cache2012 = None
-    def is_zamawiany2012(self):
-
-        if not (self.is_zamawiany_cache2012 is None):
-            return self.is_zamawiany_cache2012
-        try:
-            self.zamawiany2012()
-            self.is_zamawiany_cache2012 = True
-        except StudiaZamawiane2012.DoesNotExist:
-            self.is_zamawiany_cache2012 = False
-        return self.is_zamawiany_cache2012
-
     def is_first_year_student(self):
         return (self.semestr in [1,2]) and (self.program.id in [0,2])
 
@@ -459,147 +418,6 @@ class Program( models.Model ):
 
     def __unicode__(self):
         return self.name
-
-class ZamawianeAbstract(models.Model):
-
-    points =  models.FloatField(verbose_name='Punkty', null=True, blank=True)
-    comments = models.TextField(verbose_name='Uwagi', blank=True, null=True)
-    bank_account = models.CharField(max_length=40, null=True, blank=True, verbose_name="Numer konta bankowego")
-
-    class Meta:
-        abstract = True
-
-    def clean(self):
-        self.bank_account = self.bank_account.upper().replace(' ', '')
-        if not self.bank_account[:2].isalpha():
-            self.bank_account = 'PL' + self.bank_account
-        if not self.check_iban(self.bank_account):
-            raise ValidationError('Podany numer konta nie jest poprawny')
-
-    @staticmethod
-    def _normalize_char(c):
-        if c.isalpha():
-            return str(ord(c.lower()) - ord('a') + 10)
-        return c
-
-    @classmethod
-    def check_iban(cls, number):
-        """Checks if given number is valid IBAN"""
-        number = number.replace(' ', '')
-        if number=='PL' or number=='' or number is None:
-            return True
-        lengths = {'pl': 28}
-        if not number.isalnum():
-            return False
-        country_code = number[:2].lower()
-        if not country_code.isalpha():
-            number = 'pl' + number
-            country_code = 'pl'
-        valid_length = lengths.get(country_code)
-        if valid_length is not None:
-            if len(number) != valid_length:
-                return False
-        code = int(''.join(map(cls._normalize_char, number[4:] + number[:4])))
-        return code % 97 == 1
-
-class StudiaZamawiane(ZamawianeAbstract):
-    """
-        Model przechowuje dodatkowe informacje o studentach zamawianych
-    """
-
-    student = models.OneToOneField(Student, related_name='zamawiane', verbose_name='Student', on_delete=models.CASCADE)
-
-    def __unicode__(self):
-        return 'Student zamawiany: '+str(self.student).decode('utf-8')
-
-    def save(self, *args, **kwargs):
-        try:
-            old_sz = StudiaZamawiane.objects.get(id=self.id)
-            if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                current_site = Site.objects.get_current()
-                site_name, domain = current_site.name, current_site.domain
-                subject = '[Fereol] Zmiana numeru konta bankowego'
-                subject_employee = 'Zmiana numeru konta %s -> %s' % (self.student.matricula, self.bank_account and self.bank_account or '')
-                c = {
-                    'site_domain': domain,
-                    'site_name': site_name.replace('\n',''),
-                    'student': self.student,
-                    'old_account' : old_sz.bank_account and old_sz.bank_account or '',
-                    'new_account' : self.bank_account and self.bank_account or '',
-                }
-                message_user = render_to_string('users/bank_account_change_email.html', c)
-                message_employee = render_to_string('users/bank_account_change_email_employee.html', c)
-
-                emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
-
-                send_mail(subject, message_user, None, [self.student.user.email])
-                send_mail(subject_employee, message_employee, None ,emails)
-                logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
-        except:
-            pass
-        if self.bank_account=='':
-            self.bank_account = None
-        super(StudiaZamawiane, self).save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = 'Studia zamawiane2009'
-        verbose_name_plural = 'Studia zamawiane2009'
-
-class StudiaZamawiane2012(ZamawianeAbstract):
-    """
-        Model przechowuje dodatkowe informacje o studentach zamawianych
-    """
-
-    student = models.OneToOneField(Student, related_name='zamawiane2012', verbose_name='Student', on_delete=models.CASCADE)
-
-    def __unicode__(self):
-        return 'Student zamawiany: '+str(self.student).decode('utf-8')
-
-    def save(self, *args, **kwargs):
-        try:
-            old_sz = StudiaZamawiane2012.objects.get(id=self.id)
-            if self.bank_account != old_sz.bank_account and not (self.bank_account.lower()=='pl' and old_sz.bank_account==''):
-                current_site = Site.objects.get_current()
-                site_name, domain = current_site.name, current_site.domain
-                subject = '[Fereol] Zmiana numeru konta bankowego'
-                subject_employee = 'Zmiana numeru konta %s -> %s' % (self.student.matricula, self.bank_account and self.bank_account or '')
-                c = {
-                    'site_domain': domain,
-                    'site_name': site_name.replace('\n',''),
-                    'student': self.student,
-                    'old_account' : old_sz.bank_account and old_sz.bank_account or '',
-                    'new_account' : self.bank_account and self.bank_account or '',
-                }
-                message_user = render_to_string('users/bank_account_change_email.html', c)
-                message_employee = render_to_string('users/bank_account_change_email_employee.html', c)
-
-                emails = map( lambda x: x['email'], StudiaZamawianeMaileOpiekunow.objects.values())
-
-                send_mail(subject, message_user, None, [self.student.user.email])
-                send_mail(subject_employee, message_employee, None ,emails)
-                logger.info('User_id %s student_id %s has changed his bank_account to \'%s\'' % (self.student.user.id, self.student.id, self.bank_account))
-        except:
-            pass
-        if self.bank_account=='':
-            self.bank_account = None
-        super(StudiaZamawiane2012, self).save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = 'Studia zamawiane2012'
-        verbose_name_plural = 'Studia zamawiane2012'
-
-class StudiaZamawianeMaileOpiekunow(models.Model):
-    """
-        Model przechowuje maile, na które są wysyłane maile o zmianie numeru konta bankowego studentów zamawianych
-    """
-    email = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name = 'Studia zamawiane - opiekunowie'
-        verbose_name_plural = 'Studia zamawiane - opiekunowie'
-
-    def __unicode__(self):
-        return self.email
 
 class OpeningTimesView(models.Model):
     student  = models.OneToOneField(Student, primary_key=True,on_delete=models.CASCADE,

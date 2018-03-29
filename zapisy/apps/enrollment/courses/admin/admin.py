@@ -258,7 +258,7 @@ class QueuedInline(admin.TabularInline):
 
 class GroupAdmin(admin.ModelAdmin):
     readonly_fields = ('limit', 'id')
-    list_display = ('id', 'course', 'teacher','type','limit','limit_zamawiane','limit_zamawiane2012', 'limit_isim', 'get_terms_as_string')
+    list_display = ('id', 'course', 'teacher','type','limit', 'limit_isim', 'get_terms_as_string')
     list_filter = ('type', 'course__semester', 'teacher')
     search_fields = ('teacher__user__first_name','teacher__user__last_name','course__entity__name')
     inlines = [
@@ -281,8 +281,7 @@ class GroupAdmin(admin.ModelAdmin):
         if obj.pk:
             rearrange = obj.queued > 0 and obj.enrolled < obj.limit
             old = Group.objects.get(pk=obj.pk)
-            rearrange = rearrange and (obj.limit_isim != old.limit_isim or obj.limit_zamawiane != old.limit_zamawiane or
-                                       obj.limit_zamawiane2012 != old.limit_zamawiane2012 or obj.limit != old.limit)
+            rearrange = rearrange and (obj.limit_isim != old.limit_isim or obj.limit != old.limit)
             if rearrange:
                 from ...records.utils import run_rearanged
                 for _ in range(obj.limit - obj.enrolled):

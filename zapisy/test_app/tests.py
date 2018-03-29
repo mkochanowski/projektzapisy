@@ -656,8 +656,7 @@ class AdminTests(SeleniumTestCase):
       "/fereol_admin/ticket_create/privatekey/", "/fereol_admin/ticket_create/publickey/",
       "/fereol_admin/ticket_create/studentgraded/", "/fereol_admin/ticket_create/usedticketstamp/",
       "/fereol_admin/users/employee/", "/fereol_admin/users/program/", "/fereol_admin/users/student/",
-      "/fereol_admin/users/studiazamawianemaileopiekunow/", "/fereol_admin/users/studiazamawiane/",
-      "/fereol_admin/users/studiazamawiane2012/", "/fereol_admin/auth/group/", "/fereol_admin/auth/user/",
+      "/fereol_admin/auth/group/", "/fereol_admin/auth/user/",
       "/fereol_admin/vote/singlevote/", "/fereol_admin/vote/systemstate/"
       ]
 

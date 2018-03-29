@@ -6,8 +6,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 import unicodecsv
 
-from apps.users.models import (Employee, Student, Program, StudiaZamawiane, StudiaZamawianeMaileOpiekunow, UserProfile,
-                               StudiaZamawiane2012)
+from apps.users.models import Employee, Student, Program, UserProfile
 from apps.enrollment.courses.models import Semester
 from apps.enrollment.records.models import Record
 
@@ -17,12 +16,12 @@ class ExtendedUserAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ('username', 'password')}),
         ('Dane osobowe', {'fields': ('first_name', 'last_name', 'email')}),
-        ('Dodatkowe dane', {'fields': ('is_student', 'is_employee', 'is_zamawiany')}),
+        ('Dodatkowe dane', {'fields': ('is_student', 'is_employee')}),
         ('Uprawnienia', {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
         ('Ważne daty', {'fields': ('last_login', 'date_joined')}),
         ('Grupy', {'fields': ('groups',)})
     ]
-    list_filter = ('is_staff', 'is_superuser', 'is_student', 'is_employee', 'is_zamawiany')
+    list_filter = ('is_staff', 'is_superuser', 'is_student', 'is_employee')
     search_fields = ('username', 'first_name', 'last_name', 'email')
 
 
@@ -104,31 +103,11 @@ class ProfileInline(admin.StackedInline):
     model = UserProfile
 
 
-class StudiaZamawianeAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__', 'points', 'comments')
-    search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
-    ordering = ['student__user__last_name', 'student__user__first_name']
-
-    def get_queryset(self, request):
-        qs = super(StudiaZamawianeAdmin, self).get_queryset(request)
-        return qs.select_related('student', 'student__user')
-
-
-class StudiaZamawianeAdmin2012(admin.ModelAdmin):
-    list_display = ('__unicode__', 'points', 'comments')
-    search_fields = ('student__user__first_name', 'student__user__last_name', 'student__matricula', 'bank_account')
-    ordering = ['student__user__last_name', 'student__user__first_name']
-
-    def get_queryset(self, request):
-        qs = super(StudiaZamawianeAdmin2012, self).get_queryset(request)
-        return qs.select_related('student', 'student__user')
-
-
 class UserAdmin(DjangoUserAdmin):
     inlines = [StudentInline, ProfileInline, EmployeeInline]
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
     list_filter = ('is_active', 'is_staff', 'profile__is_student',
-                   'profile__is_employee', 'profile__is_zamawiany')
+                   'profile__is_employee')
 
 
 admin.site.unregister(User)
@@ -138,6 +117,3 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(Program, ProgramAdmin)
-admin.site.register(StudiaZamawiane, StudiaZamawianeAdmin)
-admin.site.register(StudiaZamawiane2012, StudiaZamawianeAdmin2012)
-admin.site.register(StudiaZamawianeMaileOpiekunow)
