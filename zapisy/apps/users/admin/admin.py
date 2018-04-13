@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 import unicodecsv
 
-from apps.users.models import Employee, Student, Program, UserProfile
+from apps.users.models import Employee, Student, Program
 from apps.enrollment.courses.models import Semester
 from apps.enrollment.records.models import Record
 
@@ -98,16 +98,10 @@ class EmployeeInline(admin.StackedInline):
     extra = 0
     max_num = 1
 
-
-class ProfileInline(admin.StackedInline):
-    model = UserProfile
-
-
 class UserAdmin(DjangoUserAdmin):
-    inlines = [StudentInline, ProfileInline, EmployeeInline]
+    inlines = [StudentInline, EmployeeInline]
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
-    list_filter = ('is_active', 'is_staff', 'profile__is_student',
-                   'profile__is_employee')
+    list_filter = ('is_active', 'is_staff')
 
 
 admin.site.unregister(User)

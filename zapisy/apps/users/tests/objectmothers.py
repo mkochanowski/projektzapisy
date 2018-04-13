@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from apps.users.models import User, UserProfile, Employee
+from apps.users.models import User, Employee
 
 
 class UserObjectMother():
@@ -15,20 +15,6 @@ class UserObjectMother():
                     password="jkowalski")
         user.full_clean()
         return user
-
-    @staticmethod
-    def student_profile(user):
-        profile = UserProfile(user=user,
-                              is_student=True)
-        profile.full_clean()
-        return profile
-
-    @staticmethod
-    def teacher_profile(user):
-        profile = UserProfile(user=user,
-                              is_employee=True)
-        profile.full_clean()
-        return profile
 
     @staticmethod
     def employee(user):

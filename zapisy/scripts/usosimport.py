@@ -2,9 +2,8 @@
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
-from apps.users.models import Student, Program, UserProfile
+from apps.users.models import Student, Program
 import random
-from sets import Set
 
 IMPORT_FILE = 'importusos_17_18_zima.csv'
 DEBUG = True
@@ -54,7 +53,6 @@ def create_user(indeks, imie, nazwisko, mail):
     s.semestr = 1
     s.program = Program.objects.get(id=4)
     s.save()
-    up = UserProfile.objects.create(user = user, is_student = True)
     return s
 
 programs = set([])

@@ -4,12 +4,8 @@ import logging
 
 from django.db import models
 from django.conf import settings
-from django.apps import apps
 from django.contrib.auth.models import User, UserManager
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
-from django.template import Context
-from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 
 from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
@@ -23,37 +19,6 @@ EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 class Related(models.Manager):
     def get_queryset(self):
         return super(Related, self).get_queryset().select_related('user')
-
-
-class ExtendedUser(User):
-    is_student = models.BooleanField(default=False, verbose_name="czy student?")
-    is_employee = models.BooleanField(default=False, verbose_name="czy pracownik?")
-
-    objects = UserManager()
-
-    class Meta:
-        verbose_name = 'użutkownik'
-        verbose_name_plural = 'użytkownicy'
-
-
-class UserProfile(models.Model):
-    # This field is required.
-    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
-    is_student = models.BooleanField(default=False, verbose_name="czy student?")
-    is_employee = models.BooleanField(default=False, verbose_name="czy pracownik?")
-    preferred_language = models.CharField(
-        max_length=5,
-        choices=settings.LANGUAGES,
-        default=settings.LANGUAGES[0][0],
-        verbose_name="preferowany język Systemu Zapisów")
-
-    def clean(self):
-        super(UserProfile, self).clean()
-        if not (self.is_employee or self.is_student) or (self.is_student and self.is_employee):
-            raise ValidationError(
-                message={'integrity': [u'Profil musi jedoznacznie określać rolę użytkownika w systemie']},
-            )
-
 
 class BaseUser(models.Model):
     '''
@@ -129,27 +94,6 @@ class Employee(BaseUser):
         from apps.offer.preferences.models import Preference
         return Preference.for_employee(self)
 
-
-    def has_privileges_for_group(self, group_id):
-        """
-        Method used to verify whether user is allowed to create a poll for certain group
-        (== he is an admin, a teacher for this course or a teacher for this group)
-        """
-        from apps.enrollment.courses.models import Group
-
-        try:
-            group = Group.objects.get(pk=group_id)
-            return group.teacher == self or self in group.course.teachers.all() or self.user.is_staff
-        except Group.DoesNotExist:
-            logger.error('Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' % group_id)
-        return False
-
-    def get_sex(self):
-        if self.user.first_name[-1] == 'a':
-            return 'K'
-        else:
-            return 'M'
-
     @staticmethod
     def get_actives():
         return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name'). extra(
@@ -176,9 +120,6 @@ class Employee(BaseUser):
                     select_related().order_by('user__last_name', 'user__first_name')
 
         return employees
-
-
-
 
     @staticmethod
     def get_all_groups_in_semester(user_id):
@@ -245,15 +186,6 @@ class Student(BaseUser):
 
     objects = GettersManager()
 
-
-
-
-    def make_t0(self, semester=None):
-        from apps.enrollment.courses.models import Semester
-        if not semester:
-            semester = Semester.get_current_semester()
-        self.t0 = semester.records_opening - self.get_t0_interval()
-
     def is_active(self):
         return self.status == 0
 
@@ -263,12 +195,6 @@ class Student(BaseUser):
             return self.program == Program.objects.get(name='ISIM, dzienne I stopnia')
         except Program.DoesNotExist:
             return False
-
-    def get_sex(self):
-        if self.user.first_name[-1] == 'a':
-            return 'K'
-        else:
-            return 'M'
 
     def get_type_of_studies(self):
         """ returns type of studies """
@@ -295,27 +221,6 @@ class Student(BaseUser):
         self._counted_t0 =  datetime.timedelta(minutes=minutes+grade+120)+datetime.timedelta(days=3)
         return self._counted_t0
 
-    def get_voted_courses(self, given_points):
-        """ returns courses which were voted with given_points by student """
-        from apps.enrollment.courses.models import Semester
-        current_semester = Semester.get_default_semester()
-        from apps.offer.vote.models.single_vote import SingleVote
-        return map(lambda x: x.course, SingleVote.objects.filter(student=self, state__semester_winter=current_semester,
-                                              correction=given_points).select_related('course').order_by('course__entity__name'))
-
-    def get_records_history(self,default_semester=None):
-        '''
-        Returns list of ids of course s that student was enrolled for.
-        '''
-        if not default_semester:
-            from apps.enrollment.courses.models import Semester
-            default_semester = Semester.get_default_semester()
-        records = self.records.exclude(group__course__semester = \
-            default_semester).select_related('group', 'group__course',
-            'group__course__entity')
-        records_list = map(lambda x: x.group.course.entity.id, records)
-        return list(frozenset(records_list))
-
     def get_points(self, semester=None):
         from apps.enrollment.courses.models import Semester, StudentPointsView
         from apps.enrollment.records.models import Record
@@ -338,18 +243,6 @@ class Student(BaseUser):
 
         return StudentPointsView.get_points_for_entities(self, records)
 
-
-    def get_schedule(self, semester=None):
-        from apps.enrollment.records.models import Record
-        from apps.enrollment.courses.models import Semester
-
-        if not semester:
-            semester = Semester.get_current_semester()
-        return Record.objects.filter(status=1, group__course__semester=semester, student=self)\
-          .select_related('group', 'group__course', 'group__course__type')\
-          .prefetch_related('group__term', 'group__term__classrooms')\
-          .order_by('group__course__entity__name')
-
     @classmethod
     def get_active_students(cls):
         return cls.objects.filter(status=0)
@@ -371,19 +264,6 @@ class Student(BaseUser):
             end = next_char(begin)
             return Student.objects.filter(status=0,user__last_name__range=(begin, end)).\
                     select_related().order_by('user__last_name', 'user__first_name')
-
-    @staticmethod
-    def get_all_groups(student):
-        try:
-            groups = map(lambda x: x.group, student.records.filter(status="1").\
-                        select_related('group', 'group__teacher',
-                                      'group__course__semester',
-                                      'group__course__term'))
-        except Student.DoesNotExist:
-             logger.error('Function Student.get_all_groups(student = %d)' + \
-             'throws Student.DoesNotExist exception.' % student.pk )
-             raise NonStudentException()
-        return groups
 
     def records_set_locked(self, locked):
         self.block = locked

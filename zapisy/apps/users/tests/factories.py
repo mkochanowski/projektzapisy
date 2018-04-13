@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import random
-
-import factory
 import factory.fuzzy
 from factory.django import DjangoModelFactory
 
-from ..models import User, Student, UserProfile, Employee
+from apps.users.models import User, Student, Employee
 from django.conf import settings
 
 langs = [x[0] for x in settings.LANGUAGES]
@@ -34,26 +31,6 @@ class StudentFactory(DjangoModelFactory):
 
     user = factory.SubFactory(UserFactory, suff_username="_s")
     matricula = factory.Sequence(lambda n: ('9%05d' % n))
-
-
-class UserProfileFactory(DjangoModelFactory):
-    class Meta:
-        model = UserProfile
-
-    user = factory.SubFactory(UserFactory)
-    preferred_language = factory.fuzzy.FuzzyChoice(langs)
-    is_employee = random.choice([True, False])
-    is_student = factory.LazyAttribute(lambda o: False if o.is_employee else True)
-
-
-class StudentProfileFactory(UserProfileFactory):
-    is_student = True
-    is_employee = False
-
-
-class EmployeeProfileFactory(UserProfileFactory):
-    is_employee = True
-
 
 class EmployeeFactory(DjangoModelFactory):
     class Meta:
