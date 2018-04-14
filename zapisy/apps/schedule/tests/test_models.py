@@ -337,8 +337,6 @@ class EventTestCase(TestCase):
     def setUp(self):
         teacher = factories.UserFactory()
         teacher.full_clean()
-        teacher_profile = UserObjectMother.teacher_profile(teacher)
-        teacher_profile.save()
 
         employee = UserObjectMother.employee(teacher)
         employee.save()
