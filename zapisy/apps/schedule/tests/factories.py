@@ -73,7 +73,7 @@ class TermFactory(DjangoModelFactory):
 
     event = factory.SubFactory(EventFactory)
     room = factory.SubFactory(ClassroomFactory)
-    day = factory.Faker('date_time_this_year')
+    day = factory.Faker('date_time')
     start = random.randint(9, 15)
     end = random.randint(16, 19)
     start = time(start)
