@@ -1,7 +1,6 @@
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from apps.enrollment.records.exceptions import NonGroupException
-from apps.enrollment.records.exceptions import ECTS_Limit_Exception
-from apps.enrollment.records.exceptions import InactiveStudentException
+from django.core.exceptions import ValidationError
+from apps.enrollment.records.exceptions import NonStudentException, AlreadyPinnedException, \
+    AlreadyNotPinnedException, AlreadyNotAssignedException
 
 from apps.enrollment.courses.models.course import Course
 from apps.enrollment.courses.models.group import Group
@@ -12,14 +11,12 @@ from django.db import models
 
 from apps.users.models import Student
 
-from apps.enrollment.records.exceptions import *
+from apps.enrollment.records.exceptions import NonGroupException
 from apps.enrollment.courses.exceptions import NonCourseException
 
 from datetime import datetime, timedelta, date
-from itertools import cycle
 
 from django.db.models import signals
-from apps.enrollment.utils import mail_enrollment_from_queue
 import logging
 logger = logging.getLogger('project.default')
 backup_logger = logging.getLogger('project.backup')
@@ -370,13 +367,6 @@ class Queue(models.Model):
 
     objects = models.Manager()
     queued = QueueManager()
-
-#    def delete(self, using=None):
-#        self.deleted = True
-#        old = Queue.objects.get(id=self.id)
-#        if not old.deleted:
-#            self.group.remove_from_queued_counter(self.student)
-#        self.save()
 
     def set_priority(self, value):
         self.priority = value
