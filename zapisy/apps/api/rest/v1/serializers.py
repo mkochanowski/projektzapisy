@@ -1,9 +1,9 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from apps.enrollment.courses.models import Classroom, Semester
+from apps.enrollment.courses.models.classroom import Classroom
+from apps.enrollment.courses.models.semester import Semester
 from apps.users.models import Employee
-
-from django.contrib.auth.models import User
 
 
 class SemesterSerializer(serializers.ModelSerializer):
