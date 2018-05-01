@@ -5,17 +5,20 @@ import time
 from datetime import datetime, timedelta
 import environ
 import dropbox
+import traceback
 
 from slack_notifications import send_error_notification, send_success_notification
 
-DROPBOX_DEV_DUMPS_DIRNAME = 'dev_dumps'
-DROPBOX_PROD_DUMPS_DIRNAME = 'prod_dumps'
+DROPBOX_DEV_DUMPS_DIRNAME = '/dev_dumps'
+DROPBOX_PROD_DUMPS_DIRNAME = '/prod_dumps'
 DUMPS_TRESHOLD = timedelta(weeks=-4)
 
 def get_dump_filename(suffix):
     time_now_str = time.strftime('%Y_%m_%d__%H_%M_%S')
     path = '/tmp/ii_zapisy_db_dump_{}'.format(time_now_str)
-    return '{}_{}'.format(path, suffix) if suffix else path
+    with_suffix = '{}_{}'.format(path, suffix) if suffix else path
+    # Must end with 7z or 7za will append it itself
+    return "{}.7z".format(with_suffix)
 
 def get_secrets_env():
     env = environ.Env()
@@ -38,14 +41,17 @@ def build_env_with_db_secrets(secrets_env):
 def perform_database_dump(out_dev_dump: str, out_prod_dump: str, secrets_env):
     new_environ = build_env_with_db_secrets(secrets_env)
     result = subprocess.run(
-        './perform_backup.sh {} {} > /dev/null'.format(out_dev_dump, out_prod_dump),
+        './perform_dump.sh {} {} > /dev/null'.format(out_dev_dump, out_prod_dump),
+        shell=True,
         stderr=subprocess.PIPE,
         env=new_environ,
     )
 
     if result.returncode != 0:
         raise Exception(
-            'perform_backup.sh failed with error code {}'.format(result.returncode)
+            'perform_dump.sh failed with error code {}: {}'.format(
+                result.returncode, result.stderr.decode('utf-8'),
+            )
         )
 
 
@@ -65,11 +71,11 @@ def dropbox_file_exists(dbx, path):
 def ensure_has_required_dirs(dbx):
     try:
         dbx.files_create_folder(DROPBOX_DEV_DUMPS_DIRNAME)
-    except dropbox.files.CreateFolderError:
+    except dropbox.exceptions.ApiError:
         pass
     try:
         dbx.files_create_folder(DROPBOX_PROD_DUMPS_DIRNAME)
-    except dropbox.files.CreateFolderError:
+    except dropbox.exceptions.ApiError:
         pass
 
 def remove_files_older_than_in_folder(dbx, treshold_dt, folder_path):
@@ -80,7 +86,7 @@ def remove_files_older_than_in_folder(dbx, treshold_dt, folder_path):
             dbx.files_delete(file_entry.path_lower)
 
 def remove_dumps_older_than_threshold(dbx):
-    oldest_allowed_modtime = datetime.now() - DUMPS_TRESHOLD
+    oldest_allowed_modtime = datetime.now() + DUMPS_TRESHOLD
     remove_files_older_than_in_folder(dbx, oldest_allowed_modtime, DROPBOX_DEV_DUMPS_DIRNAME)
     remove_files_older_than_in_folder(dbx, oldest_allowed_modtime, DROPBOX_PROD_DUMPS_DIRNAME)
 
@@ -107,11 +113,18 @@ def perform_full_backup():
     perform_database_dump(dev_dump_filename, prod_dump_filename, secrets_env)
     dbx = get_dropbox_instance(secrets_env)
     dev_db_shared_link = upload_generated_dumps(dbx, dev_dump_filename, prod_dump_filename)
+    os.remove(dev_dump_filename)
+    os.remove(prod_dump_filename)
     return dev_db_shared_link
 
 def main():
     try:
+        start_time = datetime.now()
         shared_link = perform_full_backup()
-        send_success_notification(shared_link)
-    except Exception as e:
-        send_error_notification(e.error_msg)
+        end_time = datetime.now()
+        seconds_elapsed = (end_time - start_time).seconds
+        send_success_notification(shared_link.url, seconds_elapsed)
+    except Exception:
+        err_desc = traceback.format_exc()
+        send_error_notification(err_desc)
+main()

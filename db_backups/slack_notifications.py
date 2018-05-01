@@ -22,10 +22,12 @@ def safe_send_msg(msg):
         text=msg
     )
 
-def send_success_notification(dev_db_link):
-    msg = "Databases backed up successfully. **Dev DB download link:** {}".format(dev_db_link)
+def send_success_notification(dev_db_link, seconds_elapsed):
+    msg = "Databases backed up successfully in {} seconds. *Dev DB download link:* {}".format(
+        seconds_elapsed, dev_db_link,
+    )
     safe_send_msg(msg)
 
 def send_error_notification(error_msg):
-    msg = "**Failed to back up databases:** {}".format(error_msg)
+    msg = "*Failed to back up databases:* ```{}```".format(error_msg)
     safe_send_msg(msg)
