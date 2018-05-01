@@ -9,9 +9,9 @@ TEMP_DUMP_PATH_PROD="ii_zapisy_dump_prod.sql"
 TEMP_DB_NAME="II_ZAPISY_BACKUP_TEMP_DB"
 
 [ -z "$II_ZAPISY_DB_BACKUP_DB_NAME" ] && echo "Need to set II_ZAPISY_DB_BACKUP_DB_NAME" && exit 1;
-[ -z "$II_ZAPISY_DB_BACKUP_DB_PORT" ] && echo "Need to set II_ZAPISY_DB_BACKUP_DB_PORT" && exit 1;
 [ -z "$II_ZAPISY_DB_BACKUP_DB_USER" ] && echo "Need to set II_ZAPISY_DB_BACKUP_DB_USER" && exit 1;
 [ -z "$II_ZAPISY_DB_BACKUP_DB_PASS" ] && echo "Need to set II_ZAPISY_DB_BACKUP_DB_PASS" && exit 1;
+[ -z "$II_ZAPISY_DB_BACKUP_DB_PORT" ] && echo "Need to set II_ZAPISY_DB_BACKUP_DB_PORT" && exit 1;
 [ -z "$II_ZAPISY_DB_BACKUP_DUMP_PASS" ] && echo "Need to set II_ZAPISY_DB_BACKUP_DUMP_PASS" && exit 1;
 
 if ! type "7zad" &> /dev/null; then
