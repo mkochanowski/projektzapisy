@@ -1,0 +1,2 @@
+slackclient==1.2.1
+dropbox==8.8.1
