@@ -7,8 +7,8 @@
 from django.shortcuts import render
 
 from django.contrib.admin.views.decorators import staff_member_required
-from apps.users.decorators import employee_required
-
+from django.contrib.auth.decorators import user_passes_test
+from apps.users.models import BaseUser
 
 def main_page(request):
     return render(request, 'help/base.html', {})
@@ -51,6 +51,6 @@ def admin(request):
     return render(request, 'help/admin.html', {})
 
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def employee(request):
     return render(request, 'help/employee.html', {})

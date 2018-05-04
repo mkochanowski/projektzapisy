@@ -4,17 +4,18 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import user_passes_test
 
 from libs.ajax_messages import AjaxFailureMessage
 from apps.offer.preferences.forms import PreferenceFormset, PreferenceForm
 from apps.offer.preferences.models import Preference
-from apps.users.decorators import employee_required
 from apps.enrollment.courses.models import Semester
+from apps.users.models import BaseUser
 
 logger = logging.getLogger()
 
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def view(request):
     employee = request.user.employee
     employee.make_preferences()
@@ -26,7 +27,7 @@ def view(request):
     return render(request, 'offer/preferences/base.html', locals())
 
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 @require_POST
 def save(request):
 

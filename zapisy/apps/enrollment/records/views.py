@@ -6,7 +6,7 @@ import StringIO
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import render
@@ -19,7 +19,6 @@ from django.db import transaction
 from django.core.cache import cache as mcache
 from xhtml2pdf import pisa
 from apps.enrollment.courses.utils import prepare_group_data
-from apps.users.decorators import employee_required
 
 from apps.cache_utils import cache_result
 from apps.enrollment.courses.models import *
@@ -245,7 +244,7 @@ def records(request, group_id):
         messages.info(request, "Podana grupa nie istnieje.")
         return render(request, 'common/error.html')
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def records_group_csv(request, group_id):
     try:
         students_in_group = Record.get_students_in_group(group_id)
@@ -263,7 +262,7 @@ def records_group_csv(request, group_id):
     except (NonGroupException, ObjectDoesNotExist):
         raise Http404
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def records_queue_csv(request, group_id):
     try:
         students_in_queue = Queue.get_students_in_queue(group_id)
@@ -368,7 +367,7 @@ def schedule_prototype(request):
     }
     return render(request, 'enrollment/records/schedule_prototype.html', data)
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def records_group_pdf(request, group_id):
     try:
         group = Group.objects.get(id=group_id)
@@ -393,7 +392,7 @@ def records_group_pdf(request, group_id):
 
     return response
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def records_queue_pdf(request, group_id):
     try:
         group = Group.objects.get(id=group_id)

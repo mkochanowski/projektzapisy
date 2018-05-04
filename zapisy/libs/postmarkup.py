@@ -671,6 +671,7 @@ class TagFactory(object):
         return name in self.tags
 
     def get(self, name, default=None):
+        # type: (object, object) -> object
 
         if name in self.tags:
             return self.tags[name]()

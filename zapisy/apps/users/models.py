@@ -4,11 +4,10 @@ import logging
 
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import User, UserManager
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
 
-from apps.users.exceptions import NonEmployeeException, NonStudentException, NonUserException
+from apps.users.exceptions import NonUserException
 from apps.users.managers import GettersManager, T0Manager
 
 logger = logging.getLogger()
@@ -51,6 +50,7 @@ class BaseUser(models.Model):
 
     @staticmethod
     def get(user_id):
+        # type: (object) -> object
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -60,11 +60,15 @@ class BaseUser(models.Model):
 
     @staticmethod
     def is_student(user):
-        return hasattr(user, "student") and user.student
+        if user:
+            return user.groups.filter(name='students').exists()
+        return False
 
     @staticmethod
     def is_employee(user):
-        return hasattr(user, "employee") and user.employee
+        if user:
+            return user.groups.filter(name='employees').exists()
+        return False
 
     def __unicode__(self):
         return self.get_full_name
@@ -120,33 +124,6 @@ class Employee(BaseUser):
                     select_related().order_by('user__last_name', 'user__first_name')
 
         return employees
-
-    @staticmethod
-    def get_all_groups_in_semester(user_id):
-        from apps.enrollment.courses.models import Group, Semester
-
-        user = User.objects.get(id=user_id)
-        semester = Semester.get_default_semester()
-        try:
-            employee = user.employee
-            groups = Group.objects.filter(teacher=employee, course__semester=semester)
-        except Employee.DoesNotExist:
-             logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
-             raise NonEmployeeException()
-        return groups
-
-    @staticmethod
-    def get_all_groups(user_id):
-        from apps.enrollment.courses.models import Group
-
-        user = User.objects.get(id=user_id)
-        try:
-            employee = user.employee
-            groups = Group.objects.filter(teacher=employee)
-        except Employee.DoesNotExist:
-             logger.error('Function Employee.get_all_groups(user_id = %d) throws Employee.DoesNotExist exception.' % user_id )
-             raise NonEmployeeException()
-        return groups
 
     class Meta:
         verbose_name = 'pracownik'

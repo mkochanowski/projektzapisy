@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from apps.users.models import Student, Program
 import random
 
@@ -45,10 +45,13 @@ def random_pass():
     return pwstring
 
 def create_user(indeks, imie, nazwisko, mail):
+    students = Group.objects.get(name='students')
     user = User.objects.create_user(username=indeks, email=mail, password=random_pass())
     user.first_name = imie
     user.last_name = nazwisko
     user.save()
+    students.user_set.add(user)
+    students.save()
     s = Student.objects.create(user=user, matricula=indeks)
     s.semestr = 1
     s.program = Program.objects.get(id=4)

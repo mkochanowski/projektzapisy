@@ -4,7 +4,7 @@
     Proposal views
 """
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import Http404
@@ -29,8 +29,7 @@ from apps.offer.proposal.exceptions import  NotOwnerException
 import json
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal, send_notification_to_3d
-from apps.users.decorators import employee_required
-from apps.users.models import Employee
+from apps.users.models import Employee, BaseUser
 
 logger = logging.getLogger("")
 
@@ -132,7 +131,7 @@ def main(request):
     return TemplateResponse(request, 'offer/main.html', {} )
 
 @login_required
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def proposal(request, slug=None):
     """
       List of user proposal
@@ -171,7 +170,7 @@ def _create_missing_course_description(request, proposal):
     return description
 
 @login_required
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def proposal_edit(request, slug=None):
     proposal = None
     description = None

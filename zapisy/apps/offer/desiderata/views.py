@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.http import Http404
 from django.shortcuts import render
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
 
 from apps.offer.desiderata.models import Desiderata, DesiderataOther
 from apps.offer.desiderata.forms import DesiderataFormSet, DesiderataOtherForm
-from apps.users.decorators import employee_required
 from apps.enrollment.courses.models import Semester
+from apps.users.models import BaseUser
 
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def change_desiderata(request):
     """
     This view is to change desiderata for semester

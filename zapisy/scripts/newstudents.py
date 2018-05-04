@@ -2,17 +2,20 @@
 
 from django.core.exceptions import ObjectDoesNotExist
 from apps.users.models import Student, Program
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 import random
 
 studentsfile = 'newstudents2016.txt'
 
 def create_user(indeks, imie, nazwisko, mail, pswd):
     p = Program.objects.get(id=4)
+    students = Group.objects.get(name='students')
     user = User.objects.create_user(username=indeks, email=mail, password=pswd)
     user.first_name = imie
     user.last_name = nazwisko
     user.save()
+    students.user_set.add(user)
+    students.save()
     s = Student.objects.create(user=user, matricula=indeks)
     s.semestr = 1
     s.program = p

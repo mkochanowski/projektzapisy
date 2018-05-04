@@ -6,7 +6,7 @@
 from datetime import date
 from django.contrib import messages
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.http                    import HttpResponseRedirect, Http404
 from django.shortcuts               import render
@@ -17,11 +17,10 @@ from apps.enrollment.courses.models.course import CourseEntity
 from apps.offer.vote.models                   import SingleVote, SystemState
 from apps.enrollment.courses.models import Type
 from apps.enrollment.courses.models import Semester
+from apps.users.models import BaseUser
 
-from apps.users.decorators      import student_required
 
-
-@student_required
+@user_passes_test(BaseUser.is_student)
 def vote( request ):
     from vote_form import VoteFormsets
 
@@ -71,7 +70,7 @@ def vote_main( request ):
     return render(request, 'offer/vote/index.html', data)
 
 
-@student_required
+@user_passes_test(BaseUser.is_student)
 def vote_view( request ):
     """
         View of once given vote

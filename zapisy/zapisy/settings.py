@@ -213,7 +213,6 @@ INSTALLED_APPS = (
 MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
 
 AUTHENTICATION_BACKENDS = (
-    'apps.users.auth_backend.BetterBackend',
     'django_cas_ng.backends.CASBackend',
 )
 

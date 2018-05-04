@@ -2,10 +2,10 @@
 import json
 
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.shortcuts import render
 from apps.grade.ticket_create.models.student_graded import StudentGraded
-from apps.users.decorators import student_required, employee_required
 from apps.users.models import BaseUser
 
 from apps.enrollment.courses.models import Semester
@@ -22,17 +22,17 @@ from django.utils.safestring import SafeUnicode
 
 ### KEYS generate:
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def ajax_keys_generate( request ):
     generate_keys_for_polls()
     return HttpResponse("OK")
 
-@employee_required
+@user_passes_test(BaseUser.is_employee)
 def ajax_keys_progress( request ):
     count = cache.get('generated-keys', 0)
     return HttpResponse(str(count))
 
-@student_required
+@user_passes_test(BaseUser.is_student)
 def ajax_get_rsa_keys_step1( request ):
     message = "No XHR"
     if request.is_ajax():
@@ -48,7 +48,7 @@ def ajax_get_rsa_keys_step1( request ):
                 message = json.dumps(tickets)
     return HttpResponse(message)
 
-@student_required
+@user_passes_test(BaseUser.is_student)
 def ajax_get_rsa_keys_step2( request ):
     message = "No XHR"
     if request.is_ajax():
@@ -71,7 +71,7 @@ def ajax_get_rsa_keys_step2( request ):
                 message = json.dumps(unblinds)
     return HttpResponse(message)
 
-@student_required
+@user_passes_test(BaseUser.is_student)
 def connections_choice( request ):
 
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
