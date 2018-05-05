@@ -35,7 +35,7 @@ class StudentFactory(DjangoModelFactory):
     @post_generation
     def group(self, create, extracted, **kwargs):
         """Method that takes care if user was added to students group."""
-        students = Group.objects.get(name='students')
+        students, _ = Group.objects.get_or_create(name='students')
         students.user_set.add(self.user)
         students.save()
         return students
@@ -51,8 +51,8 @@ class EmployeeFactory(DjangoModelFactory):
 
     @post_generation
     def group(self, create, extracted, **kwargs):
-        employees = Group.objects.get(name='employees')
         """Method that takes care if user was added to employees group."""
+        employees, _ = Group.objects.get_or_create(name='employees')
         employees.user_set.add(self.user)
         employees.save()
         return employees
