@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import factory.fuzzy
+from django.contrib.auth.models import Group
 from factory.django import DjangoModelFactory
+from factory import post_generation
 
 from apps.users.models import User, Student, Employee
 from django.conf import settings
@@ -28,12 +30,31 @@ class UserFactory(DjangoModelFactory):
 class StudentFactory(DjangoModelFactory):
     class Meta:
         model = Student
+        exclude = ("group",)
+
+    @post_generation
+    def group(self, create, extracted, **kwargs):
+        """Method that takes care if user was added to students group."""
+        students = Group.objects.get(name='students')
+        students.user_set.add(self.user)
+        students.save()
+        return students
 
     user = factory.SubFactory(UserFactory, suff_username="_s")
     matricula = factory.Sequence(lambda n: ('9%05d' % n))
 
+
 class EmployeeFactory(DjangoModelFactory):
     class Meta:
         model = Employee
+        exclude = ("group",)
+
+    @post_generation
+    def group(self, create, extracted, **kwargs):
+        employees = Group.objects.get(name='employees')
+        """Method that takes care if user was added to employees group."""
+        employees.user_set.add(self.user)
+        employees.save()
+        return employees
 
     user = factory.SubFactory(UserFactory, suff_username="_e")
