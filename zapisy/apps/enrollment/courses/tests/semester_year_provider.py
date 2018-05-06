@@ -7,6 +7,7 @@ from apps.enrollment.courses.models import Semester
 
 SEMESTER_YEAR_RANGE = 50
 
+
 class SemesterYearProvider(BaseProvider):
     def semester_year(self):
         start_year = datetime.now().year
