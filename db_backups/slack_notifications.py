@@ -2,16 +2,18 @@
 from slackclient import SlackClient
 import time
 
-def get_connected_slack_client():
+def get_connected_slack_client(secrets_env):
     try:
-        slack_client = SlackClient("xoxb-354564967223-WrNuwJcaLWIYiBMh71EKnxPK")
+        slack_client = SlackClient(secrets_env.str('SLACK_TOKEN'))
         if slack_client.rtm_connect(with_team_state=False):
             return slack_client
     except Exception:
         pass
     return None
 
-slack_client = get_connected_slack_client()
+def initialize_slack(secrets_env):
+    global slack_client
+    slack_client = get_connected_slack_client(secrets_env)
 
 def safe_send_msg(msg):
     if slack_client is None:
