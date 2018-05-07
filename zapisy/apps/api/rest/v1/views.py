@@ -1,10 +1,12 @@
 from rest_framework import viewsets
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 
+from apps.enrollment.courses.models.classroom import Classroom
+from apps.enrollment.courses.models.semester import Semester
+from apps.users.models import Employee
 from apps.users.utils import StaffPermission
-from apps.enrollment.courses.models import Semester, Classroom
 
-from .serializers import SemesterSerializer, ClassroomSerializer
+from .serializers import ClassroomSerializer, EmployeeSerializer, SemesterSerializer
 
 
 class SemesterViewSet(viewsets.ModelViewSet):
@@ -19,3 +21,9 @@ class ClassroomViewSet(viewsets.ModelViewSet):
     permission_classes = (StaffPermission,)
     queryset = Classroom.objects.all()
     serializer_class = ClassroomSerializer
+
+
+class EmployeeViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get']
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
