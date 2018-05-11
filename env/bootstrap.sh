@@ -167,14 +167,14 @@ apt-get -y install memcached
 
 # install firefox45 and geckodriver for selenium
 # firefox45
-wget https://ftp.mozilla.org/pub/firefox/releases/45.0/linux-x86_64/en-US/firefox-45.0.tar.bz2
+wget --no-verbose https://ftp.mozilla.org/pub/firefox/releases/45.0/linux-x86_64/en-US/firefox-45.0.tar.bz2
 tar -xjf firefox-45.0.tar.bz2
 sudo rm -rf  /opt/firefox
 sudo mv firefox /opt/firefox45
 sudo mv /usr/bin/firefox /usr/bin/firefoxold
 sudo ln -s /opt/firefox45/firefox /usr/bin/firefox
 # geckodriver
-wget https://github.com/mozilla/geckodriver/releases/download/v0.13.0/geckodriver-v0.13.0-linux64.tar.gz
+wget --no-verbose https://github.com/mozilla/geckodriver/releases/download/v0.13.0/geckodriver-v0.13.0-linux64.tar.gz
 tar -xvzf geckodriver*
 chmod +x geckodriver
 sudo mv geckodriver /usr/local/bin/
@@ -186,15 +186,6 @@ apt-get -y install zlib1g-dev
 
 # Install redis
 apt-get -y install redis-server
-
-# For good measure
-pip install --upgrade pip
-pip install --upgrade virtualenv
-
-# Grab Python 3.6 (official repos only have 3.5)
-add-apt-repository -y ppa:jonathonf/python-3.6
-apt-get -y update
-apt-get -y install python3.6
 
 # Install nodejs
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
