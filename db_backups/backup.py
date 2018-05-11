@@ -154,5 +154,5 @@ def main():
         send_error_notification(slack, err_desc)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

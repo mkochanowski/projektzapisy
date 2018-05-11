@@ -10,17 +10,18 @@ def get_connected_slack_client(secrets_env):
 
 def _send_slack_msg(slack_client, msg: str):
     slack_client.api_call(
-        "chat.postMessage",
-        channel="db_backups",
+        'chat.postMessage',
+        channel='db_backups',
         text=msg
     )
 
 def send_success_notification(slack_client, dev_db_link: str, seconds_elapsed: int):
-    msg = "Databases backed up successfully in {} seconds. *Dev DB download link:* {}".format(
-        seconds_elapsed, dev_db_link,
+    msg = (
+        f'Databases backed up successfully in {seconds_elapsed} seconds. ' +
+        f'*Dev DB download link:* {dev_db_link}'
     )
-    _send_slack_msgslack_client, (msg)
+    _send_slack_msg(slack_client, msg)
 
 def send_error_notification(slack_client, error_msg: str):
-    msg = "*Failed to back up databases:* ```{}```".format(error_msg)
+    msg = f'*Failed to back up databases:* ```{error_msg}```'
     _send_slack_msg(slack_client, msg)
