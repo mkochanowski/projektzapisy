@@ -80,6 +80,9 @@ def dropbox_file_exists(dbx, path: str):
 
 
 def ensure_has_required_dirs(dbx):
+    # If directory creation fails, we're assuming
+    # it's because the directory was there already;
+    # if not, we'll get an error in the upload routine
     try:
         dbx.files_create_folder(DROPBOX_DEV_DUMPS_DIRNAME)
     except dropbox.exceptions.ApiError:
