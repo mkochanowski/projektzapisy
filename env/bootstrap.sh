@@ -155,7 +155,6 @@ apt-get -y install libssl-dev
 apt-get -y install libgdbm-dev
 apt-get -y install libbz2-dev
 apt-get -y install libc6-dev
-apt-get -y install tk-dev
 apt-get -y install libjpeg62-dev
 apt-get -y install libfreetype6-dev
 apt-get -y install liblcms1-dev
