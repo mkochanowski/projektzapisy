@@ -118,7 +118,6 @@ SITE_ID = 1
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-USE_ETAGS = True
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
@@ -152,6 +151,7 @@ TEMPLATES = [
 # and Authentication both must come before LocalePref which
 # must precede LocaleMiddleware, and Common must go afterwards.
 MIDDLEWARE = [
+    'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'middleware.localePrefMiddleware.LocalePrefMiddleware',
