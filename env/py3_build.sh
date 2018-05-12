@@ -20,7 +20,3 @@ make altinstall
 
 cd
 rm -rf "$TMP_DIR"
-
-# Make sure everything is up to date
-pip3.6 install --upgrade pip
-pip3.6 install --upgrade virtualenv
