@@ -177,7 +177,6 @@ tar -xvzf geckodriver*
 chmod +x geckodriver
 sudo mv geckodriver /usr/local/bin/
 
-# download and hack broken zlib
 apt-get -y install zlib1g-dev
 
 # Install nodejs
