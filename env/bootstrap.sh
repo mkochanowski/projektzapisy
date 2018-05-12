@@ -151,12 +151,10 @@ apt-get -y install unzip
 apt-get -y install libxml2-dev libxslt1-dev
 apt-get -y install build-essential
 apt-get -y install libncursesw5-dev libncurses5-dev
-apt-get -y install libreadline5-dev
 apt-get -y install libssl-dev
 apt-get -y install libgdbm-dev
 apt-get -y install libbz2-dev
 apt-get -y install libc6-dev
-apt-get -y install libsqlite3-dev
 apt-get -y install tk-dev
 apt-get -y install libjpeg62-dev
 apt-get -y install libfreetype6-dev
@@ -181,11 +179,6 @@ sudo mv geckodriver /usr/local/bin/
 
 # download and hack broken zlib
 apt-get -y install zlib1g-dev
-# cd /lib
-# ln -s x86_64-linux-gnu/libz.so.1 libz.so
-
-# Install redis
-apt-get -y install redis-server
 
 # Install nodejs
 curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
