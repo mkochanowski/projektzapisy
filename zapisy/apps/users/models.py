@@ -146,7 +146,7 @@ class Employee(BaseUser):
         Method used to verify whether user is allowed to create a poll for certain group
         (== he is an admin, a teacher for this course or a teacher for this group)
         """
-        from apps.enrollment.courses.models import Group
+        from apps.enrollment.courses.models.group import Group
 
         try:
             group = Group.objects.get(pk=group_id)
@@ -207,7 +207,7 @@ class Employee(BaseUser):
 
     @staticmethod
     def get_all_groups(user_id):
-        from apps.enrollment.courses.models import Group
+        from apps.enrollment.courses.models.group import Group
 
         user = User.objects.get(id=user_id)
         try:
@@ -277,7 +277,7 @@ class Student(BaseUser):
     objects = GettersManager()
 
     def make_t0(self, semester=None):
-        from apps.enrollment.courses.models import Semester
+        from apps.enrollment.courses.models.semester import Semester
         if not semester:
             semester = Semester.get_current_semester()
         self.t0 = semester.records_opening - self.get_t0_interval()
@@ -331,7 +331,7 @@ class Student(BaseUser):
 
     def get_voted_courses(self, given_points):
         """ returns courses which were voted with given_points by student """
-        from apps.enrollment.courses.models import Semester
+        from apps.enrollment.courses.models.semester import Semester
         current_semester = Semester.get_default_semester()
         from apps.offer.vote.models.single_vote import SingleVote
         return [
@@ -348,7 +348,7 @@ class Student(BaseUser):
         Returns list of ids of course s that student was enrolled for.
         '''
         if not default_semester:
-            from apps.enrollment.courses.models import Semester
+            from apps.enrollment.courses.models.semester import Semester
             default_semester = Semester.get_default_semester()
         records = self.records.exclude(
             group__course__semester=default_semester).select_related(
@@ -390,7 +390,7 @@ class Student(BaseUser):
 
     def get_schedule(self, semester=None):
         from apps.enrollment.records.models import Record
-        from apps.enrollment.courses.models import Semester
+        from apps.enrollment.courses.models.semester import Semester
 
         if not semester:
             semester = Semester.get_current_semester()

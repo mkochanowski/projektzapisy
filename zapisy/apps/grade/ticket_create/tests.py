@@ -2,7 +2,7 @@ from django.test import TestCase
 from .utils import generate_keys_for_polls, group_polls_by_course
 from apps.grade.poll.models import Poll
 from apps.users.models import Employee, Student
-from apps.enrollment.courses.models import Semester
+from apps.enrollment.courses.models.semester import Semester
 
 
 class UtilsTest(TestCase):
