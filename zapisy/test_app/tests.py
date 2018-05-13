@@ -675,12 +675,16 @@ class AdminTests(SeleniumTestCase):
       ]
 
     def createAdmin(self):
+        employees = Group.objects.get(name='employees')
         self.password = '11111'
         self.admin = User.objects.create_superuser(username='przemka',
                                                    password=self.password,
                                                    email='admin@admin.com')
         self.admin.first_name = 'przemka'
         self.admin.save()
+        employees.user_set.add(self.admin)
+        employees.save()
+
     def createSemester(self):
        today = datetime.now()
        self.semester = Semester(

@@ -61,13 +61,11 @@ class MailsToStudentsLinkTestCase(TestCase):
     def test_mailto_link_not_exists_regular_user(self):
         self.client.force_login(self.regular_user)
         response = self.client.get(reverse('my-profile'))
-        print(response)
         self.assertNotContains(response, self.MSG_HEADER, status_code=200)
 
     def test_mailto_link_exists_dean_user(self):
-        self.client.force_login(self.dean_user.username)
+        self.client.force_login(self.dean_user)
         response = self.client.get(reverse('my-profile'))
-        print(response)
         self.assertContains(response, self.MSG_HEADER, status_code=200)
 
 
