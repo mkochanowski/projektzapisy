@@ -35,7 +35,7 @@ class MailsToStudentsLinkTestCase(TestCase):
         for sql_call in sql_calls:
             cursor = connection.cursor()
             cursor.execute(sql_call)
-    
+
         cls.MSG_HEADER = 'Wyślij wiadomość do studentów'
         regular_user = StudentFactory()
         cls.regular_user = regular_user.user
@@ -48,7 +48,7 @@ class MailsToStudentsLinkTestCase(TestCase):
         from apps.enrollment.courses.tests.factories import SemesterFactory
         summer_semester = SemesterFactory(type=Semester.TYPE_SUMMER)
         summer_semester.full_clean()
-        
+
     @classmethod
     def tearDownTestData(cls):
         sql_calls = [
@@ -59,14 +59,15 @@ class MailsToStudentsLinkTestCase(TestCase):
             cursor.execute(sql_call)
 
     def test_mailto_link_not_exists_regular_user(self):
-        self.client.login(username=self.regular_user.username, password='test')
+        self.client.force_login(self.regular_user)
         response = self.client.get(reverse('my-profile'))
-        #print(response)
+        print(response)
         self.assertNotContains(response, self.MSG_HEADER, status_code=200)
 
     def test_mailto_link_exists_dean_user(self):
-        self.client.login(username=self.dean_user.username, password='test')
+        self.client.force_login(self.dean_user.username)
         response = self.client.get(reverse('my-profile'))
+        print(response)
         self.assertContains(response, self.MSG_HEADER, status_code=200)
 
 
@@ -90,7 +91,7 @@ class MyProfileSemesterInfoTestCase(TestCase):
         s = StudentFactory()
         s.matricula=str(randint(100000, 200000))
         cls.student_user = s.user
-        
+
         Semester.objects.all().delete()
         cls.semester = Semester(
             visible=True,
@@ -113,26 +114,23 @@ class MyProfileSemesterInfoTestCase(TestCase):
             cursor = connection.cursor()
             cursor.execute(sql_call)
             connection.commit()
-    
+
     def test_my_profile_contains_records_closing_time(self):
         self.semester.records_ending = datetime.now()+timedelta(days=10)
         self.semester.save()
-        username = self.student_user.username
-        self.client.login(username=username, password='test')
+        self.client.force_login(self.student_user)
         response = self.client.get(reverse('my-profile'))
         self.assertContains(response, "Koniec wypisów", status_code=200)
 
     def test_my_profile_does_not_contain_records_closing_time(self):
         self.semester.records_ending = None
         self.semester.save()
-        username = self.student_user.username
-        self.client.login(username=username, password='test')
+        self.client.force_login(self.student_user)
         response = self.client.get(reverse('my-profile'))
         self.assertNotContains(response, "Koniec wypisów", status_code=200)
 
     def test_my_profile_contains_other_semester_info(self):
-        username = self.student_user.username
-        self.client.login(username=username, password='test')
+        self.client.force_login(self.student_user)
         response = self.client.get(reverse('my-profile'))
         self.assertContains(response, "Zniesienie limitu 35 ECTS")
         self.assertContains(response, "Koniec zapisów")

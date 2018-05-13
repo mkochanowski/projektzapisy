@@ -71,6 +71,9 @@ class NewSemesterTests(SeleniumTestCase):
             """
         ]
 
+        students = Group.objects.get(name='students')
+        employees = Group.objects.get(name='employees')
+
         for sql_call in sql_calls:
             cursor = connection.cursor()
             cursor.execute(sql_call)
@@ -80,8 +83,10 @@ class NewSemesterTests(SeleniumTestCase):
         self.admin = User.objects.create_superuser(username='przemka',
                                                    password=self.password,
                                                    email='admin@admin.com')
+
         self.admin.first_name = 'przemka'
         self.admin.save()
+        employees.user_set.add(self.admin)
         self.employee = Employee.objects.create(user=self.admin)
 
         self.employees = []
@@ -92,8 +97,10 @@ class NewSemesterTests(SeleniumTestCase):
             user.first_name = 'Employee'
             user.last_name = str(i)
             user.save()
+            employees.user_set.add(user)
             employee = Employee.objects.create(user=user)
             self.employees.append(employee)
+        employees.save()
 
         user_student1 = User.objects.create_user(
             username='student1',
@@ -107,6 +114,13 @@ class NewSemesterTests(SeleniumTestCase):
         user_student4 = User.objects.create_user(
             username='student4',
             password=self.password)
+
+        students.user_set.add(user_student1)
+        students.user_set.add(user_student2)
+        students.user_set.add(user_student3)
+        students.user_set.add(user_student4)
+        students.save()
+
         self.student1 = Student.objects.create(
             user=user_student1, matricula='264823')
         self.student2 = Student.objects.create(
