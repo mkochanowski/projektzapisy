@@ -71,8 +71,8 @@ class NewSemesterTests(SeleniumTestCase):
             """
         ]
 
-        students = UserGroup.objects.get(name='students')
-        employees = UserGroup.objects.get(name='employees')
+        students = UserGroup.objects.get_or_create(name='students')
+        employees = UserGroup.objects.get_or_create(name='employees')
 
         for sql_call in sql_calls:
             cursor = connection.cursor()
@@ -675,7 +675,7 @@ class AdminTests(SeleniumTestCase):
       ]
 
     def createAdmin(self):
-        employees = UserGroup.objects.get(name='employees')
+        employees, _ = UserGroup.objects.get_or_create(name='employees')
         self.password = '11111'
         self.admin = User.objects.create_superuser(username='przemka',
                                                    password=self.password,
