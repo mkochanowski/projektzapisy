@@ -17,7 +17,7 @@ from selenium.common.exceptions import (
     TimeoutException,
 )
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group as UserGroup
 from apps.users.models import Employee, Student
 from apps.enrollment.courses.models import Semester, CourseEntity, Course, Type, Group, Term, Classroom
 from apps.offer.vote.models import SystemState
@@ -71,8 +71,8 @@ class NewSemesterTests(SeleniumTestCase):
             """
         ]
 
-        students = Group.objects.get(name='students')
-        employees = Group.objects.get(name='employees')
+        students = UserGroup.objects.get(name='students')
+        employees = UserGroup.objects.get(name='employees')
 
         for sql_call in sql_calls:
             cursor = connection.cursor()
@@ -675,7 +675,7 @@ class AdminTests(SeleniumTestCase):
       ]
 
     def createAdmin(self):
-        employees = Group.objects.get(name='employees')
+        employees = UserGroup.objects.get(name='employees')
         self.password = '11111'
         self.admin = User.objects.create_superuser(username='przemka',
                                                    password=self.password,
