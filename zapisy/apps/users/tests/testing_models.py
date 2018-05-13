@@ -16,6 +16,8 @@ from random import randint
 from apps.enrollment.courses.models import Semester
 from datetime import datetime, timedelta
 
+from apps.users.tests.factories import StudentFactory, EmployeeFactory
+
 
 class MailsToStudentsLinkTestCase(TestCase):
     @classmethod
@@ -35,14 +37,13 @@ class MailsToStudentsLinkTestCase(TestCase):
             cursor.execute(sql_call)
     
         cls.MSG_HEADER = 'Wyślij wiadomość do studentów'
-        regular_user = User.objects.create_user('regular_user', 'user@user.com', 'password')
-        Student.objects.create(user=regular_user)
-        cls.regular_user = regular_user
+        regular_user = StudentFactory()
+        cls.regular_user = regular_user.user
 
         permission = Permission.objects.get(codename='mailto_all_students')
-        dean_user = User.objects.create_user('dean_user', 'user@user.com', 'password')
-        dean_user.user_permissions.add(permission)
-        cls.dean_user = dean_user
+        dean_user = EmployeeFactory()
+        dean_user.user.user_permissions.add(permission)
+        cls.dean_user = dean_user.user
 
         from apps.enrollment.courses.tests.factories import SemesterFactory
         summer_semester = SemesterFactory(type=Semester.TYPE_SUMMER)
@@ -58,13 +59,13 @@ class MailsToStudentsLinkTestCase(TestCase):
             cursor.execute(sql_call)
 
     def test_mailto_link_not_exists_regular_user(self):
-        self.client.login(username='regular_user', password='password')
+        self.client.login(username=self.regular_user.username, password='test')
         response = self.client.get(reverse('my-profile'))
         #print(response)
         self.assertNotContains(response, self.MSG_HEADER, status_code=200)
 
     def test_mailto_link_exists_dean_user(self):
-        self.client.login(username='dean_user', password='password')
+        self.client.login(username=self.dean_user.username, password='test')
         response = self.client.get(reverse('my-profile'))
         self.assertContains(response, self.MSG_HEADER, status_code=200)
 
@@ -86,10 +87,9 @@ class MyProfileSemesterInfoTestCase(TestCase):
             cursor = connection.cursor()
             cursor.execute(sql_call)
 
-        student_user = User.objects.create_user('student_user', 'student@user.com', 'password')
-        s = Student.objects.create(user=student_user, matricula=str(randint(100000, 200000)))
-        student_user.save()
-        s.save()
+        s = StudentFactory()
+        s.matricula=str(randint(100000, 200000))
+        cls.student_user = s.user
         
         Semester.objects.all().delete()
         cls.semester = Semester(
@@ -117,19 +117,22 @@ class MyProfileSemesterInfoTestCase(TestCase):
     def test_my_profile_contains_records_closing_time(self):
         self.semester.records_ending = datetime.now()+timedelta(days=10)
         self.semester.save()
-        self.client.login(username='student_user', password='password')
+        username = self.student_user.username
+        self.client.login(username=username, password='test')
         response = self.client.get(reverse('my-profile'))
         self.assertContains(response, "Koniec wypisów", status_code=200)
 
     def test_my_profile_does_not_contain_records_closing_time(self):
         self.semester.records_ending = None
         self.semester.save()
-        self.client.login(username='student_user', password='password')
+        username = self.student_user.username
+        self.client.login(username=username, password='test')
         response = self.client.get(reverse('my-profile'))
         self.assertNotContains(response, "Koniec wypisów", status_code=200)
 
     def test_my_profile_contains_other_semester_info(self):
-        self.client.login(username='student_user', password='password')
+        username = self.student_user.username
+        self.client.login(username=username, password='test')
         response = self.client.get(reverse('my-profile'))
         self.assertContains(response, "Zniesienie limitu 35 ECTS")
         self.assertContains(response, "Koniec zapisów")
