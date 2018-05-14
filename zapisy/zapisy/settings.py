@@ -170,6 +170,7 @@ INSTALLED_APPS = (
     'modeltranslation',  # needs to be before django.contrib.admin
 
     'rest_framework',
+    'rest_framework.authtoken',
 
     # needed from 1.7 onwards to prevent Django from trying to apply
     # migrations when testing (slows down DB setup _a lot_)
@@ -331,6 +332,11 @@ WEBPACK_LOADER = {
     }
 }
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
