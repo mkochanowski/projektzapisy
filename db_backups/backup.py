@@ -71,14 +71,6 @@ def get_dropbox_instance(secrets_env):
     return dropbox.Dropbox(secrets_env.str('DROPBOX_OAUTH2_TOKEN'))
 
 
-def dropbox_file_exists(dbx, path: str):
-    try:
-        dbx.files_get_metadata(path)
-        return True
-    except:
-        return False
-
-
 def ensure_has_required_dirs(dbx):
     # If directory creation fails, we're assuming
     # it's because the directory was there already;
