@@ -71,8 +71,8 @@ class NewSemesterTests(SeleniumTestCase):
             """
         ]
 
-        students = UserGroup.objects.get_or_create(name='students')
-        employees = UserGroup.objects.get_or_create(name='employees')
+        students, _ = UserGroup.objects.get_or_create(name='students')
+        employees, _ = UserGroup.objects.get_or_create(name='employees')
 
         for sql_call in sql_calls:
             cursor = connection.cursor()
@@ -604,13 +604,16 @@ class NewSemesterTests(SeleniumTestCase):
     def add_new_students(self):
         number_of_students = Student.objects.all().count()
         self.new_students = []
+        students, _ = UserGroup.objects.get_or_create(name='students')
         for i in range(1, 6):
             user = User.objects.create_user(
                 username='student{}'.format(i + number_of_students), password=self.password)
+            students.user_set.add(user)
             student = Student.objects.create(
                 user=user,
                 matricula=str(i + number_of_students))
             self.new_students.append(student)
+        students.save()
 
     def import_ects(self):
         students_ects = {
