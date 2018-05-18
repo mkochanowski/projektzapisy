@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 class NonUserException(Exception):
     """Thrown when an object does not represent a user"""
     pass

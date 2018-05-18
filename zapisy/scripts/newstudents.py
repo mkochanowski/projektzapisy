@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.core.exceptions import ObjectDoesNotExist
 from apps.users.models import Student, Program
 from django.contrib.auth.models import User, Group
@@ -22,23 +20,25 @@ def create_user(indeks, imie, nazwisko, mail, pswd):
     s.save()
     return user
 
+
 def random_pass():
     alphabet = "abcdefghijkmnpqrstuvwxyz"
     upperalphabet = alphabet.upper()
     pw_len = 8
     pwlist = []
 
-    for i in range(pw_len//3):
+    for i in range(pw_len // 3):
         pwlist.append(alphabet[random.randrange(len(alphabet))])
         pwlist.append(upperalphabet[random.randrange(len(upperalphabet))])
-        pwlist.append(str(random.randrange(8)+2))
-    for i in range(pw_len-len(pwlist)):
+        pwlist.append(str(random.randrange(8) + 2))
+    for i in range(pw_len - len(pwlist)):
         pwlist.append(alphabet[random.randrange(len(alphabet))])
 
     random.shuffle(pwlist)
     pwstring = "".join(pwlist)
 
     return pwstring
+
 
 def process(line):
     line = line.strip()
@@ -48,9 +48,9 @@ def process(line):
     except ObjectDoesNotExist:
         haslo = random_pass()
         create_user(indeks, imie, nazwisko, mail, haslo)
-        print imie + ',' + nazwisko + ',' + indeks + ',' + haslo + ',' + program
+        print(imie + ',' + nazwisko + ',' + indeks + ',' + haslo + ',' + program)
     else:
-        print(str(indeks)+': already exists')
+        print(str(indeks) + ': already exists')
 
 
 def run():

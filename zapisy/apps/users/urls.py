@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf.urls import url
 from django.contrib.auth.views import (
     password_change, password_reset, password_reset_confirm,
@@ -14,7 +13,7 @@ urlpatterns = [
     url('^email-change/$', views.email_change, name='email-change'),
     url('^setlang/$', views.set_language, name='setlang'),
     url('^employee-data-change/$', views.consultations_change, name='consultations-change'),
-    url('^password-change/$', password_change, {'template_name' : 'users/password_change_form.html', 'post_change_redirect' : '/users/password-change-done/'}, name='password_change'),
+    url('^password-change/$', password_change, {'template_name': 'users/password_change_form.html', 'post_change_redirect': '/users/password-change-done/'}, name='password_change'),
     url('^password-change-done/$', views.password_change_done, name='password_change_done'),
     url('^password-reset/$', password_reset, {'template_name': 'users/password_reset_form.html'}, name='password_reset'),
     url('^password-reset-done/$', password_reset_done, {'template_name': 'users/password_reset_done.html'}, name='password_reset_done'),

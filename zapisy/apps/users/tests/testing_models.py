@@ -1,23 +1,19 @@
-# -*- coding: utf-8 -*-
-
 # tests marked by comment "TIME DEPENDENCY" should be free from this dependency
-
 
 
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from apps.users.models import Employee, Student
 from django.contrib.auth.models import Permission
 from django.db import connection
 
 from random import randint
-from apps.enrollment.courses.models import Semester
+from apps.enrollment.courses.models.semester import Semester
 from datetime import datetime, timedelta
 
 from apps.users.tests.factories import StudentFactory, EmployeeFactory
-
 
 class MailsToStudentsLinkTestCase(TestCase):
     @classmethod
@@ -30,7 +26,7 @@ class MailsToStudentsLinkTestCase(TestCase):
                     entity_id integer
                 );
             """
-            ]
+        ]
 
         for sql_call in sql_calls:
             cursor = connection.cursor()
@@ -80,7 +76,7 @@ class MyProfileSemesterInfoTestCase(TestCase):
                     entity_id integer
                 );
             """
-            ]
+        ]
 
         for sql_call in sql_calls:
             cursor = connection.cursor()
@@ -94,11 +90,11 @@ class MyProfileSemesterInfoTestCase(TestCase):
         cls.semester = Semester(
             visible=True,
             type=Semester.TYPE_WINTER,
-            records_opening=datetime.now()-timedelta(days=15),
-            records_closing=datetime.now()+timedelta(days=15),
-            records_ects_limit_abolition=datetime.now()+timedelta(days=5),
-            semester_beginning=datetime.now()+timedelta(days=20),
-            semester_ending=datetime.now()+timedelta(days=100)
+            records_opening=datetime.now() - timedelta(days=15),
+            records_closing=datetime.now() + timedelta(days=15),
+            records_ects_limit_abolition=datetime.now() + timedelta(days=5),
+            semester_beginning=datetime.now() + timedelta(days=20),
+            semester_ending=datetime.now() + timedelta(days=100)
         )
         cls.semester.full_clean()
         cls.semester.save()
@@ -114,7 +110,7 @@ class MyProfileSemesterInfoTestCase(TestCase):
             connection.commit()
 
     def test_my_profile_contains_records_closing_time(self):
-        self.semester.records_ending = datetime.now()+timedelta(days=10)
+        self.semester.records_ending = datetime.now() + timedelta(days=10)
         self.semester.save()
         self.client.force_login(self.student_user)
         response = self.client.get(reverse('my-profile'))

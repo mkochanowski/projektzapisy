@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-
-import factory.fuzzy
 from django.contrib.auth.models import Group
+import random
+import factory
 from factory.django import DjangoModelFactory
 from factory import post_generation
 
@@ -34,7 +33,7 @@ class StudentFactory(DjangoModelFactory):
 
     @post_generation
     def group(self, create, extracted, **kwargs):
-        """Method that takes care if user was added to students group."""
+        """Method taking care if user was added to students group."""
         students, _ = Group.objects.get_or_create(name='students')
         students.user_set.add(self.user)
         students.save()
@@ -51,7 +50,7 @@ class EmployeeFactory(DjangoModelFactory):
 
     @post_generation
     def group(self, create, extracted, **kwargs):
-        """Method that takes care if user was added to employees group."""
+        """Method taking care if user was added to employees group."""
         employees, _ = Group.objects.get_or_create(name='employees')
         employees.user_set.add(self.user)
         employees.save()

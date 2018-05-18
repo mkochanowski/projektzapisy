@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 from apps.users.models import Student, Program
@@ -7,6 +5,7 @@ import random
 
 IMPORT_FILE = 'importusos_17_18_zima.csv'
 DEBUG = True
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -20,11 +19,12 @@ class bcolors:
 
 
 def deactivate_all():
-    print 'deactivating all students...'
+    print('deactivating all students...')
     students = Student.objects.all()
     for s in students:
         s.status = 1
         s.save()
+
 
 def random_pass():
     alphabet = "abcdefghijkmnpqrstuvwxyz"
@@ -32,17 +32,18 @@ def random_pass():
     pw_len = 8
     pwlist = []
 
-    for i in range(pw_len//3):
+    for i in range(pw_len // 3):
         pwlist.append(alphabet[random.randrange(len(alphabet))])
         pwlist.append(upperalphabet[random.randrange(len(upperalphabet))])
-        pwlist.append(str(random.randrange(8)+2))
-    for i in range(pw_len-len(pwlist)):
+        pwlist.append(str(random.randrange(8) + 2))
+    for i in range(pw_len - len(pwlist)):
         pwlist.append(alphabet[random.randrange(len(alphabet))])
 
     random.shuffle(pwlist)
     pwstring = "".join(pwlist)
 
     return pwstring
+
 
 def create_user(indeks, imie, nazwisko, mail):
     students = Group.objects.get(name='students')
@@ -58,27 +59,37 @@ def create_user(indeks, imie, nazwisko, mail):
     s.save()
     return s
 
-programs = set([])
+
+programs = set()
+
 
 def import_ects(file):
     for line in file:
         process(line)
-    print 'Używane programy:'
-    print programs
+    print('Używane programy:')
+    print(programs)
+
 
 def process(line):
     line = line.strip()
-    indeks,imie,nazwisko,email,bk_email,ects,program,etap,aisdL,numerycznaL,dyskretnaL = line.split('|')
-    
+    indeks, imie, nazwisko, email, bk_email, ects, program, etap, aisdL, numerycznaL, dyskretnaL = line.split(
+        '|')
+
     if indeks == 'indeks':
         return
-    
+
     ects = int(ects)
     programs.add(program)
     try:
         student = Student.objects.get(matricula=indeks)
     except ObjectDoesNotExist:
-        print bcolors.FAIL + "***" + str(indeks) + ". Brak studenta o tym indeksie. ECTS: " + str(ects) + bcolors.ENDC
+        print(
+            bcolors.FAIL +
+            "***" +
+            str(indeks) +
+            ". Brak studenta o tym indeksie. ECTS: " +
+            str(ects) +
+            bcolors.ENDC)
         if not DEBUG:
             student = create_user(indeks, imie, nazwisko, email)
         else:
@@ -97,11 +108,10 @@ def process(line):
     elif program == 'INF-K-1S2':
         student.program = Program.objects.get(name='Informatyka, dzienne II stopnia inżynierskie')
     else:
-        print bcolors.FAIL + "***" + str(indeks) + ". Brak programu: " + program + bcolors.ENDC
+        print(bcolors.FAIL + "***" + str(indeks) + ". Brak programu: " + program + bcolors.ENDC)
         return
 
     student.semestr = int(etap[-1])
-    
 
     aisdL = int(aisdL)
     numerycznaL = int(numerycznaL)
@@ -114,10 +124,9 @@ def process(line):
     if dyskretnaL > 0:
         student.dyskretna_l = True
 
-
     if student.ects > ects:
-        print bcolors.WARNING
-    print str((student, student.ects, ects, student.semestr)) + bcolors.ENDC
+        print(bcolors.WARNING)
+    print(str((student, student.ects, ects, student.semestr)) + bcolors.ENDC)
     student.ects = ects
     if not DEBUG:
         student.save()

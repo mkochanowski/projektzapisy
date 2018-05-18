@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-
-"""
-    Help views
-"""
-
 from django.shortcuts import render
-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import user_passes_test
 from apps.users.models import BaseUser
@@ -42,14 +35,9 @@ def offer(request):
     return render(request, 'help/offer.html', {})
 
 
-def errorpage(request):
-    raise Exception('Example exception')
-
-
 @staff_member_required
 def admin(request):
     return render(request, 'help/admin.html', {})
-
 
 @user_passes_test(BaseUser.is_employee)
 def employee(request):
