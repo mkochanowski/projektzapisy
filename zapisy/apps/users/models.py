@@ -49,10 +49,9 @@ class BaseUser(models.Model):
         return self._count_news
 
     @staticmethod
-    def get(user_id):
-        # type: (object) -> object
+    def get(user_id: int):
         try:
-            user = User.objects.get(id=user_id)
+            user: User = User.objects.get(id=user_id)
         except User.DoesNotExist:
             logger.error(
                 'Getter(user_id = %d) in BaseUser throws User.DoesNotExist exception.' %

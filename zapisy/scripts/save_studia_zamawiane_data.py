@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# A script saving ids of students taking part in "studia zamawiane" program.
+# We print id of each student in separate line in file "zamawiani.txt"
 
 from apps.users.models import StudiaZamawiane, StudiaZamawiane2012
 

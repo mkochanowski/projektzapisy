@@ -31,7 +31,7 @@ from apps.grade.poll.utils import check_signature, prepare_data, group_polls_and
     make_template_from_db, get_groups_for_user, make_pages, edit_poll, prepare_data_for_create_template
 
 from apps.users.models import Employee, Program, BaseUser
-from form_utils import get_section_form_data, validate_section_form, section_save
+from apps.grade.poll.form_utils import get_section_form_data, validate_section_form, section_save
 from apps.grade.poll.exceptions import NoTitleException, NoSectionException, NoPollException
 
 
@@ -281,7 +281,7 @@ def edit_section(request, section_id):
 
 @user_passes_test(BaseUser.is_employee)
 def poll_form(request, group_id=0):
-    grade =  Semester.objects.filter(is_grade_active=True).count() > 0
+    grade = Semester.objects.filter(is_grade_active=True).count() > 0
     data = prepare_data_for_create_poll( request, group_id )
     data['grade'] =  grade
     return render(request, 'grade/poll/ajax_poll_create.html', data)
