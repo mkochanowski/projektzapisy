@@ -4,7 +4,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
@@ -39,7 +39,7 @@ def offer(request, slug=None):
     else show proposal page
     """
     proposal = proposal_for_offer(slug)
-    proposals = CourseEntity.get_proposals(request.user.is_authenticated())
+    proposals = CourseEntity.get_proposals(request.user.is_authenticated)
     serialized_proposals = [prop.serialize_for_json()
                             for prop in proposals]
     proposals_json = json.dumps(serialized_proposals)
@@ -64,7 +64,7 @@ def select_for_voting(request):
     courses = filter((lambda course: 1 <= course.get_status() <= 3), courses)
     if request.method == 'POST':
         for course in courses:
-            ids_for_voting = set(map(int, request.POST.getlist('for_voting')))
+            ids_for_voting = {int(x) for x in request.POST.getlist('for_voting')}
             if not course.is_in_voting() and course.id in ids_for_voting:
                 course.mark_for_voting()
                 course.save()

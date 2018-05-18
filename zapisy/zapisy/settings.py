@@ -34,9 +34,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env.str('DATABASE_NAME', default='fereol'),
-        'PORT': env.str('DATABASE_PORT', default='5432'),
-        'USER': env.str('DATABASE_USER', default='fereol'),
+        'NAME': env.str('DATABASE_NAME'),
+        'PORT': env.str('DATABASE_PORT'),
+        'USER': env.str('DATABASE_USER'),
         'PASSWORD': env.str('DATABASE_PASSWORD'),
         'HOST': 'localhost',
         'CHARSET': 'utf8',
@@ -118,7 +118,6 @@ SITE_ID = 1
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-USE_ETAGS = True
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
@@ -140,7 +139,7 @@ TEMPLATES = [
                 ('django.template.loaders.cached.Loader', [
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
+                    'django.template.loaders.filesystem.Loader',
                 ]),
             ]
         },
@@ -152,6 +151,7 @@ TEMPLATES = [
 # and Authentication both must come before LocalePref which
 # must precede LocaleMiddleware, and Common must go afterwards.
 MIDDLEWARE = [
+    'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'middleware.localePrefMiddleware.LocalePrefMiddleware',
@@ -170,6 +170,7 @@ INSTALLED_APPS = (
     'modeltranslation',  # needs to be before django.contrib.admin
 
     'rest_framework',
+    'rest_framework.authtoken',
 
     # needed from 1.7 onwards to prevent Django from trying to apply
     # migrations when testing (slows down DB setup _a lot_)
@@ -207,7 +208,6 @@ INSTALLED_APPS = (
     'apps.schedulersync',
     'django_extensions',
     'django_filters',
-    'autoslug',
     'el_pagination',
     'apps.notifications',
     'django_cas_ng',
@@ -332,9 +332,22 @@ WEBPACK_LOADER = {
     }
 }
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    # Throttles are used to control the rate of requests that clients can make to an API.
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        # Limit the number of rest calls made by unauthenticated users.
+        'anon': '100/day',
+    }
 }

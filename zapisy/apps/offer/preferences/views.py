@@ -8,7 +8,7 @@ from libs.ajax_messages import AjaxFailureMessage
 from apps.offer.preferences.forms import PreferenceFormset, PreferenceForm
 from apps.offer.preferences.models import Preference
 from apps.users.decorators import employee_required
-from apps.enrollment.courses.models import Semester
+from apps.enrollment.courses.models.semester import Semester
 
 logger = logging.getLogger()
 
@@ -45,7 +45,7 @@ def save(request):
 
     form = PreferenceForm(data=request.POST, instance=pref)
     if form.is_valid:
-        available_fields = Preference._meta.get_all_field_names()
+        available_fields = [field.name for field in Preference._meta.get_fields()]
         changed_fields = set(available_fields) & set(request.POST.keys())
         for field in changed_fields:
             setattr(pref, field, form[field].value())
