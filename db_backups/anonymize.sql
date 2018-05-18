@@ -1,6 +1,10 @@
 -- Nuke IBANs
 UPDATE users_studiazamawiane SET bank_account='';
 
+-- Anonymize first/last names
+UPDATE auth_user SET first_name=CONCAT('user_',id);
+UPDATE auth_user SET last_name=CONCAT('user_',id);
+
 -- Anonymize/remove email addresses
 UPDATE auth_user SET email='email@example.org';
 DELETE FROM mailer_message;
