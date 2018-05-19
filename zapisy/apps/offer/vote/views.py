@@ -20,7 +20,7 @@ from apps.users.models import BaseUser
 
 @user_passes_test(BaseUser.is_student)
 def vote(request):
-    from vote_form import VoteFormsets
+    from apps.offer.vote.vote_form import VoteFormsets
 
     student = request.user.student
     state = SystemState.get_state()

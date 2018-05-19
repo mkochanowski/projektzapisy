@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
-from factories import UserFactory
+from apps.users.tests.factories import UserFactory
 from django.urls import reverse
 from apps.users.models import Employee, Student
 
