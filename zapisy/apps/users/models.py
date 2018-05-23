@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Tuple, List
+from typing import Tuple, List, TYPE_CHECKING
 
 from django.db import models
 from django.conf import settings
@@ -8,10 +8,16 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models import QuerySet
 
-from apps.enrollment.courses.models import Semester
 from apps.users.exceptions import NonUserException
 from apps.users.managers import GettersManager, T0Manager
-from apps.offer.preferences.models import Preference
+
+# The TYPE_CHECKING constant is always False at runtime, so the import won't be evaluated,
+# but mypy (and other type-checking tools) will evaluate the contents of that block.
+# It protects us from circular imports.
+
+if TYPE_CHECKING:
+    from apps.enrollment.courses.models import Semester
+    from apps.offer.preferences.models import Preference
 
 logger = logging.getLogger()
 
@@ -111,9 +117,11 @@ class Employee(BaseUser):
     title: models.CharField = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
 
     def make_preferences(self) -> None:
+        from apps.offer.preferences.models import Preference
         Preference.make_preferences(self)
 
-    def get_preferences(self) -> Preference:
+    def get_preferences(self) -> 'Preference':
+        from apps.offer.preferences.models import Preference
         return Preference.for_employee(self)
 
     @staticmethod
@@ -244,8 +252,8 @@ class Student(BaseUser):
             minutes=minutes + grade + 120) + datetime.timedelta(days=3)
         return self._counted_t0
 
-    def get_points(self, semester: Semester=None):
-        from apps.enrollment.courses.models import StudentPointsView
+    def get_points(self, semester: 'Semester'=None) -> int:
+        from apps.enrollment.courses.models import Semester, StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.objects.get_next()
@@ -259,8 +267,8 @@ class Student(BaseUser):
 
         return StudentPointsView.get_points_for_entities(self, records)
 
-    def get_points_with_course(self, course, semester: Semester=None) -> int:
-        from apps.enrollment.courses.models import StudentPointsView
+    def get_points_with_course(self, course, semester: 'Semester'=None) -> int:
+        from apps.enrollment.courses.models import Semester, StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.objects.get_next()
