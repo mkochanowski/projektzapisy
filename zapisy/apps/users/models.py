@@ -1,13 +1,17 @@
 import datetime
 import logging
+from typing import Tuple, List
 
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from django.db.models import QuerySet
 
+from apps.enrollment.courses.models import Semester
 from apps.users.exceptions import NonUserException
 from apps.users.managers import GettersManager, T0Manager
+from apps.offer.preferences.models import Preference
 
 logger = logging.getLogger()
 
@@ -15,32 +19,34 @@ EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
 
 
 class Related(models.Manager):
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return super(Related, self).get_queryset().select_related('user')
 
 class BaseUser(models.Model):
-    '''
+    """
     User abstract class. For every app user there is entry in django.auth.
     We do not inherit after User directly, because of problems with logging beckend etc.
-    '''
-    receive_mass_mail_enrollment = models.BooleanField(
+    """
+    receive_mass_mail_enrollment: models.BooleanField = models.BooleanField(
         default=True,
         verbose_name="otrzymuje mailem ogłoszenia Zapisów")
-    receive_mass_mail_offer = models.BooleanField(
+    receive_mass_mail_offer: models.BooleanField = models.BooleanField(
         default=True,
         verbose_name="otrzymuje mailem ogłoszenia OD")
-    receive_mass_mail_grade = models.BooleanField(
+    receive_mass_mail_grade: models.BooleanField = models.BooleanField(
         default=True,
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
-    last_news_view = models.DateTimeField(default=datetime.datetime.now)
+    last_news_view: models.DateTimeField = models.DateTimeField(default=datetime.datetime.now)
 
-    objects = Related()
+    objects: Related = Related()
 
-    def get_full_name(self):
+    def get_full_name(self) -> str:
+        """Returns full user name."""
         return self.user.get_full_name()
     get_full_name.short_description = 'Użytkownik'
 
-    def get_number_of_news(self):
+    def get_number_of_news(self) -> int:
+        """Returns number of news."""
         from apps.news.models import News
         if not hasattr(self, '_count_news'):
             self._count_news = News.objects.exclude(
@@ -49,7 +55,12 @@ class BaseUser(models.Model):
         return self._count_news
 
     @staticmethod
-    def get(user_id: int):
+    def get(user_id: int) -> User:
+        """Returns user with specified id.
+
+        Raises:
+            NonUserException: If user with specified id doesn't exist.
+        """
         try:
             user: User = User.objects.get(id=user_id)
         except User.DoesNotExist:
@@ -60,61 +71,60 @@ class BaseUser(models.Model):
         return user
 
     @staticmethod
-    def is_student(user):
+    def is_student(user: User) -> bool:
+        """Checks whether user is student."""
         if user:
             return user.groups.filter(name='students').exists()
         return False
 
     @staticmethod
-    def is_employee(user):
+    def is_employee(user: User) -> bool:
+        """Checks whether user is student."""
         if user:
             return user.groups.filter(name='employees').exists()
         return False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.get_full_name
 
     class Meta:
-        abstract = True
+        abstract: bool = True
 
 
 class Employee(BaseUser):
-    '''
+    """
     Employee.
-    '''
+    """
 
-    user = models.OneToOneField(
+    user: models.OneToOneField = models.OneToOneField(
         User,
         verbose_name="Użytkownik",
         related_name='employee',
         on_delete=models.CASCADE)
-    consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
-    homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
-    room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
-    status = models.PositiveIntegerField(
+    consultations: models.TextField = models.TextField(verbose_name="konsultacje", null=True, blank=True)
+    homepage: models.URLField = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
+    room: models.CharField = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
+    status: models.PositiveIntegerField = models.PositiveIntegerField(
         default=0,
         choices=EMPLOYEE_STATUS_CHOICES,
         verbose_name="Status")
-    title = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
+    title: models.CharField = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
 
-    def make_preferences(self):
-        from apps.offer.preferences.models import Preference
-
+    def make_preferences(self) -> None:
         Preference.make_preferences(self)
 
-    def get_preferences(self):
-        from apps.offer.preferences.models import Preference
+    def get_preferences(self) -> Preference:
         return Preference.for_employee(self)
 
     @staticmethod
-    def get_actives():
+    def get_actives() -> QuerySet:
         return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name'). extra(
             where=["(SELECT COUNT(*) FROM courses_courseentity WHERE courses_courseentity.status > 0 AND NOT courses_courseentity.deleted AND courses_courseentity.owner_id=users_employee.id)>0"]
         )
 
     @staticmethod
-    def get_list(begin='All'):
-        def next_char(begin):
+    def get_list(begin: str ='All') -> QuerySet:
+        def next_char(begin: str) -> str:
             try:
                 return chr(ord(begin) + 1)
             except ValueError:
@@ -133,15 +143,15 @@ class Employee(BaseUser):
         return employees
 
     class Meta:
-        verbose_name = 'pracownik'
-        verbose_name_plural = 'Pracownicy'
-        app_label = 'users'
-        ordering = ['user__last_name', 'user__first_name']
-        permissions = (
+        verbose_name: str = 'pracownik'
+        verbose_name_plural: str = 'Pracownicy'
+        app_label: str = 'users'
+        ordering: List[str] = ['user__last_name', 'user__first_name']
+        permissions: Tuple[Tuple[str, str]] = (
             ("mailto_all_students", "Może wysyłać maile do wszystkich studentów"),
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.user.get_full_name()
 
 
@@ -150,53 +160,54 @@ class Student(BaseUser):
     Student.
     '''
 
-    user = models.OneToOneField(
+    user: models.OneToOneField = models.OneToOneField(
         User,
         verbose_name="Użytkownik",
         related_name='student',
         on_delete=models.CASCADE)
-    matricula = models.CharField(
+    matricula: models.CharField = models.CharField(
         max_length=20,
         default="",
         unique=True,
         verbose_name="Numer indeksu")
-    ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
-    records_opening_bonus_minutes = models.PositiveIntegerField(
+    ects: models.PositiveIntegerField = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
+    records_opening_bonus_minutes: models.PositiveIntegerField = models.PositiveIntegerField(
         default=0, verbose_name="Przyspieszenie otwarcia zapisów (minuty)")
-    program = models.ForeignKey(
+    program: models.ForeignKey = models.ForeignKey(
         'Program',
         verbose_name='Program Studiów',
         null=True,
         default=None,
         on_delete=models.CASCADE)
-    block = models.BooleanField(verbose_name="blokada planu", default=False)
-    semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
-    status = models.PositiveIntegerField(default=0, verbose_name="Status")
-    status.help_text = "0 - aktywny student, 1 - skreślony student"
+    block: models.BooleanField = models.BooleanField(verbose_name="blokada planu", default=False)
+    semestr: models.PositiveIntegerField = models.PositiveIntegerField(default=0, verbose_name="Semestr")
+    status: models.PositiveIntegerField = models.PositiveIntegerField(default=0, verbose_name="Status")
+    status.help_text: str = "0 - aktywny student, 1 - skreślony student"
 
-    t0 = models.DateTimeField(null=True, blank=True)
+    t0: models.DateTimeField = models.DateTimeField(null=True, blank=True)
 
-    ects_in_semester = models.SmallIntegerField(default=0)
+    ects_in_semester: models.SmallIntegerField = models.SmallIntegerField(default=0)
 
-    dyskretna_l = models.BooleanField(default=False)
-    numeryczna_l = models.BooleanField(default=False)
-    algorytmy_l = models.BooleanField(default=False)
-    programowanie_l = models.BooleanField(default=False)
+    dyskretna_l: models.BooleanField = models.BooleanField(default=False)
+    numeryczna_l: models.BooleanField = models.BooleanField(default=False)
+    algorytmy_l: models.BooleanField = models.BooleanField(default=False)
+    programowanie_l: models.BooleanField = models.BooleanField(default=False)
 
-    objects = GettersManager()
+    objects: GettersManager = GettersManager()
 
-    def is_active(self):
+    def is_active(self) -> bool:
+        """Returns True if student is active, False otherwise."""
         return self.status == 0
 
-    def is_isim(self):
+    def is_isim(self) -> bool:
         """"Returns True if student's program is "ISIM, dzienne I stopnia", False otherwise."""
         try:
             return self.program == Program.objects.get(name='ISIM, dzienne I stopnia')
         except Program.DoesNotExist:
             return False
 
-    def get_type_of_studies(self):
-        """ returns type of studies """
+    def get_type_of_studies(self) -> str:
+        """Returns type of studies."""
         semestr = {
             1: 'pierwszy',
             2: 'drugi',
@@ -213,11 +224,11 @@ class Student(BaseUser):
         return '%s, semestr %s' % (self.program, semestr)
     get_type_of_studies.short_description = 'Studia'
 
-    def participated_in_last_grades(self):
+    def participated_in_last_grades(self) -> QuerySet:
         from apps.grade.ticket_create.models.student_graded import StudentGraded
         return StudentGraded.objects.filter(student=self, semester__in=[45, 239]).count()
 
-    def get_t0_interval(self):
+    def get_t0_interval(self) -> int:
         """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
         if hasattr(self, '_counted_t0'):
             return self._counted_t0
@@ -233,8 +244,8 @@ class Student(BaseUser):
             minutes=minutes + grade + 120) + datetime.timedelta(days=3)
         return self._counted_t0
 
-    def get_points(self, semester=None):
-        from apps.enrollment.courses.models import Semester, StudentPointsView
+    def get_points(self, semester: Semester=None):
+        from apps.enrollment.courses.models import StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.objects.get_next()
@@ -248,8 +259,8 @@ class Student(BaseUser):
 
         return StudentPointsView.get_points_for_entities(self, records)
 
-    def get_points_with_course(self, course, semester=None):
-        from apps.enrollment.courses.models import Semester, StudentPointsView
+    def get_points_with_course(self, course, semester: Semester=None) -> int:
+        from apps.enrollment.courses.models import StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.objects.get_next()
@@ -266,12 +277,12 @@ class Student(BaseUser):
         return StudentPointsView.get_points_for_entities(self, records)
 
     @classmethod
-    def get_active_students(cls):
+    def get_active_students(cls) -> QuerySet:
         return cls.objects.filter(status=0)
 
     @staticmethod
-    def get_list(begin='All'):
-        def next_char(begin):
+    def get_list(begin: str='All') -> QuerySet:
+        def next_char(begin: str) -> str:
             try:
                 return chr(ord(begin) + 1)
             except ValueError:
@@ -287,23 +298,20 @@ class Student(BaseUser):
             return Student.objects.filter(status=0, user__last_name__range=(begin, end)).\
                 select_related().order_by('user__last_name', 'user__first_name')
 
-    def records_set_locked(self, locked):
+    def records_set_locked(self, locked: bool) -> None:
         self.block = locked
         self.save()
 
-    def is_first_year_student(self):
+    def is_first_year_student(self) -> bool:
         return (self.semestr in [1, 2]) and (self.program.id in [0, 2])
 
-    def is_fresh_student(self):
-        return True
-
     class Meta:
-        verbose_name = 'student'
-        verbose_name_plural = 'studenci'
-        app_label = 'users'
-        ordering = ['user__last_name', 'user__first_name']
+        verbose_name: str = 'student'
+        verbose_name_plural: str = 'studenci'
+        app_label: str = 'users'
+        ordering: List[str] = ['user__last_name', 'user__first_name']
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.user.get_full_name()
 
 
@@ -311,28 +319,28 @@ class Program(models.Model):
     """
         Program of student studies
     """
-    name = models.CharField(max_length=50, unique=True, verbose_name="Program")
-    type_of_points = models.ForeignKey(
+    name: models.CharField = models.CharField(max_length=50, unique=True, verbose_name="Program")
+    type_of_points: models.ForeignKey = models.ForeignKey(
         'courses.PointTypes',
         verbose_name='rodzaj punktów',
         on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'Program studiów'
-        verbose_name_plural = 'Programy studiów'
+        verbose_name: str = 'Program studiów'
+        verbose_name_plural: str = 'Programy studiów'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class OpeningTimesView(models.Model):
-    student = models.OneToOneField(Student, primary_key=True, on_delete=models.CASCADE,
+    student: models.ForeignKey = models.OneToOneField(Student, primary_key=True, on_delete=models.CASCADE,
                                    related_name='opening_times')
-    course = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
-    semester = models.ForeignKey('courses.Semester', on_delete=models.CASCADE)
-    opening_time = models.DateTimeField()
+    course: models.ForeignKey = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
+    semester: models.ForeignKey = models.ForeignKey('courses.Semester', on_delete=models.CASCADE)
+    opening_time: models.DateTimeField = models.DateTimeField()
 
-    objects = T0Manager()
+    objects: T0Manager = T0Manager()
 
     class Meta:
-        app_label = 'users'
+        app_label: str = 'users'
