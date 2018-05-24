@@ -30,26 +30,44 @@ from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from django.db import connection
 from django.core import mail
+from typing import Callable, Any, TypeVar, Optional, Dict
 
 from django.conf import settings
 from scripts.scheduleimport import run_test as scheduleimport_run_test
 from scripts.ectsimport import run_test as ectsimport_run_test
 
+BlockVal = TypeVar('BlockVal') # Generic type used for values of block callable
 
 class SeleniumTestCase(LiveServerTestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
+        """
+        Method creating firefox driver for Selenium tests.
+        """
         cls.driver = webdriver.Firefox()
         cls.driver.set_window_size(1024, 1024)
         super(SeleniumTestCase, cls).setUpClass()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
+        """
+        Method cleaning up after tests.
+        """
         cls.driver.quit()
         super(SeleniumTestCase, cls).tearDownClass()
 
-    def wait_for_pass(self, block, times=3):
+    def wait_for_pass(self, block: Callable[[], BlockVal], times: Optional[int]=3) -> BlockVal:
+        """
+        Method executing callable block until first successful execution.
+
+        Args:
+            block: Callable needed to pass before test execution.
+            times: Number of acceptable block's executions before method's end.
+
+        Returns:
+            Result of block execution.
+        """
         for _ in range(times):
             try:
                 return block()
@@ -60,7 +78,10 @@ class SeleniumTestCase(LiveServerTestCase):
 
 class NewSemesterTests(SeleniumTestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
+        """
+        Method preparing database for testing.
+        """
         sql_calls = [
             """
                 CREATE TABLE courses_studentpointsview (
@@ -216,7 +237,10 @@ class NewSemesterTests(SeleniumTestCase):
             max_vote=3
         )
 
-    def tearDown(self):
+    def tearDown(self) -> None:
+        """
+        Method cleaning up after tests.
+        """
         sql_calls = [
             'DROP TABLE courses_studentpointsview;',
         ]
@@ -225,7 +249,7 @@ class NewSemesterTests(SeleniumTestCase):
             cursor.execute(sql_call)
             connection.commit()
 
-    def test_new_semester_scenario(self):
+    def test_new_semester_scenario(self) -> None:
         self.prepare_course_entities_for_voting()
         self.perform_voting()
         self.create_offer_for_winter_semester()
@@ -239,7 +263,10 @@ class NewSemesterTests(SeleniumTestCase):
 
         self.driver.get_screenshot_as_file('screenshot.png')
 
-    def prepare_course_entities_for_voting(self):
+    def prepare_course_entities_for_voting(self) -> None:
+        """
+        Method preparing two courses for voting.
+        """
         self.driver.get(self.live_server_url)
         self.wait_for_pass(
             lambda: self.driver.find_element_by_xpath(
@@ -316,7 +343,10 @@ class NewSemesterTests(SeleniumTestCase):
             CourseEntity.objects.filter(status=2).count(),
             len(selected_select.options))
 
-    def perform_voting(self):
+    def perform_voting(self) -> None:
+        """
+        Method performing test voting performed by four students.
+        """
         # voting starts
         self.system_state.vote_beg = date.today()
         self.system_state.vote_end = date.today() + relativedelta(days=1)
@@ -372,7 +402,14 @@ class NewSemesterTests(SeleniumTestCase):
         self.system_state.vote_end = date.today() - relativedelta(days=1)
         self.system_state.save()
 
-    def vote(self, student, points):
+    def vote(self, student: Student, points: Dict[str, int]) -> None:
+        """
+        Method performing student's votes for courses in points dictionary.
+
+        Args:
+            student: Student performing vote.
+            points: Dictionary containing courses' names as keys and points as values.
+        """
         self.driver.get('{}{}'.format(self.live_server_url, '/users/logout/'))
         self.driver.get(self.live_server_url)
         self.wait_for_pass(
@@ -430,14 +467,17 @@ class NewSemesterTests(SeleniumTestCase):
                     '//div[contains(text(), "Nie udało się oddać głosu")]')),
                 1)
 
-    def create_offer_for_winter_semester(self):
+    def create_offer_for_winter_semester(self) -> None:
+        """
+
+        """
         for course in self.winter_courses:
             Course.objects.create(
                 entity=CourseEntity.objects.get(name=course),
                 semester=self.next_winter_semester
             )
 
-    def perform_winter_correction(self):
+    def perform_winter_correction(self) -> None:
         # winter correction starts
         self.system_state.winter_correction_beg = date.today()
         self.system_state.winter_correction_end = date.today() + relativedelta(
