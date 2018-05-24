@@ -39,7 +39,9 @@ from scripts.ectsimport import run_test as ectsimport_run_test
 BlockVal = TypeVar('BlockVal') # Generic type used for values of block callable
 
 class SeleniumTestCase(LiveServerTestCase):
-
+    """
+    Base class for Selenium test cases.
+    """
     @classmethod
     def setUpClass(cls) -> None:
         """
