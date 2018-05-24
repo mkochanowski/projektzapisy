@@ -16,7 +16,7 @@ from apps.users.managers import GettersManager, T0Manager
 # It protects us from circular imports.
 
 if TYPE_CHECKING:
-    from apps.enrollment.courses.models import Semester
+    from apps.enrollment.courses.models.semester import Semester
     from apps.offer.preferences.models import Preference
 
 logger = logging.getLogger()
@@ -150,6 +150,7 @@ class Employee(BaseUser):
 
         return employees
 
+
     class Meta:
         verbose_name: str = 'pracownik'
         verbose_name_plural: str = 'Pracownicy'
@@ -253,7 +254,8 @@ class Student(BaseUser):
         return self._counted_t0
 
     def get_points(self, semester: 'Semester'=None) -> int:
-        from apps.enrollment.courses.models import Semester, StudentPointsView
+        from apps.enrollment.courses.models.semester import Semester
+        from apps.enrollment.courses.models.points import StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.objects.get_next()
@@ -268,7 +270,8 @@ class Student(BaseUser):
         return StudentPointsView.get_points_for_entities(self, records)
 
     def get_points_with_course(self, course, semester: 'Semester'=None) -> int:
-        from apps.enrollment.courses.models import Semester, StudentPointsView
+        from apps.enrollment.courses.models.semester import Semester
+        from apps.enrollment.courses.models.points import StudentPointsView
         from apps.enrollment.records.models import Record
         if not semester:
             semester = Semester.objects.get_next()

@@ -11,7 +11,8 @@ from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, Cl
 from apps.users.tests.objectmothers import UserObjectMother
 from apps.users.tests.factories import UserFactory, StudentFactory
 from apps.users.models import Employee
-from apps.enrollment.courses.models import Semester, Classroom
+from apps.enrollment.courses.models.semester import Semester
+from apps.enrollment.courses.models.classroom import Classroom
 from apps.schedule import feeds
 import apps.enrollment.courses.tests.factories as enrollment_factories
 from apps.enrollment.records.tests.factories import RecordFactory
