@@ -63,7 +63,7 @@ run_script_on_temp_db "$TEMP_DUMP_PATH_PROD"
 # Then anonymize
 run_script_on_temp_db anonymize.sql
 # Finally dump
-dump_db_to_file "$II_ZAPISY_DB_BACKUP_DB_NAME" "$TEMP_DUMP_PATH_DEV"
+dump_db_to_file "$TEMP_DB_NAME" "$TEMP_DUMP_PATH_DEV"
 # Get rid of the temp db
 teardown_temp_db
 
