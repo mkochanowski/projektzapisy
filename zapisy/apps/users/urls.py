@@ -26,5 +26,6 @@ urlpatterns = [
     url('^students/(?P<begin>[A-Z]|(All))/$', views.students_list, name='students-char-list'),
     url('^employees/(?P<begin>[A-Z]|(All))/$', views.employees_list, name='employees-char-list'),
     url('^ical/$', views.create_ical_file, name='ical'),
-    url('^email-students/$', views.email_students, name='email-students')
+    url('^email-students/$', views.email_students, name='email-students'),
+    url('^consent/$', views.consent, name='consent')
 ]

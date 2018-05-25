@@ -8,6 +8,7 @@ from django.contrib import auth, messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
+from django.views.decorators.http import require_POST
 from django.contrib.auth.views import login
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -23,7 +24,7 @@ from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.offer.vote.models.single_vote import SingleVote
 from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException
 from apps.users.utils import prepare_ajax_students_list, prepare_ajax_employee_list
-from apps.users.models import Employee, Student, BaseUser, UserProfile, OpeningTimesView
+from apps.users.models import Employee, Student, BaseUser, UserProfile, OpeningTimesView, Consents
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.records.models import Record
@@ -473,3 +474,18 @@ def email_students(request):
         form.fields['sender'].widget.attrs['readonly'] = True
     return render(request, 'users/email_students.html',
                   {'form': form, 'students_mails': studentsmails})
+
+
+@login_required
+@require_POST
+def consent(request):
+    if request.POST:
+        if 'yes' in request.POST:
+            Consents.objects.update_or_create(student=request.user.student,
+                                              defaults={'granted': True})
+            messages.success(request, 'Zgoda udzielona')
+        if 'no' in request.POST:
+            Consents.objects.update_or_create(student=request.user.student,
+                                              defaults={'granted': False})
+            messages.success(request, 'Brak zgody zapisany')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
