@@ -47,6 +47,8 @@ BREAK_DURATION = datetime.timedelta(minutes=15)
 
 @login_required
 def student_profile(request, user_id):
+    if not BaseUser.is_employee(request.user):
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     """student profile"""
     try:
         student = Student.objects.select_related('user').get(user=user_id)
@@ -334,6 +336,8 @@ def consultations_list(request, begin='A'):
 
 @login_required
 def students_list(request, begin='All', query=None):
+    if not BaseUser.is_employee(request.user):
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     students = Student.get_list(begin)
 #    students = Record.recorded_students(students)
 
