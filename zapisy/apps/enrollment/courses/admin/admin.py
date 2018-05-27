@@ -176,7 +176,7 @@ class CourseEntityAdmin(TranslationAdmin):
         ('Zmiana sposobu liczenia punktów', {'fields': ['algorytmy_l', 'dyskretna_l', 'numeryczna_l', 'programowanie_l']}),
         (None, {'fields': ['ue', 'english', 'exam', 'suggested_for_first_year', 'deleted']}),
         ('USOS', {'fields': ['usos_kod'], 'classes': ['collapse']}),
-
+        ('W preferencjach', {'fields': ['in_prefs']}),
     ]
     list_filter = ('semester', 'status', 'type', EffectsListFilter, 'owner')
     form = CourseEntityForm
@@ -321,7 +321,8 @@ class GroupAdmin(admin.ModelAdmin):
 
     def after_saving_model_and_related_inlines(self, obj):
         from apps.enrollment.courses.models.term import Term as T
-        from apps.schedule.models import Event, Term
+        from apps.schedule.models.event import Event
+        from apps.schedule.models.term import Term
         # Perform extra operation after all inlines are saved
 
         Event.objects.filter(group=obj, type='3').delete()
