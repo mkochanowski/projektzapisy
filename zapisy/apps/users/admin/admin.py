@@ -2,8 +2,9 @@ from django.http import HttpResponse
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-
+from django.db.models import QuerySet
 import csv
+from typing import Any
 
 from apps.users.models import (
     Employee,
@@ -27,7 +28,7 @@ class ExtendedUserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email')
 
 
-def export_as_csv(modeladmin, request, queryset):
+def export_as_csv(modeladmin: admin.ModelAdmin, request: Any, queryset: QuerySet) -> HttpResponse:
     semester = Semester.get_current_semester()
 
     records = Record.objects.filter(
@@ -74,14 +75,14 @@ class StudentAdmin(admin.ModelAdmin):
 
     actions = [export_as_csv]
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: Any) -> QuerySet:
         qs = super(StudentAdmin, self).get_queryset(request)
         return qs.select_related('program', 'program__type_of_points', 'user')
 
 
 class ProgramAdmin(admin.ModelAdmin):
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: Any) -> QuerySet:
         qs = super(ProgramAdmin, self).get_queryset(request)
         return qs.select_related('type_of_points')
 
@@ -99,7 +100,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     ordering = ['user__last_name', 'user__first_name']
     list_display_links = ('get_full_name',)
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: Any) -> QuerySet:
         qs = super(EmployeeAdmin, self).get_queryset(request)
         return qs.select_related('user')
 

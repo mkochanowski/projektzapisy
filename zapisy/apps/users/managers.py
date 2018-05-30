@@ -1,15 +1,16 @@
 from django.db import models
 from django.db.models.aggregates import Min
 from django.db.models import QuerySet
-from typing import Tuple, Dict, Any, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from apps.users.models import Student
     from apps.enrollment.courses.models import Semester
 
+
 class GettersManager(models.Manager):
 
-    def filter_with_t0(self, *args: Tuple[Any,...], **kwargs: Dict[str, Dict[str,Any]]) -> QuerySet:
+    def filter_with_t0(self, *args: Any, **kwargs: Any) -> QuerySet:
         return self.get_queryset().filter(*args, **kwargs).only('user__first_name', 'user__last_name',
                                                                 'matricula', 'ects').annotate(t0_min=Min('opening_times__opening_time'))
 
@@ -34,7 +35,7 @@ class GettersManager(models.Manager):
 
 class T0Manager(models.Manager):
 
-    def get_courses(self, student: 'Student', semester: 'Semester'):
+    def get_courses(self, student: 'Student', semester: 'Semester') -> QuerySet:
         return self.filter(
             student=student,
             semester=semester).select_related(

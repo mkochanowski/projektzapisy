@@ -8,8 +8,7 @@ from django.http import Http404
 from django.utils.crypto import get_random_string
 
 from apps.enrollment.courses.tests.objectmothers import SemesterObjectMother, ClassroomObjectMother
-from apps.users.tests.objectmothers import UserObjectMother
-from apps.users.tests.factories import UserFactory, StudentFactory
+from apps.users.tests.factories import UserFactory, StudentFactory, EmployeeFactory
 from apps.users.models import Employee
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.classroom import Classroom
@@ -354,10 +353,10 @@ class FeedsTestCase(TestCase):
 
 class EventTestCase(TestCase):
     def setUp(self):
-        teacher = factories.UserFactory()
+        employee = EmployeeFactory()
+        teacher = employee.user
         teacher.full_clean()
-
-        employee = UserObjectMother.employee(teacher)
+        teacher.save()
         employee.save()
 
         self.event = factories.EventFactory(author=teacher)

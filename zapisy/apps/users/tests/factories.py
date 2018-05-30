@@ -1,13 +1,10 @@
+from typing import Any
 from django.contrib.auth.models import Group
-import random
 import factory
 from factory.django import DjangoModelFactory
 from factory import post_generation
 
 from apps.users.models import User, Student, Employee
-from django.conf import settings
-
-langs = [x[0] for x in settings.LANGUAGES]
 
 
 class UserFactory(DjangoModelFactory):
@@ -32,8 +29,8 @@ class StudentFactory(DjangoModelFactory):
         exclude = ("group",)
 
     @post_generation
-    def group(self, create, extracted, **kwargs):
-        """Method taking care if user was added to students group."""
+    def group(self, create: Any, extracted: Any, **kwargs: Any) -> Group:
+        """Method taking care of checking whether user was added to students group."""
         students, _ = Group.objects.get_or_create(name='students')
         students.user_set.add(self.user)
         students.save()
@@ -49,8 +46,8 @@ class EmployeeFactory(DjangoModelFactory):
         exclude = ("group",)
 
     @post_generation
-    def group(self, create, extracted, **kwargs):
-        """Method taking care if user was added to employees group."""
+    def group(self, create: Any, extracted: Any, **kwargs: Any) -> Group:
+        """Method taking care of checking whether user was added to employees group."""
         employees, _ = Group.objects.get_or_create(name='employees')
         employees.user_set.add(self.user)
         employees.save()

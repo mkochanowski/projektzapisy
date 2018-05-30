@@ -3,6 +3,7 @@ import json
 import datetime
 import unidecode
 import re
+from typing import Any
 
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
@@ -43,9 +44,11 @@ GTC = {'1': 'wy', '2': 'cw', '3': 'pr',
        '9': 'rep', '10': 'proj'}
 BREAK_DURATION = datetime.timedelta(minutes=15)
 
+# I couldn't figure out whether we're passing always WSGIRequest or there are more type of requests involved.
+# Taking Any as argument was safer. Probably should be replaced with union of some types of requests in the future.
 
 @login_required
-def student_profile(request, user_id):
+def student_profile(request: Any, user_id: int) -> HttpResponse:
     """student profile"""
     try:
         student = Student.objects.select_related('user').get(user=user_id)
@@ -91,7 +94,7 @@ def student_profile(request, user_id):
         return render(request, 'common/error.html')
 
 
-def employee_profile(request, user_id):
+def employee_profile(request: Any, user_id: int) -> HttpResponse:
     """employee profile"""
     try:
         user = User.objects.select_related('employee').get(id=user_id)
@@ -149,7 +152,7 @@ def employee_profile(request, user_id):
 
 
 @login_required
-def set_language(request):
+def set_language(request: Any) -> HttpResponse:
     """
     Redirect to a given url while setting the chosen language in the
     session or cookie. The url and the language code need to be
@@ -173,7 +176,7 @@ def set_language(request):
 
 
 @login_required
-def email_change(request):
+def email_change(request: Any) -> HttpResponse:
     """function that enables mail changing"""
     if request.POST:
         data = request.POST.copy()
@@ -197,7 +200,7 @@ def email_change(request):
 
 
 @login_required
-def consultations_change(request):
+def consultations_change(request: Any) -> HttpResponse:
     """function that enables consultations changing"""
     try:
         employee = request.user.employee
@@ -219,7 +222,7 @@ def consultations_change(request):
 
 
 @login_required
-def password_change_done(request):
+def password_change_done(request: Any) -> HttpResponse:
     """informs if password were changed"""
     logger.info('User (%s) changed password' % request.user.get_full_name())
     messages.success(request, "Twoje hasło zostało zmienione.")
@@ -227,7 +230,7 @@ def password_change_done(request):
 
 
 @login_required
-def my_profile(request):
+def my_profile(request: Any) -> HttpResponse:
     """profile site"""
     semester = Semester.objects.get_next()
 
@@ -273,7 +276,7 @@ def my_profile(request):
     return TemplateResponse(request, 'users/my_profile.html', locals())
 
 
-def employees_list(request, begin='All', query=None):
+def employees_list(request: Any, begin: str='All', query: str=None) -> HttpResponse:
 
     employees = Employee.get_list(begin)
 
@@ -290,7 +293,7 @@ def employees_list(request, begin='All', query=None):
     return render(request, 'users/employees_list.html', data)
 
 
-def consultations_list(request, begin='A'):
+def consultations_list(request: Any, begin: str='A') -> HttpResponse:
 
     employees = Employee.get_list('All')
     semester = Semester.get_current_semester()
@@ -308,7 +311,7 @@ def consultations_list(request, begin='A'):
 
 
 @login_required
-def students_list(request, begin='All', query=None):
+def students_list(request: Any, begin: str='All', query: str=None) -> HttpResponse:
     students = Student.get_list(begin)
 
     if request.is_ajax():
@@ -326,14 +329,14 @@ def students_list(request, begin='All', query=None):
 
 
 @login_required
-def logout(request):
+def logout(request: Any) -> HttpResponse:
     """logout"""
     logger.info('User %s <id: %s> is logged out ' % (request.user.username, request.user.id))
     auth.logout(request)
     return HttpResponseRedirect('/')
 
 
-def login_plus_remember_me(request, *args, **kwargs):
+def login_plus_remember_me(request: Any, *args: Any, **kwargs: Any) -> HttpResponse:
     """
     Sign-in function with an option to save the session.
     If the user clicked the 'Remember me' button (we read it from POST data), the
@@ -354,7 +357,7 @@ def login_plus_remember_me(request, *args, **kwargs):
     return login(request, *args, **kwargs)
 
 
-def get_ical_filename(user, semester):
+def get_ical_filename(user: User, semester: Semester) -> str:
     name_with_semester = "{}_{}".format(user.get_full_name(), semester.get_short_name())
     name_ascii_only = unidecode.unidecode(name_with_semester)
     path_safe_name = re.sub(r"[\s+/]", "_", name_ascii_only)
@@ -362,7 +365,7 @@ def get_ical_filename(user, semester):
 
 
 @login_required
-def create_ical_file(request):
+def create_ical_file(request: Any) -> HttpResponse:
     user = request.user
     semester = Semester.get_default_semester()
 
@@ -410,7 +413,7 @@ def create_ical_file(request):
 
 
 @permission_required('users.mailto_all_students')
-def email_students(request):
+def email_students(request: Any) -> HttpResponse:
     """function that enables mailing all students"""
     students = Student.get_list('All')
     if students:

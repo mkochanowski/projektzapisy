@@ -17,7 +17,7 @@ from apps.users.tests.factories import StudentFactory, EmployeeFactory
 
 class MailsToStudentsLinkTestCase(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         sql_calls = [
             """
                 CREATE TABLE courses_studentpointsview (
@@ -46,7 +46,7 @@ class MailsToStudentsLinkTestCase(TestCase):
         summer_semester.full_clean()
 
     @classmethod
-    def tearDownTestData(cls):
+    def tearDownTestData(cls) -> None:
         sql_calls = [
             "DROP TABLE courses_studentpointsview;",
         ]
@@ -67,7 +67,7 @@ class MailsToStudentsLinkTestCase(TestCase):
 
 class MyProfileSemesterInfoTestCase(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         sql_calls = [
             """
                 CREATE TABLE courses_studentpointsview (
@@ -100,7 +100,7 @@ class MyProfileSemesterInfoTestCase(TestCase):
         cls.semester.save()
 
     @classmethod
-    def tearDownTestData(cls):
+    def tearDownTestData(cls) -> None:
         sql_calls = [
             "DROP TABLE courses_studentpointsview;",
         ]
@@ -109,21 +109,21 @@ class MyProfileSemesterInfoTestCase(TestCase):
             cursor.execute(sql_call)
             connection.commit()
 
-    def test_my_profile_contains_records_closing_time(self):
+    def test_my_profile_contains_records_closing_time(self) -> None:
         self.semester.records_ending = datetime.now() + timedelta(days=10)
         self.semester.save()
         self.client.force_login(self.student_user)
         response = self.client.get(reverse('my-profile'))
         self.assertContains(response, "Koniec wypisów", status_code=200)
 
-    def test_my_profile_does_not_contain_records_closing_time(self):
+    def test_my_profile_does_not_contain_records_closing_time(self) -> None:
         self.semester.records_ending = None
         self.semester.save()
         self.client.force_login(self.student_user)
         response = self.client.get(reverse('my-profile'))
         self.assertNotContains(response, "Koniec wypisów", status_code=200)
 
-    def test_my_profile_contains_other_semester_info(self):
+    def test_my_profile_contains_other_semester_info(self) -> None:
         self.client.force_login(self.student_user)
         response = self.client.get(reverse('my-profile'))
         self.assertContains(response, "Zniesienie limitu 35 ECTS")

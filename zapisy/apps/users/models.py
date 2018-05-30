@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Tuple, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
 from django.db import models
 from django.conf import settings
@@ -17,6 +17,7 @@ from apps.users.managers import GettersManager, T0Manager
 
 if TYPE_CHECKING:
     from apps.enrollment.courses.models.semester import Semester
+    from apps.enrollment.courses.models.course import Course
     from apps.offer.preferences.models import Preference
 
 logger = logging.getLogger()
@@ -33,18 +34,18 @@ class BaseUser(models.Model):
     User abstract class. For every app user there is entry in django.auth.
     We do not inherit after User directly, because of problems with logging beckend etc.
     """
-    receive_mass_mail_enrollment: models.BooleanField = models.BooleanField(
+    receive_mass_mail_enrollment = models.BooleanField(
         default=True,
         verbose_name="otrzymuje mailem ogłoszenia Zapisów")
-    receive_mass_mail_offer: models.BooleanField = models.BooleanField(
+    receive_mass_mail_offer = models.BooleanField(
         default=True,
         verbose_name="otrzymuje mailem ogłoszenia OD")
-    receive_mass_mail_grade: models.BooleanField = models.BooleanField(
+    receive_mass_mail_grade = models.BooleanField(
         default=True,
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
-    last_news_view: models.DateTimeField = models.DateTimeField(default=datetime.datetime.now)
+    last_news_view = models.DateTimeField(default=datetime.datetime.now)
 
-    objects: Related = Related()
+    objects = Related()
 
     def get_full_name(self) -> str:
         """Returns full user name."""
@@ -68,7 +69,7 @@ class BaseUser(models.Model):
             NonUserException: If user with specified id doesn't exist.
         """
         try:
-            user: User = User.objects.get(id=user_id)
+            user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             logger.error(
                 'Getter(user_id = %d) in BaseUser throws User.DoesNotExist exception.' %
@@ -78,14 +79,12 @@ class BaseUser(models.Model):
 
     @staticmethod
     def is_student(user: User) -> bool:
-        """Checks whether user is student."""
         if user:
             return user.groups.filter(name='students').exists()
         return False
 
     @staticmethod
     def is_employee(user: User) -> bool:
-        """Checks whether user is student."""
         if user:
             return user.groups.filter(name='employees').exists()
         return False
@@ -102,19 +101,19 @@ class Employee(BaseUser):
     Employee.
     """
 
-    user: models.OneToOneField = models.OneToOneField(
+    user = models.OneToOneField(
         User,
         verbose_name="Użytkownik",
         related_name='employee',
         on_delete=models.CASCADE)
-    consultations: models.TextField = models.TextField(verbose_name="konsultacje", null=True, blank=True)
-    homepage: models.URLField = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
-    room: models.CharField = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
-    status: models.PositiveIntegerField = models.PositiveIntegerField(
+    consultations = models.TextField(verbose_name="konsultacje", null=True, blank=True)
+    homepage = models.URLField(verbose_name='strona domowa', default="", null=True, blank=True)
+    room = models.CharField(max_length=20, verbose_name="pokój", null=True, blank=True)
+    status = models.PositiveIntegerField(
         default=0,
         choices=EMPLOYEE_STATUS_CHOICES,
         verbose_name="Status")
-    title: models.CharField = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
+    title = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
 
     def make_preferences(self) -> None:
         from apps.offer.preferences.models import Preference
@@ -152,11 +151,11 @@ class Employee(BaseUser):
 
 
     class Meta:
-        verbose_name: str = 'pracownik'
-        verbose_name_plural: str = 'Pracownicy'
-        app_label: str = 'users'
-        ordering: List[str] = ['user__last_name', 'user__first_name']
-        permissions: Tuple[Tuple[str, str]] = (
+        verbose_name = 'pracownik'
+        verbose_name_plural = 'Pracownicy'
+        app_label = 'users'
+        ordering = ['user__last_name', 'user__first_name']
+        permissions = (
             ("mailto_all_students", "Może wysyłać maile do wszystkich studentów"),
         )
 
@@ -169,47 +168,45 @@ class Student(BaseUser):
     Student.
     '''
 
-    user: models.OneToOneField = models.OneToOneField(
+    user = models.OneToOneField(
         User,
         verbose_name="Użytkownik",
         related_name='student',
         on_delete=models.CASCADE)
-    matricula: models.CharField = models.CharField(
+    matricula = models.CharField(
         max_length=20,
         default="",
         unique=True,
         verbose_name="Numer indeksu")
-    ects: models.PositiveIntegerField = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
-    records_opening_bonus_minutes: models.PositiveIntegerField = models.PositiveIntegerField(
+    ects = models.PositiveIntegerField(verbose_name="punkty ECTS", default=0)
+    records_opening_bonus_minutes = models.PositiveIntegerField(
         default=0, verbose_name="Przyspieszenie otwarcia zapisów (minuty)")
-    program: models.ForeignKey = models.ForeignKey(
+    program = models.ForeignKey(
         'Program',
         verbose_name='Program Studiów',
         null=True,
         default=None,
         on_delete=models.CASCADE)
-    block: models.BooleanField = models.BooleanField(verbose_name="blokada planu", default=False)
-    semestr: models.PositiveIntegerField = models.PositiveIntegerField(default=0, verbose_name="Semestr")
-    status: models.PositiveIntegerField = models.PositiveIntegerField(default=0, verbose_name="Status")
-    status.help_text: str = "0 - aktywny student, 1 - skreślony student"
+    block = models.BooleanField(verbose_name="blokada planu", default=False)
+    semestr = models.PositiveIntegerField(default=0, verbose_name="Semestr")
+    status = models.PositiveIntegerField(default=0, verbose_name="Status")
+    status.help_text = "0 - aktywny student, 1 - skreślony student"
 
-    t0: models.DateTimeField = models.DateTimeField(null=True, blank=True)
+    t0 = models.DateTimeField(null=True, blank=True)
 
-    ects_in_semester: models.SmallIntegerField = models.SmallIntegerField(default=0)
+    ects_in_semester = models.SmallIntegerField(default=0)
 
-    dyskretna_l: models.BooleanField = models.BooleanField(default=False)
-    numeryczna_l: models.BooleanField = models.BooleanField(default=False)
-    algorytmy_l: models.BooleanField = models.BooleanField(default=False)
-    programowanie_l: models.BooleanField = models.BooleanField(default=False)
+    dyskretna_l = models.BooleanField(default=False)
+    numeryczna_l = models.BooleanField(default=False)
+    algorytmy_l= models.BooleanField(default=False)
+    programowanie_l = models.BooleanField(default=False)
 
     objects: GettersManager = GettersManager()
 
     def is_active(self) -> bool:
-        """Returns True if student is active, False otherwise."""
         return self.status == 0
 
     def is_isim(self) -> bool:
-        """"Returns True if student's program is "ISIM, dzienne I stopnia", False otherwise."""
         try:
             return self.program == Program.objects.get(name='ISIM, dzienne I stopnia')
         except Program.DoesNotExist:
@@ -233,11 +230,11 @@ class Student(BaseUser):
         return '%s, semestr %s' % (self.program, semestr)
     get_type_of_studies.short_description = 'Studia'
 
-    def participated_in_last_grades(self) -> QuerySet:
+    def participated_in_last_grades(self) -> int:
         from apps.grade.ticket_create.models.student_graded import StudentGraded
         return StudentGraded.objects.filter(student=self, semester__in=[45, 239]).count()
 
-    def get_t0_interval(self) -> int:
+    def get_t0_interval(self) -> datetime.timedelta:
         """ returns t0 for student->start of records between 10:00 and 22:00; !record_opening hour should be 00:00:00! """
         if hasattr(self, '_counted_t0'):
             return self._counted_t0
@@ -269,7 +266,7 @@ class Student(BaseUser):
 
         return StudentPointsView.get_points_for_entities(self, records)
 
-    def get_points_with_course(self, course, semester: 'Semester'=None) -> int:
+    def get_points_with_course(self, course: 'Course', semester: 'Semester'=None) -> int:
         from apps.enrollment.courses.models.semester import Semester
         from apps.enrollment.courses.models.points import StudentPointsView
         from apps.enrollment.records.models import Record
@@ -330,8 +327,8 @@ class Program(models.Model):
     """
         Program of student studies
     """
-    name: models.CharField = models.CharField(max_length=50, unique=True, verbose_name="Program")
-    type_of_points: models.ForeignKey = models.ForeignKey(
+    name = models.CharField(max_length=50, unique=True, verbose_name="Program")
+    type_of_points = models.ForeignKey(
         'courses.PointTypes',
         verbose_name='rodzaj punktów',
         on_delete=models.CASCADE)
@@ -341,17 +338,17 @@ class Program(models.Model):
         verbose_name_plural: str = 'Programy studiów'
 
     def __str__(self) -> str:
-        return self.name
+        return self.name.__str__()
 
 
 class OpeningTimesView(models.Model):
-    student: models.ForeignKey = models.OneToOneField(Student, primary_key=True, on_delete=models.CASCADE,
+    student = models.OneToOneField(Student, primary_key=True, on_delete=models.CASCADE,
                                    related_name='opening_times')
-    course: models.ForeignKey = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
-    semester: models.ForeignKey = models.ForeignKey('courses.Semester', on_delete=models.CASCADE)
-    opening_time: models.DateTimeField = models.DateTimeField()
+    course = models.ForeignKey('courses.Course', on_delete=models.CASCADE)
+    semester = models.ForeignKey('courses.Semester', on_delete=models.CASCADE)
+    opening_time = models.DateTimeField()
 
-    objects: T0Manager = T0Manager()
+    objects = T0Manager()
 
     class Meta:
-        app_label: str = 'users'
+        app_label = 'users'
