@@ -5,7 +5,7 @@ from typing import List, Dict, Union, Any
 from rest_framework.request import Request
 
 
-def prepare_ajax_students_list(students: QuerySet) -> List[Dict[str, [Union[str, Any]]]]:
+def prepare_ajax_students_list(students: QuerySet) -> List[Dict[str, Union[str, Any]]]:
     return [{'id': s.user.id,
              'album': s.matricula,
              'recorded': True,
@@ -14,7 +14,7 @@ def prepare_ajax_students_list(students: QuerySet) -> List[Dict[str, [Union[str,
              'link': reverse('student-profile', args=[s.user.id])} for s in students]
 
 
-def prepare_ajax_employee_list(employees: QuerySet) -> List[Dict[str, [Union[str, Any]]]]:
+def prepare_ajax_employee_list(employees: QuerySet) -> List[Dict[str, Union[str, Any]]]:
     return [{'id': e.user.id,
              'email': e.user.email,
              'name': '%s %s' % (e.user.first_name, e.user.last_name),
