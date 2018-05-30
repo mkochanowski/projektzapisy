@@ -4,7 +4,11 @@ import factory
 from factory.django import DjangoModelFactory
 from factory import post_generation
 
-from apps.users.models import User, Student, Employee
+from django.conf import settings
+
+from apps.users.models import Student, Employee, User
+
+langs = [x[0] for x in settings.LANGUAGES]
 
 
 class UserFactory(DjangoModelFactory):

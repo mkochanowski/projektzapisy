@@ -17,9 +17,9 @@ logger = logging.getLogger()
 @user_passes_test(BaseUser.is_employee)
 def view(request):
     employee = request.user.employee
-    employee.make_preferences()
+    Preference.make_preferences(employee)
+    prefs = Preference.for_employee(employee)
 
-    prefs = employee.get_preferences()
     formset = PreferenceFormset(queryset=prefs)
     semester = Semester.get_current_semester()
 
@@ -49,8 +49,13 @@ def save(request):
         available_fields = [field.name for field in Preference._meta.get_fields()]
         changed_fields = set(available_fields) & set(request.POST.keys())
         for field in changed_fields:
-            setattr(pref, field, form[field].value())
+            try:
+                new_value = int(form[field].value())
+            except ValueError:
+                # We got an empty string - previously made choice has been taken back
+                new_value = None
+            setattr(pref, field, new_value)
         pref.save()
         form = PreferenceForm(instance=pref)
-        return render(request, 'offer/preferences/form_row.html', {'form': form, })
+        return render(request, 'offer/preferences/form_row.html', {'form': form})
     return AjaxFailureMessage('InvalidRequest', 'Coś poszło źle')

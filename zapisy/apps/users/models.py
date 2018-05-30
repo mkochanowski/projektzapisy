@@ -90,7 +90,7 @@ class BaseUser(models.Model):
         return False
 
     def __str__(self) -> str:
-        return self.get_full_name
+        return self.get_full_name()
 
     class Meta:
         abstract: bool = True
@@ -115,13 +115,21 @@ class Employee(BaseUser):
         verbose_name="Status")
     title = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
 
-    def make_preferences(self) -> None:
-        from apps.offer.preferences.models import Preference
-        Preference.make_preferences(self)
+    def has_privileges_for_group(self, group_id: int) -> bool:
+        """
+        Method used to verify whether user is allowed to create a poll for certain group
+        (== he is an admin, a teacher for this course or a teacher for this group)
+        """
+        from apps.enrollment.courses.models.group import Group
 
-    def get_preferences(self) -> 'Preference':
-        from apps.offer.preferences.models import Preference
-        return Preference.for_employee(self)
+        try:
+            group = Group.objects.get(pk=group_id)
+            return group.teacher == self or self in group.course.teachers.all() or self.user.is_staff
+        except Group.DoesNotExist:
+            logger.error(
+                'Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' %
+                group_id)
+        return False
 
     @staticmethod
     def get_actives() -> QuerySet:
