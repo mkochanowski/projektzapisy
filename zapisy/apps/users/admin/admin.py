@@ -1,10 +1,9 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.db.models import QuerySet
 import csv
-from typing import Any
 
 from apps.users.models import (
     Employee,
