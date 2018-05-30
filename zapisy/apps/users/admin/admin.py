@@ -28,7 +28,7 @@ class ExtendedUserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email')
 
 
-def export_as_csv(modeladmin: admin.ModelAdmin, request: Any, queryset: QuerySet) -> HttpResponse:
+def export_as_csv(modeladmin: admin.ModelAdmin, request: HttpRequest, queryset: QuerySet) -> HttpResponse:
     semester = Semester.get_current_semester()
 
     records = Record.objects.filter(
@@ -75,14 +75,14 @@ class StudentAdmin(admin.ModelAdmin):
 
     actions = [export_as_csv]
 
-    def get_queryset(self, request: Any) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         qs = super(StudentAdmin, self).get_queryset(request)
         return qs.select_related('program', 'program__type_of_points', 'user')
 
 
 class ProgramAdmin(admin.ModelAdmin):
 
-    def get_queryset(self, request: Any) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         qs = super(ProgramAdmin, self).get_queryset(request)
         return qs.select_related('type_of_points')
 
@@ -100,7 +100,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     ordering = ['user__last_name', 'user__first_name']
     list_display_links = ('get_full_name',)
 
-    def get_queryset(self, request: Any) -> QuerySet:
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
         qs = super(EmployeeAdmin, self).get_queryset(request)
         return qs.select_related('user')
 

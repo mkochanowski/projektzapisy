@@ -3,7 +3,7 @@ import json
 import datetime
 import unidecode
 import re
-from typing import Any
+from typing import Any, Optional
 
 from django.contrib import auth, messages
 from django.contrib.auth.models import User
@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import check_for_language, LANGUAGE_SESSION_KEY
 from django.conf import settings
@@ -48,7 +48,7 @@ BREAK_DURATION = datetime.timedelta(minutes=15)
 # Taking Any as argument was safer. Probably should be replaced with union of some types of requests in the future.
 
 @login_required
-def student_profile(request: Any, user_id: int) -> HttpResponse:
+def student_profile(request: HttpRequest, user_id: int) -> HttpResponse:
     """student profile"""
     try:
         student = Student.objects.select_related('user').get(user=user_id)
@@ -94,7 +94,7 @@ def student_profile(request: Any, user_id: int) -> HttpResponse:
         return render(request, 'common/error.html')
 
 
-def employee_profile(request: Any, user_id: int) -> HttpResponse:
+def employee_profile(request: HttpRequest, user_id: int) -> HttpResponse:
     """employee profile"""
     try:
         user = User.objects.select_related('employee').get(id=user_id)
@@ -152,7 +152,7 @@ def employee_profile(request: Any, user_id: int) -> HttpResponse:
 
 
 @login_required
-def set_language(request: Any) -> HttpResponse:
+def set_language(request: HttpRequest) -> HttpResponse:
     """
     Redirect to a given url while setting the chosen language in the
     session or cookie. The url and the language code need to be
@@ -176,7 +176,7 @@ def set_language(request: Any) -> HttpResponse:
 
 
 @login_required
-def email_change(request: Any) -> HttpResponse:
+def email_change(request: HttpRequest) -> HttpResponse:
     """function that enables mail changing"""
     if request.POST:
         data = request.POST.copy()
@@ -200,7 +200,7 @@ def email_change(request: Any) -> HttpResponse:
 
 
 @login_required
-def consultations_change(request: Any) -> HttpResponse:
+def consultations_change(request: HttpRequest) -> HttpResponse:
     """function that enables consultations changing"""
     try:
         employee = request.user.employee
@@ -222,7 +222,7 @@ def consultations_change(request: Any) -> HttpResponse:
 
 
 @login_required
-def password_change_done(request: Any) -> HttpResponse:
+def password_change_done(request: HttpRequest) -> HttpResponse:
     """informs if password were changed"""
     logger.info('User (%s) changed password' % request.user.get_full_name())
     messages.success(request, "Twoje hasło zostało zmienione.")
@@ -230,7 +230,7 @@ def password_change_done(request: Any) -> HttpResponse:
 
 
 @login_required
-def my_profile(request: Any) -> HttpResponse:
+def my_profile(request: HttpRequest) -> HttpResponse:
     """profile site"""
     semester = Semester.objects.get_next()
 
@@ -276,7 +276,7 @@ def my_profile(request: Any) -> HttpResponse:
     return TemplateResponse(request, 'users/my_profile.html', locals())
 
 
-def employees_list(request: Any, begin: str='All', query: str=None) -> HttpResponse:
+def employees_list(request: HttpRequest, begin: str='All', query: Optional[str]=None) -> HttpResponse:
 
     employees = Employee.get_list(begin)
 
@@ -293,10 +293,10 @@ def employees_list(request: Any, begin: str='All', query: str=None) -> HttpRespo
     return render(request, 'users/employees_list.html', data)
 
 
-def consultations_list(request: Any, begin: str='A') -> HttpResponse:
+def consultations_list(request: HttpRequest, begin: str='A') -> HttpResponse:
 
     employees = Employee.get_list('All')
-    semester = Semester.get_current_semester()
+    semester = Semester.get_current_semester
     employees = Group.teacher_in_present(employees, semester)
 
     if request.is_ajax():
@@ -311,7 +311,7 @@ def consultations_list(request: Any, begin: str='A') -> HttpResponse:
 
 
 @login_required
-def students_list(request: Any, begin: str='All', query: str=None) -> HttpResponse:
+def students_list(request: HttpRequest, begin: str='All', query: Optional[str]=None) -> HttpResponse:
     students = Student.get_list(begin)
 
     if request.is_ajax():
@@ -329,14 +329,14 @@ def students_list(request: Any, begin: str='All', query: str=None) -> HttpRespon
 
 
 @login_required
-def logout(request: Any) -> HttpResponse:
+def logout(request: HttpRequest) -> HttpResponse:
     """logout"""
     logger.info('User %s <id: %s> is logged out ' % (request.user.username, request.user.id))
     auth.logout(request)
     return HttpResponseRedirect('/')
 
 
-def login_plus_remember_me(request: Any, **kwargs: Any) -> HttpResponse:
+def login_plus_remember_me(request: HttpRequest, **kwargs: Any) -> HttpResponse:
     """
     Sign-in function with an option to save the session.
     If the user clicked the 'Remember me' button (we read it from POST data), the
@@ -365,7 +365,7 @@ def get_ical_filename(user: User, semester: Semester) -> str:
 
 
 @login_required
-def create_ical_file(request: Any) -> HttpResponse:
+def create_ical_file(request: HttpRequest) -> HttpResponse:
     user = request.user
     semester = Semester.get_default_semester()
 
@@ -413,7 +413,7 @@ def create_ical_file(request: Any) -> HttpResponse:
 
 
 @permission_required('users.mailto_all_students')
-def email_students(request: Any) -> HttpResponse:
+def email_students(request: HttpRequest) -> HttpResponse:
     """function that enables mailing all students"""
     students = Student.get_list('All')
     if students:

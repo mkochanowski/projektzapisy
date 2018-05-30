@@ -48,12 +48,10 @@ class BaseUser(models.Model):
     objects = Related()
 
     def get_full_name(self) -> str:
-        """Returns full user name."""
         return self.user.get_full_name()
     get_full_name.short_description = 'Użytkownik'
 
     def get_number_of_news(self) -> int:
-        """Returns number of news."""
         from apps.news.models import News
         if not hasattr(self, '_count_news'):
             self._count_news = News.objects.exclude(
@@ -97,9 +95,6 @@ class BaseUser(models.Model):
 
 
 class Employee(BaseUser):
-    """
-    Employee.
-    """
 
     user = models.OneToOneField(
         User,
@@ -172,9 +167,6 @@ class Employee(BaseUser):
 
 
 class Student(BaseUser):
-    '''
-    Student.
-    '''
 
     user = models.OneToOneField(
         User,
