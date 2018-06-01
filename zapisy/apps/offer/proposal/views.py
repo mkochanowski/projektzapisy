@@ -148,10 +148,16 @@ def proposal(request, slug=None):
     """
     try:
         proposals = CourseEntity.get_employee_proposals(request.user)
-        for_review = list(filter((lambda course: course.get_status() == 5), proposals))
-        not_accepted = list(filter((lambda course: course.get_status() == 0), proposals))
-        in_offer = list(filter((lambda course: 1 <= course.get_status() <= 3), proposals))
-        removed = list(filter((lambda course: course.get_status() == 4), proposals))
+        for_review = list(filter((lambda course: course.get_status() ==
+                                  CourseEntity.STATUS_FOR_REVIEW), proposals))
+        not_accepted = list(filter((lambda course: course.get_status() ==
+                                    CourseEntity.STATUS_PROPOSITION), proposals))
+        in_vote = list(filter((lambda course: course.get_status() ==
+                               CourseEntity.STATUS_TO_VOTE), proposals))
+        in_offer = list(filter((lambda course: course.get_status() ==
+                                CourseEntity.STATUS_IN_OFFER), proposals))
+        removed = list(filter((lambda course: course.get_status() ==
+                               CourseEntity.STATUS_WITHDRAWN), proposals))
         proposal = employee_proposal(request.user, slug)
         semester = Semester.get_current_semester()
     except NotOwnerException:
