@@ -496,10 +496,7 @@ class Student(BaseUser):
         return hasattr(self, 'consent')
 
     def consent_granted(self):
-        if self.consent_answered():
-            return self.consent.granted
-        else:
-            return False
+        return self.consent_answered() and self.consent.granted
 
     class Meta:
         verbose_name = 'student'
@@ -739,7 +736,7 @@ class OpeningTimesView(models.Model):
         app_label = 'users'
 
 
-class Consents(models.Model):
+class PersonalDataConsent(models.Model):
     """
         Model przechowuje zgody dotyczące udostępniania danych osobowych studentów
     """

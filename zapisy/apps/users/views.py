@@ -24,7 +24,7 @@ from apps.grade.ticket_create.models.student_graded import StudentGraded
 from apps.offer.vote.models.single_vote import SingleVote
 from apps.enrollment.courses.exceptions import MoreThanOneCurrentSemesterException
 from apps.users.utils import prepare_ajax_students_list, prepare_ajax_employee_list
-from apps.users.models import Employee, Student, BaseUser, UserProfile, OpeningTimesView, Consents
+from apps.users.models import Employee, Student, BaseUser, UserProfile, OpeningTimesView, PersonalDataConsent
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.records.models import Record
@@ -482,14 +482,14 @@ def email_students(request):
 
 @login_required
 @require_POST
-def consent(request):
+def personal_data_consent(request):
     if request.POST:
         if 'yes' in request.POST:
-            Consents.objects.update_or_create(student=request.user.student,
-                                              defaults={'granted': True})
+            PersonalDataConsent.objects.update_or_create(student=request.user.student,
+                                                         defaults={'granted': True})
             messages.success(request, 'Zgoda udzielona')
         if 'no' in request.POST:
-            Consents.objects.update_or_create(student=request.user.student,
-                                              defaults={'granted': False})
+            PersonalDataConsent.objects.update_or_create(student=request.user.student,
+                                                 defaults={'granted': False})
             messages.success(request, 'Brak zgody zapisany')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

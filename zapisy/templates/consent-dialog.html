@@ -13,14 +13,14 @@
             <img id="consent-icon" src="{% static 'images/ecommerce-user-profile.png' %}">
             <p>
               Potrzebujemy Twojej zgody, aby móc udostępniać Twoje dane osobowe innym studentom mającym konta w Systemie Zapisów.
-              Jeśli nie wyrazisz zgody, wówczas Twoje dane zostaną ukryte, ale wszystkie funkcjonalności Systemu Zapisów nadal będą dla Ciebie dostępne. Jeśli wyrazisz zgodę, w każdej chwili będziesz móc ją cofnąć.
+              Jeśli nie wyrazisz zgody, wówczas Twoje dane zostaną ukryte, ale wszystkie funkcjonalności Systemu Zapisów nadal będą dla Ciebie dostępne. Jeśli wyrazisz zgodę, w każdej chwili będziesz mógł ją cofnąć.
             </p>
             <p><strong>
               Czy zgadzasz się, by Twoje imię, nazwisko, adres e-mail oraz plan zajęć były widoczne dla innych studentów mających konta w Systemie Zapisów?</strong>
             </p>
           </div>
           <div class="modal-footer">
-            <form action="{% url 'consent' %}" method="post">
+            <form action="{% url 'personal_data_consent' %}" method="post">
               {% csrf_token %}
               <input type="submit" value="Nie zgadzam się" name="no" class="btn secondary" />
               <input type="submit" value="Zgadzam się" name="yes" class="btn primary" />

@@ -62,7 +62,7 @@ $('.checkall').live('click', function(){
             <td>{% if zamawiany.bank_account != None %}{{zamawiany.bank_account}}{% endif %}</td>
         </tr>{%endif%}
         {% if user.student %}
-        <form action="{% url 'consent' %}" method="post">
+        <form action="{% url 'personal_data_consent' %}" method="post">
             {% csrf_token %}
             <tr>
                 <th>Zgoda na udostępnianie danych innym studentom</th>
