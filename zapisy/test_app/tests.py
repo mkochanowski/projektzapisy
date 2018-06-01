@@ -115,13 +115,13 @@ class NewSemesterTests(SeleniumTestCase):
             user=user_student3, matricula='333333')
         self.student4 = Student.objects.create(
             user=user_student4, matricula='444444')
-        PersonalDataConsent.objects.update_or_create(student=self.student1
+        PersonalDataConsent.objects.update_or_create(student=self.student1,
                                                      defaults={'granted': True})
-        PersonalDataConsent.objects.update_or_create(student=self.student2
+        PersonalDataConsent.objects.update_or_create(student=self.student2,
                                                      defaults={'granted': True})
-        PersonalDataConsent.objects.update_or_create(student=self.student3
+        PersonalDataConsent.objects.update_or_create(student=self.student3,
                                                      defaults={'granted': True})
-        PersonalDataConsent.objects.update_or_create(student=self.student4
+        PersonalDataConsent.objects.update_or_create(student=self.student4,
                                                      defaults={'granted': True})
         self.course_type = Type.objects.create(name='Informatyczny')
         for i in range(1, 6):
