@@ -398,21 +398,24 @@ class Student(BaseUser):
         return cls.objects.filter(status=0)
 
     @staticmethod
-    def get_list(begin='All'):
+    def get_list(begin='All', restrict_list_consent=True):
         def next_char(begin):
             try:
                 return chr(ord(begin) + 1)
             except ValueError:
                 return chr(90)
+
+        qs = Student.objects.filter(status=0)
+        if restrict_list_consent:
+            qs = qs.filter(consent__granted=True)
         if begin == 'Z':
-            return Student.objects.filter(status=0, user__last_name__gte=begin).\
+            return qs.filter(user__last_name__gte=begin).\
                 select_related().order_by('user__last_name', 'user__first_name')
         elif begin == 'All':
-            return Student.objects.filter(status=0).\
-                select_related().order_by('user__last_name', 'user__first_name')
+            return qs.select_related().order_by('user__last_name', 'user__first_name')
         else:
             end = next_char(begin)
-            return Student.objects.filter(status=0, user__last_name__range=(begin, end)).\
+            return qs.filter(user__last_name__range=(begin, end)).\
                 select_related().order_by('user__last_name', 'user__first_name')
 
     @staticmethod

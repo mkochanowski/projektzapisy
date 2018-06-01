@@ -47,11 +47,11 @@ BREAK_DURATION = datetime.timedelta(minutes=15)
 
 @login_required
 def student_profile(request, user_id):
-    if not BaseUser.is_employee(request.user):
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     """student profile"""
     try:
         student = Student.objects.select_related('user').get(user=user_id)
+        if not BaseUser.is_employee(request.user) and not student.consent_granted:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         courses_with_terms = prepare_schedule_courses(
             request, for_student=student)
         votes = SingleVote.get_votes(student)
@@ -72,7 +72,7 @@ def student_profile(request, user_id):
         if request.is_ajax():
             return render(request, 'users/student_profile_contents.html', data)
         else:
-            students = Student.get_list()
+            students = Student.get_list('All', not BaseUser.is_employee(request.user))
             enrolled_students = Record.recorded_students(students)
             data['students'] = enrolled_students
             data['char'] = "All"
@@ -336,9 +336,7 @@ def consultations_list(request, begin='A'):
 
 @login_required
 def students_list(request, begin='All', query=None):
-    if not BaseUser.is_employee(request.user):
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    students = Student.get_list(begin)
+    students = Student.get_list(begin, not BaseUser.is_employee(request.user))
 #    students = Record.recorded_students(students)
 
     if request.is_ajax():
