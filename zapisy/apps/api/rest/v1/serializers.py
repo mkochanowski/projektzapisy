@@ -5,6 +5,7 @@ from apps.enrollment.courses.models.classroom import Classroom
 from apps.enrollment.courses.models.semester import Semester
 from apps.users.models import Employee
 from apps.offer.desiderata.models import Desiderata, DesiderataOther
+from apps.schedule.models.specialreservation import SpecialReservation
 
 
 class SemesterSerializer(serializers.ModelSerializer):
@@ -48,4 +49,10 @@ class DesiderataSerializer(serializers.ModelSerializer):
 class DesiderataOtherSerializer(serializers.ModelSerializer):
     class Meta:
         model = DesiderataOther
+        fields = '__all__'
+
+
+class SpecialReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SpecialReservation
         fields = '__all__'

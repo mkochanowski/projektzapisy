@@ -6,8 +6,10 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.users.models import Employee
 from apps.users.utils import StaffPermission
 from apps.offer.desiderata.models import Desiderata, DesiderataOther
+from apps.schedule.models.specialreservation import SpecialReservation
 
-from .serializers import ClassroomSerializer, EmployeeSerializer, SemesterSerializer, DesiderataSerializer, DesiderataOtherSerializer
+from .serializers import ClassroomSerializer, EmployeeSerializer, SemesterSerializer, \
+    DesiderataSerializer, DesiderataOtherSerializer, SpecialReservationSerializer
 
 
 class SemesterViewSet(viewsets.ModelViewSet):
@@ -42,4 +44,11 @@ class DesiderataOtherViewSet(viewsets.ModelViewSet):
     permission_classes = (StaffPermission,)
     queryset = DesiderataOther.objects.all()
     serializer_class = DesiderataOtherSerializer
+    filter_fields = '__all__'
+
+
+class SpecialReservationViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get']
+    queryset = SpecialReservation.objects.all()
+    serializer_class = SpecialReservationSerializer
     filter_fields = '__all__'
