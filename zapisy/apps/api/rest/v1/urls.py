@@ -1,6 +1,8 @@
 from rest_framework import routers
 
-from .views import ClassroomViewSet, DesiderataOtherViewSet, DesiderataViewSet, EmployeeViewSet, SemesterViewSet, SpecialReservationViewSet
+from .views import (ClassroomViewSet, DesiderataOtherViewSet,
+                    DesiderataViewSet, EmployeeViewSet, SemesterViewSet,
+                    SpecialReservationViewSet)
 
 router = routers.DefaultRouter()
 router.register(r'semesters', SemesterViewSet)

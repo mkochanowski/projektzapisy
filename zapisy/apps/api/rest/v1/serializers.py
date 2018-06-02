@@ -3,9 +3,9 @@ from rest_framework import serializers
 
 from apps.enrollment.courses.models.classroom import Classroom
 from apps.enrollment.courses.models.semester import Semester
-from apps.users.models import Employee
 from apps.offer.desiderata.models import Desiderata, DesiderataOther
 from apps.schedule.models.specialreservation import SpecialReservation
+from apps.users.models import Employee
 
 
 class SemesterSerializer(serializers.ModelSerializer):

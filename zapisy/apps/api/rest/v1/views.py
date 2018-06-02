@@ -1,15 +1,17 @@
 from rest_framework import viewsets
-from rest_framework.authentication import BasicAuthentication, SessionAuthentication
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication)
 
 from apps.enrollment.courses.models.classroom import Classroom
 from apps.enrollment.courses.models.semester import Semester
-from apps.users.models import Employee
-from apps.users.utils import StaffPermission
 from apps.offer.desiderata.models import Desiderata, DesiderataOther
 from apps.schedule.models.specialreservation import SpecialReservation
+from apps.users.models import Employee
+from apps.users.utils import StaffPermission
 
-from .serializers import ClassroomSerializer, EmployeeSerializer, SemesterSerializer, \
-    DesiderataSerializer, DesiderataOtherSerializer, SpecialReservationSerializer
+from .serializers import (ClassroomSerializer, DesiderataOtherSerializer,
+                          DesiderataSerializer, EmployeeSerializer,
+                          SemesterSerializer, SpecialReservationSerializer)
 
 
 class SemesterViewSet(viewsets.ModelViewSet):
