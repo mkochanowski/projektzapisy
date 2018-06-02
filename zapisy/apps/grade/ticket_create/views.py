@@ -2,7 +2,6 @@ import json
 from functools import reduce
 
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -18,21 +17,21 @@ from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_key
     secure_signer, unblind, get_valid_tickets, to_plaintext, connect_groups, secure_signer_without_save, secure_mark
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
-
+from apps.users.decorators import employee_required, student_required
 
 # KEYS generate:
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def ajax_keys_generate(request):
     generate_keys_for_polls()
     return HttpResponse("OK")
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def ajax_keys_progress(request):
     count = cache.get('generated-keys', 0)
     return HttpResponse(str(count))
 
-@user_passes_test(BaseUser.is_student)
+@student_required
 def ajax_get_rsa_keys_step1(request):
     message = "No XHR"
     if request.is_ajax():
@@ -47,7 +46,7 @@ def ajax_get_rsa_keys_step1(request):
                 message = json.dumps(tickets)
     return HttpResponse(message)
 
-@user_passes_test(BaseUser.is_student)
+@student_required
 def ajax_get_rsa_keys_step2( request ):
     message = "No XHR"
     if request.is_ajax():
@@ -70,7 +69,7 @@ def ajax_get_rsa_keys_step2( request ):
                 message = json.dumps(unblinds)
     return HttpResponse(message)
 
-@user_passes_test(BaseUser.is_student)
+@student_required
 def connections_choice(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     students_polls = Poll.get_all_polls_for_student(request.user.student)

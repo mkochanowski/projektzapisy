@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import user_passes_test
-from apps.users.models import BaseUser
-
+from apps.users.decorators import employee_required
 def main_page(request):
     return render(request, 'help/base.html', {})
 
@@ -39,6 +37,6 @@ def offer(request):
 def admin(request):
     return render(request, 'help/admin.html', {})
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def employee(request):
     return render(request, 'help/employee.html', {})

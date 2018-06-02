@@ -1,0 +1,31 @@
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import user_passes_test
+from apps.users.models import BaseUser
+
+
+def student_required(view_func=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+    """
+    Decorator for views that checks that the user is student, redirecting to the login page if necessary.
+    """
+    actual_decorator = user_passes_test(
+        BaseUser.is_student,
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
+    if view_func:
+        return actual_decorator(view_func)
+    return actual_decorator
+
+
+def employee_required(view_func=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+    """
+    Decorator for views that checks that the user is employee, redirecting to the login page if necessary.
+    """
+    actual_decorator = user_passes_test(
+        BaseUser.is_employee,
+        login_url=login_url,
+        redirect_field_name=redirect_field_name
+    )
+    if view_func:
+        return actual_decorator(view_func)
+    return actual_decorator

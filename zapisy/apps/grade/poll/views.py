@@ -2,7 +2,7 @@ import json
 from functools import cmp_to_key
 
 from django.contrib import auth, messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -30,24 +30,24 @@ from apps.grade.poll.utils import check_signature, prepare_data, group_polls_and
     make_message_from_polls, save_template_in_session, make_polls_for_all, get_templates, \
     make_template_from_db, get_groups_for_user, make_pages, edit_poll, prepare_data_for_create_template
 
-from apps.users.models import Employee, Program, BaseUser
+from apps.users.models import Employee, Program
 from apps.grade.poll.form_utils import get_section_form_data, validate_section_form, section_save
 from apps.grade.poll.exceptions import NoTitleException, NoSectionException, NoPollException
-
+from apps.users.decorators import employee_required
 
 def main(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     return TemplateResponse(request, 'grade/main.html', locals())
 
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def template_form(request, group_id=0):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     data = prepare_data_for_create_poll(request, group_id)
     data['grade'] = grade
     return TemplateResponse(request, 'grade/poll/ajax_template_create.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def templates(request):
     """
         List of templates
@@ -65,7 +65,7 @@ def templates(request):
     data['tab'] = "template_list"
     return render(request, 'grade/poll/managment/templates.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def template_actions(request):
     """
         Action for templates
@@ -91,7 +91,7 @@ def template_actions(request):
     # Nothing happend, back to list.
     return HttpResponseRedirect(reverse('grade-poll-templates'))
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def delete_templates(request):
     if request.method == 'POST':
         counter = delete_objects(request, Template, 'templates[]')
@@ -100,7 +100,7 @@ def delete_templates(request):
 
     return HttpResponseRedirect(reverse('grade-poll-templates'))
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def use_templates(request):
     """
         Aply templates - make polls!
@@ -145,7 +145,7 @@ def create_poll_from_template(request, templates):
 
     return len(message)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def show_template(request, template_id):
     template = Template.objects.get(pk=template_id)
     form = PollForm()
@@ -163,7 +163,7 @@ def show_template(request, template_id):
 # save poll as template
 # @author mjablonski
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def create_template(request):
     if request.method != "POST":
         raise Http404
@@ -178,7 +178,7 @@ def rules(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     return render(request, 'grade/rules.html', {'grade': grade})
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def enable_grade(request):
     if request.method == 'POST':
         sid = request.POST.get('semester_id')
@@ -206,7 +206,7 @@ def enable_grade(request):
 
     return render(request, 'grade/enable.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def disable_grade(request):
     semester_id = request.POST.get('semester_id')
     semester = Semester.objects.get(id=semester_id)
@@ -231,7 +231,7 @@ def disable_grade(request):
 
 #### Poll creation ####
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def autocomplete(request):
     results = []
     if request.method == "GET":
@@ -248,7 +248,7 @@ def autocomplete(request):
         json_ = ""
     return HttpResponse(json_, content_type='application/javascript')
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def ajax_get_groups(request):
     message = "No XHR"
     if request.is_ajax():
@@ -260,7 +260,7 @@ def ajax_get_groups(request):
     return HttpResponse(message)
 
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def ajax_get_courses(request):
     message = "No XHR"
     if request.is_ajax():
@@ -271,7 +271,7 @@ def ajax_get_courses(request):
     return HttpResponse(message)
 
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def edit_section(request, section_id):
     from django.template import loader
     form = PollForm()
@@ -279,14 +279,14 @@ def edit_section(request, section_id):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     return render(request, 'grade/poll/section_edit.html', {"form": form, 'grade': grade})
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def poll_form(request, group_id=0):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     data = prepare_data_for_create_poll(request, group_id)
     data['grade'] =  grade
     return render(request, 'grade/poll/ajax_poll_create.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def poll_edit_form(request, poll_id):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     poll = Poll.objects.get(pk=poll_id)
@@ -304,7 +304,7 @@ def poll_edit_form(request, poll_id):
     data['poll'] = poll
     return render(request, 'grade/poll/ajax_poll_edit.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def poll_edit(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
@@ -332,11 +332,11 @@ def poll_edit(request):
     return HttpResponseRedirect(reverse('grade-poll-list'))
 
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def poll_create_for_group():
     pass
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def poll_create(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
@@ -376,7 +376,7 @@ def poll_create(request):
 # Poll managment
 #
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def sections_list(request):
     """
         Preparation of sections list; if user is member of the staff he will also
@@ -399,7 +399,7 @@ def sections_list(request):
     data['tab'] = "section_list"
     return render(request, 'grade/poll/managment/sections_list.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def show_section(request, section_id):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     if grade:
@@ -419,7 +419,7 @@ def show_section(request, section_id):
     else:
         return render(request, 'grade/poll/managment/show_section.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def get_section(request, section_id):
     form = PollForm()
     form.setFields(None, None, section_id)
@@ -428,7 +428,7 @@ def get_section(request, section_id):
                   {"form": form, "section_id": section_id, 'grade': grade})
 
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def section_actions(request):
     data = {}
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
@@ -441,7 +441,7 @@ def section_actions(request):
 
     return HttpResponseRedirect(reverse('grade-poll-sections-list'))
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def delete_sections(request):
     if request.method == 'POST':
         counter = delete_objects(request, Section, 'sections[]')
@@ -450,7 +450,7 @@ def delete_sections(request):
 
     return HttpResponseRedirect(reverse('grade-poll-sections-list'))
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def polls_list(request):
     data = {}
     semester = Semester.get_current_semester()
@@ -519,7 +519,7 @@ def polls_list(request):
 
     return render(request, 'grade/poll/managment/polls_list.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def show_poll(request, poll_id):
     poll = Poll.objects.get(pk=poll_id)
     form = PollForm()
@@ -533,7 +533,7 @@ def show_poll(request, poll_id):
     else:
         return render(request, 'grade/poll/managment/show_poll.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def poll_actions(request):
     data = {}
     data['grade'] = Semester.objects.filter(is_grade_active=True).count() > 0
@@ -544,7 +544,7 @@ def poll_actions(request):
             return render(request, 'grade/poll/managment/poll_confirm_delete.html', data)
     return HttpResponseRedirect(reverse('grade-poll-list'))
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def delete_polls(request):
     if request.method == 'POST':
         counter = delete_objects(request, Poll, 'polls[]')
@@ -553,7 +553,7 @@ def delete_polls(request):
 
     return HttpResponseRedirect(reverse('grade-poll-list'))
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def groups_without_poll(request):
     data = {}
     data['groups'] = Poll.get_groups_without_poll()
@@ -561,7 +561,7 @@ def groups_without_poll(request):
     data['tab'] = "group_without"
     return render(request, 'grade/poll/managment/groups_without_polls.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def poll_manage(request):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     data = {}
@@ -569,7 +569,7 @@ def poll_manage(request):
     data['grade'] = grade
     return render(request, 'grade/poll/manage.html', data)
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def get_section_form(request):
     data = {}
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
@@ -578,7 +578,7 @@ def get_section_form(request):
     return render(request, 'grade/poll/ajax_section_create.html', data)
 
 
-@user_passes_test(BaseUser.is_employee)
+@employee_required
 def questionset_create(request):
     data = {}
     grade = Semester.objects.filter(is_grade_active=True).count() > 0

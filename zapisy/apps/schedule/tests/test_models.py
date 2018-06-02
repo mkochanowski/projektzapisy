@@ -416,6 +416,57 @@ class EventTestCase(TestCase):
         )
         self.assertRaises(ValidationError, term.full_clean)
 
+    def test_clean__student_cant_add_exam(self):
+        student = StudentFactory().user
+        event = factories.EventFactory.build(author=student, type=Event.TYPE_EXAM)
+        self.assertRaises(ValidationError, event.full_clean)
+
+    def test_clean__student_cant_add_test(self):
+        student = StudentFactory().user
+
+        event = factories.EventFactory.build(author=student, type=Event.TYPE_TEST)
+        self.assertRaises(ValidationError, event.full_clean)
+
+    def test_clean__employee_can_add_exam(self):
+        employee = EmployeeFactory().user
+
+        event = factories.EventFactory.build(author=employee, type=Event.TYPE_EXAM)
+        event.full_clean()
+
+    def test_clean__employee_can_add_test(self):
+        employee = EmployeeFactory().user
+
+        event = factories.EventFactory.build(author=employee, type=Event.TYPE_TEST)
+        event.full_clean()
+
+    def test_clean__student_cant_add_accepted_event(self):
+        student = StudentFactory().user
+
+        event = factories.EventFactory.build(author=student)
+        self.assertRaises(ValidationError, event.full_clean)
+
+    def test_clean__employee_can_add_accepted_event(self):
+        employee = EmployeeFactory().user
+
+        event = factories.EventFactory.build(author=employee)
+        event.full_clean()
+
+    def test_new_exam_after_clean_is_public(self):
+        exam = factories.EventFactory(type=Event.TYPE_EXAM)
+
+        employee = EmployeeFactory(user=exam.author)
+        employee.full_clean()
+        exam.full_clean()
+        self.assertTrue(exam.visible)
+
+    def test_after_clean_new_test_is_public(self):
+        test = factories.EventFactory(type=Event.TYPE_TEST)
+
+        employee = EmployeeFactory(user=test.author)
+        employee.full_clean()
+        test.full_clean()
+        self.assertTrue(test.visible)
+
     def test_normal_user_cant_see_invisible_event(self):
         user = UserFactory()
         event = factories.EventInvisibleFactory.build()
