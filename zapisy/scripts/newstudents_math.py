@@ -1,9 +1,9 @@
 from mailer.models import Message
 from django.core.exceptions import ObjectDoesNotExist
 from apps.enrollment.courses.models.semester import Semester
-from zapisy.apps.users.models import Student, Program, UserProfile
+from zapisy.apps.users.models import Student, Program
 from django.contrib.auth.models import User
-from django.db import transaction, connection
+from django.db import connection
 import datetime
 import random
 
@@ -20,7 +20,6 @@ def create_user(indeks, imie, nazwisko, mail, pswd):
     s.semestr = 1
     s.program = p
     s.save()
-    up = UserProfile.objects.create(user=user, is_student=True)
     return user
 
 

@@ -47,7 +47,7 @@ def ajax_get_rsa_keys_step1(request):
     return HttpResponse(message)
 
 @student_required
-def ajax_get_rsa_keys_step2( request ):
+def ajax_get_rsa_keys_step2(request):
     message = "No XHR"
     if request.is_ajax():
         if request.method == 'POST':

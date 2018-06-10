@@ -23,11 +23,13 @@ if TYPE_CHECKING:
 logger = logging.getLogger()
 
 EMPLOYEE_STATUS_CHOICES = [(0, 'aktywny'), (1, 'nieaktywny')]
+ISIM_PROGRAM_NAME = 'ISIM, dzienne I stopnia'
 
 
 class Related(models.Manager):
     def get_queryset(self) -> QuerySet:
         return super(Related, self).get_queryset().select_related('user')
+
 
 class BaseUser(models.Model):
     """
@@ -208,7 +210,7 @@ class Student(BaseUser):
 
     def is_isim(self) -> bool:
         try:
-            return self.program == Program.objects.get(name='ISIM, dzienne I stopnia')
+            return self.program == Program.objects.get(name=ISIM_PROGRAM_NAME)
         except Program.DoesNotExist:
             return False
 

@@ -283,7 +283,7 @@ def edit_section(request, section_id):
 def poll_form(request, group_id=0):
     grade = Semester.objects.filter(is_grade_active=True).count() > 0
     data = prepare_data_for_create_poll(request, group_id)
-    data['grade'] =  grade
+    data['grade'] = grade
     return render(request, 'grade/poll/ajax_poll_create.html', data)
 
 @employee_required
