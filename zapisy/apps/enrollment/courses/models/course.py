@@ -169,7 +169,7 @@ class CourseEntity(models.Model):
     created = models.DateTimeField(verbose_name='Utworzono', auto_now_add=True)
     edited = models.DateTimeField(verbose_name='Ostatnia zmiana', auto_now=True)
 
-    in_prefs = models.BooleanField(verbose_name='w preferencjach', default=True)
+    in_prefs = models.BooleanField(verbose_name='w preferencjach', default=False)
 
     dyskretna_l = models.BooleanField(default=False,
                                       verbose_name='Przedmiot posiada również wersje: Dyskretna (L)')
@@ -283,7 +283,7 @@ class CourseEntity(models.Model):
         ordering = ['name_pl']
 
     def get_points(self, student=None):
-        from apps.enrollment.courses.models import StudentPointsView, PointsOfCourseEntities
+        from apps.enrollment.courses.models.points import StudentPointsView, PointsOfCourseEntities
 
         if student:
             try:
@@ -443,16 +443,6 @@ class CourseEntity(models.Model):
     @staticmethod
     def get_vote():
         return CourseEntity.noremoved.filter(status=CourseEntity.STATUS_TO_VOTE)
-
-    @staticmethod
-    def get_voters():
-        from apps.offer.vote.models.single_vote import SingleVote
-        from apps.offer.vote.models.system_state import SystemState
-
-        year = date.today().year
-        current_state = SystemState.get_state(year)
-
-        return SingleVote.objects.distinct('student').filter(state=current_state)
 
     @staticmethod
     def get_proposals(is_authenticated=False):
@@ -848,7 +838,7 @@ class Course(models.Model):
             Return True if  Course have reservation for exam
         """
 
-        from apps.schedule.models import Event
+        from apps.schedule.models.event import Event
 
         if not self.exam:
             return False

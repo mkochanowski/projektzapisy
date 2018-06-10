@@ -4,12 +4,10 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.db.models.query import EmptyQuerySet
 from django import forms
 from modeltranslation.admin import TranslationAdmin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
-from apps.enrollment.courses.models import *
 from apps.enrollment.courses.models.classroom import Classroom
 from apps.enrollment.courses.models.course import Course, CourseDescription, CourseEntity, TagCourseEntity
 from apps.enrollment.courses.models.course_type import Type
@@ -20,6 +18,7 @@ from apps.enrollment.courses.models.semester import Semester, Freeday, ChangedDa
 from apps.enrollment.courses.models.tag import Tag
 from apps.enrollment.courses.models.term import Term
 from apps.enrollment.records.models import Record, Queue
+from apps.enrollment.records.utils import run_rearanged
 
 
 class GroupInline(admin.TabularInline):
@@ -178,7 +177,7 @@ class CourseEntityAdmin(TranslationAdmin):
         ('Zmiana sposobu liczenia punktów', {'fields': ['algorytmy_l', 'dyskretna_l', 'numeryczna_l', 'programowanie_l']}),
         (None, {'fields': ['ue', 'english', 'exam', 'suggested_for_first_year', 'deleted']}),
         ('USOS', {'fields': ['usos_kod'], 'classes': ['collapse']}),
-
+        ('W preferencjach', {'fields': ['in_prefs']}),
     ]
     list_filter = ('semester', 'status', 'type', EffectsListFilter, 'owner')
     form = CourseEntityForm
@@ -315,7 +314,6 @@ class GroupAdmin(admin.ModelAdmin):
             rearrange = rearrange and (obj.limit_isim != old.limit_isim or obj.limit_zamawiane != old.limit_zamawiane or
                                        obj.limit_zamawiane2012 != old.limit_zamawiane2012 or obj.limit != old.limit)
             if rearrange:
-                from ...records.utils import run_rearanged
                 for _ in range(obj.limit - obj.enrolled):
                     run_rearanged(None, obj)
 
@@ -323,7 +321,8 @@ class GroupAdmin(admin.ModelAdmin):
 
     def after_saving_model_and_related_inlines(self, obj):
         from apps.enrollment.courses.models.term import Term as T
-        from apps.schedule.models import Event, Term
+        from apps.schedule.models.event import Event
+        from apps.schedule.models.term import Term
         # Perform extra operation after all inlines are saved
 
         Event.objects.filter(group=obj, type='3').delete()

@@ -19,6 +19,7 @@ from apps.enrollment.courses.models.points import PointsOfCourseEntities, PointT
 from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.group import Group
 from apps.enrollment.courses.models.course_type import Type
+from apps.offer.preferences.models import Preference
 
 from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm, SyllabusForm
 from apps.offer.proposal.models import Syllabus, StudentWork
@@ -91,7 +92,7 @@ def course_groups(request, slug):
         teachers = Employee.objects.all()
 
         for teacher in teachers:
-            prefs = teacher.get_preferences().filter(proposal=course.entity).all()
+            prefs = Preference.for_employee(teacher).filter(proposal=course.entity).all()
             pref = None
             if len(prefs) > 0:
                 pref = prefs[len(prefs) - 1].tutorial
@@ -147,10 +148,16 @@ def proposal(request, slug=None):
     """
     try:
         proposals = CourseEntity.get_employee_proposals(request.user)
-        for_review = list(filter((lambda course: course.get_status() == 5), proposals))
-        not_accepted = list(filter((lambda course: course.get_status() == 0), proposals))
-        in_offer = list(filter((lambda course: 1 <= course.get_status() <= 3), proposals))
-        removed = list(filter((lambda course: course.get_status() == 4), proposals))
+        for_review = [course for course in proposals
+                      if course.get_status() == CourseEntity.STATUS_FOR_REVIEW]
+        not_accepted = [course for course in proposals
+                        if course.get_status() == CourseEntity.STATUS_PROPOSITION]
+        in_vote = [course for course in proposals
+                   if course.get_status() == CourseEntity.STATUS_TO_VOTE]
+        in_offer = [course for course in proposals
+                    if course.get_status() == CourseEntity.STATUS_IN_OFFER]
+        removed = [course for course in proposals
+                   if course.get_status() == CourseEntity.STATUS_WITHDRAWN]
         proposal = employee_proposal(request.user, slug)
         semester = Semester.get_current_semester()
     except NotOwnerException:
