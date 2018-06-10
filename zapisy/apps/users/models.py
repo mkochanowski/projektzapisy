@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 
 from django.db import models
 from django.conf import settings
@@ -291,21 +291,24 @@ class Student(BaseUser):
         return cls.objects.filter(status=0)
 
     @staticmethod
-    def get_list(begin: str='All') -> QuerySet:
+    def get_list(begin: str='All', restrict_list_consent: Optional[bool]=True) -> QuerySet:
         def next_char(begin: str) -> str:
             try:
                 return chr(ord(begin) + 1)
             except ValueError:
                 return chr(90)
+
+        qs = Student.objects.filter(status=0)
+        if restrict_list_consent:
+            qs = qs.filter(consent__granted=True)
         if begin == 'Z':
-            return Student.objects.filter(status=0, user__last_name__gte=begin).\
+            return qs.filter(user__last_name__gte=begin).\
                 select_related().order_by('user__last_name', 'user__first_name')
         elif begin == 'All':
-            return Student.objects.filter(status=0).\
-                select_related().order_by('user__last_name', 'user__first_name')
+            return qs.select_related().order_by('user__last_name', 'user__first_name')
         else:
             end = next_char(begin)
-            return Student.objects.filter(status=0, user__last_name__range=(begin, end)).\
+            return qs.filter(user__last_name__range=(begin, end)).\
                 select_related().order_by('user__last_name', 'user__first_name')
 
     def records_set_locked(self, locked: bool) -> None:
@@ -354,3 +357,18 @@ class OpeningTimesView(models.Model):
 
     class Meta:
         app_label = 'users'
+
+
+class PersonalDataConsent(models.Model):
+    """
+        Model przechowuje zgody dotyczące udostępniania danych osobowych studentów
+    """
+    student = models.OneToOneField(Student, related_name='consent', on_delete=models.CASCADE)
+    granted = models.NullBooleanField(verbose_name="zgoda udzielona")
+
+    class Meta:
+        verbose_name = 'Zgoda na udostępnianie danych osobowych'
+        verbose_name_plural = 'Zgody na udostępnianie danych osobowych'
+
+    def __str__(self):
+        return f"{self.student.get_full_name()}: {self.granted}"
