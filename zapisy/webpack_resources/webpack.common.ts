@@ -136,7 +136,7 @@ module.exports = function(config: any) {
 				// 1) tsc: TS -> ES6
 				// 2) babel: ES6 -> ES5 (and polyfilling)
 				{
-					test: /\.ts?$/,
+					test: /\.tsx?$/,
 					use: [
 						{ loader: "babel-loader" },
 						{
@@ -206,7 +206,7 @@ module.exports = function(config: any) {
 				path.resolve(ASSET_DIR),
 				path.resolve("/webpack_modules/node_modules"),
 			],
-			extensions: [".ts", ".js", ".vue"],
+			extensions: [".ts", ".js", ".vue", ".tsx"],
 			alias: {
 				"vue$": "vue/dist/vue.runtime.esm.js",
 			},

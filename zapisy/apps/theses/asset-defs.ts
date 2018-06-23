@@ -1,7 +1,7 @@
 module.exports = {
 	bundles: {
 		"main": [
-			"theses-main.ts",
+			"theses-main.tsx",
 		],
 	},
 };

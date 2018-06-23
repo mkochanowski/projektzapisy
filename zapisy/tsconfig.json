@@ -4,22 +4,21 @@
     "target": "es6",
     "alwaysStrict": true,
     "strict": true,
+    "strictNullChecks": false,
     "module": "commonjs",
-    "baseUrl": "/",
+    "baseUrl": "",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "*": [
         "/vagrant/zapisy/assets/*",
-        "/webpack_modules/node_modules/*",
-        "./webpack_resources/typings/*"
+        "/webpack_modules/node_modules/*"
       ]
     },
     "typeRoots": [
-      "/webpack_modules/node_modules/@types",
-      "./webpack_resources/typings"
+      "/webpack_modules/node_modules/@types/",
+      "./webpack_resources/typings/"
     ],
     "traceResolution": true
-  },
-  "include": [
-    "assets/tsfix/index.ts"
-  ]
+  }
 }
