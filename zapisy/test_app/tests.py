@@ -516,7 +516,7 @@ class NewSemesterTests(SeleniumTestCase):
             lambda: self.driver.find_element_by_link_text('Oferta').click())
         self.wait_for_pass(
             lambda: self.driver.find_element_by_link_text('Głosowanie').click())
-        self.wait_for_pass(lambda: WebDriverWait(self.driver, 5).until(
+        self.wait_for_pass(lambda: WebDriverWait(self.driver, 1).until(
             EC.element_to_be_clickable((By.LINK_TEXT, 'Głosuj'))).click())
 
         for course_name, value in points.items():
