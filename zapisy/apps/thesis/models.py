@@ -54,8 +54,16 @@ class Thesis(models.Model):
 	added_date = models.DateTimeField(auto_now_add=True)
 	modified_date = models.DateTimeField(auto_now=True)
 
+	class Meta:
+		verbose_name="Praca dyplomowa"
+		verbose_name_plural="Prace dyplomowe"
+
 class ThesisCommissionMember(models.Model):
 	member = models.ForeignKey(Employee)
+
+	class Meta:
+		verbose_name="Członek komisji"
+		verbose_name_plural="Członkowie komisji"
 
 
 class ThesisVote(Enum):
@@ -78,3 +86,6 @@ class ThesisVoteBinding(models.Model):
 
 class ThesisSystemSettings(models.Model):
 	num_required_votes = models.IntegerField()
+
+	class Meta:
+		verbose_name_plural="Ustawienia systemu prac dyplomowych"
