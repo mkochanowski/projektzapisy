@@ -37,12 +37,20 @@ THESIS_STATUS_CHOICES = (
 
 class Thesis(models.Model):
 	title = models.CharField(max_length=MAX_THESIS_TITLE_LEN)
-	advisor = models.ForeignKey(Employee, on_delete=models.PROTECT, null=True)
-	auxiliary_advisor = models.ForeignKey(Employee, on_delete=models.PROTECT, null=True)
+	advisor = models.ForeignKey(
+		Employee, on_delete=models.PROTECT, null=True, related_name="thesis_advisor",
+	)
+	auxiliary_advisor = models.ForeignKey(
+		Employee, on_delete=models.PROTECT, null=True, related_name="thesis_auxiliary_advisor",
+	)
 	kind = models.SmallIntegerField(choices=THESIS_KIND_CHOICES)
 	reserved = models.BooleanField(default=False)
-	student = models.ForeignKey(Student, on_delete=models.PROTECT, null=True)
-	student_2 = models.ForeignKey(Student, on_delete=models.PROTECT, null=True)
+	student = models.ForeignKey(
+		Student, on_delete=models.PROTECT, null=True, related_name="thesis_student",
+	)
+	student_2 = models.ForeignKey(
+		Student, on_delete=models.PROTECT, null=True, related_name="thesis_student_2",
+	)
 	added_date = models.DateTimeField(auto_now_add=True)
 	modified_date = models.DateTimeField(auto_now=True)
 
@@ -66,3 +74,7 @@ class ThesisVoteBinding(models.Model):
 	thesis = models.ForeignKey(Thesis)
 	voter = models.ForeignKey(Employee)  # should be a member of the thesis commission
 	vote = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
+
+
+class ThesisSystemSettings(models.Model):
+	num_required_votes = models.IntegerField()

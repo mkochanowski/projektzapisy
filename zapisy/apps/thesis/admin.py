@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from . import models
+
+admin.site.register(models.Thesis)
+admin.site.register(models.ThesisCommissionMember)
+admin.site.register(models.ThesisVoteBinding)
+admin.site.register(models.ThesisSystemSettings)
