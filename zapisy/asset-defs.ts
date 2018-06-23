@@ -8,4 +8,9 @@ module.exports = {
 		{ from: "legacy/favicon.ico", to: "favicon.ico" },
 		{ from: "legacy/feed-icon.png", to: "feed-icon.png" }
 	],
+	bundles: {
+        "main": [
+            "common/libs.ts",
+		],
+	},
 };
