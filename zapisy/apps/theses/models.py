@@ -58,7 +58,7 @@ class Thesis(models.Model):
 		verbose_name="praca dyplomowa"
 		verbose_name_plural="prace dyplomowe"
 
-class ThesisCommissionMember(models.Model):
+class ThesesCommissionMember(models.Model):
 	member = models.ForeignKey(Employee)
 
 	class Meta:
@@ -80,11 +80,11 @@ THESIS_VOTE_CHOICES = (
 
 class ThesisVoteBinding(models.Model):
 	thesis = models.ForeignKey(Thesis)
-	voter = models.ForeignKey(Employee)  # should be a member of the thesis commission
+	voter = models.ForeignKey(Employee)  # should be a member of the theses commission
 	vote = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
 
 
-class ThesisSystemSettings(models.Model):
+class ThesesSystemSettings(models.Model):
 	num_required_votes = models.IntegerField()
 
 	class Meta:

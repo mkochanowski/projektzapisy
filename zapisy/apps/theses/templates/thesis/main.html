@@ -1,0 +1,7 @@
+{% load render_bundle from webpack_loader %}
+
+{% extends "base.html" %}
+
+{% block js %}
+	{% render_bundle "theses-main" %}
+{% endblock %}
