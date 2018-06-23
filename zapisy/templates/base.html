@@ -130,7 +130,11 @@
                     <li{% block events_active %}{% endblock %}>
                         <a href="{% url 'events:classrooms' %}">Sale</a>
                     </li>
-
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'theses:main' %}">Prace dyplomowe</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 {% if user.is_authenticated %}
                     <div class="user-panel">
