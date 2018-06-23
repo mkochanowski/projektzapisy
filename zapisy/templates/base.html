@@ -4,6 +4,7 @@
 {% load should_display_debug %}
 {% load debug_info %}
 {% load i18n %}
+{% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
 <html lang="pl">
@@ -14,6 +15,7 @@
           content="System obsługi cyklu dydaktycznego Instytut Informatyki Uniwersytetu Wrocławskiego">
     <meta name="author" content="KSI i Studenci Instytutu Informatyki Uniwersytetu Wrocławskiego">
     <script src="{% static "vendor.js" %}"></script>
+    {% render_bundle "main" %}
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
     <link rel="apple-touch-icon" href="{% static 'images/apple-touch-icon.png' %}">
