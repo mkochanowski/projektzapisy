@@ -139,7 +139,6 @@ const allAssetDefs = getAllAssetDefs();
 console.log(allAssetDefs);
 
 const copyCommands = buildCopyCommandsForRawfiles(allAssetDefs.rawfiles);
-console.warn("Copy commands:", copyCommands);
 
 const webpackConfig: webpack.Configuration = {
 	entry: Object.assign({
