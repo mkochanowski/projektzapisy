@@ -6,19 +6,11 @@
     "strict": true,
     "strictNullChecks": false,
     "module": "commonjs",
-    "baseUrl": "",
     "jsx": "react",
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "paths": {
-      "*": [
-        "/vagrant/zapisy/assets/*",
-        "/webpack_modules/node_modules/*"
-      ]
-    },
     "typeRoots": [
-      "/webpack_modules/node_modules/@types/",
-      "./webpack_resources/typings/"
+      "./node_modules/@types",
+      "./webpack_resources/typings"
     ],
     "traceResolution": true
   },

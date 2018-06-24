@@ -204,7 +204,7 @@ module.exports = function(config: any) {
 		resolve: {
 			modules: [
 				path.resolve(ASSET_DIR),
-				path.resolve("/webpack_modules/node_modules"),
+				path.resolve("./node_modules"),
 			],
 			extensions: [".ts", ".js", ".vue", ".tsx"],
 			alias: {
@@ -213,7 +213,7 @@ module.exports = function(config: any) {
 		},
 		resolveLoader: {
 			modules: [
-				path.resolve("/webpack_modules/node_modules"),
+				path.resolve("./node_modules"),
 			],
 		},
 		plugins: [
