@@ -394,6 +394,7 @@ class NewSemesterTests(SeleniumTestCase):
         self.system_state.save()
 
     def vote(self, student, points):
+        assert(hasattr(student.user, "student") and student.user.student)
         self.driver.get('{}{}'.format(self.live_server_url, '/users/logout/'))
         self.driver.get(self.live_server_url)
         self.wait_for_pass(
