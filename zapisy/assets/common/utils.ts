@@ -1,8 +1,8 @@
 // Common utility functions shared between apps
-
 import * as $ from "jquery";
+import { UnconstrainedFunction } from "./types";
 
-function scrollUpToElementIfWindowBelow(selector: string) {
+export function scrollUpToElementIfWindowBelow(selector: string) {
 	const SCROL_TIME = 400;
 	const currentWindowTop = $(window).scrollTop();
 	if (!currentWindowTop) {
@@ -18,4 +18,7 @@ function scrollUpToElementIfWindowBelow(selector: string) {
 	}
 }
 
-export { scrollUpToElementIfWindowBelow };
+// TODO make sure this is correct - differences between browsers etc
+export function whenDomLoaded(cb: UnconstrainedFunction): void {
+	window.addEventListener("DOMContentLoaded", cb);
+}
