@@ -9,8 +9,7 @@
     "typeRoots": [
       "./node_modules/@types",
       "./webpack_resources/typings"
-    ],
-    "traceResolution": true
+    ]
   },
   "exclude": [
     "./node_modules",
