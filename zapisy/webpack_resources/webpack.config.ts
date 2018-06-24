@@ -6,9 +6,9 @@ import * as webpack from "webpack";
 const BundleTracker = require("webpack-bundle-tracker");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
+const WebpackShellPlugin = require('webpack-shell-plugin');
 
 const smp = new SpeedMeasurePlugin();
 
@@ -32,14 +32,21 @@ const ASSET_DEF_SEARCH_DIR = "apps";
 type RawfileDef = {
 	from: string,
 	to: string
-} | string;
+};
 
 type AssetDefs = {
 	bundles?: {
-		[key: string]: Array<string>
+		[key: string]: string[],
 	},
-	rawfiles?: Array<RawfileDef>
+	rawfiles?: Array<RawfileDef | string>
 };
+
+type FinalAssetDefs = {
+	bundles?: {
+		[key: string]: string[],
+	},
+	rawfiles?: RawfileDef[],
+}
 
 function mergeAssetDefs(defs: AssetDefs, newDefs: AssetDefs): AssetDefs {
 	defs.bundles = defs.bundles || {};
@@ -68,8 +75,8 @@ function getFileInputPath(packageDir: string, packageFilePath: string): string {
 	return path.resolve(packageDir, ASSET_DIR, packageFilePath);
 }
 
-function processDefs(defs: AssetDefs, packageName: string, packageDir: string): AssetDefs {
-	const result: AssetDefs = {
+function processDefs(defs: AssetDefs, packageName: string, packageDir: string): FinalAssetDefs {
+	const result: FinalAssetDefs = {
 		bundles: {},
 		rawfiles: [],
 	};
@@ -106,7 +113,7 @@ function readAsssetDefsFromFile(filepath: string): AssetDefs {
 }
 
 function getAllAssetDefs() {
-	const result: AssetDefs = {
+	const result: FinalAssetDefs = {
 		bundles: {},
 		rawfiles: [],
 	};
@@ -122,15 +129,25 @@ function getAllAssetDefs() {
 	return result;
 }
 
+function buildCopyCommandsForRawfiles(rawfiles : RawfileDef[]) : string[] {
+	return (rawfiles || []).map(r => {
+		return `cp -r ${r.from} ${r.to}`;
+	});
+}
+
 const allAssetDefs = getAllAssetDefs();
 console.log(allAssetDefs);
+
+const copyCommands = buildCopyCommandsForRawfiles(allAssetDefs.rawfiles);
+console.warn("Copy commands:", copyCommands);
+
 const webpackConfig: webpack.Configuration = {
 	entry: Object.assign({
 		polyfill: "babel-polyfill",
 	}, allAssetDefs.bundles),
 	output: {
 		path: path.resolve(BUNDLE_OUTPUT_DIR),
-		filename: DEV ? "[name]_[hash].js" : "[hash].min.js",
+		filename: DEV ? "[name]_[hash].js" : "[name]_[hash].min.js",
 	},
 	watchOptions: {
 		poll: 1000
@@ -273,7 +290,18 @@ const webpackConfig: webpack.Configuration = {
 		new BundleTracker({ filename: "webpack_resources/webpack-stats.json" }),
 		// This will copy "raw" assets - ones where we don't want any transformations
 		// (e.g. bootstrap styles)
-		new CopyWebpackPlugin(allAssetDefs.rawfiles),
+		// We're not using copy-webpack-plugin because that tries to determine
+		// which files changed in watch mode and it takes forever (around 30 seconds)
+		// due to the slow shared filesystem we're using
+		new WebpackShellPlugin({
+			onBuildEnd: [
+				'echo Copying static assets...',
+				...copyCommands,
+			],
+			// If this is set, the command won't be run on incremental builds in watch mode
+			// (matters for performance)
+			dev: DEV,
+		})
 	],
 };
 module.exports = webpackConfig;
