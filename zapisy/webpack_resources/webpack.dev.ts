@@ -1,7 +1,10 @@
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+
+const smp = new SpeedMeasurePlugin();
 const merge = require("webpack-merge");
 const common = require("./webpack.common.ts");
 
-module.exports = merge(common({
+module.exports = smp.wrap(merge(common({
 	minifyCss: false,
 	vueCssOptions: {
 		sourceMap: true,
@@ -9,4 +12,4 @@ module.exports = merge(common({
 	}
 }), {
 	devtool: "inline-source-map"
-});
+}));
