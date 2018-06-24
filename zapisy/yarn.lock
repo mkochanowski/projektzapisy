@@ -1630,6 +1630,10 @@ deep-extend@^0.4.1, deep-extend@~0.4.0:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.4.2.tgz#48b699c27e334bf89f10892be432f6e4c7d34a7f"
 
+deepmerge@^2.0.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-2.1.1.tgz#e862b4e45ea0555072bf51e7fd0d9845170ae768"
+
 define-properties@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/define-properties/-/define-properties-1.1.2.tgz#83a73f2fea569898fb737193c8f873caf6d45c94"
@@ -5171,7 +5175,7 @@ strip-indent@^1.0.1:
   dependencies:
     get-stdin "^4.0.1"
 
-strip-json-comments@^2.0.0, strip-json-comments@~2.0.1:
+strip-json-comments@^2.0.0, strip-json-comments@^2.0.1, strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
@@ -5335,6 +5339,15 @@ ts-node@^3.3.0:
     tsconfig "^6.0.0"
     v8flags "^3.0.0"
     yn "^2.0.0"
+
+tsconfig-paths@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.4.0.tgz#d19fe80c5b245f99d17363471971eab54e65a8a7"
+  dependencies:
+    deepmerge "^2.0.1"
+    minimist "^1.2.0"
+    strip-bom "^3.0.0"
+    strip-json-comments "^2.0.1"
 
 tsconfig@^6.0.0:
   version "6.0.0"

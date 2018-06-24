@@ -4,9 +4,9 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --progress --colors --config webpack_resources/webpack.dev.ts",
-    "devw": "webpack --progress --colors --watch --config webpack_resources/webpack.dev.ts",
-    "build": "webpack --progress --colors --config webpack_resources/webpack.prod.ts"
+    "dev": "TS_NODE_PROJECT=\"tsconfig.webpack-config.json\" webpack --progress --colors --config webpack_resources/webpack.dev.ts",
+    "devw": "TS_NODE_PROJECT=\"tsconfig.webpack-config.json\" webpack --progress --colors --watch --config webpack_resources/webpack.dev.ts",
+    "build": "TS_NODE_PROJECT=\"tsconfig.webpack-config.json\" webpack --progress --colors --config webpack_resources/webpack.prod.ts"
   },
   "repository": {
     "type": "git",
@@ -50,6 +50,7 @@
     "style-loader": "^0.19.0",
     "ts-loader": "^3.1.0",
     "ts-node": "^3.3.0",
+    "tsconfig-paths": "^3.4.0",
     "tslint": "^5.8.0",
     "tslint-config-standard": "^7.0.0",
     "typescript": "^2.5.3",
