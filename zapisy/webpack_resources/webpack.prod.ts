@@ -1,10 +1,13 @@
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+
+const smp = new SpeedMeasurePlugin();
 const merge = require("webpack-merge");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const common = require("./webpack.common.ts");
 const webpack = require("webpack");
 
-module.exports = merge(common({
+module.exports = smp.wrap(merge(common({
 	minifyCss: true,
 	vueCssOptions: {
 		sourceMap: false,
@@ -33,4 +36,4 @@ module.exports = merge(common({
 			},
 		}),
 	]
-});
+}));
