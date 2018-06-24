@@ -106,16 +106,6 @@ function getAllAssetDefs() {
 	return result;
 }
 
-function isExternal(module: any) {
-	const context = module.context;
-
-	if (typeof context !== "string") {
-		return false;
-	}
-
-	return context.indexOf("node_modules") !== -1;
-}
-
 const allAssetDefs = getAllAssetDefs();
 console.log(allAssetDefs);
 module.exports = function(config: any) {
@@ -218,11 +208,9 @@ module.exports = function(config: any) {
 		},
 		plugins: [
 			new webpack.optimize.CommonsChunkPlugin({
-				name: "vendor",
-				filename: "vendor.js",
-				minChunks: function(module: any) {
-					return isExternal(module);
-				}
+				name: "common_chunks",
+				filename: "common_chunks.js",
+				minChunks: 2,
 			}),
 			new CleanWebpackPlugin([path.resolve(BUNDLE_OUTPUT_DIR)], {
 				verbose:  true,
