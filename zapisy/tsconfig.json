@@ -3,6 +3,7 @@
     "sourceMap": true,
     "target": "es6",
     "alwaysStrict": true,
+    "strictNullChecks": true,
     "strict": true,
     "jsx": "react",
     "module": "es2015",

@@ -2,8 +2,8 @@
 import * as $ from "jquery";
 import { UnconstrainedFunction } from "./types";
 
-export function scrollUpToElementIfWindowBelow(selector: string) {
-	const SCROL_TIME = 400;
+const SCROLL_TIME = 400;
+export function scrollUpToElementIfWindowBelow(selector: string): void {
 	const currentWindowTop = $(window).scrollTop();
 	if (!currentWindowTop) {
 		return;
@@ -14,11 +14,14 @@ export function scrollUpToElementIfWindowBelow(selector: string) {
 	}
 	const elemTop = elem.offset()!.top;
 	if (currentWindowTop > elemTop) {
-		$("html, body")!.animate({ scrollTop: elemTop }, SCROL_TIME);
+		$("html, body").animate({ scrollTop: elemTop }, SCROLL_TIME);
 	}
 }
 
-// TODO make sure this is correct - differences between browsers etc
-export function whenDomLoaded(cb: UnconstrainedFunction): void {
-	window.addEventListener("DOMContentLoaded", cb);
+export function whenDomLoaded(fn : UnconstrainedFunction): void {
+	if (document.readyState !== "loading") {
+		fn();
+	} else {
+		window.addEventListener("DOMContentLoaded", fn);
+	}
 }
