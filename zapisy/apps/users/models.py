@@ -214,6 +214,12 @@ class Student(BaseUser):
         except Program.DoesNotExist:
             return False
 
+    def consent_answered(self):
+        return hasattr(self, 'consent')
+
+    def consent_granted(self):
+        return self.consent_answered() and self.consent.granted
+
     def get_type_of_studies(self) -> str:
         """Returns type of studies."""
         semestr = {
