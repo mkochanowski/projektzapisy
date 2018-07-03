@@ -35,9 +35,9 @@ jobs:
           path: zapisy/htmlcov
 workflows:
   version: 2
-  build_and_test:
+  setup_and_test:
     jobs:
       - setup
       - test
         requires:
-          - build
+          - setup
