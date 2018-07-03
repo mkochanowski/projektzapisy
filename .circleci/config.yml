@@ -18,11 +18,6 @@ jobs:
       - run: mkdir zapisy/logs zapisy/static
       - run: cd zapisy && NODE_PATH=/webpack_modules/node_modules yarn build
       - run: cd zapisy && python manage.py collectstatic --noinput
-  test:
-    docker:
-      - image: circleci/python:3.6.5-stretch-node-browsers
-    steps:
-      - checkout
       - run: cd zapisy && sudo coverage run manage.py test apps.news.tests --nomigrations
       - run: cd zapisy && sudo coverage run manage.py test apps.schedule --nomigrations
       - run: cd zapisy && sudo coverage run manage.py test apps.enrollment.courses --nomigrations
@@ -33,11 +28,3 @@ jobs:
       - run: cd zapisy && sudo coverage html
       - store_artifacts:
           path: zapisy/htmlcov
-workflows:
-  version: 2
-  build_and_test:
-    jobs:
-      - build
-      - test
-        requires:
-          - build
