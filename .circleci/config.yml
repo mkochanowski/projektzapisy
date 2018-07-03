@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  setup:
+  build:
     docker:
       - image: circleci/python:3.6.5-stretch-node-browsers
     steps:
@@ -35,9 +35,9 @@ jobs:
           path: zapisy/htmlcov
 workflows:
   version: 2
-  setup_and_test:
+  build_and_test:
     jobs:
-      - setup
+      - build
       - test
         requires:
-          - setup
+          - build
