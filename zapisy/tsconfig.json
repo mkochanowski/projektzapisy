@@ -1,16 +1,26 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "sourceMap": true,
     "target": "es6",
     "alwaysStrict": true,
     "strictNullChecks": true,
     "strict": true,
     "jsx": "react",
-    "module": "es2015",
+    "module": "esnext",
     "baseUrl": "./assets",
     "typeRoots": [
       "./node_modules/@types",
       "./webpack_resources/typings"
+    ],
+    "types":[
+      "jquery",
+      "clipboard",
+      "js-cookie",
+      "react",
+      "react-dom",
+      "react-table",
+      "csstype"
     ]
   },
   "exclude": [

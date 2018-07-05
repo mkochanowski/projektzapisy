@@ -6,5 +6,10 @@
   },
   "include": [
 	"./webpack_resources"
+  ],
+  "types": [
+    "node",
+    "webpack",
+    "glob"
   ]
 }

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
 	rawfiles: [
 		{ from: "legacy/css/", to: "css/" },
 		{ from: "legacy/help/", to: "help/" },
