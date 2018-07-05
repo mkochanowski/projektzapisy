@@ -1,14 +1,23 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as glob from "glob";
+import * as os from "os";
+
 import { getVueCssLoaders } from "./webpack-utils";
 import * as webpack from "webpack";
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
+import HappyPack from "happypack";
 const BundleTracker = require("webpack-bundle-tracker");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const WebpackShellPlugin = require('webpack-shell-plugin');
+
+console.warn("Init webpack config");
+
+// Leave one cpu free for the ts type checker
+const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 });
 
 const smp = new SpeedMeasurePlugin();
 
@@ -107,7 +116,7 @@ function processDefs(defs: AssetDefs, packageName: string, packageDir: string): 
 function readAsssetDefsFromFile(filepath: string): AssetDefs {
 	const dirPath = path.dirname(filepath);
 	const dirName = path.basename(dirPath);
-	const defs: AssetDefs = require(path.resolve(filepath));
+	const defs: AssetDefs = require(path.resolve(filepath)).default;
 	const packageName = dirName !== "." ? dirName : "";
 	return processDefs(defs, packageName, dirPath);
 }
@@ -189,19 +198,13 @@ const webpackConfig: webpack.Configuration = {
 			// 2) babel: ES6 -> ES5 (and polyfilling)
 			{
 				test: /\.ts?$/,
-				use: [
-					{ loader: "babel-loader" },
-					{
-						loader: "ts-loader",
-						options: { appendTsSuffixTo: [/\.vue$/] }
-					},
-				],
+				loader: "happypack/loader?id=tsbabel",
 				exclude: /node_modules/,
 			},
 			// ES6 source: babel converts to ES5 (and polyfills)
 			{
 				test: /\.js?$/,
-				loader: "babel-loader",
+				loader: "happypack/loader?id=babel",
 				exclude: /node_modules/
 			},
 			{
@@ -300,7 +303,42 @@ const webpackConfig: webpack.Configuration = {
 			// If this is set, the command won't be run on incremental builds in watch mode
 			// (matters for performance)
 			dev: DEV,
-		})
+		}),
+		new HappyPack({
+            id: "tsbabel",
+            threadPool: happyThreadPool,
+            loaders: [
+				{
+					loader: "cache-loader",
+					query: {
+						cacheDirectory: path.resolve("node_modules/.cache-loader-tsbabel")
+					}
+				},
+				{ loader: "babel-loader" },
+				{
+					loader: "ts-loader",
+					query: {
+						appendTsSuffixTo: [/\.vue$/],
+						transpileOnly: true,
+						happyPackMode: true,
+					}
+				},
+            ],
+		}),
+		new HappyPack({
+            id: "babel",
+            threadPool: happyThreadPool,
+            loaders: [
+				{
+					loader: "cache-loader",
+					query: {
+						cacheDirectory: path.resolve("node_modules/.cache-loader-babel")
+					}
+				},
+				{ loader: "babel-loader" },
+            ],
+        }),
+		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
 	],
 };
 module.exports = webpackConfig;

@@ -4,11 +4,15 @@
     "target": "es6",
     "alwaysStrict": true,
     "strict": true,
-    "module": "es2015",
+    "module": "esnext",
     "baseUrl": "./assets",
     "typeRoots": [
       "./node_modules/@types",
       "./webpack_resources/typings"
+    ],
+    "types":[
+      "jquery",
+      
     ]
   },
   "exclude": [
