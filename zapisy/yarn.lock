@@ -41,6 +41,12 @@
     "@types/node" "*"
     "@types/react" "*"
 
+"@types/react-table@^6.7.11":
+  version "6.7.11"
+  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-6.7.11.tgz#26e85411981054af7dd657ef81e249baa6aee3d5"
+  dependencies:
+    "@types/react" "*"
+
 "@types/react@*", "@types/react@^16.4.1":
   version "16.4.1"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.4.1.tgz#c53bbfb4a78933db587da085ac60dbf5fcf73f8f"
@@ -1378,6 +1384,10 @@ class-utils@^0.3.5:
     define-property "^0.2.5"
     isobject "^3.0.0"
     static-extend "^0.1.1"
+
+classnames@^2.2.5:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
 
 clean-webpack-plugin@^0.1.17:
   version "0.1.18"
@@ -4788,6 +4798,12 @@ react-dom@^16.4.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.0"
+
+react-table@^6.8.6:
+  version "6.8.6"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-6.8.6.tgz#a0ad8b4839319052d5befc012603fb161e52ede3"
+  dependencies:
+    classnames "^2.2.5"
 
 react@^16.4.1:
   version "16.4.1"
