@@ -199,6 +199,17 @@ const webpackConfig: webpack.Configuration = {
 			{
 				test: /\.tsx?$/,
 				loader: "happypack/loader?id=tsbabel",
+				// use: [
+				// 	{ loader: "babel-loader" },
+		 		// 	{
+		 		// 		loader: "ts-loader",
+		 		// 		options: {
+		 		// 			appendTsSuffixTo: [/\.vue$/],
+		 		// 			transpileOnly: true,
+		 		// 			happyPackMode: true,
+		 		// 		}
+		 		// 	},
+				// ],
 				exclude: /node_modules/,
 			},
 			// ES6 source: babel converts to ES5 (and polyfills)
@@ -318,9 +329,11 @@ const webpackConfig: webpack.Configuration = {
 				{
 					loader: "ts-loader",
 					query: {
-						appendTsSuffixTo: [/\.vue$/],
-						transpileOnly: true,
+						// TODO: this does not work in happypack mode for some reason;
+						// if we want vue, either try out thread-loader or don't use happy here
+						// appendTsSuffixTo: [/\.vue$/],
 						happyPackMode: true,
+						transpileOnly: true,
 					}
 				},
             ],

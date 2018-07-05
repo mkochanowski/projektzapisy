@@ -15,8 +15,6 @@
     ],
     "types":[
       "jquery",
-      "clipboard",
-      "js-cookie",
       "react",
       "react-dom",
       "react-table",

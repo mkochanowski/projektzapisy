@@ -1,5 +1,4 @@
-"use strict";
-module.exports = {
+export default {
     bundles: {
         "course-list": [
             "ajaxCourseLoad.ts",
