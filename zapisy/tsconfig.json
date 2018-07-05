@@ -12,7 +12,8 @@
     ],
     "types":[
       "jquery",
-      
+      "clipboard",
+      "js-cookie"
     ]
   },
   "exclude": [
