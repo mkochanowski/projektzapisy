@@ -212,7 +212,6 @@ class Employee(BaseUser):
             raise NonEmployeeException()
         return groups
 
-
     class Meta:
         verbose_name = 'pracownik'
         verbose_name_plural = 'Pracownicy'

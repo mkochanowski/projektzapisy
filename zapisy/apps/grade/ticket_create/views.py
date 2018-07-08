@@ -101,7 +101,7 @@ def connections_choice(request):
                     groups = []
                 prepared_tickets = list(zip(groups, unblindt, unblindst))
                 # final mark:
-                for g, t, unblind in prepared_tickets:
+                for g, t, _ in prepared_tickets:
                     secure_mark(request.user, g, t)
                 errors, tickets_to_serve = get_valid_tickets(prepared_tickets)
                 if errors:
@@ -218,8 +218,8 @@ def client_connection(request):
 
 @csrf_exempt
 def keys_list(request):
-    l = PublicKey.objects.all()  # .order_by('poll__group__course__name')
-    return render(request, 'grade/ticket_create/keys_list.html', {'list': l, })
+    keys = PublicKey.objects.all()  # .order_by('poll__group__course__name')
+    return render(request, 'grade/ticket_create/keys_list.html', {'list': keys})
 
 
 @csrf_exempt
