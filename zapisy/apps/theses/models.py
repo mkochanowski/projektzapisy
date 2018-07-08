@@ -14,11 +14,11 @@ class ThesisKind(Enum):
 	bachelors_engineers = 3,
 	isim = 4
 THESIS_KIND_CHOICES = (
-	(ThesisKind.masters, "mgr"),
-	(ThesisKind.engineers, "inż"),
-	(ThesisKind.bachelors, "lic"),
-	(ThesisKind.bachelors_engineers, "lic+inż"),
-	(ThesisKind.isim, "isim"),
+	(ThesisKind.masters.value, "mgr"),
+	(ThesisKind.engineers.value, "inż"),
+	(ThesisKind.bachelors.value, "lic"),
+	(ThesisKind.bachelors_engineers.value, "lic+inż"),
+	(ThesisKind.isim.value, "isim"),
 )
 
 class ThesisStatus(Enum):
@@ -28,28 +28,28 @@ class ThesisStatus(Enum):
 	in_progress = 4,
 	defended = 5,
 THESIS_STATUS_CHOICES = (
-	(ThesisStatus.being_evaluated, "poddana pod głosowanie"),	
-	(ThesisStatus.returned_for_corrections, "zwrócona do poprawek"),
-	(ThesisStatus.accepted, "zaakceptowana"),
-	(ThesisStatus.in_progress, "w realizacji"),
-	(ThesisStatus.defended, "obroniona"),	
+	(ThesisStatus.being_evaluated.value, "poddana pod głosowanie"),	
+	(ThesisStatus.returned_for_corrections.value, "zwrócona do poprawek"),
+	(ThesisStatus.accepted.value, "zaakceptowana"),
+	(ThesisStatus.in_progress.value, "w realizacji"),
+	(ThesisStatus.defended.value, "obroniona"),	
 )
 
 class Thesis(models.Model):
 	title = models.CharField(max_length=MAX_THESIS_TITLE_LEN)
 	advisor = models.ForeignKey(
-		Employee, on_delete=models.PROTECT, null=True, related_name="thesis_advisor",
+		Employee, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_advisor",
 	)
 	auxiliary_advisor = models.ForeignKey(
-		Employee, on_delete=models.PROTECT, null=True, related_name="thesis_auxiliary_advisor",
+		Employee, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_auxiliary_advisor",
 	)
 	kind = models.SmallIntegerField(choices=THESIS_KIND_CHOICES)
 	reserved = models.BooleanField(default=False)
 	student = models.ForeignKey(
-		Student, on_delete=models.PROTECT, null=True, related_name="thesis_student",
+		Student, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_student",
 	)
 	student_2 = models.ForeignKey(
-		Student, on_delete=models.PROTECT, null=True, related_name="thesis_student_2",
+		Student, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_student_2",
 	)
 	added_date = models.DateTimeField(auto_now_add=True)
 	modified_date = models.DateTimeField(auto_now=True)
@@ -72,10 +72,10 @@ class ThesisVote(Enum):
 	accepted = 3
 	user_missing = 4  # not sure about this one
 THESIS_VOTE_CHOICES = (
-	(ThesisVote.none, "brak głosu"),
-	(ThesisVote.rejected, "odrzucona"),
-	(ThesisVote.accepted, "zaakceptowana"),
-	(ThesisVote.user_missing, "brak użytkownika"),
+	(ThesisVote.none.value, "brak głosu"),
+	(ThesisVote.rejected.value, "odrzucona"),
+	(ThesisVote.accepted.value, "zaakceptowana"),
+	(ThesisVote.user_missing.value, "brak użytkownika"),
 )
 
 class ThesisVoteBinding(models.Model):
