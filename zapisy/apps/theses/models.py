@@ -22,11 +22,11 @@ THESIS_KIND_CHOICES = (
 )
 
 class ThesisStatus(Enum):
-	being_evaluated = 1,
-	returned_for_corrections = 2,
-	accepted = 3,
-	in_progress = 4,
-	defended = 5,
+	being_evaluated = 1
+	returned_for_corrections = 2
+	accepted = 3
+	in_progress = 4
+	defended = 5
 THESIS_STATUS_CHOICES = (
 	(ThesisStatus.being_evaluated.value, "poddana pod głosowanie"),	
 	(ThesisStatus.returned_for_corrections.value, "zwrócona do poprawek"),
@@ -44,6 +44,7 @@ class Thesis(models.Model):
 		Employee, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_auxiliary_advisor",
 	)
 	kind = models.SmallIntegerField(choices=THESIS_KIND_CHOICES)
+	status = models.SmallIntegerField(choices=THESIS_STATUS_CHOICES)
 	reserved = models.BooleanField(default=False)
 	student = models.ForeignKey(
 		Student, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_student",
