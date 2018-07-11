@@ -14,7 +14,14 @@ dependencies:
     - pip install --upgrade pip
     - pip install -r requirements.test.txt
     - npm i -g npm  # Make sure we're using the latest npm version
+    # Remove folders that might have been left over from previous commands
+    # and that would cause problems
+    - rm -rf /home/ubuntu/.yarn/ && rm -rf node_modules
+    - npm --version
+    - npm root -g
     - npm i -g yarn
+    - which yarn
+    - yarn --version
     - ./npm.sh
     - pip freeze
 
