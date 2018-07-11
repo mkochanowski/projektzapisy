@@ -30,13 +30,11 @@ from apps.enrollment.records.exceptions import NonGroupException, AlreadyPinnedE
 from apps.enrollment.records.models import Record, Queue, logger
 from apps.enrollment.records.utils import run_rearanged, prepare_courses_with_terms, prepare_groups_json
 
-
 from apps.cache_utils import cache_result
 from apps.enrollment.courses.views import prepare_courses_list_to_render
 from apps.enrollment.utils import mailto
 from apps.users.decorators import employee_required
 from apps.users.models import BaseUser, Student
-
 
 from libs.ajax_messages import AjaxFailureMessage, AjaxSuccessMessage
 
@@ -262,6 +260,7 @@ def records(request, group_id):
         messages.info(request, "Podana grupa nie istnieje.")
         return render(request, 'common/error.html')
 
+
 @employee_required
 def records_group_csv(request, group_id):
     try:
@@ -270,7 +269,7 @@ def records_group_csv(request, group_id):
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=' + \
-            re.sub(r'\s', '', slugify(str(group))) + '-group.csv'
+                                          re.sub(r'\s', '', slugify(str(group))) + '-group.csv'
 
         writer = csv.writer(response)
         for s in students_in_group:
@@ -283,6 +282,7 @@ def records_group_csv(request, group_id):
     except (NonGroupException, ObjectDoesNotExist):
         raise Http404
 
+
 @employee_required
 def records_queue_csv(request, group_id):
     try:
@@ -291,7 +291,7 @@ def records_queue_csv(request, group_id):
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=' + \
-            re.sub(r'\s', '', slugify(str(group))) + '-queue.csv'
+                                          re.sub(r'\s', '', slugify(str(group))) + '-queue.csv'
 
         writer = csv.writer(response)
         for s in students_in_queue:
@@ -321,7 +321,7 @@ def own(request):
         sum_points = student.get_points()
 
     if not BaseUser.is_student(request.user) and \
-       not BaseUser.is_employee(request.user):
+            not BaseUser.is_employee(request.user):
         messages.info(request, 'Nie jesteś pracownikiem ani studentem.')
         return render(request, 'common/error.html')
 
@@ -391,6 +391,7 @@ def schedule_prototype(request):
     }
     return render(request, 'enrollment/records/schedule_prototype.html', data)
 
+
 @employee_required
 def records_group_pdf(request, group_id):
     try:
@@ -413,9 +414,10 @@ def records_group_pdf(request, group_id):
 
     response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + \
-        re.sub(r'\s', '', slugify(str(group))) + '-group.pdf'
+                                      re.sub(r'\s', '', slugify(str(group))) + '-group.pdf'
 
     return response
+
 
 @employee_required
 def records_queue_pdf(request, group_id):
@@ -438,6 +440,6 @@ def records_queue_pdf(request, group_id):
     pisa.pisaDocument(io.StringIO(html), result, encoding='UTF-8')
     response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + \
-        re.sub(r'\s', '', slugify(str(group))) + '-queue.pdf'
+                                      re.sub(r'\s', '', slugify(str(group))) + '-queue.pdf'
 
     return response

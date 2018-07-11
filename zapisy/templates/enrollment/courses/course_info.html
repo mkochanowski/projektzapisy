@@ -44,9 +44,8 @@
                         {% endfor %}
                     </td>
                     <td class="number termLimit">
-                        {% if t.limit_isim  %}
-                            {{ t.limit_non_isim }}
-                            {% if t.limit_isim %} + {{ t.limit_isim }}{% endif %}
+                        {% if t.limit_isim %}
+                            {{ t.limit_non_isim }} + {{ t.limit_isim }}
                         {% else %}
                             {{ t.limit }}
                         {% endif %}

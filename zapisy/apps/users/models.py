@@ -214,10 +214,10 @@ class Student(BaseUser):
         except Program.DoesNotExist:
             return False
 
-    def consent_answered(self):
+    def consent_answered(self) -> bool:
         return hasattr(self, 'consent')
 
-    def consent_granted(self):
+    def consent_granted(self) -> bool:
         return self.consent_answered() and self.consent.granted
 
     def get_type_of_studies(self) -> str:

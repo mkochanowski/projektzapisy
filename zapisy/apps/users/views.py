@@ -45,8 +45,6 @@ GTC = {'1': 'wy', '2': 'cw', '3': 'pr',
        '9': 'rep', '10': 'proj'}
 BREAK_DURATION = datetime.timedelta(minutes=15)
 
-# I couldn't figure out whether we're passing always WSGIRequest or there are more type of requests involved.
-# Taking Any as argument was safer. Probably should be replaced with union of some types of requests in the future.
 
 @login_required
 def student_profile(request: HttpRequest, user_id: int) -> HttpResponse:
@@ -299,7 +297,7 @@ def employees_list(request: HttpRequest, begin: str='All', query: Optional[str]=
 def consultations_list(request: HttpRequest, begin: str='A') -> HttpResponse:
 
     employees = Employee.get_list('All')
-    semester = Semester.get_current_semester
+    semester = Semester.get_current_semester()
     employees = Group.teacher_in_present(employees, semester)
 
     if request.is_ajax():

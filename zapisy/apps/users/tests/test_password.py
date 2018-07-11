@@ -18,7 +18,7 @@ class BaseUserTestCase(TestCase):
 class GroupsTestCase(TestCase):
 
     def test_employee_model(self) -> None:
-        """Check if for each entry in Employee model, related user belongs to emplyees group."""
+        """Check if for each entry in Employee model, related user belongs to employees group."""
         for employee in Employee.objects.all():
             user = employee.user
             self.assertTrue(user.groups.filter(name="employees").exists())

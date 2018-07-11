@@ -19,6 +19,7 @@ from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
 
+
 # KEYS generate:
 
 @employee_required
@@ -26,10 +27,12 @@ def ajax_keys_generate(request):
     generate_keys_for_polls()
     return HttpResponse("OK")
 
+
 @employee_required
 def ajax_keys_progress(request):
     count = cache.get('generated-keys', 0)
     return HttpResponse(str(count))
+
 
 @student_required
 def ajax_get_rsa_keys_step1(request):
@@ -45,6 +48,7 @@ def ajax_get_rsa_keys_step1(request):
                 tickets = [generate_keys(gs) for gs in connected_groups]
                 message = json.dumps(tickets)
     return HttpResponse(message)
+
 
 @student_required
 def ajax_get_rsa_keys_step2(request):
@@ -68,6 +72,7 @@ def ajax_get_rsa_keys_step2(request):
                             for group, ticket, ticket_signature in signed]
                 message = json.dumps(unblinds)
     return HttpResponse(message)
+
 
 @student_required
 def connections_choice(request):
@@ -118,7 +123,7 @@ def connections_choice(request):
 
         else:
             pass
-#             form = PollCombineForm( polls = groupped_polls )
+        #             form = PollCombineForm( polls = groupped_polls )
 
         data = {'polls': polls_lists, 'grade': grade, 'general_polls': general_polls}
         return render(request, 'grade/ticket_create/connection_choice.html', data)
@@ -178,7 +183,7 @@ def client_connection(request):
                                 st += 'Ankiety ogólne: %%%   [' + poll.title + '] '
                             else:
                                 st += 'Przedmiot: ' + polls[0].group.course.name + '%%%    [' + poll.title + '] ' + \
-                                    poll.group.get_type_display() + ': ' + poll.group.get_teacher_full_name() + '***'
+                                      poll.group.get_type_display() + ': ' + poll.group.get_teacher_full_name() + '***'
                                 st += str(PublicKey.objects.get(poll=poll.pk).public_key) + '&&&'
                         st += '???'
 
@@ -190,7 +195,6 @@ def client_connection(request):
 
             for students_poll in students_polls:
                 if int(students_poll.pk) == int(groupNumber):
-
                     st = secure_signer_without_save(user, students_poll, groupKey)
                     secure_signer(user, students_poll, groupKey)
                     p = students_poll

@@ -40,6 +40,7 @@ def offer(request):
 def admin(request):
     return render(request, 'help/admin.html', {})
 
+
 @employee_required
 def employee(request):
     return render(request, 'help/employee.html', {})
