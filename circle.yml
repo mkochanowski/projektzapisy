@@ -9,8 +9,11 @@ machine:
 
 dependencies:
   override:
-    # Make sure we're operating on a clean repo
-    - git clean -f && git clean -fd
+    # CircleCI automatically caches node_modules which is just stupid
+    # as we can and do have different versions of the same packages between
+    # branches
+    # It seems you can't disable this, see https://discuss.circleci.com/t/how-to-always-rebuild-without-npm-cache/1196
+    - rm -rf node_modules/
     - pip --version
     - pip install -U setuptools
     - pip install --upgrade pip
