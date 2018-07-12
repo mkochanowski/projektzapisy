@@ -8,5 +8,16 @@ router.register('theses', views.ThesesViewSet, base_name="theses_list")
 
 urlpatterns = [
     url(r'^$', views.theses_main, name='main'),
+    # for django-autocomplete-light (admin widgets)
+    url(
+        r'^student-autocomplete/$',
+        views.StudentAutocomplete.as_view(),
+        name='student-autocomplete',
+    ),
+    url(
+        r'^employee-autocomplete/$',
+        views.EmployeeAutocomplete.as_view(),
+        name='employee-autocomplete',
+    ),
     url(r'^api/', include(router.urls))
 ]

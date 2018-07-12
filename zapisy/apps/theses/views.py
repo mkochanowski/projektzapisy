@@ -2,10 +2,13 @@ from enum import Enum
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
+from dal import autocomplete
 
+from apps.users.models import Student, Employee
 from . import models
 from . import serializers
 from .errors import InvalidQueryError
@@ -80,3 +83,22 @@ def filter_theses_queryset_for_type(queryset, thesis_type):
 @login_required
 def theses_main(request):
     return render(request, "theses/main.html")
+
+def build_autocomplete_view_with_queryset(queryset):
+    class ac(autocomplete.Select2QuerySetView):
+        def get_queryset(self):
+            if not self.request.user.is_authenticated():
+                return queryset.objects.none()
+
+            qs = queryset.objects.all()
+
+            if self.q:
+                qs = qs.filter(
+                    Q(user__first_name__istartswith=self.q) | Q(user__last_name__istartswith=self.q)
+                )
+
+            return qs
+    return ac
+
+StudentAutocomplete = build_autocomplete_view_with_queryset(Student)
+EmployeeAutocomplete = build_autocomplete_view_with_queryset(Employee)

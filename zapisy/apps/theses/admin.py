@@ -1,12 +1,18 @@
 from django.contrib import admin
 
-from . import models
+from . import models, forms
 
-admin.site.register(models.Thesis)
+
+class ThesisAdmin(admin.ModelAdmin):
+	form = forms.ThesisForm
+admin.site.register(models.Thesis, ThesisAdmin)
+
+
 admin.site.register(models.ThesesCommissionMember)
+
 
 class ThesesSystemSettingsAdmin(admin.ModelAdmin):
 	def has_add_permission(self, request):
 		return False
-
 admin.site.register(models.ThesesSystemSettings, ThesesSystemSettingsAdmin)
+

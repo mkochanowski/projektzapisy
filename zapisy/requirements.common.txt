@@ -29,3 +29,5 @@ postmarkup==1.2.2
 # Remove accents from strings (diacritics converted to Latin equivalents)
 unidecode==1.0.22
 
+# autocomplete/searchable select widgets for the admin, used by the theses system
+django-autocomplete-light==3.2.10
