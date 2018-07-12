@@ -327,21 +327,21 @@ const webpackConfig: webpack.Configuration = {
 				},
 				{ loader: "babel-loader" },
 				{
-					loader: "ts-loader",
-					query: {
+		loader: "ts-loader",
+		query: {
 						// TODO: this does not work in happypack mode for some reason;
 						// if we want vue, either try out thread-loader or don't use happy here
 						// appendTsSuffixTo: [/\.vue$/],
 						happyPackMode: true,
 						transpileOnly: true,
 					}
-				},
-            ],
+	},
+],
 		}),
 		new HappyPack({
-            id: "babel",
-            threadPool: happyThreadPool,
-            loaders: [
+			id: "babel",
+			threadPool: happyThreadPool,
+			loaders: [
 				{
 					loader: "cache-loader",
 					query: {
@@ -349,8 +349,8 @@ const webpackConfig: webpack.Configuration = {
 					}
 				},
 				{ loader: "babel-loader" },
-            ],
-        }),
+			],
+		}),
 		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
 	],
 };
