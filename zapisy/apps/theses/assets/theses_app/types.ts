@@ -23,18 +23,21 @@ export const enum ThesisVote {
 	UserMissing = 4,
 }
 
+export type Employee = {
+	id: number,
+	title: string,
+	user: {
+		id: number,
+		username: string,
+		first_name: string,
+		last_name: string,
+	},
+};
+
 export type Thesis = {
 	id: number;
 	title: string;
-	advisor: {
-		id: number,
-		user: {
-			id: number,
-			username: string,
-			first_name: string,
-			last_name: string,
-		},
-	},
+	advisor: Employee,
 	kind: ThesisKind,
 	reserved: boolean,
 };

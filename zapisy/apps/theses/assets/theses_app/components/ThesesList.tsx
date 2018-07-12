@@ -2,7 +2,7 @@ import * as React from "react";
 import ReactTable, { Column } from "react-table";
 import "react-table/react-table.css";
 
-import { Thesis } from "../types";
+import { Thesis, Employee } from "../types";
 
 type Props = {
 	currentThesesList: Thesis[],
@@ -11,6 +11,11 @@ type Props = {
 type State = {
 	searchPhrase: string,
 };
+
+function formatEmployeeDisplayName(employee: Employee): string {
+	const fullName = `${employee.user.first_name} ${employee.user.last_name}`;
+	return employee.title ? `${employee.title} ${fullName}` : fullName;
+}
 
 const TABLE_COL_DECLS: Column[] = [{
 	id: "isThesisReserved",
@@ -23,7 +28,7 @@ const TABLE_COL_DECLS: Column[] = [{
 }, {
 	id: "thesisAdvisor",
 	Header: "Promotor",
-	accessor: (props: Thesis) => props.advisor.user.first_name + props.advisor.user.last_name
+	accessor: (props: Thesis) => formatEmployeeDisplayName(props.advisor)
 }, {
 	id: "thesisName",
 	Header: "Tytuł",

@@ -11,7 +11,7 @@ class EmployeeThesesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         read_only_fields = ('id', 'user')
-        fields = ('id', 'user')
+        fields = ('id', 'title', 'user')
 
 class ThesisSerializer(serializers.ModelSerializer):
     advisor = EmployeeThesesSerializer(read_only=True)
