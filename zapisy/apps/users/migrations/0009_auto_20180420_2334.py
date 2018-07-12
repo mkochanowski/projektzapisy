@@ -3,6 +3,7 @@ from django.db import migrations
 from django.contrib.auth.models import Group
 from apps.users.models import Employee, Student
 
+
 def add_respective_users_to_groups(apps, schema_editor):
     students, created = Group.objects.get_or_create(name='students')
     employees, created = Group.objects.get_or_create(name='employees')
@@ -15,10 +16,10 @@ def add_respective_users_to_groups(apps, schema_editor):
         user = student.user
         students.user_set.add(user)
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('users', '0009_auto_20180420_2325'),
+        ('users', '0008_auto_20180601_1918'),
     ]
 
     operations = [
