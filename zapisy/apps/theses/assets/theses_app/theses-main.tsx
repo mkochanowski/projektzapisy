@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 
 import { whenDomLoaded } from "common/utils";
 import { ThesesApp } from "./components/ThesesApp";
+import "./debug";
 
 function main() {
 	console.warn("Theses system: React main");

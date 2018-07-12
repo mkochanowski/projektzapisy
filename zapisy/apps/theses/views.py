@@ -34,7 +34,7 @@ class ThesisTypeFilter(Enum):
 
 class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get"]
-    permission_classes = (permissions.DjangoModelPermissions,)
+    permission_classes = (permissions.AllowAny,)
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):
