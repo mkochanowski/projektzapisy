@@ -319,7 +319,9 @@ const webpackConfig: webpack.Configuration = {
 				{
 					loader: "ts-loader",
 					query: {
-						appendTsSuffixTo: [/\.vue$/],
+						// TODO: this does not work in happypack mode for some reason;
+						// if we want vue, either try out thread-loader or don't use happy here
+						// appendTsSuffixTo: [/\.vue$/],
 						transpileOnly: true,
 						happyPackMode: true,
 					}
