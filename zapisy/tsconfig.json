@@ -6,6 +6,7 @@
     "strict": true,
     "module": "esnext",
     "baseUrl": "./assets",
+    "noUnusedParameters": true,
     "typeRoots": [
       "./node_modules/@types",
       "./webpack_resources/typings"

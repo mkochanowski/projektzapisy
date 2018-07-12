@@ -12,7 +12,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
-const WebpackShellPlugin = require('webpack-shell-plugin');
+const WebpackShellPlugin = require("webpack-shell-plugin");
 
 console.warn("Init webpack config");
 
@@ -55,7 +55,7 @@ type FinalAssetDefs = {
 		[key: string]: string[],
 	},
 	rawfiles?: RawfileDef[],
-}
+};
 
 function mergeAssetDefs(defs: AssetDefs, newDefs: AssetDefs): AssetDefs {
 	defs.bundles = defs.bundles || {};
@@ -138,7 +138,7 @@ function getAllAssetDefs() {
 	return result;
 }
 
-function buildCopyCommandsForRawfiles(rawfiles : RawfileDef[]) : string[] {
+function buildCopyCommandsForRawfiles(rawfiles: RawfileDef[]): string[] {
 	return (rawfiles || []).map(r => {
 		return `cp -r ${r.from} ${r.to}`;
 	});
@@ -160,7 +160,8 @@ const webpackConfig: webpack.Configuration = {
 	watchOptions: {
 		poll: 1000
 	},
-	devtool: DEV ? "cheap-eval-source-map" : false,
+	// Webpack types don't seem to be aware of this devtool
+	devtool: DEV ? "inline-cheap-module-source-map" as any : false,
 	mode: DEV ? "development" : "production",
 	optimization: {
 		// This is only applied if optimization.minimize is true (mode === "development")
@@ -183,9 +184,9 @@ const webpackConfig: webpack.Configuration = {
 		splitChunks: {
 			cacheGroups: {
 			  	commons: {
-					name: 'commons',
+					name: "commons",
 					filename: "common_chunks.js",
-					chunks: 'initial',
+					chunks: "initial",
 					minChunks: 2
 			  	}
 			},
@@ -297,7 +298,7 @@ const webpackConfig: webpack.Configuration = {
 		// due to the slow shared filesystem we're using
 		new WebpackShellPlugin({
 			onBuildEnd: [
-				'echo Copying static assets...',
+				"echo Copying static assets...",
 				...copyCommands,
 			],
 			// If this is set, the command won't be run on incremental builds in watch mode
@@ -305,9 +306,9 @@ const webpackConfig: webpack.Configuration = {
 			dev: DEV,
 		}),
 		new HappyPack({
-            id: "tsbabel",
-            threadPool: happyThreadPool,
-            loaders: [
+			id: "tsbabel",
+			threadPool: happyThreadPool,
+			loaders: [
 				{
 					loader: "cache-loader",
 					query: {
@@ -323,12 +324,12 @@ const webpackConfig: webpack.Configuration = {
 						happyPackMode: true,
 					}
 				},
-            ],
+			],
 		}),
 		new HappyPack({
-            id: "babel",
-            threadPool: happyThreadPool,
-            loaders: [
+			id: "babel",
+			threadPool: happyThreadPool,
+			loaders: [
 				{
 					loader: "cache-loader",
 					query: {
@@ -336,8 +337,8 @@ const webpackConfig: webpack.Configuration = {
 					}
 				},
 				{ loader: "babel-loader" },
-            ],
-        }),
+			],
+		}),
 		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
 	],
 };
