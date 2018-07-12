@@ -14,6 +14,9 @@ dependencies:
     # branches
     # It seems you can't disable this, see https://discuss.circleci.com/t/how-to-always-rebuild-without-npm-cache/1196
     - rm -rf node_modules/
+    # For good measure also clear any other crap they might have restored from the cache
+    - git clean -nd
+    - git clean -fd
     - pip --version
     - pip install -U setuptools
     - pip install --upgrade pip
