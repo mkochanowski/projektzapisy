@@ -23,6 +23,6 @@ async function fetchJson(url: string): Promise<any> {
 	return resp.json();
 }
 
-export function getThesesList(filterType: ThesisTypeFilter): Promise<Thesis> {
+export function getThesesList(filterType: ThesisTypeFilter): Promise<Thesis[]> {
 	return fetchJson(`${BASE_API_URL}/theses?thesis_type=${filterType}`);
 }

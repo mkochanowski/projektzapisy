@@ -36,4 +36,5 @@ export type Thesis = {
 		},
 	},
 	kind: ThesisKind,
+	reserved: boolean,
 };

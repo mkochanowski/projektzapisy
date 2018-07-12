@@ -1,45 +1,33 @@
 import * as React from "react";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import { ThesesList } from "./ThesesList";
+import { Thesis } from "../types";
+import { getThesesList, ThesisTypeFilter } from "../backend_callers";
 
-export function ThesesApp(props: any) {
-	const data = [
-		{
-			name: "Tanner Linsley",
-			age: 26,
-			friend: {
-				name: "Jason Maurer",
-				age: 23,
-			}
-		},
-		{
-			name: "John Doe",
-			age: 49,
-			friend: {
-				name: "Hank Williams",
-				age: 90,
-			}
-		}
-	];
+type State = {
+	thesesList: Thesis[],
+};
 
-	  const columns = [{
-		Header: "Name",
-		accessor: "name" // String-based value accessors!
-	  }, {
-		Header: "Age",
-		accessor: "age",
-		Cell: (props: any) => <span className="number">{props.value}</span> // Custom cell components!
-	  }, {
-		id: "friendName", // Required because our accessor is not a string
-		Header: "Friend Name",
-		accessor: (d: any) => d.friend.name // Custom value accessors!
-	  }, {
-		Header: (props: any) => <span>Friend Age</span>, // Custom header components!
-		accessor: "friend.age"
-	  }];
+export class ThesesApp extends React.Component<{}, State> {
+	constructor(props: {}) {
+		super(props);
+		this.state = {
+			thesesList: [],
+		};
+		this.initList();
+	}
 
-	return <ReactTable
-		data={data}
-		columns={columns}
-	/>;
+	private async initList(): Promise<void> {
+		const theses = await getThesesList(ThesisTypeFilter.All);
+		this.setState({ thesesList: theses });
+	}
+
+	render(): JSX.Element {
+		return (
+			<div style={{ margin: "0 auto" }}>
+				<ThesesList currentThesesList={this.state.thesesList}/>
+			</div>
+		);
+	}
 }

@@ -254,6 +254,7 @@
             </div>
         {% endfor %}
         {% endblock %}
+        {% block fullWidthContent %}
         <div id="main-content-container" class="row show-grid sidebar-right marginFix">
             {% block topContent %}{% endblock %}
             {% block center %}
@@ -270,6 +271,7 @@
                 </div>
             {% endblock %}
         </div>
+        {% endblock %}
     </div>
 
 
