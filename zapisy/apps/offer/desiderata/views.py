@@ -6,6 +6,7 @@ from apps.offer.desiderata.forms import DesiderataFormSet, DesiderataOtherForm
 from apps.enrollment.courses.models.semester import Semester
 from apps.users.decorators import employee_required
 
+
 @employee_required
 def change_desiderata(request):
     """

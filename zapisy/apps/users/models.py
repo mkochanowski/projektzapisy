@@ -200,7 +200,7 @@ class Student(BaseUser):
 
     dyskretna_l = models.BooleanField(default=False)
     numeryczna_l = models.BooleanField(default=False)
-    algorytmy_l= models.BooleanField(default=False)
+    algorytmy_l = models.BooleanField(default=False)
     programowanie_l = models.BooleanField(default=False)
 
     objects: GettersManager = GettersManager()
@@ -349,7 +349,7 @@ class Program(models.Model):
         verbose_name_plural: str = 'Programy studiów'
 
     def __str__(self) -> str:
-        return self.name.__str__()
+        return self.name
 
 
 class OpeningTimesView(models.Model):

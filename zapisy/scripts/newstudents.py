@@ -5,6 +5,7 @@ import random
 
 studentsfile = 'newstudents2016.txt'
 
+
 def create_user(indeks, imie, nazwisko, mail, pswd):
     p = Program.objects.get(id=4)
     students = Group.objects.get(name='students')
