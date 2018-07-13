@@ -23,11 +23,13 @@ export class ThesesApp extends React.Component<{}, State> {
 		this.setState({ thesesList: theses });
 	}
 
-	render(): JSX.Element {
-		return (
-			<div style={{ margin: "0 auto" }}>
+	render() {
+		return [
+			<h2 key="title">Prace dyplomowe</h2>,
+			<hr key="divider"/>,
+			<div key="container" style={{ margin: "0 auto" }}>
 				<ThesesList currentThesesList={this.state.thesesList}/>
 			</div>
-		);
+		];
 	}
 }
