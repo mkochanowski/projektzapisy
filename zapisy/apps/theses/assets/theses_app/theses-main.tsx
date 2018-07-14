@@ -6,7 +6,6 @@ import { ThesesApp } from "./components/ThesesApp";
 import "./debug";
 
 function main() {
-	console.warn("Theses system: React main");
 	ReactDOM.render(
 		<ThesesApp />,
 		document.getElementById("theses-react-root"),

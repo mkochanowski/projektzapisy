@@ -7,6 +7,7 @@ import { ReservationIndicator } from "./ReservationIndicator";
 import { SearchBox } from "./SearchBox";
 import { ThesesFilter } from "./ThesesFilter";
 import { ThesisTypeFilter, getThesesList } from "../../backend_callers";
+import { isThesisAvailable } from "../../utils";
 
 type Props = {
 	// currentThesesList: Thesis[],
@@ -14,6 +15,7 @@ type Props = {
 
 type State = {
 	thesesList: Thesis[],
+	currentFilteredThesesList: Thesis[],
 };
 
 function formatEmployeeDisplayName(employee: Employee): string {
@@ -82,13 +84,15 @@ export class ThesesList extends React.Component<Props, State> {
 		super(props);
 		this.state = {
 			thesesList: [],
+			currentFilteredThesesList: [],
 		};
-		this.initListForTypeFilter(ThesisTypeFilter.Default);
+		this.initList();
 	}
 
-	private async initListForTypeFilter(filter: ThesisTypeFilter): Promise<void> {
-		const theses = await getThesesList(filter);
+	private async initList(): Promise<void> {
+		const theses = await getThesesList(ThesisTypeFilter.Default);
 		this.setState({ thesesList: theses });
+		this.updateFilteredThesesList(ThesisTypeFilter.Default);
 	}
 
 	public render() {
@@ -101,7 +105,7 @@ export class ThesesList extends React.Component<Props, State> {
 			<ReactTable
 				key="table"
 				className={"-striped -highlight"}
-				data={this.state.thesesList}
+				data={this.state.currentFilteredThesesList}
 				columns={TABLE_COL_DECLS}
 				defaultPageSize={10}
 				getTableProps={getTableProps}
@@ -114,7 +118,37 @@ export class ThesesList extends React.Component<Props, State> {
 		</div>;
 	}
 
+	private updateFilteredThesesList(filter: ThesisTypeFilter): void {
+		const newList = this.state.thesesList.filter(thesis => {
+			switch (filter) {
+				case ThesisTypeFilter.All: return true;
+				case ThesisTypeFilter.AllCurrent:
+					return isThesisAvailable(thesis);
+				case ThesisTypeFilter.AvailableBachelors:
+					return thesis.kind === ThesisKind.Bachelors && isThesisAvailable(thesis);
+				case ThesisTypeFilter.AvailableBachelorsISIM:
+					return thesis.kind === ThesisKind.Isim && isThesisAvailable(thesis);
+				case ThesisTypeFilter.AvailableEngineers:
+					return thesis.kind === ThesisKind.Engineers && isThesisAvailable(thesis);
+				case ThesisTypeFilter.AvailableMasters:
+					return thesis.kind === ThesisKind.Masters && isThesisAvailable(thesis);
+				case ThesisTypeFilter.Bachelors:
+					return thesis.kind === ThesisKind.Bachelors;
+				case ThesisTypeFilter.BachelorsISIM:
+					return thesis.kind === ThesisKind.Isim;
+				case ThesisTypeFilter.Engineers:
+					return thesis.kind === ThesisKind.Engineers;
+				case ThesisTypeFilter.Masters:
+					return thesis.kind === ThesisKind.Masters;
+			}
+			return false;
+		});
+		this.setState({
+			currentFilteredThesesList: newList,
+		});
+	}
+
 	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
-		this.initListForTypeFilter(newFilter);
+		this.updateFilteredThesesList(newFilter);
 	}
 }

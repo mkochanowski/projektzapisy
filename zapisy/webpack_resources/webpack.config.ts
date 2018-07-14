@@ -23,14 +23,14 @@ const smp = new SpeedMeasurePlugin();
 
 let DEV: boolean;
 switch (process.env.NODE_ENV) {
-case "development":
-	DEV = true;
-	break;
-case "production":
-	DEV = false;
-	break;
-default:
-	throw new Error(`Bad NODE_ENV ${process.env.NODE_ENV}`);
+	case "development":
+		DEV = true;
+		break;
+	case "production":
+		DEV = false;
+		break;
+	default:
+		throw new Error(`Bad NODE_ENV ${process.env.NODE_ENV}`);
 }
 
 const BUNDLE_OUTPUT_DIR = "compiled_assets";
@@ -158,7 +158,7 @@ const webpackConfig: webpack.Configuration = {
 		filename: DEV ? "[name]_[hash].js" : "[name]_[hash].min.js",
 	},
 	watchOptions: {
-		poll: 1000
+		poll: 2000
 	},
 	// Webpack types don't seem to be aware of this devtool
 	devtool: DEV ? "inline-cheap-module-source-map" as any : false,
