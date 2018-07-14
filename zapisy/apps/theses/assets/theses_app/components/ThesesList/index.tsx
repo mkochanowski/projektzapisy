@@ -8,6 +8,7 @@ import { SearchBox } from "./SearchBox";
 import { ThesesFilter } from "./ThesesFilter";
 import { ThesisTypeFilter, getThesesList } from "../../backend_callers";
 import { isThesisAvailable } from "../../utils";
+import { ListLoadingIndicator } from "./ListLoadingIndicator";
 
 type Props = {
 	// currentThesesList: Thesis[],
@@ -102,19 +103,23 @@ export class ThesesList extends React.Component<Props, State> {
 				initialValue={ThesisTypeFilter.Default}
 			/>
 			<br />
-			<ReactTable
-				key="table"
-				className={"-striped -highlight"}
-				data={this.state.currentFilteredThesesList}
-				columns={TABLE_COL_DECLS}
-				defaultPageSize={10}
-				getTableProps={getTableProps}
-				getTheadProps={getTheadProps}
-				// getTrProps={getTrProps}
-				style={{
-					height: "400px"
-				}}
-			/>
+			{this.state.thesesList.length ?
+				<ReactTable
+					key="table"
+					className={"-striped -highlight"}
+					data={this.state.currentFilteredThesesList}
+					columns={TABLE_COL_DECLS}
+					defaultPageSize={10}
+					getTableProps={getTableProps}
+					getTheadProps={getTheadProps}
+					// getTrProps={getTrProps}
+					style={{
+						height: "400px"
+					}}
+				/>
+				:
+				<ListLoadingIndicator />
+			}
 		</div>;
 	}
 
