@@ -7,6 +7,21 @@
 	{% render_bundle "theses-main" %}
 {% endblock %}
 
+{% block styles %}
+	{{ block.super }}
+	<style type="text/css">
+		/* Fuck bootstrap */
+		input, textarea, select {
+			height: auto;
+		}
+
+		/* Broken default webkit stylesheets */
+		div.rt-th:focus {
+			outline: none;
+		}
+	</style>
+{% endblock %}
+
 {% block fullWidthContent %}
 <div id="theses-react-root"></div>
 {% endblock %}

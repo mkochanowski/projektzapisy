@@ -13,6 +13,8 @@ export const enum ThesisTypeFilter {
 	AvailableEngineers,
 	AvailableBachelors,
 	AvailableBachelorsISIM,
+
+	Default = AllCurrent,
 }
 
 async function fetchJson(url: string): Promise<any> {

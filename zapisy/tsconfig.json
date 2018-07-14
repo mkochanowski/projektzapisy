@@ -19,7 +19,8 @@
       "react",
       "react-dom",
       "react-table",
-      "csstype"
+      "csstype",
+      "styled-components"
     ]
   },
   "exclude": [
