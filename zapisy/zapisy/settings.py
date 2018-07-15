@@ -148,7 +148,6 @@ MIDDLEWARE = [
     'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'middleware.localePrefMiddleware.LocalePrefMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -212,7 +211,7 @@ INSTALLED_APPS = (
 MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
 
 AUTHENTICATION_BACKENDS = (
-    'apps.users.auth_backend.BetterBackend',
+    'django.contrib.auth.backends.ModelBackend',
     'django_cas_ng.backends.CASBackend',
 )
 
