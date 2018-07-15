@@ -7,5 +7,13 @@
           "modules": false
         }]
     ],
-    "plugins": ["transform-runtime"]
+    "plugins": [
+      "transform-runtime",
+      ["transform-imports", {
+        "lodash": {
+          "transform": "lodash/${member}",
+          "preventFullImport": true
+        }
+      }]
+    ]
 }

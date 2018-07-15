@@ -3,18 +3,17 @@ import * as fs from "fs";
 import * as glob from "glob";
 import * as os from "os";
 
-import { getVueCssLoaders } from "./webpack-utils";
+import { getVueCssLoaders, parseBool } from "./webpack-utils";
 import * as webpack from "webpack";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import HappyPack from "happypack";
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 const BundleTracker = require("webpack-bundle-tracker");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 const WebpackShellPlugin = require("webpack-shell-plugin");
-
-console.warn("Init webpack config");
 
 // Leave one cpu free for the ts type checker
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length - 1 });
@@ -168,6 +167,7 @@ const webpackConfig: webpack.Configuration = {
 		minimizer: [
 			new UglifyJSPlugin({
 				sourceMap: false,
+				parallel: true,
 				uglifyOptions: {
 					compress: true,
 					output: { comments: false },
@@ -349,4 +349,14 @@ const webpackConfig: webpack.Configuration = {
 		new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),
 	],
 };
+
+if (parseBool(process.env.ANALYZE)) {
+	console.info("Will perform bundle analysis");
+	webpackConfig.plugins.push(new BundleAnalyzerPlugin({
+		analyzerMode: "server",
+		analyzerHost: "0.0.0.0",
+		analyzerPort: "8000",
+	}));
+}
+
 module.exports = webpackConfig;
