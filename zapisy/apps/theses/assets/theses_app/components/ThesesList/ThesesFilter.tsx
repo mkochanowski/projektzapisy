@@ -2,7 +2,7 @@ import * as React from "react";
 import { ThesisTypeFilter } from "../../backend_callers";
 
 type Props = {
-	onChanged: (newFilter: ThesisTypeFilter) => void;
+	onChange: (newFilter: ThesisTypeFilter) => void;
 	initialValue: ThesisTypeFilter;
 };
 
@@ -32,7 +32,7 @@ export class ThesesFilter extends React.Component<Props> {
 		}}>
 			<strong>Rodzaj </strong>
 			<select
-				onChange={ev => this.onChanged(ev.target.value)}
+				onChange={ev => this.onChange(ev.target.value)}
 				defaultValue={this.findDefaultStringValue()}
 			>
 				{
@@ -53,10 +53,10 @@ export class ThesesFilter extends React.Component<Props> {
 		return filterInfos.find(info => info.val === this.props.initialValue)!.stringVal;
 	}
 
-	private onChanged = (newValue: string) => {
+	private onChange = (newValue: string) => {
 		const convertedValue = stringValueToThesisFilter(newValue);
 		if (convertedValue !== null) {
-			this.props.onChanged(convertedValue);
+			this.props.onChange(convertedValue);
 		}
 	}
 }

@@ -82,7 +82,7 @@ export class ThesesList extends React.Component<Props, State> {
 		return this.props.thesesList.length ?
 			<div>
 				<ThesesFilter
-					onChanged={this.onTypeFilterChanged}
+					onChange={this.onTypeFilterChanged}
 					initialValue={ThesisTypeFilter.Default}
 				/>
 				<br />

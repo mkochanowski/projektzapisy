@@ -15,6 +15,10 @@ export class ThesisDetails extends React.Component<Props> {
 			<ThesisTopRow
 				thesis={this.props.thesis}
 			/>
+			<div style={{ display: "flex", justifyContent: "flex-end" }}>
+				<span style={{ flex: 1 }} >Tytuł </span>
+				<textarea style={{ flex: 5 }}defaultValue={this.props.thesis.title} />
+			</div>
 		</div>;
 	}
 }
