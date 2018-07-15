@@ -464,6 +464,6 @@ def personal_data_consent(request):
             messages.success(request, 'Zgoda udzielona')
         if 'no' in request.POST:
             PersonalDataConsent.objects.update_or_create(student=request.user.student,
-                                                 defaults={'granted': False})
+                                                         defaults={'granted': False})
             messages.success(request, 'Brak zgody zapisany')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
