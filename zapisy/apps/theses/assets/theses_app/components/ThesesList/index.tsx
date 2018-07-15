@@ -1,10 +1,9 @@
 import * as React from "react";
-import ReactTable, { Column, RowInfo, ComponentPropsGetter0 } from "react-table";
+import ReactTable, { Column, RowInfo } from "react-table";
 import "react-table/react-table.css";
 
 import { Thesis, Employee, ThesisKind } from "../../types";
 import { ReservationIndicator } from "./ReservationIndicator";
-import { SearchBox } from "./SearchBox";
 import { ThesesFilter } from "./ThesesFilter";
 import { ThesisTypeFilter, getThesesList } from "../../backend_callers";
 import { isThesisAvailable } from "../../utils";
@@ -13,6 +12,7 @@ import { awaitSleep } from "common/utils";
 
 type Props = {
 	thesesList: Thesis[],
+	thesisClickCallback: (thesis: Thesis) => void,
 };
 
 type State = {
@@ -70,32 +70,6 @@ function getTheadProps() {
 	}};
 }
 
-function getTdProps(_: any, rowInfo: RowInfo | undefined, column: any) {
-	if (!rowInfo) {
-		return {};
-	}
-	return {
-		style: {
-			cursor: "pointer",
-		},
-		onClick: (e: any, handleOriginal: any) => {
-		  console.log("A Td Element was clicked!");
-		  console.log("it produced this event:", e);
-		  console.log("It was in this column:", column);
-		  console.log("It was in this row:", rowInfo);
-
-		  // IMPORTANT! React-Table uses onClick internally to trigger
-		  // events like expanding SubComponents and pivots.
-		  // By default a custom 'onClick' handler will override this functionality.
-		  // If you want to fire the original onClick handler, call the
-		  // 'handleOriginal' function.
-		  if (handleOriginal) {
-			handleOriginal();
-		  }
-		}
-	};
-}
-
 export class ThesesList extends React.Component<Props, State> {
 	public constructor(props: Props) {
 		super(props);
@@ -120,7 +94,7 @@ export class ThesesList extends React.Component<Props, State> {
 					defaultPageSize={10}
 					getTableProps={getTableProps}
 					getTheadProps={getTheadProps}
-					getTdProps={getTdProps}
+					getTdProps={this.getTdProps}
 					style={{
 						height: "400px"
 					}}
@@ -128,6 +102,28 @@ export class ThesesList extends React.Component<Props, State> {
 			</div>
 			:
 			<ListLoadingIndicator />;
+	}
+
+	// Must be on the instance, we need a closure for `this`
+	private getTdProps = (_state: any, rowInfo: RowInfo | undefined, _column: any) => {
+		if (!rowInfo) {
+			return {};
+		}
+		return {
+			style: {
+				cursor: "pointer",
+			},
+			onClick: (_event: any, handleOriginal: () => void) => {
+				console.warn("Click in row", rowInfo);
+				this.props.thesisClickCallback(rowInfo.original);
+				  // React-Table uses onClick internally to trigger
+				  // events like expanding SubComponents and pivots.
+				  // By default a custom 'onClick' handler will override this functionality.
+				if (handleOriginal) {
+					handleOriginal();
+				}
+			}
+		};
 	}
 
 	private computeFilteredThesesList(): Thesis[] {

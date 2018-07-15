@@ -1,4 +1,4 @@
-import { Thesis } from "./types";
+import { Thesis, ThesisRaw } from "./types";
 
 const BASE_API_URL = "/theses/api";
 
@@ -25,6 +25,7 @@ async function fetchJson(url: string): Promise<any> {
 	return resp.json();
 }
 
-export function getThesesList(filterType: ThesisTypeFilter): Promise<Thesis[]> {
-	return fetchJson(`${BASE_API_URL}/theses?thesis_type=${filterType}`);
+export async function getThesesList(filterType: ThesisTypeFilter): Promise<Thesis[]> {
+	const results: ThesisRaw[] = await fetchJson(`${BASE_API_URL}/theses?thesis_type=${filterType}`);
+	return results.map(raw => new Thesis(raw));
 }

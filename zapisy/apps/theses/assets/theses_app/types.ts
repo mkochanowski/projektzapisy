@@ -34,10 +34,40 @@ export type Employee = {
 	},
 };
 
-export type Thesis = {
+export type ThesisRaw = {
 	id: number;
 	title: string;
 	advisor: Employee,
+	auxiliary_advisor?: Employee,
 	kind: ThesisKind,
 	reserved: boolean,
+	status: ThesisStatus,
+	added_date: string,
+	modified_date: string,
 };
+
+export class Thesis {
+	public id: number;
+	public title: string;
+	public advisor: Employee;
+	public auxiliaryAdvisor?: Employee;
+	public kind: ThesisKind;
+	public reserved: boolean;
+	public status: ThesisStatus;
+	public addedDate: Date;
+	public modifiedDate: Date;
+
+	public constructor(raw: ThesisRaw) {
+		this.id = raw.id;
+		this.title = raw.title;
+		this.advisor = raw.advisor;
+		if (raw.auxiliary_advisor) {
+			this.auxiliaryAdvisor = raw.auxiliary_advisor;
+		}
+		this.kind = raw.kind;
+		this.reserved = raw.reserved;
+		this.status = raw.status;
+		this.addedDate = new Date(raw.added_date);
+		this.modifiedDate = new Date(raw.modified_date);
+	}
+}

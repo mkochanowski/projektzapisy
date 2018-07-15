@@ -10,9 +10,20 @@
 {% block styles %}
 	{{ block.super }}
 	<style type="text/css">
-		/* Fuck bootstrap */
+		/* #undef Bootstrap */
 		input, textarea, select {
 			height: auto;
+		}
+		table {
+			width: auto;
+		}
+		table th, table td {
+			padding: 0px;
+			line-height: auto;
+			border-bottom: 0px;
+		}
+		input, textarea {
+			width: auto;
 		}
 
 		/* Broken default webkit stylesheets */
