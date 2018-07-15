@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "sourceMap": true,
     "target": "es6",
     "alwaysStrict": true,
+    "strictNullChecks": true,
     "strict": true,
+    "jsx": "react",
     "module": "esnext",
     "baseUrl": "./assets",
     "noUnusedParameters": true,
@@ -13,13 +16,12 @@
     ],
     "types":[
       "jquery",
-      "clipboard",
-      "js-cookie"
     ]
   },
   "exclude": [
     "./node_modules",
-    // This contains webpack configs etc, which are also .ts files
-    "./webpack_resources/",
+    // Config files are compiled separately, see tsconfig.webpack-config
+    "./webpack_resources/webpack-utils.ts",
+    "./webpack_resources/webpack.config.ts",
   ]
 }

@@ -23,14 +23,14 @@ const smp = new SpeedMeasurePlugin();
 
 let DEV: boolean;
 switch (process.env.NODE_ENV) {
-case "development":
-	DEV = true;
-	break;
-case "production":
-	DEV = false;
-	break;
-default:
-	throw new Error(`Bad NODE_ENV ${process.env.NODE_ENV}`);
+	case "development":
+		DEV = true;
+		break;
+	case "production":
+		DEV = false;
+		break;
+	default:
+		throw new Error(`Bad NODE_ENV ${process.env.NODE_ENV}`);
 }
 
 const BUNDLE_OUTPUT_DIR = "compiled_assets";
@@ -158,7 +158,7 @@ const webpackConfig: webpack.Configuration = {
 		filename: DEV ? "[name]_[hash].js" : "[name]_[hash].min.js",
 	},
 	watchOptions: {
-		poll: 1000
+		poll: 2000
 	},
 	// Webpack types don't seem to be aware of this devtool
 	devtool: DEV ? "inline-cheap-module-source-map" as any : false,
@@ -198,13 +198,30 @@ const webpackConfig: webpack.Configuration = {
 			// 1) tsc: TS -> ES6
 			// 2) babel: ES6 -> ES5 (and polyfilling)
 			{
-				test: /\.ts?$/,
-				loader: "happypack/loader?id=tsbabel",
+				// This doesn't use happypack because for whatever reason appendTsSuffixTo
+				// (needed by vuejs) breaks it
+				test: /\.tsx?$/,
+				use: [
+					{
+						loader: "cache-loader",
+						query: {
+							cacheDirectory: path.resolve("node_modules/.cache-loader-tsbabel")
+						}
+					},
+					{ loader: "babel-loader" },
+					{
+						loader: "ts-loader",
+						query: {
+							appendTsSuffixTo: [/\.vue$/],
+							transpileOnly: true,
+						}
+					}
+				],
 				exclude: /node_modules/,
 			},
 			// ES6 source: babel converts to ES5 (and polyfills)
 			{
-				test: /\.js?$/,
+				test: /\.jsx?$/,
 				loader: "happypack/loader?id=babel",
 				exclude: /node_modules/
 			},
@@ -263,6 +280,17 @@ const webpackConfig: webpack.Configuration = {
 						options: { minimize: !DEV }
 					}]
 				})
+			},
+			{
+				test: /\.(png|jpg|gif)$/,
+				use: [{
+					loader: "url-loader",
+					options: {
+						limit: 8192,
+						// ACHTUNG this should match the value of STATIC_URL in settings.py
+						publicPath: "/static",
+					}
+				}]
 			}
 		]
 	},
@@ -271,7 +299,7 @@ const webpackConfig: webpack.Configuration = {
 			path.resolve(ASSET_DIR),
 			path.resolve("./node_modules"),
 		],
-		extensions: [".ts", ".js", ".vue"],
+		extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
 		alias: {
 			"vue$": "vue/dist/vue.runtime.esm.js",
 		},
@@ -304,29 +332,6 @@ const webpackConfig: webpack.Configuration = {
 			// If this is set, the command won't be run on incremental builds in watch mode
 			// (matters for performance)
 			dev: DEV,
-		}),
-		new HappyPack({
-			id: "tsbabel",
-			threadPool: happyThreadPool,
-			loaders: [
-				{
-					loader: "cache-loader",
-					query: {
-						cacheDirectory: path.resolve("node_modules/.cache-loader-tsbabel")
-					}
-				},
-				{ loader: "babel-loader" },
-				{
-					loader: "ts-loader",
-					query: {
-						// TODO: this does not work in happypack mode for some reason;
-						// if we want vue, either try out thread-loader or don't use happy here
-						// appendTsSuffixTo: [/\.vue$/],
-						transpileOnly: true,
-						happyPackMode: true,
-					}
-				},
-			],
 		}),
 		new HappyPack({
 			id: "babel",
