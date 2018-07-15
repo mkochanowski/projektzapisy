@@ -198,8 +198,25 @@ const webpackConfig: webpack.Configuration = {
 			// 1) tsc: TS -> ES6
 			// 2) babel: ES6 -> ES5 (and polyfilling)
 			{
+				// This doesn't use happypack because for whatever reason appendTsSuffixTo
+				// (needed by vuejs) breaks it
 				test: /\.tsx?$/,
-				loader: "happypack/loader?id=tsbabel",
+				use: [
+					{
+						loader: "cache-loader",
+						query: {
+							cacheDirectory: path.resolve("node_modules/.cache-loader-tsbabel")
+						}
+					},
+					{ loader: "babel-loader" },
+					{
+						loader: "ts-loader",
+						query: {
+							appendTsSuffixTo: [/\.vue$/],
+							transpileOnly: true,
+						}
+					}
+				],
 				exclude: /node_modules/,
 			},
 			// ES6 source: babel converts to ES5 (and polyfills)
@@ -315,29 +332,6 @@ const webpackConfig: webpack.Configuration = {
 			// If this is set, the command won't be run on incremental builds in watch mode
 			// (matters for performance)
 			dev: DEV,
-		}),
-		new HappyPack({
-			id: "tsbabel",
-			threadPool: happyThreadPool,
-			loaders: [
-				{
-					loader: "cache-loader",
-					query: {
-						cacheDirectory: path.resolve("node_modules/.cache-loader-tsbabel")
-					}
-				},
-				{ loader: "babel-loader" },
-				{
-					loader: "ts-loader",
-					query: {
-						// TODO: this does not work in happypack mode for some reason;
-						// if we want vue, either try out thread-loader or don't use happy here
-						// appendTsSuffixTo: [/\.vue$/],
-						transpileOnly: true,
-						happyPackMode: true,
-					}
-				},
-			],
 		}),
 		new HappyPack({
 			id: "babel",

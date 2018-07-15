@@ -18,9 +18,7 @@
       "jquery",
       "react",
       "react-dom",
-      "react-table",
-      "csstype",
-      "styled-components"
+      "react-table"
     ]
   },
   "exclude": [
