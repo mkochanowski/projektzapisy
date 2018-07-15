@@ -1,5 +1,5 @@
 import * as React from "react";
-import ReactTable, { Column, RowInfo } from "react-table";
+import ReactTable, { Column, RowInfo, ComponentPropsGetter0 } from "react-table";
 import "react-table/react-table.css";
 
 import { Thesis, Employee, ThesisKind } from "../../types";
@@ -12,12 +12,11 @@ import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { awaitSleep } from "common/utils";
 
 type Props = {
-	// currentThesesList: Thesis[],
+	thesesList: Thesis[],
 };
 
 type State = {
-	thesesList: Thesis[],
-	currentFilteredThesesList: Thesis[],
+	currentListFilter: ThesisTypeFilter,
 };
 
 function formatEmployeeDisplayName(employee: Employee): string {
@@ -71,35 +70,42 @@ function getTheadProps() {
 	}};
 }
 
-function getTrProps(_: any, rowInfo: RowInfo | undefined) {
-	if (rowInfo) {
-		// console.warn(rowInfo);
-		return { style: {
-			background: rowInfo.viewIndex % 2 ? "#e8e8e8" : "white",
-		}};
+function getTdProps(_: any, rowInfo: RowInfo | undefined, column: any) {
+	if (!rowInfo) {
+		return {};
 	}
-	return {};
+	return {
+		style: {
+			cursor: "pointer",
+		},
+		onClick: (e: any, handleOriginal: any) => {
+		  console.log("A Td Element was clicked!");
+		  console.log("it produced this event:", e);
+		  console.log("It was in this column:", column);
+		  console.log("It was in this row:", rowInfo);
+
+		  // IMPORTANT! React-Table uses onClick internally to trigger
+		  // events like expanding SubComponents and pivots.
+		  // By default a custom 'onClick' handler will override this functionality.
+		  // If you want to fire the original onClick handler, call the
+		  // 'handleOriginal' function.
+		  if (handleOriginal) {
+			handleOriginal();
+		  }
+		}
+	};
 }
 
 export class ThesesList extends React.Component<Props, State> {
-	public constructor(props: {}) {
+	public constructor(props: Props) {
 		super(props);
 		this.state = {
-			thesesList: [],
-			currentFilteredThesesList: [],
+			currentListFilter: ThesisTypeFilter.Default,
 		};
-		this.initList();
-	}
-
-	private async initList(): Promise<void> {
-		const theses = await getThesesList(ThesisTypeFilter.Default);
-		// await awaitSleep(3000);
-		this.setState({ thesesList: theses });
-		this.updateFilteredThesesList(ThesisTypeFilter.Default);
 	}
 
 	public render() {
-		return this.state.thesesList.length ?
+		return this.props.thesesList.length ?
 			<div>
 				<ThesesFilter
 					onChanged={this.onTypeFilterChanged}
@@ -109,12 +115,12 @@ export class ThesesList extends React.Component<Props, State> {
 				<ReactTable
 					key="table"
 					className={"-striped -highlight"}
-					data={this.state.currentFilteredThesesList}
+					data={this.computeFilteredThesesList()}
 					columns={TABLE_COL_DECLS}
 					defaultPageSize={10}
 					getTableProps={getTableProps}
 					getTheadProps={getTheadProps}
-					// getTrProps={getTrProps}
+					getTdProps={getTdProps}
 					style={{
 						height: "400px"
 					}}
@@ -124,9 +130,9 @@ export class ThesesList extends React.Component<Props, State> {
 			<ListLoadingIndicator />;
 	}
 
-	private updateFilteredThesesList(filter: ThesisTypeFilter): void {
-		const newList = this.state.thesesList.filter(thesis => {
-			switch (filter) {
+	private computeFilteredThesesList(): Thesis[] {
+		return this.props.thesesList.filter(thesis => {
+			switch (this.state.currentListFilter) {
 				case ThesisTypeFilter.All: return true;
 				case ThesisTypeFilter.AllCurrent:
 					return isThesisAvailable(thesis);
@@ -149,12 +155,11 @@ export class ThesesList extends React.Component<Props, State> {
 			}
 			return false;
 		});
-		this.setState({
-			currentFilteredThesesList: newList,
-		});
 	}
 
 	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
-		this.updateFilteredThesesList(newFilter);
+		this.setState({
+			currentListFilter: newFilter,
+		});
 	}
 }
