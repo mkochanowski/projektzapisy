@@ -44,7 +44,10 @@ export function getVueCssLoaders(options: any) {
 	};
 }
 
-export function parseBool(stringVal: string): boolean {
+export function parseBool(stringVal: string | undefined | null): boolean {
+	if (stringVal == null) {
+		return false;
+	}
 	const lower = stringVal.toLowerCase();
 	return ["1", "true"].includes(lower);
 }
