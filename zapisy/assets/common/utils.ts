@@ -18,10 +18,16 @@ export function scrollUpToElementIfWindowBelow(selector: string): void {
 	}
 }
 
-export function whenDomLoaded(fn : UnconstrainedFunction): void {
+export function whenDomLoaded(fn: UnconstrainedFunction): void {
 	if (document.readyState !== "loading") {
 		fn();
 	} else {
 		window.addEventListener("DOMContentLoaded", fn);
 	}
+}
+
+export function awaitSleep(ms: number): Promise<void> {
+	return new Promise((resolve, _) => {
+		window.setTimeout(resolve, ms);
+	});
 }

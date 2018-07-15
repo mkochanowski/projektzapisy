@@ -1,12 +1,13 @@
 import * as React from "react";
+import spinner from "./spinner.gif";
 
-export function ListLoadingIndicator(props: {}): JSX.Element {
+export function ListLoadingIndicator(): JSX.Element {
 	return <div
 		style={{
 			textAlign: "center",
 			width: "100%",
 		}}
 	>
-		<h1>Loading data...</h1>
+		<img src={spinner} alt="Loading..." />
 	</div>;
 }

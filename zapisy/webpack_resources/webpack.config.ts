@@ -263,6 +263,17 @@ const webpackConfig: webpack.Configuration = {
 						options: { minimize: !DEV }
 					}]
 				})
+			},
+			{
+				test: /\.(png|jpg|gif)$/,
+				use: [{
+					loader: "url-loader",
+					options: {
+						limit: 8192,
+						// ACHTUNG this should match the value of STATIC_URL in settings.py
+						publicPath: "/static",
+					}
+				}]
 			}
 		]
 	},
@@ -271,7 +282,7 @@ const webpackConfig: webpack.Configuration = {
 			path.resolve(ASSET_DIR),
 			path.resolve("./node_modules"),
 		],
-		extensions: [".ts", ".js", ".vue", ".tsx"],
+		extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
 		alias: {
 			"vue$": "vue/dist/vue.runtime.esm.js",
 		},

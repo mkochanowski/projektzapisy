@@ -9,6 +9,7 @@ import { ThesesFilter } from "./ThesesFilter";
 import { ThesisTypeFilter, getThesesList } from "../../backend_callers";
 import { isThesisAvailable } from "../../utils";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
+import { awaitSleep } from "common/utils";
 
 type Props = {
 	// currentThesesList: Thesis[],
@@ -92,18 +93,19 @@ export class ThesesList extends React.Component<Props, State> {
 
 	private async initList(): Promise<void> {
 		const theses = await getThesesList(ThesisTypeFilter.Default);
+		// await awaitSleep(3000);
 		this.setState({ thesesList: theses });
 		this.updateFilteredThesesList(ThesisTypeFilter.Default);
 	}
 
 	public render() {
-		return <div>
-			<ThesesFilter
-				onChanged={this.onTypeFilterChanged}
-				initialValue={ThesisTypeFilter.Default}
-			/>
-			<br />
-			{this.state.thesesList.length ?
+		return this.state.thesesList.length ?
+			<div>
+				<ThesesFilter
+					onChanged={this.onTypeFilterChanged}
+					initialValue={ThesisTypeFilter.Default}
+				/>
+				<br />
 				<ReactTable
 					key="table"
 					className={"-striped -highlight"}
@@ -117,10 +119,9 @@ export class ThesesList extends React.Component<Props, State> {
 						height: "400px"
 					}}
 				/>
-				:
-				<ListLoadingIndicator />
-			}
-		</div>;
+			</div>
+			:
+			<ListLoadingIndicator />;
 	}
 
 	private updateFilteredThesesList(filter: ThesisTypeFilter): void {
