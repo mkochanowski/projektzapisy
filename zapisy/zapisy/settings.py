@@ -117,6 +117,11 @@ USE_I18N = True
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
 
+TEMPLATE_LOADERS_TO_USE = [
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -130,13 +135,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.request',
             ],
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.filesystem.Loader',
-                ]),
-            ]
+            'loaders': TEMPLATE_LOADERS_TO_USE
+            if DEBUG else
+            [ ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS_TO_USE) ]
         },
     },
 ]
