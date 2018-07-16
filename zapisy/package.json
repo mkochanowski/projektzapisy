@@ -24,6 +24,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.22.2",
     "react": "^16.4.1",
+    "react-button-component": "^1.0.0",
     "react-datepicker": "^1.5.0",
     "react-dom": "^16.4.1",
     "react-table": "^6.8.6",

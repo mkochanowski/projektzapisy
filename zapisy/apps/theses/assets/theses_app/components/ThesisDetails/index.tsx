@@ -1,5 +1,5 @@
 import * as React from "react";
-import styled from "styled-components";
+import Button from "react-button-component";
 
 import { Thesis } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
@@ -9,17 +9,6 @@ import { ThesisVotes } from "./ThesisVotes";
 type Props = {
 	thesis: Thesis,
 };
-
-const SaveButton = styled.button`
-	height: 30px;
-	border: 1px solid black;
-	background: white;
-
-	&:focus {
-		border: 2px solid black;
-		font-weight: bold;
-	}
-`;
 
 export class ThesisDetails extends React.Component<Props> {
 	public render() {
@@ -44,8 +33,12 @@ export class ThesisDetails extends React.Component<Props> {
 				marginLeft: "20px"
 			}}>
 				<ThesisVotes />
-				<SaveButton>Zapisz</SaveButton>
+				<Button onClick={this.onSaveRequested}>Zapisz</Button>
 			</div>
 		</div>;
+	}
+
+	private onSaveRequested = () => {
+		console.warn("Save clicked");
 	}
 }

@@ -4451,6 +4451,13 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-button-component@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-button-component/-/react-button-component-1.0.0.tgz#e0fb71c4f19898ccbc5a597d31fd8d71c6b3baaa"
+  dependencies:
+    react "^16.3.1"
+    styled-components "^3.2.5"
+
 react-datepicker@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-1.5.0.tgz#7eacd9609313189c84a21bb7421486054939a4b2"
@@ -4490,7 +4497,7 @@ react-table@^6.8.6:
   dependencies:
     classnames "^2.2.5"
 
-react@^16.4.1:
+react@^16.3.1, react@^16.4.1:
   version "16.4.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.4.1.tgz#de51ba5764b5dbcd1f9079037b862bd26b82fe32"
   dependencies:
@@ -5191,7 +5198,7 @@ style-loader@^0.21.0:
     loader-utils "^1.1.0"
     schema-utils "^0.4.5"
 
-styled-components@^3.3.3:
+styled-components@^3.2.5, styled-components@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-3.3.3.tgz#09e702055ab11f7a8eab8229b1c0d0b855095686"
   dependencies:
