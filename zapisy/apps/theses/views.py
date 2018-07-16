@@ -105,5 +105,6 @@ def build_autocomplete_view_with_queryset(queryset):
             return qs
     return ac
 
+
 StudentAutocomplete = build_autocomplete_view_with_queryset(Student)
 EmployeeAutocomplete = build_autocomplete_view_with_queryset(Employee)

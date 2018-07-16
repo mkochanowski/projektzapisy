@@ -1,13 +1,5 @@
 from enum import Enum
 
-"""
-This helps with defining value-restricted model fields (using choices=)
-"""
-class ChoiceEnum(Enum):
-    @classmethod
-    def choices(cls):
-        return tuple((opt.name, opt.value) for opt in cls)
-
 
 MONDAY = '1'
 TUESDAY = '2'
