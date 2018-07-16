@@ -15,12 +15,13 @@ from .errors import InvalidQueryError
 
 THESIS_TYPE_FILTER_NAME = "thesis_type"
 
-"""
-Various values for the "thesis type" filter in the main UI view
-Must match values in backend_callers.ts (this is what client code
-will send to us)
-"""
+
 class ThesisTypeFilter(Enum):
+    """
+    Various values for the "thesis type" filter in the main UI view
+    Must match values in backend_callers.ts (this is what client code
+    will send to us)
+    """
     all_current = 0
     all = 1
     masters = 2
@@ -32,6 +33,7 @@ class ThesisTypeFilter(Enum):
     available_bachelors = 8
     available_bachelors_isim = 9
 
+
 class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get"]
     permission_classes = (permissions.AllowAny,)
@@ -42,7 +44,7 @@ class ThesesViewSet(viewsets.ModelViewSet):
         requested_thesis_type_str = self.request.query_params.get(THESIS_TYPE_FILTER_NAME, None)
         if requested_thesis_type_str is None:
             return result
-        
+
         try:
             requested_thesis_type = int(requested_thesis_type_str)
             return filter_theses_queryset_for_type(result, requested_thesis_type)
@@ -55,6 +57,7 @@ def available_thesis_filter(queryset):
         .exclude(status=models.ThesisStatus.in_progress.value)\
         .exclude(status=models.ThesisStatus.defended.value)\
         .exclude(reserved=True)
+
 
 def filter_theses_queryset_for_type(queryset, thesis_type):
     if thesis_type == ThesisTypeFilter.all_current.value:
@@ -80,9 +83,11 @@ def filter_theses_queryset_for_type(queryset, thesis_type):
     else:
         raise ParseError()
 
+
 @login_required
 def theses_main(request):
     return render(request, "theses/main.html")
+
 
 def build_autocomplete_view_with_queryset(queryset):
     class ac(autocomplete.Select2QuerySetView):
