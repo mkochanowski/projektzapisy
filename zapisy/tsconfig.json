@@ -19,7 +19,8 @@
       "lodash",
       "react",
       "react-dom",
-      "react-table"
+      "react-table",
+      "react-button-component",
     ]
   },
   "exclude": [
