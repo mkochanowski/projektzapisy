@@ -23,7 +23,7 @@ export class ThesesApp extends React.Component<{}, State> {
 	private async initList(): Promise<void> {
 		const theses = await getThesesList(ThesisTypeFilter.Default);
 		// await awaitSleep(3000);
-		this.setState({ thesesList: theses });
+		this.setState({ thesesList: theses, currentlySelectedThesis: theses[0] });
 	}
 
 	public render() {

@@ -8,6 +8,16 @@ export const enum ThesisKind {
 	Isim = 4,
 }
 
+export function thesisKindToString(kind: ThesisKind): string {
+	switch (kind) {
+		case ThesisKind.Masters: return "mgr";
+		case ThesisKind.Engineers: return "inż";
+		case ThesisKind.Bachelors: return "lic";
+		case ThesisKind.BachelorsEngineers: return "lic+inż";
+		case ThesisKind.Isim: return "ISIM";
+	}
+}
+
 export const enum ThesisStatus {
 	BeingEvaluated = 1,
 	ReturnedForCorrections = 2,
@@ -23,7 +33,11 @@ export const enum ThesisVote {
 	UserMissing = 4,
 }
 
-export type Employee = {
+// export type StudentRaw = {
+//
+// };
+
+export type EmployeeRaw = {
 	id: number,
 	title: string,
 	user: {
@@ -34,11 +48,36 @@ export type Employee = {
 	},
 };
 
+export class Employee {
+	public id: number;
+	public academicTitle?: string;
+	public userId: number;
+	public username: string;
+	public firstName: string;
+	public lastName: string;
+
+	public constructor(raw: EmployeeRaw) {
+		this.id = raw.id;
+		if (raw.title) {
+			this.academicTitle = raw.title;
+		}
+		this.userId = raw.user.id;
+		this.username = raw.user.username;
+		this.firstName = raw.user.first_name;
+		this.lastName = raw.user.last_name;
+	}
+
+	public getDisplayName(): string {
+		const fullName = `${this.firstName} ${this.lastName}`;
+		return this.academicTitle ? `${this.academicTitle} ${fullName}` : fullName;
+	}
+}
+
 export type ThesisRaw = {
 	id: number;
 	title: string;
-	advisor: Employee,
-	auxiliary_advisor?: Employee,
+	advisor: EmployeeRaw,
+	auxiliary_advisor?: EmployeeRaw,
 	kind: ThesisKind,
 	reserved: boolean,
 	status: ThesisStatus,
@@ -60,9 +99,9 @@ export class Thesis {
 	public constructor(raw: ThesisRaw) {
 		this.id = raw.id;
 		this.title = raw.title;
-		this.advisor = raw.advisor;
+		this.advisor = new Employee(raw.advisor);
 		if (raw.auxiliary_advisor) {
-			this.auxiliaryAdvisor = raw.auxiliary_advisor;
+			this.auxiliaryAdvisor = new Employee(raw.auxiliary_advisor);
 		}
 		this.kind = raw.kind;
 		this.reserved = raw.reserved;

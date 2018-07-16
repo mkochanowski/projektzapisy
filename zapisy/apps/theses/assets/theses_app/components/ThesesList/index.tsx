@@ -2,7 +2,7 @@ import * as React from "react";
 import ReactTable, { Column, RowInfo } from "react-table";
 import "react-table/react-table.css";
 
-import { Thesis, Employee, ThesisKind } from "../../types";
+import { Thesis, Employee, ThesisKind, thesisKindToString } from "../../types";
 import { ReservationIndicator } from "./ReservationIndicator";
 import { ThesesFilter } from "./ThesesFilter";
 import { ThesisTypeFilter, getThesesList } from "../../backend_callers";
@@ -19,21 +19,6 @@ type State = {
 	currentListFilter: ThesisTypeFilter,
 };
 
-function formatEmployeeDisplayName(employee: Employee): string {
-	const fullName = `${employee.user.first_name} ${employee.user.last_name}`;
-	return employee.title ? `${employee.title} ${fullName}` : fullName;
-}
-
-function formatThesisKind(kind: ThesisKind): string {
-	switch (kind) {
-		case ThesisKind.Masters: return "mgr";
-		case ThesisKind.Engineers: return "inż";
-		case ThesisKind.Bachelors: return "lic";
-		case ThesisKind.BachelorsEngineers: return "lic+inż";
-		case ThesisKind.Isim: return "ISIM";
-	}
-}
-
 const TABLE_COL_DECLS: Column[] = [{
 	id: "isThesisReserved",
 	Header: "Rezerwacja",
@@ -44,13 +29,13 @@ const TABLE_COL_DECLS: Column[] = [{
 }, {
 	id: "thesisKind",
 	Header: "Typ",
-	accessor: (props: Thesis) => formatThesisKind(props.kind),
+	accessor: (props: Thesis) => thesisKindToString(props.kind),
 	filterable: false,
 	width: 80,
 }, {
 	id: "thesisAdvisor",
 	Header: "Promotor",
-	accessor: (props: Thesis) => formatEmployeeDisplayName(props.advisor),
+	accessor: (props: Thesis) => props.advisor.getDisplayName(),
 	filterable: true,
 }, {
 	id: "thesisName",
