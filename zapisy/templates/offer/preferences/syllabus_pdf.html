@@ -1,0 +1,24 @@
+{% load i18n %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//PL">
+
+<html xmlns:pdf="">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    </head>
+    <style>
+        @font-face { font-family: Helvetica; src: url("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf");}
+
+        html {
+            font-family: Helvetica, sans-serif;
+            font-size: 8pt;
+            }
+
+        th { font-size: 12px;}
+        table { border: 1px #000000 solid;}
+        a { text-decoration: none; color: #000000;}
+        td, th { text-align: left; padding-top: 3px; padding-left: 3px;}
+    </style>
+    <body>
+    	<h2>Syllabus dla: {{ entity }}</h2>
+    </body>
+</html>

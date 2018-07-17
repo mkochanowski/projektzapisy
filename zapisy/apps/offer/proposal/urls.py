@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^(?P<slug>[\w\-_]+)/review', views.proposal_for_review, name='proposal-review'),
     url(r'^(?P<slug>[\w\-_]+)/edit', views.proposal_edit, name='proposal-edit'),
     url(r'^(?P<slug>[\w\-_]+)', views.offer, name='offer-page'),
+    url(r'^(?P<slug>[\w\-_]+)/syllabus', views.syllabus_pdf, name='syllabus-pdf'),
 ]

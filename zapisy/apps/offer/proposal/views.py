@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.http import Http404
 from django.shortcuts import redirect
+from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 from django.forms.models import inlineformset_factory
@@ -335,3 +336,17 @@ def proposal_for_review(request, slug=None):
     proposal.mark_for_review()
     proposal.save()
     return redirect('manage')
+
+
+def syllabus_pdf(self):
+    template = get_template('proposal/syllabus_pdf.html')
+    html = template.render(data)
+    result = io.BytesIO()
+
+    pisa.pisaDocument(io.StringIO(html), result, encoding='UTF-8')
+
+    response = HttpResponse(result.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=' + \
+                                      re.sub(r'\s', '', slugify(str(self.entity))) + '-.pdf'
+
+    return response
