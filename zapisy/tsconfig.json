@@ -10,17 +10,12 @@
     "module": "esnext",
     "baseUrl": "./assets",
     "noUnusedParameters": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./webpack_resources/typings"
-    ],
     "types": [
       "jquery",
       "lodash",
       "react",
       "react-dom",
       "react-table",
-      "react-button-component",
     ]
   },
   "exclude": [
@@ -28,5 +23,6 @@
     // Config files are compiled separately, see tsconfig.webpack-config
     "./webpack_resources/webpack-utils.ts",
     "./webpack_resources/webpack.config.ts",
+    "./compiled_assets",
   ]
 }

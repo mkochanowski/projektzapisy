@@ -14,6 +14,6 @@ declare module "*.gif" {
 // mess up stuff like setInterval etc
 declare namespace NodeJS {
 	export interface ReadableStream {
-  
+
 	}
 }
