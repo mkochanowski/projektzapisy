@@ -14,7 +14,7 @@
       "./node_modules/@types",
       "./webpack_resources/typings"
     ],
-    "types":[
+    "types": [
       "jquery",
       "lodash",
       "react",
