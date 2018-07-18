@@ -60,7 +60,7 @@ export function ThesisMiddleForm(props: Props): JSX.Element {
 			</MidFormTable>
 		<textarea
 			style={{ width: "100%", height: "100px", boxSizing: "border-box" }}
-			defaultValue={"This is a very long description of what some poor sod must do"}
+			defaultValue={props.thesis.description}
 		/>
 	</div>;
 }

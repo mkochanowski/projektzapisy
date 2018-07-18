@@ -11,7 +11,6 @@ from dal import autocomplete
 from apps.users.models import Student, Employee
 from . import models
 from . import serializers
-from .errors import InvalidQueryError
 
 THESIS_TYPE_FILTER_NAME = "thesis_type"
 

@@ -80,6 +80,7 @@ export type ThesisRaw = {
 	auxiliary_advisor?: EmployeeRaw,
 	kind: ThesisKind,
 	reserved: boolean,
+	description: string,
 	status: ThesisStatus,
 	added_date: string,
 	modified_date: string,
@@ -92,6 +93,7 @@ export class Thesis {
 	public auxiliaryAdvisor?: Employee;
 	public kind: ThesisKind;
 	public reserved: boolean;
+	public description: string;
 	public status: ThesisStatus;
 	public addedDate: Date;
 	public modifiedDate: Date;
@@ -105,6 +107,7 @@ export class Thesis {
 		}
 		this.kind = raw.kind;
 		this.reserved = raw.reserved;
+		this.description = raw.description;
 		this.status = raw.status;
 		this.addedDate = new Date(raw.added_date);
 		this.modifiedDate = new Date(raw.modified_date);
