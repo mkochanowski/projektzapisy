@@ -5,9 +5,7 @@ from apps.users.models import Employee, Student
 from apps.api.rest.v1.serializers import UserSerializer
 from .errors import InvalidQueryError
 
-
-# We just need the employee's ID and their .user field
-class EmployeeThesesSerializer(serializers.RelatedField):
+class BasePersonSerializer(serializers.RelatedField):
     def get_queryset(self):
         return None
     
@@ -16,17 +14,25 @@ class EmployeeThesesSerializer(serializers.RelatedField):
             "id": instance.id,
             "username": instance.user.username,
             "first_name": instance.user.first_name,
-            "last_name": instance.user.last_name
+            "last_name": instance.user.last_name,
         }
 
     def to_internal_value(self, data):
-        print("Employee TO INTERNAL VALUE")
-        empid = data.get("id")
-        if type(empid) is not int or empid < 0:
+        person_id = data.get("id")
+        if type(person_id) is not int or person_id < 0:
             raise serializers.ValidationError({
                 "id": "Expected 'id' to be a valid positive integer"
             })
-        return { "id": empid }
+        return { "id": person_id }
+
+# We just need the employee's ID and their .user field
+class EmployeeThesesSerializer(BasePersonSerializer):
+    def to_representation(self, instance):
+        result = super(EmployeeThesesSerializer, self).to_representation(instance)
+        result.update({
+            "academic_title": instance.title,
+        })
+        return result
 
 class ThesisSerializer(serializers.ModelSerializer):
     advisor = EmployeeThesesSerializer()
@@ -60,7 +66,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         instance.reserved = validated_data.get('reserved', instance.reserved)
         instance.description = validated_data.get('description', instance.description)
         instance.status = validated_data.get('status', instance.status)
-        #self._update_advisors(instance, validated_data)
+        self._update_advisors(instance, validated_data)
         # self._update_students(instance, validated_data)
         instance.save()
         return instance
