@@ -7,6 +7,17 @@ py_library(
     name = "settings",
     srcs = ["settings.py"],
     deps = [
+        "//zapisy:project",
         requirement("django-environ"),
+    ],
+)
+
+py_library(
+    name = "urls",
+    srcs = ["urls.py"],
+    deps = [
+        "//zapisy:project",
+        requirement("django"),
+        requirement("django_cas_ng"),
     ],
 )
