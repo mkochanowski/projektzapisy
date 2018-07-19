@@ -25,9 +25,9 @@ http_archive(
 
 http_archive(
     name = "build_bazel_rules_typescript",
-    url = "https://github.com/bazelbuild/rules_typescript/archive/0.15.1.zip",
-    strip_prefix = "rules_typescript-0.15.1",
     sha256 = "3792cc20ef13bb1d1d8b1760894c3320f02a87843e3a04fed7e8e454a75328b6",
+    strip_prefix = "rules_typescript-0.15.1",
+    url = "https://github.com/bazelbuild/rules_typescript/archive/0.15.1.zip",
 )
 
 ## The rules below download and set-up buildifier (a BUILD file formatter).
