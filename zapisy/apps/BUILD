@@ -11,3 +11,11 @@ py_library(
         requirement("django"),
     ],
 )
+
+py_library(
+    name = "cache_utils",
+    srcs = ["cache_utils.py"],
+    deps = [
+        requirement("django"),
+    ],
+)
