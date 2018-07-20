@@ -10,7 +10,7 @@ class BaseUserTestCase(TestCase):
         u = UserFactory()
         self.assertTrue(u.check_password('test'))
 
-    def test_password_reset(self):
+    def test_password_reset(self) -> None:
         response = self.client.get(reverse('password_reset'))
         self.assertEqual(response.status_code, 200)
 
