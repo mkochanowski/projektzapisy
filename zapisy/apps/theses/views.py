@@ -1,4 +1,5 @@
 from enum import Enum
+import sys
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -90,6 +91,15 @@ def theses_main(request):
 
 def build_autocomplete_view_with_queryset(queryset):
     class ac(autocomplete.Select2QuerySetView):
+        def render_to_response(self, context):
+            return super(ac, self).render_to_response(context)
+
+        def get_paginate_by(self, queryset):
+            all_pages = self.request.GET.get("allpages", None)
+            if all_pages == "1":
+                return sys.maxsize
+            return super(ac, self).get_paginate_by(queryset)
+
         def get_queryset(self):
             if not self.request.user.is_authenticated():
                 return queryset.objects.none()
