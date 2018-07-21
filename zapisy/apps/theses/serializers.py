@@ -5,10 +5,7 @@ from apps.users.models import Employee, Student
 from apps.api.rest.v1.serializers import UserSerializer
 from .errors import InvalidQueryError
 
-class BasePersonSerializer(serializers.RelatedField):
-    def get_queryset(self):
-        return None
-    
+class BasePersonSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return {
             "id": instance.id,
@@ -34,18 +31,20 @@ class EmployeeThesesSerializer(BasePersonSerializer):
         })
         return result
 
+class StudentThesesSerializer(BasePersonSerializer):
+    pass
+
 class ThesisSerializer(serializers.ModelSerializer):
     advisor = EmployeeThesesSerializer()
     auxiliary_advisor = EmployeeThesesSerializer()
+    student = StudentThesesSerializer()
+    student_2 = StudentThesesSerializer()
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
 
     def _update_advisors(self, instance, validated_data):
-        print("Update advisors", validated_data)
         if "advisor" in validated_data:
-            print("Will try to update advisor", validated_data.get("advisor"))
             instance.advisor = _get_person_from_queryset(Employee, validated_data.get("advisor"))
-            print("new advisor", instance.advisor)
         if "auxiliary_advisor" in validated_data:
             if not instance.advisor:
                 raise InvalidQueryError("Cannot set auxiliary advisor without an advisor present")
@@ -60,14 +59,13 @@ class ThesisSerializer(serializers.ModelSerializer):
             instance.student_2 = _get_person_from_queryset(Student, validated_data.get("student_2"))
 
     def update(self, instance, validated_data):
-        print("UPDATE", validated_data)
         instance.title = validated_data.get('title', instance.title)
         instance.kind = validated_data.get('kind', instance.kind)
         instance.reserved = validated_data.get('reserved', instance.reserved)
         instance.description = validated_data.get('description', instance.description)
         instance.status = validated_data.get('status', instance.status)
         self._update_advisors(instance, validated_data)
-        # self._update_students(instance, validated_data)
+        self._update_students(instance, validated_data)
         instance.save()
         return instance
 

@@ -33,57 +33,67 @@ export const enum ThesisVote {
 	UserMissing = 4,
 }
 
-// export type StudentRaw = {
-//
-// };
-
-export type EmployeeRaw = {
-	id: number,
-	title: string,
-	user: {
-		id: number,
-		username: string,
-		first_name: string,
-		last_name: string,
-	},
+type BasePersonRaw = {
+	id: number;
+	username: string,
+	first_name: string,
+	last_name: string,
 };
 
-export class Employee {
+type StudentRaw = BasePersonRaw;
+type EmployeeRaw = {
+	academic_title: string;
+} & BasePersonRaw;
+
+class BasePerson {
 	public id: number;
-	public academicTitle?: string;
-	public userId: number;
 	public username: string;
 	public firstName: string;
 	public lastName: string;
 
-	public constructor(raw: EmployeeRaw) {
+	public constructor(raw: BasePersonRaw) {
 		this.id = raw.id;
-		if (raw.title) {
-			this.academicTitle = raw.title;
-		}
-		this.userId = raw.user.id;
-		this.username = raw.user.username;
-		this.firstName = raw.user.first_name;
-		this.lastName = raw.user.last_name;
+		this.username = raw.username;
+		this.firstName = raw.first_name;
+		this.lastName = raw.last_name;
 	}
 
 	public getDisplayName(): string {
-		const fullName = `${this.firstName} ${this.lastName}`;
+		return `${this.firstName} ${this.lastName}`;
+	}
+}
+
+export class Employee extends BasePerson {
+	public academicTitle?: string;
+
+	public constructor(raw: EmployeeRaw) {
+		super(raw);
+		if (raw.academic_title) {
+			this.academicTitle = raw.academic_title;
+		}
+	}
+
+	public getDisplayName(): string {
+		const fullName = super.getDisplayName();
 		return this.academicTitle ? `${this.academicTitle} ${fullName}` : fullName;
 	}
 }
 
+export class Student extends BasePerson {}
+
 export type ThesisRaw = {
 	id: number;
 	title: string;
-	advisor: EmployeeRaw,
-	auxiliary_advisor?: EmployeeRaw,
-	kind: ThesisKind,
-	reserved: boolean,
-	description: string,
-	status: ThesisStatus,
-	added_date: string,
-	modified_date: string,
+	advisor: EmployeeRaw;
+	auxiliary_advisor?: EmployeeRaw;
+	kind: ThesisKind;
+	reserved: boolean;
+	description: string;
+	status: ThesisStatus;
+	student: StudentRaw;
+	student_2?: StudentRaw;
+	added_date: string;
+	modified_date: string;
 };
 
 export class Thesis {
@@ -95,6 +105,8 @@ export class Thesis {
 	public reserved: boolean;
 	public description: string;
 	public status: ThesisStatus;
+	public student: Student;
+	public secondStudent?: Student;
 	public addedDate: Date;
 	public modifiedDate: Date;
 
@@ -109,6 +121,10 @@ export class Thesis {
 		this.reserved = raw.reserved;
 		this.description = raw.description;
 		this.status = raw.status;
+		this.student = new Student(raw.student);
+		if (raw.student_2) {
+			this.secondStudent = new Student(raw.student_2);
+		}
 		this.addedDate = new Date(raw.added_date);
 		this.modifiedDate = new Date(raw.modified_date);
 	}
