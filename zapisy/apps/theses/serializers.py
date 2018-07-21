@@ -5,6 +5,7 @@ from apps.users.models import Employee, Student
 from apps.api.rest.v1.serializers import UserSerializer
 from .errors import InvalidQueryError
 
+
 class BasePersonSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return {
@@ -20,7 +21,8 @@ class BasePersonSerializer(serializers.Serializer):
             raise serializers.ValidationError({
                 "id": "Expected 'id' to be a valid positive integer"
             })
-        return { "id": person_id }
+        return {"id": person_id}
+
 
 # We just need the employee's ID and their .user field
 class EmployeeThesesSerializer(BasePersonSerializer):
@@ -31,8 +33,10 @@ class EmployeeThesesSerializer(BasePersonSerializer):
         })
         return result
 
+
 class StudentThesesSerializer(BasePersonSerializer):
     pass
+
 
 class ThesisSerializer(serializers.ModelSerializer):
     advisor = EmployeeThesesSerializer()
@@ -85,5 +89,5 @@ def _get_person_from_queryset(queryset, person_data):
         raise InvalidQueryError("Missing person ID")
     try:
         return queryset.objects.get(pk=person_data.get("id"))
-    except:
+    except queryset.DoesNotExist:
         raise InvalidQueryError("Bad person ID specified")
