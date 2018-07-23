@@ -97,7 +97,6 @@ class BaseUser(models.Model):
 
 
 class Employee(BaseUser):
-
     user = models.OneToOneField(
         User,
         verbose_name="Użytkownik",
@@ -112,35 +111,21 @@ class Employee(BaseUser):
         verbose_name="Status")
     title = models.CharField(max_length=20, verbose_name="tytuł naukowy", null=True, blank=True)
 
-    def has_privileges_for_group(self, group_id: int) -> bool:
-        """
-        Method used to verify whether user is allowed to create a poll for certain group
-        (== he is an admin, a teacher for this course or a teacher for this group)
-        """
-        from apps.enrollment.courses.models.group import Group
-
-        try:
-            group = Group.objects.get(pk=group_id)
-            return group.teacher == self or self in group.course.teachers.all() or self.user.is_staff
-        except Group.DoesNotExist:
-            logger.error(
-                'Function Employee.has_privileges_for_group(group_id = %d) throws Group.DoesNotExist exception.' %
-                group_id)
-        return False
-
     @staticmethod
     def get_actives() -> QuerySet:
-        return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name'). extra(
-            where=["(SELECT COUNT(*) FROM courses_courseentity WHERE courses_courseentity.status > 0 AND NOT courses_courseentity.deleted AND courses_courseentity.owner_id=users_employee.id)>0"]
+        return Employee.objects.filter(user__is_active=True).order_by('user__last_name', 'user__first_name').extra(
+            where=[
+                "(SELECT COUNT(*) FROM courses_courseentity WHERE courses_courseentity.status > 0 AND NOT courses_courseentity.deleted AND courses_courseentity.owner_id=users_employee.id)>0"]
         )
 
     @staticmethod
-    def get_list(begin: str ='All') -> QuerySet:
+    def get_list(begin: str = 'All') -> QuerySet:
         def next_char(begin: str) -> str:
             try:
                 return chr(ord(begin) + 1)
             except ValueError:
                 return chr(90)
+
         if begin == 'Z':
             employees = Employee.objects.filter(user__last_name__gte=begin, status=0).\
                 select_related().order_by('user__last_name', 'user__first_name')
