@@ -299,7 +299,7 @@ const webpackConfig: webpack.Configuration = {
 			path.resolve(ASSET_DIR),
 			path.resolve("./node_modules"),
 		],
-		extensions: [".ts", ".js", ".vue", ".tsx", ".png", ".jpg", ".gif"],
+		extensions: [".ts", ".js", ".vue", ".jsx", ".tsx", ".png", ".jpg", ".gif"],
 		alias: {
 			"vue$": "vue/dist/vue.runtime.esm.js",
 		},

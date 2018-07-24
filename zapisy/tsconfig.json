@@ -15,7 +15,7 @@
       "lodash",
       "react",
       "react-dom",
-      "react-table",
+      "react-table"
     ]
   },
   "exclude": [

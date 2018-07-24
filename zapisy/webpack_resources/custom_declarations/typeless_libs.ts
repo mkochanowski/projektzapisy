@@ -1,0 +1,8 @@
+// Empty type augmentations for JS libs that don't have TS typings
+
+declare module "react-button-component";
+
+// We want to be able to import any .js file
+declare module "*.js";
+// ...or jsx
+declare module "*.jsx";
