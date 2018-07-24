@@ -3,7 +3,7 @@ import "react-select/dist/react-select.css";
 import AsyncPaginate from "./ReactSelectAsyncPaginate.jsx";
 
 import styled from "styled-components";
-import { Thesis } from "../../types";
+import { Thesis, BasePerson } from "../../types";
 import { getPersonAutocomplete, PersonType } from "../../backend_callers";
 
 const MidFormTable = styled.table`
@@ -30,7 +30,7 @@ width: 50%;
 `;
 
 type SelectValueDef = {
-	value: number;
+	value: string;
 	label: string;
 };
 
@@ -59,19 +59,25 @@ type Props = {
 
 type State = {
 	currentAdvisorId: number | null;
+	currentAuxAdvisorId: number | null;
 	currentStudentId: number | null;
+	currentSecondStudentId: number | null;
 };
 
 export class ThesisMiddleForm extends React.Component<Props, State> {
 	public constructor(props: Props) {
 		super(props);
+		const thesis = this.props.thesis;
 		this.state = {
-			currentAdvisorId: this.props.thesis.advisor.id,
-			currentStudentId: this.props.thesis.student.id,
+			currentAdvisorId: thesis.advisor ? thesis.advisor.id : null,
+			currentAuxAdvisorId: thesis.auxiliaryAdvisor ? thesis.auxiliaryAdvisor.id : null,
+			currentStudentId: thesis.student ? thesis.student.id : null,
+			currentSecondStudentId: thesis.secondStudent ? thesis.secondStudent.id : null,
 		};
 	}
 
 	public render() {
+		const thesis = this.props.thesis;
 		return <div>
 			<MidFormTable>
 				<tbody>
@@ -84,7 +90,14 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 				</tr>
 				<tr>
 					<td>Promotor</td>
-					<td></td>
+					<td><SelectComponentWrapper><AsyncPaginate
+						cacheOptions
+						defaultOptions
+						loadOptions={(new AsyncSelectAutocompleteGetter(PersonType.Employee)).get}
+						onChange={this.onAdvisorChanged}
+						value={this.state.currentAdvisorId}
+						baseOptions={this.getBaseOptionsForPerson(thesis.advisor)}
+					/></SelectComponentWrapper></td>
 				</tr>
 				<tr>
 					<td>Student</td>
@@ -93,8 +106,8 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 						defaultOptions
 						loadOptions={(new AsyncSelectAutocompleteGetter(PersonType.Student)).get}
 						onChange={this.onStudentChanged}
-						// value={this.state.currentStudentId}
-						baseOptions={[this.getBaseStudentOptions()]}
+						value={this.state.currentStudentId}
+						baseOptions={this.getBaseOptionsForPerson(thesis.student)}
 					/></SelectComponentWrapper></td>
 				</tr>
 				</tbody>
@@ -106,16 +119,21 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		</div>;
 	}
 
-	private getBaseStudentOptions(): SelectValueDef {
-		return {
-			value: this.props.thesis.student.id,
-			label: this.props.thesis.student.getDisplayName(),
+	private getBaseOptionsForPerson(person: BasePerson | undefined): SelectValueDef[] {
+		return person ? [{
+			value: String(person.id),
+			label: person.getDisplayName(),
+		}] : [];
+	}
+
+	private makeOnPersonChangedHandler(fieldName: keyof State) {
+		return (newValue: SelectValueDef | null): void => {
+			this.setState({
+				[fieldName]: newValue ? newValue.value : null,
+			} as any);
 		};
 	}
 
-	private onStudentChanged = (newValue: SelectValueDef | null): void => {
-		this.setState({
-			currentStudentId: newValue ? Number(newValue.value) : null,
-		});
-	}
+	private onStudentChanged = this.makeOnPersonChangedHandler("currentStudentId");
+	private onAdvisorChanged = this.makeOnPersonChangedHandler("currentAdvisorId");
 }

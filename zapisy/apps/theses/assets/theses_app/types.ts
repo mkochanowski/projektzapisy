@@ -45,7 +45,7 @@ type EmployeeRaw = {
 	academic_title: string;
 } & BasePersonRaw;
 
-class BasePerson {
+export class BasePerson {
 	public id: number;
 	public username: string;
 	public firstName: string;
