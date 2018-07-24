@@ -1,6 +1,6 @@
 import * as React from "react";
 import "react-select/dist/react-select.css";
-import AsyncPaginate from "./ReactSelectAsyncPaginate.jsx";
+import AsyncPaginate from "react-select-async-paginate";
 
 import styled from "styled-components";
 import { Thesis, BasePerson } from "../../types";
@@ -41,7 +41,7 @@ class AsyncSelectAutocompleteGetter {
 		this.personType = personType;
 	}
 
-	public get = async (inputValue: string, _: any, lastPage: number) => {
+	public get = async (inputValue: string, _: any, lastPage: number = 0) => {
 		const thisPageNum = lastPage + 1;
 		const acResults = await getPersonAutocomplete(this.personType, inputValue, thisPageNum);
 		const result = acResults.results.map(pac => ({ value: pac.id, label: pac.text }));
@@ -60,7 +60,7 @@ type Props = {
 type State = {
 	currentAdvisorId: number | null;
 	currentAuxAdvisorId: number | null;
-	currentStudentId: number | null;
+	currentStudentValue: SelectValueDef | null;
 	currentSecondStudentId: number | null;
 };
 
@@ -71,7 +71,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		this.state = {
 			currentAdvisorId: thesis.advisor ? thesis.advisor.id : null,
 			currentAuxAdvisorId: thesis.auxiliaryAdvisor ? thesis.auxiliaryAdvisor.id : null,
-			currentStudentId: thesis.student ? thesis.student.id : null,
+			currentStudentValue: thesis.student ? this.getBaseOptionsForPerson(thesis.student) : null,
 			currentSecondStudentId: thesis.secondStudent ? thesis.secondStudent.id : null,
 		};
 	}
@@ -90,14 +90,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 				</tr>
 				<tr>
 					<td>Promotor</td>
-					<td><SelectComponentWrapper><AsyncPaginate
-						cacheOptions
-						defaultOptions
-						loadOptions={(new AsyncSelectAutocompleteGetter(PersonType.Employee)).get}
-						onChange={this.onAdvisorChanged}
-						value={this.state.currentAdvisorId}
-						baseOptions={this.getBaseOptionsForPerson(thesis.advisor)}
-					/></SelectComponentWrapper></td>
+					<td></td>
 				</tr>
 				<tr>
 					<td>Student</td>
@@ -106,8 +99,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 						defaultOptions
 						loadOptions={(new AsyncSelectAutocompleteGetter(PersonType.Student)).get}
 						onChange={this.onStudentChanged}
-						value={this.state.currentStudentId}
-						baseOptions={this.getBaseOptionsForPerson(thesis.student)}
+						value={this.state.currentStudentValue}
 					/></SelectComponentWrapper></td>
 				</tr>
 				</tbody>
@@ -119,21 +111,21 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		</div>;
 	}
 
-	private getBaseOptionsForPerson(person: BasePerson | undefined): SelectValueDef[] {
-		return person ? [{
+	private getBaseOptionsForPerson(person: BasePerson | undefined): SelectValueDef | null {
+		return person ? {
 			value: String(person.id),
 			label: person.getDisplayName(),
-		}] : [];
+		} : null;
 	}
 
 	private makeOnPersonChangedHandler(fieldName: keyof State) {
 		return (newValue: SelectValueDef | null): void => {
 			this.setState({
-				[fieldName]: newValue ? newValue.value : null,
+				[fieldName]: newValue || null,
 			} as any);
 		};
 	}
 
-	private onStudentChanged = this.makeOnPersonChangedHandler("currentStudentId");
+	private onStudentChanged = this.makeOnPersonChangedHandler("currentStudentValue");
 	private onAdvisorChanged = this.makeOnPersonChangedHandler("currentAdvisorId");
 }
