@@ -15,7 +15,10 @@ const filterInfos: ThesisStatusFilterInfo[] = [
 	{ val: ThesisStatus.BeingEvaluated, stringVal: "evaluated", displayName: "Poddana pod głosowanie" },
 	{ val: ThesisStatus.Defended, stringVal: "defended", displayName: "Obroniona" },
 	{ val: ThesisStatus.InProgress, stringVal: "in_progress", displayName: "W realizacji" },
-	{ val: ThesisStatus.ReturnedForCorrections, stringVal: "returned", displayName: "Zwrócona do poprawek" },
+	{
+		val: ThesisStatus.ReturnedForCorrections,
+		stringVal: "returned", displayName: "Zwrócona do poprawek"
+	},
 
 ];
 

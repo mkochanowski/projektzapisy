@@ -101,9 +101,9 @@ export class ThesesList extends React.Component<Props, State> {
 			onClick: (_event: any, handleOriginal: () => void) => {
 				console.warn("Click in row", rowInfo);
 				this.props.thesisClickCallback(rowInfo.original);
-				  // React-Table uses onClick internally to trigger
-				  // events like expanding SubComponents and pivots.
-				  // By default a custom 'onClick' handler will override this functionality.
+				// React-Table uses onClick internally to trigger
+				// events like expanding SubComponents and pivots.
+				// By default a custom 'onClick' handler will override this functionality.
 				if (handleOriginal) {
 					handleOriginal();
 				}

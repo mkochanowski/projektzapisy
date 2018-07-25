@@ -39,7 +39,7 @@ export class ThesisTopRow extends React.Component<Props> {
 				initialValue={this.props.thesis.modifiedDate}
 			/>
 			<ThesisStatusIndicator
-				onChange={() => ({})}
+				onChange={() => console.warn("status changed")}
 				initialValue={this.props.thesis.status}
 			/>
 		</div>;
