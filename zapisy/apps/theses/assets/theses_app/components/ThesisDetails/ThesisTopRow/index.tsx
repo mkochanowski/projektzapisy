@@ -11,12 +11,13 @@ type Props = {
 function ReservationCheckbox(props: {
 	initialValue: boolean, onChange: (val: boolean) => void
 }) {
-	return <span><input
-		type="checkbox"
-		checked={props.initialValue}
-		style={{ position: "relative", verticalAlign: "middle" }}
+	return <label style={{ userSelect: "none" }}>
+		<input
+			type="checkbox"
+			defaultChecked={props.initialValue}
+			style={{ position: "relative", verticalAlign: "middle" }}
 		/> {"rezerwacja"}
-	</span>;
+	</label>;
 }
 
 export class ThesisTopRow extends React.Component<Props> {

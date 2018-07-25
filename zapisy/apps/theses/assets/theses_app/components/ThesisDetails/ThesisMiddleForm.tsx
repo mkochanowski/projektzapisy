@@ -11,7 +11,7 @@ width: 100%;
 
 td {
 	border-left: 4px solid transparent;
-	border-top: 4px solid transparent;
+	border-top: 6px solid transparent;
 }
 td:first-child {
 	border-left: 0;
@@ -21,12 +21,16 @@ tr:first-child td {
 }
 
 tr td:first-child {
-	width: 10%;
+	width: 13%;
 }
 `;
 
 const SelectComponentWrapper = styled.div`
 width: 50%;
+`;
+
+const OptionalFieldLabel = styled.span`
+font-style: italic;
 `;
 
 type SelectValueDef = {
@@ -58,15 +62,30 @@ class AsyncSelectAutocompleteGetter {
 	}
 }
 
+type PersonSelectComponentProps = {
+	value: SelectValueDef | null;
+	onChange: (newValue: SelectValueDef | null) => void;
+	personType: PersonType;
+};
+function PersonSelect(props: PersonSelectComponentProps) {
+	return <SelectComponentWrapper><AsyncPaginate
+		cacheOptions
+		defaultOptions
+		loadOptions={(new AsyncSelectAutocompleteGetter(props.personType)).get}
+		onChange={props.onChange}
+		value={props.value}
+	/></SelectComponentWrapper>;
+}
+
 type Props = {
 	thesis: Thesis;
 };
 
 type State = {
-	currentAdvisorId: number | null;
-	currentAuxAdvisorId: number | null;
-	currentStudentValue: SelectValueDef | null;
-	currentSecondStudentId: number | null;
+	advisorValue: SelectValueDef | null;
+	auxAdvisorValue: SelectValueDef | null;
+	studentValue: SelectValueDef | null;
+	secondStudentValue: SelectValueDef | null;
 };
 
 export class ThesisMiddleForm extends React.Component<Props, State> {
@@ -74,10 +93,10 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		super(props);
 		const thesis = this.props.thesis;
 		this.state = {
-			currentAdvisorId: thesis.advisor ? thesis.advisor.id : null,
-			currentAuxAdvisorId: thesis.auxiliaryAdvisor ? thesis.auxiliaryAdvisor.id : null,
-			currentStudentValue: thesis.student ? this.getBaseOptionsForPerson(thesis.student) : null,
-			currentSecondStudentId: thesis.secondStudent ? thesis.secondStudent.id : null,
+			advisorValue: this.getBaseOptionsForPerson(thesis.advisor),
+			auxAdvisorValue: this.getBaseOptionsForPerson(thesis.auxiliaryAdvisor),
+			studentValue: this.getBaseOptionsForPerson(thesis.student),
+			secondStudentValue: this.getBaseOptionsForPerson(thesis.secondStudent),
 		};
 	}
 
@@ -95,17 +114,43 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 				</tr>
 				<tr>
 					<td>Promotor</td>
-					<td></td>
+					<td>
+						<PersonSelect
+							personType={PersonType.Employee}
+							onChange={this.onAdvisorChanged}
+							value={this.state.advisorValue}
+						/>
+					</td>
+				</tr>
+				<tr>
+					<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
+					<td>
+						<PersonSelect
+							personType={PersonType.Employee}
+							onChange={this.onAuxAdvisorChanged}
+							value={this.state.auxAdvisorValue}
+						/>
+					</td>
 				</tr>
 				<tr>
 					<td>Student</td>
-					<td><SelectComponentWrapper><AsyncPaginate
-						cacheOptions
-						defaultOptions
-						loadOptions={(new AsyncSelectAutocompleteGetter(PersonType.Student)).get}
-						onChange={this.onStudentChanged}
-						value={this.state.currentStudentValue}
-					/></SelectComponentWrapper></td>
+					<td>
+						<PersonSelect
+							personType={PersonType.Student}
+							onChange={this.onStudentChanged}
+							value={this.state.studentValue}
+						/>
+					</td>
+				</tr>
+				<tr>
+					<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
+					<td>
+						<PersonSelect
+							personType={PersonType.Student}
+							onChange={this.onSecondStudentChanged}
+							value={this.state.secondStudentValue}
+						/>
+					</td>
 				</tr>
 				</tbody>
 			</MidFormTable>
@@ -134,6 +179,8 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		};
 	}
 
-	private onStudentChanged = this.makeOnPersonChangedHandler("currentStudentValue");
-	private onAdvisorChanged = this.makeOnPersonChangedHandler("currentAdvisorId");
+	private onStudentChanged = this.makeOnPersonChangedHandler("studentValue");
+	private onSecondStudentChanged = this.makeOnPersonChangedHandler("secondStudentValue");
+	private onAdvisorChanged = this.makeOnPersonChangedHandler("advisorValue");
+	private onAuxAdvisorChanged = this.makeOnPersonChangedHandler("auxAdvisorValue");
 }
