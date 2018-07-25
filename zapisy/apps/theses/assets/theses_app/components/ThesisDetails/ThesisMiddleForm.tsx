@@ -36,15 +36,20 @@ type SelectValueDef = {
 
 class AsyncSelectAutocompleteGetter {
 	private personType: PersonType;
+	private pageNumberForInput: Map<string, number> = new Map();
 
 	public constructor(personType: PersonType) {
 		this.personType = personType;
 	}
 
-	public get = async (inputValue: string, _: any, lastPage: number = 0) => {
-		const thisPageNum = lastPage + 1;
+	public get = async (inputValue: string, _: any) => {
+		const thisPageNum = this.pageNumberForInput.get(inputValue) || 1;
+
 		const acResults = await getPersonAutocomplete(this.personType, inputValue, thisPageNum);
 		const result = acResults.results.map(pac => ({ value: pac.id, label: pac.text }));
+
+		this.pageNumberForInput.set(inputValue, thisPageNum + 1);
+
 		return {
 			options: result,
 			hasMore: acResults.pagination.more,
@@ -122,6 +127,9 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		return (newValue: SelectValueDef | null): void => {
 			this.setState({
 				[fieldName]: newValue || null,
+			// TS doesn't allow anything other than a generic [string] key type
+			// (so we can't have a union of strings as a key type)
+			// hence this cast
 			} as any);
 		};
 	}
