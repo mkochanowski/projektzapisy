@@ -6,13 +6,11 @@ from apps.api.rest.v1.serializers import UserSerializer
 from .errors import InvalidQueryError
 
 
-class BasePersonSerializer(serializers.Serializer):
+class PersonSerializer(serializers.Serializer):
     def to_representation(self, instance):
         return {
             "id": instance.id,
-            "username": instance.user.username,
-            "first_name": instance.user.first_name,
-            "last_name": instance.user.last_name,
+            "display_name": instance.get_full_name(),
         }
 
     def to_internal_value(self, data):
@@ -24,25 +22,11 @@ class BasePersonSerializer(serializers.Serializer):
         return {"id": person_id}
 
 
-# We just need the employee's ID and their .user field
-class EmployeeThesesSerializer(BasePersonSerializer):
-    def to_representation(self, instance):
-        result = super(EmployeeThesesSerializer, self).to_representation(instance)
-        result.update({
-            "academic_title": instance.title,
-        })
-        return result
-
-
-class StudentThesesSerializer(BasePersonSerializer):
-    pass
-
-
 class ThesisSerializer(serializers.ModelSerializer):
-    advisor = EmployeeThesesSerializer()
-    auxiliary_advisor = EmployeeThesesSerializer()
-    student = StudentThesesSerializer()
-    student_2 = StudentThesesSerializer()
+    advisor = PersonSerializer()
+    auxiliary_advisor = PersonSerializer()
+    student = PersonSerializer()
+    student_2 = PersonSerializer()
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
 
