@@ -4,21 +4,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import * as moment from "moment";
 
 type Props = {
-	initialValue: Date,
-	onChange: (val: Date) => void
-};
-type State = {
-	currentDate: Date;
+	value: moment.Moment,
+	onChange: (val: moment.Moment) => void
 };
 
-export class DateUpdatedPicker extends React.Component<Props, State> {
-	public constructor(props: Props) {
-		super(props);
-		this.state = {
-			currentDate: props.initialValue,
-		};
-	}
-
+export class DateUpdatedPicker extends React.Component<Props> {
 	public render() {
 		return <table>
 			<tbody>
@@ -28,19 +18,13 @@ export class DateUpdatedPicker extends React.Component<Props, State> {
 					</td>
 					<td>
 					<DatePicker
-						selected={moment(this.state.currentDate)}
-						onChange={this.onChange}
+						selected={moment(this.props.value)}
+						onChange={this.props.onChange}
 						todayButton="Today"
 					/>
 					</td>
 				</tr>
 			</tbody>
 		</table>;
-	}
-
-	private onChange = (newMoment: moment.Moment): void => {
-		const newDate = newMoment.toDate();
-		this.setState({ currentDate: newDate });
-		this.props.onChange(newDate);
 	}
 }

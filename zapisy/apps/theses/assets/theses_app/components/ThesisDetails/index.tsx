@@ -1,6 +1,7 @@
 import * as React from "react";
 import Button from "react-button-component";
 import styled from "styled-components";
+import { clone } from "lodash";
 
 import { Thesis, ThesisStatus } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
@@ -26,35 +27,18 @@ margin-left: 20px;
 `;
 
 type Props = {
-	thesis: Thesis,
+	selectedThesis: Thesis,
 };
 
 type State = {
-	isReserved: boolean;
-	modifiedDate: Date;
-	status: ThesisStatus;
-	title: string;
-	advisorId: number | null;
-	auxAdvisorId: number | null;
-	studentId: number | null;
-	secondStudentId: number | null;
-	description: string;
+	currentThesis: Thesis;
 };
 
 export class ThesisDetails extends React.Component<Props, State> {
 	public constructor(props: Props) {
 		super(props);
-		const { thesis } = props;
 		this.state = {
-			isReserved: thesis.reserved,
-			modifiedDate: thesis.modifiedDate,
-			status: thesis.status,
-			title: thesis.title,
-			advisorId: thesis.advisor ? thesis.advisor.id : null,
-			auxAdvisorId: thesis.auxiliaryAdvisor ? thesis.auxiliaryAdvisor.id : null,
-			studentId: thesis.student ? thesis.student.id : null,
-			secondStudentId: thesis.secondStudent ? thesis.secondStudent.id : null,
-			description: thesis.description,
+			currentThesis: clone(props.selectedThesis)
 		};
 	}
 
@@ -62,10 +46,10 @@ export class ThesisDetails extends React.Component<Props, State> {
 		return <MainDetailsContainer>
 			<LeftDetailsContainer>
 				<ThesisTopRow
-					thesis={this.props.thesis}
+					thesis={this.state.currentThesis}
 				/>
 				<ThesisMiddleForm
-					thesis={this.props.thesis}
+					thesis={this.state.currentThesis}
 				/>
 			</LeftDetailsContainer>
 			<RightDetailsContainer>

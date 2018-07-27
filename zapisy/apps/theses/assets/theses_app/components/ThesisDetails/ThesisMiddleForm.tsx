@@ -50,13 +50,13 @@ class AsyncSelectAutocompleteGetter {
 		const thisPageNum = this.pageNumberForInput.get(inputValue) || 1;
 
 		const acResults = await getPersonAutocomplete(this.personType, inputValue, thisPageNum);
-		const result = acResults.results.map(pac => ({ value: pac.id, label: pac.text }));
+		const result = acResults.results.map(pac => ({ value: pac.id, label: pac.displayName }));
 
 		this.pageNumberForInput.set(inputValue, thisPageNum + 1);
 
 		return {
 			options: result,
-			hasMore: acResults.pagination.more,
+			hasMore: acResults.hasMore,
 			page: thisPageNum,
 		};
 	}
@@ -164,7 +164,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 	private getBaseOptionsForPerson(person: BasePerson | undefined): SelectValueDef | null {
 		return person ? {
 			value: String(person.id),
-			label: person.getDisplayName(),
+			label: person.displayName,
 		} : null;
 	}
 

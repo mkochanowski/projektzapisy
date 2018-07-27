@@ -1,20 +1,30 @@
 import * as React from "react";
+import styled from "styled-components";
 
 import { Thesis, ThesisStatus } from "../../../types";
 import { DateUpdatedPicker } from "./DateUpdatedPicker";
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
+
+const TopRowContainer = styled.div`
+display: flex;
+flex-direction: row;
+grid-column-gap: 10px;
+column-gap: 10px;
+justify-content: space-between;
+width: 100%;
+`;
 
 type Props = {
 	thesis: Thesis;
 };
 
 function ReservationCheckbox(props: {
-	initialValue: boolean, onChange: (val: boolean) => void
+	value: boolean, onChange: (val: boolean) => void
 }) {
 	return <label style={{ userSelect: "none" }}>
 		<input
 			type="checkbox"
-			defaultChecked={props.initialValue}
+			checked={props.value}
 			style={{ position: "relative", verticalAlign: "middle" }}
 		/> {"rezerwacja"}
 	</label>;
@@ -22,26 +32,19 @@ function ReservationCheckbox(props: {
 
 export class ThesisTopRow extends React.Component<Props> {
 	public render() {
-		return <div style={{
-			display: "flex",
-			flexDirection: "row",
-			gridColumnGap: "10px",
-			columnGap: "10px",
-			justifyContent: "space-between",
-			width: "100%"
-		}}>
+		return <TopRowContainer>
 			<ReservationCheckbox
 				onChange={() => ({})}
-				initialValue={this.props.thesis.reserved}
+				value={this.props.thesis.reserved}
 			/>
 			<DateUpdatedPicker
 				onChange={() => ({})}
-				initialValue={this.props.thesis.modifiedDate}
+				value={this.props.thesis.modifiedDate}
 			/>
 			<ThesisStatusIndicator
 				onChange={() => console.warn("status changed")}
-				initialValue={this.props.thesis.status}
+				value={this.props.thesis.status}
 			/>
-		</div>;
+		</TopRowContainer>;
 	}
 }

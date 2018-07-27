@@ -1,4 +1,5 @@
 // Must match values/structures defined in the Python backend
+import * as moment from "moment";
 
 export const enum ThesisKind {
 	Masters = 0,
@@ -33,65 +34,35 @@ export const enum ThesisVote {
 	UserMissing = 4,
 }
 
-type BasePersonRaw = {
+type PersonRaw = {
 	id: number;
-	username: string,
-	first_name: string,
-	last_name: string,
+	display_name: string;
 };
-
-type StudentRaw = BasePersonRaw;
-type EmployeeRaw = {
-	academic_title: string;
-} & BasePersonRaw;
 
 export class BasePerson {
 	public id: number;
-	public username: string;
-	public firstName: string;
-	public lastName: string;
+	public displayName: string;
 
-	public constructor(raw: BasePersonRaw) {
+	public constructor(raw: PersonRaw) {
 		this.id = raw.id;
-		this.username = raw.username;
-		this.firstName = raw.first_name;
-		this.lastName = raw.last_name;
-	}
-
-	public getDisplayName(): string {
-		return `${this.firstName} ${this.lastName}`;
+		this.displayName = raw.display_name;
 	}
 }
 
-export class Employee extends BasePerson {
-	public academicTitle?: string;
-
-	public constructor(raw: EmployeeRaw) {
-		super(raw);
-		if (raw.academic_title) {
-			this.academicTitle = raw.academic_title;
-		}
-	}
-
-	public getDisplayName(): string {
-		const fullName = super.getDisplayName();
-		return this.academicTitle ? `${this.academicTitle} ${fullName}` : fullName;
-	}
-}
-
+export class Employee extends BasePerson {}
 export class Student extends BasePerson {}
 
 export type ThesisRaw = {
 	id: number;
 	title: string;
-	advisor: EmployeeRaw;
-	auxiliary_advisor?: EmployeeRaw;
+	advisor: PersonRaw;
+	auxiliary_advisor?: PersonRaw;
 	kind: ThesisKind;
 	reserved: boolean;
 	description: string;
 	status: ThesisStatus;
-	student: StudentRaw;
-	student_2?: StudentRaw;
+	student: PersonRaw;
+	student_2?: PersonRaw;
 	added_date: string;
 	modified_date: string;
 };
@@ -107,8 +78,8 @@ export class Thesis {
 	public status: ThesisStatus;
 	public student: Student;
 	public secondStudent?: Student;
-	public addedDate: Date;
-	public modifiedDate: Date;
+	public addedDate: moment.Moment;
+	public modifiedDate: moment.Moment;
 
 	public constructor(raw: ThesisRaw) {
 		this.id = raw.id;
@@ -125,7 +96,7 @@ export class Thesis {
 		if (raw.student_2) {
 			this.secondStudent = new Student(raw.student_2);
 		}
-		this.addedDate = new Date(raw.added_date);
-		this.modifiedDate = new Date(raw.modified_date);
+		this.addedDate = moment(raw.added_date);
+		this.modifiedDate = moment(raw.modified_date);
 	}
 }

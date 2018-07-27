@@ -43,7 +43,7 @@ export class ThesesApp extends React.Component<{}, State> {
 				<hr key="divider2" />,
 				<ThesisDetails
 					key="thesis_details"
-					thesis={this.state.currentlySelectedThesis}
+					selectedThesis={this.state.currentlySelectedThesis}
 				/>
 			);
 		}

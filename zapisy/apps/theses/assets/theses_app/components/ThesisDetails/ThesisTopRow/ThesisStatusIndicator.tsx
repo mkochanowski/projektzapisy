@@ -23,7 +23,7 @@ const filterInfos: ThesisStatusFilterInfo[] = [
 ];
 
 type Props = {
-	initialValue: ThesisStatus,
+	value: ThesisStatus,
 	onChange: (val: ThesisStatus) => void
 };
 
@@ -33,7 +33,7 @@ export class ThesisStatusIndicator extends React.Component<Props> {
 			<span>Status </span>
 			<select
 				onChange={ev => this.onChange(ev.target.value)}
-				defaultValue={this.findDefaultStringValue()}
+				value={this.getCurrentSelectValue()}
 			>
 				{
 					filterInfos.map((info, i) => (
@@ -49,8 +49,8 @@ export class ThesisStatusIndicator extends React.Component<Props> {
 		</div>;
 	}
 
-	private findDefaultStringValue(): string {
-		return filterInfos.find(info => info.val === this.props.initialValue)!.stringVal;
+	private getCurrentSelectValue(): string {
+		return filterInfos.find(info => info.val === this.props.value)!.stringVal;
 	}
 
 	private onChange = (newValue: string) => {
