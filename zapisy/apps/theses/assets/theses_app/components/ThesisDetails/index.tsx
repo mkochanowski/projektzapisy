@@ -2,11 +2,13 @@ import * as React from "react";
 import Button from "react-button-component";
 import styled from "styled-components";
 import { clone } from "lodash";
+import update, { Query } from "immutability-helper";
 
-import { Thesis } from "../../types";
+import { Thesis, ThesisStatus, ThesisKind } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
+import { Moment } from "moment";
 
 const MainDetailsContainer = styled.div`
 border: 1px solid black;
@@ -47,9 +49,14 @@ export class ThesisDetails extends React.Component<Props, State> {
 			<LeftDetailsContainer>
 				<ThesisTopRow
 					thesis={this.state.currentThesis}
+					onReservationChanged={this.onReservationChanged}
+					onDateChanged={this.onDateUpdatedChanged}
+					onStatusChanged={this.onStatusChanged}
 				/>
 				<ThesisMiddleForm
 					thesis={this.state.currentThesis}
+					onTitleChanged={this.onTitleChanged}
+					onKindChanged={this.onKindChanged}
 				/>
 			</LeftDetailsContainer>
 			<RightDetailsContainer>
@@ -57,6 +64,30 @@ export class ThesisDetails extends React.Component<Props, State> {
 				<Button onClick={this.onSaveRequested}>Zapisz</Button>
 			</RightDetailsContainer>
 		</MainDetailsContainer>;
+	}
+
+	private updateThesisState(updateObject: Query<Thesis>) {
+		this.setState(update(this.state, { currentThesis: updateObject }));
+	}
+
+	private onReservationChanged = (newValue: boolean): void => {
+		this.updateThesisState({ reserved: { $set: newValue } });
+	}
+
+	private onDateUpdatedChanged = (newDate: Moment): void => {
+		this.updateThesisState({ modifiedDate: { $set: newDate } });
+	}
+
+	private onStatusChanged = (newStatus: ThesisStatus): void => {
+		this.updateThesisState({ status: { $set: newStatus } });
+	}
+
+	private onTitleChanged = (newTitle: string): void => {
+		this.updateThesisState({ title: { $set: newTitle } });
+	}
+
+	private onKindChanged = (newKind: ThesisKind): void => {
+		this.updateThesisState({ kind: { $set: newKind } });
 	}
 
 	private onSaveRequested = () => {

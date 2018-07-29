@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import styled from "styled-components";
-import { Thesis, BasePerson } from "../../../types";
+import { Thesis, BasePerson, ThesisKind } from "../../../types";
 import { PersonType } from "../../../backend_callers";
 import { AsyncSelectValueDef, PersonSelect } from "./PersonSelect";
 import { ThesisKindSelect } from "./ThesisKindSelect";
@@ -31,6 +31,8 @@ font-style: italic;
 
 type Props = {
 	thesis: Thesis;
+	onTitleChanged: (nt: string) => void;
+	onKindChanged: (nk: ThesisKind) => void;
 };
 
 type State = {
@@ -60,7 +62,8 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 					<td>Tytuł</td>
 					<td><textarea
 						style={{ width: "100%", boxSizing: "border-box" }}
-						defaultValue={this.props.thesis.title}
+						value={this.props.thesis.title}
+						onChange={ev => this.props.onTitleChanged(ev.target.value)}
 					/></td>
 				</tr>
 				<tr>
@@ -68,7 +71,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 					<td>
 						<ThesisKindSelect
 							value={this.props.thesis.kind}
-							onChange={() => ({})}
+							onChange={this.props.onKindChanged}
 						/>
 					</td>
 				</tr>

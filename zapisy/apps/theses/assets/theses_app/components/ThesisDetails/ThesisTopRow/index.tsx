@@ -1,7 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
+import { Moment } from "moment";
 
-import { Thesis } from "../../../types";
+import { Thesis, ThesisStatus } from "../../../types";
 import { DateUpdatedPicker } from "./DateUpdatedPicker";
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
 
@@ -16,6 +17,9 @@ width: 100%;
 
 type Props = {
 	thesis: Thesis;
+	onReservationChanged: (nr: boolean) => void;
+	onDateChanged: (nd: Moment) => void;
+	onStatusChanged: (ns: ThesisStatus) => void;
 };
 
 function ReservationCheckbox(props: {
@@ -25,6 +29,7 @@ function ReservationCheckbox(props: {
 		<input
 			type="checkbox"
 			checked={props.value}
+			onChange={ev => props.onChange(ev.target.checked)}
 			style={{ position: "relative", verticalAlign: "middle" }}
 		/> {"rezerwacja"}
 	</label>;
@@ -34,15 +39,15 @@ export class ThesisTopRow extends React.Component<Props> {
 	public render() {
 		return <TopRowContainer>
 			<ReservationCheckbox
-				onChange={() => ({})}
+				onChange={this.props.onReservationChanged}
 				value={this.props.thesis.reserved}
 			/>
 			<DateUpdatedPicker
-				onChange={() => ({})}
+				onChange={this.props.onDateChanged}
 				value={this.props.thesis.modifiedDate}
 			/>
 			<ThesisStatusIndicator
-				onChange={() => console.warn("status changed")}
+				onChange={this.props.onStatusChanged}
 				value={this.props.thesis.status}
 			/>
 		</TopRowContainer>;
