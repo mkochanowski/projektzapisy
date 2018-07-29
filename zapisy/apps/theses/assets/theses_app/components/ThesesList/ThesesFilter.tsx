@@ -1,71 +1,28 @@
 import * as React from "react";
 import { ThesisTypeFilter } from "../../backend_callers";
+import { GenericSelect } from "../GenericSelect";
+
+const filterInfos = [
+	{ val: ThesisTypeFilter.AllCurrent, displayName: "Wszystkie aktualne" },
+	{ val: ThesisTypeFilter.All, displayName: "Wszystkie" },
+	{ val: ThesisTypeFilter.Masters, displayName: "Magisterskie" },
+	{ val: ThesisTypeFilter.Engineers, displayName: "Inżynierskie" },
+	{ val: ThesisTypeFilter.Bachelors, displayName: "Licencjackie" },
+	{ val: ThesisTypeFilter.BachelorsISIM, displayName: "Licencjackie ISIM" },
+	{ val: ThesisTypeFilter.AvailableMasters, displayName: "Magisterskie - dostępne" },
+	{ val: ThesisTypeFilter.AvailableEngineers, displayName: "Inżynierskie - dostępne" },
+	{ val: ThesisTypeFilter.AvailableBachelors, displayName: "Licencjackie - dostępne" },
+	{ val: ThesisTypeFilter.AvailableBachelorsISIM, displayName: "Licencjackie ISIM - dostępne" },
+];
 
 type Props = {
 	onChange: (newFilter: ThesisTypeFilter) => void;
-	initialValue: ThesisTypeFilter;
+	value: ThesisTypeFilter;
 };
 
-type ThesisTypeFilterInfo = {
-	val: ThesisTypeFilter;
-	stringVal: string;
-	displayName: string;
-};
-const filterInfos: ThesisTypeFilterInfo[] = [
-	{ val: ThesisTypeFilter.AllCurrent, stringVal: "all_current", displayName: "Wszystkie aktualne" },
-	{ val: ThesisTypeFilter.All, stringVal: "all", displayName: "Wszystkie" },
-	{ val: ThesisTypeFilter.Masters, stringVal: "masters", displayName: "Magisterskie" },
-	{ val: ThesisTypeFilter.Engineers, stringVal: "engineers", displayName: "Inżynierskie" },
-	{ val: ThesisTypeFilter.Bachelors, stringVal: "bachelors", displayName: "Licencjackie" },
-	{ val: ThesisTypeFilter.BachelorsISIM, stringVal: "bachelors_isim", displayName: "Licencjackie ISIM" },
-	{ val: ThesisTypeFilter.AvailableMasters, stringVal: "available_masters", displayName: "Magisterskie - dostępne" },
-	{ val: ThesisTypeFilter.AvailableEngineers, stringVal: "available_engineers", displayName: "Inżynierskie - dostępne" },
-	{ val: ThesisTypeFilter.AvailableBachelors, stringVal: "available_bachelors", displayName: "Licencjackie - dostępne" },
-	{ val: ThesisTypeFilter.AvailableBachelorsISIM, stringVal: "available_bachelors_isim", displayName: "Licencjackie ISIM - dostępne" },
-];
-
-export class ThesesFilter extends React.Component<Props> {
-	render() {
-		return <div style={{
-			textAlign: "right",
-			width: "100%",
-		}}>
-			<strong>Rodzaj </strong>
-			<select
-				onChange={ev => this.onChange(ev.target.value)}
-				defaultValue={this.findDefaultStringValue()}
-			>
-				{
-					filterInfos.map((info, i) => (
-						<option
-							key={`filteropt_${i}`}
-							value={info.stringVal}
-						>
-							{info.displayName}
-						</option>
-					))
-				}
-			</select>
-		</div>;
-	}
-
-	private findDefaultStringValue(): string {
-		return filterInfos.find(info => info.val === this.props.initialValue)!.stringVal;
-	}
-
-	private onChange = (newValue: string) => {
-		const convertedValue = stringValueToThesisFilter(newValue);
-		if (convertedValue !== null) {
-			this.props.onChange(convertedValue);
-		}
-	}
-}
-
-function stringValueToThesisFilter(stringValue: string): ThesisTypeFilter | null {
-	for (const info of filterInfos) {
-		if (stringValue === info.stringVal) {
-			return info.val;
-		}
-	}
-	return null;
+export function ThesesFilter(props: Props) {
+	const selectComponentClass = GenericSelect<ThesisTypeFilter>(
+		"Rodzaj", filterInfos, { fontWeight: "bold", fontSize: "110%" },
+	);
+	return new selectComponentClass(props);
 }

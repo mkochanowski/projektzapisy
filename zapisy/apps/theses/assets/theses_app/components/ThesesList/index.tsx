@@ -8,7 +8,6 @@ import { ThesesFilter } from "./ThesesFilter";
 import { ThesisTypeFilter, getThesesList } from "../../backend_callers";
 import { isThesisAvailable } from "../../utils";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
-import { awaitSleep } from "common/utils";
 
 type Props = {
 	thesesList: Thesis[],
@@ -66,10 +65,12 @@ export class ThesesList extends React.Component<Props, State> {
 	public render() {
 		return this.props.thesesList.length ?
 			<div>
-				<ThesesFilter
-					onChange={this.onTypeFilterChanged}
-					initialValue={ThesisTypeFilter.Default}
-				/>
+				<div style={{ width: "100%", textAlign: "right" }}>
+					<ThesesFilter
+						onChange={this.onTypeFilterChanged}
+						value={this.state.currentListFilter}
+					/>
+				</div>
 				<br />
 				<ReactTable
 					key="table"
