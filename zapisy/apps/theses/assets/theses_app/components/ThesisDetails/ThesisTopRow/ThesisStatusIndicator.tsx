@@ -17,5 +17,5 @@ type Props = {
 };
 
 export function ThesisStatusIndicator(props: Props) {
-	return new (GenericSelect<ThesisStatus>("Status", filterInfos))(props);
+	return new (GenericSelect<ThesisStatus>(filterInfos, "Status"))(props);
 }

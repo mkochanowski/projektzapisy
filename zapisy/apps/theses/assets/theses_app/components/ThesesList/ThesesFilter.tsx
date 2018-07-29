@@ -22,7 +22,7 @@ type Props = {
 
 export function ThesesFilter(props: Props) {
 	const selectComponentClass = GenericSelect<ThesisTypeFilter>(
-		"Rodzaj", filterInfos, { fontWeight: "bold", fontSize: "110%" },
+		filterInfos, "Rodzaj", { fontWeight: "bold", fontSize: "110%" },
 	);
 	return new selectComponentClass(props);
 }

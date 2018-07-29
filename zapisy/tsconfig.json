@@ -10,6 +10,7 @@
     "module": "esnext",
     "baseUrl": "./assets",
     "noUnusedParameters": true,
+    "noUnusedLocals": true,
     "types": [
       "jquery",
       "lodash",

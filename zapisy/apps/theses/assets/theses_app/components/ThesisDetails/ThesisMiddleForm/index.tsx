@@ -1,10 +1,10 @@
 import * as React from "react";
-import "react-select/dist/react-select.css";
-import AsyncPaginate from "react-select-async-paginate";
 
 import styled from "styled-components";
-import { Thesis, BasePerson } from "../../types";
-import { getPersonAutocomplete, PersonType } from "../../backend_callers";
+import { Thesis, BasePerson } from "../../../types";
+import { 	PersonType } from "../../../backend_callers";
+import { AsyncSelectValueDef, PersonSelect } from "./PersonSelect";
+import { ThesisKindSelect } from "./ThesisKindSelect";
 
 const MidFormTable = styled.table`
 width: 100%;
@@ -25,67 +25,19 @@ tr td:first-child {
 }
 `;
 
-const SelectComponentWrapper = styled.div`
-width: 50%;
-`;
-
 const OptionalFieldLabel = styled.span`
 font-style: italic;
 `;
-
-type SelectValueDef = {
-	value: string;
-	label: string;
-};
-
-class AsyncSelectAutocompleteGetter {
-	private personType: PersonType;
-	private pageNumberForInput: Map<string, number> = new Map();
-
-	public constructor(personType: PersonType) {
-		this.personType = personType;
-	}
-
-	public get = async (inputValue: string, _: any) => {
-		const thisPageNum = this.pageNumberForInput.get(inputValue) || 1;
-
-		const acResults = await getPersonAutocomplete(this.personType, inputValue, thisPageNum);
-		const result = acResults.results.map(pac => ({ value: pac.id, label: pac.displayName }));
-
-		this.pageNumberForInput.set(inputValue, thisPageNum + 1);
-
-		return {
-			options: result,
-			hasMore: acResults.hasMore,
-			page: thisPageNum,
-		};
-	}
-}
-
-type PersonSelectComponentProps = {
-	value: SelectValueDef | null;
-	onChange: (newValue: SelectValueDef | null) => void;
-	personType: PersonType;
-};
-function PersonSelect(props: PersonSelectComponentProps) {
-	return <SelectComponentWrapper><AsyncPaginate
-		cacheOptions
-		defaultOptions
-		loadOptions={(new AsyncSelectAutocompleteGetter(props.personType)).get}
-		onChange={props.onChange}
-		value={props.value}
-	/></SelectComponentWrapper>;
-}
 
 type Props = {
 	thesis: Thesis;
 };
 
 type State = {
-	advisorValue: SelectValueDef | null;
-	auxAdvisorValue: SelectValueDef | null;
-	studentValue: SelectValueDef | null;
-	secondStudentValue: SelectValueDef | null;
+	advisorValue: AsyncSelectValueDef | null;
+	auxAdvisorValue: AsyncSelectValueDef | null;
+	studentValue: AsyncSelectValueDef | null;
+	secondStudentValue: AsyncSelectValueDef | null;
 };
 
 export class ThesisMiddleForm extends React.Component<Props, State> {
@@ -101,7 +53,6 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 	}
 
 	public render() {
-		const thesis = this.props.thesis;
 		return <div>
 			<MidFormTable>
 				<tbody>
@@ -111,6 +62,15 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 						style={{ width: "100%", boxSizing: "border-box" }}
 						defaultValue={this.props.thesis.title}
 					/></td>
+				</tr>
+				<tr>
+					<td>Rodzaj</td>
+					<td>
+						<ThesisKindSelect
+							value={this.props.thesis.kind}
+							onChange={() => ({})}
+						/>
+					</td>
 				</tr>
 				<tr>
 					<td>Promotor</td>
@@ -161,7 +121,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		</div>;
 	}
 
-	private getBaseOptionsForPerson(person: BasePerson | undefined): SelectValueDef | null {
+	private getBaseOptionsForPerson(person: BasePerson | undefined): AsyncSelectValueDef | null {
 		return person ? {
 			value: String(person.id),
 			label: person.displayName,
@@ -169,7 +129,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 	}
 
 	private makeOnPersonChangedHandler(fieldName: keyof State) {
-		return (newValue: SelectValueDef | null): void => {
+		return (newValue: AsyncSelectValueDef | null): void => {
 			this.setState({
 				[fieldName]: newValue || null,
 			// TS doesn't allow anything other than a generic [string] key type

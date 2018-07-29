@@ -11,7 +11,7 @@ type Props<T> = {
 };
 
 export function GenericSelect<T>(
-	label: string, optionInfo: SelectOptionsInfo<T>, labelCss?: React.CSSProperties,
+	optionInfo: SelectOptionsInfo<T>, label?: string, labelCss?: React.CSSProperties,
 ) {
 	return class GenericSelect extends React.Component<Props<T>> {
 		public render() {
@@ -20,7 +20,7 @@ export function GenericSelect<T>(
 					<select
 						onChange={ev => this.onChange(ev.target.value)}
 						value={String(this.getCurrentSelectValue())}
-						style={{ marginLeft: "5px" }}
+						style={label ? { marginLeft: "5px" } : {}}
 					>
 					{
 						optionInfo.map((info, i) => (
