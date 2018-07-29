@@ -2,7 +2,7 @@ import * as React from "react";
 
 import styled from "styled-components";
 import { Thesis, BasePerson } from "../../../types";
-import { 	PersonType } from "../../../backend_callers";
+import { PersonType } from "../../../backend_callers";
 import { AsyncSelectValueDef, PersonSelect } from "./PersonSelect";
 import { ThesisKindSelect } from "./ThesisKindSelect";
 

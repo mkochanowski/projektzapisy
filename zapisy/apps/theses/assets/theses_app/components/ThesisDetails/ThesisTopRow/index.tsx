@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-import { Thesis, ThesisStatus } from "../../../types";
+import { Thesis } from "../../../types";
 import { DateUpdatedPicker } from "./DateUpdatedPicker";
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
 

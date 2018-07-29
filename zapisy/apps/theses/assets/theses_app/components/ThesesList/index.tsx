@@ -2,10 +2,10 @@ import * as React from "react";
 import ReactTable, { Column, RowInfo } from "react-table";
 import "react-table/react-table.css";
 
-import { Thesis, Employee, ThesisKind, thesisKindToString } from "../../types";
+import { Thesis, ThesisKind, thesisKindToString } from "../../types";
 import { ReservationIndicator } from "./ReservationIndicator";
 import { ThesesFilter } from "./ThesesFilter";
-import { ThesisTypeFilter, getThesesList } from "../../backend_callers";
+import { ThesisTypeFilter } from "../../backend_callers";
 import { isThesisAvailable } from "../../utils";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
 

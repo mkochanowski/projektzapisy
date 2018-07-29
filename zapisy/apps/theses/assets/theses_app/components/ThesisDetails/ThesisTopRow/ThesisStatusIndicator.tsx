@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import { ThesisStatus } from "../../../types";
 import { GenericSelect } from "../../GenericSelect";
 
@@ -17,5 +19,9 @@ type Props = {
 };
 
 export function ThesisStatusIndicator(props: Props) {
-	return new (GenericSelect<ThesisStatus>(filterInfos, "Status"))(props);
+	return <GenericSelect<ThesisStatus>
+		{...props}
+		optionInfo={filterInfos}
+		label={"Status"}
+	/>;
 }

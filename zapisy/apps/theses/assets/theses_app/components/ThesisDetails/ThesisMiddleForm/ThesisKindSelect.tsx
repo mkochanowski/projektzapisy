@@ -1,3 +1,5 @@
+import * as React from "react";
+
 import { ThesisKind } from "../../../types";
 import { GenericSelect } from "../../GenericSelect";
 
@@ -14,5 +16,8 @@ export type ThesisKindSelectProps = {
 	onChange: (k: ThesisKind) => void;
 };
 export function ThesisKindSelect(props: ThesisKindSelectProps) {
-	return new (GenericSelect<ThesisKind>(kindSelectInfos))(props);
+	return <GenericSelect<ThesisKind>
+		{...props}
+		optionInfo={kindSelectInfos}
+	/>;
 }

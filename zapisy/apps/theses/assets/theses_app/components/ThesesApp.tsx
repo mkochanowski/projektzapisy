@@ -2,7 +2,6 @@ import * as React from "react";
 import { ThesesList } from "./ThesesList";
 import { Thesis } from "../types";
 import { getThesesList, ThesisTypeFilter } from "../backend_callers";
-import { awaitSleep } from "common/utils";
 import { ThesisDetails } from "./ThesisDetails";
 
 type State = {

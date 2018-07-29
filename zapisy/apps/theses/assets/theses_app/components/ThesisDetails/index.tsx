@@ -3,7 +3,7 @@ import Button from "react-button-component";
 import styled from "styled-components";
 import { clone } from "lodash";
 
-import { Thesis, ThesisStatus } from "../../types";
+import { Thesis } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
