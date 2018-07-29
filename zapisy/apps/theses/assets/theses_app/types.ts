@@ -55,13 +55,13 @@ export class Student extends BasePerson {}
 export type ThesisRaw = {
 	id: number;
 	title: string;
-	advisor: PersonRaw;
+	advisor?: PersonRaw;
 	auxiliary_advisor?: PersonRaw;
 	kind: ThesisKind;
 	reserved: boolean;
 	description: string;
 	status: ThesisStatus;
-	student: PersonRaw;
+	student?: PersonRaw;
 	student_2?: PersonRaw;
 	added_date: string;
 	modified_date: string;
@@ -70,13 +70,13 @@ export type ThesisRaw = {
 export class Thesis {
 	public id: number;
 	public title: string;
-	public advisor: Employee;
+	public advisor?: Employee;
 	public auxiliaryAdvisor?: Employee;
 	public kind: ThesisKind;
 	public reserved: boolean;
 	public description: string;
 	public status: ThesisStatus;
-	public student: Student;
+	public student?: Student;
 	public secondStudent?: Student;
 	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
@@ -84,7 +84,9 @@ export class Thesis {
 	public constructor(raw: ThesisRaw) {
 		this.id = raw.id;
 		this.title = raw.title;
-		this.advisor = new Employee(raw.advisor);
+		if (raw.advisor) {
+			this.advisor = new Employee(raw.advisor);
+		}
 		if (raw.auxiliary_advisor) {
 			this.auxiliaryAdvisor = new Employee(raw.auxiliary_advisor);
 		}
@@ -92,7 +94,9 @@ export class Thesis {
 		this.reserved = raw.reserved;
 		this.description = raw.description;
 		this.status = raw.status;
-		this.student = new Student(raw.student);
+		if (raw.student) {
+			this.student = new Student(raw.student);
+		}
 		if (raw.student_2) {
 			this.secondStudent = new Student(raw.student_2);
 		}

@@ -35,7 +35,7 @@ const TABLE_COL_DECLS: Column[] = [{
 }, {
 	id: "thesisAdvisor",
 	Header: "Promotor",
-	accessor: (props: Thesis) => props.advisor.displayName,
+	accessor: (props: Thesis) => props.advisor ? props.advisor.displayName : "<brak>",
 	filterable: true,
 }, {
 	id: "thesisName",

@@ -1,23 +1,18 @@
 import * as React from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import * as moment from "moment";
 
 import { ThesisStatus } from "../../../types";
 
 type ThesisStatusFilterInfo = {
 	val: ThesisStatus;
-	stringVal: string;
 	displayName: string;
 };
 const filterInfos: ThesisStatusFilterInfo[] = [
-	{ val: ThesisStatus.Accepted, stringVal: "accepted", displayName: "Zaakceptowana" },
-	{ val: ThesisStatus.BeingEvaluated, stringVal: "evaluated", displayName: "Poddana pod głosowanie" },
-	{ val: ThesisStatus.Defended, stringVal: "defended", displayName: "Obroniona" },
-	{ val: ThesisStatus.InProgress, stringVal: "in_progress", displayName: "W realizacji" },
+	{ val: ThesisStatus.Accepted, displayName: "Zaakceptowana" },
+	{ val: ThesisStatus.BeingEvaluated, displayName: "Poddana pod głosowanie" },
+	{ val: ThesisStatus.Defended, displayName: "Obroniona" },
+	{ val: ThesisStatus.InProgress, displayName: "W realizacji" },
 	{
-		val: ThesisStatus.ReturnedForCorrections,
-		stringVal: "returned", displayName: "Zwrócona do poprawek"
+		val: ThesisStatus.ReturnedForCorrections, displayName: "Zwrócona do poprawek"
 	},
 
 ];
@@ -39,7 +34,7 @@ export class ThesisStatusIndicator extends React.Component<Props> {
 					filterInfos.map((info, i) => (
 						<option
 							key={`status_filteropt_${i}`}
-							value={info.stringVal}
+							value={info.val}
 						>
 							{info.displayName}
 						</option>
@@ -49,8 +44,8 @@ export class ThesisStatusIndicator extends React.Component<Props> {
 		</div>;
 	}
 
-	private getCurrentSelectValue(): string {
-		return filterInfos.find(info => info.val === this.props.value)!.stringVal;
+	private getCurrentSelectValue() {
+		return filterInfos.find(info => info.val === this.props.value)!.val;
 	}
 
 	private onChange = (newValue: string) => {
@@ -63,7 +58,7 @@ export class ThesisStatusIndicator extends React.Component<Props> {
 
 function stringValueToThesisStatus(stringValue: string): ThesisStatus | null {
 	for (const info of filterInfos) {
-		if (stringValue === info.stringVal) {
+		if (Number(stringValue) === info.val) {
 			return info.val;
 		}
 	}
