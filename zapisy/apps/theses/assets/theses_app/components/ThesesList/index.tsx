@@ -9,13 +9,14 @@ import { ThesisTypeFilter } from "../../backend_callers";
 import { isThesisAvailable } from "../../utils";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
 
-type Props = {
-	thesesList: Thesis[],
-	thesisClickCallback: (thesis: Thesis) => void,
-};
-
-type State = {
-	currentListFilter: ThesisTypeFilter,
+const reactTableLocalization = {
+	previousText: "Poprzednia",
+	nextText: "Następna",
+	loadingText: "Ładowanie...",
+	noDataText: "Brak wierszy",
+	pageText: "Strona",
+	ofText: "z",
+	rowsText: "wierszy",
 };
 
 const TABLE_COL_DECLS: Column[] = [{
@@ -54,6 +55,15 @@ function getTheadProps() {
 	}};
 }
 
+type Props = {
+	thesesList: Thesis[],
+	thesisClickCallback: (thesis: Thesis) => void,
+};
+
+type State = {
+	currentListFilter: ThesisTypeFilter,
+};
+
 export class ThesesList extends React.Component<Props, State> {
 	public constructor(props: Props) {
 		super(props);
@@ -84,6 +94,7 @@ export class ThesesList extends React.Component<Props, State> {
 					style={{
 						height: "400px"
 					}}
+					{...reactTableLocalization}
 				/>
 			</div>
 			:

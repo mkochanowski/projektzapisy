@@ -20,7 +20,8 @@ export class DateUpdatedPicker extends React.Component<Props> {
 					<DatePicker
 						selected={moment(this.props.value)}
 						onChange={this.props.onChange}
-						todayButton="Today"
+						todayButton="Dzisiaj"
+						locale={"pl_PL"}
 					/>
 					</td>
 				</tr>
