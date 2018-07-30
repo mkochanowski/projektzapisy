@@ -1,9 +1,9 @@
 import * as React from "react";
 
 import styled from "styled-components";
-import { Thesis, BasePerson, ThesisKind } from "../../../types";
+import { Thesis, ThesisKind, Employee, Student } from "../../../types";
 import { PersonType } from "../../../backend_callers";
-import { AsyncSelectValueDef, PersonSelect } from "./PersonSelect";
+import { PersonSelect } from "./PersonSelect";
 import { ThesisKindSelect } from "./ThesisKindSelect";
 
 const MidFormTable = styled.table`
@@ -33,27 +33,14 @@ type Props = {
 	thesis: Thesis;
 	onTitleChanged: (nt: string) => void;
 	onKindChanged: (nk: ThesisKind) => void;
+	onAdvisorChanged: (na: Employee | null) => void;
+	onAuxAdvisorChanged: (na: Employee | null) => void;
+	onStudentChanged: (na: Student | null) => void;
+	onSecondStudentChanged: (na: Student | null) => void;
+	onDescriptionChanged: (nd: string) => void;
 };
 
-type State = {
-	advisorValue: AsyncSelectValueDef | null;
-	auxAdvisorValue: AsyncSelectValueDef | null;
-	studentValue: AsyncSelectValueDef | null;
-	secondStudentValue: AsyncSelectValueDef | null;
-};
-
-export class ThesisMiddleForm extends React.Component<Props, State> {
-	public constructor(props: Props) {
-		super(props);
-		const thesis = this.props.thesis;
-		this.state = {
-			advisorValue: this.getBaseOptionsForPerson(thesis.advisor),
-			auxAdvisorValue: this.getBaseOptionsForPerson(thesis.auxiliaryAdvisor),
-			studentValue: this.getBaseOptionsForPerson(thesis.student),
-			secondStudentValue: this.getBaseOptionsForPerson(thesis.secondStudent),
-		};
-	}
-
+export class ThesisMiddleForm extends React.Component<Props> {
 	public render() {
 		return <div>
 			<MidFormTable>
@@ -80,8 +67,8 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 					<td>
 						<PersonSelect
 							personType={PersonType.Employee}
-							onChange={this.onAdvisorChanged}
-							value={this.state.advisorValue}
+							onChange={this.props.onAdvisorChanged}
+							value={this.props.thesis.advisor}
 						/>
 					</td>
 				</tr>
@@ -90,8 +77,8 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 					<td>
 						<PersonSelect
 							personType={PersonType.Employee}
-							onChange={this.onAuxAdvisorChanged}
-							value={this.state.auxAdvisorValue}
+							onChange={this.props.onAuxAdvisorChanged}
+							value={this.props.thesis.auxiliaryAdvisor}
 						/>
 					</td>
 				</tr>
@@ -100,8 +87,8 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 					<td>
 						<PersonSelect
 							personType={PersonType.Student}
-							onChange={this.onStudentChanged}
-							value={this.state.studentValue}
+							onChange={this.props.onStudentChanged}
+							value={this.props.thesis.student}
 						/>
 					</td>
 				</tr>
@@ -110,8 +97,8 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 					<td>
 						<PersonSelect
 							personType={PersonType.Student}
-							onChange={this.onSecondStudentChanged}
-							value={this.state.secondStudentValue}
+							onChange={this.props.onSecondStudentChanged}
+							value={this.props.thesis.secondStudent}
 						/>
 					</td>
 				</tr>
@@ -119,31 +106,9 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 			</MidFormTable>
 			<textarea
 				style={{ width: "100%", height: "100px", boxSizing: "border-box" }}
-				defaultValue={this.props.thesis.description}
+				value={this.props.thesis.description}
+				onChange={ev => this.props.onDescriptionChanged(ev.target.value)}
 			/>
 		</div>;
 	}
-
-	private getBaseOptionsForPerson(person: BasePerson | undefined): AsyncSelectValueDef | null {
-		return person ? {
-			value: String(person.id),
-			label: person.displayName,
-		} : null;
-	}
-
-	private makeOnPersonChangedHandler(fieldName: keyof State) {
-		return (newValue: AsyncSelectValueDef | null): void => {
-			this.setState({
-				[fieldName]: newValue || null,
-			// TS doesn't allow anything other than a generic [string] key type
-			// (so we can't have a union of strings as a key type)
-			// hence this cast
-			} as any);
-		};
-	}
-
-	private onStudentChanged = this.makeOnPersonChangedHandler("studentValue");
-	private onSecondStudentChanged = this.makeOnPersonChangedHandler("secondStudentValue");
-	private onAdvisorChanged = this.makeOnPersonChangedHandler("advisorValue");
-	private onAuxAdvisorChanged = this.makeOnPersonChangedHandler("auxAdvisorValue");
 }

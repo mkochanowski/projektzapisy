@@ -70,36 +70,28 @@ export type ThesisRaw = {
 export class Thesis {
 	public id: number;
 	public title: string;
-	public advisor?: Employee;
-	public auxiliaryAdvisor?: Employee;
+	public advisor: Employee | null;
+	public auxiliaryAdvisor: Employee | null;
 	public kind: ThesisKind;
 	public reserved: boolean;
 	public description: string;
 	public status: ThesisStatus;
-	public student?: Student;
-	public secondStudent?: Student;
+	public student: Student | null;
+	public secondStudent: Student | null;
 	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
 
 	public constructor(raw: ThesisRaw) {
 		this.id = raw.id;
 		this.title = raw.title;
-		if (raw.advisor) {
-			this.advisor = new Employee(raw.advisor);
-		}
-		if (raw.auxiliary_advisor) {
-			this.auxiliaryAdvisor = new Employee(raw.auxiliary_advisor);
-		}
+		this.advisor = raw.advisor ? new Employee(raw.advisor) : null;
+		this.auxiliaryAdvisor = raw.auxiliary_advisor ? new Employee(raw.auxiliary_advisor) : null;
 		this.kind = raw.kind;
 		this.reserved = raw.reserved;
 		this.description = raw.description;
 		this.status = raw.status;
-		if (raw.student) {
-			this.student = new Student(raw.student);
-		}
-		if (raw.student_2) {
-			this.secondStudent = new Student(raw.student_2);
-		}
+		this.student = raw.student ? new Student(raw.student) : null;
+		this.secondStudent = raw.student_2 ? new Student(raw.student_2) : null;
 		this.addedDate = moment(raw.added_date);
 		this.modifiedDate = moment(raw.modified_date);
 	}

@@ -4,15 +4,30 @@ import styled from "styled-components";
 import AsyncPaginate from "react-select-async-paginate";
 
 import { getPersonAutocomplete, PersonType } from "../../../backend_callers";
+import { BasePerson } from "../../../types";
 
 const SelectComponentWrapper = styled.div`
 width: 50%;
 `;
 
-export type AsyncSelectValueDef = {
+export type PersonSelectOptions = {
 	value: string;
 	label: string;
 };
+
+function personToSelectOptions(person: BasePerson | null): PersonSelectOptions | null {
+	return person ? {
+		value: String(person.id),
+		label: person.displayName,
+	} : null;
+}
+
+function selectOptionsToPerson(options: PersonSelectOptions | null): BasePerson | null {
+	return options ? new BasePerson({
+		id: Number(options.value),
+		display_name: options.label,
+	}) : null;
+}
 
 class AsyncSelectAutocompleteGetter {
 	private personType: PersonType;
@@ -39,8 +54,8 @@ class AsyncSelectAutocompleteGetter {
 }
 
 type PersonSelectComponentProps = {
-	value: AsyncSelectValueDef | null;
-	onChange: (newValue: AsyncSelectValueDef | null) => void;
+	value: BasePerson | null;
+	onChange: (newValue: BasePerson | null) => void;
 	personType: PersonType;
 };
 
@@ -49,7 +64,7 @@ export function PersonSelect(props: PersonSelectComponentProps) {
 		cacheOptions
 		defaultOptions
 		loadOptions={(new AsyncSelectAutocompleteGetter(props.personType)).get}
-		onChange={props.onChange}
-		value={props.value}
+		onChange={(nv: PersonSelectOptions | null) => props.onChange(selectOptionsToPerson(nv))}
+		value={personToSelectOptions(props.value)}
 	/></SelectComponentWrapper>;
 }

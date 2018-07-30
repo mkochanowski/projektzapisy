@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { clone } from "lodash";
 import update, { Query } from "immutability-helper";
 
-import { Thesis, ThesisStatus, ThesisKind } from "../../types";
+import { Thesis, ThesisStatus, ThesisKind, Employee } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
@@ -57,6 +57,11 @@ export class ThesisDetails extends React.Component<Props, State> {
 					thesis={this.state.currentThesis}
 					onTitleChanged={this.onTitleChanged}
 					onKindChanged={this.onKindChanged}
+					onAdvisorChanged={this.onAdvisorChanged}
+					onAuxAdvisorChanged={this.onAuxAdvisorChanged}
+					onStudentChanged={this.onStudentChanged}
+					onSecondStudentChanged={this.onSecondStudentChanged}
+					onDescriptionChanged={this.onDescriptionChanged}
 				/>
 			</LeftDetailsContainer>
 			<RightDetailsContainer>
@@ -88,6 +93,26 @@ export class ThesisDetails extends React.Component<Props, State> {
 
 	private onKindChanged = (newKind: ThesisKind): void => {
 		this.updateThesisState({ kind: { $set: newKind } });
+	}
+
+	private onAdvisorChanged = (newAdvisor: Employee | null): void => {
+		this.updateThesisState({ advisor: { $set: newAdvisor } });
+	}
+
+	private onAuxAdvisorChanged = (newAuxAdvisor: Employee | null): void => {
+		this.updateThesisState({ auxiliaryAdvisor: { $set: newAuxAdvisor } });
+	}
+
+	private onStudentChanged = (newStudent: Employee | null): void => {
+		this.updateThesisState({ student: { $set: newStudent } });
+	}
+
+	private onSecondStudentChanged = (newSecondStudent: Employee | null): void => {
+		this.updateThesisState({ secondStudent: { $set: newSecondStudent } });
+	}
+
+	private onDescriptionChanged = (newDesc: string): void => {
+		this.updateThesisState({ description: { $set: newDesc } });
 	}
 
 	private onSaveRequested = () => {
