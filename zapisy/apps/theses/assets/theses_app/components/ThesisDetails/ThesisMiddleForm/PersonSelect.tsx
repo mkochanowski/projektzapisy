@@ -66,5 +66,6 @@ export function PersonSelect(props: PersonSelectComponentProps) {
 		loadOptions={(new AsyncSelectAutocompleteGetter(props.personType)).get}
 		onChange={(nv: PersonSelectOptions | null) => props.onChange(selectOptionsToPerson(nv))}
 		value={personToSelectOptions(props.value)}
+		placeholder={"Wybierz..."}
 	/></SelectComponentWrapper>;
 }
