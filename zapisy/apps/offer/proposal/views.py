@@ -1,17 +1,21 @@
 """
     Proposal views
 """
+import re
+import io
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.views.decorators.http import require_POST
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
+from django.template.defaultfilters import slugify
 
 from apps.enrollment.courses.models.effects import Effects
 from apps.enrollment.courses.models.tag import Tag
@@ -26,6 +30,7 @@ from apps.offer.proposal.forms import ProposalForm, ProposalDescriptionForm, Syl
 from apps.offer.proposal.models import Syllabus, StudentWork
 from apps.offer.proposal.exceptions import NotOwnerException
 
+from xhtml2pdf import pisa
 import json
 import logging
 from apps.offer.proposal.utils import proposal_for_offer, employee_proposal, send_notification_to_3d
@@ -338,8 +343,19 @@ def proposal_for_review(request, slug=None):
     return redirect('manage')
 
 
-def syllabus_pdf(self):
-    template = get_template('proposal/syllabus_pdf.html')
+def syllabus_pdf(request, slug=None):
+    entity = proposal_for_offer(slug)
+    pt = PointTypes.objects.get(name='ECTS')
+    ects_field = PointsOfCourseEntities.objects.get(
+        entity=entity, type_of_point=pt, program__isnull=True)
+    ects = ects_field.value
+
+    data = {
+        'entity': entity,
+        'ects': ects
+    }
+
+    template = get_template('offer/proposal/syllabus_pdf.html')
     html = template.render(data)
     result = io.BytesIO()
 
@@ -347,6 +363,6 @@ def syllabus_pdf(self):
 
     response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + \
-                                      re.sub(r'\s', '', slugify(str(self.entity))) + '-.pdf'
+                                      re.sub(r'\s', '', slugify(str(entity))) + '.pdf'
 
     return response

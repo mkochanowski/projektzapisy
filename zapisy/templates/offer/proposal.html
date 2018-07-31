@@ -9,7 +9,9 @@
     {% if user.is_staff or course.owner == user.employee %}
 	<div class="actions">
         <div class="action right">
-                <a href="{% url 'proposal-edit' course.slug %}">Edytuj</a>
+            <a href="{% url 'syllabus-pdf' course.slug %}">Pobierz Syllabus</a>
+             | 
+             <a href="{% url 'proposal-edit' course.slug %}">Edytuj</a>
         </div>
 	</div>
 	{% endif %}
