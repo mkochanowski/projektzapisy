@@ -1,0 +1,106 @@
+{% load i18n %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//PL">
+
+<html xmlns:pdf="">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    </head>
+    <style>
+        @font-face { font-family: Helvetica; src: url("/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf");}
+
+        html {
+            font-family: Helvetica, sans-serif;
+            font-size: 8pt;
+            }
+
+        th { font-size: 12px;}
+        table { border: 1px #000000 solid;}
+        a { text-decoration: none; color: #000000;}
+        td, th { text-align: left; padding-top: 3px; padding-left: 3px;}
+    </style>
+    <body>
+    	<h2>Syllabus dla: {{ entity }}</h2>
+        <table>
+            <tr>
+                <td width="20%">Nazwa:</td>
+                <td width="80%">{{ entity.name_pl }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Nazwa (ang):</td>
+                <td width="80%">{{ entity.name_en }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Rodzaj</td>
+                <td width="80%">{{ entity.type }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Semestr</td>
+                <td width="80%">{{ entity.get_semester_display }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Kierunek studiów</td>
+                <td width="80%">{{ entity.syllabus.get_studies_type_display }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Rok studiów</td>
+                <td width="80%">{{ entity.syllabus.get_year_display }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Wymagania wstępne w zakresie wiedzy, umiejętności i kompetencji społecznych</td>
+                <td width="80%">{{ entity.syllabus.requirements|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Cele przedmiotu</td>
+                <td width="80%">{{ entity.syllabus.objectives|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Zakładane efekty kształcenia</td>
+                <td width="80%">{{ entity.syllabus.effects_txt|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Symbole kierunkowych efektów kształcenia</td>
+                <td width="80%">{{ entity.syllabus.effects_codes|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Treści programowe</td>
+                <td width="80%">{{ entity.syllabus.contents|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Metody kształcenia</td>
+                <td width="80%">{{ entity.syllabus.learning_methods.all|join:", " }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Zalecana literatura (podręczniki)</td>
+                <td width="80%">{{ entity.syllabus.literature|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Forma zaliczenia poszczególnych komponentów przedmiotu/modułu, sposób sprawdzenia osiągęcia zamierzonych efektów kształcenia</td>
+                <td width="80%">{{ entity.syllabus.passing_form|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td width="20%">Godziny zajęć</td>
+                <td width="80%">
+                    {% if entity.repetitions %} repetytorium: {{ entity.repetitions }}h<br>{% endif %}
+                    {% if entity.lectures %} wykład: {{ entity.lectures }}h<br>{% endif %}
+                    {% if entity.exercises %} ćwiczenia: {{ entity.exercises }}h<br>{% endif %}
+                    {% if entity.laboratories %} pracownia: {{ entity.laboratories }}h<br>{% endif %}
+                    {% if entity.exercises_laboratiories %} ćwiczenio-pracownia: {{ entity.exercises_laboratiories }}h<br>{% endif %}
+                    {% if entity.seminars %} seminarium: {{ entity.seminars }}h<br>{% endif %}
+                    {% if entity.syllabus.exam_hour %} egzamin: {{ entity.syllabus.exam_hours }}h<br>{% endif %}
+                    {% if entity.syllabus.tests_hour %} sprawdziany/kolokwia: {{ entity.syllabus.tests_hours }}h<br>{% endif %}
+                    {% if entity.syllabus.project_presentation_hour %} prezentacja projektu: {{ entity.syllabus.project_presentation_hours }}h<br>{% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="20%">Praca własna studenta</td>
+                <td width="80%">
+                        {% for studentwork in entity.syllabus.studentwork_set.all %}{{ studentwork.name }}: {{ studentwork.hours }}h<br/>{% endfor %}                    
+                </td>
+            </tr>
+            <tr>
+                <td width="20%">ECTS</td>
+                <td width="80%">{{ ects }}</td>
+            </tr>
+        </table>
+    </body>
+</html>
