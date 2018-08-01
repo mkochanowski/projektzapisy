@@ -1,7 +1,7 @@
 import * as React from "react";
 import Button from "react-button-component";
 import styled from "styled-components";
-import { clone } from "lodash";
+import { clone, isEqual } from "lodash";
 import update, { Query } from "immutability-helper";
 
 import { Thesis, ThesisStatus, ThesisKind, Employee } from "../../types";
@@ -66,9 +66,16 @@ export class ThesisDetails extends React.Component<Props, State> {
 			</LeftDetailsContainer>
 			<RightDetailsContainer>
 				<ThesisVotes />
-				<Button onClick={this.onSaveRequested}>Zapisz</Button>
+				<Button
+					onClick={this.onSaveRequested}
+					disabled={!this.shouldAllowSave()}
+				>Zapisz</Button>
 			</RightDetailsContainer>
 		</MainDetailsContainer>;
+	}
+
+	private shouldAllowSave(): boolean {
+		return !isEqual(this.state.currentThesis, this.props.selectedThesis);
 	}
 
 	private updateThesisState(updateObject: Query<Thesis>) {

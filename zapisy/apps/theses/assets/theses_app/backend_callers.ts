@@ -1,6 +1,6 @@
 import { stringify } from "query-string";
 
-import { Thesis, ThesisRaw, Student, Employee, BasePerson } from "./types";
+import { Thesis, ThesisJson, Student, Employee, BasePerson } from "./types";
 
 const BASE_API_URL = "/theses/api";
 
@@ -28,8 +28,8 @@ async function fetchJson(url: string): Promise<any> {
 }
 
 export async function getThesesList(filterType: ThesisTypeFilter): Promise<Thesis[]> {
-	const results: ThesisRaw[] = await fetchJson(`${BASE_API_URL}/theses?thesis_type=${filterType}`);
-	return results.map(raw => new Thesis(raw));
+	const results: ThesisJson[] = await fetchJson(`${BASE_API_URL}/theses?thesis_type=${filterType}`);
+	return results.map(json => new Thesis(json));
 }
 
 export const enum PersonType {
@@ -63,7 +63,7 @@ export async function getPersonAutocomplete(
 	const constr = person === PersonType.Employee ? Employee : Student;
 	return {
 		results: acResults.results.map(
-			raw => new constr({ id: raw.id, display_name: raw.text })
+			raw => new constr(raw.id, raw.text)
 		),
 		hasMore: acResults.pagination.more,
 	};

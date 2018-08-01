@@ -1,15 +1,15 @@
 import * as React from "react";
 
-import { ThesisKind } from "../../../types";
+import { ThesisKind, thesisKindToString } from "../../../types";
 import { GenericSelect } from "../../GenericSelect";
 
 const kindSelectInfos = [
-	{ val: ThesisKind.Masters, displayName: "Magisterska" },
-	{ val: ThesisKind.Engineers, displayName: "Inżynierska" },
-	{ val: ThesisKind.Bachelors, displayName: "Licencjacka" },
-	{ val: ThesisKind.BachelorsEngineers, displayName: "Lic+Inż" },
-	{ val: ThesisKind.Isim, displayName: "ISIM" },
-];
+	ThesisKind.Masters,
+	ThesisKind.Engineers,
+	ThesisKind.Bachelors,
+	ThesisKind.BachelorsEngineers,
+	ThesisKind.Isim,
+].map(kind => ({ val: kind, displayName: thesisKindToString(kind) }));
 
 export type ThesisKindSelectProps = {
 	value: ThesisKind;

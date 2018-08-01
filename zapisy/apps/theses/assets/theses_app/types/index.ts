@@ -34,7 +34,7 @@ export const enum ThesisVote {
 	UserMissing = 4,
 }
 
-type PersonRaw = {
+type PersonJson = {
 	id: number;
 	display_name: string;
 };
@@ -43,26 +43,30 @@ export class BasePerson {
 	public id: number;
 	public displayName: string;
 
-	public constructor(raw: PersonRaw) {
-		this.id = raw.id;
-		this.displayName = raw.display_name;
+	public constructor(id: number, displayName: string) {
+		this.id = id;
+		this.displayName = displayName;
+	}
+
+	public static fromJson(raw: PersonJson) {
+		return new BasePerson(raw.id, raw.display_name);
 	}
 }
 
 export class Employee extends BasePerson {}
 export class Student extends BasePerson {}
 
-export type ThesisRaw = {
+export type ThesisJson = {
 	id: number;
 	title: string;
-	advisor?: PersonRaw;
-	auxiliary_advisor?: PersonRaw;
+	advisor?: PersonJson;
+	auxiliary_advisor?: PersonJson;
 	kind: ThesisKind;
 	reserved: boolean;
 	description: string;
 	status: ThesisStatus;
-	student?: PersonRaw;
-	student_2?: PersonRaw;
+	student?: PersonJson;
+	student_2?: PersonJson;
 	added_date: string;
 	modified_date: string;
 };
@@ -81,18 +85,18 @@ export class Thesis {
 	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
 
-	public constructor(raw: ThesisRaw) {
-		this.id = raw.id;
-		this.title = raw.title;
-		this.advisor = raw.advisor ? new Employee(raw.advisor) : null;
-		this.auxiliaryAdvisor = raw.auxiliary_advisor ? new Employee(raw.auxiliary_advisor) : null;
-		this.kind = raw.kind;
-		this.reserved = raw.reserved;
-		this.description = raw.description;
-		this.status = raw.status;
-		this.student = raw.student ? new Student(raw.student) : null;
-		this.secondStudent = raw.student_2 ? new Student(raw.student_2) : null;
-		this.addedDate = moment(raw.added_date);
-		this.modifiedDate = moment(raw.modified_date);
+	public constructor(json: ThesisJson) {
+		this.id = json.id;
+		this.title = json.title;
+		this.advisor = json.advisor ? Employee.fromJson(json.advisor) : null;
+		this.auxiliaryAdvisor = json.auxiliary_advisor ? Employee.fromJson(json.auxiliary_advisor) : null;
+		this.kind = json.kind;
+		this.reserved = json.reserved;
+		this.description = json.description;
+		this.status = json.status;
+		this.student = json.student ? Employee.fromJson(json.student) : null;
+		this.secondStudent = json.student_2 ? Employee.fromJson(json.student_2) : null;
+		this.addedDate = moment(json.added_date);
+		this.modifiedDate = moment(json.modified_date);
 	}
 }

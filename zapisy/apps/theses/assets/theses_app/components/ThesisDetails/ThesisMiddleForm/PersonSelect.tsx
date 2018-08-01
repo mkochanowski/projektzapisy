@@ -23,10 +23,10 @@ function personToSelectOptions(person: BasePerson | null): PersonSelectOptions |
 }
 
 function selectOptionsToPerson(options: PersonSelectOptions | null): BasePerson | null {
-	return options ? new BasePerson({
-		id: Number(options.value),
-		display_name: options.label,
-	}) : null;
+	return options ? new BasePerson(
+		Number(options.value),
+		options.label,
+	) : null;
 }
 
 class AsyncSelectAutocompleteGetter {

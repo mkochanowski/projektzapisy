@@ -23,10 +23,10 @@ class PersonSerializer(serializers.Serializer):
 
 
 class ThesisSerializer(serializers.ModelSerializer):
-    advisor = PersonSerializer()
-    auxiliary_advisor = PersonSerializer()
-    student = PersonSerializer()
-    student_2 = PersonSerializer()
+    advisor = PersonSerializer(allow_null=True)
+    auxiliary_advisor = PersonSerializer(allow_null=True)
+    student = PersonSerializer(allow_null=True)
+    student_2 = PersonSerializer(allow_null=True)
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
 
@@ -68,7 +68,8 @@ class ThesisSerializer(serializers.ModelSerializer):
 
 
 def _get_person_from_queryset(queryset, person_data):
-    print("get person:", person_data)
+    if person_data is None:
+        return None
     if "id" not in person_data:
         raise InvalidQueryError("Missing person ID")
     try:

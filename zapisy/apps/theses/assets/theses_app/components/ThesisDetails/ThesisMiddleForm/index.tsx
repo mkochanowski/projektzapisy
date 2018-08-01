@@ -54,7 +54,7 @@ export class ThesisMiddleForm extends React.Component<Props> {
 					/></td>
 				</tr>
 				<tr>
-					<td>Rodzaj</td>
+					<td>Typ</td>
 					<td>
 						<ThesisKindSelect
 							value={this.props.thesis.kind}
