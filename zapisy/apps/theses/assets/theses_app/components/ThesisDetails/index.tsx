@@ -10,6 +10,16 @@ import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
 import { Moment } from "moment";
 
+const SaveButton = Button.extend`
+&:disabled:hover {
+	background: white;
+}
+&:disabled {
+	color: grey;
+	cursor: default;
+}
+`;
+
 const MainDetailsContainer = styled.div`
 border: 1px solid black;
 padding: 15px;
@@ -45,6 +55,7 @@ export class ThesisDetails extends React.Component<Props, State> {
 	}
 
 	public render() {
+		const shouldAllowSave = this.shouldAllowSave();
 		return <MainDetailsContainer>
 			<LeftDetailsContainer>
 				<ThesisTopRow
@@ -66,15 +77,17 @@ export class ThesisDetails extends React.Component<Props, State> {
 			</LeftDetailsContainer>
 			<RightDetailsContainer>
 				<ThesisVotes />
-				<Button
+				<SaveButton
 					onClick={this.onSaveRequested}
-					disabled={!this.shouldAllowSave()}
-				>Zapisz</Button>
+					disabled={!shouldAllowSave}
+					title={shouldAllowSave ? "Zapisz zmiany" : "Nie dokonano zmian"}
+				>Zapisz</SaveButton>
 			</RightDetailsContainer>
 		</MainDetailsContainer>;
 	}
 
 	private shouldAllowSave(): boolean {
+		console.warn(isEqual(this.state.currentThesis, this.props.selectedThesis));
 		return !isEqual(this.state.currentThesis, this.props.selectedThesis);
 	}
 

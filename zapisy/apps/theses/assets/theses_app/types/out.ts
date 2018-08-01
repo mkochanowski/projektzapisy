@@ -50,7 +50,7 @@ export function getOutThesisJson(originalThesis: Thesis, modifiedThesis: Thesis)
 	}
 	let changed; let id;
 	({ changed, id } = getNewPersonValue(originalThesis.advisor, modifiedThesis.advisor));
-	if (changed) { result.advisor = id; }
+	// if (changed) { result.advisor = id; }
 
 	return result;
 }
