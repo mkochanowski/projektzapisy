@@ -51,6 +51,10 @@ export class BasePerson {
 	public static fromJson(raw: PersonJson) {
 		return new BasePerson(raw.id, raw.display_name);
 	}
+
+	public isEqual = (other: BasePerson): boolean => {
+		return this.id === other.id;
+	}
 }
 
 export class Employee extends BasePerson {}
@@ -98,5 +102,35 @@ export class Thesis {
 		this.secondStudent = json.student_2 ? Employee.fromJson(json.student_2) : null;
 		this.addedDate = moment(json.added_date);
 		this.modifiedDate = moment(json.modified_date);
+	}
+
+	public isEqual = (other: Thesis): boolean => {
+		return this.id === other.id;
+	}
+
+	public areValuesEqual(other: Thesis): boolean {
+		console.assert(
+			this.isEqual(other),
+			"Thesis::areValuesEqual only makes sense for two theses with the same ID",
+		);
+		return (
+			this.title === other.title &&
+			this.description === other.description &&
+			this.personValuesEqual(this.advisor, other.advisor) &&
+			this.personValuesEqual(this.auxiliaryAdvisor, other.auxiliaryAdvisor) &&
+			this.personValuesEqual(this.student, other.student) &&
+			this.personValuesEqual(this.secondStudent, other.secondStudent) &&
+			this.kind === other.kind &&
+			this.reserved === other.reserved &&
+			this.status === other.status &&
+			this.modifiedDate.isSame(other.modifiedDate)
+		);
+	}
+
+	private personValuesEqual(p1: BasePerson | null, p2: BasePerson | null): boolean {
+		return (
+			p1 === null && p2 === null ||
+			p1 !== null && p2 !== null && p1.isEqual(p2)
+		);
 	}
 }

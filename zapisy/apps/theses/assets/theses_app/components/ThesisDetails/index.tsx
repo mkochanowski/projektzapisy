@@ -1,7 +1,7 @@
 import * as React from "react";
 import Button from "react-button-component";
 import styled from "styled-components";
-import { clone, isEqual } from "lodash";
+import { clone } from "lodash";
 import update, { Query } from "immutability-helper";
 
 import { Thesis, ThesisStatus, ThesisKind, Employee } from "../../types";
@@ -95,8 +95,7 @@ export class ThesisDetails extends React.Component<Props, State> {
 	}
 
 	private shouldAllowSave(): boolean {
-		console.warn(isEqual(this.state.currentThesis, this.props.selectedThesis));
-		return !isEqual(this.state.currentThesis, this.props.selectedThesis);
+		return !this.state.currentThesis.areValuesEqual(this.props.selectedThesis);
 	}
 
 	private updateThesisState(updateObject: Query<Thesis>) {
