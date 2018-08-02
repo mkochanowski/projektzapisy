@@ -1,6 +1,7 @@
 import { stringify } from "query-string";
 
 import { Thesis, ThesisJson, Student, Employee, BasePerson } from "./types";
+import { getOutThesisJson } from "./types/out";
 
 const BASE_API_URL = "/theses/api";
 
@@ -67,4 +68,25 @@ export async function getPersonAutocomplete(
 		),
 		hasMore: acResults.pagination.more,
 	};
+}
+
+export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis: Thesis): Promise<void> {
+	const diffObj = getOutThesisJson(originalThesis, modifiedThesis);
+	const jsonData = JSON.stringify(diffObj);
+	console.warn("Sending", jsonData);
+	const resp = await fetch(
+		`${BASE_API_URL}/theses/${diffObj.id}/`,
+		{
+			credentials: "include",
+			method: "PATCH",
+			body: jsonData,
+			headers: {
+				"Content-Type": "application/json"
+			},
+		},
+	);
+	if (!resp.ok) {
+		console.warn(resp.body);
+		throw new Error(`Failed to update thesis instance: ${resp.status} ${resp.statusText}`);
+	}
 }

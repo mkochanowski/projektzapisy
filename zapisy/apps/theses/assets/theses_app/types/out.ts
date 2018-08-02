@@ -24,20 +24,18 @@ function getNewPersonValue(
 	originalPersonField: BasePerson | null,
 	modifiedPersonField: BasePerson | null,
 ) {
+	console.warn(originalPersonField, modifiedPersonField);
 	if (originalPersonField) {
 		if (modifiedPersonField) {
 			if (originalPersonField.id !== modifiedPersonField.id) {
-				return { changed: true, id: modifiedPersonField.id };
+				return { id: modifiedPersonField.id };
 			}
-			return { changed: false };
 		} else {
-			return { changed: true, id: null };
+			return null;
 		}
+	} else if (modifiedPersonField) {
+		return { id: modifiedPersonField.id };
 	}
-	if (modifiedPersonField) {
-		return { changed: true, id: modifiedPersonField.id };
-	}
-	return { changed: false };
 }
 
 export function getOutThesisJson(originalThesis: Thesis, modifiedThesis: Thesis): ThesisOutJson {
@@ -48,9 +46,25 @@ export function getOutThesisJson(originalThesis: Thesis, modifiedThesis: Thesis)
 	if (originalThesis.title !== modifiedThesis.title) {
 		result.title = modifiedThesis.title;
 	}
-	let changed; let id;
-	({ changed, id } = getNewPersonValue(originalThesis.advisor, modifiedThesis.advisor));
-	// if (changed) { result.advisor = id; }
+	result.advisor = getNewPersonValue(originalThesis.advisor, modifiedThesis.advisor);
+	result.auxiliary_advisor = getNewPersonValue(
+		originalThesis.auxiliaryAdvisor, modifiedThesis.auxiliaryAdvisor,
+	);
+	result.student = getNewPersonValue(originalThesis.student, modifiedThesis.student);
+	result.student_2 = getNewPersonValue(originalThesis.secondStudent, modifiedThesis.secondStudent);
+	if (originalThesis.kind !== modifiedThesis.kind) {
+		result.kind = modifiedThesis.kind;
+	}
+	if (originalThesis.reserved !== modifiedThesis.reserved) {
+		result.reserved = modifiedThesis.reserved;
+	}
+	if (originalThesis.description !== modifiedThesis.description) {
+		result.description = modifiedThesis.description;
+	}
+	if (originalThesis.status !== modifiedThesis.status) {
+		result.status = modifiedThesis.status;
+	}
+	// TODO date
 
 	return result;
 }

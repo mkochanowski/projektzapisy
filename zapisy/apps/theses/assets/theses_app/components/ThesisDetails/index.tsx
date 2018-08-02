@@ -9,6 +9,7 @@ import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
 import { Moment } from "moment";
+import { saveModifiedThesis } from "../../backend_callers";
 
 const SaveButton = Button.extend`
 &:disabled:hover {
@@ -137,5 +138,6 @@ export class ThesisDetails extends React.Component<Props, State> {
 
 	private onSaveRequested = () => {
 		console.warn("Save clicked");
+		saveModifiedThesis(this.props.selectedThesis, this.state.currentThesis);
 	}
 }
