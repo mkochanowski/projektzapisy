@@ -55,6 +55,13 @@ export class ThesisDetails extends React.Component<Props, State> {
 		};
 	}
 
+	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
+		console.error("Getting derived state");
+		this.setState({
+			currentThesis: clone(nextProps.selectedThesis)
+		});
+	}
+
 	public render() {
 		const shouldAllowSave = this.shouldAllowSave();
 		return <MainDetailsContainer>

@@ -16,7 +16,8 @@
       "lodash",
       "react",
       "react-dom",
-      "react-table"
+      "react-table",
+      "js-cookie"
     ]
   },
   "exclude": [

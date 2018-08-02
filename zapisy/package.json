@@ -22,8 +22,10 @@
     "babel-runtime": "^6.26.0",
     "immutability-helper": "^2.7.1",
     "jquery": "^3.2.1",
+    "js-cookie": "^2.2.0",
     "lodash": "^4.17.4",
     "moment": "^2.22.2",
+    "object-assign-deep": "^0.4.0",
     "prop-types": "^15.6.2",
     "query-string": "^6.1.0",
     "react": "^16.4.1",
@@ -40,6 +42,7 @@
   "devDependencies": {
     "@types/glob": "^5.0.33",
     "@types/jquery": "^3.3.4",
+    "@types/js-cookie": "^2.1.0",
     "@types/lodash": "^4.14.110",
     "@types/moment": "^2.13.0",
     "@types/node": "^8.0.51",

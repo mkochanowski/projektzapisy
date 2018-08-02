@@ -1,4 +1,6 @@
 import { stringify } from "query-string";
+import { get as getCookie } from "js-cookie";
+import * as objectAssignDeep from "object-assign-deep";
 
 import { Thesis, ThesisJson, Student, Employee, BasePerson } from "./types";
 import { getOutThesisJson } from "./types/out";
@@ -20,12 +22,32 @@ export const enum ThesisTypeFilter {
 	Default = AllCurrent,
 }
 
-async function fetchJson(url: string): Promise<any> {
-	const resp = await fetch(url, { credentials: "include" });
+async function sendFetchRequest(url: string, options?: RequestInit): Promise<Response> {
+	console.warn(objectAssignDeep);
+	const finalOptions = objectAssignDeep({ credentials: "include" }, options);
+	console.warn("Dispatching a request to", url, "with options", finalOptions);
+	const resp = await fetch(url, finalOptions);
 	if (!resp.ok) {
 		throw new Error(`Did not get a successful fetch response: ${resp.status} ${resp.statusText}`);
 	}
-	return resp.json();
+	return resp;
+}
+
+async function sendFetchRequestWithCsrf(url: string, options?: RequestInit): Promise<Response> {
+	const tokenValue = getCookie("csrftoken");
+	if (!tokenValue) {
+		throw new Error("CSRF token not found in cookies");
+	}
+	return sendFetchRequest(
+		url,
+		objectAssignDeep({}, options, {
+			headers: { "X-CSRFToken": tokenValue }
+		})
+	);
+}
+
+async function fetchJson(url: string): Promise<any> {
+	return (await sendFetchRequest(url)).json();
 }
 
 export async function getThesesList(filterType: ThesisTypeFilter): Promise<Thesis[]> {
@@ -74,10 +96,9 @@ export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis:
 	const diffObj = getOutThesisJson(originalThesis, modifiedThesis);
 	const jsonData = JSON.stringify(diffObj);
 	console.warn("Sending", jsonData);
-	const resp = await fetch(
+	await sendFetchRequestWithCsrf(
 		`${BASE_API_URL}/theses/${diffObj.id}/`,
 		{
-			credentials: "include",
 			method: "PATCH",
 			body: jsonData,
 			headers: {
@@ -85,8 +106,4 @@ export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis:
 			},
 		},
 	);
-	if (!resp.ok) {
-		console.warn(resp.body);
-		throw new Error(`Failed to update thesis instance: ${resp.status} ${resp.statusText}`);
-	}
 }

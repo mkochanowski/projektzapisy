@@ -59,7 +59,7 @@ class ThesisSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Thesis
-        read_only_fields = ('id', 'kind')
+        read_only_fields = ('id', )
         fields = (
             'id', 'title', 'advisor', 'auxiliary_advisor',
             'kind', 'reserved', 'description', 'status',
