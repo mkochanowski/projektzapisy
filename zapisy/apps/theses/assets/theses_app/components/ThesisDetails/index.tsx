@@ -10,6 +10,7 @@ import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
 import { Moment } from "moment";
 import { saveModifiedThesis } from "../../backend_callers";
+import { SavingIndicator } from "./SavingIndicator";
 
 const SaveButton = Button.extend`
 &:disabled:hover {
@@ -40,18 +41,21 @@ margin-left: 20px;
 `;
 
 type Props = {
-	selectedThesis: Thesis,
+	selectedThesis: Thesis;
+	onModifiedThesisSaved: () => Promise<void>;
 };
 
 type State = {
 	currentThesis: Thesis;
+	isSaving: boolean;
 };
 
 export class ThesisDetails extends React.Component<Props, State> {
 	public constructor(props: Props) {
 		super(props);
 		this.state = {
-			currentThesis: clone(props.selectedThesis)
+			currentThesis: clone(props.selectedThesis),
+			isSaving: false,
 		};
 	}
 
@@ -63,6 +67,10 @@ export class ThesisDetails extends React.Component<Props, State> {
 	}
 
 	public render() {
+		if (this.state.isSaving) {
+			return <SavingIndicator />;
+		}
+
 		const shouldAllowSave = this.shouldAllowSave();
 		return <MainDetailsContainer>
 			<LeftDetailsContainer>
@@ -142,8 +150,14 @@ export class ThesisDetails extends React.Component<Props, State> {
 		this.updateThesisState({ description: { $set: newDesc } });
 	}
 
-	private onSaveRequested = () => {
-		console.warn("Save clicked");
-		saveModifiedThesis(this.props.selectedThesis, this.state.currentThesis);
+	private setSavingState(isSaving: boolean): void {
+		this.setState({ isSaving });
+	}
+
+	private onSaveRequested = async () => {
+		this.setSavingState(true);
+		await saveModifiedThesis(this.props.selectedThesis, this.state.currentThesis);
+		await this.props.onModifiedThesisSaved();
+		this.setSavingState(false);
 	}
 }

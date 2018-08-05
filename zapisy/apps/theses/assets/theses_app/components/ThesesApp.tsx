@@ -1,7 +1,9 @@
 import * as React from "react";
+import update from "immutability-helper";
+
 import { ThesesList } from "./ThesesList";
 import { Thesis } from "../types";
-import { getThesesList, ThesisTypeFilter } from "../backend_callers";
+import { getThesesList, ThesisTypeFilter, getThesisById } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 
 type State = {
@@ -21,7 +23,6 @@ export class ThesesApp extends React.Component<{}, State> {
 
 	private async initList(): Promise<void> {
 		const theses = await getThesesList(ThesisTypeFilter.Default);
-		// await awaitSleep(3000);
 		this.setState({ thesesList: theses, currentlySelectedThesis: theses[0] });
 	}
 
@@ -44,6 +45,7 @@ export class ThesesApp extends React.Component<{}, State> {
 				<ThesisDetails
 					key="thesis_details"
 					selectedThesis={this.state.currentlySelectedThesis}
+					onModifiedThesisSaved={this.onModifiedThesisSaved}
 				/>
 			);
 		}
@@ -54,5 +56,16 @@ export class ThesesApp extends React.Component<{}, State> {
 	private onThesisSelected = (thesis: Thesis): void => {
 		console.warn("Selected", thesis.title);
 		this.setState({ currentlySelectedThesis: thesis });
+	}
+
+	private onModifiedThesisSaved = async (): Promise<void> => {
+		const currentThesis = this.state.currentlySelectedThesis;
+		if (currentThesis === null) {
+			throw new Error("Modified thesis was saved but no thesis selected");
+		}
+		const idx = this.state.thesesList.findIndex(currentThesis.isEqual);
+		const updatedInstance = await getThesisById(currentThesis.id);
+		console.warn("New thesis to insert at index:", idx, updatedInstance);
+		this.setState(update(this.state, { thesesList: { $splice: [[idx, 1, updatedInstance]] } }));
 	}
 }

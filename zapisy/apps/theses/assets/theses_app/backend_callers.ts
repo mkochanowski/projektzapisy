@@ -55,6 +55,11 @@ export async function getThesesList(filterType: ThesisTypeFilter): Promise<Thesi
 	return results.map(json => new Thesis(json));
 }
 
+export async function getThesisById(id: number): Promise<Thesis> {
+	const json: ThesisJson = await fetchJson(`${BASE_API_URL}/theses/${id}`);
+	return new Thesis(json);
+}
+
 export const enum PersonType {
 	Employee,
 	Student,
