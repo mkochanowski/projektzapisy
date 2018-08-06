@@ -11,6 +11,7 @@ import { ThesisVotes } from "./ThesisVotes";
 import { Moment } from "moment";
 import { saveModifiedThesis } from "../../backend_callers";
 import { SavingIndicator } from "./SavingIndicator";
+import { awaitSleep } from "common/utils";
 
 const SaveButton = Button.extend`
 &:disabled:hover {
@@ -20,6 +21,12 @@ const SaveButton = Button.extend`
 	color: grey;
 	cursor: default;
 }
+`;
+
+const DetailsSectionWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
 `;
 
 const MainDetailsContainer = styled.div`
@@ -67,39 +74,42 @@ export class ThesisDetails extends React.Component<Props, State> {
 	}
 
 	public render() {
-		if (this.state.isSaving) {
-			return <SavingIndicator />;
-		}
-
 		const shouldAllowSave = this.shouldAllowSave();
-		return <MainDetailsContainer>
-			<LeftDetailsContainer>
-				<ThesisTopRow
-					thesis={this.state.currentThesis}
-					onReservationChanged={this.onReservationChanged}
-					onDateChanged={this.onDateUpdatedChanged}
-					onStatusChanged={this.onStatusChanged}
-				/>
-				<ThesisMiddleForm
-					thesis={this.state.currentThesis}
-					onTitleChanged={this.onTitleChanged}
-					onKindChanged={this.onKindChanged}
-					onAdvisorChanged={this.onAdvisorChanged}
-					onAuxAdvisorChanged={this.onAuxAdvisorChanged}
-					onStudentChanged={this.onStudentChanged}
-					onSecondStudentChanged={this.onSecondStudentChanged}
-					onDescriptionChanged={this.onDescriptionChanged}
-				/>
-			</LeftDetailsContainer>
-			<RightDetailsContainer>
-				<ThesisVotes />
-				<SaveButton
-					onClick={this.onSaveRequested}
-					disabled={!shouldAllowSave}
-					title={shouldAllowSave ? "Zapisz zmiany" : "Nie dokonano zmian"}
-				>Zapisz</SaveButton>
-			</RightDetailsContainer>
-		</MainDetailsContainer>;
+		const { isSaving } = this.state;
+
+		return <DetailsSectionWrapper>
+			{isSaving ? <SavingIndicator/> : null}
+			<MainDetailsContainer
+				style={isSaving ? { opacity: 0.5, pointerEvents: "none" } : {}}
+			>
+				<LeftDetailsContainer>
+					<ThesisTopRow
+						thesis={this.state.currentThesis}
+						onReservationChanged={this.onReservationChanged}
+						onDateChanged={this.onDateUpdatedChanged}
+						onStatusChanged={this.onStatusChanged}
+					/>
+					<ThesisMiddleForm
+						thesis={this.state.currentThesis}
+						onTitleChanged={this.onTitleChanged}
+						onKindChanged={this.onKindChanged}
+						onAdvisorChanged={this.onAdvisorChanged}
+						onAuxAdvisorChanged={this.onAuxAdvisorChanged}
+						onStudentChanged={this.onStudentChanged}
+						onSecondStudentChanged={this.onSecondStudentChanged}
+						onDescriptionChanged={this.onDescriptionChanged}
+					/>
+				</LeftDetailsContainer>
+				<RightDetailsContainer>
+					<ThesisVotes />
+					<SaveButton
+						onClick={this.onSaveRequested}
+						disabled={!shouldAllowSave}
+						title={shouldAllowSave ? "Zapisz zmiany" : "Nie dokonano zmian"}
+					>Zapisz</SaveButton>
+				</RightDetailsContainer>
+			</MainDetailsContainer>
+		</DetailsSectionWrapper>;
 	}
 
 	private shouldAllowSave(): boolean {
@@ -158,6 +168,7 @@ export class ThesisDetails extends React.Component<Props, State> {
 		this.setSavingState(true);
 		await saveModifiedThesis(this.props.selectedThesis, this.state.currentThesis);
 		await this.props.onModifiedThesisSaved();
+		await awaitSleep(2000);
 		this.setSavingState(false);
 	}
 }

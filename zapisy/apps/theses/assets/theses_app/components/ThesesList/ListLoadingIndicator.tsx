@@ -8,6 +8,10 @@ export function ListLoadingIndicator(): JSX.Element {
 			width: "100%",
 		}}
 	>
-		<img src={spinner} alt="Pobieranie listy prac..." />
+		<img
+			src={spinner}
+			alt="Pobieranie listy prac..."
+			style={{ width: "600px" }}
+		/>;
 	</div>;
 }

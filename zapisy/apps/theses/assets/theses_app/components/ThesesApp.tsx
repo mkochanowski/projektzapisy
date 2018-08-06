@@ -7,8 +7,8 @@ import { getThesesList, ThesisTypeFilter, getThesisById } from "../backend_calle
 import { ThesisDetails } from "./ThesisDetails";
 
 type State = {
-	thesesList: Thesis[],
-	currentlySelectedThesis: Thesis | null,
+	thesesList: Thesis[];
+	curThesisIdx: number | null;
 };
 
 export class ThesesApp extends React.Component<{}, State> {
@@ -16,14 +16,14 @@ export class ThesesApp extends React.Component<{}, State> {
 		super(props);
 		this.state = {
 			thesesList: [],
-			currentlySelectedThesis: null,
+			curThesisIdx: null,
 		};
 		this.initList();
 	}
 
 	private async initList(): Promise<void> {
 		const theses = await getThesesList(ThesisTypeFilter.Default);
-		this.setState({ thesesList: theses, currentlySelectedThesis: theses[0] });
+		this.setState({ thesesList: theses, curThesisIdx: 0 });
 	}
 
 	public render() {
@@ -38,13 +38,13 @@ export class ThesesApp extends React.Component<{}, State> {
 				/>
 			</div>
 		];
-		if (this.state.currentlySelectedThesis) {
+		if (this.state.curThesisIdx !== null) {
 			result.push(
 				<br key="spacer" />,
 				<hr key="divider2" />,
 				<ThesisDetails
 					key="thesis_details"
-					selectedThesis={this.state.currentlySelectedThesis}
+					selectedThesis={this.state.thesesList[this.state.curThesisIdx]}
 					onModifiedThesisSaved={this.onModifiedThesisSaved}
 				/>
 			);
@@ -54,18 +54,21 @@ export class ThesesApp extends React.Component<{}, State> {
 	}
 
 	private onThesisSelected = (thesis: Thesis): void => {
-		console.warn("Selected", thesis.title);
-		this.setState({ currentlySelectedThesis: thesis });
+		const idx = this.state.thesesList.findIndex(thesis.isEqual);
+		if (idx === -1) {
+			throw new Error("Selected thesis not found");
+		}
+		this.setState({ curThesisIdx: idx });
 	}
 
 	private onModifiedThesisSaved = async (): Promise<void> => {
-		const currentThesis = this.state.currentlySelectedThesis;
-		if (currentThesis === null) {
+		const curIdx = this.state.curThesisIdx;
+		if (curIdx === null) {
 			throw new Error("Modified thesis was saved but no thesis selected");
 		}
-		const idx = this.state.thesesList.findIndex(currentThesis.isEqual);
+		const currentThesis = this.state.thesesList[curIdx];
 		const updatedInstance = await getThesisById(currentThesis.id);
-		console.warn("New thesis to insert at index:", idx, updatedInstance);
-		this.setState(update(this.state, { thesesList: { $splice: [[idx, 1, updatedInstance]] } }));
+		console.warn("New thesis to insert at index:", curIdx, updatedInstance);
+		this.setState(update(this.state, { thesesList: { $splice: [[curIdx, 1, updatedInstance]] } }));
 	}
 }
