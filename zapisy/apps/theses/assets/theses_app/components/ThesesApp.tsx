@@ -5,6 +5,7 @@ import { ThesesList } from "./ThesesList";
 import { Thesis } from "../types";
 import { getThesesList, ThesisTypeFilter, getThesisById } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 type State = {
 	thesesList: Thesis[];
@@ -50,7 +51,7 @@ export class ThesesApp extends React.Component<{}, State> {
 			);
 		}
 
-		return result;
+		return <ErrorBoundary>{result}</ErrorBoundary>;
 	}
 
 	private onThesisSelected = (thesis: Thesis): void => {

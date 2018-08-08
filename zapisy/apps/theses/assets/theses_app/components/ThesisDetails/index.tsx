@@ -11,7 +11,6 @@ import { ThesisVotes } from "./ThesisVotes";
 import { Moment } from "moment";
 import { saveModifiedThesis } from "../../backend_callers";
 import { SavingIndicator } from "./SavingIndicator";
-import { awaitSleep } from "common/utils";
 
 const SaveButton = Button.extend`
 &:disabled:hover {
@@ -166,9 +165,15 @@ export class ThesisDetails extends React.Component<Props, State> {
 
 	private onSaveRequested = async () => {
 		this.setSavingState(true);
-		await saveModifiedThesis(this.props.selectedThesis, this.state.currentThesis);
-		await this.props.onModifiedThesisSaved();
-		await awaitSleep(2000);
+		try {
+			await saveModifiedThesis(this.props.selectedThesis, this.state.currentThesis);
+			await this.props.onModifiedThesisSaved();
+		} catch (err) {
+			alert(
+				"Nie udało się zapisać pracy. Spróbuj jeszcze raz. " +
+				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów"
+			);
+		}
 		this.setSavingState(false);
 	}
 }
