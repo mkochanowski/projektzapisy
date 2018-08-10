@@ -16,10 +16,10 @@ class ThesisUserType(Enum):
     admin = 3
 
 
-"""
-Used to serialize employee/student fields in the thesis model
-"""
 class PersonSerializerForThesis(serializers.Serializer):
+    """
+    Used to serialize employee/student fields in the thesis model
+    """
     def to_representation(self, instance):
         return {
             "id": instance.id,
@@ -97,7 +97,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             "id": instance.pk,
             "type": CurrentUserSerializer.get_user_type(instance).value
         }
-    
+
     @staticmethod
     def get_user_type(user_instance: BaseUser) -> ThesisUserType:
         # FIXME is this correct?
