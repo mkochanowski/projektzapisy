@@ -71,12 +71,19 @@ class Thesis(models.Model):
         verbose_name_plural = "prace dyplomowe"
 
 
-class ThesesCommissionMember(models.Model):
+class ThesesBoardMember(models.Model):
     member = models.ForeignKey(Employee)
 
     class Meta:
         verbose_name = "członek komisji"
         verbose_name_plural = "członkowie komisji"
+
+    def __str__(self):
+        return str(self.member)
+
+
+def is_theses_board_member(emp: Employee) -> bool:
+    return ThesesBoardMember.objects.filter(member=emp.pk).exists()
 
 
 class ThesisVote(Enum):
@@ -96,7 +103,7 @@ THESIS_VOTE_CHOICES = (
 
 class ThesisVoteBinding(models.Model):
     thesis = models.ForeignKey(Thesis)
-    voter = models.ForeignKey(Employee)  # should be a member of the theses commission
+    voter = models.ForeignKey(Employee)  # should be a member of the theses board
     vote = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
 
 

@@ -1,12 +1,25 @@
+from enum import Enum
+
 from rest_framework import serializers
 
 from . import models
 from apps.users.models import Employee, Student
 from apps.api.rest.v1.serializers import UserSerializer
 from .errors import InvalidQueryError
+from apps.users.models import BaseUser
 
 
-class PersonSerializer(serializers.Serializer):
+class ThesisUserType(Enum):
+    student = 0
+    employee = 1
+    theses_board_member = 2
+    admin = 3
+
+
+"""
+Used to serialize employee/student fields in the thesis model
+"""
+class PersonSerializerForThesis(serializers.Serializer):
     def to_representation(self, instance):
         return {
             "id": instance.id,
@@ -23,10 +36,10 @@ class PersonSerializer(serializers.Serializer):
 
 
 class ThesisSerializer(serializers.ModelSerializer):
-    advisor = PersonSerializer(allow_null=True)
-    auxiliary_advisor = PersonSerializer(allow_null=True)
-    student = PersonSerializer(allow_null=True)
-    student_2 = PersonSerializer(allow_null=True)
+    advisor = PersonSerializerForThesis(allow_null=True)
+    auxiliary_advisor = PersonSerializerForThesis(allow_null=True)
+    student = PersonSerializerForThesis(allow_null=True)
+    student_2 = PersonSerializerForThesis(allow_null=True)
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
 
@@ -76,3 +89,25 @@ def _get_person_from_queryset(queryset, person_data):
         return queryset.objects.get(pk=person_data.get("id"))
     except queryset.DoesNotExist:
         raise InvalidQueryError("Bad person ID specified")
+
+
+class CurrentUserSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance: BaseUser):
+        return {
+            "id": instance.pk,
+            "type": CurrentUserSerializer.get_user_type(instance).value
+        }
+    
+    @staticmethod
+    def get_user_type(user_instance: BaseUser) -> ThesisUserType:
+        # FIXME is this correct?
+        if user_instance.is_staff:
+            return ThesisUserType.admin
+        elif BaseUser.is_employee(user_instance):
+            return (
+                ThesisUserType.theses_board_member
+                if models.is_theses_board_member(user_instance.employee)
+                else ThesisUserType.employee
+            )
+        elif BaseUser.is_student(user_instance):
+            return ThesisUserType.student

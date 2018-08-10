@@ -10,7 +10,7 @@ class ThesisAdmin(admin.ModelAdmin):
 admin.site.register(models.Thesis, ThesisAdmin)
 
 
-admin.site.register(models.ThesesCommissionMember)
+admin.site.register(models.ThesesBoardMember)
 
 
 class ThesesSystemSettingsAdmin(admin.ModelAdmin):

@@ -7,6 +7,7 @@ from django.db.models import Q
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
+from rest_framework.decorators import api_view, permission_classes
 from dal import autocomplete
 
 from apps.users.models import Student, Employee
@@ -36,7 +37,7 @@ class ThesisTypeFilter(Enum):
 
 class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get"]
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.DjangoModelPermissions,)
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):
@@ -82,6 +83,13 @@ def filter_theses_queryset_for_type(queryset, thesis_type):
         return available_thesis_filter(queryset.filter(kind=models.ThesisKind.isim.value))
     else:
         raise ParseError()
+
+
+@api_view()
+@permission_classes((permissions.IsAuthenticated,))
+def get_current_user(request):
+    serializer = serializers.CurrentUserSerializer(request.user)
+    return Response(serializer.data)
 
 
 @login_required
