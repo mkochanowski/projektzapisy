@@ -362,7 +362,7 @@ def syllabus_pdf(request, slug=None):
     pisa.pisaDocument(io.StringIO(html), result, encoding='UTF-8')
 
     response = HttpResponse(result.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=' + \
-                                      re.sub(r'\s', '', slugify(str(entity))) + '.pdf'
+    filename = re.sub(r'\s', '', slugify(str(entity)))
+    response['Content-Disposition'] = f'attachment; filename={filename}.pdf'
 
     return response
