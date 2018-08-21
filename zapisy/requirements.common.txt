@@ -1,4 +1,4 @@
-Django==1.11.9 --no-binary django
+Django==2.0
 django-cas-ng==3.5.9
 django-el-pagination==3.2.4
 django-environ==0.4.4
@@ -11,6 +11,7 @@ django-test-without-migrations==0.6
 django-webpack-loader==0.6.0
 djangorestframework==3.8.2
 
+django-rq==1.2
 Fabric3==1.14.post1
 ipdb==0.11
 ipython==6.4.0
