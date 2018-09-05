@@ -343,7 +343,8 @@ def proposal_for_review(request, slug=None):
     return redirect('manage')
 
 
-def syllabus_pdf(request, slug=None):
+def syllabus_pdf(request, slug):
+    """Generates response with a pdf file containing syllabus for given entity"""
     entity = proposal_for_offer(slug)
     pt = PointTypes.objects.get(name='ECTS')
     ects_field = PointsOfCourseEntities.objects.get(
