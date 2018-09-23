@@ -24,7 +24,10 @@ Vagrant.configure(2) do |config|
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = "4096"
+    vb.cpus = "4"
+    # Enable "IO APIC" for better multicore performance
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
     # Fix symlinks on Win32, see https://blog.rudylee.com/2014/10/27/symbolic-links-with-vagrant-windows/
     # NOTE: apart from this, you'll need to run `vagrant up` as admin on Win32
     # for symlinks (webpack) to work
