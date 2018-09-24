@@ -13,13 +13,16 @@ import { saveModifiedThesis } from "../../backend_callers";
 import { SavingIndicator } from "./SavingIndicator";
 
 const SaveButton = Button.extend`
-&:disabled:hover {
-	background: white;
-}
-&:disabled {
-	color: grey;
-	cursor: default;
-}
+	&:disabled:hover {
+		background: white;
+	}
+	&:disabled {
+		color: grey;
+		cursor: default;
+	}
+	height: 25px;
+	min-height: 25px;
+	max-height: 25px;
 `;
 
 const DetailsSectionWrapper = styled.div`
