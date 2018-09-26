@@ -4,7 +4,7 @@ import "react-table/react-table.css";
 
 import { Thesis, ThesisKind, thesisKindToString } from "../../types";
 import { ReservationIndicator } from "./ReservationIndicator";
-import { ThesesFilter } from "./ThesesFilter";
+import { TopFilters } from "./TopFilters";
 import { ThesisTypeFilter } from "../../backend_callers";
 import { isThesisAvailable } from "../../utils";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
@@ -60,30 +60,37 @@ type Props = {
 	thesisClickCallback: (thesis: Thesis) => void,
 };
 
-type State = {
-	currentListFilter: ThesisTypeFilter,
+const initialState = {
+	currentListFilter: ThesisTypeFilter.Default,
+	currentTitleFilter: "",
+	currentAdvisorFilter: "",
 };
 
+type State = typeof initialState;
+
 export class ThesesList extends React.Component<Props, State> {
-	public constructor(props: Props) {
-		super(props);
-		this.state = {
-			currentListFilter: ThesisTypeFilter.Default,
-		};
+	private reactTable: ReactTable | null = null;
+	state = initialState;
+
+	private assignReactTable = (table: ReactTable): void => {
+		this.reactTable = table;
 	}
 
 	public render() {
 		return this.props.thesesList.length ?
-			<div>
-				<div style={{ width: "100%", textAlign: "right" }}>
-					<ThesesFilter
-						onChange={this.onTypeFilterChanged}
-						value={this.state.currentListFilter}
-					/>
-				</div>
+			<>
+				<TopFilters
+					onTypeChange={this.onTypeFilterChanged}
+					typeValue={this.state.currentListFilter}
+					onAdvisorChange={this.onAdvisorFilterChanged}
+					advisorValue={this.state.currentAdvisorFilter}
+					onTitleChange={this.onTitleFilterChanged}
+					titleValue={this.state.currentTitleFilter}
+				/>
 				<br />
 				<ReactTable
 					key="table"
+					ref={this.assignReactTable}
 					className={"-striped -highlight"}
 					data={this.computeFilteredThesesList()}
 					columns={TABLE_COL_DECLS}
@@ -96,7 +103,7 @@ export class ThesesList extends React.Component<Props, State> {
 					}}
 					{...reactTableLocalization}
 				/>
-			</div>
+			</>
 			:
 			<ListLoadingIndicator />;
 	}
@@ -153,6 +160,18 @@ export class ThesesList extends React.Component<Props, State> {
 	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
 		this.setState({
 			currentListFilter: newFilter,
+		});
+	}
+
+	private onAdvisorFilterChanged = (newAdvisorFilter: string): void => {
+		this.setState({
+			currentAdvisorFilter: newAdvisorFilter,
+		});
+	}
+
+	private onTitleFilterChanged = (newTitleFilter: string): void => {
+		this.setState({
+			currentTitleFilter: newTitleFilter,
 		});
 	}
 }

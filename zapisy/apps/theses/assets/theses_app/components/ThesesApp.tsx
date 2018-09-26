@@ -30,8 +30,6 @@ export class ThesesApp extends React.Component<{}, State> {
 	public render() {
 		console.error("Main rerender");
 		const result = [
-			<h2 key="title">Prace dyplomowe</h2>,
-			<hr key="divider"/>,
 			<div key="container" style={{ margin: "0 auto" }}>
 				<ThesesList
 					thesesList={this.state.thesesList}
