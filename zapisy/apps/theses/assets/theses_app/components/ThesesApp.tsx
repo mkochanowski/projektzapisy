@@ -1,73 +1,184 @@
 import * as React from "react";
-import update from "immutability-helper";
+import Griddle from "griddle-react";
 
-import { ThesesList } from "./ThesesList";
-import { Thesis } from "../types";
-import { getThesesList, ThesisTypeFilter, getThesisById } from "../backend_callers";
+import { Thesis/*, ThesisKind, thesisKindToString*/ } from "../types";
+// import { ReservationIndicator } from "./ReservationIndicator";
+import { TopFilters } from "./TopFilters";
+import { ThesisTypeFilter } from "../backend_callers";
+// import { isThesisAvailable } from "../utils";
+// import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ThesisDetails } from "./ThesisDetails";
-import { ErrorBoundary } from "./ErrorBoundary";
 
-type State = {
-	thesesList: Thesis[];
-	curThesisIdx: number | null;
+// const reactTableLocalization = {
+// 	previousText: "Poprzednia",
+// 	nextText: "Następna",
+// 	loadingText: "Ładowanie...",
+// 	noDataText: "Brak wierszy",
+// 	pageText: "Strona",
+// 	ofText: "z",
+// 	rowsText: "wierszy",
+// };
+
+// const TABLE_COL_DECLS: Column[] = [{
+// 	id: "isThesisReserved",
+// 	Header: "Rezerwacja",
+// 	accessor: (props: Thesis) => props.reserved,
+// 	Cell: props => <ReservationIndicator reserved={props.value} />,
+// 	width: 100,
+// 	filterable: false,
+// }, {
+// 	id: "thesisKind",
+// 	Header: "Typ",
+// 	accessor: (props: Thesis) => thesisKindToString(props.kind),
+// 	filterable: false,
+// 	width: 80,
+// }, {
+// 	id: "thesisAdvisor",
+// 	Header: "Promotor",
+// 	accessor: (props: Thesis) => props.advisor ? props.advisor.displayName : "<brak>",
+// 	filterable: true,
+// }, {
+// 	id: "thesisName",
+// 	Header: "Tytuł",
+// 	accessor: (props: Thesis) => props.title,
+// 	filterable: true,
+// }];
+
+// function getTableProps() {
+// 	return { style: { textAlign: "center" } };
+// }
+
+// function getTheadProps() {
+// 	return { style: {
+// 		fontWeight: "bold",
+// 		fontSize: "120%",
+// 	}};
+// }
+
+type Props = {};
+
+const initialState = {
+	selectedThesis: null as (Thesis | null),
+
+	currentTypeFilter: ThesisTypeFilter.Default,
+	currentTitleFilter: "",
+	currentAdvisorFilter: "",
 };
 
-export class ThesesApp extends React.Component<{}, State> {
-	public constructor(props: {}) {
+type State = typeof initialState;
+
+export class ThesesApp extends React.Component<Props, State> {
+	state = initialState;
+
+	public constructor(props: Props) {
 		super(props);
-		this.state = {
-			thesesList: [],
-			curThesisIdx: null,
-		};
-		this.initList();
 	}
 
-	private async initList(): Promise<void> {
-		const theses = await getThesesList(ThesisTypeFilter.Default);
-		this.setState({ thesesList: theses, curThesisIdx: 0 });
+	private renderTopFilters() {
+		return <TopFilters
+			onTypeChange={this.onTypeFilterChanged}
+			typeValue={this.state.currentTypeFilter}
+			onAdvisorChange={this.onAdvisorFilterChanged}
+			advisorValue={this.state.currentAdvisorFilter}
+			onTitleChange={this.onTitleFilterChanged}
+			titleValue={this.state.currentTitleFilter}
+		/>;
+	}
+
+	private renderThesesList() {
+		// return <ReactTable
+		// 	key="table"
+		// 	ref={this.assignReactTable}
+		// 	className={"-striped -highlight"}
+		// 	defaultPageSize={10}
+		// 	getTableProps={getTableProps}
+		// 	getTheadProps={getTheadProps}
+		// 	getTdProps={this.getTdProps}
+		// 	style={{
+		// 		height: "400px"
+		// 	}}
+		// 	{...reactTableLocalization}
+		// 	columns={TABLE_COL_DECLS}
+		// 	data={this.props.thesesList}
+		// 	pages={-1}
+		// 	loading={this.props.isLoadingList}
+		// 	manual
+		// />;
+		return <Griddle
+			results={
+				[
+					{ one: "one", two: "two", three: "three" },
+					{ one: "uno", two: "dos", three: "tres" },
+					{ one: "ichi", two: "ni", three: "san" },
+				]
+			}
+		/>;
 	}
 
 	public render() {
-		console.error("Main rerender");
-		const result = [
-			<div key="container" style={{ margin: "0 auto" }}>
-				<ThesesList
-					thesesList={this.state.thesesList}
-					thesisClickCallback={this.onThesisSelected}
-				/>
-			</div>
-		];
-		if (this.state.curThesisIdx !== null) {
-			result.push(
-				<br key="spacer" />,
-				<hr key="divider2" />,
+		const mainComponent = (
+			<>
+				{this.renderTopFilters()}
+				<br />
+				{this.renderThesesList()}
+			</>
+		);
+		return this.state.selectedThesis
+			? <>
+				{mainComponent}
+				<br />,
+				<hr />,
 				<ThesisDetails
 					key="thesis_details"
-					selectedThesis={this.state.thesesList[this.state.curThesisIdx]}
-					onModifiedThesisSaved={this.onModifiedThesisSaved}
+					selectedThesis={this.state.selectedThesis}
+					onModifiedThesisSaved={this.handleThesisSaved}
 				/>
-			);
-		}
-
-		return <ErrorBoundary>{result}</ErrorBoundary>;
+			</>
+			: mainComponent;
 	}
 
-	private onThesisSelected = (thesis: Thesis): void => {
-		const idx = this.state.thesesList.findIndex(thesis.isEqual);
-		if (idx === -1) {
-			throw new Error("Selected thesis not found");
+	// Must be on the instance, we need a closure for `this`
+	/*private getTdProps = (_state: any, rowInfo: RowInfo | undefined, _column: any) => {
+		if (!rowInfo) {
+			return {};
 		}
-		this.setState({ curThesisIdx: idx });
+		return {
+			style: {
+				cursor: "pointer",
+			},
+			onClick: (_event: any, handleOriginal: () => void) => {
+				console.warn("Click in row", rowInfo);
+				this.props.thesisClickCallback(rowInfo.original);
+				// React-Table uses onClick internally to trigger
+				// events like expanding SubComponents and; pivots.
+				// By default a custom "onClick" handler; will; override; this; functionality.;
+				if (handleOriginal) {
+					handleOriginal();
+				}
+			}
+		};
+	}*/
+
+	private handleThesisSaved = () => {
+		console.warn("SAVED");
+		return Promise.resolve();
 	}
 
-	private onModifiedThesisSaved = async (): Promise<void> => {
-		const curIdx = this.state.curThesisIdx;
-		if (curIdx === null) {
-			throw new Error("Modified thesis was saved but no thesis selected");
-		}
-		const currentThesis = this.state.thesesList[curIdx];
-		const updatedInstance = await getThesisById(currentThesis.id);
-		console.warn("New thesis to insert at index:", curIdx, updatedInstance);
-		this.setState(update(this.state, { thesesList: { $splice: [[curIdx, 1, updatedInstance]] } }));
+	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
+		this.setState({
+			currentTypeFilter: newFilter,
+		});
+	}
+
+	private onAdvisorFilterChanged = (newAdvisorFilter: string): void => {
+		this.setState({
+			currentAdvisorFilter: newAdvisorFilter,
+		});
+	}
+
+	private onTitleFilterChanged = (newTitleFilter: string): void => {
+		this.setState({
+			currentTitleFilter: newTitleFilter,
+		});
 	}
 }

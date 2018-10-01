@@ -1,6 +1,6 @@
-import { stringify } from "query-string";
 import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
+import axios, { AxiosRequestConfig } from "axios";
 
 import { Thesis, ThesisJson, Student, Employee, BasePerson } from "./types";
 import { getOutThesisJson } from "./types/out";
@@ -22,41 +22,40 @@ export const enum ThesisTypeFilter {
 	Default = AllCurrent,
 }
 
-async function sendFetchRequest(url: string, options?: RequestInit): Promise<Response> {
-	console.warn(objectAssignDeep);
-	const finalOptions = objectAssignDeep({ credentials: "include" }, options);
-	console.warn("Dispatching a request to", url, "with options", finalOptions);
-	const resp = await fetch(url, finalOptions);
-	if (!resp.ok) {
-		throw new Error(`Did not get a successful fetch response: ${resp.status} ${resp.statusText}`);
-	}
-	return resp;
-}
-
-async function sendFetchRequestWithCsrf(url: string, options?: RequestInit): Promise<Response> {
+async function sendRequestWithCsrf(url: string, config?: AxiosRequestConfig) {
 	const tokenValue = getCookie("csrftoken");
 	if (!tokenValue) {
 		throw new Error("CSRF token not found in cookies");
 	}
-	return sendFetchRequest(
-		url,
-		objectAssignDeep({}, options, {
+
+	return axios.request(
+		objectAssignDeep({}, config, {
+			url,
 			headers: { "X-CSRFToken": tokenValue }
 		})
 	);
 }
 
-async function fetchJson(url: string): Promise<any> {
-	return (await sendFetchRequest(url)).json();
+async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
+	return (await axios.get(url, config)).data;
 }
 
-export async function getThesesList(filterType: ThesisTypeFilter): Promise<Thesis[]> {
-	const results: ThesisJson[] = await fetchJson(`${BASE_API_URL}/theses?thesis_type=${filterType}`);
+export async function getThesesList(
+	filterType: ThesisTypeFilter, title: string, advisorName: string,
+): Promise<Thesis[]> {
+	const results: ThesisJson[] = await getData(
+		`${BASE_API_URL}/theses`,
+		{ params: {
+			type: filterType,
+			title,
+			advisor: advisorName,
+		}},
+	);
 	return results.map(json => new Thesis(json));
 }
 
 export async function getThesisById(id: number): Promise<Thesis> {
-	const json: ThesisJson = await fetchJson(`${BASE_API_URL}/theses/${id}`);
+	const json: ThesisJson = await getData(`${BASE_API_URL}/theses/${id}`);
 	return new Thesis(json);
 }
 
@@ -82,12 +81,11 @@ export async function getPersonAutocomplete(
 	person: PersonType, substr: string, pageNum: number,
 ): Promise<PersonAutcompleteResults> {
 	const personUrlPart = person === PersonType.Employee ? "employee" : "student";
-	const queryString = stringify({
+	const url = `/theses/${personUrlPart}-autocomplete`;
+	const acResults = await getData(url, { params: {
 		page: pageNum,
 		q: substr,
-	});
-	const url = `/theses/${personUrlPart}-autocomplete?${queryString}`;
-	const acResults = await fetchJson(url) as PersonAutocompleteJson;
+	}}) as PersonAutocompleteJson;
 	const constr = person === PersonType.Employee ? Employee : Student;
 	return {
 		results: acResults.results.map(
@@ -101,11 +99,11 @@ export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis:
 	const diffObj = getOutThesisJson(originalThesis, modifiedThesis);
 	const jsonData = JSON.stringify(diffObj);
 	console.warn("Sending", jsonData);
-	await sendFetchRequestWithCsrf(
+	await sendRequestWithCsrf(
 		`${BASE_API_URL}/theses/${diffObj.id}/`,
 		{
 			method: "PATCH",
-			body: jsonData,
+			data: jsonData,
 			headers: {
 				"Content-Type": "application/json"
 			},

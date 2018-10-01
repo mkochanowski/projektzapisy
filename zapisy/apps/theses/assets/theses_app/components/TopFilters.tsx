@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { ThesisTypeFilter } from "../../backend_callers";
-import { GenericSelect } from "../GenericSelect";
+import { ThesisTypeFilter } from "../backend_callers";
+import { GenericSelect } from "./GenericSelect";
 
 const typefilterInfos = [
 	{ val: ThesisTypeFilter.AllCurrent, displayName: "Wszystkie aktualne" },
@@ -31,6 +31,11 @@ const textFieldStyle = {
 	marginLeft: "5px",
 };
 
+const labelStyle: React.CSSProperties = {
+	fontWeight: "bold",
+	fontSize: "110%",
+};
+
 export class TopFilters extends React.Component<Props> {
 	private handleTitleChanged = (e: React.ChangeEvent<HTMLInputElement>): void => {
 		this.props.onTitleChange(e.target.value);
@@ -52,28 +57,28 @@ export class TopFilters extends React.Component<Props> {
 				onChange={this.props.onTypeChange}
 				optionInfo={typefilterInfos}
 				label={"Rodzaj"}
-				labelCss={{ fontWeight: "bold", fontSize: "110%" }}
+				labelCss={labelStyle}
 			/>
 
-			<label>
-				<strong>Tytuł</strong>
+			<div>
+				<span style={labelStyle}>Tytuł</span>
 				<input
 					type="text"
 					value={this.props.titleValue}
 					onChange={this.handleTitleChanged}
 					style={textFieldStyle}
 				/>
-			</label>
+			</div>
 
-			<label>
-				<strong>Promotor</strong>
+			<div>
+				<span style={labelStyle}>Promotor</span>
 				<input
 					type="text"
 					value={this.props.advisorValue}
 					onChange={this.handleAdvisorChanged}
 					style={textFieldStyle}
 				/>
-			</label>
+			</div>
 		</div>;
 	}
 }

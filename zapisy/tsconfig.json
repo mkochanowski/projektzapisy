@@ -17,7 +17,8 @@
       "react",
       "react-dom",
       "react-table",
-      "js-cookie"
+      "js-cookie",
+      "griddle-react",
     ]
   },
   "exclude": [
