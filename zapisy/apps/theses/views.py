@@ -4,17 +4,19 @@ import sys
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
 from rest_framework.decorators import api_view, permission_classes
 from dal import autocomplete
 
 from apps.users.models import Student, Employee
-from . import models
+from .models import Thesis, ThesisStatus, ThesisKind
 from . import serializers
 
-THESIS_TYPE_FILTER_NAME = "thesis_type"
+THESIS_TYPE_FILTER_NAME = "type"
+THESIS_TITLE_FILTER_NAME = "title"
+THESIS_ADVISOR_FILTER_NAME = "advisor"
 
 
 class ThesisTypeFilter(Enum):
@@ -34,6 +36,8 @@ class ThesisTypeFilter(Enum):
     available_bachelors = 8
     available_bachelors_isim = 9
 
+    default = all_current
+
 
 class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get"]
@@ -41,46 +45,74 @@ class ThesesViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):
-        result = models.Thesis.objects.all()
         requested_thesis_type_str = self.request.query_params.get(THESIS_TYPE_FILTER_NAME, None)
-        if requested_thesis_type_str is None:
-            return result
 
         try:
-            requested_thesis_type = int(requested_thesis_type_str)
-            return filter_theses_queryset_for_type(result, requested_thesis_type)
+            requested_thesis_type = int(requested_thesis_type_str)\
+                if requested_thesis_type_str\
+                else ThesisTypeFilter.default.value
         except ValueError:
             raise ParseError()
+
+        requested_thesis_title = self.request.query_params.get(
+            THESIS_TITLE_FILTER_NAME, ""
+        ).strip()
+        requested_advisor_name = self.request.query_params.get(
+            THESIS_ADVISOR_FILTER_NAME, ""
+        ).strip()
+
+        result = filter_theses_queryset(
+            requested_thesis_type, requested_thesis_title, requested_advisor_name
+        )
+        print(result)
+        return result
+
+
+def filter_theses_queryset(thesis_type: ThesisTypeFilter, title: str, advisor_name: str):
+    print("FILTER", thesis_type, title, advisor_name)
+    result = Thesis.objects.all()
+    result = filter_theses_queryset_for_type(result, thesis_type)
+    if title:
+        result = result.filter(title__contains=title)
+
+    if advisor_name:
+        emp_filtered_theses_ids = [
+            t.id for t in result
+            if "advisor_name" in t.advisor.get_full_name().lower()
+        ]
+        result.filter(advisor__id__in=emp_filtered_theses_ids)
+
+    return result
 
 
 def available_thesis_filter(queryset):
     return queryset\
-        .exclude(status=models.ThesisStatus.in_progress.value)\
-        .exclude(status=models.ThesisStatus.defended.value)\
+        .exclude(status=ThesisStatus.in_progress.value)\
+        .exclude(status=ThesisStatus.defended.value)\
         .exclude(reserved=True)
 
 
 def filter_theses_queryset_for_type(queryset, thesis_type):
     if thesis_type == ThesisTypeFilter.all_current.value:
-        return queryset.exclude(status=models.ThesisStatus.defended.value)
+        return queryset.exclude(status=ThesisStatus.defended.value)
     elif thesis_type == ThesisTypeFilter.all.value:
         return queryset
     elif thesis_type == ThesisTypeFilter.masters.value:
-        return queryset.filter(kind=models.ThesisKind.masters.value)
+        return queryset.filter(kind=ThesisKind.masters.value)
     elif thesis_type == ThesisTypeFilter.engineers.value:
-        return queryset.filter(kind=models.ThesisKind.engineers.value)
+        return queryset.filter(kind=ThesisKind.engineers.value)
     elif thesis_type == ThesisTypeFilter.bachelors.value:
-        return queryset.filter(kind=models.ThesisKind.bachelors.value)
+        return queryset.filter(kind=ThesisKind.bachelors.value)
     elif thesis_type == ThesisTypeFilter.bachelors_isim.value:
-        return queryset.filter(kind=models.ThesisKind.isim.value)
+        return queryset.filter(kind=ThesisKind.isim.value)
     elif thesis_type == ThesisTypeFilter.available_masters.value:
-        return available_thesis_filter(queryset.filter(kind=models.ThesisKind.masters.value))
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.masters.value))
     elif thesis_type == ThesisTypeFilter.available_engineers.value:
-        return available_thesis_filter(queryset.filter(kind=models.ThesisKind.engineers.value))
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.engineers.value))
     elif thesis_type == ThesisTypeFilter.available_bachelors.value:
-        return available_thesis_filter(queryset.filter(kind=models.ThesisKind.bachelors.value))
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.bachelors.value))
     elif thesis_type == ThesisTypeFilter.available_bachelors_isim.value:
-        return available_thesis_filter(queryset.filter(kind=models.ThesisKind.isim.value))
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.isim.value))
     else:
         raise ParseError()
 

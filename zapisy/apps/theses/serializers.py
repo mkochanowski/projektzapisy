@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from . import models
 from apps.users.models import Employee, Student
-from apps.api.rest.v1.serializers import UserSerializer
 from .errors import InvalidQueryError
 from apps.users.models import BaseUser
 
@@ -49,7 +48,9 @@ class ThesisSerializer(serializers.ModelSerializer):
         if "auxiliary_advisor" in validated_data:
             if not instance.advisor:
                 raise InvalidQueryError("Cannot set auxiliary advisor without an advisor present")
-            instance.auxiliary_advisor = _get_person_from_queryset(Employee, validated_data.get("auxiliary_advisor"))
+            instance.auxiliary_advisor = _get_person_from_queryset(
+                Employee, validated_data.get("auxiliary_advisor")
+            )
 
     def _update_students(self, instance, validated_data):
         if "student" in validated_data:

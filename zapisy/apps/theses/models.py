@@ -48,7 +48,8 @@ class Thesis(models.Model):
         Employee, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_advisor",
     )
     auxiliary_advisor = models.ForeignKey(
-        Employee, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_auxiliary_advisor",
+        Employee, on_delete=models.PROTECT, blank=True,
+        null=True, related_name="thesis_auxiliary_advisor",
     )
     kind = models.SmallIntegerField(choices=THESIS_KIND_CHOICES)
     status = models.SmallIntegerField(choices=THESIS_STATUS_CHOICES)
