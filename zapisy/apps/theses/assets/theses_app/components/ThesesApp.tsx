@@ -1,13 +1,14 @@
 import * as React from "react";
-import Griddle from "griddle-react";
+import Griddle, { ColumnMetaData } from "griddle-react";
 
 import { Thesis/*, ThesisKind, thesisKindToString*/ } from "../types";
 // import { ReservationIndicator } from "./ReservationIndicator";
 import { TopFilters } from "./TopFilters";
-import { ThesisTypeFilter } from "../backend_callers";
+import { ThesisTypeFilter, getThesesList } from "../backend_callers";
 // import { isThesisAvailable } from "../utils";
 // import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ThesisDetails } from "./ThesisDetails";
+import { ListLoadingIndicator } from "./ListLoadingIndicator";
 
 // const reactTableLocalization = {
 // 	previousText: "Poprzednia",
@@ -55,17 +56,43 @@ import { ThesisDetails } from "./ThesisDetails";
 // 	}};
 // }
 
+const griddleColumnMeta: Array<ColumnMetaData<any>> = [
+	{
+		columnName: "reserved",
+		displayName: "Rezerwacja",
+	},
+];
+
+const THESES_PER_PAGE = 10;
+
 type Props = {};
 
-const initialState = {
-	selectedThesis: null as (Thesis | null),
+type State = {
+	selectedThesis: Thesis | null;
+	currentTypeFilter: ThesisTypeFilter;
+	currentTitleFilter: string;
+	currentAdvisorFilter: string;
+
+	maxTablePage: number;
+	currentTablePage: number;
+	tableResults: Thesis[];
+	isLoadingTable: boolean;
+	isTableAscendingSort: boolean;
+};
+
+const initialState: State = {
+	selectedThesis: null,
 
 	currentTypeFilter: ThesisTypeFilter.Default,
 	currentTitleFilter: "",
 	currentAdvisorFilter: "",
-};
 
-type State = typeof initialState;
+	maxTablePage: 0,
+	currentTablePage: 0,
+	tableResults: [],
+	isLoadingTable: false,
+	isTableAscendingSort: false,
+};
 
 export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
@@ -105,14 +132,48 @@ export class ThesesApp extends React.Component<Props, State> {
 		// 	manual
 		// />;
 		return <Griddle
-			results={
-				[
-					{ one: "one", two: "two", three: "three" },
-					{ one: "uno", two: "dos", three: "tres" },
-					{ one: "ichi", two: "ni", three: "san" },
-				]
-			}
+			useGriddleStyles={false}
+			showFilter={false}
+			enableInfiniteScroll
+			useFixedHeader
+			bodyHeight={100}
+			resultsPerPage={THESES_PER_PAGE}
+			onRowClick={(this.onRowClick as any)}
+			columnMetadata={griddleColumnMeta}
+			externalLoadingComponent={ListLoadingIndicator}
+
+			useExternal
+			externalSetPage={this.setTablePage}
+			externalChangeSort={this.setTableSort}
+			// tslint:disable:no-empty
+			// This is stupid as in external mode it can only ever
+			// "set" the page size to the prop we specify ourselves
+			externalSetPageSize={function() {}}
+			// ...and this is hopelessly broken in 0.8.2, courtesy
+			// mr Dan Krieger commit 60338690404adddecf41427a32cd210b7273403d
+			// in componentWillReceiveProps, if the results prop changed
+			// he fires setFilter - which will obviously fetch new results
+			// and change the prop, and so you get an infinite render loop
+			externalSetFilter={function() {}}
+			// tslint:enable:no-empty
+			externalMaxPage={this.state.maxTablePage}
+			externalCurrentPage={this.state.currentTablePage}
+			results={this.state.tableResults}
+			externalIsLoading={this.state.isLoadingTable}
+			externalSortAscending={this.state.isTableAscendingSort}
 		/>;
+	}
+
+	private setTablePage = (index: number) => {
+
+	}
+
+	private setTableSort = (sortColumn: string, isAscending: boolean) => {
+
+	}
+
+	private onRowClick = (row: any, e: MouseEvent) => {
+		console.warn(row, e);
 	}
 
 	public render() {

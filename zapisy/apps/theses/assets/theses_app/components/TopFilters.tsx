@@ -36,13 +36,30 @@ const labelStyle: React.CSSProperties = {
 	fontSize: "110%",
 };
 
+const VALUE_CHANGE_TIMEOUT = 500;
+
 export class TopFilters extends React.Component<Props> {
+	private titleChangeTimeout: number | null = null;
+	private advisorChangeTimeout: number | null = null;
+
 	private handleTitleChanged = (e: React.ChangeEvent<HTMLInputElement>): void => {
-		this.props.onTitleChange(e.target.value);
+		if (this.titleChangeTimeout !== null) {
+			window.clearTimeout(this.titleChangeTimeout);
+		}
+		this.titleChangeTimeout = window.setTimeout(() => {
+			this.titleChangeTimeout = null;
+			this.props.onTitleChange(e.target.value);
+		}, VALUE_CHANGE_TIMEOUT);
 	}
 
 	private handleAdvisorChanged = (e: React.ChangeEvent<HTMLInputElement>): void => {
-		this.props.onAdvisorChange(e.target.value);
+		if (this.advisorChangeTimeout !== null) {
+			window.clearTimeout(this.advisorChangeTimeout);
+		}
+		this.advisorChangeTimeout = window.setTimeout(() => {
+			this.advisorChangeTimeout = null;
+			this.props.onAdvisorChange(e.target.value);
+		}, VALUE_CHANGE_TIMEOUT);
 	}
 
 	public render() {
