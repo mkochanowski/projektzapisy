@@ -63,6 +63,7 @@ const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 		displayName: "Rezerwacja",
 		customComponent: ReservationIndicator,
 		cssClassName: "reservedColumn",
+		sortable: false,
 	},
 	{
 		columnName: "title",
@@ -89,7 +90,7 @@ type State = {
 	maxTablePage: number;
 	currentTablePage: number;
 	thesesList: Thesis[];
-	tableSortColumn: SortColumn;
+	tableSortColumn: string;
 	isLoadingTable: boolean;
 	isTableAscendingSort: boolean;
 };
@@ -104,7 +105,7 @@ const initialState: State = {
 	maxTablePage: 0,
 	currentTablePage: 0,
 	thesesList: [],
-	tableSortColumn: SortColumn.None,
+	tableSortColumn: "",
 	isLoadingTable: false,
 	isTableAscendingSort: false,
 };
@@ -159,7 +160,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			onRowClick={(this.onRowClick as any)}
 			columnMetadata={griddleColumnMeta}
 			metadataColumns={["id"]}
-			externalLoadingComponent={ListLoadingIndicator}
+			results={this.getTableResults()}
 
 			useExternal
 			externalSetPage={this.setTablePage}
@@ -177,9 +178,10 @@ export class ThesesApp extends React.Component<Props, State> {
 			// tslint:enable:no-empty
 			externalMaxPage={this.state.maxTablePage}
 			externalCurrentPage={this.state.currentTablePage}
-			results={this.getTableResults()}
 			externalIsLoading={this.state.isLoadingTable}
+			externalSortColumn={this.state.tableSortColumn}
 			externalSortAscending={this.state.isTableAscendingSort}
+			externalLoadingComponent={ListLoadingIndicator}
 		/>;
 	}
 
@@ -198,20 +200,8 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private setTableSort = (sortColumnStr: string | undefined, isAscending: boolean) => {
-		let sortColumn: SortColumn;
-		switch (sortColumnStr) {
-			case "title":
-				sortColumn = SortColumn.ThesisTitle;
-				break;
-			case "advisor":
-				sortColumn = SortColumn.ThesisAdvisor;
-				break;
-			default:
-				sortColumn = SortColumn.None;
-				break;
-		}
 		this.updateWithNewState({
-			tableSortColumn: sortColumn, isTableAscendingSort: isAscending,
+			tableSortColumn: sortColumnStr || "", isTableAscendingSort: isAscending,
 		});
 	}
 
@@ -293,9 +283,20 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 }
 
+function sortColumnFromString(sortColumnStr: string): SortColumn {
+	switch (sortColumnStr) {
+		case "title":
+			return SortColumn.ThesisTitle;
+		case "advisor":
+			return SortColumn.ThesisAdvisor;
+		default:
+			return SortColumn.None;
+	}
+}
+
 async function getThesesListForState(state: State) {
 	return getThesesList(
 		state.currentTypeFilter, state.currentTitleFilter, state.currentAdvisorFilter,
-		state.tableSortColumn, state.isTableAscendingSort
+		sortColumnFromString(state.tableSortColumn), state.isTableAscendingSort
 	);
 }
