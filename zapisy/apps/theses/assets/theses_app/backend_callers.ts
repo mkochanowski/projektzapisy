@@ -22,6 +22,12 @@ export const enum ThesisTypeFilter {
 	Default = AllCurrent,
 }
 
+export const enum SortColumn {
+	None,
+	ThesisTitle,
+	ThesisAdvisor,
+}
+
 async function sendRequestWithCsrf(url: string, config?: AxiosRequestConfig) {
 	const tokenValue = getCookie("csrftoken");
 	if (!tokenValue) {
@@ -42,6 +48,7 @@ async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
 
 export async function getThesesList(
 	filterType: ThesisTypeFilter, title: string, advisorName: string,
+	sortColumn: SortColumn, isAscendingSort: boolean,
 ): Promise<Thesis[]> {
 	const results: ThesisJson[] = await getData(
 		`${BASE_API_URL}/theses`,
@@ -49,6 +56,8 @@ export async function getThesesList(
 			type: filterType,
 			title,
 			advisor: advisorName,
+			sort: sortColumn,
+			asc: isAscendingSort,
 		}},
 	);
 	return results.map(json => new Thesis(json));

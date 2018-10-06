@@ -4,7 +4,7 @@ import Griddle, { ColumnMetaData } from "griddle-react";
 import { Thesis/*, ThesisKind, thesisKindToString*/ } from "../types";
 // import { ReservationIndicator } from "./ReservationIndicator";
 import { TopFilters } from "./TopFilters";
-import { ThesisTypeFilter, getThesesList } from "../backend_callers";
+import { ThesisTypeFilter, getThesesList, SortColumn } from "../backend_callers";
 // import { isThesisAvailable } from "../utils";
 // import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ThesisDetails } from "./ThesisDetails";
@@ -61,6 +61,14 @@ const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 		columnName: "reserved",
 		displayName: "Rezerwacja",
 	},
+	{
+		columnName: "title",
+		displayName: "Tytuł",
+	},
+	{
+		columnName: "advisorName",
+		displayName: "Promotor",
+	},
 ];
 
 const THESES_PER_PAGE = 10;
@@ -75,7 +83,8 @@ type State = {
 
 	maxTablePage: number;
 	currentTablePage: number;
-	tableResults: Thesis[];
+	thesesList: Thesis[];
+	tableSortColumn: SortColumn;
 	isLoadingTable: boolean;
 	isTableAscendingSort: boolean;
 };
@@ -89,7 +98,8 @@ const initialState: State = {
 
 	maxTablePage: 0,
 	currentTablePage: 0,
-	tableResults: [],
+	thesesList: [],
+	tableSortColumn: SortColumn.None,
 	isLoadingTable: false,
 	isTableAscendingSort: false,
 };
@@ -97,8 +107,10 @@ const initialState: State = {
 export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
 
-	public constructor(props: Props) {
-		super(props);
+	async componentDidMount() {
+		this.setState({
+			thesesList: await getThesesListForState(this.state),
+		});
 	}
 
 	private renderTopFilters() {
@@ -158,18 +170,65 @@ export class ThesesApp extends React.Component<Props, State> {
 			// tslint:enable:no-empty
 			externalMaxPage={this.state.maxTablePage}
 			externalCurrentPage={this.state.currentTablePage}
-			results={this.state.tableResults}
+			results={this.getTableResults()}
 			externalIsLoading={this.state.isLoadingTable}
 			externalSortAscending={this.state.isTableAscendingSort}
 		/>;
 	}
 
-	private setTablePage = (index: number) => {
-
+	private getTableResults() {
+		console.error("GET RESULTS");
+		return this.state.thesesList.map(thesis => ({
+			reserved: thesis.reserved,
+			title: thesis.title,
+			advisorName: thesis.advisor ? thesis.advisor.displayName : "<brak>",
+		}));
 	}
 
-	private setTableSort = (sortColumn: string, isAscending: boolean) => {
+	private setTablePage = (index: number) => {
+		this.updateWithNewState({ currentTablePage: index });
+	}
 
+	private setTableSort = (sortColumnStr: string | undefined, isAscending: boolean) => {
+		let sortColumn: SortColumn;
+		switch (sortColumnStr) {
+			case "title":
+				sortColumn = SortColumn.ThesisTitle;
+				break;
+			case "advisor":
+				sortColumn = SortColumn.ThesisAdvisor;
+				break;
+			default:
+				sortColumn = SortColumn.None;
+				break;
+		}
+		this.updateWithNewState({
+			tableSortColumn: sortColumn, isTableAscendingSort: isAscending,
+		});
+	}
+
+	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
+		this.updateWithNewState({
+			currentTypeFilter: newFilter,
+		});
+	}
+
+	private onAdvisorFilterChanged = (newAdvisorFilter: string): void => {
+		this.updateWithNewState({
+			currentAdvisorFilter: newAdvisorFilter,
+		});
+	}
+
+	private onTitleFilterChanged = (newTitleFilter: string): void => {
+		this.updateWithNewState({
+			currentTitleFilter: newTitleFilter,
+		});
+	}
+
+	private async updateWithNewState<T extends keyof State>(partialState: Pick<State, T>) {
+		const newState = Object.assign({}, this.state, partialState);
+		const newList = await getThesesListForState(newState);
+		this.setState(Object.assign({}, newState, { thesesList: newList }));
 	}
 
 	private onRowClick = (row: any, e: MouseEvent) => {
@@ -224,22 +283,11 @@ export class ThesesApp extends React.Component<Props, State> {
 		console.warn("SAVED");
 		return Promise.resolve();
 	}
+}
 
-	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
-		this.setState({
-			currentTypeFilter: newFilter,
-		});
-	}
-
-	private onAdvisorFilterChanged = (newAdvisorFilter: string): void => {
-		this.setState({
-			currentAdvisorFilter: newAdvisorFilter,
-		});
-	}
-
-	private onTitleFilterChanged = (newTitleFilter: string): void => {
-		this.setState({
-			currentTitleFilter: newTitleFilter,
-		});
-	}
+async function getThesesListForState(state: State) {
+	return getThesesList(
+		state.currentTypeFilter, state.currentTitleFilter, state.currentAdvisorFilter,
+		state.tableSortColumn, state.isTableAscendingSort
+	);
 }
