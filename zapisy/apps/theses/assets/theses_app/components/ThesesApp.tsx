@@ -9,6 +9,7 @@ import { ThesisTypeFilter, getThesesList, SortColumn } from "../backend_callers"
 // import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ThesisDetails } from "./ThesisDetails";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
+import { ReservationIndicator } from "./ReservationIndicator";
 
 // const reactTableLocalization = {
 // 	previousText: "Poprzednia",
@@ -60,14 +61,18 @@ const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	{
 		columnName: "reserved",
 		displayName: "Rezerwacja",
+		customComponent: ReservationIndicator,
+		cssClassName: "reservedColumn",
 	},
 	{
 		columnName: "title",
 		displayName: "Tytuł",
+		cssClassName: "titleColumn",
 	},
 	{
 		columnName: "advisorName",
 		displayName: "Promotor",
+		cssClassName: "advisorColumn",
 	},
 ];
 
@@ -145,6 +150,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		// />;
 		return <Griddle
 			useGriddleStyles={false}
+			tableClassName={"griddleTable"}
 			showFilter={false}
 			enableInfiniteScroll
 			useFixedHeader
@@ -152,6 +158,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			resultsPerPage={THESES_PER_PAGE}
 			onRowClick={(this.onRowClick as any)}
 			columnMetadata={griddleColumnMeta}
+			metadataColumns={["id"]}
 			externalLoadingComponent={ListLoadingIndicator}
 
 			useExternal
@@ -179,6 +186,7 @@ export class ThesesApp extends React.Component<Props, State> {
 	private getTableResults() {
 		console.error("GET RESULTS");
 		return this.state.thesesList.map(thesis => ({
+			id: thesis.id,
 			reserved: thesis.reserved,
 			title: thesis.title,
 			advisorName: thesis.advisor ? thesis.advisor.displayName : "<brak>",
