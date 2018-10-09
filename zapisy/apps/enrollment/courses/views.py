@@ -28,6 +28,38 @@ def main(request):
     return render(request, 'enrollment/main.html')
 
 
+def course_groups_of_students_willing_to_join(groups):
+    return get_exercise_group(groups), get_laboratory_group(groups), get_exercise_and_laboratory_group(groups)
+
+
+def get_exercise_group(groups):
+    return get_list_of_students_willing_to_join_a_course_group_type(groups, '2', "cwiczenia")
+
+
+def get_laboratory_group(groups):
+    return get_list_of_students_willing_to_join_a_course_group_type(groups, '3', "pracownie")
+
+
+def get_exercise_and_laboratory_group(groups):
+    return get_list_of_students_willing_to_join_a_course_group_type(groups, '5', "ćwiczenio-pracownie")
+
+
+def get_list_of_students_willing_to_join_a_course_group_type(groups, group_type, type_name):
+    students_in_queue = list()
+    students_already_in_groups = list()
+
+    for group in groups:
+        if group.type == group_type:
+            students_in_queue += (student.matricula for student in Queue.get_students_in_queue(group.id))
+            students_already_in_groups += (student.matricula for student in Record.get_students_in_group(group.id))
+
+    amount = len(list(set(students_in_queue) - set(students_already_in_groups)))
+
+    if amount > 0:
+        return type_name, amount
+    return 0
+
+
 def get_courses_list_in_semester_with_history_info(user, semester):
     """
         This ugly piece of SQL is generally the
@@ -338,7 +370,8 @@ def course_view_data(request, slug):
             'can_remove_record': default_semester.can_remove_record(),
             'ects_limit_would_be_exceeded': ectsLimitExceeded,
             'max_ects': maxEcts,
-            'current_ects': currentEcts
+            'current_ects': currentEcts,
+            'course_groups_of_students_willing_to_join': course_groups_of_students_willing_to_join(groups)
         })
 
         return data, course
