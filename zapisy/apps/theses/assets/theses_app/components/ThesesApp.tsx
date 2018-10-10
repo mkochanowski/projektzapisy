@@ -74,7 +74,6 @@ export class ThesesApp extends React.Component<Props, State> {
 			thesesList: await getThesesList(),
 			isLoadingThesesList: false,
 		});
-		this.setGriddleFilter();
 	}
 
 	private setStateAsync<K extends keyof State>(partialState: Pick<State, K>): Promise<void> {
@@ -99,10 +98,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.griddle = griddle;
 	}
 
-	private griddleFilterer = (results: GriddleThesisData[], filter: any) => {
-		if (filter !== GRIDDLE_FILTER_MAGIC) {
-			return results;
-		}
+	private filterGriddleResults(results: GriddleThesisData[]) {
 		const advisor = this.state.currentAdvisorFilter;
 		const title = this.state.currentTitleFilter;
 		const type = this.state.currentTypeFilter;
@@ -119,6 +115,13 @@ export class ThesesApp extends React.Component<Props, State> {
 				(!title || td.title.toLowerCase().includes(title.toLowerCase()))
 			);
 		});
+	}
+
+	private griddleFilterer = (results: GriddleThesisData[], filter: any) => {
+		if (filter !== GRIDDLE_FILTER_MAGIC) {
+			return results;
+		}
+		return this.filterGriddleResults(results);
 	}
 
 	private renderThesesList() {
@@ -149,12 +152,13 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	private getTableResults(): GriddleThesisData[] {
 		console.error("GET RESULTS", this.state.thesesList);
-		return this.state.thesesList.map(thesis => ({
+		const griddleResults = this.state.thesesList.map(thesis => ({
 			id: thesis.id,
 			reserved: thesis.reserved,
 			title: thesis.title,
 			advisorName: thesis.advisor ? thesis.advisor.displayName : "<brak>",
 		}));
+		return this.filterGriddleResults(griddleResults);
 	}
 
 	private setGriddleFilter() {
