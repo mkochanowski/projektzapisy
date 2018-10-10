@@ -28,6 +28,8 @@ const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	},
 ];
 
+const GRIDDLE_NO_DATA = "Brak danych";
+
 // ACHTUNG must match value in views.py
 const THESES_PER_PAGE = 10;
 
@@ -100,6 +102,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			columnMetadata={griddleColumnMeta}
 			metadataColumns={["id"]}
 			results={this.getTableResults()}
+			noDataMessage={GRIDDLE_NO_DATA}
 
 			useExternal
 			externalSetPage={this.setTablePage}
@@ -176,6 +179,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setState({
 			thesesList: [],
 			currentTablePage: 1,
+			maxTablePage: 1,
 		});
 		this.lastGriddleSetPage = 1;
 		await this.updateWithNewState(partialState);
@@ -191,6 +195,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		newState.thesesList.push(...newList.theses);
 		newState.maxTablePage = Math.ceil(newList.total / THESES_PER_PAGE);
 		newState.isLoadingTable = false;
+		console.error("update with new state: final state", newState);
 		this.setState(newState);
 	}
 
