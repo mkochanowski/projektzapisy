@@ -6,6 +6,7 @@ import { TopFilters } from "./TopFilters";
 import { ThesisTypeFilter, getThesesList } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ReservationIndicator } from "./ReservationIndicator";
+import { ListLoadingIndicator } from "./ListLoadingIndicator";
 
 const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	{
@@ -44,7 +45,7 @@ type State = {
 	currentTablePage: number;
 	thesesList: Thesis[];
 	tableSortColumn: string;
-	isLoadingTable: boolean;
+	isLoadingThesesList: boolean;
 	isTableAscendingSort: boolean;
 
 	enableGriddleComponent: boolean;
@@ -61,7 +62,7 @@ const initialState: State = {
 	currentTablePage: 1,
 	thesesList: [],
 	tableSortColumn: "",
-	isLoadingTable: false,
+	isLoadingThesesList: true,
 	isTableAscendingSort: false,
 
 	enableGriddleComponent: true,
@@ -102,7 +103,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			advisorValue={this.state.currentAdvisorFilter}
 			onTitleChange={this.onTitleFilterChanged}
 			titleValue={this.state.currentTitleFilter}
-			enabled={!this.state.isLoadingTable}
+			enabled={!this.state.isLoadingThesesList}
 		/>;
 	}
 
@@ -150,6 +151,9 @@ export class ThesesApp extends React.Component<Props, State> {
 			noDataMessage={GRIDDLE_NO_DATA}
 			useCustomFilterer={true}
 			customFilterer={this.griddleFilterer}
+			// Hacky: you don't have to set useExternalData for this stuff to work
+			externalIsLoading={this.state.isLoadingThesesList}
+			externalLoadingComponent={ListLoadingIndicator}
 		/>;
 	}
 

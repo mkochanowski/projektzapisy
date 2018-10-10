@@ -6,7 +6,6 @@ export function ListLoadingIndicator(): JSX.Element {
 		style={{
 			textAlign: "center",
 			width: "100%",
-			marginTop: "-40px",
 		}}
 	>
 		<img
