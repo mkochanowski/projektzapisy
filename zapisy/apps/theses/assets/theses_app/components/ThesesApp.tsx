@@ -77,6 +77,7 @@ const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	},
 ];
 
+// ACHTUNG must match value in views.py
 const THESES_PER_PAGE = 10;
 
 type Props = {};
@@ -103,7 +104,7 @@ const initialState: State = {
 	currentAdvisorFilter: "",
 
 	maxTablePage: 0,
-	currentTablePage: 0,
+	currentTablePage: 1,
 	thesesList: [],
 	tableSortColumn: "",
 	isLoadingTable: false,
@@ -112,11 +113,10 @@ const initialState: State = {
 
 export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
+	private lastGriddleSetPage: number = 0;
 
 	async componentDidMount() {
-		this.setState({
-			thesesList: await getThesesListForState(this.state),
-		});
+		this.updateWithNewState(this.state);
 	}
 
 	private renderTopFilters() {
@@ -154,11 +154,13 @@ export class ThesesApp extends React.Component<Props, State> {
 			tableClassName={"griddleTable"}
 			showFilter={false}
 			enableInfiniteScroll
+			infiniteScrollLoadTreshold={25}
 			useFixedHeader
-			bodyHeight={100}
+			bodyHeight={200}
 			resultsPerPage={THESES_PER_PAGE}
 			onRowClick={(this.onRowClick as any)}
 			columnMetadata={griddleColumnMeta}
+			rowMetadata={{ key: "id" } as any}
 			metadataColumns={["id"]}
 			results={this.getTableResults()}
 
@@ -196,6 +198,16 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private setTablePage = (index: number) => {
+		console.warn("Set page to", index);
+		// Griddle has no throttling mechanism and will call
+		// this a massive number of times in a very short time period;
+		// the react state is only updated when we get a successful server response,
+		// so all those redundant griddle requests would be made before that happens
+		// so we need a separate realtime-updated field
+		if (this.lastGriddleSetPage === index) {
+			return;
+		}
+		this.lastGriddleSetPage = index;
 		this.updateWithNewState({ currentTablePage: index });
 	}
 
@@ -207,26 +219,35 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
 		this.updateWithNewState({
+			thesesList: [],
+			currentTablePage: 1,
 			currentTypeFilter: newFilter,
 		});
 	}
 
 	private onAdvisorFilterChanged = (newAdvisorFilter: string): void => {
 		this.updateWithNewState({
+			thesesList: [],
+			currentTablePage: 1,
 			currentAdvisorFilter: newAdvisorFilter,
 		});
 	}
 
 	private onTitleFilterChanged = (newTitleFilter: string): void => {
 		this.updateWithNewState({
+			thesesList: [],
+			currentTablePage: 1,
 			currentTitleFilter: newTitleFilter,
 		});
 	}
 
 	private async updateWithNewState<T extends keyof State>(partialState: Pick<State, T>) {
+		console.warn("Updating with new state");
 		const newState = Object.assign({}, this.state, partialState);
 		const newList = await getThesesListForState(newState);
-		this.setState(Object.assign({}, newState, { thesesList: newList }));
+		newState.thesesList.push(...newList.theses);
+		newState.maxTablePage = Math.ceil(newList.total / THESES_PER_PAGE);
+		this.setState(newState);
 	}
 
 	private onRowClick = (row: any, e: MouseEvent) => {
@@ -297,6 +318,6 @@ function sortColumnFromString(sortColumnStr: string): SortColumn {
 async function getThesesListForState(state: State) {
 	return getThesesList(
 		state.currentTypeFilter, state.currentTitleFilter, state.currentAdvisorFilter,
-		sortColumnFromString(state.tableSortColumn), state.isTableAscendingSort
+		state.currentTablePage,
 	);
 }

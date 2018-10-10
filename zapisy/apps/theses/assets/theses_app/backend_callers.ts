@@ -46,21 +46,30 @@ async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
 	return (await axios.get(url, config)).data;
 }
 
+type PaginatedThesesResult = {
+	count: number;
+	next: string;
+	previous: string;
+	results: ThesisJson[];
+};
+
 export async function getThesesList(
 	filterType: ThesisTypeFilter, title: string, advisorName: string,
-	sortColumn: SortColumn, isAscendingSort: boolean,
-): Promise<Thesis[]> {
-	const results: ThesisJson[] = await getData(
+	page: number,
+) {
+	const paginatedResults: PaginatedThesesResult = await getData(
 		`${BASE_API_URL}/theses`,
 		{ params: {
 			type: filterType,
 			title,
 			advisor: advisorName,
-			sort: sortColumn,
-			asc: isAscendingSort,
+			page: page,
 		}},
 	);
-	return results.map(json => new Thesis(json));
+	return {
+		theses: paginatedResults.results.map(json => new Thesis(json)),
+		total: paginatedResults.count,
+	};
 }
 
 export async function getThesisById(id: number): Promise<Thesis> {
