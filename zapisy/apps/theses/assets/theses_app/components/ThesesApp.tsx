@@ -1,61 +1,12 @@
 import * as React from "react";
 import Griddle, { ColumnMetaData } from "griddle-react";
 
-import { Thesis/*, ThesisKind, thesisKindToString*/ } from "../types";
-// import { ReservationIndicator } from "./ReservationIndicator";
+import { Thesis } from "../types";
 import { TopFilters } from "./TopFilters";
-import { ThesisTypeFilter, getThesesList, SortColumn } from "../backend_callers";
-// import { isThesisAvailable } from "../utils";
-// import { ListLoadingIndicator } from "./ListLoadingIndicator";
+import { ThesisTypeFilter, getThesesList } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ReservationIndicator } from "./ReservationIndicator";
-
-// const reactTableLocalization = {
-// 	previousText: "Poprzednia",
-// 	nextText: "Następna",
-// 	loadingText: "Ładowanie...",
-// 	noDataText: "Brak wierszy",
-// 	pageText: "Strona",
-// 	ofText: "z",
-// 	rowsText: "wierszy",
-// };
-
-// const TABLE_COL_DECLS: Column[] = [{
-// 	id: "isThesisReserved",
-// 	Header: "Rezerwacja",
-// 	accessor: (props: Thesis) => props.reserved,
-// 	Cell: props => <ReservationIndicator reserved={props.value} />,
-// 	width: 100,
-// 	filterable: false,
-// }, {
-// 	id: "thesisKind",
-// 	Header: "Typ",
-// 	accessor: (props: Thesis) => thesisKindToString(props.kind),
-// 	filterable: false,
-// 	width: 80,
-// }, {
-// 	id: "thesisAdvisor",
-// 	Header: "Promotor",
-// 	accessor: (props: Thesis) => props.advisor ? props.advisor.displayName : "<brak>",
-// 	filterable: true,
-// }, {
-// 	id: "thesisName",
-// 	Header: "Tytuł",
-// 	accessor: (props: Thesis) => props.title,
-// 	filterable: true,
-// }];
-
-// function getTableProps() {
-// 	return { style: { textAlign: "center" } };
-// }
-
-// function getTheadProps() {
-// 	return { style: {
-// 		fontWeight: "bold",
-// 		fontSize: "120%",
-// 	}};
-// }
 
 const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	{
@@ -136,24 +87,6 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private renderThesesList() {
-		// return <ReactTable
-		// 	key="table"
-		// 	ref={this.assignReactTable}
-		// 	className={"-striped -highlight"}
-		// 	defaultPageSize={10}
-		// 	getTableProps={getTableProps}
-		// 	getTheadProps={getTheadProps}
-		// 	getTdProps={this.getTdProps}
-		// 	style={{
-		// 		height: "400px"
-		// 	}}
-		// 	{...reactTableLocalization}
-		// 	columns={TABLE_COL_DECLS}
-		// 	data={this.props.thesesList}
-		// 	pages={-1}
-		// 	loading={this.props.isLoadingList}
-		// 	manual
-		// />;
 		return <Griddle
 			useGriddleStyles={false}
 			tableClassName={"griddleTable"}
@@ -165,7 +98,6 @@ export class ThesesApp extends React.Component<Props, State> {
 			resultsPerPage={THESES_PER_PAGE}
 			onRowClick={(this.onRowClick as any)}
 			columnMetadata={griddleColumnMeta}
-			// rowMetadata={{ key: "id" } as any}
 			metadataColumns={["id"]}
 			results={this.getTableResults()}
 
@@ -287,28 +219,6 @@ export class ThesesApp extends React.Component<Props, State> {
 			</>
 			: mainComponent;
 	}
-
-	// Must be on the instance, we need a closure for `this`
-	/*private getTdProps = (_state: any, rowInfo: RowInfo | undefined, _column: any) => {
-		if (!rowInfo) {
-			return {};
-		}
-		return {
-			style: {
-				cursor: "pointer",
-			},
-			onClick: (_event: any, handleOriginal: () => void) => {
-				console.warn("Click in row", rowInfo);
-				this.props.thesisClickCallback(rowInfo.original);
-				// React-Table uses onClick internally to trigger
-				// events like expanding SubComponents and; pivots.
-				// By default a custom "onClick" handler; will; override; this; functionality.;
-				if (handleOriginal) {
-					handleOriginal();
-				}
-			}
-		};
-	}*/
 
 	private handleThesisSaved = () => {
 		console.warn("SAVED");
