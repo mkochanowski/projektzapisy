@@ -41,14 +41,8 @@ type State = {
 	currentTitleFilter: string;
 	currentAdvisorFilter: string;
 
-	maxTablePage: number;
-	currentTablePage: number;
 	thesesList: Thesis[];
-	tableSortColumn: string;
 	isLoadingThesesList: boolean;
-	isTableAscendingSort: boolean;
-
-	enableGriddleComponent: boolean;
 };
 
 const initialState: State = {
@@ -58,14 +52,8 @@ const initialState: State = {
 	currentTitleFilter: "",
 	currentAdvisorFilter: "",
 
-	maxTablePage: 0,
-	currentTablePage: 1,
 	thesesList: [],
-	tableSortColumn: "",
 	isLoadingThesesList: true,
-	isTableAscendingSort: false,
-
-	enableGriddleComponent: true,
 };
 
 type GriddleThesisData = {
@@ -82,7 +70,6 @@ export class ThesesApp extends React.Component<Props, State> {
 	private griddle: any;
 
 	async componentDidMount() {
-		// this.updateWithNewState(this.state);
 		await this.setStateAsync({
 			thesesList: await getThesesList(),
 			isLoadingThesesList: false,
@@ -123,7 +110,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		return results.filter(td => {
 			const thesis = this.state.thesesList.find(t => t.id === td.id);
 			if (!thesis) {
-				console.warn("Griddle table has bad thesis", td);
+				console.warn("[Sort] Griddle table has bad thesis", td);
 				return false;
 			}
 			return (
@@ -195,8 +182,16 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setGriddleFilter();
 	}
 
-	private onRowClick = (row: any, e: MouseEvent) => {
-		console.warn(row, e);
+	private onRowClick = (row: any, _e: MouseEvent) => {
+		const data: GriddleThesisData = row.props.data;
+		const thesis = this.state.thesesList.find(t => t.id === data.id);
+		if (!thesis) {
+			console.warn("[Click] Griddle table has bad thesis", data);
+			return;
+		}
+		this.setState({
+			selectedThesis: thesis,
+		});
 	}
 
 	public render() {
@@ -213,7 +208,6 @@ export class ThesesApp extends React.Component<Props, State> {
 				<br />,
 				<hr />,
 				<ThesisDetails
-					key="thesis_details"
 					selectedThesis={this.state.selectedThesis}
 					onModifiedThesisSaved={this.handleThesisSaved}
 				/>
