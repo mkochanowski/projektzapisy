@@ -127,9 +127,9 @@ export class ThesesApp extends React.Component<Props, State> {
 				return false;
 			}
 			return (
+				thesisMatchesType(thesis, type) &&
 				(!advisor || td.advisorName.toLowerCase().includes(advisor.toLowerCase())) &&
-				(!title || td.title.toLowerCase().includes(title.toLowerCase())) &&
-				thesisMatchesType(thesis, type)
+				(!title || td.title.toLowerCase().includes(title.toLowerCase()))
 			);
 		});
 	}
