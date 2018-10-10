@@ -76,6 +76,10 @@
 		/* overflow-y: hidden !important; */
 		padding-top: 10px;
 	}
+
+	.griddle td:hover, .griddle th:hover:not(.reservedColumn) {
+		cursor: pointer;
+	}
   
   .griddle td{
 	padding:5px;
@@ -83,6 +87,10 @@
 	border-top-color:#DDD;
 	color:#222;
 	text-align: center;
+	}
+
+	.griddle tr:hover td {
+		background-color: #EDEDED;
 	}
 
 	.reservedColumn {
