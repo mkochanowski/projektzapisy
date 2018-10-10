@@ -31,6 +31,8 @@ type Props = {
 
 	onTitleChange: (titleSubstr: string) => void;
 	initialTitleValue: string;
+
+	enabled: boolean;
 };
 
 const textFieldStyle = {
@@ -51,10 +53,17 @@ export class TopFilters extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		this.state = {
-			typeValue: props.initialTypeValue,
 			advisorValue: props.initialAdvisorValue,
 			titleValue: props.initialTitleValue,
+			typeValue: props.initialTypeValue,
 		};
+	}
+
+	private handleTypeChange = (newFilter: ThesisTypeFilter): void => {
+		this.setState({
+			typeValue: newFilter,
+		});
+		this.props.onTypeChange(newFilter);
 	}
 
 	private handleTitleChanged = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -92,10 +101,11 @@ export class TopFilters extends React.Component<Props, State> {
 		}}>
 			<GenericSelect<ThesisTypeFilter>
 				value={this.state.typeValue}
-				onChange={this.props.onTypeChange}
+				onChange={this.handleTypeChange}
 				optionInfo={typefilterInfos}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
+				enabled={this.props.enabled}
 			/>
 
 			<div>
@@ -105,6 +115,7 @@ export class TopFilters extends React.Component<Props, State> {
 					value={this.state.titleValue}
 					onChange={this.handleTitleChanged}
 					style={textFieldStyle}
+					disabled={!this.props.enabled}
 				/>
 			</div>
 
@@ -115,6 +126,7 @@ export class TopFilters extends React.Component<Props, State> {
 					value={this.state.advisorValue}
 					onChange={this.handleAdvisorChanged}
 					style={textFieldStyle}
+					disabled={!this.props.enabled}
 				/>
 			</div>
 		</div>;

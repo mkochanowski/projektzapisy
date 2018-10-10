@@ -11,16 +11,26 @@ type Props<T> = {
 	optionInfo: SelectOptionsInfo<T>;
 	label?: string;
 	labelCss?: React.CSSProperties;
+	enabled?: boolean;
 };
 
 export class GenericSelect<T> extends React.Component<Props<T>> {
 	public render() {
+		const shouldDisable = typeof this.props.enabled === "boolean" ? !this.props.enabled : false;
+		const styles: React.CSSProperties = {};
+		if (shouldDisable) {
+			Object.assign(styles, { backgroundColor: "lightgray" });
+		}
+		if (this.props.label) {
+			Object.assign(styles, { marginLeft: "5px" });
+		}
 		return <div>
 				<span style={this.props.labelCss || {}}>{this.props.label || ""}</span>
 				<select
 					onChange={ev => this.onChange(ev.target.value)}
 					value={String(this.getCurrentSelectValue())}
-					style={this.props.label ? { marginLeft: "5px" } : {}}
+					style={styles}
+					disabled={shouldDisable}
 				>
 				{
 					this.props.optionInfo.map((info, i) => (

@@ -94,6 +94,8 @@ type State = {
 	tableSortColumn: string;
 	isLoadingTable: boolean;
 	isTableAscendingSort: boolean;
+
+	enableGriddleComponent: boolean;
 };
 
 const initialState: State = {
@@ -109,6 +111,8 @@ const initialState: State = {
 	tableSortColumn: "",
 	isLoadingTable: false,
 	isTableAscendingSort: false,
+
+	enableGriddleComponent: true,
 };
 
 export class ThesesApp extends React.Component<Props, State> {
@@ -127,6 +131,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			initialAdvisorValue={this.state.currentAdvisorFilter}
 			onTitleChange={this.onTitleFilterChanged}
 			initialTitleValue={this.state.currentTitleFilter}
+			enabled={!this.state.isLoadingTable}
 		/>;
 	}
 
@@ -236,21 +241,24 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private async updateFreshWithNewState<T extends keyof State>(partialState: Pick<State, T>) {
-		await this.updateWithNewState(Object.assign(partialState, {
+		this.setState({
 			thesesList: [],
 			currentTablePage: 1,
-			lastGriddleSetPage: 1,
-		}));
+		});
+		this.lastGriddleSetPage = 1;
+		await this.updateWithNewState(partialState);
 		// Griddle is such a piece of shit
 		document.querySelector("div.griddle > div > div > div > div")!.scrollTop = 0;
 	}
 
 	private async updateWithNewState<T extends keyof State>(partialState: Pick<State, T>) {
 		console.warn("Updating with new state");
+		this.setState({ isLoadingTable: true });
 		const newState = Object.assign({}, this.state, partialState);
 		const newList = await getThesesListForState(newState);
 		newState.thesesList.push(...newList.theses);
 		newState.maxTablePage = Math.ceil(newList.total / THESES_PER_PAGE);
+		newState.isLoadingTable = false;
 		this.setState(newState);
 	}
 
@@ -308,16 +316,16 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 }
 
-function sortColumnFromString(sortColumnStr: string): SortColumn {
-	switch (sortColumnStr) {
-		case "title":
-			return SortColumn.ThesisTitle;
-		case "advisor":
-			return SortColumn.ThesisAdvisor;
-		default:
-			return SortColumn.None;
-	}
-}
+// function sortColumnFromString(sortColumnStr: string): SortColumn {
+	// switch (sortColumnStr) {
+		// case "title":
+			// return SortColumn.ThesisTitle;
+		// case "advisor":
+			// return SortColumn.ThesisAdvisor;
+		// default:
+			// return SortColumn.None;
+	// }
+// }
 
 async function getThesesListForState(state: State) {
 	return getThesesList(
