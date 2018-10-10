@@ -1,11 +1,10 @@
 import * as React from "react";
 import Griddle, { ColumnMetaData } from "griddle-react";
 
-import { Thesis } from "../types";
+import { Thesis, ThesisStatus, ThesisKind } from "../types";
 import { TopFilters } from "./TopFilters";
 import { ThesisTypeFilter, getThesesList } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
-import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ReservationIndicator } from "./ReservationIndicator";
 
 const griddleColumnMeta: Array<ColumnMetaData<any>> = [
@@ -68,28 +67,74 @@ const initialState: State = {
 	enableGriddleComponent: true,
 };
 
+type GriddleThesisData = {
+	id: number;
+	reserved: boolean;
+	title: string;
+	advisorName: string;
+};
+
+const GRIDDLE_FILTER_MAGIC = "a hack of epic proportions";
+
 export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
-	private lastGriddleSetPage: number = 0;
+	private griddle: any;
 
 	async componentDidMount() {
-		this.updateWithNewState(this.state);
+		// this.updateWithNewState(this.state);
+		await this.setStateAsync({
+			thesesList: await getThesesList(),
+		});
+		this.setGriddleFilter();
+	}
+
+	private setStateAsync<K extends keyof State>(partialState: Pick<State, K>): Promise<void> {
+		return new Promise((resolve, _) => {
+			this.setState(partialState, resolve);
+		});
 	}
 
 	private renderTopFilters() {
 		return <TopFilters
 			onTypeChange={this.onTypeFilterChanged}
-			initialTypeValue={this.state.currentTypeFilter}
+			typeValue={this.state.currentTypeFilter}
 			onAdvisorChange={this.onAdvisorFilterChanged}
-			initialAdvisorValue={this.state.currentAdvisorFilter}
+			advisorValue={this.state.currentAdvisorFilter}
 			onTitleChange={this.onTitleFilterChanged}
-			initialTitleValue={this.state.currentTitleFilter}
+			titleValue={this.state.currentTitleFilter}
 			enabled={!this.state.isLoadingTable}
 		/>;
 	}
 
+	private setGriddle = (griddle: Griddle<any>) => {
+		this.griddle = griddle;
+	}
+
+	private griddleFilterer = (results: GriddleThesisData[], filter: any) => {
+		if (filter !== GRIDDLE_FILTER_MAGIC) {
+			return results;
+		}
+		const advisor = this.state.currentAdvisorFilter;
+		const title = this.state.currentTitleFilter;
+		const type = this.state.currentTypeFilter;
+
+		return results.filter(td => {
+			const thesis = this.state.thesesList.find(t => t.id === td.id);
+			if (!thesis) {
+				console.warn("Griddle table has bad thesis", td);
+				return false;
+			}
+			return (
+				(!advisor || td.advisorName.toLowerCase().includes(advisor.toLowerCase())) &&
+				(!title || td.title.toLowerCase().includes(title.toLowerCase())) &&
+				thesisMatchesType(thesis, type)
+			);
+		});
+	}
+
 	private renderThesesList() {
 		return <Griddle
+			ref={this.setGriddle}
 			useGriddleStyles={false}
 			tableClassName={"griddleTable"}
 			showFilter={false}
@@ -103,32 +148,13 @@ export class ThesesApp extends React.Component<Props, State> {
 			metadataColumns={["id"]}
 			results={this.getTableResults()}
 			noDataMessage={GRIDDLE_NO_DATA}
-
-			useExternal
-			externalSetPage={this.setTablePage}
-			externalChangeSort={this.setTableSort}
-			// tslint:disable:no-empty
-			// This is stupid as in external mode it can only ever
-			// "set" the page size to the prop we specify ourselves
-			externalSetPageSize={function() {}}
-			// ...and this is hopelessly broken in 0.8.2, courtesy
-			// mr Dan Krieger commit 60338690404adddecf41427a32cd210b7273403d
-			// in componentWillReceiveProps, if the results prop changed
-			// he fires setFilter - which will obviously fetch new results
-			// and change the prop, and so you get an infinite render loop
-			externalSetFilter={function() {}}
-			// tslint:enable:no-empty
-			externalMaxPage={this.state.maxTablePage}
-			externalCurrentPage={this.state.currentTablePage}
-			externalIsLoading={this.state.isLoadingTable}
-			externalSortColumn={this.state.tableSortColumn}
-			externalSortAscending={this.state.isTableAscendingSort}
-			externalLoadingComponent={ListLoadingIndicator}
+			useCustomFilterer={true}
+			customFilterer={this.griddleFilterer}
 		/>;
 	}
 
-	private getTableResults() {
-		console.error("GET RESULTS");
+	private getTableResults(): GriddleThesisData[] {
+		console.error("GET RESULTS", this.state.thesesList);
 		return this.state.thesesList.map(thesis => ({
 			id: thesis.id,
 			reserved: thesis.reserved,
@@ -137,66 +163,23 @@ export class ThesesApp extends React.Component<Props, State> {
 		}));
 	}
 
-	private setTablePage = (index: number) => {
-		console.warn("Set page to", index);
-		// Griddle has no throttling mechanism and will call
-		// this a massive number of times in a very short time period;
-		// the react state is only updated when we get a successful server response,
-		// so all those redundant griddle requests would be made before that happens
-		// so we need a separate realtime-updated field
-		if (this.lastGriddleSetPage === index) {
-			return;
-		}
-		this.lastGriddleSetPage = index;
-		this.updateWithNewState({ currentTablePage: index });
+	private setGriddleFilter() {
+		this.griddle.setFilter(GRIDDLE_FILTER_MAGIC);
 	}
 
-	private setTableSort = (sortColumnStr: string | undefined, isAscending: boolean) => {
-		this.updateWithNewState({
-			tableSortColumn: sortColumnStr || "", isTableAscendingSort: isAscending,
-		});
+	private onTypeFilterChanged = async (newFilter: ThesisTypeFilter) => {
+		await this.setStateAsync({ currentTypeFilter: newFilter });
+		this.setGriddleFilter();
 	}
 
-	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
-		this.updateFreshWithNewState({
-			currentTypeFilter: newFilter,
-		});
+	private onAdvisorFilterChanged = async (newAdvisorFilter: string) => {
+		await this.setStateAsync({ currentAdvisorFilter: newAdvisorFilter.trim() });
+		this.setGriddleFilter();
 	}
 
-	private onAdvisorFilterChanged = (newAdvisorFilter: string): void => {
-		this.updateFreshWithNewState({
-			currentAdvisorFilter: newAdvisorFilter,
-		});
-	}
-
-	private onTitleFilterChanged = (newTitleFilter: string): void => {
-		this.updateFreshWithNewState({
-			currentTitleFilter: newTitleFilter,
-		});
-	}
-
-	private async updateFreshWithNewState<T extends keyof State>(partialState: Pick<State, T>) {
-		this.setState({
-			thesesList: [],
-			currentTablePage: 1,
-			maxTablePage: 1,
-		});
-		this.lastGriddleSetPage = 1;
-		await this.updateWithNewState(partialState);
-		// Griddle is such a piece of shit
-		document.querySelector("div.griddle > div > div > div > div")!.scrollTop = 0;
-	}
-
-	private async updateWithNewState<T extends keyof State>(partialState: Pick<State, T>) {
-		console.warn("Updating with new state");
-		this.setState({ isLoadingTable: true });
-		const newState = Object.assign({}, this.state, partialState);
-		const newList = await getThesesListForState(newState);
-		newState.thesesList.push(...newList.theses);
-		newState.maxTablePage = Math.ceil(newList.total / THESES_PER_PAGE);
-		newState.isLoadingTable = false;
-		console.error("update with new state: final state", newState);
-		this.setState(newState);
+	private onTitleFilterChanged = async (newTitleFilter: string) => {
+		await this.setStateAsync({ currentTitleFilter: newTitleFilter.trim() });
+		this.setGriddleFilter();
 	}
 
 	private onRowClick = (row: any, e: MouseEvent) => {
@@ -231,20 +214,29 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 }
 
-// function sortColumnFromString(sortColumnStr: string): SortColumn {
-	// switch (sortColumnStr) {
-		// case "title":
-			// return SortColumn.ThesisTitle;
-		// case "advisor":
-			// return SortColumn.ThesisAdvisor;
-		// default:
-			// return SortColumn.None;
-	// }
-// }
-
-async function getThesesListForState(state: State) {
-	return getThesesList(
-		state.currentTypeFilter, state.currentTitleFilter, state.currentAdvisorFilter,
-		state.currentTablePage,
+function isThesisAvailable(thesis: Thesis): boolean {
+	return (
+		thesis.status !== ThesisStatus.InProgress &&
+		thesis.status !== ThesisStatus.Defended &&
+		!thesis.reserved
 	);
+}
+
+function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter) {
+	switch (type) {
+		case ThesisTypeFilter.All: return true;
+		case ThesisTypeFilter.AllCurrent: return isThesisAvailable(thesis);
+		case ThesisTypeFilter.Masters: return thesis.kind === ThesisKind.Masters;
+		case ThesisTypeFilter.Engineers: return thesis.kind === ThesisKind.Engineers;
+		case ThesisTypeFilter.Bachelors: return thesis.kind === ThesisKind.Bachelors;
+		case ThesisTypeFilter.BachelorsISIM: return thesis.kind === ThesisKind.Isim;
+		case ThesisTypeFilter.AvailableMasters:
+			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Masters;
+		case ThesisTypeFilter.AvailableEngineers:
+			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Engineers;
+		case ThesisTypeFilter.AvailableBachelors:
+			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Bachelors;
+		case ThesisTypeFilter.AvailableBachelorsISIM:
+			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Isim;
+	}
 }

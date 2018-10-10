@@ -48,7 +48,6 @@ class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get"]
     permission_classes = (permissions.DjangoModelPermissions,)
     serializer_class = serializers.ThesisSerializer
-    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         requested_thesis_type_str = self.request.query_params.get(THESIS_TYPE_FILTER_NAME, None)

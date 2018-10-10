@@ -22,12 +22,6 @@ export const enum ThesisTypeFilter {
 	Default = AllCurrent,
 }
 
-export const enum SortColumn {
-	None,
-	ThesisTitle,
-	ThesisAdvisor,
-}
-
 async function sendRequestWithCsrf(url: string, config?: AxiosRequestConfig) {
 	const tokenValue = getCookie("csrftoken");
 	if (!tokenValue) {
@@ -46,30 +40,10 @@ async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
 	return (await axios.get(url, config)).data;
 }
 
-type PaginatedThesesResult = {
-	count: number;
-	next: string;
-	previous: string;
-	results: ThesisJson[];
-};
-
 export async function getThesesList(
-	filterType: ThesisTypeFilter, title: string, advisorName: string,
-	page: number,
 ) {
-	const paginatedResults: PaginatedThesesResult = await getData(
-		`${BASE_API_URL}/theses`,
-		{ params: {
-			type: filterType,
-			title,
-			advisor: advisorName,
-			page: page,
-		}},
-	);
-	return {
-		theses: paginatedResults.results.map(json => new Thesis(json)),
-		total: paginatedResults.count,
-	};
+	const rawData: ThesisJson[] = await getData(`${BASE_API_URL}/theses`);
+	return rawData.map(json => new Thesis(json));
 }
 
 export async function getThesisById(id: number): Promise<Thesis> {
