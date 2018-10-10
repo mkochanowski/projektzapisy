@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=300)),
-                ('kind', models.SmallIntegerField(choices=[(apps.theses.models.ThesisKind(0), 'mgr'), (apps.theses.models.ThesisKind(1), 'inż'), (apps.theses.models.ThesisKind(2), 'lic'), (apps.theses.models.ThesisKind((3,)), 'lic+inż'), (apps.theses.models.ThesisKind(4), 'isim')])),
+                ('kind', models.SmallIntegerField(choices=[(apps.theses.models.ThesisKind(0), 'mgr'), (apps.theses.models.ThesisKind(1), 'inż'), (apps.theses.models.ThesisKind(2), 'lic'), (apps.theses.models.ThesisKind(3), 'lic+inż'), (apps.theses.models.ThesisKind(4), 'isim')])),
                 ('reserved', models.BooleanField(default=False)),
                 ('added_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),

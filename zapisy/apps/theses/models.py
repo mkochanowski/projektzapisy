@@ -12,7 +12,7 @@ class ThesisKind(Enum):
     masters = 0
     engineers = 1
     bachelors = 2
-    bachelors_engineers = 3,
+    bachelors_engineers = 3
     isim = 4
 
 

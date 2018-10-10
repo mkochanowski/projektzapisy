@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='thesis',
             name='kind',
-            field=models.SmallIntegerField(choices=[(0, 'mgr'), (1, 'inż'), (2, 'lic'), ((3,), 'lic+inż'), (4, 'isim')]),
+            field=models.SmallIntegerField(choices=[(0, 'mgr'), (1, 'inż'), (2, 'lic'), (3, 'lic+inż'), (4, 'isim')]),
         ),
         migrations.AlterField(
             model_name='thesis',
