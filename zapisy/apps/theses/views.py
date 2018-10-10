@@ -70,7 +70,6 @@ class ThesesViewSet(viewsets.ModelViewSet):
         result = filter_theses_queryset(
             requested_thesis_type, requested_thesis_title, requested_advisor_name
         )
-        print(result)
         return result
 
 
@@ -84,10 +83,11 @@ def filter_theses_queryset(thesis_type: ThesisTypeFilter, title: str, advisor_na
     if advisor_name:
         emp_filtered_theses_ids = [
             t.id for t in result
-            if "advisor_name" in t.advisor.get_full_name().lower()
+            if advisor_name.lower() in t.advisor.get_full_name().lower()
         ]
-        result.filter(advisor__id__in=emp_filtered_theses_ids)
+        result = result.filter(advisor__id__in=emp_filtered_theses_ids)
 
+    print(result)
     return result
 
 
