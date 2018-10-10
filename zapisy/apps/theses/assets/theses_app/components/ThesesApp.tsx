@@ -85,6 +85,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		// this.updateWithNewState(this.state);
 		await this.setStateAsync({
 			thesesList: await getThesesList(),
+			isLoadingThesesList: false,
 		});
 		this.setGriddleFilter();
 	}
@@ -154,6 +155,8 @@ export class ThesesApp extends React.Component<Props, State> {
 			// Hacky: you don't have to set useExternalData for this stuff to work
 			externalIsLoading={this.state.isLoadingThesesList}
 			externalLoadingComponent={ListLoadingIndicator}
+			// @ts-ignore - missing prop
+			allowEmptyGrid={this.state.isLoadingThesesList}
 		/>;
 	}
 
@@ -177,12 +180,18 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private onAdvisorFilterChanged = async (newAdvisorFilter: string) => {
-		await this.setStateAsync({ currentAdvisorFilter: newAdvisorFilter.trim() });
+		if (!newAdvisorFilter.trim()) {
+			newAdvisorFilter = "";
+		}
+		await this.setStateAsync({ currentAdvisorFilter: newAdvisorFilter });
 		this.setGriddleFilter();
 	}
 
 	private onTitleFilterChanged = async (newTitleFilter: string) => {
-		await this.setStateAsync({ currentTitleFilter: newTitleFilter.trim() });
+		if (!newTitleFilter.trim()) {
+			newTitleFilter = "";
+		}
+		await this.setStateAsync({ currentTitleFilter: newTitleFilter });
 		this.setGriddleFilter();
 	}
 
