@@ -122,11 +122,11 @@ export class ThesesApp extends React.Component<Props, State> {
 	private renderTopFilters() {
 		return <TopFilters
 			onTypeChange={this.onTypeFilterChanged}
-			typeValue={this.state.currentTypeFilter}
+			initialTypeValue={this.state.currentTypeFilter}
 			onAdvisorChange={this.onAdvisorFilterChanged}
-			advisorValue={this.state.currentAdvisorFilter}
+			initialAdvisorValue={this.state.currentAdvisorFilter}
 			onTitleChange={this.onTitleFilterChanged}
-			titleValue={this.state.currentTitleFilter}
+			initialTitleValue={this.state.currentTitleFilter}
 		/>;
 	}
 
@@ -160,7 +160,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			resultsPerPage={THESES_PER_PAGE}
 			onRowClick={(this.onRowClick as any)}
 			columnMetadata={griddleColumnMeta}
-			rowMetadata={{ key: "id" } as any}
+			// rowMetadata={{ key: "id" } as any}
 			metadataColumns={["id"]}
 			results={this.getTableResults()}
 
@@ -218,27 +218,31 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private onTypeFilterChanged = (newFilter: ThesisTypeFilter): void => {
-		this.updateWithNewState({
-			thesesList: [],
-			currentTablePage: 1,
+		this.updateFreshWithNewState({
 			currentTypeFilter: newFilter,
 		});
 	}
 
 	private onAdvisorFilterChanged = (newAdvisorFilter: string): void => {
-		this.updateWithNewState({
-			thesesList: [],
-			currentTablePage: 1,
+		this.updateFreshWithNewState({
 			currentAdvisorFilter: newAdvisorFilter,
 		});
 	}
 
 	private onTitleFilterChanged = (newTitleFilter: string): void => {
-		this.updateWithNewState({
-			thesesList: [],
-			currentTablePage: 1,
+		this.updateFreshWithNewState({
 			currentTitleFilter: newTitleFilter,
 		});
+	}
+
+	private async updateFreshWithNewState<T extends keyof State>(partialState: Pick<State, T>) {
+		await this.updateWithNewState(Object.assign(partialState, {
+			thesesList: [],
+			currentTablePage: 1,
+			lastGriddleSetPage: 1,
+		}));
+		// Griddle is such a piece of shit
+		document.querySelector("div.griddle > div > div > div > div")!.scrollTop = 0;
 	}
 
 	private async updateWithNewState<T extends keyof State>(partialState: Pick<State, T>) {

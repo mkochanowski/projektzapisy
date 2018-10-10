@@ -16,15 +16,21 @@ const typefilterInfos = [
 	{ val: ThesisTypeFilter.AvailableBachelorsISIM, displayName: "Licencjackie ISIM - dostępne" },
 ];
 
+type State = {
+	typeValue: ThesisTypeFilter;
+	advisorValue: string;
+	titleValue: string;
+};
+
 type Props = {
 	onTypeChange: (newFilter: ThesisTypeFilter) => void;
-	typeValue: ThesisTypeFilter;
+	initialTypeValue: ThesisTypeFilter;
 
 	onAdvisorChange: (advisorSubstr: string) => void;
-	advisorValue: string;
+	initialAdvisorValue: string;
 
 	onTitleChange: (titleSubstr: string) => void;
-	titleValue: string;
+	initialTitleValue: string;
 };
 
 const textFieldStyle = {
@@ -38,17 +44,29 @@ const labelStyle: React.CSSProperties = {
 
 const VALUE_CHANGE_TIMEOUT = 500;
 
-export class TopFilters extends React.Component<Props> {
+export class TopFilters extends React.Component<Props, State> {
 	private titleChangeTimeout: number | null = null;
 	private advisorChangeTimeout: number | null = null;
+
+	constructor(props: Props) {
+		super(props);
+		this.state = {
+			typeValue: props.initialTypeValue,
+			advisorValue: props.initialAdvisorValue,
+			titleValue: props.initialTitleValue,
+		};
+	}
 
 	private handleTitleChanged = (e: React.ChangeEvent<HTMLInputElement>): void => {
 		if (this.titleChangeTimeout !== null) {
 			window.clearTimeout(this.titleChangeTimeout);
 		}
+		this.setState({
+			titleValue: e.target.value,
+		});
 		this.titleChangeTimeout = window.setTimeout(() => {
 			this.titleChangeTimeout = null;
-			this.props.onTitleChange(e.target.value);
+			this.props.onTitleChange(this.state.titleValue);
 		}, VALUE_CHANGE_TIMEOUT);
 	}
 
@@ -56,9 +74,12 @@ export class TopFilters extends React.Component<Props> {
 		if (this.advisorChangeTimeout !== null) {
 			window.clearTimeout(this.advisorChangeTimeout);
 		}
+		this.setState({
+			advisorValue: e.target.value,
+		});
 		this.advisorChangeTimeout = window.setTimeout(() => {
 			this.advisorChangeTimeout = null;
-			this.props.onAdvisorChange(e.target.value);
+			this.props.onAdvisorChange(this.state.advisorValue);
 		}, VALUE_CHANGE_TIMEOUT);
 	}
 
@@ -70,7 +91,7 @@ export class TopFilters extends React.Component<Props> {
 			alignItems: "center",
 		}}>
 			<GenericSelect<ThesisTypeFilter>
-				value={this.props.typeValue}
+				value={this.state.typeValue}
 				onChange={this.props.onTypeChange}
 				optionInfo={typefilterInfos}
 				label={"Rodzaj"}
@@ -81,7 +102,7 @@ export class TopFilters extends React.Component<Props> {
 				<span style={labelStyle}>Tytuł</span>
 				<input
 					type="text"
-					value={this.props.titleValue}
+					value={this.state.titleValue}
 					onChange={this.handleTitleChanged}
 					style={textFieldStyle}
 				/>
@@ -91,7 +112,7 @@ export class TopFilters extends React.Component<Props> {
 				<span style={labelStyle}>Promotor</span>
 				<input
 					type="text"
-					value={this.props.advisorValue}
+					value={this.state.advisorValue}
 					onChange={this.handleAdvisorChanged}
 					style={textFieldStyle}
 				/>

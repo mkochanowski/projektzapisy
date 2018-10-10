@@ -79,7 +79,7 @@ def filter_theses_queryset(thesis_type: ThesisTypeFilter, title: str, advisor_na
     result = Thesis.objects.all()
     result = filter_theses_queryset_for_type(result, thesis_type)
     if title:
-        result = result.filter(title__contains=title)
+        result = result.filter(title__icontains=title)
 
     if advisor_name:
         emp_filtered_theses_ids = [
