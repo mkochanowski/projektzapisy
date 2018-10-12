@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import logging
+from typing import Optional
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -28,36 +29,28 @@ def main(request):
     return render(request, 'enrollment/main.html')
 
 
-def course_groups_of_students_willing_to_join(groups):
-    return get_exercise_group(groups), get_laboratory_group(groups), get_exercise_and_laboratory_group(groups)
+def course_group_types_with_willing_students_to_join(groups: list) -> list:
+    group_types = [
+        {'id': '2', 'name': 'cwiczenia'},
+        {'id': '3', 'name': 'pracownie'},
+        {'id': '5', 'name': 'ćwiczenio-pracownie'}
+    ]
+
+    return list(course_group_type_with_willing_students_to_join(group_type, groups) for group_type in group_types)
 
 
-def get_exercise_group(groups):
-    return get_list_of_students_willing_to_join_a_course_group_type(groups, '2', "cwiczenia")
-
-
-def get_laboratory_group(groups):
-    return get_list_of_students_willing_to_join_a_course_group_type(groups, '3', "pracownie")
-
-
-def get_exercise_and_laboratory_group(groups):
-    return get_list_of_students_willing_to_join_a_course_group_type(groups, '5', "ćwiczenio-pracownie")
-
-
-def get_list_of_students_willing_to_join_a_course_group_type(groups, group_type, type_name):
-    students_in_queue = list()
-    students_already_in_groups = list()
+def course_group_type_with_willing_students_to_join(group_type: dict, groups: list) -> Optional[dict]:
+    students_in_queue = set()
+    students_already_in_groups = set()
 
     for group in groups:
-        if group.type == group_type:
-            students_in_queue += (student.matricula for student in Queue.get_students_in_queue(group.id))
-            students_already_in_groups += (student.matricula for student in Record.get_students_in_group(group.id))
+        if group.type == group_type['id']:
+            students_in_queue.update(student.matricula for student in Queue.get_students_in_queue(group.id))
+            students_already_in_groups.update(student.matricula for student in Record.get_students_in_group(group.id))
 
-    amount = len(list(set(students_in_queue) - set(students_already_in_groups)))
+    amount = len(students_in_queue - students_already_in_groups)
 
-    if amount > 0:
-        return type_name, amount
-    return 0
+    return {'students_amount': amount, 'type_name': group_type['name']} if amount else None
 
 
 def get_courses_list_in_semester_with_history_info(user, semester):
@@ -371,7 +364,7 @@ def course_view_data(request, slug):
             'ects_limit_would_be_exceeded': ectsLimitExceeded,
             'max_ects': maxEcts,
             'current_ects': currentEcts,
-            'course_groups_of_students_willing_to_join': course_groups_of_students_willing_to_join(groups)
+            'course_group_types_with_willing_students_to_join': course_group_types_with_willing_students_to_join(groups)
         })
 
         return data, course

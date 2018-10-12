@@ -69,11 +69,11 @@ Zrezygnuj z innych przedmiotów, aby zapisać się na ten.
                 </td>
             </tr>
         {% endif %}
-        {% for course_group_of_students_willing_to_join in course_groups_of_students_willing_to_join %}
-            {% if course_group_of_students_willing_to_join %}
+        {% for course_group_type_with_willing_students_to_join in course_group_types_with_willing_students_to_join %}
+            {% if course_group_type_with_willing_students_to_join.students_amount %}
             <tr>
-                <th>Liczba chętnych na {{ course_group_of_students_willing_to_join.0 }}</th>
-                <td>{{ course_group_of_students_willing_to_join.1 }}</td>
+                <th>Liczba chętnych na {{ course_group_type_with_willing_students_to_join.type_name }}</th>
+                <td>{{ course_group_type_with_willing_students_to_join.students_amount }}</td>
             </tr>
             {% endif %}
         {% endfor %}
