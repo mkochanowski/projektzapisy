@@ -28,7 +28,7 @@ const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	},
 ];
 
-const GRIDDLE_NO_DATA = "Brak danych";
+const GRIDDLE_NO_DATA = "Brak wyników";
 
 // ACHTUNG must match value in views.py
 const THESES_PER_PAGE = 10;
@@ -36,7 +36,7 @@ const THESES_PER_PAGE = 10;
 type Props = {};
 
 type State = {
-	selectedThesis: Thesis | null;
+	selectedThesisId: number;
 	currentTypeFilter: ThesisTypeFilter;
 	currentTitleFilter: string;
 	currentAdvisorFilter: string;
@@ -46,7 +46,7 @@ type State = {
 };
 
 const initialState: State = {
-	selectedThesis: null,
+	selectedThesisId: -1,
 
 	currentTypeFilter: ThesisTypeFilter.Default,
 	currentTitleFilter: "",
@@ -69,7 +69,12 @@ export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
 	private griddle: any;
 
-	async componentDidMount() {
+	componentDidMount() {
+		this.fetchThesesList();
+	}
+
+	private async fetchThesesList() {
+		this.setState({ isLoadingThesesList: true });
 		await this.setStateAsync({
 			thesesList: await getThesesList(),
 			isLoadingThesesList: false,
@@ -188,14 +193,19 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	private onRowClick = (row: any, _e: MouseEvent) => {
 		const data: GriddleThesisData = row.props.data;
-		const thesis = this.state.thesesList.find(t => t.id === data.id);
-		if (!thesis) {
-			console.warn("[Click] Griddle table has bad thesis", data);
-			return;
-		}
 		this.setState({
-			selectedThesis: thesis,
+			selectedThesisId: data.id,
 		});
+	}
+
+	private getCurrentlySelectedThesis(): Thesis | null {
+		const result = this.state.thesesList.find(t => t.id === this.state.selectedThesisId);
+		if (!result) {
+			console.warn(`We had a bad thesis ID ${this.state.selectedThesisId} on our state`);
+			this.state.selectedThesisId = -1;
+			return null;
+		}
+		return result;
 	}
 
 	public render() {
@@ -206,22 +216,23 @@ export class ThesesApp extends React.Component<Props, State> {
 				{this.renderThesesList()}
 			</>
 		);
-		return this.state.selectedThesis
+		const currentThesis = this.getCurrentlySelectedThesis();
+		return currentThesis !== null
 			? <>
 				{mainComponent}
-				<br />,
-				<hr />,
+				<br />
+				<hr />
 				<ThesisDetails
-					selectedThesis={this.state.selectedThesis}
+					selectedThesis={currentThesis}
 					onModifiedThesisSaved={this.handleThesisSaved}
 				/>
 			</>
 			: mainComponent;
 	}
 
-	private handleThesisSaved = () => {
+	private handleThesisSaved = async () => {
 		console.warn("SAVED");
-		return Promise.resolve();
+		await this.fetchThesesList();
 	}
 }
 

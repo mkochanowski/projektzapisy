@@ -69,7 +69,7 @@ class ThesesViewSet(viewsets.ModelViewSet):
         result = filter_theses_queryset(
             requested_thesis_type, requested_thesis_title, requested_advisor_name
         )
-        return result
+        return result.order_by("-added_date")
 
 
 def filter_theses_queryset(thesis_type: ThesisTypeFilter, title: str, advisor_name: str):

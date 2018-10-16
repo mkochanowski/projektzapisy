@@ -40,16 +40,20 @@ class AsyncSelectAutocompleteGetter {
 	public get = async (inputValue: string, _: any) => {
 		const thisPageNum = this.pageNumberForInput.get(inputValue) || 1;
 
-		const acResults = await getPersonAutocomplete(this.personType, inputValue, thisPageNum);
-		const result = acResults.results.map(pac => ({ value: pac.id, label: pac.displayName }));
+		try {
+			const acResults = await getPersonAutocomplete(this.personType, inputValue, thisPageNum);
+			const result = acResults.results.map(pac => ({ value: pac.id, label: pac.displayName }));
 
-		this.pageNumberForInput.set(inputValue, thisPageNum + 1);
+			this.pageNumberForInput.set(inputValue, thisPageNum + 1);
 
-		return {
-			options: result,
-			hasMore: acResults.hasMore,
-			page: thisPageNum,
-		};
+			return {
+				options: result,
+				hasMore: acResults.hasMore,
+				page: thisPageNum,
+			};
+		} catch (err) {
+			alert(`Nie udało się pobrać listy (${err.toString()}); odśwież stronę lub spróbuj później`);
+		}
 	}
 }
 
@@ -67,5 +71,6 @@ export function PersonSelect(props: PersonSelectComponentProps) {
 		onChange={(nv: PersonSelectOptions | null) => props.onChange(selectOptionsToPerson(nv))}
 		value={personToSelectOptions(props.value)}
 		placeholder={"Wybierz..."}
+		noResultsText={"Pobieranie listy..."}
 	/></SelectComponentWrapper>;
 }

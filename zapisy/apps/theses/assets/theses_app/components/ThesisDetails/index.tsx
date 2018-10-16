@@ -36,6 +36,7 @@ border: 1px solid black;
 padding: 15px;
 display: flex;
 flex-direction: row;
+width: 100%;
 `;
 
 const LeftDetailsContainer = styled.div`
