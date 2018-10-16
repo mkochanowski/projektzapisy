@@ -168,6 +168,8 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	private setGriddleFilter() {
 		this.griddle.setFilter(GRIDDLE_FILTER_MAGIC);
+		// Griddle is such a piece of shit
+		document.querySelector("div.griddle > div > div > div > div")!.scrollTop = 0;
 	}
 
 	private onTypeFilterChanged = async (newFilter: ThesisTypeFilter) => {
@@ -199,6 +201,9 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private getCurrentlySelectedThesis(): Thesis | null {
+		if (this.state.selectedThesisId === -1) {
+			return null;
+		}
 		const result = this.state.thesesList.find(t => t.id === this.state.selectedThesisId);
 		if (!result) {
 			console.warn(`We had a bad thesis ID ${this.state.selectedThesisId} on our state`);
