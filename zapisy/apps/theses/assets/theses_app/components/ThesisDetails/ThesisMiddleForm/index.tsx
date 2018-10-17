@@ -5,6 +5,7 @@ import { Thesis, ThesisKind, Employee, Student } from "../../../types";
 import { PersonType } from "../../../backend_callers";
 import { PersonSelect } from "./PersonSelect";
 import { ThesisKindSelect } from "./ThesisKindSelect";
+import { AddIcon } from "./AddIcon";
 
 const MidFormTable = styled.table`
 width: 100%;
@@ -29,6 +30,11 @@ const OptionalFieldLabel = styled.span`
 font-style: italic;
 `;
 
+type State = {
+	displayAuxAdvisor: boolean;
+	displayAuxStudent: boolean;
+};
+
 type Props = {
 	thesis: Thesis;
 	onTitleChanged: (nt: string) => void;
@@ -40,7 +46,27 @@ type Props = {
 	onDescriptionChanged: (nd: string) => void;
 };
 
-export class ThesisMiddleForm extends React.Component<Props> {
+export class ThesisMiddleForm extends React.Component<Props, State> {
+	constructor(props: Props) {
+		super(props);
+		this.state = {
+			displayAuxAdvisor: props.thesis.auxiliaryAdvisor !== null,
+			displayAuxStudent: props.thesis.secondStudent !== null,
+		};
+	}
+
+	private handleDescriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		this.props.onDescriptionChanged(e.target.value);
+	}
+
+	private handleShowAuxiliaryAdvisor = () => {
+		this.setState({ displayAuxAdvisor: true });
+	}
+
+	private handleShowSecondStudent = () => {
+		this.setState({ displayAuxStudent: true });
+	}
+
 	public render() {
 		return <div>
 			<MidFormTable>
@@ -71,17 +97,20 @@ export class ThesisMiddleForm extends React.Component<Props> {
 							value={this.props.thesis.advisor}
 						/>
 					</td>
+					<td><AddIcon onClick={this.handleShowAuxiliaryAdvisor} /></td>
 				</tr>
-				<tr>
-					<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
-					<td>
-						<PersonSelect
-							personType={PersonType.Employee}
-							onChange={this.props.onAuxAdvisorChanged}
-							value={this.props.thesis.auxiliaryAdvisor}
-						/>
-					</td>
-				</tr>
+				{ this.state.displayAuxAdvisor ? (
+					<tr>
+						<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
+						<td>
+							<PersonSelect
+								personType={PersonType.Employee}
+								onChange={this.props.onAuxAdvisorChanged}
+								value={this.props.thesis.auxiliaryAdvisor}
+							/>
+						</td>
+					</tr>
+				) : null }
 				<tr>
 					<td>Student</td>
 					<td>
@@ -91,23 +120,26 @@ export class ThesisMiddleForm extends React.Component<Props> {
 							value={this.props.thesis.student}
 						/>
 					</td>
+					<td><AddIcon onClick={this.handleShowSecondStudent} /></td>
 				</tr>
-				<tr>
-					<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
-					<td>
-						<PersonSelect
-							personType={PersonType.Student}
-							onChange={this.props.onSecondStudentChanged}
-							value={this.props.thesis.secondStudent}
-						/>
-					</td>
-				</tr>
+				{ this.state.displayAuxStudent ? (
+					<tr>
+						<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
+						<td>
+							<PersonSelect
+								personType={PersonType.Student}
+								onChange={this.props.onSecondStudentChanged}
+								value={this.props.thesis.secondStudent}
+							/>
+						</td>
+					</tr>
+				) : null }
 				</tbody>
 			</MidFormTable>
 			<textarea
 				style={{ width: "100%", height: "100px", boxSizing: "border-box" }}
 				value={this.props.thesis.description}
-				onChange={ev => this.props.onDescriptionChanged(ev.target.value)}
+				onChange={this.handleDescriptionChanged}
 			/>
 		</div>;
 	}
