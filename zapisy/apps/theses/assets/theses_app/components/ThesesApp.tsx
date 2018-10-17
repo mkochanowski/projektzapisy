@@ -122,6 +122,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		});
 	}
 
+	// See setGriddleFilter
 	private griddleFilterer = (results: GriddleThesisData[], filter: any) => {
 		if (filter !== GRIDDLE_FILTER_MAGIC) {
 			return results;
@@ -167,8 +168,18 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private setGriddleFilter() {
+		// This is a rather big hack to achieve what we want;
+		// I want the filters in external components I manage myself; when
+		// the value is changed I just want to tell griddle to update itself
+		// we use a ref to save the component instance and call the internal setFilter
+		// method; this forces griddle to call the (user supplied) custom filtering method
+		// where I apply the new filters
+		// To be able to tell whether it's me who called my custom filtered
+		// I pass this "magic" filter argument; in the handler I only use it to check
+		// if it was me who called it, the filters are saved on `this`
 		this.griddle.setFilter(GRIDDLE_FILTER_MAGIC);
-		// Griddle is such a piece of shit
+		// Changing a filter will almost certainly change the result set,
+		// so it'd be nice to scroll to the top but griddle won't do that itself, so...
 		document.querySelector("div.griddle > div > div > div > div")!.scrollTop = 0;
 	}
 
