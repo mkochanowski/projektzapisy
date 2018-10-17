@@ -3,13 +3,13 @@ import Button from "react-button-component";
 import styled from "styled-components";
 import { clone } from "lodash";
 import update, { Query } from "immutability-helper";
+import { Moment } from "moment";
 
 import { Thesis, ThesisStatus, ThesisKind, Employee } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
-import { Moment } from "moment";
-import { saveModifiedThesis } from "../../backend_callers";
+
 import { SavingIndicator } from "./SavingIndicator";
 
 const SaveButton = Button.extend`
@@ -52,12 +52,12 @@ margin-left: 20px;
 
 type Props = {
 	selectedThesis: Thesis;
-	onModifiedThesisSaved: () => Promise<void>;
+	onSaveRequested: (modifiedThesis: Thesis) => void;
+	isSaving: boolean;
 };
 
 type State = {
 	currentThesis: Thesis;
-	isSaving: boolean;
 };
 
 export class ThesisDetails extends React.Component<Props, State> {
@@ -65,7 +65,6 @@ export class ThesisDetails extends React.Component<Props, State> {
 		super(props);
 		this.state = {
 			currentThesis: clone(props.selectedThesis),
-			isSaving: false,
 		};
 	}
 
@@ -78,12 +77,11 @@ export class ThesisDetails extends React.Component<Props, State> {
 
 	public render() {
 		const shouldAllowSave = this.shouldAllowSave();
-		const { isSaving } = this.state;
 
 		return <DetailsSectionWrapper>
-			{isSaving ? <SavingIndicator/> : null}
+			{this.props.isSaving ? <SavingIndicator/> : null}
 			<MainDetailsContainer
-				style={isSaving ? { opacity: 0.5, pointerEvents: "none" } : {}}
+				style={this.props.isSaving ? { opacity: 0.5, pointerEvents: "none" } : {}}
 			>
 				<LeftDetailsContainer>
 					<ThesisTopRow
@@ -106,7 +104,7 @@ export class ThesisDetails extends React.Component<Props, State> {
 				<RightDetailsContainer>
 					<ThesisVotes />
 					<SaveButton
-						onClick={this.onSaveRequested}
+						onClick={this.handleSave}
 						disabled={!shouldAllowSave}
 						title={shouldAllowSave ? "Zapisz zmiany" : "Nie dokonano zmian"}
 					>Zapisz</SaveButton>
@@ -163,21 +161,7 @@ export class ThesisDetails extends React.Component<Props, State> {
 		this.updateThesisState({ description: { $set: newDesc } });
 	}
 
-	private setSavingState(isSaving: boolean): void {
-		this.setState({ isSaving });
-	}
-
-	private onSaveRequested = async () => {
-		this.setSavingState(true);
-		try {
-			await saveModifiedThesis(this.props.selectedThesis, this.state.currentThesis);
-			await this.props.onModifiedThesisSaved();
-		} catch (err) {
-			alert(
-				"Nie udało się zapisać pracy. Spróbuj jeszcze raz. " +
-				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów"
-			);
-		}
-		this.setSavingState(false);
+	private handleSave = () => {
+		this.props.onSaveRequested(this.state.currentThesis);
 	}
 }

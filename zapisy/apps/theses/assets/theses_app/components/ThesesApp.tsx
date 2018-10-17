@@ -3,7 +3,7 @@ import Griddle, { ColumnMetaData } from "griddle-react";
 
 import { Thesis, ThesisStatus, ThesisKind } from "../types";
 import { TopFilters } from "./TopFilters";
-import { ThesisTypeFilter, getThesesList } from "../backend_callers";
+import { ThesisTypeFilter, getThesesList, saveModifiedThesis } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ReservationIndicator } from "./ReservationIndicator";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
@@ -33,27 +33,33 @@ const GRIDDLE_NO_DATA = "Brak wyników";
 // ACHTUNG must match value in views.py
 const THESES_PER_PAGE = 10;
 
+const enum ApplicationState {
+	InitialLoading,
+	PerformingBackendChanges,
+	Normal,
+}
+
 type Props = {};
 
 type State = {
-	selectedThesisId: number;
+	selectedThesis: Thesis | null;
 	currentTypeFilter: ThesisTypeFilter;
 	currentTitleFilter: string;
 	currentAdvisorFilter: string;
 
 	thesesList: Thesis[];
-	isLoadingThesesList: boolean;
+	applicationState: ApplicationState,
 };
 
 const initialState: State = {
-	selectedThesisId: -1,
+	selectedThesis: null,
 
 	currentTypeFilter: ThesisTypeFilter.Default,
 	currentTitleFilter: "",
 	currentAdvisorFilter: "",
 
 	thesesList: [],
-	isLoadingThesesList: true,
+	applicationState: ApplicationState.InitialLoading,
 };
 
 type GriddleThesisData = {
@@ -69,15 +75,10 @@ export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
 	private griddle: any;
 
-	componentDidMount() {
-		this.fetchThesesList();
-	}
-
-	private async fetchThesesList() {
-		this.setState({ isLoadingThesesList: true });
-		await this.setStateAsync({
+	async componentDidMount() {
+		this.setState({
 			thesesList: await getThesesList(),
-			isLoadingThesesList: false,
+			applicationState: ApplicationState.Normal,
 		});
 	}
 
@@ -95,7 +96,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			advisorValue={this.state.currentAdvisorFilter}
 			onTitleChange={this.onTitleFilterChanged}
 			titleValue={this.state.currentTitleFilter}
-			enabled={!this.state.isLoadingThesesList}
+			enabled={this.state.applicationState === ApplicationState.Normal}
 		/>;
 	}
 
@@ -131,33 +132,39 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private renderThesesList() {
-		return <Griddle
-			ref={this.setGriddle}
-			useGriddleStyles={false}
-			tableClassName={"griddleTable"}
-			showFilter={false}
-			enableInfiniteScroll
-			infiniteScrollLoadTreshold={25}
-			useFixedHeader
-			bodyHeight={200}
-			resultsPerPage={THESES_PER_PAGE}
-			onRowClick={(this.onRowClick as any)}
-			columnMetadata={griddleColumnMeta}
-			metadataColumns={["id"]}
-			results={this.getTableResults()}
-			noDataMessage={GRIDDLE_NO_DATA}
-			useCustomFilterer={true}
-			customFilterer={this.griddleFilterer}
-			// Hacky: you don't have to set useExternalData for this stuff to work
-			externalIsLoading={this.state.isLoadingThesesList}
-			externalLoadingComponent={ListLoadingIndicator}
-			// @ts-ignore - missing prop
-			allowEmptyGrid={this.state.isLoadingThesesList}
-		/>;
+		const { applicationState } = this.state;
+		const style: React.CSSProperties = (
+			applicationState === ApplicationState.PerformingBackendChanges
+			? { opacity: 0.5, pointerEvents: "none" } : { }
+		);
+		return <div style={style}>
+			<Griddle
+				ref={this.setGriddle}
+				useGriddleStyles={false}
+				tableClassName={"griddleTable"}
+				showFilter={false}
+				enableInfiniteScroll
+				infiniteScrollLoadTreshold={25}
+				useFixedHeader
+				bodyHeight={200}
+				resultsPerPage={THESES_PER_PAGE}
+				onRowClick={(this.onRowClick as any)}
+				columnMetadata={griddleColumnMeta}
+				metadataColumns={["id"]}
+				results={this.getTableResults()}
+				noDataMessage={GRIDDLE_NO_DATA}
+				useCustomFilterer={true}
+				customFilterer={this.griddleFilterer}
+				// @ts-ignore - missing prop
+				allowEmptyGrid={applicationState === ApplicationState.InitialLoading}
+				// Hacky: you don't have to set useExternalData for this stuff to work
+				externalIsLoading={applicationState === ApplicationState.InitialLoading}
+				externalLoadingComponent={ListLoadingIndicator}
+			/>
+		</div>;
 	}
 
 	private getTableResults(): GriddleThesisData[] {
-		console.error("GET RESULTS", this.state.thesesList);
 		const griddleResults = this.state.thesesList.map(thesis => ({
 			id: thesis.id,
 			reserved: thesis.reserved,
@@ -204,27 +211,21 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setGriddleFilter();
 	}
 
-	private onRowClick = (row: any, _e: MouseEvent) => {
-		const data: GriddleThesisData = row.props.data;
-		this.setState({
-			selectedThesisId: data.id,
-		});
+	private getThesisForId(id: number, theses: Thesis[] = this.state.thesesList): Thesis | null {
+		return theses.find(t => t.id === id) || null;
 	}
 
-	private getCurrentlySelectedThesis(): Thesis | null {
-		if (this.state.selectedThesisId === -1) {
-			return null;
+	private onRowClick = (row: any, _e: MouseEvent) => {
+		const data: GriddleThesisData = row.props.data;
+		const thesis = this.getThesisForId(data.id);
+		if (!thesis) {
+			console.warn(`[Table onclick] Griddle had bad thesis ID ${data.id}`);
 		}
-		const result = this.state.thesesList.find(t => t.id === this.state.selectedThesisId);
-		if (!result) {
-			console.warn(`We had a bad thesis ID ${this.state.selectedThesisId} on our state`);
-			this.state.selectedThesisId = -1;
-			return null;
-		}
-		return result;
+		this.setState({ selectedThesis: thesis });
 	}
 
 	public render() {
+		console.warn("Main render");
 		const mainComponent = (
 			<>
 				{this.renderTopFilters()}
@@ -232,23 +233,47 @@ export class ThesesApp extends React.Component<Props, State> {
 				{this.renderThesesList()}
 			</>
 		);
-		const currentThesis = this.getCurrentlySelectedThesis();
-		return currentThesis !== null
+		const { selectedThesis } = this.state;
+		return selectedThesis !== null
 			? <>
 				{mainComponent}
 				<br />
 				<hr />
 				<ThesisDetails
-					selectedThesis={currentThesis}
-					onModifiedThesisSaved={this.handleThesisSaved}
+					selectedThesis={selectedThesis}
+					onSaveRequested={this.handleThesisSave}
+					isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
 				/>
 			</>
 			: mainComponent;
 	}
 
-	private handleThesisSaved = async () => {
-		console.warn("SAVED");
-		await this.fetchThesesList();
+	private handleThesisSave = async (modifiedThesis: Thesis) => {
+		const { selectedThesis } = this.state;
+		if (selectedThesis === null) {
+			console.warn("Tried to save thesis but none selected, this shouldn't happen");
+			return;
+		}
+		this.setState({ applicationState: ApplicationState.PerformingBackendChanges });
+		const oldSelectedThesisId = selectedThesis.id;
+		try {
+			await saveModifiedThesis(selectedThesis, modifiedThesis);
+		} catch (err) {
+			alert(
+				"Nie udało się zapisać pracy. Spróbuj jeszcze raz. " +
+				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów"
+			);
+			return;
+		}
+		// This could theoretically be null if someone deletes what we've just saved
+		// slim chance but who knows
+		const newList = await getThesesList();
+		const newThesisInstance = this.getThesisForId(oldSelectedThesisId, newList);
+		this.setState({
+			thesesList: newList,
+			applicationState: ApplicationState.Normal,
+			selectedThesis: newThesisInstance,
+		});
 	}
 }
 
