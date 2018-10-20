@@ -60,9 +60,10 @@ def vote_main(request):
     """
         Vote main page
     """
-    sytem_state = SystemState.get_state()
-    data = {'isVoteActive': sytem_state.is_system_active(), 'max_points': sytem_state.max_points,
-            'semester': Semester.get_current_semester()}
+    system_state = SystemState.get_state()
+    data = {'isVoteActive': system_state.is_system_active(), 'max_points': system_state.max_points,
+            'semester': Semester.get_current_semester(), 'vote_beg': system_state.vote_beg.strftime("%H:%M %d.%m.%Y"),
+            'vote_end': system_state.vote_end.strftime("%H:%M %d.%m.%Y")}
     return render(request, 'offer/vote/index.html', data)
 
 

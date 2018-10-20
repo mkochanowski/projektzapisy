@@ -25,7 +25,7 @@
     margin-bottom: 30px;
 }
 
-#od-vote-main .link, #od-vote-main .disabled-link
+#od-vote-main .link, #od-vote-main .disabled-link, #od-vote-main .vote-beg
 {
     text-align: center;
 }
