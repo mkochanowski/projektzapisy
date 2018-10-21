@@ -130,7 +130,11 @@
                         </li>
                     {% endif %}
                     <li{% block events_active %}{% endblock %}>
-                        <a href="{% url 'events:classrooms' %}">Sale</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'events:classrooms' %}">Sale</a>
+                        {% else %}
+                            <a href="{% url 'events:event_show' %}">Sale</a>
+                        {% endif %}
                     </li>
 
                 </ul>
