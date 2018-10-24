@@ -60,11 +60,19 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 	}
 
 	private triggerAuxAdvVisibility = () => {
-		this.setState({ displayAuxAdvisor: !this.state.displayAuxAdvisor });
+		const newValue = !this.state.displayAuxAdvisor;
+		this.setState({ displayAuxAdvisor: newValue });
+		if (!newValue) {
+			this.props.onAuxAdvisorChanged(null);
+		}
 	}
 
 	private triggerSecondStudentVisibility = () => {
-		this.setState({ displayAuxStudent: !this.state.displayAuxStudent });
+		const newValue = !this.state.displayAuxStudent;
+		this.setState({ displayAuxStudent: newValue });
+		if (!newValue) {
+			this.props.onSecondStudentChanged(null);
+		}
 	}
 
 	public render() {
