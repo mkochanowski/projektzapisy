@@ -8,6 +8,7 @@ import { BasePerson } from "../../../types";
 
 const SelectComponentWrapper = styled.div`
 width: 50%;
+display: inline-block;
 `;
 
 export type PersonSelectOptions = {

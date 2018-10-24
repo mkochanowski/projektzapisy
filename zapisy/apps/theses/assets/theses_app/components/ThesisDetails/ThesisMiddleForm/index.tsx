@@ -5,25 +5,25 @@ import { Thesis, ThesisKind, Employee, Student } from "../../../types";
 import { PersonType } from "../../../backend_callers";
 import { PersonSelect } from "./PersonSelect";
 import { ThesisKindSelect } from "./ThesisKindSelect";
-import { AddIcon } from "./AddIcon";
+import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
 
 const MidFormTable = styled.table`
-width: 100%;
+	width: 100%;
 
-td {
-	border-left: 4px solid transparent;
-	border-top: 6px solid transparent;
-}
-td:first-child {
-	border-left: 0;
-}
-tr:first-child td {
-	border-top: 0;
-}
+	td {
+		border-left: 4px solid transparent;
+		border-top: 6px solid transparent;
+	}
+	td:first-child {
+		border-left: 0;
+	}
+	tr:first-child td {
+		border-top: 0;
+	}
 
-tr td:first-child {
-	width: 13%;
-}
+	tr td:first-child {
+		width: 13%;
+	}
 `;
 
 const OptionalFieldLabel = styled.span`
@@ -59,12 +59,12 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 		this.props.onDescriptionChanged(e.target.value);
 	}
 
-	private handleShowAuxiliaryAdvisor = () => {
-		this.setState({ displayAuxAdvisor: true });
+	private triggerAuxAdvVisibility = () => {
+		this.setState({ displayAuxAdvisor: !this.state.displayAuxAdvisor });
 	}
 
-	private handleShowSecondStudent = () => {
-		this.setState({ displayAuxStudent: true });
+	private triggerSecondStudentVisibility = () => {
+		this.setState({ displayAuxStudent: !this.state.displayAuxStudent });
 	}
 
 	public render() {
@@ -96,8 +96,11 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 							onChange={this.props.onAdvisorChanged}
 							value={this.props.thesis.advisor}
 						/>
+						<AddRemoveIcon
+							onClick={this.triggerAuxAdvVisibility}
+							type={this.state.displayAuxAdvisor ? IconType.Remove : IconType.Add}
+						/>
 					</td>
-					<td><AddIcon onClick={this.handleShowAuxiliaryAdvisor} /></td>
 				</tr>
 				{ this.state.displayAuxAdvisor ? (
 					<tr>
@@ -119,8 +122,11 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 							onChange={this.props.onStudentChanged}
 							value={this.props.thesis.student}
 						/>
+						<AddRemoveIcon
+							onClick={this.triggerSecondStudentVisibility}
+							type={this.state.displayAuxStudent ? IconType.Remove : IconType.Add}
+						/>
 					</td>
-					<td><AddIcon onClick={this.handleShowSecondStudent} /></td>
 				</tr>
 				{ this.state.displayAuxStudent ? (
 					<tr>
