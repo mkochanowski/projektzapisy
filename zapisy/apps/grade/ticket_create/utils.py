@@ -83,6 +83,17 @@ def revMod(a, m):
     return x
 
 
+def cmp(a, b):
+    """
+    Since there is no cmp in python 3 documentation suggests this expression to
+    emulate the feature
+    :param a:
+    :param b:
+    :return:
+    """
+    return (a > b) - (b < a)
+
+
 def poll_cmp(poll1, poll2):
     if poll1.group:
         if poll2.group:
