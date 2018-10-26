@@ -14,8 +14,10 @@ from apps.grade.ticket_create.models import PublicKey, \
     PrivateKey, \
     UsedTicketStamp
 from functools import cmp_to_key
+from typing import List
 
 RAND_BITS = 512
+KEY_BITS = 1024
 
 
 def flatten(x):
@@ -335,7 +337,24 @@ def secure_signer_without_save(user, g, t):
         return "Nie jesteś przypisany do tej ankiety",
     except TicketUsed:
         return "Bilet już pobrano",
+    except ValueError:
+        return "Niepoprawny format"
 
+
+def normalize_tickets(ts: List[str]) -> List[int]:
+    ts_as_int = []
+    for ticket in ts:
+        try:
+            ticket_as_int = int(ticket)
+            if ticket_as_int < 0 or ticket_as_int.bit_length() > KEY_BITS:
+                raise ValueError
+            ts_as_int.append(ticket_as_int)
+            
+        except ValueError:
+            # TODO: except of ignoring wrong ticket format, we should handle it somehow
+            continue
+    return ts_as_int
+        
 
 def secure_mark(user, g, t):
     try:
@@ -357,9 +376,12 @@ def secure_signer(user, g, t):
 
 def unblind(poll, st):
     st = st[0]
-    if st == "Nie jesteś przypisany do tej ankiety":
-        return st
-    elif st == "Bilet już pobrano":
+    errors = [
+        "Nie jesteś przypisany do tej ankiety",
+        "Bilet już pobrano",
+        "Niepoprawny format",
+    ]
+    if st in errors:
         return st
     else:
         st = st[0]
