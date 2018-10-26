@@ -25,9 +25,9 @@ class PrivateKey(models.Model):
 
     # FIXME the return type of this method is due to legacy ticket
     # handling code in ticket_create/views and poll/utils
-    def sign_ticket(self, ticket: str) -> Tuple[int]:
+    def sign_ticket(self, ticket: int) -> Tuple[int]:
         key = RSA.importKey(self.private_key)
-        ticket_hash = SHA256.new(ticket.encode("utf-8"))
-        signed = pkcs1_15.new(key).sign(ticket_hash)
-        signed_as_int = PrivateKey._int_from_bytes(signed)
-        return (signed_as_int, )
+        if ticket >= key.n:
+            raise ValueError
+        signed = pow(ticket, key.d, key.n)
+        return (signed, )
