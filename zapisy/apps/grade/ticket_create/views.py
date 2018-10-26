@@ -14,7 +14,8 @@ from apps.users.models import BaseUser
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
-    secure_signer, unblind, get_valid_tickets, to_plaintext, connect_groups, secure_signer_without_save, secure_mark
+    secure_signer, unblind, get_valid_tickets, to_plaintext, connect_groups, secure_signer_without_save, \
+    secure_mark, normalize_tickets
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
@@ -63,10 +64,11 @@ def ajax_get_rsa_keys_step2(request):
             )
             if form.is_valid():
                 ts = json.loads(request.POST.get('ts'))
+                ts_to_sign = normalize_tickets(ts)
                 connected_groups = connect_groups(groupped_polls, form)
                 groups = reduce(list.__add__, connected_groups)
-                tickets = zip(groups, ts)
-                signed = [(group, int(t), secure_signer_without_save(request.user, group, t))
+                tickets = zip(groups, ts_to_sign)
+                signed = [(group, t, secure_signer_without_save(request.user, group, t))
                           for group, t in tickets]
                 unblinds = [(str(ticket), unblind(group, ticket_signature))
                             for group, ticket, ticket_signature in signed]
