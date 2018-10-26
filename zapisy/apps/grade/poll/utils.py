@@ -39,14 +39,19 @@ def poll_and_ticket_cmp(pollTuple1, pollTuple2):
 def int_to_bytes(x: int) -> bytes:
     return x.to_bytes((x.bit_length() + 7) // 8, 'big')
 
+def bytes_to_int(x: bytes) -> int:
+    return int.from_bytes(x, byteorder='big')
+
 
 def check_signature(ticket: str, ticket_signature: int, public_key):
-    pk = RSA.importKey(public_key.public_key)
-    ticket_hash = SHA256.new(ticket.encode("utf-8"))
-    signature_as_bytes = int_to_bytes(ticket_signature)
     try:
-        pkcs1_15.new(pk).verify(ticket_hash, signature_as_bytes)
-        return True
+        ticket = int(ticket)
+        pk = RSA.importKey(public_key.public_key)
+        signature_pow_e = pow(ticket_signature, pk.e, pk.n)
+        signature_pow_e_as_bytes = int_to_bytes(signature_pow_e)
+        ticket_hash = SHA256.new(int_to_bytes(ticket)).digest()
+
+        return ticket_hash == signature_pow_e_as_bytes
     except (TypeError, ValueError):
         return False
 
