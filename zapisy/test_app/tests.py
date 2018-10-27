@@ -47,7 +47,7 @@ class SeleniumTestCase(LiveServerTestCase):
         """
         Method creating firefox driver for Selenium tests.
         """
-        cls.driver = webdriver.Firefox()
+        cls.driver = webdriver.PhantomJS()
         cls.driver.set_window_size(1024, 1024)
         super(SeleniumTestCase, cls).setUpClass()
 

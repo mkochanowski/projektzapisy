@@ -156,6 +156,14 @@ apt-get -y install xvfb
 apt-get -y install firefox
 apt-get -y install memcached
 
+# install PhantomJS
+apt-get -y install build-essential chrpath libssl-dev libxft-dev 
+apt-get -y install libfreetype6-dev libfreetype6 libfontconfig1-dev libfontconfig1
+
+wget --no-verbose https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
+sudo tar xvjf phantomjs-2.1.1-linux-x86_64.tar.bz2 -C /usr/local/share/
+sudo ln -s /usr/local/share/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/local/bin/
+rm phantomjs-2.1.1-linux-x86_64.tar.bz2
 # install firefox45 and geckodriver for selenium
 # firefox45
 wget --no-verbose https://ftp.mozilla.org/pub/firefox/releases/45.0/linux-x86_64/en-US/firefox-45.0.tar.bz2
