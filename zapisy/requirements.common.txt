@@ -32,3 +32,5 @@ postmarkup==1.2.2
 unidecode==1.0.22
 # PyYAML is used for fixtures.
 pyyaml==3.13
+# Silk is used for profiling
+django-silk==3.0.1

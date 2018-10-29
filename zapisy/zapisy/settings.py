@@ -160,6 +160,7 @@ TEMPLATES = [
 # and Authentication both must come before LocalePref which
 # must precede LocaleMiddleware, and Common must go afterwards.
 MIDDLEWARE = [
+    'silk.middleware.SilkyMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -223,6 +224,7 @@ INSTALLED_APPS = (
     'test_app',
     'django_rq',
     'webpack_loader',
+    'silk',
 )
 
 MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
@@ -359,3 +361,7 @@ REST_FRAMEWORK = {
     # default filter backends for views - enables querying/filtering after specifying `filter_fields` in a view
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
+
+SILKY_PYTHON_PROFILER = True
+SILKY_PYTHON_PROFILER_BINARY = True
+SILKY_PYTHON_PROFILER_RESULT_PATH = '../profiler_result'

@@ -46,4 +46,5 @@ urlpatterns = [
     url(r'^accounts/login$', views.login, name='cas_ng_login'),
     url(r'^accounts/logout$', views.logout, name='cas_ng_logout'),
     url(r'^accounts/callback$', views.callback, name='cas_ng_proxy_callback'),
+    url(r'^silk/', include('silk.urls', namespace='silk'))
 ]
