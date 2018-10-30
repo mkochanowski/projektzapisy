@@ -193,6 +193,7 @@ PIPELINE_JS = {
             'js/jquery/tooltip.jquery.js',
             'js/grade/ticket_create/BigInt.js',
             'js/grade/ticket_create/ticket_create.js',
+            'js/grade/ticket_create/forge-sha256.js',
         ),
         'output_filename': 'js/connectionchoice.min.js',
     },
