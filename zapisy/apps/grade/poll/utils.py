@@ -48,10 +48,10 @@ def check_signature(ticket: str, ticket_signature: int, public_key):
         ticket = int(ticket)
         pk = RSA.importKey(public_key.public_key)
         signature_pow_e = pow(ticket_signature, pk.e, pk.n)
-        signature_pow_e_as_bytes = int_to_bytes(signature_pow_e)
-        ticket_hash = SHA256.new(int_to_bytes(ticket)).digest()
+        ticket_hash = SHA256.new(str(ticket).encode()).hexdigest()
+        ticket_hash_as_int = int(ticket_hash, 16)
 
-        return ticket_hash == signature_pow_e_as_bytes
+        return ticket_hash_as_int == signature_pow_e
     except (TypeError, ValueError):
         return False
 

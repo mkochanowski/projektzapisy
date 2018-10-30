@@ -64,12 +64,11 @@ Ticket.create.step2 = function (keys) {
 }
 
 // The server signed our generated tickets and sent
-// them to us; previously we'd shuffle them with some modular
-// arithmetic, but this is now disabled as that algorithm
-// it not compatible with pycryptodome anymore and it provided
-// no extra security one way or another
-// Now this function essentially just resends the server's response
-// back to it so it can render the tickets in tickets_save.html
+// them to us; Now we unblind the signed ticket by
+// multiplying by inverse of r, and then send both
+// ticket and its signature to the server to do
+// rendering for us(this should be done client side)
+
 Ticket.create.step3 = function (unblinds) {
     $("#progressbar").progressbar("option", "value", 70);
     $.each(unblinds, Ticket.create.unblinds_generator);
@@ -98,41 +97,38 @@ Ticket.create.unblinds_generator = function (index, unblind) {
         Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10))
     }
     else {
-        var ticket = unblind[0];
         var ticketSignature = unblind[1][0];
-        Ticket.create.unblindt_array.push(ticket);
-        Ticket.create.unblindst_array.push(ticketSignature);
 
-        // FIXME disabled this after we transition to Python3/pycryptodome
-        // the legacy signing/verification algo used by pycrypto
-        // that allowed this to work is no longer supported
-
-        //var st = str2bigInt(unblind[1][0], 10, 10)
-        // var n = str2bigInt(unblind[1][1], 10, 10)
-        // var e = str2bigInt(unblind[1][2], 10, 10)
-        // var rk = inverseMod(Ticket.create.k_array[index], n)
-        // Ticket.create.unblindst_array.push(bigInt2str(multMod(mod(st, n), mod(rk, n), n), 10))
-        // Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10))
+        var st = str2bigInt(ticketSignature, 10, 10)
+        var n = str2bigInt(unblind[1][1], 10, 10)
+        var e = str2bigInt(unblind[1][2], 10, 10)
+        var rk = inverseMod(Ticket.create.k_array[index], n)
+        Ticket.create.unblindst_array.push(bigInt2str(multMod(st, rk, n), 10))
+        Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10))
     }
 }
 
+// This is where core of our crypto happens
+// m and k are generated randomly with exactly same bit length as n,
+// then the ticket is computed as SHA256(m) * k^e mod n
+// SHA256(m) means that we convert int m to string with base 10,
+// compute SHA256 of it, and then convert it back to int
 Ticket.create.t_generator = function (key, val) {
-    var m = randBigInt(512, 0)
     $.each(val, function (nr, g) {
-        var n = str2bigInt(g[0], 10, 10)
-        var e = str2bigInt(g[1], 10, 10)
-        var bits = bitSize(n)
-
+        var n = str2bigInt(g[0], 10, 10);
+        var e = str2bigInt(g[1], 10, 10);
+        var bits = bitSize(n);
         do
         {
-            var k = randBigInt(bits, 0)
-        } while ((greater(k, n) || greater(int2bigInt(2, 2, 1), k)) && !equalsInt(GCD(k, n), 1)) ;
+            var m = randBigInt(bits, 1);
+            var k = randBigInt(bits, 1);
+        } while ( greater(k, n) || greater(m, n) || !equalsInt(GCD(k, n), 1) );
 
         Ticket.create.k_array.push(k);
-        Ticket.create.m_array.push(mod(m, n));
-        var a = mod(m, n)
-        var b = powMod(k, e, n)
-        var t = multMod(a, b, n)
+        Ticket.create.m_array.push(m);
+        var m_sha256 = str2bigInt(forge_sha256(bigInt2str(m, 10)), 16);
+        var k_pow_e = powMod(k, e, n);
+        var t = multMod(m_sha256, k_pow_e, n);
 
         Ticket.create.t_array.push(bigInt2str(t, 10))
     });
