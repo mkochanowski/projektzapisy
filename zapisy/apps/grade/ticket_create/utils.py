@@ -272,6 +272,12 @@ def generate_keys(poll_list):
 
     return keys
 
+def get_pubkey_as_dict(poll):
+    key = RSA.importKey(PublicKey.objects.get(poll=poll).public_key)
+    return {
+        'n': str(key.n),
+        'e': str(key.e),
+    }
 
 def check_poll_visiblity(user, poll):
     """Checks, whether user is a student entitled to the poll.
@@ -332,7 +338,7 @@ def ticket_check_and_sign_without_mark(user, poll, ticket):
 
 def secure_signer_without_save(user, g, t):
     try:
-        return ticket_check_and_sign_without_mark(user, g, t),
+        return ticket_check_and_sign_without_mark(user, g, t)
     except InvalidPollException:
         return "Nie jesteś przypisany do tej ankiety",
     except TicketUsed:
@@ -419,6 +425,23 @@ def to_plaintext(vtl):
         res += str(st) + " &#10;"
         res += "---------------------------------- &#10;"
     return SafeText(str(res))
+
+
+def get_poll_info_as_dict(poll):
+    res = {}
+    res['title'] = poll.title
+    if not poll.group:
+        res['course_name'] = 'Ankieta ogólna'
+    else:
+        res['course_name'] = poll.group.course.name
+        res['type'] = poll.group.get_type_display()
+        res['teacher_name'] = poll.group.get_teacher_full_name()
+    if poll.studies_type:
+        res['studies_type'] = poll.studies_type
+
+    res['id'] = poll.pk
+
+    return res
 
 
 # FIXME explanation of ticket parsing code: str(int())
