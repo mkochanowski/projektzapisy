@@ -15,6 +15,8 @@ Ticket.create.init = function () {
     Ticket.create.unblindst_array = new Array();
     Ticket.create.unblindt_array = new Array();
     Ticket.create.k_array = new Array();
+    Ticket.create.pubkeys_array = new Array();
+    Ticket.create.poll_info_array = new Array();
     Ticket.create.RAND_BITS = 512;
     Ticket.create.used = false;
 
@@ -29,7 +31,7 @@ Ticket.create.init = function () {
     })
 }
 
-// Request public keys from the server
+// Request public keys and poll info from the server
 Ticket.create.step1 = function () {
     dataString = $("#connection_choice").serialize()
     $("#progressbar").progressbar("option", "value", 10);
@@ -45,9 +47,9 @@ Ticket.create.step1 = function () {
 
 // Once we have the public keys, use them to generate
 // tickets, then send them to the server for signing
-Ticket.create.step2 = function (keys) {
+Ticket.create.step2 = function (data) {
     $("#progressbar").progressbar("option", "value", 30);
-    $.each(keys, Ticket.create.t_generator);
+    $.each(data, Ticket.create.t_generator);
     var hidden = document.createElement('input')
     hidden.name = 'ts'
     hidden.type = 'hidden'
@@ -97,14 +99,12 @@ Ticket.create.unblinds_generator = function (index, unblind) {
         Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10))
     }
     else {
-        var ticketSignature = unblind[1][0];
-
-        var st = str2bigInt(ticketSignature, 10, 10)
-        var n = str2bigInt(unblind[1][1], 10, 10)
-        var e = str2bigInt(unblind[1][2], 10, 10)
-        var rk = inverseMod(Ticket.create.k_array[index], n)
-        Ticket.create.unblindst_array.push(bigInt2str(multMod(st, rk, n), 10))
-        Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10))
+        var st = str2bigInt(unblind.signature, 10);
+        var pubkey = Ticket.create.pubkeys_array[index];
+        var n = pubkey.n;
+        var rk = inverseMod(Ticket.create.k_array[index], n);
+        Ticket.create.unblindst_array.push(bigInt2str(multMod(st, rk, n), 10));
+        Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10));
     }
 }
 
@@ -113,26 +113,48 @@ Ticket.create.unblinds_generator = function (index, unblind) {
 // then the ticket is computed as SHA256(m) * k^e mod n
 // SHA256(m) means that we convert int m to string with base 10,
 // compute SHA256 of it, and then convert it back to int
-Ticket.create.t_generator = function (key, val) {
-    $.each(val, function (nr, g) {
-        var n = str2bigInt(g[0], 10, 10);
-        var e = str2bigInt(g[1], 10, 10);
-        var bits = bitSize(n);
-        do
-        {
-            var m = randBigInt(bits, 1);
-            var k = randBigInt(bits, 1);
-        } while ( greater(k, n) || greater(m, n) || !equalsInt(GCD(k, n), 1) );
-
-        Ticket.create.k_array.push(k);
-        Ticket.create.m_array.push(m);
-        var m_sha256 = str2bigInt(forge_sha256(bigInt2str(m, 10)), 16);
-        var k_pow_e = powMod(k, e, n);
-        var t = multMod(m_sha256, k_pow_e, n);
-
-        Ticket.create.t_array.push(bigInt2str(t, 10))
+Ticket.create.t_generator = function (key, poll_data) {
+    var n = str2bigInt(poll_data.key.n, 10, 10);
+    var e = str2bigInt(poll_data.key.e, 10, 10);
+    Ticket.create.pubkeys_array.push({
+        n: n,
+        e: e
     });
 
+    Ticket.create.poll_info_array.push(poll_data.poll_info);
+
+    var bits = bitSize(n);
+    do
+    {
+        var m = randBigInt(bits, 1);
+        var k = randBigInt(bits, 1);
+    } while ( greater(k, n) || greater(m, n) || !equalsInt(GCD(k, n), 1) );
+
+    Ticket.create.k_array.push(k);
+    Ticket.create.m_array.push(m);
+    var m_sha256 = str2bigInt(forge_sha256(bigInt2str(m, 10)), 16);
+    var k_pow_e = powMod(k, e, n);
+    var t = multMod(m_sha256, k_pow_e, n);
+
+    Ticket.create.t_array.push(bigInt2str(t, 10))
+
+}
+
+// TODO
+// finish this
+Ticket.create.to_plaintext = function() {
+    var res = '';
+    $.each(Ticket.create.unblindt_array, function(index, ticket) {
+        res += '[' + 'title' + ']';
+        res += 'course_name' + " &#10;";
+        res += 'type' + ": ";
+        res += 'teacher_full_name' + " &#10;";
+        res += 'id: ' + 'pk';
+        res += bigInt2str(ticket, 10) + " &#10;";
+        res += bigInt2str(Ticket.create.unblindt_array[index], 10);
+        res += '---------------------------------- &#10;';
+    });
+    console.log(res);
 }
 
 $(Ticket.create.init)

@@ -23,11 +23,9 @@ class PrivateKey(models.Model):
     def _int_from_bytes(xbytes: bytes) -> int:
         return int.from_bytes(xbytes, 'big')
 
-    # FIXME the return type of this method is due to legacy ticket
-    # handling code in ticket_create/views and poll/utils
     def sign_ticket(self, ticket: int) -> Tuple[int]:
         key = RSA.importKey(self.private_key)
         if ticket >= key.n:
             raise ValueError
         signed = pow(ticket, key.d, key.n)
-        return (signed, )
+        return signed

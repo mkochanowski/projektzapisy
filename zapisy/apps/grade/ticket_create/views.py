@@ -15,7 +15,7 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
     secure_signer, unblind, get_valid_tickets, to_plaintext, connect_groups, secure_signer_without_save, \
-    secure_mark, normalize_tickets
+    secure_mark, normalize_tickets, get_poll_info_as_dict, get_pubkey_as_dict
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
@@ -46,8 +46,18 @@ def ajax_get_rsa_keys_step1(request):
                                    polls=groupped_polls)
             if form.is_valid():
                 connected_groups = connect_groups(groupped_polls, form)
-                tickets = [generate_keys(gs) for gs in connected_groups]
-                message = json.dumps(tickets)
+                data = []
+                for poll in connected_groups:
+                    # TODO handle this properly?
+                    # im not sure how it works, but seems like len(poll) == 1 is always true
+                    assert len(poll) == 1
+                    poll = poll[0]
+                    poll_data = {
+                        'key': get_pubkey_as_dict(poll),
+                        'poll_info': get_poll_info_as_dict(poll),
+                    }
+                    data.append(poll_data)
+                message = json.dumps(data)
     return HttpResponse(message)
 
 
@@ -70,8 +80,13 @@ def ajax_get_rsa_keys_step2(request):
                 tickets = zip(groups, ts_to_sign)
                 signed = [(group, t, secure_signer_without_save(request.user, group, t))
                           for group, t in tickets]
-                unblinds = [(str(ticket), unblind(group, ticket_signature))
-                            for group, ticket, ticket_signature in signed]
+                unblinds = []
+                for _, _, ticket_signature in signed:
+                    unblinds.append(
+                        {
+                            'signature': str(ticket_signature)
+                        }
+                    )
                 message = json.dumps(unblinds)
     return HttpResponse(message)
 
