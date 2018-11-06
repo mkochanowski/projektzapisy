@@ -1,11 +1,15 @@
 {% load i18n %}
 
-{% if course_entity.owner %}
+{% if course_entity.owners %}
 <tr>
     <th>Prowadzący</th>
     <td>
-        <a href="{% url 'employee-profile' course_entity.owner.user.id %}"
-           class="person">{{ course_entity.owner.user.get_full_name }}</a>
+        {% for owner in course_entity.owners.all %}
+            <p>
+                <a href="{% url 'employee-profile' owner.user.id %}"
+                class="person">{{ owner.user.get_full_name }}</a>
+            </p>
+        {% endfor %}
     </td>
 </tr>
 {% endif %}
