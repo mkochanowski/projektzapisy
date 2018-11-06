@@ -167,12 +167,16 @@ class EffectsListFilter(SimpleListFilter):
             return queryset
 
 
+class OwnersInline(admin.TabularInline):
+    model = CourseEntity.owners.through
+
+
 class CourseEntityAdmin(TranslationAdmin):
-    list_display = ('name', 'shortName', 'owner')
-    search_fields = ('name', 'shortName', 'owner__user__first_name', 'owner__user__last_name')
+    list_display = ('name', 'shortName')
+    search_fields = ('name', 'shortName')
     fieldsets = [
         (None, {'fields': ['name', 'shortName', 'type', 'information'], 'classes': ['long_name']}),
-        (None, {'fields': ['owner', 'status', 'semester', 'effects']}),
+        (None, {'fields': ['status', 'semester', 'effects']}),
         ('Godziny', {'fields': ['lectures', 'exercises', 'laboratories', 'repetitions', 'seminars', 'exercises_laboratiories']}),
         ('Zmiana sposobu liczenia punktów', {'fields': ['algorytmy_l', 'dyskretna_l', 'numeryczna_l', 'programowanie_l']}),
         (None, {'fields': ['ue', 'english', 'exam', 'suggested_for_first_year', 'deleted']}),
@@ -182,7 +186,7 @@ class CourseEntityAdmin(TranslationAdmin):
     list_filter = ('semester', 'status', 'type', EffectsListFilter, 'owner')
     form = CourseEntityForm
 
-    inlines = [PointsInline, TagsInline]
+    inlines = [OwnersInline, PointsInline, TagsInline]
 
     def get_queryset(self, request):
         """
