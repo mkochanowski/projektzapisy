@@ -160,6 +160,11 @@ class CourseEntity(models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE)
+    owners = models.ManyToManyField(
+        'users.Employee',
+        related_name='+',
+        verbose_name='opiekunowie',
+        blank=True)
     slug = models.SlugField(
         max_length=255,
         unique=True,
