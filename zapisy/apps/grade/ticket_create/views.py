@@ -77,9 +77,14 @@ def ajax_get_rsa_keys_step2(request):
                 ts_to_sign = normalize_tickets(ts)
                 connected_groups = connect_groups(groupped_polls, form)
                 groups = reduce(list.__add__, connected_groups)
-                tickets = zip(groups, ts_to_sign)
-                signed = [(group, t, secure_signer_without_save(request.user, group, t))
-                          for group, t in tickets]
+                tickets_arr = zip(groups, ts_to_sign)
+
+                signed = []
+                for group, ticket in tickets_arr:
+                    signature = secure_signer_without_save(request.user, group, ticket)
+                    signed.append((group, ticket, signature))
+                    secure_mark(request.user, group)
+
                 unblinds = []
                 for _, _, ticket_signature in signed:
                     unblinds.append(
@@ -103,45 +108,6 @@ def connections_choice(request):
     polls_lists, general_polls = Poll.get_polls_list(request.user.student)
     connected = any(len(x) > 1 for x in groupped_polls)
     if grade:
-        if request.method == "POST":
-            form = PollCombineForm(request.POST,
-                                   polls=groupped_polls)
-            if form.is_valid():
-                unblindst = json.loads(request.POST.get('unblindst', ''))
-                unblindt = json.loads(request.POST.get('unblindt', ''))
-                ts = json.loads(request.POST.get('ts', ''))
-                connected_groups = connect_groups(groupped_polls, form)
-                if connected_groups:
-                    groups = reduce(list.__add__, connected_groups)
-                else:
-                    groups = []
-                prepared_tickets = list(zip(groups, unblindt, unblindst))
-                # final mark:
-                for g, t, _ in prepared_tickets:
-                    secure_mark(request.user, g, t)
-                errors, tickets_to_serve = get_valid_tickets(prepared_tickets)
-                if errors:
-                    message = 'Nie udało się pobrać następujących biletów:\n<ul>'
-                    for poll, reason in errors:
-                        message += "<li>Ankieta: " + str(poll)
-                        message += "<br>Powód: "
-                        message += str(reason)
-                        message += "</li>"
-                    message += "</ul>"
-                    messages.error(request, SafeText(message))
-                data = {'tickets': to_plaintext(tickets_to_serve),
-                        'grade': grade}
-
-                if tickets_to_serve:
-                    StudentGraded.objects.get_or_create(student=request.user.student,
-                                                        semester=semester)
-
-                return render(request, "grade/ticket_create/tickets_save.html", data)
-
-        else:
-            pass
-        #             form = PollCombineForm( polls = groupped_polls )
-
         data = {'polls': polls_lists, 'grade': grade, 'general_polls': general_polls}
         return render(request, 'grade/ticket_create/connection_choice.html', data)
     else:
