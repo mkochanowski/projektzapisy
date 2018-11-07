@@ -272,12 +272,14 @@ def generate_keys(poll_list):
 
     return keys
 
+
 def get_pubkey_as_dict(poll):
     key = RSA.importKey(PublicKey.objects.get(poll=poll).public_key)
     return {
         'n': str(key.n),
         'e': str(key.e),
     }
+
 
 def check_poll_visiblity(user, poll):
     """Checks, whether user is a student entitled to the poll.
@@ -355,12 +357,11 @@ def normalize_tickets(ts: List[str]) -> List[int]:
             if ticket_as_int < 0 or ticket_as_int.bit_length() > KEY_BITS:
                 raise ValueError
             ts_as_int.append(ticket_as_int)
-            
         except ValueError:
             # TODO: except of ignoring wrong ticket format, we should handle it somehow
             continue
     return ts_as_int
-        
+
 
 def secure_mark(user, g, t):
     try:
@@ -430,9 +431,7 @@ def to_plaintext(vtl):
 def get_poll_info_as_dict(poll):
     res = {}
     res['title'] = poll.title
-    if not poll.group:
-        res['course_name'] = 'Ankieta ogólna'
-    else:
+    if poll.group is not None:
         res['course_name'] = poll.group.course.name
         res['type'] = poll.group.get_type_display()
         res['teacher_name'] = poll.group.get_teacher_full_name()
