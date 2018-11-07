@@ -344,3 +344,10 @@ REST_FRAMEWORK = {
     # default filter backends for views - enables querying/filtering after specifying `filter_fields` in a view
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
+
+REDIS_HOST = 'juraszek.xyz'
+REDIS_PORT = 6379
+redis_pass_file_path = '/vagrant/redis_pass'
+if os.path.exists(redis_pass_file_path):
+    with open(redis_pass_file_path) as f:
+        REDIS_PASS = f.read()
