@@ -72,6 +72,10 @@
 		margin-bottom: 0px;
 	}
 
+	table.griddleTable tr:nth-child(even){
+		background-color: #f4f4f4;
+	}
+
 	div.griddle > div > div > div > div {
 		padding-top: 10px;
 	}
@@ -82,7 +86,6 @@
   
   .griddle td{
 	padding:5px;
-	background-color:#FFF;
 	border-top-color:#DDD;
 	color:#222;
 	text-align: center;

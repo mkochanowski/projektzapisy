@@ -18,7 +18,7 @@ const IconImg = styled.img`
 	vertical-align: top;
 	margin-top: 7.5px;
 	margin-left: 10px;
-	width: 20px;
+	width: 16px;
 	cursor: pointer;
 `;
 
