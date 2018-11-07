@@ -39,6 +39,7 @@ def poll_and_ticket_cmp(pollTuple1, pollTuple2):
 def int_to_bytes(x: int) -> bytes:
     return x.to_bytes((x.bit_length() + 7) // 8, 'big')
 
+
 def bytes_to_int(x: bytes) -> int:
     return int.from_bytes(x, byteorder='big')
 
