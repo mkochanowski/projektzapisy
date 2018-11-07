@@ -316,7 +316,7 @@ def mark_poll_used(user, poll):
     u.save()
 
 
-def ticket_check_and_mark(user, poll, ticket):
+def ticket_check_and_mark(user, poll):
     check_poll_visiblity(user, poll)
     check_ticket_not_signed(user, poll)
     mark_poll_used(user, poll)
@@ -363,9 +363,9 @@ def normalize_tickets(ts: List[str]) -> List[int]:
     return ts_as_int
 
 
-def secure_mark(user, g, t):
+def secure_mark(user, poll):
     try:
-        return ticket_check_and_mark(user, g, t),
+        return ticket_check_and_mark(user, poll),
     except InvalidPollException:
         return "Nie jesteś przypisany do tej ankiety",
     except TicketUsed:
