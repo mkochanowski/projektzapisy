@@ -112,7 +112,7 @@
     <div class="topbar">
         <div class="fill">
             <!-- up-menu  -->
-            <div class="container">
+            <div id="top_menu_container" class="container">
 
                 <ul class="topBarLinkContainer">
                     <li{% block enrollment_active %}{% endblock %}>
@@ -209,16 +209,13 @@
     </div>
 
 
-    <div class="header">
-
-        <div class="container">
-            <div class="logo">
-                <a href="/">
-                    <img src="{% static 'images/logotyp.jpg'%}" alt="Uniwersytet Wrocławski">
-                </a>
-            </div>
-        </div>
-    </div>
+    {% block uwr_logo %}
+        <div id="logo_container"><div class="container">
+            <a href="/">
+                <img src="{% static 'images/logotyp.jpg'%}" alt="Uniwersytet Wrocławski">
+            </a>
+        </div></div>
+    {% endblock %}
     <!-- down-menu  -->
     <div class="topbar systemtopbar">
         <div class="fill">
