@@ -8,7 +8,7 @@ def make_many_teachers(apps, schema_editor):
     Group = apps.get_model('courses', 'Group')
 
     for group in Group.objects.all():
-        if group.owner:
+        if group.teacher:
             group.teachers.add(group.teacher)
 
 

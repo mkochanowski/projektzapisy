@@ -278,13 +278,15 @@ class QueuedInline(admin.TabularInline):
     can_delete = False
     form = QueuedInlineForm
 
+class TeachersInline(admin.TabularInline):
+    model = Group.teachers.through
 
 class GroupAdmin(admin.ModelAdmin):
     readonly_fields = ('limit', 'id')
     list_display = (
         'id',
         'course',
-        'teacher',
+       'teacher',
         'type',
         'limit',
         'limit_isim',
@@ -295,7 +297,7 @@ class GroupAdmin(admin.ModelAdmin):
         'teacher__user__last_name',
         'course__entity__name')
     inlines = [
-        TermInline, RecordInline, QueuedInline
+        TeachersInline, TermInline, RecordInline, QueuedInline
     ]
 
     raw_id_fields = ('course', 'teacher')

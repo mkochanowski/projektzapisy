@@ -27,16 +27,22 @@
             {% for t in tutorial.groups %}
                 <tr {% if t.signed %} class="signed" {% endif %} >
                     <td>
-                        {% if t.teacher %}
-                            <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">
+                        {% if t.teachers %}
+                            {% for teacher in t.teachers.all %}
+                                <p>
+                                    <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">{{ teacher.user.get_full_name }}</a>
+                                </p>
+                            {% endfor %}
+                            <!-- <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">
                                 {{ t.teacher.user.get_full_name }}
-                            </a>
+                            </a> -->
                         {% else %}
                             {% trans "(nieznany prowadzący)" %}
                         {% endif %}
                         {% if t.extra %}
                             <br/><span class="small">{{ t.extra }}</span>
                         {% endif %}
+                    
                     </td>
                     <td class="term">
                         {% for d in t.terms_list %}
