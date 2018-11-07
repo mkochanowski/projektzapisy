@@ -6,6 +6,18 @@ from django.contrib.auth.models import User
 from apps.notifications2.datatypes import Notification
 
 
+def get_current_repository_implementation() -> NotificationsRepository:
+    """
+    Return an object implementing NotificationsRepository interface,
+    thus providing access to _some_ notifications storage.
+    Client code should always call this method instead of
+    instantiating such classes directly.
+    TODO: replace it with Redis-based one when it's ready
+    """
+
+    return FakeNotificationsRepository()
+
+
 class NotificationsRepository(ABC):
 
     @abstractmethod
