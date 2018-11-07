@@ -75,18 +75,8 @@ Ticket.create.step3 = function (unblinds) {
     $("#progressbar").progressbar("option", "value", 70);
     $.each(unblinds, Ticket.create.unblinds_generator);
 
-    var hidden = document.createElement('input')
-    hidden.name = 'unblindst'
-    hidden.type = 'hidden'
-    hidden.value = JSON.stringify(Ticket.create.unblindst_array)
-    $("#connection_choice").append(hidden);
-    var hidden = document.createElement('input')
-    hidden.name = 'unblindt'
-    hidden.type = 'hidden'
-    hidden.value = JSON.stringify(Ticket.create.unblindt_array)
-    $("#connection_choice").append(hidden);
-    $("#progressbar").progressbar("option", "value", 100);
-    $('#connection_choice').submit();
+    // TODO Make it work properly, this is only temporary workaround 
+    $('#main-content')[0].innerHTML = '<div id="main-content"><div id="grade-tickets-save-form"><h3> Pomyślnie wygenerowano klucze.</h3><h3>Zapisz je w bezpiecznym miejscu - <strong>nie ma powrotu do tego ekranu</strong>.</h3><form action="."><textarea id="keys" name="keys" cols="80" rows="20" readonly="readonly">' + Ticket.create.to_plaintext() + '</textarea></form></div></div>';
 }
 
 Ticket.create.unblinds_generator = function (index, unblind) {
@@ -140,21 +130,24 @@ Ticket.create.t_generator = function (key, poll_data) {
 
 }
 
-// TODO
-// finish this
 Ticket.create.to_plaintext = function() {
     var res = '';
     $.each(Ticket.create.unblindt_array, function(index, ticket) {
-        res += '[' + 'title' + ']';
-        res += 'course_name' + " &#10;";
-        res += 'type' + ": ";
-        res += 'teacher_full_name' + " &#10;";
-        res += 'id: ' + 'pk';
-        res += bigInt2str(ticket, 10) + " &#10;";
-        res += bigInt2str(Ticket.create.unblindt_array[index], 10);
+        var poll_info = Ticket.create.poll_info_array[index];
+        res += '[' + poll_info.title + '] ';
+        if (!poll_info.course_name) {
+            res += 'Ankieta ogólna &#10;';
+        } else {
+            res += poll_info.course_name + ' &#10;';
+            res += poll_info.type + ': ';
+            res += poll_info.teacher_name + ' &#10;';
+        }
+        res += 'id: ' + poll_info.id + ' &#10;';
+        res += ticket + ' &#10;';
+        res += Ticket.create.unblindst_array[index] + ' &#10;';
         res += '---------------------------------- &#10;';
     });
-    console.log(res);
+    return res;
 }
 
 $(Ticket.create.init)
