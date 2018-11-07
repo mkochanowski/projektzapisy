@@ -6,7 +6,7 @@ export function ReservationIndicator(props: CustomColumnComponentProps<any>): JS
 		type={"checkbox"}
 		checked={props.data}
 		style={{ cursor: "default" }}
-		readOnly
+		disabled
 		onClick={eatEvent}
 	></input>;
 }

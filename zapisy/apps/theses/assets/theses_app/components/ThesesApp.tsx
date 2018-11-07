@@ -181,7 +181,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		// we use a ref to save the component instance and call the internal setFilter
 		// method; this forces griddle to call the (user supplied) custom filtering method
 		// where I apply the new filters
-		// To be able to tell whether it's me who called my custom filtered
+		// To be able to tell whether it's me who called my custom filter method
 		// I pass this "magic" filter argument; in the handler I only use it to check
 		// if it was me who called it, the filters are saved on `this`
 		this.griddle.setFilter(GRIDDLE_FILTER_MAGIC);

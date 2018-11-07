@@ -73,7 +73,6 @@
 	}
 
 	div.griddle > div > div > div > div {
-		/* overflow-y: hidden !important; */
 		padding-top: 10px;
 	}
 
@@ -94,11 +93,15 @@
 	}
 
 	.reservedColumn {
-		width: 10%
+		width: 10%;
 	}
 	
 	.titleColumn {
 		width: 45%;
+	}
+
+	td.titleColumn, td.advisorColumn {
+		text-align: left;
 	}
   
   .griddle .footer-container{

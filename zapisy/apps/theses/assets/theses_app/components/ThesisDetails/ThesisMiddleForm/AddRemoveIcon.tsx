@@ -2,7 +2,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import AddIconImage from "./add-icon.png";
-import RemoveIconImage from "./remove-icon.ico";
+import RemoveIconImage from "./remove-icon.png";
 
 export const enum IconType {
 	Add,
