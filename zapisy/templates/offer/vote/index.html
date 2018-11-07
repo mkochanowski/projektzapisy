@@ -45,11 +45,9 @@
                         <p>Przed rozpoczęciem semestru odbędzie się korekta, podczas której można będzie ponownie przydzielić punkty, które zostały przyznane na przedmioty,
                         które nie będą prowadzone w tym roku.</p>
                     </li>
-                    <li><h4>Zakończenie głosowania:</h4>
-                        <p>{{ vote_end }}.</p>
-                    </li>
 				</ol>
 			</div>
+            <p class="vote-date">Zakończenie głosowania: {{ vote_end }}.</p>
 
 			{% if user.student %}<p class="link"><a href="{% url 'vote' %}">Głosuj</a></p>{% endif %}
 		{% elif isCorrectionActive %}
@@ -58,7 +56,7 @@
 			</div>
         {% else %}
 			<p class="disabled-link">Głosowanie nie jest w tej chwili aktywne.</p>
-            <p class="vote-beg">Rozpoczęcie głosowania: {{ vote_beg }}.</p>
+            <p class="vote-date">Rozpoczęcie głosowania: {{ vote_beg }}.</p>
 		{% endif %}
 
 		<p class="link"><a href="{% url 'vote-summary' %}">Podsumowanie głosowania</a></p>
