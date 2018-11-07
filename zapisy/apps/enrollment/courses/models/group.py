@@ -69,6 +69,11 @@ class Group(models.Model):
         blank=True,
         verbose_name='prowadzący',
         on_delete=models.CASCADE)
+    teachers = models.ManyToManyField(
+        'users.Employee',
+        blank=True,
+        related_name='+',
+        verbose_name='prowadzący1')
     type = models.CharField(max_length=2, choices=GROUP_TYPE_CHOICES, verbose_name='typ zajęć')
     limit = models.PositiveSmallIntegerField(default=0, verbose_name='limit miejsc')
     limit_isim = models.PositiveSmallIntegerField(
