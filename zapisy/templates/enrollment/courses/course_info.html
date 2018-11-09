@@ -33,9 +33,6 @@
                                     <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">{{ teacher.user.get_full_name }}</a>
                                 </p>
                             {% endfor %}
-                            <!-- <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">
-                                {{ t.teacher.user.get_full_name }}
-                            </a> -->
                         {% else %}
                             {% trans "(nieznany prowadzący)" %}
                         {% endif %}
