@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import List
 
 from django.contrib.auth.models import User
 
@@ -21,23 +22,23 @@ def get_current_repository_implementation() -> NotificationsRepository:
 class NotificationsRepository(ABC):
 
     @abstractmethod
-    def get_count_for_user(self, user: User):
+    def get_count_for_user(self, user: User) -> int:
         pass
 
     @abstractmethod
-    def get_all_for_user(self, user: User):
+    def get_all_for_user(self, user: User) -> List[Notification]:
         pass
 
     @abstractmethod
-    def get_unsent_for_user(self, user: User):
+    def get_unsent_for_user(self, user: User) -> List[Notification]:
         pass
 
     @abstractmethod
-    def save(self, user: User, notification: Notification):
+    def save(self, user: User, notification: Notification) -> None:
         pass
 
     @abstractmethod
-    def mark_all_before_as_read(self, user: User, until: datetime):
+    def mark_all_before_as_read(self, user: User, until: datetime) -> None:
         pass
 
 
@@ -50,17 +51,17 @@ class FakeNotificationsRepository(NotificationsRepository):
             Notification(datetime.now(), 'fake_desc', {'example_arg': 'ccc'}),
         ]
 
-    def get_count_for_user(self, user: User):
+    def get_count_for_user(self, user: User) -> int:
         return 3
 
-    def get_all_for_user(self, user: User):
+    def get_all_for_user(self, user: User) -> List[Notification]:
         return self.notifications
 
-    def get_unsent_for_user(self, user: User):
+    def get_unsent_for_user(self, user: User) -> List[Notification]:
         return self.notifications
 
-    def save(self, user: User, notification: Notification):
+    def save(self, user: User, notification: Notification) -> None:
         pass
 
-    def mark_all_before_as_read(self, user: User, until: datetime):
+    def mark_all_before_as_read(self, user: User, until: datetime) -> None:
         pass
