@@ -29,7 +29,7 @@ class NotificationsRepository(ABC):
         pass
 
     @abstractmethod
-    def mark_all_before_as_read(self, user: User, until: datetime) -> None:
+    def remove_all_older_than(self, user: User, until: datetime) -> None:
         pass
 
 
@@ -54,7 +54,7 @@ class FakeNotificationsRepository(NotificationsRepository):
     def save(self, user: User, notification: Notification) -> None:
         pass
 
-    def mark_all_before_as_read(self, user: User, until: datetime) -> None:
+    def remove_all_older_than(self, user: User, until: datetime) -> None:
         pass
 
 
@@ -95,7 +95,7 @@ class RedisNotificationsRepository(NotificationsRepository):
             self._generate_unsent_key_for_user(user),
             self.serializer.serialize(notification))
 
-    def mark_all_before_as_read(self, user: User, until: datetime) -> None:
+    def remove_all_older_than(self, user: User, until: datetime) -> None:
         self._remove_all_older_than(
             self._generate_unsent_key_for_user(user), until)
         self._remove_all_older_than(
