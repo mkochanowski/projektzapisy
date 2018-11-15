@@ -29,6 +29,10 @@ class NotificationsRepository(ABC):
         pass
 
     @abstractmethod
+    def get_unsent_for_user(self, user: User):
+        pass
+
+    @abstractmethod
     def save(self, user: User, notification: Notification):
         pass
 
@@ -46,10 +50,13 @@ class FakeNotificationsRepository(NotificationsRepository):
             Notification(datetime.now(), 'fake_desc', {'example_arg': 'ccc'}),
         ]
 
-    def get_count_for_user(user: User):
+    def get_count_for_user(self, user: User):
         return 3
 
-    def get_all_for_user(user: User):
+    def get_all_for_user(self, user: User):
+        return self.notifications
+
+    def get_unsent_for_user(self, user: User):
         return self.notifications
 
     def save(self, user: User, notification: Notification):
