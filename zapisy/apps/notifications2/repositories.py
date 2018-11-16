@@ -29,7 +29,7 @@ class NotificationsRepository(ABC):
         pass
 
     @abstractmethod
-    def remove_all_older_than(self, user: User, until: datetime) -> None:
+    def remove_all_older_than(self, user: User, until: datetime) -> int:
         pass
 
 
@@ -54,8 +54,8 @@ class FakeNotificationsRepository(NotificationsRepository):
     def save(self, user: User, notification: Notification) -> None:
         pass
 
-    def remove_all_older_than(self, user: User, until: datetime) -> None:
-        pass
+    def remove_all_older_than(self, user: User, until: datetime) -> int:
+        return 0
 
 
 class RedisNotificationsRepository(NotificationsRepository):
@@ -66,6 +66,7 @@ class RedisNotificationsRepository(NotificationsRepository):
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
             password=settings.REDIS_PASS)
+        self.removed_count = 0
 
     def get_count_for_user(self, user: User) -> int:
         # SCARD returns 0 if one of them does not exist
@@ -95,13 +96,17 @@ class RedisNotificationsRepository(NotificationsRepository):
             self._generate_unsent_key_for_user(user),
             self.serializer.serialize(notification))
 
-    def remove_all_older_than(self, user: User, until: datetime) -> None:
+    def remove_all_older_than(self, user: User, until: datetime) -> int:
+        self.removed_count = 0
+
         self._remove_all_older_than(
             self._generate_unsent_key_for_user(user), until)
         self._remove_all_older_than(
             self._generate_sent_key_for_user(user), until)
 
-    def _remove_all_older_than(self, key: str, point_in_time: datetime) -> None:
+        return self.removed_count
+
+    def _remove_all_older_than(self, key: str, point_in_time: datetime) -> int:
         notifications_under_that_key = map(
             self.serializer.deserialize,
             self.redis_client.smembers(key))
@@ -110,6 +115,7 @@ class RedisNotificationsRepository(NotificationsRepository):
             if notification.issued_on < point_in_time:
                 self.redis_client.srem(
                     key, self.serializer.serialize(notification))
+                self.removed_count += 1
 
     def _generate_unsent_key_for_user(self, user: User) -> str:
         return f'notifications_unsent_{user.id}'
