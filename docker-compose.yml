@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: ./zapisy
+      args:
+        - IMAGE_VERSION=${PYTHON_VERSION}
+    volumes:
+      - ./zapisy:/app
+      - ./frontend/static:/static:ro
+    ports:
+      - 8000:8000
+    networks:
+      - main-network
+    command: ./bin/entrypoint.sh
+    depends_on:
+      - postgresql
+      - frontend
+
+  postgresql:
+    image: postgres:${POSTGRESQL_VERSION}
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+      - ./db_backups:/db_backups
+    networks:
+      - main-network
+    environment:
+      POSTGRES_PASSWORD: fereolpass
+      POSTGRES_USER: fereol
+      POSTGRES_DB: fereol
+
+  frontend:
+    image: node:${NODE_VERSION}
+    volumes:
+      - ./frontend:/frontend
+    working_dir: /frontend
+    networks: 
+      - main-network
+    command: ./bin/run.sh
+
+networks:
+  main-network:
+    
+volumes:
+  postgresql-data:
+  

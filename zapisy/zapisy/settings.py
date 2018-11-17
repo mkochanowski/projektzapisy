@@ -6,7 +6,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 env = environ.Env()
 
-environ.Env.read_env(os.path.join(BASE_DIR, os.pardir, 'env', '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, 'env', '.env'))
 
 DEBUG = env.bool('DEBUG')
 RELEASE = env.bool('RELEASE')
@@ -37,7 +37,7 @@ DATABASES = {
         'PORT': env.str('DATABASE_PORT'),
         'USER': env.str('DATABASE_USER'),
         'PASSWORD': env.str('DATABASE_PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': 'postgresql',
         'CHARSET': 'utf8',
         'USE_UNICODE': True,
     }
@@ -297,7 +297,7 @@ COMPRESS_OFFLINT_TIMEOUT = env.int('COMPRESS_OFFLINT_TIMEOUT', default=0)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "compiled_assets"),
+    '/static/compiled_assets',
 )
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
