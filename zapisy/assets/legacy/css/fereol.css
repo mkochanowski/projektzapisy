@@ -417,3 +417,13 @@ table ul.voted-courses {
   font-size: 11px;
   color: grey;
 }
+
+.notification_ico{
+    font-weight: 700;
+    border-radius: 10px;
+    border: solid 1px #4700ff;
+    color: midnightblue;
+    margin: 1px;
+    padding: 1px 5px;
+    background: floralwhite;
+}
