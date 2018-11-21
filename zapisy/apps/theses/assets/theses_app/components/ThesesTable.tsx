@@ -4,8 +4,9 @@ import Griddle, { ColumnMetaData } from "griddle-react";
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ReservationIndicator } from "./ReservationIndicator";
 import { ThesisTypeFilter } from "../backend_callers";
-import { Thesis } from "../types";
+import { Thesis, ThesisStatus, ThesisKind } from "../types";
 import { ApplicationState } from "../types/application_state";
+import { TopFilters } from "./TopFilters";
 
 const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	{
@@ -40,46 +41,44 @@ type GriddleThesisData = {
 };
 
 type Props = {
-	advisorFilter: string;
-	titleFilter: string;
-	typeFilter: ThesisTypeFilter;
 	applicationState: ApplicationState;
+	thesesList: Thesis[];
 
-	thesisForId: (id: number) => Thesis;
-}
+	thesisForId: (id: number) => Thesis | null;
+	onThesisClicked: (t: Thesis) => void;
+};
+
+const initialState = {
+	typeFilter: ThesisTypeFilter.Default,
+	titleFilter: "",
+	advisorFilter: "",
+};
+type State = typeof initialState;
 
 export class ThesesTable extends React.Component<Props> {
 	private griddle: any;
+	state = initialState;
 
 	private setGriddle = (griddle: Griddle<any>) => {
 		this.griddle = griddle;
 	}
 
-	private filterGriddleResults(results: GriddleThesisData[]) {
-		const advisor = this.props.advisorFilter;
-		const title = this.props.titleFilter;
-		const type = this.props.typeFilter;
-
-		return results.filter(td => {
-			const thesis = this.props.thesisForId(td.id);
-			if (!thesis) {
-				console.warn("[Sort] Griddle table has bad thesis", td);
-				return false;
-			}
-			return (
-				thesisMatchesType(thesis, type) &&
-				(!advisor || td.advisorName.toLowerCase().includes(advisor.toLowerCase())) &&
-				(!title || td.title.toLowerCase().includes(title.toLowerCase()))
-			);
+	private setStateAsync<K extends keyof State>(partialState: Pick<State, K>): Promise<void> {
+		return new Promise((resolve, _) => {
+			this.setState(partialState, resolve);
 		});
 	}
 
-	// See setGriddleFilter
-	private griddleFilterer = (results: GriddleThesisData[], filter: any) => {
-		if (filter !== GRIDDLE_FILTER_MAGIC) {
-			return results;
-		}
-		return this.filterGriddleResults(results);
+	private renderTopFilters() {
+		return <TopFilters
+			onTypeChange={this.onTypeFilterChanged}
+			typeValue={this.state.typeFilter}
+			onAdvisorChange={this.onAdvisorFilterChanged}
+			advisorValue={this.state.advisorFilter}
+			onTitleChange={this.onTitleFilterChanged}
+			titleValue={this.state.titleFilter}
+			enabled={this.props.applicationState === ApplicationState.Normal}
+		/>;
 	}
 
 	private getTableCss(): React.CSSProperties {
@@ -90,7 +89,6 @@ export class ThesesTable extends React.Component<Props> {
 	}
 
 	private renderThesesList() {
-		const { applicationState } = this.props;
 		const style = this.getTableCss();
 		const isLoading = this.props.applicationState === ApplicationState.InitialLoading;
 		return <div style={style}>
@@ -120,14 +118,61 @@ export class ThesesTable extends React.Component<Props> {
 		</div>;
 	}
 
+	public render() {
+		return (
+			<>
+				{this.renderTopFilters()}
+				<br />
+				{this.renderThesesList()}
+			</>
+		);
+	}
+
 	private getTableResults(): GriddleThesisData[] {
-		const griddleResults = this.state.thesesList.map(thesis => ({
+		const griddleResults = this.props.thesesList.map(thesis => ({
 			id: thesis.id,
 			reserved: thesis.reserved,
 			title: thesis.title,
 			advisorName: thesis.advisor ? thesis.advisor.displayName : "<brak>",
 		}));
 		return this.filterGriddleResults(griddleResults);
+	}
+
+	private onRowClick = (row: any, _e: MouseEvent) => {
+		const data: GriddleThesisData = row.props.data;
+		const thesis = this.props.thesisForId(data.id);
+		if (!thesis) {
+			console.warn(`[Table onclick] Griddle had bad thesis ID ${data.id}`);
+			return;
+		}
+		this.props.onThesisClicked(thesis);
+	}
+
+	private filterGriddleResults(results: GriddleThesisData[]) {
+		const advisor = this.state.advisorFilter;
+		const title = this.state.titleFilter;
+		const type = this.state.typeFilter;
+
+		return results.filter(td => {
+			const thesis = this.props.thesisForId(td.id);
+			if (!thesis) {
+				console.warn("[Sort] Griddle table has bad thesis", td);
+				return false;
+			}
+			return (
+				thesisMatchesType(thesis, type) &&
+				(!advisor || td.advisorName.toLowerCase().includes(advisor.toLowerCase())) &&
+				(!title || td.title.toLowerCase().includes(title.toLowerCase()))
+			);
+		});
+	}
+
+	// See setGriddleFilter
+	private griddleFilterer = (results: GriddleThesisData[], filter: any) => {
+		if (filter !== GRIDDLE_FILTER_MAGIC) {
+			return results;
+		}
+		return this.filterGriddleResults(results);
 	}
 
 	private setGriddleFilter() {
@@ -147,7 +192,7 @@ export class ThesesTable extends React.Component<Props> {
 	}
 
 	private onTypeFilterChanged = async (newFilter: ThesisTypeFilter) => {
-		await this.setStateAsync({ currentTypeFilter: newFilter });
+		await this.setStateAsync({ typeFilter: newFilter });
 		this.setGriddleFilter();
 	}
 
@@ -155,7 +200,7 @@ export class ThesesTable extends React.Component<Props> {
 		if (!newAdvisorFilter.trim()) {
 			newAdvisorFilter = "";
 		}
-		await this.setStateAsync({ currentAdvisorFilter: newAdvisorFilter });
+		await this.setStateAsync({ advisorFilter: newAdvisorFilter });
 		this.setGriddleFilter();
 	}
 
@@ -163,9 +208,17 @@ export class ThesesTable extends React.Component<Props> {
 		if (!newTitleFilter.trim()) {
 			newTitleFilter = "";
 		}
-		await this.setStateAsync({ currentTitleFilter: newTitleFilter });
+		await this.setStateAsync({ titleFilter: newTitleFilter });
 		this.setGriddleFilter();
 	}
+}
+
+function isThesisAvailable(thesis: Thesis): boolean {
+	return (
+		thesis.status !== ThesisStatus.InProgress &&
+		thesis.status !== ThesisStatus.Defended &&
+		!thesis.reserved
+	);
 }
 
 function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter) {
