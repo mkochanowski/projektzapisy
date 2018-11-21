@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
+import { clone } from "lodash";
 
 import { Thesis } from "../types";
 import { getThesesList, saveModifiedThesis } from "../backend_callers";
@@ -10,14 +11,17 @@ import { ThesesTable } from "./ThesesTable";
 type Props = {};
 
 type State = {
-	selectedThesis: Thesis | null;
+	thesis: {
+		original: Thesis,
+		mutable: Thesis,
+	} | null;
 
 	thesesList: Thesis[];
 	applicationState: ApplicationState,
 };
 
 const initialState: State = {
-	selectedThesis: null,
+	thesis: null,
 
 	thesesList: [],
 	applicationState: ApplicationState.InitialLoading,
@@ -46,19 +50,25 @@ export class ThesesApp extends React.Component<Props, State> {
 			thesisForId={this.getThesisForId}
 			onThesisClicked={this.onThesisClicked}
 		/>;
-		const { selectedThesis } = this.state;
-		return selectedThesis !== null
+		const { thesis } = this.state;
+		return thesis !== null
 			? <>
 				{mainComponent}
 				<br />
 				<hr />
 				<ThesisDetails
-					selectedThesis={selectedThesis}
+					originalThesis={thesis.original}
+					mutableThesis={thesis.mutable}
 					onSaveRequested={this.handleThesisSave}
 					isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
+					shouldAllowSave={this.thesisWasEdited()}
 				/>
 			</>
 			: mainComponent;
+	}
+
+	private onThesisClicked = (thesis: Thesis) => {
+		this.setThesis(thesis);
 	}
 
 	private getThesisForId = (
@@ -67,20 +77,31 @@ export class ThesesApp extends React.Component<Props, State> {
 		return theses.find(t => t.id === id) || null;
 	}
 
-	private onThesisClicked = (thesis: Thesis) => {
-		this.setState({ selectedThesis: thesis });
+	private setThesis(t: Thesis) {
+		this.setState({
+			thesis: { original: t, mutable: clone(t) },
+		});
 	}
 
-	private handleThesisSave = async (modifiedThesis: Thesis) => {
-		const { selectedThesis } = this.state;
-		if (selectedThesis === null) {
+	private thesisWasEdited() {
+		const { thesis } = this.state;
+		return (
+			thesis !== null &&
+			!thesis.original.areValuesEqual(thesis.mutable!)
+		);
+	}
+
+	private handleThesisSave = async () => {
+		const { thesis } = this.state;
+		if (thesis === null) {
 			console.warn("Tried to save thesis but none selected, this shouldn't happen");
 			return;
 		}
+		console.assert(this.thesisWasEdited());
+
 		this.setState({ applicationState: ApplicationState.PerformingBackendChanges });
-		const oldSelectedThesisId = selectedThesis.id;
 		try {
-			await saveModifiedThesis(selectedThesis, modifiedThesis);
+			await saveModifiedThesis(thesis.original, thesis.mutable);
 		} catch (err) {
 			alert(
 				"Nie udało się zapisać pracy. Spróbuj jeszcze raz. " +
@@ -88,14 +109,14 @@ export class ThesesApp extends React.Component<Props, State> {
 			);
 			return;
 		}
-		// This could theoretically be null if someone deletes what we've just saved
-		// slim chance but who knows
-		const newList = await getThesesList();
-		const newThesisInstance = this.getThesisForId(oldSelectedThesisId, newList);
+		// Update the list to contain the new thesis
+		const oldIdx = this.state.thesesList.findIndex(
+			t => t.id === thesis.original.id
+		);
+		console.assert(oldIdx !== -1);
+		this.state.thesesList[oldIdx] = thesis.mutable;
 		this.setState({
-			thesesList: newList,
 			applicationState: ApplicationState.Normal,
-			selectedThesis: newThesisInstance,
 		});
 	}
 
@@ -104,21 +125,25 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private installKeyHandler() {
-		// Mousetrap.bind("up", this.upArrow);
-		// Mousetrap.bind("down", this.downArrow);
+		Mousetrap.bind("up", this.upArrow);
+		Mousetrap.bind("down", this.downArrow);
 	}
 
-	// private allowArrowSwitch() {
-	// 	return (
-	// 		document.activeElement === document.body
-	// 	);
-	// }
-//
-	// private upArrow = (e: ExtendedKeyboardEvent) => {
-//
-	// }
-//
-	// private downArrow = (e: ExtendedKeyboardEvent) => {
-//
-	// }
+	private allowArrowSwitch() {
+		return (
+			document.activeElement === document.body &&
+			!this.thesisWasEdited()
+		);
+	}
+
+	private upArrow = (e: ExtendedKeyboardEvent) => {
+		if (!this.allowArrowSwitch()) {
+			return;
+		}
+
+	}
+
+	private downArrow = (e: ExtendedKeyboardEvent) => {
+
+	}
 }

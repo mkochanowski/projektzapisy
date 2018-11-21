@@ -1,7 +1,6 @@
 import * as React from "react";
 import Button from "react-button-component";
 import styled from "styled-components";
-import { clone } from "lodash";
 import update, { Query } from "immutability-helper";
 import { Moment } from "moment";
 
@@ -51,32 +50,16 @@ margin-left: 20px;
 `;
 
 type Props = {
-	selectedThesis: Thesis;
-	onSaveRequested: (modifiedThesis: Thesis) => void;
+	originalThesis: Thesis;
+	mutableThesis: Thesis;
+	onSaveRequested: () => void;
 	isSaving: boolean;
+	shouldAllowSave: boolean;
 };
 
-type State = {
-	currentThesis: Thesis;
-};
-
-export class ThesisDetails extends React.Component<Props, State> {
-	public constructor(props: Props) {
-		super(props);
-		this.state = {
-			currentThesis: clone(props.selectedThesis),
-		};
-	}
-
-	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
-		console.error("Getting derived state");
-		this.setState({
-			currentThesis: clone(nextProps.selectedThesis)
-		});
-	}
-
+export class ThesisDetails extends React.Component<Props> {
 	public render() {
-		const shouldAllowSave = this.shouldAllowSave();
+		const { shouldAllowSave } = this.props;
 
 		return <DetailsSectionWrapper>
 			{this.props.isSaving ? <SavingIndicator/> : null}
@@ -85,13 +68,13 @@ export class ThesisDetails extends React.Component<Props, State> {
 			>
 				<LeftDetailsContainer>
 					<ThesisTopRow
-						thesis={this.state.currentThesis}
+						thesis={this.props.mutableThesis}
 						onReservationChanged={this.onReservationChanged}
 						onDateChanged={this.onDateUpdatedChanged}
 						onStatusChanged={this.onStatusChanged}
 					/>
 					<ThesisMiddleForm
-						thesis={this.state.currentThesis}
+						thesis={this.props.mutableThesis}
 						onTitleChanged={this.onTitleChanged}
 						onKindChanged={this.onKindChanged}
 						onAdvisorChanged={this.onAdvisorChanged}
@@ -111,10 +94,6 @@ export class ThesisDetails extends React.Component<Props, State> {
 				</RightDetailsContainer>
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
-	}
-
-	private shouldAllowSave(): boolean {
-		return !this.state.currentThesis.areValuesEqual(this.props.selectedThesis);
 	}
 
 	private updateThesisState(updateObject: Query<Thesis>) {
@@ -162,6 +141,6 @@ export class ThesisDetails extends React.Component<Props, State> {
 	}
 
 	private handleSave = () => {
-		this.props.onSaveRequested(this.state.currentThesis);
+		this.props.onSaveRequested();
 	}
 }
