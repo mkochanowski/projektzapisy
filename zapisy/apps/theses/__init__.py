@@ -1,7 +1,5 @@
 """
 TODO:
--> remove uwr logo
--> table: title, advisor left centered, alternating colors
 -> discard changes popup
 -> add new thesis: on click outside return to clear mode, also clear mode by default, button says "Add"
 -> textareas limit length
