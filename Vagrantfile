@@ -27,16 +27,9 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
     vb.memory = "1024"
-    # The folder "node_modules" will live somewhere else and only be mounted
-    # in /vagrant/zapisy to avoid the issue with symlinks on Windows.
-    config.vm.provision "shell", inline: <<-SHELL
-      echo "Preparing local node_modules folder…"
-      mkdir -p /vagrant_node_modules
-      chown vagrant:vagrant /vagrant_node_modules
-    SHELL
-    config.vm.provision "shell", run: "always", inline: <<-SHELL
-      mkdir -p /vagrant/zapisy/node_modules
-      mount --bind /vagrant_node_modules /vagrant/zapisy/node_modules
-    SHELL
+    # Fix symlinks on Win32, see https://blog.rudylee.com/2014/10/27/symbolic-links-with-vagrant-windows/
+    # NOTE: apart from this, you'll need to run `vagrant up` as admin on Win32
+    # for symlinks (webpack) to work
+    vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
   end
 end
