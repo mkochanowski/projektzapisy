@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta, date
+from typing import List
 
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
@@ -191,6 +192,15 @@ class Record(models.Model):
                 'program', 'user')
         except Group.DoesNotExist:
             raise NonGroupException()
+
+    @staticmethod
+    def get_students_willing_to_join_group_type(course_groups: List, group_type: str) -> int:
+        """Returns amount of students willing to join given course group type."""
+        return Queue.objects.filter(
+            group__in=course_groups, group__type=group_type, deleted=False).only('student').exclude(
+            student__in=Record.objects.filter(
+                group__in=course_groups, group__type=group_type, status=1).only('student')
+                .values_list('student')).distinct('student').count()
 
     @staticmethod
     def get_groups_for_student(user):

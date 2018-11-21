@@ -452,3 +452,33 @@ class DummyTest(TransactionTestCase):
         self.assertEqual(set(enrolled), set(should_be_enrolled))
         self.assertEqual(set(queued), set(should_be_queued))
         self.assertEqual(set(removed), set(should_be_removed))
+
+    def test_get_amount_of_students_willing_to_join_course_group(self):
+        """
+        We have 3 groups of the same type and 30 students.
+        We are adding given students to groups.
+        Every student except students[9] is enrolled correctly in one of groups.
+        students[9] is in two queues.
+        We expects Record.get_students_willing_to_join_group_type(...) to return 1.
+        """
+        today = datetime.now()
+        course = CourseFactory()
+        group_type = '2'
+        groups = [GroupFactory(course=course, limit=10, type=group_type,
+                  course__semester__records_opening=today + timedelta(days=-1),
+                  course__semester__records_closing=today + timedelta(days=6),) for i in range(3)]
+        students = StudentFactory.create_batch(30)
+
+        for student in students:
+            open_course_for_student(student, course)
+        for student in students[0:9]:
+            groups[0].enroll_student(student)
+        for student in students[10:20]:
+            groups[1].enroll_student(student)
+        for student in students[20:30]:
+            groups[2].enroll_student(student)
+        for student in students[0:10]:
+            groups[1].enroll_student(student)
+            groups[2].enroll_student(student)
+
+        self.assertEqual(Record.get_students_willing_to_join_group_type(groups, group_type), 1)

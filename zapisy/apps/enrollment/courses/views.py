@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import logging
-from typing import Optional, List
+from typing import List
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -29,31 +29,23 @@ def main(request):
     return render(request, 'enrollment/main.html')
 
 
-def get_course_group_types_with_students(groups: List[Group]) -> List:
-    """Return amount of students willing to join associated course group types"""
-    group_types: list = [
+def get_students_willing_to_join_course(course, request) -> List:
+    """Return amount of students willing to join associated course group types."""
+    if not request.user.is_superuser:
+        return []
+
+    group_types: List = [
         {'id': '2', 'name': 'cwiczenia'},
         {'id': '3', 'name': 'pracownie'},
         {'id': '5', 'name': 'ćwiczenio-pracownie'}
     ]
 
+    course_groups = Group.objects.filter(course=course)
+
     return [{
-        'students_amount': get_amount_of_students(group_type['id'], groups),
+        'students_amount': Record.get_students_willing_to_join_group_type(course_groups, group_type['id']),
         'type_name': group_type['name']
     } for group_type in group_types]
-
-
-def get_amount_of_students(group_type_id: str, groups: List) -> int:
-    """Return amount of students willing to join given course group type"""
-    students_in_queue: set = set()
-    students_already_in_groups: set = set()
-
-    for group in groups:
-        if group.type == group_type_id:
-            students_in_queue.update(student.matricula for student in Queue.get_students_in_queue(group.id))
-            students_already_in_groups.update(student.matricula for student in Record.get_students_in_group(group.id))
-
-    return len(students_in_queue - students_already_in_groups)
 
 
 def get_courses_list_in_semester_with_history_info(user, semester):
@@ -367,7 +359,7 @@ def course_view_data(request, slug):
             'ects_limit_would_be_exceeded': ectsLimitExceeded,
             'max_ects': maxEcts,
             'current_ects': currentEcts,
-            'course_group_types_with_willing_students_to_join': get_course_group_types_with_students(groups)
+            'course_group_types_with_willing_students_to_join': get_students_willing_to_join_course(course, request),
         })
 
         return data, course
