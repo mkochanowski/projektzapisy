@@ -73,7 +73,7 @@ class Thesis(models.Model):
 
 
 class ThesesBoardMember(models.Model):
-    member = models.ForeignKey(Employee)
+    member = models.ForeignKey(Employee, on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = "członek komisji"
@@ -103,8 +103,9 @@ THESIS_VOTE_CHOICES = (
 
 
 class ThesisVoteBinding(models.Model):
-    thesis = models.ForeignKey(Thesis)
-    voter = models.ForeignKey(Employee)  # should be a member of the theses board
+    thesis = models.ForeignKey(Thesis, on_delete=models.CASCADE)
+    # should be a member of the theses board
+    voter = models.ForeignKey(Employee, on_delete=models.PROTECT)
     vote = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
 
 
