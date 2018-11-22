@@ -74,7 +74,10 @@ class ThesesViewSet(viewsets.ModelViewSet):
 
 def filter_theses_queryset(thesis_type: ThesisTypeFilter, title: str, advisor_name: str):
     print("FILTER", thesis_type, title, advisor_name)
-    result = Thesis.objects.all()
+    result = Thesis.objects.select_related(
+        "student", "student_2", "advisor", "auxiliary_advisor",
+        "student__user", "student_2__user", "advisor__user", "auxiliary_advisor__user",
+    ).all()
     result = filter_theses_queryset_for_type(result, thesis_type)
     if title:
         result = result.filter(title__icontains=title)
