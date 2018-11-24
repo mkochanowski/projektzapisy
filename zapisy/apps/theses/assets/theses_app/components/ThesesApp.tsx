@@ -115,6 +115,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		);
 		console.assert(oldIdx !== -1);
 		this.state.thesesList[oldIdx] = thesis.mutable;
+		this.setThesis(thesis.mutable);
 		this.setState({
 			applicationState: ApplicationState.Normal,
 		});
@@ -140,7 +141,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		if (!this.allowArrowSwitch()) {
 			return;
 		}
-
+		
 	}
 
 	private downArrow = (e: ExtendedKeyboardEvent) => {
