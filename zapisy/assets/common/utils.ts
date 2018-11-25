@@ -36,4 +36,8 @@ export function strcmp(a: string, b: string) {
 	return (a < b ? -1 : (a > b ? 1 : 0));
 }
 
+export function inRange<T>(value: T, min: T, max: T): boolean {
+	return value >= min && value <= max;
+}
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

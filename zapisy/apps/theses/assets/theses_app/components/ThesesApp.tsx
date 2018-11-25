@@ -38,14 +38,15 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	public render() {
 		console.warn("Main render");
+		const { thesis } = this.state;
 		const mainComponent = <ThesesTable
 			applicationState={this.state.applicationState}
 			thesesList={this.state.thesesList}
 			thesisForId={this.getThesisForId}
 			onThesisClicked={this.onThesisClicked}
+			selectedThesis={thesis && thesis.original}
 			isEditingThesis={this.thesisWasEdited()}
 		/>;
-		const { thesis } = this.state;
 		return thesis !== null
 			? <>
 				{mainComponent}

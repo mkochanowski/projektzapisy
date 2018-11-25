@@ -2,20 +2,21 @@ import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import Griddle from "griddle-react";
 
-import { ListLoadingIndicator } from "./ListLoadingIndicator";
-import { ThesisTypeFilter } from "../backend_callers";
-import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../types";
-import { ApplicationState } from "../types/application_state";
-import { TopFilters } from "./TopFilters";
-import { strcmp } from "common/utils";
+import { ListLoadingIndicator } from "../ListLoadingIndicator";
+import { ThesisTypeFilter } from "../../backend_callers";
+import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../../types";
+import { ApplicationState } from "../../types/application_state";
+import { TopFilters } from "../TopFilters";
+import { strcmp, inRange } from "common/utils";
 import {
-	THESES_PER_PAGE, griddleColumnMeta, GRIDDLE_NO_DATA, GriddleThesisData,
-} from "./GriddleDetails";
+	THESES_PER_PAGE, griddleColumnMeta, GRIDDLE_NO_DATA, GriddleThesisData, GRIDDLE_TABLE_HEIGHT,
+} from "./GriddleDefs";
 
 type Props = {
 	applicationState: ApplicationState;
 	thesesList: Thesis[];
 	isEditingThesis: boolean;
+	selectedThesis: Thesis | null;
 
 	thesisForId: (id: number) => Thesis | null;
 	onThesisClicked: (t: Thesis) => void;
@@ -76,11 +77,11 @@ export class ThesesTable extends React.Component<Props, State> {
 				enableInfiniteScroll
 				infiniteScrollLoadTreshold={25}
 				useFixedHeader
-				bodyHeight={200}
+				bodyHeight={GRIDDLE_TABLE_HEIGHT}
 				resultsPerPage={THESES_PER_PAGE}
 				onRowClick={(this.onRowClick as any)}
 				columnMetadata={griddleColumnMeta}
-				metadataColumns={["id"]}
+				metadataColumns={["id", "idx"]}
 				results={this.dataForGriddle(data)}
 				noDataMessage={GRIDDLE_NO_DATA}
 				// @ts-ignore - missing prop
@@ -166,7 +167,7 @@ export class ThesesTable extends React.Component<Props, State> {
 			? (t: Thesis) => t.advisor != null ? t.advisor.displayName : ""
 			: (t: Thesis) => t.title
 		);
-		const adapt = this.state.sortAscending ? (r: number) => r	: (r: number) => -r;
+		const adapt = this.state.sortAscending ? (r: number) => r : (r: number) => -r;
 
 		const r = data.sort((t1: Thesis, t2: Thesis) => (
 			adapt(strcmp(getter(t1), getter(t2)))
@@ -228,28 +229,43 @@ export class ThesesTable extends React.Component<Props, State> {
 	private allowArrowSwitch(): boolean {
 		return (
 			document.activeElement === document.body &&
-			!this.props.isEditingThesis
+			!this.props.isEditingThesis &&
+			this.props.selectedThesis != null
 		);
 	}
 
-	private upArrow = (e: ExtendedKeyboardEvent) => {
-		if (!this.allowArrowSwitch()) {
-			return;
+	private getCurrentThesisIdx(data: Thesis[]) {
+		const { selectedThesis } = this.props;
+		if (!selectedThesis) {
+			console.assert(false, "getSelectedThesisIdx: no thesis");
+			return -1;
 		}
-		console.warn("previous", e);
+		return data.findIndex(selectedThesis.isEqual);
+	}
+
+	private arrowSwitch(offset: -1 | 1, e: ExtendedKeyboardEvent) {
+		if (!this.allowArrowSwitch()) { return;	}
+		const data = this.getData();
+		const current = this.getCurrentThesisIdx(data);
+		const target = current + offset;
+		if (!inRange(target, 0, data.length - 1)) { return; }
+		this.props.onThesisClicked(data[target]);
+		e.preventDefault();
+	}
+
+	private upArrow = (e: ExtendedKeyboardEvent) => {
+		this.arrowSwitch(-1, e);
 	}
 
 	private downArrow = (e: ExtendedKeyboardEvent) => {
-		if (!this.allowArrowSwitch()) {
-			return;
-		}
-		console.warn("next", e);
+		this.arrowSwitch(+1, e);
 	}
 }
 
 function toGriddleData(list: Thesis[]): GriddleThesisData[] {
-	return list.map(thesis => ({
+	return list.map((thesis: Thesis, idx: number) => ({
 		id: thesis.id,
+		idx,
 		reserved: thesis.reserved,
 		title: thesis.title,
 		advisorName: thesis.advisor ? thesis.advisor.displayName : "<brak>",
