@@ -1,45 +1,16 @@
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
-import Griddle, { ColumnMetaData } from "griddle-react";
+import Griddle from "griddle-react";
 
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
-import { ReservationIndicator } from "./ReservationIndicator";
 import { ThesisTypeFilter } from "../backend_callers";
 import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../types";
 import { ApplicationState } from "../types/application_state";
 import { TopFilters } from "./TopFilters";
 import { strcmp } from "common/utils";
-
-const griddleColumnMeta: Array<ColumnMetaData<any>> = [
-	{
-		columnName: "reserved",
-		displayName: "Rezerwacja",
-		customComponent: ReservationIndicator,
-		cssClassName: "reservedColumn",
-		sortable: false,
-	},
-	{
-		columnName: "title",
-		displayName: "Tytuł",
-		cssClassName: "titleColumn",
-	},
-	{
-		columnName: "advisorName",
-		displayName: "Promotor",
-		cssClassName: "advisorColumn",
-	},
-];
-
-const THESES_PER_PAGE = 10;
-const GRIDDLE_NO_DATA = "Brak wyników";
-
-// Converted theses data passed to griddle for rendering
-type GriddleThesisData = {
-	id: number;
-	reserved: boolean;
-	title: string;
-	advisorName: string;
-};
+import {
+	THESES_PER_PAGE, griddleColumnMeta, GRIDDLE_NO_DATA, GriddleThesisData,
+} from "./GriddleDetails";
 
 type Props = {
 	applicationState: ApplicationState;
