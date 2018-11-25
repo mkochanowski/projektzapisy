@@ -52,6 +52,9 @@ const initialState = {
 	typeFilter: ThesisTypeFilter.Default,
 	titleFilter: "",
 	advisorFilter: "",
+	griddlePage: 0,
+	sortAscending: true,
+	sortColumn: "",
 };
 type State = typeof initialState;
 
@@ -91,6 +94,7 @@ export class ThesesTable extends React.Component<Props> {
 	private renderThesesList() {
 		const style = this.getTableCss();
 		const isLoading = this.props.applicationState === ApplicationState.InitialLoading;
+		const griddleData = this.getTableResults();
 		return <div style={style}>
 			<Griddle
 				ref={this.setGriddle}
@@ -105,15 +109,23 @@ export class ThesesTable extends React.Component<Props> {
 				onRowClick={(this.onRowClick as any)}
 				columnMetadata={griddleColumnMeta}
 				metadataColumns={["id"]}
-				results={this.getTableResults()}
+				results={griddleData}
 				noDataMessage={GRIDDLE_NO_DATA}
-				useCustomFilterer={true}
+				useCustomFilterer
 				customFilterer={this.griddleFilterer}
 				// @ts-ignore - missing prop
 				allowEmptyGrid={isLoading}
-				// Hacky: you don't have to set useExternalData for this stuff to work
+				useExternal
 				externalIsLoading={isLoading}
 				externalLoadingComponent={ListLoadingIndicator}
+				externalSetPage={this.setPage}
+				externalSetPageSize={() => void(0)}
+				externalChangeSort={this.changeSort}
+				externalSetFilter={() => void(0)}
+				externalCurrentPage={this.state.griddlePage}
+				externalMaxPage={Math.ceil(griddleData.length / THESES_PER_PAGE)}
+				externalSortAscending={this.state.sortAscending}
+				externalSortColumn={this.state.sortColumn}
 			/>
 		</div>;
 	}
@@ -126,6 +138,18 @@ export class ThesesTable extends React.Component<Props> {
 				{this.renderThesesList()}
 			</>
 		);
+	}
+
+	private setPage = (pageNum: number) => {
+		this.setState({ griddlePage : pageNum });
+	}
+
+	private changeSort = (sortColumn: "title" | "advisorName", asc: boolean) => {
+		if (this.state.sortColumn === sortColumn && asc) {
+			this.setState({ sortColumn: "" });
+		} else {
+			this.setState({ sortColumn, sortAscending: asc });
+		}
 	}
 
 	private getTableResults(): GriddleThesisData[] {
@@ -157,7 +181,7 @@ export class ThesesTable extends React.Component<Props> {
 		const r = results.filter(td => {
 			const thesis = this.props.thesisForId(td.id);
 			if (!thesis) {
-				console.warn("[Sort] Griddle table has bad thesis", td);
+				console.warn("[Filter] Griddle table has bad thesis", td);
 				return false;
 			}
 			return (

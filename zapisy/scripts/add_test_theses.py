@@ -5,7 +5,7 @@ from faker import Faker
 from apps.theses.models import Thesis, ThesisKind, ThesisStatus
 from apps.users.models import Employee, Student
 
-NUM_THESES = 3000
+NUM_THESES = 1000
 
 
 fake = Faker()
