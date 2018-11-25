@@ -124,7 +124,7 @@ class RedisNotificationsRepository(NotificationsRepository):
         return f'notifications_sent_{user.id}'
 
 
-def get_current_repository_implementation() -> NotificationsRepository:
+def get_notifications_repository() -> NotificationsRepository:
     """
     Return an object implementing NotificationsRepository interface,
     thus providing access to _some_ notifications storage.

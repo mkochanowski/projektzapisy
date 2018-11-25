@@ -1,6 +1,6 @@
-from apps.notifications2.repositories import get_current_repository_implementation
+from apps.notifications2.repositories import get_notifications_repository
 
 
 def notification_ico(request):
-    repo = get_current_repository_implementation()
+    repo = get_notifications_repository()
     return {"notification_counter": repo.get_count_for_user(request.user)}
