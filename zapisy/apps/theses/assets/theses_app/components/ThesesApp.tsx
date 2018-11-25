@@ -45,7 +45,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			thesisForId={this.getThesisForId}
 			onThesisClicked={this.onThesisClicked}
 			selectedThesis={thesis && thesis.original}
-			isEditingThesis={this.thesisWasEdited()}
+			isEditingThesis={this.wasThesisEdited()}
 		/>;
 		return thesis !== null
 			? <>
@@ -53,11 +53,11 @@ export class ThesesApp extends React.Component<Props, State> {
 				<br />
 				<hr />
 				<ThesisDetails
-					originalThesis={thesis.original}
-					mutableThesis={thesis.mutable}
+					thesis={thesis.mutable}
 					onSaveRequested={this.handleThesisSave}
 					isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
-					shouldAllowSave={this.thesisWasEdited()}
+					shouldAllowSave={this.wasThesisEdited()}
+					onThesisModified={this.onThesisModified}
 				/>
 			</>
 			: mainComponent;
@@ -65,6 +65,15 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	private onThesisClicked = (thesis: Thesis) => {
 		this.setThesis(thesis);
+	}
+
+	private onThesisModified = (thesis: Thesis) => {
+		this.setState({
+			thesis: {
+				original: this.state.thesis!.original,
+				mutable: thesis,
+			}
+		});
 	}
 
 	private getThesisForId = (
@@ -83,7 +92,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		});
 	}
 
-	private thesisWasEdited() {
+	private wasThesisEdited() {
 		const { thesis } = this.state;
 		return (
 			thesis !== null &&
@@ -97,7 +106,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			console.warn("Tried to save thesis but none selected, this shouldn't happen");
 			return;
 		}
-		console.assert(this.thesisWasEdited());
+		console.assert(this.wasThesisEdited());
 
 		this.setState({ applicationState: ApplicationState.PerformingBackendChanges });
 		try {

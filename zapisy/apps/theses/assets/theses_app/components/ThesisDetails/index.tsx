@@ -50,8 +50,8 @@ margin-left: 20px;
 `;
 
 type Props = {
-	originalThesis: Thesis;
-	mutableThesis: Thesis;
+	thesis: Thesis;
+	onThesisModified: (thesis: Thesis) => void;
 	onSaveRequested: () => void;
 	isSaving: boolean;
 	shouldAllowSave: boolean;
@@ -68,13 +68,13 @@ export class ThesisDetails extends React.Component<Props> {
 			>
 				<LeftDetailsContainer>
 					<ThesisTopRow
-						thesis={this.props.mutableThesis}
+						thesis={this.props.thesis}
 						onReservationChanged={this.onReservationChanged}
 						onDateChanged={this.onDateUpdatedChanged}
 						onStatusChanged={this.onStatusChanged}
 					/>
 					<ThesisMiddleForm
-						thesis={this.props.mutableThesis}
+						thesis={this.props.thesis}
 						onTitleChanged={this.onTitleChanged}
 						onKindChanged={this.onKindChanged}
 						onAdvisorChanged={this.onAdvisorChanged}
@@ -97,7 +97,9 @@ export class ThesisDetails extends React.Component<Props> {
 	}
 
 	private updateThesisState(updateObject: Query<Thesis>) {
-		this.setState(update(this.state, { currentThesis: updateObject }));
+		this.props.onThesisModified(
+			update(this.props.thesis, updateObject)
+		);
 	}
 
 	private onReservationChanged = (newValue: boolean): void => {

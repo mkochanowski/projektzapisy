@@ -9,7 +9,7 @@ import "react-virtualized/styles.css"; // only needs to be imported once
 import { ThesisTypeFilter } from "../../backend_callers";
 import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../../types";
 import { ApplicationState } from "../../types/application_state";
-import { TopFilters } from "../TopFilters";
+import { TopFilters } from "./TopFilters";
 import { strcmp, inRange } from "common/utils";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
@@ -34,7 +34,7 @@ const initialState = {
 };
 type State = typeof initialState;
 
-export class ThesesTable extends React.Component<Props, State> {
+export class ThesesTable extends React.PureComponent<Props, State> {
 	state = initialState;
 	private tableData: Thesis[] | null = null;
 	private filterCache: Map<string, Thesis[]> = new Map();
@@ -61,7 +61,7 @@ export class ThesesTable extends React.Component<Props, State> {
 
 	private renderThesesList() {
 		const data = this.getData();
-		console.log("received", data.length);
+		console.warn("list renders");
 		return <AutoSizer disableHeight>
 			{({ width }) => (
 				<Table

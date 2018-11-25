@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { ThesisTypeFilter } from "../backend_callers";
-import { GenericSelect } from "./GenericSelect";
+import { ThesisTypeFilter } from "../../backend_callers";
+import { GenericSelect } from "../GenericSelect";
 
 const typefilterInfos = [
 	{ val: ThesisTypeFilter.AllCurrent, displayName: "Wszystkie aktualne" },
@@ -38,7 +38,7 @@ const labelStyle: React.CSSProperties = {
 	fontSize: "110%",
 };
 
-export class TopFilters extends React.Component<Props> {
+export class TopFilters extends React.PureComponent<Props> {
 	private handleTypeChange = (newFilter: ThesisTypeFilter): void => {
 		this.props.onTypeChange(newFilter);
 	}
@@ -52,6 +52,7 @@ export class TopFilters extends React.Component<Props> {
 	}
 
 	public render() {
+		console.warn("filters render");
 		return <div style={{
 			width: "100%",
 			display: "flex",

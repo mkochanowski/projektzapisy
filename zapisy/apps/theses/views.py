@@ -145,7 +145,7 @@ def build_autocomplete_view_with_queryset(queryset):
             return super(ac, self).get_paginate_by(queryset)
 
         def get_queryset(self):
-            if not self.request.user.is_authenticated():
+            if not self.request.user.is_authenticated:
                 return queryset.objects.none()
 
             qs = queryset.objects.all()
