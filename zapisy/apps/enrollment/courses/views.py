@@ -123,7 +123,10 @@ def get_semester_info(request, semester_id):
         raise Http404
 
 
-def course(request, slug):
+def course_view_data(request, slug):
+    """
+        This function returns requested course and data that are needed to view this course. If course does not exist it returns None.
+    """
     try:
         default_semester = Semester.get_default_semester()
         user = request.user
@@ -338,17 +341,30 @@ def course(request, slug):
             'current_ects': currentEcts
         })
 
-        if request.is_ajax():
-            rendered_html = render_to_string(
-                'enrollment/courses/course_info.html',
-                data, request)
-            return JsonResponse({
-                'courseHtml': rendered_html,
-                'courseName': course.name,
-                'courseEditLink': reverse('admin:courses_course_change', args=[course.pk])
-            })
-        else:
-            return render(request, 'enrollment/courses/course.html', data)
+        return data, course
 
     except (Course.DoesNotExist, NonCourseException):
+        return None
+
+
+def course_ajax(request, slug):
+    try:
+        data, course = course_view_data(request, slug)
+        rendered_html = render_to_string(
+            'enrollment/courses/course_info.html',
+            data, request)
+        return JsonResponse({
+            'courseHtml': rendered_html,
+            'courseName': course.name,
+            'courseEditLink': reverse('admin:courses_course_change', args=[course.pk])
+        })
+    except (TypeError):
+        raise Http404
+
+
+def course_page(request, slug):
+    try:
+        data, course = course_view_data(request, slug)
+        return render(request, 'enrollment/courses/course.html', data)
+    except (TypeError):
         raise Http404

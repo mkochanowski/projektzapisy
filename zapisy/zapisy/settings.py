@@ -43,6 +43,20 @@ DATABASES = {
     }
 }
 
+# django-rq is a task queue. It can be used to run asynchronous tasks. The tasks
+# should be implemented so, that setting RUN_ASYNC to False would run them
+# eagerly.
+RUN_ASYNC = env.bool('RUN_ASYNC', True)
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'PASSWORD': '',
+        'DEFAULT_TIMEOUT': 360,
+    },
+}
+
 # mass-mail account
 # You can test sending with:
 # $ python -m smtpd -n -c DebuggingServer localhost:1025
@@ -115,7 +129,7 @@ SITE_ID = 1
 USE_I18N = True
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
+SECRET_KEY = env.str('SECRET_KEY', default='N3MUBVRQXkhuqzsZ8QMepRaZwHDXwhp4rTcVQF5bmckB2c293V')
 
 TEMPLATE_LOADERS_TO_USE = [
     'django.template.loaders.filesystem.Loader',
@@ -208,6 +222,7 @@ INSTALLED_APPS = (
     'django_cas_ng',
 
     'test_app',
+    'django_rq',
     'webpack_loader',
 )
 
