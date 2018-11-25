@@ -74,6 +74,10 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private setThesis(t: Thesis) {
+		console.assert(
+			this.state.thesesList.find(t.isEqual) != null,
+			"Trying to set a nonexistent thesis",
+		);
 		this.setState({
 			thesis: { original: t, mutable: clone(t) },
 		});

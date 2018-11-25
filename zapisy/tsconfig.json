@@ -18,7 +18,7 @@
       "react-dom",
       "react-table",
       "js-cookie",
-      "griddle-react",
+      "react-virtualized"
     ]
   },
   "exclude": [

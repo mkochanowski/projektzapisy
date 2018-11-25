@@ -19,10 +19,10 @@
   },
   "homepage": "https://github.com/iiuni/projektzapisy#README",
   "dependencies": {
+    "@types/react-virtualized": "^9.18.9",
     "axios": "^0.18.0",
     "babel-runtime": "^6.26.0",
     "create-react-class": "^15.6.3",
-    "griddle-react": "0.8.2",
     "immutability-helper": "^2.7.1",
     "jquery": "^3.2.1",
     "js-cookie": "^2.2.0",
@@ -37,6 +37,7 @@
     "react-select": "1",
     "react-select-async-paginate": "^0.1.0",
     "react-table": "^6.8.6",
+    "react-virtualized": "^9.21.0",
     "styled-components": "^3.3.3",
     "vue": "^2.5.6",
     "vuex": "^3.0.1"
@@ -44,7 +45,6 @@
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/glob": "^5.0.33",
-    "@types/griddle-react": "^0.7.3",
     "@types/jquery": "^3.3.4",
     "@types/js-cookie": "^2.1.0",
     "@types/lodash": "^4.14.110",
