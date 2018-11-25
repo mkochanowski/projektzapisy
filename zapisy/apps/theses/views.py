@@ -73,7 +73,6 @@ class ThesesViewSet(viewsets.ModelViewSet):
 
 
 def filter_theses_queryset(thesis_type: ThesisTypeFilter, title: str, advisor_name: str):
-    print("FILTER", thesis_type, title, advisor_name)
     result = Thesis.objects.select_related(
         "student", "student_2", "advisor", "auxiliary_advisor",
         "student__user", "student_2__user", "advisor__user", "auxiliary_advisor__user",
@@ -89,7 +88,7 @@ def filter_theses_queryset(thesis_type: ThesisTypeFilter, title: str, advisor_na
         ]
         result = result.filter(advisor__id__in=emp_filtered_theses_ids)
 
-    print(result)
+    print(f'{result.count()} theses')
     return result
 
 

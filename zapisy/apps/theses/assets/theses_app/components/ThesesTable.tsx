@@ -153,7 +153,8 @@ export class ThesesTable extends React.Component<Props> {
 		const title = this.state.titleFilter;
 		const type = this.state.typeFilter;
 
-		return results.filter(td => {
+		console.time("filter");
+		const r = results.filter(td => {
 			const thesis = this.props.thesisForId(td.id);
 			if (!thesis) {
 				console.warn("[Sort] Griddle table has bad thesis", td);
@@ -165,6 +166,8 @@ export class ThesesTable extends React.Component<Props> {
 				(!title || td.title.toLowerCase().includes(title.toLowerCase()))
 			);
 		});
+		console.timeEnd("filter");
+		return r;
 	}
 
 	// See setGriddleFilter
@@ -175,41 +178,22 @@ export class ThesesTable extends React.Component<Props> {
 		return this.filterGriddleResults(results);
 	}
 
-	private setGriddleFilter() {
-		// This is a rather big hack to achieve what we want;
-		// I want the filters in external components I manage myself; when
-		// the value is changed I just want to tell griddle to update itself
-		// we use a ref to save the component instance and call the internal setFilter
-		// method; this forces griddle to call the (user supplied) custom filtering method
-		// where I apply the new filters
-		// To be able to tell whether it's me who called my custom filter method
-		// I pass this "magic" filter argument; in the handler I only use it to check
-		// if it was me who called it, the filters are saved on `this`
-		this.griddle.setFilter(GRIDDLE_FILTER_MAGIC);
-		// Changing a filter will almost certainly change the result set,
-		// so it'd be nice to scroll to the top but griddle won't do that itself, so...
-		document.querySelector("div.griddle > div > div > div > div")!.scrollTop = 0;
-	}
-
 	private onTypeFilterChanged = async (newFilter: ThesisTypeFilter) => {
-		await this.setStateAsync({ typeFilter: newFilter });
-		this.setGriddleFilter();
+		this.setStateAsync({ typeFilter: newFilter });
 	}
 
 	private onAdvisorFilterChanged = async (newAdvisorFilter: string) => {
 		if (!newAdvisorFilter.trim()) {
 			newAdvisorFilter = "";
 		}
-		await this.setStateAsync({ advisorFilter: newAdvisorFilter });
-		this.setGriddleFilter();
+		this.setStateAsync({ advisorFilter: newAdvisorFilter });
 	}
 
 	private onTitleFilterChanged = async (newTitleFilter: string) => {
 		if (!newTitleFilter.trim()) {
 			newTitleFilter = "";
 		}
-		await this.setStateAsync({ titleFilter: newTitleFilter });
-		this.setGriddleFilter();
+		this.setStateAsync({ titleFilter: newTitleFilter });
 	}
 }
 
