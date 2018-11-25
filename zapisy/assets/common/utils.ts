@@ -32,4 +32,8 @@ export function awaitSleep(ms: number): Promise<void> {
 	});
 }
 
+export function strcmp(a: string, b: string) {
+	return (a < b ? -1 : (a > b ? 1 : 0));
+}
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

@@ -1,12 +1,14 @@
 import * as React from "react";
+import * as Mousetrap from "mousetrap";
 import Griddle, { ColumnMetaData } from "griddle-react";
 
 import { ListLoadingIndicator } from "./ListLoadingIndicator";
 import { ReservationIndicator } from "./ReservationIndicator";
 import { ThesisTypeFilter } from "../backend_callers";
-import { Thesis, ThesisStatus, ThesisKind } from "../types";
+import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../types";
 import { ApplicationState } from "../types/application_state";
 import { TopFilters } from "./TopFilters";
+import { strcmp } from "common/utils";
 
 const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 	{
@@ -30,7 +32,6 @@ const griddleColumnMeta: Array<ColumnMetaData<any>> = [
 
 const THESES_PER_PAGE = 10;
 const GRIDDLE_NO_DATA = "Brak wyników";
-const GRIDDLE_FILTER_MAGIC = "a hack of epic proportions";
 
 // Converted theses data passed to griddle for rendering
 type GriddleThesisData = {
@@ -43,6 +44,7 @@ type GriddleThesisData = {
 type Props = {
 	applicationState: ApplicationState;
 	thesesList: Thesis[];
+	isEditingThesis: boolean;
 
 	thesisForId: (id: number) => Thesis | null;
 	onThesisClicked: (t: Thesis) => void;
@@ -52,24 +54,23 @@ const initialState = {
 	typeFilter: ThesisTypeFilter.Default,
 	titleFilter: "",
 	advisorFilter: "",
-	griddlePage: 0,
+	griddlePage: 1,
 	sortAscending: true,
-	sortColumn: "",
+	sortColumn: "" as ("title" | "advisorName" | ""),
 };
 type State = typeof initialState;
 
-export class ThesesTable extends React.Component<Props> {
-	private griddle: any;
+export class ThesesTable extends React.Component<Props, State> {
 	state = initialState;
+	private filterCache: Map<string, Thesis[]> = new Map();
+	private sortCache: Map<string, Thesis[]> = new Map();
 
-	private setGriddle = (griddle: Griddle<any>) => {
-		this.griddle = griddle;
+	componentDidMount() {
+		this.installKeyHandler();
 	}
 
-	private setStateAsync<K extends keyof State>(partialState: Pick<State, K>): Promise<void> {
-		return new Promise((resolve, _) => {
-			this.setState(partialState, resolve);
-		});
+	componentWillUnmount() {
+		this.uninstallKeyHandler();
 	}
 
 	private renderTopFilters() {
@@ -94,10 +95,10 @@ export class ThesesTable extends React.Component<Props> {
 	private renderThesesList() {
 		const style = this.getTableCss();
 		const isLoading = this.props.applicationState === ApplicationState.InitialLoading;
-		const griddleData = this.getTableResults();
+		const data = this.getData();
+		const maxPage = Math.ceil(data.length / THESES_PER_PAGE);
 		return <div style={style}>
 			<Griddle
-				ref={this.setGriddle}
 				useGriddleStyles={false}
 				tableClassName={"griddleTable"}
 				showFilter={false}
@@ -109,10 +110,8 @@ export class ThesesTable extends React.Component<Props> {
 				onRowClick={(this.onRowClick as any)}
 				columnMetadata={griddleColumnMeta}
 				metadataColumns={["id"]}
-				results={griddleData}
+				results={this.dataForGriddle(data)}
 				noDataMessage={GRIDDLE_NO_DATA}
-				useCustomFilterer
-				customFilterer={this.griddleFilterer}
 				// @ts-ignore - missing prop
 				allowEmptyGrid={isLoading}
 				useExternal
@@ -123,7 +122,7 @@ export class ThesesTable extends React.Component<Props> {
 				externalChangeSort={this.changeSort}
 				externalSetFilter={() => void(0)}
 				externalCurrentPage={this.state.griddlePage}
-				externalMaxPage={Math.ceil(griddleData.length / THESES_PER_PAGE)}
+				externalMaxPage={maxPage}
 				externalSortAscending={this.state.sortAscending}
 				externalSortColumn={this.state.sortColumn}
 			/>
@@ -140,8 +139,74 @@ export class ThesesTable extends React.Component<Props> {
 		);
 	}
 
+	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
+		if (this.props.thesesList !== nextProps.thesesList) {
+			// Invalidate caches
+			this.filterCache.clear();
+			this.sortCache.clear();
+		}
+	}
+
+	private dataForGriddle(data: Thesis[]): GriddleThesisData[] {
+		return toGriddleData(data.slice(0, this.state.griddlePage * THESES_PER_PAGE));
+	}
+
+	private getData(): Thesis[] {
+		console.time("getData");
+		console.time("filter");
+		const filteredData = this.filterData(this.props.thesesList);
+		console.timeEnd("filter");
+		console.time("sort");
+		const sortedData = this.sortData(filteredData);
+		console.timeEnd("sort");
+		console.timeEnd("getData");
+		return sortedData;
+	}
+
+	private filterData(data: Thesis[]) {
+		const advisor = this.state.advisorFilter.toLowerCase();
+		const title = this.state.titleFilter.toLowerCase();
+		const type = this.state.typeFilter;
+
+		const cacheKey = `${advisor}_${title}_${type}`;
+		const cached = this.filterCache.get(cacheKey);
+		if (cached) { return cached; }
+
+		const r = data.filter(thesis => (
+			thesisMatchesType(thesis, type) &&
+			personNameFilter(thesis.advisor, advisor) &&
+			thesis.title.toLowerCase().includes(title)
+		));
+		this.filterCache.set(cacheKey, r);
+		return r;
+	}
+
+	private sortData(data: Thesis[]): Thesis[] {
+		if (!this.state.sortColumn) {
+			return data;
+		}
+
+		const cacheKey = `${this.state.sortColumn}_${this.state.sortAscending}`;
+		const cached = this.sortCache.get(cacheKey);
+		if (cached) { return cached; }
+
+		const getter = (
+			this.state.sortColumn === "advisorName"
+			? (t: Thesis) => t.advisor != null ? t.advisor.displayName : ""
+			: (t: Thesis) => t.title
+		);
+		const adapt = this.state.sortAscending ? (r: number) => r	: (r: number) => -r;
+
+		const r = data.sort((t1: Thesis, t2: Thesis) => (
+			adapt(strcmp(getter(t1), getter(t2)))
+		));
+		this.sortCache.set(cacheKey, r);
+		return r;
+	}
+
 	private setPage = (pageNum: number) => {
-		this.setState({ griddlePage : pageNum });
+		console.error("Setting page", pageNum);
+		this.setState({ griddlePage: pageNum });
 	}
 
 	private changeSort = (sortColumn: "title" | "advisorName", asc: boolean) => {
@@ -150,16 +215,6 @@ export class ThesesTable extends React.Component<Props> {
 		} else {
 			this.setState({ sortColumn, sortAscending: asc });
 		}
-	}
-
-	private getTableResults(): GriddleThesisData[] {
-		const griddleResults = this.props.thesesList.map(thesis => ({
-			id: thesis.id,
-			reserved: thesis.reserved,
-			title: thesis.title,
-			advisorName: thesis.advisor ? thesis.advisor.displayName : "<brak>",
-		}));
-		return this.filterGriddleResults(griddleResults);
 	}
 
 	private onRowClick = (row: any, _e: MouseEvent) => {
@@ -172,53 +227,67 @@ export class ThesesTable extends React.Component<Props> {
 		this.props.onThesisClicked(thesis);
 	}
 
-	private filterGriddleResults(results: GriddleThesisData[]) {
-		const advisor = this.state.advisorFilter;
-		const title = this.state.titleFilter;
-		const type = this.state.typeFilter;
-
-		console.time("filter");
-		const r = results.filter(td => {
-			const thesis = this.props.thesisForId(td.id);
-			if (!thesis) {
-				console.warn("[Filter] Griddle table has bad thesis", td);
-				return false;
-			}
-			return (
-				thesisMatchesType(thesis, type) &&
-				(!advisor || td.advisorName.toLowerCase().includes(advisor.toLowerCase())) &&
-				(!title || td.title.toLowerCase().includes(title.toLowerCase()))
-			);
-		});
-		console.timeEnd("filter");
-		return r;
-	}
-
-	// See setGriddleFilter
-	private griddleFilterer = (results: GriddleThesisData[], filter: any) => {
-		if (filter !== GRIDDLE_FILTER_MAGIC) {
-			return results;
-		}
-		return this.filterGriddleResults(results);
-	}
-
 	private onTypeFilterChanged = async (newFilter: ThesisTypeFilter) => {
-		this.setStateAsync({ typeFilter: newFilter });
+		this.setState({ typeFilter: newFilter });
 	}
 
 	private onAdvisorFilterChanged = async (newAdvisorFilter: string) => {
 		if (!newAdvisorFilter.trim()) {
 			newAdvisorFilter = "";
 		}
-		this.setStateAsync({ advisorFilter: newAdvisorFilter });
+		this.setState({ advisorFilter: newAdvisorFilter });
 	}
 
 	private onTitleFilterChanged = async (newTitleFilter: string) => {
 		if (!newTitleFilter.trim()) {
 			newTitleFilter = "";
 		}
-		this.setStateAsync({ titleFilter: newTitleFilter });
+		this.setState({ titleFilter: newTitleFilter });
 	}
+
+	private uninstallKeyHandler() {
+		Mousetrap.unbind(["up", "down"]);
+	}
+
+	private installKeyHandler() {
+		Mousetrap.bind("up", this.upArrow);
+		Mousetrap.bind("down", this.downArrow);
+	}
+
+	private allowArrowSwitch(): boolean {
+		return (
+			document.activeElement === document.body &&
+			!this.props.isEditingThesis
+		);
+	}
+
+	private upArrow = (e: ExtendedKeyboardEvent) => {
+		if (!this.allowArrowSwitch()) {
+			return;
+		}
+		console.warn("previous", e);
+	}
+
+	private downArrow = (e: ExtendedKeyboardEvent) => {
+		if (!this.allowArrowSwitch()) {
+			return;
+		}
+		console.warn("next", e);
+	}
+}
+
+function toGriddleData(list: Thesis[]): GriddleThesisData[] {
+	return list.map(thesis => ({
+		id: thesis.id,
+		reserved: thesis.reserved,
+		title: thesis.title,
+		advisorName: thesis.advisor ? thesis.advisor.displayName : "<brak>",
+	}));
+}
+
+// nameFilt - already lowercase
+function personNameFilter(p: BasePerson | null, nameFilt: string): boolean {
+	return p != null && p.displayName.toLowerCase().includes(nameFilt);
 }
 
 function isThesisAvailable(thesis: Thesis): boolean {

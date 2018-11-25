@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
 import { Thesis } from "../types";
@@ -31,15 +30,10 @@ export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
 
 	async componentDidMount() {
-		this.installKeyHandler();
 		this.setState({
 			thesesList: await getThesesList(),
 			applicationState: ApplicationState.Normal,
 		});
-	}
-
-	componentWillUnmount() {
-		this.uninstallKeyHandler();
 	}
 
 	public render() {
@@ -49,6 +43,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			thesesList={this.state.thesesList}
 			thesisForId={this.getThesisForId}
 			onThesisClicked={this.onThesisClicked}
+			isEditingThesis={this.thesisWasEdited()}
 		/>;
 		const { thesis } = this.state;
 		return thesis !== null
@@ -119,32 +114,5 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setState({
 			applicationState: ApplicationState.Normal,
 		});
-	}
-
-	private uninstallKeyHandler() {
-		Mousetrap.unbind(["up", "down"]);
-	}
-
-	private installKeyHandler() {
-		Mousetrap.bind("up", this.upArrow);
-		Mousetrap.bind("down", this.downArrow);
-	}
-
-	private allowArrowSwitch() {
-		return (
-			document.activeElement === document.body &&
-			!this.thesisWasEdited()
-		);
-	}
-
-	private upArrow = (e: ExtendedKeyboardEvent) => {
-		if (!this.allowArrowSwitch()) {
-			return;
-		}
-		
-	}
-
-	private downArrow = (e: ExtendedKeyboardEvent) => {
-
 	}
 }
