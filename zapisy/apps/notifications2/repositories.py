@@ -118,10 +118,10 @@ class RedisNotificationsRepository(NotificationsRepository):
                 self.removed_count += 1
 
     def _generate_unsent_key_for_user(self, user: User) -> str:
-        return f'notifications_unsent_{user.id}'
+        return f'notifications:unsent#{user.id}'
 
     def _generate_sent_key_for_user(self, user: User) -> str:
-        return f'notifications_sent_{user.id}'
+        return f'notifications:sent#{user.id}'
 
 
 def get_notifications_repository() -> NotificationsRepository:
