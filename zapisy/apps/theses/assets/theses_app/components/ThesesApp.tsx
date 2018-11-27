@@ -43,7 +43,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			applicationState={this.state.applicationState}
 			thesesList={this.state.thesesList}
 			thesisForId={this.getThesisForId}
-			onThesisClicked={this.onThesisClicked}
+			onThesisSelected={this.onThesisClicked}
 			selectedThesis={thesis && thesis.original}
 			isEditingThesis={this.wasThesisEdited()}
 		/>;

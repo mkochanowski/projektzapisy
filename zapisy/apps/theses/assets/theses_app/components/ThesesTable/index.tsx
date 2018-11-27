@@ -14,6 +14,9 @@ import { strcmp, inRange } from "common/utils";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 
+const TABLE_HEIGHT = 200;
+const TABLE_CELL_HEIGHT = 30;
+
 type Props = {
 	applicationState: ApplicationState;
 	thesesList: Thesis[];
@@ -21,7 +24,7 @@ type Props = {
 	selectedThesis: Thesis | null;
 
 	thesisForId: (id: number) => Thesis | null;
-	onThesisClicked: (t: Thesis) => void;
+	onThesisSelected: (t: Thesis) => void;
 };
 
 const initialState = {
@@ -71,10 +74,10 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 				<Table
 					rowGetter={this.getRowByIndex}
 					rowCount={data.length}
-					rowHeight={30}
+					rowHeight={TABLE_CELL_HEIGHT}
 					width={width}
-					height={200}
-					headerHeight={30}
+					height={TABLE_HEIGHT}
+					headerHeight={TABLE_CELL_HEIGHT}
 					sort={this.changeSort}
 					sortBy={this.state.sortColumn}
 					sortDirection={this.state.sortDirection}
@@ -88,6 +91,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 						width={150}
 						disableSort
 						cellRenderer={ReservationIndicator}
+						className={"reservation_cell"}
 					/>
 					<Column
 						label="Tytuł"
@@ -211,7 +215,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	private onRowClick = (info: RowMouseEventHandlerParams) => {
 		// The typings are invalid and think rowData is some object
 		const thesis = info.rowData as any as Thesis;
-		this.props.onThesisClicked(thesis);
+		this.props.onThesisSelected(thesis);
 	}
 
 	private onTypeFilterChanged = (newFilter: ThesisTypeFilter) => {
@@ -256,7 +260,8 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		const data = this.getData();
 		const target = this.state.currentThesisIdx + offset;
 		if (!inRange(target, 0, data.length - 1)) { return; }
-		this.props.onThesisClicked(data[target]);
+
+		this.props.onThesisSelected(data[target]);
 		e.preventDefault();
 	}
 
