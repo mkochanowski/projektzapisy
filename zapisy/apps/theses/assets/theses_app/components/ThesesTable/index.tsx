@@ -31,6 +31,8 @@ const initialState = {
 	griddlePage: 1,
 	sortDirection: SortDirection.ASC as SortDirectionType,
 	sortColumn: "" as ("title" | "advisor" | ""),
+	// cache this since finding it isn't a zero cost operation
+	currentThesisIdx: -1,
 };
 type State = typeof initialState;
 
@@ -61,7 +63,9 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 
 	private renderThesesList() {
 		const data = this.getData();
-		console.warn("list renders");
+		const scrollTo = this.state.currentThesisIdx !== -1
+			? this.state.currentThesisIdx
+			: undefined;
 		return <AutoSizer disableHeight>
 			{({ width }) => (
 				<Table
@@ -76,6 +80,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 					sortDirection={this.state.sortDirection}
 					onRowClick={this.onRowClick}
 					rowClassName={this.getRowClassName}
+					scrollToIndex={scrollTo}
 				>
 					<Column
 						label="Rezerwacja"
@@ -109,7 +114,10 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		if (index < 0) {
 			return "";
 		}
-		return `alternating_color_${index % 2 ? "odd" : "even"}`;
+		const colorComponent = `alternating_color_${index % 2 ? "odd" : "even"}`;
+		return this.state.currentThesisIdx === index
+			? `active_row ${colorComponent}`
+			: colorComponent;
 	}
 
 	public render() {
@@ -126,6 +134,15 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		if (this.props.thesesList !== nextProps.thesesList) {
 			this.resetAllCaches();
 		}
+		if (nextProps.selectedThesis) {
+			this.setState({
+				currentThesisIdx: this.getThesisIdx(nextProps.selectedThesis),
+			});
+		}
+	}
+
+	private getThesisIdx(thesis: Thesis) {
+		return this.getData().findIndex(thesis.isEqual);
 	}
 
 	private resetAllCaches() {
@@ -229,26 +246,15 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 
 	private allowArrowSwitch(): boolean {
 		return (
-			document.activeElement === document.body &&
 			!this.props.isEditingThesis &&
 			this.props.selectedThesis != null
 		);
 	}
 
-	private getCurrentThesisIdx(data: Thesis[]) {
-		const { selectedThesis } = this.props;
-		if (!selectedThesis) {
-			console.assert(false, "getSelectedThesisIdx: no thesis");
-			return -1;
-		}
-		return data.findIndex(selectedThesis.isEqual);
-	}
-
 	private arrowSwitch(offset: -1 | 1, e: ExtendedKeyboardEvent) {
 		if (!this.allowArrowSwitch()) { return;	}
 		const data = this.getData();
-		const current = this.getCurrentThesisIdx(data);
-		const target = current + offset;
+		const target = this.state.currentThesisIdx + offset;
 		if (!inRange(target, 0, data.length - 1)) { return; }
 		this.props.onThesisClicked(data[target]);
 		e.preventDefault();
