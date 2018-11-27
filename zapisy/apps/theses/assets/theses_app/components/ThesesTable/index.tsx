@@ -13,6 +13,9 @@ import { TopFilters } from "./TopFilters";
 import { strcmp, inRange } from "common/utils";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
+import { Spinner } from "../Spinner";
+import { getDisabledStyle } from "../../utils";
+import { LoadingIndicator } from "./LoadingIndicator";
 
 const TABLE_HEIGHT = 200;
 const TABLE_CELL_HEIGHT = 30;
@@ -64,9 +67,16 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private renderThesesList() {
+		if (this.props.applicationState === ApplicationState.InitialLoading) {
+			return <LoadingIndicator/>;
+		}
 		const data = this.getData();
 		const selectedIdx = this.getSelectedIdx();
-		return <AutoSizer disableHeight>
+		const shouldDisable = this.props.applicationState === ApplicationState.PerformingBackendChanges;
+		return <AutoSizer
+			disableHeight
+			style={shouldDisable ? getDisabledStyle() : {}}
+		>
 			{({ width }) => (
 				<Table
 					rowGetter={this.getRowByIndex}

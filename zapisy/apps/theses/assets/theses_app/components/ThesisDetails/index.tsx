@@ -9,7 +9,8 @@ import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
 
-import { SavingIndicator } from "./SavingIndicator";
+import { Spinner } from "../Spinner";
+import { getDisabledStyle } from "../../utils";
 
 const SaveButton = Button.extend`
 	&:disabled:hover {
@@ -62,9 +63,9 @@ export class ThesisDetails extends React.Component<Props> {
 		const { shouldAllowSave } = this.props;
 
 		return <DetailsSectionWrapper>
-			{this.props.isSaving ? <SavingIndicator/> : null}
+			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
 			<MainDetailsContainer
-				style={this.props.isSaving ? { opacity: 0.5, pointerEvents: "none" } : {}}
+				style={this.props.isSaving ? getDisabledStyle() : {}}
 			>
 				<LeftDetailsContainer>
 					<ThesisTopRow

@@ -60,7 +60,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			applicationState={this.state.applicationState}
 			thesesList={this.state.thesesList}
 			thesisForId={this.getThesisForId}
-			onThesisSelected={this.onThesisClicked}
+			onThesisSelected={this.onThesisSelected}
 			selectedThesis={thesis && thesis.original}
 			isEditingThesis={this.hasUnsavedChanges()}
 		/>;
@@ -88,14 +88,18 @@ export class ThesesApp extends React.Component<Props, State> {
 		);
 	}
 
-	private onThesisClicked = (thesis: Thesis) => {
+	private onThesisSelected = (thesis: Thesis) => {
 		if (this.hasUnsavedChanges()) {
 			const title = this.state.thesis!.mutable.title;
 			if (!confirmDiscardChanges(title)) {
 				return;
 			}
 		}
-		this.setThesis(thesis);
+		console.assert(
+			this.state.thesesList.find(thesis.isEqual) != null,
+			"Tried to select a nonexistent thesis",
+		);
+		this.setActiveThesis(thesis);
 	}
 
 	// When modified in the Details subcomponent; we need to maintain
@@ -115,13 +119,9 @@ export class ThesesApp extends React.Component<Props, State> {
 		return theses.find(t => t.id === id) || null;
 	}
 
-	private setThesis(t: Thesis) {
-		console.assert(
-			this.state.thesesList.find(t.isEqual) != null,
-			"Trying to set a nonexistent thesis",
-		);
+	private setActiveThesis(t: Thesis | null) {
 		this.setState({
-			thesis: { original: t, mutable: clone(t) },
+			thesis: t ? { original: t, mutable: clone(t) } : null,
 		});
 	}
 
@@ -143,16 +143,19 @@ export class ThesesApp extends React.Component<Props, State> {
 			);
 			return;
 		}
-		// Update the list to contain the new thesis
-		const oldIdx = this.state.thesesList.findIndex(
-			t => t.id === thesis.original.id
-		);
-		console.assert(oldIdx !== -1);
-		this.state.thesesList[oldIdx] = thesis.mutable;
-		this.setThesis(thesis.mutable);
-		this.setState({
-			applicationState: ApplicationState.Normal,
-		});
+		// Re-fetch everything
+		// this might seem pointless but as we don't currently have any
+		// backend synchronization this is the only chance to refresh
+		// everything
+		const newList = await getThesesList();
+		// We'll want to find the thesis we just saved
+		// Note that it _could_ technically be absent from the new list
+		// but the odds are absurdly low (it would have to be deleted by someone
+		// else or the admin in the time between those two requests above)
+		const freshThesisInstance = newList.find(thesis.original.isEqual) || null;
+		this.setState({ thesesList: newList });
+		this.setActiveThesis(freshThesisInstance);
+		this.setState({ applicationState: ApplicationState.Normal });
 	}
 }
 
