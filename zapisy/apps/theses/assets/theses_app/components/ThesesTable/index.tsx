@@ -13,7 +13,6 @@ import { TopFilters } from "./TopFilters";
 import { strcmp, inRange } from "common/utils";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
-import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
 
