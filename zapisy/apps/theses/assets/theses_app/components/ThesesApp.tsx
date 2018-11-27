@@ -28,12 +28,29 @@ const initialState: State = {
 
 export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
+	private oldOnBeforeUnload: ((this: Window, ev: BeforeUnloadEvent) => any) | null = null;
 
 	async componentDidMount() {
 		this.setState({
 			thesesList: await getThesesList(),
 			applicationState: ApplicationState.Normal,
 		});
+		this.oldOnBeforeUnload = window.onbeforeunload;
+		window.onbeforeunload = this.confirmUnload;
+	}
+
+	componentWillUnmount() {
+		window.onbeforeunload = this.oldOnBeforeUnload;
+	}
+
+	private confirmUnload = (ev: BeforeUnloadEvent) => {
+		if (this.hasUnsavedChanges()) {
+			// As specified in https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
+			// preventDefault() is what the spec says, in practice some
+			// browsers like returnValue to be set
+			ev.preventDefault();
+			ev.returnValue = "";
+		}
 	}
 
 	public render() {
@@ -45,7 +62,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			thesisForId={this.getThesisForId}
 			onThesisSelected={this.onThesisClicked}
 			selectedThesis={thesis && thesis.original}
-			isEditingThesis={this.wasThesisEdited()}
+			isEditingThesis={this.hasUnsavedChanges()}
 		/>;
 		return thesis !== null
 			? <>
@@ -56,17 +73,33 @@ export class ThesesApp extends React.Component<Props, State> {
 					thesis={thesis.mutable}
 					onSaveRequested={this.handleThesisSave}
 					isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
-					shouldAllowSave={this.wasThesisEdited()}
+					shouldAllowSave={this.hasUnsavedChanges()}
 					onThesisModified={this.onThesisModified}
 				/>
 			</>
 			: mainComponent;
 	}
 
+	private hasUnsavedChanges() {
+		const { thesis } = this.state;
+		return (
+			thesis !== null &&
+			!thesis.original.areValuesEqual(thesis.mutable!)
+		);
+	}
+
 	private onThesisClicked = (thesis: Thesis) => {
+		if (this.hasUnsavedChanges()) {
+			const title = this.state.thesis!.mutable.title;
+			if (!confirmDiscardChanges(title)) {
+				return;
+			}
+		}
 		this.setThesis(thesis);
 	}
 
+	// When modified in the Details subcomponent; we need to maintain
+	// it on the main app state
 	private onThesisModified = (thesis: Thesis) => {
 		this.setState({
 			thesis: {
@@ -92,21 +125,13 @@ export class ThesesApp extends React.Component<Props, State> {
 		});
 	}
 
-	private wasThesisEdited() {
-		const { thesis } = this.state;
-		return (
-			thesis !== null &&
-			!thesis.original.areValuesEqual(thesis.mutable!)
-		);
-	}
-
 	private handleThesisSave = async () => {
 		const { thesis } = this.state;
 		if (thesis === null) {
 			console.warn("Tried to save thesis but none selected, this shouldn't happen");
 			return;
 		}
-		console.assert(this.wasThesisEdited());
+		console.assert(this.hasUnsavedChanges());
 
 		this.setState({ applicationState: ApplicationState.PerformingBackendChanges });
 		try {
@@ -129,4 +154,10 @@ export class ThesesApp extends React.Component<Props, State> {
 			applicationState: ApplicationState.Normal,
 		});
 	}
+}
+
+function confirmDiscardChanges(thesisTitle: string) {
+	return window.confirm(
+		`Czy porzucić niezapisane zmiany w pracy "${thesisTitle}"?`
+	);
 }
