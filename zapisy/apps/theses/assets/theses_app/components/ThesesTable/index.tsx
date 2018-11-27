@@ -34,8 +34,6 @@ const initialState = {
 	griddlePage: 1,
 	sortDirection: SortDirection.ASC as SortDirectionType,
 	sortColumn: "" as ("title" | "advisor" | ""),
-	// cache this since finding it isn't a zero cost operation
-	currentThesisIdx: -1,
 };
 type State = typeof initialState;
 
@@ -43,6 +41,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	state = initialState;
 	private tableData: Thesis[] | null = null;
 	private filterCache: Map<string, Thesis[]> = new Map();
+	private selectedIdxCache: number | null = null;
 
 	componentDidMount() {
 		this.installKeyHandler();
@@ -66,9 +65,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 
 	private renderThesesList() {
 		const data = this.getData();
-		const scrollTo = this.state.currentThesisIdx !== -1
-			? this.state.currentThesisIdx
-			: undefined;
+		const selectedIdx = this.getSelectedIdx();
 		return <AutoSizer disableHeight>
 			{({ width }) => (
 				<Table
@@ -83,7 +80,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 					sortDirection={this.state.sortDirection}
 					onRowClick={this.onRowClick}
 					rowClassName={this.getRowClassName}
-					scrollToIndex={scrollTo}
+					scrollToIndex={selectedIdx !== -1 ? selectedIdx : undefined}
 				>
 					<Column
 						label="Rezerwacja"
@@ -119,7 +116,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			return "";
 		}
 		const colorComponent = `alternating_color_${index % 2 ? "odd" : "even"}`;
-		return this.state.currentThesisIdx === index
+		return this.getSelectedIdx() === index
 			? `active_row ${colorComponent}`
 			: colorComponent;
 	}
@@ -137,21 +134,37 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
 		if (this.props.thesesList !== nextProps.thesesList) {
 			this.resetAllCaches();
+		} else if (thesisPropDidChange(this.props.selectedThesis, nextProps.selectedThesis)) {
+			this.resetSelectedIdx();
 		}
-		if (nextProps.selectedThesis) {
-			this.setState({
-				currentThesisIdx: this.getThesisIdx(nextProps.selectedThesis),
-			});
-		}
-	}
-
-	private getThesisIdx(thesis: Thesis) {
-		return this.getData().findIndex(thesis.isEqual);
 	}
 
 	private resetAllCaches() {
 		this.resetFilterCache();
 		this.resetData();
+		this.resetSelectedIdx();
+	}
+
+	// If the displayed list changes logically (contents, order)
+	// there are some caches to invalidate
+	private onListChanged() {
+		this.resetSelectedIdx();
+		this.resetData();
+	}
+
+	private resetSelectedIdx() {
+		this.selectedIdxCache = null;
+	}
+
+	private getSelectedIdx() {
+		if (this.selectedIdxCache === null) {
+			const { selectedThesis } = this.props;
+			const idx = selectedThesis != null
+				? this.getData().findIndex(selectedThesis.isEqual)
+				: -1;
+			this.selectedIdxCache = idx;
+		}
+		return this.selectedIdxCache;
 	}
 
 	private resetData(): void {
@@ -208,8 +221,8 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private changeSort = (info: { sortBy: string; sortDirection: SortDirectionType }) => {
-		this.resetData();
 		this.setState({ sortColumn: info.sortBy as any, sortDirection: info.sortDirection });
+		this.onListChanged();
 	}
 
 	private onRowClick = (info: RowMouseEventHandlerParams) => {
@@ -220,7 +233,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 
 	private onTypeFilterChanged = (newFilter: ThesisTypeFilter) => {
 		this.setState({ typeFilter: newFilter });
-		this.resetData();
+		this.onListChanged();
 	}
 
 	private onAdvisorFilterChanged = (newAdvisorFilter: string) => {
@@ -228,7 +241,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			newAdvisorFilter = "";
 		}
 		this.setState({ advisorFilter: newAdvisorFilter });
-		this.resetData();
+		this.onListChanged();
 	}
 
 	private onTitleFilterChanged = (newTitleFilter: string) => {
@@ -236,7 +249,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			newTitleFilter = "";
 		}
 		this.setState({ titleFilter: newTitleFilter });
-		this.resetData();
+		this.onListChanged();
 	}
 
 	private uninstallKeyHandler() {
@@ -258,7 +271,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	private arrowSwitch(offset: -1 | 1, e: ExtendedKeyboardEvent) {
 		if (!this.allowArrowSwitch()) { return;	}
 		const data = this.getData();
-		const target = this.state.currentThesisIdx + offset;
+		const target = this.getSelectedIdx() + offset;
 		if (!inRange(target, 0, data.length - 1)) { return; }
 
 		this.props.onThesisSelected(data[target]);
@@ -314,4 +327,12 @@ function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter) {
 		case ThesisTypeFilter.AvailableBachelorsISIM:
 			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Isim;
 	}
+}
+
+function thesisPropDidChange(t1: Thesis | null, t2: Thesis | null): boolean {
+	return (
+		t1 === null && t2 !== null ||
+		t1 !== null && t2 === null ||
+		t1 !== null && t2 !== null && !t1.isEqual(t2)
+	);
 }

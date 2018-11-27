@@ -46,8 +46,8 @@ export class ThesesApp extends React.Component<Props, State> {
 	private confirmUnload = (ev: BeforeUnloadEvent) => {
 		if (this.hasUnsavedChanges()) {
 			// As specified in https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
-			// preventDefault() is what the spec says, in practice some
-			// browsers like returnValue to be set
+			// preventDefault() is what the spec says,
+			// in practice some browsers like returnValue to be set
 			ev.preventDefault();
 			ev.returnValue = "";
 		}
