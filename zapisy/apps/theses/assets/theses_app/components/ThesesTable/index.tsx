@@ -33,7 +33,6 @@ const initialState = {
 	typeFilter: ThesisTypeFilter.Default,
 	titleFilter: "",
 	advisorFilter: "",
-	griddlePage: 1,
 	sortDirection: SortDirection.ASC as SortDirectionType,
 	sortColumn: "" as ("title" | "advisor" | ""),
 };
