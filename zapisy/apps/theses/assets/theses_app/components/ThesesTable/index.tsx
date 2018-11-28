@@ -345,7 +345,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 
 // nameFilt - already lowercase
 function personNameFilter(p: BasePerson | null, nameFilt: string): boolean {
-	return p != null && p.displayName.toLowerCase().includes(nameFilt);
+	return p === null || p.displayName.toLowerCase().includes(nameFilt);
 }
 
 function isThesisAvailable(thesis: Thesis): boolean {

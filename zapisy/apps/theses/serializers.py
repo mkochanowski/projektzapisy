@@ -47,8 +47,6 @@ class ThesisSerializer(serializers.ModelSerializer):
         if "advisor" in validated_data:
             instance.advisor = _get_person_from_queryset(Employee, validated_data.get("advisor"))
         if "auxiliary_advisor" in validated_data:
-            if not instance.advisor:
-                raise InvalidQueryError("Cannot set auxiliary advisor without an advisor present")
             instance.auxiliary_advisor = _get_person_from_queryset(
                 Employee, validated_data.get("auxiliary_advisor")
             )
@@ -57,8 +55,6 @@ class ThesisSerializer(serializers.ModelSerializer):
         if "student" in validated_data:
             instance.student = _get_person_from_queryset(Student, validated_data.get("student"))
         if "student_2" in validated_data:
-            if not instance.student:
-                raise InvalidQueryError("Cannot set second student without a student present")
             instance.student_2 = _get_person_from_queryset(Student, validated_data.get("student_2"))
 
     def update(self, instance, validated_data):

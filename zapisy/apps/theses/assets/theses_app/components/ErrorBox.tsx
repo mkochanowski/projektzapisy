@@ -21,6 +21,7 @@ export function ErrorBox(props: Props) {
 	return (
 		<ErrorTextContainer>
 			<h2>Wystąpił błąd</h2>
+			<br />
 			<h3>{props.errorTitle}</h3>
 			<br />
 			<p>{props.errorDescription || DEFAULT_ERROR_DESCRIPTION}</p>
