@@ -263,7 +263,21 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private changeSort = (info: { sortBy: string; sortDirection: SortDirectionType }) => {
-		this.setState({ sortColumn: info.sortBy as any, sortDirection: info.sortDirection });
+		const {
+			sortColumn: prevSortColumn,
+			sortDirection: prevSortDirection
+		} = this.state;
+
+		// If list was sorted DESC by this column.
+		// Rather than switch to ASC, return to "natural" order.
+		if (prevSortColumn === info.sortBy && prevSortDirection === SortDirection.DESC) {
+			this.setState({ sortColumn: "" });
+		} else {
+			this.setState({
+				sortColumn: info.sortBy as any,
+				sortDirection: info.sortDirection,
+			});
+		}
 		this.onListChanged();
 	}
 
