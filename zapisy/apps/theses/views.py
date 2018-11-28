@@ -1,4 +1,3 @@
-import sys
 from typing import List
 
 from django.shortcuts import render
@@ -47,23 +46,14 @@ def theses_main(request):
 
 def build_autocomplete_view_with_queryset(queryset):
     class ac(autocomplete.Select2QuerySetView):
-        def get_paginate_by(self, queryset):
-            all_pages = self.request.GET.get("allpages", None)
-            if all_pages == "1":
-                return sys.maxsize
-            return super(ac, self).get_paginate_by(queryset)
-
         def get_queryset(self):
             if not self.request.user.is_authenticated:
                 return queryset.objects.none()
-
-            qs = queryset.objects.all()
-
+            qs = queryset.objects.all().select_related("user")
             if self.q:
                 qs = qs.filter(
                     Q(user__first_name__istartswith=self.q) | Q(user__last_name__istartswith=self.q)
                 )
-
             return qs
     return ac
 
