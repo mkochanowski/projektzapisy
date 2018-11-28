@@ -42,6 +42,15 @@
     outline: none;
 }
 
+// For some bizarre reason Gecko insists on making the first column
+// (but not the header cell) one px wider; other engines don't do this
+// force a margin smaller by one px to correct this
+@-moz-document url-prefix() {
+    .reservation_cell {
+        margin-right: 9px !important;
+    }
+}
+
 .alternating_color_odd {
     background-color: #f4f4f4;
 }

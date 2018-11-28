@@ -82,7 +82,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 				<tr>
 					<td>Tytuł</td>
 					<td><textarea
-						style={{ width: "100%", boxSizing: "border-box" }}
+						style={{ width: "100%", height: "70px", boxSizing: "border-box" }}
 						value={this.props.thesis.title}
 						maxLength={MAX_THESIS_TITLE_LEN}
 						onChange={ev => this.props.onTitleChanged(ev.target.value)}
