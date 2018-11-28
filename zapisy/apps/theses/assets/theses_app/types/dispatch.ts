@@ -1,6 +1,6 @@
 // Types we'll be dispatching to the Python backend to perform changes
 
-import { ThesisKind, ThesisStatus, Thesis, BasePerson } from ".";
+import { ThesisKind, ThesisStatus, Thesis, BasePerson, MAX_THESIS_TITLE_LEN } from ".";
 
 export type PersonDispatch = {
 	id: number;
@@ -44,7 +44,7 @@ export function getThesisDispatch(originalThesis: Thesis, modifiedThesis: Thesis
 		id: originalThesis.id,
 	};
 	if (originalThesis.title !== modifiedThesis.title) {
-		result.title = modifiedThesis.title;
+		result.title = modifiedThesis.title.slice(0, MAX_THESIS_TITLE_LEN);
 	}
 	result.advisor = getNewPersonValue(originalThesis.advisor, modifiedThesis.advisor);
 	result.auxiliary_advisor = getNewPersonValue(

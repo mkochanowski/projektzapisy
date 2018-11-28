@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import styled from "styled-components";
-import { Thesis, ThesisKind, Employee, Student } from "../../../types";
+import { Thesis, ThesisKind, Employee, Student, MAX_THESIS_TITLE_LEN } from "../../../types";
 import { PersonType } from "../../../backend_callers";
 import { PersonSelect } from "./PersonSelect";
 import { ThesisKindSelect } from "./ThesisKindSelect";
@@ -84,6 +84,7 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 					<td><textarea
 						style={{ width: "100%", boxSizing: "border-box" }}
 						value={this.props.thesis.title}
+						maxLength={MAX_THESIS_TITLE_LEN}
 						onChange={ev => this.props.onTitleChanged(ev.target.value)}
 					/></td>
 				</tr>

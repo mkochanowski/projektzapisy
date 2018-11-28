@@ -1,6 +1,8 @@
 // Must match values/structures defined in the Python backend
 import * as moment from "moment";
 
+export const MAX_THESIS_TITLE_LEN = 300;
+
 export const enum ThesisKind {
 	Masters = 0,
 	Engineers = 1,
