@@ -10,12 +10,12 @@ urlpatterns = [
     url(r'^$', views.theses_main, name='main'),
     # for django-autocomplete-light (admin widgets)
     url(
-        r'^student-autocomplete/$',
+        r'^api/student-autocomplete/$',
         views.StudentAutocomplete.as_view(),
         name='student-autocomplete',
     ),
     url(
-        r'^employee-autocomplete/$',
+        r'^api/employee-autocomplete/$',
         views.EmployeeAutocomplete.as_view(),
         name='employee-autocomplete',
     ),

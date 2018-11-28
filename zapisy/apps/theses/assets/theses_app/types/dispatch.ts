@@ -2,21 +2,21 @@
 
 import { ThesisKind, ThesisStatus, Thesis, BasePerson } from ".";
 
-export type PersonOutJson = {
+export type PersonDispatch = {
 	id: number;
 };
 
-export type ThesisOutJson = {
+export type ThesisDispatch = {
 	id: number;
 	title?: string;
-	advisor?: PersonOutJson | null;
-	auxiliary_advisor?: PersonOutJson | null;
+	advisor?: PersonDispatch | null;
+	auxiliary_advisor?: PersonDispatch | null;
 	kind?: ThesisKind;
 	reserved?: boolean;
 	description?: string;
 	status?: ThesisStatus;
-	student?: PersonOutJson | null;
-	student_2?: PersonOutJson | null;
+	student?: PersonDispatch | null;
+	student_2?: PersonDispatch | null;
 	modified_date?: string;
 };
 
@@ -38,9 +38,9 @@ function getNewPersonValue(
 	}
 }
 
-export function getOutThesisJson(originalThesis: Thesis, modifiedThesis: Thesis): ThesisOutJson {
-	console.assert(originalThesis.id === modifiedThesis.id);
-	const result: ThesisOutJson = {
+export function getThesisDispatch(originalThesis: Thesis, modifiedThesis: Thesis): ThesisDispatch {
+	originalThesis.isEqual(modifiedThesis);
+	const result: ThesisDispatch = {
 		id: originalThesis.id,
 	};
 	if (originalThesis.title !== modifiedThesis.title) {
@@ -64,7 +64,6 @@ export function getOutThesisJson(originalThesis: Thesis, modifiedThesis: Thesis)
 	if (originalThesis.status !== modifiedThesis.status) {
 		result.status = modifiedThesis.status;
 	}
-	// TODO date
 
 	return result;
 }

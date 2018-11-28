@@ -3,7 +3,7 @@ import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";
 
 import { Thesis, ThesisJson, Student, Employee, BasePerson } from "./types";
-import { getOutThesisJson } from "./types/out";
+import { getThesisDispatch } from "./types/dispatch";
 
 const BASE_API_URL = "/theses/api";
 
@@ -73,7 +73,7 @@ export async function getPersonAutocomplete(
 	person: PersonType, substr: string, pageNum: number,
 ): Promise<PersonAutcompleteResults> {
 	const personUrlPart = person === PersonType.Employee ? "employee" : "student";
-	const url = `/theses/${personUrlPart}-autocomplete`;
+	const url = `${BASE_API_URL}/${personUrlPart}-autocomplete`;
 	const acResults = await getData(url, { params: {
 		page: pageNum,
 		q: substr,
@@ -88,11 +88,11 @@ export async function getPersonAutocomplete(
 }
 
 export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis: Thesis): Promise<void> {
-	const diffObj = getOutThesisJson(originalThesis, modifiedThesis);
-	const jsonData = JSON.stringify(diffObj);
+	const objToSend = getThesisDispatch(originalThesis, modifiedThesis);
+	const jsonData = JSON.stringify(objToSend);
 	console.warn("Sending", jsonData);
 	await sendRequestWithCsrf(
-		`${BASE_API_URL}/theses/${diffObj.id}/`,
+		`${BASE_API_URL}/theses/${objToSend.id}/`,
 		{
 			method: "PATCH",
 			data: jsonData,

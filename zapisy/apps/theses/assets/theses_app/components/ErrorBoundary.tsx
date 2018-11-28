@@ -30,7 +30,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 				<h2>Coś poszło nie tak</h2>
 				<h3>Wystąpił błąd: <em>{this.state.error.toString()}</em></h3>
 				<br />
-				<p>Spróbuj jeszcze raz. Jeżeli problem powtórzy się, opisz go na trackerze Zapisów.</p>
+				<p>Spróbuj załadować stronę od nowa. Jeżeli problem powtórzy się, opisz go na trackerze Zapisów.</p>
 			</ErrorTextContainer>;
 		}
 		return this.props.children;

@@ -32,7 +32,7 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	async componentDidMount() {
 		this.setState({
-			thesesList: await getThesesList(),
+			thesesList: await safeGetTheses(),
 			applicationState: ApplicationState.Normal,
 		});
 		this.oldOnBeforeUnload = window.onbeforeunload;
@@ -147,7 +147,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		// this might seem pointless but as we don't currently have any
 		// backend synchronization this is the only chance to refresh
 		// everything
-		const newList = await getThesesList();
+		const newList = await safeGetTheses();
 		// We'll want to find the thesis we just saved
 		// Note that it _could_ technically be absent from the new list
 		// but the odds are absurdly low (it would have to be deleted by someone
@@ -156,6 +156,15 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setState({ thesesList: newList });
 		this.setActiveThesis(freshThesisInstance);
 		this.setState({ applicationState: ApplicationState.Normal });
+	}
+}
+
+async function safeGetTheses() {
+	try {
+		return await getThesesList();
+	} catch (err) {
+		window.alert(`Wystąpił błąd przy pobieraniu listy prac (${err}).`);
+		return [];
 	}
 }
 
