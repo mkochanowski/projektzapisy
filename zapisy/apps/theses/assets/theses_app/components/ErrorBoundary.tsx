@@ -1,11 +1,6 @@
 import * as React from "react";
-import styled from "styled-components";
 
-const ErrorTextContainer = styled.div`
-width: 100%;
-padding: 40px;
-text-align: center;
-`;
+import { ErrorBox } from "./ErrorBox";
 
 type Props = {};
 type State = {
@@ -26,12 +21,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
 	public render() {
 		if (this.state.error) {
-			return <ErrorTextContainer>
-				<h2>Coś poszło nie tak</h2>
-				<h3>Wystąpił błąd: <em>{this.state.error.toString()}</em></h3>
-				<br />
-				<p>Spróbuj załadować stronę od nowa. Jeżeli problem powtórzy się, opisz go na trackerze Zapisów.</p>
-			</ErrorTextContainer>;
+			return <ErrorBox
+				errorTitle={<em>{this.state.error.toString()}</em>}
+			/>;
 		}
 		return this.props.children;
 	}

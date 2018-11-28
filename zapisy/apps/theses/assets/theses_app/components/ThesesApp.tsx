@@ -6,6 +6,7 @@ import { getThesesList, saveModifiedThesis } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState } from "../types/application_state";
 import { ThesesTable } from "./ThesesTable";
+import { ErrorBox } from "./ErrorBox";
 
 type Props = {};
 
@@ -16,7 +17,8 @@ type State = {
 	} | null;
 
 	thesesList: Thesis[];
-	applicationState: ApplicationState,
+	applicationState: ApplicationState;
+	fetchError: Error | null;
 };
 
 const initialState: State = {
@@ -24,6 +26,7 @@ const initialState: State = {
 
 	thesesList: [],
 	applicationState: ApplicationState.InitialLoading,
+	fetchError: null,
 };
 
 export class ThesesApp extends React.Component<Props, State> {
@@ -32,7 +35,7 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	async componentDidMount() {
 		this.setState({
-			thesesList: await safeGetTheses(),
+			thesesList: await this.safeGetTheses(),
 			applicationState: ApplicationState.Normal,
 		});
 		this.oldOnBeforeUnload = window.onbeforeunload;
@@ -54,6 +57,9 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	public render() {
+		if (this.state.fetchError) {
+			return this.renderErrorScreen();
+		}
 		console.warn("Main render");
 		const { thesis } = this.state;
 		const mainComponent = <ThesesTable
@@ -78,6 +84,25 @@ export class ThesesApp extends React.Component<Props, State> {
 				/>
 			</>
 			: mainComponent;
+	}
+
+	private renderErrorScreen() {
+		return <ErrorBox
+			errorTitle={
+				<span>
+					Nie udało się pobrać listy prac: <em>{this.state.fetchError!.toString()}</em>
+				</span>
+			}
+		/>;
+	}
+
+	private async safeGetTheses() {
+		try {
+			return await getThesesList();
+		} catch (err) {
+			this.setState({ fetchError: err });
+			return [];
+		}
 	}
 
 	private hasUnsavedChanges() {
@@ -137,17 +162,18 @@ export class ThesesApp extends React.Component<Props, State> {
 		try {
 			await saveModifiedThesis(thesis.original, thesis.mutable);
 		} catch (err) {
-			alert(
-				"Nie udało się zapisać pracy. Spróbuj jeszcze raz. " +
-				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów"
+			window.alert(
+				"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
+				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 			);
+			this.setState({ applicationState: ApplicationState.Normal });
 			return;
 		}
 		// Re-fetch everything
 		// this might seem pointless but as we don't currently have any
 		// backend synchronization this is the only chance to refresh
 		// everything
-		const newList = await safeGetTheses();
+		const newList = await this.safeGetTheses();
 		// We'll want to find the thesis we just saved
 		// Note that it _could_ technically be absent from the new list
 		// but the odds are absurdly low (it would have to be deleted by someone
@@ -156,15 +182,6 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setState({ thesesList: newList });
 		this.setActiveThesis(freshThesisInstance);
 		this.setState({ applicationState: ApplicationState.Normal });
-	}
-}
-
-async function safeGetTheses() {
-	try {
-		return await getThesesList();
-	} catch (err) {
-		window.alert(`Wystąpił błąd przy pobieraniu listy prac (${err}).`);
-		return [];
 	}
 }
 
