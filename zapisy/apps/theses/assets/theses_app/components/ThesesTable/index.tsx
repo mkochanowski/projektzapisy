@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import {
-	Column, Table, TableCellDataGetterParams, CellMeasurer, CellMeasurerCache,
+	Column, Table, CellMeasurer, CellMeasurerCache,
 	AutoSizer, SortDirectionType, SortDirection, RowMouseEventHandlerParams, TableCellProps,
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
@@ -40,6 +40,7 @@ const initialState = {
 	advisorFilter: "",
 	sortDirection: SortDirection.ASC as SortDirectionType,
 	sortColumn: "" as ("title" | "advisor" | ""),
+	hasScrolled: false,
 };
 type State = typeof initialState;
 
@@ -96,8 +97,9 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 					sortDirection={this.state.sortDirection}
 					onRowClick={this.onRowClick}
 					rowClassName={this.getRowClassName}
-					scrollToIndex={selectedIdx !== -1 ? selectedIdx : undefined}
+					scrollToIndex={!this.state.hasScrolled && selectedIdx !== -1 ? selectedIdx : undefined}
 					deferredMeasurementCache={rowHeightCache}
+					onScroll={this.onScroll}
 				>
 					<Column
 						label="Rezerwacja"
@@ -155,6 +157,10 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			: colorComponent;
 	}
 
+	private onScroll = () => {
+		this.setState({ hasScrolled: true });
+	}
+
 	public render() {
 		return (
 			<>
@@ -170,6 +176,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			this.resetAllCaches();
 		} else if (thesisPropDidChange(this.props.selectedThesis, nextProps.selectedThesis)) {
 			this.resetSelectedIdx();
+			this.setState({ hasScrolled: false });
 		}
 	}
 
