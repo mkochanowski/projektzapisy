@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import {
-	Column, Table, TableCellDataGetterParams,
-	AutoSizer, SortDirectionType, SortDirection, RowMouseEventHandlerParams,
+	Column, Table, TableCellDataGetterParams, CellMeasurer, CellMeasurerCache,
+	AutoSizer, SortDirectionType, SortDirection, RowMouseEventHandlerParams, TableCellProps,
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
 
@@ -16,8 +16,13 @@ import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
 
-const TABLE_HEIGHT = 200;
-const TABLE_CELL_HEIGHT = 30;
+const TABLE_HEIGHT = 300;
+const TABLE_CELL_MIN_HEIGHT = 30;
+
+const rowHeightCache = new CellMeasurerCache({
+	fixedWidth: true,
+	minHeight: TABLE_CELL_MIN_HEIGHT,
+});
 
 type Props = {
 	applicationState: ApplicationState;
@@ -43,6 +48,9 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	private tableData: Thesis[] | null = null;
 	private filterCache: Map<string, Thesis[]> = new Map();
 	private selectedIdxCache: number | null = null;
+
+	private titleRenderer = this.getCellRenderer(t => t.title);
+	private advisorRenderer = this.getCellRenderer(t => t.advisor ? t.advisor.displayName : "<brak>");
 
 	componentDidMount() {
 		this.installKeyHandler();
@@ -79,16 +87,17 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 				<Table
 					rowGetter={this.getRowByIndex}
 					rowCount={data.length}
-					rowHeight={TABLE_CELL_HEIGHT}
+					rowHeight={rowHeightCache.rowHeight}
 					width={width}
 					height={TABLE_HEIGHT}
-					headerHeight={TABLE_CELL_HEIGHT}
+					headerHeight={TABLE_CELL_MIN_HEIGHT}
 					sort={this.changeSort}
 					sortBy={this.state.sortColumn}
 					sortDirection={this.state.sortDirection}
 					onRowClick={this.onRowClick}
 					rowClassName={this.getRowClassName}
 					scrollToIndex={selectedIdx !== -1 ? selectedIdx : undefined}
+					deferredMeasurementCache={rowHeightCache}
 				>
 					<Column
 						label="Rezerwacja"
@@ -102,17 +111,34 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 						label="Tytuł"
 						dataKey="title"
 						width={500}
-						cellDataGetter={getTitle}
+						cellRenderer={this.titleRenderer}
 					/>
 					<Column
 						label="Promotor"
 						dataKey="advisor"
 						width={500}
-						cellDataGetter={getAdvisor}
+						cellRenderer={this.advisorRenderer}
 					/>
 				</Table>
 		)	}
 		</AutoSizer>;
+	}
+
+	private getCellRenderer(dataGetter: (t: Thesis) => string) {
+		return ({ dataKey, parent, rowIndex, rowData }: TableCellProps) => {
+			return (
+				<CellMeasurer
+					cache={rowHeightCache}
+					columnIndex={0}
+					key={dataKey}
+					parent={parent}
+					rowIndex={rowIndex}>
+					<div style={{ whiteSpace: "normal" }}>
+						{dataGetter(rowData as Thesis)}
+					</div>
+				</CellMeasurer>
+			);
+		};
 	}
 
 	private getRowByIndex = ({ index }: { index: number}) => {
@@ -158,6 +184,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	private onListChanged() {
 		this.resetSelectedIdx();
 		this.resetData();
+		rowHeightCache.clearAll();
 	}
 
 	private resetSelectedIdx() {
@@ -293,16 +320,6 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	private downArrow = (e: ExtendedKeyboardEvent) => {
 		this.arrowSwitch(+1, e);
 	}
-}
-
-function getTitle(params: TableCellDataGetterParams) {
-	const thesis = params.rowData as Thesis;
-	return thesis.title;
-}
-
-function getAdvisor(params: TableCellDataGetterParams) {
-	const thesis = params.rowData as Thesis;
-	return thesis.advisor ? thesis.advisor.displayName : "<brak>";
 }
 
 // nameFilt - already lowercase
