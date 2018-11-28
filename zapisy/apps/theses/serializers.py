@@ -1,5 +1,6 @@
 from enum import Enum
 
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from . import models
@@ -93,15 +94,14 @@ def _get_person_from_queryset(queryset, person_data):
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance: BaseUser):
+    def to_representation(self, instance: User):
         return {
             "id": instance.pk,
             "type": CurrentUserSerializer.get_user_type(instance).value
         }
 
     @staticmethod
-    def get_user_type(user_instance: BaseUser) -> ThesisUserType:
-        # FIXME is this correct?
+    def get_user_type(user_instance: User) -> ThesisUserType:
         if user_instance.is_staff:
             return ThesisUserType.admin
         elif BaseUser.is_employee(user_instance):
