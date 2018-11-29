@@ -115,7 +115,7 @@ export class Thesis {
 	}
 
 	private initNewThesis() {
-		this.id = 0;
+		this.id = -1;
 		this.title = "";
 		this.advisor = null;
 		this.auxiliaryAdvisor = null;

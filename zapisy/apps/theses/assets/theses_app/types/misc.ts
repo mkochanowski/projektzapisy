@@ -3,3 +3,8 @@ export const enum ApplicationState {
 	PerformingBackendChanges,
 	Normal,
 }
+
+export const enum ThesisWorkMode {
+	Editing,
+	Adding,
+}

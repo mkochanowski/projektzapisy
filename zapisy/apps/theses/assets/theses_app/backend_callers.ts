@@ -3,7 +3,7 @@ import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";
 
 import { Thesis, ThesisJson, Student, Employee, BasePerson } from "./types";
-import { getThesisModDispatch } from "./types/dispatch";
+import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 
 const BASE_API_URL = "/theses/api";
 
@@ -95,6 +95,22 @@ export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis:
 		`${BASE_API_URL}/theses/${objToSend.id}/`,
 		{
 			method: "PATCH",
+			data: jsonData,
+			headers: {
+				"Content-Type": "application/json"
+			},
+		},
+	);
+}
+
+export async function saveNewThesis(thesis: Thesis) {
+	const objToSend = getThesisAddDispatch(thesis);
+	const jsonData = JSON.stringify(objToSend);
+	console.warn("Adding:", jsonData);
+	await sendRequestWithCsrf(
+		`${BASE_API_URL}/theses/`,
+		{
+			method: "PUT",
 			data: jsonData,
 			headers: {
 				"Content-Type": "application/json"

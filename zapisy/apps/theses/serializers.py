@@ -43,6 +43,9 @@ class ThesisSerializer(serializers.ModelSerializer):
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
 
+    def create(self, validated_data):
+        print("Create a thesis", validated_data)
+
     def _update_advisors(self, instance, validated_data):
         if "advisor" in validated_data:
             instance.advisor = _get_person_from_queryset(Employee, validated_data.get("advisor"))

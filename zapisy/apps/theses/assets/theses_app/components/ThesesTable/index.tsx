@@ -8,7 +8,7 @@ import "react-virtualized/styles.css"; // only needs to be imported once
 
 import { ThesisTypeFilter } from "../../backend_callers";
 import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../../types";
-import { ApplicationState } from "../../types/application_state";
+import { ApplicationState } from "../../types/misc";
 import { TopFilters } from "./TopFilters";
 import { strcmp, inRange } from "common/utils";
 import { ReservationIndicator } from "./ReservationIndicator";
@@ -30,7 +30,6 @@ type Props = {
 	isEditingThesis: boolean;
 	selectedThesis: Thesis | null;
 
-	thesisForId: (id: number) => Thesis | null;
 	onThesisSelected: (t: Thesis) => void;
 };
 

@@ -5,6 +5,7 @@ import { Moment } from "moment";
 import { Thesis, ThesisStatus } from "../../../types";
 import { ThesisDateField } from "./ThesisDateField";
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
+import { ThesisWorkMode } from "../../../types/misc";
 
 const TopRowContainer = styled.div`
 display: flex;
@@ -17,6 +18,7 @@ width: 100%;
 
 type Props = {
 	thesis: Thesis;
+	mode: ThesisWorkMode;
 	onReservationChanged: (nr: boolean) => void;
 	onDateChanged: (nd: Moment) => void;
 	onStatusChanged: (ns: ThesisStatus) => void;
@@ -37,18 +39,19 @@ function ReservationCheckbox(props: {
 
 export class ThesisTopRow extends React.Component<Props> {
 	public render() {
+		const { mode, thesis } = this.props;
 		return <TopRowContainer>
 			<ReservationCheckbox
 				onChange={this.props.onReservationChanged}
-				value={this.props.thesis.reserved}
+				value={thesis.reserved}
 			/>
 			<ThesisDateField
-				value={this.props.thesis.modifiedDate}
+				value={mode === ThesisWorkMode.Editing ? thesis.modifiedDate : undefined}
 				label={"Aktualizacja"}
 			/>
 			<ThesisStatusIndicator
 				onChange={this.props.onStatusChanged}
-				value={this.props.thesis.status}
+				value={thesis.status}
 			/>
 		</TopRowContainer>;
 	}

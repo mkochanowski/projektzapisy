@@ -37,6 +37,7 @@ type State = {
 
 type Props = {
 	thesis: Thesis;
+	titleError: boolean;
 	onTitleChanged: (nt: string) => void;
 	onKindChanged: (nk: ThesisKind) => void;
 	onAdvisorChanged: (na: Employee | null) => void;
@@ -46,7 +47,7 @@ type Props = {
 	onDescriptionChanged: (nd: string) => void;
 };
 
-export class ThesisMiddleForm extends React.Component<Props, State> {
+export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -76,13 +77,19 @@ export class ThesisMiddleForm extends React.Component<Props, State> {
 	}
 
 	public render() {
+		const titleStyle: React.CSSProperties = { width: "100%", height: "70px", boxSizing: "border-box" };
+		if (this.props.titleError) {
+			Object.assign(titleStyle, {
+				border: "1px solid red"
+			});
+		}
 		return <div>
 			<MidFormTable>
 				<tbody>
 				<tr>
 					<td>Tytuł</td>
 					<td><textarea
-						style={{ width: "100%", height: "70px", boxSizing: "border-box" }}
+						style={titleStyle}
 						value={this.props.thesis.title}
 						maxLength={MAX_THESIS_TITLE_LEN}
 						onChange={ev => this.props.onTitleChanged(ev.target.value)}

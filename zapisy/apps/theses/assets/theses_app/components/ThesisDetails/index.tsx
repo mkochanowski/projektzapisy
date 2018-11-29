@@ -11,6 +11,7 @@ import { ThesisVotes } from "./ThesisVotes";
 
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
+import { ThesisWorkMode } from "../../types/misc";
 
 const SaveButton = Button.extend`
 	&:disabled:hover {
@@ -52,13 +53,22 @@ margin-left: 20px;
 
 type Props = {
 	thesis: Thesis;
+	thesesList: Thesis[];
 	onThesisModified: (thesis: Thesis) => void;
 	onSaveRequested: () => void;
 	isSaving: boolean;
 	shouldAllowSave: boolean;
+	mode: ThesisWorkMode;
 };
 
-export class ThesisDetails extends React.Component<Props> {
+const initialState = {
+	hasTitleError: false,
+};
+type State = typeof initialState;
+
+export class ThesisDetails extends React.PureComponent<Props, State> {
+	state = initialState;
+
 	public render() {
 		const { shouldAllowSave } = this.props;
 
@@ -73,9 +83,11 @@ export class ThesisDetails extends React.Component<Props> {
 						onReservationChanged={this.onReservationChanged}
 						onDateChanged={this.onDateUpdatedChanged}
 						onStatusChanged={this.onStatusChanged}
+						mode={this.props.mode}
 					/>
 					<ThesisMiddleForm
 						thesis={this.props.thesis}
+						titleError={this.state.hasTitleError}
 						onTitleChanged={this.onTitleChanged}
 						onKindChanged={this.onKindChanged}
 						onAdvisorChanged={this.onAdvisorChanged}
@@ -90,11 +102,19 @@ export class ThesisDetails extends React.Component<Props> {
 					<SaveButton
 						onClick={this.handleSave}
 						disabled={!shouldAllowSave}
-						title={shouldAllowSave ? "Zapisz zmiany" : "Nie dokonano zmian"}
-					>Zapisz</SaveButton>
+						title={shouldAllowSave ? this.getActionDescription() : "Nie dokonano zmian"}
+					>{this.getActionTitle()}</SaveButton>
 				</RightDetailsContainer>
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
+	}
+
+	private getActionTitle() {
+		return this.props.mode === ThesisWorkMode.Adding ? "Dodaj" : "Zapisz";
+	}
+
+	private getActionDescription() {
+		return this.props.mode === ThesisWorkMode.Adding ? "Dodaj nową pracę" : "Zapisz zmiany";
 	}
 
 	private updateThesisState(updateObject: Query<Thesis>) {
@@ -116,6 +136,7 @@ export class ThesisDetails extends React.Component<Props> {
 	}
 
 	private onTitleChanged = (newTitle: string): void => {
+		this.setState({ hasTitleError: false });
 		this.updateThesisState({ title: { $set: newTitle } });
 	}
 
@@ -143,7 +164,29 @@ export class ThesisDetails extends React.Component<Props> {
 		this.updateThesisState({ description: { $set: newDesc } });
 	}
 
+	private validateBeforeSave() {
+		const { thesis, thesesList } = this.props;
+		const trimmedTitle = thesis.title.trim();
+		if (!trimmedTitle) {
+			window.alert("Tytuł pracy nie może być pusty.");
+			this.setState({ hasTitleError: true });
+			return false;
+		}
+		if (thesesList.find(t => !t.isEqual(thesis) && t.title.trim() === trimmedTitle)) {
+			window.alert("Istnieje już inna praca o tym tytule.");
+			this.setState({ hasTitleError: true });
+			return false;
+		}
+
+		this.setState({ hasTitleError: false });
+		return true;
+	}
+
 	private handleSave = () => {
+		if (!this.validateBeforeSave()) {
+			return;
+		}
+
 		this.props.onSaveRequested();
 	}
 }
