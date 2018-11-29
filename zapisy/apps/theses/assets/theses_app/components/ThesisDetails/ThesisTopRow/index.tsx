@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Moment } from "moment";
 
 import { Thesis, ThesisStatus } from "../../../types";
-import { DateUpdatedField } from "./DateUpdatedField";
+import { ThesisDateField } from "./ThesisDateField";
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
 
 const TopRowContainer = styled.div`
@@ -42,8 +42,9 @@ export class ThesisTopRow extends React.Component<Props> {
 				onChange={this.props.onReservationChanged}
 				value={this.props.thesis.reserved}
 			/>
-			<DateUpdatedField
+			<ThesisDateField
 				value={this.props.thesis.modifiedDate}
+				label={"Aktualizacja"}
 			/>
 			<ThesisStatusIndicator
 				onChange={this.props.onStatusChanged}
