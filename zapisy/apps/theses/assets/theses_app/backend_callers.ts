@@ -110,7 +110,7 @@ export async function saveNewThesis(thesis: Thesis) {
 	await sendRequestWithCsrf(
 		`${BASE_API_URL}/theses/`,
 		{
-			method: "PUT",
+			method: "POST",
 			data: jsonData,
 			headers: {
 				"Content-Type": "application/json"

@@ -14,7 +14,7 @@ from . import serializers
 
 
 class ThesesViewSet(viewsets.ModelViewSet):
-    http_method_names = ["patch", "get", "put"]
+    http_method_names = ["patch", "get", "post"]
     permission_classes = (permissions.DjangoModelPermissions,)
     serializer_class = serializers.ThesisSerializer
 

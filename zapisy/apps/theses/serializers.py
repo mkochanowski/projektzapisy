@@ -36,15 +36,18 @@ class PersonSerializerForThesis(serializers.Serializer):
 
 
 class ThesisSerializer(serializers.ModelSerializer):
-    advisor = PersonSerializerForThesis(allow_null=True)
-    auxiliary_advisor = PersonSerializerForThesis(allow_null=True)
-    student = PersonSerializerForThesis(allow_null=True)
-    student_2 = PersonSerializerForThesis(allow_null=True)
-    added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
-    modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
+    advisor = PersonSerializerForThesis(allow_null=True, required=False)
+    auxiliary_advisor = PersonSerializerForThesis(allow_null=True, required=False)
+    student = PersonSerializerForThesis(allow_null=True, required=False)
+    student_2 = PersonSerializerForThesis(allow_null=True, required=False)
+    added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
+    modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
 
     def create(self, validated_data):
         print("Create a thesis", validated_data)
+
+    def validate(self, data):
+        print("I must validate", data)
 
     def _update_advisors(self, instance, validated_data):
         if "advisor" in validated_data:
