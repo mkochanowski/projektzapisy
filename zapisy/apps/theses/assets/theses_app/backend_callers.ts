@@ -3,7 +3,7 @@ import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";
 
 import { Thesis, ThesisJson, Student, Employee, BasePerson } from "./types";
-import { getThesisDispatch } from "./types/dispatch";
+import { getThesisModDispatch } from "./types/dispatch";
 
 const BASE_API_URL = "/theses/api";
 
@@ -88,7 +88,7 @@ export async function getPersonAutocomplete(
 }
 
 export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis: Thesis): Promise<void> {
-	const objToSend = getThesisDispatch(originalThesis, modifiedThesis);
+	const objToSend = getThesisModDispatch(originalThesis, modifiedThesis);
 	const jsonData = JSON.stringify(objToSend);
 	console.warn("Sending", jsonData);
 	await sendRequestWithCsrf(

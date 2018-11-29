@@ -6,8 +6,7 @@ export type PersonDispatch = {
 	id: number;
 };
 
-export type ThesisDispatch = {
-	id: number;
+export type ThesisAddDispatch = {
 	title?: string;
 	advisor?: PersonDispatch | null;
 	auxiliary_advisor?: PersonDispatch | null;
@@ -17,52 +16,76 @@ export type ThesisDispatch = {
 	status?: ThesisStatus;
 	student?: PersonDispatch | null;
 	student_2?: PersonDispatch | null;
-	modified_date?: string;
 };
 
-function getNewPersonValue(
-	originalPersonField: BasePerson | null,
-	modifiedPersonField: BasePerson | null,
-) {
-	console.warn(originalPersonField, modifiedPersonField);
-	if (originalPersonField) {
-		if (modifiedPersonField) {
-			if (originalPersonField.id !== modifiedPersonField.id) {
-				return { id: modifiedPersonField.id };
-			}
-		} else {
-			return null;
-		}
-	} else if (modifiedPersonField) {
-		return { id: modifiedPersonField.id };
+export type ThesisModDispatch = {
+	id: number;
+} & ThesisAddDispatch;
+
+export function getThesisAddDispatch(thesis: Thesis): ThesisAddDispatch {
+	const result: ThesisAddDispatch = {
+		title: thesis.title,
+		kind: thesis.kind,
+		reserved: thesis.reserved,
+		description: thesis.description,
+		status: thesis.status,
+	};
+	if (thesis.advisor) {
+		result.advisor = toPersonDispatch(thesis.advisor);
 	}
+	if (thesis.auxiliaryAdvisor) {
+		result.auxiliary_advisor = toPersonDispatch(thesis.auxiliaryAdvisor);
+	}
+	if (thesis.student) {
+		result.student = toPersonDispatch(thesis.student);
+	}
+	if (thesis.secondStudent) {
+		result.student_2 = toPersonDispatch(thesis.secondStudent);
+	}
+	return result;
 }
 
-export function getThesisDispatch(originalThesis: Thesis, modifiedThesis: Thesis): ThesisDispatch {
-	originalThesis.isEqual(modifiedThesis);
-	const result: ThesisDispatch = {
-		id: originalThesis.id,
-	};
-	if (originalThesis.title !== modifiedThesis.title) {
-		result.title = modifiedThesis.title.slice(0, MAX_THESIS_TITLE_LEN);
-	}
-	result.advisor = getNewPersonValue(originalThesis.advisor, modifiedThesis.advisor);
-	result.auxiliary_advisor = getNewPersonValue(
-		originalThesis.auxiliaryAdvisor, modifiedThesis.auxiliaryAdvisor,
+function hadPersonChange(old: BasePerson | null, newp: BasePerson | null) {
+	return (
+		old === null && newp !== null ||
+		old !== null && newp === null ||
+		old !== null && newp !== null && !old.isEqual(newp)
 	);
-	result.student = getNewPersonValue(originalThesis.student, modifiedThesis.student);
-	result.student_2 = getNewPersonValue(originalThesis.secondStudent, modifiedThesis.secondStudent);
-	if (originalThesis.kind !== modifiedThesis.kind) {
-		result.kind = modifiedThesis.kind;
+}
+
+function toPersonDispatch(newPerson: BasePerson | null): PersonDispatch | null {
+	return newPerson ? { id: newPerson.id } : null;
+}
+
+export function getThesisModDispatch(orig: Thesis, mod: Thesis): ThesisModDispatch {
+	console.assert(orig.isEqual(mod));
+	const result: ThesisModDispatch = { id: orig.id };
+	if (orig.title !== mod.title) {
+		result.title = mod.title.slice(0, MAX_THESIS_TITLE_LEN);
 	}
-	if (originalThesis.reserved !== modifiedThesis.reserved) {
-		result.reserved = modifiedThesis.reserved;
+	if (hadPersonChange(orig.advisor, mod.advisor)) {
+		result.advisor = toPersonDispatch(mod.advisor);
 	}
-	if (originalThesis.description !== modifiedThesis.description) {
-		result.description = modifiedThesis.description;
+	if (hadPersonChange(orig.auxiliaryAdvisor, mod.auxiliaryAdvisor)) {
+		result.auxiliary_advisor = toPersonDispatch(mod.auxiliaryAdvisor);
 	}
-	if (originalThesis.status !== modifiedThesis.status) {
-		result.status = modifiedThesis.status;
+	if (hadPersonChange(orig.student, mod.student)) {
+		result.student = toPersonDispatch(mod.student);
+	}
+	if (hadPersonChange(orig.secondStudent, mod.secondStudent)) {
+		result.student_2 = toPersonDispatch(mod.secondStudent);
+	}
+	if (orig.kind !== mod.kind) {
+		result.kind = mod.kind;
+	}
+	if (orig.reserved !== mod.reserved) {
+		result.reserved = mod.reserved;
+	}
+	if (orig.description !== mod.description) {
+		result.description = mod.description;
+	}
+	if (orig.status !== mod.status) {
+		result.status = mod.status;
 	}
 
 	return result;

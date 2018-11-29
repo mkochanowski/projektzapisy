@@ -91,7 +91,15 @@ export class Thesis {
 	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
 
-	public constructor(json: ThesisJson) {
+	public constructor(json?: ThesisJson) {
+		if (json) {
+			this.initFromJson(json);
+		} else {
+			this.initNewThesis();
+		}
+	}
+
+	private initFromJson(json: ThesisJson) {
 		this.id = json.id;
 		this.title = json.title;
 		this.advisor = json.advisor ? Employee.fromJson(json.advisor) : null;
@@ -104,6 +112,21 @@ export class Thesis {
 		this.secondStudent = json.student_2 ? Employee.fromJson(json.student_2) : null;
 		this.addedDate = moment(json.added_date);
 		this.modifiedDate = moment(json.modified_date);
+	}
+
+	private initNewThesis() {
+		this.id = 0;
+		this.title = "";
+		this.advisor = null;
+		this.auxiliaryAdvisor = null;
+		this.kind = ThesisKind.Bachelors;
+		this.reserved = false;
+		this.description = "";
+		this.status = ThesisStatus.BeingEvaluated;
+		this.student = null;
+		this.secondStudent = null;
+		this.addedDate = moment();
+		this.modifiedDate = moment();
 	}
 
 	public isEqual = (other: Thesis): boolean => {

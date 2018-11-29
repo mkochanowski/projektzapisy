@@ -11,6 +11,7 @@
     "baseUrl": "./assets",
     "noUnusedParameters": true,
     "noUnusedLocals": true,
+    "strictPropertyInitialization": false,
     "types": [
       "jquery",
       "lodash",
