@@ -13,7 +13,12 @@ Powiadomienia
 
 {% block center %}
 <h1>Powiadomienia</h1>
+
+
 <div class="news-content">
+    {% for element in notifications %}
+        {{ element }} <br />
+    {% endfor %}
     <div class="od-news-item">
         <div class="od-news-header">
             <h3></h3>
