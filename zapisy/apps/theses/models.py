@@ -4,7 +4,6 @@ from django.db import models
 
 from apps.users.models import Employee, Student
 
-
 MAX_THESIS_TITLE_LEN = 300
 
 

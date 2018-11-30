@@ -2,8 +2,8 @@ import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
-import { Thesis } from "../types";
-import { getThesesList, saveModifiedThesis, saveNewThesis } from "../backend_callers";
+import { Thesis, UserType, CurrentUser } from "../types";
+import { getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";
 import { ThesesTable } from "./ThesesTable";
@@ -22,6 +22,7 @@ type State = {
 	fetchError: Error | null;
 	wasTitleInvalid: boolean;
 	workMode: ThesisWorkMode | null;
+	user: CurrentUser;
 };
 
 const initialState: State = {
@@ -32,6 +33,7 @@ const initialState: State = {
 	fetchError: null,
 	wasTitleInvalid: false,
 	workMode: null,
+	user: { id: -1, type: UserType.Student },
 };
 
 export class ThesesApp extends React.Component<Props, State> {
@@ -41,6 +43,7 @@ export class ThesesApp extends React.Component<Props, State> {
 	async componentDidMount() {
 		this.setState({
 			thesesList: await this.safeGetTheses(),
+			user: await getCurrentUser(),
 			applicationState: ApplicationState.Normal,
 		});
 		this.oldOnBeforeUnload = window.onbeforeunload;

@@ -166,3 +166,8 @@ export const enum UserType {
 	ThesesBoardMember,
 	Admin,
 }
+
+export type CurrentUser = {
+	id: number;
+	type: UserType;
+};
