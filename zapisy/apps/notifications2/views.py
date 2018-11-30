@@ -3,6 +3,7 @@ from django.shortcuts import render
 from apps.notifications2.repositories import get_notifications_repository
 from apps.notifications2.utils import render_description
 
+
 def index(request):
 
     repo = get_notifications_repository()

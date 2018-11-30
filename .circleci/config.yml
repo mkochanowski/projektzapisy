@@ -3,6 +3,8 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.6.5-stretch-node-browsers
+      # _a bit_ old, thanks Ubuntu
+      - image: redis:3
     steps:
       - checkout
       - run: sudo apt-get update
