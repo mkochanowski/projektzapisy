@@ -62,10 +62,7 @@ class RedisNotificationsRepository(NotificationsRepository):
 
     def __init__(self, serializer: NotificationSerializer):
         self.serializer = serializer
-        self.redis_client = redis.Redis(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            password=settings.REDIS_PASS)
+        self.redis_client = redis.Redis()
         self.removed_count = 0
 
     def get_count_for_user(self, user: User) -> int:
