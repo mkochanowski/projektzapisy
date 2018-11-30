@@ -2,7 +2,7 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "sourceMap": true,
-    "target": "es6",
+    "target": "esnext",
     "alwaysStrict": true,
     "strictNullChecks": true,
     "strict": true,

@@ -2,12 +2,13 @@ import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
-import { Thesis, UserType, CurrentUser } from "../types";
+import { Thesis, UserType, AppUser } from "../types";
 import { getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
+import { canAddThesis } from "../permissions";
 
 type Props = {};
 
@@ -22,7 +23,7 @@ type State = {
 	fetchError: Error | null;
 	wasTitleInvalid: boolean;
 	workMode: ThesisWorkMode | null;
-	user: CurrentUser;
+	user: AppUser;
 };
 
 const initialState: State = {
@@ -88,11 +89,12 @@ export class ThesesApp extends React.Component<Props, State> {
 				<ThesisDetails
 					thesis={thesis.mutable}
 					thesesList={this.state.thesesList}
-					onSaveRequested={this.handleThesisSave}
 					isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
-					shouldAllowSave={this.hasUnsavedChanges()}
-					onThesisModified={this.onThesisModified}
+					hasUnsavedChanges={this.hasUnsavedChanges()}
 					mode={this.state.workMode!}
+					user={this.state.user}
+					onSaveRequested={this.handleThesisSave}
+					onThesisModified={this.onThesisModified}
 				/>
 			</>;
 		 }
@@ -166,6 +168,9 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private setupForAddingThesis = () => {
+		if (!canAddThesis(this.state.user.type)) {
+			return;
+		}
 		const thesis = new Thesis();
 		this.setStateWithNewThesis({
 			workMode: ThesisWorkMode.Adding

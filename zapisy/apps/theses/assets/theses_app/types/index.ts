@@ -167,7 +167,7 @@ export const enum UserType {
 	Admin,
 }
 
-export type CurrentUser = {
+export type AppUser = {
 	id: number;
 	type: UserType;
 };

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import update, { Query } from "immutability-helper";
 import { Moment } from "moment";
 
-import { Thesis, ThesisStatus, ThesisKind, Employee } from "../../types";
+import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
@@ -12,6 +12,7 @@ import { ThesisVotes } from "./ThesisVotes";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode } from "../../types/misc";
+import { canVote, canModifyThesis } from "../../permissions";
 
 const SaveButton = Button.extend`
 	&:disabled:hover {
@@ -54,11 +55,12 @@ margin-left: 20px;
 type Props = {
 	thesis: Thesis;
 	thesesList: Thesis[];
+	isSaving: boolean;
+	hasUnsavedChanges: boolean;
+	mode: ThesisWorkMode;
+	user: AppUser;
 	onThesisModified: (thesis: Thesis) => void;
 	onSaveRequested: () => void;
-	isSaving: boolean;
-	shouldAllowSave: boolean;
-	mode: ThesisWorkMode;
 };
 
 const initialState = {
@@ -71,7 +73,9 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	public render() {
 		console.warn("Render details");
-		const { shouldAllowSave } = this.props;
+		const { hasUnsavedChanges } = this.props;
+		const showVotes = canVote(this.props.user.type);
+		const canModify = canModifyThesis(this.props.user, this.props.thesis);
 
 		return <DetailsSectionWrapper>
 			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
@@ -98,14 +102,14 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 						onDescriptionChanged={this.onDescriptionChanged}
 					/>
 				</LeftDetailsContainer>
-				<RightDetailsContainer>
-					<ThesisVotes />
-					<SaveButton
+				{showVotes || canModify ? <RightDetailsContainer>
+					{ showVotes ? <ThesisVotes /> : null }
+					{ canModify ? <SaveButton
 						onClick={this.handleSave}
-						disabled={!shouldAllowSave}
-						title={shouldAllowSave ? this.getActionDescription() : "Nie dokonano zmian"}
-					>{this.getActionTitle()}</SaveButton>
-				</RightDetailsContainer>
+						disabled={!hasUnsavedChanges}
+						title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
+					>{this.getActionTitle()}</SaveButton> : null }
+				</RightDetailsContainer> : null}
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
 	}
