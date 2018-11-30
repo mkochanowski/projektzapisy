@@ -7,7 +7,10 @@ from django.contrib.auth.models import User
 import redis
 
 from apps.notifications2.datatypes import Notification
-from apps.notifications2.serialization import NotificationSerializer
+from apps.notifications2.serialization import (
+    JsonNotificationSerializer,
+    NotificationSerializer,
+)
 
 
 class NotificationsRepository(ABC):
@@ -127,7 +130,6 @@ def get_notifications_repository() -> NotificationsRepository:
     thus providing access to _some_ notifications storage.
     Client code should always call this method instead of
     instantiating such classes directly.
-    TODO: replace it with Redis-based one when it's ready
     """
 
-    return FakeNotificationsRepository()
+    return RedisNotificationsRepository(JsonNotificationSerializer())
