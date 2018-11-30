@@ -161,6 +161,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	public render() {
+		console.warn("Render list");
 		return (
 			<>
 				{this.renderTopFilters()}
@@ -183,6 +184,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.resetFilterCache();
 		this.resetData();
 		this.resetSelectedIdx();
+		rowHeightCache.clearAll();
 	}
 
 	// If the displayed list changes logically (contents, order)

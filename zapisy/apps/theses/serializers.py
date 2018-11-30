@@ -44,24 +44,18 @@ class ThesisSerializer(serializers.ModelSerializer):
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
 
     def create(self, validated_data):
-        print("Create a thesis", validated_data)
-
-    def validate(self, data):
-        print("I must validate", data)
-
-    def _update_advisors(self, instance, validated_data):
-        if "advisor" in validated_data:
-            instance.advisor = _get_person_from_queryset(Employee, validated_data.get("advisor"))
-        if "auxiliary_advisor" in validated_data:
-            instance.auxiliary_advisor = _get_person_from_queryset(
-                Employee, validated_data.get("auxiliary_advisor")
-            )
-
-    def _update_students(self, instance, validated_data):
-        if "student" in validated_data:
-            instance.student = _get_person_from_queryset(Student, validated_data.get("student"))
-        if "student_2" in validated_data:
-            instance.student_2 = _get_person_from_queryset(Student, validated_data.get("student_2"))
+        new_instance = models.Thesis(
+            title=validated_data.get("title"),
+            kind=validated_data.get("kind"),
+            status=validated_data.get("status"),
+            reserved=validated_data.get("reserved"),
+        )
+        if "description" in validated_data:
+            new_instance.description = validated_data.get("description")
+        ThesisSerializer._assign_advisors(new_instance, validated_data)
+        ThesisSerializer._assign_students(new_instance, validated_data)
+        new_instance.save()
+        return new_instance
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
@@ -69,10 +63,26 @@ class ThesisSerializer(serializers.ModelSerializer):
         instance.reserved = validated_data.get('reserved', instance.reserved)
         instance.description = validated_data.get('description', instance.description)
         instance.status = validated_data.get('status', instance.status)
-        self._update_advisors(instance, validated_data)
-        self._update_students(instance, validated_data)
+        ThesisSerializer._assign_advisors(instance, validated_data)
+        ThesisSerializer._assign_students(instance, validated_data)
         instance.save()
         return instance
+
+    @staticmethod
+    def _assign_advisors(instance, validated_data):
+        if "advisor" in validated_data:
+            instance.advisor = _get_person_from_queryset(Employee, validated_data.get("advisor"))
+        if "auxiliary_advisor" in validated_data:
+            instance.auxiliary_advisor = _get_person_from_queryset(
+                Employee, validated_data.get("auxiliary_advisor")
+            )
+
+    @staticmethod
+    def _assign_students(instance, validated_data):
+        if "student" in validated_data:
+            instance.student = _get_person_from_queryset(Student, validated_data.get("student"))
+        if "student_2" in validated_data:
+            instance.student_2 = _get_person_from_queryset(Student, validated_data.get("student_2"))
 
     class Meta:
         model = models.Thesis

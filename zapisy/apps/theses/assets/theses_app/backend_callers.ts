@@ -103,11 +103,11 @@ export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis:
 	);
 }
 
-export async function saveNewThesis(thesis: Thesis) {
+export async function saveNewThesis(thesis: Thesis): Promise<number> {
 	const objToSend = getThesisAddDispatch(thesis);
 	const jsonData = JSON.stringify(objToSend);
 	console.warn("Adding:", jsonData);
-	await sendRequestWithCsrf(
+	const res = await sendRequestWithCsrf(
 		`${BASE_API_URL}/theses/`,
 		{
 			method: "POST",
@@ -117,4 +117,5 @@ export async function saveNewThesis(thesis: Thesis) {
 			},
 		},
 	);
+	return (res.data as ThesisJson).id;
 }

@@ -45,7 +45,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		});
 		this.oldOnBeforeUnload = window.onbeforeunload;
 		window.onbeforeunload = this.confirmUnload;
-		Mousetrap.bind("ctrl+m", this.setupForNewThesis);
+		Mousetrap.bind("ctrl+m", this.setupForAddingThesis);
 	}
 
 	componentWillUnmount() {
@@ -67,8 +67,8 @@ export class ThesesApp extends React.Component<Props, State> {
 		if (this.state.fetchError) {
 			return this.renderErrorScreen();
 		}
-		console.warn("Main render");
 		const { thesis } = this.state;
+		console.warn("Main render", thesis, this.state.workMode);
 		const mainComponent = <ThesesTable
 			applicationState={this.state.applicationState}
 			thesesList={this.state.thesesList}
@@ -104,6 +104,13 @@ export class ThesesApp extends React.Component<Props, State> {
 				</span>
 			}
 		/>;
+	}
+	private setStateWithNewThesis<K extends keyof State>
+	(state: Pick<State, K> | State | null, t: Thesis | null) {
+		const thesisState = {
+			thesis: t ? { original: t, mutable: clone(t) } : null,
+		};
+		this.setState(Object.assign(thesisState, state));
 	}
 
 	private async safeGetTheses() {
@@ -141,8 +148,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			this.state.thesesList.find(thesis.isEqual) != null,
 			"Tried to select a nonexistent thesis",
 		);
-		this.setActiveThesis(thesis);
-		this.setState({ workMode: ThesisWorkMode.Editing });
+		this.setStateWithNewThesis({ workMode: ThesisWorkMode.Editing }, thesis);
 	}
 
 	// When modified in the Details subcomponent; we need to maintain
@@ -156,16 +162,11 @@ export class ThesesApp extends React.Component<Props, State> {
 		});
 	}
 
-	private setActiveThesis(t: Thesis | null) {
-		this.setState({
-			thesis: t ? { original: t, mutable: clone(t) } : null,
-		});
-	}
-
-	private setupForNewThesis = () => {
+	private setupForAddingThesis = () => {
 		const thesis = new Thesis();
-		this.setActiveThesis(thesis);
-		this.setState({ workMode: ThesisWorkMode.Adding });
+		this.setStateWithNewThesis({
+			workMode: ThesisWorkMode.Adding
+		}, thesis);
 	}
 
 	private handlerForWorkMode = {
@@ -189,7 +190,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		const handler = this.handlerForWorkMode[workMode];
 		const id = await handler.call(this);
 
-		if (id === null) {
+		if (id === -1) {
 			this.setState({ applicationState: ApplicationState.Normal });
 			return;
 		}
@@ -203,12 +204,13 @@ export class ThesesApp extends React.Component<Props, State> {
 		// but the odds are absurdly low (it would have to be deleted by someone
 		// else or the admin in the time between those two requests above)
 		const freshThesisInstance = newList.find(t => t.id === id) || null;
-		this.setState({ thesesList: newList });
-		this.setActiveThesis(freshThesisInstance);
-		this.setState({ applicationState: ApplicationState.Normal });
-
-		// no matter what the work mode was, if we have a thesis we end up in the edit view
-		this.setState({ workMode: freshThesisInstance ? ThesisWorkMode.Editing : null });
+		const newState = {
+			thesesList: newList,
+			applicationState: ApplicationState.Normal,
+			// no matter what the work mode was, if we have a thesis we end up in the edit view
+			workMode: freshThesisInstance ? ThesisWorkMode.Editing : null,
+		};
+		this.setStateWithNewThesis(newState, freshThesisInstance);
 	}
 
 	private async modifyExistingThesis() {
@@ -221,21 +223,20 @@ export class ThesesApp extends React.Component<Props, State> {
 				"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
 				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 			);
-			return null;
+			return -1;
 		}
 	}
 
 	private async addNewThesis() {
 		const { thesis } = this.state;
 		try {
-			await saveNewThesis(thesis!.mutable);
-			return -1;
+			return await saveNewThesis(thesis!.mutable);
 		} catch (err) {
 			window.alert(
 				"Nie udało się dodać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
 				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 			);
-			return null;
+			return -1;
 		}
 	}
 }

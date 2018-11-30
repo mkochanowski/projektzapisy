@@ -70,6 +70,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	state = initialState;
 
 	public render() {
+		console.warn("Render details");
 		const { shouldAllowSave } = this.props;
 
 		return <DetailsSectionWrapper>
