@@ -9,6 +9,7 @@ services:
     volumes:
       - ./zapisy:/app
       - ./frontend/static:/static:ro
+      - ./frontend/webpack_resources:/app/webpack_resources:ro
     ports:
       - 8000:8000
     networks:
@@ -34,6 +35,7 @@ services:
     image: node:${NODE_VERSION}
     volumes:
       - ./frontend:/frontend
+      - ./zapisy/apps:/frontend/apps:ro
     working_dir: /frontend
     networks: 
       - main-network

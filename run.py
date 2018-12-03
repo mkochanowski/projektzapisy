@@ -32,23 +32,6 @@ def install_dependencies():
     """
     docker_compose_exec('app', './bin/install.sh')
 
-
-
-# @click.command()
-# @click.argument("app", default="")
-# @click.option(
-#     "--frontend", default=False, help='run selenium tests', is_flag=True)
-# def tests(app, frontend):
-#     """
-#     Run tests
-#     """
-#     if frontend:
-#         local('xvfb-run python manage.py test test_app --nomigrations')
-#     else:
-#         run_locally_with_manage_py(
-#             'test {app} --nomigrations'.format(app=app))
-
-
 @click.group()
 def db():
     """
@@ -91,6 +74,9 @@ def rebuild():
 @click.command()
 @click.argument('cmd', nargs=-1)
 def manage(cmd):
+    """
+    Runs manage.py [ARGS]
+    """
     docker_compose_exec(*(['app', 'python', 'manage.py'] + list(cmd)))
 
 cli.add_command(db)

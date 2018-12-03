@@ -22,7 +22,7 @@ personal/
 static/
 node_modules
 compiled_assets/
-webpack-stats.json
+frontend/webpack_resources/webpack-stats.json
 *.gz
 *.sql
 *.sqlite3
