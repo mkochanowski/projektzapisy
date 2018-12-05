@@ -39,7 +39,7 @@ services:
     working_dir: /frontend
     networks: 
       - main-network
-    command: ./bin/run.sh
+    command: ./bin/entrypoint.sh
 
 networks:
   main-network:
