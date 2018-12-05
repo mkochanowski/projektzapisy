@@ -21,12 +21,12 @@ def cli():
 @click.option('--port', default='8000')
 def server(ip, port):
     """
-    Run development server.
+    Run development server. By default it listens on all interfaces(0.0.0.0) and port 8000
     """
     docker_compose_exec('app', './bin/runserver.sh', ip, port)
 
-@click.command(name='install-dependencies')
-def install_dependencies():
+@click.command(name='pip-install')
+def pip_install():
     """
     Install python dependencies from requirements.development.txt
     """
@@ -45,6 +45,9 @@ def run_with_psql(*args):
 @click.command()
 @click.option("--user", default='fereol')
 def psql(user):
+    """
+    Runs interactive psql session, by default with user `fereol`.
+    """
     run_with_psql('-U', user)
 
 
@@ -52,7 +55,7 @@ def psql(user):
 @click.argument("path", required=True)
 def load(path):
     """
-    Load database
+    Load database from .sql file. Path should be relative to db_backups/
     """
     run_with_psql('-U', 'postgres', '-c', 'DROP DATABASE "fereol";')
     run_with_psql('-U', 'postgres', '-c', 'CREATE DATABASE "fereol";')
@@ -66,8 +69,11 @@ def static():
     """
     pass
 
-@click.command()
-def rebuild():
+@click.command(name='compile')
+def compile_():
+    """
+    Compiles all assets to static files using `yarn dev`
+    """
     docker_compose_exec('frontend', 'yarn', 'dev')
 
 
@@ -88,9 +94,9 @@ db.add_command(load)
 
 cli.add_command(static)
 
-static.add_command(rebuild)
+static.add_command(compile_)
 
-cli.add_command(install_dependencies)
+cli.add_command(pip_install)
 cli.add_command(manage)
 
 if __name__ == '__main__':
