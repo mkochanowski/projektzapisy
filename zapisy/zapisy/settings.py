@@ -24,7 +24,6 @@ EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD', default='')
 EMAIL_PORT = env.int('EMAIL_PORT', default=25)
 SERVER_EMAIL = env.str('SERVER_EMAIL', default='root@localhost')
 
-
 # django-environ doesn't support nested arrays, but decoding json objects works fine
 ARRAY_VALS = env.json('ARRAY_VALS', {})
 ADMINS = ARRAY_VALS['ADMINS'] if ARRAY_VALS else []
@@ -42,6 +41,20 @@ DATABASES = {
         'CHARSET': 'utf8',
         'USE_UNICODE': True,
     }
+}
+
+# django-rq is a task queue. It can be used to run asynchronous tasks. The tasks
+# should be implemented so, that setting RUN_ASYNC to False would run them
+# eagerly.
+RUN_ASYNC = env.bool('RUN_ASYNC', True)
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'PASSWORD': '',
+        'DEFAULT_TIMEOUT': 360,
+    },
 }
 
 # mass-mail account
@@ -65,13 +78,13 @@ LOGGING = {
             'level': 'DEBUG',  # DEBUG or higher goes to the log file
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'logs/djangoproject.log',
-            'maxBytes': 50 * 10**6,  # will 50 MB do?
+            'maxBytes': 50 * 10 ** 6,  # will 50 MB do?
             'backupCount': 3,  # keep this many extra historical files
             'formatter': 'timestampthread'
         },
         'console': {
-           'class': 'logging.StreamHandler',
-           'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'level': 'INFO',
         },
     },
     'loggers': {
@@ -90,7 +103,6 @@ LOGGING = {
     }
 }
 
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -105,12 +117,9 @@ LANGUAGE_CODE = 'pl-pl'
 # Available languages for using the service. The first one is the default.
 
 
-def ugettext(s): return s
-
-
 LANGUAGES = (
-    ('pl', ugettext('Polish')),
-    ('en', ugettext('English')),
+    ('pl', 'Polish'),
+    ('en', 'English'),
 )
 
 SITE_ID = 1
@@ -120,7 +129,12 @@ SITE_ID = 1
 USE_I18N = True
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '6$u2ggeh-!^hxep3s4h$3z&2-+3c@sy7-sy8349+l-1m)9r0fn'
+SECRET_KEY = env.str('SECRET_KEY', default='N3MUBVRQXkhuqzsZ8QMepRaZwHDXwhp4rTcVQF5bmckB2c293V')
+
+TEMPLATE_LOADERS_TO_USE = [
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+]
 
 TEMPLATES = [
     {
@@ -135,17 +149,12 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.request',
             ],
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.filesystem.Loader',
-                ]),
-            ]
+            'loaders': TEMPLATE_LOADERS_TO_USE
+            if DEBUG else
+            [('django.template.loaders.cached.Loader', TEMPLATE_LOADERS_TO_USE)]
         },
     },
 ]
-
 
 # Be careful with the order! SessionMiddleware
 # and Authentication both must come before LocalePref which
@@ -154,7 +163,6 @@ MIDDLEWARE = [
     'django.middleware.http.ConditionalGetMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'middleware.localePrefMiddleware.LocalePrefMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -200,7 +208,7 @@ INSTALLED_APPS = (
 
     'apps.utils',
     'apps.schedule',
-    #'debug_toolbar',
+    # 'debug_toolbar',
     'apps.grade.poll',
     'apps.grade.ticket_create',
     'apps.email_change',
@@ -212,13 +220,14 @@ INSTALLED_APPS = (
     'django_cas_ng',
 
     'test_app',
+    'django_rq',
     'webpack_loader',
 )
 
 MODELTRANSLATION_FALLBACK_LANGUAGES = ('pl',)
 
 AUTHENTICATION_BACKENDS = (
-    'apps.users.auth_backend.BetterBackend',
+    'django.contrib.auth.backends.ModelBackend',
     'django_cas_ng.backends.CASBackend',
 )
 
@@ -271,7 +280,6 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': show_toolbar,
     'INTERCEPT_REDIRECTS': False,
 }
-
 
 CACHES = {
     'default': {

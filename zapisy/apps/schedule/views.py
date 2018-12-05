@@ -26,6 +26,7 @@ import io
 from functools import reduce
 
 
+@login_required
 def classrooms(request):
 
     # Avoids lookup of non existing variable during template rendering
@@ -34,6 +35,7 @@ def classrooms(request):
     return TemplateResponse(request, 'schedule/classrooms.html', locals())
 
 
+@login_required
 def classroom(request, slug):
 
     rooms = Classroom.get_in_institute(reservation=True)
@@ -145,6 +147,7 @@ def history(request):
     return TemplateResponse(request, 'schedule/history.html', locals())
 
 
+@login_required
 @require_POST
 def decision(request, event_id):
     from .models.message import EventModerationMessage
@@ -175,7 +178,6 @@ def events(request):
     return TemplateResponse(request, 'schedule/events.html', locals())
 
 
-@login_required
 def event(request, event_id):
     from apps.schedule.models.message import EventModerationMessage, EventMessage
 

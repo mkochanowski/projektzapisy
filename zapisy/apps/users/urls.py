@@ -1,3 +1,4 @@
+from typing import List, Union, Any
 from django.conf.urls import url
 from django.contrib.auth.views import password_reset, password_reset_confirm, \
     password_reset_complete, password_reset_done, PasswordChangeView
@@ -11,7 +12,6 @@ urlpatterns = [
     url('^email-change/$', views.email_change, name='email-change'),
     url('^setlang/$', views.set_language, name='setlang'),
     url('^employee-data-change/$', views.consultations_change, name='consultations-change'),
-    url('^bank-account-change/$', views.bank_account_change, name='bank-account-change'),
     url('^password-change/$', PasswordChangeView.as_view(template_name='users/password_change_form.html'),
         name='password_change'),
     url('^password-change-done/$', views.password_change_done, name='password_change_done'),

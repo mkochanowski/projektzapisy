@@ -44,7 +44,7 @@ def server(ip, port, no_package_install):
               "Only use this option if you know what you're doing.")
         print("******************************************")
     else:
-        npm_result = os.system("./npm.sh")
+        npm_result = os.system("yarn")
         npm_exit_code = os.WEXITSTATUS(npm_result)
         if npm_exit_code != 0:
             click.echo(click.style("Package installation failed with exit code {}".format(
@@ -55,9 +55,11 @@ def server(ip, port, no_package_install):
         "python", "manage.py", "runserver", "{ip}:{port}".format(
             ip=ip, port=port)])
     p2 = subprocess.Popen(["yarn", "devw"])
+    p3 = subprocess.Popen(["python", "manage.py", "rqworker", "default"])
 
     p1.wait()
     p2.wait()
+    p3.wait()
     sys.exit(0)
 
 

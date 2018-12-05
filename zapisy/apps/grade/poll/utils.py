@@ -1,5 +1,4 @@
 import re
-import io
 import csv
 
 import unidecode
@@ -8,7 +7,7 @@ from Crypto.Hash import SHA256
 from Crypto.Signature import pkcs1_15
 from apps.grade.poll.models import Poll, Section, SectionOrdering, \
     OpenQuestion, SingleChoiceQuestion, \
-    OpenQuestionOrdering, Option, \
+    OpenQuestionOrdering, \
     SingleChoiceQuestionOrdering, \
     MultipleChoiceQuestion, \
     MultipleChoiceQuestionOrdering, \
@@ -20,7 +19,6 @@ from apps.grade.poll.models import Poll, Section, SectionOrdering, \
 from apps.grade.ticket_create.utils import (
     poll_cmp, flatten,
 )
-from apps.enrollment.records.models import Group
 from apps.grade.poll.exceptions import NoTitleException, NoPollException, \
     NoSectionException
 
@@ -30,7 +28,6 @@ from apps.enrollment.courses.models.course import Course, CourseEntity
 from apps.users.models import Program
 
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.utils.safestring import SafeText, mark_safe
 from django.db.models import Q
 from functools import reduce, cmp_to_key
 
@@ -41,6 +38,7 @@ def poll_and_ticket_cmp(pollTuple1, pollTuple2):
 
 def int_to_bytes(x: int) -> bytes:
     return x.to_bytes((x.bit_length() + 7) // 8, 'big')
+
 
 def check_signature(ticket: str, ticket_signature: int, public_key):
     pk = RSA.importKey(public_key.public_key)

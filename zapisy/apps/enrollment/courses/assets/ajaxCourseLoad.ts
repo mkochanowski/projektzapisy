@@ -8,7 +8,6 @@
 // The received HTML response is then simply dumped into the DOM
 // (main-content); we also update the page title and links
 
-
 import * as $ from "jquery";
 import { scrollUpToElementIfWindowBelow } from "common/utils";
 
@@ -45,6 +44,7 @@ function onCourseLinkClicked(event: Event): void {
 // page URL; the received response will be loaded
 // into the DOM
 function fetchCourseInfoAsync(courseUrl: string): void {
+
 	isLoadingCourse = true;
 	const container = document.getElementById("main-content");
 	if (!container) {
@@ -53,9 +53,10 @@ function fetchCourseInfoAsync(courseUrl: string): void {
 	setElementLoadingUi(container);
 	scrollUpToElementIfWindowBelow("#main-menu-list");
 	$.ajax({
+		cache: false,
 		type: "GET",
 		dataType: "html",
-		url: courseUrl,
+		url: courseUrl + ".json",
 		success: function(resp: string) {
 			onCourseResponseReceived(resp, courseUrl);
 		},
@@ -135,7 +136,7 @@ function pushHistoryEntry(url: string, thisCourseInfo: CourseInfo) {
 	window.history.pushState(thisCourseInfo, "", url);
 }
 
-function onPopState(event : PopStateEvent) {
+function onPopState(event: PopStateEvent) {
 	if (event.state) {
 		populateCoursePageFromCourseInfo(event.state);
 	} else {

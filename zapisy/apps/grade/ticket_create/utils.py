@@ -8,10 +8,10 @@ from Crypto.Random.random import getrandbits, \
 from django.utils.safestring import SafeText
 
 from apps.grade.poll.models import Poll
+from apps.grade.ticket_create.exceptions import InvalidPollException, TicketUsed
 from apps.grade.ticket_create.models import PublicKey, \
     PrivateKey, \
     UsedTicketStamp
-from apps.grade.ticket_create.exceptions import *
 from functools import cmp_to_key
 
 RAND_BITS = 512
@@ -81,6 +81,14 @@ def revMod(a, m):
     if x < 0:
         x += m
     return x
+
+
+def cmp(x, y):
+    if x < y:
+        return -1
+    if x == y:
+        return 0
+    return 1
 
 
 def poll_cmp(poll1, poll2):
@@ -378,7 +386,7 @@ def to_plaintext(vtl):
     return SafeText(str(res))
 
 
-### FIXME explanation of ticket parsing code: str(int())
+# FIXME explanation of ticket parsing code: str(int())
 # The list is split into chunks, some of which are empty, and some of which
 # contain the tickets we want (e.g. ['123123', '', '', 'somecrap', '321321'])
 # The list is iterated until doing int(list[i]) succeeds; at this point

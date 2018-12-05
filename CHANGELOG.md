@@ -1,5 +1,12 @@
 # projektzapisy Changelog
 
+# Version 5.12.18
+
+* Ubuntu upgraded to 18.04.
+* Major changes in users app. We have groups now. UserProfile and ExtendedUser are gone (#444).
+* Webpack/Yarn is used for compiling and bundling assets (JS/TS/CSS).
+* Django is updated to version 2.0.
+
 # Version 10.06.18
 
 * added consent for students
@@ -19,6 +26,11 @@
 * Classroom REST API serving classroom data
 * Fixed negative counts in grade summary
 * Added confirmation pop-up before direct disenrollment
+
+* Removed redundant informations about isim students
+* Removed anything related to program "studia zamawiane"
+* Removed UserProfile and ExtendedUser
+* Changed authentication backend to django's default
 
 # Version 18.02.25
 
