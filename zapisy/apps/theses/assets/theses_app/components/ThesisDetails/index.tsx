@@ -75,7 +75,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 		console.warn("Render details");
 		const { hasUnsavedChanges } = this.props;
 		const showVotes = canVote(this.props.user);
-		const canModify = canModifyThesis(this.props.user, this.props.thesis);
+		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
 
 		return <DetailsSectionWrapper>
 			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
@@ -104,13 +104,13 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 						onDescriptionChanged={this.onDescriptionChanged}
 					/>
 				</LeftDetailsContainer>
-				{showVotes || canModify ? <RightDetailsContainer>
+				{showVotes || !readOnly ? <RightDetailsContainer>
 					{ showVotes ? <ThesisVotes /> : null }
-					{ canModify ? <SaveButton
+					{ readOnly ? null : <SaveButton
 						onClick={this.handleSave}
 						disabled={!hasUnsavedChanges}
 						title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
-					>{this.getActionTitle()}</SaveButton> : null }
+					>{this.getActionTitle()}</SaveButton> }
 				</RightDetailsContainer> : null}
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
