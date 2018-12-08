@@ -11,11 +11,12 @@ from dal import autocomplete
 from apps.users.models import Student, Employee
 from .models import Thesis
 from . import serializers
+from .drf_permission_classes import ThesisModificationPermission
 
 
 class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get", "post"]
-    permission_classes = (permissions.DjangoModelPermissions,)
+    permission_classes = (permissions.DjangoModelPermissions, ThesisModificationPermission,)
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):

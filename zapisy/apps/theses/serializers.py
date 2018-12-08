@@ -1,10 +1,12 @@
+from typing import Dict, Any
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from apps.users.models import Employee, Student
 from .models import Thesis, ThesisStatus
 from .errors import InvalidQueryError
-from .user_type import get_user_type
+from .user_type import get_user_type, ThesisUserType
 from .permissions import can_set_status, can_set_advisor
 
 
@@ -27,9 +29,29 @@ class PersonSerializerForThesis(serializers.Serializer):
         return {"id": person_id}
 
 
+ValidationData = Dict[str, Any]
+
+
 def copy_if_present(dst, src, key, converter=None):
     if key in src:
         dst[key] = converter(src[key]) if converter else src[key]
+
+
+def validate_advisor(user: User, user_type: ThesisUserType, advisor: User):
+    if not can_set_advisor(user, user_type, advisor):
+        raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
+
+
+def validate_status(user_type: ThesisUserType, status: ThesisStatus):
+    if not can_set_status(user_type, status):
+        raise serializers.ValidationError(f'This type of user cannot set status to {status}')
+
+
+def copy_optional_fields(result, data):
+    copy_if_present(result, data, "description")
+    copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
+    copy_if_present(result, data, "student", lambda s: get_person(Student, s))
+    copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
 
 
 class ThesisSerializer(serializers.ModelSerializer):
@@ -54,66 +76,67 @@ class ThesisSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError(f'Unknown request type {request.method}')
 
-    def validate_add_thesis(user: User, data: dict):
+    def validate_add_thesis(self, user: User, data: ValidationData):
         user_type = get_user_type(user)
         advisor = get_person(Employee, data["advisor"])
-        if not can_set_advisor(user, user_type, advisor):
-            raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
+        validate_advisor(user, user_type, advisor)
         status = data["status"]
-        if not can_set_status(user_type, status):
-            raise serializers.ValidationError(f'This type of user cannot set status to {status}')
+        validate_status(user_type, status)
         result = {
             "title": data["title"],
             "reserved": data["reserved"],
             "kind": data["kind"],
             "status": status,
         }
-        copy_if_present(result, data, "description")
-        copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
-        copy_if_present(result, data, "student", lambda s: get_person(Student, s))
-        copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
+        copy_optional_fields(result, data)
+
+        return result
+
+    def validate_modify_thesis(self, user: User, data: ValidationData):
+        user_type = get_user_type(user)
+        result = {}
+        if "advisor" in data:
+            advisor = get_person(Employee, data["advisor"])
+            validate_advisor(user, user_type, advisor)
+            result["advisor"] = advisor
+        if "status" in data:
+            status = data["status"]
+            validate_status(user_type, status)
+            result["status"] = status
+        copy_if_present(result, data, "title")
+        copy_if_present(result, data, "reserved")
+        copy_if_present(result, data, "kind")
+        copy_optional_fields(result, data)
+
         return result
 
     def create(self, validated_data):
-        new_instance = Thesis(
+        return Thesis.objects.create(
             title=validated_data.get("title"),
             kind=validated_data.get("kind"),
             status=validated_data.get("status"),
             reserved=validated_data.get("reserved"),
+            description=validated_data.get("description"),
             advisor=validated_data.get("advisor"),
-            auxiliary_advisor=validated_data.get("auxiliary_advisor")
+            auxiliary_advisor=validated_data.get("auxiliary_advisor"),
+            student=validated_data.get("student"),
+            student_2=validated_data.get("student_2"),
         )
-        if "description" in validated_data:
-            new_instance.description = validated_data.get("description")
-        new_instance.save()
-        return new_instance
 
     def update(self, instance, validated_data):
-        instance.title = validated_data.get('title', instance.title)
-        instance.kind = validated_data.get('kind', instance.kind)
-        instance.reserved = validated_data.get('reserved', instance.reserved)
-        instance.description = validated_data.get('description', instance.description)
-        instance.status = validated_data.get('status', instance.status)
-        ThesisSerializer._assign_advisors(instance, validated_data)
-        ThesisSerializer._assign_students(instance, validated_data)
+        instance.title = validated_data.get("title", instance.title)
+        instance.kind = validated_data.get("kind", instance.kind)
+        instance.reserved = validated_data.get("reserved", instance.reserved)
+        instance.description = validated_data.get("description", instance.description)
+        instance.status = validated_data.get("status", instance.status)
+        instance.advisor = validated_data.get("advisor", instance.advisor)
+        instance.auxiliary_advisor = validated_data.get(
+            "auxiliary_advisor", instance.auxiliary_advisor
+        )
+        instance.student = validated_data.get("student", instance.student)
+        instance.student_2 = validated_data.get("student_2", instance.student_2)
         instance.save()
         return instance
-
-    @staticmethod
-    def _assign_advisors(instance, validated_data):
-        if "advisor" in validated_data:
-            instance.advisor = _get_person_from_queryset(Employee, validated_data.get("advisor"))
-        if "auxiliary_advisor" in validated_data:
-            instance.auxiliary_advisor = _get_person_from_queryset(
-                Employee, validated_data.get("auxiliary_advisor")
-            )
-
-    @staticmethod
-    def _assign_students(instance, validated_data):
-        if "student" in validated_data:
-            instance.student = _get_person_from_queryset(Student, validated_data.get("student"))
-        if "student_2" in validated_data:
-            instance.student_2 = _get_person_from_queryset(Student, validated_data.get("student_2"))
 
     class Meta:
         model = Thesis
