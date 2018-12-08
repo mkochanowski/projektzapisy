@@ -55,6 +55,11 @@ RQ_QUEUES = {
         'PASSWORD': '',
         'DEFAULT_TIMEOUT': 360,
     },
+    'dispatch-notifications': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+    },
 }
 
 # mass-mail account

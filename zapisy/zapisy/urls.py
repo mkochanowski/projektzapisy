@@ -1,5 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import path
 from django.views.generic import TemplateView
 from django_cas_ng import views
 
@@ -19,6 +20,8 @@ urlpatterns = [
     url(r'^records/', include('apps.enrollment.records.urls')),
     url(r'^statistics/', include(('apps.statistics.urls', 'statistics'), namespace='statistics')),
     url(r'^consultations/$', users_views.consultations_list, name="consultations-list"),
+
+    path('django-rq/', include('django_rq.urls')),
 
     url(r'^news/', include('apps.news.urls')),
     url(r'^jstests/', TemplateView.as_view(template_name="jstests/tests.html")),
