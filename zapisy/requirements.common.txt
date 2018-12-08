@@ -29,4 +29,4 @@ xhtml2pdf==0.2.2
 postmarkup==1.2.2
 # Remove accents from strings (diacritics converted to Latin equivalents)
 unidecode==1.0.22
-redis==3.0.0.post1
+redis==2.10.6
