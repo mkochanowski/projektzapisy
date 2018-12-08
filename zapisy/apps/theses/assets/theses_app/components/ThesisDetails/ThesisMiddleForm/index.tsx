@@ -47,13 +47,21 @@ type Props = {
 	onDescriptionChanged: (nd: string) => void;
 };
 
+function getStateFromProps(props: Props) {
+	return {
+		displayAuxAdvisor: props.thesis.auxiliaryAdvisor !== null,
+		displayAuxStudent: props.thesis.secondStudent !== null,
+	};
+}
+
 export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 	constructor(props: Props) {
 		super(props);
-		this.state = {
-			displayAuxAdvisor: props.thesis.auxiliaryAdvisor !== null,
-			displayAuxStudent: props.thesis.secondStudent !== null,
-		};
+		this.state = getStateFromProps(props);
+	}
+
+	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
+		this.setState(getStateFromProps(nextProps));
 	}
 
 	private handleDescriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
