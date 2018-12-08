@@ -1,11 +1,12 @@
 import * as React from "react";
 
 import styled from "styled-components";
-import { Thesis, ThesisKind, Employee, Student, MAX_THESIS_TITLE_LEN } from "../../../types";
+import { Thesis, ThesisKind, Employee, Student, MAX_THESIS_TITLE_LEN, AppUser } from "../../../types";
 import { PersonType } from "../../../backend_callers";
 import { PersonSelect } from "./PersonSelect";
 import { ThesisKindSelect } from "./ThesisKindSelect";
 import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
+import { canSetArbitraryAdvisor } from "../../../permissions";
 
 const MidFormTable = styled.table`
 	width: 100%;
@@ -38,6 +39,7 @@ type State = {
 type Props = {
 	thesis: Thesis;
 	titleError: boolean;
+	user: AppUser;
 	onTitleChanged: (nt: string) => void;
 	onKindChanged: (nk: ThesisKind) => void;
 	onAdvisorChanged: (na: Employee | null) => void;
@@ -119,6 +121,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 							personType={PersonType.Employee}
 							onChange={this.props.onAdvisorChanged}
 							value={this.props.thesis.advisor}
+							enabled={canSetArbitraryAdvisor(this.props.user)}
 						/>
 						<AddRemoveIcon
 							onClick={this.triggerAuxAdvVisibility}

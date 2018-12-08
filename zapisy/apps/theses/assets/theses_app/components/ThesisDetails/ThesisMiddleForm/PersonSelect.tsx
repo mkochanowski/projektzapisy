@@ -62,9 +62,11 @@ type PersonSelectComponentProps = {
 	value: BasePerson | null;
 	onChange: (newValue: BasePerson | null) => void;
 	personType: PersonType;
+	enabled?: boolean;
 };
 
 export function PersonSelect(props: PersonSelectComponentProps) {
+	const shouldEnable = typeof props.enabled !== "undefined" ? props.enabled : true;
 	return <SelectComponentWrapper><AsyncPaginate
 		cacheOptions
 		defaultOptions
@@ -73,5 +75,6 @@ export function PersonSelect(props: PersonSelectComponentProps) {
 		value={personToSelectOptions(props.value)}
 		placeholder={"Wybierz..."}
 		noResultsText={"Pobieranie listy..."}
+		disabled={!shouldEnable}
 	/></SelectComponentWrapper>;
 }

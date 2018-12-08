@@ -167,7 +167,17 @@ export const enum UserType {
 	Admin,
 }
 
-export type AppUser = {
-	id: number;
+type CurrentUserJson = {
+	user: PersonJson;
 	type: UserType;
 };
+
+export class AppUser {
+	public user: BasePerson;
+	public type: UserType;
+
+	public constructor(json: CurrentUserJson) {
+		this.user = BasePerson.fromJson(json.user);
+		this.type = json.type;
+	}
+}

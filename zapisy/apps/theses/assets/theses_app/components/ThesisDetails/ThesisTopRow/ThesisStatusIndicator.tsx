@@ -16,6 +16,7 @@ const filterInfos = [
 type Props = {
 	value: ThesisStatus;
 	onChange: (val: ThesisStatus) => void;
+	enabled: boolean;
 };
 
 export function ThesisStatusIndicator(props: Props) {

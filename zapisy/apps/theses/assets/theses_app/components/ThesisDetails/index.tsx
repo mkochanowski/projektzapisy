@@ -74,7 +74,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	public render() {
 		console.warn("Render details");
 		const { hasUnsavedChanges } = this.props;
-		const showVotes = canVote(this.props.user.type);
+		const showVotes = canVote(this.props.user);
 		const canModify = canModifyThesis(this.props.user, this.props.thesis);
 
 		return <DetailsSectionWrapper>
@@ -85,14 +85,16 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 				<LeftDetailsContainer>
 					<ThesisTopRow
 						thesis={this.props.thesis}
+						mode={this.props.mode}
+						user={this.props.user}
 						onReservationChanged={this.onReservationChanged}
 						onDateChanged={this.onDateUpdatedChanged}
 						onStatusChanged={this.onStatusChanged}
-						mode={this.props.mode}
 					/>
 					<ThesisMiddleForm
 						thesis={this.props.thesis}
 						titleError={this.state.hasTitleError}
+						user={this.props.user}
 						onTitleChanged={this.onTitleChanged}
 						onKindChanged={this.onKindChanged}
 						onAdvisorChanged={this.onAdvisorChanged}

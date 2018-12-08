@@ -156,6 +156,6 @@ def get_person(queryset, person_data):
 class CurrentUserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance: BaseUser):
         return {
-            "id": instance.pk,
+            "user": PersonSerializerForThesis(instance).data,
             "type": get_user_type(instance).value
         }
