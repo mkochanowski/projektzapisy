@@ -1,33 +1,40 @@
-from django.contrib.auth.models import User
+from apps.users.models import Employee, BaseUser
 
 from .models import Thesis, ThesisStatus
 from .user_type import ThesisUserType, get_user_type
-
-
-def can_add_thesis(user_type: ThesisUserType) -> bool:
-    return user_type != ThesisUserType.student
 
 
 def is_thesis_staff(user_type: ThesisUserType) -> bool:
     return user_type in [ThesisUserType.admin, ThesisUserType.theses_board_member]
 
 
-def can_modify_thesis(user: User, thesis: Thesis):
+def can_add_thesis(user: BaseUser) -> bool:
     user_type = get_user_type(user)
-    if (is_thesis_staff(user_type)):
-        return True
-    return thesis.advisor.pk == user.pk
+    return user_type != ThesisUserType.student
+
+
+def can_modify_thesis(user: BaseUser, thesis: Thesis):
+    user_type = get_user_type(user)
+    return is_thesis_staff(user_type) or thesis.advisor.pk == user.pk
 
 
 def can_set_status(user_type: ThesisUserType, status: ThesisStatus):
+    """
+    Can a user of the specified type set the specified status for a new thesis?
+    """
     return (
         is_thesis_staff(user_type) or
         status == ThesisStatus.being_evaluated
     )
 
 
-def can_set_advisor(user: User, user_type: ThesisUserType, advisor: User):
+def can_modify_status(user_type: ThesisUserType):
+    """
+    Can a user of the specified type modify an existing thesis' status?
+    """
+    return is_thesis_staff(user_type)
+
+
+def can_set_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employee):
     user_type = get_user_type(user)
-    if (is_thesis_staff(user_type)):
-        return True
-    return user.pk == advisor.pk
+    return is_thesis_staff(user_type) or user.pk == advisor.pk

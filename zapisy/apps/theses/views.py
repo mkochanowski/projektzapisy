@@ -11,12 +11,14 @@ from dal import autocomplete
 from apps.users.models import Student, Employee
 from .models import Thesis
 from . import serializers
-from .drf_permission_classes import ThesisModificationPermission
+from .drf_permission_classes import ThesisPermissions
+from .utils import wrap_user
 
 
 class ThesesViewSet(viewsets.ModelViewSet):
+    # NOTICE if you change this, you might also want to change the permission class
     http_method_names = ["patch", "get", "post"]
-    permission_classes = (permissions.DjangoModelPermissions, ThesisModificationPermission,)
+    permission_classes = (ThesisPermissions,)
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):
@@ -36,7 +38,8 @@ def fields_for_prefetching(base_field: str) -> List[str]:
 @api_view()
 @permission_classes((permissions.IsAuthenticated,))
 def get_current_user(request):
-    serializer = serializers.CurrentUserSerializer(request.user)
+    wrapped_user = wrap_user(request.user)
+    serializer = serializers.CurrentUserSerializer(wrapped_user)
     return Response(serializer.data)
 
 

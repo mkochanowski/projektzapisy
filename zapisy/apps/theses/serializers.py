@@ -1,13 +1,13 @@
 from typing import Dict, Any
 
-from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from apps.users.models import Employee, Student
+from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus
 from .errors import InvalidQueryError
 from .user_type import get_user_type, ThesisUserType
-from .permissions import can_set_status, can_set_advisor
+from .permissions import can_set_status, can_set_advisor, can_modify_status
+from .utils import wrap_user
 
 
 class PersonSerializerForThesis(serializers.Serializer):
@@ -37,14 +37,9 @@ def copy_if_present(dst, src, key, converter=None):
         dst[key] = converter(src[key]) if converter else src[key]
 
 
-def validate_advisor(user: User, user_type: ThesisUserType, advisor: User):
+def validate_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employee):
     if not can_set_advisor(user, user_type, advisor):
         raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
-
-
-def validate_status(user_type: ThesisUserType, status: ThesisStatus):
-    if not can_set_status(user_type, status):
-        raise serializers.ValidationError(f'This type of user cannot set status to {status}')
 
 
 def copy_optional_fields(result, data):
@@ -69,30 +64,33 @@ class ThesisSerializer(serializers.ModelSerializer):
         if not self.context:
             return data
         request = self.context["request"]
+        wrapped_user = wrap_user(request.user)
         if request.method == "POST":
-            return self.validate_add_thesis(request.user, data)
+            return self.validate_add_thesis(wrapped_user, data)
         elif request.method == "PATCH":
-            return self.validate_modify_thesis(request.user, data)
+            return self.validate_modify_thesis(wrapped_user, data)
         else:
             raise serializers.ValidationError(f'Unknown request type {request.method}')
 
-    def validate_add_thesis(self, user: User, data: ValidationData):
+    def validate_add_thesis(self, user: BaseUser, data: ValidationData):
         user_type = get_user_type(user)
         advisor = get_person(Employee, data["advisor"])
         validate_advisor(user, user_type, advisor)
         status = data["status"]
-        validate_status(user_type, status)
+        if not can_set_status(user_type, ThesisStatus(status)):
+            raise serializers.ValidationError(f'This type of user cannot set status to {status}')
         result = {
             "title": data["title"],
             "reserved": data["reserved"],
             "kind": data["kind"],
             "status": status,
+            "advisor": advisor,
         }
         copy_optional_fields(result, data)
 
         return result
 
-    def validate_modify_thesis(self, user: User, data: ValidationData):
+    def validate_modify_thesis(self, user: BaseUser, data: ValidationData):
         user_type = get_user_type(user)
         result = {}
         if "advisor" in data:
@@ -100,9 +98,9 @@ class ThesisSerializer(serializers.ModelSerializer):
             validate_advisor(user, user_type, advisor)
             result["advisor"] = advisor
         if "status" in data:
-            status = data["status"]
-            validate_status(user_type, status)
-            result["status"] = status
+            if not can_modify_status(user_type):
+                raise serializers.ValidationError("This type of user cannot modify the status")
+            result["status"] = data["status"]
         copy_if_present(result, data, "title")
         copy_if_present(result, data, "reserved")
         copy_if_present(result, data, "kind")
@@ -156,7 +154,7 @@ def get_person(queryset, person_data):
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance: User):
+    def to_representation(self, instance: BaseUser):
         return {
             "id": instance.pk,
             "type": get_user_type(instance).value
