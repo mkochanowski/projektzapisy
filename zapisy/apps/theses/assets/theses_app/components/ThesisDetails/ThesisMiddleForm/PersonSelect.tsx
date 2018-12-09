@@ -69,7 +69,10 @@ type PersonSelectComponentProps = {
 export function PersonSelect(props: PersonSelectComponentProps) {
 	const isReadOnly = typeof props.readOnly !== "undefined" ? props.readOnly : false;
 	const valueComponent = isReadOnly
-		? <ReadOnlyInput text={props.value ? props.value.displayName : "<brak>"}/>
+		? <ReadOnlyInput
+			text={props.value ? props.value.displayName : "<brak>"}
+			style={{ height: "36px" }}
+		/>
 		: <AsyncPaginate
 			cacheOptions
 			defaultOptions

@@ -21,7 +21,6 @@ class PersonSerializerForThesis(serializers.Serializer):
         }
 
     def to_internal_value(self, data):
-        print("TO_INTERNAL_VALUE", data)
         person_id = data.get("id")
         if type(person_id) is not int or person_id < 0:
             raise serializers.ValidationError({
