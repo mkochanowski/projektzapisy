@@ -5,8 +5,9 @@ import AsyncPaginate from "react-select-async-paginate";
 
 import { getPersonAutocomplete, PersonType } from "../../../backend_callers";
 import { BasePerson } from "../../../types";
+import { ReadOnlyInput } from "./ReadOnlyInput";
 
-const SelectComponentWrapper = styled.div`
+const PersonFieldWrapper = styled.div`
 width: 50%;
 display: inline-block;
 `;
@@ -58,20 +59,29 @@ class AsyncSelectAutocompleteGetter {
 	}
 }
 
-type PersonSelectComponentProps = {
+type Props = {
 	value: BasePerson | null;
 	onChange: (newValue: BasePerson | null) => void;
 	personType: PersonType;
+	readOnly?: boolean;
 };
 
-export function PersonSelect(props: PersonSelectComponentProps) {
-	return <SelectComponentWrapper><AsyncPaginate
-		cacheOptions
-		defaultOptions
-		loadOptions={(new AsyncSelectAutocompleteGetter(props.personType)).get}
-		onChange={(nv: PersonSelectOptions | null) => props.onChange(selectOptionsToPerson(nv))}
-		value={personToSelectOptions(props.value)}
-		placeholder={"Wybierz..."}
-		noResultsText={"Pobieranie listy..."}
-	/></SelectComponentWrapper>;
+export function PersonField(props: Props) {
+	const isReadOnly = typeof props.readOnly !== "undefined" ? props.readOnly : false;
+	const valueComponent = isReadOnly
+		? <ReadOnlyInput
+			text={props.value ? props.value.displayName : "<brak>"}
+			style={{ height: "36px", width: "100%", boxSizing: "border-box" }}
+		/>
+		: <AsyncPaginate
+			cacheOptions
+			defaultOptions
+			loadOptions={(new AsyncSelectAutocompleteGetter(props.personType)).get}
+			onChange={(nv: PersonSelectOptions | null) => props.onChange(selectOptionsToPerson(nv))}
+			value={personToSelectOptions(props.value)}
+			placeholder={"Wybierz..."}
+			noResultsText={"Pobieranie listy..."}
+		/>;
+
+	return <PersonFieldWrapper>{valueComponent}</PersonFieldWrapper>;
 }

@@ -1,8 +1,6 @@
 from enum import Enum
 
-from django.contrib.auth.models import User
-
-from apps.users.models import BaseUser
+from apps.users.models import BaseUser, Employee, Student
 from . import models
 
 
@@ -11,16 +9,18 @@ class ThesisUserType(Enum):
     employee = 1
     theses_board_member = 2
     admin = 3
+    none = 4
 
 
-def get_user_type(user_instance: User) -> ThesisUserType:
-    if user_instance.is_staff:
-        return ThesisUserType.admin
-    elif BaseUser.is_employee(user_instance):
+def get_user_type(base_user: BaseUser) -> ThesisUserType:
+    if isinstance(base_user, Employee):
+        if base_user.user.is_staff:
+            return ThesisUserType.admin
         return (
             ThesisUserType.theses_board_member
-            if models.is_theses_board_member(user_instance.employee)
+            if models.is_theses_board_member(base_user)
             else ThesisUserType.employee
         )
-    elif BaseUser.is_student(user_instance):
+    elif isinstance(base_user, Student):
         return ThesisUserType.student
+    return ThesisUserType.none

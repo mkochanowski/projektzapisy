@@ -124,5 +124,5 @@ export async function saveNewThesis(thesis: Thesis): Promise<number> {
 }
 
 export async function getCurrentUser(): Promise<AppUser> {
-	return getData(`${BASE_API_URL}/current_user`);
+	return new AppUser(await getData(`${BASE_API_URL}/current_user`));
 }

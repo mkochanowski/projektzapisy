@@ -1,24 +1,30 @@
 import { AppUser, UserType, Thesis } from "./types";
 
-export function canAddThesis(type: UserType) {
-	return type !== UserType.Student;
+export function canAddThesis(user: AppUser) {
+	return user.type !== UserType.Student;
 }
 
-function isThesisStaff(type: UserType) {
-	return [UserType.Admin, UserType.ThesesBoardMember].includes(type);
+function isThesisStaff(user: AppUser) {
+	return [UserType.Admin, UserType.ThesesBoardMember].includes(user.type);
 }
 
-export function canVote(type: UserType) {
-	return isThesisStaff(type);
+export function canVote(user: AppUser) {
+	return isThesisStaff(user);
 }
 
 export function canModifyThesis(user: AppUser, thesis: Thesis) {
-	if (isThesisStaff(user.type)) {
-		return true;
-	}
 	return (
+		isThesisStaff(user) ||
 		user.type === UserType.Employee &&
 		thesis.advisor !== null &&
-		thesis.advisor.id === user.id
+		thesis.advisor.id === user.user.id
 	);
+}
+
+export function canChangeStatus(user: AppUser) {
+	return isThesisStaff(user);
+}
+
+export function canSetArbitraryAdvisor(user: AppUser) {
+	return isThesisStaff(user);
 }

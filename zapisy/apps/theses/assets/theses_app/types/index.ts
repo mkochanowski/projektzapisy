@@ -29,6 +29,16 @@ export const enum ThesisStatus {
 	Defended = 5,
 }
 
+export function thesisStatusToString(status: ThesisStatus) {
+	switch (status) {
+		case ThesisStatus.Accepted: return "Zaakceptowana";
+		case ThesisStatus.BeingEvaluated: return "Poddana pod głosowanie";
+		case ThesisStatus.Defended: return "Obroniona";
+		case ThesisStatus.InProgress: return "W realizacji";
+		case ThesisStatus.ReturnedForCorrections: return "Zwrócona do poprawek";
+	}
+}
+
 export const enum ThesisVote {
 	None = 1,
 	Rejected = 2,
@@ -167,7 +177,17 @@ export const enum UserType {
 	Admin,
 }
 
-export type AppUser = {
-	id: number;
+type CurrentUserJson = {
+	user: PersonJson;
 	type: UserType;
 };
+
+export class AppUser {
+	public user: BasePerson;
+	public type: UserType;
+
+	public constructor(json: CurrentUserJson) {
+		this.user = BasePerson.fromJson(json.user);
+		this.type = json.type;
+	}
+}

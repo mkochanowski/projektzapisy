@@ -8,7 +8,7 @@ import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
-import { canAddThesis } from "../permissions";
+import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 
 type Props = {};
 
@@ -34,7 +34,7 @@ const initialState: State = {
 	fetchError: null,
 	wasTitleInvalid: false,
 	workMode: null,
-	user: { id: -1, type: UserType.Student },
+	user: new AppUser({ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }),
 };
 
 export class ThesesApp extends React.Component<Props, State> {
@@ -168,10 +168,13 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private setupForAddingThesis = () => {
-		if (!canAddThesis(this.state.user.type)) {
+		if (!canAddThesis(this.state.user)) {
 			return;
 		}
 		const thesis = new Thesis();
+		if (!canSetArbitraryAdvisor(this.state.user)) {
+			thesis.advisor = this.state.user.user;
+		}
 		this.setStateWithNewThesis({
 			workMode: ThesisWorkMode.Adding
 		}, thesis);

@@ -12,7 +12,7 @@ import { ThesisVotes } from "./ThesisVotes";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode } from "../../types/misc";
-import { canVote, canModifyThesis } from "../../permissions";
+import { canModifyThesis } from "../../permissions";
 
 const SaveButton = Button.extend`
 	&:disabled:hover {
@@ -42,7 +42,7 @@ width: 100%;
 `;
 
 const LeftDetailsContainer = styled.div`
-width: 100%;
+flex-basis: 85%;
 `;
 
 const RightDetailsContainer = styled.div`
@@ -74,8 +74,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	public render() {
 		console.warn("Render details");
 		const { hasUnsavedChanges } = this.props;
-		const showVotes = canVote(this.props.user.type);
-		const canModify = canModifyThesis(this.props.user, this.props.thesis);
+		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
 
 		return <DetailsSectionWrapper>
 			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
@@ -85,14 +84,16 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 				<LeftDetailsContainer>
 					<ThesisTopRow
 						thesis={this.props.thesis}
+						mode={this.props.mode}
+						user={this.props.user}
 						onReservationChanged={this.onReservationChanged}
 						onDateChanged={this.onDateUpdatedChanged}
 						onStatusChanged={this.onStatusChanged}
-						mode={this.props.mode}
 					/>
 					<ThesisMiddleForm
 						thesis={this.props.thesis}
 						titleError={this.state.hasTitleError}
+						user={this.props.user}
 						onTitleChanged={this.onTitleChanged}
 						onKindChanged={this.onKindChanged}
 						onAdvisorChanged={this.onAdvisorChanged}
@@ -102,14 +103,14 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 						onDescriptionChanged={this.onDescriptionChanged}
 					/>
 				</LeftDetailsContainer>
-				{showVotes || canModify ? <RightDetailsContainer>
-					{ showVotes ? <ThesisVotes /> : null }
-					{ canModify ? <SaveButton
+				<RightDetailsContainer>
+					<ThesisVotes />
+					{ readOnly ? null : <SaveButton
 						onClick={this.handleSave}
 						disabled={!hasUnsavedChanges}
 						title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
-					>{this.getActionTitle()}</SaveButton> : null }
-				</RightDetailsContainer> : null}
+					>{this.getActionTitle()}</SaveButton> }
+				</RightDetailsContainer>
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
 	}

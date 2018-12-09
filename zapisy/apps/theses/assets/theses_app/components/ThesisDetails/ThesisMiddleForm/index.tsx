@@ -1,11 +1,15 @@
 import * as React from "react";
 
 import styled from "styled-components";
-import { Thesis, ThesisKind, Employee, Student, MAX_THESIS_TITLE_LEN } from "../../../types";
+import {
+	Thesis, ThesisKind, Employee, Student,
+	MAX_THESIS_TITLE_LEN, AppUser,
+} from "../../../types";
 import { PersonType } from "../../../backend_callers";
-import { PersonSelect } from "./PersonSelect";
-import { ThesisKindSelect } from "./ThesisKindSelect";
+import { PersonField } from "./PersonField";
+import { ThesisKindField } from "./ThesisKindField";
 import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
+import { canSetArbitraryAdvisor, canModifyThesis } from "../../../permissions";
 
 const MidFormTable = styled.table`
 	width: 100%;
@@ -38,6 +42,7 @@ type State = {
 type Props = {
 	thesis: Thesis;
 	titleError: boolean;
+	user: AppUser;
 	onTitleChanged: (nt: string) => void;
 	onKindChanged: (nk: ThesisKind) => void;
 	onAdvisorChanged: (na: Employee | null) => void;
@@ -47,13 +52,21 @@ type Props = {
 	onDescriptionChanged: (nd: string) => void;
 };
 
+function getStateFromProps(props: Props) {
+	return {
+		displayAuxAdvisor: props.thesis.auxiliaryAdvisor !== null,
+		displayAuxStudent: props.thesis.secondStudent !== null,
+	};
+}
+
 export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 	constructor(props: Props) {
 		super(props);
-		this.state = {
-			displayAuxAdvisor: props.thesis.auxiliaryAdvisor !== null,
-			displayAuxStudent: props.thesis.secondStudent !== null,
-		};
+		this.state = getStateFromProps(props);
+	}
+
+	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
+		this.setState(getStateFromProps(nextProps));
 	}
 
 	private handleDescriptionChanged = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -77,92 +90,135 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 	}
 
 	public render() {
-		const titleStyle: React.CSSProperties = { width: "100%", height: "70px", boxSizing: "border-box" };
+		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
+
+		return <div>
+			<MidFormTable>
+				<tbody>
+				{this.renderTitle(readOnly)}
+				{this.renderKind(readOnly)}
+				{this.renderAdvisors(readOnly)}
+				{this.renderStudents(readOnly)}
+				</tbody>
+			</MidFormTable>
+			{this.renderDescription(readOnly)}
+		</div>;
+	}
+
+	private renderTitle(readOnly: boolean) {
+		const titleStyle: React.CSSProperties = {
+			width: "100%",
+			height: "70px",
+			boxSizing: "border-box",
+		};
 		if (this.props.titleError) {
 			Object.assign(titleStyle, {
 				border: "1px solid red"
 			});
 		}
-		return <div>
-			<MidFormTable>
-				<tbody>
-				<tr>
-					<td>Tytuł</td>
-					<td><textarea
-						style={titleStyle}
-						value={this.props.thesis.title}
-						maxLength={MAX_THESIS_TITLE_LEN}
-						onChange={ev => this.props.onTitleChanged(ev.target.value)}
-					/></td>
-				</tr>
-				<tr>
-					<td>Typ</td>
-					<td>
-						<ThesisKindSelect
-							value={this.props.thesis.kind}
-							onChange={this.props.onKindChanged}
-						/>
-					</td>
-				</tr>
-				<tr>
-					<td>Promotor</td>
-					<td>
-						<PersonSelect
-							personType={PersonType.Employee}
-							onChange={this.props.onAdvisorChanged}
-							value={this.props.thesis.advisor}
-						/>
-						<AddRemoveIcon
+		return <tr>
+			<td>Tytuł</td>
+			<td><textarea
+				style={titleStyle}
+				value={this.props.thesis.title}
+				maxLength={MAX_THESIS_TITLE_LEN}
+				readOnly={readOnly}
+				onChange={ev => this.props.onTitleChanged(ev.target.value)}
+			/></td>
+		</tr>;
+	}
+
+	private renderKind(readOnly: boolean) {
+		return <tr>
+			<td>Typ</td>
+			<td>
+				<ThesisKindField
+					value={this.props.thesis.kind}
+					readOnly={readOnly}
+					onChange={this.props.onKindChanged}
+				/>
+			</td>
+		</tr>;
+	}
+
+	private renderAdvisors(readOnly: boolean) {
+		return <>
+			<tr>
+				<td>Promotor</td>
+				<td>
+					<PersonField
+						personType={PersonType.Employee}
+						onChange={this.props.onAdvisorChanged}
+						value={this.props.thesis.advisor}
+						readOnly={readOnly || !canSetArbitraryAdvisor(this.props.user)}
+					/>
+					{ readOnly
+						? null
+						: <AddRemoveIcon
 							onClick={this.triggerAuxAdvVisibility}
 							type={this.state.displayAuxAdvisor ? IconType.Remove : IconType.Add}
 						/>
+					}
+				</td>
+			</tr>
+			{ this.state.displayAuxAdvisor ? (
+				<tr>
+					<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
+					<td>
+						<PersonField
+							personType={PersonType.Employee}
+							onChange={this.props.onAuxAdvisorChanged}
+							value={this.props.thesis.auxiliaryAdvisor}
+							readOnly={readOnly}
+						/>
 					</td>
 				</tr>
-				{ this.state.displayAuxAdvisor ? (
-					<tr>
-						<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
-						<td>
-							<PersonSelect
-								personType={PersonType.Employee}
-								onChange={this.props.onAuxAdvisorChanged}
-								value={this.props.thesis.auxiliaryAdvisor}
-							/>
-						</td>
-					</tr>
-				) : null }
-				<tr>
-					<td>Student</td>
-					<td>
-						<PersonSelect
-							personType={PersonType.Student}
-							onChange={this.props.onStudentChanged}
-							value={this.props.thesis.student}
-						/>
-						<AddRemoveIcon
+			) : null }
+		</>;
+	}
+
+	private renderStudents(readOnly: boolean) {
+		return <>
+			<tr>
+				<td>Student</td>
+				<td>
+					<PersonField
+						personType={PersonType.Student}
+						onChange={this.props.onStudentChanged}
+						value={this.props.thesis.student}
+						readOnly={readOnly}
+					/>
+					{ readOnly
+						? null
+						: <AddRemoveIcon
 							onClick={this.triggerSecondStudentVisibility}
 							type={this.state.displayAuxStudent ? IconType.Remove : IconType.Add}
 						/>
+					}
+				</td>
+			</tr>
+			{ this.state.displayAuxStudent ? (
+				<tr>
+					<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
+					<td>
+						<PersonField
+							personType={PersonType.Student}
+							onChange={this.props.onSecondStudentChanged}
+							value={this.props.thesis.secondStudent}
+							readOnly={readOnly}
+						/>
 					</td>
 				</tr>
-				{ this.state.displayAuxStudent ? (
-					<tr>
-						<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
-						<td>
-							<PersonSelect
-								personType={PersonType.Student}
-								onChange={this.props.onSecondStudentChanged}
-								value={this.props.thesis.secondStudent}
-							/>
-						</td>
-					</tr>
-				) : null }
-				</tbody>
-			</MidFormTable>
-			<textarea
-				style={{ width: "100%", height: "100px", boxSizing: "border-box" }}
-				value={this.props.thesis.description}
-				onChange={this.handleDescriptionChanged}
-			/>
-		</div>;
+			) : null }
+		</>;
+	}
+
+	private renderDescription(readOnly: boolean) {
+		return <textarea
+			style={{ width: "100%", height: "100px", boxSizing: "border-box" }}
+			value={this.props.thesis.description}
+			readOnly={readOnly}
+			onChange={this.handleDescriptionChanged}
+		/>;
 	}
 }

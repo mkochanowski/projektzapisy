@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { ThesisKind, thesisKindToString } from "../../../types";
 import { GenericSelect } from "../../GenericSelect";
+import { ReadOnlyInput } from "./ReadOnlyInput";
 
 const kindSelectInfos = [
 	ThesisKind.Masters,
@@ -13,11 +14,18 @@ const kindSelectInfos = [
 
 export type ThesisKindSelectProps = {
 	value: ThesisKind;
+	readOnly: boolean;
 	onChange: (k: ThesisKind) => void;
 };
-export function ThesisKindSelect(props: ThesisKindSelectProps) {
-	return <GenericSelect<ThesisKind>
-		{...props}
+export function ThesisKindField(props: ThesisKindSelectProps) {
+	return props.readOnly
+	? <ReadOnlyInput
+		text={thesisKindToString(props.value)}
+		style={{ width: "210px" }}
+	/>
+	: <GenericSelect<ThesisKind>
+		value={props.value}
+		onChange={props.onChange}
 		optionInfo={kindSelectInfos}
 	/>;
 }
