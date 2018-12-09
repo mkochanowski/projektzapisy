@@ -3,6 +3,7 @@ from enum import Enum
 from django.db import models
 
 from apps.users.models import Employee, Student
+from .validators import validate_num_required_votes
 
 MAX_THESIS_TITLE_LEN = 300
 
@@ -112,7 +113,14 @@ class ThesisVoteBinding(models.Model):
 
 
 class ThesesSystemSettings(models.Model):
-    num_required_votes = models.IntegerField()
+    num_required_votes = models.SmallIntegerField(
+        verbose_name="Liczba głosów wymaganych do zaakceptowania",
+        validators=[validate_num_required_votes]
+    )
+
+    def __str__(self):
+        return "Ustawienia systemu"
 
     class Meta:
+        verbose_name = "ustawienia systemu prac dyplomowych"
         verbose_name_plural = "ustawienia systemu prac dyplomowych"
