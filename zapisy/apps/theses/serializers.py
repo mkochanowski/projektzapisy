@@ -29,6 +29,13 @@ class PersonSerializerForThesis(serializers.Serializer):
         return {"id": person_id}
 
 
+class ThesisVotesSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        return {
+            "bleh": 123
+        }
+
+
 ValidationData = Dict[str, Any]
 
 
@@ -56,6 +63,7 @@ class ThesisSerializer(serializers.ModelSerializer):
     student_2 = PersonSerializerForThesis(allow_null=True, required=False)
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
+    votes = serializers.SerializerMethodField()
 
     def validate(self, data):
         # self.context will not be defined for local serialization
@@ -136,6 +144,9 @@ class ThesisSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+    def get_votes(self, instance):
+        return ThesisVotesSerializer(instance).data
+
     class Meta:
         model = Thesis
         read_only_fields = ('id', )
@@ -143,6 +154,7 @@ class ThesisSerializer(serializers.ModelSerializer):
             'id', 'title', 'advisor', 'auxiliary_advisor',
             'kind', 'reserved', 'description', 'status',
             'student', 'student_2', 'added_date', 'modified_date',
+            'votes',
         )
 
 
