@@ -73,7 +73,9 @@ class Thesis(models.Model):
 
 
 class ThesesBoardMember(models.Model):
-    member = models.ForeignKey(Employee, on_delete=models.PROTECT)
+    member = models.ForeignKey(
+        Employee, on_delete=models.PROTECT, verbose_name="Pracownik",
+    )
 
     class Meta:
         verbose_name = "członek komisji"
