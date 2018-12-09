@@ -6,6 +6,7 @@ import { Thesis, ThesisJson, Student, Employee, BasePerson, AppUser } from "./ty
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 
 const BASE_API_URL = "/theses/api";
+const REST_REQUEST_TIMEOUT = 10000;
 
 export const enum ThesisTypeFilter {
 	AllCurrent,
@@ -21,6 +22,8 @@ export const enum ThesisTypeFilter {
 
 	Default = AllCurrent,
 }
+
+axios.defaults.timeout = REST_REQUEST_TIMEOUT;
 
 async function sendRequestWithCsrf(url: string, config?: AxiosRequestConfig) {
 	const tokenValue = getCookie("csrftoken");
