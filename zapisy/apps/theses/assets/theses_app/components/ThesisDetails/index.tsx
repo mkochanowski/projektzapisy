@@ -12,7 +12,7 @@ import { ThesisVotes } from "./ThesisVotes";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode } from "../../types/misc";
-import { canVote, canModifyThesis } from "../../permissions";
+import { canModifyThesis } from "../../permissions";
 
 const SaveButton = Button.extend`
 	&:disabled:hover {
@@ -42,7 +42,7 @@ width: 100%;
 `;
 
 const LeftDetailsContainer = styled.div`
-width: 100%;
+flex-basis: 85%;
 `;
 
 const RightDetailsContainer = styled.div`
@@ -74,7 +74,6 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	public render() {
 		console.warn("Render details");
 		const { hasUnsavedChanges } = this.props;
-		const showVotes = canVote(this.props.user);
 		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
 
 		return <DetailsSectionWrapper>
@@ -104,14 +103,14 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 						onDescriptionChanged={this.onDescriptionChanged}
 					/>
 				</LeftDetailsContainer>
-				{showVotes || !readOnly ? <RightDetailsContainer>
-					{ showVotes ? <ThesisVotes /> : null }
+				<RightDetailsContainer>
+					<ThesisVotes />
 					{ readOnly ? null : <SaveButton
 						onClick={this.handleSave}
 						disabled={!hasUnsavedChanges}
 						title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
 					>{this.getActionTitle()}</SaveButton> }
-				</RightDetailsContainer> : null}
+				</RightDetailsContainer>
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
 	}

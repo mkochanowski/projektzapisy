@@ -3,11 +3,11 @@ import * as React from "react";
 import styled from "styled-components";
 import {
 	Thesis, ThesisKind, Employee, Student,
-	MAX_THESIS_TITLE_LEN, AppUser, thesisKindToString,
+	MAX_THESIS_TITLE_LEN, AppUser,
 } from "../../../types";
 import { PersonType } from "../../../backend_callers";
-import { PersonSelect } from "./PersonSelect";
-import { ThesisKindSelect } from "./ThesisKindSelect";
+import { PersonField } from "./PersonField";
+import { ThesisKindField } from "./ThesisKindField";
 import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
 import { canSetArbitraryAdvisor, canModifyThesis } from "../../../permissions";
 
@@ -132,17 +132,11 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 		return <tr>
 			<td>Typ</td>
 			<td>
-				{readOnly
-					? <input
-						type={"text"}
-						readOnly
-						value={thesisKindToString(this.props.thesis.kind)}
-					/>
-					: <ThesisKindSelect
-						value={this.props.thesis.kind}
-						onChange={this.props.onKindChanged}
-					/>
-				}
+				<ThesisKindField
+					value={this.props.thesis.kind}
+					readOnly={readOnly}
+					onChange={this.props.onKindChanged}
+				/>
 			</td>
 		</tr>;
 	}
@@ -152,7 +146,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 			<tr>
 				<td>Promotor</td>
 				<td>
-					<PersonSelect
+					<PersonField
 						personType={PersonType.Employee}
 						onChange={this.props.onAdvisorChanged}
 						value={this.props.thesis.advisor}
@@ -171,7 +165,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 				<tr>
 					<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
 					<td>
-						<PersonSelect
+						<PersonField
 							personType={PersonType.Employee}
 							onChange={this.props.onAuxAdvisorChanged}
 							value={this.props.thesis.auxiliaryAdvisor}
@@ -188,7 +182,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 			<tr>
 				<td>Student</td>
 				<td>
-					<PersonSelect
+					<PersonField
 						personType={PersonType.Student}
 						onChange={this.props.onStudentChanged}
 						value={this.props.thesis.student}
@@ -207,7 +201,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 				<tr>
 					<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
 					<td>
-						<PersonSelect
+						<PersonField
 							personType={PersonType.Student}
 							onChange={this.props.onSecondStudentChanged}
 							value={this.props.thesis.secondStudent}
