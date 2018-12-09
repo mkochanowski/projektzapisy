@@ -34,14 +34,6 @@ const OptionalFieldLabel = styled.span`
 font-style: italic;
 `;
 
-function ReadOnlyInput(props: { text: string }) {
-	return <input
-		type={"text"}
-		readOnly
-		value={props.text}
-	/>;
-}
-
 type State = {
 	displayAuxAdvisor: boolean;
 	displayAuxStudent: boolean;
@@ -141,8 +133,10 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 			<td>Typ</td>
 			<td>
 				{readOnly
-					? <ReadOnlyInput
-						text={thesisKindToString(this.props.thesis.kind)}
+					? <input
+						type={"text"}
+						readOnly
+						value={thesisKindToString(this.props.thesis.kind)}
 					/>
 					: <ThesisKindSelect
 						value={this.props.thesis.kind}
@@ -158,18 +152,18 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 			<tr>
 				<td>Promotor</td>
 				<td>
+					<PersonSelect
+						personType={PersonType.Employee}
+						onChange={this.props.onAdvisorChanged}
+						value={this.props.thesis.advisor}
+						readOnly={readOnly || !canSetArbitraryAdvisor(this.props.user)}
+					/>
 					{ readOnly
-						? <ReadOnlyInput text={this.props.thesis.advisor!.displayName}/>
-						: <><PersonSelect
-							personType={PersonType.Employee}
-							onChange={this.props.onAdvisorChanged}
-							value={this.props.thesis.advisor}
-							enabled={canSetArbitraryAdvisor(this.props.user)}
-						/>
-						<AddRemoveIcon
+						? null
+						: <AddRemoveIcon
 							onClick={this.triggerAuxAdvVisibility}
 							type={this.state.displayAuxAdvisor ? IconType.Remove : IconType.Add}
-						/></>
+						/>
 					}
 				</td>
 			</tr>
@@ -181,6 +175,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 							personType={PersonType.Employee}
 							onChange={this.props.onAuxAdvisorChanged}
 							value={this.props.thesis.auxiliaryAdvisor}
+							readOnly={readOnly}
 						/>
 					</td>
 				</tr>
@@ -188,7 +183,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 		</>;
 	}
 
-	private renderStudents(_readOnly: boolean) {
+	private renderStudents(readOnly: boolean) {
 		return <>
 			<tr>
 				<td>Student</td>
@@ -197,11 +192,15 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 						personType={PersonType.Student}
 						onChange={this.props.onStudentChanged}
 						value={this.props.thesis.student}
+						readOnly={readOnly}
 					/>
-					<AddRemoveIcon
-						onClick={this.triggerSecondStudentVisibility}
-						type={this.state.displayAuxStudent ? IconType.Remove : IconType.Add}
-					/>
+					{ readOnly
+						? null
+						: <AddRemoveIcon
+							onClick={this.triggerSecondStudentVisibility}
+							type={this.state.displayAuxStudent ? IconType.Remove : IconType.Add}
+						/>
+					}
 				</td>
 			</tr>
 			{ this.state.displayAuxStudent ? (
@@ -212,6 +211,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 							personType={PersonType.Student}
 							onChange={this.props.onSecondStudentChanged}
 							value={this.props.thesis.secondStudent}
+							readOnly={readOnly}
 						/>
 					</td>
 				</tr>

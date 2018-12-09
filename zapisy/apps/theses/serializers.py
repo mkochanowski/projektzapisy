@@ -21,6 +21,7 @@ class PersonSerializerForThesis(serializers.Serializer):
         }
 
     def to_internal_value(self, data):
+        print("TO_INTERNAL_VALUE", data)
         person_id = data.get("id")
         if type(person_id) is not int or person_id < 0:
             raise serializers.ValidationError({
@@ -74,7 +75,7 @@ class ThesisSerializer(serializers.ModelSerializer):
 
     def validate_add_thesis(self, user: BaseUser, data: ValidationData):
         user_type = get_user_type(user)
-        advisor = get_person(Employee, data["advisor"])
+        advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
         validate_advisor(user, user_type, advisor)
         status = data["status"]
         if not can_set_status(user_type, ThesisStatus(status)):
@@ -148,7 +149,7 @@ class ThesisSerializer(serializers.ModelSerializer):
 
 def get_person(queryset, person_data):
     try:
-        return queryset.objects.get(pk=person_data.get("id"))
+        return queryset.objects.get(pk=person_data.get("id")) if person_data else None
     except queryset.DoesNotExist:
         raise InvalidQueryError("Bad person ID specified")
 

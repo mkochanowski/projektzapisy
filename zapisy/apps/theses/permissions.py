@@ -36,5 +36,8 @@ def can_modify_status(user_type: ThesisUserType):
 
 
 def can_set_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employee):
+    """
+    Is the specified user permitted to set the given advisor (may be None)?
+    """
     user_type = get_user_type(user)
-    return is_thesis_staff(user_type) or user.pk == advisor.pk
+    return is_thesis_staff(user_type) or advisor and user.pk == advisor.pk
