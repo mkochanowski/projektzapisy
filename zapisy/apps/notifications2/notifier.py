@@ -12,5 +12,5 @@ def notify_that_user_was_pulled_from_queue(user: User, group) -> None:
     notify_user(user, "pulled_from_queue", {
         "course_name": group.course.information.entity.name,
         "teacher": group.teacher.user.get_full_name(),
-        "type": group_types[group.type]
+        "type": group_types[str(group.type)]
     })
