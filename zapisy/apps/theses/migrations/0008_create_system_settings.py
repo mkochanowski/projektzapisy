@@ -20,6 +20,12 @@ def create_thesis_settings(apps, schema_editor):
     )
 
 
+def remove_system_settings(apps, schema_editor):
+    ThesesSystemSettings = apps.get_model("theses", "ThesesSystemSettings")
+    db_alias = schema_editor.connection.alias
+    ThesesSystemSettings.objects.using(db_alias).all().delete()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -27,5 +33,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_thesis_settings)
+        migrations.RunPython(create_thesis_settings, remove_system_settings)
     ]

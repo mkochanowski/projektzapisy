@@ -6,7 +6,6 @@ from apps.users.models import Employee, Student
 from .validators import validate_num_required_votes
 
 MAX_THESIS_TITLE_LEN = 300
-THESIS_BOARD_MEMBER_GROUP_NAME = "thesis_board_member"
 
 
 class ThesisKind(Enum):
@@ -74,23 +73,6 @@ class Thesis(models.Model):
         verbose_name_plural = "prace dyplomowe"
 
 
-class ThesesBoardMember(models.Model):
-    member = models.OneToOneField(
-        Employee, on_delete=models.PROTECT, verbose_name="Pracownik",
-    )
-
-    class Meta:
-        verbose_name = "członek komisji"
-        verbose_name_plural = "członkowie komisji"
-
-    def __str__(self):
-        return str(self.member)
-
-
-def is_theses_board_member(emp: Employee) -> bool:
-    return ThesesBoardMember.objects.filter(member=emp.pk).exists()
-
-
 class ThesisVote(Enum):
     none = 1
     rejected = 2
@@ -115,7 +97,7 @@ def vote_to_string(vote_value):
 
 class ThesisVoteBinding(models.Model):
     thesis = models.ForeignKey(Thesis, on_delete=models.CASCADE, related_name="votes")
-    # should be a member of the theses board
+    # should be a member of the theses board group
     voter = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name="thesis_votes")
     value = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
 

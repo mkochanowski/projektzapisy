@@ -5,10 +5,9 @@ from rest_framework import serializers
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus
 from .errors import InvalidQueryError
-from .user_type import get_user_type, ThesisUserType
+from .users import get_user_type, ThesisUserType
 from .permissions import can_set_status, can_set_advisor, can_modify_status
 from .utils import wrap_user
-import random
 
 
 class PersonSerializerForThesis(serializers.Serializer):
