@@ -8,6 +8,7 @@ from .errors import InvalidQueryError
 from .user_type import get_user_type, ThesisUserType
 from .permissions import can_set_status, can_set_advisor, can_modify_status
 from .utils import wrap_user
+import random
 
 
 class PersonSerializerForThesis(serializers.Serializer):
@@ -29,11 +30,9 @@ class PersonSerializerForThesis(serializers.Serializer):
         return {"id": person_id}
 
 
-class ThesisVotesSerializer(serializers.Serializer):
-    def to_representation(self, instance):
-        return {
-            "bleh": 123
-        }
+def serialize_thesis_votes(thesis: Thesis):
+    vote_tpls = ((vote.voter.pk, vote.value) for vote in thesis.votes.all())
+    return dict(vote_tpls)
 
 
 ValidationData = Dict[str, Any]
@@ -145,7 +144,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         return instance
 
     def get_votes(self, instance):
-        return ThesisVotesSerializer(instance).data
+        return serialize_thesis_votes(instance)
 
     class Meta:
         model = Thesis

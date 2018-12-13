@@ -18,17 +18,21 @@ from .utils import wrap_user
 class ThesesViewSet(viewsets.ModelViewSet):
     # NOTICE if you change this, you might also want to change the permission class
     http_method_names = ["patch", "get", "post"]
-    permission_classes = (ThesisPermissions,)
+    #permission_classes = (ThesisPermissions,)
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):
-        result = Thesis.objects.select_related(
-            *fields_for_prefetching("student"),
-            *fields_for_prefetching("student_2"),
-            *fields_for_prefetching("advisor"),
-            *fields_for_prefetching("auxiliary_advisor"),
-        ).all()
-        return result.order_by("-added_date")
+        return Thesis.objects\
+            .order_by("-added_date")\
+            .select_related(
+                *fields_for_prefetching("student"),
+                *fields_for_prefetching("student_2"),
+                *fields_for_prefetching("advisor"),
+                *fields_for_prefetching("auxiliary_advisor"),
+            )\
+            .prefetch_related("votes")\
+            .prefetch_related("votes__voter")\
+            .all()
 
 
 def fields_for_prefetching(base_field: str) -> List[str]:
