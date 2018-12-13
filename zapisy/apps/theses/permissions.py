@@ -1,7 +1,7 @@
 from apps.users.models import Employee, BaseUser
 
 from .models import Thesis, ThesisStatus
-from .user_type import ThesisUserType, get_user_type
+from .users import ThesisUserType, get_user_type
 
 
 def is_thesis_staff(user_type: ThesisUserType) -> bool:

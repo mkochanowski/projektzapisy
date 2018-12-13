@@ -72,23 +72,6 @@ class Thesis(models.Model):
         verbose_name_plural = "prace dyplomowe"
 
 
-class ThesesBoardMember(models.Model):
-    member = models.ForeignKey(
-        Employee, on_delete=models.PROTECT, verbose_name="Pracownik",
-    )
-
-    class Meta:
-        verbose_name = "członek komisji"
-        verbose_name_plural = "członkowie komisji"
-
-    def __str__(self):
-        return str(self.member)
-
-
-def is_theses_board_member(emp: Employee) -> bool:
-    return ThesesBoardMember.objects.filter(member=emp.pk).exists()
-
-
 class ThesisVote(Enum):
     none = 1
     rejected = 2
@@ -104,11 +87,21 @@ THESIS_VOTE_CHOICES = (
 )
 
 
+def vote_to_string(vote_value):
+    for value, vote_string in THESIS_VOTE_CHOICES:
+        if value == vote_value:
+            return vote_string
+    return ""
+
+
 class ThesisVoteBinding(models.Model):
-    thesis = models.ForeignKey(Thesis, on_delete=models.CASCADE)
-    # should be a member of the theses board
-    voter = models.ForeignKey(Employee, on_delete=models.PROTECT)
-    vote = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
+    thesis = models.ForeignKey(Thesis, on_delete=models.CASCADE, related_name="votes")
+    # should be a member of the theses board group
+    voter = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name="thesis_votes")
+    value = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
+
+    def __str__(self):
+        return f'Głos {self.voter} na {self.thesis} - {vote_to_string(self.value)}'
 
 
 class ThesesSystemSettings(models.Model):

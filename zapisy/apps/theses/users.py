@@ -1,7 +1,17 @@
 from enum import Enum
 
-from apps.users.models import BaseUser, Employee, Student
-from . import models
+from django.contrib.auth.models import Group
+from apps.users.models import BaseUser, Employee, Student, is_user_in_group
+
+THESIS_BOARD_MEMBER_GROUP_NAME = "Członek komisji prac dyplomowych"
+
+
+def is_theses_board_member(user: BaseUser) -> bool:
+    return is_user_in_group(user.user, THESIS_BOARD_MEMBER_GROUP_NAME)
+
+
+def get_num_board_members() -> int:
+    return Group.objects.filter(name=THESIS_BOARD_MEMBER_GROUP_NAME).count()
 
 
 class ThesisUserType(Enum):
@@ -18,7 +28,7 @@ def get_user_type(base_user: BaseUser) -> ThesisUserType:
             return ThesisUserType.admin
         return (
             ThesisUserType.theses_board_member
-            if models.is_theses_board_member(base_user)
+            if is_theses_board_member(base_user)
             else ThesisUserType.employee
         )
     elif isinstance(base_user, Student):

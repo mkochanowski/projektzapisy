@@ -10,9 +10,6 @@ class ThesisAdmin(admin.ModelAdmin):
 admin.site.register(models.Thesis, ThesisAdmin)
 
 
-admin.site.register(models.ThesesBoardMember)
-
-
 class ThesesSystemSettingsAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
