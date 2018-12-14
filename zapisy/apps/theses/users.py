@@ -3,15 +3,15 @@ from enum import Enum
 from django.contrib.auth.models import Group
 from apps.users.models import BaseUser, Employee, Student, is_user_in_group
 
-THESIS_BOARD_MEMBER_GROUP_NAME = "Członek komisji prac dyplomowych"
+THESIS_BOARD_GROUP_NAME = "Komisja prac dyplomowych"
 
 
 def is_theses_board_member(user: BaseUser) -> bool:
-    return is_user_in_group(user.user, THESIS_BOARD_MEMBER_GROUP_NAME)
+    return is_user_in_group(user.user, THESIS_BOARD_GROUP_NAME)
 
 
 def get_num_board_members() -> int:
-    return Group.objects.filter(name=THESIS_BOARD_MEMBER_GROUP_NAME).count()
+    return Group.objects.filter(name=THESIS_BOARD_GROUP_NAME).count()
 
 
 class ThesisUserType(Enum):
