@@ -2,7 +2,7 @@ import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";
 
-import { Thesis, ThesisJson, Student, Employee, BasePerson, AppUser } from "./types";
+import { Thesis, ThesisJson, Student, Employee, BasePerson, AppUser, PersonJson } from "./types";
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 
 const BASE_API_URL = "/theses/api";
@@ -52,6 +52,15 @@ export async function getThesesList(
 export async function getThesisById(id: number): Promise<Thesis> {
 	const json: ThesisJson = await getData(`${BASE_API_URL}/theses/${id}`);
 	return new Thesis(json);
+}
+
+export async function getCurrentUser(): Promise<AppUser> {
+	return new AppUser(await getData(`${BASE_API_URL}/current_user`));
+}
+
+export async function getThesesBoard() {
+	const json: PersonJson[] = await getData(`${BASE_API_URL}/theses_board`);
+	return json.map(pj => Employee.fromJson(pj) as Employee);
 }
 
 export const enum PersonType {
@@ -121,8 +130,4 @@ export async function saveNewThesis(thesis: Thesis): Promise<number> {
 		},
 	);
 	return (res.data as ThesisJson).id;
-}
-
-export async function getCurrentUser(): Promise<AppUser> {
-	return new AppUser(await getData(`${BASE_API_URL}/current_user`));
 }

@@ -55,6 +55,7 @@ margin-left: 20px;
 type Props = {
 	thesis: Thesis;
 	thesesList: Thesis[];
+	thesesBoard: Employee[],
 	isSaving: boolean;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
@@ -73,46 +74,64 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	public render() {
 		console.warn("Render details");
-		const { hasUnsavedChanges } = this.props;
-		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
 
 		return <DetailsSectionWrapper>
 			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
 			<MainDetailsContainer
 				style={this.props.isSaving ? getDisabledStyle() : {}}
 			>
-				<LeftDetailsContainer>
-					<ThesisTopRow
-						thesis={this.props.thesis}
-						mode={this.props.mode}
-						user={this.props.user}
-						onReservationChanged={this.onReservationChanged}
-						onDateChanged={this.onDateUpdatedChanged}
-						onStatusChanged={this.onStatusChanged}
-					/>
-					<ThesisMiddleForm
-						thesis={this.props.thesis}
-						titleError={this.state.hasTitleError}
-						user={this.props.user}
-						onTitleChanged={this.onTitleChanged}
-						onKindChanged={this.onKindChanged}
-						onAdvisorChanged={this.onAdvisorChanged}
-						onAuxAdvisorChanged={this.onAuxAdvisorChanged}
-						onStudentChanged={this.onStudentChanged}
-						onSecondStudentChanged={this.onSecondStudentChanged}
-						onDescriptionChanged={this.onDescriptionChanged}
-					/>
-				</LeftDetailsContainer>
-				<RightDetailsContainer>
-					<ThesisVotes />
-					{ readOnly ? null : <SaveButton
-						onClick={this.handleSave}
-						disabled={!hasUnsavedChanges}
-						title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
-					>{this.getActionTitle()}</SaveButton> }
-				</RightDetailsContainer>
+				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
+				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
+	}
+
+	private renderThesisLeftPanel() {
+		return <>
+			<ThesisTopRow
+				thesis={this.props.thesis}
+				mode={this.props.mode}
+				user={this.props.user}
+				onReservationChanged={this.onReservationChanged}
+				onDateChanged={this.onDateUpdatedChanged}
+				onStatusChanged={this.onStatusChanged}
+			/>
+			<ThesisMiddleForm
+				thesis={this.props.thesis}
+				titleError={this.state.hasTitleError}
+				user={this.props.user}
+				onTitleChanged={this.onTitleChanged}
+				onKindChanged={this.onKindChanged}
+				onAdvisorChanged={this.onAdvisorChanged}
+				onAuxAdvisorChanged={this.onAuxAdvisorChanged}
+				onStudentChanged={this.onStudentChanged}
+				onSecondStudentChanged={this.onSecondStudentChanged}
+				onDescriptionChanged={this.onDescriptionChanged}
+			/>
+		</>;
+	}
+
+	private renderThesisRightPanel() {
+		return <>
+			<ThesisVotes
+				thesis={this.props.thesis}
+				thesesBoard={this.props.thesesBoard}
+			/>
+			{this.renderSaveButton()}
+		</>;
+	}
+
+	private renderSaveButton() {
+		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
+		if (readOnly) {
+			return null;
+		}
+		const { hasUnsavedChanges } = this.props;
+		return <SaveButton
+			onClick={this.handleSave}
+			disabled={!hasUnsavedChanges}
+			title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
+		>{this.getActionTitle()}</SaveButton>;
 	}
 
 	private getActionTitle() {

@@ -2,8 +2,10 @@ import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
-import { Thesis, UserType, AppUser } from "../types";
-import { getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser } from "../backend_callers";
+import { Thesis, UserType, AppUser, Employee } from "../types";
+import {
+	getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser, getThesesBoard
+} from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";
 import { ThesesTable } from "./ThesesTable";
@@ -19,6 +21,7 @@ type State = {
 	} | null;
 
 	thesesList: Thesis[];
+	thesesBoard: Employee[];
 	applicationState: ApplicationState;
 	fetchError: Error | null;
 	wasTitleInvalid: boolean;
@@ -30,6 +33,7 @@ const initialState: State = {
 	thesis: null,
 
 	thesesList: [],
+	thesesBoard: [],
 	applicationState: ApplicationState.InitialLoading,
 	fetchError: null,
 	wasTitleInvalid: false,
@@ -44,6 +48,7 @@ export class ThesesApp extends React.Component<Props, State> {
 	async componentDidMount() {
 		this.setState({
 			thesesList: await this.safeGetTheses(),
+			thesesBoard: await getThesesBoard(),
 			user: await getCurrentUser(),
 			applicationState: ApplicationState.Normal,
 		});
@@ -89,6 +94,7 @@ export class ThesesApp extends React.Component<Props, State> {
 				<ThesisDetails
 					thesis={thesis.mutable}
 					thesesList={this.state.thesesList}
+					thesesBoard={this.state.thesesBoard}
 					isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
 					hasUnsavedChanges={this.hasUnsavedChanges()}
 					mode={this.state.workMode!}

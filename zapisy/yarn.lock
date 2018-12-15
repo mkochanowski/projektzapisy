@@ -5109,6 +5109,11 @@ react-table@^6.8.6:
   dependencies:
     classnames "^2.2.5"
 
+react-three-state-checkbox@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/react-three-state-checkbox/-/react-three-state-checkbox-1.2.2.tgz#0de34aa1380d93f3106748864e247f9fc75ba92d"
+  integrity sha512-bTdBci9xJ0Rpo17+/JjtLKzqeZTExM+eZ2gfO5f5MwZYMP8Qu1gYdWeMf3yx3Dk2YUfAJcReE2LhGXHYmoykCA==
+
 react-virtualized@^9.21.0:
   version "9.21.0"
   resolved "https://registry.yarnpkg.com/react-virtualized/-/react-virtualized-9.21.0.tgz#8267c40ffb48db35b242a36dea85edcf280a6506"

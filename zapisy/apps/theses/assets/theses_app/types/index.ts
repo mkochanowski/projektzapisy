@@ -46,7 +46,7 @@ export const enum ThesisVote {
 	UserMissing = 4,
 }
 
-type PersonJson = {
+export type PersonJson = {
 	id: number;
 	display_name: string;
 };

@@ -19,7 +19,8 @@
       "react-dom",
       "react-table",
       "js-cookie",
-      "react-virtualized"
+      "react-virtualized",
+      "Checkbox",
     ]
   },
   "exclude": [
