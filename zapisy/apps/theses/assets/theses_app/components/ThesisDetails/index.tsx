@@ -1,7 +1,7 @@
 import * as React from "react";
 import Button from "react-button-component";
 import styled from "styled-components";
-import update, { Query } from "immutability-helper";
+import update from "immutability-helper";
 import { Moment } from "moment";
 
 import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser } from "../../types";
@@ -123,7 +123,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 		return this.props.mode === ThesisWorkMode.Adding ? "Dodaj nową pracę" : "Zapisz zmiany";
 	}
 
-	private updateThesisState(updateObject: Query<Thesis>) {
+	private updateThesisState(updateObject: object) {
 		this.props.onThesisModified(
 			update(this.props.thesis, updateObject)
 		);

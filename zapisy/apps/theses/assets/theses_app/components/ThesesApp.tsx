@@ -39,7 +39,7 @@ const initialState: State = {
 
 export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
-	private oldOnBeforeUnload: ((this: Window, ev: BeforeUnloadEvent) => any) | null = null;
+	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
 
 	async componentDidMount() {
 		this.setState({
@@ -110,12 +110,19 @@ export class ThesesApp extends React.Component<Props, State> {
 			}
 		/>;
 	}
-	private setStateWithNewThesis<K extends keyof State>
-	(state: Pick<State, K> | State | null, t: Thesis | null) {
-		const thesisState = {
+
+	// properly typing setState in TS is nontrivial because of a peculiarity
+	// of the type system: there is no distinction between absent keys
+	// and keys with `undefined` as their value; for this reason the React
+	// .d.ts files hack around using Pick<State, K>, but this doesn't work
+	// for multiple levels (i.e. if this function's state argument has the same
+	// type as React's setState argument definition, it will not work anyway)
+	// for this reason we simply use Partial<State> and cast it later
+	private setStateWithNewThesis(state: Partial<State>, t: Thesis | null) {
+		const finalState = Object.assign({
 			thesis: t ? { original: t, mutable: clone(t) } : null,
-		};
-		this.setState(Object.assign(thesisState, state));
+		}, state);
+		this.setState(finalState as State);
 	}
 
 	private async safeGetTheses() {
