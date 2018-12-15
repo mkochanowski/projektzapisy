@@ -13,12 +13,13 @@ from .models import Thesis
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
 from .utils import wrap_user
+from .users import get_theses_board
 
 
 class ThesesViewSet(viewsets.ModelViewSet):
     # NOTICE if you change this, you might also want to change the permission class
     http_method_names = ["patch", "get", "post"]
-    #permission_classes = (ThesisPermissions,)
+    permission_classes = (ThesisPermissions,)
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):
@@ -37,6 +38,15 @@ class ThesesViewSet(viewsets.ModelViewSet):
 
 def fields_for_prefetching(base_field: str) -> List[str]:
     return [base_field, f'{base_field}__user']
+
+
+class ThesesBoardViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get"]
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = serializers.PersonSerializerForThesis
+
+    def get_queryset(self):
+        return get_theses_board()
 
 
 @api_view()
