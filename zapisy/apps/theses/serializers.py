@@ -3,9 +3,8 @@ from typing import Dict, Any
 from rest_framework import serializers
 
 from apps.users.models import Employee, Student, BaseUser
-from .models import Thesis, ThesisStatus
-from .errors import InvalidQueryError
-from .users import get_user_type, ThesisUserType
+from .models import Thesis, ThesisStatus, ThesisVote
+from .users import get_user_type, ThesisUserType, is_theses_board_member
 from .permissions import can_set_status, can_set_advisor, can_modify_status
 from .utils import wrap_user
 
@@ -30,7 +29,11 @@ class PersonSerializerForThesis(serializers.Serializer):
 
 
 def serialize_thesis_votes(thesis: Thesis):
-    vote_tpls = ((vote.voter.pk, vote.value) for vote in thesis.votes.all())
+    vote_tpls = (
+        (vote.voter.pk, vote.value)
+        for vote in thesis.votes.all()
+        if vote.value != ThesisVote.none.value
+    )
     return dict(vote_tpls)
 
 
@@ -42,13 +45,43 @@ def copy_if_present(dst, src, key, converter=None):
         dst[key] = converter(src[key]) if converter else src[key]
 
 
+def get_person(queryset, person_data):
+    try:
+        return queryset.objects.get(pk=person_data.get("id")) if person_data else None
+    except queryset.DoesNotExist:
+        raise serializers.ValidationError("bad person ID specified")
+
+
 def validate_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employee):
     if not can_set_advisor(user, user_type, advisor):
         raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
 
 
+def validate_thesis_vote(value):
+    return value in [vote.value for vote in ThesisVote]    
+
+
+def validate_votes(votes):
+    if type(votes) is not dict:
+        raise serializers.ValidationError("\"votes\" must be an object")
+    result = []
+    for id, value in votes.items():
+        if not validate_thesis_vote(value):
+            raise serializers.ValidationError("invalid thesis vote value")
+        try:
+            voter_id = int(id)
+            voter = Employee.objects.get(pk=voter_id)
+            if not is_theses_board_member(voter):
+                raise serializers.ValidationError("voter is not a member of the theses board")
+            result.append((voter, ThesisVote(value)))
+        except: # noqa:E722
+            raise serializers.ValidationError("bad voter id")
+    return result
+
+
 def copy_optional_fields(result, data):
     copy_if_present(result, data, "description")
+    copy_if_present(result, data, "votes", validate_votes)
     copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
     copy_if_present(result, data, "student", lambda s: get_person(Student, s))
     copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
@@ -62,6 +95,12 @@ class ThesisSerializer(serializers.ModelSerializer):
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
     votes = serializers.SerializerMethodField()
+
+    def to_internal_value(self, data):
+        result = super().to_internal_value(data)
+        if "votes" in data:
+            result["votes"] = data["votes"]
+        return result
 
     def validate(self, data):
         # self.context will not be defined for local serialization
@@ -115,7 +154,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         return result
 
     def create(self, validated_data):
-        return Thesis.objects.create(
+        new_instance = Thesis.objects.create(
             title=validated_data.get("title"),
             kind=validated_data.get("kind"),
             status=validated_data.get("status"),
@@ -126,6 +165,9 @@ class ThesisSerializer(serializers.ModelSerializer):
             student=validated_data.get("student"),
             student_2=validated_data.get("student_2"),
         )
+        if "votes" in validated_data:
+            new_instance.process_new_votes(validated_data["votes"])
+        return new_instance
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get("title", instance.title)
@@ -140,6 +182,8 @@ class ThesisSerializer(serializers.ModelSerializer):
         instance.student = validated_data.get("student", instance.student)
         instance.student_2 = validated_data.get("student_2", instance.student_2)
         instance.save()
+        if "votes" in validated_data:
+            instance.process_new_votes(validated_data["votes"])
         return instance
 
     def get_votes(self, instance):
@@ -154,13 +198,6 @@ class ThesisSerializer(serializers.ModelSerializer):
             'student', 'student_2', 'added_date', 'modified_date',
             'votes',
         )
-
-
-def get_person(queryset, person_data):
-    try:
-        return queryset.objects.get(pk=person_data.get("id")) if person_data else None
-    except queryset.DoesNotExist:
-        raise InvalidQueryError("Bad person ID specified")
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):

@@ -1,8 +1,7 @@
-from .models import ThesesSystemSettings
-
+from . import models
 
 def _get_settings():
-    return ThesesSystemSettings.objects.get()
+    return models.ThesesSystemSettings.objects.get()
 
 
 def get_num_required_votes():

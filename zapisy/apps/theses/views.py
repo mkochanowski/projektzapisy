@@ -49,7 +49,7 @@ class ThesesBoardViewSet(viewsets.ModelViewSet):
         return get_theses_board()
 
 
-@api_view()
+@api_view(http_method_names=["get"])
 @permission_classes((permissions.IsAuthenticated,))
 def get_current_user(request):
     wrapped_user = wrap_user(request.user)

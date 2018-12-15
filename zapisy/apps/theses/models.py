@@ -4,6 +4,7 @@ from django.db import models
 
 from apps.users.models import Employee, Student
 from .validators import validate_num_required_votes
+from .system_settings import get_num_required_votes
 
 MAX_THESIS_TITLE_LEN = 300
 
@@ -64,6 +65,34 @@ class Thesis(models.Model):
     )
     added_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    def process_new_votes(self, votes):
+        had_rejection = False
+        had_approval = False
+        for voter, vote in votes:
+            try:
+                existing_vote = ThesisVoteBinding.objects.get(thesis=self, voter=voter)
+                existing_vote.value = vote.value
+                existing_vote.save()
+                if vote == ThesisVote.rejected:
+                    had_rejection = True
+                elif vote == ThesisVote.accepted:
+                    had_approval = True
+            except ThesisVoteBinding.DoesNotExist:
+                ThesisVoteBinding.objects.create(thesis=self, voter=voter, value=vote.value)
+        if had_approval:
+            self.check_for_approval_status_change()
+        elif had_rejection:
+            self.status = ThesisStatus.returned_for_corrections.value
+            self.save()
+
+    def check_for_approval_status_change(self):
+        approve_votes_cnt = ThesisVoteBinding.objects.filter(
+            thesis=self, value=ThesisVote.accepted.value
+        ).count()
+        if approve_votes_cnt >= get_num_required_votes():
+            self.status = ThesisStatus.accepted.value
+            self.save()
 
     def __str__(self):
         return self.title

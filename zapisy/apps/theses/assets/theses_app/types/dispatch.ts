@@ -1,6 +1,6 @@
 // Types we'll be dispatching to the Python backend to perform changes
 
-import { ThesisKind, ThesisStatus, Thesis, BasePerson, MAX_THESIS_TITLE_LEN } from ".";
+import { ThesisKind, ThesisStatus, Thesis, BasePerson, MAX_THESIS_TITLE_LEN, VoteMap } from ".";
 
 export type PersonDispatch = {
 	id: number;
@@ -16,6 +16,7 @@ export type ThesisAddDispatch = {
 	status?: ThesisStatus;
 	student?: PersonDispatch | null;
 	student_2?: PersonDispatch | null;
+	votes?: VoteMap;
 };
 
 export type ThesisModDispatch = {
@@ -86,6 +87,15 @@ export function getThesisModDispatch(orig: Thesis, mod: Thesis): ThesisModDispat
 	}
 	if (orig.status !== mod.status) {
 		result.status = mod.status;
+	}
+
+	const votesDiff = Object.keys(mod.votes)
+		.map(Number)
+		.reduce((acc, id) => (
+			orig.votes[id] === mod.votes[id] ? acc : (acc[id] = mod.votes[id], acc)
+		), {} as VoteMap);
+	if (Object.keys(votesDiff).length) {
+		result.votes = votesDiff;
 	}
 
 	return result;

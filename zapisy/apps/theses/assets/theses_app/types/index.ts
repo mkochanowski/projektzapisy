@@ -70,7 +70,7 @@ export class BasePerson {
 	}
 }
 
-type VoteMap = { [id: number]: ThesisVote };
+export type VoteMap = { [id: number]: ThesisVote };
 
 export class Employee extends BasePerson {}
 export class Student extends BasePerson {}
@@ -177,7 +177,7 @@ export class Thesis {
 		);
 	}
 
-	private onlyDefiniteVotes(): VoteMap {
+	public onlyDefiniteVotes(): VoteMap {
 		return Object.keys(this.votes)
 			.map(Number)
 			.filter(id => this.votes[id] !== ThesisVote.None)
