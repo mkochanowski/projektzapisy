@@ -1,5 +1,6 @@
 // Must match values/structures defined in the Python backend
 import * as moment from "moment";
+import { isEqual } from "lodash";
 
 export const MAX_THESIS_TITLE_LEN = 300;
 
@@ -69,6 +70,8 @@ export class BasePerson {
 	}
 }
 
+type VoteMap = { [id: number]: ThesisVote };
+
 export class Employee extends BasePerson {}
 export class Student extends BasePerson {}
 
@@ -85,7 +88,7 @@ export type ThesisJson = {
 	student_2?: PersonJson;
 	added_date: string;
 	modified_date: string;
-	votes: { [id: number]: ThesisVote };
+	votes: VoteMap;
 };
 
 export class Thesis {
@@ -101,7 +104,7 @@ export class Thesis {
 	public secondStudent: Student | null;
 	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
-	public votes: { [id: number]: ThesisVote };
+	public votes: VoteMap;
 
 	public constructor(json?: ThesisJson) {
 		if (json) {
@@ -162,7 +165,8 @@ export class Thesis {
 			this.kind === other.kind &&
 			this.reserved === other.reserved &&
 			this.status === other.status &&
-			this.modifiedDate.isSame(other.modifiedDate)
+			this.modifiedDate.isSame(other.modifiedDate) &&
+			isEqual(this.onlyDefiniteVotes(), other.onlyDefiniteVotes())
 		);
 	}
 
@@ -171,6 +175,13 @@ export class Thesis {
 			p1 === null && p2 === null ||
 			p1 !== null && p2 !== null && p1.isEqual(p2)
 		);
+	}
+
+	private onlyDefiniteVotes(): VoteMap {
+		return Object.keys(this.votes)
+			.map(Number)
+			.filter(id => this.votes[id] !== ThesisVote.None)
+			.reduce((acc, id) => (acc[id] = this.votes[id], acc), {} as VoteMap);
 	}
 }
 

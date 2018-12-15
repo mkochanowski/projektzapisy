@@ -11,12 +11,10 @@ type Props = {
 const voteCycle = [ThesisVote.None, ThesisVote.Accepted, ThesisVote.Rejected];
 
 export function SingleVote(props: Props) {
-	return <VoteContainer>
-		<VoteIndicatorContainer
-			onClick={() => props.onChange(nextValue(props.value))}
-		>
-			{indicatorForValue(props.value)}
-		</VoteIndicatorContainer>
+	return <VoteContainer
+		onClick={() => props.onChange(nextValue(props.value))}
+	>
+		<VoteIndicatorContainer>{indicatorForValue(props.value)}</VoteIndicatorContainer>
 		<VoteLabel>{props.voter.displayName.split(" ")[0]}</VoteLabel>
 	</VoteContainer>;
 }
@@ -36,14 +34,14 @@ function nextValue(value: ThesisVote) {
 }
 
 const VoteIndicatorContainer = styled.span`
-	user-select: none;
-	cursor: pointer;
 	width: 18px;
 	display: inline-block;
 `;
 
 const VoteContainer = styled.div`
 	margin-bottom: 5px;
+	user-select: none;
+	cursor: pointer;
 `;
 
 const VoteLabel = styled.span`
