@@ -7,6 +7,7 @@ import styled from "styled-components";
 type Props = {
 	thesis: Thesis,
 	thesesBoard: Employee[],
+	onChange: (member: Employee, newValue: ThesisVote) => void;
 };
 
 export function ThesisVotes(props: Props) {
@@ -14,20 +15,24 @@ export function ThesisVotes(props: Props) {
 		<SingleVote
 			key={i}
 			voter={emp}
-			value={ThesisVote.None}
+			value={props.thesis.votes[emp.id] || ThesisVote.None}
+			onChange={nv => props.onChange(emp, nv)}
 		/>
 	));
-	return <div>
+	return <VotesContainer>
 		<Header>Głosy</Header>
 		{votes}
-	</div>;
+	</VotesContainer>;
 }
 
 const Header = styled.div`
-	width: 100%;
-	text-align: center;
 	font-weight: bold;
 	font-size: 16px;
 	color: black;
 	margin-bottom: 15px;
+`;
+
+const VotesContainer = styled.div`
+	text-align: center;
+	width: 100%;
 `;

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import update from "immutability-helper";
 import { Moment } from "moment";
 
-import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser } from "../../types";
+import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser, ThesisVote } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
@@ -116,6 +116,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 			<ThesisVotes
 				thesis={this.props.thesis}
 				thesesBoard={this.props.thesesBoard}
+				onChange={this.onVoteChanged}
 			/>
 			{this.renderSaveButton()}
 		</>;
@@ -187,6 +188,13 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	private onDescriptionChanged = (newDesc: string): void => {
 		this.updateThesisState({ description: { $set: newDesc } });
+	}
+
+	private onVoteChanged = (voter: Employee, newValue: ThesisVote): void => {
+		const newVotes = Object.assign({}, this.props.thesis.votes, {
+			[voter.id]: newValue,
+		});
+		this.updateThesisState({ votes: { $set: newVotes } });
 	}
 
 	private validateBeforeSave() {

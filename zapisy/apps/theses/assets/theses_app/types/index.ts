@@ -85,6 +85,7 @@ export type ThesisJson = {
 	student_2?: PersonJson;
 	added_date: string;
 	modified_date: string;
+	votes: { [id: number]: ThesisVote };
 };
 
 export class Thesis {
@@ -100,6 +101,7 @@ export class Thesis {
 	public secondStudent: Student | null;
 	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
+	public votes: { [id: number]: ThesisVote };
 
 	public constructor(json?: ThesisJson) {
 		if (json) {
@@ -122,6 +124,7 @@ export class Thesis {
 		this.secondStudent = json.student_2 ? Employee.fromJson(json.student_2) : null;
 		this.addedDate = moment(json.added_date);
 		this.modifiedDate = moment(json.modified_date);
+		this.votes = json.votes;
 	}
 
 	private initNewThesis() {
@@ -137,6 +140,7 @@ export class Thesis {
 		this.secondStudent = null;
 		this.addedDate = moment();
 		this.modifiedDate = moment();
+		this.votes = {};
 	}
 
 	public isEqual = (other: Thesis): boolean => {
