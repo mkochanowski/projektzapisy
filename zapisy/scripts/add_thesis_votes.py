@@ -1,18 +1,21 @@
 import random
-from apps.theses.models import (
-    Thesis, ThesisVoteBinding, ThesesBoardMember
-)
+from apps.theses.models import Thesis, ThesisVoteBinding
+from apps.theses.users import get_theses_board
 
 
 def run():
     ThesisVoteBinding.objects.all().delete()
 
-    board_members = ThesesBoardMember.objects.all()
-    board_members_cnt = board_members.count()
+    cnt = 0
+    board_members = get_theses_board()
+    board_members_cnt = len(board_members)
     for thesis in Thesis.objects.all():
         num_votes = random.randint(board_members_cnt // 2, board_members_cnt)
         votes = [
-            ThesisVoteBinding(thesis=thesis, voter=board_members[i].member, value=random.randint(1, 2))
+            ThesisVoteBinding(thesis=thesis, voter=board_members[i], value=random.randint(2, 3))
             for i in range(num_votes)
         ]
         ThesisVoteBinding.objects.bulk_create(votes)
+        cnt += len(votes)
+
+    print(f'Created {cnt} instances in total')

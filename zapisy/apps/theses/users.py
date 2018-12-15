@@ -1,6 +1,6 @@
 from enum import Enum
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from apps.users.models import BaseUser, Employee, Student, is_user_in_group
 
 THESIS_BOARD_GROUP_NAME = "Komisja prac dyplomowych"
@@ -10,8 +10,13 @@ def is_theses_board_member(user: BaseUser) -> bool:
     return is_user_in_group(user.user, THESIS_BOARD_GROUP_NAME)
 
 
+def get_theses_board():
+    board_users = User.objects.filter(groups__name=THESIS_BOARD_GROUP_NAME)
+    return [u.employee for u in board_users if is_user_in_group(u, "employees")]
+
+
 def get_num_board_members() -> int:
-    return Group.objects.filter(name=THESIS_BOARD_GROUP_NAME).count()
+    return len(get_theses_board())
 
 
 class ThesisUserType(Enum):
