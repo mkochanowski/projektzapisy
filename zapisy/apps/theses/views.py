@@ -43,7 +43,7 @@ def fields_for_prefetching(base_field: str) -> List[str]:
 class ThesesBoardViewSet(viewsets.ModelViewSet):
     http_method_names = ["get"]
     permission_classes = (permissions.IsAuthenticated, )
-    serializer_class = serializers.PersonSerializerForThesis
+    serializer_class = serializers.ThesesBoardMemberSerializer
 
     def get_queryset(self):
         return get_theses_board()

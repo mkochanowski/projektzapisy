@@ -27,6 +27,6 @@ const Container = styled.span`
 	display: inline-block;
 `;
 
-const DisabledContainer = Container.extend`
+const DisabledContainer = styled(Container)`
 	filter: grayscale(30%) opacity(0.6);
 `;

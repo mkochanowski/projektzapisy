@@ -208,3 +208,11 @@ class CurrentUserSerializer(serializers.ModelSerializer):
             "user": PersonSerializerForThesis(instance).data,
             "type": get_user_type(instance).value
         }
+
+
+class ThesesBoardMemberSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance: Employee):
+        return {
+            "id": instance.id,
+            "display_name": instance.get_initials(),
+        }

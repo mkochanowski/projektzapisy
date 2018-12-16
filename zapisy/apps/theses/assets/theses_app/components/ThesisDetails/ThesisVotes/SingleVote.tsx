@@ -39,11 +39,11 @@ const VoteContainerBase = styled.div`
 	user-select: none;
 `;
 
-const VoteContainerActive = VoteContainerBase.extend`
+const VoteContainerActive = styled(VoteContainerBase)`
 	cursor: pointer;
 `;
 
-const VoteContainerInactive = VoteContainerBase.extend`
+const VoteContainerInactive = styled(VoteContainerBase)`
 	cursor: default;
 `;
 
