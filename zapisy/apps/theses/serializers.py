@@ -58,7 +58,7 @@ def validate_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employe
 
 
 def validate_thesis_vote(value):
-    return value in [vote.value for vote in ThesisVote]    
+    return value in [vote.value for vote in ThesisVote]
 
 
 def validate_votes(votes, user: BaseUser):

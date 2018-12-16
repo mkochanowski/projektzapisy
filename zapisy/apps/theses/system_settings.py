@@ -1,5 +1,6 @@
 from . import models
 
+
 def _get_settings():
     return models.ThesesSystemSettings.objects.get()
 
