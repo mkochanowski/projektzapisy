@@ -1,4 +1,4 @@
-import { AppUser, UserType, Thesis } from "./types";
+import { AppUser, UserType, Thesis, Employee } from "./types";
 
 export function canAddThesis(user: AppUser) {
 	return user.type !== UserType.Student;
@@ -8,8 +8,8 @@ function isThesisStaff(user: AppUser) {
 	return [UserType.Admin, UserType.ThesesBoardMember].includes(user.type);
 }
 
-export function canVote(user: AppUser) {
-	return isThesisStaff(user);
+export function canCastVoteAsUser(appUser: AppUser, user: Employee) {
+	return appUser.type === UserType.Admin || appUser.user.isEqual(user);
 }
 
 export function canModifyThesis(user: AppUser, thesis: Thesis) {

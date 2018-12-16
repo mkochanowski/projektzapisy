@@ -1,8 +1,11 @@
 import * as React from "react";
-import { ThesisVote, Employee } from "../../../types";
+import { ThesisVote, Employee, AppUser } from "../../../types";
 import styled from "styled-components";
+import { canCastVoteAsUser } from "../../../permissions";
+import { VoteIndicator } from "./VoteIndicator";
 
 type Props = {
+	user: AppUser;
 	value: ThesisVote;
 	voter: Employee;
 	onChange: (v: ThesisVote) => void;
@@ -11,21 +14,19 @@ type Props = {
 const voteCycle = [ThesisVote.None, ThesisVote.Accepted, ThesisVote.Rejected];
 
 export function SingleVote(props: Props) {
-	return <VoteContainer
-		onClick={() => props.onChange(nextValue(props.value))}
-	>
-		<VoteIndicatorContainer>{indicatorForValue(props.value)}</VoteIndicatorContainer>
-		<VoteLabel>{props.voter.displayName.split(" ")[0]}</VoteLabel>
-	</VoteContainer>;
-}
-
-function indicatorForValue(value: ThesisVote) {
-	switch (value) {
-		case ThesisVote.None: return "\u{2B1C}";
-		case ThesisVote.Accepted: return "\u{2705}";
-		case ThesisVote.Rejected: return "\u{274C}";
-		case ThesisVote.UserMissing: return "\u{2753}";
-	}
+	const allowAction = canCastVoteAsUser(props.user, props.voter);
+	const sameUser = props.user.user.isEqual(props.voter);
+	const content = <>
+		<VoteIndicator active={allowAction} value={props.value} />
+		<VoteLabel
+			style={sameUser ? { fontWeight: "bold" } : {}}
+		>{props.voter.displayName.split(" ")[0]}</VoteLabel>
+	</>;
+	return allowAction
+		? <VoteContainerActive
+			onClick={() => props.onChange(nextValue(props.value))}
+		>{content}</VoteContainerActive>
+		: <VoteContainerInactive>{content}</VoteContainerInactive>;
 }
 
 function nextValue(value: ThesisVote) {
@@ -33,17 +34,22 @@ function nextValue(value: ThesisVote) {
 	return voteCycle[(valIdx + 1) % voteCycle.length];
 }
 
-const VoteIndicatorContainer = styled.span`
-	width: 18px;
-	display: inline-block;
-`;
-
-const VoteContainer = styled.div`
+const VoteContainerBase = styled.div`
 	margin-bottom: 5px;
 	user-select: none;
+`;
+
+const VoteContainerActive = VoteContainerBase.extend`
 	cursor: pointer;
+`;
+
+const VoteContainerInactive = VoteContainerBase.extend`
+	cursor: default;
 `;
 
 const VoteLabel = styled.span`
 	margin-left: 5px;
+	width: 60px;
+	display: inline-block;
+	text-align: left;
 `;

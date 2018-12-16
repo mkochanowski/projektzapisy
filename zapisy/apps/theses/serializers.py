@@ -5,7 +5,7 @@ from rest_framework import serializers
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus, ThesisVote
 from .users import get_user_type, ThesisUserType, is_theses_board_member
-from .permissions import can_set_status, can_set_advisor, can_modify_status
+from .permissions import can_set_status, can_set_advisor, can_modify_status, can_cast_vote_as_user
 from .utils import wrap_user
 
 
@@ -61,27 +61,29 @@ def validate_thesis_vote(value):
     return value in [vote.value for vote in ThesisVote]    
 
 
-def validate_votes(votes):
+def validate_votes(votes, user: BaseUser):
     if type(votes) is not dict:
         raise serializers.ValidationError("\"votes\" must be an object")
     result = []
-    for id, value in votes.items():
+    for key, value in votes.items():
         if not validate_thesis_vote(value):
             raise serializers.ValidationError("invalid thesis vote value")
         try:
-            voter_id = int(id)
+            voter_id = int(key)
             voter = Employee.objects.get(pk=voter_id)
             if not is_theses_board_member(voter):
                 raise serializers.ValidationError("voter is not a member of the theses board")
+            if not can_cast_vote_as_user(user, voter):
+                raise serializers.ValidationError("this user cannot change that user's vote")
             result.append((voter, ThesisVote(value)))
-        except: # noqa:E722
+        except (ValueError, Employee.DoesNotExist):
             raise serializers.ValidationError("bad voter id")
     return result
 
 
-def copy_optional_fields(result, data):
+def handle_optional_fields(result, data, user: BaseUser):
     copy_if_present(result, data, "description")
-    copy_if_present(result, data, "votes", validate_votes)
+    copy_if_present(result, data, "votes", lambda votes: validate_votes(votes, user))
     copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
     copy_if_present(result, data, "student", lambda s: get_person(Student, s))
     copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
@@ -131,7 +133,7 @@ class ThesisSerializer(serializers.ModelSerializer):
             "status": status,
             "advisor": advisor,
         }
-        copy_optional_fields(result, data)
+        handle_optional_fields(result, data, user)
 
         return result
 
@@ -149,7 +151,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         copy_if_present(result, data, "title")
         copy_if_present(result, data, "reserved")
         copy_if_present(result, data, "kind")
-        copy_optional_fields(result, data)
+        handle_optional_fields(result, data, user)
 
         return result
 
