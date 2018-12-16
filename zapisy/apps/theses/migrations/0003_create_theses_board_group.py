@@ -4,16 +4,19 @@ users can then be added to this group using the admin interface.
 """
 
 from django.db import migrations
-from django.contrib.auth.models import Group
 from ..users import THESIS_BOARD_GROUP_NAME
 
 
 def create_group(apps, schema_editor):
-    Group.objects.create(name=THESIS_BOARD_GROUP_NAME)
+    Group = apps.get_model("auth", "Group")
+    db_alias = schema_editor.connection.alias
+    Group.objects.using(db_alias).create(name=THESIS_BOARD_GROUP_NAME)
 
 
 def remove_group(apps, schema_editor):
-    Group.objects.filter(name=THESIS_BOARD_GROUP_NAME).delete()
+    Group = apps.get_model("auth", "Group")
+    db_alias = schema_editor.connection.alias
+    Group.objects.using(db_alias).filter(name=THESIS_BOARD_GROUP_NAME).delete()
 
 
 class Migration(migrations.Migration):
