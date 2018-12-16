@@ -1,16 +1,18 @@
-from django.contrib.auth.models import Group
-from django.db import models, migrations
-
+from django.db import migrations
 
 EXTERNAL_CONTRACTORS_GROUP_NAME = 'external_contractors'
 
 
 def apply_migration(apps, schema_editor):
-    Group.objects.create(name=EXTERNAL_CONTRACTORS_GROUP_NAME)
+    Group = apps.get_model("auth", "Group")
+    db_alias = schema_editor.connection.alias
+    Group.objects.using(db_alias).create(name=EXTERNAL_CONTRACTORS_GROUP_NAME)
 
 
 def revert_migration(apps, schema_editor):
-    Group.objects.filter(name=EXTERNAL_CONTRACTORS_GROUP_NAME).delete()
+    Group = apps.get_model("auth", "Group")
+    db_alias = schema_editor.connection.alias
+    Group.objects.using(db_alias).filter(name=EXTERNAL_CONTRACTORS_GROUP_NAME).delete()
 
 
 class Migration(migrations.Migration):
