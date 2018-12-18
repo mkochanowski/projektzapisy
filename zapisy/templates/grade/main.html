@@ -1,13 +1,103 @@
 {% extends "grade/base.html" %}
+{% load static %}
+{% block styles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static "katex/katex.min.css" %}" crossorigin="anonymous">
+  <style type="text/css">
+    .katex { font-size: 1.35em !important; } 
+    p .katex { font-size: 1.2em !important; } 
+  </style>
+{% endblock %}
+{% block js %}
+  {{ block.super }}
+<script defer src="{% static "katex/katex.min.js" %}" crossorigin="anonymous"></script>
+<script defer src="{% static "katex/contrib/auto-render.min.js" %}" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+{% endblock %}
 
 {% block main-subtitle %}Informacje{% endblock %}
 {% block grade_active %} class="active"{% endblock %}
 
-{% block grade-info %}active{% endblock %}
+{% block grade-info %} class="active"{% endblock %}
 
-{% block bread %}
-<li class="breadcrumb-item"><a href="/">Strona główna</a></li>
-<li class="breadcrumb-item active" aria-current="page">Zasady oceny</li>
+{% block content %}
+    <div id="mainPage-container">
+   		{% if grade %}
+   			<h2>Ocena Zajęć</h2>
+   			<div id="od-vote-main-rules">
+          <p>
+            Ocena zajęć ma na celu zebranie informacji na temat zajęć prowadzonych w Instytucie Informatyki UWr. Po uzyskaniu kluczy należy je zapisać w bezpiecznym miejscu, ponieważ można je uzyskać <strong>tylko raz</strong>. Mając klucze przechodzimy do wypełnienia ankiet, które jest <strong>anonimowe</strong>, co pozwala na całkowitą szczerość. Udział nagradzany jest <strong>24 godzinnym bonusem</strong> do otwarcia zapisów w kolejnym roku akademickim ?(maksymalnie 48 godzin)?.
+          </p>
+          <p>
+            Anonimowość zapewniona jest dzięki protokołowi ślepych głosów. Klucze można pobrać w serwisie po zalogowaniu lub używając <a href="{% static "grade/grade-client.py" %}">przykładowego klienta</a>, który zawiera szczegóły implementacyjne.
+          </p>
+          <h3>Cały proces jest przeprowadzony w następujący sposób:</h3>
+   				<ol>
+                   <li><h4>Przygotowanie</h4>
+                      <p>
+Dla każej ankiety serwer posiada klucze RSA:
+                      </p>
+                      <p>
+\((e_0, n_0), \dotsc, (e_l, n_l)\) &mdash; klucze publiczne,<br/>
+\((d_0, n_0), \dotsc, (d_l, n_l)\) &mdash; klucze prywatne.
+                      </p>
+                      <p>
+Klient będzie potrzebował kluczy publicznych ankiet do zaślepiania i odślepiania kluczy do głosowania.
+                      </p>
+                   </li>
+                   <li><h4>Generowanie kluczy</h4>
+                      <p>
+Klucze to 512 bitowe liczby:
+                      </p>
+                      <p>
+\(m_0, \dotsc, m_l\) &mdash; karty, klucze do głosowania,<br/>
+\(k_0, \dotsc, k_l\) &mdash; koperty, liczby do zaślepiania.
+                      </p>
+                      <p>
+Dodatkowo muszą spełniać warunek:
+                      </p>
+\[\underset{i=0, \dotsc, l}{\forall} \space k_i \le m_i \land m_i \le n_i \land \gcd\left( k_i, n_i \right) = 1 \text{.}\]
+                   </li>
+                   <li><h4>Zaślepianie</h4>
+                       <p>
+Otrzymane koperty wkładamy do kopert:
+                       </p>
+\[t_i \coloneqq \text{sha256}^\ast(m_i) \cdot {k_i}^{e_i} \bmod n_i \text{,}\]
+                       <p>
+gdzie \(\text{sha256}^\ast(x)\) to funkcja \(\text{sha256}\) hashująca reprezentację dziesiętną liczby \(x\) w ASCII, bez wiodących zer.
+                       </p>
+                   </li>
+                   <li><h4>Podpisanie</h4>
+                       <p>
+Zaślepione klucze do głosowania wysłane są na serwer, pomimo że serwer wie kto wysłał dane, to nie zna klucza \(m_i\), który podpisuje wykonując następującą operację:
+                       </p>
+\[s_i \coloneqq {t_i}^{d_i} \bmod n_i \text{.}\]
+                       <p>
+Tak podpisane dane są odsyłane do klienta.
+                       </p>
+                   </li>
+                   <li><h4>Odślepianie</h4>
+                       <p>
+Wiedząc, że:
+                       </p>
+\[{t_i}^{d_i} = (m_i \cdot {k_i}^{e_i})^{d_i} =  {m_i}^{d_i} \cdot {k_i}^{e_i \cdot d_i} = {m_i}^{d_i} \cdot k_i  \pmod {n_i} \text{,}\]
+                       <p>
+obliczamy z użyciem algorytmu Euklidesa:
+                       </p>
+\[ \dfrac{ {m_i}^{d_i} \cdot k_i }{ k_i } \bmod {n_i} = {m_i}^{d_i} \cdot k_i \cdot {k_i}^{-1} \bmod {n_i} = {m_i}^{d_i} \text{.}\]
+                   </li>
+                   <li><h4>Wypełnianie ankiet</h4>
+                       <p>
+Otrzymane podpisane i odślepione klucze zapisane są w ustalonym formacie. Należy je zapisać, a następnie wylogować się i w dowolnym czasie, z dowolnej maszyny wejść do serwisu i bezpiecznie odpowiedzieć na pytania. Bonus zostaje przyznany, gdy klucze do głosowania są podpisane, ponieważ nie istnieje możliwość zweryfikowania do kogo należy dany klucz.
+                       </p>
+                   </li>
+   				</ol>
+   			</div>
+
+           {% else %}
+   			<p class="disabled-link">Ocena nie jest w tej chwili aktywna.</p>
+   		{% endif %}
+
 {% endblock %}
 
 
