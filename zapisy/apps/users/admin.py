@@ -122,7 +122,6 @@ class EmployeeInline(admin.StackedInline):
 class UserAdmin(DjangoUserAdmin):
     def user_groups(self, user):
         return ', '.join(group.name for group in user.groups.all())
-        return ', '.join(group_names)
     user_groups.short_description = 'Grupy'
 
     inlines = [StudentInline, EmployeeInline]
