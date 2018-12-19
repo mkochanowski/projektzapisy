@@ -121,7 +121,7 @@ class EmployeeInline(admin.StackedInline):
 
 class UserAdmin(DjangoUserAdmin):
     def user_groups(self, user):
-        group_names = map(lambda g: g.name, user.groups.all())
+        return ', '.join(group.name for group in user.groups.all())
         return ', '.join(group_names)
     user_groups.short_description = 'Grupy'
 
