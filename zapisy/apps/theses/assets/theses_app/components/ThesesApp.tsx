@@ -2,7 +2,7 @@ import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
-import { Thesis, UserType, AppUser, Employee } from "../types";
+import { Thesis, UserType, AppUser, Employee, ThesisVote } from "../types";
 import {
 	getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser, getThesesBoard
 } from "../backend_callers";
@@ -12,13 +12,15 @@ import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 
+type StateThesis = {
+	original: Thesis,
+	mutable: Thesis,
+};
+
 type Props = {};
 
 type State = {
-	thesis: {
-		original: Thesis,
-		mutable: Thesis,
-	} | null;
+	thesis: StateThesis | null;
 
 	thesesList: Thesis[];
 	thesesBoard: Employee[];
@@ -243,18 +245,38 @@ export class ThesesApp extends React.Component<Props, State> {
 		// backend synchronization this is the only chance to refresh
 		// everything
 		const newList = await this.safeGetTheses();
-		// We'll want to find the thesis we just saved
-		// Note that it _could_ technically be absent from the new list
-		// but the odds are absurdly low (it would have to be deleted by someone
-		// else or the admin in the time between those two requests above)
-		const freshThesisInstance = newList.find(t => t.id === id) || null;
+		const thesisToSelect = this.thesisToSelectAfterAction(thesis, newList, id);
 		const newState = {
 			thesesList: newList,
 			applicationState: ApplicationState.Normal,
 			// no matter what the work mode was, if we have a thesis we end up in the edit view
-			workMode: freshThesisInstance ? ThesisWorkMode.Editing : null,
+			workMode: thesisToSelect ? ThesisWorkMode.Editing : null,
 		};
-		this.setStateWithNewThesis(newState, freshThesisInstance);
+		this.setStateWithNewThesis(newState, thesisToSelect);
+	}
+
+	private thesisToSelectAfterAction(oldThesis: StateThesis, newList: Thesis[], savedId: number) {
+		const { user } = this.state;
+		if (
+			user.type === UserType.ThesesBoardMember &&
+			oldThesis.original.getMemberVote(user.user) !== oldThesis.mutable.getMemberVote(user.user)
+		) {
+			// The first nonvoted-for thesis
+			const result = newList.find(t =>
+				!t.isEqual(oldThesis.original) &&
+				t.getMemberVote(user.user) === ThesisVote.None
+			);
+			if (result) {
+				return result;
+			}
+			// and if not, return whatever they were working on
+		}
+
+		// We'll want to find the thesis we just saved
+		// Note that it _could_ technically be absent from the new list
+		// but the odds are absurdly low (it would have to be deleted by someone
+		// else or the admin in the time between those two requests above)
+		return newList.find(t => t.id === savedId) || null;
 	}
 
 	private async modifyExistingThesis() {
