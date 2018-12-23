@@ -5,6 +5,7 @@ import {
 	AutoSizer, SortDirectionType, SortDirection, RowMouseEventHandlerParams, TableCellProps,
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
+import styled from "styled-components";
 
 import { ThesisTypeFilter } from "../../backend_callers";
 import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../../types";
@@ -15,6 +16,7 @@ import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
+import { AddNewButton } from "./AddNewButton";
 
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
@@ -26,6 +28,8 @@ const rowHeightCache = new CellMeasurerCache({
 
 type Props = {
 	applicationState: ApplicationState;
+	showAddNew: boolean;
+	addNewClicked: () => void;
 	thesesList: Thesis[];
 	isEditingThesis: boolean;
 	selectedThesis: Thesis | null;
@@ -42,6 +46,11 @@ const initialState = {
 	hasScrolled: false,
 };
 type State = typeof initialState;
+
+const TopRowContainer = styled.div`
+	display: flex;
+	justify-content: space-between;
+`;
 
 export class ThesesTable extends React.PureComponent<Props, State> {
 	state = initialState;
@@ -60,16 +69,19 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.uninstallKeyHandler();
 	}
 
-	private renderTopFilters() {
-		return <TopFilters
-			onTypeChange={this.onTypeFilterChanged}
-			typeValue={this.state.typeFilter}
-			onAdvisorChange={this.onAdvisorFilterChanged}
-			advisorValue={this.state.advisorFilter}
-			onTitleChange={this.onTitleFilterChanged}
-			titleValue={this.state.titleFilter}
-			enabled={this.props.applicationState === ApplicationState.Normal}
-		/>;
+	private renderTopRow() {
+		return <TopRowContainer>
+			<TopFilters
+				onTypeChange={this.onTypeFilterChanged}
+				typeValue={this.state.typeFilter}
+				onAdvisorChange={this.onAdvisorFilterChanged}
+				advisorValue={this.state.advisorFilter}
+				onTitleChange={this.onTitleFilterChanged}
+				titleValue={this.state.titleFilter}
+				enabled={this.props.applicationState === ApplicationState.Normal}
+			/>
+			{this.props.showAddNew ? <AddNewButton onClick={this.props.addNewClicked}/> : null}
+		</TopRowContainer>;
 	}
 
 	private renderThesesList() {
@@ -164,7 +176,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		console.warn("Render list");
 		return (
 			<>
-				{this.renderTopFilters()}
+				{this.renderTopRow()}
 				<br />
 				{this.renderThesesList()}
 			</>
