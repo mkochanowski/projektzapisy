@@ -3,12 +3,23 @@ import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
 import { Thesis, UserType, AppUser } from "../types";
-import { getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser } from "../backend_callers";
+import {
+	getThesesList, saveModifiedThesis, saveNewThesis,
+	getCurrentUser, ThesisTypeFilter,
+} from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
+import styled from "styled-components";
+import { ListFilters } from "./ListFilters";
+import { AddNewButton } from "./AddNewButton";
+import { inRange } from "common/utils";
+import {
+	getProcessedTheses, SortColumn, SortDirection,
+	onListChanged, onSortChanged,
+} from "./theses_store";
 
 type Props = {};
 
@@ -17,33 +28,55 @@ type State = {
 		original: Thesis,
 		mutable: Thesis,
 	} | null;
+	thesisIdx: number | null;
 
-	thesesList: Thesis[];
+	rawTheses: Thesis[];
+	theses: Thesis[];
 	applicationState: ApplicationState;
 	fetchError: Error | null;
 	wasTitleInvalid: boolean;
 	workMode: ThesisWorkMode | null;
 	user: AppUser;
+
+	typeFilter: ThesisTypeFilter;
+	titleFilter: string;
+	advisorFilter: string;
+	sortColumn: SortColumn;
+	sortDirection: SortDirection;
 };
 
 const initialState: State = {
 	thesis: null,
+	thesisIdx: null,
 
-	thesesList: [],
+	rawTheses: [],
+	theses: [],
 	applicationState: ApplicationState.InitialLoading,
 	fetchError: null,
 	wasTitleInvalid: false,
 	workMode: null,
 	user: new AppUser({ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }),
+
+	typeFilter: ThesisTypeFilter.Default,
+	titleFilter: "",
+	advisorFilter: "",
+	sortColumn: SortColumn.None,
+	sortDirection: SortDirection.Asc,
 };
+
+const TopRowContainer = styled.div`
+	display: flex;
+	justify-content: space-between;
+`;
 
 export class ThesesApp extends React.Component<Props, State> {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
 
 	async componentDidMount() {
+		const rawTheses = await this.safeGetRawTheses();
 		this.setState({
-			thesesList: await this.safeGetTheses(),
+			rawTheses,
 			user: await getCurrentUser(),
 			applicationState: ApplicationState.Normal,
 		});
@@ -76,37 +109,89 @@ export class ThesesApp extends React.Component<Props, State> {
 		}
 	}
 
+	private updateFilters(title: string, advisor: string, type: ThesisTypeFilter) {
+		this.setState({
+			titleFilter: title, advisorFilter: advisor, typeFilter: type,
+		});
+		onListChanged();
+	}
+
+	private onTypeFilterChanged = (value: ThesisTypeFilter) => {
+		this.updateFilters(this.state.titleFilter, this.state.advisorFilter, value);
+	}
+	private onAdvisorFilterChanged = (value: string) => {
+		this.updateFilters(this.state.titleFilter, value.toLowerCase(), this.state.typeFilter);
+	}
+	private onTitleFilterChanged = (value: string) => {
+		this.updateFilters(value.toLowerCase(), this.state.advisorFilter, this.state.typeFilter);
+	}
+
+	private renderTopRow() {
+		const shouldShowNewBtn = canAddThesis(this.state.user);
+		return <TopRowContainer>
+			<ListFilters
+				onTypeChange={this.onTypeFilterChanged}
+				typeValue={this.state.typeFilter}
+				onAdvisorChange={this.onAdvisorFilterChanged}
+				advisorValue={this.state.advisorFilter}
+				onTitleChange={this.onTitleFilterChanged}
+				titleValue={this.state.titleFilter}
+				enabled={this.state.applicationState === ApplicationState.Normal}
+			/>
+			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
+		</TopRowContainer>;
+	}
+
+	private onSortChanged = (column: SortColumn, dir: SortDirection) => {
+		onSortChanged();
+		console.warn(column, dir);
+		this.setState({ sortColumn: column, sortDirection: dir });
+	}
+
+	private renderThesesList() {
+		return <ThesesTable
+			applicationState={this.state.applicationState}
+			theses={this.getTheses()}
+			selectedIdx={this.getSelectedIdx()}
+			sortColumn={this.state.sortColumn}
+			sortDirection={this.state.sortDirection}
+			isEditingThesis={this.hasUnsavedChanges()}
+			onThesisSelected={this.onThesisSelected}
+			switchToThesisWithOffset={this.switchWithOffset}
+			onSortChanged={this.onSortChanged}
+		/>;
+	}
+
+	private renderThesesDetails() {
+		return <ThesisDetails
+			thesis={this.state.thesis!.mutable}
+			thesesList={this.state.rawTheses}
+			isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
+			hasUnsavedChanges={this.hasUnsavedChanges()}
+			mode={this.state.workMode!}
+			user={this.state.user}
+			onSaveRequested={this.handleThesisSave}
+			onThesisModified={this.onThesisModified}
+		/>;
+	}
+
 	public render() {
 		if (this.state.fetchError) {
 			return this.renderErrorScreen();
 		}
 		const { thesis } = this.state;
-		console.warn("Main render", thesis, this.state.workMode);
-		const mainComponent = <ThesesTable
-			showAddNew={canAddThesis(this.state.user)}
-			addNewClicked={this.setupForAddingThesis}
-			applicationState={this.state.applicationState}
-			thesesList={this.state.thesesList}
-			onThesisSelected={this.onThesisSelected}
-			selectedThesis={thesis && thesis.original}
-			isEditingThesis={this.hasUnsavedChanges()}
-		/>;
+		const mainComponent = <>
+			{this.renderTopRow()}
+			<br />
+			{this.renderThesesList()}
+		</>;
 		if (thesis !== null) {
 			console.assert(this.state.workMode !== null);
 			return <>
 				{mainComponent}
 				<br />
 				<hr />
-				<ThesisDetails
-					thesis={thesis.mutable}
-					thesesList={this.state.thesesList}
-					isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
-					hasUnsavedChanges={this.hasUnsavedChanges()}
-					mode={this.state.workMode!}
-					user={this.state.user}
-					onSaveRequested={this.handleThesisSave}
-					onThesisModified={this.onThesisModified}
-				/>
+				{this.renderThesesDetails()}
 			</>;
 		 }
 		 return mainComponent;
@@ -136,13 +221,31 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setState(finalState as State);
 	}
 
-	private async safeGetTheses() {
+	private async safeGetRawTheses() {
 		try {
 			return await getThesesList();
 		} catch (err) {
 			this.setState({ fetchError: err });
 			return [];
 		}
+	}
+
+	private getTheses() {
+		const { state } = this;
+		return getProcessedTheses(
+			state.rawTheses,
+			state.advisorFilter, state.titleFilter, state.typeFilter,
+			state.sortColumn, state.sortDirection,
+		);
+	}
+
+	private getSelectedIdx() {
+		const { thesis } = this.state;
+		if (!thesis) {
+			return null;
+		}
+		const result = this.getTheses().findIndex(thesis.original.isEqual);
+		return result !== -1 ? result : null;
 	}
 
 	private hasUnsavedChanges() {
@@ -170,10 +273,23 @@ export class ThesesApp extends React.Component<Props, State> {
 			return;
 		}
 		console.assert(
-			this.state.thesesList.find(thesis.isEqual) != null,
+			this.state.rawTheses.find(thesis.isEqual) != null,
 			"Tried to select a nonexistent thesis",
 		);
 		this.setStateWithNewThesis({ workMode: ThesisWorkMode.Editing }, thesis);
+	}
+
+	public switchWithOffset = (offset: number) => {
+		const idx = this.getSelectedIdx();
+		if (idx === null) {
+			return;
+		}
+		const target = idx + offset;
+		const theses = this.getTheses();
+		if (!inRange(target, 0, theses.length - 1)) {
+			return;
+		}
+		this.onThesisSelected(theses[target]);
 	}
 
 	// When modified in the Details subcomponent; we need to maintain
@@ -236,14 +352,14 @@ export class ThesesApp extends React.Component<Props, State> {
 		// this might seem pointless but as we don't currently have any
 		// backend synchronization this is the only chance to refresh
 		// everything
-		const newList = await this.safeGetTheses();
+		const newList = await this.safeGetRawTheses();
 		// We'll want to find the thesis we just saved
 		// Note that it _could_ technically be absent from the new list
 		// but the odds are absurdly low (it would have to be deleted by someone
 		// else or the admin in the time between those two requests above)
 		const freshThesisInstance = newList.find(t => t.id === id) || null;
-		const newState = {
-			thesesList: newList,
+		const newState: Partial<State> = {
+			rawTheses: newList,
 			applicationState: ApplicationState.Normal,
 			// no matter what the work mode was, if we have a thesis we end up in the edit view
 			workMode: freshThesisInstance ? ThesisWorkMode.Editing : null,

@@ -2,21 +2,18 @@ import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import {
 	Column, Table, CellMeasurer, CellMeasurerCache,
-	AutoSizer, SortDirectionType, SortDirection, RowMouseEventHandlerParams, TableCellProps,
+	AutoSizer, SortDirectionType, SortDirection as RVSortDirection,
+	RowMouseEventHandlerParams, TableCellProps,
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
-import styled from "styled-components";
 
-import { ThesisTypeFilter } from "../../backend_callers";
-import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../../types";
+import { Thesis } from "../../types";
 import { ApplicationState } from "../../types/misc";
-import { TopFilters } from "./TopFilters";
-import { strcmp, inRange } from "common/utils";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
-import { AddNewButton } from "./AddNewButton";
+import { SortColumn, SortDirection } from "../theses_store";
 
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
@@ -28,35 +25,24 @@ const rowHeightCache = new CellMeasurerCache({
 
 type Props = {
 	applicationState: ApplicationState;
-	showAddNew: boolean;
-	addNewClicked: () => void;
-	thesesList: Thesis[];
+	theses: Thesis[];
+	selectedIdx: number | null;
 	isEditingThesis: boolean;
-	selectedThesis: Thesis | null;
+	sortColumn: SortColumn;
+	sortDirection: SortDirection;
 
+	switchToThesisWithOffset: (offset: number) => void;
 	onThesisSelected: (t: Thesis) => void;
+	onSortChanged: (column: SortColumn, dir: SortDirection) => void;
 };
 
 const initialState = {
-	typeFilter: ThesisTypeFilter.Default,
-	titleFilter: "",
-	advisorFilter: "",
-	sortDirection: SortDirection.ASC as SortDirectionType,
-	sortColumn: "" as ("title" | "advisor" | ""),
 	hasScrolled: false,
 };
 type State = typeof initialState;
 
-const TopRowContainer = styled.div`
-	display: flex;
-	justify-content: space-between;
-`;
-
 export class ThesesTable extends React.PureComponent<Props, State> {
 	state = initialState;
-	private tableData: Thesis[] | null = null;
-	private filterCache: Map<string, Thesis[]> = new Map();
-	private selectedIdxCache: number | null = null;
 
 	private titleRenderer = this.getCellRenderer(t => t.title);
 	private advisorRenderer = this.getCellRenderer(t => t.advisor ? t.advisor.displayName : "<brak>");
@@ -69,27 +55,11 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.uninstallKeyHandler();
 	}
 
-	private renderTopRow() {
-		return <TopRowContainer>
-			<TopFilters
-				onTypeChange={this.onTypeFilterChanged}
-				typeValue={this.state.typeFilter}
-				onAdvisorChange={this.onAdvisorFilterChanged}
-				advisorValue={this.state.advisorFilter}
-				onTitleChange={this.onTitleFilterChanged}
-				titleValue={this.state.titleFilter}
-				enabled={this.props.applicationState === ApplicationState.Normal}
-			/>
-			{this.props.showAddNew ? <AddNewButton onClick={this.props.addNewClicked}/> : null}
-		</TopRowContainer>;
-	}
-
-	private renderThesesList() {
+	public render() {
 		if (this.props.applicationState === ApplicationState.InitialLoading) {
 			return <LoadingIndicator/>;
 		}
-		const data = this.getData();
-		const selectedIdx = this.getSelectedIdx();
+		const { theses, selectedIdx } = this.props;
 		const shouldDisable = this.props.applicationState === ApplicationState.PerformingBackendChanges;
 		return <AutoSizer
 			disableHeight
@@ -98,17 +68,17 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			{({ width }) => (
 				<Table
 					rowGetter={this.getRowByIndex}
-					rowCount={data.length}
+					rowCount={theses.length}
 					rowHeight={rowHeightCache.rowHeight}
 					width={width}
 					height={TABLE_HEIGHT}
 					headerHeight={TABLE_CELL_MIN_HEIGHT}
 					sort={this.changeSort}
-					sortBy={this.state.sortColumn}
-					sortDirection={this.state.sortDirection}
+					sortBy={ownToRvColumn(this.props.sortColumn)}
+					sortDirection={ownToRvDirection(this.props.sortDirection)}
 					onRowClick={this.onRowClick}
 					rowClassName={this.getRowClassName}
-					scrollToIndex={!this.state.hasScrolled && selectedIdx !== -1 ? selectedIdx : undefined}
+					scrollToIndex={!this.state.hasScrolled && selectedIdx !== null ? selectedIdx : undefined}
 					deferredMeasurementCache={rowHeightCache}
 					onScroll={this.onScroll}
 				>
@@ -155,7 +125,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private getRowByIndex = ({ index }: { index: number}) => {
-		return this.getData()[index];
+		return this.props.theses[index];
 	}
 
 	private getRowClassName = ({ index }: {index: number}) => {
@@ -163,7 +133,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			return "";
 		}
 		const colorComponent = `alternating_color_${index % 2 ? "odd" : "even"}`;
-		return this.getSelectedIdx() === index
+		return this.props.selectedIdx === index
 			? `active_row ${colorComponent}`
 			: colorComponent;
 	}
@@ -172,153 +142,42 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.setState({ hasScrolled: true });
 	}
 
-	public render() {
-		console.warn("Render list");
-		return (
-			<>
-				{this.renderTopRow()}
-				<br />
-				{this.renderThesesList()}
-			</>
-		);
-	}
-
 	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
-		if (this.props.thesesList !== nextProps.thesesList) {
-			this.resetAllCaches();
-		} else if (thesisPropDidChange(this.props.selectedThesis, nextProps.selectedThesis)) {
-			this.resetSelectedIdx();
+		if (this.props.theses !== nextProps.theses) {
+			this.onListChanged();
+		} else if (this.props.selectedIdx !== nextProps.selectedIdx) {
 			this.setState({ hasScrolled: false });
 		}
-	}
-
-	private resetAllCaches() {
-		this.resetFilterCache();
-		this.resetData();
-		this.resetSelectedIdx();
-		rowHeightCache.clearAll();
 	}
 
 	// If the displayed list changes logically (contents, order)
 	// there are some caches to invalidate
 	private onListChanged() {
-		this.resetSelectedIdx();
-		this.resetData();
 		rowHeightCache.clearAll();
-	}
-
-	private resetSelectedIdx() {
-		this.selectedIdxCache = null;
-	}
-
-	private getSelectedIdx() {
-		if (this.selectedIdxCache === null) {
-			const { selectedThesis } = this.props;
-			const idx = selectedThesis != null
-				? this.getData().findIndex(selectedThesis.isEqual)
-				: -1;
-			this.selectedIdxCache = idx;
-		}
-		return this.selectedIdxCache;
-	}
-
-	private resetData(): void {
-		this.tableData = null;
-	}
-
-	private getData(): Thesis[] {
-		if (this.tableData) {
-			return this.tableData;
-		}
-		const filteredData = this.filterData(this.props.thesesList);
-		const sortedData = this.sortData(filteredData);
-		return this.tableData = sortedData;
-	}
-
-	private resetFilterCache() {
-		this.filterCache.clear();
-	}
-
-	private filterData(data: Thesis[]) {
-		const advisor = this.state.advisorFilter.toLowerCase();
-		const title = this.state.titleFilter.toLowerCase();
-		const type = this.state.typeFilter;
-
-		const cacheKey = `${advisor}_${title}_${type}`;
-		const cached = this.filterCache.get(cacheKey);
-		if (cached) { return cached; }
-
-		const r = data.filter(thesis => (
-			thesisMatchesType(thesis, type) &&
-			personNameFilter(thesis.advisor, advisor) &&
-			thesis.title.toLowerCase().includes(title)
-		));
-		this.filterCache.set(cacheKey, r);
-		return r;
-	}
-
-	private sortData(data: Thesis[]): Thesis[] {
-		if (!this.state.sortColumn) {
-			return data;
-		}
-
-		const getter = (
-			this.state.sortColumn === "advisor"
-			? (t: Thesis) => t.advisor != null ? t.advisor.displayName : ""
-			: (t: Thesis) => t.title
-		);
-		const adapt = this.state.sortDirection === SortDirection.ASC
-			? (r: number) => r : (r: number) => -r;
-
-		return data.slice().sort((t1: Thesis, t2: Thesis) => (
-			adapt(strcmp(getter(t1), getter(t2)))
-		));
 	}
 
 	private changeSort = (info: { sortBy: string; sortDirection: SortDirectionType }) => {
 		const {
 			sortColumn: prevSortColumn,
 			sortDirection: prevSortDirection
-		} = this.state;
+		} = this.props;
 
 		// If list was sorted DESC by this column.
 		// Rather than switch to ASC, return to "natural" order.
-		if (prevSortColumn === info.sortBy && prevSortDirection === SortDirection.DESC) {
-			this.setState({ sortColumn: "" });
+		if (prevSortColumn === rvColumnToOwn(info.sortBy) && prevSortDirection === SortDirection.Desc) {
+			this.props.onSortChanged(SortColumn.None, SortDirection.Asc);
 		} else {
-			this.setState({
-				sortColumn: info.sortBy as any,
-				sortDirection: info.sortDirection,
-			});
+			this.props.onSortChanged(
+				rvColumnToOwn(info.sortBy),
+				rvDirectionToOwn(info.sortDirection)
+			);
 		}
-		this.onListChanged();
 	}
 
 	private onRowClick = (info: RowMouseEventHandlerParams) => {
 		// The typings are invalid and think rowData is some object
 		const thesis = info.rowData as any as Thesis;
 		this.props.onThesisSelected(thesis);
-	}
-
-	private onTypeFilterChanged = (newFilter: ThesisTypeFilter) => {
-		this.setState({ typeFilter: newFilter });
-		this.onListChanged();
-	}
-
-	private onAdvisorFilterChanged = (newAdvisorFilter: string) => {
-		if (!newAdvisorFilter.trim()) {
-			newAdvisorFilter = "";
-		}
-		this.setState({ advisorFilter: newAdvisorFilter });
-		this.onListChanged();
-	}
-
-	private onTitleFilterChanged = (newTitleFilter: string) => {
-		if (!newTitleFilter.trim()) {
-			newTitleFilter = "";
-		}
-		this.setState({ titleFilter: newTitleFilter });
-		this.onListChanged();
 	}
 
 	private uninstallKeyHandler() {
@@ -330,19 +189,10 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		Mousetrap.bind("down", this.downArrow);
 	}
 
-	private switchWithOffset(offset: number) {
-		const data = this.getData();
-		const target = this.getSelectedIdx() + offset;
-		if (!inRange(target, 0, data.length - 1)) {
-			return;
-		}
-		this.props.onThesisSelected(data[target]);
-	}
-
 	private allowArrowSwitch(): boolean {
 		return (
 			!this.props.isEditingThesis &&
-			this.props.selectedThesis != null
+			this.props.selectedIdx != null
 		);
 	}
 
@@ -350,7 +200,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		if (!this.allowArrowSwitch()) {
 			return;
 		}
-		this.switchWithOffset(offset);
+		this.props.switchToThesisWithOffset(offset);
 		e.preventDefault();
 	}
 
@@ -363,42 +213,33 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 }
 
-// nameFilt - already lowercase
-function personNameFilter(p: BasePerson | null, nameFilt: string): boolean {
-	return p === null || p.displayName.toLowerCase().includes(nameFilt);
+// react-virtualized's sort column to our enum
+function rvColumnToOwn(sortColumn: string) {
+	switch (sortColumn) {
+		case "advisor": return SortColumn.Advisor;
+		case "title": return SortColumn.Title;
+		default: return SortColumn.None;
+	}
 }
-
-function isThesisAvailable(thesis: Thesis): boolean {
-	return (
-		thesis.status !== ThesisStatus.InProgress &&
-		thesis.status !== ThesisStatus.Defended &&
-		!thesis.reserved
-	);
-}
-
-function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter) {
-	switch (type) {
-		case ThesisTypeFilter.All: return true;
-		case ThesisTypeFilter.AllCurrent: return isThesisAvailable(thesis);
-		case ThesisTypeFilter.Masters: return thesis.kind === ThesisKind.Masters;
-		case ThesisTypeFilter.Engineers: return thesis.kind === ThesisKind.Engineers;
-		case ThesisTypeFilter.Bachelors: return thesis.kind === ThesisKind.Bachelors;
-		case ThesisTypeFilter.BachelorsISIM: return thesis.kind === ThesisKind.Isim;
-		case ThesisTypeFilter.AvailableMasters:
-			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Masters;
-		case ThesisTypeFilter.AvailableEngineers:
-			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Engineers;
-		case ThesisTypeFilter.AvailableBachelors:
-			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Bachelors;
-		case ThesisTypeFilter.AvailableBachelorsISIM:
-			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Isim;
+// react-virtualized's sort direction to our enum
+function rvDirectionToOwn(sortDirection: SortDirectionType) {
+	switch (sortDirection) {
+		case RVSortDirection.ASC: return SortDirection.Asc;
+		case RVSortDirection.DESC: return SortDirection.Desc;
 	}
 }
 
-function thesisPropDidChange(t1: Thesis | null, t2: Thesis | null): boolean {
-	return (
-		t1 === null && t2 !== null ||
-		t1 !== null && t2 === null ||
-		t1 !== null && t2 !== null && !t1.isEqual(t2)
-	);
+// as above, but reverse
+function ownToRvColumn(sortColumn: SortColumn) {
+	switch (sortColumn) {
+		case SortColumn.Advisor: return "advisor";
+		case SortColumn.Title: return "title";
+		case SortColumn.None: return "";
+	}
+}
+function ownToRvDirection(sortDirection: SortDirection) {
+	switch (sortDirection) {
+		case SortDirection.Asc: return RVSortDirection.ASC;
+		case SortDirection.Desc: return RVSortDirection.DESC;
+	}
 }
