@@ -15,7 +15,10 @@ def can_add_thesis(user: BaseUser) -> bool:
 
 def can_modify_thesis(user: BaseUser, thesis: Thesis):
     user_type = get_user_type(user)
-    return is_thesis_staff(user_type) or thesis.advisor.pk == user.pk
+    return (
+        is_thesis_staff(user_type) or
+        thesis.advisor.pk == user.pk and thesis.status != ThesisStatus.accepted.value
+    )
 
 
 def can_set_status(user_type: ThesisUserType, status: ThesisStatus):
