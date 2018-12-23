@@ -18,7 +18,7 @@ import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
 import {
 	getProcessedTheses, SortColumn, SortDirection,
-	onListChanged, onSortChanged,
+	clearFilterCache, ThesesProcessParams,
 } from "./theses_store";
 
 type Props = {};
@@ -28,7 +28,7 @@ type State = {
 		original: Thesis,
 		mutable: Thesis,
 	} | null;
-	thesisIdx: number | null;
+	thesisIdx: number;
 
 	rawTheses: Thesis[];
 	theses: Thesis[];
@@ -38,16 +38,12 @@ type State = {
 	workMode: ThesisWorkMode | null;
 	user: AppUser;
 
-	typeFilter: ThesisTypeFilter;
-	titleFilter: string;
-	advisorFilter: string;
-	sortColumn: SortColumn;
-	sortDirection: SortDirection;
+	thesesParams: ThesesProcessParams;
 };
 
 const initialState: State = {
 	thesis: null,
-	thesisIdx: null,
+	thesisIdx: -1,
 
 	rawTheses: [],
 	theses: [],
@@ -57,11 +53,13 @@ const initialState: State = {
 	workMode: null,
 	user: new AppUser({ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }),
 
-	typeFilter: ThesisTypeFilter.Default,
-	titleFilter: "",
-	advisorFilter: "",
-	sortColumn: SortColumn.None,
-	sortDirection: SortDirection.Asc,
+	thesesParams: {
+		type: ThesisTypeFilter.Default,
+		title: "",
+		advisor: "",
+		sortColumn: SortColumn.None,
+		sortDirection: SortDirection.Asc,
+	},
 };
 
 const TopRowContainer = styled.div`
@@ -77,6 +75,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		const rawTheses = await this.safeGetRawTheses();
 		this.setState({
 			rawTheses,
+			theses: getProcessedTheses(rawTheses, this.state.thesesParams),
 			user: await getCurrentUser(),
 			applicationState: ApplicationState.Normal,
 		});
@@ -109,33 +108,50 @@ export class ThesesApp extends React.Component<Props, State> {
 		}
 	}
 
+	private getNewStateForParams(params: Partial<ThesesProcessParams>): Partial<State> {
+		const finalParams = Object.assign({}, this.state.thesesParams, params);
+		const processed = getProcessedTheses(this.state.rawTheses, finalParams);
+		return {
+			thesesParams: finalParams,
+			theses: processed,
+			thesisIdx: thesisIndexInList(
+				this.state.thesis && this.state.thesis.mutable, this.state.rawTheses,
+			),
+		};
+	}
+
 	private updateFilters(title: string, advisor: string, type: ThesisTypeFilter) {
-		this.setState({
-			titleFilter: title, advisorFilter: advisor, typeFilter: type,
+		const newState = this.getNewStateForParams({
+			title: title, advisor: advisor, type: type,
 		});
-		onListChanged();
+		clearFilterCache();
+		this.setState(newState as State);
 	}
 
 	private onTypeFilterChanged = (value: ThesisTypeFilter) => {
-		this.updateFilters(this.state.titleFilter, this.state.advisorFilter, value);
+		const { thesesParams } = this.state;
+		this.updateFilters(thesesParams.title, thesesParams.advisor, value);
 	}
 	private onAdvisorFilterChanged = (value: string) => {
-		this.updateFilters(this.state.titleFilter, value.toLowerCase(), this.state.typeFilter);
+		const { thesesParams } = this.state;
+		this.updateFilters(thesesParams.title, value.toLowerCase(), thesesParams.type);
 	}
 	private onTitleFilterChanged = (value: string) => {
-		this.updateFilters(value.toLowerCase(), this.state.advisorFilter, this.state.typeFilter);
+		const { thesesParams } = this.state;
+		this.updateFilters(value.toLowerCase(), thesesParams.advisor, thesesParams.type);
 	}
 
 	private renderTopRow() {
 		const shouldShowNewBtn = canAddThesis(this.state.user);
+		const { thesesParams } = this.state;
 		return <TopRowContainer>
 			<ListFilters
 				onTypeChange={this.onTypeFilterChanged}
-				typeValue={this.state.typeFilter}
+				typeValue={thesesParams.type}
 				onAdvisorChange={this.onAdvisorFilterChanged}
-				advisorValue={this.state.advisorFilter}
+				advisorValue={thesesParams.advisor}
 				onTitleChange={this.onTitleFilterChanged}
-				titleValue={this.state.titleFilter}
+				titleValue={thesesParams.title}
 				enabled={this.state.applicationState === ApplicationState.Normal}
 			/>
 			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
@@ -143,18 +159,19 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	private onSortChanged = (column: SortColumn, dir: SortDirection) => {
-		onSortChanged();
-		console.warn(column, dir);
-		this.setState({ sortColumn: column, sortDirection: dir });
+		const newState = this.getNewStateForParams({
+			sortColumn: column, sortDirection: dir,
+		});
+		this.setState(newState as State);
 	}
 
 	private renderThesesList() {
 		return <ThesesTable
 			applicationState={this.state.applicationState}
-			theses={this.getTheses()}
-			selectedIdx={this.getSelectedIdx()}
-			sortColumn={this.state.sortColumn}
-			sortDirection={this.state.sortDirection}
+			theses={this.state.theses}
+			selectedIdx={this.state.thesisIdx}
+			sortColumn={this.state.thesesParams.sortColumn}
+			sortDirection={this.state.thesesParams.sortDirection}
 			isEditingThesis={this.hasUnsavedChanges()}
 			onThesisSelected={this.onThesisSelected}
 			switchToThesisWithOffset={this.switchWithOffset}
@@ -217,6 +234,7 @@ export class ThesesApp extends React.Component<Props, State> {
 	private setStateWithNewThesis(state: Partial<State>, t: Thesis | null) {
 		const finalState = Object.assign({
 			thesis: t ? { original: t, mutable: clone(t) } : null,
+			thesisIdx: thesisIndexInList(t, state.theses || this.state.theses)
 		}, state);
 		this.setState(finalState as State);
 	}
@@ -228,24 +246,6 @@ export class ThesesApp extends React.Component<Props, State> {
 			this.setState({ fetchError: err });
 			return [];
 		}
-	}
-
-	private getTheses() {
-		const { state } = this;
-		return getProcessedTheses(
-			state.rawTheses,
-			state.advisorFilter, state.titleFilter, state.typeFilter,
-			state.sortColumn, state.sortDirection,
-		);
-	}
-
-	private getSelectedIdx() {
-		const { thesis } = this.state;
-		if (!thesis) {
-			return null;
-		}
-		const result = this.getTheses().findIndex(thesis.original.isEqual);
-		return result !== -1 ? result : null;
 	}
 
 	private hasUnsavedChanges() {
@@ -280,12 +280,11 @@ export class ThesesApp extends React.Component<Props, State> {
 	}
 
 	public switchWithOffset = (offset: number) => {
-		const idx = this.getSelectedIdx();
-		if (idx === null) {
+		const { thesisIdx, theses } = this.state;
+		if (thesisIdx === null) {
 			return;
 		}
-		const target = idx + offset;
-		const theses = this.getTheses();
+		const target = thesisIdx + offset;
 		if (!inRange(target, 0, theses.length - 1)) {
 			return;
 		}
@@ -360,6 +359,7 @@ export class ThesesApp extends React.Component<Props, State> {
 		const freshThesisInstance = newList.find(t => t.id === id) || null;
 		const newState: Partial<State> = {
 			rawTheses: newList,
+			theses: getProcessedTheses(newList, this.state.thesesParams),
 			applicationState: ApplicationState.Normal,
 			// no matter what the work mode was, if we have a thesis we end up in the edit view
 			workMode: freshThesisInstance ? ThesisWorkMode.Editing : null,
@@ -393,4 +393,10 @@ export class ThesesApp extends React.Component<Props, State> {
 			return -1;
 		}
 	}
+}
+
+function thesisIndexInList(thesis: Thesis | null, theses: Thesis[]) {
+	return thesis
+		? theses.findIndex(thesis.isEqual)
+		: -1;
 }

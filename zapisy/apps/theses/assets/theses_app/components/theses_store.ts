@@ -14,26 +14,22 @@ export const enum SortColumn {
 }
 
 const filterCache: Map<string, Thesis[]> = new Map();
-let listCache: Thesis[] | null = null;
 
-export function getProcessedTheses(
-	theses: Thesis[],
-	advisor: string, title: string, type: ThesisTypeFilter,
-	sortColumn: SortColumn, sortDirection: SortDirection,
-): Thesis[] {
-	if (listCache) {
-		return listCache;
-	}
-	const filteredData = filterData(theses, advisor, title, type);
-	return listCache = sortData(filteredData, sortColumn, sortDirection);
+export type ThesesProcessParams = {
+	advisor: string;
+	title: string;
+	type: ThesisTypeFilter;
+
+	sortColumn: SortColumn;
+	sortDirection: SortDirection;
+};
+
+export function getProcessedTheses(theses: Thesis[], params: ThesesProcessParams): Thesis[] {
+	const filteredData = filterData(theses, params.advisor, params.title, params.type);
+	return sortData(filteredData, params.sortColumn, params.sortDirection);
 }
 
-export function onSortChanged() {
-	listCache = null;
-}
-
-export function onListChanged() {
-	listCache = null;
+export function clearFilterCache() {
 	filterCache.clear();
 }
 
