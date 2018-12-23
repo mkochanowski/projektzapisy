@@ -13,11 +13,23 @@ def can_add_thesis(user: BaseUser) -> bool:
     return user_type != ThesisUserType.student
 
 
+def is_owner_of_thesis(user: BaseUser, thesis: Thesis):
+    return thesis.advisor and thesis.advisor.pk == user.pk
+
+
 def can_modify_thesis(user: BaseUser, thesis: Thesis):
     user_type = get_user_type(user)
     return (
         is_thesis_staff(user_type) or
-        thesis.advisor.pk == user.pk and thesis.status != ThesisStatus.accepted.value
+        is_owner_of_thesis(user, thesis)
+    )
+
+
+def can_change_title(user: BaseUser, thesis: Thesis):
+    user_type = get_user_type(user)
+    return (
+        is_thesis_staff(user_type) or
+        is_owner_of_thesis(user, thesis) and thesis.status != ThesisStatus.accepted.value
     )
 
 
