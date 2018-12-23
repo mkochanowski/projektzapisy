@@ -16,7 +16,7 @@ export function ThesisVotes(props: Props) {
 		<SingleVote
 			key={i}
 			voter={emp}
-			value={props.thesis.votes[emp.id] || ThesisVote.None}
+			value={props.thesis.getMemberVote(emp)}
 			user={props.user}
 			onChange={nv => props.onChange(emp, nv)}
 		/>

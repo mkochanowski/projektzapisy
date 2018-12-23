@@ -150,6 +150,10 @@ export class Thesis {
 		return this.id === other.id;
 	}
 
+	public getMemberVote(emp: Employee): ThesisVote {
+		return this.votes[emp.id] || ThesisVote.None;
+	}
+
 	public areValuesEqual(other: Thesis): boolean {
 		console.assert(
 			this.isEqual(other),
@@ -177,7 +181,7 @@ export class Thesis {
 		);
 	}
 
-	public onlyDefiniteVotes(): VoteMap {
+	private onlyDefiniteVotes(): VoteMap {
 		return Object.keys(this.votes)
 			.map(Number)
 			.filter(id => this.votes[id] !== ThesisVote.None)
