@@ -330,6 +330,15 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		Mousetrap.bind("down", this.downArrow);
 	}
 
+	private switchWithOffset(offset: number) {
+		const data = this.getData();
+		const target = this.getSelectedIdx() + offset;
+		if (!inRange(target, 0, data.length - 1)) {
+			return;
+		}
+		this.props.onThesisSelected(data[target]);
+	}
+
 	private allowArrowSwitch(): boolean {
 		return (
 			!this.props.isEditingThesis &&
@@ -338,12 +347,10 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private arrowSwitch(offset: -1 | 1, e: ExtendedKeyboardEvent) {
-		if (!this.allowArrowSwitch()) { return;	}
-		const data = this.getData();
-		const target = this.getSelectedIdx() + offset;
-		if (!inRange(target, 0, data.length - 1)) { return; }
-
-		this.props.onThesisSelected(data[target]);
+		if (!this.allowArrowSwitch()) {
+			return;
+		}
+		this.switchWithOffset(offset);
 		e.preventDefault();
 	}
 
