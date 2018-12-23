@@ -5,7 +5,11 @@ from rest_framework import serializers
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus, ThesisVote
 from .users import get_user_type, ThesisUserType, is_theses_board_member
-from .permissions import can_set_status, can_set_advisor, can_modify_status, can_cast_vote_as_user
+from .permissions import (
+    can_set_status, can_set_advisor,
+    can_modify_status, can_cast_vote_as_user,
+    can_change_title
+)
 from .utils import wrap_user
 
 
@@ -148,7 +152,11 @@ class ThesisSerializer(serializers.ModelSerializer):
             if not can_modify_status(user_type):
                 raise serializers.ValidationError("This type of user cannot modify the status")
             result["status"] = data["status"]
-        copy_if_present(result, data, "title")
+        if "title" in data:
+            title = data["title"]
+            if not can_change_title(user, self.instance):
+                raise serializers.ValidationError("This type of user cannot change the title")
+            result["title"] = title
         copy_if_present(result, data, "reserved")
         copy_if_present(result, data, "kind")
         handle_optional_fields(result, data, user)

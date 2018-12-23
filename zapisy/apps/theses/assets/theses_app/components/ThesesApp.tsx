@@ -54,12 +54,21 @@ export class ThesesApp extends React.Component<Props, State> {
 		});
 		this.oldOnBeforeUnload = window.onbeforeunload;
 		window.onbeforeunload = this.confirmUnload;
-		Mousetrap.bind("ctrl+m", this.setupForAddingThesis);
+		this.initializeKeyboardShortcuts();
 	}
 
 	componentWillUnmount() {
 		window.onbeforeunload = this.oldOnBeforeUnload;
-		Mousetrap.unbind("ctrl+m");
+		this.deconfigureKeyboardShortcuts();
+	}
+
+	private initializeKeyboardShortcuts() {
+		Mousetrap.bind("ctrl+m", this.setupForAddingThesis);
+		Mousetrap.bind("esc", this.resetChanges);
+	}
+
+	private deconfigureKeyboardShortcuts() {
+		Mousetrap.unbind(["ctrl+m", "esc"]);
 	}
 
 	private confirmUnload = (ev: BeforeUnloadEvent) => {
@@ -79,6 +88,8 @@ export class ThesesApp extends React.Component<Props, State> {
 		const { thesis } = this.state;
 		console.warn("Main render", thesis, this.state.workMode);
 		const mainComponent = <ThesesTable
+			showAddNew={canAddThesis(this.state.user)}
+			addNewClicked={this.setupForAddingThesis}
 			applicationState={this.state.applicationState}
 			thesesList={this.state.thesesList}
 			onThesisSelected={this.onThesisSelected}
@@ -152,7 +163,9 @@ export class ThesesApp extends React.Component<Props, State> {
 		if (this.hasUnsavedChanges()) {
 			const title = this.state.thesis!.mutable.title;
 			return window.confirm(
-				`Czy porzucić niezapisane zmiany w pracy "${title}"?`
+				title
+					? `Czy porzucić niezapisane zmiany w pracy "${title}"?`
+					: "Czy porzucić niezapisane zmiany?"
 			);
 		}
 		return true;
@@ -191,6 +204,13 @@ export class ThesesApp extends React.Component<Props, State> {
 		this.setStateWithNewThesis({
 			workMode: ThesisWorkMode.Adding
 		}, thesis);
+	}
+
+	private resetChanges = () => {
+		if (!this.hasUnsavedChanges()) {
+			return;
+		}
+		this.setStateWithNewThesis({}, this.state.thesis!.original);
 	}
 
 	private handlerForWorkMode = {

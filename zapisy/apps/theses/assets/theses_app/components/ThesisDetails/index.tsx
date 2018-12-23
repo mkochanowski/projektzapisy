@@ -2,6 +2,7 @@ import * as React from "react";
 import Button from "react-button-component";
 import styled from "styled-components";
 import update from "immutability-helper";
+import * as Mousetrap from "mousetrap";
 import { Moment } from "moment";
 
 import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser, ThesisVote } from "../../types";
@@ -22,9 +23,8 @@ const SaveButton = Button.extend`
 		color: grey;
 		cursor: default;
 	}
+	min-height: initial;
 	height: 25px;
-	min-height: 25px;
-	max-height: 25px;
 `;
 
 const DetailsSectionWrapper = styled.div`
@@ -71,6 +71,19 @@ type State = typeof initialState;
 
 export class ThesisDetails extends React.PureComponent<Props, State> {
 	state = initialState;
+
+	public componentWillMount() {
+		Mousetrap.bind("ctrl+s", ev => {
+			if (this.props.hasUnsavedChanges) {
+				this.handleSave();
+			}
+			ev.preventDefault();
+		});
+	}
+
+	public componentWillUnmount() {
+		Mousetrap.unbind("ctrl+s");
+	}
 
 	public render() {
 		console.warn("Render details");

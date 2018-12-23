@@ -9,7 +9,7 @@ import { PersonType } from "../../../backend_callers";
 import { PersonField } from "./PersonField";
 import { ThesisKindField } from "./ThesisKindField";
 import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
-import { canSetArbitraryAdvisor, canModifyThesis } from "../../../permissions";
+import { canSetArbitraryAdvisor, canModifyThesis, canChangeTitle } from "../../../permissions";
 
 const MidFormTable = styled.table`
 	width: 100%;
@@ -116,13 +116,14 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 				border: "1px solid red"
 			});
 		}
+		const titleReadOnly = readOnly || !canChangeTitle(this.props.user, this.props.thesis);
 		return <tr>
 			<td>Tytuł</td>
 			<td><textarea
 				style={titleStyle}
 				value={this.props.thesis.title}
 				maxLength={MAX_THESIS_TITLE_LEN}
-				readOnly={readOnly}
+				readOnly={titleReadOnly}
 				onChange={ev => this.props.onTitleChanged(ev.target.value)}
 			/></td>
 		</tr>;
