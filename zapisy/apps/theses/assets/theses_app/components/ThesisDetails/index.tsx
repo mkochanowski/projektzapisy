@@ -80,6 +80,10 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 		});
 	}
 
+	public componentWillUnmount() {
+		Mousetrap.unbind("ctrl+s");
+	}
+
 	public render() {
 		console.warn("Render details");
 		const { hasUnsavedChanges } = this.props;
