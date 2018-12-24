@@ -21,8 +21,6 @@ import {
 	clearFilterCache, ThesesProcessParams,
 } from "./theses_store";
 
-type Props = {};
-
 type State = {
 	thesis: {
 		original: Thesis,
@@ -67,7 +65,7 @@ const TopRowContainer = styled.div`
 	justify-content: space-between;
 `;
 
-export class ThesesApp extends React.Component<Props, State> {
+export class ThesesApp extends React.Component<{}, State > {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
 
