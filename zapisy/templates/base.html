@@ -5,6 +5,7 @@
 {% load debug_info %}
 {% load i18n %}
 {% load render_bundle from webpack_loader %}
+{% load num_ungraded_theses %}
 
 <!DOCTYPE html>
 <html lang="pl">
@@ -139,8 +140,9 @@
                     {% if user.is_authenticated %}
                         <li>
                             <a href="{% url 'theses:main' %}">Prace dyplomowe
-                            {% if num_ungraded_thesis %}
-                                ({{ num_ungraded_thesis }})
+                            {% num_ungraded_theses user as num_ungraded %}
+                            {% if num_ungraded > 0 %}
+                                ({{ num_ungraded }})
                             {% endif %}
                             </a>
                         </li>

@@ -1,6 +1,7 @@
 from enum import Enum
 
 from django.db import models
+from django.db import connection
 
 from apps.users.models import Employee, Student
 from .validators import validate_num_required_votes
@@ -134,21 +135,39 @@ class ThesisVoteBinding(models.Model):
         return f'Głos {self.voter} na {self.thesis} - {vote_to_string(self.value)}'
 
 
-def _is_ungraded_for_emp(t: Thesis, emp: Employee):
-    emp_has_definite_vote = any(
-        v.voter == emp and v.value != ThesisVote.none.value
-        for v in t.votes.all()
-    )
-    return not emp_has_definite_vote
-
-
 def get_num_ungraded_for_emp(emp: Employee) -> int:
-    theses = Thesis.objects\
-        .prefetch_related("votes")\
-        .prefetch_related("votes__voter")\
-        .all()
-    result = sum(1 for t in theses if _is_ungraded_for_emp(t, emp))
-    return result
+    """
+    Get the number of _ungraded_ theses for a given board member
+    A thesis is _ungraded_ if the voter has not cast a vote at all
+    or manually set it to none (not possible from the client UI currently)
+
+    Sadly, this uses a handwritten query. The reason is performance:
+    this will be called at every normal template render for board members,
+    so it must be fast. Timings on an old (Nehalem) i5-750@2.6GHz for 1000 theses,
+    on average 4 out of 7 votes each (with all relevant prefetch_related calls):
+    1. Pure Django queryset logic: 3.8 sec
+    2. Fetch using querysets, then process in Python: 0.8 sec
+    3. Manual SQL: 6 msec
+
+    Query explanation: select the number of theses where there are no bindings
+    of that thesis and the given member with a vote value other than none (i.e. if
+    the given member has cast a non-none vote for this thesis)
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+                select count(*) from theses_thesis t where
+                (
+                    select count(*) from theses_thesisvotebinding
+                    where thesis_id = t.id and value != %s and voter_id = %s
+                ) = 0;
+            """,
+            # Note that there is no risk of injection here, we're passing the parameters
+            # as arguments to cursor.execute, not formatting them into the query string
+            [ThesisVote.none.value, emp.pk]
+        )
+        row = cursor.fetchone()
+    return row[0]
 
 
 class ThesesSystemSettings(models.Model):
