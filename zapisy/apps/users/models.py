@@ -1,13 +1,12 @@
 import datetime
 import logging
-from html import escape
 from typing import List, TYPE_CHECKING, Optional
 
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from django.db.models import QuerySet
-from unidecode import unidecode
 
 from apps.users.exceptions import NonUserException
 from apps.users.managers import GettersManager, T0Manager
@@ -51,13 +50,6 @@ class BaseUser(models.Model):
         default=True,
         verbose_name="otrzymuje mailem ogłoszenia Oceny Zajęć")
     last_news_view = models.DateTimeField(default=datetime.datetime.now)
-    initials = models.CharField(
-        max_length=20, verbose_name="inicjały", null=True, blank=True,
-        help_text=escape(
-            "Inicjały użytkownika. Jeżeli puste, zostaną wygenerowane wg wzoru: " +
-            "<pierwsza litera imienia> + <dwie pierwsze litery nazwiska>"
-        )
-    )
 
     objects = Related()
 
@@ -72,13 +64,6 @@ class BaseUser(models.Model):
                 category='-').filter(date__gte=self.last_news_view).count()
 
         return self._count_news
-
-    def get_initials(self) -> str:
-        if self.initials:
-            return self.initials
-        clean_first_name = unidecode(self.user.first_name)
-        clean_last_name = unidecode(self.user.last_name)
-        return clean_first_name[:1] + clean_last_name[:2]
 
     @staticmethod
     def get(user_id: int) -> User:
@@ -350,6 +335,9 @@ class Student(BaseUser):
         verbose_name_plural: str = 'studenci'
         app_label: str = 'users'
         ordering: List[str] = ['user__last_name', 'user__first_name']
+
+    def __str__(self) -> str:
+        return self.user.get_full_name()
 
 
 class Program(models.Model):
