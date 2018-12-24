@@ -26,13 +26,8 @@ type StateThesis = {
 	mutable: Thesis,
 };
 
-type Props = {};
-
 type State = {
-	thesis: {
-		original: Thesis,
-		mutable: Thesis,
-	} | null;
+	thesis: StateThesis | null;
 	thesisIdx: number;
 
 	rawTheses: Thesis[];
@@ -74,7 +69,7 @@ const TopRowContainer = styled.div`
 	justify-content: space-between;
 `;
 
-export class ThesesApp extends React.Component<Props, State> {
+export class ThesesApp extends React.Component<{}, State > {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
 

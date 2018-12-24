@@ -222,5 +222,5 @@ class ThesesBoardMemberSerializer(serializers.ModelSerializer):
     def to_representation(self, instance: Employee):
         return {
             "id": instance.id,
-            "display_name": instance.get_initials(),
+            "display_name": instance.user.username,
         }
