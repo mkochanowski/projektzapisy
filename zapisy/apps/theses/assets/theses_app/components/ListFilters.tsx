@@ -2,8 +2,9 @@ import * as React from "react";
 
 import { ThesisTypeFilter } from "../backend_callers";
 import { GenericSelect } from "./GenericSelect";
+import { AppUser, UserType } from "../types";
 
-const typefilterInfos = [
+const typeFilters = [
 	{ val: ThesisTypeFilter.AllCurrent, displayName: "Wszystkie aktualne" },
 	{ val: ThesisTypeFilter.All, displayName: "Wszystkie" },
 	{ val: ThesisTypeFilter.Masters, displayName: "Magisterskie" },
@@ -15,8 +16,14 @@ const typefilterInfos = [
 	{ val: ThesisTypeFilter.AvailableBachelors, displayName: "Licencjackie - dostępne" },
 	{ val: ThesisTypeFilter.AvailableBachelorsISIM, displayName: "Licencjackie ISIM - dostępne" },
 ];
+const boardMemberFilters = [
+	{ val: ThesisTypeFilter.Ungraded, displayName: "Wszystkie nieocenione" },
+	...typeFilters,
+];
 
 type Props = {
+	user: AppUser;
+
 	onTypeChange: (newFilter: ThesisTypeFilter) => void;
 	typeValue: ThesisTypeFilter;
 
@@ -61,7 +68,11 @@ export class ListFilters extends React.PureComponent<Props> {
 			<GenericSelect<ThesisTypeFilter>
 				value={this.props.typeValue}
 				onChange={this.handleTypeChange}
-				optionInfo={typefilterInfos}
+				optionInfo={
+					this.props.user.type === UserType.ThesesBoardMember
+					? boardMemberFilters
+					: typeFilters
+				}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
 				enabled={this.props.enabled}

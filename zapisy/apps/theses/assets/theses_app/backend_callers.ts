@@ -19,6 +19,7 @@ export const enum ThesisTypeFilter {
 	AvailableEngineers,
 	AvailableBachelors,
 	AvailableBachelorsISIM,
+	Ungraded,	// board members only
 
 	Default = AllCurrent,
 }

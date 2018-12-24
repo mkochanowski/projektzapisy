@@ -1,5 +1,5 @@
 import { ThesisTypeFilter } from "../backend_callers";
-import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../types";
+import { Thesis, ThesisStatus, ThesisKind, BasePerson, AppUser, UserType, ThesisVote } from "../types";
 import { strcmp } from "common/utils";
 
 export const enum SortDirection {
@@ -24,8 +24,10 @@ export type ThesesProcessParams = {
 	sortDirection: SortDirection;
 };
 
-export function getProcessedTheses(theses: Thesis[], params: ThesesProcessParams): Thesis[] {
-	const filteredData = filterData(theses, params.advisor, params.title, params.type);
+export function getProcessedTheses(
+	theses: Thesis[], params: ThesesProcessParams, user: AppUser,
+): Thesis[] {
+	const filteredData = filterData(theses, params.advisor, params.title, params.type, user);
 	return sortData(filteredData, params.sortColumn, params.sortDirection);
 }
 
@@ -33,7 +35,10 @@ export function clearFilterCache() {
 	filterCache.clear();
 }
 
-function filterData(data: Thesis[], advisor: string, title: string, type: ThesisTypeFilter) {
+function filterData(
+	data: Thesis[], advisor: string, title: string, type: ThesisTypeFilter,
+	user: AppUser,
+) {
 	advisor = advisor.toLowerCase();
 	title = title.toLowerCase();
 
@@ -44,7 +49,7 @@ function filterData(data: Thesis[], advisor: string, title: string, type: Thesis
 	}
 
 	const r = data.filter(thesis => (
-		thesisMatchesType(thesis, type) &&
+		thesisMatchesType(thesis, type, user) &&
 		personNameFilter(thesis.advisor, advisor) &&
 		thesis.title.toLowerCase().includes(title)
 	));
@@ -81,7 +86,7 @@ function isThesisAvailable(thesis: Thesis): boolean {
 	);
 }
 
-function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter) {
+function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter, user: AppUser) {
 	switch (type) {
 		case ThesisTypeFilter.All: return true;
 		case ThesisTypeFilter.AllCurrent: return isThesisAvailable(thesis);
@@ -97,5 +102,8 @@ function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter) {
 			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Bachelors;
 		case ThesisTypeFilter.AvailableBachelorsISIM:
 			return isThesisAvailable(thesis) && thesis.kind === ThesisKind.Isim;
+		case ThesisTypeFilter.Ungraded:
+			console.assert(user.type === UserType.ThesesBoardMember);
+			return thesis.getMemberVote(user.user) === ThesisVote.None;
 	}
 }

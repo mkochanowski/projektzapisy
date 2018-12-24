@@ -75,11 +75,12 @@ export class ThesesApp extends React.Component<{}, State > {
 
 	async componentDidMount() {
 		const rawTheses = await this.safeGetRawTheses();
+		const user = await getCurrentUser();
 		this.setState({
 			rawTheses,
-			theses: getProcessedTheses(rawTheses, this.state.thesesParams),
+			theses: getProcessedTheses(rawTheses, this.state.thesesParams, user),
 			thesesBoard: await getThesesBoard(),
-			user: await getCurrentUser(),
+			user,
 			applicationState: ApplicationState.Normal,
 		});
 		this.oldOnBeforeUnload = window.onbeforeunload;
@@ -113,7 +114,7 @@ export class ThesesApp extends React.Component<{}, State > {
 
 	private getNewStateForParams(params: Partial<ThesesProcessParams>): Partial<State> {
 		const finalParams = Object.assign({}, this.state.thesesParams, params);
-		const processed = getProcessedTheses(this.state.rawTheses, finalParams);
+		const processed = getProcessedTheses(this.state.rawTheses, finalParams, this.state.user);
 		return {
 			thesesParams: finalParams,
 			theses: processed,
@@ -156,6 +157,7 @@ export class ThesesApp extends React.Component<{}, State > {
 				onTitleChange={this.onTitleFilterChanged}
 				titleValue={thesesParams.title}
 				enabled={this.state.applicationState === ApplicationState.Normal}
+				user={this.state.user}
 			/>
 			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
 		</TopRowContainer>;
@@ -363,7 +365,7 @@ export class ThesesApp extends React.Component<{}, State > {
 		const thesisToSelect = this.thesisToSelectAfterAction(thesis, newList, id);
 		const newState: Partial<State> = {
 			rawTheses: newList,
-			theses: getProcessedTheses(newList, this.state.thesesParams),
+			theses: getProcessedTheses(newList, this.state.thesesParams, this.state.user),
 			applicationState: ApplicationState.Normal,
 			// no matter what the work mode was, if we have a thesis we end up in the edit view
 			workMode: thesisToSelect ? ThesisWorkMode.Editing : null,
