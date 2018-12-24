@@ -14,6 +14,7 @@ import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { SortColumn, SortDirection } from "../theses_store";
+import { NoResultsMessage } from "./NoResultsMessage";
 
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
@@ -81,6 +82,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 					scrollToIndex={!this.state.hasScrolled && selectedIdx !== -1 ? selectedIdx : undefined}
 					deferredMeasurementCache={rowHeightCache}
 					onScroll={this.onScroll}
+					noRowsRenderer={NoResultsMessage}
 				>
 					<Column
 						label="Rezerwacja"

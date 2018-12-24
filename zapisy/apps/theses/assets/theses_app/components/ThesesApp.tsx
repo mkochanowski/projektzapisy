@@ -358,6 +358,8 @@ export class ThesesApp extends React.Component<{}, State > {
 		// backend synchronization this is the only chance to refresh
 		// everything
 		const newList = await this.safeGetRawTheses();
+		// Got a new list, old filter cache no longer valid
+		clearFilterCache();
 		// We'll want to find the thesis we just saved
 		// Note that it _could_ technically be absent from the new list
 		// but the odds are absurdly low (it would have to be deleted by someone
