@@ -26,7 +26,7 @@ const rowHeightCache = new CellMeasurerCache({
 type Props = {
 	applicationState: ApplicationState;
 	theses: Thesis[];
-	selectedIdx: number | null;
+	selectedIdx: number;
 	isEditingThesis: boolean;
 	sortColumn: SortColumn;
 	sortDirection: SortDirection;
@@ -78,7 +78,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 					sortDirection={ownToRvDirection(this.props.sortDirection)}
 					onRowClick={this.onRowClick}
 					rowClassName={this.getRowClassName}
-					scrollToIndex={!this.state.hasScrolled && selectedIdx !== null ? selectedIdx : undefined}
+					scrollToIndex={!this.state.hasScrolled && selectedIdx !== -1 ? selectedIdx : undefined}
 					deferredMeasurementCache={rowHeightCache}
 					onScroll={this.onScroll}
 				>
@@ -145,7 +145,8 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
 		if (this.props.theses !== nextProps.theses) {
 			this.onListChanged();
-		} else if (this.props.selectedIdx !== nextProps.selectedIdx) {
+		}
+		if (this.props.selectedIdx !== nextProps.selectedIdx) {
 			this.setState({ hasScrolled: false });
 		}
 	}

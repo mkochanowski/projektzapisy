@@ -115,7 +115,7 @@ export class ThesesApp extends React.Component<Props, State> {
 			thesesParams: finalParams,
 			theses: processed,
 			thesisIdx: thesisIndexInList(
-				this.state.thesis && this.state.thesis.mutable, this.state.rawTheses,
+				this.state.thesis && this.state.thesis.mutable, processed,
 			),
 		};
 	}
@@ -281,7 +281,7 @@ export class ThesesApp extends React.Component<Props, State> {
 
 	public switchWithOffset = (offset: number) => {
 		const { thesisIdx, theses } = this.state;
-		if (thesisIdx === null) {
+		if (thesisIdx === -1) {
 			return;
 		}
 		const target = thesisIdx + offset;
