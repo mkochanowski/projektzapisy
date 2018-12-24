@@ -134,6 +134,23 @@ class ThesisVoteBinding(models.Model):
         return f'Głos {self.voter} na {self.thesis} - {vote_to_string(self.value)}'
 
 
+def _is_ungraded_for_emp(t: Thesis, emp: Employee):
+    emp_has_definite_vote = any(
+        v.voter == emp and v.value != ThesisVote.none.value
+        for v in t.votes.all()
+    )
+    return not emp_has_definite_vote
+
+
+def get_num_ungraded_for_emp(emp: Employee) -> int:
+    theses = Thesis.objects\
+        .prefetch_related("votes")\
+        .prefetch_related("votes__voter")\
+        .all()
+    result = sum(1 for t in theses if _is_ungraded_for_emp(t, emp))
+    return result
+
+
 class ThesesSystemSettings(models.Model):
     num_required_votes = models.SmallIntegerField(
         verbose_name="Liczba głosów wymaganych do zaakceptowania",

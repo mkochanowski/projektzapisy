@@ -150,6 +150,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.request',
+                'apps.theses.context_processors.num_ungraded_theses',
             ],
             'loaders': TEMPLATE_LOADERS_TO_USE
             if DEBUG else
