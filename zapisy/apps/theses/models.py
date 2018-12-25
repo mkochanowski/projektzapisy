@@ -141,7 +141,7 @@ class ThesisVoteBinding(models.Model):
 
 def get_num_ungraded_for_emp(emp: Employee) -> int:
     """
-    Get the number of _ungraded_ theses for a given board member
+    Get the number of _ungraded_ theses for a given board member.
     A thesis is _ungraded_ if the voter has not cast a vote at all
     or manually set it to none (not possible from the client UI currently)
 
