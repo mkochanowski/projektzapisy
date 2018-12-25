@@ -22,13 +22,12 @@ class ThesesViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ThesisSerializer
 
     def get_queryset(self):
-        result = Thesis.objects.select_related(
+        return Thesis.objects.select_related(
             *fields_for_prefetching("student"),
             *fields_for_prefetching("student_2"),
             *fields_for_prefetching("advisor"),
             *fields_for_prefetching("auxiliary_advisor"),
-        ).all()
-        return result.order_by("-added_date")
+        ).order_by("-added_date").all()
 
 
 def fields_for_prefetching(base_field: str) -> List[str]:
