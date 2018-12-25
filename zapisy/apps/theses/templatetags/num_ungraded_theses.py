@@ -1,6 +1,5 @@
 from django import template
-from ..utils import wrap_user
-from ..users import get_user_type, ThesisUserType
+from ..users import wrap_user, get_user_type, ThesisUserType
 from ..models import get_num_ungraded_for_emp
 
 
