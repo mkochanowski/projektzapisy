@@ -12,7 +12,7 @@ from apps.users.models import Student, Employee
 from .models import Thesis
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
-from .utils import wrap_user
+from .users import wrap_user
 
 
 class ThesesViewSet(viewsets.ModelViewSet):

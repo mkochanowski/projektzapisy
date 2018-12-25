@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 from .permissions import can_modify_thesis, can_add_thesis
-from .utils import wrap_user
+from .users import wrap_user
 
 
 class ThesisPermissions(BasePermission):
