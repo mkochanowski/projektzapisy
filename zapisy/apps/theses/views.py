@@ -33,7 +33,15 @@ class ThesesViewSet(viewsets.ModelViewSet):
 def fields_for_prefetching(base_field: str) -> List[str]:
     """For all user fields present on the thesis, we need to prefetch
     both our user model and the standard Django user it's linked to; see
-    users.wrap_user for a more detailed explanation"""
+    users.wrap_user for a more detailed explanation
+
+    Note that this hurts performance: DB queries with the __user prefetch
+    are roughly two times slower than with just the base thesis fields.
+    (Of course, we're only talking about the performance of get_queryset here;
+    not prefetching those fields would have disastrous consequences later when
+    the serializer accesses them)
+    Sadly this is necessary until the User system is refactored.
+    """
     return [base_field, f'{base_field}__user']
 
 
