@@ -139,11 +139,11 @@
                     </li>
                     {% if user.is_authenticated %}
                         <li>
-                            <a href="{% url 'theses:main' %}">Prace dyplomowe
                             {% num_ungraded_theses user as num_ungraded %}
-                            {% if num_ungraded > 0 %}
-                                ({{ num_ungraded }})
-                            {% endif %}
+                            <a href="{% url 'theses:main' %}">Prace dyplomowe
+                                <span id="num_ungraded_theses">
+                                    {% if num_ungraded > 0 %}({{ num_ungraded }}){% endif %}
+                                </span>
                             </a>
                         </li>
                     {% endif %}

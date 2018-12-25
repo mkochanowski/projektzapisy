@@ -6,14 +6,15 @@ from django.db.models import Q
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import NotFound
 from dal import autocomplete
 
 from apps.users.models import Student, Employee
-from .models import Thesis
+from .models import Thesis, get_num_ungraded_for_emp
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
 from .utils import wrap_user
-from .users import get_theses_board
+from .users import ThesisUserType, get_theses_board, get_user_type
 
 
 class ThesesViewSet(viewsets.ModelViewSet):
@@ -55,6 +56,16 @@ def get_current_user(request):
     wrapped_user = wrap_user(request.user)
     serializer = serializers.CurrentUserSerializer(wrapped_user)
     return Response(serializer.data)
+
+
+@api_view(http_method_names=["get"])
+@permission_classes((permissions.IsAuthenticated,))
+def get_num_ungraded(request):
+    wrapped_user = wrap_user(request.user)
+    user_type = get_user_type(wrapped_user)
+    if user_type != ThesisUserType.theses_board_member:
+        raise NotFound()
+    return Response(get_num_ungraded_for_emp(wrapped_user))
 
 
 @login_required

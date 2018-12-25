@@ -64,6 +64,10 @@ export async function getThesesBoard() {
 	return json.map(pj => Employee.fromJson(pj) as Employee);
 }
 
+export async function getNumUngraded() {
+	return Number(await getData(`${BASE_API_URL}/num_ungraded`));
+}
+
 export const enum PersonType {
 	Employee,
 	Student,

@@ -5,7 +5,7 @@ import { clone } from "lodash";
 import { Thesis, UserType, AppUser, Employee, ThesisVote } from "../types";
 import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
-	getCurrentUser, ThesisTypeFilter, getThesesBoard,
+	getCurrentUser, ThesisTypeFilter, getThesesBoard, getNumUngraded,
 } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";
@@ -20,6 +20,7 @@ import {
 	getProcessedTheses, SortColumn, SortDirection,
 	clearFilterCache, ThesesProcessParams,
 } from "./theses_store";
+import { adjustDomForUngraded } from "../utils";
 
 type StateThesis = {
 	original: Thesis,
@@ -72,17 +73,10 @@ const TopRowContainer = styled.div`
 export class ThesesApp extends React.Component<{}, State > {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
+	private hasChangedTypeFilter: boolean = false;
 
 	async componentDidMount() {
-		const rawTheses = await this.safeGetRawTheses();
-		const user = await getCurrentUser();
-		this.setState({
-			rawTheses,
-			theses: getProcessedTheses(rawTheses, this.state.thesesParams, user),
-			thesesBoard: await getThesesBoard(),
-			user,
-			applicationState: ApplicationState.Normal,
-		});
+		this.initializeAppState();
 		this.oldOnBeforeUnload = window.onbeforeunload;
 		window.onbeforeunload = this.confirmUnload;
 		this.initializeKeyboardShortcuts();
@@ -112,6 +106,33 @@ export class ThesesApp extends React.Component<{}, State > {
 		}
 	}
 
+	private async getNumUngraded(user: AppUser = this.state.user) {
+		return user.type === UserType.ThesesBoardMember ? getNumUngraded() : 0;
+	}
+
+	private filterParamsForUngraded(numUngraded: number) {
+		if (numUngraded && !this.hasChangedTypeFilter) {
+			return Object.assign({}, this.state.thesesParams, {
+				type: ThesisTypeFilter.Ungraded
+			});
+		}
+		return this.state.thesesParams;
+	}
+
+	private async initializeAppState() {
+		const rawTheses = await this.safeGetRawTheses();
+		const user = await getCurrentUser();
+		const params = this.filterParamsForUngraded(await this.getNumUngraded(user));
+		this.setState({
+			rawTheses,
+			theses: getProcessedTheses(rawTheses, params, user),
+			thesesBoard: await getThesesBoard(),
+			thesesParams: params,
+			applicationState: ApplicationState.Normal,
+			user,
+		});
+	}
+
 	private getNewStateForParams(params: Partial<ThesesProcessParams>): Partial<State> {
 		const finalParams = Object.assign({}, this.state.thesesParams, params);
 		const processed = getProcessedTheses(this.state.rawTheses, finalParams, this.state.user);
@@ -134,6 +155,7 @@ export class ThesesApp extends React.Component<{}, State > {
 
 	private onTypeFilterChanged = (value: ThesisTypeFilter) => {
 		const { thesesParams } = this.state;
+		this.hasChangedTypeFilter = true;
 		this.updateFilters(thesesParams.title, thesesParams.advisor, value);
 	}
 	private onAdvisorFilterChanged = (value: string) => {
@@ -333,20 +355,31 @@ export class ThesesApp extends React.Component<{}, State > {
 		[ThesisWorkMode.Editing]: this.modifyExistingThesis,
 	};
 
-	private handleThesisSave = async () => {
+	private preSaveChecks() {
 		const { thesis, workMode } = this.state;
 		if (thesis === null) {
-			console.warn("Tried to save thesis but none selected, this shouldn't happen");
-			return;
+			console.assert(false, "Tried to save thesis but none selected, this shouldn't happen");
+			return false;
 		}
 		if (workMode === null) {
 			console.assert(false, "Tried to perform a save action without a work mode");
+			return false;
+		}
+		if (!this.hasUnsavedChanges()) {
+			console.assert(false, "save() called but no unsaved changes");
+			return false;
+		}
+		return true;
+	}
+
+	private handleThesisSave = async () => {
+		if (!this.preSaveChecks()) {
 			return;
 		}
-		console.assert(this.hasUnsavedChanges());
 
+		const { thesis, workMode } = this.state;
 		this.setState({ applicationState: ApplicationState.PerformingBackendChanges });
-		const handler = this.handlerForWorkMode[workMode];
+		const handler = this.handlerForWorkMode[workMode!];
 		const id = await handler.call(this);
 
 		if (id === -1) {
@@ -360,21 +393,24 @@ export class ThesesApp extends React.Component<{}, State > {
 		const newList = await this.safeGetRawTheses();
 		// Got a new list, old filter cache no longer valid
 		clearFilterCache();
-		// We'll want to find the thesis we just saved
-		// Note that it _could_ technically be absent from the new list
-		// but the odds are absurdly low (it would have to be deleted by someone
-		// else or the admin in the time between those two requests above)
-		const thesisToSelect = this.thesisToSelectAfterAction(thesis, newList, id);
+
+		const thesisToSelect = this.thesisToSelectAfterAction(thesis!, newList, id);
+		const numUngraded = await this.getNumUngraded();
+		const newParams = this.filterParamsForUngraded(numUngraded);
 		const newState: Partial<State> = {
 			rawTheses: newList,
-			theses: getProcessedTheses(newList, this.state.thesesParams, this.state.user),
+			theses: getProcessedTheses(newList, newParams, this.state.user),
 			applicationState: ApplicationState.Normal,
 			// no matter what the work mode was, if we have a thesis we end up in the edit view
 			workMode: thesisToSelect ? ThesisWorkMode.Editing : null,
+			thesesParams: newParams,
 		};
 		this.setStateWithNewThesis(newState, thesisToSelect);
+		adjustDomForUngraded(numUngraded);
 	}
 
+	// Either the same thesis we just saved, or the next ungraded thesis
+	// if the current user is a theses board member and only edited votes
 	private thesisToSelectAfterAction(oldThesis: StateThesis, newList: Thesis[], savedId: number) {
 		const { user } = this.state;
 		if (
