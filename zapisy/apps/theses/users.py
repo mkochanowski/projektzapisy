@@ -7,10 +7,12 @@ THESIS_BOARD_GROUP_NAME = "Komisja prac dyplomowych"
 
 
 def is_theses_board_member(user: BaseUser) -> bool:
+    """Is the specified user a member of the theses board?"""
     return is_user_in_group(user.user, THESIS_BOARD_GROUP_NAME)
 
 
 def get_num_board_members() -> int:
+    """How many theses board members are there in total?"""
     return Group.objects.filter(name=THESIS_BOARD_GROUP_NAME).count()
 
 
@@ -23,6 +25,8 @@ class ThesisUserType(Enum):
 
 
 def get_user_type(base_user: BaseUser) -> ThesisUserType:
+    """Given a user, return their role in the thesis system
+    The roles are based on group membership"""
     if isinstance(base_user, Employee):
         if base_user.user.is_staff:
             return ThesisUserType.admin

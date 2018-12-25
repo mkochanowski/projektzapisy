@@ -5,7 +5,11 @@ from .utils import wrap_user
 
 
 class ThesisPermissions(BasePermission):
+    """A custom permission class that determines access rights
+    based on the user type (i.e. what groups the user is in) in the system
+    """
     def has_object_permission(self, request, view, obj):
+        """Is this request allowed on the specified object?"""
         if not request.user.is_authenticated:
             return False
         return (
@@ -14,6 +18,7 @@ class ThesisPermissions(BasePermission):
         )
 
     def has_permission(self, request, view):
+        """Is the request allowed?"""
         if not request.user.is_authenticated:
             return False
         if request.method == "POST":

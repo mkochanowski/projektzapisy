@@ -32,12 +32,16 @@ class ThesesViewSet(viewsets.ModelViewSet):
 
 
 def fields_for_prefetching(base_field: str) -> List[str]:
+    """For all user fields present on the thesis, we need to prefetch
+    both our user model and the standard Django user it's linked to; see
+    users.wrap_user for a more detailed explanation"""
     return [base_field, f'{base_field}__user']
 
 
 @api_view()
 @permission_classes((permissions.IsAuthenticated,))
 def get_current_user(request):
+    """Allows the front end to query the current thesis user role"""
     wrapped_user = wrap_user(request.user)
     serializer = serializers.CurrentUserSerializer(wrapped_user)
     return Response(serializer.data)
@@ -49,6 +53,9 @@ def theses_main(request):
 
 
 def build_autocomplete_view_with_queryset(queryset):
+    """Given a queryset, build an autocomplete view for django-autocomplete-light
+    (forms.py explains why we use it)
+    """
     class ac(autocomplete.Select2QuerySetView):
         def get_queryset(self):
             if not self.request.user.is_authenticated:
