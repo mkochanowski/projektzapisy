@@ -68,6 +68,9 @@ class Thesis(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def process_new_votes(self, votes):
+        """Whenever one or more votes for a thesis change, this function
+        should be called to process & save them
+        """
         had_rejection = False
         had_approval = False
         for voter, vote in votes:
@@ -75,12 +78,12 @@ class Thesis(models.Model):
                 existing_vote = ThesisVoteBinding.objects.get(thesis=self, voter=voter)
                 existing_vote.value = vote.value
                 existing_vote.save()
-                if vote == ThesisVote.rejected:
-                    had_rejection = True
-                elif vote == ThesisVote.accepted:
-                    had_approval = True
             except ThesisVoteBinding.DoesNotExist:
                 ThesisVoteBinding.objects.create(thesis=self, voter=voter, value=vote.value)
+            if vote == ThesisVote.rejected:
+                    had_rejection = True
+            elif vote == ThesisVote.accepted:
+                had_approval = True
         if had_approval:
             self.check_for_approval_status_change()
         elif had_rejection:
@@ -88,6 +91,7 @@ class Thesis(models.Model):
             self.save()
 
     def check_for_approval_status_change(self):
+        """We had a "yes" vote, see if we now have enough votes to accept this thesis"""
         approve_votes_cnt = ThesisVoteBinding.objects.filter(
             thesis=self, value=ThesisVote.accepted.value
         ).count()

@@ -41,6 +41,7 @@ class PersonSerializerForThesis(serializers.Serializer):
 
 
 def serialize_thesis_votes(thesis: Thesis):
+    """Serializes the votes of the given thesis into a dict"""
     vote_tpls = (
         (vote.voter.pk, vote.value)
         for vote in thesis.votes.all()
@@ -78,10 +79,12 @@ def validate_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employe
 
 
 def validate_thesis_vote(value):
+    """Check if the given vote value is valid"""
     return value in [vote.value for vote in ThesisVote]
 
 
 def validate_votes(votes, user: BaseUser):
+    """Validate the votes dict for a thesis"""
     if type(votes) is not dict:
         raise serializers.ValidationError("\"votes\" must be an object")
     result = []
