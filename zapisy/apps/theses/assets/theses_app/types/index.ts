@@ -1,4 +1,6 @@
-// Must match values/structures defined in the Python backend
+/*
+	Defines core types used in the front end code
+*/
 import * as moment from "moment";
 
 export const MAX_THESIS_TITLE_LEN = 300;
@@ -11,6 +13,10 @@ export const enum ThesisKind {
 	Isim = 4,
 }
 
+/**
+ * Stringify a thesis kind
+ * @param kind The kind to stringify
+ */
 export function thesisKindToString(kind: ThesisKind): string {
 	switch (kind) {
 		case ThesisKind.Masters: return "mgr";
@@ -29,6 +35,10 @@ export const enum ThesisStatus {
 	Defended = 5,
 }
 
+/**
+ * Stringify a thesis status
+ * @param status The status to stringify
+ */
 export function thesisStatusToString(status: ThesisStatus) {
 	switch (status) {
 		case ThesisStatus.Accepted: return "Zaakceptowana";
@@ -54,6 +64,10 @@ export const enum ThesisTypeFilter {
 	Default = AllCurrent,
 }
 
+/**
+ * Stringify a thesis type filter
+ * @param type The type filter to stringify
+ */
 export function thesisTypeFilterToString(type: ThesisTypeFilter) {
 	switch (type) {
 		case ThesisTypeFilter.AllCurrent: return "Wszystkie aktualne";
@@ -81,6 +95,9 @@ type PersonJson = {
 	display_name: string;
 };
 
+/**
+ * Represents a person in the thesis system
+ */
 export class BasePerson {
 	public id: number;
 	public displayName: string;
@@ -99,9 +116,18 @@ export class BasePerson {
 	}
 }
 
+/**
+ * Represents a university employee in the thesis system
+ */
 export class Employee extends BasePerson {}
+/**
+ * Represents a student in the thesis system
+ */
 export class Student extends BasePerson {}
 
+/**
+ * This is the format in which we receive theses from the backend
+ */
 export type ThesisJson = {
 	id: number;
 	title: string;
@@ -117,6 +143,9 @@ export type ThesisJson = {
 	modified_date: string;
 };
 
+/**
+ * Native representation of a thesis
+ */
 export class Thesis {
 	public id: number;
 	public title: string;
@@ -131,6 +160,11 @@ export class Thesis {
 	public addedDate: moment.Moment;
 	public modifiedDate: moment.Moment;
 
+	/**
+	 * Construct a thesis object from JSON if present,
+	 * or initialize with defaults otherwise
+	 * @param json The optional JSON object from to initialize
+	 */
 	public constructor(json?: ThesisJson) {
 		if (json) {
 			this.initFromJson(json);
@@ -169,10 +203,21 @@ export class Thesis {
 		this.modifiedDate = moment();
 	}
 
+	/**
+	 * Is this the same thesis as the supplied one?
+	 * @param other The other thesis
+	 * Note that because this is a fat arrow it can be conveniently used
+	 * as a callback, i.e. theses.find(t.isEqual)
+	 */
 	public isEqual = (other: Thesis): boolean => {
 		return this.id === other.id;
 	}
 
+	/**
+	 * Determine whether the other instance of the same thesis has been modified;
+	 * to compare two possibly different thesis objects, see isEqual above
+	 * @param other The other thesis
+	 */
 	public areValuesEqual(other: Thesis): boolean {
 		console.assert(
 			this.isEqual(other),
@@ -212,6 +257,9 @@ type CurrentUserJson = {
 	type: UserType;
 };
 
+/**
+ * Represents the user of the thesis system
+ */
 export class AppUser {
 	public user: BasePerson;
 	public type: UserType;

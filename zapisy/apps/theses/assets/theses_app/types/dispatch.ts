@@ -5,12 +5,16 @@
 
 import { ThesisKind, ThesisStatus, Thesis, BasePerson, MAX_THESIS_TITLE_LEN } from ".";
 
-// The representation of a person sent to the backend
+/**
+ * The representation of a person sent to the backend
+ */
 export type PersonDispatch = {
 	id: number;
 };
 
-// The representation of a new thesis object sent to the backend
+/**
+ * The representation of a new thesis object sent to the backend
+ */
 export type ThesisAddDispatch = {
 	title?: string;
 	advisor?: PersonDispatch | null;
@@ -23,14 +27,18 @@ export type ThesisAddDispatch = {
 	student_2?: PersonDispatch | null;
 };
 
-// The representation of a diff for an existing thesis object
-// sent to the backend
+/**
+ * The representation of a diff for an existing thesis object sent to the backend
+ */
 export type ThesisModDispatch = {
 	id: number;
 } & ThesisAddDispatch;
 
-// Given a new thesis object, convert it to a representation
-// consumed by the backend
+/**
+ * Given a new thesis object, convert it to a representation
+ * consumed by the backend
+ * @param thesis The thesis object to convert
+ */
 export function getThesisAddDispatch(thesis: Thesis): ThesisAddDispatch {
 	const result: ThesisAddDispatch = {
 		title: thesis.title,
@@ -54,8 +62,10 @@ export function getThesisAddDispatch(thesis: Thesis): ThesisAddDispatch {
 	return result;
 }
 
-// Given an old and new person value, determine whether it should be considered
-// to have "changed" - based on this we will include it in the info sent to the backend
+/**
+ * Given an old and new person value, determine whether it should be considered
+ * to have "changed" - based on this we will include it in the info sent to the backend
+ */
 function hadPersonChange(old: BasePerson | null, newp: BasePerson | null) {
 	return (
 		old === null && newp !== null ||
@@ -64,13 +74,19 @@ function hadPersonChange(old: BasePerson | null, newp: BasePerson | null) {
 	);
 }
 
-// Given a person instance, convert it to the backend representation
+/**
+ * Given a person instance, convert it to the backend representation
+ */
 function toPersonDispatch(newPerson: BasePerson | null): PersonDispatch | null {
 	return newPerson ? { id: newPerson.id } : null;
 }
 
-// Given the previous and new thesis object, compute the diff to be
-// sent to the backend
+/**
+ * Given the previous and new thesis object, compute the diff to be
+ * sent to the backend
+ * @param orig The old thesis object
+ * @param mod The new (modified) thesis object
+ */
 export function getThesisModDispatch(orig: Thesis, mod: Thesis): ThesisModDispatch {
 	console.assert(orig.isEqual(mod));
 	const result: ThesisModDispatch = { id: orig.id };
