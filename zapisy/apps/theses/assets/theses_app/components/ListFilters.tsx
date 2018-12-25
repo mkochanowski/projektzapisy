@@ -1,20 +1,25 @@
+/*
+	Defines the filters component rendered above the theses table.
+*/
+
 import * as React from "react";
+import styled from "styled-components";
 
-import { ThesisTypeFilter } from "../backend_callers";
 import { GenericSelect } from "./GenericSelect";
+import { ThesisTypeFilter, thesisTypeFilterToString } from "../types";
 
-const typefilterInfos = [
-	{ val: ThesisTypeFilter.AllCurrent, displayName: "Wszystkie aktualne" },
-	{ val: ThesisTypeFilter.All, displayName: "Wszystkie" },
-	{ val: ThesisTypeFilter.Masters, displayName: "Magisterskie" },
-	{ val: ThesisTypeFilter.Engineers, displayName: "Inżynierskie" },
-	{ val: ThesisTypeFilter.Bachelors, displayName: "Licencjackie" },
-	{ val: ThesisTypeFilter.BachelorsISIM, displayName: "Licencjackie ISIM" },
-	{ val: ThesisTypeFilter.AvailableMasters, displayName: "Magisterskie - dostępne" },
-	{ val: ThesisTypeFilter.AvailableEngineers, displayName: "Inżynierskie - dostępne" },
-	{ val: ThesisTypeFilter.AvailableBachelors, displayName: "Licencjackie - dostępne" },
-	{ val: ThesisTypeFilter.AvailableBachelorsISIM, displayName: "Licencjackie ISIM - dostępne" },
-];
+const typeFilterInfos = [
+	ThesisTypeFilter.AllCurrent,
+	ThesisTypeFilter.All,
+	ThesisTypeFilter.Masters,
+	ThesisTypeFilter.Engineers,
+	ThesisTypeFilter.Bachelors,
+	ThesisTypeFilter.BachelorsISIM,
+	ThesisTypeFilter.AvailableMasters,
+	ThesisTypeFilter.AvailableEngineers,
+	ThesisTypeFilter.AvailableBachelors,
+	ThesisTypeFilter.AvailableBachelorsISIM,
+].map(type => ({ val: type, displayName: thesisTypeFilterToString(type) }));
 
 type Props = {
 	onTypeChange: (newFilter: ThesisTypeFilter) => void;
@@ -38,6 +43,13 @@ const labelStyle: React.CSSProperties = {
 	fontSize: "110%",
 };
 
+const FiltersContainer = styled.div`
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+`;
+
 export class ListFilters extends React.PureComponent<Props> {
 	private handleTypeChange = (newFilter: ThesisTypeFilter): void => {
 		this.props.onTypeChange(newFilter);
@@ -52,16 +64,11 @@ export class ListFilters extends React.PureComponent<Props> {
 	}
 
 	public render() {
-		return <div style={{
-			width: "100%",
-			display: "flex",
-			justifyContent: "space-between",
-			alignItems: "center",
-		}}>
+		return <FiltersContainer>
 			<GenericSelect<ThesisTypeFilter>
 				value={this.props.typeValue}
 				onChange={this.handleTypeChange}
-				optionInfo={typefilterInfos}
+				optionInfo={typeFilterInfos}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
 				enabled={this.props.enabled}
@@ -88,6 +95,6 @@ export class ListFilters extends React.PureComponent<Props> {
 					disabled={!this.props.enabled}
 				/>
 			</div>
-		</div>;
+		</FiltersContainer>;
 	}
 }

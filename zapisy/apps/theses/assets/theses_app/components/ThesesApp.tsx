@@ -2,10 +2,9 @@ import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
-import { Thesis, UserType, AppUser } from "../types";
+import { Thesis, UserType, AppUser, ThesisTypeFilter } from "../types";
 import {
-	getThesesList, saveModifiedThesis, saveNewThesis,
-	getCurrentUser, ThesisTypeFilter,
+	getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser,
 } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";

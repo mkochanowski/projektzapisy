@@ -1,5 +1,11 @@
+/*
+	A generic select component that renders a <select>
+	widget for the specified options and optionally a label
+*/
+
 import * as React from "react";
 
+// The format in which users are required to supply select options
 type SelectOptionsInfo<T> = Array<{
 	val: T;
 	displayName: string;
@@ -51,13 +57,15 @@ export class GenericSelect<T> extends React.Component<Props<T>> {
 	}
 
 	private onChange = (newValue: string) => {
-		const convertedValue = this.stringValueToThesisStatus(newValue);
+		const convertedValue = this.convertToExternalValue(newValue);
 		if (convertedValue !== null) {
 			this.props.onChange(convertedValue);
 		}
 	}
 
-	private stringValueToThesisStatus(stringValue: string): T | null {
+	private convertToExternalValue(stringValue: string): T | null {
+		// The HTML select widget will stringify all values passed to it,
+		// so we need to perform the reverse conversion here
 		for (const info of this.props.optionInfo) {
 			if (stringValue === String(info.val)) {
 				return info.val;

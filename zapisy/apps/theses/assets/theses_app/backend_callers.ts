@@ -13,21 +13,6 @@ import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 const BASE_API_URL = "/theses/api";
 const REST_REQUEST_TIMEOUT = 10000;
 
-export const enum ThesisTypeFilter {
-	AllCurrent,
-	All,
-	Masters,
-	Engineers,
-	Bachelors,
-	BachelorsISIM,
-	AvailableMasters,
-	AvailableEngineers,
-	AvailableBachelors,
-	AvailableBachelorsISIM,
-
-	Default = AllCurrent,
-}
-
 axios.defaults.timeout = REST_REQUEST_TIMEOUT;
 
 // Send a request to the backend including the csrf token

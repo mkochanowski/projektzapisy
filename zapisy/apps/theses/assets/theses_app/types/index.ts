@@ -39,6 +39,36 @@ export function thesisStatusToString(status: ThesisStatus) {
 	}
 }
 
+export const enum ThesisTypeFilter {
+	AllCurrent,
+	All,
+	Masters,
+	Engineers,
+	Bachelors,
+	BachelorsISIM,
+	AvailableMasters,
+	AvailableEngineers,
+	AvailableBachelors,
+	AvailableBachelorsISIM,
+
+	Default = AllCurrent,
+}
+
+export function thesisTypeFilterToString(type: ThesisTypeFilter) {
+	switch (type) {
+		case ThesisTypeFilter.AllCurrent: return "Wszystkie aktualne";
+		case ThesisTypeFilter.All: return "Wszystkie";
+		case ThesisTypeFilter.Masters: return "Magisterskie";
+		case ThesisTypeFilter.Engineers: return "Inżynierskie";
+		case ThesisTypeFilter.Bachelors: return "Licencjackie";
+		case ThesisTypeFilter.BachelorsISIM: return "Licencjackie ISIM";
+		case ThesisTypeFilter.AvailableMasters: return "Magisterskie - dostępne";
+		case ThesisTypeFilter.AvailableEngineers: return "Inżynierskie - dostępne";
+		case ThesisTypeFilter.AvailableBachelors: return "Licencjackie - dostępne";
+		case ThesisTypeFilter.AvailableBachelorsISIM: return "Licencjackie ISIM - dostępne";
+	}
+}
+
 export const enum ThesisVote {
 	None = 1,
 	Rejected = 2,

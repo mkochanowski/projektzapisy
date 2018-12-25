@@ -1,5 +1,4 @@
-import { ThesisTypeFilter } from "../backend_callers";
-import { Thesis, ThesisStatus, ThesisKind, BasePerson } from "../types";
+import { Thesis, ThesisStatus, ThesisKind, BasePerson, ThesisTypeFilter } from "../types";
 import { strcmp } from "common/utils";
 
 export const enum SortDirection {
