@@ -1,3 +1,4 @@
+"""Custom Django admin validators for theses system-related admin pages"""
 from django.core.exceptions import ValidationError
 
 from .users import get_num_board_members

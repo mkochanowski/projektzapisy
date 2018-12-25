@@ -1,3 +1,6 @@
+"""This module defines high-level thesis-related permissions
+checks used when deserializing a received thesis object and performing actions.
+"""
 from apps.users.models import Employee, BaseUser
 
 from .models import Thesis, ThesisStatus

@@ -1,3 +1,10 @@
+"""Defines all (de)serialization logic related
+to objects used in the theses system, that is:
+* packing/unpacking logic
+* validation
+* fine-grained permissions checks
+* performing modifications/adding new objects
+"""
 from typing import Dict, Any
 
 from rest_framework import serializers
@@ -76,6 +83,10 @@ class ThesisSerializer(serializers.ModelSerializer):
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
 
     def validate(self, data):
+        """Validate a dict object received from the frontend client;
+        DRF expects us to return a dict object to be used for further processing,
+        so we use this opportunity to perform conversions to more convenient formats
+        """
         # self.context will not be defined for local serialization
         # presently we don't use this serializer in a local context, and even if we did,
         # no special validation needs to be performed then (drf already provides

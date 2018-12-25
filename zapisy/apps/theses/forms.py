@@ -11,7 +11,10 @@ class ThesisForm(forms.ModelForm):
     to view one there. Because there are so many users/employees in the system,
     the <select> widget Django outputs lags the browser, so we use
     https://github.com/yourlabs/django-autocomplete-light to mitigate that problem
-    by fetching users via AJAX
+    by fetching users via AJAX.
+
+    Note that frontend client code reuses the endpoint provided by DAL for the same
+    purpose; see backend_callers.ts
     """
 
     class Meta:

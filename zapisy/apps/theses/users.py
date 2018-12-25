@@ -1,3 +1,5 @@
+"""Defines various utility functions related to operations
+on users of the theses system"""
 from enum import Enum
 
 from django.contrib.auth.models import Group, User

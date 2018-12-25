@@ -1,3 +1,9 @@
+/*
+	A simple error boundary - if an uncaught error propagates
+	to the root of the tree, it's deemed serious enough that we
+	kill the application and display a notification with error details
+*/
+
 import * as React from "react";
 
 import { ErrorBox } from "./ErrorBox";
