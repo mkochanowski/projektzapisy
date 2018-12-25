@@ -84,6 +84,7 @@ export function thesisTypeFilterToString(type: ThesisTypeFilter) {
 		case ThesisTypeFilter.AvailableEngineers: return "Inżynierskie - dostępne";
 		case ThesisTypeFilter.AvailableBachelors: return "Licencjackie - dostępne";
 		case ThesisTypeFilter.AvailableBachelorsISIM: return "Licencjackie ISIM - dostępne";
+		case ThesisTypeFilter.Ungraded: return "Wszystkie nieocenione";
 	}
 }
 
