@@ -10,21 +10,24 @@ type Props = {
 
 export function VoteIndicator(props: Props) {
 	const Component = props.active ? Container : DisabledContainer;
-	return <Component>{indicatorForValue(props.value)}</Component>;
+	const { text, color = "default" } = paramsForValue(props.value);
+	return <Component cssColor={color}>{text}</Component>;
 }
 
-function indicatorForValue(value: ThesisVote) {
+function paramsForValue(value: ThesisVote) {
 	switch (value) {
-		case ThesisVote.None: return "\u{2B1C}";
-		case ThesisVote.Accepted: return "\u{2705}";
-		case ThesisVote.Rejected: return "\u{274C}";
-		case ThesisVote.UserMissing: return "\u{2753}";
+		case ThesisVote.None: return { text: "\u{2B1C}" };
+		case ThesisVote.Accepted: return { text: "\u{2705}", color: "green" };
+		case ThesisVote.Rejected: return { text: "\u{274C}", color: "red" };
+		case ThesisVote.UserMissing: return { text: "\u{2753}" };
 	}
 }
 
+type ContainerProps = { cssColor: string };
 const Container = styled.span`
 	width: 18px;
 	display: inline-block;
+	color: ${(props: ContainerProps) => props.cssColor}
 `;
 
 const DisabledContainer = styled(Container)`
