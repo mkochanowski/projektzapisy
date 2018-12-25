@@ -81,14 +81,14 @@ class Thesis(models.Model):
             except ThesisVoteBinding.DoesNotExist:
                 ThesisVoteBinding.objects.create(thesis=self, voter=voter, value=vote.value)
             if vote == ThesisVote.rejected:
-                    had_rejection = True
+                had_rejection = True
             elif vote == ThesisVote.accepted:
                 had_approval = True
-        if had_approval:
-            self.check_for_approval_status_change()
-        elif had_rejection:
+        if had_rejection:
             self.status = ThesisStatus.returned_for_corrections.value
             self.save()
+        elif had_approval:
+            self.check_for_approval_status_change()
 
     def check_for_approval_status_change(self):
         """We had a "yes" vote, see if we now have enough votes to accept this thesis"""
