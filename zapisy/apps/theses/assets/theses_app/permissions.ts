@@ -1,6 +1,6 @@
-/*
-	Theses app permission checks, mostly analogous to permissions.py
-*/
+/**
+ * @file Theses app permission checks, mostly analogous to permissions.py
+ */
 import { AppUser, UserType, Thesis, ThesisStatus } from "./types";
 
 /**

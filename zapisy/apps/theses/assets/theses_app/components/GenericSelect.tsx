@@ -1,11 +1,12 @@
-/*
-	A generic select component that renders a <select>
-	widget for the specified options and optionally a label
-*/
-
+/**
+ * @file A generic select component that renders a <select>
+ * widget for the specified options and optionally a label
+ */
 import * as React from "react";
 
-// The format in which users are required to supply select options
+/**
+ * The format in which users are required to supply select options
+ */
 type SelectOptionsInfo<T> = Array<{
 	val: T;
 	displayName: string;
@@ -13,13 +14,20 @@ type SelectOptionsInfo<T> = Array<{
 
 type Props<T> = {
 	value: T;
-	onChange: (val: T) => void
+	onChange: (val: T) => void;
+	/** The options to be displayed in the <select> */
 	optionInfo: SelectOptionsInfo<T>;
+	/** Optional label, will be displayed to the left by default */
 	label?: string;
+	/** Optional styles */
 	labelCss?: React.CSSProperties;
 	enabled?: boolean;
 };
 
+/**
+ * A wrapper around the HTML select component with a convenient API
+ * and an optional label
+ */
 export class GenericSelect<T> extends React.Component<Props<T>> {
 	public render() {
 		const shouldDisable = typeof this.props.enabled === "boolean" ? !this.props.enabled : false;

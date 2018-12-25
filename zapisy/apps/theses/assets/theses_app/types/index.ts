@@ -1,6 +1,8 @@
-/*
-	Defines core types used in the front end code
-*/
+/**
+ * @file Defines core types used in the front end code.
+ * If you change any of those types, you should most likely also change
+ * the Python equivalent in models.py
+ */
 import * as moment from "moment";
 
 export const MAX_THESIS_TITLE_LEN = 300;

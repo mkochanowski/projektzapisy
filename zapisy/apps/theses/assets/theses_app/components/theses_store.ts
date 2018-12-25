@@ -1,7 +1,7 @@
-/*
-	Logic related to sorting/filtering theses based
-	on user settings in the UI
-*/
+/**
+ * Logic related to sorting/filtering theses based
+ * on user settings in the UI
+ */
 
 import { Thesis, ThesisStatus, ThesisKind, BasePerson, ThesisTypeFilter } from "../types";
 import { strcmp } from "common/utils";
@@ -26,7 +26,9 @@ export const enum SortColumn {
 // clearFilterCache below does this.
 const filterCache: Map<string, Thesis[]> = new Map();
 
-// The results returned by this module are determined by these parameters
+/**
+ * Thesis processing parameters; the results of getProcessedTheses depend on this
+ */
 export type ThesesProcessParams = {
 	advisor: string;
 	title: string;

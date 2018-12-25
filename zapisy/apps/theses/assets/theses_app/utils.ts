@@ -1,6 +1,6 @@
-/*
-	Misc utils for the thesis system app.
-*/
+/**
+ * @file Misc utils for the thesis system app.
+ */
 
 import * as React from "react";
 

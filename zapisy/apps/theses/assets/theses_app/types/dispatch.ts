@@ -1,8 +1,7 @@
-/*
-	Defines types that will be dispatched to the backend
-	as well as functions to operate on them
-*/
-
+/**
+ * Defines types that will be dispatched to the backend
+ * as well as functions to operate on them
+ */
 import { ThesisKind, ThesisStatus, Thesis, BasePerson, MAX_THESIS_TITLE_LEN } from ".";
 
 /**

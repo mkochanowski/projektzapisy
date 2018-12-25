@@ -1,6 +1,6 @@
-/*
-	Defines the filters component rendered above the theses table.
-*/
+/**
+ * Defines the filters component rendered above the theses table.
+ */
 
 import * as React from "react";
 import styled from "styled-components";

@@ -1,6 +1,6 @@
-/*
-	Miscellaneous types
-*/
+/**
+ * @file Miscellaneous types
+ */
 
 /**
  * The current global application mode

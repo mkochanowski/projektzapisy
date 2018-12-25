@@ -1,8 +1,7 @@
-/*
-	This file contains functions that permit interaction
-	with the backend - both pure getters and modifiers
-*/
-
+/**
+ * @file Contains functions that permit interaction
+ * with the backend - both pure getters and modifiers
+ */
 import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";

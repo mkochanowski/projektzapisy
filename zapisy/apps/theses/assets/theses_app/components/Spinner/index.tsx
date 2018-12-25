@@ -1,6 +1,6 @@
-/*
-	A simple spinner component used as a base by other components
-*/
+/**
+ * @file A simple spinner component used as a base by other components
+ */
 
 import * as React from "react";
 import spinner from "./spinner_transparent.gif";
