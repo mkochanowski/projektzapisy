@@ -41,6 +41,7 @@ type State = {
 
 type Props = {
 	thesis: Thesis;
+	/** Should the title field be highlighted to indicate an error? */
 	titleError: boolean;
 	user: AppUser;
 	onTitleChanged: (nt: string) => void;
@@ -52,6 +53,7 @@ type Props = {
 	onDescriptionChanged: (nd: string) => void;
 };
 
+/** Decide whether to display the fields based on the thesis instance in the props */
 function getStateFromProps(props: Props) {
 	return {
 		displayAuxAdvisor: props.thesis.auxiliaryAdvisor !== null,

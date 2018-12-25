@@ -20,6 +20,10 @@ type Props = {
 	enabled: boolean;
 };
 
+/**
+ * Shows the thesis status in a <select> field if modification
+ * is allowed or a read-only text input otherwise
+ */
 export function ThesisStatusIndicator(props: Props) {
 	return props.enabled
 	? <GenericSelect<ThesisStatus>

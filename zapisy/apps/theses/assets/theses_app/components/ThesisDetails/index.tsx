@@ -28,33 +28,34 @@ const SaveButton = Button.extend`
 `;
 
 const DetailsSectionWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `;
 
 const MainDetailsContainer = styled.div`
-border: 1px solid black;
-padding: 15px;
-display: flex;
-flex-direction: row;
-width: 100%;
+	border: 1px solid black;
+	padding: 15px;
+	display: flex;
+	flex-direction: row;
+	width: 100%;
 `;
 
 const LeftDetailsContainer = styled.div`
-flex-basis: 85%;
+	flex-basis: 85%;
 `;
 
 const RightDetailsContainer = styled.div`
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-margin-left: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	margin-left: 20px;
 `;
 
 type Props = {
 	thesis: Thesis;
 	thesesList: Thesis[];
+	/** Are we saving this thesis (i.e. should it be read-only)? */
 	isSaving: boolean;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
@@ -64,6 +65,7 @@ type Props = {
 };
 
 const initialState = {
+	/** Was the title invalid when we last validated the thesis before saving? */
 	hasTitleError: false,
 };
 type State = typeof initialState;
@@ -86,46 +88,61 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	public render() {
 		console.warn("Render details");
-		const { hasUnsavedChanges } = this.props;
-		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
 
 		return <DetailsSectionWrapper>
 			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
 			<MainDetailsContainer
 				style={this.props.isSaving ? getDisabledStyle() : {}}
 			>
-				<LeftDetailsContainer>
-					<ThesisTopRow
-						thesis={this.props.thesis}
-						mode={this.props.mode}
-						user={this.props.user}
-						onReservationChanged={this.onReservationChanged}
-						onDateChanged={this.onDateUpdatedChanged}
-						onStatusChanged={this.onStatusChanged}
-					/>
-					<ThesisMiddleForm
-						thesis={this.props.thesis}
-						titleError={this.state.hasTitleError}
-						user={this.props.user}
-						onTitleChanged={this.onTitleChanged}
-						onKindChanged={this.onKindChanged}
-						onAdvisorChanged={this.onAdvisorChanged}
-						onAuxAdvisorChanged={this.onAuxAdvisorChanged}
-						onStudentChanged={this.onStudentChanged}
-						onSecondStudentChanged={this.onSecondStudentChanged}
-						onDescriptionChanged={this.onDescriptionChanged}
-					/>
-				</LeftDetailsContainer>
-				<RightDetailsContainer>
-					<ThesisVotes />
-					{ readOnly ? null : <SaveButton
-						onClick={this.handleSave}
-						disabled={!hasUnsavedChanges}
-						title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
-					>{this.getActionTitle()}</SaveButton> }
-				</RightDetailsContainer>
+				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
+				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
 			</MainDetailsContainer>
 		</DetailsSectionWrapper>;
+	}
+
+	private renderThesisLeftPanel() {
+		return <>
+			<ThesisTopRow
+				thesis={this.props.thesis}
+				mode={this.props.mode}
+				user={this.props.user}
+				onReservationChanged={this.onReservationChanged}
+				onDateChanged={this.onDateUpdatedChanged}
+				onStatusChanged={this.onStatusChanged}
+			/>
+			<ThesisMiddleForm
+				thesis={this.props.thesis}
+				titleError={this.state.hasTitleError}
+				user={this.props.user}
+				onTitleChanged={this.onTitleChanged}
+				onKindChanged={this.onKindChanged}
+				onAdvisorChanged={this.onAdvisorChanged}
+				onAuxAdvisorChanged={this.onAuxAdvisorChanged}
+				onStudentChanged={this.onStudentChanged}
+				onSecondStudentChanged={this.onSecondStudentChanged}
+				onDescriptionChanged={this.onDescriptionChanged}
+			/>
+		</>;
+	}
+
+	private renderThesisRightPanel() {
+		return <>
+			<ThesisVotes/>
+			{this.renderSaveButton()}
+		</>;
+	}
+
+	private renderSaveButton() {
+		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
+		if (readOnly) {
+			return null;
+		}
+		const { hasUnsavedChanges } = this.props;
+		return <SaveButton
+			onClick={this.handleSave}
+			disabled={!hasUnsavedChanges}
+			title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
+		>{this.getActionTitle()}</SaveButton>;
 	}
 
 	private getActionTitle() {
@@ -155,6 +172,8 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	}
 
 	private onTitleChanged = (newTitle: string): void => {
+		// As soon as the user changes the title, we clear the error state
+		// it would be annoying if it stayed on until Save is clicked again
 		this.setState({ hasTitleError: false });
 		this.updateThesisState({ title: { $set: newTitle } });
 	}

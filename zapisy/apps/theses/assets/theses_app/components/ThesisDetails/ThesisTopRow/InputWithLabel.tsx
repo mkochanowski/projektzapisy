@@ -12,6 +12,10 @@ type Props = {
 	inputType: InputType,
 };
 
+/**
+ * A simple component to render a text input with a label to the left,
+ * used by more specific components
+ */
 export function InputWithLabel(props: Props) {
 	return <table>
 		<tbody>

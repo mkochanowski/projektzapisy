@@ -5,6 +5,10 @@ type Props = {
 	style?: React.CSSProperties;
 };
 
+/**
+ * A simple wrapper around the HTML <input> element, set to readonly
+ * Used in the thesis details component if the user does not have edit rights
+ */
 export function ReadOnlyInput(props: Props) {
 	return <input
 		type={"text"}
