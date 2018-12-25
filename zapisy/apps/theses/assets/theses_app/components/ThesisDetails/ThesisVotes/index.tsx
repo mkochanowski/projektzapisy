@@ -11,6 +11,9 @@ type Props = {
 	onChange: (member: Employee, newValue: ThesisVote) => void;
 };
 
+/**
+ * Renders the vote value for this thesis for each theses board member
+ */
 export function ThesisVotes(props: Props) {
 	const votes = props.thesesBoard.map((emp, i) => (
 		<SingleVote

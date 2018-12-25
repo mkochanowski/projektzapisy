@@ -121,6 +121,10 @@ export class ThesesApp extends React.Component<{}, State > {
 		return user.type === UserType.ThesesBoardMember ? getNumUngraded() : 0;
 	}
 
+	/**
+	 * Given the number of ungraded theses, return the new state
+	 * (used for setting the type filter to ungraded if any such theses exist)
+	 */
 	private filterParamsForUngraded(numUngraded: number) {
 		if (numUngraded && !this.hasChangedTypeFilter) {
 			return Object.assign({}, this.state.thesesParams, {
