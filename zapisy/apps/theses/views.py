@@ -72,6 +72,7 @@ def get_current_user(request):
 @api_view(http_method_names=["get"])
 @permission_classes((permissions.IsAuthenticated,))
 def get_num_ungraded(request):
+    """Allows the front end to query the number of ungraded theses for the current user"""
     wrapped_user = wrap_user(request.user)
     user_type = get_user_type(wrapped_user)
     if user_type != ThesisUserType.theses_board_member:
