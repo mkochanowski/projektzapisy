@@ -1,3 +1,11 @@
+/**
+ * @file An error notification box rendered when an error deemed to be fatal
+ * occurs in the app. Note that this isn't the same as ErrorBoundary;
+ * that can only catch escaped exceptions thrown in one of React lifecycle
+ * functions, such as componentDidMount, render etc, whereas this component
+ * is used deliberately and voluntarily by the ThesesApp component when
+ * it detects an error.
+ */
 import * as React from "react";
 import styled from "styled-components";
 

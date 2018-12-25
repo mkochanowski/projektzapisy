@@ -1,3 +1,7 @@
+/**
+ * @file Contains functions that permit interaction
+ * with the backend - both pure getters and modifiers
+ */
 import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";
@@ -8,24 +12,16 @@ import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 const BASE_API_URL = "/theses/api";
 const REST_REQUEST_TIMEOUT = 10000;
 
-export const enum ThesisTypeFilter {
-	AllCurrent,
-	All,
-	Masters,
-	Engineers,
-	Bachelors,
-	BachelorsISIM,
-	AvailableMasters,
-	AvailableEngineers,
-	AvailableBachelors,
-	AvailableBachelorsISIM,
-	Ungraded,	// board members only
-
-	Default = AllCurrent,
-}
-
 axios.defaults.timeout = REST_REQUEST_TIMEOUT;
 
+/**
+ * Send a request to the backend including the csrf token
+ * supplied by Django's auth system; all requests
+ * should go through this function because otherwise they will be rejected
+ * as unauthorized
+ * @param url The URL
+ * @param config Optional Axios request config
+ */
 async function sendRequestWithCsrf(url: string, config?: AxiosRequestConfig) {
 	const tokenValue = getCookie("csrftoken");
 	if (!tokenValue) {
@@ -40,30 +36,42 @@ async function sendRequestWithCsrf(url: string, config?: AxiosRequestConfig) {
 	);
 }
 
+/**
+ * Perform a request, then return the body of the response
+ * @param url The URL
+ * @param config Optional Axios request config
+ */
 async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
 	return (await axios.get(url, config)).data;
 }
 
-export async function getThesesList(
-) {
+/**
+ * Fetch the list of all theses from the backend
+ * @returns An array of Thesis objects
+ */
+export async function getThesesList() {
 	const rawData: ThesisJson[] = await getData(`${BASE_API_URL}/theses`);
 	return rawData.map(json => new Thesis(json));
 }
 
-export async function getThesisById(id: number): Promise<Thesis> {
-	const json: ThesisJson = await getData(`${BASE_API_URL}/theses/${id}`);
-	return new Thesis(json);
-}
-
+/**
+ * Fetch the current system user from the backend
+ */
 export async function getCurrentUser(): Promise<AppUser> {
 	return new AppUser(await getData(`${BASE_API_URL}/current_user`));
 }
 
+/**
+ * Get the theses board as an Employee list
+ */
 export async function getThesesBoard() {
 	const json: PersonJson[] = await getData(`${BASE_API_URL}/theses_board`);
 	return json.map(pj => Employee.fromJson(pj) as Employee);
 }
 
+/**
+ * Get the number of ungraded theses for the current board member
+ */
 export async function getNumUngraded() {
 	return Number(await getData(`${BASE_API_URL}/num_ungraded`));
 }
@@ -86,6 +94,13 @@ type PersonAutocompleteJson = {
 		text: string;
 	}>;
 };
+/**
+ * Use django-autocomplete-light's endpoint (also used by thesis forms in Django admin)
+ * to fetch all matching students/employees
+ * @param person The person type - determines which endpoint to use
+ * @param substr The name filter - only persons matching this will be returned
+ * @param pageNum Which page to return
+ */
 export async function getPersonAutocomplete(
 	person: PersonType, substr: string, pageNum: number,
 ): Promise<PersonAutcompleteResults> {
@@ -104,7 +119,15 @@ export async function getPersonAutocomplete(
 	};
 }
 
-export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis: Thesis): Promise<void> {
+/**
+ * Given a previous and a modified thesis instance, compute the diff
+ * and dispatch a request to the backend
+ * @param originalThesis The old thesis object
+ * @param modifiedThesis The new (modified) thesis object
+ */
+export async function saveModifiedThesis(
+	originalThesis: Thesis, modifiedThesis: Thesis,
+): Promise<void> {
 	const objToSend = getThesisModDispatch(originalThesis, modifiedThesis);
 	const jsonData = JSON.stringify(objToSend);
 	console.warn("Sending", jsonData);
@@ -120,6 +143,11 @@ export async function saveModifiedThesis(originalThesis: Thesis, modifiedThesis:
 	);
 }
 
+/**
+ * Given a thesis object, serialize it and dispatch a request
+ * to add it to the backend
+ * @param thesis The thesis object to add
+ */
 export async function saveNewThesis(thesis: Thesis): Promise<number> {
 	const objToSend = getThesisAddDispatch(thesis);
 	const jsonData = JSON.stringify(objToSend);

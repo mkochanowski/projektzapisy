@@ -1,3 +1,6 @@
+/**
+ * @file The top row of the thesis details view
+ */
 import * as React from "react";
 import styled from "styled-components";
 import { Moment } from "moment";

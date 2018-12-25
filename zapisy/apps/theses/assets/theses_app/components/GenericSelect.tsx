@@ -1,5 +1,12 @@
+/**
+ * @file A generic select component that renders a <select>
+ * widget for the specified options and optionally a label
+ */
 import * as React from "react";
 
+/**
+ * The format in which users are required to supply select options
+ */
 type SelectOptionsInfo<T> = Array<{
 	val: T;
 	displayName: string;
@@ -7,13 +14,20 @@ type SelectOptionsInfo<T> = Array<{
 
 type Props<T> = {
 	value: T;
-	onChange: (val: T) => void
+	onChange: (val: T) => void;
+	/** The options to be displayed in the <select> */
 	optionInfo: SelectOptionsInfo<T>;
+	/** Optional label, will be displayed to the left by default */
 	label?: string;
+	/** Optional styles */
 	labelCss?: React.CSSProperties;
 	enabled?: boolean;
 };
 
+/**
+ * A wrapper around the HTML select component with a convenient API
+ * and an optional label
+ */
 export class GenericSelect<T> extends React.Component<Props<T>> {
 	public render() {
 		const shouldDisable = typeof this.props.enabled === "boolean" ? !this.props.enabled : false;
@@ -51,13 +65,15 @@ export class GenericSelect<T> extends React.Component<Props<T>> {
 	}
 
 	private onChange = (newValue: string) => {
-		const convertedValue = this.stringValueToThesisStatus(newValue);
+		const convertedValue = this.convertToExternalValue(newValue);
 		if (convertedValue !== null) {
 			this.props.onChange(convertedValue);
 		}
 	}
 
-	private stringValueToThesisStatus(stringValue: string): T | null {
+	private convertToExternalValue(stringValue: string): T | null {
+		// The HTML select widget will stringify all values passed to it,
+		// so we need to perform the reverse conversion here
 		for (const info of this.props.optionInfo) {
 			if (stringValue === String(info.val)) {
 				return info.val;

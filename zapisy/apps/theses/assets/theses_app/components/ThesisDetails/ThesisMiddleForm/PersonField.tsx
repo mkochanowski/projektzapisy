@@ -1,3 +1,7 @@
+/**
+ * @file Implements a <select> based person field with async loading
+ * and text search, used for students and advisors
+ */
 import * as React from "react";
 import "react-select/dist/react-select.css";
 import styled from "styled-components";
@@ -12,7 +16,11 @@ width: 50%;
 display: inline-block;
 `;
 
-export type PersonSelectOptions = {
+// This uses django-autocomplete-light's endpoint to fetch a list of
+// matching employees/students, which dictates the person format defined below
+// For an explanation of django-autocomplete-light, look in forms.py
+
+type PersonSelectOptions = {
 	value: string;
 	label: string;
 };
@@ -31,6 +39,11 @@ function selectOptionsToPerson(options: PersonSelectOptions | null): BasePerson 
 	) : null;
 }
 
+/**
+ * A helper to fetch matching objects for the given string.
+ * This is a class rather than a function since we need to know the
+ * person type in order to decide which endpoint to access
+ */
 class AsyncSelectAutocompleteGetter {
 	private personType: PersonType;
 	private pageNumberForInput: Map<string, number> = new Map();
@@ -62,6 +75,7 @@ class AsyncSelectAutocompleteGetter {
 type Props = {
 	value: BasePerson | null;
 	onChange: (newValue: BasePerson | null) => void;
+	/** Student or Employee */
 	personType: PersonType;
 	readOnly?: boolean;
 };

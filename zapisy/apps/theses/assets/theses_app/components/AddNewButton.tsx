@@ -1,3 +1,8 @@
+/**
+ * @file The "add new thesis" button component shown above the theses table
+ * 	if the user has the necessary permissions
+ */
+
 import * as React from "react";
 import StandardButton from "react-button-component";
 import styled from "styled-components";

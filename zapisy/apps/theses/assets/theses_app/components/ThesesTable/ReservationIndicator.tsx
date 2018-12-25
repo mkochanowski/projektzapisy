@@ -7,6 +7,9 @@ const Centered = styled.div`
 	text-align: center;
 `;
 
+/**
+ * A component to display the reservation status in the theses table
+ */
 export function ReservationIndicator(props: TableCellProps): JSX.Element {
 	const thesis: Thesis = props.rowData;
 	return <Centered><input
@@ -14,12 +17,5 @@ export function ReservationIndicator(props: TableCellProps): JSX.Element {
 		checked={thesis.reserved}
 		style={{ cursor: "default" }}
 		disabled
-		onClick={eatEvent}
 	/></Centered>;
-}
-
-function eatEvent(e: React.MouseEvent<HTMLInputElement>) {
-	e.preventDefault();
-	e.stopPropagation();
-	return false;
 }

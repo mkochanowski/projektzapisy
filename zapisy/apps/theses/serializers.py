@@ -1,21 +1,29 @@
+"""Defines all (de)serialization logic related
+to objects used in the theses system, that is:
+* packing/unpacking logic
+* validation
+* fine-grained permissions checks
+* performing modifications/adding new objects
+"""
 from typing import Dict, Any
 
 from rest_framework import serializers
 
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus, ThesisVote
-from .users import get_user_type, ThesisUserType, is_theses_board_member
+from .users import wrap_user, get_user_type, ThesisUserType, is_theses_board_member
 from .permissions import (
     can_set_status, can_set_advisor,
     can_modify_status, can_cast_vote_as_user,
     can_change_title
 )
-from .utils import wrap_user
 
 
 class PersonSerializerForThesis(serializers.Serializer):
-    """
-    Used to serialize employee/student fields in the thesis model
+    """Used to serialize user profiles as needed by various parts of the system;
+    we don't want to use the user serializer from apps.api.rest
+    because it packs too much data, and size matters here as we'll send it
+    for every thesis
     """
     def to_representation(self, instance):
         return {
@@ -44,19 +52,27 @@ def serialize_thesis_votes(thesis: Thesis):
 ValidationData = Dict[str, Any]
 
 
-def copy_if_present(dst, src, key, converter=None):
-    if key in src:
-        dst[key] = converter(src[key]) if converter else src[key]
-
-
 def get_person(queryset, person_data):
+    """Given a person object of the format specified above (in PersonSerializer.to_internal_value)
+    and a queryset, try to return the corresponding model instance
+    """
     try:
         return queryset.objects.get(pk=person_data.get("id")) if person_data else None
     except queryset.DoesNotExist:
         raise serializers.ValidationError("bad person ID specified")
 
 
+def copy_if_present(dst, src, key, converter=None):
+    """If the given key is present in the source dictionary,
+    copy it to the destination dictionary optionally applying the
+    supplied conversion function if present
+    """
+    if key in src:
+        dst[key] = converter(src[key]) if converter else src[key]
+
+
 def validate_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employee):
+    """Check that the current user is permitted to set the specified advisor"""
     if not can_set_advisor(user, user_type, advisor):
         raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
 
@@ -86,6 +102,9 @@ def validate_votes(votes, user: BaseUser):
 
 
 def handle_optional_fields(result, data, user: BaseUser):
+    """Extract optional fields from the source dictionary (sent by the client),
+    perform any necessary conversions, then place it in the result dictionary
+    """
     copy_if_present(result, data, "description")
     copy_if_present(result, data, "votes", lambda votes: validate_votes(votes, user))
     copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
@@ -109,7 +128,12 @@ class ThesisSerializer(serializers.ModelSerializer):
         return result
 
     def validate(self, data):
+        """Validate a dict object received from the frontend client;
+        DRF expects us to return a dict object to be used for further processing,
+        so we use this opportunity to perform conversions to more convenient formats
+        """
         # self.context will not be defined for local serialization
+        # presently we don't use this serializer in a local context, and even if we did,
         # no special validation needs to be performed then (drf already provides
         # basic validation based on the constraints above)
         if not self.context:
@@ -124,6 +148,10 @@ class ThesisSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f'Unknown request type {request.method}')
 
     def validate_add_thesis(self, user: BaseUser, data: ValidationData):
+        """Validate a request to add a new thesis object; basic permissions
+        checks have already been performed, so this deals with more detailed checks
+        (is the given status valid for this type of user) and conversions
+        """
         user_type = get_user_type(user)
         advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
         validate_advisor(user, user_type, advisor)
@@ -142,6 +170,10 @@ class ThesisSerializer(serializers.ModelSerializer):
         return result
 
     def validate_modify_thesis(self, user: BaseUser, data: ValidationData):
+        """As above, but this time the thesis object already exists. There is some
+        additional logic in this case; for instance, if a thesis is already accepted,
+        its owner/advisor cannot change the title anymore
+        """
         user_type = get_user_type(user)
         result = {}
         if "advisor" in data:
@@ -164,6 +196,10 @@ class ThesisSerializer(serializers.ModelSerializer):
         return result
 
     def create(self, validated_data):
+        """If the checks above succeed, DRF will call this method
+        in response to a POST request with the dictionary we returned
+        from validate_add_thesis
+        """
         new_instance = Thesis.objects.create(
             title=validated_data.get("title"),
             kind=validated_data.get("kind"),
@@ -180,6 +216,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         return new_instance
 
     def update(self, instance, validated_data):
+        """As above"""
         instance.title = validated_data.get("title", instance.title)
         instance.kind = validated_data.get("kind", instance.kind)
         instance.reserved = validated_data.get("reserved", instance.reserved)
@@ -211,6 +248,8 @@ class ThesisSerializer(serializers.ModelSerializer):
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
+    """Serialize the currently logged in user; this also needs to send the user type,
+    so it's a separate serializer"""
     def to_representation(self, instance: BaseUser):
         return {
             "user": PersonSerializerForThesis(instance).data,

@@ -1,3 +1,6 @@
+/**
+ * @file Renders the table view of all theses
+ */
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import {
@@ -16,8 +19,23 @@ import { LoadingIndicator } from "./LoadingIndicator";
 import { SortColumn, SortDirection } from "../theses_store";
 import { NoResultsMessage } from "./NoResultsMessage";
 
+/*
+	The theses table is powered by react-virtualized's Table component;
+	the docs are very good and available at
+	https://github.com/bvaughn/react-virtualized/blob/master/docs/Table.md.
+	The following pages are also of interest:
+	https://github.com/bvaughn/react-virtualized/blob/master/docs/Column.md#cellrenderer
+	(for the column components used inside the table)
+	https://github.com/bvaughn/react-virtualized/blob/master/docs/CellMeasurer.md
+	(for the "cell measurer", responsible for dynamically adjusting the height
+	of each row to fit the contents)
+*/
+
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
+const RESERVED_COLUMN_WIDTH = 150;
+const TITLE_COLUMN_WIDTH = 500;
+const ADVISOR_COLUMN_WIDTH = 500;
 
 const rowHeightCache = new CellMeasurerCache({
 	fixedWidth: true,
@@ -27,17 +45,25 @@ const rowHeightCache = new CellMeasurerCache({
 type Props = {
 	applicationState: ApplicationState;
 	theses: Thesis[];
+	/** The index in the `theses` list of the currently selected thesis */
 	selectedIdx: number;
+	/** Has the user made any changes? */
 	isEditingThesis: boolean;
 	sortColumn: SortColumn;
 	sortDirection: SortDirection;
 
+	/* Function to be called to switch to the thesis at the specified offset */
 	switchToThesisWithOffset: (offset: number) => void;
 	onThesisSelected: (t: Thesis) => void;
 	onSortChanged: (column: SortColumn, dir: SortDirection) => void;
 };
 
 const initialState = {
+	/**
+	 * Has the user scrolled since the last change of thesis?
+	 * Based on this info we know whether or not to focus the table
+	 * on the selected thesis - see render() -> scrollToIndex
+	 */
 	hasScrolled: false,
 };
 type State = typeof initialState;
@@ -87,7 +113,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 					<Column
 						label="Rezerwacja"
 						dataKey="reserved"
-						width={150}
+						width={RESERVED_COLUMN_WIDTH}
 						disableSort
 						cellRenderer={ReservationIndicator}
 						className={"reservation_cell"}
@@ -95,13 +121,13 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 					<Column
 						label="Tytuł"
 						dataKey="title"
-						width={500}
+						width={TITLE_COLUMN_WIDTH}
 						cellRenderer={this.titleRenderer}
 					/>
 					<Column
 						label="Promotor"
 						dataKey="advisor"
-						width={500}
+						width={ADVISOR_COLUMN_WIDTH}
 						cellRenderer={this.advisorRenderer}
 					/>
 				</Table>
@@ -109,6 +135,11 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		</AutoSizer>;
 	}
 
+	/**
+	 * Return a cell renderer using the provided thesis data getter
+	 * This function exists to abstract away the usage of CellMeasurer
+	 * @param dataGetter Responsible for converting a Thesis instance to a value to display
+	 */
 	private getCellRenderer(dataGetter: (t: Thesis) => string) {
 		return ({ dataKey, parent, rowIndex, rowData }: TableCellProps) => {
 			return (
@@ -130,6 +161,10 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		return this.props.theses[index];
 	}
 
+	/**
+	 * Get the CSS class name for the given row; used to implement
+	 * alternating colors
+	 */
 	private getRowClassName = ({ index }: {index: number}) => {
 		if (index < 0) {
 			return "";
@@ -144,11 +179,15 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.setState({ hasScrolled: true });
 	}
 
+	// When the component is re-rendered with new props, some local changes
+	// need to be performed
 	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
 		if (this.props.theses !== nextProps.theses) {
 			this.onListChanged();
 		}
 		if (this.props.selectedIdx !== nextProps.selectedIdx) {
+			// If the position of the selected thesis in the list changes
+			// we should focus the table on it
 			this.setState({ hasScrolled: false });
 		}
 	}
@@ -165,8 +204,8 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			sortDirection: prevSortDirection
 		} = this.props;
 
-		// If list was sorted DESC by this column.
-		// Rather than switch to ASC, return to "natural" order.
+		// If list was sorted desc by this column,
+		// rather than switch to ASC, return to "natural" order (i.e. no sort)
 		if (prevSortColumn === rvColumnToOwn(info.sortBy) && prevSortDirection === SortDirection.Desc) {
 			this.props.onSortChanged(SortColumn.None, SortDirection.Asc);
 		} else {
@@ -178,7 +217,8 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private onRowClick = (info: RowMouseEventHandlerParams) => {
-		// The typings are invalid and think rowData is some object
+		// The typings are invalid and think rowData is some object,
+		// hence the ugly cast
 		const thesis = info.rowData as any as Thesis;
 		this.props.onThesisSelected(thesis);
 	}
@@ -192,7 +232,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		Mousetrap.bind("down", this.downArrow);
 	}
 
-	private allowArrowSwitch(): boolean {
+	private shouldAllowArrowSwitch(): boolean {
 		return (
 			!this.props.isEditingThesis &&
 			this.props.selectedIdx != null
@@ -200,7 +240,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private arrowSwitch(offset: -1 | 1, e: ExtendedKeyboardEvent) {
-		if (!this.allowArrowSwitch()) {
+		if (!this.shouldAllowArrowSwitch()) {
 			return;
 		}
 		this.props.switchToThesisWithOffset(offset);
@@ -216,7 +256,9 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 }
 
-// react-virtualized's sort column to our enum
+/**
+ * convert react-virtualized's sort column to our enum
+ */
 function rvColumnToOwn(sortColumn: string) {
 	switch (sortColumn) {
 		case "advisor": return SortColumn.Advisor;
@@ -224,7 +266,9 @@ function rvColumnToOwn(sortColumn: string) {
 		default: return SortColumn.None;
 	}
 }
-// react-virtualized's sort direction to our enum
+/**
+ * convert react-virtualized's sort direction to our enum
+ */
 function rvDirectionToOwn(sortDirection: SortDirectionType) {
 	switch (sortDirection) {
 		case RVSortDirection.ASC: return SortDirection.Asc;
@@ -232,7 +276,9 @@ function rvDirectionToOwn(sortDirection: SortDirectionType) {
 	}
 }
 
-// as above, but reverse
+/**
+ * convert our sort column to react-virtualized's format
+ */
 function ownToRvColumn(sortColumn: SortColumn) {
 	switch (sortColumn) {
 		case SortColumn.Advisor: return "advisor";
@@ -240,6 +286,9 @@ function ownToRvColumn(sortColumn: SortColumn) {
 		case SortColumn.None: return "";
 	}
 }
+/**
+ * convert our sort direction to react-virtualized's format
+ */
 function ownToRvDirection(sortDirection: SortDirection) {
 	switch (sortDirection) {
 		case SortDirection.Asc: return RVSortDirection.ASC;

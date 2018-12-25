@@ -28,34 +28,35 @@ const SaveButton = Button.extend`
 `;
 
 const DetailsSectionWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `;
 
 const MainDetailsContainer = styled.div`
-border: 1px solid black;
-padding: 15px;
-display: flex;
-flex-direction: row;
-width: 100%;
+	border: 1px solid black;
+	padding: 15px;
+	display: flex;
+	flex-direction: row;
+	width: 100%;
 `;
 
 const LeftDetailsContainer = styled.div`
-flex-basis: 85%;
+	flex-basis: 85%;
 `;
 
 const RightDetailsContainer = styled.div`
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-margin-left: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	margin-left: 20px;
 `;
 
 type Props = {
 	thesis: Thesis;
 	thesesList: Thesis[];
 	thesesBoard: Employee[],
+	/** Are we saving this thesis (i.e. should it be read-only)? */
 	isSaving: boolean;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
@@ -65,6 +66,7 @@ type Props = {
 };
 
 const initialState = {
+	/** Was the title invalid when we last validated the thesis before saving? */
 	hasTitleError: false,
 };
 type State = typeof initialState;
@@ -176,6 +178,8 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	}
 
 	private onTitleChanged = (newTitle: string): void => {
+		// As soon as the user changes the title, we clear the error state
+		// it would be annoying if it stayed on until Save is clicked again
 		this.setState({ hasTitleError: false });
 		this.updateThesisState({ title: { $set: newTitle } });
 	}

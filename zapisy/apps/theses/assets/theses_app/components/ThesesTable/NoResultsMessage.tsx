@@ -10,6 +10,9 @@ const MessageContainer = styled.div`
 	font-size: 18px;
 `;
 
+/**
+ * A component to indicate that there are no results in the theses table
+ */
 export function NoResultsMessage() {
 	return <MessageContainer>Brak wyników</MessageContainer>;
 }

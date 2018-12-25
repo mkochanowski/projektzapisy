@@ -1,21 +1,47 @@
+/**
+ * @file Theses app permission checks, mostly analogous to permissions.py
+ */
 import { AppUser, UserType, Thesis, Employee, ThesisStatus } from "./types";
 
-export function canAddThesis(user: AppUser) {
-	return user.type !== UserType.Student;
-}
-
+/**
+ * Determine whether the specified app user has a thesis staff role
+ * @param user The app user
+ */
 function isThesisStaff(user: AppUser) {
 	return [UserType.Admin, UserType.ThesesBoardMember].includes(user.type);
 }
 
+/**
+ * Determine whether the specified app user can cast a vote as the specified user
+ * @param appUser The app user
+ * @param user The user to cast a vote as
+ */
 export function canCastVoteAsUser(appUser: AppUser, user: Employee) {
 	return appUser.type === UserType.Admin || appUser.user.isEqual(user);
 }
 
+/**
+ * Determine whether the specified app user is permitted to add new objects
+ * @param user The app user
+ */
+export function canAddThesis(user: AppUser) {
+	return user.type !== UserType.Student;
+}
+
+/**
+ * Determine whether the specified user "owns" the specified thesis
+ * @param user The app user
+ * @param thesis The thesis
+ */
 function isOwnerOfThesis(user: AppUser, thesis: Thesis) {
 	return thesis.advisor !== null && thesis.advisor.id === user.user.id;
 }
 
+/**
+ * Determine if the specified user is permitted to make any changes to the specified thesis
+ * @param user The user
+ * @param thesis The thesis
+ */
 export function canModifyThesis(user: AppUser, thesis: Thesis) {
 	return (
 		isThesisStaff(user) ||
@@ -24,6 +50,11 @@ export function canModifyThesis(user: AppUser, thesis: Thesis) {
 	);
 }
 
+/**
+ * Determine if the specified user is permitted to change the title of the specified thesis
+ * @param user The user
+ * @param thesis The thesis
+ */
 export function canChangeTitle(user: AppUser, thesis: Thesis) {
 	return (
 		isThesisStaff(user) ||
@@ -31,10 +62,18 @@ export function canChangeTitle(user: AppUser, thesis: Thesis) {
 	);
 }
 
+/**
+ * Determine if a user of the specified type can modify an existing thesis' status
+ * @param user The app user
+ */
 export function canChangeStatus(user: AppUser) {
 	return isThesisStaff(user);
 }
 
+/**
+ * Determine if the specified user is allowed to set any advisor on any thesis
+ * @param user The app user
+ */
 export function canSetArbitraryAdvisor(user: AppUser) {
 	return isThesisStaff(user);
 }

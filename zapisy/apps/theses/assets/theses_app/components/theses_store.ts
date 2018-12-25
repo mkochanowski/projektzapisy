@@ -1,5 +1,11 @@
-import { ThesisTypeFilter } from "../backend_callers";
-import { Thesis, ThesisStatus, ThesisKind, BasePerson, AppUser, UserType, ThesisVote } from "../types";
+/**
+ * Logic related to sorting/filtering theses based
+ * on user settings in the UI
+ */
+import {
+	Thesis, ThesisStatus, ThesisKind, BasePerson,
+	AppUser, UserType, ThesisVote, ThesisTypeFilter,
+} from "../types";
 import { strcmp } from "common/utils";
 
 export const enum SortDirection {
@@ -13,8 +19,18 @@ export const enum SortColumn {
 	Title,
 }
 
+// Whenever the sorting or filters change, getProcessedTheses will be called
+// anew with the parameters specified. However, if we only change the sorting,
+// we don't really want to pay the cost of filtering the list as this can
+// be relatively expensive (substring checks on every instance), so we cache the results
+// based on the parameters specified - see filterData.
+// Of course, if a new theses list is fetched from the backend the cache must be invalidated;
+// clearFilterCache below does this.
 const filterCache: Map<string, Thesis[]> = new Map();
 
+/**
+ * Thesis processing parameters; the results of getProcessedTheses depend on this
+ */
 export type ThesesProcessParams = {
 	advisor: string;
 	title: string;
@@ -24,6 +40,12 @@ export type ThesesProcessParams = {
 	sortDirection: SortDirection;
 };
 
+/**
+ * Process the given theses list using the given parameters.
+ *
+ * @param theses - The raw theses list to be processed
+ * @param params - The parameters to use for the processing
+ */
 export function getProcessedTheses(
 	theses: Thesis[], params: ThesesProcessParams, user: AppUser,
 ): Thesis[] {
@@ -31,6 +53,9 @@ export function getProcessedTheses(
 	return sortData(filteredData, params.sortColumn, params.sortDirection);
 }
 
+/**
+ * Clear the filter results cache. Needs to be called whenver the raw theses list changes.
+ */
 export function clearFilterCache() {
 	filterCache.clear();
 }
@@ -74,10 +99,16 @@ function sortData(data: Thesis[], sortColumn: SortColumn, sortDirection: SortDir
 	));
 }
 
+/**
+ * Determine whether the specified person matches the specified name filter
+ */
 function personNameFilter(p: BasePerson | null, nameFilt: string): boolean {
 	return p === null || p.displayName.toLowerCase().includes(nameFilt);
 }
 
+/**
+ * Determine whether the specified thesis should be considered as "available"
+ */
 function isThesisAvailable(thesis: Thesis): boolean {
 	return (
 		thesis.status !== ThesisStatus.InProgress &&
@@ -86,6 +117,9 @@ function isThesisAvailable(thesis: Thesis): boolean {
 	);
 }
 
+/**
+ * Determine whether the specified thesis matches the specified type
+ */
 function thesisMatchesType(thesis: Thesis, type: ThesisTypeFilter, user: AppUser) {
 	switch (type) {
 		case ThesisTypeFilter.All: return true;

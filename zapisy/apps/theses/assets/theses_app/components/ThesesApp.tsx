@@ -1,11 +1,17 @@
+/**
+ * @file The main theses app component. It performs two basic tasks:
+ * -> stores the global application-wide state
+ * -> renders all subcomponents and glues them together, also permitting them
+ * to change the state via callbacks
+ */
+
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
 import { clone } from "lodash";
 
-import { Thesis, UserType, AppUser, Employee, ThesisVote } from "../types";
+import { Thesis, UserType, AppUser, ThesisTypeFilter, Employee, ThesisVote } from "../types";
 import {
-	getThesesList, saveModifiedThesis, saveNewThesis,
-	getCurrentUser, ThesisTypeFilter, getThesesBoard, getNumUngraded,
+	getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser, getNumUngraded, getThesesBoard,
 } from "../backend_callers";
 import { ThesisDetails } from "./ThesisDetails";
 import { ApplicationState, ThesisWorkMode } from "../types/misc";
@@ -22,21 +28,27 @@ import {
 } from "./theses_store";
 import { adjustDomForUngraded } from "../utils";
 
+/** The currently selected thesis */
 type StateThesis = {
-	original: Thesis,
-	mutable: Thesis,
+	/** Its original, unchanged version */
+	original: Thesis;
+	/** And the version the user is modifying */
+	mutable: Thesis;
 };
 
 type State = {
 	thesis: StateThesis | null;
+	/** The index/position of the currently selected thesis in the list */
 	thesisIdx: number;
 
+	/** Unfiltered, unsorted theses as received from the backend */
 	rawTheses: Thesis[];
+	/** Processed theses */
 	theses: Thesis[];
 	thesesBoard: Employee[];
 	applicationState: ApplicationState;
+	/** The error that occurred when downloading theses */
 	fetchError: Error | null;
-	wasTitleInvalid: boolean;
 	workMode: ThesisWorkMode | null;
 	user: AppUser;
 
@@ -52,7 +64,6 @@ const initialState: State = {
 	thesesBoard: [],
 	applicationState: ApplicationState.InitialLoading,
 	fetchError: null,
-	wasTitleInvalid: false,
 	workMode: null,
 	user: new AppUser({ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }),
 
@@ -133,6 +144,10 @@ export class ThesesApp extends React.Component<{}, State > {
 		});
 	}
 
+	/**
+	 * When the processing params are updated, some changes to the state are required
+	 * we have to re-process the theses list and find the position of the selected thesis
+	 */
 	private getNewStateForParams(params: Partial<ThesesProcessParams>): Partial<State> {
 		const finalParams = Object.assign({}, this.state.thesesParams, params);
 		const processed = getProcessedTheses(this.state.rawTheses, finalParams, this.state.user);
@@ -145,6 +160,7 @@ export class ThesesApp extends React.Component<{}, State > {
 		};
 	}
 
+	/** Called when filters change with the new values */
 	private updateFilters(title: string, advisor: string, type: ThesisTypeFilter) {
 		const newState = this.getNewStateForParams({
 			title: title, advisor: advisor, type: type,
@@ -252,6 +268,9 @@ export class ThesesApp extends React.Component<{}, State > {
 		/>;
 	}
 
+	/** A version of setState that also sets the specified thesis as the
+	 * currently selected thesis (abstracts the original/mutable logic)
+	 */
 	// properly typing setState in TS is nontrivial because of a peculiarity
 	// of the type system: there is no distinction between absent keys
 	// and keys with `undefined` as their value; for this reason the React
@@ -267,6 +286,7 @@ export class ThesesApp extends React.Component<{}, State > {
 		this.setState(finalState as State);
 	}
 
+	/** Download theses or set the error screen if an error occurred */
 	private async safeGetRawTheses() {
 		try {
 			return await getThesesList();
@@ -307,6 +327,7 @@ export class ThesesApp extends React.Component<{}, State > {
 		this.setStateWithNewThesis({ workMode: ThesisWorkMode.Editing }, thesis);
 	}
 
+	/** Switch to the thesis at the specified offset from the current thesis */
 	public switchWithOffset = (offset: number) => {
 		const { thesisIdx, theses } = this.state;
 		if (thesisIdx === -1) {
@@ -436,26 +457,29 @@ export class ThesesApp extends React.Component<{}, State > {
 	}
 
 	private async modifyExistingThesis() {
-		const { thesis } = this.state;
-		try {
+		return this.performBackendAction(async thesis => {
 			await saveModifiedThesis(thesis!.original, thesis!.mutable);
 			return thesis!.original.id;
-		} catch (err) {
-			window.alert(
-				"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
-				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
-			);
-			return -1;
-		}
+		});
 	}
 
 	private async addNewThesis() {
+		return this.performBackendAction(thesis => {
+			return saveNewThesis(thesis.mutable!);
+		});
+	}
+
+	/**
+	 * Perform the specified backend action and handle any errors
+	 * @returns The ID of the thesis object the action was performed on
+	 */
+	private async performBackendAction(cb: (t: StateThesis) => Promise<number>) {
 		const { thesis } = this.state;
 		try {
-			return await saveNewThesis(thesis!.mutable);
+			return await cb(thesis!);
 		} catch (err) {
 			window.alert(
-				"Nie udało się dodać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
+				"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
 				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 			);
 			return -1;

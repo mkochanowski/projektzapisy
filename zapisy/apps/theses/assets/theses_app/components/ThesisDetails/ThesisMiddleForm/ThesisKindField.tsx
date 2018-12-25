@@ -1,3 +1,7 @@
+/**
+ * @file Displays (and optionally allows to modify)the kind of a thesis
+ */
+
 import * as React from "react";
 
 import { ThesisKind, thesisKindToString } from "../../../types";

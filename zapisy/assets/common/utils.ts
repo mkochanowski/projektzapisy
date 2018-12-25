@@ -32,6 +32,12 @@ export function awaitSleep(ms: number): Promise<void> {
 	});
 }
 
+/**
+ * Compare two strings with the same semantics as C's strcmp
+ * @param a The first string
+ * @param b The second string
+ * @returns -1 if a < b, 0 if a == b, 1 if a > b
+ */
 export function strcmp(a: string, b: string) {
 	return (a < b ? -1 : (a > b ? 1 : 0));
 }
