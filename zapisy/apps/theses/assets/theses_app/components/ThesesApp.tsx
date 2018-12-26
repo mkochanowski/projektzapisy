@@ -106,26 +106,32 @@ export class ThesesApp extends React.Component {
 		}
 	}
 
-	private onFilterChanged = () => {
-		this.currentPage = 1;
-		this.refreshTheses();
-	}
-	private onTypeFilterChanged = flow(function*(this: ThesesApp, value: ThesisTypeFilter) {
-		this.params.type = value;
+	private disableAndRefetch = flow(function*(this: ThesesApp) {
 		this.currentPage = 1;
 		this.applicationState = ApplicationState.FetchingTheses;
 		yield this.refreshTheses();
 		this.applicationState = ApplicationState.Normal;
-	}).bind(this);
+	});
+
+	private refetch() {
+		this.currentPage = 1;
+		this.refreshTheses();
+	}
+
+	@action
+	private onTypeFilterChanged = (value: ThesisTypeFilter) => {
+		this.params.type = value;
+		this.disableAndRefetch();
+	}
 	@action
 	private onAdvisorFilterChanged = (value: string) => {
 		this.params.advisor = value.toLowerCase();
-		this.onFilterChanged();
+		this.refetch();
 	}
 	@action
 	private onTitleFilterChanged = (value: string) => {
 		this.params.title = value.toLowerCase();
-		this.onFilterChanged();
+		this.refetch();
 	}
 
 	private renderTopRow() {
@@ -149,7 +155,7 @@ export class ThesesApp extends React.Component {
 	private onSortChanged = (column: SortColumn, dir: SortDirection) => {
 		this.params.sortColumn = column;
 		this.params.sortDirection = dir;
-		this.onFilterChanged();
+		this.disableAndRefetch();
 	}
 
 	private loadMoreForTable = (flow(function* (this: ThesesApp, _: number, stopIndex: number) {

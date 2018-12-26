@@ -4,7 +4,7 @@ from enum import Enum
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, Lower
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -114,12 +114,12 @@ def sort_queryset(qs, sort_column: str, sort_dir: str):
     elif sort_column == "title":
         db_column = "title"
 
-    db_dir = ""
-    if sort_dir == "desc":
-        db_dir = "-"
-
     if db_column:
-        return qs.order_by(db_dir + db_column)
+        annot = Lower(db_column)
+        return qs.order_by(
+            annot.desc() if sort_dir == "desc" else annot.asc()
+        )
+
     return qs.order_by("-added_date")
 
 
