@@ -6,7 +6,10 @@ import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";
 
-import { Thesis, ThesisJson, Student, Employee, BasePerson, AppUser } from "./types";
+import {
+	Thesis, ThesisJson, Student, Employee,
+	BasePerson, AppUser, ThesisTypeFilter,
+} from "./types";
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 
 const BASE_API_URL = "/theses/api";
@@ -45,13 +48,67 @@ async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
 	return (await axios.get(url, config)).data;
 }
 
+export const enum SortDirection {
+	Asc,
+	Desc,
+}
+
+export const enum SortColumn {
+	None,
+	Advisor,
+	Title,
+}
+
 /**
- * Fetch the list of all theses from the backend
- * @returns An array of Thesis objects
+ * Thesis processing parameters; the results of getProcessedTheses depend on this
  */
-export async function getThesesList() {
-	const rawData: ThesisJson[] = await getData(`${BASE_API_URL}/theses`);
-	return rawData.map(json => new Thesis(json));
+export type ThesesProcessParams = {
+	advisor: string;
+	title: string;
+	type: ThesisTypeFilter;
+
+	sortColumn: SortColumn;
+	sortDirection: SortDirection;
+};
+
+type PaginatedThesesResult = {
+	count: number;
+	next: string;
+	previous: string;
+	results: ThesisJson[];
+};
+
+function sortColToBackendStr(col: SortColumn) {
+	switch (col) {
+		case SortColumn.Advisor: return "advisor";
+		case SortColumn.Title: return "title";
+		case SortColumn.None: return "";
+	}
+}
+
+function sortDirToBackendStr(dir: SortDirection) {
+	switch (dir) {
+		case SortDirection.Asc: return "asc";
+		case SortDirection.Desc: return "desc";
+	}
+}
+
+export async function getThesesList(params: ThesesProcessParams, page: number) {
+	const paginatedResults: PaginatedThesesResult = await getData(
+		`${BASE_API_URL}/theses`,
+		{ params: {
+			type: params.type,
+			title: params.title,
+			advisor: params.advisor,
+			column: sortColToBackendStr(params.sortColumn),
+			dir: sortDirToBackendStr(params.sortDirection),
+			page: page,
+		}},
+	);
+	return {
+		theses: paginatedResults.results.map(json => new Thesis(json)),
+		total: paginatedResults.count,
+	};
 }
 
 export const enum PersonType {

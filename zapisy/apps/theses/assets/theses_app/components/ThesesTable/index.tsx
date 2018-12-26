@@ -7,6 +7,7 @@ import {
 	Column, Table, CellMeasurer, CellMeasurerCache,
 	AutoSizer, SortDirectionType, SortDirection as RVSortDirection,
 	RowMouseEventHandlerParams, TableCellProps,
+	InfiniteLoader,
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
 
@@ -16,7 +17,7 @@ import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
-import { SortColumn, SortDirection } from "../theses_store";
+import { SortColumn, SortDirection } from "../../backend_callers";
 import { NoResultsMessage } from "./NoResultsMessage";
 
 /*
@@ -51,11 +52,13 @@ type Props = {
 	isEditingThesis: boolean;
 	sortColumn: SortColumn;
 	sortDirection: SortDirection;
+	totalThesesCount: number;
 
 	/* Function to be called to switch to the thesis at the specified offset */
 	switchToThesisWithOffset: (offset: number) => void;
 	onThesisSelected: (t: Thesis) => void;
 	onSortChanged: (column: SortColumn, dir: SortDirection) => void;
+	loadMoreRows: (startIndex: number , stopIndex: number) => Promise<void>;
 };
 
 const initialState = {
@@ -82,57 +85,73 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.uninstallKeyHandler();
 	}
 
+	private isRowLoaded = (index: number) => {
+		return index < this.props.theses.length;
+	}
+
 	public render() {
 		if (this.props.applicationState === ApplicationState.InitialLoading) {
 			return <LoadingIndicator/>;
 		}
 		const { theses, selectedIdx } = this.props;
+		const actualIdx = selectedIdx !== -1 ? selectedIdx : 0;
 		const shouldDisable = this.props.applicationState === ApplicationState.PerformingBackendChanges;
-		return <AutoSizer
-			disableHeight
-			style={shouldDisable ? getDisabledStyle() : {}}
-		>
-			{({ width }) => (
-				<Table
-					rowGetter={this.getRowByIndex}
-					rowCount={theses.length}
-					rowHeight={rowHeightCache.rowHeight}
-					width={width}
-					height={TABLE_HEIGHT}
-					headerHeight={TABLE_CELL_MIN_HEIGHT}
-					sort={this.changeSort}
-					sortBy={ownToRvColumn(this.props.sortColumn)}
-					sortDirection={ownToRvDirection(this.props.sortDirection)}
-					onRowClick={this.onRowClick}
-					rowClassName={this.getRowClassName}
-					scrollToIndex={!this.state.hasScrolled && selectedIdx !== -1 ? selectedIdx : undefined}
-					deferredMeasurementCache={rowHeightCache}
-					onScroll={this.onScroll}
-					noRowsRenderer={NoResultsMessage}
+		return <InfiniteLoader
+				loadMoreRows={({ startIndex, stopIndex }) => this.props.loadMoreRows(startIndex, stopIndex)}
+				isRowLoaded={({ index }) => this.isRowLoaded(index)}
+				rowCount={this.props.totalThesesCount}
+				threshold={10}
+			>
+			{({ onRowsRendered, registerChild }) => (
+				<AutoSizer
+					disableHeight
+					style={shouldDisable ? getDisabledStyle() : {}}
 				>
-					<Column
-						label="Rezerwacja"
-						dataKey="reserved"
-						width={RESERVED_COLUMN_WIDTH}
-						disableSort
-						cellRenderer={ReservationIndicator}
-						className={"reservation_cell"}
-					/>
-					<Column
-						label="Tytuł"
-						dataKey="title"
-						width={TITLE_COLUMN_WIDTH}
-						cellRenderer={this.titleRenderer}
-					/>
-					<Column
-						label="Promotor"
-						dataKey="advisor"
-						width={ADVISOR_COLUMN_WIDTH}
-						cellRenderer={this.advisorRenderer}
-					/>
-				</Table>
-		)	}
-		</AutoSizer>;
+					{({ width }) => (
+						<Table
+							onRowsRendered={onRowsRendered}
+							ref={registerChild}
+							rowGetter={this.getRowByIndex}
+							rowCount={theses.length}
+							rowHeight={rowHeightCache.rowHeight}
+							width={width}
+							height={TABLE_HEIGHT}
+							headerHeight={TABLE_CELL_MIN_HEIGHT}
+							sort={this.changeSort}
+							sortBy={ownToRvColumn(this.props.sortColumn)}
+							sortDirection={ownToRvDirection(this.props.sortDirection)}
+							onRowClick={this.onRowClick}
+							rowClassName={this.getRowClassName}
+							scrollToIndex={!this.state.hasScrolled ? actualIdx : undefined}
+							deferredMeasurementCache={rowHeightCache}
+							onScroll={this.onScroll}
+							noRowsRenderer={NoResultsMessage}
+						>
+							<Column
+								label="Rezerwacja"
+								dataKey="reserved"
+								width={RESERVED_COLUMN_WIDTH}
+								disableSort
+								cellRenderer={ReservationIndicator}
+								className={"reservation_cell"}
+							/>
+							<Column
+								label="Tytuł"
+								dataKey="title"
+								width={TITLE_COLUMN_WIDTH}
+								cellRenderer={this.titleRenderer}
+							/>
+							<Column
+								label="Promotor"
+								dataKey="advisor"
+								width={ADVISOR_COLUMN_WIDTH}
+								cellRenderer={this.advisorRenderer}
+							/>
+						</Table>
+				)}
+				</AutoSizer>
+			)}
+		</InfiniteLoader>;
 	}
 
 	/**
