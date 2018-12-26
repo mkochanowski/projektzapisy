@@ -9,7 +9,7 @@ import * as Mousetrap from "mousetrap";
 import { observer } from "mobx-react";
 import styled from "styled-components";
 
-import { Thesis } from "../types";
+import { Thesis, ThesisTypeFilter } from "../types";
 import { ThesisDetails } from "./ThesisDetails";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
@@ -18,6 +18,7 @@ import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
 import { thesesStore as store } from "./theses_store";
+import { SortColumn, SortDirection } from "../backend_callers";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -63,18 +64,21 @@ export class ThesesApp extends React.Component {
 		}
 	}
 
+	private onTypeFilterChanged = (t: ThesisTypeFilter) => store.onTypeFilterChanged(t);
+	private onAdvisorChanged = (a: string) => store.onAdvisorFilterChanged(a);
+	private onTitleChanged = (t: string) => store.onTitleFilterChanged(t);
 	private renderTopRow() {
 		const shouldShowNewBtn = canAddThesis(store.user);
 		return <TopRowContainer>
 			<ListFilters
-				onTypeChange={store.onTypeFilterChanged}
+				onTypeChange={this.onTypeFilterChanged}
 				typeValue={store.params.type}
-				onAdvisorChange={store.onAdvisorFilterChanged}
+				onAdvisorChange={this.onAdvisorChanged}
 				advisorValue={store.params.advisor}
-				onTitleChange={store.onTitleFilterChanged}
+				onTitleChange={this.onTitleChanged}
 				titleValue={store.params.title}
 				state={store.applicationState}
-				isChangingStringFilter={false}
+				stringFilterBeingChanged={store.stringFilterBeingChanged}
 			/>
 			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
 		</TopRowContainer>;
@@ -84,6 +88,8 @@ export class ThesesApp extends React.Component {
 		this.tableInstance = table;
 	}
 
+	private onLoadMore = async (_: number, until: number) => { await store.loadMore(until); };
+	private onSortChanged = (col: SortColumn, dir: SortDirection) => store.onSortChanged(col, dir);
 	private renderThesesList() {
 		return <ThesesTable
 			ref={this.setTableInstance}
@@ -96,11 +102,12 @@ export class ThesesApp extends React.Component {
 			totalThesesCount={store.totalCount}
 			onThesisSelected={this.onThesisSelected}
 			switchToThesisWithOffset={this.switchWithOffset}
-			onSortChanged={store.onSortChanged}
-			loadMoreRows={async (_, until) => { await store.loadMore(until); }}
+			onSortChanged={this.onSortChanged}
+			loadMoreRows={this.onLoadMore}
 		/>;
 	}
 
+	private onThesisModified = (nt: Thesis) => store.updateModifiedThesis(nt);
 	private renderThesesDetails() {
 		return <ThesisDetails
 			thesis={store.thesis!.modified}
@@ -109,7 +116,7 @@ export class ThesesApp extends React.Component {
 			mode={store.workMode!}
 			user={store.user}
 			onSaveRequested={this.onSave}
-			onThesisModified={store.updateModifiedThesis}
+			onThesisModified={this.onThesisModified}
 		/>;
 	}
 

@@ -8,6 +8,7 @@ import {
 } from "../backend_callers";
 import { ApplicationState, ThesisWorkMode, canPerformBackendOp } from "../types/misc";
 import { roundUp, awaitSleep } from "common/utils";
+import { CancellablePromise } from "mobx/lib/api/flow";
 
 configure({ enforceActions: "observed" });
 
@@ -26,6 +27,8 @@ const enum LoadMode {
 	Replace,
 }
 
+export type ChangedStringFilter = "advisor" | "title" | "";
+
 class ThesesStore {
 	@observable public theses: Thesis[] = [];
 	@observable public thesis: CompositeThesis | null = null;
@@ -42,7 +45,8 @@ class ThesesStore {
 		sortColumn: SortColumn.None,
 		sortDirection: SortDirection.Asc,
 	});
-	@observable public isChangingStringFilter: boolean;
+	@observable public stringFilterBeingChanged: ChangedStringFilter = "";
+	private stringFilterPromise: CancellablePromise<any> | null = null;
 
 	private onListChangedCallback: (() => void) | null = null;
 
@@ -87,22 +91,53 @@ class ThesesStore {
 		this.refetch();
 	}
 
-	public onAdvisorFilterChanged = flow(function*(this: ThesesStore, value: string) {
-		this.isChangingStringFilter = true;
-		this.params.advisor = value.toLowerCase();
+	private changeStringFilterInternal = flow(function*(
+		this: ThesesStore, thisKey: "title" | "advisor", value: string
+	) {
+		this.params[thisKey] = value.toLowerCase();
+		this.stringFilterBeingChanged = thisKey;
+		this.applicationState = ApplicationState.Refetching;
+		yield awaitSleep(250);
 		yield this.refreshTheses();
-		this.isChangingStringFilter = false;
-	});
-
-	public onTitleFilterChanged = flow(function*(this: ThesesStore, value: string) {
-		this.isChangingStringFilter = true;
-		this.params.title = value.toLowerCase();
-		yield this.refreshTheses();
-		this.isChangingStringFilter = false;
+		this.applicationState = ApplicationState.Normal;
+		this.stringFilterBeingChanged = "";
+		// a suicide of sorts
+		this.stringFilterPromise = null;
 	});
 
 	@action
-	public onSortChanged = (column: SortColumn, dir: SortDirection) => {
+	private changeStringFilter(
+		thisKey: "title" | "advisor", otherKey: "title" | "advisor",
+		value: string
+	) {
+		if (this.stringFilterBeingChanged === otherKey) {
+			console.assert(false, "Not allowed");
+			return;
+		}
+		if (this.stringFilterPromise) {
+			console.assert(this.stringFilterBeingChanged === thisKey);
+			this.stringFilterPromise.cancel();
+		}
+		const changePromise = this.changeStringFilterInternal(thisKey, value);
+		changePromise.catch(err => {
+			if (!err.toString().includes("FLOW_CANCELLED")) {
+				// a real error happened
+				console.error("When attempting to fetch filtered results:", err);
+			}
+		});
+		this.stringFilterPromise = changePromise;
+	}
+
+	public onAdvisorFilterChanged(value: string) {
+		this.changeStringFilter("advisor", "title", value);
+	}
+
+	public onTitleFilterChanged(value: string) {
+		this.changeStringFilter("title", "advisor", value);
+	}
+
+	@action
+	public onSortChanged(column: SortColumn, dir: SortDirection) {
 		if (!this.checkCanPerformBackendOp()) {
 			return;
 		}
@@ -130,7 +165,6 @@ class ThesesStore {
 		// Calling this function without having first set the state is an error
 		console.assert(!canPerformBackendOp(this.applicationState));
 		try {
-			yield awaitSleep(3000);
 			if (mode === LoadMode.Append) {
 				console.assert(untilRow > this.lastRowIndex, "Already loaded");
 				const result = yield getThesesList(
@@ -171,7 +205,7 @@ class ThesesStore {
 	}
 
 	@action
-	public updateModifiedThesis = (thesis: Thesis) => {
+	public updateModifiedThesis(thesis: Thesis) {
 		if (!this.thesis) {
 			console.error("Modified nonexistent thesis");
 			return;

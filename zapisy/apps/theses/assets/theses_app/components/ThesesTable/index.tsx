@@ -59,7 +59,7 @@ type Props = {
 	switchToThesisWithOffset: (offset: number) => void;
 	onThesisSelected: (t: Thesis) => void;
 	onSortChanged: (column: SortColumn, dir: SortDirection) => void;
-	loadMoreRows: (startIndex: number , stopIndex: number) => Promise<void>;
+	loadMoreRows: (startIndex: number, stopIndex: number) => Promise<void>;
 };
 
 const initialState = {
@@ -108,6 +108,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		if (this.props.applicationState === ApplicationState.FirstLoad) {
 			return <LoadingIndicator/>;
 		}
+		console.warn("Render table");
 		// Don't let people use the table while something is happening
 		const allowInteraction = canPerformBackendOp(this.props.applicationState);
 		return <InfiniteLoader
@@ -224,11 +225,11 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		if (this.props.theses !== nextProps.theses) {
 			this.onListChanged();
 		}
-		if (this.props.selectedIdx !== nextProps.selectedIdx || nextProps.selectedIdx === -1) {
-			// If the position of the selected thesis in the list changes
-			// we should focus the table on it
-			this.setState({ hasScrolled: false });
-		}
+		// if (this.props.selectedIdx !== nextProps.selectedIdx || nextProps.selectedIdx === -1) {
+		// 	// If the position of the selected thesis in the list changes
+		// 	// we should focus the table on it
+		// 	this.setState({ hasScrolled: false });
+		// }
 	}
 
 	// If the displayed list changes logically (contents, order)

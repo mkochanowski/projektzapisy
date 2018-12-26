@@ -8,6 +8,7 @@ import styled from "styled-components";
 import { GenericSelect } from "./GenericSelect";
 import { ThesisTypeFilter, thesisTypeFilterToString } from "../types";
 import { ApplicationState } from "../types/misc";
+import { ChangedStringFilter } from "./theses_store";
 
 const typeFilterInfos = [
 	ThesisTypeFilter.AllCurrent,
@@ -33,7 +34,7 @@ type Props = {
 	titleValue: string;
 
 	state: ApplicationState;
-	isChangingStringFilter: boolean;
+	stringFilterBeingChanged: ChangedStringFilter;
 };
 
 const textFieldStyle = {
@@ -66,16 +67,14 @@ export class ListFilters extends React.PureComponent<Props> {
 	}
 
 	public render() {
-		const { state, isChangingStringFilter } = this.props;
-		if (isChangingStringFilter) {
+		const { state, stringFilterBeingChanged } = this.props;
+		if (stringFilterBeingChanged !== "") {
 			console.assert(
 				state === ApplicationState.Refetching,
 				"While changing string filters we should fetching",
 			);
 		}
-
-		const enableStringFilters = state === ApplicationState.Normal || isChangingStringFilter;
-
+		const isNormalState = state === ApplicationState.Normal;
 		return <FiltersContainer>
 			<GenericSelect<ThesisTypeFilter>
 				value={this.props.typeValue}
@@ -83,7 +82,7 @@ export class ListFilters extends React.PureComponent<Props> {
 				optionInfo={typeFilterInfos}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
-				enabled={state === ApplicationState.Normal}
+				enabled={isNormalState}
 			/>
 
 			<div>
@@ -93,7 +92,7 @@ export class ListFilters extends React.PureComponent<Props> {
 					value={this.props.titleValue}
 					onChange={this.handleTitleChanged}
 					style={textFieldStyle}
-					disabled={!enableStringFilters}
+					disabled={!(isNormalState || stringFilterBeingChanged === "title")}
 				/>
 			</div>
 
@@ -104,7 +103,7 @@ export class ListFilters extends React.PureComponent<Props> {
 					value={this.props.advisorValue}
 					onChange={this.handleAdvisorChanged}
 					style={textFieldStyle}
-					disabled={!enableStringFilters}
+					disabled={!(isNormalState || stringFilterBeingChanged === "advisor")}
 				/>
 			</div>
 		</FiltersContainer>;
