@@ -156,7 +156,6 @@ export class ThesesApp extends React.Component {
 		if (page <= this.currentPage) {
 			return;
 		}
-		console.warn("OOOH this", this);
 		this.currentPage = page;
 		yield this.refreshTheses();
 	}) as (_: number, stopIndex: number) => CancellablePromise<void>).bind(this);
@@ -293,6 +292,7 @@ export class ThesesApp extends React.Component {
 		this.thesis.mutable = thesis;
 	}
 
+	@action
 	private setupForAddingThesis = () => {
 		if (!canAddThesis(this.user)) {
 			return;
@@ -358,7 +358,7 @@ export class ThesesApp extends React.Component {
 		this.applicationState = ApplicationState.Normal;
 		// no matter what the work mode was, if we have a thesis we end up in the edit view
 		this.thesis = compositeThesisForThesis(toSelect);
-	});
+	}).bind(this);
 
 	private async modifyExistingThesis() {
 		return this.performBackendAction(async thesis => {

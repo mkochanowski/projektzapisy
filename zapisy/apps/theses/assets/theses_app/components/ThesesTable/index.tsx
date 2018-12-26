@@ -94,6 +94,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 			return <LoadingIndicator/>;
 		}
 		const { theses, selectedIdx } = this.props;
+		console.warn("Render table with idx", selectedIdx);
 		const actualIdx = selectedIdx !== -1 ? selectedIdx : 0;
 		const shouldDisable = this.props.applicationState === ApplicationState.PerformingBackendChanges;
 		return <InfiniteLoader
@@ -204,7 +205,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		if (this.props.theses !== nextProps.theses) {
 			this.onListChanged();
 		}
-		if (this.props.selectedIdx !== nextProps.selectedIdx) {
+		if (this.props.selectedIdx !== nextProps.selectedIdx || nextProps.selectedIdx === -1) {
 			// If the position of the selected thesis in the list changes
 			// we should focus the table on it
 			this.setState({ hasScrolled: false });
