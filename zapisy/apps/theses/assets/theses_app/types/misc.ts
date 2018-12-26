@@ -13,8 +13,8 @@ export const enum ApplicationState {
 	Normal,
 }
 
-export function canPerformBackendOp(state: ApplicationState) {
-	return state === ApplicationState.Normal;
+export function isPerformingBackendOp(state: ApplicationState) {
+	return state !== ApplicationState.Normal;
 }
 
 /**

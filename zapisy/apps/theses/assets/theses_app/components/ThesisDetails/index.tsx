@@ -12,7 +12,7 @@ import { ThesisVotes } from "./ThesisVotes";
 
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
-import { ThesisWorkMode, ApplicationState, canPerformBackendOp } from "../../types/misc";
+import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../types/misc";
 import { canModifyThesis } from "../../permissions";
 
 const SaveButton = Button.extend`
@@ -93,7 +93,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 				: null
 			}
 			<MainDetailsContainer
-				style={canPerformBackendOp(this.props.appState) ? {} : getDisabledStyle()}
+				style={isPerformingBackendOp(this.props.appState) ? getDisabledStyle() : {}}
 			>
 				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
 				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>

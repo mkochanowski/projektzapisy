@@ -6,7 +6,7 @@ import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
 	getCurrentUser, ThesesProcessParams, SortColumn, SortDirection, FAKE_USER,
 } from "../backend_callers";
-import { ApplicationState, ThesisWorkMode, canPerformBackendOp } from "../types/misc";
+import { ApplicationState, ThesisWorkMode, isPerformingBackendOp } from "../types/misc";
 import { roundUp, awaitSleep } from "common/utils";
 import { CancellablePromise } from "mobx/lib/api/flow";
 
@@ -69,7 +69,7 @@ class ThesesStore {
 	});
 
 	private checkCanPerformBackendOp() {
-		if (!canPerformBackendOp(this.applicationState)) {
+		if (isPerformingBackendOp(this.applicationState)) {
 			console.assert(false, "Not allowed to perform backend op");
 			return false;
 		}
@@ -148,7 +148,7 @@ class ThesesStore {
 
 	public loadMore = flow(function* (this: ThesesStore, upToRow: number) {
 		console.warn("render more", upToRow);
-		if (!canPerformBackendOp(this.applicationState) || upToRow <= this.lastRowIndex) {
+		if (isPerformingBackendOp(this.applicationState) || upToRow <= this.lastRowIndex) {
 			return;
 		}
 		this.applicationState = ApplicationState.LoadingMore;
@@ -163,7 +163,7 @@ class ThesesStore {
 	/** Download theses or set the error screen if an error occurred */
 	private loadTheses = flow(function*(this: ThesesStore, mode: LoadMode, untilRow: number) {
 		// Calling this function without having first set the state is an error
-		console.assert(!canPerformBackendOp(this.applicationState));
+		console.assert(isPerformingBackendOp(this.applicationState));
 		try {
 			if (mode === LoadMode.Append) {
 				console.assert(untilRow > this.lastRowIndex, "Already loaded");
@@ -239,7 +239,7 @@ class ThesesStore {
 			console.assert(false, "save() called but no unsaved changes");
 			return false;
 		}
-		if (!canPerformBackendOp(this.applicationState)) {
+		if (isPerformingBackendOp(this.applicationState)) {
 			console.assert(false, "Called save() but we're already doing something backend-related");
 			return false;
 		}
