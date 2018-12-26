@@ -8,7 +8,7 @@ import axios, { AxiosRequestConfig } from "axios";
 
 import {
 	Thesis, ThesisJson, Student, Employee,
-	BasePerson, AppUser, ThesisTypeFilter,
+	BasePerson, AppUser, ThesisTypeFilter, UserType,
 } from "./types";
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 
@@ -16,6 +16,10 @@ const BASE_API_URL = "/theses/api";
 const REST_REQUEST_TIMEOUT = 10000;
 
 axios.defaults.timeout = REST_REQUEST_TIMEOUT;
+
+export const FAKE_USER = new AppUser(
+	{ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }
+);
 
 /**
  * Send a request to the backend including the csrf token

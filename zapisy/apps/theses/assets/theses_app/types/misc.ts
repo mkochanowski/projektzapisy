@@ -15,6 +15,7 @@ export const enum ApplicationState {
  * Determines whether we're adding a new thesis or modifying an existing one
  */
 export const enum ThesisWorkMode {
+	Viewing,
 	Editing,
 	Adding,
 }

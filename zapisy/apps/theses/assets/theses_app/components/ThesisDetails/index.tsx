@@ -54,7 +54,6 @@ const RightDetailsContainer = styled.div`
 
 type Props = {
 	thesis: Thesis;
-	thesesList: Thesis[];
 	/** Are we saving this thesis (i.e. should it be read-only)? */
 	isSaving: boolean;
 	hasUnsavedChanges: boolean;
@@ -203,15 +202,10 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	}
 
 	private validateBeforeSave() {
-		const { thesis, thesesList } = this.props;
+		const { thesis } = this.props;
 		const trimmedTitle = thesis.title.trim();
 		if (!trimmedTitle) {
 			window.alert("Tytuł pracy nie może być pusty.");
-			this.setState({ hasTitleError: true });
-			return false;
-		}
-		if (thesesList.find(t => !t.isEqual(thesis) && t.title.trim() === trimmedTitle)) {
-			window.alert("Istnieje już inna praca o tym tytule.");
 			this.setState({ hasTitleError: true });
 			return false;
 		}
