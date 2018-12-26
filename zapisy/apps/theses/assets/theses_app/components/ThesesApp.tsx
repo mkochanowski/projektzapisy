@@ -106,15 +106,17 @@ export class ThesesApp extends React.Component {
 		}
 	}
 
-	private onFilterChanged() {
+	private onFilterChanged = () => {
 		this.currentPage = 1;
 		this.refreshTheses();
 	}
-	@action
-	private onTypeFilterChanged = (value: ThesisTypeFilter) => {
+	private onTypeFilterChanged = flow(function*(this: ThesesApp, value: ThesisTypeFilter) {
 		this.params.type = value;
-		this.onFilterChanged();
-	}
+		this.currentPage = 1;
+		this.applicationState = ApplicationState.FetchingTheses;
+		yield this.refreshTheses();
+		this.applicationState = ApplicationState.Normal;
+	}).bind(this);
 	@action
 	private onAdvisorFilterChanged = (value: string) => {
 		this.params.advisor = value.toLowerCase();
@@ -179,7 +181,7 @@ export class ThesesApp extends React.Component {
 	private renderThesesDetails() {
 		return <ThesisDetails
 			thesis={this.thesis!.mutable}
-			isSaving={this.applicationState === ApplicationState.PerformingBackendChanges}
+			appState={this.applicationState}
 			hasUnsavedChanges={this.hasUnsavedChanges()}
 			mode={this.workMode!}
 			user={this.user}
@@ -342,7 +344,7 @@ export class ThesesApp extends React.Component {
 
 		const { workMode } = this;
 
-		this.applicationState = ApplicationState.PerformingBackendChanges;
+		this.applicationState = ApplicationState.Saving;
 		type NonViewModes = (ThesisWorkMode.Adding | ThesisWorkMode.Editing);
 		const handler = this.handlerForWorkMode[workMode as NonViewModes];
 		const id = yield handler.call(this);

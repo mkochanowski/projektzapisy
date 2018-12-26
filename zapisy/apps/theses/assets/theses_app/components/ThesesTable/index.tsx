@@ -12,7 +12,7 @@ import {
 import "react-virtualized/styles.css"; // only needs to be imported once
 
 import { Thesis } from "../../types";
-import { ApplicationState } from "../../types/misc";
+import { ApplicationState, isWaitingOnBackend } from "../../types/misc";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
@@ -96,7 +96,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		const { theses, selectedIdx } = this.props;
 		console.warn("Render table with idx", selectedIdx);
 		const actualIdx = selectedIdx !== -1 ? selectedIdx : 0;
-		const shouldDisable = this.props.applicationState === ApplicationState.PerformingBackendChanges;
+		const shouldDisable = isWaitingOnBackend(this.props.applicationState);
 		return <InfiniteLoader
 				loadMoreRows={({ startIndex, stopIndex }) => this.props.loadMoreRows(startIndex, stopIndex)}
 				isRowLoaded={({ index }) => this.isRowLoaded(index)}

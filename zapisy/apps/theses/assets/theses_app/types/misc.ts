@@ -7,8 +7,15 @@
  */
 export const enum ApplicationState {
 	InitialLoading,
-	PerformingBackendChanges,
+	FetchingTheses,
+	Saving,
 	Normal,
+}
+
+export function isWaitingOnBackend(state: ApplicationState) {
+	return [
+		ApplicationState.Saving, ApplicationState.FetchingTheses,
+	].includes(state);
 }
 
 /**

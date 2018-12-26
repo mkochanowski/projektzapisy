@@ -12,7 +12,7 @@ import { ThesisVotes } from "./ThesisVotes";
 
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
-import { ThesisWorkMode } from "../../types/misc";
+import { ThesisWorkMode, ApplicationState, isWaitingOnBackend } from "../../types/misc";
 import { canModifyThesis } from "../../permissions";
 
 const SaveButton = Button.extend`
@@ -54,8 +54,7 @@ const RightDetailsContainer = styled.div`
 
 type Props = {
 	thesis: Thesis;
-	/** Are we saving this thesis (i.e. should it be read-only)? */
-	isSaving: boolean;
+	appState: ApplicationState;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
 	user: AppUser;
@@ -87,12 +86,14 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	public render() {
 		console.warn("Render details");
+		const shouldDisable = isWaitingOnBackend(this.props.appState);
 
 		return <DetailsSectionWrapper>
-			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
-			<MainDetailsContainer
-				style={this.props.isSaving ? getDisabledStyle() : {}}
-			>
+			{this.props.appState === ApplicationState.Saving
+				? <Spinner style={{ position: "absolute" }}/>
+				: null
+			}
+			<MainDetailsContainer style={shouldDisable ? getDisabledStyle() : {}}>
 				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
 				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
 			</MainDetailsContainer>
