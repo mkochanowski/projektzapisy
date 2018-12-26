@@ -28,6 +28,7 @@ const TopRowContainer = styled.div`
 @observer
 export class ThesesApp extends React.Component {
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
+	private tableInstance: ThesesTable;
 
 	componentDidMount() {
 		store.initialize();
@@ -35,11 +36,13 @@ export class ThesesApp extends React.Component {
 		this.oldOnBeforeUnload = window.onbeforeunload;
 		window.onbeforeunload = this.confirmUnload;
 		this.initializeKeyboardShortcuts();
+		store.registerOnListChanged(() => this.tableInstance.resetRowInfo());
 	}
 
 	componentWillUnmount() {
 		window.onbeforeunload = this.oldOnBeforeUnload;
 		this.deconfigureKeyboardShortcuts();
+		store.clearOnListChangedCallback();
 	}
 
 	private initializeKeyboardShortcuts() {
@@ -77,8 +80,13 @@ export class ThesesApp extends React.Component {
 		</TopRowContainer>;
 	}
 
+	private setTableInstance = (table: ThesesTable) => {
+		this.tableInstance = table;
+	}
+
 	private renderThesesList() {
 		return <ThesesTable
+			ref={this.setTableInstance}
 			applicationState={store.applicationState}
 			theses={store.theses}
 			selectedIdx={store.selectedIdx}

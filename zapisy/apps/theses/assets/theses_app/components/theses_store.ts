@@ -36,6 +36,15 @@ class ThesesStore {
 		sortColumn: SortColumn.None,
 		sortDirection: SortDirection.Asc,
 	});
+	private onListChangedCallback: (() => void) | null = null;
+
+	public registerOnListChanged(cb: () => void) {
+		this.onListChangedCallback = cb;
+	}
+
+	public clearOnListChangedCallback() {
+		this.onListChangedCallback = null;
+	}
 
 	@computed public get selectedIdx() {
 		return thesisIndexInList(this.thesis && this.thesis.original, this.theses);
@@ -112,6 +121,9 @@ class ThesesStore {
 				this.theses = this.theses.concat(result.theses);
 			}
 			this.totalCount = result.total;
+			if (this.onListChangedCallback) {
+				this.onListChangedCallback();
+			}
 		} catch (err) {
 			this.fetchError = err;
 		}
