@@ -11,7 +11,6 @@ import styled from "styled-components";
 
 import { Thesis } from "../types";
 import { ThesisDetails } from "./ThesisDetails";
-import { ApplicationState } from "../types/misc";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
@@ -74,7 +73,8 @@ export class ThesesApp extends React.Component {
 				advisorValue={store.params.advisor}
 				onTitleChange={store.onTitleFilterChanged}
 				titleValue={store.params.title}
-				enabled={store.applicationState === ApplicationState.Normal}
+				state={store.applicationState}
+				isChangingStringFilter={false}
 			/>
 			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
 		</TopRowContainer>;
@@ -97,7 +97,7 @@ export class ThesesApp extends React.Component {
 			onThesisSelected={this.onThesisSelected}
 			switchToThesisWithOffset={this.switchWithOffset}
 			onSortChanged={store.onSortChanged}
-			loadMoreRows={async until => { await store.loadMore(until); }}
+			loadMoreRows={async (_, until) => { await store.loadMore(until); }}
 		/>;
 	}
 

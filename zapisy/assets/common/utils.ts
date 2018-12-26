@@ -46,4 +46,20 @@ export function inRange<T>(value: T, min: T, max: T): boolean {
 	return value >= min && value <= max;
 }
 
+/**
+ * Round up the specified to the nearest multiple
+ * @param numToRound The number to round up
+ * @param multiple Round up to the nearest multiple of this
+ */
+export function roundUp(numToRound: number, multiple: number) {
+	if (multiple === 0) {
+		return numToRound;
+	}
+	const remainder = numToRound % multiple;
+	if (remainder === 0) {
+		return numToRound;
+	}
+	return numToRound + multiple - remainder;
+}
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

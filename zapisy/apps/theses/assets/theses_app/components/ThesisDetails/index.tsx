@@ -12,7 +12,7 @@ import { ThesisVotes } from "./ThesisVotes";
 
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
-import { ThesisWorkMode, ApplicationState, isWaitingOnBackend } from "../../types/misc";
+import { ThesisWorkMode, ApplicationState, canPerformBackendOp } from "../../types/misc";
 import { canModifyThesis } from "../../permissions";
 
 const SaveButton = Button.extend`
@@ -86,14 +86,15 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	public render() {
 		console.warn("Render details");
-		const shouldDisable = isWaitingOnBackend(this.props.appState);
 
 		return <DetailsSectionWrapper>
 			{this.props.appState === ApplicationState.Saving
 				? <Spinner style={{ position: "absolute" }}/>
 				: null
 			}
-			<MainDetailsContainer style={shouldDisable ? getDisabledStyle() : {}}>
+			<MainDetailsContainer
+				style={canPerformBackendOp(this.props.appState) ? {} : getDisabledStyle()}
+			>
 				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
 				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
 			</MainDetailsContainer>

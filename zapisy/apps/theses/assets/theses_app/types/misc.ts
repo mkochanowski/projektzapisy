@@ -6,16 +6,15 @@
  * The current global application mode
  */
 export const enum ApplicationState {
-	InitialLoading,
-	FetchingTheses,
+	FirstLoad,
+	LoadingMore,
+	Refetching,
 	Saving,
 	Normal,
 }
 
-export function isWaitingOnBackend(state: ApplicationState) {
-	return [
-		ApplicationState.Saving, ApplicationState.FetchingTheses,
-	].includes(state);
+export function canPerformBackendOp(state: ApplicationState) {
+	return state === ApplicationState.Normal;
 }
 
 /**

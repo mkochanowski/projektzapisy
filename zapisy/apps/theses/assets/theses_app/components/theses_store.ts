@@ -6,7 +6,8 @@ import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
 	getCurrentUser, ThesesProcessParams, SortColumn, SortDirection, FAKE_USER,
 } from "../backend_callers";
-import { ApplicationState, ThesisWorkMode } from "../types/misc";
+import { ApplicationState, ThesisWorkMode, canPerformBackendOp } from "../types/misc";
+import { roundUp, awaitSleep } from "common/utils";
 
 configure({ enforceActions: "observed" });
 
@@ -20,12 +21,17 @@ type CompositeThesis = {
 	modified: Thesis;
 };
 
+const enum LoadMode {
+	Append,
+	Replace,
+}
+
 class ThesesStore {
 	@observable public theses: Thesis[] = [];
 	@observable public thesis: CompositeThesis | null = null;
-	@observable public currentPage: number = 1;
+	@observable public lastRowIndex: number = 0;
 	@observable public user: AppUser = FAKE_USER;
-	@observable public applicationState: ApplicationState = ApplicationState.InitialLoading;
+	@observable public applicationState: ApplicationState = ApplicationState.FirstLoad;
 	@observable public fetchError: Error | null = null;
 	@observable public workMode: ThesisWorkMode = ThesisWorkMode.Viewing;
 	@observable public totalCount: number = 0;
@@ -36,6 +42,8 @@ class ThesesStore {
 		sortColumn: SortColumn.None,
 		sortDirection: SortDirection.Asc,
 	});
+	@observable public isChangingStringFilter: boolean;
+
 	private onListChangedCallback: (() => void) | null = null;
 
 	public registerOnListChanged(cb: () => void) {
@@ -56,6 +64,94 @@ class ThesesStore {
 		this.applicationState = ApplicationState.Normal;
 	});
 
+	private checkCanPerformBackendOp() {
+		if (!canPerformBackendOp(this.applicationState)) {
+			console.assert(false, "Not allowed to perform backend op");
+			return false;
+		}
+		return true;
+	}
+
+	private refetch = flow(function*(this: ThesesStore) {
+		this.applicationState = ApplicationState.Refetching;
+		yield this.refreshTheses();
+		this.applicationState = ApplicationState.Normal;
+	});
+
+	@action
+	public onTypeFilterChanged = (value: ThesisTypeFilter) => {
+		if (!this.checkCanPerformBackendOp()) {
+			return;
+		}
+		this.params.type = value;
+		this.refetch();
+	}
+
+	public onAdvisorFilterChanged = flow(function*(this: ThesesStore, value: string) {
+		this.isChangingStringFilter = true;
+		this.params.advisor = value.toLowerCase();
+		yield this.refreshTheses();
+		this.isChangingStringFilter = false;
+	});
+
+	public onTitleFilterChanged = flow(function*(this: ThesesStore, value: string) {
+		this.isChangingStringFilter = true;
+		this.params.title = value.toLowerCase();
+		yield this.refreshTheses();
+		this.isChangingStringFilter = false;
+	});
+
+	@action
+	public onSortChanged = (column: SortColumn, dir: SortDirection) => {
+		if (!this.checkCanPerformBackendOp()) {
+			return;
+		}
+		this.params.sortColumn = column;
+		this.params.sortDirection = dir;
+		this.refetch();
+	}
+
+	public loadMore = flow(function* (this: ThesesStore, upToRow: number) {
+		console.warn("render more", upToRow);
+		if (!canPerformBackendOp(this.applicationState) || upToRow <= this.lastRowIndex) {
+			return;
+		}
+		this.applicationState = ApplicationState.LoadingMore;
+		yield this.loadTheses(LoadMode.Append, roundUp(upToRow, ROWS_PER_PAGE));
+		this.applicationState = ApplicationState.Normal;
+	});
+
+	private refreshTheses() {
+		return this.loadTheses(LoadMode.Replace, ROWS_PER_PAGE);
+	}
+
+	/** Download theses or set the error screen if an error occurred */
+	private loadTheses = flow(function*(this: ThesesStore, mode: LoadMode, untilRow: number) {
+		// Calling this function without having first set the state is an error
+		console.assert(!canPerformBackendOp(this.applicationState));
+		try {
+			yield awaitSleep(3000);
+			if (mode === LoadMode.Append) {
+				console.assert(untilRow > this.lastRowIndex, "Already loaded");
+				const result = yield getThesesList(
+					this.params, this.lastRowIndex, untilRow - this.lastRowIndex,
+				);
+				this.theses = this.theses.concat(result.theses);
+				this.totalCount = result.total;
+			} else {
+				const result = yield getThesesList(this.params, 0, untilRow);
+				this.theses = result.theses;
+				this.totalCount = result.total;
+			}
+			this.lastRowIndex = untilRow;
+			if (this.onListChangedCallback) {
+				this.onListChangedCallback();
+			}
+		} catch (err) {
+			this.fetchError = err;
+		}
+	});
+
 	@action
 	public selectThesis(thesis: Thesis) {
 		console.assert(
@@ -65,69 +161,6 @@ class ThesesStore {
 		this.workMode = ThesisWorkMode.Editing;
 		this.thesis = compositeThesisForThesis(thesis);
 	}
-
-	private disableAndRefetch = flow(function*(this: ThesesStore) {
-		this.currentPage = 1;
-		this.applicationState = ApplicationState.FetchingTheses;
-		yield this.refreshTheses();
-		this.applicationState = ApplicationState.Normal;
-	});
-
-	private refetch() {
-		this.currentPage = 1;
-		this.refreshTheses();
-	}
-
-	@action
-	public onTypeFilterChanged = (value: ThesisTypeFilter) => {
-		this.params.type = value;
-		this.disableAndRefetch();
-	}
-	@action
-	public onAdvisorFilterChanged = (value: string) => {
-		this.params.advisor = value.toLowerCase();
-		this.refetch();
-	}
-	@action
-	public onTitleFilterChanged = (value: string) => {
-		this.params.title = value.toLowerCase();
-		this.refetch();
-	}
-
-	@action
-	public onSortChanged = (column: SortColumn, dir: SortDirection) => {
-		this.params.sortColumn = column;
-		this.params.sortDirection = dir;
-		this.disableAndRefetch();
-	}
-
-	public loadMore = flow(function* (this: ThesesStore, until: number) {
-		console.warn("render more", until);
-		const page = indexToPage(until);
-		if (page <= this.currentPage) {
-			return;
-		}
-		this.currentPage = page;
-		yield this.refreshTheses();
-	});
-
-	/** Download theses or set the error screen if an error occurred */
-	public refreshTheses = flow(function*(this: ThesesStore) {
-		try {
-			const result = yield getThesesList(this.params, this.currentPage);
-			if (this.currentPage === 1) {
-				this.theses = result.theses;
-			} else {
-				this.theses = this.theses.concat(result.theses);
-			}
-			this.totalCount = result.total;
-			if (this.onListChangedCallback) {
-				this.onListChangedCallback();
-			}
-		} catch (err) {
-			this.fetchError = err;
-		}
-	});
 
 	public hasUnsavedChanges() {
 		const { thesis } = this;
@@ -172,6 +205,10 @@ class ThesesStore {
 			console.assert(false, "save() called but no unsaved changes");
 			return false;
 		}
+		if (!canPerformBackendOp(this.applicationState)) {
+			console.assert(false, "Called save() but we're already doing something backend-related");
+			return false;
+		}
 		return true;
 	}
 
@@ -199,7 +236,6 @@ class ThesesStore {
 			throw err;
 		}
 
-		this.currentPage = 1;
 		yield this.refreshTheses();
 
 		const toSelect = this.theses.find(t => t.id === id) || null;
@@ -222,10 +258,6 @@ function thesisIndexInList(thesis: Thesis | null, theses: Thesis[]) {
 	return thesis
 		? theses.findIndex(thesis.isEqual)
 		: -1;
-}
-
-function indexToPage(index: number) {
-	return Math.ceil(index / ROWS_PER_PAGE);
 }
 
 function compositeThesisForThesis(t: Thesis | null) {

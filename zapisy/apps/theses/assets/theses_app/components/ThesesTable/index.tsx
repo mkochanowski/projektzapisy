@@ -12,7 +12,7 @@ import {
 import "react-virtualized/styles.css"; // only needs to be imported once
 
 import { Thesis } from "../../types";
-import { ApplicationState, isWaitingOnBackend } from "../../types/misc";
+import { ApplicationState, canPerformBackendOp } from "../../types/misc";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
@@ -105,21 +105,21 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	public render() {
-		if (this.props.applicationState === ApplicationState.InitialLoading) {
+		if (this.props.applicationState === ApplicationState.FirstLoad) {
 			return <LoadingIndicator/>;
 		}
-		const shouldDisable = isWaitingOnBackend(this.props.applicationState);
+		// Don't let people use the table while something is happening
+		const allowInteraction = canPerformBackendOp(this.props.applicationState);
 		return <InfiniteLoader
 				loadMoreRows={({ startIndex, stopIndex }) => this.props.loadMoreRows(startIndex, stopIndex)}
 				isRowLoaded={({ index }) => this.isRowLoaded(index)}
 				rowCount={this.props.totalThesesCount}
-				threshold={10}
 				ref={this.setLoaderInstance}
 			>
 			{({ onRowsRendered, registerChild }) => (
 				<AutoSizer
 					disableHeight
-					style={shouldDisable ? getDisabledStyle() : {}}
+					style={allowInteraction ? {} : getDisabledStyle() }
 				>
 					{({ width }) => this.renderTableItself(width, onRowsRendered, registerChild)}
 				</AutoSizer>

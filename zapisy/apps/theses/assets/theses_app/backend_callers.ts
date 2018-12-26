@@ -97,7 +97,9 @@ function sortDirToBackendStr(dir: SortDirection) {
 	}
 }
 
-export async function getThesesList(params: ThesesProcessParams, page: number) {
+export async function getThesesList(
+	params: ThesesProcessParams, offset: number, limit: number,
+) {
 	const paginatedResults: PaginatedThesesResult = await getData(
 		`${BASE_API_URL}/theses`,
 		{ params: {
@@ -106,7 +108,7 @@ export async function getThesesList(params: ThesesProcessParams, page: number) {
 			advisor: params.advisor,
 			column: sortColToBackendStr(params.sortColumn),
 			dir: sortDirToBackendStr(params.sortDirection),
-			page: page,
+			offset, limit,
 		}},
 	);
 	return {

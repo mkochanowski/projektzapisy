@@ -7,6 +7,7 @@ import styled from "styled-components";
 
 import { GenericSelect } from "./GenericSelect";
 import { ThesisTypeFilter, thesisTypeFilterToString } from "../types";
+import { ApplicationState } from "../types/misc";
 
 const typeFilterInfos = [
 	ThesisTypeFilter.AllCurrent,
@@ -31,7 +32,8 @@ type Props = {
 	onTitleChange: (titleSubstr: string) => void;
 	titleValue: string;
 
-	enabled: boolean;
+	state: ApplicationState;
+	isChangingStringFilter: boolean;
 };
 
 const textFieldStyle = {
@@ -64,6 +66,16 @@ export class ListFilters extends React.PureComponent<Props> {
 	}
 
 	public render() {
+		const { state, isChangingStringFilter } = this.props;
+		if (isChangingStringFilter) {
+			console.assert(
+				state === ApplicationState.Refetching,
+				"While changing string filters we should fetching",
+			);
+		}
+
+		const enableStringFilters = state === ApplicationState.Normal || isChangingStringFilter;
+
 		return <FiltersContainer>
 			<GenericSelect<ThesisTypeFilter>
 				value={this.props.typeValue}
@@ -71,7 +83,7 @@ export class ListFilters extends React.PureComponent<Props> {
 				optionInfo={typeFilterInfos}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
-				enabled={this.props.enabled}
+				enabled={state === ApplicationState.Normal}
 			/>
 
 			<div>
@@ -81,7 +93,7 @@ export class ListFilters extends React.PureComponent<Props> {
 					value={this.props.titleValue}
 					onChange={this.handleTitleChanged}
 					style={textFieldStyle}
-					disabled={!this.props.enabled}
+					disabled={!enableStringFilters}
 				/>
 			</div>
 
@@ -92,7 +104,7 @@ export class ListFilters extends React.PureComponent<Props> {
 					value={this.props.advisorValue}
 					onChange={this.handleAdvisorChanged}
 					style={textFieldStyle}
-					disabled={!this.props.enabled}
+					disabled={!enableStringFilters}
 				/>
 			</div>
 		</FiltersContainer>;

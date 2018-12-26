@@ -9,7 +9,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import exceptions
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import LimitOffsetPagination
 from dal import autocomplete
 
 from apps.users.models import Student, Employee
@@ -45,8 +45,8 @@ class ThesisTypeFilter(Enum):
     default = all_current
 
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 30
+class ThesesPagination(LimitOffsetPagination):
+    default_limit = 30
 
 
 class ThesesViewSet(viewsets.ModelViewSet):
@@ -54,7 +54,7 @@ class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get", "post"]
     permission_classes = (ThesisPermissions,)
     serializer_class = serializers.ThesisSerializer
-    pagination_class = StandardResultsSetPagination
+    pagination_class = ThesesPagination
 
     def get_queryset(self):
         requested_thesis_type_str = self.request.query_params.get(THESIS_TYPE_FILTER_NAME, None)
