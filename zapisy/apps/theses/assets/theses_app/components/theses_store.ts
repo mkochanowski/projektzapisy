@@ -12,7 +12,7 @@ import { CancellablePromise } from "mobx/lib/api/flow";
 
 configure({ enforceActions: "observed" });
 
-const ROWS_PER_PAGE = 30;
+const ROWS_PER_PAGE = 100;
 
 /** The currently selected thesis */
 type CompositeThesis = {

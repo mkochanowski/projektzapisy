@@ -12,7 +12,7 @@ import {
 import "react-virtualized/styles.css"; // only needs to be imported once
 
 import { Thesis } from "../../types";
-import { ApplicationState, canPerformBackendOp } from "../../types/misc";
+import { ApplicationState } from "../../types/misc";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
@@ -32,6 +32,9 @@ import { UnconstrainedFunction } from "common/types";
 	(for the "cell measurer", responsible for dynamically adjusting the height
 	of each row to fit the contents)
 */
+
+// How close to the end the user has to get before we fetch more
+const LOAD_THRESHOLD = 40;
 
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
@@ -105,17 +108,21 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	public render() {
-		if (this.props.applicationState === ApplicationState.FirstLoad) {
+		const { applicationState } = this.props;
+		if (applicationState === ApplicationState.FirstLoad) {
 			return <LoadingIndicator/>;
 		}
 		console.warn("Render table");
 		// Don't let people use the table while something is happening
-		const allowInteraction = canPerformBackendOp(this.props.applicationState);
+		const allowInteraction = [
+			ApplicationState.Normal, ApplicationState.LoadingMore
+		].includes(applicationState);
 		return <InfiniteLoader
 				loadMoreRows={({ startIndex, stopIndex }) => this.props.loadMoreRows(startIndex, stopIndex)}
 				isRowLoaded={({ index }) => this.isRowLoaded(index)}
 				rowCount={this.props.totalThesesCount}
 				ref={this.setLoaderInstance}
+				threshold={LOAD_THRESHOLD}
 			>
 			{({ onRowsRendered, registerChild }) => (
 				<AutoSizer
@@ -239,6 +246,10 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private changeSort = (info: { sortBy: string; sortDirection: SortDirectionType }) => {
+		// theoretically someone could click this while infinite scroll is loading
+		if (this.props.applicationState === ApplicationState.LoadingMore) {
+			return;
+		}
 		const {
 			sortColumn: prevSortColumn,
 			sortDirection: prevSortDirection
