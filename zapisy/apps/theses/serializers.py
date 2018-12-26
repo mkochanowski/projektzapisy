@@ -121,6 +121,8 @@ class ThesisSerializer(serializers.ModelSerializer):
             "advisor": advisor,
         }
         copy_optional_fields(result, data)
+        if "description" not in result:
+            result["description"] = ""
 
         return result
 
