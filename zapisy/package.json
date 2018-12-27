@@ -33,13 +33,12 @@
     "mousetrap": "^1.6.2",
     "object-assign-deep": "^0.4.0",
     "prop-types": "^15.6.2",
-    "react": "^16.4.1",
+    "react": "^16.7.0",
     "react-button-component": "^1.0.0",
-    "react-dom": "^16.4.1",
+    "react-dom": "^16.7.0",
     "react-mobx": "^0.0.4",
     "react-select": "1",
     "react-select-async-paginate": "^0.1.0",
-    "react-table": "^6.8.6",
     "react-virtualized": "^9.21.0",
     "styled-components": "^3.3.3",
     "vue": "^2.5.6",
@@ -54,9 +53,8 @@
     "@types/moment": "^2.13.0",
     "@types/mousetrap": "^1.6.0",
     "@types/node": "^8.0.51",
-    "@types/react": "^16.4.1",
+    "@types/react": "^16.7.18",
     "@types/react-dom": "^16.0.6",
-    "@types/react-table": "^6.7.11",
     "@types/react-virtualized": "^9.18.9",
     "@types/webpack": "^4.4.2",
     "@types/webpack-env": "^1.13.2",
@@ -99,5 +97,8 @@
     "webpack-bundle-tracker": "^0.3.0",
     "webpack-cli": "^3.0.8",
     "webpack-shell-plugin": "^0.5.0"
+  },
+  "resolutions": {
+    "@types/react": "^16.7.18"
   }
 }
