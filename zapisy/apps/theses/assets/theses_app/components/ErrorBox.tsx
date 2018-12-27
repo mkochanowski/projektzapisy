@@ -10,9 +10,9 @@ import * as React from "react";
 import styled from "styled-components";
 
 const ErrorTextContainer = styled.div`
-width: 100%;
-padding: 40px;
-text-align: center;
+	width: 100%;
+	padding: 40px;
+	text-align: center;
 `;
 
 type Props = {
