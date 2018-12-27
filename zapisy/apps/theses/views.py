@@ -13,7 +13,10 @@ from rest_framework.pagination import LimitOffsetPagination
 from dal import autocomplete
 
 from apps.users.models import Student, Employee
-from .models import Thesis, ThesisStatus, ThesisKind, get_num_ungraded_for_emp
+from .models import (
+    Thesis, ThesisStatus, ThesisKind, ThesisVote,
+    get_num_ungraded_for_emp, filter_ungraded_for_emp
+)
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
 from .users import wrap_user, ThesisUserType, get_theses_board, get_user_type
@@ -121,7 +124,7 @@ def fields_for_prefetching(base_field: str) -> List[str]:
 
 
 def filter_queryset(
-    qs, user: BaseUser,
+    qs, user: Employee,
     thesis_type: ThesisTypeFilter, title: str, advisor_name: str
 ):
     """Filter the specified theses queryset based on the passed conditions"""
@@ -165,7 +168,7 @@ def ungraded_theses_filter(queryset, user: Employee):
     user_type = get_user_type(user)
     if user_type != ThesisUserType.theses_board_member:
         raise exceptions.NotFound()
-    return queryset
+    return filter_ungraded_for_emp(queryset, user)
 
 
 def filter_theses_queryset_for_type(queryset, user: Employee, thesis_type: ThesisTypeFilter):
