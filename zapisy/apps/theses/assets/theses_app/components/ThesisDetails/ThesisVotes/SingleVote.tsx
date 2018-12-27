@@ -8,25 +8,30 @@ type Props = {
 	user: AppUser;
 	value: ThesisVote;
 	voter: Employee;
-	onChange: (v: ThesisVote) => void;
+	onChange: (voter: Employee, v: ThesisVote) => void;
 };
 
 const voteCycle = [ThesisVote.None, ThesisVote.Accepted, ThesisVote.Rejected];
 
-export function SingleVote(props: Props) {
-	const allowAction = canCastVoteAsUser(props.user, props.voter);
-	const sameUser = props.user.user.isEqual(props.voter);
-	const content = <>
-		<VoteIndicator active={allowAction} value={props.value} />
-		<VoteLabel
-			style={sameUser ? { fontWeight: "bold" } : {}}
-		>{props.voter.displayName.split(" ")[0]}</VoteLabel>
-	</>;
-	return allowAction
-		? <VoteContainerActive
-			onClick={() => props.onChange(nextValue(props.value))}
-		>{content}</VoteContainerActive>
-		: <VoteContainerInactive>{content}</VoteContainerInactive>;
+export class SingleVote extends React.PureComponent<Props> {
+	public render() {
+		const { user, voter } = this.props;
+		const allowAction = canCastVoteAsUser(user, voter);
+		const sameUser = user.user.isEqual(voter);
+		const content = <>
+			<VoteIndicator active={allowAction} value={this.props.value} />
+			<VoteLabel
+				style={sameUser ? { fontWeight: "bold" } : {}}
+			>{voter.displayName}</VoteLabel>
+		</>;
+		return allowAction
+			? <VoteContainerActive onClick={this.onClick}>{content}</VoteContainerActive>
+			: <VoteContainerInactive>{content}</VoteContainerInactive>;
+	}
+
+	private onClick = () => {
+		this.props.onChange(this.props.voter, nextValue(this.props.value));
+	}
 }
 
 function nextValue(value: ThesisVote) {

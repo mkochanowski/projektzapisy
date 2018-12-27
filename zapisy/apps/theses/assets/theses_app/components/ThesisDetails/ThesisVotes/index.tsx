@@ -14,21 +14,21 @@ type Props = {
 /**
  * Renders the vote value for this thesis for each theses board member
  */
-export function ThesisVotes(props: Props) {
+export const ThesisVotes = React.memo(function(props: Props) {
 	const votes = props.thesesBoard.map((emp, i) => (
 		<SingleVote
 			key={i}
 			voter={emp}
 			value={props.thesis.getMemberVote(emp)}
 			user={props.user}
-			onChange={nv => props.onChange(emp, nv)}
+			onChange={props.onChange}
 		/>
 	));
 	return <VotesContainer>
 		<Header>Głosy</Header>
 		{votes}
 	</VotesContainer>;
-}
+});
 
 const Header = styled.div`
 	font-weight: bold;
