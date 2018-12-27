@@ -102,11 +102,16 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	}
 
 	private renderThesisLeftPanel() {
+		const { thesis } = this.props;
+		const canModify = canModifyThesis(this.props.user, this.props.thesis);
 		return <>
 			<ThesisTopRow
-				thesis={this.props.thesis}
 				mode={this.props.mode}
 				user={this.props.user}
+				readOnly={!canModify}
+				isReserved={thesis.reserved}
+				dateChanged={thesis.modifiedDate}
+				status={thesis.status}
 				onReservationChanged={this.onReservationChanged}
 				onDateChanged={this.onDateUpdatedChanged}
 				onStatusChanged={this.onStatusChanged}
