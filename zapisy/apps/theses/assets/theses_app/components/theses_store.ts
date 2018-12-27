@@ -270,7 +270,8 @@ class ThesesStore {
 			throw err;
 		}
 
-		yield this.refreshTheses();
+		// Reload without losing the current position
+		yield this.loadTheses(LoadMode.Replace, this.lastRowIndex);
 
 		const toSelect = this.theses.find(t => t.id === id) || null;
 		this.applicationState = ApplicationState.Normal;
