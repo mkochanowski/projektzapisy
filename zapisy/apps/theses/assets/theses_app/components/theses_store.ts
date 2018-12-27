@@ -22,7 +22,7 @@ type CompositeThesis = {
 	modified: Thesis;
 };
 
-const enum LoadMode {
+export const enum LoadMode {
 	Append,
 	Replace,
 }
@@ -48,9 +48,9 @@ class ThesesStore {
 	@observable public stringFilterBeingChanged: ChangedStringFilter = "";
 	private stringFilterPromise: CancellablePromise<any> | null = null;
 
-	private onListChangedCallback: (() => void) | null = null;
+	private onListChangedCallback: ((mode: LoadMode) => void) | null = null;
 
-	public registerOnListChanged(cb: () => void) {
+	public registerOnListChanged(cb: (mod: LoadMode) => void) {
 		this.onListChangedCallback = cb;
 	}
 
@@ -179,7 +179,7 @@ class ThesesStore {
 			}
 			this.lastRowIndex = untilRow;
 			if (this.onListChangedCallback) {
-				this.onListChangedCallback();
+				this.onListChangedCallback(mode);
 			}
 		} catch (err) {
 			this.fetchError = err;

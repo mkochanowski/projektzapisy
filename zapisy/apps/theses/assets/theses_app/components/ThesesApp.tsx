@@ -17,7 +17,7 @@ import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
-import { thesesStore as store } from "./theses_store";
+import { thesesStore as store, LoadMode } from "./theses_store";
 import { SortColumn, SortDirection } from "../backend_callers";
 
 const TopRowContainer = styled.div`
@@ -36,7 +36,11 @@ export class ThesesApp extends React.Component {
 		this.oldOnBeforeUnload = window.onbeforeunload;
 		window.onbeforeunload = this.confirmUnload;
 		this.initializeKeyboardShortcuts();
-		store.registerOnListChanged(() => this.tableInstance.resetRowInfo());
+		store.registerOnListChanged(this.onListChanged);
+	}
+
+	private onListChanged = (mode: LoadMode) => {
+		this.tableInstance.onListDidChange(mode);
 	}
 
 	componentWillUnmount() {
@@ -156,7 +160,7 @@ export class ThesesApp extends React.Component {
 		if (store.hasUnsavedChanges()) {
 			const title = store.thesis!.modified.title;
 			return window.confirm(
-				title
+				title.trim()
 					? `Czy porzucić niezapisane zmiany w pracy "${title}"?`
 					: "Czy porzucić niezapisane zmiany?"
 			);

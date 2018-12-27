@@ -20,6 +20,7 @@ import { LoadingIndicator } from "./LoadingIndicator";
 import { SortColumn, SortDirection } from "../../backend_callers";
 import { NoResultsMessage } from "./NoResultsMessage";
 import { UnconstrainedFunction } from "common/types";
+import { LoadMode } from "../theses_store";
 
 /*
 	The theses table is powered by react-virtualized's Table component;
@@ -65,19 +66,13 @@ type Props = {
 	loadMoreRows: (startIndex: number, stopIndex: number) => Promise<void>;
 };
 
-const initialState = {
+export class ThesesTable extends React.PureComponent<Props> {
 	/**
 	 * Has the user scrolled since the last change of thesis?
 	 * Based on this info we know whether or not to focus the table
 	 * on the selected thesis - see render() -> scrollToIndex
 	 */
-	hasScrolled: false,
-};
-type State = typeof initialState;
-
-export class ThesesTable extends React.PureComponent<Props, State> {
-	state = initialState;
-
+	private hasScrolledSinceChange: boolean = false;
 	private titleRenderer = this.getCellRenderer(t => t.title);
 	private advisorRenderer = this.getCellRenderer(t => t.advisor ? t.advisor.displayName : "<brak>");
 	private loaderInstance: InfiniteLoader;
@@ -90,12 +85,20 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.uninstallKeyHandler();
 	}
 
-	public resetRowInfo() {
+	public onListDidChange(mode: LoadMode) {
 		// https://github.com/bvaughn/react-virtualized/blob/master/docs/InfiniteLoader.md
 		// resetLoadMoreRowsCache - we need to call it if the list changes completely
 		// so that it knows to clear its internal caches
 		if (this.loaderInstance) {
 			this.loaderInstance.resetLoadMoreRowsCache();
+		}
+		// as above - tell the row height calculator that its caches are no longer
+		// valid
+		rowHeightCache.clearAll();
+		// if the list changed completely, the old position is no longer meaningful,
+		// so return to the top
+		if (mode === LoadMode.Replace) {
+			this.hasScrolledSinceChange = false;
 		}
 	}
 
@@ -154,7 +157,7 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 				sortDirection={ownToRvDirection(this.props.sortDirection)}
 				onRowClick={this.onRowClick}
 				rowClassName={this.getRowClassName}
-				scrollToIndex={!this.state.hasScrolled ? actualIdx : undefined}
+				scrollToIndex={!this.hasScrolledSinceChange ? actualIdx : undefined}
 				deferredMeasurementCache={rowHeightCache}
 				onScroll={this.onScroll}
 				noRowsRenderer={NoResultsMessage}
@@ -223,26 +226,17 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private onScroll = () => {
-		this.setState({ hasScrolled: true });
+		this.hasScrolledSinceChange = true;
 	}
 
 	// When the component is re-rendered with new props, some local changes
 	// need to be performed
 	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
-		if (this.props.theses !== nextProps.theses) {
-			this.onListChanged();
+		if (this.props.selectedIdx !== nextProps.selectedIdx) {
+			// If the position of the selected thesis in the list changes
+			// we should focus the table on it
+			this.hasScrolledSinceChange = false;
 		}
-		// if (this.props.selectedIdx !== nextProps.selectedIdx || nextProps.selectedIdx === -1) {
-		// 	// If the position of the selected thesis in the list changes
-		// 	// we should focus the table on it
-		// 	this.setState({ hasScrolled: false });
-		// }
-	}
-
-	// If the displayed list changes logically (contents, order)
-	// there are some caches to invalidate
-	private onListChanged() {
-		rowHeightCache.clearAll();
 	}
 
 	private changeSort = (info: { sortBy: string; sortDirection: SortDirectionType }) => {
