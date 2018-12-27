@@ -96,7 +96,7 @@ export class ThesesApp extends React.Component<any, State> {
 				onTitleChange={this.onTitleChanged}
 				titleValue={store.params.title}
 				state={store.applicationState}
-				user={store.user}
+				displayUngraded={store.isThesesBoardMember(store.user.user)}
 				stringFilterBeingChanged={store.stringFilterBeingChanged}
 			/>
 			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}

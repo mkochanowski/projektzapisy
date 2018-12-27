@@ -1,5 +1,5 @@
 from django import template
-from ..users import wrap_user, get_user_type, ThesisUserType
+from ..users import wrap_user, is_theses_board_member
 from ..models import get_num_ungraded_for_emp
 
 
@@ -15,7 +15,6 @@ def num_ungraded_theses(user):
     if not user.is_authenticated:
         return 0
     wrapped_user = wrap_user(user)
-    user_type = get_user_type(wrapped_user)
-    if user_type != ThesisUserType.theses_board_member:
+    if not is_theses_board_member(wrapped_user):
         return 0
     return get_num_ungraded_for_emp(wrapped_user)

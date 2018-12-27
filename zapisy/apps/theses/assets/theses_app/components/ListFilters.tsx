@@ -6,7 +6,7 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { GenericSelect } from "./GenericSelect";
-import { ThesisTypeFilter, thesisTypeFilterToString, AppUser, UserType } from "../types";
+import { ThesisTypeFilter, thesisTypeFilterToString } from "../types";
 import { ApplicationState } from "../types/misc";
 import { ChangedStringFilter } from "../theses_store";
 
@@ -23,7 +23,7 @@ const typeFilters = [
 	ThesisTypeFilter.AvailableBachelorsISIM,
 ].map(type => ({ val: type, displayName: thesisTypeFilterToString(type) }));
 
-const boardMemberFilters = [
+const filtersWithUngraded = [
 	{
 		val: ThesisTypeFilter.Ungraded,
 		displayName: thesisTypeFilterToString(ThesisTypeFilter.Ungraded),
@@ -32,7 +32,7 @@ const boardMemberFilters = [
 ];
 
 type Props = {
-	user: AppUser;
+	displayUngraded: boolean;
 
 	onTypeChange: (newFilter: ThesisTypeFilter) => void;
 	typeValue: ThesisTypeFilter;
@@ -91,9 +91,7 @@ export class ListFilters extends React.PureComponent<Props> {
 				value={this.props.typeValue}
 				onChange={this.handleTypeChange}
 				optionInfo={
-					this.props.user.type === UserType.ThesesBoardMember
-					? boardMemberFilters
-					: typeFilters
+					this.props.displayUngraded ? filtersWithUngraded : typeFilters
 				}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
