@@ -2,13 +2,14 @@
  * @file Theses app permission checks, mostly analogous to permissions.py
  */
 import { AppUser, UserType, Thesis, ThesisStatus } from "./types";
+import { thesesStore } from "./theses_store";
 
 /**
  * Determine whether the specified app user has a thesis staff role
  * @param user The app user
  */
 function isThesisStaff(user: AppUser) {
-	return [UserType.Admin, UserType.ThesesBoardMember].includes(user.type);
+	return user.type === UserType.Admin || thesesStore.isThesesBoardMember(user.user);
 }
 
 /**

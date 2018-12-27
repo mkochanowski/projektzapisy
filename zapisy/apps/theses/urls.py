@@ -4,7 +4,8 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register('theses', views.ThesesViewSet, base_name="theses_list")
+router.register("theses", views.ThesesViewSet, base_name="theses")
+router.register("theses_board", views.ThesesBoardViewSet, base_name="theses_board")
 
 urlpatterns = [
     url(r'^$', views.theses_main, name='main'),

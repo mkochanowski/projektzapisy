@@ -8,15 +8,15 @@
 import { observable, action, flow, configure, computed } from "mobx";
 import { clone } from "lodash";
 
-import { Thesis, AppUser, ThesisTypeFilter } from "../types";
+import { Thesis, AppUser, ThesisTypeFilter, Employee, BasePerson } from "./types";
 import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
-	getCurrentUser, FAKE_USER,
-} from "../backend_callers";
+	getCurrentUser, getThesesBoard, FAKE_USER,
+} from "./backend_callers";
 import {
 	ApplicationState, ThesisWorkMode, isPerformingBackendOp,
 	ThesesProcessParams, SortColumn, SortDirection,
-} from "../types/misc";
+} from "./types/misc";
 import { roundUp, awaitSleep } from "common/utils";
 import { CancellablePromise } from "mobx/lib/api/flow";
 
@@ -48,6 +48,7 @@ class ThesesStore {
 	/** All the theses we currently know about (having downloaded them from the backend) */
 	@observable public theses: Thesis[] = [];
 	@observable public thesis: CompositeThesis | null = null;
+	@observable public thesesBoard: Employee[] = [];
 	/** The last thesis row we have downloaded */
 	@observable public lastRowIndex: number = 0;
 	@observable public user: AppUser = FAKE_USER;
@@ -108,12 +109,20 @@ class ThesesStore {
 	public initialize = flow(function* (this: ThesesStore) {
 		try {
 			this.user = yield getCurrentUser();
+			this.thesesBoard = yield getThesesBoard();
 			yield this.refreshTheses();
 			this.applicationState = ApplicationState.Normal;
 		} catch (err) {
 			this.handleError(err);
 		}
 	});
+
+	/**
+	 * Checks whether the given user is a member of the theses board
+	 */
+	public isThesesBoardMember(user: BasePerson): boolean {
+		return !!this.thesesBoard.find(member => member.isEqual(user));
+	}
 
 	private checkCanPerformBackendOp() {
 		if (isPerformingBackendOp(this.applicationState)) {

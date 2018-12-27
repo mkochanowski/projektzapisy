@@ -8,7 +8,7 @@ import axios, { AxiosRequestConfig } from "axios";
 
 import {
 	Thesis, ThesisJson, Student, Employee,
-	BasePerson, AppUser, UserType,
+	BasePerson, AppUser, UserType, PersonJson,
 } from "./types";
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 import { SortColumn, SortDirection, ThesesProcessParams } from "./types/misc";
@@ -108,6 +108,21 @@ export async function getThesesList(
 	};
 }
 
+/**
+ * Fetch the current system user from the backend
+ */
+export async function getCurrentUser(): Promise<AppUser> {
+	return new AppUser(await getData(`${BASE_API_URL}/current_user/`));
+}
+
+/**
+ * Get the theses board as an Employee list
+ */
+export async function getThesesBoard() {
+	const json: PersonJson[] = await getData(`${BASE_API_URL}/theses_board/`);
+	return json.map(pj => Employee.fromJson(pj) as Employee);
+}
+
 export const enum PersonType {
 	Employee,
 	Student,
@@ -195,11 +210,4 @@ export async function saveNewThesis(thesis: Thesis): Promise<number> {
 		},
 	);
 	return (res.data as ThesisJson).id;
-}
-
-/**
- * Fetch the current system user from the backend
- */
-export async function getCurrentUser(): Promise<AppUser> {
-	return new AppUser(await getData(`${BASE_API_URL}/current_user/`));
 }

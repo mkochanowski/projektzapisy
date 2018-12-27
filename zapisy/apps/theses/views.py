@@ -16,7 +16,7 @@ from apps.users.models import Student, Employee
 from .models import Thesis, ThesisStatus, ThesisKind
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
-from .users import wrap_user
+from .users import wrap_user, get_theses_board
 
 """Names of processing parameters in query strings"""
 THESIS_TYPE_FILTER_NAME = "type"
@@ -177,6 +177,15 @@ def filter_theses_queryset_for_type(queryset, thesis_type):
         return available_thesis_filter(queryset.filter(kind=ThesisKind.isim.value))
     else:
         raise exceptions.ParseError()
+
+
+class ThesesBoardViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get"]
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = serializers.ThesesBoardMemberSerializer
+
+    def get_queryset(self):
+        return get_theses_board()
 
 
 @api_view()

@@ -8,7 +8,7 @@ import styled from "styled-components";
 import { GenericSelect } from "./GenericSelect";
 import { ThesisTypeFilter, thesisTypeFilterToString } from "../types";
 import { ApplicationState } from "../types/misc";
-import { ChangedStringFilter } from "./theses_store";
+import { ChangedStringFilter } from "../theses_store";
 
 const typeFilterInfos = [
 	ThesisTypeFilter.AllCurrent,

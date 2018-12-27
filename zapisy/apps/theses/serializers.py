@@ -11,8 +11,8 @@ from rest_framework import serializers
 
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus
-from .users import wrap_user, get_user_type, ThesisUserType
-from .permissions import can_set_status, can_set_advisor, can_modify_status, can_change_title
+from .users import wrap_user, get_user_type
+from .permissions import can_set_status, can_set_advisor, can_change_status, can_change_title
 
 
 class PersonSerializerForThesis(serializers.Serializer):
@@ -58,9 +58,9 @@ def copy_if_present(dst, src, key, converter=None):
         dst[key] = converter(src[key]) if converter else src[key]
 
 
-def validate_advisor(user: BaseUser, user_type: ThesisUserType, advisor: Employee):
+def validate_advisor(user: BaseUser, advisor: Employee):
     """Check that the current user is permitted to set the specified advisor"""
-    if not can_set_advisor(user, user_type, advisor):
+    if not can_set_advisor(user, advisor):
         raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
 
 
@@ -107,11 +107,10 @@ class ThesisSerializer(serializers.ModelSerializer):
         checks have already been performed, so this deals with more detailed checks
         (is the given status valid for this type of user) and conversions
         """
-        user_type = get_user_type(user)
         advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
-        validate_advisor(user, user_type, advisor)
+        validate_advisor(user, advisor)
         status = data["status"]
-        if not can_set_status(user_type, ThesisStatus(status)):
+        if not can_set_status(user, ThesisStatus(status)):
             raise serializers.ValidationError(f'This type of user cannot set status to {status}')
         result = {
             "title": data["title"],
@@ -131,14 +130,13 @@ class ThesisSerializer(serializers.ModelSerializer):
         additional logic in this case; for instance, if a thesis is already accepted,
         its owner/advisor cannot change the title anymore
         """
-        user_type = get_user_type(user)
         result = {}
         if "advisor" in data:
             advisor = get_person(Employee, data["advisor"])
-            validate_advisor(user, user_type, advisor)
+            validate_advisor(user, advisor)
             result["advisor"] = advisor
         if "status" in data:
-            if not can_modify_status(user_type):
+            if not can_change_status(user):
                 raise serializers.ValidationError("This type of user cannot modify the status")
             result["status"] = data["status"]
         if "title" in data:
@@ -202,4 +200,12 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         return {
             "user": PersonSerializerForThesis(instance).data,
             "type": get_user_type(instance).value
+        }
+
+
+class ThesesBoardMemberSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance: Employee):
+        return {
+            "id": instance.id,
+            "display_name": instance.user.username,
         }

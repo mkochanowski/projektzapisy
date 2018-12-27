@@ -2,7 +2,7 @@
 on users of the theses system"""
 from enum import Enum
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from apps.users.models import BaseUser, Employee, Student, is_user_in_group
 
 THESIS_BOARD_GROUP_NAME = "Komisja prac dyplomowych"
@@ -13,17 +13,24 @@ def is_theses_board_member(user: BaseUser) -> bool:
     return is_user_in_group(user.user, THESIS_BOARD_GROUP_NAME)
 
 
+def get_theses_board():
+    """Return all members of the theses board"""
+    return Employee.objects\
+        .select_related("user")\
+        .filter(user__groups__name=THESIS_BOARD_GROUP_NAME)\
+        .all()
+
+
 def get_num_board_members() -> int:
-    """How many theses board members are there in total?"""
-    return Group.objects.filter(name=THESIS_BOARD_GROUP_NAME).count()
+    """Return the number of theses board members"""
+    return len(get_theses_board())
 
 
 class ThesisUserType(Enum):
     student = 0
     employee = 1
-    theses_board_member = 2
-    admin = 3
-    none = 4
+    admin = 2
+    none = 3
 
 
 def get_user_type(base_user: BaseUser) -> ThesisUserType:
@@ -32,11 +39,7 @@ def get_user_type(base_user: BaseUser) -> ThesisUserType:
     if isinstance(base_user, Employee):
         if base_user.user.is_staff:
             return ThesisUserType.admin
-        return (
-            ThesisUserType.theses_board_member
-            if is_theses_board_member(base_user)
-            else ThesisUserType.employee
-        )
+        return ThesisUserType.employee
     elif isinstance(base_user, Student):
         return ThesisUserType.student
     return ThesisUserType.none
