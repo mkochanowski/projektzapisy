@@ -1,15 +1,26 @@
+/**
+ * @file Stores application data and implements theses fetching/editing
+ * logic by interacting with lower-level APIs from backend_callers
+ * Conceptually ThesesApp is responsible for rendering the entire application
+ * and imports logic manipulation functions from this file, passing them
+ * as props to subcomponents so that they can change global application state
+ */
 import { observable, action, flow, configure, computed } from "mobx";
 import { clone } from "lodash";
 
 import { Thesis, AppUser, ThesisTypeFilter } from "../types";
 import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
-	getCurrentUser, ThesesProcessParams, SortColumn, SortDirection, FAKE_USER,
+	getCurrentUser, FAKE_USER,
 } from "../backend_callers";
-import { ApplicationState, ThesisWorkMode, isPerformingBackendOp } from "../types/misc";
+import {
+	ApplicationState, ThesisWorkMode, isPerformingBackendOp,
+	ThesesProcessParams, SortColumn, SortDirection,
+} from "../types/misc";
 import { roundUp, awaitSleep } from "common/utils";
 import { CancellablePromise } from "mobx/lib/api/flow";
 
+/** Tell MobX to ensure that @observable fields are only modified in actions */
 configure({ enforceActions: "observed" });
 
 const ROWS_PER_PAGE = 100;
@@ -22,21 +33,34 @@ type CompositeThesis = {
 	modified: Thesis;
 };
 
+/** The mode in which we're loading theses:
+ * should we append them at the end, or replace the entire list?
+ */
 export const enum LoadMode {
 	Append,
 	Replace,
 }
 
+/** Which string filter (above the table) is being changed? */
 export type ChangedStringFilter = "advisor" | "title" | "";
 
 class ThesesStore {
+	/** All the theses we currently know about (having downloaded them from the backend) */
 	@observable public theses: Thesis[] = [];
 	@observable public thesis: CompositeThesis | null = null;
+	/** The last thesis row we have downloaded */
 	@observable public lastRowIndex: number = 0;
 	@observable public user: AppUser = FAKE_USER;
 	@observable public applicationState: ApplicationState = ApplicationState.FirstLoad;
+	/** Work state: just viewing, modifying an existing one or adding a new one */
 	@observable public workMode: ThesisWorkMode = ThesisWorkMode.Viewing;
+	/** The total number of theses matching current filters.
+	 * Note that this will almost always be more than theses.length - theses
+	 * only holds a subset of everything that's available, unless the user
+	 * scrolls to the very end
+	 */
 	@observable public totalCount: number = 0;
+	/** Current filtering/sort params */
 	@observable public params: ThesesProcessParams = observable({
 		type: ThesisTypeFilter.Default,
 		title: "",
@@ -45,11 +69,11 @@ class ThesesStore {
 		sortDirection: SortDirection.Asc,
 	});
 	@observable public stringFilterBeingChanged: ChangedStringFilter = "";
+	/** Represents the current asynchronous filter edition action */
 	private stringFilterPromise: CancellablePromise<any> | null = null;
 
+	/** Other parts of the system need to be told whenever the list changes */
 	private onListChangedCallback: ((mode: LoadMode) => void) | null = null;
-	private onErrorCallback: ((err: Error) => void) | null = null;
-
 	public registerOnListChanged(cb: (mod: LoadMode) => void) {
 		this.onListChangedCallback = cb;
 	}
@@ -57,12 +81,17 @@ class ThesesStore {
 		this.onListChangedCallback = null;
 	}
 
+	private onErrorCallback: ((err: Error) => void) | null = null;
 	public registerOnError(cb: (err: Error) => void) {
 		this.onErrorCallback = cb;
 	}
 	public clearOnError() {
 		this.onErrorCallback = null;
 	}
+	/** Handle an internal fatal error that occurred in the store.
+	 * The main component is expected to install a callback so that
+	 * it can be told about the error and display it
+	 */
 	private handleError(err: Error) {
 		if (this.onErrorCallback) {
 			this.onErrorCallback(err);
@@ -71,6 +100,7 @@ class ThesesStore {
 		}
 	}
 
+	/** The position of the currently selected thesis in the list */
 	@computed public get selectedIdx() {
 		return thesisIndexInList(this.thesis && this.thesis.original, this.theses);
 	}
@@ -93,6 +123,7 @@ class ThesesStore {
 		return true;
 	}
 
+	/** Re-download theses from the backend respecting current params */
 	private refetch = flow(function*(this: ThesesStore) {
 		this.applicationState = ApplicationState.Refetching;
 		yield this.refreshTheses();
@@ -108,6 +139,12 @@ class ThesesStore {
 		this.refetch();
 	}
 
+	// Regarding the next two functions: see https://mobx.js.org/best/actions.html
+	// (the flow section at the bottom)
+
+	/** Save the new filter value, wait for the user to maybe type more,
+	 * after the set delay assume they won't and query the backend
+	 */
 	private changeStringFilterInternal = flow(function*(
 		this: ThesesStore, thisKey: "title" | "advisor", value: string
 	) {
@@ -131,14 +168,18 @@ class ThesesStore {
 			console.assert(false, "Not allowed");
 			return;
 		}
+		// If a string filter action is already going on, it should be
+		// cancelled - we won't be interested in the old results anyway,
+		// since the filter value changed
 		if (this.stringFilterPromise) {
 			console.assert(this.stringFilterBeingChanged === thisKey);
 			this.stringFilterPromise.cancel();
 		}
 		const changePromise = this.changeStringFilterInternal(thisKey, value);
 		changePromise.catch(err => {
+			// This is the error thrown in the promise when we call cancel()
+			// so that's expected; anything else is a real error
 			if (!err.toString().includes("FLOW_CANCELLED")) {
-				// a real error happened
 				console.error("When attempting to fetch filtered results:", err);
 			}
 		});
@@ -163,8 +204,10 @@ class ThesesStore {
 		this.refetch();
 	}
 
+	/** Load more rows as demanded by the table component */
 	public loadMore = flow(function* (this: ThesesStore, upToRow: number) {
-		console.warn("render more", upToRow);
+		// The table component might call this function many times in response
+		// to the same scroll "session"
 		if (isPerformingBackendOp(this.applicationState) || upToRow <= this.lastRowIndex) {
 			return;
 		}
@@ -173,11 +216,16 @@ class ThesesStore {
 		this.applicationState = ApplicationState.Normal;
 	});
 
+	/** Download rows in range 0 - ROWS_PER_PAGE, replacing the current set */
 	private refreshTheses() {
 		return this.loadTheses(LoadMode.Replace, ROWS_PER_PAGE);
 	}
 
-	/** Download theses or set the error screen if an error occurred */
+	/**
+	 * Download theses from the backend
+	 * @param mode The mode in which to perform the action - replace or append new rows
+	 * @param untilRow Ensure that all rows up to this one are available
+	 */
 	private loadTheses = flow(function*(this: ThesesStore, mode: LoadMode, untilRow: number) {
 		// Calling this function without having first set the state is an error
 		console.assert(isPerformingBackendOp(this.applicationState));
@@ -203,6 +251,10 @@ class ThesesStore {
 		}
 	});
 
+	/**
+	 * Set the specified thesis as selected
+	 * @param thesis The thesis to select; must be in the local theses list
+	 */
 	@action
 	public selectThesis(thesis: Thesis) {
 		console.assert(
@@ -213,6 +265,9 @@ class ThesesStore {
 		this.thesis = compositeThesisForThesis(thesis);
 	}
 
+	/** Determine whether we have a thesis being modified and if so,
+	 * whether it's different from the original one
+	 */
 	public hasUnsavedChanges() {
 		const { thesis } = this;
 		return (
@@ -221,6 +276,11 @@ class ThesesStore {
 		);
 	}
 
+	/**
+	 * Update the modified thesis instance (it's an immutable object, a new instance
+	 * must be set)
+	 * @param thesis The new modified instance
+	 */
 	@action
 	public updateModifiedThesis(thesis: Thesis) {
 		if (!this.thesis) {
@@ -230,12 +290,19 @@ class ThesesStore {
 		this.thesis.modified = thesis;
 	}
 
+	/**
+	 * Set the specified thesis as active and switch to adding mode
+	 * @param thesis The thesis we'll be adding
+	 */
 	@action
 	public setupForNewThesis(thesis: Thesis) {
 		this.workMode = ThesisWorkMode.Adding;
 		this.thesis = compositeThesisForThesis(thesis);
 	}
 
+	/**
+	 * Discard all changes in the modified instance, resetting it to original
+	 */
 	@action
 	public resetModifiedThesis() {
 		console.assert(this.thesis != null);
@@ -268,6 +335,10 @@ class ThesesStore {
 		[ThesisWorkMode.Editing]: modifyExistingThesis,
 	};
 
+	/**
+	 * Save the currently selected thesis. It is an error to call this
+	 * if there are no unsaved changes.
+	 */
 	public save = flow(function*(this: ThesesStore) {
 		if (!this.preSaveAsserts()) {
 			return;

@@ -2,6 +2,7 @@
  * @file The main theses app component.
  * Renders all subcomponents and glues them together, also permitting them
  * to change the state via callbacks.
+ * Application state is generally held in theses_store.
  */
 
 import * as React from "react";
@@ -18,8 +19,7 @@ import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
 import { thesesStore as store, LoadMode } from "./theses_store";
-import { SortColumn, SortDirection } from "../backend_callers";
-import { ThesisWorkMode } from "../types/misc";
+import { ThesisWorkMode, SortColumn, SortDirection } from "../types/misc";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -102,6 +102,7 @@ export class ThesesApp extends React.Component<any, State> {
 		</TopRowContainer>;
 	}
 
+	/** Stores the child table component so that we can tell it when the list changes */
 	private setTableInstance = (table: ThesesTable) => {
 		this.tableInstance = table;
 	}
@@ -167,6 +168,10 @@ export class ThesesApp extends React.Component<any, State> {
 		/>;
 	}
 
+	/**
+	 * If there are unsaved changes, ask the user whether they should be discarded.
+	 * Returns true immediately if there are no changes to be saved.
+	 */
 	private confirmDiscardChanges() {
 		if (store.hasUnsavedChanges()) {
 			const title = store.thesis!.modified.title;

@@ -18,7 +18,7 @@ from . import serializers
 from .drf_permission_classes import ThesisPermissions
 from .users import wrap_user
 
-
+"""Names of processing parameters in query strings"""
 THESIS_TYPE_FILTER_NAME = "type"
 THESIS_TITLE_FILTER_NAME = "title"
 THESIS_ADVISOR_FILTER_NAME = "advisor"
@@ -86,6 +86,9 @@ class ThesesViewSet(viewsets.ModelViewSet):
 
 
 def generate_base_queryset():
+    """Return theses queryset with the appropriate fields prefetched (see below)
+    as well as user names annotated for further processing - sorting/filtering
+    """
     return Thesis.objects.select_related(
         *fields_for_prefetching("student"),
         *fields_for_prefetching("student_2"),
@@ -96,9 +99,25 @@ def generate_base_queryset():
     )
 
 
+def fields_for_prefetching(base_field: str) -> List[str]:
+    """For all user fields present on the thesis, we need to prefetch
+    both our user model and the standard Django user it's linked to; see
+    users.wrap_user for a more detailed explanation
+
+    Note that this hurts performance: DB queries with the __user prefetch
+    are roughly two times slower than with just the base thesis fields.
+    (Of course, we're only talking about the performance of get_queryset here;
+    not prefetching those fields would have disastrous consequences later when
+    the serializer accesses them)
+    Sadly this is necessary until the User system is refactored.
+    """
+    return [base_field, f'{base_field}__user']
+
+
 def filter_queryset(
     qs, thesis_type: ThesisTypeFilter, title: str, advisor_name: str
 ):
+    """Filter the specified theses queryset based on the passed conditions"""
     result = filter_theses_queryset_for_type(qs, thesis_type)
     if title:
         result = result.filter(title__icontains=title)
@@ -108,6 +127,9 @@ def filter_queryset(
 
 
 def sort_queryset(qs, sort_column: str, sort_dir: str):
+    """Sort the specified queryset by the specified column
+    in the specified direction, or by newest first if not specified
+    """
     db_column = ""
     if sort_column == "advisor":
         db_column = "advisor_name"
@@ -124,6 +146,7 @@ def sort_queryset(qs, sort_column: str, sort_dir: str):
 
 
 def available_thesis_filter(queryset):
+    """Returns only theses that are considered "available" from the specified queryset"""
     return queryset\
         .exclude(status=ThesisStatus.in_progress.value)\
         .exclude(status=ThesisStatus.defended.value)\
@@ -131,6 +154,7 @@ def available_thesis_filter(queryset):
 
 
 def filter_theses_queryset_for_type(queryset, thesis_type):
+    """Returns only theses matching the specified type filter from the specified queryset"""
     if thesis_type == ThesisTypeFilter.all_current.value:
         return queryset.exclude(status=ThesisStatus.defended.value)
     elif thesis_type == ThesisTypeFilter.all.value:
@@ -153,21 +177,6 @@ def filter_theses_queryset_for_type(queryset, thesis_type):
         return available_thesis_filter(queryset.filter(kind=ThesisKind.isim.value))
     else:
         raise exceptions.ParseError()
-
-
-def fields_for_prefetching(base_field: str) -> List[str]:
-    """For all user fields present on the thesis, we need to prefetch
-    both our user model and the standard Django user it's linked to; see
-    users.wrap_user for a more detailed explanation
-
-    Note that this hurts performance: DB queries with the __user prefetch
-    are roughly two times slower than with just the base thesis fields.
-    (Of course, we're only talking about the performance of get_queryset here;
-    not prefetching those fields would have disastrous consequences later when
-    the serializer accesses them)
-    Sadly this is necessary until the User system is refactored.
-    """
-    return [base_field, f'{base_field}__user']
 
 
 @api_view()

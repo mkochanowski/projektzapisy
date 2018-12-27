@@ -12,12 +12,11 @@ import {
 import "react-virtualized/styles.css"; // only needs to be imported once
 
 import { Thesis } from "../../types";
-import { ApplicationState } from "../../types/misc";
+import { ApplicationState, SortColumn, SortDirection } from "../../types/misc";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
-import { SortColumn, SortDirection } from "../../backend_callers";
 import { NoResultsMessage } from "./NoResultsMessage";
 import { UnconstrainedFunction } from "common/types";
 import { LoadMode } from "../theses_store";
@@ -30,8 +29,11 @@ import { LoadMode } from "../theses_store";
 	https://github.com/bvaughn/react-virtualized/blob/master/docs/Column.md#cellrenderer
 	(for the column components used inside the table)
 	https://github.com/bvaughn/react-virtualized/blob/master/docs/CellMeasurer.md
-	(for the "cell measurer", responsible for dynamically adjusting the height
+	(for the "cell measurer" HOC, responsible for dynamically adjusting the height
 	of each row to fit the contents)
+	https://github.com/bvaughn/react-virtualized/blob/master/docs/InfiniteLoader.md
+	(for the infinite scrolling HOC; lets us know when the user has scrolled far
+	enough so that we can fetch more rows)
 */
 
 // How close to the end the user has to get before we fetch more
@@ -128,6 +130,7 @@ export class ThesesTable extends React.PureComponent<Props> {
 				threshold={LOAD_THRESHOLD}
 			>
 			{({ onRowsRendered, registerChild }) => (
+				// HOC needed for dynamic row heights to accomodate long titles
 				<AutoSizer
 					disableHeight
 					style={allowInteraction ? {} : getDisabledStyle() }
@@ -138,6 +141,10 @@ export class ThesesTable extends React.PureComponent<Props> {
 		</InfiniteLoader>;
 	}
 
+	/**
+	 * Render the Table component only; the render method also has to enclose
+	 * it in two HOCs
+	 */
 	private renderTableItself(
 		width: number, onRowsRendered: UnconstrainedFunction, registerChild: UnconstrainedFunction,
 	) {

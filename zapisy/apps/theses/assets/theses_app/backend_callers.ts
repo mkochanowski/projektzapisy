@@ -8,9 +8,10 @@ import axios, { AxiosRequestConfig } from "axios";
 
 import {
 	Thesis, ThesisJson, Student, Employee,
-	BasePerson, AppUser, ThesisTypeFilter, UserType,
+	BasePerson, AppUser, UserType,
 } from "./types";
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
+import { SortColumn, SortDirection, ThesesProcessParams } from "./types/misc";
 
 const BASE_API_URL = "/theses/api";
 const REST_REQUEST_TIMEOUT = 10000;
@@ -52,29 +53,7 @@ async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
 	return (await axios.get(url, config)).data;
 }
 
-export const enum SortDirection {
-	Asc,
-	Desc,
-}
-
-export const enum SortColumn {
-	None,
-	Advisor,
-	Title,
-}
-
-/**
- * Thesis processing parameters; the results of getProcessedTheses depend on this
- */
-export type ThesesProcessParams = {
-	advisor: string;
-	title: string;
-	type: ThesisTypeFilter;
-
-	sortColumn: SortColumn;
-	sortDirection: SortDirection;
-};
-
+/** The results the backend returns to us in response to a list query */
 type PaginatedThesesResult = {
 	count: number;
 	next: string;
@@ -82,6 +61,9 @@ type PaginatedThesesResult = {
 	results: ThesisJson[];
 };
 
+/**
+ * Convert from the local sort column representation to a string used in the query
+ */
 function sortColToBackendStr(col: SortColumn) {
 	switch (col) {
 		case SortColumn.Advisor: return "advisor";
@@ -90,6 +72,9 @@ function sortColToBackendStr(col: SortColumn) {
 	}
 }
 
+/**
+ * Convert from the local sort dir representation to a string used in the query
+ */
 function sortDirToBackendStr(dir: SortDirection) {
 	switch (dir) {
 		case SortDirection.Asc: return "asc";
@@ -97,6 +82,12 @@ function sortDirToBackendStr(dir: SortDirection) {
 	}
 }
 
+/**
+ * Fetch theses from the backend.
+ * @param params The filtering and sorting params
+ * @param offset The start row index
+ * @param limit How many theses to fetch starting at `offset`
+ */
 export async function getThesesList(
 	params: ThesesProcessParams, offset: number, limit: number,
 ) {
