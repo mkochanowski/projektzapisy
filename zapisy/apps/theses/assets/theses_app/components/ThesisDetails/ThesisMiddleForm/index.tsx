@@ -5,11 +5,9 @@ import {
 	Thesis, ThesisKind, Employee, Student,
 	MAX_THESIS_TITLE_LEN, AppUser,
 } from "../../../types";
-import { PersonType } from "../../../backend_callers";
-import { PersonField } from "./PersonField";
 import { ThesisKindField } from "./ThesisKindField";
-import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
-import { canSetArbitraryAdvisor, canModifyThesis, canChangeTitle } from "../../../permissions";
+import { canModifyThesis, canChangeTitle } from "../../../permissions";
+import { AdvisorsAndStudents } from "./AdvisorsAndStudents";
 
 const MidFormTable = styled.table`
 	width: 100%;
@@ -29,15 +27,6 @@ const MidFormTable = styled.table`
 		width: 13%;
 	}
 `;
-
-const OptionalFieldLabel = styled.span`
-font-style: italic;
-`;
-
-type State = {
-	displayAuxAdvisor: boolean;
-	displayAuxStudent: boolean;
-};
 
 type Props = {
 	thesis: Thesis;
@@ -61,7 +50,7 @@ function getStateFromProps(props: Props) {
 	};
 }
 
-export class ThesisMiddleForm extends React.PureComponent<Props, State> {
+export class ThesisMiddleForm extends React.PureComponent<Props> {
 	constructor(props: Props) {
 		super(props);
 		this.state = getStateFromProps(props);
@@ -75,22 +64,6 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 		this.props.onDescriptionChanged(e.target.value);
 	}
 
-	private triggerAuxAdvVisibility = () => {
-		const newValue = !this.state.displayAuxAdvisor;
-		this.setState({ displayAuxAdvisor: newValue });
-		if (!newValue) {
-			this.props.onAuxAdvisorChanged(null);
-		}
-	}
-
-	private triggerSecondStudentVisibility = () => {
-		const newValue = !this.state.displayAuxStudent;
-		this.setState({ displayAuxStudent: newValue });
-		if (!newValue) {
-			this.props.onSecondStudentChanged(null);
-		}
-	}
-
 	public render() {
 		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
 
@@ -99,8 +72,18 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 				<tbody>
 				{this.renderTitle(readOnly)}
 				{this.renderKind(readOnly)}
-				{this.renderAdvisors(readOnly)}
-				{this.renderStudents(readOnly)}
+				<AdvisorsAndStudents
+					user={this.props.user}
+					readOnly={readOnly}
+					advisor={this.props.thesis.advisor}
+					auxAdvisor={this.props.thesis.auxiliaryAdvisor}
+					student={this.props.thesis.student}
+					secondStudent={this.props.thesis.secondStudent}
+					onAdvisorChanged={this.props.onAdvisorChanged}
+					onAuxAdvisorChanged={this.props.onAuxAdvisorChanged}
+					onStudentChanged={this.props.onStudentChanged}
+					onSecondStudentChanged={this.props.onSecondStudentChanged}
+				/>
 				</tbody>
 			</MidFormTable>
 			{this.renderDescription(readOnly)}
@@ -142,78 +125,6 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 				/>
 			</td>
 		</tr>;
-	}
-
-	private renderAdvisors(readOnly: boolean) {
-		return <>
-			<tr>
-				<td>Promotor</td>
-				<td>
-					<PersonField
-						personType={PersonType.Employee}
-						onChange={this.props.onAdvisorChanged}
-						value={this.props.thesis.advisor}
-						readOnly={readOnly || !canSetArbitraryAdvisor(this.props.user)}
-					/>
-					{ readOnly
-						? null
-						: <AddRemoveIcon
-							onClick={this.triggerAuxAdvVisibility}
-							type={this.state.displayAuxAdvisor ? IconType.Remove : IconType.Add}
-						/>
-					}
-				</td>
-			</tr>
-			{ this.state.displayAuxAdvisor ? (
-				<tr>
-					<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
-					<td>
-						<PersonField
-							personType={PersonType.Employee}
-							onChange={this.props.onAuxAdvisorChanged}
-							value={this.props.thesis.auxiliaryAdvisor}
-							readOnly={readOnly}
-						/>
-					</td>
-				</tr>
-			) : null }
-		</>;
-	}
-
-	private renderStudents(readOnly: boolean) {
-		return <>
-			<tr>
-				<td>Student</td>
-				<td>
-					<PersonField
-						personType={PersonType.Student}
-						onChange={this.props.onStudentChanged}
-						value={this.props.thesis.student}
-						readOnly={readOnly}
-					/>
-					{ readOnly
-						? null
-						: <AddRemoveIcon
-							onClick={this.triggerSecondStudentVisibility}
-							type={this.state.displayAuxStudent ? IconType.Remove : IconType.Add}
-						/>
-					}
-				</td>
-			</tr>
-			{ this.state.displayAuxStudent ? (
-				<tr>
-					<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
-					<td>
-						<PersonField
-							personType={PersonType.Student}
-							onChange={this.props.onSecondStudentChanged}
-							value={this.props.thesis.secondStudent}
-							readOnly={readOnly}
-						/>
-					</td>
-				</tr>
-			) : null }
-		</>;
 	}
 
 	private renderDescription(readOnly: boolean) {

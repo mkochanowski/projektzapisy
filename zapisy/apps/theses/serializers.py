@@ -169,6 +169,8 @@ class ThesisSerializer(serializers.ModelSerializer):
             "advisor": advisor,
         }
         handle_optional_fields(result, data, user)
+        if "description" not in result:
+            result["description"] = ""
 
         return result
 

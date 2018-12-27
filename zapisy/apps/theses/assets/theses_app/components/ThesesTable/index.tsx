@@ -7,17 +7,19 @@ import {
 	Column, Table, CellMeasurer, CellMeasurerCache,
 	AutoSizer, SortDirectionType, SortDirection as RVSortDirection,
 	RowMouseEventHandlerParams, TableCellProps,
+	InfiniteLoader,
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
 
 import { Thesis } from "../../types";
-import { ApplicationState } from "../../types/misc";
+import { ApplicationState, SortColumn, SortDirection } from "../../types/misc";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
-import { SortColumn, SortDirection } from "../theses_store";
 import { NoResultsMessage } from "./NoResultsMessage";
+import { UnconstrainedFunction } from "common/types";
+import { LoadMode } from "../theses_store";
 
 /*
 	The theses table is powered by react-virtualized's Table component;
@@ -27,9 +29,15 @@ import { NoResultsMessage } from "./NoResultsMessage";
 	https://github.com/bvaughn/react-virtualized/blob/master/docs/Column.md#cellrenderer
 	(for the column components used inside the table)
 	https://github.com/bvaughn/react-virtualized/blob/master/docs/CellMeasurer.md
-	(for the "cell measurer", responsible for dynamically adjusting the height
+	(for the "cell measurer" HOC, responsible for dynamically adjusting the height
 	of each row to fit the contents)
+	https://github.com/bvaughn/react-virtualized/blob/master/docs/InfiniteLoader.md
+	(for the infinite scrolling HOC; lets us know when the user has scrolled far
+	enough so that we can fetch more rows)
 */
+
+// How close to the end the user has to get before we fetch more
+const LOAD_THRESHOLD = 40;
 
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
@@ -51,28 +59,25 @@ type Props = {
 	isEditingThesis: boolean;
 	sortColumn: SortColumn;
 	sortDirection: SortDirection;
+	totalThesesCount: number;
 
 	/* Function to be called to switch to the thesis at the specified offset */
 	switchToThesisWithOffset: (offset: number) => void;
 	onThesisSelected: (t: Thesis) => void;
 	onSortChanged: (column: SortColumn, dir: SortDirection) => void;
+	loadMoreRows: (startIndex: number, stopIndex: number) => Promise<void>;
 };
 
-const initialState = {
+export class ThesesTable extends React.PureComponent<Props> {
 	/**
 	 * Has the user scrolled since the last change of thesis?
 	 * Based on this info we know whether or not to focus the table
 	 * on the selected thesis - see render() -> scrollToIndex
 	 */
-	hasScrolled: false,
-};
-type State = typeof initialState;
-
-export class ThesesTable extends React.PureComponent<Props, State> {
-	state = initialState;
-
+	private hasScrolledSinceChange: boolean = false;
 	private titleRenderer = this.getCellRenderer(t => t.title);
 	private advisorRenderer = this.getCellRenderer(t => t.advisor ? t.advisor.displayName : "<brak>");
+	private loaderInstance: InfiniteLoader;
 
 	componentDidMount() {
 		this.installKeyHandler();
@@ -82,57 +87,112 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 		this.uninstallKeyHandler();
 	}
 
+	public onListDidChange(mode: LoadMode) {
+		// https://github.com/bvaughn/react-virtualized/blob/master/docs/InfiniteLoader.md
+		// resetLoadMoreRowsCache - we need to call it if the list changes completely
+		// so that it knows to clear its internal caches
+		if (this.loaderInstance) {
+			this.loaderInstance.resetLoadMoreRowsCache();
+		}
+		// as above - tell the row height calculator that its caches are no longer
+		// valid
+		rowHeightCache.clearAll();
+		// if the list changed completely, the old position is no longer meaningful,
+		// so return to the top
+		if (mode === LoadMode.Replace) {
+			this.hasScrolledSinceChange = false;
+		}
+	}
+
+	private isRowLoaded = (index: number) => {
+		return index < this.props.theses.length;
+	}
+
+	private setLoaderInstance = (loader: InfiniteLoader) => {
+		this.loaderInstance = loader;
+	}
+
 	public render() {
-		if (this.props.applicationState === ApplicationState.InitialLoading) {
+		const { applicationState } = this.props;
+		if (applicationState === ApplicationState.FirstLoad) {
 			return <LoadingIndicator/>;
 		}
-		const { theses, selectedIdx } = this.props;
-		const shouldDisable = this.props.applicationState === ApplicationState.PerformingBackendChanges;
-		return <AutoSizer
-			disableHeight
-			style={shouldDisable ? getDisabledStyle() : {}}
-		>
-			{({ width }) => (
-				<Table
-					rowGetter={this.getRowByIndex}
-					rowCount={theses.length}
-					rowHeight={rowHeightCache.rowHeight}
-					width={width}
-					height={TABLE_HEIGHT}
-					headerHeight={TABLE_CELL_MIN_HEIGHT}
-					sort={this.changeSort}
-					sortBy={ownToRvColumn(this.props.sortColumn)}
-					sortDirection={ownToRvDirection(this.props.sortDirection)}
-					onRowClick={this.onRowClick}
-					rowClassName={this.getRowClassName}
-					scrollToIndex={!this.state.hasScrolled && selectedIdx !== -1 ? selectedIdx : undefined}
-					deferredMeasurementCache={rowHeightCache}
-					onScroll={this.onScroll}
-					noRowsRenderer={NoResultsMessage}
+		console.warn("Render table");
+		// Don't let people use the table while something is happening
+		const allowInteraction = [
+			ApplicationState.Normal, ApplicationState.LoadingMore
+		].includes(applicationState);
+		return <InfiniteLoader
+				loadMoreRows={({ startIndex, stopIndex }) => this.props.loadMoreRows(startIndex, stopIndex)}
+				isRowLoaded={({ index }) => this.isRowLoaded(index)}
+				rowCount={this.props.totalThesesCount}
+				ref={this.setLoaderInstance}
+				threshold={LOAD_THRESHOLD}
+			>
+			{({ onRowsRendered, registerChild }) => (
+				// HOC needed for dynamic row heights to accomodate long titles
+				<AutoSizer
+					disableHeight
+					style={allowInteraction ? {} : getDisabledStyle() }
 				>
-					<Column
-						label="Rezerwacja"
-						dataKey="reserved"
-						width={RESERVED_COLUMN_WIDTH}
-						disableSort
-						cellRenderer={ReservationIndicator}
-						className={"reservation_cell"}
-					/>
-					<Column
-						label="Tytuł"
-						dataKey="title"
-						width={TITLE_COLUMN_WIDTH}
-						cellRenderer={this.titleRenderer}
-					/>
-					<Column
-						label="Promotor"
-						dataKey="advisor"
-						width={ADVISOR_COLUMN_WIDTH}
-						cellRenderer={this.advisorRenderer}
-					/>
-				</Table>
-		)	}
-		</AutoSizer>;
+					{({ width }) => this.renderTableItself(width, onRowsRendered, registerChild)}
+				</AutoSizer>
+			)}
+		</InfiniteLoader>;
+	}
+
+	/**
+	 * Render the Table component only; the render method also has to enclose
+	 * it in two HOCs
+	 */
+	private renderTableItself(
+		width: number, onRowsRendered: UnconstrainedFunction, registerChild: UnconstrainedFunction,
+	) {
+		const { theses, selectedIdx } = this.props;
+		const actualIdx = selectedIdx !== -1 ? selectedIdx : 0;
+		return <Table
+				onRowsRendered={onRowsRendered}
+				ref={registerChild}
+				rowGetter={this.getRowByIndex}
+				rowCount={theses.length}
+				rowHeight={rowHeightCache.rowHeight}
+				width={width}
+				height={TABLE_HEIGHT}
+				headerHeight={TABLE_CELL_MIN_HEIGHT}
+				sort={this.changeSort}
+				sortBy={ownToRvColumn(this.props.sortColumn)}
+				sortDirection={ownToRvDirection(this.props.sortDirection)}
+				onRowClick={this.onRowClick}
+				rowClassName={this.getRowClassName}
+				// if the user has initiated scrolling, we no longer specify this
+				// otherwise the list would keep jumping to that thesis, preventing
+				// scrolling altogether
+				scrollToIndex={this.hasScrolledSinceChange ? undefined : actualIdx}
+				deferredMeasurementCache={rowHeightCache}
+				onScroll={this.onScroll}
+				noRowsRenderer={NoResultsMessage}
+			>
+				<Column
+					label="Rezerwacja"
+					dataKey="reserved"
+					width={RESERVED_COLUMN_WIDTH}
+					disableSort
+					cellRenderer={ReservationIndicator}
+					className={"reservation_cell"}
+				/>
+				<Column
+					label="Tytuł"
+					dataKey="title"
+					width={TITLE_COLUMN_WIDTH}
+					cellRenderer={this.titleRenderer}
+				/>
+				<Column
+					label="Promotor"
+					dataKey="advisor"
+					width={ADVISOR_COLUMN_WIDTH}
+					cellRenderer={this.advisorRenderer}
+				/>
+		</Table>;
 	}
 
 	/**
@@ -176,29 +236,24 @@ export class ThesesTable extends React.PureComponent<Props, State> {
 	}
 
 	private onScroll = () => {
-		this.setState({ hasScrolled: true });
+		this.hasScrolledSinceChange = true;
 	}
 
 	// When the component is re-rendered with new props, some local changes
 	// need to be performed
 	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
-		if (this.props.theses !== nextProps.theses) {
-			this.onListChanged();
-		}
 		if (this.props.selectedIdx !== nextProps.selectedIdx) {
 			// If the position of the selected thesis in the list changes
 			// we should focus the table on it
-			this.setState({ hasScrolled: false });
+			this.hasScrolledSinceChange = false;
 		}
 	}
 
-	// If the displayed list changes logically (contents, order)
-	// there are some caches to invalidate
-	private onListChanged() {
-		rowHeightCache.clearAll();
-	}
-
 	private changeSort = (info: { sortBy: string; sortDirection: SortDirectionType }) => {
+		// theoretically someone could click this while infinite scroll is loading
+		if (this.props.applicationState === ApplicationState.LoadingMore) {
+			return;
+		}
 		const {
 			sortColumn: prevSortColumn,
 			sortDirection: prevSortDirection

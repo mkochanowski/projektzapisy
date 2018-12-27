@@ -1,106 +1,71 @@
 /**
- * @file The main theses app component. It performs two basic tasks:
- * -> stores the global application-wide state
- * -> renders all subcomponents and glues them together, also permitting them
- * to change the state via callbacks
+ * @file The main theses app component.
+ * Renders all subcomponents and glues them together, also permitting them
+ * to change the state via callbacks.
+ * Application state is generally held in theses_store.
  */
 
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
-import { clone } from "lodash";
+import { observer } from "mobx-react";
+import styled from "styled-components";
 
-import { Thesis, UserType, AppUser, ThesisTypeFilter, Employee, ThesisVote } from "../types";
-import {
-	getThesesList, saveModifiedThesis, saveNewThesis, getCurrentUser, getNumUngraded, getThesesBoard,
-} from "../backend_callers";
+import { Thesis, ThesisTypeFilter } from "../types";
 import { ThesisDetails } from "./ThesisDetails";
-import { ApplicationState, ThesisWorkMode } from "../types/misc";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
-import styled from "styled-components";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
-import {
-	getProcessedTheses, SortColumn, SortDirection,
-	clearFilterCache, ThesesProcessParams,
-} from "./theses_store";
-import { adjustDomForUngraded } from "../utils";
-
-/** The currently selected thesis */
-type StateThesis = {
-	/** Its original, unchanged version */
-	original: Thesis;
-	/** And the version the user is modifying */
-	mutable: Thesis;
-};
-
-type State = {
-	thesis: StateThesis | null;
-	/** The index/position of the currently selected thesis in the list */
-	thesisIdx: number;
-
-	/** Unfiltered, unsorted theses as received from the backend */
-	rawTheses: Thesis[];
-	/** Processed theses */
-	theses: Thesis[];
-	thesesBoard: Employee[];
-	applicationState: ApplicationState;
-	/** The error that occurred when downloading theses */
-	fetchError: Error | null;
-	workMode: ThesisWorkMode | null;
-	user: AppUser;
-
-	thesesParams: ThesesProcessParams;
-};
-
-const initialState: State = {
-	thesis: null,
-	thesisIdx: -1,
-
-	rawTheses: [],
-	theses: [],
-	thesesBoard: [],
-	applicationState: ApplicationState.InitialLoading,
-	fetchError: null,
-	workMode: null,
-	user: new AppUser({ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }),
-
-	thesesParams: {
-		type: ThesisTypeFilter.Default,
-		title: "",
-		advisor: "",
-		sortColumn: SortColumn.None,
-		sortDirection: SortDirection.Asc,
-	},
-};
+import { thesesStore as store, LoadMode } from "./theses_store";
+import { ThesisWorkMode, SortColumn, SortDirection } from "../types/misc";
 
 const TopRowContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
 `;
 
-export class ThesesApp extends React.Component<{}, State > {
+const initialState = {
+	/** The error instance, if any. If one exists, we abort the app and display it */
+	applicationError: null as Error | null,
+};
+type State = typeof initialState;
+
+@observer
+export class ThesesApp extends React.Component<any, State> {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
-	private hasChangedTypeFilter: boolean = false;
+	private tableInstance: ThesesTable;
 
-	async componentDidMount() {
-		this.initializeAppState();
+	componentDidMount() {
+		store.initialize();
+
 		this.oldOnBeforeUnload = window.onbeforeunload;
 		window.onbeforeunload = this.confirmUnload;
 		this.initializeKeyboardShortcuts();
+		store.registerOnListChanged(this.onListChanged);
+		store.registerOnError(this.onError);
+	}
+
+	private onListChanged = (mode: LoadMode) => {
+		this.tableInstance.onListDidChange(mode);
+	}
+
+	private onError = (err: Error) => {
+		this.setState({ applicationError: err });
 	}
 
 	componentWillUnmount() {
 		window.onbeforeunload = this.oldOnBeforeUnload;
 		this.deconfigureKeyboardShortcuts();
+		store.clearOnListChanged();
+		store.clearOnError();
 	}
 
 	private initializeKeyboardShortcuts() {
 		Mousetrap.bind("ctrl+m", this.setupForAddingThesis);
-		Mousetrap.bind("esc", this.resetChanges);
+		Mousetrap.bind("esc", this.onResetChanges);
 	}
 
 	private deconfigureKeyboardShortcuts() {
@@ -108,7 +73,7 @@ export class ThesesApp extends React.Component<{}, State > {
 	}
 
 	private confirmUnload = (ev: BeforeUnloadEvent) => {
-		if (this.hasUnsavedChanges()) {
+		if (store.hasUnsavedChanges()) {
 			// As specified in https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
 			// preventDefault() is what the spec says,
 			// in practice some browsers like returnValue to be set
@@ -117,202 +82,103 @@ export class ThesesApp extends React.Component<{}, State > {
 		}
 	}
 
-	private async getNumUngraded(user: AppUser = this.state.user) {
-		return user.type === UserType.ThesesBoardMember ? getNumUngraded() : 0;
-	}
-
-	/**
-	 * Given the number of ungraded theses, return the new state
-	 * (used for setting the type filter to ungraded if any such theses exist)
-	 */
-	private filterParamsForUngraded(numUngraded: number) {
-		if (numUngraded && !this.hasChangedTypeFilter) {
-			return Object.assign({}, this.state.thesesParams, {
-				type: ThesisTypeFilter.Ungraded
-			});
-		}
-		return this.state.thesesParams;
-	}
-
-	private async initializeAppState() {
-		const rawTheses = await this.safeGetRawTheses();
-		const user = await getCurrentUser();
-		const params = this.filterParamsForUngraded(await this.getNumUngraded(user));
-		this.setState({
-			rawTheses,
-			theses: getProcessedTheses(rawTheses, params, user),
-			thesesBoard: await getThesesBoard(),
-			thesesParams: params,
-			applicationState: ApplicationState.Normal,
-			user,
-		});
-	}
-
-	/**
-	 * When the processing params are updated, some changes to the state are required
-	 * we have to re-process the theses list and find the position of the selected thesis
-	 */
-	private getNewStateForParams(params: Partial<ThesesProcessParams>): Partial<State> {
-		const finalParams = Object.assign({}, this.state.thesesParams, params);
-		const processed = getProcessedTheses(this.state.rawTheses, finalParams, this.state.user);
-		return {
-			thesesParams: finalParams,
-			theses: processed,
-			thesisIdx: thesisIndexInList(
-				this.state.thesis && this.state.thesis.mutable, processed,
-			),
-		};
-	}
-
-	/** Called when filters change with the new values */
-	private updateFilters(title: string, advisor: string, type: ThesisTypeFilter) {
-		const newState = this.getNewStateForParams({
-			title: title, advisor: advisor, type: type,
-		});
-		clearFilterCache();
-		this.setState(newState as State);
-	}
-
-	private onTypeFilterChanged = (value: ThesisTypeFilter) => {
-		const { thesesParams } = this.state;
-		this.hasChangedTypeFilter = true;
-		this.updateFilters(thesesParams.title, thesesParams.advisor, value);
-	}
-	private onAdvisorFilterChanged = (value: string) => {
-		const { thesesParams } = this.state;
-		this.updateFilters(thesesParams.title, value.toLowerCase(), thesesParams.type);
-	}
-	private onTitleFilterChanged = (value: string) => {
-		const { thesesParams } = this.state;
-		this.updateFilters(value.toLowerCase(), thesesParams.advisor, thesesParams.type);
-	}
-
+	private onTypeFilterChanged = (t: ThesisTypeFilter) => store.onTypeFilterChanged(t);
+	private onAdvisorChanged = (a: string) => store.onAdvisorFilterChanged(a);
+	private onTitleChanged = (t: string) => store.onTitleFilterChanged(t);
 	private renderTopRow() {
-		const shouldShowNewBtn = canAddThesis(this.state.user);
-		const { thesesParams } = this.state;
+		const shouldShowNewBtn = canAddThesis(store.user);
 		return <TopRowContainer>
 			<ListFilters
 				onTypeChange={this.onTypeFilterChanged}
-				typeValue={thesesParams.type}
-				onAdvisorChange={this.onAdvisorFilterChanged}
-				advisorValue={thesesParams.advisor}
-				onTitleChange={this.onTitleFilterChanged}
-				titleValue={thesesParams.title}
-				enabled={this.state.applicationState === ApplicationState.Normal}
-				user={this.state.user}
+				typeValue={store.params.type}
+				onAdvisorChange={this.onAdvisorChanged}
+				advisorValue={store.params.advisor}
+				onTitleChange={this.onTitleChanged}
+				titleValue={store.params.title}
+				state={store.applicationState}
+				user={store.user}
+				stringFilterBeingChanged={store.stringFilterBeingChanged}
 			/>
 			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
 		</TopRowContainer>;
 	}
 
-	private onSortChanged = (column: SortColumn, dir: SortDirection) => {
-		const newState = this.getNewStateForParams({
-			sortColumn: column, sortDirection: dir,
-		});
-		this.setState(newState as State);
+	/** Stores the child table component so that we can tell it when the list changes */
+	private setTableInstance = (table: ThesesTable) => {
+		this.tableInstance = table;
 	}
 
+	private onLoadMore = async (_: number, until: number) => { await store.loadMore(until); };
+	private onSortChanged = (col: SortColumn, dir: SortDirection) => store.onSortChanged(col, dir);
 	private renderThesesList() {
 		return <ThesesTable
-			applicationState={this.state.applicationState}
-			theses={this.state.theses}
-			selectedIdx={this.state.thesisIdx}
-			sortColumn={this.state.thesesParams.sortColumn}
-			sortDirection={this.state.thesesParams.sortDirection}
-			isEditingThesis={this.hasUnsavedChanges()}
+			ref={this.setTableInstance}
+			applicationState={store.applicationState}
+			theses={store.theses}
+			selectedIdx={store.selectedIdx}
+			sortColumn={store.params.sortColumn}
+			sortDirection={store.params.sortDirection}
+			isEditingThesis={store.hasUnsavedChanges()}
+			totalThesesCount={store.totalCount}
 			onThesisSelected={this.onThesisSelected}
 			switchToThesisWithOffset={this.switchWithOffset}
 			onSortChanged={this.onSortChanged}
+			loadMoreRows={this.onLoadMore}
 		/>;
 	}
 
-	private renderThesesDetails() {
+	private onThesisModified = (nt: Thesis) => store.updateModifiedThesis(nt);
+	private renderThesisDetails() {
 		return <ThesisDetails
-			thesis={this.state.thesis!.mutable}
-			thesesList={this.state.rawTheses}
-			thesesBoard={this.state.thesesBoard}
-			isSaving={this.state.applicationState === ApplicationState.PerformingBackendChanges}
-			hasUnsavedChanges={this.hasUnsavedChanges()}
-			mode={this.state.workMode!}
-			user={this.state.user}
-			onSaveRequested={this.handleThesisSave}
+			thesis={store.thesis!.modified}
+			thesesBoard={store.thesesBoard}
+			appState={store.applicationState}
+			hasUnsavedChanges={store.hasUnsavedChanges()}
+			mode={store.workMode!}
+			user={store.user}
+			onSaveRequested={this.onSave}
 			onThesisModified={this.onThesisModified}
 		/>;
 	}
 
 	public render() {
-		if (this.state.fetchError) {
+		if (this.state.applicationError) {
 			return this.renderErrorScreen();
 		}
-		const { thesis } = this.state;
-		const mainComponent = <>
+		const { thesis } = store;
+		if (thesis !== null) {
+			// if a thesis is present, we're not just viewing
+			console.assert(store.workMode !== ThesisWorkMode.Viewing);
+		}
+		return <>
 			{this.renderTopRow()}
 			<br />
 			{this.renderThesesList()}
+			{
+				thesis
+				? <><br /><hr />{this.renderThesisDetails()}</>
+				: null
+			}
 		</>;
-		if (thesis !== null) {
-			console.assert(this.state.workMode !== null);
-			return <>
-				{mainComponent}
-				<br />
-				<hr />
-				{this.renderThesesDetails()}
-			</>;
-		 }
-		 return mainComponent;
 	}
 
 	private renderErrorScreen() {
 		return <ErrorBox
 			errorTitle={
-				<span>
-					Nie udało się pobrać listy prac: <em>{this.state.fetchError!.toString()}</em>
-				</span>
+				<em>{this.state.applicationError!.toString()}</em>
 			}
 		/>;
 	}
 
-	/** A version of setState that also sets the specified thesis as the
-	 * currently selected thesis (abstracts the original/mutable logic)
+	/**
+	 * If there are unsaved changes, ask the user whether they should be discarded.
+	 * Returns true immediately if there are no changes to be saved.
 	 */
-	// properly typing setState in TS is nontrivial because of a peculiarity
-	// of the type system: there is no distinction between absent keys
-	// and keys with `undefined` as their value; for this reason the React
-	// .d.ts files hack around using Pick<State, K>, but this doesn't work
-	// for multiple levels (i.e. if this function's state argument has the same
-	// type as React's setState argument definition, it will not work anyway)
-	// for this reason we simply use Partial<State> and cast it later
-	private setStateWithNewThesis(state: Partial<State>, t: Thesis | null) {
-		const finalState = Object.assign({
-			thesis: t ? { original: t, mutable: clone(t) } : null,
-			thesisIdx: thesisIndexInList(t, state.theses || this.state.theses)
-		}, state);
-		this.setState(finalState as State);
-	}
-
-	/** Download theses or set the error screen if an error occurred */
-	private async safeGetRawTheses() {
-		try {
-			return await getThesesList();
-		} catch (err) {
-			this.setState({ fetchError: err });
-			return [];
-		}
-	}
-
-	private hasUnsavedChanges() {
-		const { thesis } = this.state;
-		return (
-			thesis !== null &&
-			!thesis.original.areValuesEqual(thesis.mutable!)
-		);
-	}
-
 	private confirmDiscardChanges() {
-		if (this.hasUnsavedChanges()) {
-			const title = this.state.thesis!.mutable.title;
+		if (store.hasUnsavedChanges()) {
+			const title = store.thesis!.modified.title;
 			return window.confirm(
-				title
+				title.trim()
 					? `Czy porzucić niezapisane zmiany w pracy "${title}"?`
 					: "Czy porzucić niezapisane zmiany?"
 			);
@@ -324,175 +190,48 @@ export class ThesesApp extends React.Component<{}, State > {
 		if (!this.confirmDiscardChanges()) {
 			return;
 		}
-		console.assert(
-			this.state.rawTheses.find(thesis.isEqual) != null,
-			"Tried to select a nonexistent thesis",
-		);
-		this.setStateWithNewThesis({ workMode: ThesisWorkMode.Editing }, thesis);
+		store.selectThesis(thesis);
 	}
 
 	/** Switch to the thesis at the specified offset from the current thesis */
 	public switchWithOffset = (offset: number) => {
-		const { thesisIdx, theses } = this.state;
-		if (thesisIdx === -1) {
+		const { selectedIdx, theses } = store;
+		if (selectedIdx === -1) {
 			return;
 		}
-		const target = thesisIdx + offset;
+		const target = selectedIdx + offset;
 		if (!inRange(target, 0, theses.length - 1)) {
 			return;
 		}
 		this.onThesisSelected(theses[target]);
 	}
 
-	// When modified in the Details subcomponent; we need to maintain
-	// it on the main app state
-	private onThesisModified = (thesis: Thesis) => {
-		this.setState({
-			thesis: {
-				original: this.state.thesis!.original,
-				mutable: thesis,
-			}
-		});
-	}
-
 	private setupForAddingThesis = () => {
-		if (!canAddThesis(this.state.user)) {
+		if (!canAddThesis(store.user)) {
 			return;
 		}
 		const thesis = new Thesis();
-		if (!canSetArbitraryAdvisor(this.state.user)) {
-			thesis.advisor = this.state.user.user;
+		if (!canSetArbitraryAdvisor(store.user)) {
+			thesis.advisor = store.user.user;
 		}
-		this.setStateWithNewThesis({
-			workMode: ThesisWorkMode.Adding
-		}, thesis);
+		store.setupForNewThesis(thesis);
 	}
 
-	private resetChanges = () => {
-		if (!this.hasUnsavedChanges()) {
+	private onResetChanges = () => {
+		if (!this.confirmDiscardChanges()) {
 			return;
 		}
-		this.setStateWithNewThesis({}, this.state.thesis!.original);
+		store.resetModifiedThesis();
 	}
 
-	private handlerForWorkMode = {
-		[ThesisWorkMode.Adding]: this.addNewThesis,
-		[ThesisWorkMode.Editing]: this.modifyExistingThesis,
-	};
-
-	private preSaveChecks() {
-		const { thesis, workMode } = this.state;
-		if (thesis === null) {
-			console.assert(false, "Tried to save thesis but none selected, this shouldn't happen");
-			return false;
-		}
-		if (workMode === null) {
-			console.assert(false, "Tried to perform a save action without a work mode");
-			return false;
-		}
-		if (!this.hasUnsavedChanges()) {
-			console.assert(false, "save() called but no unsaved changes");
-			return false;
-		}
-		return true;
-	}
-
-	private handleThesisSave = async () => {
-		if (!this.preSaveChecks()) {
-			return;
-		}
-
-		const { thesis, workMode } = this.state;
-		this.setState({ applicationState: ApplicationState.PerformingBackendChanges });
-		const handler = this.handlerForWorkMode[workMode!];
-		const id = await handler.call(this);
-
-		if (id === -1) {
-			this.setState({ applicationState: ApplicationState.Normal });
-			return;
-		}
-		// Re-fetch everything
-		// this might seem pointless but as we don't currently have any
-		// backend synchronization this is the only chance to refresh
-		// everything
-		const newList = await this.safeGetRawTheses();
-		// Got a new list, old filter cache no longer valid
-		clearFilterCache();
-
-		const thesisToSelect = this.thesisToSelectAfterAction(thesis!, newList, id);
-		const numUngraded = await this.getNumUngraded();
-		const newParams = this.filterParamsForUngraded(numUngraded);
-		const newState: Partial<State> = {
-			rawTheses: newList,
-			theses: getProcessedTheses(newList, newParams, this.state.user),
-			applicationState: ApplicationState.Normal,
-			// no matter what the work mode was, if we have a thesis we end up in the edit view
-			workMode: thesisToSelect ? ThesisWorkMode.Editing : null,
-			thesesParams: newParams,
-		};
-		this.setStateWithNewThesis(newState, thesisToSelect);
-		adjustDomForUngraded(numUngraded);
-	}
-
-	// Either the same thesis we just saved, or the next ungraded thesis
-	// if the current user is a theses board member and only edited votes
-	private thesisToSelectAfterAction(oldThesis: StateThesis, newList: Thesis[], savedId: number) {
-		const { user } = this.state;
-		if (
-			user.type === UserType.ThesesBoardMember &&
-			oldThesis.original.getMemberVote(user.user) !== oldThesis.mutable.getMemberVote(user.user)
-		) {
-			// The first nonvoted-for thesis
-			const result = newList.find(t =>
-				!t.isEqual(oldThesis.original) &&
-				t.getMemberVote(user.user) === ThesisVote.None
-			);
-			if (result) {
-				return result;
-			}
-			// and if not, return whatever they were working on
-		}
-
-		// We'll want to find the thesis we just saved
-		// Note that it _could_ technically be absent from the new list
-		// but the odds are absurdly low (it would have to be deleted by someone
-		// else or the admin in the time between those two requests above)
-		return newList.find(t => t.id === savedId) || null;
-	}
-
-	private async modifyExistingThesis() {
-		return this.performBackendAction(async thesis => {
-			await saveModifiedThesis(thesis!.original, thesis!.mutable);
-			return thesis!.original.id;
-		});
-	}
-
-	private async addNewThesis() {
-		return this.performBackendAction(thesis => {
-			return saveNewThesis(thesis.mutable!);
-		});
-	}
-
-	/**
-	 * Perform the specified backend action and handle any errors
-	 * @returns The ID of the thesis object the action was performed on
-	 */
-	private async performBackendAction(cb: (t: StateThesis) => Promise<number>) {
-		const { thesis } = this.state;
+	private onSave = async () => {
 		try {
-			return await cb(thesis!);
+			await store.save();
 		} catch (err) {
 			window.alert(
 				"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
 				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 			);
-			return -1;
 		}
 	}
-}
-
-function thesisIndexInList(thesis: Thesis | null, theses: Thesis[]) {
-	return thesis
-		? theses.findIndex(thesis.isEqual)
-		: -1;
 }

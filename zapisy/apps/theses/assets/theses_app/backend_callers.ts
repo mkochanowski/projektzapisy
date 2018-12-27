@@ -6,13 +6,21 @@ import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig } from "axios";
 
-import { Thesis, ThesisJson, Student, Employee, BasePerson, AppUser, PersonJson } from "./types";
+import {
+	Thesis, ThesisJson, Student, Employee,
+	BasePerson, AppUser, UserType, PersonJson,
+} from "./types";
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
+import { SortColumn, SortDirection, ThesesProcessParams } from "./types/misc";
 
 const BASE_API_URL = "/theses/api";
 const REST_REQUEST_TIMEOUT = 10000;
 
 axios.defaults.timeout = REST_REQUEST_TIMEOUT;
+
+export const FAKE_USER = new AppUser(
+	{ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }
+);
 
 /**
  * Send a request to the backend including the csrf token
@@ -45,27 +53,73 @@ async function getData(url: string, config?: AxiosRequestConfig): Promise<any> {
 	return (await axios.get(url, config)).data;
 }
 
+/** The results the backend returns to us in response to a list query */
+type PaginatedThesesResult = {
+	count: number;
+	next: string;
+	previous: string;
+	results: ThesisJson[];
+};
+
 /**
- * Fetch the list of all theses from the backend
- * @returns An array of Thesis objects
+ * Convert from the local sort column representation to a string used in the query
  */
-export async function getThesesList() {
-	const rawData: ThesisJson[] = await getData(`${BASE_API_URL}/theses`);
-	return rawData.map(json => new Thesis(json));
+function sortColToBackendStr(col: SortColumn) {
+	switch (col) {
+		case SortColumn.Advisor: return "advisor";
+		case SortColumn.Title: return "title";
+		case SortColumn.None: return "";
+	}
+}
+
+/**
+ * Convert from the local sort dir representation to a string used in the query
+ */
+function sortDirToBackendStr(dir: SortDirection) {
+	switch (dir) {
+		case SortDirection.Asc: return "asc";
+		case SortDirection.Desc: return "desc";
+	}
+}
+
+/**
+ * Fetch theses from the backend.
+ * @param params The filtering and sorting params
+ * @param offset The start row index
+ * @param limit How many theses to fetch starting at `offset`
+ */
+export async function getThesesList(
+	params: ThesesProcessParams, offset: number, limit: number,
+) {
+	const paginatedResults: PaginatedThesesResult = await getData(
+		`${BASE_API_URL}/theses/`,
+		{ params: {
+			type: params.type,
+			title: params.title,
+			advisor: params.advisor,
+			column: sortColToBackendStr(params.sortColumn),
+			dir: sortDirToBackendStr(params.sortDirection),
+			offset, limit,
+		}},
+	);
+	return {
+		theses: paginatedResults.results.map(json => new Thesis(json)),
+		total: paginatedResults.count,
+	};
 }
 
 /**
  * Fetch the current system user from the backend
  */
 export async function getCurrentUser(): Promise<AppUser> {
-	return new AppUser(await getData(`${BASE_API_URL}/current_user`));
+	return new AppUser(await getData(`${BASE_API_URL}/current_user/`));
 }
 
 /**
  * Get the theses board as an Employee list
  */
 export async function getThesesBoard() {
-	const json: PersonJson[] = await getData(`${BASE_API_URL}/theses_board`);
+	const json: PersonJson[] = await getData(`${BASE_API_URL}/theses_board/`);
 	return json.map(pj => Employee.fromJson(pj) as Employee);
 }
 
@@ -73,7 +127,7 @@ export async function getThesesBoard() {
  * Get the number of ungraded theses for the current board member
  */
 export async function getNumUngraded() {
-	return Number(await getData(`${BASE_API_URL}/num_ungraded`));
+	return Number(await getData(`${BASE_API_URL}/num_ungraded/`));
 }
 
 export const enum PersonType {
@@ -105,7 +159,7 @@ export async function getPersonAutocomplete(
 	person: PersonType, substr: string, pageNum: number,
 ): Promise<PersonAutcompleteResults> {
 	const personUrlPart = person === PersonType.Employee ? "employee" : "student";
-	const url = `${BASE_API_URL}/${personUrlPart}-autocomplete`;
+	const url = `${BASE_API_URL}/${personUrlPart}-autocomplete/`;
 	const acResults = await getData(url, { params: {
 		page: pageNum,
 		q: substr,

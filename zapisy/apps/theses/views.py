@@ -1,19 +1,53 @@
 from typing import List
+from enum import Enum
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.db.models.functions import Concat, Lower
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import NotFound
+from rest_framework import exceptions
+from rest_framework.pagination import LimitOffsetPagination
 from dal import autocomplete
 
 from apps.users.models import Student, Employee
-from .models import Thesis, get_num_ungraded_for_emp
+from .models import Thesis, ThesisStatus, ThesisKind, get_num_ungraded_for_emp
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
 from .users import wrap_user, ThesisUserType, get_theses_board, get_user_type
+
+"""Names of processing parameters in query strings"""
+THESIS_TYPE_FILTER_NAME = "type"
+THESIS_TITLE_FILTER_NAME = "title"
+THESIS_ADVISOR_FILTER_NAME = "advisor"
+THESIS_SORT_COLUMN_NAME = "column"
+THESIS_SORT_DIR_NAME = "dir"
+
+
+class ThesisTypeFilter(Enum):
+    """Various values for the "thesis type" filter in the main UI view
+    Must match values in backend_callers.ts (this is what client code
+    will send to us)
+    """
+    all_current = 0
+    all = 1
+    masters = 2
+    engineers = 3
+    bachelors = 4
+    bachelors_isim = 5
+    available_masters = 6
+    available_engineers = 7
+    available_bachelors = 8
+    available_bachelors_isim = 9
+    ungraded = 10
+
+    default = all_current
+
+
+class ThesesPagination(LimitOffsetPagination):
+    default_limit = 30
 
 
 class ThesesViewSet(viewsets.ModelViewSet):
@@ -21,19 +55,54 @@ class ThesesViewSet(viewsets.ModelViewSet):
     http_method_names = ["patch", "get", "post"]
     permission_classes = (ThesisPermissions,)
     serializer_class = serializers.ThesisSerializer
+    pagination_class = ThesesPagination
 
     def get_queryset(self):
-        return Thesis.objects\
-            .order_by("-added_date")\
-            .select_related(
-                *fields_for_prefetching("student"),
-                *fields_for_prefetching("student_2"),
-                *fields_for_prefetching("advisor"),
-                *fields_for_prefetching("auxiliary_advisor"),
-            )\
-            .prefetch_related("votes")\
-            .prefetch_related("votes__voter")\
-            .all()
+        requested_thesis_type_str = self.request.query_params.get(THESIS_TYPE_FILTER_NAME, None)
+
+        try:
+            requested_thesis_type = \
+                ThesisTypeFilter(int(requested_thesis_type_str))\
+                if requested_thesis_type_str\
+                else ThesisTypeFilter.default
+        except ValueError:
+            raise exceptions.ParseError()
+
+        requested_thesis_title = self.request.query_params.get(
+            THESIS_TITLE_FILTER_NAME, ""
+        ).strip()
+        requested_advisor_name = self.request.query_params.get(
+            THESIS_ADVISOR_FILTER_NAME, ""
+        ).strip()
+
+        sort_column = self.request.query_params.get(THESIS_SORT_COLUMN_NAME, "")
+        sort_dir = self.request.query_params.get(THESIS_SORT_DIR_NAME, "")
+
+        base_qs = generate_base_queryset()
+        wrapped_user = wrap_user(self.request.user)
+        filtered = filter_queryset(
+            base_qs, wrapped_user,
+            requested_thesis_type, requested_thesis_title, requested_advisor_name,
+        )
+        return sort_queryset(filtered, sort_column, sort_dir)
+
+
+def generate_base_queryset():
+    """Return theses queryset with the appropriate fields prefetched (see below)
+    as well as user names annotated for further processing - sorting/filtering
+    """
+    return Thesis.objects\
+        .select_related(
+            *fields_for_prefetching("student"),
+            *fields_for_prefetching("student_2"),
+            *fields_for_prefetching("advisor"),
+            *fields_for_prefetching("auxiliary_advisor"),
+        )\
+        .prefetch_related("votes")\
+        .prefetch_related("votes__voter")\
+        .annotate(
+            advisor_name=Concat("advisor__user__first_name", "advisor__user__last_name")
+        )
 
 
 def fields_for_prefetching(base_field: str) -> List[str]:
@@ -49,6 +118,82 @@ def fields_for_prefetching(base_field: str) -> List[str]:
     Sadly this is necessary until the User system is refactored.
     """
     return [base_field, f'{base_field}__user']
+
+
+def filter_queryset(
+    qs, user: BaseUser,
+    thesis_type: ThesisTypeFilter, title: str, advisor_name: str
+):
+    """Filter the specified theses queryset based on the passed conditions"""
+    result = filter_theses_queryset_for_type(qs, user, thesis_type)
+    if title:
+        result = result.filter(title__icontains=title)
+    if advisor_name:
+        result = result.filter(advisor_name__icontains=advisor_name)
+    return result
+
+
+def sort_queryset(qs, sort_column: str, sort_dir: str):
+    """Sort the specified queryset by the specified column
+    in the specified direction, or by newest first if not specified
+    """
+    db_column = ""
+    if sort_column == "advisor":
+        db_column = "advisor_name"
+    elif sort_column == "title":
+        db_column = "title"
+
+    if db_column:
+        annot = Lower(db_column)
+        return qs.order_by(
+            annot.desc() if sort_dir == "desc" else annot.asc()
+        )
+
+    return qs.order_by("-added_date")
+
+
+def available_thesis_filter(queryset):
+    """Returns only theses that are considered "available" from the specified queryset"""
+    return queryset\
+        .exclude(status=ThesisStatus.in_progress.value)\
+        .exclude(status=ThesisStatus.defended.value)\
+        .exclude(reserved=True)
+
+
+def ungraded_theses_filter(queryset, user: Employee):
+    """Returns only theses that are ungraded by the currently logged in board member"""
+    user_type = get_user_type(user)
+    if user_type != ThesisUserType.theses_board_member:
+        raise exceptions.NotFound()
+    return queryset
+
+
+def filter_theses_queryset_for_type(queryset, user: Employee, thesis_type: ThesisTypeFilter):
+    """Returns only theses matching the specified type filter from the specified queryset"""
+    if thesis_type == ThesisTypeFilter.all_current:
+        return queryset.exclude(status=ThesisStatus.defended.value)
+    elif thesis_type == ThesisTypeFilter.all:
+        return queryset
+    elif thesis_type == ThesisTypeFilter.masters:
+        return queryset.filter(kind=ThesisKind.masters.value)
+    elif thesis_type == ThesisTypeFilter.engineers:
+        return queryset.filter(kind=ThesisKind.engineers.value)
+    elif thesis_type == ThesisTypeFilter.bachelors:
+        return queryset.filter(kind=ThesisKind.bachelors.value)
+    elif thesis_type == ThesisTypeFilter.bachelors_isim:
+        return queryset.filter(kind=ThesisKind.isim.value)
+    elif thesis_type == ThesisTypeFilter.available_masters:
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.masters.value))
+    elif thesis_type == ThesisTypeFilter.available_engineers:
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.engineers.value))
+    elif thesis_type == ThesisTypeFilter.available_bachelors:
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.bachelors.value))
+    elif thesis_type == ThesisTypeFilter.available_bachelors_isim:
+        return available_thesis_filter(queryset.filter(kind=ThesisKind.isim.value))
+    elif thesis_type == ThesisTypeFilter.ungraded:
+        return ungraded_theses_filter(queryset, user)
+    else:
+        raise exceptions.ParseError()
 
 
 class ThesesBoardViewSet(viewsets.ModelViewSet):
@@ -76,7 +221,7 @@ def get_num_ungraded(request):
     wrapped_user = wrap_user(request.user)
     user_type = get_user_type(wrapped_user)
     if user_type != ThesisUserType.theses_board_member:
-        raise NotFound()
+        raise exceptions.NotFound()
     return Response(get_num_ungraded_for_emp(wrapped_user))
 
 

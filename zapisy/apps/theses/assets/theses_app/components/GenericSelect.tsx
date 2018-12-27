@@ -28,7 +28,7 @@ type Props<T> = {
  * A wrapper around the HTML select component with a convenient API
  * and an optional label
  */
-export class GenericSelect<T> extends React.Component<Props<T>> {
+export class GenericSelect<T> extends React.PureComponent<Props<T>> {
 	public render() {
 		const shouldDisable = typeof this.props.enabled === "boolean" ? !this.props.enabled : false;
 		const styles: React.CSSProperties = {};

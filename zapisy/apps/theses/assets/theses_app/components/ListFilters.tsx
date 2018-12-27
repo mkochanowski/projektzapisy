@@ -7,6 +7,8 @@ import styled from "styled-components";
 
 import { GenericSelect } from "./GenericSelect";
 import { ThesisTypeFilter, thesisTypeFilterToString, AppUser, UserType } from "../types";
+import { ApplicationState } from "../types/misc";
+import { ChangedStringFilter } from "./theses_store";
 
 const typeFilters = [
 	ThesisTypeFilter.AllCurrent,
@@ -41,7 +43,8 @@ type Props = {
 	onTitleChange: (titleSubstr: string) => void;
 	titleValue: string;
 
-	enabled: boolean;
+	state: ApplicationState;
+	stringFilterBeingChanged: ChangedStringFilter;
 };
 
 const textFieldStyle = {
@@ -74,6 +77,15 @@ export class ListFilters extends React.PureComponent<Props> {
 	}
 
 	public render() {
+		console.warn("Rendering filters");
+		const { state, stringFilterBeingChanged } = this.props;
+		if (stringFilterBeingChanged !== "") {
+			console.assert(
+				state === ApplicationState.Refetching,
+				"While changing string filters we should fetching",
+			);
+		}
+		const isNormalState = state === ApplicationState.Normal;
 		return <FiltersContainer>
 			<GenericSelect<ThesisTypeFilter>
 				value={this.props.typeValue}
@@ -85,7 +97,7 @@ export class ListFilters extends React.PureComponent<Props> {
 				}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
-				enabled={this.props.enabled}
+				enabled={isNormalState}
 			/>
 
 			<div>
@@ -95,7 +107,7 @@ export class ListFilters extends React.PureComponent<Props> {
 					value={this.props.titleValue}
 					onChange={this.handleTitleChanged}
 					style={textFieldStyle}
-					disabled={!this.props.enabled}
+					disabled={!(isNormalState || stringFilterBeingChanged === "title")}
 				/>
 			</div>
 
@@ -106,7 +118,7 @@ export class ListFilters extends React.PureComponent<Props> {
 					value={this.props.advisorValue}
 					onChange={this.handleAdvisorChanged}
 					style={textFieldStyle}
-					disabled={!this.props.enabled}
+					disabled={!(isNormalState || stringFilterBeingChanged === "advisor")}
 				/>
 			</div>
 		</FiltersContainer>;

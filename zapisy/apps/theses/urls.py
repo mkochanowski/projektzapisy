@@ -20,7 +20,7 @@ urlpatterns = [
         views.EmployeeAutocomplete.as_view(),
         name='employee-autocomplete',
     ),
-    url(r'^api/current_user$', views.get_current_user),
-    url(r'^api/num_ungraded$', views.get_num_ungraded),
+    url(r'^api/current_user/$', views.get_current_user),
+    url(r'^api/num_ungraded/$', views.get_num_ungraded),
     url(r'^api/', include(router.urls))
 ]

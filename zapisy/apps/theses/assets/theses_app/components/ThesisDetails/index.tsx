@@ -12,7 +12,7 @@ import { ThesisVotes } from "./ThesisVotes";
 
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
-import { ThesisWorkMode } from "../../types/misc";
+import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../types/misc";
 import { canModifyThesis } from "../../permissions";
 
 const SaveButton = Button.extend`
@@ -54,10 +54,8 @@ const RightDetailsContainer = styled.div`
 
 type Props = {
 	thesis: Thesis;
-	thesesList: Thesis[];
-	thesesBoard: Employee[],
-	/** Are we saving this thesis (i.e. should it be read-only)? */
-	isSaving: boolean;
+	thesesBoard: Employee[];
+	appState: ApplicationState;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
 	user: AppUser;
@@ -91,9 +89,12 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 		console.warn("Render details");
 
 		return <DetailsSectionWrapper>
-			{this.props.isSaving ? <Spinner style={{ position: "absolute" }}/> : null}
+			{this.props.appState === ApplicationState.Saving
+				? <Spinner style={{ position: "absolute" }}/>
+				: null
+			}
 			<MainDetailsContainer
-				style={this.props.isSaving ? getDisabledStyle() : {}}
+				style={isPerformingBackendOp(this.props.appState) ? getDisabledStyle() : {}}
 			>
 				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
 				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
@@ -102,11 +103,16 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	}
 
 	private renderThesisLeftPanel() {
+		const { thesis } = this.props;
+		const canModify = canModifyThesis(this.props.user, this.props.thesis);
 		return <>
 			<ThesisTopRow
-				thesis={this.props.thesis}
 				mode={this.props.mode}
 				user={this.props.user}
+				readOnly={!canModify}
+				isReserved={thesis.reserved}
+				dateChanged={thesis.modifiedDate}
+				status={thesis.status}
 				onReservationChanged={this.onReservationChanged}
 				onDateChanged={this.onDateUpdatedChanged}
 				onStatusChanged={this.onStatusChanged}
@@ -216,15 +222,10 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	}
 
 	private validateBeforeSave() {
-		const { thesis, thesesList } = this.props;
+		const { thesis } = this.props;
 		const trimmedTitle = thesis.title.trim();
 		if (!trimmedTitle) {
 			window.alert("Tytuł pracy nie może być pusty.");
-			this.setState({ hasTitleError: true });
-			return false;
-		}
-		if (thesesList.find(t => !t.isEqual(thesis) && t.title.trim() === trimmedTitle)) {
-			window.alert("Istnieje już inna praca o tym tytule.");
 			this.setState({ hasTitleError: true });
 			return false;
 		}
