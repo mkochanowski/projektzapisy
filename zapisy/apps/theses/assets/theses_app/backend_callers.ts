@@ -101,7 +101,7 @@ export async function getThesesList(
 	params: ThesesProcessParams, offset: number, limit: number,
 ) {
 	const paginatedResults: PaginatedThesesResult = await getData(
-		`${BASE_API_URL}/theses`,
+		`${BASE_API_URL}/theses/`,
 		{ params: {
 			type: params.type,
 			title: params.title,
@@ -146,7 +146,7 @@ export async function getPersonAutocomplete(
 	person: PersonType, substr: string, pageNum: number,
 ): Promise<PersonAutcompleteResults> {
 	const personUrlPart = person === PersonType.Employee ? "employee" : "student";
-	const url = `${BASE_API_URL}/${personUrlPart}-autocomplete`;
+	const url = `${BASE_API_URL}/${personUrlPart}-autocomplete/`;
 	const acResults = await getData(url, { params: {
 		page: pageNum,
 		q: substr,
@@ -210,5 +210,5 @@ export async function saveNewThesis(thesis: Thesis): Promise<number> {
  * Fetch the current system user from the backend
  */
 export async function getCurrentUser(): Promise<AppUser> {
-	return new AppUser(await getData(`${BASE_API_URL}/current_user`));
+	return new AppUser(await getData(`${BASE_API_URL}/current_user/`));
 }

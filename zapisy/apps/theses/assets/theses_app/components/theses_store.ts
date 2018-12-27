@@ -35,7 +35,6 @@ class ThesesStore {
 	@observable public lastRowIndex: number = 0;
 	@observable public user: AppUser = FAKE_USER;
 	@observable public applicationState: ApplicationState = ApplicationState.FirstLoad;
-	@observable public fetchError: Error | null = null;
 	@observable public workMode: ThesisWorkMode = ThesisWorkMode.Viewing;
 	@observable public totalCount: number = 0;
 	@observable public params: ThesesProcessParams = observable({
@@ -49,13 +48,27 @@ class ThesesStore {
 	private stringFilterPromise: CancellablePromise<any> | null = null;
 
 	private onListChangedCallback: ((mode: LoadMode) => void) | null = null;
+	private onErrorCallback: ((err: Error) => void) | null = null;
 
 	public registerOnListChanged(cb: (mod: LoadMode) => void) {
 		this.onListChangedCallback = cb;
 	}
-
-	public clearOnListChangedCallback() {
+	public clearOnListChanged() {
 		this.onListChangedCallback = null;
+	}
+
+	public registerOnError(cb: (err: Error) => void) {
+		this.onErrorCallback = cb;
+	}
+	public clearOnError() {
+		this.onErrorCallback = null;
+	}
+	private handleError(err: Error) {
+		if (this.onErrorCallback) {
+			this.onErrorCallback(err);
+		} else {
+			console.error("Error while loading and no callback:", err);
+		}
 	}
 
 	@computed public get selectedIdx() {
@@ -63,9 +76,13 @@ class ThesesStore {
 	}
 
 	public initialize = flow(function* (this: ThesesStore) {
-		this.user = yield getCurrentUser();
-		yield this.refreshTheses();
-		this.applicationState = ApplicationState.Normal;
+		try {
+			this.user = yield getCurrentUser();
+			yield this.refreshTheses();
+			this.applicationState = ApplicationState.Normal;
+		} catch (err) {
+			this.handleError(err);
+		}
 	});
 
 	private checkCanPerformBackendOp() {
@@ -182,7 +199,7 @@ class ThesesStore {
 				this.onListChangedCallback(mode);
 			}
 		} catch (err) {
-			this.fetchError = err;
+			this.handleError(err);
 		}
 	});
 

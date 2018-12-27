@@ -25,8 +25,15 @@ const TopRowContainer = styled.div`
 	justify-content: space-between;
 `;
 
+const initialState = {
+	/** The error instance, if any. If one exists, we abort the app and display it */
+	applicationError: null as Error | null,
+};
+type State = typeof initialState;
+
 @observer
-export class ThesesApp extends React.Component {
+export class ThesesApp extends React.Component<any, State> {
+	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
 	private tableInstance: ThesesTable;
 
@@ -37,16 +44,22 @@ export class ThesesApp extends React.Component {
 		window.onbeforeunload = this.confirmUnload;
 		this.initializeKeyboardShortcuts();
 		store.registerOnListChanged(this.onListChanged);
+		store.registerOnError(this.onError);
 	}
 
 	private onListChanged = (mode: LoadMode) => {
 		this.tableInstance.onListDidChange(mode);
 	}
 
+	private onError = (err: Error) => {
+		this.setState({ applicationError: err });
+	}
+
 	componentWillUnmount() {
 		window.onbeforeunload = this.oldOnBeforeUnload;
 		this.deconfigureKeyboardShortcuts();
-		store.clearOnListChangedCallback();
+		store.clearOnListChanged();
+		store.clearOnError();
 	}
 
 	private initializeKeyboardShortcuts() {
@@ -125,7 +138,7 @@ export class ThesesApp extends React.Component {
 	}
 
 	public render() {
-		if (store.fetchError) {
+		if (this.state.applicationError) {
 			return this.renderErrorScreen();
 		}
 		const { thesis } = store;
@@ -149,9 +162,7 @@ export class ThesesApp extends React.Component {
 	private renderErrorScreen() {
 		return <ErrorBox
 			errorTitle={
-				<span>
-					Nie udało się pobrać listy prac: <em>{store.fetchError!.toString()}</em>
-				</span>
+				<em>{this.state.applicationError!.toString()}</em>
 			}
 		/>;
 	}
