@@ -3,7 +3,7 @@ from enum import Enum
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Value, When, Case, BooleanField
 from django.db.models.functions import Concat, Lower
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
@@ -127,8 +127,9 @@ def filter_queryset(
 
 
 def sort_queryset(qs, sort_column: str, sort_dir: str):
-    """Sort the specified queryset by the specified column
-    in the specified direction, or by newest first if not specified
+    """Sort the specified queryset first by archived status (unarchived theses first),
+    then by the specified column in the specified direction,
+    or by newest first if not specified
     """
     db_column = ""
     if sort_column == "advisor":
@@ -136,13 +137,18 @@ def sort_queryset(qs, sort_column: str, sort_dir: str):
     elif sort_column == "title":
         db_column = "title"
 
+    resulting_ordering = "-added_date"
     if db_column:
-        annot = Lower(db_column)
-        return qs.order_by(
-            annot.desc() if sort_dir == "desc" else annot.asc()
-        )
+        orderer = Lower(db_column)
+        resulting_ordering = orderer.desc() if sort_dir == "desc" else orderer.asc()
 
-    return qs.order_by("-added_date")
+    # We want to first order by archived, so compute that as an annotated field
+    qs = qs.annotate(is_archived=Case(
+        When(status=5, then=1),
+        default=Value(0),
+        output_field=BooleanField()
+    ))
+    return qs.order_by("is_archived", resulting_ordering)
 
 
 def available_thesis_filter(queryset):
