@@ -157,7 +157,10 @@ export class ThesesTable extends React.PureComponent<Props> {
 				sortDirection={ownToRvDirection(this.props.sortDirection)}
 				onRowClick={this.onRowClick}
 				rowClassName={this.getRowClassName}
-				scrollToIndex={!this.hasScrolledSinceChange ? actualIdx : undefined}
+				// if the user has initiated scrolling, we no longer specify this
+				// otherwise the list would keep jumping to that thesis, preventing
+				// scrolling altogether
+				scrollToIndex={this.hasScrolledSinceChange ? undefined : actualIdx}
 				deferredMeasurementCache={rowHeightCache}
 				onScroll={this.onScroll}
 				noRowsRenderer={NoResultsMessage}
