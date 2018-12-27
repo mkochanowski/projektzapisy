@@ -80,7 +80,7 @@ type Props = {
 	readOnly?: boolean;
 };
 
-export function PersonField(props: Props) {
+export const PersonField = React.memo(function(props: Props) {
 	const isReadOnly = typeof props.readOnly !== "undefined" ? props.readOnly : false;
 	const valueComponent = isReadOnly
 		? <ReadOnlyInput
@@ -98,4 +98,4 @@ export function PersonField(props: Props) {
 		/>;
 
 	return <PersonFieldWrapper>{valueComponent}</PersonFieldWrapper>;
-}
+});

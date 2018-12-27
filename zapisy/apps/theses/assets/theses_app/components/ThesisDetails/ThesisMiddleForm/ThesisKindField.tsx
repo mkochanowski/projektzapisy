@@ -21,7 +21,7 @@ export type ThesisKindSelectProps = {
 	readOnly: boolean;
 	onChange: (k: ThesisKind) => void;
 };
-export function ThesisKindField(props: ThesisKindSelectProps) {
+export const ThesisKindField = React.memo(function(props: ThesisKindSelectProps) {
 	return props.readOnly
 	? <ReadOnlyInput
 		text={thesisKindToString(props.value)}
@@ -32,4 +32,4 @@ export function ThesisKindField(props: ThesisKindSelectProps) {
 		onChange={props.onChange}
 		optionInfo={kindSelectInfos}
 	/>;
-}
+});

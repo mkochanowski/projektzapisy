@@ -18,6 +18,6 @@ type Props = {
 	onClick: () => void;
 };
 
-export function AddNewButton(props: Props) {
+export const AddNewButton = React.memo(function(props: Props) {
 	return <Button onClick={props.onClick}>Dodaj nową</Button>;
-}
+});

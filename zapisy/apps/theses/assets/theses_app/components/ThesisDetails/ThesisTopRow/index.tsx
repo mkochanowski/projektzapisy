@@ -5,11 +5,11 @@ import * as React from "react";
 import styled from "styled-components";
 import { Moment } from "moment";
 
-import { ThesisStatus, AppUser } from "../../../types";
+import { Thesis, ThesisStatus, AppUser } from "../../../types";
 import { ThesisDateField } from "./ThesisDateField";
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
 import { ThesisWorkMode } from "../../../types/misc";
-import { canChangeStatus } from "../../../permissions";
+import { canChangeStatus, canModifyThesis } from "../../../permissions";
 
 const TopRowContainer = styled.div`
 display: flex;
@@ -21,12 +21,9 @@ width: 100%;
 `;
 
 type Props = {
+	thesis: Thesis;
 	mode: ThesisWorkMode;
 	user: AppUser;
-	readOnly: boolean;
-	isReserved: boolean;
-	dateChanged: Moment;
-	status: ThesisStatus;
 	onReservationChanged: (nr: boolean) => void;
 	onDateChanged: (nd: Moment) => void;
 	onStatusChanged: (ns: ThesisStatus) => void;
@@ -54,20 +51,21 @@ function ReservationCheckbox(props: {
 
 export class ThesisTopRow extends React.PureComponent<Props> {
 	public render() {
-		const { mode, readOnly } = this.props;
+		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
+		const { mode, thesis } = this.props;
 		return <TopRowContainer>
 			<ReservationCheckbox
 				onChange={this.props.onReservationChanged}
-				value={this.props.isReserved}
+				value={thesis.reserved}
 				enabled={!readOnly}
 			/>
 			<ThesisDateField
-				value={mode === ThesisWorkMode.Editing ? this.props.dateChanged : undefined}
+				value={mode === ThesisWorkMode.Editing ? thesis.modifiedDate : undefined}
 				label={"Aktualizacja"}
 			/>
 			<ThesisStatusIndicator
 				onChange={this.props.onStatusChanged}
-				value={this.props.status}
+				value={thesis.status}
 				enabled={!readOnly && canChangeStatus(this.props.user)}
 			/>
 		</TopRowContainer>;

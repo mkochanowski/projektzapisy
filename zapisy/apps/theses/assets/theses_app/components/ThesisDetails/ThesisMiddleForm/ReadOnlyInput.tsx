@@ -9,11 +9,11 @@ type Props = {
  * A simple wrapper around the HTML <input> element, set to readonly
  * Used in the thesis details component if the user does not have edit rights
  */
-export function ReadOnlyInput(props: Props) {
+export const ReadOnlyInput = React.memo(function(props: Props) {
 	return <input
 		type={"text"}
 		readOnly
 		value={props.text}
 		style={props.style || {}}
 	/>;
-}
+});

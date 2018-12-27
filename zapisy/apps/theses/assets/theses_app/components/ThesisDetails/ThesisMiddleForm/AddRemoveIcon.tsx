@@ -26,9 +26,9 @@ const IconImg = styled.img`
  * The icon rendered next to advisor/student fields; either + or -
  * depending on whether the secondary advisor/student is present
  */
-export function AddRemoveIcon(props: Props) {
+export const AddRemoveIcon = React.memo(function(props: Props) {
 	return <IconImg
 		src={props.type === IconType.Add ? AddIconImage : RemoveIconImage}
 		onClick={props.onClick}
 	/>;
-}
+});
