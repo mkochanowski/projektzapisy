@@ -3,7 +3,7 @@ from enum import Enum
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Value, When, Case, BooleanField
 from django.db.models.functions import Concat, Lower
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
@@ -14,12 +14,12 @@ from dal import autocomplete
 
 from apps.users.models import Student, Employee
 from .models import (
-    Thesis, ThesisStatus, ThesisKind, ThesisVote,
+    Thesis, ThesisStatus, ThesisKind,
     get_num_ungraded_for_emp, filter_ungraded_for_emp
 )
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
-from .users import wrap_user, ThesisUserType, get_theses_board, get_user_type
+from .users import wrap_user, get_theses_board, is_theses_board_member
 
 """Names of processing parameters in query strings"""
 THESIS_TYPE_FILTER_NAME = "type"
@@ -137,8 +137,9 @@ def filter_queryset(
 
 
 def sort_queryset(qs, sort_column: str, sort_dir: str):
-    """Sort the specified queryset by the specified column
-    in the specified direction, or by newest first if not specified
+    """Sort the specified queryset first by archived status (unarchived theses first),
+    then by the specified column in the specified direction,
+    or by newest first if not specified
     """
     db_column = ""
     if sort_column == "advisor":
@@ -146,13 +147,18 @@ def sort_queryset(qs, sort_column: str, sort_dir: str):
     elif sort_column == "title":
         db_column = "title"
 
+    resulting_ordering = "-added_date"
     if db_column:
-        annot = Lower(db_column)
-        return qs.order_by(
-            annot.desc() if sort_dir == "desc" else annot.asc()
-        )
+        orderer = Lower(db_column)
+        resulting_ordering = orderer.desc() if sort_dir == "desc" else orderer.asc()
 
-    return qs.order_by("-added_date")
+    # We want to first order by archived, so compute that as an annotated field
+    qs = qs.annotate(is_archived=Case(
+        When(status=5, then=1),
+        default=Value(0),
+        output_field=BooleanField()
+    ))
+    return qs.order_by("is_archived", resulting_ordering)
 
 
 def available_thesis_filter(queryset):
@@ -165,8 +171,7 @@ def available_thesis_filter(queryset):
 
 def ungraded_theses_filter(queryset, user: Employee):
     """Returns only theses that are ungraded by the currently logged in board member"""
-    user_type = get_user_type(user)
-    if user_type != ThesisUserType.theses_board_member:
+    if not is_theses_board_member(user):
         raise exceptions.NotFound()
     return filter_ungraded_for_emp(queryset, user)
 
@@ -222,8 +227,7 @@ def get_current_user(request):
 def get_num_ungraded(request):
     """Allows the front end to query the number of ungraded theses for the current user"""
     wrapped_user = wrap_user(request.user)
-    user_type = get_user_type(wrapped_user)
-    if user_type != ThesisUserType.theses_board_member:
+    if not is_theses_board_member(wrapped_user):
         raise exceptions.NotFound()
     return Response(get_num_ungraded_for_emp(wrapped_user))
 

@@ -18,7 +18,7 @@ import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
-import { thesesStore as store, LoadMode } from "./theses_store";
+import { thesesStore as store, LoadMode } from "../theses_store";
 import { ThesisWorkMode, SortColumn, SortDirection } from "../types/misc";
 
 const TopRowContainer = styled.div`

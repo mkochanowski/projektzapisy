@@ -19,7 +19,7 @@ import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { NoResultsMessage } from "./NoResultsMessage";
 import { UnconstrainedFunction } from "common/types";
-import { LoadMode } from "../theses_store";
+import { LoadMode } from "../../theses_store";
 
 /*
 	The theses table is powered by react-virtualized's Table component;

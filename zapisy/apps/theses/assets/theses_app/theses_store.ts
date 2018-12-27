@@ -8,18 +8,18 @@
 import { observable, action, flow, configure, computed } from "mobx";
 import { clone } from "lodash";
 
-import { Thesis, AppUser, ThesisTypeFilter, Employee, UserType, ThesisVote } from "../types";
+import { Thesis, AppUser, ThesisTypeFilter, Employee, ThesisVote, BasePerson } from "./types";
 import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
 	getCurrentUser, FAKE_USER, getThesesBoard, getNumUngraded,
-} from "../backend_callers";
+} from "./backend_callers";
 import {
 	ApplicationState, ThesisWorkMode, isPerformingBackendOp,
 	ThesesProcessParams, SortColumn, SortDirection,
-} from "../types/misc";
+} from "./types/misc";
 import { roundUp, awaitSleep } from "common/utils";
 import { CancellablePromise } from "mobx/lib/api/flow";
-import { adjustDomForUngraded } from "../utils";
+import { adjustDomForUngraded } from "./utils";
 
 /** Tell MobX to ensure that @observable fields are only modified in actions */
 configure({ enforceActions: "observed" });
@@ -122,11 +122,18 @@ class ThesesStore {
 		}
 	});
 
+	/**
+	 * Checks whether the given user is a member of the theses board
+	 */
+	public isThesesBoardMember(user: BasePerson): boolean {
+		return !!this.thesesBoard.find(member => member.isEqual(user));
+	}
+
 	/** Get the number of ungraded theses for the current user.
 	 * Returns 0 if the user is not a member of the theses board.
 	 */
 	private async getNumUngraded() {
-		return this.user.type === UserType.ThesesBoardMember ? getNumUngraded() : 0;
+		return this.isThesesBoardMember(this.user.user) ? getNumUngraded() : 0;
 	}
 
 	/** For theses board members we'll want to switch to ungraded theses
@@ -403,7 +410,7 @@ class ThesesStore {
 	private thesisToSelectAfterAction(oldThesis: Thesis, savedId: number) {
 		const { user } = this;
 		if (
-			user.type === UserType.ThesesBoardMember &&
+			this.isThesesBoardMember(user.user) &&
 			this.params.type === ThesisTypeFilter.Ungraded
 		) {
 			// The first nonvoted-for thesis

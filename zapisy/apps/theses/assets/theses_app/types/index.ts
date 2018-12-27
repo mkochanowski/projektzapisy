@@ -276,7 +276,6 @@ export class Thesis {
 export const enum UserType {
 	Student,
 	Employee,
-	ThesesBoardMember,
 	Admin,
 }
 

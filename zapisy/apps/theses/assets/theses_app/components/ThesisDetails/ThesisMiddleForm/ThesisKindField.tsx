@@ -9,11 +9,11 @@ import { GenericSelect } from "../../GenericSelect";
 import { ReadOnlyInput } from "./ReadOnlyInput";
 
 const kindSelectInfos = [
-	ThesisKind.Masters,
-	ThesisKind.Engineers,
 	ThesisKind.Bachelors,
-	ThesisKind.BachelorsEngineers,
 	ThesisKind.Isim,
+	ThesisKind.Engineers,
+	ThesisKind.BachelorsEngineers,
+	ThesisKind.Masters,
 ].map(kind => ({ val: kind, displayName: thesisKindToString(kind) }));
 
 export type ThesisKindSelectProps = {
