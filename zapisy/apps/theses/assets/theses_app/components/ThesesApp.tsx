@@ -19,6 +19,7 @@ import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
 import { thesesStore as store, LoadMode } from "./theses_store";
 import { SortColumn, SortDirection } from "../backend_callers";
+import { ThesisWorkMode } from "../types/misc";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -125,7 +126,7 @@ export class ThesesApp extends React.Component<any, State> {
 	}
 
 	private onThesisModified = (nt: Thesis) => store.updateModifiedThesis(nt);
-	private renderThesesDetails() {
+	private renderThesisDetails() {
 		return <ThesisDetails
 			thesis={store.thesis!.modified}
 			appState={store.applicationState}
@@ -142,21 +143,20 @@ export class ThesesApp extends React.Component<any, State> {
 			return this.renderErrorScreen();
 		}
 		const { thesis } = store;
-		const mainComponent = <>
+		if (thesis !== null) {
+			// if a thesis is present, we're not just viewing
+			console.assert(store.workMode !== ThesisWorkMode.Viewing);
+		}
+		return <>
 			{this.renderTopRow()}
 			<br />
 			{this.renderThesesList()}
+			{
+				thesis
+				? <><br /><hr />{this.renderThesisDetails()}</>
+				: null
+			}
 		</>;
-		if (thesis !== null) {
-			console.assert(store.workMode !== null);
-			return <>
-				{mainComponent}
-				<br />
-				<hr />
-				{this.renderThesesDetails()}
-			</>;
-		 }
-		 return mainComponent;
 	}
 
 	private renderErrorScreen() {
