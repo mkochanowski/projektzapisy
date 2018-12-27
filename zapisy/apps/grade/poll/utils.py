@@ -653,7 +653,7 @@ def make_polls_for_groups(request, groups, template):
     origin.save()
     for group in groups:
         if template['groups_without'] == 'on' and Poll.get_all_polls_for_group(
-                group, template.semeter).count() > 0:
+                group, template.semester).count() > 0:
             continue
 
         poll = make_poll(request, template, group, origin)
