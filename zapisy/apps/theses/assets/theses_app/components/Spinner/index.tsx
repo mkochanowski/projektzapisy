@@ -8,7 +8,7 @@ import spinner from "./spinner_transparent.gif";
 type Props = {
 	style?: React.CSSProperties;
 };
-export function Spinner(props: Props): JSX.Element {
+export const Spinner = React.memo(function(props: Props): JSX.Element {
 	return <img
 		src={spinner}
 		style={Object.assign({
@@ -16,4 +16,4 @@ export function Spinner(props: Props): JSX.Element {
 			width: "300px",
 		}, props.style)}
 	/>;
-}
+});

@@ -9,11 +9,11 @@ type Props = {
 
 const FORMAT_STR = "DD/MM/YYYY HH:mm:ss";
 
-export function ThesisDateField(props: Props) {
+export const ThesisDateField = React.memo(function(props: Props) {
 	const { label, value } = props;
 	return <InputWithLabel
 		labelText={label}
 		inputText={value ? value.format(FORMAT_STR) : ""}
 		inputType={InputType.ReadOnly}
 	/>;
-}
+});

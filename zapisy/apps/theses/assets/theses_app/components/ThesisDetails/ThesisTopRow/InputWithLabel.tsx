@@ -16,7 +16,7 @@ type Props = {
  * A simple component to render a text input with a label to the left,
  * used by more specific components
  */
-export function InputWithLabel(props: Props) {
+export const InputWithLabel = React.memo(function(props: Props) {
 	return <table>
 		<tbody>
 			<tr>
@@ -34,4 +34,4 @@ export function InputWithLabel(props: Props) {
 			</tr>
 		</tbody>
 	</table>;
-}
+});

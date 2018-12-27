@@ -24,7 +24,7 @@ type Props = {
  * Shows the thesis status in a <select> field if modification
  * is allowed or a read-only text input otherwise
  */
-export function ThesisStatusIndicator(props: Props) {
+export const ThesisStatusIndicator = React.memo(function(props: Props) {
 	return props.enabled
 	? <GenericSelect<ThesisStatus>
 		{...props}
@@ -36,4 +36,4 @@ export function ThesisStatusIndicator(props: Props) {
 		inputText={thesisStatusToString(props.value)}
 		inputType={InputType.ReadOnly}
 	/>;
-}
+});

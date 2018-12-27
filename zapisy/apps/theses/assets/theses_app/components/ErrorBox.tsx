@@ -25,7 +25,7 @@ const DEFAULT_ERROR_DESCRIPTION = (
 	"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
 );
 
-export function ErrorBox(props: Props) {
+export const ErrorBox = React.memo(function(props: Props) {
 	return (
 		<ErrorTextContainer>
 			<h2>Wystąpił błąd</h2>
@@ -35,4 +35,4 @@ export function ErrorBox(props: Props) {
 			<p>{props.errorDescription || DEFAULT_ERROR_DESCRIPTION}</p>
 		</ErrorTextContainer>
 	);
-}
+});
