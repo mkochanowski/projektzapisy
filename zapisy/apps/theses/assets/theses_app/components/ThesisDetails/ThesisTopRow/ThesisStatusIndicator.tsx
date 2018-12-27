@@ -7,10 +7,10 @@ import { InputWithLabel, InputType } from "./InputWithLabel";
 const LABEL_TEXT = "Status";
 
 const statusSelectInfos = [
-	ThesisStatus.Accepted,
 	ThesisStatus.BeingEvaluated,
-	ThesisStatus.Defended,
+	ThesisStatus.Accepted,
 	ThesisStatus.InProgress,
+	ThesisStatus.Defended,
 	ThesisStatus.ReturnedForCorrections,
 ].map(kind => ({ val: kind, displayName: thesisStatusToString(kind) }));
 
