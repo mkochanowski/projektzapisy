@@ -58,12 +58,6 @@ def copy_if_present(dst, src, key, converter=None):
         dst[key] = converter(src[key]) if converter else src[key]
 
 
-def validate_advisor(user: BaseUser, advisor: Employee):
-    """Check that the current user is permitted to set the specified advisor"""
-    if not can_set_advisor(user, advisor):
-        raise exceptions.PermissionDenied(f'This type of user cannot set advisor to {advisor}')
-
-
 def copy_optional_fields(result, data):
     """Extract optional fields from the source dictionary (sent by the client),
     perform any necessary conversions, then place it in the result dictionary
@@ -72,6 +66,12 @@ def copy_optional_fields(result, data):
     copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
     copy_if_present(result, data, "student", lambda s: get_person(Student, s))
     copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
+
+
+def check_advisor_permissions(user: BaseUser, advisor: Employee):
+    """Check that the current user is permitted to set the specified advisor"""
+    if not can_set_advisor(user, advisor):
+        raise exceptions.PermissionDenied(f'This type of user cannot set advisor to {advisor}')
 
 
 class ThesisSerializer(serializers.ModelSerializer):
@@ -142,7 +142,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         # First check that the user is permitted to set these values
         request = self.context["request"]
         user = wrap_user(request.user)
-        validate_advisor(user, validated_data["advisor"])
+        check_advisor_permissions(user, validated_data["advisor"])
         status = validated_data["status"]
         if not can_set_status(user, ThesisStatus(status)):
             raise exceptions.PermissionDenied(f'This type of user cannot set status to {status}')
@@ -164,7 +164,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         user = wrap_user(request.user)
         if "advisor" in validated_data:
-            validate_advisor(user, validated_data["advisor"])
+            check_advisor_permissions(user, validated_data["advisor"])
         if "status" in validated_data:
             if not can_change_status(user):
                 raise exceptions.PermissionDenied("This type of user cannot modify the status")
