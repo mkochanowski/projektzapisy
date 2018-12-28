@@ -9,6 +9,7 @@ from django.contrib.auth.models import Group, User
 from apps.users.models import Employee, Student, BaseUser
 from apps.users.tests.factories import EmployeeFactory, StudentFactory
 from ..models import Thesis, ThesisKind, ThesisStatus
+from ..views import ThesisTypeFilter
 from ..users import THESIS_BOARD_GROUP_NAME
 
 from .factory_utils import (
@@ -17,18 +18,23 @@ from .factory_utils import (
     random_student, random_description,
 )
 
+PAGE_SIZE = 100
 
-class ThesesTestCase(APITestCase):
+
+class ThesesBaseTestCase(APITestCase):
+    """A test case base class for theses tests that takes care of user creation
+    and provides common utilities
+    """
     @classmethod
     def setUpTestData(cls):
         cls.create_users()
-        cls.create_theses()
+
+    NUM_BOARD_MEMBERS = 7
 
     @classmethod
     def create_users(cls):
-        # Keep these numbers low - this is slow
-        NUM_STUDENTS = 20
-        NUM_EMPLOYEES = 15
+        NUM_STUDENTS = 15
+        NUM_EMPLOYEES = cls.NUM_BOARD_MEMBERS * 2
         StudentFactory.create_batch(NUM_STUDENTS)
         EmployeeFactory.create_batch(NUM_EMPLOYEES)
         cls.students = list(Student.objects.all())
@@ -39,60 +45,143 @@ class ThesesTestCase(APITestCase):
         cls.staff_user.is_staff = True
         cls.staff_user.save()
 
-        NUM_BOARD_MEMBERS = 7
         cls.board_members = []
-        for i in range(1, 1 + NUM_BOARD_MEMBERS):
+        for i in range(1, 1 + cls.NUM_BOARD_MEMBERS):
             member = Employee.objects.all()[i]
             cls.board_members.append(member)
             cls.board_group.user_set.add(member.user)
 
     @classmethod
-    def create_theses(cls):
-        cls.num_theses = random.randint(50, 100)
-        studs = Student.objects.all()
-        emps = Employee.objects.all()
-        theses = [
-            Thesis(
-                title=random_title(),
-                advisor=random_advisor(emps),
-                auxiliary_advisor=random_advisor(emps) if random_bool() else None,
-                kind=random_kind(),
-                status=random_status(),
-                reserved=random_reserved(),
-                description=random_description(),
-                student=random_student(studs),
-                student_2=random_student(studs) if random_bool() else None
-            ) for _ in range(cls.num_theses)
-        ]
-        Thesis.objects.bulk_create(theses)
+    def get_random_emp(cls):
+        return random.choice(cls.employees[1 + cls.NUM_BOARD_MEMBERS:])
+
+    @classmethod
+    def get_admin(cls):
+        return cls.staff_user
+
+    @classmethod
+    def get_random_board_member(cls):
+        return random.choice(cls.board_members)
+
+    @classmethod
+    def get_random_student(cls):
+        return random.choice(cls.students)
+
+    @classmethod
+    def make_thesis(cls, **kwargs):
+        return Thesis(
+            title=kwargs.get("title", random_title()),
+            advisor=kwargs.get("advisor", cls.get_random_emp()),
+            auxiliary_advisor=kwargs.get(
+                "auxiliary_advisor", cls.get_random_emp() if random_bool() else None
+            ),
+            kind=kwargs.get("kind", random_kind()),
+            status=kwargs.get("status", random_status()),
+            reserved=kwargs.get("reserved", random_reserved()),
+            description=kwargs.get("description", random_description()),
+            student=kwargs.get("student", cls.get_random_student()),
+            student_2=kwargs.get("student_2", cls.get_random_student() if random_bool() else None)
+        )
 
     def login_as(self, user: BaseUser):
         self.client.login(username=user.user.username, password="test")
 
+    def get_response_with_data(self, data={}):
+        url = reverse("theses:theses-list")
+        if "limit" not in data:
+            data["limit"] = PAGE_SIZE
+        return self.client.get(url, data)
+
+    def get_theses_with_data(self, data={}):
+        return self.get_response_with_data(data).data["results"]
+
+
+class ThesesListingTestCase(ThesesBaseTestCase):
+    """Tests theses listing functionality: is the limit setting respected,
+    are permissions granted correctly"""
+    @classmethod
+    def setUpTestData(cls):
+        super(ThesesListingTestCase, cls).setUpTestData()
+        cls.create_theses()
+
+    @classmethod
+    def create_theses(cls):
+        cls.num_theses = random.randint(PAGE_SIZE, PAGE_SIZE * 2)
+        theses = [cls.make_thesis() for _ in range(cls.num_theses)]
+        Thesis.objects.bulk_create(theses)
+
+    def _check_theses_response_data(self, data):
+        self.assertTrue(isinstance(data, dict))
+        self.assertTrue("count" in data)
+        self.assertTrue("results" in data)
+        results = data["results"]
+        self.assertTrue(isinstance(results, list))
+        self.assertEqual(len(results), PAGE_SIZE)
+
     def _test_user_can_list_theses(self, user: BaseUser):
         self.login_as(user)
-        response = self.client.get(reverse("theses:theses-list"))
+        response = self.get_response_with_data()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.data
-        self.assertTrue(isinstance(data, list))
-        self.assertEqual(len(data), ThesesTestCase.num_theses)
+        self._check_theses_response_data(response.data)
 
     def test_logged_in_can_list_theses(self):
-        self._test_user_can_list_theses(random.choice(ThesesTestCase.students))
-        self._test_user_can_list_theses(random.choice(ThesesTestCase.employees))
-        self._test_user_can_list_theses(random.choice(ThesesTestCase.board_members))
-        self._test_user_can_list_theses(ThesesTestCase.staff_user)
+        self._test_user_can_list_theses(self.get_random_student())
+        self._test_user_can_list_theses(self.get_random_emp())
+        self._test_user_can_list_theses(self.get_random_board_member())
+        self._test_user_can_list_theses(self.get_admin())
 
     def test_logged_out_cannot_list_theses(self):
-        self.client.logout()
         response = self.client.get(reverse("theses:theses-list"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+
+class ThesesFiltersTestCase(ThesesBaseTestCase):
+    def login_for_perms(self):
+        """A simple helper that logs in as any user authorized to view theses
+        so that we can test filters"""
+        self.login_as(self.get_random_emp())
+
+    def test_title_filter(self):
+        num_matching = random.randint(10, PAGE_SIZE / 2)
+        num_nonmatching = random.randint(10, PAGE_SIZE / 2)
+        title_base_match = "foobar"
+        title_base_nonmatch = "{}blahblah"
+        theses_matching = [
+            self.make_thesis(title=f'{title_base_match}_{i}') for i in range(num_matching)
+        ]
+        theses_nonmatching = [
+            self.make_thesis(title=title_base_nonmatch.format(i)) for i in range(num_nonmatching)
+        ]
+        Thesis.objects.bulk_create(theses_matching + theses_nonmatching)
+        self.login_for_perms()
+        theses = self.get_theses_with_data({"title": title_base_match})
+        self.assertEqual(len(theses), num_matching)
+
+    def test_advisor_filter(self):
+        num_matching = random.randint(10, PAGE_SIZE / 2)
+        num_nonmatching = random.randint(10, PAGE_SIZE / 2)
+        advisor_base_match = "johndoe"
+        advisor_base_nonmatch = "{}notanacademic"
+        theses_matching = [
+            self.make_thesis(advisor=f'{advisor_base_match}_{i}') for i in range(num_matching)
+        ]
+        theses_nonmatching = [
+            self.make_thesis(
+                advisor=advisor_base_nonmatch.format(i)
+            ) for i in range(num_nonmatching)
+        ]
+        Thesis.objects.bulk_create(theses_matching + theses_nonmatching)
+        self.login_for_perms()
+        theses = self.get_theses_with_data({"advisor": advisor_base_match})
+        self.assertEqual(len(theses), num_matching)
+
+
+class ThesesModificationTestCase(ThesesBaseTestCase):
     def add_thesis(self, thesis_data: Dict):
         return self.client.post(reverse("theses:theses-list"), thesis_data, format="json")
 
     def test_employee_can_add_own_thesis(self):
-        emp = random.choice(ThesesTestCase.employees)
+        emp = self.get_random_emp()
         self.login_as(emp)
         thesis_data = {
             "title": random_title(),

@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 import environ
 
@@ -10,6 +11,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, os.pardir, 'env', '.env'))
 
 DEBUG = env.bool('DEBUG')
 RELEASE = env.bool('RELEASE')
+TESTING = "test" in sys.argv
 
 # USE_TZ = True
 
@@ -295,6 +297,19 @@ CACHES = {
         'TIMEOUT': 300,
     }
 }
+
+# When testing, don't use strong hashers that take forever to compute
+# Taken from https://github.com/FactoryBoy/factory_boy/issues/224
+if TESTING:
+    PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptPasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.CryptPasswordHasher',
+    )
 
 NEWS_PER_PAGE = 15
 
