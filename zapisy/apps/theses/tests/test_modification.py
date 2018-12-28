@@ -148,14 +148,17 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         response = self.cast_vote_as(emp, random_vote())
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def vote_to_accept_thesis_required_times(self):
+    def vote_to_accept_thesis_required_times(self, voter_to_skip: Employee = None):
+        """Cast enough approving votes to accept the current thesis, not using
+        the specified voter (if specified)
+        """
         num_required = get_num_required_votes()
         self.assertLessEqual(num_required, len(self.board_members))
         voters = []
         while len(voters) < num_required:
-            voter = self.get_random_board_member()
+            voter = self.get_random_board_member_different_from(voter_to_skip)
             while voter in voters:
-                voter = self.get_random_board_member()
+                voter = self.get_random_board_member_different_from(voter_to_skip)
             voters.append(voter)
         for voter in voters:
             self.login_as(voter)
@@ -168,15 +171,15 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["status"], ThesisStatus.accepted.value)
 
-    def reject_thesis_once(self):
-        board_member = self.get_random_board_member()
-        self.login_as(board_member)
-        response = self.cast_vote_as(board_member, ThesisVote.rejected)
+    def reject_thesis_once(self, voter: Employee):
+        """Cast a rejecting vote for the current thesis as the given voter"""
+        self.login_as(voter)
+        response = self.cast_vote_as(voter, ThesisVote.rejected)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_single_rejection_rejects_thesis(self):
         """Ensure that a single rejection is enough to reject a thesis"""
-        self.reject_thesis_once()
+        self.reject_thesis_once(self.get_random_board_member())
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["status"], ThesisStatus.returned_for_corrections.value)
 
@@ -184,7 +187,8 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         """Ensure that if a thesis was rejected, it will not be accepted again even if
         enough "approve" votes are cast
         """
-        self.reject_thesis_once()
-        self.vote_to_accept_thesis_required_times()
+        rejecter = self.get_random_board_member()
+        self.reject_thesis_once(rejecter)
+        self.vote_to_accept_thesis_required_times(rejecter)
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["status"], ThesisStatus.returned_for_corrections.value)
