@@ -61,9 +61,9 @@ class ThesesViewSet(viewsets.ModelViewSet):
 
         try:
             requested_thesis_type = \
-                int(requested_thesis_type_str)\
+                ThesisTypeFilter(int(requested_thesis_type_str))\
                 if requested_thesis_type_str\
-                else ThesisTypeFilter.default.value
+                else ThesisTypeFilter.default
         except ValueError:
             raise exceptions.ParseError()
 
@@ -160,25 +160,25 @@ def available_thesis_filter(queryset):
 
 def filter_theses_queryset_for_type(queryset, thesis_type):
     """Returns only theses matching the specified type filter from the specified queryset"""
-    if thesis_type == ThesisTypeFilter.all_current.value:
+    if thesis_type == ThesisTypeFilter.all_current:
         return queryset.exclude(is_archived=True)
-    elif thesis_type == ThesisTypeFilter.all.value:
+    elif thesis_type == ThesisTypeFilter.all:
         return queryset
-    elif thesis_type == ThesisTypeFilter.masters.value:
+    elif thesis_type == ThesisTypeFilter.masters:
         return queryset.filter(kind=ThesisKind.masters.value)
-    elif thesis_type == ThesisTypeFilter.engineers.value:
+    elif thesis_type == ThesisTypeFilter.engineers:
         return queryset.filter(kind=ThesisKind.engineers.value)
-    elif thesis_type == ThesisTypeFilter.bachelors.value:
+    elif thesis_type == ThesisTypeFilter.bachelors:
         return queryset.filter(kind=ThesisKind.bachelors.value)
-    elif thesis_type == ThesisTypeFilter.bachelors_isim.value:
+    elif thesis_type == ThesisTypeFilter.bachelors_isim:
         return queryset.filter(kind=ThesisKind.isim.value)
-    elif thesis_type == ThesisTypeFilter.available_masters.value:
+    elif thesis_type == ThesisTypeFilter.available_masters:
         return available_thesis_filter(queryset.filter(kind=ThesisKind.masters.value))
-    elif thesis_type == ThesisTypeFilter.available_engineers.value:
+    elif thesis_type == ThesisTypeFilter.available_engineers:
         return available_thesis_filter(queryset.filter(kind=ThesisKind.engineers.value))
-    elif thesis_type == ThesisTypeFilter.available_bachelors.value:
+    elif thesis_type == ThesisTypeFilter.available_bachelors:
         return available_thesis_filter(queryset.filter(kind=ThesisKind.bachelors.value))
-    elif thesis_type == ThesisTypeFilter.available_bachelors_isim.value:
+    elif thesis_type == ThesisTypeFilter.available_bachelors_isim:
         return available_thesis_filter(queryset.filter(kind=ThesisKind.isim.value))
     else:
         raise exceptions.ParseError()
