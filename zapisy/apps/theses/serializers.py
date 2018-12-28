@@ -7,7 +7,7 @@ to objects used in the theses system, that is:
 """
 from typing import Dict, Any
 
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus
@@ -61,7 +61,7 @@ def copy_if_present(dst, src, key, converter=None):
 def validate_advisor(user: BaseUser, advisor: Employee):
     """Check that the current user is permitted to set the specified advisor"""
     if not can_set_advisor(user, advisor):
-        raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
+        raise exceptions.PermissionDenied(f'This type of user cannot set advisor to {advisor}')
 
 
 def copy_optional_fields(result, data):
@@ -111,7 +111,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         validate_advisor(user, advisor)
         status = data["status"]
         if not can_set_status(user, ThesisStatus(status)):
-            raise serializers.ValidationError(f'This type of user cannot set status to {status}')
+            raise exceptions.PermissionDenied(f'This type of user cannot set status to {status}')
         result = {
             "title": data["title"],
             "reserved": data["reserved"],
@@ -137,12 +137,12 @@ class ThesisSerializer(serializers.ModelSerializer):
             result["advisor"] = advisor
         if "status" in data:
             if not can_change_status(user):
-                raise serializers.ValidationError("This type of user cannot modify the status")
+                raise exceptions.PermissionDenied("This type of user cannot modify the status")
             result["status"] = data["status"]
         if "title" in data:
             title = data["title"]
             if not can_change_title(user, self.instance):
-                raise serializers.ValidationError("This type of user cannot change the title")
+                raise exceptions.PermissionDenied("This type of user cannot change the title")
             result["title"] = title
         copy_if_present(result, data, "reserved")
         copy_if_present(result, data, "kind")
