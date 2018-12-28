@@ -19,18 +19,16 @@ def random_advisor(emps):
     return random.choice(emps)
 
 
-valid_kinds = [
-    kind.value for kind in ThesisKind
-]
-def random_kind():  # noqa: E302
-    return random.choice(valid_kinds)
+def random_kind():
+    return random.choice([kind for kind in ThesisKind])
 
 
-valid_statuses = [
-    status.value for status in ThesisStatus
-]
-def random_status():  # noqa: E302
-    return random.choice(valid_statuses)
+def random_status():
+    return random.choice([status for status in ThesisStatus])
+
+
+def random_current_status():
+    return random.choice([status for status in ThesisStatus if status != ThesisStatus.defended])
 
 
 def random_reserved():

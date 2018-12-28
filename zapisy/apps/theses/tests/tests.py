@@ -11,11 +11,12 @@ from apps.users.tests.factories import EmployeeFactory, StudentFactory
 from ..models import Thesis, ThesisKind, ThesisStatus
 from ..views import ThesisTypeFilter
 from ..users import THESIS_BOARD_GROUP_NAME
+from ..serializers import ThesisSerializer
 
 from .factory_utils import (
     random_title, random_advisor, random_bool,
     random_kind, random_status, random_reserved,
-    random_student, random_description,
+    random_student, random_description, random_current_status
 )
 
 PAGE_SIZE = 100
@@ -69,14 +70,15 @@ class ThesesBaseTestCase(APITestCase):
 
     @classmethod
     def make_thesis(cls, **kwargs):
+        """Create a thesis instance using the provided params or defaults"""
         return Thesis(
             title=kwargs.get("title", random_title()),
             advisor=kwargs.get("advisor", cls.get_random_emp()),
             auxiliary_advisor=kwargs.get(
                 "auxiliary_advisor", cls.get_random_emp() if random_bool() else None
             ),
-            kind=kwargs.get("kind", random_kind()),
-            status=kwargs.get("status", random_status()),
+            kind=kwargs.get("kind", random_kind()).value,
+            status=kwargs.get("status", random_status()).value,
             reserved=kwargs.get("reserved", random_reserved()),
             description=kwargs.get("description", random_description()),
             student=kwargs.get("student", cls.get_random_student()),
@@ -84,16 +86,22 @@ class ThesesBaseTestCase(APITestCase):
         )
 
     def login_as(self, user: BaseUser):
+        """Login as the specified user"""
         self.client.login(username=user.user.username, password="test")
 
     def get_response_with_data(self, data={}):
+        """Make a request to the theses list endpoint with the specified params,
+        return the raw response
+        """
         url = reverse("theses:theses-list")
         if "limit" not in data:
             data["limit"] = PAGE_SIZE
         return self.client.get(url, data)
 
     def get_theses_with_data(self, data={}):
-        return self.get_response_with_data(data).data["results"]
+        """Download theses with the provided params, then deserialize"""
+        data = self.get_response_with_data(data).data
+        return data["results"]
 
 
 class ThesesListingTestCase(ThesesBaseTestCase):
@@ -156,24 +164,45 @@ class ThesesFiltersTestCase(ThesesBaseTestCase):
         self.login_for_perms()
         theses = self.get_theses_with_data({"title": title_base_match})
         self.assertEqual(len(theses), num_matching)
+        for thesis in theses:
+            self.assertTrue(title_base_match in thesis["title"])
 
     def test_advisor_filter(self):
-        num_matching = random.randint(10, PAGE_SIZE / 2)
-        num_nonmatching = random.randint(10, PAGE_SIZE / 2)
-        advisor_base_match = "johndoe"
-        advisor_base_nonmatch = "{}notanacademic"
+        num_matching = random.randint(1, PAGE_SIZE / 2)
+        num_nonmatching = random.randint(1, PAGE_SIZE / 2)
+        matching_emp = self.get_random_emp()
+        nonmatching_emp = self.get_random_emp()
+        while matching_emp == nonmatching_emp:
+            nonmatching_emp = self.get_random_emp()
         theses_matching = [
-            self.make_thesis(advisor=f'{advisor_base_match}_{i}') for i in range(num_matching)
+            self.make_thesis(advisor=matching_emp) for i in range(num_matching)
         ]
         theses_nonmatching = [
-            self.make_thesis(
-                advisor=advisor_base_nonmatch.format(i)
-            ) for i in range(num_nonmatching)
+            self.make_thesis(advisor=nonmatching_emp) for i in range(num_nonmatching)
         ]
         Thesis.objects.bulk_create(theses_matching + theses_nonmatching)
         self.login_for_perms()
-        theses = self.get_theses_with_data({"advisor": advisor_base_match})
+        theses = self.get_theses_with_data({"advisor": matching_emp.get_full_name()})
         self.assertEqual(len(theses), num_matching)
+        for thesis in theses:
+            self.assertTrue(matching_emp.get_full_name() in thesis["advisor"]["display_name"])
+
+    def test_current_type_filter(self):
+        """Test that current, i.e. not yet defended theses are being filtered correctly"""
+        num_normal = random.randint(1, PAGE_SIZE / 2)
+        num_defended = random.randint(1, PAGE_SIZE / 2)
+        normal = [
+            self.make_thesis(status=random_current_status()) for i in range(num_normal)
+        ]
+        defended = [
+            self.make_thesis(status=ThesisStatus.defended) for i in range(num_defended)
+        ]
+        Thesis.objects.bulk_create(normal + defended)
+        self.login_for_perms()
+        theses = self.get_theses_with_data({"type": ThesisTypeFilter.all_current.value})
+        self.assertEqual(len(theses), num_normal)
+        for thesis in theses:
+            self.assertTrue(thesis["status"] != ThesisStatus.defended.value)
 
 
 class ThesesModificationTestCase(ThesesBaseTestCase):
@@ -186,7 +215,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         thesis_data = {
             "title": random_title(),
             "advisor": {"id": emp.pk},
-            "kind": random_kind(),
+            "kind": random_kind().value,
             "reserved": random_reserved(),
             "status": ThesisStatus.being_evaluated.value
         }
