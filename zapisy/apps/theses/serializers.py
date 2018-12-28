@@ -71,12 +71,6 @@ def copy_if_present(dst, src, key, converter=None):
         dst[key] = converter(src[key]) if converter else src[key]
 
 
-def validate_advisor(user: BaseUser, advisor: Employee):
-    """Check that the current user is permitted to set the specified advisor"""
-    if not can_set_advisor(user, advisor):
-        raise exceptions.PermissionDenied(f'This type of user cannot set advisor to {advisor}')
-
-
 def validate_thesis_vote(value):
     """Check if the given vote value is valid"""
     return value in [vote.value for vote in ThesisVote]
@@ -100,9 +94,6 @@ def validate_votes(votes,):
 
 
 def handle_optional_fields(result, data):
-    """Extract optional fields from the source dictionary (sent by the client),
-    perform any necessary conversions, then place it in the result dictionary
-    """
     copy_if_present(result, data, "description")
     copy_if_present(result, data, "votes", lambda votes: validate_votes(votes))
     copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
@@ -111,11 +102,18 @@ def handle_optional_fields(result, data):
 
 
 def check_votes_permissions(user: BaseUser, votes: List):
+    """Check that the specified user is permitted to modify the votes as specified"""
     for voter, value in votes:
         if not is_theses_board_member(voter):
             raise exceptions.PermissionDenied("voter is not a member of the theses board")
         if not can_cast_vote_as_user(user, voter):
             raise exceptions.PermissionDenied("this user cannot change that user's vote")
+
+
+def check_advisor_permissions(user: BaseUser, advisor: Employee):
+    """Check that the current user is permitted to set the specified advisor"""
+    if not can_set_advisor(user, advisor):
+        raise exceptions.PermissionDenied(f'This type of user cannot set advisor to {advisor}')
 
 
 class ThesisSerializer(serializers.ModelSerializer):
@@ -193,7 +191,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         # First check that the user is permitted to set these values
         request = self.context["request"]
         user = wrap_user(request.user)
-        validate_advisor(user, validated_data["advisor"])
+        check_advisor_permissions(user, validated_data["advisor"])
         status = validated_data["status"]
         if not can_set_status(user, ThesisStatus(status)):
             raise exceptions.PermissionDenied(f'This type of user cannot set status to {status}')
@@ -220,7 +218,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         request = self.context["request"]
         user = wrap_user(request.user)
         if "advisor" in validated_data:
-            validate_advisor(user, validated_data["advisor"])
+            check_advisor_permissions(user, validated_data["advisor"])
         if "status" in validated_data:
             if not can_change_status(user):
                 raise exceptions.PermissionDenied("This type of user cannot modify the status")
