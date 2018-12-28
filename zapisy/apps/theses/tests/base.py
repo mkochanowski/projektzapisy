@@ -68,6 +68,7 @@ class ThesesBaseTestCase(APITestCase):
 
     @classmethod
     def get_random_board_member(cls):
+        """Get a random member of the theses board, _possibly the admin_"""
         return random.choice(cls.board_members)
 
     @classmethod
