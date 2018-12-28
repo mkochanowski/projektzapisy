@@ -104,7 +104,9 @@ def generate_base_queryset():
         .prefetch_related("votes")\
         .prefetch_related("votes__voter")\
         .annotate(
-            advisor_name=Concat("advisor__user__first_name", "advisor__user__last_name")
+            advisor_name=Concat(
+                "advisor__user__first_name", Value(" "), "advisor__user__last_name"
+            )
         )\
         .annotate(is_archived=Case(
             When(status=ThesisStatus.defended.value, then=True),
