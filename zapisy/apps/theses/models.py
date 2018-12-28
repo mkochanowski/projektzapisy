@@ -79,7 +79,7 @@ class Thesis(models.Model):
                 ThesisVoteBinding.objects.create(thesis=self, voter=voter, value=vote.value)
         self.check_for_vote_status_change()
 
-    def check_for_approval_status_change(self):
+    def check_for_vote_status_change(self):
         """If we have enough approving votes, accept this thesis - unless there's a rejecting
         vote, then we return it for corrections
         """
