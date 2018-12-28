@@ -87,6 +87,8 @@ def validate_votes(votes,):
         try:
             voter_id = int(key)
             voter = Employee.objects.get(pk=voter_id)
+            if not is_theses_board_member(voter):
+                raise serializers.ValidationError("voter is not a member of the theses board")
             result.append((voter, ThesisVote(value)))
         except (ValueError, Employee.DoesNotExist):
             raise serializers.ValidationError("bad voter id")
@@ -103,9 +105,7 @@ def handle_optional_fields(result, data):
 
 def check_votes_permissions(user: BaseUser, votes: List):
     """Check that the specified user is permitted to modify the votes as specified"""
-    for voter, value in votes:
-        if not is_theses_board_member(voter):
-            raise exceptions.PermissionDenied("voter is not a member of the theses board")
+    for voter, _ in votes:
         if not can_cast_vote_as_user(user, voter):
             raise exceptions.PermissionDenied("this user cannot change that user's vote")
 
