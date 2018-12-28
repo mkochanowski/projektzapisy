@@ -94,29 +94,23 @@ class ThesisSerializer(serializers.ModelSerializer):
         if not self.context:
             return data
         request = self.context["request"]
-        wrapped_user = wrap_user(request.user)
         if request.method == "POST":
-            return self.validate_add_thesis(wrapped_user, data)
+            return self.validate_add_thesis(data)
         elif request.method == "PATCH":
-            return self.validate_modify_thesis(wrapped_user, data)
+            return self.validate_modify_thesis(data)
         else:
             raise serializers.ValidationError(f'Unknown request type {request.method}')
 
-    def validate_add_thesis(self, user: BaseUser, data: ValidationData):
-        """Validate a request to add a new thesis object; basic permissions
-        checks have already been performed, so this deals with more detailed checks
-        (is the given status valid for this type of user) and conversions
+    def validate_add_thesis(self, data: ValidationData):
+        """Validate a request to add a new thesis object and convert to more convenient
+        local types
         """
         advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
-        validate_advisor(user, advisor)
-        status = data["status"]
-        if not can_set_status(user, ThesisStatus(status)):
-            raise exceptions.PermissionDenied(f'This type of user cannot set status to {status}')
         result = {
             "title": data["title"],
             "reserved": data["reserved"],
             "kind": data["kind"],
-            "status": status,
+            "status": data["status"],
             "advisor": advisor,
         }
         copy_optional_fields(result, data)
@@ -125,25 +119,15 @@ class ThesisSerializer(serializers.ModelSerializer):
 
         return result
 
-    def validate_modify_thesis(self, user: BaseUser, data: ValidationData):
+    def validate_modify_thesis(self, data: ValidationData):
         """As above, but this time the thesis object already exists. There is some
         additional logic in this case; for instance, if a thesis is already accepted,
         its owner/advisor cannot change the title anymore
         """
         result = {}
-        if "advisor" in data:
-            advisor = get_person(Employee, data["advisor"])
-            validate_advisor(user, advisor)
-            result["advisor"] = advisor
-        if "status" in data:
-            if not can_change_status(user):
-                raise exceptions.PermissionDenied("This type of user cannot modify the status")
-            result["status"] = data["status"]
-        if "title" in data:
-            title = data["title"]
-            if not can_change_title(user, self.instance):
-                raise exceptions.PermissionDenied("This type of user cannot change the title")
-            result["title"] = title
+        copy_if_present(result, data, "advisor", lambda a: get_person(Employee, a))
+        copy_if_present(result, data, "status")
+        copy_if_present(result, data, "title")
         copy_if_present(result, data, "reserved")
         copy_if_present(result, data, "kind")
         copy_optional_fields(result, data)
@@ -155,6 +139,14 @@ class ThesisSerializer(serializers.ModelSerializer):
         in response to a POST request with the dictionary we returned
         from validate_add_thesis
         """
+        # First check that the user is permitted to set these values
+        request = self.context["request"]
+        user = wrap_user(request.user)
+        validate_advisor(user, validated_data["advisor"])
+        status = validated_data["status"]
+        if not can_set_status(user, ThesisStatus(status)):
+            raise exceptions.PermissionDenied(f'This type of user cannot set status to {status}')
+
         return Thesis.objects.create(
             title=validated_data.get("title"),
             kind=validated_data.get("kind"),
@@ -168,7 +160,18 @@ class ThesisSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        """As above"""
+        """Called in response to a successfully validated PATCH request"""
+        request = self.context["request"]
+        user = wrap_user(request.user)
+        if "advisor" in validated_data:
+            validate_advisor(user, validated_data["advisor"])
+        if "status" in validated_data:
+            if not can_change_status(user):
+                raise exceptions.PermissionDenied("This type of user cannot modify the status")
+        if "title" in validated_data:
+            if not can_change_title(user, self.instance):
+                raise exceptions.PermissionDenied("This type of user cannot change the title")
+
         instance.title = validated_data.get("title", instance.title)
         instance.kind = validated_data.get("kind", instance.kind)
         instance.reserved = validated_data.get("reserved", instance.reserved)
