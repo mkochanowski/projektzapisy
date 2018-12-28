@@ -4,19 +4,18 @@ from typing import Dict
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.urls import reverse
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 
 from apps.users.models import Employee, Student, BaseUser
 from apps.users.tests.factories import EmployeeFactory, StudentFactory
-from ..models import Thesis, ThesisKind, ThesisStatus
+from ..models import Thesis, ThesisStatus
 from ..views import ThesisTypeFilter
 from ..users import THESIS_BOARD_GROUP_NAME
-from ..serializers import ThesisSerializer
 
 from .factory_utils import (
-    random_title, random_advisor, random_bool,
+    random_title, random_bool,
     random_kind, random_status, random_reserved,
-    random_student, random_description, random_current_status
+    random_description, random_current_status
 )
 
 PAGE_SIZE = 100
