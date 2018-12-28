@@ -1,7 +1,7 @@
 import random
 from faker import Faker
 
-from ..models import ThesisKind, ThesisStatus
+from ..models import ThesisKind, ThesisStatus, ThesisVote
 
 
 fake = Faker()
@@ -20,7 +20,7 @@ def random_advisor(emps):
 
 
 def random_kind():
-    return random.choice([kind for kind in ThesisKind])
+    return random.choice(list(ThesisKind))
 
 
 def random_status():
@@ -29,6 +29,14 @@ def random_status():
 
 def random_current_status():
     return random.choice([status for status in ThesisStatus if status != ThesisStatus.defended])
+
+
+def random_available_status():
+    return random.choice([
+        ThesisStatus.accepted,
+        ThesisStatus.being_evaluated,
+        ThesisStatus.returned_for_corrections
+    ])
 
 
 def random_reserved():
@@ -41,3 +49,7 @@ def random_description():
 
 def random_student(studs):
     return random.choice(studs)
+
+
+def random_vote():
+    return random.choice(list(ThesisVote))

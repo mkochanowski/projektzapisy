@@ -51,10 +51,12 @@ class ThesesBaseTestCase(APITestCase):
 
     @classmethod
     def get_random_emp(cls):
+        """Return a random employee (not an admin or a board member)"""
         return random.choice(cls.employees[1 + cls.NUM_BOARD_MEMBERS:])
 
     @classmethod
     def get_random_emp_different_from(cls, emp):
+        """Return a random employee different from the specified employee"""
         result = cls.get_random_emp()
         while result == emp:
             result = cls.get_random_emp()
