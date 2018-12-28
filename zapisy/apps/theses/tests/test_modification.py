@@ -56,7 +56,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         self.login_as(self.advisor)
         new_title = "A new title"
         response = self._try_modify_accepted_title(new_title)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         modified_thesis = self.get_theses_with_data()[0]
         self.assertNotEqual(modified_thesis["title"], new_title)
 
@@ -91,8 +91,47 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         modified_thesis = self.get_theses_with_data()[0]
         self.assertEqual(modified_thesis["title"], new_title)
 
-    def employee_cannot_vote(self):
+    def test_student_cannot_vote(self):
+        """Ensure that students are not permitted to vote"""
+        student = self.get_random_student()
+        self.login_as(student)
+        response = self.update_thesis_with_data({"votes": {self.advisor.pk: random_vote().value}})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_employee_cannot_vote(self):
         """Ensure that employees are not permitted to vote"""
         self.login_as(self.advisor)
-        response = self.update_thesis_with_data({self.advisor.pk: random_vote().value})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.update_thesis_with_data({"votes": {self.advisor.pk: random_vote().value}})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_board_members_can_vote_as_themselves(self):
+        """Ensure board members can vote, but only as themselves"""
+        board_member = self.get_random_board_member()
+        self.login_as(board_member)
+        response = self.update_thesis_with_data({"votes": {board_member.pk: random_vote().value}})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_board_members_cannot_vote_as_other(self):
+        """Ensure board members cannot vote as anyone else"""
+        board_member = self.get_random_board_member()
+        another_member = self.get_random_board_member_different_from(board_member)
+        self.login_as(board_member)
+        response = self.update_thesis_with_data({"votes": {another_member.pk: random_vote().value}})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_admin_can_vote_as_anyone(self):
+        """Ensure the system admin can cast votes as any board member"""
+        admin = self.get_admin()
+        another_member = self.get_random_board_member_different_from(admin)
+        self.login_as(admin)
+        response = self.update_thesis_with_data({"votes": {another_member.pk: random_vote().value}})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_admin_cannot_cast_vote_as_non_board_member(self):
+        """Ensure that even the admin cannot vote as someone
+        who isn't a member of the theses board"""
+        admin = self.get_admin()
+        emp = self.get_random_emp()
+        self.login_as(admin)
+        response = self.update_thesis_with_data({"votes": {emp.pk: random_vote().value}})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

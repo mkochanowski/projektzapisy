@@ -44,13 +44,13 @@ class ThesesAdditionTestCase(ThesesBaseTestCase):
         emp = self.get_random_emp()
         other_emp = self.get_random_emp_different_from(emp)
         response = self.add_thesis(emp, advisor=other_emp)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     # ...or with status set to anything other than being evaluated
     def test_employee_cannot_add_thesis_with_other_status(self):
         emp = self.get_random_emp()
         response = self.add_thesis(emp, status=ThesisStatus.accepted.value)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     # But board members can
     def test_board_member_can_add_someone_elses_thesis(self):

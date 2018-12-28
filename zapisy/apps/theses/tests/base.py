@@ -40,8 +40,8 @@ class ThesesBaseTestCase(APITestCase):
         cls.board_group = Group.objects.get(name=THESIS_BOARD_GROUP_NAME)
 
         cls.staff_user = Employee.objects.all()[0]
-        cls.staff_user.is_staff = True
-        cls.staff_user.save()
+        cls.staff_user.user.is_staff = True
+        cls.staff_user.user.save()
 
         cls.board_members = []
         for i in range(0, cls.NUM_BOARD_MEMBERS):
@@ -69,6 +69,14 @@ class ThesesBaseTestCase(APITestCase):
     @classmethod
     def get_random_board_member(cls):
         return random.choice(cls.board_members)
+
+    @classmethod
+    def get_random_board_member_different_from(cls, member):
+        """Return a random board member different from the specified one"""
+        result = cls.get_random_board_member()
+        while result == member:
+            result = cls.get_random_board_member()
+        return result
 
     @classmethod
     def get_random_student(cls):
