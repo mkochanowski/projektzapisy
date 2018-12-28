@@ -1,10 +1,11 @@
-import random
 from rest_framework import status
 from django.urls import reverse
 
-from ..models import Thesis, ThesisStatus, ThesisKind
-from ..views import ThesisTypeFilter
-from .base import ThesesBaseTestCase, PAGE_SIZE
+from apps.users.models import Employee
+
+from ..models import ThesisStatus, ThesisVote
+from ..system_settings import get_num_required_votes
+from .base import ThesesBaseTestCase
 from .factory_utils import random_vote
 
 
@@ -20,6 +21,12 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
             data, format="json"
         )
 
+    def get_modified_thesis(self):
+        """Re-fetch the thesis we're modifying from the backend code
+        There will always be only one instance as we create just one in setUp
+        """
+        return self.get_theses_with_data()[0]
+
     def test_student_cannot_modify_thesis(self):
         """Ensure that students are not permitted to modify theses"""
         student = self.get_random_student()
@@ -27,7 +34,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         new_reserved = not self.thesis.reserved
         response = self.update_thesis_with_data({"reserved": new_reserved})
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
-        modified_thesis = self.get_theses_with_data()[0]
+        modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["reserved"], self.thesis.reserved)
 
     def test_emp_can_modify_their_thesis(self):
@@ -41,7 +48,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
             {"title": new_title, "description": new_desc, "student": {"id": new_student.pk}}
         )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
-        modified_thesis = self.get_theses_with_data()[0]
+        modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["title"], new_title)
         self.assertEqual(modified_thesis["description"], new_desc)
         self.assertEqual(modified_thesis["student"]["id"], new_student.pk)
@@ -57,7 +64,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         new_title = "A new title"
         response = self._try_modify_accepted_title(new_title)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        modified_thesis = self.get_theses_with_data()[0]
+        modified_thesis = self.get_modified_thesis()
         self.assertNotEqual(modified_thesis["title"], new_title)
 
     def test_emp_can_modify_their_accepted_thesis_other_than_title(self):
@@ -68,7 +75,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         new_2nd_student = self.get_random_student()
         response = self.update_thesis_with_data({"student_2": {"id": new_2nd_student.pk}})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        modified_thesis = self.get_theses_with_data()[0]
+        modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["student_2"]["id"], new_2nd_student.pk)
 
     def test_emp_cannot_modify_someone_elses_thesis(self):
@@ -78,7 +85,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         new_desc = "Another description"
         response = self.update_thesis_with_data({"description": new_desc})
         self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
-        modified_thesis = self.get_theses_with_data()[0]
+        modified_thesis = self.get_modified_thesis()
         self.assertNotEqual(modified_thesis["description"], new_desc)
 
     def test_board_member_can_modify_accepted_title(self):
@@ -88,29 +95,32 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         new_title = "A new title"
         response = self._try_modify_accepted_title(new_title)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        modified_thesis = self.get_theses_with_data()[0]
+        modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["title"], new_title)
+
+    def cast_vote_as(self, voter: Employee, vote: ThesisVote):
+        return self.update_thesis_with_data({"votes": {voter.pk: vote.value}})
 
     def test_student_cannot_vote(self):
         """Ensure that students are not permitted to vote"""
         student = self.get_random_student()
         self.login_as(student)
         board_member = self.get_random_board_member()
-        response = self.update_thesis_with_data({"votes": {board_member.pk: random_vote().value}})
+        response = self.cast_vote_as(board_member, random_vote())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_employee_cannot_vote(self):
         """Ensure that employees are not permitted to vote"""
         self.login_as(self.advisor)
         board_member = self.get_random_board_member()
-        response = self.update_thesis_with_data({"votes": {board_member.pk: random_vote().value}})
+        response = self.cast_vote_as(board_member, random_vote())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_board_members_can_vote_as_themselves(self):
         """Ensure board members can vote, but only as themselves"""
         board_member = self.get_random_board_member()
         self.login_as(board_member)
-        response = self.update_thesis_with_data({"votes": {board_member.pk: random_vote().value}})
+        response = self.cast_vote_as(board_member, random_vote())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_board_members_cannot_vote_as_other(self):
@@ -118,7 +128,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         board_member = self.get_random_board_member_different_from(self.get_admin())
         another_member = self.get_random_board_member_different_from(board_member)
         self.login_as(board_member)
-        response = self.update_thesis_with_data({"votes": {another_member.pk: random_vote().value}})
+        response = self.cast_vote_as(another_member, random_vote())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_admin_can_vote_as_anyone(self):
@@ -126,7 +136,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         admin = self.get_admin()
         another_member = self.get_random_board_member_different_from(admin)
         self.login_as(admin)
-        response = self.update_thesis_with_data({"votes": {another_member.pk: random_vote().value}})
+        response = self.cast_vote_as(another_member, random_vote())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_admin_cannot_cast_vote_as_non_board_member(self):
@@ -135,5 +145,46 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         admin = self.get_admin()
         emp = self.get_random_emp()
         self.login_as(admin)
-        response = self.update_thesis_with_data({"votes": {emp.pk: random_vote().value}})
+        response = self.cast_vote_as(emp, random_vote())
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def vote_to_accept_thesis_required_times(self):
+        num_required = get_num_required_votes()
+        self.assertLessEqual(num_required, len(self.board_members))
+        voters = []
+        while len(voters) < num_required:
+            voter = self.get_random_board_member()
+            while voter in voters:
+                voter = self.get_random_board_member()
+            voters.append(voter)
+        for voter in voters:
+            self.login_as(voter)
+            response = self.cast_vote_as(voter, ThesisVote.accepted)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_enough_votes_accept_thesis(self):
+        """Test that when enough board members vote "approve" on a thesis, it gets accepted"""
+        self.vote_to_accept_thesis_required_times()
+        modified_thesis = self.get_modified_thesis()
+        self.assertEqual(modified_thesis["status"], ThesisStatus.accepted.value)
+
+    def reject_thesis_once(self):
+        board_member = self.get_random_board_member()
+        self.login_as(board_member)
+        response = self.cast_vote_as(board_member, ThesisVote.rejected)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_single_rejection_rejects_thesis(self):
+        """Ensure that a single rejection is enough to reject a thesis"""
+        self.reject_thesis_once()
+        modified_thesis = self.get_modified_thesis()
+        self.assertEqual(modified_thesis["status"], ThesisStatus.returned_for_corrections.value)
+
+    def test_enough_votes_dont_accept_after_rejection(self):
+        """Ensure that if a thesis was rejected, it will not be accepted again even if
+        enough "approve" votes are cast
+        """
+        self.reject_thesis_once()
+        self.vote_to_accept_thesis_required_times()
+        modified_thesis = self.get_modified_thesis()
+        self.assertEqual(modified_thesis["status"], ThesisStatus.returned_for_corrections.value)
