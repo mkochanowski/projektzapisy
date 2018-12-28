@@ -5,9 +5,9 @@ to objects used in the theses system, that is:
 * fine-grained permissions checks
 * performing modifications/adding new objects
 """
-from typing import Dict, Any
+from typing import Dict, Any, List
 
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus, ThesisVote
@@ -74,7 +74,7 @@ def copy_if_present(dst, src, key, converter=None):
 def validate_advisor(user: BaseUser, advisor: Employee):
     """Check that the current user is permitted to set the specified advisor"""
     if not can_set_advisor(user, advisor):
-        raise serializers.ValidationError(f'This type of user cannot set advisor to {advisor}')
+        raise exceptions.PermissionDenied(f'This type of user cannot set advisor to {advisor}')
 
 
 def validate_thesis_vote(value):
@@ -82,7 +82,7 @@ def validate_thesis_vote(value):
     return value in [vote.value for vote in ThesisVote]
 
 
-def validate_votes(votes, user: BaseUser):
+def validate_votes(votes,):
     """Validate the votes dict for a thesis"""
     if type(votes) is not dict:
         raise serializers.ValidationError("\"votes\" must be an object")
@@ -93,25 +93,29 @@ def validate_votes(votes, user: BaseUser):
         try:
             voter_id = int(key)
             voter = Employee.objects.get(pk=voter_id)
-            if not is_theses_board_member(voter):
-                raise serializers.ValidationError("voter is not a member of the theses board")
-            if not can_cast_vote_as_user(user, voter):
-                raise serializers.ValidationError("this user cannot change that user's vote")
             result.append((voter, ThesisVote(value)))
         except (ValueError, Employee.DoesNotExist):
             raise serializers.ValidationError("bad voter id")
     return result
 
 
-def handle_optional_fields(result, data, user: BaseUser):
+def handle_optional_fields(result, data):
     """Extract optional fields from the source dictionary (sent by the client),
     perform any necessary conversions, then place it in the result dictionary
     """
     copy_if_present(result, data, "description")
-    copy_if_present(result, data, "votes", lambda votes: validate_votes(votes, user))
+    copy_if_present(result, data, "votes", lambda votes: validate_votes(votes))
     copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
     copy_if_present(result, data, "student", lambda s: get_person(Student, s))
     copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
+
+
+def check_votes_permissions(user: BaseUser, votes: List):
+    for voter, value in votes:
+        if not is_theses_board_member(voter):
+            raise exceptions.PermissionDenied("voter is not a member of the theses board")
+        if not can_cast_vote_as_user(user, voter):
+            raise exceptions.PermissionDenied("this user cannot change that user's vote")
 
 
 class ThesisSerializer(serializers.ModelSerializer):
@@ -141,59 +145,43 @@ class ThesisSerializer(serializers.ModelSerializer):
         if not self.context:
             return data
         request = self.context["request"]
-        wrapped_user = wrap_user(request.user)
         if request.method == "POST":
-            return self.validate_add_thesis(wrapped_user, data)
+            return self.validate_add_thesis(data)
         elif request.method == "PATCH":
-            return self.validate_modify_thesis(wrapped_user, data)
+            return self.validate_modify_thesis(data)
         else:
             raise serializers.ValidationError(f'Unknown request type {request.method}')
 
-    def validate_add_thesis(self, user: BaseUser, data: ValidationData):
-        """Validate a request to add a new thesis object; basic permissions
-        checks have already been performed, so this deals with more detailed checks
-        (is the given status valid for this type of user) and conversions
+    def validate_add_thesis(self, data: ValidationData):
+        """Validate a request to add a new thesis object and convert to more convenient
+        local types
         """
         advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
-        validate_advisor(user, advisor)
-        status = data["status"]
-        if not can_set_status(user, ThesisStatus(status)):
-            raise serializers.ValidationError(f'This type of user cannot set status to {status}')
         result = {
             "title": data["title"],
             "reserved": data["reserved"],
             "kind": data["kind"],
-            "status": status,
+            "status": data["status"],
             "advisor": advisor,
         }
-        handle_optional_fields(result, data, user)
+        handle_optional_fields(result, data)
         if "description" not in result:
             result["description"] = ""
 
         return result
 
-    def validate_modify_thesis(self, user: BaseUser, data: ValidationData):
+    def validate_modify_thesis(self, data: ValidationData):
         """As above, but this time the thesis object already exists. There is some
         additional logic in this case; for instance, if a thesis is already accepted,
         its owner/advisor cannot change the title anymore
         """
         result = {}
-        if "advisor" in data:
-            advisor = get_person(Employee, data["advisor"])
-            validate_advisor(user, advisor)
-            result["advisor"] = advisor
-        if "status" in data:
-            if not can_change_status(user):
-                raise serializers.ValidationError("This type of user cannot modify the status")
-            result["status"] = data["status"]
-        if "title" in data:
-            title = data["title"]
-            if not can_change_title(user, self.instance):
-                raise serializers.ValidationError("This type of user cannot change the title")
-            result["title"] = title
+        copy_if_present(result, data, "advisor", lambda a: get_person(Employee, a))
+        copy_if_present(result, data, "status")
+        copy_if_present(result, data, "title")
         copy_if_present(result, data, "reserved")
         copy_if_present(result, data, "kind")
-        handle_optional_fields(result, data, user)
+        handle_optional_fields(result, data)
 
         return result
 
@@ -202,6 +190,14 @@ class ThesisSerializer(serializers.ModelSerializer):
         in response to a POST request with the dictionary we returned
         from validate_add_thesis
         """
+        # First check that the user is permitted to set these values
+        request = self.context["request"]
+        user = wrap_user(request.user)
+        validate_advisor(user, validated_data["advisor"])
+        status = validated_data["status"]
+        if not can_set_status(user, ThesisStatus(status)):
+            raise exceptions.PermissionDenied(f'This type of user cannot set status to {status}')
+
         new_instance = Thesis.objects.create(
             title=validated_data.get("title"),
             kind=validated_data.get("kind"),
@@ -214,11 +210,24 @@ class ThesisSerializer(serializers.ModelSerializer):
             student_2=validated_data.get("student_2"),
         )
         if "votes" in validated_data:
-            new_instance.process_new_votes(validated_data["votes"])
+            votes = validated_data["votes"]
+            check_votes_permissions(votes)
+            new_instance.process_new_votes(votes)
         return new_instance
 
     def update(self, instance, validated_data):
-        """As above"""
+        """Called in response to a successfully validated PATCH request"""
+        request = self.context["request"]
+        user = wrap_user(request.user)
+        if "advisor" in validated_data:
+            validate_advisor(user, validated_data["advisor"])
+        if "status" in validated_data:
+            if not can_change_status(user):
+                raise exceptions.PermissionDenied("This type of user cannot modify the status")
+        if "title" in validated_data:
+            if not can_change_title(user, self.instance):
+                raise exceptions.PermissionDenied("This type of user cannot change the title")
+
         instance.title = validated_data.get("title", instance.title)
         instance.kind = validated_data.get("kind", instance.kind)
         instance.reserved = validated_data.get("reserved", instance.reserved)
@@ -232,7 +241,9 @@ class ThesisSerializer(serializers.ModelSerializer):
         instance.student_2 = validated_data.get("student_2", instance.student_2)
         instance.save()
         if "votes" in validated_data:
-            instance.process_new_votes(validated_data["votes"])
+            votes = validated_data["votes"]
+            check_votes_permissions(votes)
+            instance.process_new_votes(votes)
         return instance
 
     def get_votes(self, instance):

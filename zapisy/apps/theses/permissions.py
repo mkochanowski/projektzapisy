@@ -27,7 +27,7 @@ def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user permitted to make any changes to the specified thesis?"""
     return (
         is_thesis_staff(user) or
-        is_owner_of_thesis(user, thesis) and thesis.status != ThesisStatus.accepted.value
+        is_owner_of_thesis(user, thesis)
     )
 
 
