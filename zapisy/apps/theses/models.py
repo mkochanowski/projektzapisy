@@ -70,8 +70,6 @@ class Thesis(models.Model):
         """Whenever one or more votes for a thesis change, this function
         should be called to process & save them
         """
-        had_rejection = False
-        had_approval = False
         for voter, vote in votes:
             try:
                 existing_vote = ThesisVoteBinding.objects.get(thesis=self, voter=voter)
@@ -79,24 +77,23 @@ class Thesis(models.Model):
                 existing_vote.save()
             except ThesisVoteBinding.DoesNotExist:
                 ThesisVoteBinding.objects.create(thesis=self, voter=voter, value=vote.value)
-            if vote == ThesisVote.rejected:
-                had_rejection = True
-            elif vote == ThesisVote.accepted:
-                had_approval = True
-        if had_rejection:
-            self.status = ThesisStatus.returned_for_corrections.value
-            self.save()
-        elif had_approval:
-            self.check_for_approval_status_change()
+        self.check_for_vote_status_change()
 
     def check_for_approval_status_change(self):
-        """We had a "yes" vote, see if we now have enough votes to accept this thesis"""
+        """If we have enough approving votes, accept this thesis - unless there's a rejecting
+        vote, then we return it for corrections
+        """
         approve_votes_cnt = ThesisVoteBinding.objects.filter(
             thesis=self, value=ThesisVote.accepted.value
         ).count()
-        if approve_votes_cnt >= get_num_required_votes():
+        reject_votes_cnt = ThesisVoteBinding.objects.filter(
+            thesis=self, value=ThesisVote.rejected.value
+        ).count()
+        if reject_votes_cnt:
+            self.status = ThesisStatus.returned_for_corrections.value
+        elif approve_votes_cnt >= get_num_required_votes():
             self.status = ThesisStatus.accepted.value
-            self.save()
+        self.save()
 
     def __str__(self):
         return self.title
