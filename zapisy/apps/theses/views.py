@@ -96,7 +96,11 @@ def generate_base_queryset():
         *fields_for_prefetching("auxiliary_advisor"),
     ).annotate(
         advisor_name=Concat("advisor__user__first_name", "advisor__user__last_name")
-    )
+    ).annotate(is_archived=Case(
+        When(status=ThesisStatus.defended.value, then=True),
+        default=Value(False),
+        output_field=BooleanField()
+    ))
 
 
 def fields_for_prefetching(base_field: str) -> List[str]:
@@ -142,12 +146,7 @@ def sort_queryset(qs, sort_column: str, sort_dir: str):
         orderer = Lower(db_column)
         resulting_ordering = orderer.desc() if sort_dir == "desc" else orderer.asc()
 
-    # We want to first order by archived, so compute that as an annotated field
-    qs = qs.annotate(is_archived=Case(
-        When(status=5, then=1),
-        default=Value(0),
-        output_field=BooleanField()
-    ))
+    # We want to first order by archived
     return qs.order_by("is_archived", resulting_ordering)
 
 
@@ -155,14 +154,14 @@ def available_thesis_filter(queryset):
     """Returns only theses that are considered "available" from the specified queryset"""
     return queryset\
         .exclude(status=ThesisStatus.in_progress.value)\
-        .exclude(status=ThesisStatus.defended.value)\
+        .exclude(is_archived=True)\
         .exclude(reserved=True)
 
 
 def filter_theses_queryset_for_type(queryset, thesis_type):
     """Returns only theses matching the specified type filter from the specified queryset"""
     if thesis_type == ThesisTypeFilter.all_current.value:
-        return queryset.exclude(status=ThesisStatus.defended.value)
+        return queryset.exclude(is_archived=True)
     elif thesis_type == ThesisTypeFilter.all.value:
         return queryset
     elif thesis_type == ThesisTypeFilter.masters.value:
