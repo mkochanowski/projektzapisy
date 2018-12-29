@@ -43,7 +43,7 @@ THESIS_STATUS_CHOICES = (
 
 
 class Thesis(models.Model):
-    title = models.CharField(max_length=MAX_THESIS_TITLE_LEN)
+    title = models.CharField(max_length=MAX_THESIS_TITLE_LEN, unique=True)
     advisor = models.ForeignKey(
         Employee, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_advisor",
     )
@@ -66,6 +66,14 @@ class Thesis(models.Model):
 
     def __str__(self):
         return self.title
+
+    def clean(self):
+        """Ensure that the title never contains superfluous whitespace"""
+        self.title = self.title.strip()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Thesis, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "praca dyplomowa"

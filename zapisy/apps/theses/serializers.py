@@ -5,7 +5,7 @@ to objects used in the theses system, that is:
 * fine-grained permissions checks
 * performing modifications/adding new objects
 """
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from rest_framework import serializers, exceptions
 
@@ -13,6 +13,7 @@ from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus
 from .users import wrap_user, get_user_type
 from .permissions import can_set_status, can_set_advisor, can_change_status, can_change_title
+from .drf_errors import ThesisNameConflict
 
 
 class PersonSerializerForThesis(serializers.Serializer):
@@ -68,6 +69,14 @@ def copy_optional_fields(result, data):
     copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
 
 
+def validate_new_title_for_instance(title: str, instance: Optional[Thesis]):
+    qs = Thesis.objects.filter(title=title.strip())
+    if instance:
+        qs = qs.exclude(pk=instance.pk)
+    if qs.count():
+        raise ThesisNameConflict()
+
+
 def check_advisor_permissions(user: BaseUser, advisor: Employee):
     """Check that the current user is permitted to set the specified advisor"""
     if not can_set_advisor(user, advisor):
@@ -106,6 +115,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         local types
         """
         advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
+        validate_new_title_for_instance(data["title"], None)
         result = {
             "title": data["title"],
             "reserved": data["reserved"],
@@ -124,6 +134,8 @@ class ThesisSerializer(serializers.ModelSerializer):
         additional logic in this case; for instance, if a thesis is already accepted,
         its owner/advisor cannot change the title anymore
         """
+        if "title" in data:
+            validate_new_title_for_instance(data["title"], self.instance)
         result = {}
         copy_if_present(result, data, "advisor", lambda a: get_person(Employee, a))
         copy_if_present(result, data, "status")
