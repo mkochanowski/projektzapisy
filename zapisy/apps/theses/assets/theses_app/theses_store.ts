@@ -20,6 +20,7 @@ import {
 import { roundUp, wait } from "common/utils";
 import { CancellablePromise } from "mobx/lib/api/flow";
 import { adjustDomForUngraded } from "./utils";
+import { ThesisEmptyTitle } from "./errors";
 
 /** Tell MobX to ensure that @observable fields are only modified in actions */
 configure({ enforceActions: "observed" });
@@ -374,6 +375,14 @@ class ThesesStore {
 		return true;
 	}
 
+	private performPreSaveChecks() {
+		const { modified } = this.thesis!;
+		const trimmedTitle = modified.title.trim();
+		if (!trimmedTitle) {
+			throw new ThesisEmptyTitle();
+		}
+	}
+
 	private handlerForWorkMode = {
 		[ThesisWorkMode.Adding]: addNewThesis,
 		[ThesisWorkMode.Editing]: modifyExistingThesis,
@@ -387,6 +396,7 @@ class ThesesStore {
 		if (!this.preSaveAsserts()) {
 			return;
 		}
+		this.performPreSaveChecks();
 
 		const { workMode, thesis } = this;
 

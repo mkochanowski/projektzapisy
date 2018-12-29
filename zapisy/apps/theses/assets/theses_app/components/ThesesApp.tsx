@@ -10,6 +10,9 @@ import * as Mousetrap from "mousetrap";
 import "mousetrap-global-bind";
 import { observer } from "mobx-react";
 import styled from "styled-components";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import "./misc_style.less";
 
 import { Thesis, ThesisTypeFilter } from "../types";
 import { ThesisDetails } from "./ThesisDetails";
@@ -20,7 +23,8 @@ import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
 import { thesesStore as store, LoadMode } from "../theses_store";
 import { ThesisWorkMode, SortColumn, SortDirection } from "../types/misc";
-import { ThesisNameConflict } from "../errors";
+import { ThesisNameConflict, ThesisEmptyTitle } from "../errors";
+import { withAlert } from "react-alert";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -30,13 +34,13 @@ const TopRowContainer = styled.div`
 const initialState = {
 	/** The error instance, if any. If one exists, we abort the app and display it */
 	applicationError: null as Error | null,
-	/** Whether the last save attempt failed because of a duplicate title */
-	hadDuplicateTitle: false,
+	/** Whether the thesis title was invalid */
+	hasTitleError: false,
 };
 type State = typeof initialState;
 
 @observer
-export class ThesesApp extends React.Component<any, State> {
+class ThesesAppInternal extends React.Component<any, State> {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
 	private tableInstance: ThesesTable;
@@ -129,7 +133,12 @@ export class ThesesApp extends React.Component<any, State> {
 		/>;
 	}
 
-	private onThesisModified = (nt: Thesis) => store.updateModifiedThesis(nt);
+	private onThesisModified = (nt: Thesis) => { store.updateModifiedThesis(nt); };
+	private onChangedTitle = () => {
+		if (this.state.hasTitleError) {
+			this.setState({ hasTitleError: false });
+		}
+	}
 	private renderThesisDetails() {
 		return <ThesisDetails
 			thesis={store.thesis!.modified}
@@ -138,7 +147,8 @@ export class ThesesApp extends React.Component<any, State> {
 			hasUnsavedChanges={store.hasUnsavedChanges()}
 			mode={store.workMode!}
 			user={store.user}
-			hadDuplicateTitle={this.state.hadDuplicateTitle}
+			hasTitleError={this.state.hasTitleError}
+			onChangedTitle={this.onChangedTitle}
 			onSaveRequested={this.onSave}
 			onThesisModified={this.onThesisModified}
 		/>;
@@ -179,36 +189,50 @@ export class ThesesApp extends React.Component<any, State> {
 	 */
 	private confirmDiscardChanges() {
 		if (store.hasUnsavedChanges()) {
-			const title = store.thesis!.modified.title;
-			return window.confirm(
-				title.trim()
-					? `Czy porzucić niezapisane zmiany w pracy "${title}"?`
-					: "Czy porzucić niezapisane zmiany?"
-			);
+			return new Promise((resolve) => {
+				const title = store.thesis!.modified.title;
+				const msg = buildUnsavedConfirmation(title);
+				confirmAlert({
+					title: "",
+					message: msg,
+					buttons: [
+						{
+							label: "Tak, porzuć",
+							onClick: () => resolve(true),
+						},
+						{
+							label: "Nie, wróć",
+							onClick: () => resolve(false),
+						}
+					],
+				});
+			});
 		}
-		return true;
+		return Promise.resolve(true);
 	}
 
-	private onThesisSelected = (thesis: Thesis) => {
-		if (!this.confirmDiscardChanges()) {
+	private onThesisSelected = async (thesis: Thesis) => {
+		if (!await this.confirmDiscardChanges()) {
 			return;
 		}
+		this.setState({ hasTitleError: false });
 		store.selectThesis(thesis);
 	}
 
-	private setupForAddingThesis = () => {
-		if (!canAddThesis(store.user)) {
+	private setupForAddingThesis = async () => {
+		if (!canAddThesis(store.user) || !await this.confirmDiscardChanges()) {
 			return;
 		}
 		const thesis = new Thesis();
 		if (!canSetArbitraryAdvisor(store.user)) {
 			thesis.advisor = store.user.user;
 		}
+		this.setState({ hasTitleError: false });
 		store.setupForNewThesis(thesis);
 	}
 
-	private onResetChanges = () => {
-		if (!this.confirmDiscardChanges()) {
+	private onResetChanges = async () => {
+		if (!await this.confirmDiscardChanges()) {
 			return;
 		}
 		store.resetModifiedThesis();
@@ -216,18 +240,50 @@ export class ThesesApp extends React.Component<any, State> {
 
 	private onSave = async () => {
 		try {
+			const oldWorkMode = store.workMode;
 			await store.save();
+			this.props.alert.success(messageForWorkMode(oldWorkMode));
 		} catch (err) {
-			if (err instanceof ThesisNameConflict) {
-				window.alert("Praca o tym tytule już istnieje.");
-				this.setState({ hadDuplicateTitle: true });
-			} else {
-				window.alert(
-					"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
-					"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów.\n\n" +
-					`Szczegóły błędu: ${err}`
-				);
-			}
+			this.handleSaveError(err);
+		}
+	}
+
+	private handleSaveError(err: Error) {
+		if (err instanceof ThesisNameConflict) {
+			this.props.alert.error("Praca o tym tytule już istnieje.");
+			this.setState({ hasTitleError: true });
+		} else if (err instanceof ThesisEmptyTitle) {
+			this.props.alert.error("Tytuł pracy nie może być pusty");
+			this.setState({ hasTitleError: true });
+		} else {
+			const msg = (
+				`Nie udało się zapisać pracy (${err}). ` +
+				"Odśwież stronę/sprawdź połączenie sieciowe i spróbuj jeszcze raz. " +
+				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
+			);
+			// This isn't a confirmation message, but that component can also
+			// be used for modal alerts
+			confirmAlert({
+				title: "Błąd",
+				message: msg,
+				buttons: [{ label: "OK" }],
+			});
 		}
 	}
 }
+
+function buildUnsavedConfirmation(title: string) {
+	return title.trim()
+		? `Czy porzucić niezapisane zmiany w pracy "${title}"?`
+		: "Czy porzucić niezapisane zmiany w edytowanej pracy?";
+}
+
+function messageForWorkMode(mode: ThesisWorkMode) {
+	switch (mode) {
+		case ThesisWorkMode.Adding: return "Praca została dodana";
+		case ThesisWorkMode.Editing: return "Zapisano zmiany";
+		default: throw new Error("bad work mode");
+	}
+}
+
+export const ThesesApp = withAlert(ThesesAppInternal);
