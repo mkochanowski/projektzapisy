@@ -3,8 +3,9 @@ from enum import Enum
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Value, When, Case, BooleanField
+from django.db.models import Value, When, Case, BooleanField
 from django.db.models.functions import Concat, Lower
+from django.core.exceptions import PermissionDenied
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -246,13 +247,18 @@ def build_autocomplete_view_with_queryset(queryset):
     class ac(autocomplete.Select2QuerySetView):
         def get_queryset(self):
             if not self.request.user.is_authenticated:
-                return queryset.objects.none()
-            qs = queryset.objects.all().select_related("user")
+                raise PermissionDenied()
+            qs = queryset.objects
             if self.q:
-                qs = qs.filter(
-                    Q(user__first_name__istartswith=self.q) | Q(user__last_name__istartswith=self.q)
-                )
-            return qs
+                qs = qs\
+                    .select_related("user")\
+                    .annotate(
+                        full_name=Concat(
+                            "user__first_name", Value(" "), "user__last_name"
+                        )
+                    )\
+                    .filter(full_name__icontains=self.q)
+            return qs.all()
     return ac
 
 
