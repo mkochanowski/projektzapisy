@@ -18,7 +18,6 @@ import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
-import { inRange } from "common/utils";
 import { thesesStore as store, LoadMode } from "../theses_store";
 import { ThesisWorkMode, SortColumn, SortDirection } from "../types/misc";
 import { ThesisNameConflict } from "../errors";
@@ -124,7 +123,6 @@ export class ThesesApp extends React.Component<any, State> {
 			isEditingThesis={store.hasUnsavedChanges()}
 			totalThesesCount={store.totalCount}
 			onThesisSelected={this.onThesisSelected}
-			switchToThesisWithOffset={this.switchWithOffset}
 			onSortChanged={this.onSortChanged}
 			loadMoreRows={this.onLoadMore}
 		/>;
@@ -194,19 +192,6 @@ export class ThesesApp extends React.Component<any, State> {
 			return;
 		}
 		store.selectThesis(thesis);
-	}
-
-	/** Switch to the thesis at the specified offset from the current thesis */
-	public switchWithOffset = (offset: number) => {
-		const { selectedIdx, theses } = store;
-		if (selectedIdx === -1) {
-			return;
-		}
-		const target = selectedIdx + offset;
-		if (!inRange(target, 0, theses.length - 1)) {
-			return;
-		}
-		this.onThesisSelected(theses[target]);
 	}
 
 	private setupForAddingThesis = () => {
