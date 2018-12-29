@@ -7,6 +7,7 @@
 
 import * as React from "react";
 import * as Mousetrap from "mousetrap";
+import "mousetrap-global-bind";
 import { observer } from "mobx-react";
 import styled from "styled-components";
 
@@ -67,12 +68,12 @@ export class ThesesApp extends React.Component<any, State> {
 	}
 
 	private initializeKeyboardShortcuts() {
-		Mousetrap.bind("ctrl+m", this.setupForAddingThesis);
-		Mousetrap.bind("esc", this.onResetChanges);
+		Mousetrap.bindGlobal("ctrl+m", this.setupForAddingThesis);
+		Mousetrap.bindGlobal("esc", this.onResetChanges);
 	}
 
 	private deconfigureKeyboardShortcuts() {
-		Mousetrap.unbind(["ctrl+m", "esc"]);
+		Mousetrap.unbindGlobal(["ctrl+m", "esc"]);
 	}
 
 	private confirmUnload = (ev: BeforeUnloadEvent) => {

@@ -18,9 +18,9 @@
       "lodash",
       "react",
       "react-dom",
-      "react-table",
       "js-cookie",
-      "react-virtualized"
+      "react-virtualized",
+      "mousetrap"
     ]
   },
   "exclude": [
