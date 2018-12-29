@@ -5,17 +5,18 @@ to objects used in the theses system, that is:
 * fine-grained permissions checks
 * performing modifications/adding new objects
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from rest_framework import serializers, exceptions
 
 from apps.users.models import Employee, Student, BaseUser
-from .models import Thesis, ThesisStatus, ThesisVote
+from .models import Thesis, ThesisStatus, ThesisVote, MAX_THESIS_TITLE_LEN
 from .users import wrap_user, get_user_type, is_theses_board_member
 from .permissions import (
     can_set_status, can_set_advisor,
     can_cast_vote_as_user, can_change_status, can_change_title
 )
+from .drf_errors import ThesisNameConflict
 
 
 class PersonSerializerForThesis(serializers.Serializer):
@@ -103,6 +104,14 @@ def handle_optional_fields(result, data):
     copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
 
 
+def validate_new_title_for_instance(title: str, instance: Optional[Thesis]):
+    qs = Thesis.objects.filter(title=title.strip())
+    if instance:
+        qs = qs.exclude(pk=instance.pk)
+    if qs.count():
+        raise ThesisNameConflict()
+
+
 def check_votes_permissions(user: BaseUser, votes: List):
     """Check that the specified user is permitted to modify the votes as specified"""
     for voter, _ in votes:
@@ -131,6 +140,12 @@ class ThesisSerializer(serializers.ModelSerializer):
             result["votes"] = data["votes"]
         return result
 
+    # We need to define this field here manually to disable DRF's unique validator which
+    # isn't flexible enough to override the error code it returns (throws a 400, we want 409)
+    # See https://stackoverflow.com/q/33475334
+    # and https://github.com/encode/django-rest-framework/issues/6124
+    title = serializers.CharField(max_length=MAX_THESIS_TITLE_LEN)
+
     def validate(self, data):
         """Validate a dict object received from the frontend client;
         DRF expects us to return a dict object to be used for further processing,
@@ -155,6 +170,7 @@ class ThesisSerializer(serializers.ModelSerializer):
         local types
         """
         advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
+        validate_new_title_for_instance(data["title"], None)
         result = {
             "title": data["title"],
             "reserved": data["reserved"],
@@ -173,6 +189,8 @@ class ThesisSerializer(serializers.ModelSerializer):
         additional logic in this case; for instance, if a thesis is already accepted,
         its owner/advisor cannot change the title anymore
         """
+        if "title" in data:
+            validate_new_title_for_instance(data["title"], self.instance)
         result = {}
         copy_if_present(result, data, "advisor", lambda a: get_person(Employee, a))
         copy_if_present(result, data, "status")
@@ -256,6 +274,9 @@ class ThesisSerializer(serializers.ModelSerializer):
             'student', 'student_2', 'added_date', 'modified_date',
             'votes',
         )
+        extra_kwargs = {
+            "title": {"error_messages": {"unique": "Give yourself a username"}}
+        }
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):

@@ -20,6 +20,7 @@ import { AddNewButton } from "./AddNewButton";
 import { inRange } from "common/utils";
 import { thesesStore as store, LoadMode } from "../theses_store";
 import { ThesisWorkMode, SortColumn, SortDirection } from "../types/misc";
+import { ThesisNameConflict } from "../errors";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -29,6 +30,8 @@ const TopRowContainer = styled.div`
 const initialState = {
 	/** The error instance, if any. If one exists, we abort the app and display it */
 	applicationError: null as Error | null,
+	/** Whether the last save attempt failed because of a duplicate title */
+	hadDuplicateTitle: false,
 };
 type State = typeof initialState;
 
@@ -136,6 +139,7 @@ export class ThesesApp extends React.Component<any, State> {
 			hasUnsavedChanges={store.hasUnsavedChanges()}
 			mode={store.workMode!}
 			user={store.user}
+			hadDuplicateTitle={this.state.hadDuplicateTitle}
 			onSaveRequested={this.onSave}
 			onThesisModified={this.onThesisModified}
 		/>;
@@ -228,10 +232,16 @@ export class ThesesApp extends React.Component<any, State> {
 		try {
 			await store.save();
 		} catch (err) {
-			window.alert(
-				"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
-				"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów."
-			);
+			if (err instanceof ThesisNameConflict) {
+				window.alert("Praca o tym tytule już istnieje.");
+				this.setState({ hadDuplicateTitle: true });
+			} else {
+				window.alert(
+					"Nie udało się zapisać pracy. Odśwież stronę i spróbuj jeszcze raz. " +
+					"Jeżeli problem powtórzy się, opisz go na trackerze Zapisów.\n\n" +
+					`Szczegóły błędu: ${err}`
+				);
+			}
 		}
 	}
 }

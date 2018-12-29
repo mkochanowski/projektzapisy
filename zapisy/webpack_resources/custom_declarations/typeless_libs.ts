@@ -3,6 +3,7 @@
 declare module "react-button-component";
 declare module "react-select-async-paginate";
 declare module "object-assign-deep";
+declare module "extendable-error-class";
 
 // We want to be able to import any .js file
 declare module "*.js";

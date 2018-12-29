@@ -59,12 +59,19 @@ type Props = {
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
 	user: AppUser;
+	hadDuplicateTitle: boolean;
 	onThesisModified: (thesis: Thesis) => void;
 	onSaveRequested: () => void;
 };
 
 const initialState = {
-	/** Was the title invalid when we last validated the thesis before saving? */
+	/**
+	 * Should the title be highlighted as invalid?
+	 * This can happen in two cases:
+	 * -> the user tries to save with an empty title
+	 * -> the user tries to save, but we get an error from the backend
+	 * because a thesis with that title already existed
+	 */
 	hasTitleError: false,
 };
 type State = typeof initialState;
@@ -72,7 +79,7 @@ type State = typeof initialState;
 export class ThesisDetails extends React.PureComponent<Props, State> {
 	state = initialState;
 
-	public componentWillMount() {
+	public componentDidMount() {
 		Mousetrap.bind("ctrl+s", ev => {
 			if (this.props.hasUnsavedChanges) {
 				this.handleSave();
@@ -83,6 +90,12 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	public componentWillUnmount() {
 		Mousetrap.unbind("ctrl+s");
+	}
+
+	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
+		if (!this.props.hadDuplicateTitle && nextProps.hadDuplicateTitle) {
+			this.setState({	hasTitleError: true	});
+		}
 	}
 
 	public render() {
