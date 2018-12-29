@@ -26,7 +26,11 @@ export function canAddThesis(user: AppUser) {
  * @param thesis The thesis
  */
 function isOwnerOfThesis(user: AppUser, thesis: Thesis) {
-	return thesis.advisor !== null && thesis.advisor.id === user.user.id;
+	return (
+		thesis.advisor !== null &&
+		user.type === UserType.Employee &&
+		thesis.advisor.id === user.user.id
+	);
 }
 
 /**
@@ -48,9 +52,12 @@ export function canModifyThesis(user: AppUser, thesis: Thesis) {
  * @param thesis The thesis
  */
 export function canChangeTitle(user: AppUser, thesis: Thesis) {
+	const frozenStatuses = [
+		ThesisStatus.Accepted, ThesisStatus.Defended, ThesisStatus.InProgress,
+	];
 	return (
 		isThesisStaff(user) ||
-		isOwnerOfThesis(user, thesis) && thesis.status !== ThesisStatus.Accepted
+		isOwnerOfThesis(user, thesis) && !frozenStatuses.includes(thesis.status)
 	);
 }
 

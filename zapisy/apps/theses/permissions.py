@@ -8,6 +8,7 @@ from .users import ThesisUserType, get_user_type, is_theses_board_member
 
 
 def is_thesis_staff(user: BaseUser) -> bool:
+    """Determine whether the user should be considered a "staff member" in the theses system"""
     user_type = get_user_type(user)
     return user_type == ThesisUserType.admin or is_theses_board_member(user)
 
@@ -33,9 +34,10 @@ def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
 
 def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user permitted to change the title of the specified thesis?"""
+    frozen_statuses = [ThesisStatus.accepted, ThesisStatus.in_progress, ThesisStatus.defended]
     return (
         is_thesis_staff(user) or
-        is_owner_of_thesis(user, thesis) and thesis.status != ThesisStatus.accepted.value
+        is_owner_of_thesis(user, thesis) and not ThesisStatus(thesis.status) in frozen_statuses
     )
 
 
