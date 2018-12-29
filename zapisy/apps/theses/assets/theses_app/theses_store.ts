@@ -17,13 +17,23 @@ import {
 	ApplicationState, ThesisWorkMode, isPerformingBackendOp,
 	ThesesProcessParams, SortColumn, SortDirection,
 } from "./types/misc";
-import { roundUp, awaitSleep } from "common/utils";
+import { roundUp, wait } from "common/utils";
 import { CancellablePromise } from "mobx/lib/api/flow";
 
 /** Tell MobX to ensure that @observable fields are only modified in actions */
 configure({ enforceActions: "observed" });
 
+/** How many theses to download in a single request */
 const ROWS_PER_PAGE = 100;
+
+/**
+ * How long to wait after the last keystroke before dispatching
+ * a request to the backend with the specified filter
+ * This assumes the user will be typing at at least 240 CPM
+ * which is slightly above average, but our target audience is rather
+ * more computer literate than the average person, so that should be fine
+ */
+const STRING_FILTER_QUERY_DELAY = 250;
 
 /** The currently selected thesis */
 type CompositeThesis = {
@@ -160,7 +170,7 @@ class ThesesStore {
 		this.params[thisKey] = value.toLowerCase();
 		this.stringFilterBeingChanged = thisKey;
 		this.applicationState = ApplicationState.Refetching;
-		yield awaitSleep(250);
+		yield wait(STRING_FILTER_QUERY_DELAY);
 		yield this.refreshTheses();
 		this.applicationState = ApplicationState.Normal;
 		this.stringFilterBeingChanged = "";
