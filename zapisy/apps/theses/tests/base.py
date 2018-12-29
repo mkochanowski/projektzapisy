@@ -80,6 +80,11 @@ class ThesesBaseTestCase(APITestCase):
         return result
 
     @classmethod
+    def get_random_board_member_not_admin(cls):
+        """Get a random board member, but not the admin"""
+        return cls.get_random_board_member_different_from(cls.get_admin())
+
+    @classmethod
     def get_random_student(cls):
         return random.choice(cls.students)
 

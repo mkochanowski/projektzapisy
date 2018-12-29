@@ -1,7 +1,7 @@
 from rest_framework import status
 from django.urls import reverse
 
-from apps.users.models import Employee
+from apps.users.models import Employee, BaseUser
 from ..models import ThesisStatus
 from .factory_utils import random_title, random_kind, random_reserved
 from .base import ThesesBaseTestCase
@@ -65,7 +65,31 @@ class ThesesAdditionTestCase(ThesesBaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     # Theses with empty titles are not permitted
-    def test_cannot_add_thesis_with_empty_title(self):
-        emp = self.get_random_board_member()
-        response = self.add_thesis(emp, title="")
+    def ensure_user_cannot_add_thesis_with_empty_title(self, user):
+        response = self.add_thesis(user, title="")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cannot_add_thesis_with_empty_title(self):
+        self.ensure_user_cannot_add_thesis_with_empty_title(self.get_random_emp())
+        board_member = self.get_random_board_member_not_admin()
+        self.ensure_user_cannot_add_thesis_with_empty_title(board_member)
+        self.ensure_user_cannot_add_thesis_with_empty_title(self.get_admin())
+
+    def ensure_409_with_user(self, user: BaseUser):
+        title = random_title()
+        thesis = self.make_thesis(title=title)
+        thesis.save()
+        # Padding at each end should be trimmed, so this is still a dupe
+        padded_title = f'  \t{title}    \n   '
+        response = self.add_thesis(user, title=padded_title)
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    # Titles must be unique, for all users
+    def test_admin_cannot_add_thesis_with_duplicate_title(self):
+        self.ensure_409_with_user(self.get_admin())
+
+    def test_board_member_cannot_add_thesis_with_duplicate_title(self):
+        self.ensure_409_with_user(self.get_random_board_member_different_from(self.get_admin()))
+
+    def test_emp_cannot_add_thesis_with_duplicate_title(self):
+        self.ensure_409_with_user(self.get_random_emp())

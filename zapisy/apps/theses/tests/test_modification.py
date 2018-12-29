@@ -1,7 +1,7 @@
 from rest_framework import status
 from django.urls import reverse
 
-from apps.users.models import Employee
+from apps.users.models import Employee, BaseUser
 
 from ..models import ThesisStatus, ThesisVote
 from ..system_settings import get_num_required_votes
@@ -56,28 +56,37 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         self.assertEqual(modified_thesis["description"], new_desc)
         self.assertEqual(modified_thesis["student"]["id"], new_student.pk)
 
-    def _try_modify_accepted_title(self, new_title):
-        self.thesis.status = ThesisStatus.accepted.value
-        self.thesis.save()
-        return self.update_thesis_with_data({"title": new_title})
+    FROZEN_STATUSES = [
+        ThesisStatus.accepted,
+        ThesisStatus.in_progress,
+        ThesisStatus.defended,
+    ]
 
-    def test_emp_cannot_modify_their_accepted_thesis_title(self):
-        """Ensure an employee cannot modify their thesis title if it's been accepted"""
+    def _try_modify_frozen_with_data(self, data):
+        result = []
+        for frozen_status in ThesesModificationTestCase.FROZEN_STATUSES:
+            self.thesis.status = frozen_status.value
+            self.thesis.save()
+            result.append(self.update_thesis_with_data(data))
+        return result
+
+    def test_emp_cannot_modify_their_frozen_thesis_title(self):
+        """Ensure an employee cannot modify their thesis title if it's been "frozen" """
         self.login_as(self.advisor)
         new_title = "A new title"
-        response = self._try_modify_accepted_title(new_title)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        responses = self._try_modify_frozen_with_data({"title": new_title})
+        for response in responses:
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         modified_thesis = self.get_modified_thesis()
         self.assertNotEqual(modified_thesis["title"], new_title)
 
-    def test_emp_can_modify_their_accepted_thesis_other_than_title(self):
+    def test_emp_can_modify_their_frozen_thesis_other_than_title(self):
         """Ensure that modifying things other than title is permitted"""
-        self.thesis.status = ThesisStatus.accepted.value
-        self.thesis.save()
         self.login_as(self.advisor)
         new_2nd_student = self.get_random_student()
-        response = self.update_thesis_with_data({"student_2": {"id": new_2nd_student.pk}})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        responses = self._try_modify_frozen_with_data({"student_2": {"id": new_2nd_student.pk}})
+        for response in responses:
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["student_2"]["id"], new_2nd_student.pk)
 
@@ -91,13 +100,14 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         modified_thesis = self.get_modified_thesis()
         self.assertNotEqual(modified_thesis["description"], new_desc)
 
-    def test_board_member_can_modify_accepted_title(self):
-        """Ensure that board members are allowed to modify the title even if it's been accepted"""
+    def test_board_member_can_modify_frozen_title(self):
+        """Ensure that board members are allowed to modify the title even if it's been "frozen" """
         board_member = self.get_random_board_member()
         self.login_as(board_member)
         new_title = "A new title"
-        response = self._try_modify_accepted_title(new_title)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        responses = self._try_modify_frozen_with_data({"title": new_title})
+        for response in responses:
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["title"], new_title)
 
@@ -195,3 +205,19 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         self.vote_to_accept_thesis_required_times(rejecter)
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["status"], ThesisStatus.returned_for_corrections.value)
+
+    def _test_cannot_modify_thesis_duplicate_title_as_user(self, user: BaseUser):
+        other_thesis = self.make_thesis()
+        other_thesis.save()
+        padded_title = '\n\t   {other_thesis.title}   \t\t\n       '
+        self.login_as(user)
+        response = self.update_thesis_with_data({"title": padded_title})
+        self.assertTrue(response.status_code, status.HTTP_409_CONFLICT)
+
+    def test_cannot_modify_thesis_duplicate_title(self):
+        """Test that a thesis cannot be modified to contain a duplicate title by any user"""
+        self._test_cannot_modify_thesis_duplicate_title_as_user(self.advisor)
+        self._test_cannot_modify_thesis_duplicate_title_as_user(
+            self.get_random_board_member_not_admin()
+        )
+        self._test_cannot_modify_thesis_duplicate_title_as_user(self.get_admin())
