@@ -10,7 +10,7 @@ from typing import Dict, Any, Optional
 from rest_framework import serializers, exceptions
 
 from apps.users.models import Employee, Student, BaseUser
-from .models import Thesis, ThesisStatus
+from .models import Thesis, ThesisStatus, MAX_THESIS_TITLE_LEN
 from .users import wrap_user, get_user_type
 from .permissions import can_set_status, can_set_advisor, can_change_status, can_change_title
 from .drf_errors import ThesisNameConflict
@@ -90,6 +90,12 @@ class ThesisSerializer(serializers.ModelSerializer):
     student_2 = PersonSerializerForThesis(allow_null=True, required=False)
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
+
+    # We need to define this field here manually to disable DRF's unique validator which
+    # isn't flexible enough to override the error code it returns (throws a 400, we want 409)
+    # See https://stackoverflow.com/q/33475334
+    # and https://github.com/encode/django-rest-framework/issues/6124
+    title = serializers.CharField(max_length=MAX_THESIS_TITLE_LEN)
 
     def validate(self, data):
         """Validate a dict object received from the frontend client;
@@ -206,6 +212,9 @@ class ThesisSerializer(serializers.ModelSerializer):
             'kind', 'reserved', 'description', 'status',
             'student', 'student_2', 'added_date', 'modified_date',
         )
+        extra_kwargs = {
+            "title": {"error_messages": {"unique": "Give yourself a username"}}
+        }
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
