@@ -26,7 +26,11 @@ export function whenDomLoaded(fn: UnconstrainedFunction): void {
 	}
 }
 
-export function awaitSleep(ms: number): Promise<void> {
+/**
+ * Returns a promise that resolves after the specified timeout
+ * @param ms The timeout in milliseconds
+ */
+export function wait(ms: number): Promise<void> {
 	return new Promise((resolve, _) => {
 		window.setTimeout(resolve, ms);
 	});

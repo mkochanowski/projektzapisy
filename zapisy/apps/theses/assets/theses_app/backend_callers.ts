@@ -4,7 +4,8 @@
  */
 import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import * as HttpStatus from "http-status-codes";
 
 import {
 	Thesis, ThesisJson, Student, Employee,
@@ -12,6 +13,7 @@ import {
 } from "./types";
 import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
 import { SortColumn, SortDirection, ThesesProcessParams } from "./types/misc";
+import { ThesisNameConflict } from "./errors";
 
 const BASE_API_URL = "/theses/api";
 const REST_REQUEST_TIMEOUT = 10000;
@@ -174,6 +176,25 @@ export async function getPersonAutocomplete(
 }
 
 /**
+ * Send a thesis operation (new/modify) and handle potential duplicate
+ * title conflicts
+ */
+async function safeSendThesisRequest(url: string, config?: AxiosRequestConfig) {
+	try {
+		return await sendRequestWithCsrf(url, config);
+	} catch (err) {
+		if (err.response) {
+			const response: AxiosResponse = err.response;
+			if (response.status === HttpStatus.CONFLICT) {
+				throw new ThesisNameConflict();
+			}
+		}
+		// Otherwise just pass the error we got
+		throw err;
+	}
+}
+
+/**
  * Given a previous and a modified thesis instance, compute the diff
  * and dispatch a request to the backend
  * @param originalThesis The old thesis object
@@ -185,7 +206,7 @@ export async function saveModifiedThesis(
 	const objToSend = getThesisModDispatch(originalThesis, modifiedThesis);
 	const jsonData = JSON.stringify(objToSend);
 	console.warn("Sending", jsonData);
-	await sendRequestWithCsrf(
+	await safeSendThesisRequest(
 		`${BASE_API_URL}/theses/${objToSend.id}/`,
 		{
 			method: "PATCH",
@@ -206,7 +227,7 @@ export async function saveNewThesis(thesis: Thesis): Promise<number> {
 	const objToSend = getThesisAddDispatch(thesis);
 	const jsonData = JSON.stringify(objToSend);
 	console.warn("Adding:", jsonData);
-	const res = await sendRequestWithCsrf(
+	const res = await safeSendThesisRequest(
 		`${BASE_API_URL}/theses/`,
 		{
 			method: "POST",

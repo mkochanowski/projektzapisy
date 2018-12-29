@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             name='Thesis',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=300)),
+                ('title', models.CharField(max_length=300, unique=True)),
                 ('kind', models.SmallIntegerField(choices=[(0, 'mgr'), (1, 'inż'), (2, 'lic'), (3, 'lic+inż'), (4, 'isim')])),
                 ('status', models.SmallIntegerField(choices=[(1, 'poddana pod głosowanie'), (2, 'zwrócona do poprawek'), (3, 'zaakceptowana'), (4, 'w realizacji'), (5, 'obroniona')])),
                 ('reserved', models.BooleanField(default=False)),
