@@ -488,24 +488,3 @@ def from_plaintext(tickets_plaintext):
             i += 1
 
     return ids_tickets_signed
-
-
-def generate_ticket(poll_list):
-    # TODO: Docelowo ma być po stronie przeglądarki
-    m = getrandbits(RAND_BITS)
-    blinded = []
-
-    for poll in poll_list:
-        key = RSA.importKey(PublicKey.objects.get(poll=poll).public_key)
-        n = key.n
-        e = key.e
-        k = randint(2, n)
-        while gcd(n, k) != 1:
-            k = randint(1, n)
-
-        a = (m % n)
-        b = expMod(k, e, n)
-        t = (a * b) % n
-
-        blinded.append((poll, t, (m, k)))
-    return blinded
