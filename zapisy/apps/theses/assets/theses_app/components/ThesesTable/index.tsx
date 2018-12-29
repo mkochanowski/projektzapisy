@@ -20,6 +20,7 @@ import { LoadingIndicator } from "./LoadingIndicator";
 import { NoResultsMessage } from "./NoResultsMessage";
 import { UnconstrainedFunction } from "common/types";
 import { LoadMode } from "../../theses_store";
+import { inRange } from "common/utils";
 
 /*
 	The theses table is powered by react-virtualized's Table component;
@@ -62,7 +63,6 @@ type Props = {
 	totalThesesCount: number;
 
 	/* Function to be called to switch to the thesis at the specified offset */
-	switchToThesisWithOffset: (offset: number) => void;
 	onThesisSelected: (t: Thesis) => void;
 	onSortChanged: (column: SortColumn, dir: SortDirection) => void;
 	loadMoreRows: (startIndex: number, stopIndex: number) => Promise<void>;
@@ -294,11 +294,18 @@ export class ThesesTable extends React.PureComponent<Props> {
 		);
 	}
 
+	/** Handle an arrow switch event */
 	private arrowSwitch(offset: -1 | 1, e: ExtendedKeyboardEvent) {
 		if (!this.shouldAllowArrowSwitch()) {
 			return;
 		}
-		this.props.switchToThesisWithOffset(offset);
+		const { selectedIdx, theses } = this.props;
+		// If nothing is selected, select the first thesis
+		const target = selectedIdx !== -1 ? selectedIdx + offset : 0;
+		if (!inRange(target, 0, theses.length - 1)) {
+			return;
+		}
+		this.props.onThesisSelected(theses[target]);
 		e.preventDefault();
 	}
 
