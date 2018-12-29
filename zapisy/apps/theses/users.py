@@ -2,6 +2,7 @@
 on users of the theses system"""
 from enum import Enum
 
+from django.http import Http404
 from django.contrib.auth.models import User
 from apps.users.models import BaseUser, Employee, Student, is_user_in_group
 
@@ -62,4 +63,4 @@ def wrap_user(user: User) -> BaseUser:
     elif BaseUser.is_student(user):
         return user.student
     else:
-        return user
+        raise Http404("invalid user")
