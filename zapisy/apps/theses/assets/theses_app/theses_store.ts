@@ -383,6 +383,7 @@ class ThesesStore {
 		const toSelect = this.theses.find(t => t.id === id) || null;
 		this.applicationState = ApplicationState.Normal;
 		// no matter what the work mode was, if we have a thesis we end up in the edit view
+		this.workMode = toSelect ? ThesisWorkMode.Editing : ThesisWorkMode.Viewing;
 		this.thesis = compositeThesisForThesis(toSelect);
 	});
 }
