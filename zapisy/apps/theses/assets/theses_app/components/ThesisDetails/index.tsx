@@ -3,6 +3,7 @@ import Button from "react-button-component";
 import styled from "styled-components";
 import update from "immutability-helper";
 import * as Mousetrap from "mousetrap";
+import "mousetrap-global-bind";
 import { Moment } from "moment";
 
 import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser, ThesisVote } from "../../types";
@@ -80,7 +81,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	state = initialState;
 
 	public componentDidMount() {
-		Mousetrap.bind("ctrl+s", ev => {
+		Mousetrap.bindGlobal("ctrl+s", ev => {
 			if (this.props.hasUnsavedChanges) {
 				this.handleSave();
 			}
@@ -89,7 +90,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	}
 
 	public componentWillUnmount() {
-		Mousetrap.unbind("ctrl+s");
+		Mousetrap.unbindGlobal("ctrl+s");
 	}
 
 	public UNSAFE_componentWillReceiveProps(nextProps: Props) {

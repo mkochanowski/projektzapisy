@@ -4109,6 +4109,11 @@ moment@*, moment@^2.22.2:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.23.0.tgz#759ea491ac97d54bac5ad776996e2a58cc1bc225"
   integrity sha512-3IE39bHVqFbWWaPOMHZF98Q9c3LDKGTmypMiTM2QygGXXElkFWIH7GxfmlwmY2vwa+wmNsoYZmG2iusf1ZjJoA==
 
+mousetrap-global-bind@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/mousetrap-global-bind/-/mousetrap-global-bind-1.1.0.tgz#cd7de9222bd0646fa2e010d54c84a74c26a88edd"
+  integrity sha1-zX3pIivQZG+i4BDVTISnTCaojt0=
+
 mousetrap@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/mousetrap/-/mousetrap-1.6.2.tgz#caadd9cf886db0986fb2fee59a82f6bd37527587"
