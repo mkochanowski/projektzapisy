@@ -5,6 +5,7 @@ declare module "react-select-async-paginate";
 declare module "object-assign-deep";
 declare module "extendable-error-class";
 declare module "react-confirm-alert";
+declare module "react-alert-template-basic";
 
 // We want to be able to import any .js file
 declare module "*.js";

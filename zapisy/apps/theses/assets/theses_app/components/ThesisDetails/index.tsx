@@ -59,30 +59,17 @@ type Props = {
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
 	user: AppUser;
-	hadDuplicateTitle: boolean;
+	hasTitleError: boolean;
 	onThesisModified: (thesis: Thesis) => void;
 	onSaveRequested: () => void;
+	onChangedTitle: () => void;
 };
 
-const initialState = {
-	/**
-	 * Should the title be highlighted as invalid?
-	 * This can happen in two cases:
-	 * -> the user tries to save with an empty title
-	 * -> the user tries to save, but we get an error from the backend
-	 * because a thesis with that title already existed
-	 */
-	hasTitleError: false,
-};
-type State = typeof initialState;
-
-export class ThesisDetails extends React.PureComponent<Props, State> {
-	state = initialState;
-
+export class ThesisDetails extends React.PureComponent<Props> {
 	public componentDidMount() {
 		Mousetrap.bindGlobal("ctrl+s", ev => {
 			if (this.props.hasUnsavedChanges) {
-				this.handleSave();
+				this.props.onSaveRequested();
 			}
 			ev.preventDefault();
 		});
@@ -90,12 +77,6 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	public componentWillUnmount() {
 		Mousetrap.unbindGlobal("ctrl+s");
-	}
-
-	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
-		if (!this.props.hadDuplicateTitle && nextProps.hadDuplicateTitle) {
-			this.setState({	hasTitleError: true	});
-		}
 	}
 
 	public render() {
@@ -128,7 +109,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 			/>
 			<ThesisMiddleForm
 				thesis={thesis}
-				titleError={this.state.hasTitleError}
+				titleError={this.props.hasTitleError}
 				user={this.props.user}
 				onTitleChanged={this.onTitleChanged}
 				onKindChanged={this.onKindChanged}
@@ -155,7 +136,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 		}
 		const { hasUnsavedChanges } = this.props;
 		return <SaveButton
-			onClick={this.handleSave}
+			onClick={this.props.onSaveRequested}
 			disabled={!hasUnsavedChanges}
 			title={hasUnsavedChanges ? this.getActionDescription() : "Nie dokonano zmian"}
 		>{this.getActionTitle()}</SaveButton>;
@@ -190,7 +171,7 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 	private onTitleChanged = (newTitle: string): void => {
 		// As soon as the user changes the title, we clear the error state
 		// it would be annoying if it stayed on until Save is clicked again
-		this.setState({ hasTitleError: false });
+		this.props.onChangedTitle();
 		this.updateThesisState({ title: { $set: newTitle } });
 	}
 
@@ -216,26 +197,5 @@ export class ThesisDetails extends React.PureComponent<Props, State> {
 
 	private onDescriptionChanged = (newDesc: string): void => {
 		this.updateThesisState({ description: { $set: newDesc } });
-	}
-
-	private validateBeforeSave() {
-		const { thesis } = this.props;
-		const trimmedTitle = thesis.title.trim();
-		if (!trimmedTitle) {
-			window.alert("Tytuł pracy nie może być pusty.");
-			this.setState({ hasTitleError: true });
-			return false;
-		}
-
-		this.setState({ hasTitleError: false });
-		return true;
-	}
-
-	private handleSave = () => {
-		if (!this.validateBeforeSave()) {
-			return;
-		}
-
-		this.props.onSaveRequested();
 	}
 }
