@@ -117,7 +117,6 @@ export class ThesesTable extends React.PureComponent<Props> {
 		if (applicationState === ApplicationState.FirstLoad) {
 			return <LoadingIndicator/>;
 		}
-		console.warn("Render table");
 		// Don't let people use the table while something is happening
 		const allowInteraction = [
 			ApplicationState.Normal, ApplicationState.LoadingMore

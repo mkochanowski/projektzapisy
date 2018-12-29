@@ -80,8 +80,6 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	public render() {
-		console.warn("Render details");
-
 		return <DetailsSectionWrapper>
 			{this.props.appState === ApplicationState.Saving
 				? <Spinner style={{ position: "absolute" }}/>

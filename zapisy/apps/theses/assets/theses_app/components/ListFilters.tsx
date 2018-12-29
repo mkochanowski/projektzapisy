@@ -67,7 +67,6 @@ export class ListFilters extends React.PureComponent<Props> {
 	}
 
 	public render() {
-		console.warn("Rendering filters");
 		const { state, stringFilterBeingChanged } = this.props;
 		if (stringFilterBeingChanged !== "") {
 			console.assert(
