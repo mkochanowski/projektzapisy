@@ -20,7 +20,7 @@ def can_add_thesis(user: BaseUser) -> bool:
 
 def is_owner_of_thesis(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user the advisor of the specified thesis?"""
-    return thesis.advisor and thesis.advisor.pk == user.pk
+    return thesis.advisor == user
 
 
 def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
@@ -54,4 +54,4 @@ def can_change_status(user: BaseUser) -> bool:
 
 def can_set_advisor(user: BaseUser, advisor: Employee) -> bool:
     """Is the specified user permitted to set the given advisor (may be None)?"""
-    return is_thesis_staff(user) or advisor and user.pk == advisor.pk
+    return is_thesis_staff(user) or advisor and user == advisor
