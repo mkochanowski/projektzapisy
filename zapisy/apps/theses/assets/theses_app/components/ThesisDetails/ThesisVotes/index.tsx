@@ -15,7 +15,8 @@ type Props = {
  * Renders the vote value for this thesis for each theses board member
  */
 export const ThesisVotes = React.memo(function(props: Props) {
-	const votes = props.thesesBoard.map((emp, i) => (
+	const board = props.thesesBoard;
+	const votes = board.length ? board.map((emp, i) => (
 		<SingleVote
 			key={i}
 			voter={emp}
@@ -23,7 +24,7 @@ export const ThesisVotes = React.memo(function(props: Props) {
 			user={props.user}
 			onChange={props.onChange}
 		/>
-	));
+	)) : <span>Nie zdefiniowano członków komisji</span>;
 	return <VotesContainer>
 		<Header>Głosy</Header>
 		{votes}
