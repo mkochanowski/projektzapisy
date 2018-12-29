@@ -10,6 +10,9 @@ import * as Mousetrap from "mousetrap";
 import "mousetrap-global-bind";
 import { observer } from "mobx-react";
 import styled from "styled-components";
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import "./misc_style.less";
 
 import { Thesis, ThesisTypeFilter } from "../types";
 import { ThesisDetails } from "./ThesisDetails";
@@ -25,6 +28,12 @@ import { ThesisNameConflict } from "../errors";
 const TopRowContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
+`;
+const UnsavedConfirmationContainer = styled.span`
+	font-size: 16px;
+`;
+const ThesisNameContainer = styled.span`
+	font-style: italic;
 `;
 
 const initialState = {
@@ -177,18 +186,30 @@ export class ThesesApp extends React.Component<any, State> {
 	 */
 	private confirmDiscardChanges() {
 		if (store.hasUnsavedChanges()) {
-			const title = store.thesis!.modified.title;
-			return window.confirm(
-				title.trim()
-					? `Czy porzucić niezapisane zmiany w pracy "${title}"?`
-					: "Czy porzucić niezapisane zmiany?"
-			);
+			return new Promise((resolve) => {
+				const title = store.thesis!.modified.title;
+				const msg = buildUnsavedConfirmation(title);
+				confirmAlert({
+					title: "",
+					message: msg,
+					buttons: [
+						{
+							label: "Tak, porzuć",
+							onClick: () => resolve(true),
+						},
+						{
+							label: "Nie, wróć",
+							onClick: () => resolve(false),
+						}
+					],
+				});
+			});
 		}
-		return true;
+		return Promise.resolve(true);
 	}
 
-	private onThesisSelected = (thesis: Thesis) => {
-		if (!this.confirmDiscardChanges()) {
+	private onThesisSelected = async (thesis: Thesis) => {
+		if (!await this.confirmDiscardChanges()) {
 			return;
 		}
 		store.selectThesis(thesis);
@@ -205,8 +226,8 @@ export class ThesesApp extends React.Component<any, State> {
 		store.setupForNewThesis(thesis);
 	}
 
-	private onResetChanges = () => {
-		if (!this.confirmDiscardChanges()) {
+	private onResetChanges = async () => {
+		if (!await this.confirmDiscardChanges()) {
 			return;
 		}
 		store.resetModifiedThesis();
@@ -228,4 +249,13 @@ export class ThesesApp extends React.Component<any, State> {
 			}
 		}
 	}
+}
+
+function buildUnsavedConfirmation(title: string) {
+	return <UnsavedConfirmationContainer>
+		{title.trim()
+		? <>Czy porzucić niezapisane zmiany
+			w&nbsp;pracy <ThesisNameContainer>{title}</ThesisNameContainer>?</>
+		: "Czy porzucić niezapisane zmiany w edytowanej pracy?"}
+	</UnsavedConfirmationContainer>;
 }
