@@ -36,7 +36,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         self.login_as(student)
         new_reserved = not self.thesis.reserved
         response = self.update_thesis_with_data({"reserved": new_reserved})
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["reserved"], self.thesis.reserved)
 
@@ -50,7 +50,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         response = self.update_thesis_with_data(
             {"title": new_title, "description": new_desc, "student": {"id": new_student.pk}}
         )
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         modified_thesis = self.get_modified_thesis()
         self.assertEqual(modified_thesis["title"], new_title)
         self.assertEqual(modified_thesis["description"], new_desc)
@@ -87,7 +87,7 @@ class ThesesModificationTestCase(ThesesBaseTestCase):
         self.login_as(another_emp)
         new_desc = "Another description"
         response = self.update_thesis_with_data({"description": new_desc})
-        self.assertEquals(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         modified_thesis = self.get_modified_thesis()
         self.assertNotEqual(modified_thesis["description"], new_desc)
 

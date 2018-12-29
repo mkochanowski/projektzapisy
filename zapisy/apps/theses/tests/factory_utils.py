@@ -1,6 +1,8 @@
 import random
 from faker import Faker
 
+from apps.users.models import Employee, Student
+from apps.users.tests.factories import EmployeeFactory, StudentFactory
 from ..models import ThesisKind, ThesisStatus, ThesisVote
 
 
@@ -53,3 +55,19 @@ def random_student(studs):
 
 def random_vote():
     return random.choice(list(ThesisVote))
+
+
+def random_definite_vote():
+    """Return a random thesis vote other than none"""
+    return random.choice([
+        ThesisVote.accepted,
+        ThesisVote.rejected,
+    ])
+
+
+def make_employee_with_name(name: str) -> Employee:
+    return EmployeeFactory(user__first_name=name, user__last_name="")
+
+
+def make_student_with_name(name: str) -> Student:
+    return StudentFactory(user__first_name=name, user__last_name="")

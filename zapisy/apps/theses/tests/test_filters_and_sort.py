@@ -1,10 +1,12 @@
 import random
 
-from apps.users.tests.factories import EmployeeFactory
 from ..models import Thesis, ThesisStatus, ThesisKind
 from ..views import ThesisTypeFilter
 from .base import ThesesBaseTestCase, PAGE_SIZE
-from .factory_utils import random_current_status, random_available_status, random_status
+from .factory_utils import (
+    random_current_status, random_available_status,
+    random_status, make_employee_with_name
+)
 
 
 class ThesesFiltersAndSortingTestCase(ThesesBaseTestCase):
@@ -126,13 +128,13 @@ class ThesesFiltersAndSortingTestCase(ThesesBaseTestCase):
         archived_adv_names = ["aaaa", "zyd"]
         currents = [
             self.make_thesis(
-                advisor=employee_with_name(cur_adv_name),
+                advisor=make_employee_with_name(cur_adv_name),
                 status=random_current_status()
             ) for cur_adv_name in current_adv_names
         ]
         archiveds = [
             self.make_thesis(
-                advisor=employee_with_name(arch_adv_name),
+                advisor=make_employee_with_name(arch_adv_name),
                 status=ThesisStatus.defended
             ) for arch_adv_name in archived_adv_names
         ]
@@ -144,7 +146,3 @@ class ThesesFiltersAndSortingTestCase(ThesesBaseTestCase):
         all_adv_names = current_adv_names + archived_adv_names
         for i in range(len(all_theses)):
             self.assertEqual(theses[i]["advisor"]["display_name"], all_adv_names[i])
-
-
-def employee_with_name(name):
-    return EmployeeFactory(user__first_name=name, user__last_name="")

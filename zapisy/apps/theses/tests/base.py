@@ -116,5 +116,5 @@ class ThesesBaseTestCase(APITestCase):
     def get_theses_with_data(self, data={}):
         """Download and return theses with the provided params"""
         response = self.get_response_with_data(data)
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         return response.data["results"]
