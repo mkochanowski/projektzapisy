@@ -227,11 +227,6 @@ def disable_grade(request):
         #        PublicKey.objects.all().delete()
         #        PrivateKey.objects.all().delete()
 
-        for st in SavedTicket.objects.filter(finished=False):
-            # TODO: oznaczyć je jako archiwalne!
-            st.finished = True
-            st.save()
-
         messages.success(request, "Zamknięto ocenę zajęć")
     else:
         messages.error(request, "Nie można zamknąć oceny; system nie był uruchomiony")
@@ -695,7 +690,6 @@ def tickets_enter(request):
 
             errors = []
             polls = []
-            finished = []
             for (id, (ticket, signed_ticket)) in ids_and_tickets:
                 try:
                     poll = Poll.objects.get(pk=id)
@@ -704,10 +698,7 @@ def tickets_enter(request):
                         try:
                             st = SavedTicket.objects.get(poll=poll,
                                                          ticket=ticket)
-                            if st.finished:
-                                finished.append((poll, ticket, signed_ticket))
-                            else:
-                                polls.append((poll, ticket, signed_ticket))
+                            polls.append((poll, ticket, signed_ticket))
                         except BaseException:
                             st = SavedTicket(poll=poll, ticket=ticket)
                             st.save()
@@ -734,12 +725,6 @@ def tickets_enter(request):
                     poll_list,
                 ) for poll_name, poll_list in group_polls_and_tickets_by_course(polls)
             ]
-            request.session["finished"] = [
-                (
-                    (poll_name, create_slug(poll_name)),
-                    poll_list,
-                ) for poll_name, poll_list in group_polls_and_tickets_by_course(finished)
-            ]
 
             return HttpResponseRedirect('/grade/poll/polls/all')
     else:
@@ -758,10 +743,6 @@ def polls_for_user(request, slug):
     data['grade'] = Semester.objects.filter(is_grade_active=True).count() > 0
     if data['polls']:
         (_, s), _, list_ = data['polls'][0]
-        id_, _, _, _ = list_[0]
-        return HttpResponseRedirect(reverse('grade-poll-poll-answer', args=[s, id_]))
-    elif data['finished']:
-        (_, s), _, list_ = data['finished'][0]
         id_, _, _, _ = list_[0]
         return HttpResponseRedirect(reverse('grade-poll-poll-answer', args=[s, id_]))
 
@@ -809,26 +790,13 @@ def poll_answer(request, slug, pid):
     except IndexError:
         poll_cands = []
 
-    try:
-
-        finished_cands = []
-        for poll_to_show in data['finished']:
-
-            polls = []
-            for poll_details in poll_to_show[2]:
-                polls.append((poll_details, poll_to_show[0][1]))
-
-            finished_cands.extend(polls)
-    except BaseException:
-        finished_cands = []
-
-    data['next'] = get_next(poll_cands, finished_cands, int(pid))
-    data['prev'] = get_prev(poll_cands, finished_cands, int(pid))
+    data['next'] = get_next(poll_cands, int(pid))
+    data['prev'] = get_prev(poll_cands, int(pid))
 
     if ticket and signed_ticket and check_signature(ticket, signed_ticket, public_key):
         st = SavedTicket.objects.get(ticket=str(ticket), poll=poll)
 
-        if request.method == "POST" and not st.finished:
+        if request.method == "POST":
             form = PollForm()
             form.setFields(poll, st, None, request.POST)
 
@@ -987,11 +955,9 @@ def poll_answer(request, slug, pid):
                                     ans.delete()
                 if 'finish' in request.POST:
                     messages.success(request, "Ankieta: " + poll.title + " zakończona")
-                    finit = request.session.get('finished', default=[])
                     polls = request.session.get('polls', default=[])
 
                     slug_polls = [x_s_ls for x_s_ls in polls if slug == x_s_ls[0][1]]
-                    slug_finit = [x_s_ls1 for x_s_ls1 in finit if slug == x_s_ls1[0][1]]
 
                     name = None
 
@@ -1006,23 +972,10 @@ def poll_answer(request, slug, pid):
                             name = n
                             break
 
-                    if slug_finit:
-                        for ((n, s), ls) in slug_finit:
-                            if n == name:
-                                finit.remove(((n, s), ls))
-                                ls.append((int(pid), ticket, signed_ticket))
-                                finit.append(((n, s), ls))
-                                break
-                    else:
-                        finit.append(((name, slug), [(int(pid), ticket, signed_ticket)]))
-
                     polls.sort(key=cmp_to_key(slug_cmp))
-                    finit.sort(key=cmp_to_key(slug_cmp))
 
-                    request.session['finished'] = finit
                     request.session['polls'] = polls
 
-                    st.finished = True
                     st.save()
                 else:
                     messages.success(request, "Ankieta: " + poll.title + " zapisana")
@@ -1040,7 +993,7 @@ def poll_answer(request, slug, pid):
         data['pid'] = int(pid)
 
         if request.method == "POST" and (
-                not ('form_errors' in data and data['form_errors']) or st.finished):
+                not ('form_errors' in data and data['form_errors'])):
             if request.POST.get('Next', default=None):
                 return HttpResponseRedirect('/grade/poll/poll_answer/' +
                                             str(data['next'][3]) + '/' + str(data['next'][0]))
@@ -1125,9 +1078,7 @@ def poll_results(request, mode='S', poll_id=None, semester=None):
 
         if poll.is_user_entitled_to_view_result(request.user):
             poll_answers = poll.all_answers()
-            sts_fin = SavedTicket.objects.filter(poll=poll, finished=True).count()
-            sts_not_fin = SavedTicket.objects.filter(poll=poll, finished=False).count()
-            sts_all = sts_fin + sts_not_fin
+            sts_all = SavedTicket.objects.filter(poll=poll).count()
 
             answers = []
             for section, section_answers in poll_answers:
@@ -1188,14 +1139,9 @@ def poll_results(request, mode='S', poll_id=None, semester=None):
 
                 answers.append((section.title, s_ans))
 
-            if semester.is_grade_active:
-                data['completness'] = SafeText(
-                    "Liczba studentów, którzy zakończyli wypełniać ankietę: %d<br/>Liczba studentów którzy nie zakończyli wypełniać ankiety: %d" %
-                    (sts_fin, sts_not_fin))
-            else:
-                data['completness'] = SafeText(
-                    "Liczba studentów, którzy wypełnili ankietę: %d" %
-                    (sts_fin))
+            data['completness'] = SafeText(
+                "Liczba studentów, którzy wypełnili ankietę: %d" %
+                (sts_all))
             data['poll_title'] = poll.title
             try:
                 data['poll_course'] = poll.group.course.name
@@ -1269,7 +1215,7 @@ def poll_results_detailed(request, mode, poll_id, st_id=None, semester=None):
     if poll.is_user_entitled_to_view_result(request.user):
 
         if not st_id:
-            sts = SavedTicket.objects.filter(poll=poll, finished=True)
+            sts = SavedTicket.objects.filter(poll=poll)
             data['page'] = 1
             data['sts'] = sts
             request.session['sts'] = data['sts']
@@ -1277,7 +1223,7 @@ def poll_results_detailed(request, mode, poll_id, st_id=None, semester=None):
             try:
                 data['sts'] = request.session['sts']
             except BaseException:
-                sts = SavedTicket.objects.filter(poll=poll, finished=True)
+                sts = SavedTicket.objects.filter(poll=poll)
                 data['sts'] = sts
                 request.session['sts'] = data['sts']
 
@@ -1304,8 +1250,7 @@ def poll_results_detailed(request, mode, poll_id, st_id=None, semester=None):
             data['last'] = sts[-1].id
             data['connected'] = []
             for cst in SavedTicket.objects.filter(
-                    ticket=st.ticket,
-                    finished=True).exclude(poll=poll):
+                    ticket=st.ticket).exclude(poll=poll):
                 cform = PollForm()
                 cform.setFields(cst.poll, cst)
                 data['connected'].append(cform)

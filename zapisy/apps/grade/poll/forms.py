@@ -45,10 +45,6 @@ class PollForm(forms.Form):
 
     def setFields(self, poll=None, st=None, section_id=None, post_data=None):
         self.instance = poll
-        if st:
-            self.finished = st.finished
-        else:
-            self.finished = True
 
         if poll:
             ppk = poll.pk
@@ -111,12 +107,8 @@ class PollForm(forms.Form):
                         field.description = ""
                     field.is_scale = questions[0].is_scale
                     field.type = 'single'
-                    if self.finished:
-                        field.widget.attrs['disabled'] = True
                     poll_section.questions.append(field)
 
-                    if self.finished:
-                        field.disabled = True
                     self.fields[str(title)] = field
                     questions = questions[1:]
 
@@ -157,11 +149,7 @@ class PollForm(forms.Form):
                         field.description = ""
                     if question.is_scale:
                         field.is_scale = True
-                    if self.finished:
-                        field.widget.attrs['disabled'] = True
                     field.title = title
-                    if self.finished:
-                        field.disabled = True
                     poll_section.questions.append(field)
                     self.fields[str(title)] = field
                 elif str(type(question)) == \
@@ -197,8 +185,6 @@ class PollForm(forms.Form):
                             required=False)
                         other_field.title = title + '-other'
                         other_field.type = 'other'
-                        if self.finished:
-                            other_field.widget.attrs['disabled'] = True
                         if other_ans and -1 not in answer:
                             answer.append(-1)
                     if answer:
@@ -223,8 +209,6 @@ class PollForm(forms.Form):
                         field.description = ""
                     field.type = 'multi'
                     field.title = title
-                    if self.finished:
-                        field.disabled = True
                     poll_section.questions.append(field)
                     self.fields[str(title)] = field
                     if question.has_other:
@@ -252,15 +236,11 @@ class PollForm(forms.Form):
                         label=str(question.content),
                         required=False,
                         initial=answer)
-                    if self.finished:
-                        field.widget.attrs['disabled'] = True
                     field.type = 'open'
                     field.title = title
                     field.description = question.description
                     if not field.description:
                         field.description = ""
-                    if self.finished:
-                        field.disabled = True
                     poll_section.questions.append(field)
                     self.fields[str(title)] = field
 
@@ -268,12 +248,3 @@ class PollForm(forms.Form):
                 poll_section.pk = section.pk
 
             self.sections.append(poll_section)
-        if not self.finished:
-            field = forms.BooleanField(
-                label='Zakończ oceniać',
-                required=False,
-                initial=False,
-                help_text='Ankieta zakończona - Jeśli zaznaczysz to pole, utracisz mozliwość edycji tej ankiety.')
-            field.type = 'finish'
-            self.finish = field
-            self.fields['finish'] = field

@@ -40,8 +40,6 @@ class Poll(models.Model):
         on_delete=models.CASCADE)
     share_result = models.BooleanField(verbose_name='udostępnij wyniki', default=False, blank=True)
 
-    finished = models.BooleanField(verbose_name="zakończona", default=False)
-
     deleted = models.BooleanField(blank=False, null=False, default=False, verbose_name='usunięta')
     origin = models.ForeignKey(
         Origin,
@@ -271,7 +269,7 @@ class Poll(models.Model):
 
     def all_answers_by_tickets(self):
         results = []
-        tickets = SavedTicket.objects.filter(poll=self, finished=True)
+        tickets = SavedTicket.objects.filter(poll=self)
         sections = self.all_sections()
         for ticket in tickets:
             sections_answers = []

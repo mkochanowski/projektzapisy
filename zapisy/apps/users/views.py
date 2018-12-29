@@ -347,8 +347,6 @@ def login_plus_remember_me(request: HttpRequest, **kwargs: Any) -> HttpResponse:
         return redirect("main-page")
     if 'polls' in request.session:
         del request.session['polls']
-    if 'finished' in request.session:
-        del request.session['finished']
 
     if request.method == 'POST':
         if request.POST.get('remember_me', None):

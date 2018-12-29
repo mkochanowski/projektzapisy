@@ -109,8 +109,7 @@ def create_slug(name):
 
 def prepare_data(request, slug):
     data = {'errors': [],
-            'polls': [],
-            'finished': []}
+            'polls': [],}
 
     for id, error in request.session.get('errors', default=[]):
         try:
@@ -128,7 +127,7 @@ def prepare_data(request, slug):
     dict = {}
     if polls:
         polls_id = reduce(lambda x, y: x + y, [[id_t_st[0]
-                                                for id_t_st in x_s_l[1]] for x_s_l in polls])
+                                                for id_t_st in x_s_l[1]] for x_s_l in polls], [])
         for poll in Poll.objects.filter(
                 pk__in=polls_id).select_related(
                 'group',
@@ -141,38 +140,14 @@ def prepare_data(request, slug):
                                                                                 id_t_st2[2], dict[id_t_st2[0]].to_url_title(True)) for id_t_st2 in x_s_l7[1]]) for x_s_l7 in polls]
     else:
         data['polls'] = []
-    finished = request.session.get("finished", default=[])
-    if finished:
-        finished_id = reduce(lambda x, y: x + y, [[id_t_st1[0]
-                                                   for id_t_st1 in x_s_l4[1]] for x_s_l4 in finished])
-        for poll in Poll.objects.filter(
-                pk__in=finished_id).select_related(
-                'group',
-                'group__course',
-                'group__teacher',
-                'group__teacher__user'):
-            dict[poll.pk] = poll
-
-        data['finished'] = [((x_s_l8[0][0], x_s_l8[0][1]), slug == x_s_l8[0][1], [(id_t_st3[0], id_t_st3[1],
-                                                                                   id_t_st3[2], dict[id_t_st3[0]].to_url_title(True)) for id_t_st3 in x_s_l8[1]]) for x_s_l8 in finished]
-    else:
-        data['finished'] = []
-
-    data['finished_polls'] = len(request.session.get("finished", default=[]))
     data['all_polls'] = reduce(lambda x, y: x + y, [len(p_l[1])
-                                                    for p_l in request.session.get("polls", default=[])], data['finished_polls'])
+                                                    for p_l in request.session.get("polls", default=[])], 0)
     return data
 
 
-def get_next(poll_list, finished_list, poll_id):
+def get_next(poll_list, poll_id):
     ret = False
     for (p_id, t, st, s), slug in poll_list:
-        if ret:
-            return p_id, t, s, slug
-        ret = p_id == poll_id
-
-    ret = False
-    for (p_id, t, st, s), slug in finished_list:
         if ret:
             return p_id, t, s, slug
         ret = p_id == poll_id
@@ -180,33 +155,25 @@ def get_next(poll_list, finished_list, poll_id):
     return None
 
 
-def get_prev(poll_list, finished_list, poll_id):
+def get_prev(poll_list, poll_id):
     poll_list.reverse()
-    finished_list.reverse()
-
-    prev = get_next(poll_list, finished_list, poll_id)
-
+    prev = get_next(poll_list, poll_id)
     poll_list.reverse()
-    finished_list.reverse()
 
     return prev
 
 
 def get_ticket_and_signed_ticket_from_session(session, slug, poll_id):
     polls = session.get('polls', default=[])
-    finished = session.get('finished', default=[])
 
     polls = flatten([n_s_lt[1]
                      for n_s_lt in [name_s_lt for name_s_lt in polls if name_s_lt[0][1] == slug]])
-    finished = flatten([n_s_lt9[1] for n_s_lt9 in [
-                       name_s_lt5 for name_s_lt5 in finished if name_s_lt5[0][1] == slug]])
 
-    data = polls + finished
-    data = [(id_t_st10[1], id_t_st10[2])
-            for id_t_st10 in [id_t_st6 for id_t_st6 in data if id_t_st6[0] == int(poll_id)]]
+    polls = [(id_t_st10[1], id_t_st10[2])
+             for id_t_st10 in [id_t_st6 for id_t_st6 in polls if id_t_st6[0] == int(poll_id)]]
 
     try:
-        return data[0]
+        return polls[0]
     except IndexError:
         return None, None
 
