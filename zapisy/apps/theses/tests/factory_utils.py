@@ -3,7 +3,7 @@ from faker import Faker
 
 from apps.users.models import Employee, Student
 from apps.users.tests.factories import EmployeeFactory, StudentFactory
-from ..models import ThesisKind, ThesisStatus, ThesisVote
+from ..models import ThesisKind, ThesisStatus, ThesisVote, Thesis
 
 
 fake = Faker()
@@ -14,7 +14,10 @@ def random_bool():
 
 
 def random_title():
-    return fake.name()
+    result = fake.name()
+    while Thesis.objects.filter(title=result.strip()).count():
+        result = fake.name()
+    return result
 
 
 def random_advisor(emps):
