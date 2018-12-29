@@ -10,6 +10,9 @@ from .factory_utils import random_vote
 
 
 class ThesesModificationTestCase(ThesesBaseTestCase):
+    """Tests that theses modification via the REST API (PATCH requests)
+    and related processing work correctly
+    """
     def setUp(self):
         self.advisor = self.get_random_emp()
         self.thesis = self.make_thesis(advisor=self.advisor, status=ThesisStatus.being_evaluated)
