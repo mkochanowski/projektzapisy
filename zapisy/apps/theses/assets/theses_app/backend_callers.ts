@@ -205,7 +205,6 @@ export async function saveModifiedThesis(
 ): Promise<void> {
 	const objToSend = getThesisModDispatch(originalThesis, modifiedThesis);
 	const jsonData = JSON.stringify(objToSend);
-	console.warn("Sending", jsonData);
 	await safeSendThesisRequest(
 		`${BASE_API_URL}/theses/${objToSend.id}/`,
 		{
@@ -226,7 +225,6 @@ export async function saveModifiedThesis(
 export async function saveNewThesis(thesis: Thesis): Promise<number> {
 	const objToSend = getThesisAddDispatch(thesis);
 	const jsonData = JSON.stringify(objToSend);
-	console.warn("Adding:", jsonData);
 	const res = await safeSendThesisRequest(
 		`${BASE_API_URL}/theses/`,
 		{

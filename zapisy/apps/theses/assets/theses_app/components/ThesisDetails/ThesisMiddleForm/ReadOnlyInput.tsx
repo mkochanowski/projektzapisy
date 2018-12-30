@@ -3,6 +3,7 @@ import * as React from "react";
 type Props = {
 	text: string;
 	style?: React.CSSProperties;
+	className?: string;
 };
 
 /**
@@ -15,5 +16,6 @@ export const ReadOnlyInput = React.memo(function(props: Props) {
 		readOnly
 		value={props.text}
 		style={props.style || {}}
+		className={props.className}
 	/>;
 });

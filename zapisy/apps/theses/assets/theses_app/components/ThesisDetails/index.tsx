@@ -10,7 +10,7 @@ import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser, ThesisVote } from 
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
-
+import "./style.less";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../types/misc";
@@ -81,8 +81,6 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	public render() {
-		console.warn("Render details");
-
 		return <DetailsSectionWrapper>
 			{this.props.appState === ApplicationState.Saving
 				? <Spinner style={{ position: "absolute" }}/>

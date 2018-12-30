@@ -7,41 +7,13 @@
 	{% render_bundle "theses-main" %}
 {% endblock %}
 
-{% block styles %}
-	{{ block.super }}
-	<style type="text/css">
-		/* reset annoying Bootstrap changes */
-		input, textarea {
-			height: auto;
-		}
-		table {
-			width: auto;
-		}
-		table th, table td {
-			padding: 0px;
-			line-height: auto;
-			border-bottom: 0px;
-		}
-		input, textarea, label {
-			width: auto;
-		}
-		select {
-			padding: 0px;
-		}
-		label {
-			padding-top: 0px;
-		}
-
-		/* Broken default webkit stylesheets */
-		div.rt-th:focus {
-			outline: none;
-		}
-	</style>
-{% endblock %}
-
 {% block uwr_logo %}
 {% endblock %}
 
-{% block fullWidthContent %}
-<div id="theses-react-root"></div>
+{% block full_width_content %}
+<div id="theses-react-root">
+	<div class="centering_div">
+		<h3>System prac dyplomowych wymaga włączonej obsługi JavaScript</h3>
+	</div>
+</div>
 {% endblock %}

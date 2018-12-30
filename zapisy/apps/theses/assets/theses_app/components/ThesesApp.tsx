@@ -12,7 +12,6 @@ import { observer } from "mobx-react";
 import styled from "styled-components";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import "./misc_style.less";
 
 import { Thesis, ThesisTypeFilter } from "../types";
 import { ThesisDetails } from "./ThesisDetails";
