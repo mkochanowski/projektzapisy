@@ -44,7 +44,6 @@
     "react-button-component": "^1.0.0",
     "react-confirm-alert": "^2.0.7",
     "react-dom": "^16.7.0",
-    "react-mobx": "^0.0.4",
     "react-select": "1",
     "react-select-async-paginate": "^0.1.0",
     "react-transition-group": "^2.5.2",
