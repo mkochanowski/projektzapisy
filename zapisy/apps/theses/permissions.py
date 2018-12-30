@@ -9,8 +9,7 @@ from .users import ThesisUserType, get_user_type, is_theses_board_member
 
 def is_thesis_staff(user: BaseUser) -> bool:
     """Determine whether the user should be considered a "staff member" in the theses system"""
-    user_type = get_user_type(user)
-    return user_type == ThesisUserType.admin or is_theses_board_member(user)
+    return get_user_type(user) == ThesisUserType.admin or is_theses_board_member(user)
 
 
 def can_add_thesis(user: BaseUser) -> bool:
@@ -26,10 +25,7 @@ def is_owner_of_thesis(user: BaseUser, thesis: Thesis) -> bool:
 
 def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user permitted to make any changes to the specified thesis?"""
-    return (
-        is_thesis_staff(user) or
-        is_owner_of_thesis(user, thesis)
-    )
+    return is_thesis_staff(user) or is_owner_of_thesis(user, thesis)
 
 
 def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
@@ -43,10 +39,7 @@ def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
 
 def can_set_status(user: BaseUser, status: ThesisStatus) -> bool:
     """Can a user of the specified type set the specified status for a new thesis?"""
-    return (
-        is_thesis_staff(user) or
-        status == ThesisStatus.being_evaluated
-    )
+    return is_thesis_staff(user) or status == ThesisStatus.being_evaluated
 
 
 def can_change_status(user: BaseUser) -> bool:
@@ -56,4 +49,4 @@ def can_change_status(user: BaseUser) -> bool:
 
 def can_set_advisor(user: BaseUser, advisor: Employee) -> bool:
     """Is the specified user permitted to set the given advisor (may be None)?"""
-    return is_thesis_staff(user) or advisor and user == advisor
+    return is_thesis_staff(user) or user == advisor

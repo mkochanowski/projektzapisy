@@ -30,7 +30,7 @@ class PersonSerializerForThesis(serializers.Serializer):
 
     def to_internal_value(self, data):
         person_id = data.get("id")
-        if type(person_id) is not int or person_id < 0:
+        if not isinstance(person_id, int) or person_id < 0:
             raise serializers.ValidationError({
                 "id": "Expected 'id' to be a valid positive integer"
             })
@@ -113,8 +113,7 @@ class ThesisSerializer(serializers.ModelSerializer):
             return self.validate_add_thesis(data)
         elif request.method == "PATCH":
             return self.validate_modify_thesis(data)
-        else:
-            raise serializers.ValidationError(f'Unknown request type {request.method}')
+        raise serializers.ValidationError(f'Unknown request type {request.method}')
 
     def validate_add_thesis(self, data: ValidationData):
         """Validate a request to add a new thesis object and convert to more convenient
@@ -183,12 +182,10 @@ class ThesisSerializer(serializers.ModelSerializer):
         user = wrap_user(request.user)
         if "advisor" in validated_data:
             check_advisor_permissions(user, validated_data["advisor"])
-        if "status" in validated_data:
-            if not can_change_status(user):
-                raise exceptions.PermissionDenied("This type of user cannot modify the status")
-        if "title" in validated_data:
-            if not can_change_title(user, self.instance):
-                raise exceptions.PermissionDenied("This type of user cannot change the title")
+        if "status" in validated_data and not can_change_status(user):
+            raise exceptions.PermissionDenied("This type of user cannot modify the status")
+        if "title" in validated_data and not can_change_title(user, self.instance):
+            raise exceptions.PermissionDenied("This type of user cannot change the title")
 
         instance.title = validated_data.get("title", instance.title)
         instance.kind = validated_data.get("kind", instance.kind)

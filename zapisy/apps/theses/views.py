@@ -62,8 +62,8 @@ class ThesesViewSet(viewsets.ModelViewSet):
 
         try:
             requested_thesis_type = \
-                ThesisTypeFilter(int(requested_thesis_type_str))\
-                if requested_thesis_type_str\
+                ThesisTypeFilter(int(requested_thesis_type_str)) \
+                if requested_thesis_type_str \
                 else ThesisTypeFilter.default
         except ValueError:
             raise exceptions.ParseError()
@@ -90,18 +90,18 @@ def generate_base_queryset():
     """Return theses queryset with the appropriate fields prefetched (see below)
     as well as user names annotated for further processing - sorting/filtering
     """
-    return Thesis.objects\
+    return Thesis.objects \
         .select_related(
             *fields_for_prefetching("student"),
             *fields_for_prefetching("student_2"),
             *fields_for_prefetching("advisor"),
             *fields_for_prefetching("auxiliary_advisor"),
-        )\
+        ) \
         .annotate(
             advisor_name=Concat(
                 "advisor__user__first_name", Value(" "), "advisor__user__last_name"
             )
-        )\
+        ) \
         .annotate(is_archived=Case(
             When(status=ThesisStatus.defended.value, then=True),
             default=Value(False),
@@ -158,9 +158,9 @@ def sort_queryset(qs, sort_column: str, sort_dir: str):
 
 def available_thesis_filter(queryset):
     """Returns only theses that are considered "available" from the specified queryset"""
-    return queryset\
-        .exclude(status=ThesisStatus.in_progress.value)\
-        .exclude(is_archived=True)\
+    return queryset \
+        .exclude(status=ThesisStatus.in_progress.value) \
+        .exclude(is_archived=True) \
         .exclude(reserved=True)
 
 
@@ -221,13 +221,13 @@ def build_autocomplete_view_with_queryset(queryset):
         def get_queryset(self):
             if not self.request.user.is_authenticated:
                 raise PermissionDenied()
-            qs = queryset.objects\
-                .select_related("user")\
+            qs = queryset.objects \
+                .select_related("user") \
                 .annotate(
                     full_name=Concat(
                         "user__first_name", Value(" "), "user__last_name"
                     )
-                )\
+                ) \
                 .order_by("full_name")
             if self.q:
                 qs = qs.filter(full_name__icontains=self.q)

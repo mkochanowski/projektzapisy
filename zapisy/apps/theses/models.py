@@ -73,7 +73,7 @@ class Thesis(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        super(Thesis, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "praca dyplomowa"

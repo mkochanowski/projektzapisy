@@ -16,9 +16,9 @@ def is_theses_board_member(user: BaseUser) -> bool:
 
 def get_theses_board():
     """Return all members of the theses board"""
-    return Employee.objects\
-        .select_related("user")\
-        .filter(user__groups__name=THESIS_BOARD_GROUP_NAME)\
+    return Employee.objects \
+        .select_related("user") \
+        .filter(user__groups__name=THESIS_BOARD_GROUP_NAME) \
         .all()
 
 
@@ -62,5 +62,4 @@ def wrap_user(user: User) -> BaseUser:
         return user.employee
     elif BaseUser.is_student(user):
         return user.student
-    else:
-        raise Http404("invalid user")
+    raise Http404("invalid user")
