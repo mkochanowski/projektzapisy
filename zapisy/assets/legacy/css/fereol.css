@@ -10,7 +10,14 @@ a {
   float: left;
 }
 
-div.header {
+#top_menu_container {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+}
+
+#logo_container {
   background: #00709e;
  /* Old browsers */
   height: 96px;
