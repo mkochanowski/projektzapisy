@@ -10,7 +10,7 @@ import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser } from "../../types
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
-
+import "./style.less";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../types/misc";

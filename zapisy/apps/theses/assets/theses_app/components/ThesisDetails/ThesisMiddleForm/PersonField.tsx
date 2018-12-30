@@ -12,8 +12,8 @@ import { BasePerson } from "../../../types";
 import { ReadOnlyInput } from "./ReadOnlyInput";
 
 const PersonFieldWrapper = styled.div`
-width: 50%;
-display: inline-block;
+	width: 50%;
+	display: inline-block;
 `;
 
 // This uses django-autocomplete-light's endpoint to fetch a list of

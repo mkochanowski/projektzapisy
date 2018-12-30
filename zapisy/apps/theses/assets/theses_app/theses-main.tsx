@@ -15,6 +15,7 @@ import AlertTemplate from "react-alert-template-basic";
 import { whenDomLoaded } from "common/utils";
 import { ThesesApp } from "./components/ThesesApp";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import "./misc_style.less";
 
 const alertOptions = {
 	position: "bottom center",
