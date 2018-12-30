@@ -11,7 +11,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, os.pardir, 'env', '.env'))
 
 DEBUG = env.bool('DEBUG')
 RELEASE = env.bool('RELEASE')
-TESTING = "test" in sys.argv
+TESTING = sys.argv[1:2] = ["test"]
 
 # USE_TZ = True
 
@@ -300,15 +300,13 @@ CACHES = {
 
 # When testing, don't use strong hashers that take forever to compute
 # Taken from https://github.com/FactoryBoy/factory_boy/issues/224
-if TESTING:
+# This very noticeably improves performance when creating multiple test users
+# (by an order of magnitude, for ~40 users 30 sec -> 1 sec)
+# We very much don't want this to ever happen in a productive environment,
+# so also check for RELEASE
+if TESTING and not RELEASE:
     PASSWORD_HASHERS = (
         'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-        'django.contrib.auth.hashers.BCryptPasswordHasher',
-        'django.contrib.auth.hashers.SHA1PasswordHasher',
-        'django.contrib.auth.hashers.MD5PasswordHasher',
-        'django.contrib.auth.hashers.CryptPasswordHasher',
     )
 
 NEWS_PER_PAGE = 15

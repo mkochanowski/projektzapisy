@@ -1,9 +1,12 @@
 import random
+import os
+import sys
+
 from faker import Faker
 
 from apps.users.models import Employee, Student
 from apps.users.tests.factories import EmployeeFactory, StudentFactory
-from ..models import ThesisKind, ThesisStatus, ThesisVote, Thesis
+from ..models import ThesisKind, ThesisStatus, ThesisVote
 
 
 fake = Faker()
@@ -14,10 +17,10 @@ def random_bool():
 
 
 def random_title():
-    result = fake.name()
-    while Thesis.objects.filter(title=result.strip()).count():
-        result = fake.name()
-    return result
+    """Return a unique random title"""
+    # By appending the pid to the title we guarantee uniqueness
+    # among processes, enabling tests to be run with --parallel
+    return f'{fake.name()}_{random.randrange(sys.maxsize)}_{os.getpid()}'
 
 
 def random_advisor(emps):
@@ -33,10 +36,14 @@ def random_status():
 
 
 def random_current_status():
+    """Return a random "current", i.e. not defended status"""
     return random.choice([status for status in ThesisStatus if status != ThesisStatus.defended])
 
 
 def random_available_status():
+    """Return a random status where the thesis will be considered "available"
+    for students
+    """
     return random.choice([
         ThesisStatus.accepted,
         ThesisStatus.being_evaluated,
