@@ -16,7 +16,7 @@ import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../types/misc";
 import { canModifyThesis } from "../../permissions";
 
-const SaveButton = Button.extend`
+const SaveButton = React.memo(Button.extend`
 	&:disabled:hover {
 		background: white;
 	}
@@ -26,7 +26,7 @@ const SaveButton = Button.extend`
 	}
 	min-height: initial;
 	height: 25px;
-`;
+`);
 
 const DetailsSectionWrapper = styled.div`
 	display: flex;
