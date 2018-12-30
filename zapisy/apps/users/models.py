@@ -169,7 +169,7 @@ class Employee(BaseUser):
         )
 
     def get_full_name(self) -> str:
-        base_name = super(Employee, self).get_full_name()
+        base_name = super().get_full_name()
         return f'{self.title} {base_name}' if self.title else base_name
 
 
