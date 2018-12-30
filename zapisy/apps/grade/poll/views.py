@@ -17,7 +17,7 @@ from apps.enrollment.courses.models.course import Course, CourseEntity
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.ticket_create.utils import from_plaintext
 from apps.grade.ticket_create.models import PublicKey
-from apps.grade.poll.models import Poll, Section, OpenQuestion, SingleChoiceQuestion, \
+from apps.grade.poll.models import GradingSession, Poll, Section, OpenQuestion, SingleChoiceQuestion, \
     MultipleChoiceQuestion, SavedTicket, SingleChoiceQuestionAnswer, \
     MultipleChoiceQuestionAnswer, OpenQuestionAnswer, Option, Template, Origin
 from apps.grade.poll.forms import TicketsForm, PollForm
@@ -690,6 +690,8 @@ def tickets_enter(request):
 
             errors = []
             polls = []
+            grading_session = GradingSession(tickets=[])
+
             for (id, (ticket, signed_ticket)) in ids_and_tickets:
                 try:
                     poll = Poll.objects.get(pk=id)
@@ -699,6 +701,11 @@ def tickets_enter(request):
                             st = SavedTicket.objects.get(poll=poll,
                                                          ticket=ticket)
                             polls.append((poll, ticket, signed_ticket))
+                            grading_session.tickets.append({
+                                'id': id,
+                                'ticket': ticket,
+                                'signature': signed_ticket,
+                            })
                         except BaseException:
                             st = SavedTicket(poll=poll, ticket=ticket)
                             st.save()
@@ -725,6 +732,9 @@ def tickets_enter(request):
                     poll_list,
                 ) for poll_name, poll_list in group_polls_and_tickets_by_course(polls)
             ]
+
+            grading_session.save()
+            request.session['grading_session_uuid'] = grading_session.uuid
 
             return HttpResponseRedirect('/grade/poll/polls/all')
     else:
@@ -991,6 +1001,7 @@ def poll_answer(request, slug, pid):
 
         data['form'] = form
         data['pid'] = int(pid)
+        data['grading_session_uuid'] = request.session['grading_session_uuid']
 
         if request.method == "POST" and (
                 not ('form_errors' in data and data['form_errors'])):
