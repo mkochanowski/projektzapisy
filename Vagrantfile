@@ -25,7 +25,11 @@ Vagrant.configure(2) do |config|
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = "2048"
+    vb.cpus = "2"
+    # Enable "IO APIC" for better multicore performance, see
+    # https://serverfault.com/questions/74672/why-should-i-enable-io-apic-in-virtualbox
+    vb.customize ["modifyvm", :id, "--ioapic", "on"]
     # The folder "node_modules" will live somewhere else and only be mounted
     # in /vagrant/zapisy to avoid the issue with symlinks on Windows.
     config.vm.provision "shell", inline: <<-SHELL
