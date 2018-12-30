@@ -221,16 +221,16 @@ def build_autocomplete_view_with_queryset(queryset):
         def get_queryset(self):
             if not self.request.user.is_authenticated:
                 raise PermissionDenied()
-            qs = queryset.objects
+            qs = queryset.objects\
+                .select_related("user")\
+                .annotate(
+                    full_name=Concat(
+                        "user__first_name", Value(" "), "user__last_name"
+                    )
+                )\
+                .order_by("full_name")
             if self.q:
-                qs = qs\
-                    .select_related("user")\
-                    .annotate(
-                        full_name=Concat(
-                            "user__first_name", Value(" "), "user__last_name"
-                        )
-                    )\
-                    .filter(full_name__icontains=self.q)
+                qs = qs.filter(full_name__icontains=self.q)
             return qs.all()
     return ac
 
