@@ -7,7 +7,7 @@ from apps.notifications2.models import get_all_users_in_course_groups
 
 
 @receiver(post_save, sender=Group)
-def notify_that_group_was_added_in_subject(sender: Group, **kwargs) -> None:
+def notify_that_group_was_added_in_course(sender: Group, **kwargs) -> None:
     group = kwargs["instance"]
     if kwargs["created"] and group.course.information:
         course_groups = Group.objects.filter(course=group.course)
