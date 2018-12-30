@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='ThesesSystemSettings',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('num_required_votes', models.IntegerField()),
+                ('num_required_votes', models.SmallIntegerField()),
             ],
             options={
                 'verbose_name_plural': 'ustawienia systemu prac dyplomowych',
