@@ -28,6 +28,10 @@ class NotificationsRepository(ABC):
         pass
 
     @abstractmethod
+    def mark_as_sent(self, user: User, notification: Notification) -> None:
+        pass
+
+    @abstractmethod
     def save(self, user: User, notification: Notification) -> None:
         pass
 
@@ -53,6 +57,9 @@ class FakeNotificationsRepository(NotificationsRepository):
 
     def get_unsent_for_user(self, user: User) -> List[Notification]:
         return self.notifications
+
+    def mark_as_sent(self, user: User, notification: Notification) -> None:
+        pass
 
     def save(self, user: User, notification: Notification) -> None:
         pass
@@ -90,6 +97,14 @@ class RedisNotificationsRepository(NotificationsRepository):
         return list(map(
             self.serializer.deserialize,
             self.redis_client.smembers(self._generate_unsent_key_for_user(user))))
+
+    def mark_as_sent(self, user: User, notification: Notification) -> None:
+        serialized = self.serializer.serialize(notification)
+
+        self.redis_client.srem(
+            self._generate_unsent_key_for_user(user), serialized)
+        self.redis_client.sadd(
+            self._generate_sent_key_for_user(user), serialized)
 
     def save(self, user: User, notification: Notification) -> None:
         self.redis_client.sadd(

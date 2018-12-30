@@ -35,4 +35,4 @@ def dispatch_notifications_task(user):
             settings.MASS_MAIL_FROM,
             [user.email])
 
-        # TODO: mark this notifications as `sent`
+        repo.mark_as_sent(user, pn)
