@@ -192,40 +192,48 @@ $('.checkall').live('click', function(){
 {% endif %}
 <p class="info-table-header">Ustawienia powiadomień</p>
 
-<form method="POST" action="{% url 'notifications:save' %}">
+{#<form method="POST" action="{% url 'notifications:save' %}">#}
+{#    {% csrf_token %}#}
+{#    {{ notifications.management_form }}#}
+{##}
+{#    {% regroup notifications|dictsort:"category" by category as categories_list %}#}
+{##}
+{##}
+{##}
+{#    <table class="notifications">#}
+{#    {% for group in categories_list %}#}
+{#        <tr class="catgroup{{ forloop.counter }}">#}
+{#            <th>#}
+{#                {{ group.grouper }}#}
+{#            </th>#}
+{#            <th><input type="checkbox" class="checkall"></th>#}
+{#        </tr>#}
+{#        {% for form in group.list %}#}
+{#        <tr class="catgroup{{ forloop.parentloop.counter }}">#}
+{#            <td>{{ form.instance.get_type_display }}</td>#}
+{#            <td>{{ form.value }}#}
+{#                {% for hidden in form.hidden_fields %}#}
+{#                {{ hidden }}#}
+{#                {% endfor %}</td>#}
+{#        </tr>#}
+{#        {% endfor %}#}
+{#    {% endfor %}#}
+{#    </table>#}
+{#    <p>#}
+{#        <strong>Uwaga</strong>: potwierdzenia oceny i głosowania zostaną podpisane i będą stanowić <strong>jedyną</strong> podstawę reklamacji.#}
+{#    </p>#}
+{#    <button type="submit" class="btn success right">#}
+{#        Zapisz#}
+{#    </button>#}
+{#</form>#}
+
+<form action="/your-name/" method="post">
     {% csrf_token %}
-    {{ notifications.management_form }}
+        {{ notificationsform }}
 
-    {% regroup notifications|dictsort:"category" by category as categories_list %}
-
-
-
-    <table class="notifications">
-    {% for group in categories_list %}
-        <tr class="catgroup{{ forloop.counter }}">
-            <th>
-                {{ group.grouper }}
-            </th>
-            <th><input type="checkbox" class="checkall"></th>
-        </tr>
-        {% for form in group.list %}
-        <tr class="catgroup{{ forloop.parentloop.counter }}">
-            <td>{{ form.instance.get_type_display }}</td>
-            <td>{{ form.value }}
-                {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-                {% endfor %}</td>
-        </tr>
-        {% endfor %}
-    {% endfor %}
-    </table>
-    <p>
-        <strong>Uwaga</strong>: potwierdzenia oceny i głosowania zostaną podpisane i będą stanowić <strong>jedyną</strong> podstawę reklamacji.
-    </p>
-    <button type="submit" class="btn success right">
-        Zapisz
-    </button>
+    <input type="submit" value="Submit">
 </form>
+
 {% if perms.users.mailto_all_students %}
     <a href="{% url 'email-students' %}">Wyślij wiadomość do studentów</a>
 {% endif %}

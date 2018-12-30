@@ -37,6 +37,9 @@ from apps.notifications.models import NotificationPreferences
 from libs.ajax_messages import AjaxSuccessMessage
 from mailer.models import Message
 
+from apps.notifications2.views import def_form
+
+
 logger = logging.getLogger()
 
 GTC = {'1': 'wy', '2': 'cw', '3': 'pr',
@@ -239,6 +242,7 @@ def my_profile(request: HttpRequest) -> HttpResponse:
         queryset=NotificationPreferences.objects.create_and_get(
             request.user))
 
+
     if BaseUser.is_employee(request.user):
         consultations = request.user.employee.consultations
         room = request.user.employee.room
@@ -274,7 +278,10 @@ def my_profile(request: HttpRequest) -> HttpResponse:
         grade = None
         courses = None
 
-    return TemplateResponse(request, 'users/my_profile.html', locals())
+    d = locals()
+    d['notificationsform'] = def_form
+
+    return TemplateResponse(request, 'users/my_profile.html', d)
 
 
 def employees_list(request: HttpRequest, begin: str='All', query: Optional[str]=None) -> HttpResponse:
