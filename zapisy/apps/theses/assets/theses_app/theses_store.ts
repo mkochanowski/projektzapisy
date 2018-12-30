@@ -61,7 +61,7 @@ class ThesesStore {
 	@observable public thesis: CompositeThesis | null = null;
 	@observable public thesesBoard: Employee[] = [];
 	/** The last thesis row we have downloaded */
-	@observable public lastRowIndex: number = 0;
+	@observable private lastRowIndex: number = 0;
 	@observable public user: AppUser = FAKE_USER;
 	@observable public applicationState: ApplicationState = ApplicationState.FirstLoad;
 	/** Work state: just viewing, modifying an existing one or adding a new one */
