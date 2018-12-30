@@ -1917,7 +1917,7 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@^2.12.1, commander@^2.13.0:
+commander@^2.12.1, commander@^2.13.0, commander@^2.19.0:
   version "2.19.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.19.0.tgz#f6198aa84e5b83c46054b94ddedbfed5ee9ff12a"
   integrity sha512-6tvAOO+D6OENvRAh524Dh9jcfKTYDQAqvqezbCW82xj5X0pSrcpxtvRKHLG0yBY6SD7PSDrJaj+0AiOcKVd1Xg==
@@ -4252,11 +4252,6 @@ mixin-object@^2.0.1:
   dependencies:
     minimist "0.0.8"
 
-mobx-react-devtools@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/mobx-react-devtools/-/mobx-react-devtools-6.0.3.tgz#4d536c8cdd77d9f4b81f5e8415d7bedccc6a2a99"
-  integrity sha512-PY+lG6XeWaC0DFnDaVC7ImrHJQu7XVXNy4z4fmqHzWc3p+fJisKmaZNwgToO2vJGBghz98Mx2yXUBLw1Ba2mPQ==
-
 mobx-react@^4.4.2:
   version "4.4.3"
   resolved "https://registry.yarnpkg.com/mobx-react/-/mobx-react-4.4.3.tgz#baa9ec41165ee35ae7b9df19bca10190f36f117e"
@@ -6140,7 +6135,7 @@ scheduler@^0.12.0:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-schema-utils@^0.4.2, schema-utils@^0.4.5:
+schema-utils@^0.4.2, schema-utils@^0.4.4, schema-utils@^0.4.5:
   version "0.4.7"
   resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-0.4.7.tgz#ba74f597d2be2ea880131746ee17d0a093c68187"
   integrity sha512-v/iwU6wvwGK8HbU9yi3/nhGzP0yGSuhQMzL6ySiec1FSrZZDkhm4noOSWzrNFo/jEc+SJY6jRTwuwbSXJPDUnQ==
@@ -6347,6 +6342,14 @@ source-map-support@^0.4.0, source-map-support@^0.4.15:
   integrity sha512-try0/JqxPLF9nOjvSta7tVondkP5dwgyLDjVoyMDlmjugT2lRZ1OfsrYTkCd2hkDnJTKRbO/Rl3orm8vlsUzbA==
   dependencies:
     source-map "^0.5.6"
+
+source-map-support@~0.5.10:
+  version "0.5.11"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.11.tgz#efac2ce0800355d026326a0ca23e162aeac9a4e2"
+  integrity sha512-//sajEx/fGL3iw6fltKMdPvy8kL3kJ2O3iuYlRoT3k9Kb4BjOoZ+BZzaNHeuaruSt+Kf3Zk9tnfAQg9/AJqUVQ==
+  dependencies:
+    buffer-from "^1.0.0"
+    source-map "^0.6.0"
 
 source-map-url@^0.4.0:
   version "0.4.0"
@@ -6713,14 +6716,14 @@ terser-webpack-plugin@^1.1.0:
     webpack-sources "^1.1.0"
     worker-farm "^1.5.2"
 
-terser@^3.16.1:
-  version "3.16.1"
-  resolved "https://registry.yarnpkg.com/terser/-/terser-3.16.1.tgz#5b0dd4fa1ffd0b0b43c2493b2c364fd179160493"
-  integrity sha512-JDJjgleBROeek2iBcSNzOHLKsB/MdDf+E/BOAJ0Tk9r7p9/fVobfv7LMJ/g/k3v9SXdmjZnIlFd5nfn/Rt0Xow==
+terser@^3.8.1:
+  version "3.17.0"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-3.17.0.tgz#f88ffbeda0deb5637f9d24b0da66f4e15ab10cb2"
+  integrity sha512-/FQzzPJmCpjAH9Xvk2paiWrFq+5M6aVOf+2KRbwhByISDX/EujxsK+BAvrhb6H+2rtrLCHK9N01wO014vrIwVQ==
   dependencies:
-    commander "~2.17.1"
+    commander "^2.19.0"
     source-map "~0.6.1"
-    source-map-support "~0.5.9"
+    source-map-support "~0.5.10"
 
 through2@^2.0.0:
   version "2.0.5"

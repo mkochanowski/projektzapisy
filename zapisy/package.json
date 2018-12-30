@@ -35,7 +35,6 @@
     "vue-timers": "^1.10.0",
     "mobx": "^5.8.0",
     "mobx-react": "^5.4.3",
-    "mobx-react-devtools": "^6.0.3",
     "mousetrap": "^1.6.2",
     "mousetrap-global-bind": "^1.1.0",
     "object-assign-deep": "^0.4.0",
