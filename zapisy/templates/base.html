@@ -70,6 +70,11 @@
                     <li {% block events_active %}{% endblock %} class="nav-item">
                         <a href="{% url 'events:classrooms' %}" class="nav-link">Sale</a>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li {% block theses_active %}{% endblock %} class="nav-item">>
+                        <a href="{% url 'theses:main' %}" class="nav-link">Prace dyplomowe</a>
+                    </li>
+                    {% endif %}
                 </ul>
             {% if user.is_authenticated %}
                 <div class="navbar-nav ml-auto">
