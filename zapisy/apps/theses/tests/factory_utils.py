@@ -1,5 +1,4 @@
 import random
-import os
 import sys
 
 from faker import Faker
@@ -18,9 +17,7 @@ def random_bool():
 
 def random_title():
     """Return a unique random title"""
-    # By appending the pid to the title we guarantee uniqueness
-    # among processes, enabling tests to be run with --parallel
-    return f'{fake.name()}_{random.randrange(sys.maxsize)}_{os.getpid()}'
+    return f'{fake.name()}_{random.randrange(sys.maxsize)}'
 
 
 def random_advisor(emps):
