@@ -212,15 +212,12 @@ class ThesisSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Thesis
-        read_only_fields = ('id', )
+        read_only_fields = ("id",)
         fields = (
-            'id', 'title', 'advisor', 'auxiliary_advisor',
-            'kind', 'reserved', 'description', 'status',
-            'student', 'student_2', 'added_date', 'modified_date',
+            "id", "title", "advisor", "auxiliary_advisor",
+            "kind", "reserved", "description", "status",
+            "student", "student_2", "added_date", "modified_date",
         )
-        extra_kwargs = {
-            "title": {"error_messages": {"unique": "Give yourself a username"}}
-        }
 
 
 class CurrentUserSerializer(serializers.ModelSerializer):
