@@ -70,6 +70,15 @@ def copy_optional_fields(result, data):
 
 
 def validate_new_title_for_instance(title: str, instance: Optional[Thesis]):
+    """
+    Validate that the supplied title is valid for the supplied instance,
+    or for a new thesis if not supplied"""
+    # I don't like this very much since there's a race condition here,
+    # but it seems Django doesn't think you should worry about it;
+    # they have very similar logic with their validate_unique method:
+    # https://docs.djangoproject.com/en/2.1/ref/models/instances/#django.db.models.Model.validate_unique
+    # (they first perform this validation, and later hit the DB with the update)
+    # and SO seems to agree: https://stackoverflow.com/q/25702813
     qs = Thesis.objects.filter(title=title.strip())
     if instance:
         qs = qs.exclude(pk=instance.pk)
