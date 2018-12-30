@@ -11,8 +11,6 @@ environ.Env.read_env(os.path.join(BASE_DIR, os.pardir, 'env', '.env'))
 DEBUG = env.bool('DEBUG')
 RELEASE = env.bool('RELEASE')
 
-# USE_TZ = True
-
 # With DEBUG = False Django will refuse to serve requests to hosts different than this one.
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
@@ -177,7 +175,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'zapisy.urls'
 
 INSTALLED_APPS = (
-    # nicer admin select widgets
+    # nicer admin select widgets, see https://github.com/yourlabs/django-autocomplete-light
     'dal',
     'dal_select2',
 

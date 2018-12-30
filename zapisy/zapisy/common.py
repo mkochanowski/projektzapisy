@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 MONDAY = '1'
 TUESDAY = '2'
 WEDNESDAY = '3'
