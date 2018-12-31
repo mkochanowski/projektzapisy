@@ -5,15 +5,18 @@ to objects used in the theses system, that is:
 * fine-grained permissions checks
 * performing modifications/adding new objects
 """
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Callable
 
 from rest_framework import serializers, exceptions
+from django.db.models import QuerySet
 
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus, MAX_THESIS_TITLE_LEN
 from .users import wrap_user, get_user_type
 from .permissions import can_set_status, can_set_advisor, can_change_status, can_change_title
 from .drf_errors import ThesisNameConflict
+
+GenericDict = Dict[str, Any]
 
 
 class PersonSerializerForThesis(serializers.Serializer):
@@ -22,13 +25,13 @@ class PersonSerializerForThesis(serializers.Serializer):
     because it packs too much data, and size matters here as we'll send it
     for every thesis
     """
-    def to_representation(self, instance):
+    def to_representation(self, instance: BaseUser):
         return {
             "id": instance.id,
             "display_name": instance.get_full_name(),
         }
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: GenericDict):
         person_id = data.get("id")
         if not isinstance(person_id, int) or person_id < 0:
             raise serializers.ValidationError({
@@ -37,10 +40,7 @@ class PersonSerializerForThesis(serializers.Serializer):
         return {"id": person_id}
 
 
-ValidationData = Dict[str, Any]
-
-
-def get_person(queryset, person_data):
+def get_person(queryset: QuerySet, person_data: GenericDict) -> BaseUser:
     """Given a person object of the format specified above (in PersonSerializer.to_internal_value)
     and a queryset, try to return the corresponding model instance
     """
@@ -50,7 +50,9 @@ def get_person(queryset, person_data):
         raise serializers.ValidationError("bad person ID specified")
 
 
-def copy_if_present(dst, src, key, converter=None):
+def copy_if_present(
+    dst: GenericDict, src: GenericDict, key: str, converter: Callable[[any], any]=None
+):
     """If the given key is present in the source dictionary,
     copy it to the destination dictionary optionally applying the
     supplied conversion function if present
@@ -59,7 +61,7 @@ def copy_if_present(dst, src, key, converter=None):
         dst[key] = converter(src[key]) if converter else src[key]
 
 
-def copy_optional_fields(result, data):
+def copy_optional_fields(result: GenericDict, data: GenericDict):
     """Extract optional fields from the source dictionary (sent by the client),
     perform any necessary conversions, then place it in the result dictionary
     """
@@ -106,7 +108,7 @@ class ThesisSerializer(serializers.ModelSerializer):
     # and https://github.com/encode/django-rest-framework/issues/6124
     title = serializers.CharField(max_length=MAX_THESIS_TITLE_LEN)
 
-    def validate(self, data):
+    def validate(self, data: GenericDict):
         """Validate a dict object received from the frontend client;
         DRF expects us to return a dict object to be used for further processing,
         so we use this opportunity to perform conversions to more convenient formats
@@ -124,7 +126,7 @@ class ThesisSerializer(serializers.ModelSerializer):
             return self.validate_modify_thesis(data)
         raise serializers.ValidationError(f'Unknown request type {request.method}')
 
-    def validate_add_thesis(self, data: ValidationData):
+    def validate_add_thesis(self, data: GenericDict):
         """Validate a request to add a new thesis object and convert to more convenient
         local types
         """
@@ -143,7 +145,7 @@ class ThesisSerializer(serializers.ModelSerializer):
 
         return result
 
-    def validate_modify_thesis(self, data: ValidationData):
+    def validate_modify_thesis(self, data: GenericDict):
         """As above, but this time the thesis object already exists. There is some
         additional logic in this case; for instance, if a thesis is already accepted,
         its owner/advisor cannot change the title anymore
@@ -160,7 +162,7 @@ class ThesisSerializer(serializers.ModelSerializer):
 
         return result
 
-    def create(self, validated_data):
+    def create(self, validated_data: GenericDict):
         """If the checks above succeed, DRF will call this method
         in response to a POST request with the dictionary we returned
         from validate_add_thesis
@@ -185,7 +187,7 @@ class ThesisSerializer(serializers.ModelSerializer):
             student_2=validated_data.get("student_2"),
         )
 
-    def update(self, instance, validated_data):
+    def update(self, instance: Thesis, validated_data: GenericDict):
         """Called in response to a successfully validated PATCH request"""
         request = self.context["request"]
         user = wrap_user(request.user)

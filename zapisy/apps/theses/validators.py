@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from .users import get_num_board_members
 
 
-def validate_num_required_votes(value):
+def validate_num_required_votes(value: int):
     """Validate that the numbe of required "accepted" votes
     is in range, that is, not negative and not more than the number
     of theses board members."""

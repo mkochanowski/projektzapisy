@@ -64,7 +64,7 @@ class Thesis(models.Model):
     added_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
     def clean(self):
@@ -95,7 +95,7 @@ THESIS_VOTE_CHOICES = (
 )
 
 
-def vote_to_string(vote_value):
+def vote_to_string(vote_value: int) -> str:
     for value, vote_string in THESIS_VOTE_CHOICES:
         if value == vote_value:
             return vote_string
@@ -108,7 +108,7 @@ class ThesisVoteBinding(models.Model):
     voter = models.ForeignKey(Employee, on_delete=models.PROTECT, related_name="thesis_votes")
     value = models.SmallIntegerField(choices=THESIS_VOTE_CHOICES)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'Głos {self.voter} na {self.thesis} - {vote_to_string(self.value)}'
 
 

@@ -3,7 +3,7 @@ from enum import Enum
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Value, When, Case, BooleanField
+from django.db.models import Value, When, Case, BooleanField, QuerySet
 from django.db.models.functions import Concat, Lower
 from django.core.exceptions import PermissionDenied
 from rest_framework import viewsets, permissions
@@ -57,7 +57,7 @@ class ThesesViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ThesisSerializer
     pagination_class = ThesesPagination
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         requested_thesis_type_str = self.request.query_params.get(THESIS_TYPE_FILTER_NAME, None)
 
         try:
@@ -86,7 +86,7 @@ class ThesesViewSet(viewsets.ModelViewSet):
         return sort_queryset(filtered, sort_column, sort_dir)
 
 
-def generate_base_queryset():
+def generate_base_queryset() -> QuerySet:
     """Return theses queryset with the appropriate fields prefetched (see below)
     as well as user names annotated for further processing - sorting/filtering
     """
@@ -126,7 +126,7 @@ def fields_for_prefetching(base_field: str) -> List[str]:
 
 def filter_queryset(
     qs, thesis_type: ThesisTypeFilter, title: str, advisor_name: str
-):
+) -> QuerySet:
     """Filter the specified theses queryset based on the passed conditions"""
     result = filter_theses_queryset_for_type(qs, thesis_type)
     if title:
@@ -136,7 +136,7 @@ def filter_queryset(
     return result
 
 
-def sort_queryset(qs, sort_column: str, sort_dir: str):
+def sort_queryset(qs, sort_column: str, sort_dir: str) -> QuerySet:
     """Sort the specified queryset first by archived status (unarchived theses first),
     then by the specified column in the specified direction,
     or by newest first if not specified
@@ -156,7 +156,7 @@ def sort_queryset(qs, sort_column: str, sort_dir: str):
     return qs.order_by("is_archived", resulting_ordering)
 
 
-def available_thesis_filter(queryset):
+def available_thesis_filter(queryset: QuerySet) -> QuerySet:
     """Returns only theses that are considered "available" from the specified queryset"""
     return queryset \
         .exclude(status=ThesisStatus.in_progress.value) \
@@ -164,7 +164,7 @@ def available_thesis_filter(queryset):
         .exclude(reserved=True)
 
 
-def filter_theses_queryset_for_type(queryset, thesis_type):
+def filter_theses_queryset_for_type(queryset: QuerySet, thesis_type: ThesisTypeFilter) -> QuerySet:
     """Returns only theses matching the specified type filter from the specified queryset"""
     if thesis_type == ThesisTypeFilter.all_current:
         return queryset.exclude(is_archived=True)
@@ -195,7 +195,7 @@ class ThesesBoardViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, )
     serializer_class = serializers.ThesesBoardMemberSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return get_theses_board()
 
 
