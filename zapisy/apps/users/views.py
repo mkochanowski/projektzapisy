@@ -21,6 +21,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.translation import check_for_language, LANGUAGE_SESSION_KEY
 from django.conf import settings
+from silk.profiling.profiler import silk_profile
 
 from vobject import iCalendar
 
@@ -49,6 +50,7 @@ GTC = {'1': 'wy', '2': 'cw', '3': 'pr',
 BREAK_DURATION = datetime.timedelta(minutes=15)
 
 
+@silk_profile(name="Student profile view")
 @login_required
 def student_profile(request: HttpRequest, user_id: int) -> HttpResponse:
     """student profile"""
@@ -203,7 +205,7 @@ def password_change_done(request: HttpRequest) -> HttpResponse:
     messages.success(request, "Twoje hasło zostało zmienione.")
     return HttpResponseRedirect(reverse('my-profile'))
 
-
+@silk_profile(name="My profile view")
 @login_required
 def my_profile(request):
     """User profile page.

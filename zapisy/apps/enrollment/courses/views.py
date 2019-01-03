@@ -18,6 +18,8 @@ from apps.enrollment.utils import mailto
 from apps.users.decorators import employee_required
 from apps.users.models import BaseUser, Student
 
+from silk.profiling.profiler import silk_profile
+
 
 def get_course_list_info_for_semester(semester):
     """Builds a list of courses in the semester to show on the right side.
@@ -72,6 +74,7 @@ def semester_info(request, semester_id):
     return JsonResponse(courses_list)
 
 
+@silk_profile(name="Course page view")
 def course_view(request, slug):
     """Presents a single course to the viewer.
 
@@ -83,7 +86,7 @@ def course_view(request, slug):
     try:
         course = (
             Course.objects.filter(slug=slug).select_related('semester', 'entity', 'entity__type')
-            .prefetch_related('groups', 'entity__tags', 'entity__effects').get()
+                .prefetch_related('groups', 'entity__tags', 'entity__effects').get()
         )
     except Course.DoesNotExist:
         return Http404
@@ -133,6 +136,7 @@ def course_view(request, slug):
     return render(request, 'courses/course.html', data)
 
 
+@silk_profile(name="Group view")
 @login_required
 def group_view(request, group_id):
     """Group records view - list of all students enrolled and enqueued to group.
