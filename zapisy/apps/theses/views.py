@@ -45,7 +45,7 @@ class ThesisTypeFilter(Enum):
     available_bachelors = 8
     available_bachelors_isim = 9
 
-    default = all_current
+    default = all
 
 
 class ThesesPagination(LimitOffsetPagination):
