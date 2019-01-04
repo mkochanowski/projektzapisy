@@ -8,7 +8,7 @@
 import { observable, action, flow, configure, computed } from "mobx";
 import { clone } from "lodash";
 
-import { Thesis, AppUser, ThesisTypeFilter, Employee, BasePerson } from "./types";
+import { Thesis, AppUser, ThesisTypeFilter, Employee, BasePerson, UserType } from "./types";
 import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
 	getCurrentUser, getThesesBoard, FAKE_USER,
@@ -122,6 +122,10 @@ class ThesesStore {
 		try {
 			this.user = yield getCurrentUser();
 			this.thesesBoard = yield getThesesBoard();
+			if (this.user.type === UserType.Employee && !this.isThesesBoardMember(this.user.user)) {
+				// employees are most likely only interested in their own theses
+				this.params.onlyMine = true;
+			}
 			yield this.refreshTheses();
 			this.applicationState = ApplicationState.Normal;
 		} catch (err) {
