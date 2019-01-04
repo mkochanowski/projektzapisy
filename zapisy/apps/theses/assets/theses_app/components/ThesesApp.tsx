@@ -104,7 +104,6 @@ class ThesesAppInternal extends React.Component<any, State> {
 				advisorValue={store.params.advisor}
 				onTitleChange={this.onTitleChanged}
 				titleValue={store.params.title}
-				displayOnlyMine={canAddThesis(store.user)}
 				state={store.applicationState}
 				stringFilterBeingChanged={store.stringFilterBeingChanged}
 			/>
