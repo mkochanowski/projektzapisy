@@ -97,6 +97,7 @@ export async function getThesesList(
 		`${BASE_API_URL}/theses/`,
 		{ params: {
 			type: params.type,
+			only_mine: params.onlyMine ? 1 : 0,
 			title: params.title,
 			advisor: params.advisor,
 			column: sortColToBackendStr(params.sortColumn),

@@ -11,7 +11,7 @@ const Button = styled(StandardButton)`
 	width: 100px;
 	min-height: initial;
 	height: 30px;
-	margin-left: 40px;
+	margin-left: 25px;
 `;
 
 type Props = {

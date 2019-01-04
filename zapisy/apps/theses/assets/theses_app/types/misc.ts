@@ -45,6 +45,7 @@ export type ThesesProcessParams = {
 	advisor: string;
 	title: string;
 	type: ThesisTypeFilter;
+	onlyMine: boolean;
 
 	sortColumn: SortColumn;
 	sortDirection: SortDirection;

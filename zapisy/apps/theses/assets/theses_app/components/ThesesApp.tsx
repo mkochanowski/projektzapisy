@@ -89,6 +89,7 @@ class ThesesAppInternal extends React.Component<any, State> {
 	}
 
 	private onTypeFilterChanged = (t: ThesisTypeFilter) => store.onTypeFilterChanged(t);
+	private onOnlyMineChanged = (v: boolean) => store.onOnlyMineChanged(v);
 	private onAdvisorChanged = (a: string) => store.onAdvisorFilterChanged(a);
 	private onTitleChanged = (t: string) => store.onTitleFilterChanged(t);
 	private renderTopRow() {
@@ -97,10 +98,13 @@ class ThesesAppInternal extends React.Component<any, State> {
 			<ListFilters
 				onTypeChange={this.onTypeFilterChanged}
 				typeValue={store.params.type}
+				onOnlyMineChange={this.onOnlyMineChanged}
+				onlyMine={store.params.onlyMine}
 				onAdvisorChange={this.onAdvisorChanged}
 				advisorValue={store.params.advisor}
 				onTitleChange={this.onTitleChanged}
 				titleValue={store.params.title}
+				displayOnlyMine={canAddThesis(store.user)}
 				state={store.applicationState}
 				stringFilterBeingChanged={store.stringFilterBeingChanged}
 			/>

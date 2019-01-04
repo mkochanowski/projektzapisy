@@ -27,24 +27,42 @@ type Props = {
 	onTypeChange: (newFilter: ThesisTypeFilter) => void;
 	typeValue: ThesisTypeFilter;
 
+	onOnlyMineChange: (onlyMine: boolean) => void;
+	onlyMine: boolean;
+
 	onAdvisorChange: (advisorSubstr: string) => void;
 	advisorValue: string;
 
 	onTitleChange: (titleSubstr: string) => void;
 	titleValue: string;
 
+	displayOnlyMine: boolean;
 	state: ApplicationState;
 	stringFilterBeingChanged: ChangedStringFilter;
 };
 
-const textFieldStyle = {
-	marginLeft: "5px",
-};
+const TextFilterField = styled.input`
+	margin-left: 5px;
+	width: 150px;
+`;
 
 const labelStyle: React.CSSProperties = {
 	fontWeight: "bold",
 	fontSize: "110%",
 };
+
+const OnlyMineContainer = styled.label`
+	display: block;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	color: inherit;
+`;
+
+const OnlyMineCheckbox = styled.input`
+	/* _sigh_ bootstrap */
+	margin-right: 5px !important;
+`;
 
 const FiltersContainer = styled.div`
 	width: 100%;
@@ -56,6 +74,10 @@ const FiltersContainer = styled.div`
 export class ListFilters extends React.PureComponent<Props> {
 	private handleTypeChange = (newFilter: ThesisTypeFilter): void => {
 		this.props.onTypeChange(newFilter);
+	}
+
+	private handleOnlyMineChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+		this.props.onOnlyMineChange(e.target.checked);
 	}
 
 	private handleTitleChanged = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -87,25 +109,33 @@ export class ListFilters extends React.PureComponent<Props> {
 
 			<div>
 				<span style={labelStyle}>Tytuł</span>
-				<input
+				<TextFilterField
 					type="text"
 					value={this.props.titleValue}
 					onChange={this.handleTitleChanged}
-					style={textFieldStyle}
 					disabled={!(isNormalState || stringFilterBeingChanged === "title")}
 				/>
 			</div>
 
 			<div>
 				<span style={labelStyle}>Promotor</span>
-				<input
+				<TextFilterField
 					type="text"
 					value={this.props.advisorValue}
 					onChange={this.handleAdvisorChanged}
-					style={textFieldStyle}
 					disabled={!(isNormalState || stringFilterBeingChanged === "advisor")}
 				/>
 			</div>
+
+			{this.props.displayOnlyMine ? <OnlyMineContainer>
+				<OnlyMineCheckbox
+					type="checkbox"
+					checked={this.props.onlyMine}
+					onChange={this.handleOnlyMineChange}
+					disabled={!isNormalState}
+				/>
+				<span style={labelStyle}>Tylko moje</span>
+			</OnlyMineContainer> : null}
 		</FiltersContainer>;
 	}
 }
