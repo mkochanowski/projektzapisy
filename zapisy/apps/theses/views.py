@@ -3,9 +3,10 @@ from enum import Enum
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Value, When, Case, BooleanField, QuerySet
+from django.db.models import Value, When, Case, BooleanField, QuerySet, Q
 from django.db.models.functions import Concat, Lower
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -13,7 +14,7 @@ from rest_framework import exceptions
 from rest_framework.pagination import LimitOffsetPagination
 from dal import autocomplete
 
-from apps.users.models import Student, Employee
+from apps.users.models import Student, Employee, BaseUser
 from .models import Thesis, ThesisStatus, ThesisKind
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
@@ -23,6 +24,7 @@ from .users import wrap_user, get_theses_board
 THESIS_TYPE_FILTER_NAME = "type"
 THESIS_TITLE_FILTER_NAME = "title"
 THESIS_ADVISOR_FILTER_NAME = "advisor"
+ONLY_MINE_THESES_PARAM_NAME = "only_mine"
 THESIS_SORT_COLUMN_NAME = "column"
 THESIS_SORT_DIR_NAME = "dir"
 
@@ -74,14 +76,19 @@ class ThesesViewSet(viewsets.ModelViewSet):
         requested_advisor_name = self.request.query_params.get(
             THESIS_ADVISOR_FILTER_NAME, ""
         ).strip()
+        only_mine = self.request.query_params.get(
+            ONLY_MINE_THESES_PARAM_NAME, "0"
+        ) == "1"
 
         sort_column = self.request.query_params.get(THESIS_SORT_COLUMN_NAME, "")
         sort_dir = self.request.query_params.get(THESIS_SORT_DIR_NAME, "")
 
         base_qs = generate_base_queryset()
+        wrapped_user = wrap_user(self.request.user)
         filtered = filter_queryset(
-            base_qs,
-            requested_thesis_type, requested_thesis_title, requested_advisor_name,
+            base_qs, wrapped_user,
+            requested_thesis_type, requested_thesis_title,
+            requested_advisor_name, only_mine,
         )
         return sort_queryset(filtered, sort_column, sort_dir)
 
@@ -125,7 +132,8 @@ def fields_for_prefetching(base_field: str) -> List[str]:
 
 
 def filter_queryset(
-    qs, thesis_type: ThesisTypeFilter, title: str, advisor_name: str
+    qs, user: BaseUser,
+    thesis_type: ThesisTypeFilter, title: str, advisor_name: str, only_mine: bool,
 ) -> QuerySet:
     """Filter the specified theses queryset based on the passed conditions"""
     result = filter_theses_queryset_for_type(qs, thesis_type)
@@ -133,6 +141,10 @@ def filter_queryset(
         result = result.filter(title__icontains=title)
     if advisor_name:
         result = result.filter(advisor_name__icontains=advisor_name)
+    if only_mine:
+        if not isinstance(user, Employee):
+            raise Http404()
+        result = result.filter(Q(advisor=user) | Q(auxiliary_advisor=user))
     return result
 
 
