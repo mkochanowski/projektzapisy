@@ -87,14 +87,12 @@ class ThesisVote(Enum):
     none = 1
     rejected = 2
     accepted = 3
-    user_missing = 4  # not sure about this one
 
 
 THESIS_VOTE_CHOICES = (
     (ThesisVote.none.value, "brak głosu"),
     (ThesisVote.rejected.value, "odrzucona"),
     (ThesisVote.accepted.value, "zaakceptowana"),
-    (ThesisVote.user_missing.value, "brak użytkownika"),
 )
 
 

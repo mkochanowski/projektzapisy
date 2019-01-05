@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
             name='ThesisVoteBinding',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('value', models.SmallIntegerField(choices=[(1, 'brak głosu'), (2, 'odrzucona'), (3, 'zaakceptowana'), (4, 'brak użytkownika')])),
+                ('value', models.SmallIntegerField(choices=[(1, 'brak głosu'), (2, 'odrzucona'), (3, 'zaakceptowana')])),
                 ('thesis', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='votes', to='theses.Thesis')),
                 ('voter', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='thesis_votes', to='users.Employee')),
             ],
