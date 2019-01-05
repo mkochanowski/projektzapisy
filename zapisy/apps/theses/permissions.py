@@ -32,10 +32,10 @@ def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
 
 def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user permitted to change the title of the specified thesis?"""
-    frozen_statuses = [ThesisStatus.accepted, ThesisStatus.in_progress, ThesisStatus.defended]
+    allowed_statuses = [ThesisStatus.being_evaluated, ThesisStatus.returned_for_corrections]
     return (
         is_thesis_staff(user) or
-        is_owner_of_thesis(user, thesis) and not ThesisStatus(thesis.status) in frozen_statuses
+        is_owner_of_thesis(user, thesis) and not ThesisStatus(thesis.status) in allowed_statuses
     )
 
 
