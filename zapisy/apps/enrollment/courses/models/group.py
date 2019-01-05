@@ -5,8 +5,8 @@ from django.urls import reverse
 from django.conf import settings
 
 from apps.enrollment.records.exceptions import AlreadyNotAssignedException, NonGroupException, NonStudentException
-from apps.notifications2.notifier import notify_that_user_was_pulled_from_queue
 from apps.notifications.models import Notification
+from apps.notifications2.custom_signals import student_pulled
 
 import logging
 
@@ -396,7 +396,7 @@ class Group(models.Model):
                     result, messages = self.add_student(q.student, return_group=True)
 
                     if 'Student dopisany do grupy' in messages:
-                        notify_that_user_was_pulled_from_queue(q.student.user, self)
+                        student_pulled.send(sender=self.__class__, instance=self, user=q.student.user)
 
                     total_queues = 0
                     for old in Queue.objects.filter(
