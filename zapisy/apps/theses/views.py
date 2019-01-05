@@ -157,7 +157,7 @@ def sort_queryset(qs: QuerySet, sort_column: str, sort_dir: str) -> QuerySet:
     elif sort_column == "title":
         db_column = "title"
 
-    resulting_ordering = "-added_date"
+    resulting_ordering = "-modified_date"
     if db_column:
         orderer = Lower(db_column)
         resulting_ordering = orderer.desc() if sort_dir == "desc" else orderer.asc()
