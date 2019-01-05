@@ -206,6 +206,13 @@ export class Thesis {
 	}
 
 	/**
+	 * Determine whether this thesis is archived, i.e. has been defended
+	 */
+	public isArchived() {
+		return this.status === ThesisStatus.Defended;
+	}
+
+	/**
 	 * Is this the same thesis as the supplied one?
 	 * @param other The other thesis
 	 * Note that because this is a fat arrow it can be conveniently used
