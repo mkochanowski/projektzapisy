@@ -64,6 +64,9 @@ class Thesis(models.Model):
     added_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
+    def is_archived(self):
+        return self.status == ThesisStatus.defended.value
+
     def __str__(self) -> str:
         return self.title
 

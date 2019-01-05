@@ -25,6 +25,8 @@ def is_owner_of_thesis(user: BaseUser, thesis: Thesis) -> bool:
 
 def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user permitted to make any changes to the specified thesis?"""
+    if thesis.is_archived():
+        return get_user_type(user) == ThesisUserType.admin
     return is_thesis_staff(user) or is_owner_of_thesis(user, thesis)
 
 

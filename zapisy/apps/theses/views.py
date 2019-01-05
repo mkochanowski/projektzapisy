@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Value, When, Case, BooleanField, QuerySet, Q
 from django.db.models.functions import Concat, Lower
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -204,9 +203,7 @@ def filter_theses_queryset_for_only_mine(qs: QuerySet, user: BaseUser):
     user_type = get_user_type(user)
     if user_type == ThesisUserType.student:
         return qs.filter(Q(student=user) | Q(student_2=user))
-    elif user_type == ThesisUserType.employee:
-        return qs.filter(Q(advisor=user) | Q(auxiliary_advisor=user))
-    raise Http404()
+    return qs.filter(Q(advisor=user) | Q(auxiliary_advisor=user))
 
 
 class ThesesBoardViewSet(viewsets.ModelViewSet):
