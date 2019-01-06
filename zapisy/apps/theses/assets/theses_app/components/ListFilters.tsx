@@ -6,9 +6,9 @@ import * as React from "react";
 import styled from "styled-components";
 
 import { GenericSelect } from "./GenericSelect";
-import { ThesisTypeFilter, thesisTypeFilterToString } from "../types";
-import { ApplicationState } from "../types/misc";
-import { ChangedStringFilter } from "../theses_store";
+import { ApplicationState } from "../app_types";
+import { ChangedStringFilter } from "../theses_logic";
+import { ThesisTypeFilter, thesisTypeFilterToString } from "../protocol_types";
 
 const typeFilterInfos = [
 	ThesisTypeFilter.AllCurrent,

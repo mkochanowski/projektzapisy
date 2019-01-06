@@ -5,11 +5,13 @@ import * as React from "react";
 import styled from "styled-components";
 import { Moment } from "moment";
 
-import { Thesis, ThesisStatus, AppUser } from "../../../types";
 import { ThesisDateField } from "./ThesisDateField";
 import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
-import { ThesisWorkMode } from "../../../types/misc";
+import { ThesisWorkMode } from "../../../app_types";
 import { canChangeStatus, canModifyThesis } from "../../../permissions";
+import { Thesis } from "../../../thesis";
+import { AppUser } from "../../../users";
+import { ThesisStatus } from "../../../protocol_types";
 
 const TopRowContainer = styled.div`
 display: flex;

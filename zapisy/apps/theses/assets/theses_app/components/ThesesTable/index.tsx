@@ -11,16 +11,16 @@ import {
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
 
-import { Thesis } from "../../types";
-import { ApplicationState, SortColumn, SortDirection } from "../../types/misc";
+import { ApplicationState, SortColumn, SortDirection } from "../../app_types";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { NoResultsMessage } from "./NoResultsMessage";
 import { UnconstrainedFunction } from "common/types";
-import { LoadMode } from "../../theses_store";
+import { LoadMode } from "../../theses_logic";
 import { inRange } from "common/utils";
+import { Thesis } from "../../thesis";
 
 /*
 	The theses table is powered by react-virtualized's Table component;
@@ -77,7 +77,7 @@ export class ThesesTable extends React.PureComponent<Props> {
 	private hasScrolledSinceChange: boolean = false;
 	private titleRenderer = this.getCellRenderer(t => t.title);
 	private advisorRenderer = this.getCellRenderer(t => t.advisor ? t.advisor.displayName : "<brak>");
-	private loaderInstance: InfiniteLoader;
+	private loaderInstance?: InfiniteLoader;
 
 	componentDidMount() {
 		this.installKeyHandler();

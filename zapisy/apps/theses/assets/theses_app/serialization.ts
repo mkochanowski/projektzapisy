@@ -1,45 +1,47 @@
 /**
- * Defines types that will be dispatched to the backend
- * as well as functions to operate on them
+ * @file Defines types we'll be sending to the backend and provides
+ * functions to serialize local objects to those types
  */
-import { ThesisKind, ThesisStatus, Thesis, BasePerson, MAX_THESIS_TITLE_LEN } from ".";
+import { ThesisKind, ThesisStatus } from "./protocol_types";
+import { Thesis, MAX_THESIS_TITLE_LEN } from "./thesis";
+import { Person } from "./users";
 
 /**
  * The representation of a person sent to the backend
  */
-export type PersonDispatch = {
+type PersonOutSerialized = {
 	id: number;
 };
 
 /**
  * The representation of a new thesis object sent to the backend
  */
-export type ThesisAddDispatch = {
+type ThesisAddOutSerialized = {
 	title?: string;
-	advisor?: PersonDispatch | null;
-	auxiliary_advisor?: PersonDispatch | null;
+	advisor?: PersonOutSerialized | null;
+	auxiliary_advisor?: PersonOutSerialized | null;
 	kind?: ThesisKind;
 	reserved?: boolean;
 	description?: string;
 	status?: ThesisStatus;
-	student?: PersonDispatch | null;
-	student_2?: PersonDispatch | null;
+	student?: PersonOutSerialized | null;
+	student_2?: PersonOutSerialized | null;
 };
 
 /**
  * The representation of a diff for an existing thesis object sent to the backend
  */
-export type ThesisModDispatch = {
+type ThesisModOutSerialized = {
 	id: number;
-} & ThesisAddDispatch;
+} & ThesisAddOutSerialized;
 
 /**
  * Given a new thesis object, convert it to a representation
  * consumed by the backend
  * @param thesis The thesis object to convert
  */
-export function getThesisAddDispatch(thesis: Thesis): ThesisAddDispatch {
-	const result: ThesisAddDispatch = {
+export function serializeNewThesis(thesis: Thesis): ThesisAddOutSerialized {
+	const result: ThesisAddOutSerialized = {
 		title: thesis.title,
 		kind: thesis.kind,
 		reserved: thesis.reserved,
@@ -65,7 +67,7 @@ export function getThesisAddDispatch(thesis: Thesis): ThesisAddDispatch {
  * Given an old and new person value, determine whether it should be considered
  * to have "changed" - based on this we will include it in the info sent to the backend
  */
-function hadPersonChange(old: BasePerson | null, newp: BasePerson | null) {
+function hadPersonChange(old: Person | null, newp: Person | null) {
 	return (
 		old === null && newp !== null ||
 		old !== null && newp === null ||
@@ -76,7 +78,7 @@ function hadPersonChange(old: BasePerson | null, newp: BasePerson | null) {
 /**
  * Given a person instance, convert it to the backend representation
  */
-function toPersonDispatch(newPerson: BasePerson | null): PersonDispatch | null {
+function toPersonDispatch(newPerson: Person | null): PersonOutSerialized | null {
 	return newPerson ? { id: newPerson.id } : null;
 }
 
@@ -86,9 +88,9 @@ function toPersonDispatch(newPerson: BasePerson | null): PersonDispatch | null {
  * @param orig The old thesis object
  * @param mod The new (modified) thesis object
  */
-export function getThesisModDispatch(orig: Thesis, mod: Thesis): ThesisModDispatch {
+export function serializeThesisDiff(orig: Thesis, mod: Thesis): ThesisModOutSerialized {
 	console.assert(orig.isEqual(mod));
-	const result: ThesisModDispatch = { id: orig.id };
+	const result: ThesisModOutSerialized = { id: orig.id };
 	if (orig.title !== mod.title) {
 		result.title = mod.title.slice(0, MAX_THESIS_TITLE_LEN);
 	}

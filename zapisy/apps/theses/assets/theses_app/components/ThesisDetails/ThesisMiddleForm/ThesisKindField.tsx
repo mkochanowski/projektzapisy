@@ -4,9 +4,9 @@
 
 import * as React from "react";
 
-import { ThesisKind, thesisKindToString } from "../../../types";
 import { GenericSelect } from "../../GenericSelect";
 import { ReadOnlyInput } from "./ReadOnlyInput";
+import { ThesisKind, thesisKindToString } from "../../../protocol_types";
 
 const kindSelectInfos = [
 	ThesisKind.Bachelors,

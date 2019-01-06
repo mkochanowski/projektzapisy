@@ -1,8 +1,10 @@
 /**
  * @file Theses app permission checks, mostly analogous to permissions.py
  */
-import { AppUser, UserType, Thesis, ThesisStatus } from "./types";
-import { thesesStore } from "./theses_store";
+import { thesesStore } from "./theses_logic";
+import { AppUser } from "./users";
+import { UserType, ThesisStatus } from "./protocol_types";
+import { Thesis } from "./thesis";
 
 /**
  * Determine whether the specified app user has a thesis staff role

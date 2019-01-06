@@ -1,15 +1,14 @@
 import * as React from "react";
 
 import styled from "styled-components";
-import {
-	Thesis, ThesisKind, Employee, Student,
-	MAX_THESIS_TITLE_LEN, AppUser,
-} from "../../../types";
 import { PersonType } from "../../../backend_callers";
 import { PersonField } from "./PersonField";
 import { ThesisKindField } from "./ThesisKindField";
 import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
 import { canSetArbitraryAdvisor, canModifyThesis, canChangeTitle } from "../../../permissions";
+import { Thesis, MAX_THESIS_TITLE_LEN } from "../../../thesis";
+import { AppUser, Employee, Student } from "../../../users";
+import { ThesisKind } from "../../../protocol_types";
 
 const MidFormTable = styled.table`
 	width: 100%;
@@ -152,6 +151,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 					<PersonField
 						personType={PersonType.Employee}
 						onChange={this.props.onAdvisorChanged}
+						personConstructor={Employee}
 						value={this.props.thesis.advisor}
 						readOnly={readOnly || !canSetArbitraryAdvisor(this.props.user)}
 					/>
@@ -171,6 +171,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 						<PersonField
 							personType={PersonType.Employee}
 							onChange={this.props.onAuxAdvisorChanged}
+							personConstructor={Employee}
 							value={this.props.thesis.auxiliaryAdvisor}
 							readOnly={readOnly}
 						/>
@@ -188,6 +189,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 					<PersonField
 						personType={PersonType.Student}
 						onChange={this.props.onStudentChanged}
+						personConstructor={Student}
 						value={this.props.thesis.student}
 						readOnly={readOnly}
 					/>
@@ -207,6 +209,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 						<PersonField
 							personType={PersonType.Student}
 							onChange={this.props.onSecondStudentChanged}
+							personConstructor={Student}
 							value={this.props.thesis.secondStudent}
 							readOnly={readOnly}
 						/>

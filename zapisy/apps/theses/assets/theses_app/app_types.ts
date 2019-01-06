@@ -1,4 +1,4 @@
-import { ThesisTypeFilter } from ".";
+import { ThesisTypeFilter } from "./protocol_types";
 
 /**
  * @file Miscellaneous types

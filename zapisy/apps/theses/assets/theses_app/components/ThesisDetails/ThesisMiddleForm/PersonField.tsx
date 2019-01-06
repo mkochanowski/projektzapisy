@@ -8,8 +8,8 @@ import styled from "styled-components";
 import AsyncPaginate from "react-select-async-paginate";
 
 import { getPersonAutocomplete, PersonType } from "../../../backend_callers";
-import { BasePerson } from "../../../types";
 import { ReadOnlyInput } from "./ReadOnlyInput";
+import { Person } from "../../../users";
 
 const PersonFieldWrapper = styled.div`
 	width: 50%;
@@ -25,15 +25,16 @@ const PersonIndicatorInput = styled(ReadOnlyInput)`
 // matching employees/students, which dictates the person format defined below
 // For an explanation of django-autocomplete-light, look in forms.py
 
-type Props = {
-	value: BasePerson | null;
-	onChange: (newValue: BasePerson | null) => void;
+type Props<PersonT> = {
+	value: Person | null;
+	onChange: (newValue: PersonT | null) => void;
+	personConstructor: new(id: number, name: string) => PersonT;
 	/** Student or Employee */
 	personType: PersonType;
 	readOnly?: boolean;
 };
 
-export class PersonField extends React.PureComponent<Props> {
+export class PersonField<PersonT> extends React.PureComponent<Props<PersonT>> {
 	/** Used so that we know which page to ask for in getResults */
 	private pageNumberForInput: Map<string, number> = new Map();
 
@@ -48,7 +49,7 @@ export class PersonField extends React.PureComponent<Props> {
 				cacheOptions
 				defaultOptions
 				loadOptions={this.getResults}
-				onChange={(nv: PersonSelectOptions | null) => props.onChange(selectOptionsToPerson(nv))}
+				onChange={(nv: PersonSelectOptions | null) => props.onChange(this.selectOptionsToPerson(nv))}
 				value={personToSelectOptions(props.value)}
 				placeholder={"Wybierz..."}
 				noResultsText={""}
@@ -73,6 +74,13 @@ export class PersonField extends React.PureComponent<Props> {
 			alert(`Nie udało się pobrać listy (${err.toString()}); odśwież stronę lub spróbuj później`);
 		}
 	}
+
+	private selectOptionsToPerson(options: PersonSelectOptions | null): PersonT | null {
+		return options ? new this.props.personConstructor(
+			Number(options.value),
+			options.label,
+		) : null;
+	}
 }
 
 type PersonSelectOptions = {
@@ -80,16 +88,9 @@ type PersonSelectOptions = {
 	label: string;
 };
 
-function personToSelectOptions(person: BasePerson | null): PersonSelectOptions | null {
+function personToSelectOptions(person: Person | null): PersonSelectOptions | null {
 	return person ? {
 		value: String(person.id),
 		label: person.displayName,
 	} : null;
-}
-
-function selectOptionsToPerson(options: PersonSelectOptions | null): BasePerson | null {
-	return options ? new BasePerson(
-		Number(options.value),
-		options.label,
-	) : null;
 }

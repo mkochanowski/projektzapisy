@@ -7,22 +7,23 @@ import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import * as HttpStatus from "http-status-codes";
 
-import {
-	Thesis, ThesisJson, Student, Employee,
-	BasePerson, AppUser, UserType, PersonJson,
-} from "./types";
-import { getThesisModDispatch, getThesisAddDispatch } from "./types/dispatch";
-import { SortColumn, SortDirection, ThesesProcessParams } from "./types/misc";
+import { SortColumn, SortDirection, ThesesProcessParams } from "./app_types";
 import { ThesisNameConflict } from "./errors";
+import { AppUser, Student, Person, Employee } from "./users";
+import { UserType } from "./protocol_types";
+import {
+	ThesisInJson, deserializeThesis,
+	deserializeCurrentUser, deserializeEmployee,
+} from "./deserialization";
+import { Thesis } from "./thesis";
+import { serializeThesisDiff, serializeNewThesis } from "./serialization";
 
 const BASE_API_URL = "/theses/api";
 const REST_REQUEST_TIMEOUT = 10000;
 
 axios.defaults.timeout = REST_REQUEST_TIMEOUT;
 
-export const FAKE_USER = new AppUser(
-	{ user: { id: -1, display_name: "Unknown user" }, type: UserType.Student }
-);
+export const FAKE_USER = new AppUser(new Student(-1, "Fake user"), UserType.Student);
 
 /**
  * Send a request to the backend including the csrf token
@@ -60,7 +61,7 @@ type PaginatedThesesResult = {
 	count: number;
 	next: string;
 	previous: string;
-	results: ThesisJson[];
+	results: ThesisInJson[];
 };
 
 /**
@@ -106,7 +107,7 @@ export async function getThesesList(
 		}},
 	);
 	return {
-		theses: paginatedResults.results.map(json => new Thesis(json)),
+		theses: paginatedResults.results.map(deserializeThesis),
 		total: paginatedResults.count,
 	};
 }
@@ -115,15 +116,15 @@ export async function getThesesList(
  * Fetch the current system user from the backend
  */
 export async function getCurrentUser(): Promise<AppUser> {
-	return new AppUser(await getData(`${BASE_API_URL}/current_user/`));
+	return deserializeCurrentUser(await getData(`${BASE_API_URL}/current_user/`));
 }
 
 /**
  * Get the theses board as an Employee list
  */
 export async function getThesesBoard() {
-	const json: PersonJson[] = await getData(`${BASE_API_URL}/theses_board/`);
-	return json.map(pj => Employee.fromJson(pj) as Employee);
+	const members = await getData(`${BASE_API_URL}/theses_board/`);
+	return members.map(deserializeEmployee);
 }
 
 export const enum PersonType {
@@ -132,7 +133,7 @@ export const enum PersonType {
 }
 
 export type PersonAutcompleteResults = {
-	results: BasePerson[];
+	results: Person[];
 	hasMore: boolean;
 };
 type PersonAutocompleteJson = {
@@ -197,7 +198,7 @@ async function safeSendThesisRequest(url: string, config?: AxiosRequestConfig) {
 export async function saveModifiedThesis(
 	originalThesis: Thesis, modifiedThesis: Thesis,
 ): Promise<void> {
-	const objToSend = getThesisModDispatch(originalThesis, modifiedThesis);
+	const objToSend = serializeThesisDiff(originalThesis, modifiedThesis);
 	const jsonData = JSON.stringify(objToSend);
 	await safeSendThesisRequest(
 		`${BASE_API_URL}/theses/${objToSend.id}/`,
@@ -217,7 +218,7 @@ export async function saveModifiedThesis(
  * @param thesis The thesis object to add
  */
 export async function saveNewThesis(thesis: Thesis): Promise<number> {
-	const objToSend = getThesisAddDispatch(thesis);
+	const objToSend = serializeNewThesis(thesis);
 	const jsonData = JSON.stringify(objToSend);
 	const res = await safeSendThesisRequest(
 		`${BASE_API_URL}/theses/`,
@@ -229,5 +230,5 @@ export async function saveNewThesis(thesis: Thesis): Promise<number> {
 			},
 		},
 	);
-	return (res.data as ThesisJson).id;
+	return (res.data as ThesisInJson).id;
 }

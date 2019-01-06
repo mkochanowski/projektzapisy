@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import { ThesisStatus, thesisStatusToString } from "../../../types";
 import { GenericSelect } from "../../GenericSelect";
 import { InputWithLabel, InputType } from "./InputWithLabel";
+import { ThesisStatus, thesisStatusToString } from "../../../protocol_types";
 
 const LABEL_TEXT = "Status";
 

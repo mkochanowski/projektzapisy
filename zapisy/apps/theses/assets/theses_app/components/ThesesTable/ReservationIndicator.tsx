@@ -1,7 +1,7 @@
 import * as React from "react";
 import { TableCellProps } from "react-virtualized";
-import { Thesis } from "../../types";
 import styled from "styled-components";
+import { Thesis } from "../../thesis";
 
 const Centered = styled.div`
 	text-align: center;

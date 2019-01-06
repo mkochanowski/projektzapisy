@@ -6,15 +6,17 @@ import * as Mousetrap from "mousetrap";
 import "mousetrap-global-bind";
 import { Moment } from "moment";
 
-import { Thesis, ThesisStatus, ThesisKind, Employee, AppUser } from "../../types";
 import { ThesisTopRow } from "./ThesisTopRow";
 import { ThesisMiddleForm } from "./ThesisMiddleForm";
 import { ThesisVotes } from "./ThesisVotes";
 import "./style.less";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
-import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../types/misc";
+import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../app_types";
 import { canModifyThesis } from "../../permissions";
+import { Thesis } from "../../thesis";
+import { AppUser, Employee, Student } from "../../users";
+import { ThesisStatus, ThesisKind } from "../../protocol_types";
 
 const SaveButton = React.memo(Button.extend`
 	&:disabled:hover {
@@ -185,11 +187,11 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		this.updateThesisState({ auxiliaryAdvisor: { $set: newAuxAdvisor } });
 	}
 
-	private onStudentChanged = (newStudent: Employee | null): void => {
+	private onStudentChanged = (newStudent: Student | null): void => {
 		this.updateThesisState({ student: { $set: newStudent } });
 	}
 
-	private onSecondStudentChanged = (newSecondStudent: Employee | null): void => {
+	private onSecondStudentChanged = (newSecondStudent: Student | null): void => {
 		this.updateThesisState({ secondStudent: { $set: newSecondStudent } });
 	}
 

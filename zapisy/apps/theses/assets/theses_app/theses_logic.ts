@@ -8,7 +8,6 @@
 import { observable, action, flow, configure, computed } from "mobx";
 import { clone } from "lodash";
 
-import { Thesis, AppUser, ThesisTypeFilter, Employee, BasePerson, UserType } from "./types";
 import {
 	getThesesList, saveModifiedThesis, saveNewThesis,
 	getCurrentUser, getThesesBoard, FAKE_USER,
@@ -16,10 +15,13 @@ import {
 import {
 	ApplicationState, ThesisWorkMode, isPerformingBackendOp,
 	ThesesProcessParams, SortColumn, SortDirection,
-} from "./types/misc";
+} from "./app_types";
 import { roundUp, wait } from "common/utils";
 import { CancellablePromise } from "mobx/lib/api/flow";
 import { ThesisEmptyTitle } from "./errors";
+import { Thesis } from "./thesis";
+import { ThesisTypeFilter, UserType } from "./protocol_types";
+import { AppUser, Employee, Person } from "./users";
 
 /** Tell MobX to ensure that @observable fields are only modified in actions */
 configure({ enforceActions: "observed" });
@@ -136,7 +138,7 @@ class ThesesStore {
 	/**
 	 * Checks whether the given user is a member of the theses board
 	 */
-	public isThesesBoardMember(user: BasePerson): boolean {
+	public isThesesBoardMember(user: Person): boolean {
 		return !!this.thesesBoard.find(member => member.isEqual(user));
 	}
 

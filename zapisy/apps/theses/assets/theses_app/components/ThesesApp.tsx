@@ -13,17 +13,19 @@ import styled from "styled-components";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
-import { Thesis, ThesisTypeFilter } from "../types";
 import { ThesisDetails } from "./ThesisDetails";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
-import { thesesStore as store, LoadMode } from "../theses_store";
-import { ThesisWorkMode, SortColumn, SortDirection } from "../types/misc";
+import { thesesStore as store, LoadMode } from "../theses_logic";
+import { ThesisWorkMode, SortColumn, SortDirection } from "../app_types";
 import { ThesisNameConflict, ThesisEmptyTitle } from "../errors";
 import { withAlert } from "react-alert";
+import { ThesisTypeFilter } from "../protocol_types";
+import { Thesis } from "../thesis";
+import { Employee } from "../users";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -42,7 +44,7 @@ type State = typeof initialState;
 class ThesesAppInternal extends React.Component<any, State> {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
-	private tableInstance: ThesesTable;
+	private tableInstance?: ThesesTable;
 
 	componentDidMount() {
 		store.initialize();
@@ -55,7 +57,9 @@ class ThesesAppInternal extends React.Component<any, State> {
 	}
 
 	private onListChanged = (mode: LoadMode) => {
-		this.tableInstance.onListDidChange(mode);
+		if (this.tableInstance) {
+			this.tableInstance.onListDidChange(mode);
+		}
 	}
 
 	private onError = (err: Error) => {
@@ -223,9 +227,10 @@ class ThesesAppInternal extends React.Component<any, State> {
 		if (!canAddThesis(store.user) || !await this.confirmDiscardChanges()) {
 			return;
 		}
+		const empUser = store.user.user as Employee;
 		const thesis = new Thesis();
 		if (!canSetArbitraryAdvisor(store.user)) {
-			thesis.advisor = store.user.user;
+			thesis.advisor = empUser;
 		}
 		this.setState({ hasTitleError: false });
 		store.setupForNewThesis(thesis);
