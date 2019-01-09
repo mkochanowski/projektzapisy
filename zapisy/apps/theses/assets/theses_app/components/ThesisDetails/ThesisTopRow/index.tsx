@@ -10,7 +10,6 @@ import { ThesisStatusIndicator } from "./ThesisStatusIndicator";
 import { ThesisWorkMode } from "../../../app_types";
 import { canChangeStatus, canModifyThesis } from "../../../permissions";
 import { Thesis } from "../../../thesis";
-import { AppUser } from "../../../users";
 import { ThesisStatus } from "../../../protocol_types";
 
 const TopRowContainer = styled.div`

@@ -7,7 +7,7 @@ import { ThesisKindField } from "./ThesisKindField";
 import { AddRemoveIcon, IconType } from "./AddRemoveIcon";
 import { canSetArbitraryAdvisor, canModifyThesis, canChangeTitle } from "../../../permissions";
 import { Thesis, MAX_THESIS_TITLE_LEN } from "../../../thesis";
-import { AppUser, Employee, Student } from "../../../users";
+import { Employee, Student } from "../../../users";
 import { ThesisKind } from "../../../protocol_types";
 
 const MidFormTable = styled.table`
