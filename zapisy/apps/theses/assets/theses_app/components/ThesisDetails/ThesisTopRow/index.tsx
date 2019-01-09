@@ -53,7 +53,7 @@ function ReservationCheckbox(props: {
 
 export class ThesisTopRow extends React.PureComponent<Props> {
 	public render() {
-		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
+		const readOnly = !canModifyThesis(this.props.thesis);
 		const { mode, thesis } = this.props;
 		return <TopRowContainer>
 			<ReservationCheckbox
@@ -68,7 +68,7 @@ export class ThesisTopRow extends React.PureComponent<Props> {
 			<ThesisStatusIndicator
 				onChange={this.props.onStatusChanged}
 				value={thesis.status}
-				enabled={!readOnly && canChangeStatus(this.props.user)}
+				enabled={!readOnly && canChangeStatus()}
 			/>
 		</TopRowContainer>;
 	}

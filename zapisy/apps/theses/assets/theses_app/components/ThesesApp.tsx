@@ -2,7 +2,7 @@
  * @file The main theses app component.
  * Renders all subcomponents and glues them together, also permitting them
  * to change the state via callbacks.
- * Application state is generally held in theses_store.
+ * Application state/logic is held in app_logic/
  */
 
 import * as React from "react";
@@ -12,6 +12,7 @@ import { observer } from "mobx-react";
 import styled from "styled-components";
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { withAlert } from "react-alert";
 
 import { ThesisDetails } from "./ThesisDetails";
 import { ThesesTable } from "./ThesesTable";
@@ -19,18 +20,24 @@ import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
-import { thesesStore as store, LoadMode } from "../theses_logic";
-import { ThesisWorkMode, SortColumn, SortDirection } from "../app_types";
+import { ThesisWorkMode } from "../app_types";
 import { ThesisNameConflict, ThesisEmptyTitle } from "../errors";
-import { withAlert } from "react-alert";
-import { ThesisTypeFilter } from "../protocol_types";
 import { Thesis } from "../thesis";
 import { Employee } from "../users";
+import { ThesisEditing } from "../app_logic/editing";
+import { List } from "../app_logic/theses_list";
+import { AppMode } from "../app_logic/app_mode";
+import { Users } from "../app_logic/users";
 
 const TopRowContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
 `;
+
+type Props = {
+	/** A promise representing the app logic initialization process */
+	initPromise: PromiseLike<any>;
+};
 
 const initialState = {
 	/** The error instance, if any. If one exists, we abort the app and display it */
@@ -41,36 +48,26 @@ const initialState = {
 type State = typeof initialState;
 
 @observer
-class ThesesAppInternal extends React.Component<any, State> {
+class ThesesAppInternal extends React.Component<Props, State> {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
 	private tableInstance?: ThesesTable;
 
-	componentDidMount() {
-		store.initialize();
-
+	async componentDidMount() {
 		this.oldOnBeforeUnload = window.onbeforeunload;
 		window.onbeforeunload = this.confirmUnload;
 		this.initializeKeyboardShortcuts();
-		store.registerOnListChanged(this.onListChanged);
-		store.registerOnError(this.onError);
-	}
 
-	private onListChanged = (mode: LoadMode) => {
-		if (this.tableInstance) {
-			this.tableInstance.onListDidChange(mode);
+		try {
+			await this.props.initPromise;
+		} catch (err) {
+			this.setState({ applicationError: err });
 		}
-	}
-
-	private onError = (err: Error) => {
-		this.setState({ applicationError: err });
 	}
 
 	componentWillUnmount() {
 		window.onbeforeunload = this.oldOnBeforeUnload;
 		this.deconfigureKeyboardShortcuts();
-		store.clearOnListChanged();
-		store.clearOnError();
 	}
 
 	private initializeKeyboardShortcuts() {
@@ -83,7 +80,7 @@ class ThesesAppInternal extends React.Component<any, State> {
 	}
 
 	private confirmUnload = (ev: BeforeUnloadEvent) => {
-		if (store.hasUnsavedChanges()) {
+		if (ThesisEditing.hasUnsavedChanges) {
 			// As specified in https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
 			// preventDefault() is what the spec says,
 			// in practice some browsers like returnValue to be set
@@ -92,24 +89,35 @@ class ThesesAppInternal extends React.Component<any, State> {
 		}
 	}
 
-	private onTypeFilterChanged = (t: ThesisTypeFilter) => store.onTypeFilterChanged(t);
-	private onOnlyMineChanged = (v: boolean) => store.onOnlyMineChanged(v);
-	private onAdvisorChanged = (a: string) => store.onAdvisorFilterChanged(a);
-	private onTitleChanged = (t: string) => store.onTitleFilterChanged(t);
+	private wrapListChanger(context: object, f: (...args: any[]) => PromiseLike<any>) {
+		return async (...args: any[]) => {
+			try {
+				await f.apply(context, args);
+				if (this.tableInstance) {
+					this.tableInstance.onListReloaded();
+				}
+			} catch (err) { this.setState({ applicationError: err }); }
+		};
+	}
+
+	private onTypeFilterChanged = this.wrapListChanger(List, List.changeTypeFilter);
+	private onOnlyMineChanged = this.wrapListChanger(List, List.changeOnlyMineFilter);
+	private onAdvisorChanged = this.wrapListChanger(List, List.changeAdvisorFilter);
+	private onTitleChanged = this.wrapListChanger(List, List.changeTitleFilter);
 	private renderTopRow() {
-		const shouldShowNewBtn = canAddThesis(store.user);
+		const shouldShowNewBtn = canAddThesis();
 		return <TopRowContainer>
 			<ListFilters
 				onTypeChange={this.onTypeFilterChanged}
-				typeValue={store.params.type}
+				typeValue={List.params.type}
 				onOnlyMineChange={this.onOnlyMineChanged}
-				onlyMine={store.params.onlyMine}
+				onlyMine={List.params.onlyMine}
 				onAdvisorChange={this.onAdvisorChanged}
-				advisorValue={store.params.advisor}
+				advisorValue={List.params.advisor}
 				onTitleChange={this.onTitleChanged}
-				titleValue={store.params.title}
-				state={store.applicationState}
-				stringFilterBeingChanged={store.stringFilterBeingChanged}
+				titleValue={List.params.title}
+				state={AppMode.applicationState}
+				stringFilterBeingChanged={List.stringFilterBeingChanged}
 			/>
 			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
 		</TopRowContainer>;
@@ -120,25 +128,29 @@ class ThesesAppInternal extends React.Component<any, State> {
 		this.tableInstance = table;
 	}
 
-	private onLoadMore = async (_: number, until: number) => { await store.loadMore(until); };
-	private onSortChanged = (col: SortColumn, dir: SortDirection) => store.onSortChanged(col, dir);
+	private onLoadMore = async (until: number) => {
+		try {
+			await List.loadMore(until);
+		} catch (err) { console.error("Unable to load more:", err); }
+	}
+	private onSortChanged = this.wrapListChanger(List, List.changeSort);
 	private renderThesesList() {
 		return <ThesesTable
 			ref={this.setTableInstance}
-			applicationState={store.applicationState}
-			theses={store.theses}
-			selectedIdx={store.selectedIdx}
-			sortColumn={store.params.sortColumn}
-			sortDirection={store.params.sortDirection}
-			isEditingThesis={store.hasUnsavedChanges()}
-			totalThesesCount={store.totalCount}
+			applicationState={AppMode.applicationState}
+			theses={List.theses}
+			selectedIdx={ThesisEditing.selectedIdx}
+			sortColumn={List.params.sortColumn}
+			sortDirection={List.params.sortDirection}
+			isEditingThesis={ThesisEditing.hasUnsavedChanges}
+			totalThesesCount={List.totalCount}
 			onThesisSelected={this.onThesisSelected}
 			onSortChanged={this.onSortChanged}
 			loadMoreRows={this.onLoadMore}
 		/>;
 	}
 
-	private onThesisModified = (nt: Thesis) => { store.updateModifiedThesis(nt); };
+	private onThesisModified = (nt: Thesis) => { ThesisEditing.updateModifiedThesis(nt); };
 	private onChangedTitle = () => {
 		if (this.state.hasTitleError) {
 			this.setState({ hasTitleError: false });
@@ -146,11 +158,11 @@ class ThesesAppInternal extends React.Component<any, State> {
 	}
 	private renderThesisDetails() {
 		return <ThesisDetails
-			thesis={store.thesis!.modified}
-			appState={store.applicationState}
-			hasUnsavedChanges={store.hasUnsavedChanges()}
-			mode={store.workMode!}
-			user={store.user}
+			thesis={ThesisEditing.thesis!.modified}
+			appState={AppMode.applicationState}
+			hasUnsavedChanges={ThesisEditing.hasUnsavedChanges}
+			mode={AppMode.workMode!}
+			user={Users.currentUser}
 			hasTitleError={this.state.hasTitleError}
 			onChangedTitle={this.onChangedTitle}
 			onSaveRequested={this.onSave}
@@ -162,10 +174,10 @@ class ThesesAppInternal extends React.Component<any, State> {
 		if (this.state.applicationError) {
 			return this.renderErrorScreen();
 		}
-		const { thesis } = store;
+		const { thesis } = ThesisEditing;
 		if (thesis !== null) {
 			// if a thesis is present, we're not just viewing
-			console.assert(store.workMode !== ThesisWorkMode.Viewing);
+			console.assert(AppMode.workMode !== ThesisWorkMode.Viewing);
 		}
 		return <>
 			{this.renderTopRow()}
@@ -192,9 +204,9 @@ class ThesesAppInternal extends React.Component<any, State> {
 	 * Returns true immediately if there are no changes to be saved.
 	 */
 	private confirmDiscardChanges() {
-		if (store.hasUnsavedChanges()) {
+		if (ThesisEditing.hasUnsavedChanges) {
 			return new Promise((resolve) => {
-				const title = store.thesis!.modified.title;
+				const title = ThesisEditing.thesis!.modified.title;
 				const msg = buildUnsavedConfirmation(title);
 				confirmAlert({
 					title: "",
@@ -220,34 +232,34 @@ class ThesesAppInternal extends React.Component<any, State> {
 			return;
 		}
 		this.setState({ hasTitleError: false });
-		store.selectThesis(thesis);
+		ThesisEditing.selectThesis(thesis);
 	}
 
 	private setupForAddingThesis = async () => {
-		if (!canAddThesis(store.user) || !await this.confirmDiscardChanges()) {
+		if (!canAddThesis() || !await this.confirmDiscardChanges()) {
 			return;
 		}
-		const empUser = store.user.user as Employee;
+		const empUser = Users.currentUser.person as Employee;
 		const thesis = new Thesis();
-		if (!canSetArbitraryAdvisor(store.user)) {
+		if (!canSetArbitraryAdvisor()) {
 			thesis.advisor = empUser;
 		}
 		this.setState({ hasTitleError: false });
-		store.setupForNewThesis(thesis);
+		ThesisEditing.setupForNewThesis(thesis);
 	}
 
 	private onResetChanges = async () => {
 		if (!await this.confirmDiscardChanges()) {
 			return;
 		}
-		store.resetModifiedThesis();
+		ThesisEditing.resetModifiedThesis();
 	}
 
 	private onSave = async () => {
 		try {
-			const oldWorkMode = store.workMode;
-			await store.save();
-			this.props.alert.success(messageForWorkMode(oldWorkMode));
+			const oldWorkMode = AppMode.workMode;
+			await ThesisEditing.save();
+			(this.props as any).alert.success(messageForWorkMode(oldWorkMode));
 		} catch (err) {
 			this.handleSaveError(err);
 		}
@@ -255,10 +267,10 @@ class ThesesAppInternal extends React.Component<any, State> {
 
 	private handleSaveError(err: Error) {
 		if (err instanceof ThesisNameConflict) {
-			this.props.alert.error("Praca o tym tytule już istnieje.");
+			(this.props as any).alert.error("Praca o tym tytule już istnieje.");
 			this.setState({ hasTitleError: true });
 		} else if (err instanceof ThesisEmptyTitle) {
-			this.props.alert.error("Tytuł pracy nie może być pusty");
+			(this.props as any).alert.error("Tytuł pracy nie może być pusty");
 			this.setState({ hasTitleError: true });
 		} else {
 			const msg = (
@@ -291,4 +303,6 @@ function messageForWorkMode(mode: ThesisWorkMode) {
 	}
 }
 
-export const ThesesApp = withAlert(ThesesAppInternal);
+// This type juggling is required because react-alert is badly typed
+const enhanced = withAlert(ThesesAppInternal as any);
+export const ThesesApp = enhanced as any as typeof ThesesAppInternal;

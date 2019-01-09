@@ -7,8 +7,8 @@ import styled from "styled-components";
 
 import { GenericSelect } from "./GenericSelect";
 import { ApplicationState } from "../app_types";
-import { ChangedStringFilter } from "../theses_logic";
 import { ThesisTypeFilter, thesisTypeFilterToString } from "../protocol_types";
+import { StringFilter } from "../app_logic/theses_list";
 
 const typeFilterInfos = [
 	ThesisTypeFilter.AllCurrent,
@@ -37,7 +37,7 @@ type Props = {
 	titleValue: string;
 
 	state: ApplicationState;
-	stringFilterBeingChanged: ChangedStringFilter;
+	stringFilterBeingChanged: StringFilter;
 };
 
 const TextFilterField = styled.input`

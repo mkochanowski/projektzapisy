@@ -11,11 +11,17 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
-
 import { whenDomLoaded } from "common/utils";
 import { ThesesApp } from "./components/ThesesApp";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./misc_style.less";
+import { initializeLogic } from "./app_logic";
+
+function main() {
+	const initPromise = initializeLogic();
+	whenDomLoaded(() => renderApp(initPromise));
+}
+main();
 
 const alertOptions = {
 	position: "bottom center",
@@ -24,14 +30,13 @@ const alertOptions = {
 	transition: "scale"
 } as any;	// TS's type inference with the constants above isn't very good
 
-function main() {
+function renderApp(initPromise: PromiseLike<any>) {
 	ReactDOM.render(
 		<ErrorBoundary>
 			<AlertProvider template={AlertTemplate} {...alertOptions}>
-				<ThesesApp/>
+				<ThesesApp initPromise={initPromise}/>
 			</AlertProvider>
 		</ErrorBoundary>,
 		document.getElementById("theses-react-root"),
 	);
 }
-whenDomLoaded(main);

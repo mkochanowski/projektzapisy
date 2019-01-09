@@ -42,11 +42,11 @@ export class Student extends Person {
  * Represents the user of the thesis system
  */
 export class AppUser {
-	public user: Person;
+	public person: Person;
 	public type: UserType;
 
 	public constructor(user: Person, type: UserType) {
-		this.user = user;
+		this.person = user;
 		this.type = type;
 	}
 }

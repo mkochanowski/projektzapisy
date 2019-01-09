@@ -8,6 +8,7 @@ import {
 	AutoSizer, SortDirectionType, SortDirection as RVSortDirection,
 	RowMouseEventHandlerParams, TableCellProps,
 	InfiniteLoader,
+	IndexRange,
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
 
@@ -18,7 +19,6 @@ import { getDisabledStyle } from "../../utils";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { NoResultsMessage } from "./NoResultsMessage";
 import { UnconstrainedFunction } from "common/types";
-import { LoadMode } from "../../theses_logic";
 import { inRange } from "common/utils";
 import { Thesis } from "../../thesis";
 
@@ -65,7 +65,7 @@ type Props = {
 	/* Function to be called to switch to the thesis at the specified offset */
 	onThesisSelected: (t: Thesis) => void;
 	onSortChanged: (column: SortColumn, dir: SortDirection) => void;
-	loadMoreRows: (startIndex: number, stopIndex: number) => Promise<void>;
+	loadMoreRows: (stopIndex: number) => Promise<void>;
 };
 
 export class ThesesTable extends React.PureComponent<Props> {
@@ -87,20 +87,25 @@ export class ThesesTable extends React.PureComponent<Props> {
 		this.uninstallKeyHandler();
 	}
 
-	public onListDidChange(mode: LoadMode) {
+	public onListReloaded() {
+		// the list changed completely, the old position is no longer meaningful,
+		// so return to the top
+		this.hasScrolledSinceChange = false;
+		this.RV_resetLoadMoreRows();
+		// tell the row height calculator that its caches are no longer valid
+		rowHeightCache.clearAll();
+	}
+
+	/**
+	 * Tells react-virtualized's InfiniteLoader logic when we've loaded
+	 * more rows so it can perform some internal bookkeeping
+	 */
+	private RV_resetLoadMoreRows() {
 		// https://github.com/bvaughn/react-virtualized/blob/master/docs/InfiniteLoader.md
 		// resetLoadMoreRowsCache - we need to call it if the list changes completely
 		// so that it knows to clear its internal caches
 		if (this.loaderInstance) {
 			this.loaderInstance.resetLoadMoreRowsCache();
-		}
-		// as above - tell the row height calculator that its caches are no longer
-		// valid
-		rowHeightCache.clearAll();
-		// if the list changed completely, the old position is no longer meaningful,
-		// so return to the top
-		if (mode === LoadMode.Replace) {
-			this.hasScrolledSinceChange = false;
 		}
 	}
 
@@ -122,7 +127,7 @@ export class ThesesTable extends React.PureComponent<Props> {
 			ApplicationState.Normal, ApplicationState.LoadingMore
 		].includes(applicationState);
 		return <InfiniteLoader
-				loadMoreRows={({ startIndex, stopIndex }) => this.props.loadMoreRows(startIndex, stopIndex)}
+				loadMoreRows={this.loadMoreRows}
 				isRowLoaded={({ index }) => this.isRowLoaded(index)}
 				rowCount={this.props.totalThesesCount}
 				ref={this.setLoaderInstance}
@@ -194,6 +199,10 @@ export class ThesesTable extends React.PureComponent<Props> {
 		</Table>;
 	}
 
+	private loadMoreRows = async ({ stopIndex }: IndexRange) => {
+		await this.props.loadMoreRows(stopIndex);
+		this.RV_resetLoadMoreRows();
+	}
 	/**
 	 * Return a cell renderer using the provided thesis data getter
 	 * This function exists to abstract away the usage of CellMeasurer

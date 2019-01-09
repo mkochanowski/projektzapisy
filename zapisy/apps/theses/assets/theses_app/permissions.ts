@@ -1,78 +1,63 @@
 /**
  * @file Theses app permission checks, mostly analogous to permissions.py
  */
-import { thesesStore } from "./theses_logic";
-import { AppUser } from "./users";
-import { UserType, ThesisStatus } from "./protocol_types";
+import { ThesisStatus } from "./protocol_types";
 import { Thesis } from "./thesis";
+import { Users } from "./app_logic/users";
 
 /**
- * Determine whether the specified app user has a thesis staff role
- * @param user The app user
+ * Determine whether the current app user is permitted to add new thesis objects
  */
-function isThesisStaff(user: AppUser) {
-	return user.type === UserType.Admin || thesesStore.isThesesBoardMember(user.user);
+export function canAddThesis() {
+	return !Users.isUserStudent();
 }
 
 /**
- * Determine whether the specified app user is permitted to add new objects
- * @param user The app user
- */
-export function canAddThesis(user: AppUser) {
-	return user.type !== UserType.Student;
-}
-
-/**
- * Determine whether the specified user "owns" the specified thesis
- * @param user The app user
+ * Determine whether the current user "owns" the specified thesis
  * @param thesis The thesis
  */
-function isOwnerOfThesis(user: AppUser, thesis: Thesis): boolean {
-	return !!thesis.advisor && thesis.advisor.isEqual(user.user);
+function isOwnerOfThesis(thesis: Thesis): boolean {
+	return !!thesis.advisor && thesis.advisor.isEqual(Users.currentUser.person);
 }
 
 /**
- * Determine if the specified user is permitted to make any changes to the specified thesis
- * @param user The user
+ * Determine if the current user is permitted to make any changes to the specified thesis
  * @param thesis The thesis
  */
-export function canModifyThesis(user: AppUser, thesis: Thesis) {
+export function canModifyThesis(thesis: Thesis) {
 	if (thesis.isArchived()) {
-		return user.type === UserType.Admin;
+		return Users.isUserAdmin();
 	}
-	return isThesisStaff(user) || isOwnerOfThesis(user, thesis);
+	return Users.isUserStaff() || isOwnerOfThesis(thesis);
 }
 
 // The functions below will only be used if the one above returns true,
-// so they don't need to repeat its checks
+// so they don't need to repeat their checks
 
 /**
  * Determine if the specified user is permitted to change the title of the specified thesis
- * @param user The user
  * @param thesis The thesis
  */
-export function canChangeTitle(user: AppUser, thesis: Thesis) {
+export function canChangeTitle(thesis: Thesis) {
 	const allowedStatuses = [
 		ThesisStatus.BeingEvaluated, ThesisStatus.ReturnedForCorrections,
 	];
 	return (
-		isThesisStaff(user) ||
-		isOwnerOfThesis(user, thesis) && allowedStatuses.includes(thesis.status)
+		Users.isUserStaff() ||
+		isOwnerOfThesis(thesis) && allowedStatuses.includes(thesis.status)
 	);
 }
 
 /**
  * Determine if a user of the specified type can modify an existing thesis' status
- * @param user The app user
  */
-export function canChangeStatus(user: AppUser) {
-	return isThesisStaff(user);
+export function canChangeStatus() {
+	return Users.isUserStaff();
 }
 
 /**
  * Determine if the specified user is allowed to set any advisor on any thesis
- * @param user The app user
  */
-export function canSetArbitraryAdvisor(user: AppUser) {
-	return isThesisStaff(user);
+export function canSetArbitraryAdvisor() {
+	return Users.isUserStaff();
 }

@@ -12,11 +12,12 @@ import { ThesisVotes } from "./ThesisVotes";
 import "./style.less";
 import { Spinner } from "../Spinner";
 import { getDisabledStyle } from "../../utils";
-import { ThesisWorkMode, ApplicationState, isPerformingBackendOp } from "../../app_types";
+import { ThesisWorkMode, ApplicationState } from "../../app_types";
 import { canModifyThesis } from "../../permissions";
 import { Thesis } from "../../thesis";
 import { AppUser, Employee, Student } from "../../users";
 import { ThesisStatus, ThesisKind } from "../../protocol_types";
+import { AppMode } from "../../app_logic/app_mode";
 
 const SaveButton = React.memo(Button.extend`
 	&:disabled:hover {
@@ -88,7 +89,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 				: null
 			}
 			<MainDetailsContainer
-				style={isPerformingBackendOp(this.props.appState) ? getDisabledStyle() : {}}
+				style={AppMode.isPerformingBackendOp() ? getDisabledStyle() : {}}
 			>
 				<LeftDetailsContainer>{this.renderThesisLeftPanel()}</LeftDetailsContainer>
 				<RightDetailsContainer>{this.renderThesisRightPanel()}</RightDetailsContainer>
@@ -130,7 +131,7 @@ export class ThesisDetails extends React.PureComponent<Props> {
 	}
 
 	private renderSaveButton() {
-		const readOnly = !canModifyThesis(this.props.user, this.props.thesis);
+		const readOnly = !canModifyThesis(this.props.thesis);
 		if (readOnly) {
 			return null;
 		}

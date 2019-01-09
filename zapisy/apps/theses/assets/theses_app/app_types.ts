@@ -15,10 +15,6 @@ export const enum ApplicationState {
 	Normal,
 }
 
-export function isPerformingBackendOp(state: ApplicationState) {
-	return state !== ApplicationState.Normal;
-}
-
 /**
  * Determines whether we're adding a new thesis or modifying an existing one
  */
