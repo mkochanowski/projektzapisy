@@ -282,7 +282,7 @@ const webpackConfig: webpack.Configuration = {
 				})
 			},
 			{
-				test: /\.(png|jpg|gif)$/,
+				test: /\.(png|jpg|gif|ttf|woff|woff2)$/,
 				use: [{
 					loader: "url-loader",
 					options: {
