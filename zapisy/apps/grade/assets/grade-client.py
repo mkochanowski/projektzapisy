@@ -41,15 +41,14 @@ def modinv(a, n):
 
 class Tickets:
    """
-   Główna logika generowania kluczy do głosowania
+      Główna logika generowania kluczy do głosowania
    """
-   url = 'http://localhost:8002/' # 'https://zapisy.ii.uni.wroc.pl/'
-   bits = 512
+   url = 'https://zapisy.ii.uni.wroc.pl/'
    template = "[{title}] {name} \nid: {id} \n{ticket} \n{signed_ticket} \n"+('-'*34)+" \n"
 
    def __init__(self, out_file, backup_file):
-      self.client = requests.session()
       # połączenie z serwerem jest obsługiwane przez bibiliotekę requests
+      self.client = requests.session()
       self.loggedin = False
       self.poll_data = None
       self.public_keys = []
@@ -64,7 +63,7 @@ class Tickets:
 
    def run(self):
       """
-         uruchamia główną logikę
+         Uruchamia główną logikę
       """
 
       # logowanie jest wymagane do pobrania kluczy publicznych
@@ -107,9 +106,10 @@ class Tickets:
 
    def login(self):
       """
-         logowanie
+         Logowanie
       """
-      self.client.get(self.url) # weź pierwszy CSRF token
+      # weź pierwszy CSRF token
+      self.client.get(self.url)
 
       # wyślij dane do logowania z tokenem CSRF
       data = {
@@ -119,11 +119,12 @@ class Tickets:
       }
 
       response = self.client.post(self.url+'users/login/', data=data)
+      # proste sprawdzenie czy logowanie się powiodło
       self.loggedin = response.ok and response.text.find('/users/password-change/') != -1
 
    def get_public_keys(self):
       """
-         pobranie kluczy publicznych ankiet
+         Pobranie kluczy publicznych ankiet
       """
       # należy wysłać token CSRF
       data = {
@@ -137,11 +138,16 @@ class Tickets:
       response = self.client.post(self.url+'grade/ticket/ajax_tickets1', data=data, headers=headers)
 
       if response.ok:
+         # zwrócone dane to lista obiektów
+         # [{'key': {'n': string, 'e': string }, 'pool_info': X }]
+         # X jest oiektem z conajmniej polem 'title' oraz 'id'
+         # może mieć również pola 'type', 'course_name', 'teacher_name'
+         # jeśli ich nie ma jest to ankieta ogólna
          self.poll_data = response.json()
 
    def generate_tickets(self):
       """
-         generate tickets to sign
+         Generowanie kluczy/kart i zaślepianie/wsadzanie do kopert do podpisania
       """
       for data in self.poll_data:
          n = int(data['key']['n'])
@@ -170,7 +176,7 @@ class Tickets:
 
    def get_signed_tickets(self):
       """
-         send tickets to sign
+         Wyślij karty w kopertach do podpisania
       """
       data = {
           'csrfmiddlewaretoken': self.csrftoken,
@@ -183,17 +189,24 @@ class Tickets:
       response = self.client.post(self.url+'grade/ticket/ajax_tickets2', data=data, headers=headers)
 
       if response.ok:
+         # zwrócone dane to lista obiektów
+         # [{'signature': string }]
+         # wartość 'signature' to informacja o błędzie
+         # lub podpisana karta w kopercie
          self.signed_blind_tickets = response.json()
+         # karty można podpisać tylko raz
+         # dlatego nie przetworzoną odpowiedź należy zapisać
+         # aby móc wznowić w razie problemów
          self.backup_file.write(response.text)
 
    def unblind_tickets(self):
       """
-         unblind signed tickets
+         Wyjęcie podpisanych kart z kopert
       """
       for index, data in enumerate(self.signed_blind_tickets):
          if (data['signature'] == "Nie jesteś przypisany do tej ankiety" or
              data['signature'] == "Bilet już pobrano"):
-            self.signed_tickets.append(data['signature']) # signed ticket
+            self.signed_tickets.append(data['signature'])
          else:
             st = int(data['signature'])
             public_key = self.public_keys[index]
@@ -204,7 +217,7 @@ class Tickets:
 
    def save(self):
       """
-         save tickets in proper format to file
+         Zapisanie kopert w ustalonym formacie
       """
       for poll_info, ticket, signed_ticket in zip(self.poll_info, self.ms, self.signed_tickets):
          data = {
@@ -241,6 +254,9 @@ class Tickets:
       return getpass('Password: ')
 
 
+# użycie: ./grade-client.py [plik_z_kartami [plik_backup]]
+# plik_z_kartami domyślnie to standardowe wyjście
+# plik_backup domyślnie to standardowe wyjście błędów
 if __name__ == "__main__":
    FILE = stdout
    BACKUP = stderr
