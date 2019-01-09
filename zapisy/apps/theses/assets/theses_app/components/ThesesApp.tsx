@@ -162,7 +162,6 @@ class ThesesAppInternal extends React.Component<Props, State> {
 			appState={AppMode.applicationState}
 			hasUnsavedChanges={ThesisEditing.hasUnsavedChanges}
 			mode={AppMode.workMode!}
-			user={Users.currentUser}
 			hasTitleError={this.state.hasTitleError}
 			onChangedTitle={this.onChangedTitle}
 			onSaveRequested={this.onSave}

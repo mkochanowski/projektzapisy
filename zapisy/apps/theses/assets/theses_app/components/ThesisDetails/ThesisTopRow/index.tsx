@@ -25,7 +25,6 @@ width: 100%;
 type Props = {
 	thesis: Thesis;
 	mode: ThesisWorkMode;
-	user: AppUser;
 	onReservationChanged: (nr: boolean) => void;
 	onDateChanged: (nd: Moment) => void;
 	onStatusChanged: (ns: ThesisStatus) => void;

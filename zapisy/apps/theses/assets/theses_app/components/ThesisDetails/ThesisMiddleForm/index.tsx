@@ -42,7 +42,6 @@ type Props = {
 	thesis: Thesis;
 	/** Should the title field be highlighted to indicate an error? */
 	titleError: boolean;
-	user: AppUser;
 	onTitleChanged: (nt: string) => void;
 	onKindChanged: (nk: ThesisKind) => void;
 	onAdvisorChanged: (na: Employee | null) => void;

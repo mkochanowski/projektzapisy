@@ -15,7 +15,7 @@ import { getDisabledStyle } from "../../utils";
 import { ThesisWorkMode, ApplicationState } from "../../app_types";
 import { canModifyThesis } from "../../permissions";
 import { Thesis } from "../../thesis";
-import { AppUser, Employee, Student } from "../../users";
+import { Employee, Student } from "../../users";
 import { ThesisStatus, ThesisKind } from "../../protocol_types";
 import { AppMode } from "../../app_logic/app_mode";
 
@@ -61,7 +61,6 @@ type Props = {
 	appState: ApplicationState;
 	hasUnsavedChanges: boolean;
 	mode: ThesisWorkMode;
-	user: AppUser;
 	hasTitleError: boolean;
 	onThesisModified: (thesis: Thesis) => void;
 	onSaveRequested: () => void;
@@ -102,7 +101,6 @@ export class ThesisDetails extends React.PureComponent<Props> {
 		return <>
 			<ThesisTopRow
 				mode={this.props.mode}
-				user={this.props.user}
 				thesis={thesis}
 				onReservationChanged={this.onReservationChanged}
 				onDateChanged={this.onDateUpdatedChanged}
@@ -111,7 +109,6 @@ export class ThesisDetails extends React.PureComponent<Props> {
 			<ThesisMiddleForm
 				thesis={thesis}
 				titleError={this.props.hasTitleError}
-				user={this.props.user}
 				onTitleChanged={this.onTitleChanged}
 				onKindChanged={this.onKindChanged}
 				onAdvisorChanged={this.onAdvisorChanged}
