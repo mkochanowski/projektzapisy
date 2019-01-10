@@ -10,7 +10,14 @@
         {% endif %}
         <div class="poll-header">
             <h2>{{ poll_course }}</h2>
-            <h3>{{ poll_group }} {{ poll_teacher }}</h3>
+            <h3>{{ poll_group }} </h3>
+            {% for teacher in poll_teachers %}
+                {% if teacher %}
+                    <h5>{{ teacher.user.get_full_name }}</h5>
+                {% else %}
+                    <h3>nieznany prowadzący</h3>
+                {% endif %}
+            {% endfor %}
         </div>
         {% for s_result in results %}
             <div class="section-results">

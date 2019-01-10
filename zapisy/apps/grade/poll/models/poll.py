@@ -110,7 +110,7 @@ class Poll(models.Model):
             viewer = user.employee
 
             if self.group:
-                if viewer == self.group.teacher:
+                if viewer in self.group.teachers.all():
                     return True
 
                 lectureCode = next((code for code, desc in GROUP_TYPE_CHOICES if desc == 'wykład'))

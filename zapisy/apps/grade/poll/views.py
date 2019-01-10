@@ -1200,7 +1200,7 @@ def poll_results(request, mode='S', poll_id=None, semester=None):
             try:
                 data['poll_course'] = poll.group.course.name
                 data['poll_group'] = poll.group.get_type_display()
-                data['poll_teacher'] = poll.group.get_teacher_full_name()
+                data['poll_teachers'] = poll.group.teachers.all()
             except BaseException:
                 data['poll_course'] = "Ankieta ogólna"
 
