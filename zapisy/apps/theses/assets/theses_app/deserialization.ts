@@ -3,10 +3,11 @@ import * as moment from "moment";
 import { ThesisKind, ThesisStatus, UserType } from "./protocol_types";
 import { Thesis } from "./thesis";
 import { Employee, Student, AppUser } from "./users";
+import { Users } from "./app_logic/users";
 
 type PersonInJson = {
 	id: number;
-	display_name: string;
+	name: string;
 };
 
 /**
@@ -15,8 +16,8 @@ type PersonInJson = {
 export type ThesisInJson = {
 	id: number;
 	title: string;
-	advisor?: PersonInJson;
-	auxiliary_advisor?: PersonInJson;
+	advisor?: number;
+	auxiliary_advisor?: number;
 	kind: ThesisKind;
 	reserved: boolean;
 	description: string;
@@ -33,19 +34,19 @@ type CurrentUserInJson = {
 };
 
 export function deserializeEmployee(json: PersonInJson) {
-	return new Employee(json.id, json.display_name);
+	return new Employee(json.id, json.name);
 }
 
 export function deserializeStudent(json: PersonInJson) {
-	return new Student(json.id, json.display_name);
+	return new Student(json.id, json.name);
 }
 
 export function deserializeThesis(json: ThesisInJson) {
 	const result = new Thesis();
 	result.id = json.id;
 	result.title = json.title;
-	result.advisor = json.advisor ? deserializeEmployee(json.advisor) : null;
-	result.auxiliaryAdvisor = json.auxiliary_advisor ? deserializeEmployee(json.auxiliary_advisor) : null;
+	result.advisor = json.advisor ? Users.getEmployeeById(json.advisor) : null;
+	result.auxiliaryAdvisor = json.auxiliary_advisor ? Users.getEmployeeById(json.auxiliary_advisor) : null;
 	result.kind = json.kind;
 	result.reserved = json.reserved;
 	result.description = json.description;
@@ -62,4 +63,14 @@ export function deserializeCurrentUser(json: CurrentUserInJson) {
 		? deserializeStudent
 		: deserializeEmployee;
 	return new AppUser(deserializer(json.user), json.type);
+}
+
+type BoardMemberIn = number;
+export function deserializeBoardMember(member: BoardMemberIn) {
+	const result = Users.getEmployeeById(member);
+	if (!result) {
+		console.error(`Board member with ID ${member} not found, skipping`);
+		return null;
+	}
+	return result;
 }

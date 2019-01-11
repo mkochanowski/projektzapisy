@@ -7,25 +7,18 @@ import { Thesis, MAX_THESIS_TITLE_LEN } from "./thesis";
 import { Person } from "./users";
 
 /**
- * The representation of a person sent to the backend
- */
-type PersonOutSerialized = {
-	id: number;
-};
-
-/**
  * The representation of a new thesis object sent to the backend
  */
 type ThesisAddOutSerialized = {
 	title?: string;
-	advisor?: PersonOutSerialized | null;
-	auxiliary_advisor?: PersonOutSerialized | null;
+	advisor?: number | null;
+	auxiliary_advisor?: number | null;
 	kind?: ThesisKind;
 	reserved?: boolean;
 	description?: string;
 	status?: ThesisStatus;
-	student?: PersonOutSerialized | null;
-	student_2?: PersonOutSerialized | null;
+	student?: number | null;
+	student_2?: number | null;
 };
 
 /**
@@ -78,8 +71,8 @@ function hadPersonChange(old: Person | null, newp: Person | null) {
 /**
  * Given a person instance, convert it to the backend representation
  */
-function toPersonDispatch(newPerson: Person | null): PersonOutSerialized | null {
-	return newPerson ? { id: newPerson.id } : null;
+function toPersonDispatch(newPerson: Person | null): number | null {
+	return newPerson ? newPerson.id : null;
 }
 
 /**

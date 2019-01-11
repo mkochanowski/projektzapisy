@@ -6,6 +6,7 @@ import { get as getCookie } from "js-cookie";
 import * as objectAssignDeep from "object-assign-deep";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import * as HttpStatus from "http-status-codes";
+import { compact } from "lodash";
 
 import { SortColumn, SortDirection, ThesesProcessParams } from "./app_types";
 import { ThesisNameConflict } from "./errors";
@@ -13,7 +14,7 @@ import { AppUser, Student, Person, Employee } from "./users";
 import { UserType } from "./protocol_types";
 import {
 	ThesisInJson, deserializeThesis,
-	deserializeCurrentUser, deserializeEmployee,
+	deserializeCurrentUser, deserializeEmployee, deserializeBoardMember,
 } from "./deserialization";
 import { Thesis } from "./thesis";
 import { serializeThesisDiff, serializeNewThesis } from "./serialization";
@@ -113,6 +114,14 @@ export async function getThesesList(
 }
 
 /**
+ * Get all the employees as an array
+ */
+export async function getEmployees(): Promise<Employee[]> {
+	const emps = await getData(`${BASE_API_URL}/theses_employees/`);
+	return emps.map(deserializeEmployee);
+}
+
+/**
  * Fetch the current system user from the backend
  */
 export async function getCurrentUser(): Promise<AppUser> {
@@ -124,7 +133,7 @@ export async function getCurrentUser(): Promise<AppUser> {
  */
 export async function getThesesBoard() {
 	const members = await getData(`${BASE_API_URL}/theses_board/`);
-	return members.map(deserializeEmployee);
+	return compact(members.map(deserializeBoardMember));
 }
 
 export const enum PersonType {
