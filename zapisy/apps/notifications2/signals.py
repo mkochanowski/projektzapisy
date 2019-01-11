@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from apps.enrollment.courses.models.group import Group
 from apps.notifications2.api import notify_user, notify_selected_users
 from apps.notifications2.models import get_all_users_in_course_groups
-from apps.notifications2.custom_signals import student_pulled
+from apps.notifications2.custom_signals import student_pulled, teacher_changed
 
 
 @receiver(post_save, sender=Group)
@@ -35,5 +35,24 @@ def notify_that_user_was_pulled_from_queue(sender: Group, **kwargs) -> None:
     notify_user(kwargs["user"], "pulled_from_queue", {
         "course_name": group.course.information.entity.name,
         "teacher": group.teacher.user.get_full_name(),
+        "type": group_types[str(group.type)]
+    })
+
+
+@receiver(teacher_changed, sender=Group)
+def notify_that_teacher_was_changed(sender: Group, **kwargs) -> None:
+    group = kwargs["instance"]
+    group_types: Dict = {"1": "wykład", "2": "ćwiczenia", "3": "pracownia", "5": "ćwiczenio-pracownia",
+                         "6": "seminarium", "7": "lektorat", "8": "WF", "9": "repetytorium", "10": "projekt"}
+
+    teacher = group.teacher.user
+    course_name = group.course.information.entity.name
+
+    notify_user(teacher, "assigned_to_new_group_as_teacher", {"course_name": course_name})
+
+    users = get_all_users_in_course_groups([group])
+    notify_selected_users(users, "teacher_has_been_changed", {
+        "course_name": course_name,
+        "teacher": teacher.get_full_name(),
         "type": group_types[str(group.type)]
     })
