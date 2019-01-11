@@ -40,34 +40,6 @@ class NotificationsRepository(ABC):
         pass
 
 
-class FakeNotificationsRepository(NotificationsRepository):
-
-    def __init__(self):
-        self.notifications = [
-            Notification(datetime.now(), 'fake_desc', {'example_arg': 'aaa'}),
-            Notification(datetime.now(), 'fake_desc', {'example_arg': 'bbb'}),
-            Notification(datetime.now(), 'fake_desc', {'example_arg': 'ccc'}),
-        ]
-
-    def get_count_for_user(self, user: User) -> int:
-        return 3
-
-    def get_all_for_user(self, user: User) -> List[Notification]:
-        return self.notifications
-
-    def get_unsent_for_user(self, user: User) -> List[Notification]:
-        return self.notifications
-
-    def mark_as_sent(self, user: User, notification: Notification) -> None:
-        pass
-
-    def save(self, user: User, notification: Notification) -> None:
-        pass
-
-    def remove_all_older_than(self, user: User, until: datetime) -> int:
-        return 0
-
-
 class RedisNotificationsRepository(NotificationsRepository):
 
     def __init__(self, serializer: NotificationSerializer):
