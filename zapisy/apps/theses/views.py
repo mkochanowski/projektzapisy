@@ -215,6 +215,15 @@ class ThesesBoardViewSet(viewsets.ModelViewSet):
         return get_theses_board()
 
 
+class EmployeesViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get"]
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = serializers.ThesesPersonSerializer
+
+    def get_queryset(self) -> QuerySet:
+        return Employee.objects.select_related("user")
+
+
 @api_view()
 @permission_classes((permissions.IsAuthenticated,))
 def get_current_user(request):

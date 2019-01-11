@@ -5,10 +5,10 @@ to objects used in the theses system, that is:
 * fine-grained permissions checks
 * performing modifications/adding new objects
 """
-from typing import Dict, Any, Optional, Callable
+from typing import Dict, Any, Optional
 
 from rest_framework import serializers, exceptions
-from django.db.models import QuerySet
+from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus, MAX_THESIS_TITLE_LEN
@@ -19,56 +19,43 @@ from .drf_errors import ThesisNameConflict
 GenericDict = Dict[str, Any]
 
 
-class PersonSerializerForThesis(serializers.Serializer):
+class ThesesPersonSerializer(serializers.Serializer):
     """Used to serialize user profiles as needed by various parts of the system;
     we don't want to use the user serializer from apps.api.rest
-    because it packs too much data, and size matters here as we'll send it
-    for every thesis
+    because it serializes a lot of unnecessary data
     """
+    default_error_messages = serializers.PrimaryKeyRelatedField.default_error_messages
+
+    def __init__(self, *args, **kwargs):
+        self.queryset = kwargs.pop("queryset", None)
+        super().__init__(*args, **kwargs)
+
     def to_representation(self, instance: BaseUser):
         return {
-            "id": instance.id,
-            "display_name": instance.get_full_name(),
+            "id": instance.pk,
+            "name": instance.get_full_name(),
         }
 
-    def to_internal_value(self, data: GenericDict):
-        person_id = data.get("id")
-        if not isinstance(person_id, int) or person_id < 0:
-            raise serializers.ValidationError({
-                "id": "Expected 'id' to be a valid positive integer"
-            })
-        return {"id": person_id}
+    def to_internal_value(self, data):
+        if not self.queryset:
+            raise ImproperlyConfigured(
+                "PersonSerializerForThesis cannot deserialize without a queryset provided"
+            )
+        try:
+            return self.queryset.get(pk=data)
+        except ObjectDoesNotExist:
+            self.fail('does_not_exist', pk_value=data)
+        except (TypeError, ValueError):
+            self.fail('incorrect_type', data_type=type(data).__name__)
 
-
-def get_person(queryset: QuerySet, person_data: GenericDict) -> BaseUser:
-    """Given a person object of the format specified above (in PersonSerializer.to_internal_value)
-    and a queryset, try to return the corresponding model instance
-    """
-    try:
-        return queryset.objects.get(pk=person_data.get("id")) if person_data else None
-    except queryset.DoesNotExist:
-        raise serializers.ValidationError("bad person ID specified")
-
-
-def copy_if_present(
-    dst: GenericDict, src: GenericDict, key: str, converter: Callable[[any], any]=None
-):
-    """If the given key is present in the source dictionary,
-    copy it to the destination dictionary optionally applying the
-    supplied conversion function if present
-    """
-    if key in src:
-        dst[key] = converter(src[key]) if converter else src[key]
-
-
-def copy_optional_fields(result: GenericDict, data: GenericDict):
-    """Extract optional fields from the source dictionary (sent by the client),
-    perform any necessary conversions, then place it in the result dictionary
-    """
-    copy_if_present(result, data, "description")
-    copy_if_present(result, data, "auxiliary_advisor", lambda a: get_person(Employee, a))
-    copy_if_present(result, data, "student", lambda s: get_person(Student, s))
-    copy_if_present(result, data, "student_2", lambda s: get_person(Student, s))
+    def run_validators(self, value):
+        """DRF 3.8.2 to 3.9.0 have a bug that prevents returning non-dict types
+        from to_internal_value, see
+        https://github.com/encode/django-rest-framework/issues/6053
+        this is fixed in 3.9.1 but as of writing this that version is not yet
+        available; this workaround should be removed when upgrading
+        """
+        super(serializers.Serializer, self).run_validators(value)
 
 
 def validate_new_title_for_instance(title: str, instance: Optional[Thesis]):
@@ -95,10 +82,18 @@ def check_advisor_permissions(user: BaseUser, advisor: Employee):
 
 
 class ThesisSerializer(serializers.ModelSerializer):
-    advisor = PersonSerializerForThesis(allow_null=True, required=False)
-    auxiliary_advisor = PersonSerializerForThesis(allow_null=True, required=False)
-    student = PersonSerializerForThesis(allow_null=True, required=False)
-    student_2 = PersonSerializerForThesis(allow_null=True, required=False)
+    advisor = serializers.PrimaryKeyRelatedField(
+        allow_null=True, required=False, queryset=Employee.objects.all()
+    )
+    auxiliary_advisor = serializers.PrimaryKeyRelatedField(
+        allow_null=True, required=False, queryset=Employee.objects.all()
+    )
+    student = ThesesPersonSerializer(
+        allow_null=True, required=False, queryset=Student.objects.all()
+    )
+    student_2 = ThesesPersonSerializer(
+        allow_null=True, required=False, queryset=Student.objects.all()
+    )
     added_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
 
@@ -106,61 +101,13 @@ class ThesisSerializer(serializers.ModelSerializer):
     # isn't flexible enough to override the error code it returns (throws a 400, we want 409)
     # See https://stackoverflow.com/q/33475334
     # and https://github.com/encode/django-rest-framework/issues/6124
+    # Instead of using DRF's validation we override field-level validation below
+    # and manually check for uniqueness
     title = serializers.CharField(max_length=MAX_THESIS_TITLE_LEN)
 
-    def validate(self, data: GenericDict):
-        """Validate a dict object received from the frontend client;
-        DRF expects us to return a dict object to be used for further processing,
-        so we use this opportunity to perform conversions to more convenient formats
-        """
-        # self.context will not be defined for local serialization
-        # presently we don't use this serializer in a local context, and even if we did,
-        # no special validation needs to be performed then (drf already provides
-        # basic validation based on the constraints above)
-        if not self.context:
-            return data
-        request = self.context["request"]
-        if request.method == "POST":
-            return self.validate_add_thesis(data)
-        elif request.method == "PATCH":
-            return self.validate_modify_thesis(data)
-        raise serializers.ValidationError(f'Unknown request type {request.method}')
-
-    def validate_add_thesis(self, data: GenericDict):
-        """Validate a request to add a new thesis object and convert to more convenient
-        local types
-        """
-        advisor = get_person(Employee, data["advisor"]) if "advisor" in data else None
-        validate_new_title_for_instance(data["title"], None)
-        result = {
-            "title": data["title"],
-            "reserved": data["reserved"],
-            "kind": data["kind"],
-            "status": data["status"],
-            "advisor": advisor,
-        }
-        copy_optional_fields(result, data)
-        if "description" not in result:
-            result["description"] = ""
-
-        return result
-
-    def validate_modify_thesis(self, data: GenericDict):
-        """As above, but this time the thesis object already exists. There is some
-        additional logic in this case; for instance, if a thesis is already accepted,
-        its owner/advisor cannot change the title anymore
-        """
-        if "title" in data:
-            validate_new_title_for_instance(data["title"], self.instance)
-        result = {}
-        copy_if_present(result, data, "advisor", lambda a: get_person(Employee, a))
-        copy_if_present(result, data, "status")
-        copy_if_present(result, data, "title")
-        copy_if_present(result, data, "reserved")
-        copy_if_present(result, data, "kind")
-        copy_optional_fields(result, data)
-
-        return result
+    def validate_title(self, new_title: str):
+        validate_new_title_for_instance(new_title, self.instance)
+        return new_title
 
     def create(self, validated_data: GenericDict):
         """If the checks above succeed, DRF will call this method
@@ -227,14 +174,11 @@ class CurrentUserSerializer(serializers.ModelSerializer):
     so it's a separate serializer"""
     def to_representation(self, instance: BaseUser):
         return {
-            "user": PersonSerializerForThesis(instance).data,
+            "user": ThesesPersonSerializer(instance).data,
             "type": get_user_type(instance).value
         }
 
 
 class ThesesBoardMemberSerializer(serializers.ModelSerializer):
     def to_representation(self, instance: Employee):
-        return {
-            "id": instance.id,
-            "display_name": instance.user.username,
-        }
+        return instance.pk
