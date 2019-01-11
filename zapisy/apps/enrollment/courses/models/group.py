@@ -6,7 +6,7 @@ from django.conf import settings
 
 from apps.enrollment.records.exceptions import AlreadyNotAssignedException, NonGroupException, NonStudentException
 from apps.notifications.models import Notification
-from apps.notifications2.custom_signals import student_pulled
+from apps.notifications2.custom_signals import student_pulled, teacher_changed
 
 import logging
 
@@ -108,6 +108,13 @@ class Group(models.Model):
     objects = models.Manager()
     statistics = StatisticManager()
 
+    def save(self, *args, **kw):
+        old = type(self).objects.get(pk=self.pk) if self.pk else None
+        super(Group, self).save(*args, **kw)
+        if old:
+            if old.teacher != self.teacher:
+                teacher_changed.send(sender=self.__class__, instance=self, teacher=self.teacher)
+
     def get_teacher_full_name(self):
         """return teacher's full name of current group"""
         if self.teacher is None:
@@ -137,7 +144,7 @@ class Group(models.Model):
             '8': 'Zajęcia sportowe',
             '10': 'Projekt',
         }
-        return types[self.type]
+        return types[str(self.type)]
 
     def get_terms_as_string(self):
         return ",".join(["%s %s-%s" % (x.get_dayOfWeek_display(),
