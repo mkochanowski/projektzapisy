@@ -28,7 +28,7 @@ export const FAKE_USER = new AppUser(new Student(-1, "Fake user"), UserType.Stud
 
 /**
  * Send a request to the backend including the csrf token
- * supplied by Django's auth system; all requests
+ * supplied by Django's auth system; all nonpure requests
  * should go through this function because otherwise they will be rejected
  * as unauthorized
  * @param url The URL
@@ -131,7 +131,7 @@ export async function getCurrentUser(): Promise<AppUser> {
 /**
  * Get the theses board as an Employee list
  */
-export async function getThesesBoard() {
+export async function getThesesBoard(): Promise<Employee[]> {
 	const members = await getData(`${BASE_API_URL}/theses_board/`);
 	return compact(members.map(deserializeBoardMember));
 }
