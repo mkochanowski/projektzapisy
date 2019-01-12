@@ -3,12 +3,12 @@ import { getCurrentUser, getThesesBoard, getEmployees, FAKE_USER } from "../back
 import { Employee, AppUser } from "../users";
 import { UserType } from "../protocol_types";
 
-class UsersC {
+class C {
 	@observable public employees: Employee[] = [];
 	@observable public thesesBoard: Employee[] = [];
 	@observable public currentUser: AppUser = FAKE_USER;
 
-	public initialize = flow(function*(this: UsersC) {
+	public initialize = flow(function*(this: C) {
 		this.employees = yield getEmployees();
 		this.currentUser = yield getCurrentUser();
 		this.thesesBoard = yield getThesesBoard();
@@ -45,4 +45,4 @@ class UsersC {
 	}
 }
 
-export const Users = new UsersC();
+export const Users = new C();
