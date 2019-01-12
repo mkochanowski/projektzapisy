@@ -25,7 +25,7 @@ export const ThesisKindField = React.memo(function(props: ThesisKindSelectProps)
 	return props.readOnly
 	? <ReadOnlyInput
 		text={thesisKindToString(props.value)}
-		style={{ width: "210px" }}
+		style={{ width: "210px", height: "17px" }}
 	/>
 	: <GenericSelect<ThesisKind>
 		value={props.value}

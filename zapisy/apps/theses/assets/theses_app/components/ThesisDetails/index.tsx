@@ -46,10 +46,11 @@ const MainDetailsContainer = styled.div`
 `;
 
 const LeftDetailsContainer = styled.div`
-	flex-basis: 85%;
+	width: 790px;
 `;
 
 const RightDetailsContainer = styled.div`
+	width: 100px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;

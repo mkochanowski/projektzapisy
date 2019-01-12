@@ -29,6 +29,10 @@ const MidFormTable = styled.table`
 	}
 `;
 
+const PersonTableRow = styled.tr`
+	height: 44px;
+`;
+
 const OptionalFieldLabel = React.memo(styled.span`
 	font-style: italic;
 `);
@@ -144,7 +148,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 
 	private renderAdvisors(readOnly: boolean) {
 		return <>
-			<tr>
+			<PersonTableRow>
 				<td>Promotor</td>
 				<td>
 					<PersonField
@@ -162,9 +166,9 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 						/>
 					}
 				</td>
-			</tr>
+			</PersonTableRow>
 			{ this.state.displayAuxAdvisor ? (
-				<tr>
+				<PersonTableRow>
 					<td><OptionalFieldLabel>Promotor wspomagający</OptionalFieldLabel></td>
 					<td>
 						<PersonField
@@ -175,14 +179,14 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 							readOnly={readOnly}
 						/>
 					</td>
-				</tr>
+				</PersonTableRow>
 			) : null }
 		</>;
 	}
 
 	private renderStudents(readOnly: boolean) {
 		return <>
-			<tr>
+			<PersonTableRow>
 				<td>Student</td>
 				<td>
 					<PersonField
@@ -200,9 +204,9 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 						/>
 					}
 				</td>
-			</tr>
+			</PersonTableRow>
 			{ this.state.displayAuxStudent ? (
-				<tr>
+				<PersonTableRow>
 					<td><OptionalFieldLabel>Student wspomagający</OptionalFieldLabel></td>
 					<td>
 						<PersonField
@@ -213,7 +217,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 							readOnly={readOnly}
 						/>
 					</td>
-				</tr>
+				</PersonTableRow>
 			) : null }
 		</>;
 	}
