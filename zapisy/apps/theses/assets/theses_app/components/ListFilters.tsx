@@ -10,7 +10,7 @@ import { ApplicationState } from "../app_types";
 import { ThesisTypeFilter, thesisTypeFilterToString } from "../protocol_types";
 import { StringFilter } from "../app_logic/theses_list";
 
-const typeFilterInfos = [
+const typeFilters = [
 	ThesisTypeFilter.Everything,
 	ThesisTypeFilter.Current,
 	ThesisTypeFilter.Archived,
@@ -101,7 +101,7 @@ export class ListFilters extends React.PureComponent<Props> {
 			<GenericSelect<ThesisTypeFilter>
 				value={this.props.typeValue}
 				onChange={this.handleTypeChange}
-				optionInfo={typeFilterInfos}
+				optionInfo={typeFilters}
 				label={"Rodzaj"}
 				labelCss={labelStyle}
 				enabled={isNormalState}
