@@ -64,8 +64,9 @@ export const enum UserType {
 
 /** Defines the filter values sent to the backend when retrieving theses */
 export const enum ThesisTypeFilter {
-	AllCurrent,
-	All,
+	Everything,
+	Current,
+	Archived,
 	Masters,
 	Engineers,
 	Bachelors,
@@ -75,7 +76,7 @@ export const enum ThesisTypeFilter {
 	AvailableBachelors,
 	AvailableBachelorsISIM,
 
-	Default = AllCurrent,
+	Default = Current,
 }
 
 /**
@@ -84,8 +85,9 @@ export const enum ThesisTypeFilter {
  */
 export function thesisTypeFilterToString(type: ThesisTypeFilter) {
 	switch (type) {
-		case ThesisTypeFilter.AllCurrent: return "Wszystkie aktualne";
-		case ThesisTypeFilter.All: return "Wszystkie";
+		case ThesisTypeFilter.Everything: return "Wszystkie";
+		case ThesisTypeFilter.Current: return "Wszystkie aktualne";
+		case ThesisTypeFilter.Archived: return "Wszystkie archiwalne";
 		case ThesisTypeFilter.Masters: return "Magisterskie";
 		case ThesisTypeFilter.Engineers: return "Inżynierskie";
 		case ThesisTypeFilter.Bachelors: return "Licencjackie";

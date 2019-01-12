@@ -11,8 +11,9 @@ import { ThesisTypeFilter, thesisTypeFilterToString } from "../protocol_types";
 import { StringFilter } from "../app_logic/theses_list";
 
 const typeFilterInfos = [
-	ThesisTypeFilter.AllCurrent,
-	ThesisTypeFilter.All,
+	ThesisTypeFilter.Everything,
+	ThesisTypeFilter.Current,
+	ThesisTypeFilter.Archived,
 	ThesisTypeFilter.Masters,
 	ThesisTypeFilter.Engineers,
 	ThesisTypeFilter.Bachelors,
