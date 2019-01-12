@@ -258,7 +258,7 @@ def build_autocomplete_view_with_queryset(queryset):
                 ) \
                 .order_by("_full_name")
             if self.q:
-                qs = qs.filter(full_name__icontains=self.q)
+                qs = qs.filter(_full_name__icontains=self.q)
             return qs.all()
     return ac
 

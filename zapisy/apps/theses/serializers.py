@@ -127,7 +127,7 @@ class ThesisSerializer(serializers.ModelSerializer):
             kind=validated_data.get("kind"),
             status=validated_data.get("status"),
             reserved=validated_data.get("reserved"),
-            description=validated_data.get("description"),
+            description=validated_data.get("description", ""),
             advisor=validated_data.get("advisor"),
             auxiliary_advisor=validated_data.get("auxiliary_advisor"),
             student=validated_data.get("student"),
