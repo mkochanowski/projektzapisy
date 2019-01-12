@@ -33,16 +33,17 @@ class ThesisTypeFilter(Enum):
     Must match values in backend_callers.ts (this is what client code
     will send to us)
     """
-    all_current = 0
-    all = 1
-    masters = 2
-    engineers = 3
-    bachelors = 4
-    bachelors_isim = 5
-    available_masters = 6
-    available_engineers = 7
-    available_bachelors = 8
-    available_bachelors_isim = 9
+    everything = 0
+    current = 1
+    archived = 2
+    masters = 3
+    engineers = 4
+    bachelors = 5
+    bachelors_isim = 6
+    available_masters = 7
+    available_engineers = 8
+    available_bachelors = 9
+    available_bachelors_isim = 10
 
     default = all
 
@@ -67,7 +68,7 @@ class ThesesViewSet(viewsets.ModelViewSet):
                 if requested_thesis_type_str \
                 else ThesisTypeFilter.default
         except ValueError:
-            raise exceptions.ParseError()
+            raise exceptions.ParseError(f'Unknown filter value {requested_thesis_type_str}')
 
         requested_thesis_title = self.request.query_params.get(
             THESIS_TITLE_FILTER_NAME, ""
@@ -175,10 +176,12 @@ def available_thesis_filter(qs: QuerySet) -> QuerySet:
 
 def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter) -> QuerySet:
     """Returns only theses matching the specified type filter from the specified queryset"""
-    if thesis_type == ThesisTypeFilter.all_current:
-        return qs.exclude(_is_archived=True)
-    elif thesis_type == ThesisTypeFilter.all:
+    if thesis_type == ThesisTypeFilter.everything:
         return qs
+    elif thesis_type == ThesisTypeFilter.current:
+        return qs.exclude(_is_archived=True)
+    elif thesis_type == ThesisTypeFilter.archived:
+        return qs.filter(_is_archived=True)
     elif thesis_type == ThesisTypeFilter.masters:
         return qs.filter(kind=ThesisKind.masters.value)
     elif thesis_type == ThesisTypeFilter.engineers:
@@ -195,8 +198,8 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
         return available_thesis_filter(qs.filter(kind=ThesisKind.bachelors.value))
     elif thesis_type == ThesisTypeFilter.available_bachelors_isim:
         return available_thesis_filter(qs.filter(kind=ThesisKind.isim.value))
-    else:
-        raise exceptions.ParseError()
+    # Should never get here
+    return qs
 
 
 def filter_theses_queryset_for_only_mine(qs: QuerySet, user: BaseUser):
