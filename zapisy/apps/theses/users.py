@@ -14,6 +14,10 @@ def is_theses_board_member(user: BaseUser) -> bool:
     return is_user_in_group(user.user, THESIS_BOARD_GROUP_NAME)
 
 
+def is_admin(user: BaseUser):
+    return get_user_type(user) == ThesisUserType.admin
+
+
 def get_theses_board():
     """Return all members of the theses board"""
     return Employee.objects \
