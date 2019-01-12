@@ -45,7 +45,7 @@ class ThesisTypeFilter(Enum):
     available_bachelors = 9
     available_bachelors_isim = 10
 
-    default = all
+    default = everything
 
 
 class ThesesPagination(LimitOffsetPagination):
@@ -227,7 +227,7 @@ class EmployeesViewSet(viewsets.ModelViewSet):
         return Employee.objects.select_related("user")
 
 
-@api_view()
+@api_view(http_method_names=["get"])
 @permission_classes((permissions.IsAuthenticated,))
 def get_current_user(request):
     """Allows the front end to query the current thesis user role"""
