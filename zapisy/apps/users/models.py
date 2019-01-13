@@ -168,7 +168,10 @@ class Employee(BaseUser):
             ("mailto_all_students", "Może wysyłać maile do wszystkich studentów"),
         )
 
-    def get_full_name(self) -> str:
+    def get_full_name_with_academic_title(self) -> str:
+        """Same as get_full_name(), but prepends the employee's academic title
+        if one is defined.
+        """
         base_name = super().get_full_name()
         return f'{self.title} {base_name}' if self.title else base_name
 
@@ -285,9 +288,6 @@ class Student(BaseUser):
         verbose_name_plural: str = 'studenci'
         app_label: str = 'users'
         ordering: List[str] = ['user__last_name', 'user__first_name']
-
-    def __str__(self) -> str:
-        return self.user.get_full_name()
 
 
 class Program(models.Model):
