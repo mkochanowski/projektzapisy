@@ -33,7 +33,9 @@ class ThesesPersonSerializer(serializers.Serializer):
     def to_representation(self, instance: BaseUser):
         return {
             "id": instance.pk,
-            "name": instance.get_full_name(),
+            "name": instance.get_full_name_with_academic_title()
+            if isinstance(instance, Employee)
+            else instance.get_full_name(),
         }
 
     def to_internal_value(self, data):

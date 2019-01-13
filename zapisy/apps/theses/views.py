@@ -260,6 +260,12 @@ def build_autocomplete_view_with_queryset(queryset):
             if self.q:
                 qs = qs.filter(_full_name__icontains=self.q)
             return qs.all()
+
+        def get_result_label(self, result):
+            """Define how to stringify results; for Employees we want their full name with title"""
+            if isinstance(result, Employee):
+                return result.get_full_name_with_academic_title()
+            return result.get_full_name()
     return ac
 
 
