@@ -169,7 +169,7 @@ class Employee(BaseUser):
         )
 
     def get_full_name_with_academic_title(self) -> str:
-        """Same as get_full_name(), but prepends the employee's academic title
+        """Same as `get_full_name`, but prepends the employee's academic title
         if one is defined.
         """
         base_name = super().get_full_name()
