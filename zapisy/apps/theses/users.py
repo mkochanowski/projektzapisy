@@ -67,3 +67,13 @@ def wrap_user(user: User) -> BaseUser:
     elif BaseUser.is_student(user):
         return user.student
     raise Http404("invalid user")
+
+
+def get_theses_user_full_name(user: BaseUser):
+    """Returns the full name of the user for use by the theses system.
+    If the user is an Employee, `get_full_name_with_academic_title` will be used;
+    otherwise, `get_full_name` will be used.
+    """
+    if isinstance(user, Employee):
+        return user.get_full_name_with_academic_title()
+    return user.get_full_name()

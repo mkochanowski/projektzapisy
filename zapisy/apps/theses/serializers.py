@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 
 from apps.users.models import Employee, Student, BaseUser
 from .models import Thesis, ThesisStatus, MAX_THESIS_TITLE_LEN
-from .users import wrap_user, get_user_type
+from .users import wrap_user, get_user_type, get_theses_user_full_name
 from .permissions import can_set_status, can_set_advisor, can_change_status, can_change_title
 from .drf_errors import ThesisNameConflict
 
@@ -33,9 +33,7 @@ class ThesesPersonSerializer(serializers.Serializer):
     def to_representation(self, instance: BaseUser):
         return {
             "id": instance.pk,
-            "name": instance.get_full_name_with_academic_title()
-            if isinstance(instance, Employee)
-            else instance.get_full_name(),
+            "name": get_theses_user_full_name(instance)
         }
 
     def to_internal_value(self, data):

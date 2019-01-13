@@ -17,7 +17,10 @@ from apps.users.models import Student, Employee, BaseUser
 from .models import Thesis, ThesisStatus, ThesisKind
 from . import serializers
 from .drf_permission_classes import ThesisPermissions
-from .users import wrap_user, get_theses_board, get_user_type, ThesisUserType
+from .users import (
+    wrap_user, get_theses_board, get_user_type,
+    get_theses_user_full_name, ThesisUserType
+)
 
 """Names of processing parameters in query strings"""
 THESIS_TYPE_FILTER_NAME = "type"
@@ -263,9 +266,7 @@ def build_autocomplete_view_with_queryset(queryset):
 
         def get_result_label(self, result):
             """Define how to stringify results; for Employees we want their full name with title"""
-            if isinstance(result, Employee):
-                return result.get_full_name_with_academic_title()
-            return result.get_full_name()
+            return get_theses_user_full_name(result)
     return ac
 
 
