@@ -111,7 +111,6 @@ export class ThesesTable extends React.PureComponent<Props> {
 		this.hasScrolledSinceChange = false;
 		this.RV_resetLoadMoreRows();
 		// tell the row height calculator that its caches are no longer valid
-		console.error("clearing row height cache");
 		rowHeightCache.clearAll();
 	}
 
