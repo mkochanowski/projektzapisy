@@ -26,7 +26,6 @@ import { Thesis } from "../thesis";
 import { ThesisEditing } from "../app_logic/editing";
 import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
-import { Users } from "../app_logic/users";
 import { LoadingIndicator } from "./LoadingIndicator";
 
 const TopRowContainer = styled.div`
