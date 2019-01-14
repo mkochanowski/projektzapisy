@@ -1,5 +1,5 @@
 import { observable, action, flow, computed } from "mobx";
-import { clone } from "lodash";
+import { cloneDeep } from "lodash";
 
 import { Thesis } from "../thesis";
 import { ThesisEmptyTitle } from "../errors";
@@ -7,6 +7,9 @@ import { saveModifiedThesis, saveNewThesis } from "../backend_callers";
 import { ThesisWorkMode, ApplicationState } from "../app_types";
 import { AppMode } from "./app_mode";
 import { List } from "./theses_list";
+import { Users } from "./users";
+import { canSetArbitraryAdvisor } from "../permissions";
+import { Employee } from "../users";
 
 /** The currently selected thesis */
 type CompositeThesis = {
@@ -68,8 +71,13 @@ class C {
 	 * @param thesis The thesis we'll be adding
 	 */
 	@action
-	public setupForNewThesis(thesis: Thesis) {
+	public setupForNewThesis() {
 		AppMode.workMode = ThesisWorkMode.Adding;
+		const empUser = Users.currentUser.person as Employee;
+		const thesis = new Thesis();
+		if (!canSetArbitraryAdvisor()) {
+			thesis.advisor = empUser;
+		}
 		this.thesis = compositeThesisForThesis(thesis);
 	}
 
@@ -166,7 +174,7 @@ function addNewThesis(thesis: CompositeThesis) {
 }
 
 function compositeThesisForThesis(t: Thesis | null) {
-	return t ? { original: t, modified: clone(t) } : null;
+	return t ? { original: t, modified: cloneDeep(t) } : null;
 }
 
 export const ThesisEditing = new C();

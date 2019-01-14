@@ -17,13 +17,12 @@ import { withAlert } from "react-alert";
 import { ThesisDetails } from "./ThesisDetails";
 import { ThesesTable } from "./ThesesTable";
 import { ErrorBox } from "./ErrorBox";
-import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
+import { canAddThesis } from "../permissions";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
 import { ThesisWorkMode, ApplicationState } from "../app_types";
 import { ThesisNameConflict, ThesisEmptyTitle } from "../errors";
 import { Thesis } from "../thesis";
-import { Employee } from "../users";
 import { ThesisEditing } from "../app_logic/editing";
 import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
@@ -242,13 +241,8 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		if (!canAddThesis() || !await this.confirmDiscardChanges()) {
 			return;
 		}
-		const empUser = Users.currentUser.person as Employee;
-		const thesis = new Thesis();
-		if (!canSetArbitraryAdvisor()) {
-			thesis.advisor = empUser;
-		}
 		this.setState({ hasTitleError: false });
-		ThesisEditing.setupForNewThesis(thesis);
+		ThesisEditing.setupForNewThesis();
 	}
 
 	private onResetChanges = async () => {
