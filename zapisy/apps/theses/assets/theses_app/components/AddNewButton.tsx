@@ -16,8 +16,12 @@ const Button = styled(StandardButton)`
 
 type Props = {
 	onClick: () => void;
+	enabled: boolean;
 };
 
 export const AddNewButton = React.memo(function(props: Props) {
-	return <Button onClick={props.onClick}>Dodaj nową</Button>;
+	return <Button
+		onClick={props.onClick}
+		disabled={!props.enabled}
+	>Dodaj nową</Button>;
 });

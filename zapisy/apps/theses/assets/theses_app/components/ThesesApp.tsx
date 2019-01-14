@@ -20,7 +20,7 @@ import { ErrorBox } from "./ErrorBox";
 import { canAddThesis, canSetArbitraryAdvisor } from "../permissions";
 import { ListFilters } from "./ListFilters";
 import { AddNewButton } from "./AddNewButton";
-import { ThesisWorkMode } from "../app_types";
+import { ThesisWorkMode, ApplicationState } from "../app_types";
 import { ThesisNameConflict, ThesisEmptyTitle } from "../errors";
 import { Thesis } from "../thesis";
 import { Employee } from "../users";
@@ -28,6 +28,7 @@ import { ThesisEditing } from "../app_logic/editing";
 import { List } from "../app_logic/theses_list";
 import { AppMode } from "../app_logic/app_mode";
 import { Users } from "../app_logic/users";
+import { LoadingIndicator } from "./LoadingIndicator";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -119,7 +120,13 @@ class ThesesAppInternal extends React.Component<Props, State> {
 				state={AppMode.applicationState}
 				stringFilterBeingChanged={List.stringFilterBeingChanged}
 			/>
-			{shouldShowNewBtn ? <AddNewButton onClick={this.setupForAddingThesis}/> : null}
+			{shouldShowNewBtn
+				? <AddNewButton
+					onClick={this.setupForAddingThesis}
+					enabled={!AppMode.isPerformingBackendOp()}
+				/>
+				: null
+			}
 		</TopRowContainer>;
 	}
 
@@ -166,6 +173,9 @@ class ThesesAppInternal extends React.Component<Props, State> {
 	public render() {
 		if (this.state.applicationError) {
 			return this.renderErrorScreen();
+		}
+		if (AppMode.applicationState === ApplicationState.FirstLoad) {
+			return <LoadingIndicator/>;
 		}
 		const { thesis } = ThesisEditing;
 		if (thesis !== null) {

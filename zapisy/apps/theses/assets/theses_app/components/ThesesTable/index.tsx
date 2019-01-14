@@ -16,7 +16,6 @@ import { ApplicationState, SortColumn, SortDirection } from "../../app_types";
 import { ReservationIndicator } from "./ReservationIndicator";
 import "./style.less";
 import { getDisabledStyle } from "../../utils";
-import { LoadingIndicator } from "./LoadingIndicator";
 import { NoResultsMessage } from "./NoResultsMessage";
 import { UnconstrainedFunction } from "common/types";
 import { inRange } from "common/utils";
@@ -137,9 +136,6 @@ export class ThesesTable extends React.PureComponent<Props> {
 
 	public render() {
 		const { applicationState } = this.props;
-		if (applicationState === ApplicationState.FirstLoad) {
-			return <LoadingIndicator/>;
-		}
 		// Don't let people use the table while something is happening
 		const allowInteraction = [
 			ApplicationState.Normal, ApplicationState.LoadingMore
