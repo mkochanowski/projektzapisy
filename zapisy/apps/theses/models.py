@@ -8,37 +8,37 @@ MAX_THESIS_TITLE_LEN = 300
 
 
 class ThesisKind(Enum):
-    masters = 0
-    engineers = 1
-    bachelors = 2
-    bachelors_engineers = 3
-    isim = 4
+    MASTERS = 0
+    ENGINEERS = 1
+    BACHELORS = 2
+    BACHELORS_ENGINEERS = 3
+    ISIM = 4
 
 
 THESIS_KIND_CHOICES = (
-    (ThesisKind.masters.value, "mgr"),
-    (ThesisKind.engineers.value, "inż"),
-    (ThesisKind.bachelors.value, "lic"),
-    (ThesisKind.bachelors_engineers.value, "lic+inż"),
-    (ThesisKind.isim.value, "isim"),
+    (ThesisKind.MASTERS.value, "mgr"),
+    (ThesisKind.ENGINEERS.value, "inż"),
+    (ThesisKind.BACHELORS.value, "lic"),
+    (ThesisKind.BACHELORS_ENGINEERS.value, "lic+inż"),
+    (ThesisKind.ISIM.value, "isim"),
 )
 
 
 class ThesisStatus(Enum):
-    being_evaluated = 1
-    returned_for_corrections = 2
-    accepted = 3
-    in_progress = 4
-    defended = 5
-    default = being_evaluated
+    BEING_EVALUATED = 1
+    RETURNED_FOR_CORRECTIONS = 2
+    ACCEPTED = 3
+    IN_PROGRESS = 4
+    DEFENDED = 5
+    DEFAULT = BEING_EVALUATED
 
 
 THESIS_STATUS_CHOICES = (
-    (ThesisStatus.being_evaluated.value, "poddana pod głosowanie"),
-    (ThesisStatus.returned_for_corrections.value, "zwrócona do poprawek"),
-    (ThesisStatus.accepted.value, "zaakceptowana"),
-    (ThesisStatus.in_progress.value, "w realizacji"),
-    (ThesisStatus.defended.value, "obroniona"),
+    (ThesisStatus.BEING_EVALUATED.value, "poddana pod głosowanie"),
+    (ThesisStatus.RETURNED_FOR_CORRECTIONS.value, "zwrócona do poprawek"),
+    (ThesisStatus.ACCEPTED.value, "zaakceptowana"),
+    (ThesisStatus.IN_PROGRESS.value, "w realizacji"),
+    (ThesisStatus.DEFENDED.value, "obroniona"),
 )
 
 
@@ -65,7 +65,7 @@ class Thesis(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def is_archived(self):
-        return self.status == ThesisStatus.defended.value
+        return self.status == ThesisStatus.DEFENDED.value
 
     def __str__(self) -> str:
         return self.title
@@ -84,15 +84,15 @@ class Thesis(models.Model):
 
 
 class ThesisVote(Enum):
-    none = 1
-    rejected = 2
-    accepted = 3
+    NONE = 1
+    REJECTED = 2
+    ACCEPTED = 3
 
 
 THESIS_VOTE_CHOICES = (
-    (ThesisVote.none.value, "brak głosu"),
-    (ThesisVote.rejected.value, "odrzucona"),
-    (ThesisVote.accepted.value, "zaakceptowana"),
+    (ThesisVote.NONE.value, "brak głosu"),
+    (ThesisVote.REJECTED.value, "odrzucona"),
+    (ThesisVote.ACCEPTED.value, "zaakceptowana"),
 )
 
 

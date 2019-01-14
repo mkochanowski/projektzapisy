@@ -11,6 +11,6 @@ def validate_num_required_votes(value: int):
     max_value = get_num_board_members()
     if not 1 <= value <= max_value:
         raise ValidationError(
-            "Liczba wymaganych głosów musi być z przedziału " +
+            "Liczba wymaganych głosów musi być z przedziału "
             f'[1, {max_value} (liczba członków komisji)]'
         )

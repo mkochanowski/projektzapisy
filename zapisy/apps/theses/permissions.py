@@ -15,7 +15,7 @@ def is_thesis_staff(user: BaseUser) -> bool:
 def can_add_thesis(user: BaseUser) -> bool:
     """Is the given user permitted to add new thesis objects?"""
     user_type = get_user_type(user)
-    return user_type != ThesisUserType.student
+    return user_type != ThesisUserType.STUDENT
 
 
 def is_owner_of_thesis(user: BaseUser, thesis: Thesis) -> bool:
@@ -32,7 +32,7 @@ def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
 
 def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user permitted to change the title of the specified thesis?"""
-    allowed_statuses = [ThesisStatus.being_evaluated, ThesisStatus.returned_for_corrections]
+    allowed_statuses = (ThesisStatus.BEING_EVALUATED, ThesisStatus.RETURNED_FOR_CORRECTIONS)
     return (
         is_thesis_staff(user) or
         is_owner_of_thesis(user, thesis) and ThesisStatus(thesis.status) in allowed_statuses
@@ -41,7 +41,7 @@ def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
 
 def can_set_status(user: BaseUser, status: ThesisStatus) -> bool:
     """Can a user of the specified type set the specified status for a new thesis?"""
-    return is_thesis_staff(user) or status == ThesisStatus.being_evaluated
+    return is_thesis_staff(user) or status == ThesisStatus.BEING_EVALUATED
 
 
 def can_change_status(user: BaseUser) -> bool:

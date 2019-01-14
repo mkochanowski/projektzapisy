@@ -6,10 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Value, When, Case, BooleanField, QuerySet, Q
 from django.db.models.functions import Concat, Lower
 from django.core.exceptions import PermissionDenied
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, exceptions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework import exceptions
 from rest_framework.pagination import LimitOffsetPagination
 from dal import autocomplete
 
@@ -36,19 +35,19 @@ class ThesisTypeFilter(Enum):
     Must match values in backend_callers.ts (this is what client code
     will send to us)
     """
-    everything = 0
-    current = 1
-    archived = 2
-    masters = 3
-    engineers = 4
-    bachelors = 5
-    bachelors_isim = 6
-    available_masters = 7
-    available_engineers = 8
-    available_bachelors = 9
-    available_bachelors_isim = 10
+    EVERYTHING = 0
+    CURRENT = 1
+    ARCHIVED = 2
+    MASTERS = 3
+    ENGINEERS = 4
+    BACHELORS = 5
+    BACHELORS_ISIM = 6
+    AVAILABLE_MASTERS = 7
+    AVAILABLE_ENGINEERS = 8
+    AVAILABLE_BACHELORS = 9
+    AVAILABLE_BACHELORS_ISIM = 10
 
-    default = everything
+    DEFAULT = EVERYTHING
 
 
 class ThesesPagination(LimitOffsetPagination):
@@ -66,10 +65,10 @@ class ThesesViewSet(viewsets.ModelViewSet):
         requested_thesis_type_str = self.request.query_params.get(THESIS_TYPE_FILTER_NAME, None)
 
         try:
-            requested_thesis_type = \
-                ThesisTypeFilter(int(requested_thesis_type_str)) \
-                if requested_thesis_type_str \
-                else ThesisTypeFilter.default
+            if requested_thesis_type_str:
+                requested_thesis_type = ThesisTypeFilter(int(requested_thesis_type_str))
+            else:
+                requested_thesis_type = ThesisTypeFilter.DEFAULT
         except ValueError:
             raise exceptions.ParseError(f'Unknown filter value {requested_thesis_type_str}')
 
@@ -100,20 +99,17 @@ def generate_base_queryset() -> QuerySet:
     """Return theses queryset with the appropriate fields prefetched (see below)
     as well as user names annotated for further processing - sorting/filtering
     """
-    return Thesis.objects \
-        .select_related(
+    return Thesis.objects.select_related(
             *fields_for_prefetching("student"),
             *fields_for_prefetching("student_2"),
             *fields_for_prefetching("advisor"),
             *fields_for_prefetching("auxiliary_advisor"),
-        ) \
-        .annotate(
+        ).annotate(
             _advisor_name=Concat(
                 "advisor__user__first_name", Value(" "), "advisor__user__last_name"
             )
-        ) \
-        .annotate(_is_archived=Case(
-            When(status=ThesisStatus.defended.value, then=True),
+        ).annotate(_is_archived=Case(
+            When(status=ThesisStatus.DEFENDED.value, then=True),
             default=Value(False),
             output_field=BooleanField()
         ))
@@ -172,42 +168,42 @@ def sort_queryset(qs: QuerySet, sort_column: str, sort_dir: str) -> QuerySet:
 def available_thesis_filter(qs: QuerySet) -> QuerySet:
     """Returns only theses that are considered "available" from the specified queryset"""
     return qs \
-        .exclude(status=ThesisStatus.in_progress.value) \
+        .exclude(status=ThesisStatus.IN_PROGRESS.value) \
         .exclude(_is_archived=True) \
         .exclude(reserved=True)
 
 
 def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter) -> QuerySet:
     """Returns only theses matching the specified type filter from the specified queryset"""
-    if thesis_type == ThesisTypeFilter.everything:
+    if thesis_type == ThesisTypeFilter.EVERYTHING:
         return qs
-    elif thesis_type == ThesisTypeFilter.current:
+    elif thesis_type == ThesisTypeFilter.CURRENT:
         return qs.exclude(_is_archived=True)
-    elif thesis_type == ThesisTypeFilter.archived:
+    elif thesis_type == ThesisTypeFilter.ARCHIVED:
         return qs.filter(_is_archived=True)
-    elif thesis_type == ThesisTypeFilter.masters:
-        return qs.filter(kind=ThesisKind.masters.value)
-    elif thesis_type == ThesisTypeFilter.engineers:
-        return qs.filter(kind=ThesisKind.engineers.value)
-    elif thesis_type == ThesisTypeFilter.bachelors:
-        return qs.filter(kind=ThesisKind.bachelors.value)
-    elif thesis_type == ThesisTypeFilter.bachelors_isim:
-        return qs.filter(kind=ThesisKind.isim.value)
-    elif thesis_type == ThesisTypeFilter.available_masters:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.masters.value))
-    elif thesis_type == ThesisTypeFilter.available_engineers:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.engineers.value))
-    elif thesis_type == ThesisTypeFilter.available_bachelors:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.bachelors.value))
-    elif thesis_type == ThesisTypeFilter.available_bachelors_isim:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.isim.value))
+    elif thesis_type == ThesisTypeFilter.MASTERS:
+        return qs.filter(kind=ThesisKind.MASTERS.value)
+    elif thesis_type == ThesisTypeFilter.ENGINEERS:
+        return qs.filter(kind=ThesisKind.ENGINEERS.value)
+    elif thesis_type == ThesisTypeFilter.BACHELORS:
+        return qs.filter(kind=ThesisKind.BACHELORS.value)
+    elif thesis_type == ThesisTypeFilter.BACHELORS_ISIM:
+        return qs.filter(kind=ThesisKind.ISIM.value)
+    elif thesis_type == ThesisTypeFilter.AVAILABLE_MASTERS:
+        return available_thesis_filter(qs.filter(kind=ThesisKind.MASTERS.value))
+    elif thesis_type == ThesisTypeFilter.AVAILABLE_ENGINEERS:
+        return available_thesis_filter(qs.filter(kind=ThesisKind.ENGINEERS.value))
+    elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS:
+        return available_thesis_filter(qs.filter(kind=ThesisKind.BACHELORS.value))
+    elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS_ISIM:
+        return available_thesis_filter(qs.filter(kind=ThesisKind.ISIM.value))
     # Should never get here
     return qs
 
 
 def filter_theses_queryset_for_only_mine(qs: QuerySet, user: BaseUser):
     user_type = get_user_type(user)
-    if user_type == ThesisUserType.student:
+    if user_type == ThesisUserType.STUDENT:
         return qs.filter(Q(student=user) | Q(student_2=user))
     return qs.filter(Q(advisor=user) | Q(auxiliary_advisor=user))
 

@@ -15,15 +15,14 @@ def is_theses_board_member(user: BaseUser) -> bool:
 
 
 def is_admin(user: BaseUser):
-    return get_user_type(user) == ThesisUserType.admin
+    return get_user_type(user) == ThesisUserType.ADMIN
 
 
 def get_theses_board():
     """Return all members of the theses board"""
-    return Employee.objects \
-        .select_related("user") \
-        .filter(user__groups__name=THESIS_BOARD_GROUP_NAME) \
-        .all()
+    return Employee.objects.select_related(
+        "user"
+    ).filter(user__groups__name=THESIS_BOARD_GROUP_NAME)
 
 
 def get_num_board_members() -> int:
@@ -32,10 +31,10 @@ def get_num_board_members() -> int:
 
 
 class ThesisUserType(Enum):
-    student = 0
-    employee = 1
-    admin = 2
-    none = 3
+    STUDENT = 0
+    EMPLOYEE = 1
+    ADMIN = 2
+    NONE = 3
 
 
 def get_user_type(base_user: BaseUser) -> ThesisUserType:
@@ -43,11 +42,11 @@ def get_user_type(base_user: BaseUser) -> ThesisUserType:
     The roles are based on group membership"""
     if isinstance(base_user, Employee):
         if base_user.user.is_staff:
-            return ThesisUserType.admin
-        return ThesisUserType.employee
+            return ThesisUserType.ADMIN
+        return ThesisUserType.EMPLOYEE
     elif isinstance(base_user, Student):
-        return ThesisUserType.student
-    return ThesisUserType.none
+        return ThesisUserType.STUDENT
+    return ThesisUserType.NONE
 
 
 def wrap_user(user: User) -> BaseUser:
