@@ -51,7 +51,6 @@ type State = typeof initialState;
 class ThesesAppInternal extends React.Component<Props, State> {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
-	private tableInstance?: ThesesTable;
 
 	async componentDidMount() {
 		this.oldOnBeforeUnload = window.onbeforeunload;
@@ -89,13 +88,14 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		}
 	}
 
+	/**
+	 * Execute the specified list-modifying action in a safe context - if any
+	 * error occurs, it'll be caught and handled
+	 */
 	private wrapListChanger(context: object, f: (...args: any[]) => PromiseLike<any>) {
 		return async (...args: any[]) => {
 			try {
 				await f.apply(context, args);
-				if (this.tableInstance) {
-					this.tableInstance.onListReloaded();
-				}
 			} catch (err) { this.setState({ applicationError: err }); }
 		};
 	}
@@ -123,11 +123,6 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		</TopRowContainer>;
 	}
 
-	/** Stores the child table component so that we can tell it when the list changes */
-	private setTableInstance = (table: ThesesTable) => {
-		this.tableInstance = table;
-	}
-
 	private onLoadMore = async (until: number) => {
 		try {
 			await List.loadMore(until);
@@ -136,7 +131,6 @@ class ThesesAppInternal extends React.Component<Props, State> {
 	private onSortChanged = this.wrapListChanger(List, List.changeSort);
 	private renderThesesList() {
 		return <ThesesTable
-			ref={this.setTableInstance}
 			applicationState={AppMode.applicationState}
 			theses={List.theses}
 			selectedIdx={ThesisEditing.selectedIdx}

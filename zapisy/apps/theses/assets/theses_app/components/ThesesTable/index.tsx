@@ -42,9 +42,27 @@ const LOAD_THRESHOLD = 40;
 
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
-const RESERVED_COLUMN_WIDTH = 150;
-const TITLE_COLUMN_WIDTH = 500;
-const ADVISOR_COLUMN_WIDTH = 500;
+const RESERVED_COLUMN_WIDTH = 80;
+const TITLE_COLUMN_WIDTH = 400;
+const ADVISOR_COLUMN_WIDTH = 400;
+
+/*
+While react-virtualized is a very nice library, this is one aspect
+of it is less than ideal. We want table rows to automatically adjust their
+height so that all content fits. The way the library does this is by providing
+the CellMeasurer HOC, which basically just takes the component you return
+(in our case it's <div className="table_text_cell">, see getCellRenderer),
+renders it into the DOM with height set to auto, then asks the browser
+what they height should be and uses that for the table row. Sadly, for this
+to work correctly the width of the rendered element has to be equal to the
+width of the table column, or else you'll get erroneous results.
+For this reason we explicitly specify the width of .table_text_cell to the same
+value as TITLE_- and ADVISOR_COLUMN_WIDTH above. This isn't really mentioned
+in the docs, but there is this TODO in CellMeasurer.js line 80:
+// TODO Check for a bad combination of fixedWidth and missing numeric width or vice versa with height
+and this issue:
+https://github.com/bvaughn/react-virtualized/issues/896
+*/
 
 const rowHeightCache = new CellMeasurerCache({
 	fixedWidth: true,
@@ -93,6 +111,7 @@ export class ThesesTable extends React.PureComponent<Props> {
 		this.hasScrolledSinceChange = false;
 		this.RV_resetLoadMoreRows();
 		// tell the row height calculator that its caches are no longer valid
+		console.error("clearing row height cache");
 		rowHeightCache.clearAll();
 	}
 
@@ -216,8 +235,9 @@ export class ThesesTable extends React.PureComponent<Props> {
 					columnIndex={0}
 					key={dataKey}
 					parent={parent}
-					rowIndex={rowIndex}>
-					<div style={{ whiteSpace: "normal" }}>
+					rowIndex={rowIndex}
+				>
+					<div className="table_text_cell">
 						{dataGetter(rowData as Thesis)}
 					</div>
 				</CellMeasurer>
@@ -249,11 +269,23 @@ export class ThesesTable extends React.PureComponent<Props> {
 
 	// When the component is re-rendered with new props, some local changes
 	// need to be performed
-	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
+	public componentWillReceiveProps(nextProps: Props) {
+		if (this.props.theses !== nextProps.theses) {
+			this.onListReloaded();
+		}
 		if (this.props.selectedIdx !== nextProps.selectedIdx) {
 			// If the position of the selected thesis in the list changes
 			// we should focus the table on it
 			this.hasScrolledSinceChange = false;
+
+			// Because the currently selected row is displayed in bold, it might need
+			// more space, so when it changes, reset both the previous and next selected rows
+			if (this.props.selectedIdx !== -1) {
+				rowHeightCache.clear(this.props.selectedIdx, 0);
+			}
+			if (nextProps.selectedIdx !== -1) {
+				rowHeightCache.clear(nextProps.selectedIdx, 0);
+			}
 		}
 	}
 
