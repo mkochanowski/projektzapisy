@@ -100,19 +100,19 @@ def generate_base_queryset() -> QuerySet:
     as well as user names annotated for further processing - sorting/filtering
     """
     return Thesis.objects.select_related(
-            *fields_for_prefetching("student"),
-            *fields_for_prefetching("student_2"),
-            *fields_for_prefetching("advisor"),
-            *fields_for_prefetching("auxiliary_advisor"),
-        ).annotate(
-            _advisor_name=Concat(
-                "advisor__user__first_name", Value(" "), "advisor__user__last_name"
-            )
-        ).annotate(_is_archived=Case(
-            When(status=ThesisStatus.DEFENDED.value, then=True),
-            default=Value(False),
-            output_field=BooleanField()
-        ))
+        *fields_for_prefetching("student"),
+        *fields_for_prefetching("student_2"),
+        *fields_for_prefetching("advisor"),
+        *fields_for_prefetching("auxiliary_advisor"),
+    ).annotate(
+        _advisor_name=Concat(
+            "advisor__user__first_name", Value(" "), "advisor__user__last_name"
+        )
+    ).annotate(_is_archived=Case(
+        When(status=ThesisStatus.DEFENDED.value, then=True),
+        default=Value(False),
+        output_field=BooleanField()
+    ))
 
 
 def fields_for_prefetching(base_field: str) -> List[str]:
