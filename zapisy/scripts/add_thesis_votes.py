@@ -17,11 +17,9 @@ def run():
     for thesis in Thesis.objects.all():
         num_votes = random.randint(0, board_members_cnt)
         members_to_vote = random.sample(board_members, num_votes)
-        votes = [
-            (voter, random.choice(DEFINITE_VOTES))
-            for voter in members_to_vote
-        ]
-        thesis.process_new_votes(votes, True)
-        cnt += len(votes)
+        for member in members_to_vote:
+            vote = ((member, random.choice(DEFINITE_VOTES)), )
+            thesis.process_new_votes(vote, member, True)
+        cnt += len(members_to_vote)
 
     print(f'Created {cnt} instances in total')

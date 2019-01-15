@@ -59,7 +59,7 @@ def run():
             advisor=random_advisor(emps),
             auxiliary_advisor=random_advisor(emps) if random_bool() else None,
             kind=random_kind(),
-            status=random_status(),
+            status=ThesisStatus.BEING_EVALUATED.value,
             reserved=random_reserved(),
             description=random_description(),
             student=random_student(studs),
