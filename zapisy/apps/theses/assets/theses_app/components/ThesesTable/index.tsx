@@ -42,8 +42,8 @@ const LOAD_THRESHOLD = 40;
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
 const RESERVED_COLUMN_WIDTH = 80;
-const TITLE_COLUMN_WIDTH = 400;
-const ADVISOR_COLUMN_WIDTH = 400;
+const TITLE_COLUMN_WIDTH = 550;
+const ADVISOR_COLUMN_WIDTH = 250;
 
 /*
 While react-virtualized is a very nice library, this is one aspect
@@ -92,8 +92,10 @@ export class ThesesTable extends React.PureComponent<Props> {
 	 * on the selected thesis - see render() -> scrollToIndex
 	 */
 	private hasScrolledSinceChange: boolean = false;
-	private titleRenderer = this.getCellRenderer(t => t.title);
-	private advisorRenderer = this.getCellRenderer(t => t.advisor ? t.advisor.displayName : "<brak>");
+	private titleRenderer = this.getCellRenderer(t => t.title, "title_cell");
+	private advisorRenderer = this.getCellRenderer(
+		t => t.advisor ? t.advisor.displayName : "<brak>", "advisor_cell"
+	);
 	private loaderInstance?: InfiniteLoader;
 
 	componentDidMount() {
@@ -111,6 +113,8 @@ export class ThesesTable extends React.PureComponent<Props> {
 		this.RV_resetLoadMoreRows();
 		// tell the row height calculator that its caches are no longer valid
 		rowHeightCache.clearAll();
+		// a rerender will be necessary
+		this.forceUpdate();
 	}
 
 	/**
@@ -222,7 +226,7 @@ export class ThesesTable extends React.PureComponent<Props> {
 	 * This function exists to abstract away the usage of CellMeasurer
 	 * @param dataGetter Responsible for converting a Thesis instance to a value to display
 	 */
-	private getCellRenderer(dataGetter: (t: Thesis) => string) {
+	private getCellRenderer(dataGetter: (t: Thesis) => string, className: string) {
 		return ({ dataKey, parent, rowIndex, rowData }: TableCellProps) => {
 			return (
 				<CellMeasurer
@@ -232,7 +236,7 @@ export class ThesesTable extends React.PureComponent<Props> {
 					parent={parent}
 					rowIndex={rowIndex}
 				>
-					<div className="table_text_cell">
+					<div className={`table_text_cell ${className}`}>
 						{dataGetter(rowData as Thesis)}
 					</div>
 				</CellMeasurer>
@@ -265,9 +269,6 @@ export class ThesesTable extends React.PureComponent<Props> {
 	// When the component is re-rendered with new props, some local changes
 	// need to be performed
 	public componentWillReceiveProps(nextProps: Props) {
-		if (this.props.theses !== nextProps.theses) {
-			this.onListReloaded();
-		}
 		if (this.props.selectedIdx !== nextProps.selectedIdx) {
 			// If the position of the selected thesis in the list changes
 			// we should focus the table on it

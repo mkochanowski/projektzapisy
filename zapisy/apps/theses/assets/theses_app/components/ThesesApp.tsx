@@ -50,6 +50,7 @@ type State = typeof initialState;
 class ThesesAppInternal extends React.Component<Props, State> {
 	state = initialState;
 	private oldOnBeforeUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
+	private tableInstance?: ThesesTable;
 
 	async componentDidMount() {
 		this.oldOnBeforeUnload = window.onbeforeunload;
@@ -95,6 +96,9 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		return async (...args: any[]) => {
 			try {
 				await f.apply(context, args);
+				if (this.tableInstance) {
+					this.tableInstance.onListReloaded();
+				}
 			} catch (err) { this.setState({ applicationError: err }); }
 		};
 	}
@@ -134,8 +138,10 @@ class ThesesAppInternal extends React.Component<Props, State> {
 		} catch (err) { console.error("Unable to load more:", err); }
 	}
 	private onSortChanged = this.wrapListChanger(List, List.changeSort);
+	private setTableRef = (ref: ThesesTable) => { this.tableInstance = ref; };
 	private renderThesesList() {
 		return <ThesesTable
+			ref={this.setTableRef}
 			applicationState={AppMode.applicationState}
 			theses={List.theses}
 			selectedIdx={ThesisEditing.selectedIdx}

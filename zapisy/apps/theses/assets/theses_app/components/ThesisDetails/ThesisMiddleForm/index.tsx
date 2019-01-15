@@ -69,7 +69,7 @@ export class ThesisMiddleForm extends React.PureComponent<Props, State> {
 		this.state = getStateFromProps(props);
 	}
 
-	public UNSAFE_componentWillReceiveProps(nextProps: Props) {
+	public componentWillReceiveProps(nextProps: Props) {
 		this.setState(getStateFromProps(nextProps));
 	}
 
