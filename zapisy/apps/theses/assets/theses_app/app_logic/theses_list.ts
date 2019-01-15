@@ -162,9 +162,12 @@ class C {
 		if (AppMode.isPerformingBackendOp() || upToRow <= this.lastRowIndex) {
 			return;
 		}
-		AppMode.applicationState = ApplicationState.LoadingMore;
-		yield this.loadTheses(LoadMode.Append, roundUp(upToRow, ROWS_PER_PAGE));
-		AppMode.applicationState = ApplicationState.Normal;
+		try {
+			AppMode.applicationState = ApplicationState.LoadingMore;
+			yield this.loadTheses(LoadMode.Append, roundUp(upToRow, ROWS_PER_PAGE));
+		} finally {
+			AppMode.applicationState = ApplicationState.Normal;
+		}
 	});
 
 	/** Download rows in range 0 - ROWS_PER_PAGE, replacing the current set */
