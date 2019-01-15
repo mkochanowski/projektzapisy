@@ -16,7 +16,7 @@ def run():
             (voter, ThesisVote(random.randint(2, 3)))
             for voter in members_to_vote
         ]
-        thesis.process_new_votes(votes)
+        thesis.process_new_votes(votes, True)
         cnt += len(votes)
 
     print(f'Created {cnt} instances in total')
