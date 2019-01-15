@@ -42,8 +42,8 @@ const LOAD_THRESHOLD = 40;
 const TABLE_HEIGHT = 300;
 const TABLE_CELL_MIN_HEIGHT = 30;
 const RESERVED_COLUMN_WIDTH = 80;
-const TITLE_COLUMN_WIDTH = 550;
-const ADVISOR_COLUMN_WIDTH = 250;
+const TITLE_COLUMN_WIDTH = 630;
+const ADVISOR_COLUMN_WIDTH = 230;
 
 /*
 While react-virtualized is a very nice library, this is one aspect
@@ -55,9 +55,9 @@ renders it into the DOM with height set to auto, then asks the browser
 what they height should be and uses that for the table row. Sadly, for this
 to work correctly the width of the rendered element has to be equal to the
 width of the table column, or else you'll get erroneous results.
-For this reason we explicitly specify the width of .table_text_cell to the same
-value as TITLE_- and ADVISOR_COLUMN_WIDTH above. This isn't really mentioned
-in the docs, but there is this TODO in CellMeasurer.js line 80:
+For this reason we explicitly specify the width of each cell to the same
+value as TITLE_- and ADVISOR_COLUMN_WIDTH above (see getCellRenderer).
+This isn't really mentioned in the docs, but there is this TODO in CellMeasurer.js line 80:
 // TODO Check for a bad combination of fixedWidth and missing numeric width or vice versa with height
 and this issue:
 https://github.com/bvaughn/react-virtualized/issues/896
@@ -92,9 +92,9 @@ export class ThesesTable extends React.PureComponent<Props> {
 	 * on the selected thesis - see render() -> scrollToIndex
 	 */
 	private hasScrolledSinceChange: boolean = false;
-	private titleRenderer = this.getCellRenderer(t => t.title, "title_cell");
+	private titleRenderer = this.getCellRenderer(t => t.title, TITLE_COLUMN_WIDTH, 0);
 	private advisorRenderer = this.getCellRenderer(
-		t => t.advisor ? t.advisor.displayName : "<brak>", "advisor_cell"
+		t => t.advisor ? t.advisor.displayName : "<brak>", ADVISOR_COLUMN_WIDTH, 1
 	);
 	private loaderInstance?: InfiniteLoader;
 
@@ -226,17 +226,17 @@ export class ThesesTable extends React.PureComponent<Props> {
 	 * This function exists to abstract away the usage of CellMeasurer
 	 * @param dataGetter Responsible for converting a Thesis instance to a value to display
 	 */
-	private getCellRenderer(dataGetter: (t: Thesis) => string, className: string) {
+	private getCellRenderer(dataGetter: (t: Thesis) => string, cellWidth: number, c: number) {
 		return ({ dataKey, parent, rowIndex, rowData }: TableCellProps) => {
 			return (
 				<CellMeasurer
 					cache={rowHeightCache}
-					columnIndex={0}
+					columnIndex={c}
 					key={dataKey}
 					parent={parent}
 					rowIndex={rowIndex}
 				>
-					<div className={`table_text_cell ${className}`}>
+					<div style={{ width: cellWidth }} className="table_text_cell">
 						{dataGetter(rowData as Thesis)}
 					</div>
 				</CellMeasurer>
