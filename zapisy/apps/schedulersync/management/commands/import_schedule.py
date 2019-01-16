@@ -181,11 +181,13 @@ class Command(BaseCommand):
                     # The lecture always has a single group but possibly many terms
                     group = Group.objects.get_or_create(course=course,
                                                         teacher=data['teacher'],
+                                                        teachers=data['teachers'],
                                                         type=data['group_type'],
                                                         limit=data['limit'])[0]
                 else:
                     group = Group.objects.create(course=course,
                                                  teacher=data['teacher'],
+                                                 teachers=data['teachers'],
                                                  type=data['group_type'],
                                                  limit=data['limit'])
                 term = Term.objects.create(dayOfWeek=data['dayOfWeek'],
@@ -214,11 +216,14 @@ class Command(BaseCommand):
                 diffs.append(('type', (term.group.type, data['group_type'])))
             if term.group.teacher != data['teacher']:
                 diffs.append(('teacher', (term.group.teacher, data['teacher'])))
+            if term.group.teachers != data['teachers']:
+                diffs.append(('teachers', (term.group.teachers, data['teachers'])))
             term.dayOfWeek = data['dayOfWeek']
             term.start_time = data['start_time']
             term.end_time = data['end_time']
             term.group.type = data['group_type']
             term.group.teacher = data['teacher']
+            term.group.teachers = data['teachers']
             if set(term.classrooms.all()) != set(data['classrooms']):
                 diffs.append(('classroom', (set(term.classrooms.all()), set(data['classrooms']))))
                 if create_terms:
@@ -249,7 +254,8 @@ class Command(BaseCommand):
             'id': g['id'],
             'entity_name': g['extra']['course'],
             'group_type': GROUP_TYPES[g['extra']['group_type']],
-            'teacher': self.get_employee(g['teachers'][0])
+            'teacher': self.get_employee(g['teachers'][0]),
+            'teachers': g['teachers']
         }
 
         # start_time will be determined as the minimum start_time among all terms
