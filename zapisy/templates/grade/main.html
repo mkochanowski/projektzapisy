@@ -15,52 +15,58 @@
    			<h2>Ocena Zajęć</h2>
    			<div id="od-vote-main-rules">
           <p>
-            Ocena zajęć ma na celu zebranie informacji na temat zajęć prowadzonych w Instytucie Informatyki UWr. Po uzyskaniu kluczy należy je zapisać w bezpiecznym miejscu, ponieważ można je uzyskać <strong>tylko raz</strong>. Mając klucze przechodzimy do wypełnienia ankiet, które jest <strong>anonimowe</strong>, co pozwala na całkowitą szczerość. Udział nagradzany jest <strong>24 godzinnym bonusem</strong> do otwarcia zapisów w kolejnym roku akademickim ?(maksymalnie 48 godzin)?.
+            Ocena zajęć ma na celu zebranie informacji na temat zajęć prowadzonych w Instytucie Informatyki UWr. Po uzyskaniu kluczy należy je zapisać w bezpiecznym miejscu, ponieważ można je uzyskać <strong>tylko raz</strong>. Mając klucze przechodzimy do wypełnienia ankiet, które jest <strong>anonimowe</strong>, co pozwala na całkowitą szczerość. Udział nagradzany jest <strong>24 godzinnym bonusem</strong> do otwarcia zapisów w kolejnym roku akademickim.
           </p>
           <p>
-            Anonimowość zapewniona jest dzięki protokołowi ślepych podpisów. Klucze można pobrać w serwisie po zalogowaniu lub używając <a href="{% static "grade/grade-client.py" %}">przykładowego klienta</a>, który zawiera szczegóły implementacyjne.
+            Anonimowość zapewniona jest dzięki protokołowi ślepych podpisów. Klucze można pobrać w serwisie po zalogowaniu lub używając <a href="{% static "grade/grade-client.py" %}">przykładowego klienta</a>. W komentarzach zawarte są szczegóły implementacyjne.
           </p>
           <h3>Cały proces jest przeprowadzony w następujący sposób:</h3>
+          <p>
+Kroki przeprowadzone są dla wszystkich dostępnych dla studenta ankiet.
+          </p>
    				<ol>
                    <li><h4>Przygotowanie</h4>
                       <p>
-Dla każej ankiety serwer posiada klucze RSA:
+Serwer posiada klucze RSA:
                       </p>
                       <p>
-\((e_0, n_0), \dotsc, (e_l, n_l)\) &mdash; klucze publiczne,<br/>
-\((d_0, n_0), \dotsc, (d_l, n_l)\) &mdash; klucze prywatne.
+\((e, n)\) &mdash; klucz publiczny ankiety,<br/>
+\((d, n)\) &mdash; klucz prywatny ankiety.
                       </p>
                       <p>
-Klient będzie potrzebował kluczy publicznych ankiet do zaślepiania i odślepiania kluczy do głosowania.
+Klient będzie potrzebował klucza publicznego ankiety do zaślepiania i odślepiania kluczy do głosowania.
+                      </p>
+                      <p>
+O kluczu do głosowania można myśleć jako o karcie do głosowania, a zaślepianiu i odślepianiu jak o wkładaniu i wyjmowaniu karty z koperty.
                       </p>
                    </li>
-                   <li><h4>Generowanie kluczy</h4>
+                   <li><h4>Tworzenie kart</h4>
                       <p>
-Klucze to liczby o tylu samo bitach co \(n_i\):
+Karta to liczba o tylu samo bitach co \(n\):
                       </p>
                       <p>
-\(m_0, \dotsc, m_l\) &mdash; karty, klucze do głosowania,<br/>
-\(k_0, \dotsc, k_l\) &mdash; koperty, liczby do zaślepiania.
+\(m\) &mdash; karta,<br/>
+\(k\) &mdash; koperta.
                       </p>
                       <p>
 Dodatkowo muszą spełniać warunek:
                       </p>
-\[\underset{i=0, \dotsc, l}{\forall} \space \gcd\left( k_i, n_i \right) = 1 \text{.}\]
+\[\gcd\left( k, n \right) = 1 \text{.}\]
                    </li>
                    <li><h4>Zaślepianie</h4>
                        <p>
-Otrzymane koperty wkładamy do kopert:
+Otrzymane karty wkładamy do kopert:
                        </p>
-\[t_i \coloneqq \text{sha256}^\ast(m_i) \cdot {k_i}^{e_i} \bmod n_i \text{,}\]
+\[t \coloneqq \text{sha256}^\ast(m) \cdot {k}^{e} \bmod n \text{,}\]
                        <p>
 gdzie \(\text{sha256}^\ast(x)\) to funkcja \(\text{sha256}\) hashująca reprezentację dziesiętną liczby \(x\) w ASCII, bez wiodących zer.
                        </p>
                    </li>
                    <li><h4>Podpisanie</h4>
                        <p>
-Zaślepione klucze do głosowania wysłane są na serwer, pomimo że serwer wie kto wysłał dane, to nie zna klucza \(m_i\), który podpisuje wykonując następującą operację:
+Karta w kopercie jest wysłana do podpisu, pomimo że serwer wie od kogo dostał koperte, to nie zna karty \(m\). Podpisuje wykonując następującą operację:
                        </p>
-\[s_i \coloneqq {t_i}^{d_i} \bmod n_i \text{.}\]
+\[s \coloneqq {t}^{d} \bmod n \text{.}\]
                        <p>
 Tak podpisane dane są odsyłane do klienta.
                        </p>
@@ -69,15 +75,18 @@ Tak podpisane dane są odsyłane do klienta.
                        <p>
 Wiedząc, że:
                        </p>
-\[{t_i}^{d_i} = (m_i \cdot {k_i}^{e_i})^{d_i} =  {m_i}^{d_i} \cdot {k_i}^{e_i \cdot d_i} = {m_i}^{d_i} \cdot k_i  \pmod {n_i} \text{,}\]
+\[s = {t}^{d} = (m \cdot {k}^{e})^{d} =  {m}^{d} \cdot {k}^{e \cdot d} = {m}^{d} \cdot k  \pmod {n} \text{,}\]
                        <p>
 obliczamy z użyciem algorytmu Euklidesa:
                        </p>
-\[ \dfrac{ {m_i}^{d_i} \cdot k_i }{ k_i } \bmod {n_i} = {m_i}^{d_i} \cdot k_i \cdot {k_i}^{-1} \bmod {n_i} = {m_i}^{d_i} \text{.}\]
+\[ \dfrac{ s }{ k } = \dfrac{ {m}^{d} \cdot k }{ k } = {m}^{d} \cdot k \cdot {k}^{-1} = {m}^{d}  \pmod {n} \text{.}\]
+                       <p>
+Wyjmujemy karty z kopert. Dzięki arytmetyce modulo, która zadziała jak kalka, karty również będą podpisane.
+                       </p>
                    </li>
                    <li><h4>Wypełnianie ankiet</h4>
                        <p>
-Otrzymane podpisane i odślepione klucze zapisane są w ustalonym formacie. Należy je zapisać, a następnie wylogować się i w dowolnym czasie, z dowolnej maszyny wejść do serwisu i bezpiecznie odpowiedzieć na pytania. Bonus zostaje przyznany, gdy klucze do głosowania są podpisane, ponieważ nie istnieje możliwość zweryfikowania do kogo należy dany klucz.
+Otrzymane podpisane karty zapisane są w ustalonym formacie. Należy je zapisać, a następnie wylogować się i w dowolnym czasie, z dowolnej maszyny wejść do serwisu i bezpiecznie odpowiedzieć na pytania. Bonus zostaje przyznany, gdy klucze do głosowania są podpisane, ponieważ nie istnieje możliwość zweryfikowania do kogo należy dany klucz.
                        </p>
                    </li>
    				</ol>
