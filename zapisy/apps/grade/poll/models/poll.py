@@ -15,7 +15,6 @@ from .section import SectionOrdering
 from .saved_ticket import SavedTicket
 from .origin import Origin
 
-
 class Poll(models.Model):
 
     author = models.ForeignKey(
@@ -113,11 +112,13 @@ class Poll(models.Model):
                 if viewer in self.group.teachers.all():
                     return True
 
-                lectureCode = next((code for code, desc in GROUP_TYPE_CHOICES if desc == 'wykład'))
-                groups = Group.objects.filter(course=self.group.course,
-                                              teacher=viewer,
-                                              type=lectureCode)
-                if groups:
+                lectureCode = next((code for code, desc in GROUP_TYPE_CHOICES if desc == 'wykład'))               
+                groups = Group.objects.filter(course=self.group.course, type=lectureCode)
+                filtred_groups = []
+                for g in groups.all():
+                    if viewer in g.teachers.all():
+                        filtred_groups.append(g)
+                if filtred_groups:
                     return True
             else:
                 # Zakładam, że wszyscy pracownicy powinni widzieć wyniki ankiet
