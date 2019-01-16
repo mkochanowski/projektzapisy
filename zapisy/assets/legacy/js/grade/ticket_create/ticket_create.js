@@ -75,8 +75,20 @@ Ticket.create.step3 = function (unblinds) {
     $("#progressbar").progressbar("option", "value", 70);
     $.each(unblinds, Ticket.create.unblinds_generator);
 
-    // TODO Make it work properly, this is only temporary workaround 
-    $('#main-content')[0].innerHTML = '<div id="main-content"><div id="grade-tickets-save-form"><h3> Pomyślnie wygenerowano klucze.</h3><h3>Zapisz je w bezpiecznym miejscu - <strong>nie ma powrotu do tego ekranu</strong>.</h3><form action="."><textarea id="keys" name="keys" cols="80" rows="20" readonly="readonly">' + Ticket.create.to_plaintext() + '</textarea></form></div></div>';
+    // TODO Make it work properly, this is only temporary workaround
+    $('#pregen').css('display', 'none');
+    $('#postgen').css('display', '');
+    $('#keys')[0].innerHTML = Ticket.create.to_plaintext();
+    $('#copy-keys').click(() => {
+        var el = document.getElementById("keys");
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('copy');
+        sel.removeAllRanges();
+    });
 }
 
 Ticket.create.unblinds_generator = function (index, unblind) {
@@ -145,7 +157,7 @@ Ticket.create.to_plaintext = function() {
         res += 'id: ' + poll_info.id + ' &#10;';
         res += ticket + ' &#10;';
         res += Ticket.create.unblindst_array[index] + ' &#10;';
-        res += '---------------------------------- &#10;';
+        res += '-'.repeat(34) + ' &#10;';
     });
     return res;
 }
