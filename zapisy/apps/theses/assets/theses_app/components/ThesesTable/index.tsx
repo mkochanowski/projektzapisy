@@ -85,6 +85,11 @@ type Props = {
 	loadMoreRows: (stopIndex: number) => Promise<void>;
 };
 
+function clearHeightForRow(index: number) {
+	rowHeightCache.clear(index, 0);
+	rowHeightCache.clear(index, 1);
+}
+
 export class ThesesTable extends React.PureComponent<Props> {
 	/**
 	 * Has the user scrolled since the last change of thesis?
@@ -277,10 +282,10 @@ export class ThesesTable extends React.PureComponent<Props> {
 			// Because the currently selected row is displayed in bold, it might need
 			// more space, so when it changes, reset both the previous and next selected rows
 			if (this.props.selectedIdx !== -1) {
-				rowHeightCache.clear(this.props.selectedIdx, 0);
+				clearHeightForRow(this.props.selectedIdx);
 			}
 			if (nextProps.selectedIdx !== -1) {
-				rowHeightCache.clear(nextProps.selectedIdx, 0);
+				clearHeightForRow(nextProps.selectedIdx);
 			}
 		}
 	}
