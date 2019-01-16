@@ -23,6 +23,7 @@ from apps.enrollment.records.utils import run_rearanged
 
 class GroupInline(admin.TabularInline):
     model = Group
+    exclude = ['teacher']
     extra = 0
     raw_id_fields = ("teacher",)
 
@@ -288,7 +289,6 @@ class GroupAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'course',
-        'teacher',
         'type',
         'limit',
         'limit_isim',
@@ -298,6 +298,7 @@ class GroupAdmin(admin.ModelAdmin):
         'teacher__user__first_name',
         'teacher__user__last_name',
         'course__entity__name')
+    exclude = ['teacher']
     inlines = [
         TeachersInline, TermInline, RecordInline, QueuedInline
     ]
