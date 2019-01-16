@@ -29,7 +29,7 @@ def FormView(request):
         except NotificationPreferences2.DoesNotExist:
             form = NotificationForm(request.POST)
 
-        if not form.is_valid():
+        if form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
             post.save()
