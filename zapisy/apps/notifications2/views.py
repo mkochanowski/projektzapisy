@@ -4,6 +4,7 @@ from datetime import datetime
 from django.shortcuts import render
 from apps.notifications2.repositories import get_notifications_repository
 from apps.notifications2.utils import render_description
+from django.contrib import messages
 
 
 def index(request):
@@ -28,14 +29,14 @@ def FormView(request):
         except NotificationPreferences2.DoesNotExist:
             form = NotificationForm(request.POST)
 
-        if form.is_valid():
+        if not form.is_valid():
             post = form.save(commit=False)
             post.user = request.user
             post.save()
             args = {'form': form}
             return render(request, 'notifications2/pref.html', args)
         else:
-            print("Form ERROR")
+            messages.error(request, "Wystąpił błąd, zmiany nie zostały zapisane. Proszę wypełnić formularz ponownie")
     else:
         try:
             item = NotificationPreferences2.objects.get(user=request.user)
