@@ -28,9 +28,9 @@
                 <tr {% if t.signed %} class="signed" {% endif %} >
                     <td>
                         {% if t.teachers %}
-                            {% for teacher in t.teachers.all %}
+                            {% for single_teacher in t.teachers.all %}
                                 <p>
-                                    <a href="{% url 'employee-profile' t.teacher.user.id %}" class="person">{{ teacher.user.get_full_name }}</a>
+                                    <a href="{% url 'employee-profile' single_teacher.user.id %}" class="person">{{ single_teacher.user.get_full_name }}</a>
                                 </p>
                             {% endfor %}
                         {% else %}
