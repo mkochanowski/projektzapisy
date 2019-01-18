@@ -5,7 +5,6 @@ from django.urls import reverse
 from django.conf import settings
 
 from apps.enrollment.records.exceptions import AlreadyNotAssignedException, NonGroupException, NonStudentException
-from apps.notifications.models import Notification
 from apps.notifications2.custom_signals import student_pulled, teacher_changed
 
 import logging
@@ -419,18 +418,6 @@ class Group(models.Model):
                         else:
                             self.remove_from_queued_counter(q.student)
                         total_queues += 1
-                    if isinstance(result, Group):
-                        Notification.send_notification(q.student.user,
-                                                       'enrolled-again',
-                                                       {'group': self,
-                                                        'old_group': result,
-                                                        'messages': messages,
-                                                        'another_queues': total_queues - 1})
-                    else:
-                        Notification.send_notification(
-                            q.student.user, 'enrolled', {
-                                'group': self, 'messages': messages, 'another_queues': total_queues - 1})
-
                     break
                 to_removed.append(q)
 
@@ -438,10 +425,6 @@ class Group(models.Model):
             queue.deleted = True
             self.remove_from_queued_counter(queue.student)
             queue.save()
-            Notification.send_notification(queue.student.user,
-                                           'queue-remove',
-                                           {'group': self,
-                                            'reason': 'Zapis spowodowałby przekroczenie limitu ECTS'})
 
         return result
 

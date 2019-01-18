@@ -32,8 +32,6 @@ from apps.enrollment.records.models import Record
 from apps.enrollment.utils import mailto
 from apps.users.forms import EmailChangeForm, ConsultationsChangeForm, EmailToAllStudentsForm
 from apps.users.exceptions import InvalidUserException
-from apps.notifications.forms import NotificationFormset
-from apps.notifications.models import NotificationPreferences
 from libs.ajax_messages import AjaxSuccessMessage
 from mailer.models import Message
 
@@ -234,10 +232,6 @@ def password_change_done(request: HttpRequest) -> HttpResponse:
 def my_profile(request: HttpRequest) -> HttpResponse:
     """profile site"""
     semester = Semester.objects.get_next()
-
-    notifications = NotificationFormset(
-        queryset=NotificationPreferences.objects.create_and_get(
-            request.user))
 
     if BaseUser.is_employee(request.user):
         consultations = request.user.employee.consultations
