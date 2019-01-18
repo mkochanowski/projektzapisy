@@ -190,8 +190,8 @@ $('.checkall').live('click', function(){
     </table>
 </form>
 {% endif %}
-<p class="info-table-header">Ustawienia powiadomień</p>
-
+{#<p class="info-table-header">Ustawienia powiadomień</p>#}
+{##}
 {#<form method="POST" action="{% url 'notifications:save' %}">#}
 {#    {% csrf_token %}#}
 {#    {{ notifications.management_form }}#}
@@ -227,13 +227,8 @@ $('.checkall').live('click', function(){
 {#    </button>#}
 {#</form>#}
 
-<form action="/your-name/" method="post">
-    {% csrf_token %}
-        {{ notificationsform }}
 
-    <input type="submit" value="Submit">
-</form>
-
+<br>
 {% if perms.users.mailto_all_students %}
     <a href="{% url 'email-students' %}">Wyślij wiadomość do studentów</a>
 {% endif %}

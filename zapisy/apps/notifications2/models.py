@@ -20,4 +20,3 @@ class NotificationPreferences2(models.Model):
     add_to_group = models.BooleanField(default=True, verbose_name='Dodano do grupy')
     add_new_group = models.BooleanField(default=True, verbose_name='Dodano nową grupe')
     classroom_change = models.BooleanField(default=True, verbose_name='Zmieniono sale')
-

@@ -1,11 +1,10 @@
+from apps.notifications2.forms import NotificationForm
+from apps.notifications2.models import NotificationPreferences2
 from datetime import datetime
-
 from django.shortcuts import render
-from django import forms
-
 from apps.notifications2.repositories import get_notifications_repository
 from apps.notifications2.utils import render_description
-from apps.notifications2.models import NotificationForm
+
 
 def index(request):
 
@@ -21,21 +20,28 @@ def index(request):
     return render(request, 'notifications2/index.html', {'notifications': notifications})
 
 
-from django.http import HttpResponseRedirect
+def FormView(request):
+    if request.method == "POST":
+        try:
+            item = NotificationPreferences2.objects.get(user=request.user)
+            form = NotificationForm(request.POST, instance=item)
+        except NotificationPreferences2.DoesNotExist:
+            form = NotificationForm(request.POST)
 
-
-def def_form(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form2 = NotificationForm(request.POST)
-        # check whether it's valid:
-
-        return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+            args = {'form': form}
+            return render(request, 'notifications2/pref.html', args)
+        else:
+            print("Form ERROR")
     else:
-        form2 = NotificationForm()
+        try:
+            item = NotificationPreferences2.objects.get(user=request.user)
+            form = NotificationForm(instance=item)
+        except NotificationPreferences2.DoesNotExist:
+            form = NotificationForm()
 
-    return render(request, 'user.html', {'notificationsform': form2})
-
+    args = {'form': form}
+    return render(request, 'notifications2/pref.html', args)
