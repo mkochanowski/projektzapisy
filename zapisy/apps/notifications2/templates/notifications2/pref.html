@@ -1,0 +1,26 @@
+{% extends "common/index.html" %}
+
+{% block main-subtitle %}Powiadomienia{% endblock %}
+
+{% block bread %}
+<a href="/">Strona główna</a> &raquo; Powiadomienia &raquo; Preferencje
+{% endblock %}
+
+<style>
+
+</style>
+
+
+{% block center %}
+<h1>Powiadomienia</h1>
+
+    Preferencje
+    <form method="post" action="">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <button type="submit">Wyślij</button>
+</form>
+
+{% endblock %}

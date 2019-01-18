@@ -235,10 +235,6 @@ def my_profile(request: HttpRequest) -> HttpResponse:
     """profile site"""
     semester = Semester.objects.get_next()
 
-    notifications = NotificationFormset(
-        queryset=NotificationPreferences.objects.create_and_get(
-            request.user))
-
     if BaseUser.is_employee(request.user):
         consultations = request.user.employee.consultations
         room = request.user.employee.room
