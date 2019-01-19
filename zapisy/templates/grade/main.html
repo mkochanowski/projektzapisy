@@ -57,7 +57,8 @@ Dodatkowo muszą spełniać warunek:
                        <p>
 Otrzymane karty wkładamy do kopert:
                        </p>
-\[t \coloneqq \text{sha256}^\ast(m) \cdot {k}^{e} \bmod n \text{,}\]
+\[\tilde{m} \coloneqq \text{sha256}^\ast(m) \text{,}\]
+\[t \coloneqq \tilde{m} \cdot {k}^{e} \bmod n \text{,}\]
                        <p>
 gdzie \(\text{sha256}^\ast(x)\) to funkcja \(\text{sha256}\) hashująca reprezentację dziesiętną liczby \(x\) w ASCII, bez wiodących zer.
                        </p>
@@ -75,18 +76,25 @@ Tak podpisane dane są odsyłane do klienta.
                        <p>
 Wiedząc, że:
                        </p>
-\[s = {t}^{d} = (m \cdot {k}^{e})^{d} =  {m}^{d} \cdot {k}^{e \cdot d} = {m}^{d} \cdot k  \pmod {n} \text{,}\]
+\[s = {t}^{d} = (\tilde{m} \cdot {k}^{e})^{d} =  {\tilde{m}}^{d} \cdot {k}^{e \cdot d} = {\tilde{m}}^{d} \cdot k  \pmod {n} \text{,}\]
                        <p>
 obliczamy z użyciem algorytmu Euklidesa:
                        </p>
-\[ \dfrac{ s }{ k } = \dfrac{ {m}^{d} \cdot k }{ k } = {m}^{d} \cdot k \cdot {k}^{-1} = {m}^{d}  \pmod {n} \text{.}\]
+\[ \dfrac{ s }{ k } = \dfrac{ {\tilde{m}}^{d} \cdot k }{ k } = {\tilde{m}}^{d} \cdot k \cdot {k}^{-1} = {\tilde{m}}^{d}  \pmod {n} \text{.}\]
                        <p>
 Wyjmujemy karty z kopert. Dzięki arytmetyce modulo, która zadziała jak kalka, karty również będą podpisane.
                        </p>
                    </li>
                    <li><h4>Wypełnianie ankiet</h4>
                        <p>
-Otrzymane podpisane karty zapisane są w ustalonym formacie. Należy je zapisać, a następnie wylogować się i w dowolnym czasie, z dowolnej maszyny wejść do serwisu i bezpiecznie odpowiedzieć na pytania. Bonus zostaje przyznany, gdy klucze do głosowania są podpisane, ponieważ nie istnieje możliwość zweryfikowania do kogo należy dany klucz.
+Otrzymane podpisane karty zapisane są w ustalonym formacie. Należy je zapisać, a następnie wylogować się i w dowolnym czasie, z dowolnej maszyny,  wejść do serwisu i bezpiecznie odpowiedzieć na pytania.
+                       </p>
+                       <p>
+Ostatecznie przy wypełnianiu ankiet wysyłamy \(\tilde{m}^d\) i \(m\). Karta jest poprawna, gdy:
+                       </p>
+\[{(\tilde{m}^d)}^{e} = \text{sha256}^\ast(m) \text{.}\]
+                       <p>
+Bonus zostaje przyznany, gdy klucze do głosowania są podpisane, ponieważ nie istnieje możliwość zweryfikowania do kogo należy dany klucz.
                        </p>
                    </li>
    				</ol>
