@@ -4,39 +4,30 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.enrollment.courses.models.course import CourseEntity, Course
 from apps.enrollment.courses.models.course_type import Type
 from apps.enrollment.courses.models.group import Group
-from apps.enrollment.courses.models.term import Term
-from apps.enrollment.courses.models.classroom import Classroom
 from apps.offer.vote.models import SystemState
 
-import os
-from time import sleep
 from datetime import datetime, date, time, timedelta
 from dateutil.relativedelta import relativedelta
-from collections import defaultdict
 from django.db import connection
-from django.core import mail
 
-from django.conf import settings
-from scripts.scheduleimport import run_test as scheduleimport_run_test
-from scripts.ectsimport import run_test as ectsimport_run_test
 
 sql_calls = [
-            """
-                CREATE TABLE courses_studentpointsview (
-                    value smallint,
-                    student_id integer,
-                    entity_id integer
-                );
-            """
-        ]
+    """
+        CREATE TABLE courses_studentpointsview (
+            value smallint,
+            student_id integer,
+            entity_id integer
+        );
+    """
+]
 
 students, _ = UserGroup.objects.get_or_create(name='students')
 employees, _ = UserGroup.objects.get_or_create(name='employees')
 
 for sql_call in sql_calls:
-        cursor = connection.cursor()
-        cursor.execute(sql_call)
-        connection.commit()
+    cursor = connection.cursor()
+    cursor.execute(sql_call)
+    connection.commit()
 
 password = '11111'
 admin = User.objects.create_superuser(username='przemka',
@@ -44,7 +35,7 @@ admin = User.objects.create_superuser(username='przemka',
                                       email='admin@admin.com')
 
 admin.first_name = 'przemka'
-self.admin.save()
+admin.save()
 employees.user_set.add(admin)
 employee = Employee.objects.create(user=admin)
 
@@ -64,110 +55,98 @@ employees.save()
 student_list = []
 for i in range(180):
     user = User.objects.create_user(
-            username='student{}'.format(i),
-            password=password)
+        username='student{}'.format(i),
+        password=password)
     students.user_set.add(user)
     student = Student.objects.create(user=user)
     PersonalDataConsent.objects.update_or_create(student=student,
                                                  defaults={'granted': True})
     student_list.append(student)
 students.save()
+
+COMPULSORY_COURSES = {
+    "Logika": 8,
+    "AnalMat": 10,
+    "LogikaZ": 8,
+}
+
+VOLUNTARY_COURSES = {
+    "PWI": 3,
+    "WdC": 5,
+    "WdPython": 5,
+    "WDI": 6,
+    "MD": 6
+}
+
 course_type = Type.objects.create(name='Informatyczny')
-        # for i in range(1, 6):
-        #     CourseEntity.objects.create(
-        #         name='Course {}'.format(i),
-        #         name_pl='Course {}'.format(i),
-        #         name_en='Course {}'.format(i),
-        #         semester='z',
-        #         type=self.course_type,
-        #         status=1,  # w ofercie
-        #         suggested_for_first_year=False,
-        #     )
-        # for i in range(6, 11):
-        #     CourseEntity.objects.create(
-        #         name='Course {}'.format(i),
-        #         name_pl='Course {}'.format(i),
-        #         name_en='Course {}'.format(i),
-        #         semester='l',
-        #         type=self.course_type,
-        #         status=1,  # w ofercie
-        #         suggested_for_first_year=False,
-        #     )
-        # CourseEntity.objects.create(
-        #     name='Course 50',
-        #     semester='l',
-        #     type=self.course_type,
-        #     status=0,  # propozycja
-        #     suggested_for_first_year=False,
-        # )
-        #
-        # CourseEntity.objects.create(
-        #     name='Course 100',
-        #     semester='z',
-        #     type=self.course_type,
-        #     status=1,  # w ofercie
-        #     suggested_for_first_year=False,
-        # )
-        #
-        # CourseEntity.objects.create(
-        #     name='Course 101',
-        #     semester='l',
-        #     type=self.course_type,
-        #     status=1,  # w ofercie
-        #     suggested_for_first_year=False,
-        # )
-        #
-        # for course_entity in CourseEntity.objects.all():
-        #     course_entity.owner = self.employee
-        #     course_entity.save()
-        #
-        # self.winter_courses = ['Course 1', 'Course 2', 'Course 3']
-        #
-        # self.current_semester = Semester.objects.create(
-        #     type=Semester.TYPE_SUMMER,
-        #     year='1',
-        #     semester_beginning=date.today(),
-        #     semester_ending=date.today() + relativedelta(months=3),
-        #     records_ects_limit_abolition=date.today() + relativedelta(days=10),
-        #     visible=True,
-        #     is_grade_active=False
-        # )
-        #
-        # self.next_winter_semester = Semester.objects.create(
-        #     type=Semester.TYPE_WINTER,
-        #     year='2',
-        #     semester_beginning=self.current_semester.semester_ending +
-        #     relativedelta(
-        #         days=1),
-        #     semester_ending=self.current_semester.semester_ending +
-        #     relativedelta(
-        #         days=1,
-        #         months=3),
-        #     records_ects_limit_abolition=self.current_semester.semester_ending +
-        #     relativedelta(
-        #         days=11),
-        #     visible=True,
-        #     is_grade_active=False)
-        #
-        # self.next_summer_semester = Semester.objects.create(
-        #     type=Semester.TYPE_SUMMER,
-        #     year='3',
-        #     semester_beginning=self.next_winter_semester.semester_ending +
-        #     relativedelta(
-        #         days=1),
-        #     semester_ending=self.next_winter_semester.semester_ending +
-        #     relativedelta(
-        #         days=1,
-        #         months=3),
-        #     records_ects_limit_abolition=self.next_winter_semester.semester_ending +
-        #     relativedelta(
-        #         days=11),
-        #     visible=True,
-        #     is_grade_active=False)
-        #
-        # self.system_state = SystemState.objects.create(
-        #     semester_winter=self.next_winter_semester,
-        #     semester_summer=self.next_summer_semester,
-        #     max_points=12,
-        #     max_vote=3
-        # )
+for name, ects in COMPULSORY_COURSES:
+    CourseEntity.objects.create(
+        name=name,
+        name_pl=name,
+        name_en=name,
+        semester='z',
+        type=course_type,
+        status=1,  # w ofercie
+        suggested_for_first_year=True,
+        ects=ects
+    )
+
+for name, ects in VOLUNTARY_COURSES:
+    CourseEntity.objects.create(
+        name=name,
+        name_pl=name,
+        name_en=name,
+        semester='z',
+        type=course_type,
+        status=1,  # w ofercie
+        suggested_for_first_year=True,
+        ects=ects
+    )
+
+for course_entity in CourseEntity.objects.all():
+    course_entity.owner = employee
+    course = Course.objects.create(entity=course_entity)
+    for i in range(4):
+        Group.objects.create(
+            course=course,
+            teacher=employee,
+            limit=30,
+            type='ćwiczenia'
+        )
+    course_entity.save()
+
+winter_courses = ['Course 1', 'Course 2', 'Course 3']
+current_semester = Semester.objects.create(
+    type=Semester.TYPE_WINTER,
+    year='1',
+    semester_beginning=date.today(),
+    semester_ending=date.today() + relativedelta(months=3),
+    records_ects_limit_abolition=date.today() + relativedelta(days=10),
+    visible=True,
+    is_grade_active=False
+)
+
+next_summer_semester = Semester.objects.create(
+    type=Semester.TYPE_SUMMER,
+    year='2',
+    semester_beginning=current_semester.semester_ending + relativedelta(days=1),
+    semester_ending=current_semester.semester_ending + relativedelta(days=1, months=3),
+    records_ects_limit_abolition=current_semester.semester_ending + relativedelta(days=11),
+    visible=True,
+    is_grade_active=False)
+
+next_winter_semester = Semester.objects.create(
+    type=Semester.TYPE_WINTER,
+    year='3',
+    semester_beginning=next_summer_semester.semester_ending + relativedelta(days=1),
+    semester_ending=next_summer_semester.semester_ending + relativedelta(days=1, months=3),
+    records_ects_limit_abolition=next_summer_semester.semester_ending + relativedelta(days=11),
+    visible=True,
+    is_grade_active=False)
+
+system_state = SystemState.objects.create(
+    semester_winter=next_winter_semester,
+    semester_summer=next_summer_semester,
+    max_points=12,
+    max_vote=3
+)
