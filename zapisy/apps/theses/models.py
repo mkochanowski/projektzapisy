@@ -116,5 +116,9 @@ class ThesisVoteBinding(models.Model):
 class ThesesSystemSettings(models.Model):
     num_required_votes = models.SmallIntegerField()
 
+    def __str__(self):
+        return "Ustawienia systemu"
+
     class Meta:
+        verbose_name = "ustawienia systemu prac dyplomowych"
         verbose_name_plural = "ustawienia systemu prac dyplomowych"
