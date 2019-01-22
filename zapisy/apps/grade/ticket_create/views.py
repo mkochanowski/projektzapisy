@@ -14,7 +14,7 @@ from apps.users.models import BaseUser
 from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
-    secure_signer, unblind, get_valid_tickets, to_plaintext, connect_groups, secure_signer_without_save, \
+    secure_signer, get_valid_tickets, to_plaintext, secure_signer_without_save, \
     secure_mark, parse_and_validate_tickets, get_poll_info_as_dict, get_pubkey_as_dict
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
