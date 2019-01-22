@@ -1,6 +1,8 @@
 """This module defines high-level thesis-related permissions
 checks used when deserializing a received thesis object and performing actions.
 """
+from typing import Optional
+
 from apps.users.models import Employee, BaseUser
 
 from .models import Thesis, ThesisStatus
@@ -47,6 +49,12 @@ def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
     return is_thesis_staff(user) or is_owner_of_thesis(user, thesis)
 
 
+"""The detailed checks below will only be performed
+if it is determined that the user is permitted to modify the thesis in general,
+so there's no need to check that again
+"""
+
+
 def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user permitted to change the title of the specified thesis?"""
     allowed_statuses = (ThesisStatus.BEING_EVALUATED, ThesisStatus.RETURNED_FOR_CORRECTIONS)
@@ -56,16 +64,22 @@ def can_change_title(user: BaseUser, thesis: Thesis) -> bool:
     )
 
 
-def can_set_status(user: BaseUser, status: ThesisStatus) -> bool:
-    """Can a user of the specified type set the specified status for a new thesis?"""
+def can_set_status_for_new(user: BaseUser, status: ThesisStatus) -> bool:
+    """Can the specified user set the specified status for a new thesis?"""
     return is_thesis_staff(user) or status == ThesisStatus.BEING_EVALUATED
 
 
-def can_change_status(user: BaseUser) -> bool:
-    """Can a user of the specified type modify an existing thesis' status?"""
-    return is_thesis_staff(user)
+def can_change_status_to(user: BaseUser, thesis: ThesisStatus, new_status: ThesisStatus) -> bool:
+    """Can the specified user change the status
+    of the specified thesis to the new specified status?"""
+    old_status = ThesisStatus(thesis.status)
+    return (
+        is_thesis_staff(user) or
+        old_status == ThesisStatus.IN_PROGRESS and new_status == ThesisStatus.DEFENDED or
+        old_status == ThesisStatus.IN_PROGRESS and new_status == ThesisStatus.ACCEPTED
+    )
 
 
-def can_set_advisor(user: BaseUser, advisor: Employee) -> bool:
+def can_set_advisor(user: BaseUser, advisor: Optional[Employee]) -> bool:
     """Is the specified user permitted to set the given advisor (may be None)?"""
     return is_thesis_staff(user) or user == advisor
