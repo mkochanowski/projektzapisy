@@ -56,7 +56,7 @@ class ThesesPagination(LimitOffsetPagination):
 
 class ThesesViewSet(viewsets.ModelViewSet):
     # NOTICE if you change this, you might also want to change the permission class
-    http_method_names = ["patch", "get", "post"]
+    http_method_names = ["patch", "get", "post", "delete"]
     permission_classes = (ThesisPermissions,)
     serializer_class = serializers.ThesisSerializer
     pagination_class = ThesesPagination

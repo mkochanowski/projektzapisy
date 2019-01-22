@@ -1,7 +1,7 @@
 """Defines a custom DRF permission class for the theses endpoint"""
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-from .permissions import can_modify_thesis, can_add_thesis
+from .permissions import can_modify_thesis, can_add_thesis, can_delete_thesis
 from .users import wrap_user
 
 
@@ -13,9 +13,11 @@ class ThesisPermissions(BasePermission):
         """Is this request allowed on the specified object?"""
         if not request.user.is_authenticated:
             return False
+        wrapped_user = wrap_user(request.user)
         return (
             request.method in SAFE_METHODS or
-            can_modify_thesis(wrap_user(request.user), obj)
+            request.method == "PATCH" and can_modify_thesis(wrapped_user, obj) or
+            request.method == "DELETE" and can_delete_thesis(wrapped_user, obj)
         )
 
     def has_permission(self, request, view):

@@ -4,7 +4,9 @@ checks used when deserializing a received thesis object and performing actions.
 from apps.users.models import Employee, BaseUser
 
 from .models import Thesis, ThesisStatus
-from .users import ThesisUserType, get_user_type, is_theses_board_member, is_admin
+from .users import (
+    ThesisUserType, get_user_type, is_theses_board_member, is_admin, is_regular_employee
+)
 
 
 def is_thesis_staff(user: BaseUser) -> bool:
@@ -21,6 +23,21 @@ def can_add_thesis(user: BaseUser) -> bool:
 def is_owner_of_thesis(user: BaseUser, thesis: Thesis) -> bool:
     """Is the specified user the advisor of the specified thesis?"""
     return thesis.advisor == user
+
+
+EMPLOYEE_DELETABLE_STATUSES = (
+    ThesisStatus.BEING_EVALUATED,
+    ThesisStatus.RETURNED_FOR_CORRECTIONS
+)
+
+
+def can_delete_thesis(user: BaseUser, thesis: Thesis) -> bool:
+    """Determine if the specified user is permitted to delete the specified thesis"""
+    return (
+        is_admin(user) or
+        is_theses_board_member(user) and not thesis.is_archived() or
+        is_regular_employee(user) and ThesisStatus(thesis.status) in EMPLOYEE_DELETABLE_STATUSES
+    )
 
 
 def can_modify_thesis(user: BaseUser, thesis: Thesis) -> bool:
