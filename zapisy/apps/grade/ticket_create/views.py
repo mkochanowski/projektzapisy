@@ -37,6 +37,10 @@ def ajax_keys_progress(request):
 
 @student_required
 def ajax_get_rsa_keys_step1(request):
+    """
+    For each poll student is allowed to vote in, responds with its public key
+    and information, such as course name, teachers name.
+    """
     if request.method != 'POST':
         return HttpResponse('Wrong request')
 
@@ -55,6 +59,10 @@ def ajax_get_rsa_keys_step1(request):
 
 @student_required
 def ajax_get_rsa_keys_step2(request):
+    """
+    Reads tickets sent by the user, signs them and marks them as already
+    used, so user cannot sign them twice. Responds with generated signatures.
+    """
     if request.method != 'POST':
         return HttpResponse('Wrong request')
 
@@ -69,7 +77,7 @@ def ajax_get_rsa_keys_step2(request):
         secure_mark(request.user, group)
 
     response = [
-        { 'signature': str(signed_ticket) }
+        {'signature': str(signed_ticket)}
         for signed_ticket in signed
     ]
     message = json.dumps(response)
