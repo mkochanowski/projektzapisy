@@ -349,7 +349,7 @@ def secure_signer_without_save(user, g, t):
         return "Niepoprawny format"
 
 
-def normalize_tickets(ts: List[str]) -> List[int]:
+def parse_and_validate_tickets(ts: List[str]) -> List[int]:
     ts_as_int = []
     for ticket in ts:
         try:
