@@ -17,7 +17,6 @@ Ticket.create.init = function () {
     Ticket.create.k_array = new Array();
     Ticket.create.pubkeys_array = new Array();
     Ticket.create.poll_info_array = new Array();
-    Ticket.create.RAND_BITS = 512;
     Ticket.create.used = false;
 
     $("#connection_choice_button").click(function (event) {
@@ -33,13 +32,11 @@ Ticket.create.init = function () {
 
 // Request public keys and poll info from the server
 Ticket.create.step1 = function () {
-    dataString = $("#connection_choice").serialize()
     $("#progressbar").progressbar("option", "value", 10);
     $.ajax({
         type:"POST",
         url:"/grade/ticket/ajax_tickets1",
         dataType:'json',
-        data:dataString,
         success:Ticket.create.step2
     });
     return false;
@@ -75,7 +72,6 @@ Ticket.create.step3 = function (unblinds) {
     $("#progressbar").progressbar("option", "value", 70);
     $.each(unblinds, Ticket.create.unblinds_generator);
 
-    // TODO Make it work properly, this is only temporary workaround
     $('#pregen').css('display', 'none');
     $('#postgen').css('display', '');
     $('#keys')[0].innerHTML = Ticket.create.to_plaintext();
