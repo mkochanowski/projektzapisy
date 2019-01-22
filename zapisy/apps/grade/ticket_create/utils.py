@@ -16,7 +16,6 @@ from apps.grade.ticket_create.models import PublicKey, \
 from functools import cmp_to_key
 from typing import List
 
-RAND_BITS = 512
 KEY_BITS = 1024
 
 
@@ -32,58 +31,6 @@ def flatten(x):
             result.append(el)
 
     return result
-
-
-def gcd(a, b):
-    if b > a:
-        a, b = b, a
-    while a:
-        a, b = b % a, a
-    return b
-
-
-def gcwd(u, v):
-    u1 = 1
-    u2 = 0
-    u3 = u
-    v1 = 0
-    v2 = 1
-    v3 = v
-    while v3 != 0:
-        q = u3 / v3
-        t1 = u1 - q * v1
-        t2 = u2 - q * v2
-        t3 = u3 - q * v3
-        u1 = v1
-        u2 = v2
-        u3 = v3
-        v1 = t1
-        v2 = t2
-        v3 = t3
-    return u1, u2, u3
-
-
-def expMod(a, b, q):
-    p = 1
-
-    while b > 0:
-        if b & 1:
-            p = (p * a) % q
-        a = (a * a) % q
-        b /= 2
-    return p
-
-
-def revMod(a, m):
-    x, y, d = gcwd(a, m)
-
-    if d != 1:
-        return -1
-
-    x %= m
-    if x < 0:
-        x += m
-    return x
 
 
 def cmp(a, b):
@@ -244,25 +191,6 @@ def group_polls_by_course(poll_list):
     return res
 
 
-def connect_groups(groupped_polls, form):
-    connected_groups = []
-    for polls in groupped_polls:
-        if not polls[0].group:
-            label = 'join_common'
-        else:
-            label = 'join_' + str(polls[0].group.course.pk)
-
-        if len(polls) == 1:
-            connected_groups.append(polls)
-        elif form.cleaned_data[label]:
-            connected_groups.append(polls)
-        else:
-            for poll in polls:
-                connected_groups.append([poll])
-
-    return connected_groups
-
-
 def generate_keys(poll_list):
     keys = []
 
@@ -381,21 +309,6 @@ def secure_signer(user, g, t):
         return "Bilet już pobrano",
 
 
-def unblind(poll, st):
-    st = st[0]
-    errors = [
-        "Nie jesteś przypisany do tej ankiety",
-        "Bilet już pobrano",
-        "Niepoprawny format",
-    ]
-    if st in errors:
-        return st
-    else:
-        st = st[0]
-        key = RSA.importKey(PublicKey.objects.get(poll=poll).public_key)
-        return (str(st), str(key.n), str(key.e))
-
-
 def get_valid_tickets(ticket_list):
     err = []
     val = []
@@ -498,24 +411,3 @@ def from_plaintext(tickets_plaintext):
             i += 1
 
     return ids_tickets_signed
-
-
-def generate_ticket(poll_list):
-    # TODO: Docelowo ma być po stronie przeglądarki
-    m = getrandbits(RAND_BITS)
-    blinded = []
-
-    for poll in poll_list:
-        key = RSA.importKey(PublicKey.objects.get(poll=poll).public_key)
-        n = key.n
-        e = key.e
-        k = randint(2, n)
-        while gcd(n, k) != 1:
-            k = randint(1, n)
-
-        a = (m % n)
-        b = expMod(k, e, n)
-        t = (a * b) % n
-
-        blinded.append((poll, t, (m, k)))
-    return blinded
