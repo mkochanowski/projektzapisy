@@ -11,16 +11,19 @@ class ThesisKind(Enum):
     MASTERS = 0
     ENGINEERS = 1
     BACHELORS = 2
-    BACHELORS_ENGINEERS = 3
-    ISIM = 4
+    ISIM = 3
+    # Certain theses will be appropriate for both bachelor and engineer degrees
+    BACHELORS_ENGINEERS = 4
+    BACHELORS_ENGINEERS_ISIM = 5
 
 
 THESIS_KIND_CHOICES = (
     (ThesisKind.MASTERS.value, "mgr"),
     (ThesisKind.ENGINEERS.value, "inż"),
     (ThesisKind.BACHELORS.value, "lic"),
-    (ThesisKind.BACHELORS_ENGINEERS.value, "lic+inż"),
     (ThesisKind.ISIM.value, "isim"),
+    (ThesisKind.BACHELORS_ENGINEERS.value, "lic+inż"),
+    (ThesisKind.BACHELORS_ENGINEERS_ISIM.value, "lic+inż+isim"),
 )
 
 
@@ -34,7 +37,7 @@ class ThesisStatus(Enum):
 
 
 THESIS_STATUS_CHOICES = (
-    (ThesisStatus.BEING_EVALUATED.value, "poddana pod głosowanie"),
+    (ThesisStatus.BEING_EVALUATED.value, "weryfikowana przez komisję"),
     (ThesisStatus.RETURNED_FOR_CORRECTIONS.value, "zwrócona do poprawek"),
     (ThesisStatus.ACCEPTED.value, "zaakceptowana"),
     (ThesisStatus.IN_PROGRESS.value, "w realizacji"),

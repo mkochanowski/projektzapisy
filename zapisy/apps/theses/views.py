@@ -41,11 +41,11 @@ class ThesisTypeFilter(Enum):
     MASTERS = 3
     ENGINEERS = 4
     BACHELORS = 5
-    BACHELORS_ISIM = 6
+    ISIM = 6
     AVAILABLE_MASTERS = 7
     AVAILABLE_ENGINEERS = 8
     AVAILABLE_BACHELORS = 9
-    AVAILABLE_BACHELORS_ISIM = 10
+    AVAILABLE_ISIM = 10
 
     DEFAULT = EVERYTHING
 
@@ -172,6 +172,21 @@ def available_thesis_filter(qs: QuerySet) -> QuerySet:
     ).exclude(_is_archived=True).exclude(reserved=True)
 
 
+# Determines the thesis kinds that match given filter values
+# i.e. if the user asks for all engineer theses, we assume they want
+# all theses suitable for engineer degrees, so bachelors+engineers should
+# be returned as well
+ENGINEERS_KINDS = (k.value for k in (
+    ThesisKind.ENGINEERS, ThesisKind.BACHELORS_ENGINEERS, ThesisKind.BACHELORS_ENGINEERS_ISIM
+))
+BACHELORS_KINDS = (k.value for k in(
+    ThesisKind.BACHELORS, ThesisKind.BACHELORS_ENGINEERS, ThesisKind.BACHELORS_ENGINEERS_ISIM
+))
+ISIM_KINDS = (k.value for k in (
+    ThesisKind.ISIM, ThesisKind.BACHELORS_ENGINEERS_ISIM
+))
+
+
 def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter) -> QuerySet:
     """Returns only theses matching the specified type filter from the specified queryset"""
     if thesis_type == ThesisTypeFilter.EVERYTHING:
@@ -183,19 +198,19 @@ def filter_theses_queryset_for_type(qs: QuerySet, thesis_type: ThesisTypeFilter)
     elif thesis_type == ThesisTypeFilter.MASTERS:
         return qs.filter(kind=ThesisKind.MASTERS.value)
     elif thesis_type == ThesisTypeFilter.ENGINEERS:
-        return qs.filter(kind=ThesisKind.ENGINEERS.value)
+        return qs.filter(kind__in=ENGINEERS_KINDS)
     elif thesis_type == ThesisTypeFilter.BACHELORS:
-        return qs.filter(kind=ThesisKind.BACHELORS.value)
-    elif thesis_type == ThesisTypeFilter.BACHELORS_ISIM:
-        return qs.filter(kind=ThesisKind.ISIM.value)
+        return qs.filter(kind__in=BACHELORS_KINDS)
+    elif thesis_type == ThesisTypeFilter.ISIM:
+        return qs.filter(kind__in=ISIM_KINDS)
     elif thesis_type == ThesisTypeFilter.AVAILABLE_MASTERS:
         return available_thesis_filter(qs.filter(kind=ThesisKind.MASTERS.value))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_ENGINEERS:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.ENGINEERS.value))
+        return available_thesis_filter(qs.filter(kind__in=ENGINEERS_KINDS))
     elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.BACHELORS.value))
-    elif thesis_type == ThesisTypeFilter.AVAILABLE_BACHELORS_ISIM:
-        return available_thesis_filter(qs.filter(kind=ThesisKind.ISIM.value))
+        return available_thesis_filter(qs.filter(kind__in=BACHELORS_KINDS))
+    elif thesis_type == ThesisTypeFilter.AVAILABLE_ISIM:
+        return available_thesis_filter(qs.filter(kind__in=ISIM_KINDS))
     # Should never get here
     return qs
 
