@@ -20,7 +20,8 @@ class Migration(migrations.Migration):
                 ('num_required_votes', models.SmallIntegerField()),
             ],
             options={
-                'verbose_name_plural': 'ustawienia systemu prac dyplomowych',
+                'verbose_name': 'ustawienia systemu prac dyplomowych',
+                'verbose_name_plural': 'ustawienia systemu prac dyplomowych'
             },
         ),
         migrations.CreateModel(
@@ -28,12 +29,12 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=300, unique=True)),
-                ('kind', models.SmallIntegerField(choices=[(0, 'mgr'), (1, 'inż'), (2, 'lic'), (3, 'lic+inż'), (4, 'isim')])),
-                ('status', models.SmallIntegerField(choices=[(1, 'poddana pod głosowanie'), (2, 'zwrócona do poprawek'), (3, 'zaakceptowana'), (4, 'w realizacji'), (5, 'obroniona')])),
+                ('kind', models.SmallIntegerField(choices=[(0, 'mgr'), (1, 'inż'), (2, 'lic'), (3, 'isim'), (4, 'lic+inż'), (5, 'lic+inż+isim')])),
+                ('status', models.SmallIntegerField(choices=[(1, 'weryfikowana przez komisję'), (2, 'zwrócona do poprawek'), (3, 'zaakceptowana'), (4, 'w realizacji'), (5, 'obroniona')])),
                 ('reserved', models.BooleanField(default=False)),
                 ('description', models.TextField(blank=True)),
                 ('added_date', models.DateTimeField(auto_now_add=True)),
-                ('modified_date', models.DateTimeField(auto_now=True)),
+                ('modified_date', models.DateTimeField(auto_now_add=True)),
                 ('advisor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='thesis_advisor', to='users.Employee')),
                 ('auxiliary_advisor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='thesis_auxiliary_advisor', to='users.Employee')),
                 ('student', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='thesis_student', to='users.Student')),

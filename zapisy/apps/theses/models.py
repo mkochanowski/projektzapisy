@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 
 from django.db import models
 
@@ -46,6 +47,12 @@ THESIS_STATUS_CHOICES = (
 
 
 class Thesis(models.Model):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Save the status so that, when saving, we can determine whether or not it changed
+        # See https://stackoverflow.com/a/1793323
+        self.__original_status = self.status
+
     title = models.CharField(max_length=MAX_THESIS_TITLE_LEN, unique=True)
     advisor = models.ForeignKey(
         Employee, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_advisor",
@@ -65,7 +72,8 @@ class Thesis(models.Model):
         Student, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_student_2",
     )
     added_date = models.DateTimeField(auto_now_add=True)
-    modified_date = models.DateTimeField(auto_now=True)
+    # A thesis is _modified_ when its status changes
+    modified_date = models.DateTimeField(auto_now_add=True)
 
     def is_archived(self):
         return self.status == ThesisStatus.DEFENDED.value
@@ -79,7 +87,11 @@ class Thesis(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()
+        if self.status != self.__original_status:
+            # If the status changed, update modified date
+            self.modified_date = datetime.now()
         super().save(*args, **kwargs)
+        self.__original_status = self.status
 
     class Meta:
         verbose_name = "praca dyplomowa"
