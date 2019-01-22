@@ -15,7 +15,7 @@ from apps.enrollment.courses.models.semester import Semester
 from apps.grade.poll.models.poll import Poll
 from apps.grade.ticket_create.utils import generate_keys_for_polls, generate_keys, group_polls_by_course, \
     secure_signer, unblind, get_valid_tickets, to_plaintext, connect_groups, secure_signer_without_save, \
-    secure_mark, normalize_tickets, get_poll_info_as_dict, get_pubkey_as_dict
+    secure_mark, parse_and_validate_tickets, get_poll_info_as_dict, get_pubkey_as_dict
 from apps.grade.ticket_create.models import PublicKey
 from apps.grade.ticket_create.forms import ContactForm, PollCombineForm
 from apps.users.decorators import employee_required, student_required
@@ -37,62 +37,42 @@ def ajax_keys_progress(request):
 
 @student_required
 def ajax_get_rsa_keys_step1(request):
-    message = "No XHR"
-    if request.is_ajax():
-        if request.method == 'POST':
-            students_polls = Poll.get_all_polls_for_student(request.user.student)
-            groupped_polls = group_polls_by_course(students_polls)
-            form = PollCombineForm(request.POST,
-                                   polls=groupped_polls)
-            if form.is_valid():
-                connected_groups = connect_groups(groupped_polls, form)
-                data = []
-                for poll in connected_groups:
-                    # TODO handle this properly?
-                    # im not sure how it works, but seems like len(poll) == 1 is always true
-                    assert len(poll) == 1
-                    poll = poll[0]
-                    poll_data = {
-                        'key': get_pubkey_as_dict(poll),
-                        'poll_info': get_poll_info_as_dict(poll),
-                    }
-                    data.append(poll_data)
-                message = json.dumps(data)
+    if request.method != 'POST':
+        return HttpResponse('Wrong request')
+
+    students_polls = Poll.get_all_polls_for_student(request.user.student)
+    if True:
+        data = []
+        for poll in students_polls:
+            poll_data = {
+                'key': get_pubkey_as_dict(poll),
+                'poll_info': get_poll_info_as_dict(poll),
+            }
+            data.append(poll_data)
+        message = json.dumps(data)
     return HttpResponse(message)
 
 
 @student_required
 def ajax_get_rsa_keys_step2(request):
-    message = "No XHR"
-    if request.is_ajax():
-        if request.method == 'POST':
-            students_polls = Poll.get_all_polls_for_student(request.user.student)
-            groupped_polls = group_polls_by_course(students_polls)
-            form = PollCombineForm(
-                request.POST,
-                polls=groupped_polls
-            )
-            if form.is_valid():
-                ts = json.loads(request.POST.get('ts'))
-                ts_to_sign = normalize_tickets(ts)
-                connected_groups = connect_groups(groupped_polls, form)
-                groups = reduce(list.__add__, connected_groups)
-                tickets_arr = zip(groups, ts_to_sign)
+    if request.method != 'POST':
+        return HttpResponse('Wrong request')
 
-                signed = []
-                for group, ticket in tickets_arr:
-                    signature = secure_signer_without_save(request.user, group, ticket)
-                    signed.append((group, ticket, signature))
-                    secure_mark(request.user, group)
+    students_polls = Poll.get_all_polls_for_student(request.user.student)
+    raw_tickets = json.loads(request.POST.get('ts'))
+    tickets = parse_and_validate_tickets(raw_tickets)
 
-                unblinds = []
-                for _, _, ticket_signature in signed:
-                    unblinds.append(
-                        {
-                            'signature': str(ticket_signature)
-                        }
-                    )
-                message = json.dumps(unblinds)
+    signed = []
+    for group, ticket in zip(students_polls, tickets):
+        signed_ticket = secure_signer_without_save(request.user, group, ticket)
+        signed.append(signed_ticket)
+        secure_mark(request.user, group)
+
+    response = [
+        { 'signature': str(signed_ticket) }
+        for signed_ticket in signed
+    ]
+    message = json.dumps(response)
     return HttpResponse(message)
 
 
