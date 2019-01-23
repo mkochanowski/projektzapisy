@@ -2,7 +2,7 @@ import json
 from functools import reduce
 
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
@@ -45,16 +45,14 @@ def ajax_get_rsa_keys_step1(request):
         return HttpResponse('Wrong request')
 
     students_polls = Poll.get_all_polls_for_student(request.user.student)
-    if True:
-        data = []
-        for poll in students_polls:
-            poll_data = {
-                'key': get_pubkey_as_dict(poll),
-                'poll_info': get_poll_info_as_dict(poll),
-            }
-            data.append(poll_data)
-        message = json.dumps(data)
-    return HttpResponse(message)
+    response_data = []
+    for poll in students_polls:
+        poll_data = {
+            'key': get_pubkey_as_dict(poll),
+            'poll_info': get_poll_info_as_dict(poll),
+        }
+        response_data.append(poll_data)
+    return JsonResponse(response_data, safe=False)
 
 
 @student_required
@@ -67,7 +65,10 @@ def ajax_get_rsa_keys_step2(request):
         return HttpResponse('Wrong request')
 
     students_polls = Poll.get_all_polls_for_student(request.user.student)
-    raw_tickets = json.loads(request.POST.get('ts'))
+    try:
+        raw_tickets = json.loads(request.body.decode("utf-8"))
+    except json.decoder.JSONDecodeError:
+        return HttpResponse('Wrong request')
     tickets = parse_and_validate_tickets(raw_tickets)
 
     signed = []
@@ -80,8 +81,7 @@ def ajax_get_rsa_keys_step2(request):
         {'signature': str(signed_ticket)}
         for signed_ticket in signed
     ]
-    message = json.dumps(response)
-    return HttpResponse(message)
+    return JsonResponse(response, safe=False)
 
 
 @student_required
