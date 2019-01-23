@@ -5,7 +5,7 @@
 import { ThesisKind, ThesisStatus } from "./protocol_types";
 import { Thesis, MAX_THESIS_TITLE_LEN } from "./thesis";
 import { Person } from "./users";
-import { formatDate } from "./utils";
+import { Moment } from "moment";
 
 /**
  * The representation of a new thesis object sent to the backend
@@ -15,7 +15,7 @@ type ThesisAddOutSerialized = {
 	advisor?: number | null;
 	auxiliary_advisor?: number | null;
 	kind?: ThesisKind;
-	reservedUntil?: string | null;
+	reserved_until?: string | null;
 	description?: string;
 	status?: ThesisStatus;
 	student?: number | null;
@@ -54,7 +54,7 @@ export function serializeNewThesis(thesis: Thesis): ThesisAddOutSerialized {
 		result.student_2 = toPersonDispatch(thesis.secondStudent);
 	}
 	if (thesis.reservedUntil) {
-		result.reservedUntil = thesis.reservedUntil.toISOString();
+		result.reserved_until = serializeReservationDate(thesis.reservedUntil);
 	}
 	return result;
 }
@@ -106,7 +106,7 @@ export function serializeThesisDiff(orig: Thesis, mod: Thesis): ThesisModOutSeri
 		result.kind = mod.kind;
 	}
 	if (!orig.isReservationDateSame(mod.reservedUntil)) {
-		result.reservedUntil = mod.reservedUntil ? formatDate(mod.reservedUntil) : null;
+		result.reserved_until = mod.reservedUntil ? serializeReservationDate(mod.reservedUntil) : null;
 	}
 	if (orig.description !== mod.description) {
 		result.description = mod.description;
@@ -116,4 +116,8 @@ export function serializeThesisDiff(orig: Thesis, mod: Thesis): ThesisModOutSeri
 	}
 
 	return result;
+}
+
+function serializeReservationDate(date: Moment) {
+	return date.format("YYYY-MM-DD");
 }

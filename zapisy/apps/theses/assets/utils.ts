@@ -15,10 +15,14 @@ export function getDisabledStyle(): React.CSSProperties {
 }
 
 /**
- * Format a given moment instance to string.
+ * Format a given moment instance to a date string.
  */
 export function formatDate(m: Moment): string {
-	return m.format("DD/MM/YYYY HH:mm:ss");
+	return m.format("DD.MM.YYYY");
+}
+
+export function formatDateTime(m: Moment): string {
+	return m.format("DD.MM.YYYY HH:mm:ss");
 }
 
 /**

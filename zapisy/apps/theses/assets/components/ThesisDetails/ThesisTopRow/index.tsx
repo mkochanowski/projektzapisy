@@ -12,7 +12,7 @@ import { Thesis } from "../../../thesis";
 import { ThesisStatus } from "../../../protocol_types";
 import { ThesisReservationIndicator } from "./ThesisReservationIndicator";
 import { InputWithLabel, InputType } from "./InputWithLabel";
-import { formatDate } from "../../../utils";
+import { formatDateTime } from "../../../utils";
 
 const TopRowContainer = styled.div`
 	display: flex;
@@ -54,7 +54,7 @@ export class ThesisTopRow extends React.PureComponent<Props> {
 			<InputWithLabel
 				labelText={"Aktualizacja"}
 				inputWidth={DATE_UPDATED_WIDTH}
-				inputText={mode === ThesisWorkMode.Editing ? formatDate(thesis.modifiedDate) : ""}
+				inputText={mode === ThesisWorkMode.Editing ? formatDateTime(thesis.modifiedDate) : ""}
 				inputType={InputType.ReadOnly}
 			/>
 			</ElementWrapper>
