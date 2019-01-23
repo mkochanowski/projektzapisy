@@ -47,17 +47,12 @@ Ticket.create.step1 = function () {
 Ticket.create.step2 = function (data) {
     $("#progressbar").progressbar("option", "value", 30);
     $.each(data, Ticket.create.t_generator);
-    var hidden = document.createElement('input')
-    hidden.name = 'ts'
-    hidden.type = 'hidden'
-    hidden.value = JSON.stringify(Ticket.create.t_array)
-    $("#connection_choice").append(hidden);
-    dataString = $("#connection_choice").serialize()
+    tickets_as_json = JSON.stringify(Ticket.create.t_array);
     $.ajax({
         type:"POST",
         url:"/grade/ticket/ajax_tickets2",
         dataType:'json',
-        data:dataString,
+        data:tickets_as_json,
         success:Ticket.create.step3
     });
 }
@@ -68,9 +63,9 @@ Ticket.create.step2 = function (data) {
 // ticket and its signature to the server to do
 // rendering for us(this should be done client side)
 
-Ticket.create.step3 = function (unblinds) {
+Ticket.create.step3 = function (signed_tickets) {
     $("#progressbar").progressbar("option", "value", 70);
-    $.each(unblinds, Ticket.create.unblinds_generator);
+    $.each(signed_tickets, Ticket.create.unblinds_generator);
 
     $('#pregen').css('display', 'none');
     $('#postgen').css('display', '');
@@ -88,22 +83,12 @@ Ticket.create.step3 = function (unblinds) {
 }
 
 Ticket.create.unblinds_generator = function (index, unblind) {
-    if (unblind[1] == "Nie jesteś przypisany do tej ankiety") {
-        Ticket.create.unblindst_array.push(unblind[1])
-        Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10))
-    }
-    else if (unblind[1] == "Bilet już pobrano") {
-        Ticket.create.unblindst_array.push(unblind[1])
-        Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10))
-    }
-    else {
-        var st = str2bigInt(unblind.signature, 10);
-        var pubkey = Ticket.create.pubkeys_array[index];
-        var n = pubkey.n;
-        var rk = inverseMod(Ticket.create.k_array[index], n);
-        Ticket.create.unblindst_array.push(bigInt2str(multMod(st, rk, n), 10));
-        Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10));
-    }
+    var signature = str2bigInt(unblind.signature, 10);
+    var pubkey = Ticket.create.pubkeys_array[index];
+    var n = pubkey.n;
+    var r_inverse = inverseMod(Ticket.create.k_array[index], n);
+    Ticket.create.unblindst_array.push(bigInt2str(multMod(signature, r_inverse, n), 10));
+    Ticket.create.unblindt_array.push(bigInt2str(Ticket.create.m_array[index], 10));
 }
 
 // This is where core of our crypto happens
@@ -111,7 +96,7 @@ Ticket.create.unblinds_generator = function (index, unblind) {
 // then the ticket is computed as SHA256(m) * k^e mod n
 // SHA256(m) means that we convert int m to string with base 10,
 // compute SHA256 of it, and then convert it back to int
-Ticket.create.t_generator = function (key, poll_data) {
+Ticket.create.t_generator = function (index, poll_data) {
     var n = str2bigInt(poll_data.key.n, 10, 10);
     var e = str2bigInt(poll_data.key.e, 10, 10);
     Ticket.create.pubkeys_array.push({
