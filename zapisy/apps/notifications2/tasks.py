@@ -5,6 +5,8 @@ from django_rq import job
 
 from apps.notifications2.repositories import get_notifications_repository
 from apps.notifications2.utils import render_description
+from apps.notifications2.models import NotificationPreferencesStudent, NotificationPreferencesTeacher
+from apps.users.models import BaseUser
 
 
 @job('dispatch-notifications')
@@ -18,11 +20,18 @@ def dispatch_notifications_task(user):
 
     TODO: respect user's preferences
     """
+    if BaseUser.is_employee(user):
+        model, created = NotificationPreferencesTeacher.objects.get_or_create(user=user)
+    else:
+        model, created = NotificationPreferencesStudent.objects.get_or_create(user=user)
 
     repo = get_notifications_repository()
     pending_notifications = repo.get_unsent_for_user(user)
 
     for pn in pending_notifications:
+        if not getattr(model, pn.description_id):
+            continue
+
         ctx = {
             'content': render_description(
                 pn.description_id, pn.description_args),
