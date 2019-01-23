@@ -17,8 +17,6 @@ def dispatch_notifications_task(user):
     at a time instead of handling them one by one
     so we can introduce a rate-limit and/or batch them together
     should there ever be a need to do so.
-
-    TODO: respect user's preferences
     """
     if BaseUser.is_employee(user):
         model, created = NotificationPreferencesTeacher.objects.get_or_create(user=user)

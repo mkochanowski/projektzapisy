@@ -3,7 +3,7 @@ import logging
 import environ
 import sys
 
-TESTING = sys.argv[1:2] == ['test']
+TESTING = 'test' in sys.argv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
