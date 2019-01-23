@@ -171,17 +171,17 @@ def available_thesis_filter(qs: QuerySet) -> QuerySet:
     """Returns only theses that are considered "available" from the specified queryset"""
     return qs.exclude(
         status=ThesisStatus.IN_PROGRESS.value
-    ).exclude(_is_archived=True).exclude(reserved=True)
+    ).exclude(_is_archived=True).filter(reserved_until__isnull=True)
 
 
 # Determines the thesis kinds that match given filter values
 # i.e. if the user asks for all engineer theses, we assume they want
 # all theses suitable for engineer degrees, so bachelors+engineers should
 # be returned as well
-ENGINEERS_KINDS = (k.value for k in (
+ENGINEERS_KINDS = tuple(k.value for k in (
     ThesisKind.ENGINEERS, ThesisKind.BACHELORS_ENGINEERS, ThesisKind.BACHELORS_ENGINEERS_ISIM
 ))
-BACHELORS_KINDS = (k.value for k in(
+BACHELORS_KINDS = tuple(k.value for k in(
     ThesisKind.BACHELORS, ThesisKind.BACHELORS_ENGINEERS, ThesisKind.BACHELORS_ENGINEERS_ISIM
 ))
 BACHELORS_OR_ENGINEERS_KINDS = tuple(set(ENGINEERS_KINDS + BACHELORS_KINDS))

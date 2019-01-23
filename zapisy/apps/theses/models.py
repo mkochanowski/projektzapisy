@@ -63,7 +63,7 @@ class Thesis(models.Model):
     )
     kind = models.SmallIntegerField(choices=THESIS_KIND_CHOICES)
     status = models.SmallIntegerField(choices=THESIS_STATUS_CHOICES)
-    reserved_until = models.DateTimeField(null=True)
+    reserved_until = models.DateField(null=True)
     description = models.TextField(blank=True)
     student = models.ForeignKey(
         Student, on_delete=models.PROTECT, blank=True, null=True, related_name="thesis_student",

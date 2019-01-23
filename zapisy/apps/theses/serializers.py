@@ -96,7 +96,6 @@ class ThesisSerializer(serializers.ModelSerializer):
     student_2 = ThesesPersonSerializer(
         allow_null=True, required=False, queryset=Student.objects.all()
     )
-    reserved_until = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z")
     modified_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S%z", required=False)
 
     # We need to define this field here manually to disable DRF's unique validator which
