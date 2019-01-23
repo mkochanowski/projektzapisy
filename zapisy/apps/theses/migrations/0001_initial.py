@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=300, unique=True)),
                 ('kind', models.SmallIntegerField(choices=[(0, 'mgr'), (1, 'inż'), (2, 'lic'), (3, 'isim'), (4, 'lic+inż'), (5, 'lic+inż+isim')])),
                 ('status', models.SmallIntegerField(choices=[(1, 'weryfikowana przez komisję'), (2, 'zwrócona do poprawek'), (3, 'zaakceptowana'), (4, 'w realizacji'), (5, 'obroniona')])),
-                ('reserved_until', models.DateField(null=True)),
+                ('reserved_until', models.DateField(blank=True, null=True)),
                 ('description', models.TextField(blank=True)),
                 ('added_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now_add=True)),
