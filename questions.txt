@@ -7,19 +7,20 @@
 
 
 
-todo: filters: lic OR inz
-typ: lic inz isim
-when rejecting, require a reason (min 100)
-accepting unconditionally happens when limit reached
-reject symbol -> a yellow question mark
-rejection reasons as <titles> for question mark votes
-one special user can actually reject (change status), this automatically
+todo: 
+x filters: lic OR inz
+x typ: lic inz isim
+v when rejecting, require a reason (min 100)
+v accepting unconditionally happens when limit reached
+x reject symbol -> a yellow question mark
+v rejection reasons as <titles> for question mark votes
+v one special user can actually reject (change status), this automatically
 sends an email to the advisor
-email when a question mark is posted
-when accepted, can't vote
+v email when a question mark is posted
+v when accepted, can't vote
 new field: when creating a thesis, date of reservation, by default today+2 yrs
 advisor can set thesis as defended
-Poddana pod glosowanie -> Weryfikowana przez komisje
+x Poddana pod glosowanie -> Weryfikowana przez komisje
 warn when setting to defended
 deleting theses? advisor self
-update date is only status update date, add date removed
+x update date is only status update date, add date removed
